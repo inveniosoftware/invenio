@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -80,7 +80,9 @@ CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE = @prefix@/etc/bibrank/stopwords.kb
 ## helper style of variables for WebSubmit:
 CFG_WEBSUBMIT_COUNTERSDIR = @localstatedir@/data/submit/counters
 CFG_WEBSUBMIT_STORAGEDIR = @localstatedir@/data/submit/storage
-CFG_WEBSUBMIT_FILEDIR = @localstatedir@/data/files
 CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = @prefix@/etc/bibconvert/config
+
+## helper style of variables for BibDocFile:
+CFG_BIBDOCFILE_FILEDIR = @localstatedir@/data/files
 
 ## - end of file -

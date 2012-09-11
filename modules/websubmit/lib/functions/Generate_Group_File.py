@@ -54,7 +54,7 @@ def Generate_Group_File(parameters, curdir, form, user_info=None):
         err_msg = "Error: Unable to create Group file [%s/%s]. " \
           "Perhaps check directory permissions. " \
           % (curdir, CFG_WEBSUBMIT_GROUP_FILE_NAME)
-        register_exception(req=req_obj, prefix=err_msg)
+        register_exception(prefix=err_msg)
         raise InvenioWebSubmitFunctionError(err_msg)
     ## Return an empty string:
     return ""

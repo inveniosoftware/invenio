@@ -90,6 +90,19 @@ def convert_conf_option(option_name, option_value):
     ## 1) convert option name to uppercase:
     option_name = option_name.upper()
 
+    ## 1a) adjust renamed variables:
+    if option_name in ['CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
+                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
+                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
+                          'CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT',
+                          'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
+                          'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
+        new_option_name = option_name.replace('WEBSUBMIT', 'BIBDOCFILE')
+        print >> sys.stderr, ("""WARNING: %s has been renamed to %s.
+Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name))
+        option_name = new_option_name
+
+
     ## 2) convert option value to int or string:
     if option_name in ['CFG_BIBUPLOAD_REFERENCE_TAG',
                        'CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG',
@@ -137,12 +150,12 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBSCHED_NODE_TASKS',
                        'CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE',
                        'CFG_OAI_METADATA_FORMATS',
-                       'CFG_WEBSUBMIT_DESIRED_CONVERSIONS',
+                       'CFG_BIBDOCFILE_DESIRED_CONVERSIONS',
                        'CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM',
                        'CFG_WEB_API_KEY_ALLOWED_URL',
-                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
-                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
-                       'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS']:
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES',
+                       'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS']:
         try:
             option_value = option_value[1:-1]
         except TypeError:
@@ -166,7 +179,7 @@ You may want to customise your invenio-local.conf configuration accordingly."""
 
     ## 3d) special cases: comma-separated lists
     if option_name in ['CFG_SITE_LANGS',
-                       'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
+                       'CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
                        'CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS',
                        'CFG_BIBUPLOAD_STRONG_TAGS',
                        'CFG_BIBFORMAT_HIDDEN_TAGS',
@@ -226,6 +239,18 @@ You may want to customise your invenio-local.conf configuration accordingly."""
 CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS.
 Please, update your invenio-local.conf file accordingly.""")
         option_value = option_value[1:-1]
+    elif option_name in ['CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
+                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
+                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
+                          'CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT',
+                          'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
+                          'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
+        new_option_name = option_name.replace('WEBSUBMIT', 'BIBDOCFILE')
+        print >> sys.stderr, ("""ERROR: %s has been renamed to %s.
+Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name))
+        option_name = new_option_name
+
+
 
     ## 5) finally, return output line:
     return '%s = %s' % (option_name, option_value)
@@ -831,7 +856,7 @@ def cli_cmd_create_apache_conf(conf):
         xsendfile_directive = "XSendFile On\n"
     else:
         xsendfile_directive = "#XSendFile On\n"
-    for path in (conf.get('Invenio', 'CFG_WEBSUBMIT_FILEDIR'), # BibDocFile
+    for path in (conf.get('Invenio', 'CFG_BIBDOCFILE_FILEDIR'), # BibDocFile
             conf.get('Invenio', 'CFG_WEBDIR'),
             conf.get('Invenio', 'CFG_WEBSUBMIT_STORAGEDIR'), # WebSubmit
             conf.get('Invenio', 'CFG_TMPDIR'),

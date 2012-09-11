@@ -34,7 +34,7 @@ import time
 import os
 
 from invenio.bibdocfile import \
-     InvenioWebSubmitFileError, \
+     InvenioBibDocFileError, \
      BibRecDocs
 from invenio.errorlib import register_exception
 from invenio.websubmit_icon_creator import \
@@ -43,7 +43,7 @@ from invenio.config import CFG_BINDIR
 from invenio.dbquery import run_sql
 from invenio.websubmit_functions.Shared_Functions import \
      createRelatedFormats
-from invenio.websubmit_managedocfiles import get_description_and_comment
+from invenio.bibdocfile_managedocfiles import get_description_and_comment
 
 def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -207,7 +207,7 @@ def add(bibrecdocs, curdir, sysno, file_path, doctype,
                     ' to ' + bibdoc.get_docname() + ': ' + iconpath)
 
 
-    except InvenioWebSubmitFileError, e:
+    except InvenioBibDocFileError, e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Revised_Files_to_Storage ' \
@@ -256,7 +256,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
                 _do_log(curdir, '  Added ' + bibdoc.get_docname() + ': ' + \
                         file_path)
 
-            except InvenioWebSubmitFileError, e:
+            except InvenioBibDocFileError, e:
                 _do_log(curdir, str(e))
                 register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
                                    'tried to revise a file %s ' \
@@ -289,7 +289,7 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
             _do_log(curdir, '  Addeded format ' + additional_format + \
                     ' to ' + bibdoc.get_docname() + ': ' + iconpath)
 
-    except InvenioWebSubmitFileError, e:
+    except InvenioBibDocFileError, e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Revised_Files_to_Storage ' \

@@ -44,7 +44,9 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
                             page_not_authorized
-from invenio.websubmit_config import *
+from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES, \
+    InvenioWebSubmitFunctionError, InvenioWebSubmitFunctionStop, \
+    InvenioWebSubmitFunctionWarning
 from invenio.messages import gettext_set_language, wash_language
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception

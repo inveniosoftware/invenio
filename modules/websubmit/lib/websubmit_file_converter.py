@@ -72,7 +72,7 @@ from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_LOGDIR, \
     CFG_BIBSCHED_PROCESS_USER, \
     CFG_BIBDOCFILE_BEST_FORMATS_TO_EXTRACT_TEXT_FROM, \
-    CFG_WEBSUBMIT_DESIRED_CONVERSIONS
+    CFG_BIBDOCFILE_DESIRED_CONVERSIONS
 
 from invenio.errorlib import register_exception
 
@@ -268,7 +268,7 @@ def get_missing_formats(filelist, desired_conversion=None):
         return ret
 
     if desired_conversion is None:
-        desired_conversion = CFG_WEBSUBMIT_DESIRED_CONVERSIONS
+        desired_conversion = CFG_BIBDOCFILE_DESIRED_CONVERSIONS
 
     available_formats = [decompose_file(filename, skip_version=True)[2] for filename in filelist]
     missing_formats = []

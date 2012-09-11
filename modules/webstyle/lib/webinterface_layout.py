@@ -24,9 +24,6 @@ This module binds together Invenio's modules and maps them to
 their corresponding URLs (ie, /search to the websearch modules,...)
 """
 
-__revision__ = \
-    "$Id$"
-
 from invenio.webinterface_handler import create_handler
 from invenio.errorlib import register_exception
 from invenio.webinterface_handler import WebInterfaceDirectory
@@ -82,10 +79,10 @@ except:
     WebInterfaceUnAPIPages = WebInterfaceDumbPages
 
 try:
-    from invenio.websubmit_webinterface import websubmit_legacy_getfile
+    from invenio.bibdocfile_webinterface import bibdocfile_legacy_getfile
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    websubmit_legacy_getfile = WebInterfaceDumbPages
+    bibdocfile_legacy_getfile = WebInterfaceDumbPages
 
 try:
     from invenio.websubmit_webinterface import WebInterfaceSubmitPages
@@ -264,7 +261,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         ] + test_exports + openaire_exports
 
     def __init__(self):
-        self.getfile = websubmit_legacy_getfile
+        self.getfile = bibdocfile_legacy_getfile
         if CFG_DEVEL_SITE:
             self.httptest = WebInterfaceHTTPTestPages()
         if CFG_OPENAIRE_SITE:

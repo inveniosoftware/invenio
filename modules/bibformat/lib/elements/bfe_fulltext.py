@@ -25,7 +25,7 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, com
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD, \
     CFG_BIBFORMAT_HIDDEN_FILE_FORMATS
-from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE
+from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
 from cgi import escape, parse_qs
 from urlparse import urlparse
 from os.path import basename
@@ -282,7 +282,7 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                                 for f in doc.list_all_files()]:
                         assigned = True
                         if not include_subformat_icons and \
-                               CFG_WEBSUBMIT_ICON_SUBFORMAT_RE.match(subformat):
+                               CFG_BIBDOCFILE_ICON_SUBFORMAT_RE.match(subformat):
                             # This is an icon and we want to skip it
                             continue
                         if not doc.doctype == 'Main' and \

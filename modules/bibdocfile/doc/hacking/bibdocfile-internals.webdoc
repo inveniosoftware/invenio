@@ -17,23 +17,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<!-- WebDoc-Page-Title: WebSubmit Internals -->
+<!-- WebDoc-Page-Title: BibDocFile Internals -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 This page summarizes all the information suitable to dig inside
-the WebSubmit internals.
+the BibDocFile internals.
 
 <blockquote>
  <dl>
-  <dt><a href="websubmit-file-converter">Conversion tools</a> </dt>
-  <dd>Explains how to convert from a file format to an other, and how to perform OCR.</dd>
-
-  <dt><a href="websubmit-file-stamper">Stamping fulltextes</a> </dt>
-  <dd>Explains how to stamp fulltextes.</dd>
-
-  <dt><a href="websubmit-icon-creator">Icon creation tools</a> </dt>
-  <dd>Explains how to create icons from fulltextes.</dd>
+  <dt><a href="bibdocfile-api">BibDocFile API</a></dt>
+  <dd>Explains the fulltext document management library.</dd>
  </dl>
 </dl>
 </blockquote>

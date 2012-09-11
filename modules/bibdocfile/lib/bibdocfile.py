@@ -36,7 +36,7 @@ This module implements the low-level API for dealing with fulltext files.
       synonim for a physical file.
 
 @group Main classes: BibRecDocs,BibDoc,BibDocFile
-@group Other classes: BibDocMoreInfo,Md5Folder,InvenioWebSubmitFileError
+@group Other classes: BibDocMoreInfo,Md5Folder,InvenioBibDocFileError
 @group Main functions: decompose_file,stream_file,bibdocfile_*,download_url
 @group Configuration Variables: CFG_*
 """
@@ -107,9 +107,9 @@ from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
 from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
-    CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR,\
-    CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
-    CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
+    CFG_WEBDIR, CFG_BIBDOCFILE_FILEDIR,\
+    CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
+    CFG_BIBDOCFILE_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
     CFG_TMPDIR, CFG_TMPSHAREDDIR, CFG_PATH_MD5SUM, \
     CFG_WEBSUBMIT_STORAGEDIR, \
@@ -119,11 +119,10 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE
 
-from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, \
-    CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
+from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
+    CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 import invenio.template
-websubmit_templates = invenio.template.load('websubmit')
-websearch_templates = invenio.template.load('websearch')
+bibdocfile_templates = invenio.template.load('bibdocfile')
 
 #: block size when performing I/O.
 CFG_BIBDOCFILE_BLOCK_SIZE = 1024 * 8
@@ -187,7 +186,7 @@ def _generate_extensions():
     _tmp_extensions = _mimes.encodings_map.keys() + \
                 _mimes.suffix_map.keys() + \
                 _mimes.types_map[1].keys() + \
-                CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS
+                CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS
     extensions = []
     for ext in _tmp_extensions:
         if ext.startswith('.'):
@@ -204,18 +203,24 @@ def _generate_extensions():
 #: Regular expression to recognized extensions.
 _extensions = _generate_extensions()
 
-class InvenioWebSubmitFileError(Exception):
+class InvenioBibDocFileError(Exception):
     """
     Exception raised in case of errors related to fulltext files.
     """
     pass
 
-class InvenioBibdocfileUnauthorizedURL(Exception):
+class InvenioWebSubmitFileError(InvenioBibDocFileError):
     """
-    Exception raised when one tries to download an unauthorized external URL.
+    Exception raised in case of errors related to fulltext files.
     """
+    ## NOTE: this is a legacy Exception
     pass
 
+class InvenioBibdocfileUnauthorizedURL(Exception):
+    """
+    Exception raised in case it is not possible to access a certain URL
+    """
+    pass
 def file_strip_ext(afile, skip_version=False, only_known_extensions=False, allow_subformat=True):
     """
     Strip in the best way the extension from a filename.
@@ -742,7 +747,7 @@ class BibRecDocs:
                into C{docname1}.
             2. C{docname2} is marked as deleted.
 
-        @raise InvenioWebSubmitFileError: if at least one format in C{docname2}
+        @raise InvenioBibDocFileError: if at least one format in C{docname2}
             already exists in C{docname1}. (In this case the two bibdocs are
             preserved)
         @note: comments and descriptions are also copied.
@@ -756,7 +761,7 @@ class BibRecDocs:
         for bibdocfile in bibdoc2.list_latest_files():
             format = bibdocfile.get_format()
             if bibdoc1.format_already_exists_p(format):
-                raise InvenioWebSubmitFileError('Format %s already exists in bibdoc %s of record %s. It\'s impossible to merge bibdoc %s into it.' % (format, docname1, self.id, docname2))
+                raise InvenioBibDocFileError('Format %s already exists in bibdoc %s of record %s. It\'s impossible to merge bibdoc %s into it.' % (format, docname1, self.id, docname2))
 
         ## Importing restriction if needed.
         restriction1 = bibdoc1.get_status()
@@ -781,13 +786,13 @@ class BibRecDocs:
         @type docname: string
         @return: the identifier corresponding to the given C{docname}.
         @rtype: integer
-        @raise InvenioWebSubmitFileError: if the C{docname} does not
+        @raise InvenioBibDocFileError: if the C{docname} does not
             corresponds to a document attached to this record.
         """
         for bibdoc in self.bibdocs:
             if bibdoc.docname == docname:
                 return bibdoc.id
-        raise InvenioWebSubmitFileError, "Recid '%s' is not connected with a " \
+        raise InvenioBibDocFileError, "Recid '%s' is not connected with a " \
             "docname '%s'" % (self.id, docname)
 
     def get_docname(self, docid):
@@ -797,13 +802,13 @@ class BibRecDocs:
         @return: the name of the document corresponding to the given document
             identifier.
         @rtype: string
-        @raise InvenioWebSubmitFileError: if the C{docid} does not
+        @raise InvenioBibDocFileError: if the C{docid} does not
             corresponds to a document attached to this record.
         """
         for bibdoc in self.bibdocs:
             if bibdoc.id == docid:
                 return bibdoc.docname
-        raise InvenioWebSubmitFileError, "Recid '%s' is not connected with a " \
+        raise InvenioBibDocFileError, "Recid '%s' is not connected with a " \
             "docid '%s'" % (self.id, docid)
 
     def has_docname_p(self, docname):
@@ -826,7 +831,7 @@ class BibRecDocs:
         for bibdoc in self.bibdocs:
             if bibdoc.docname == docname:
                 return bibdoc
-        raise InvenioWebSubmitFileError, "Recid '%s' is not connected with " \
+        raise InvenioBibDocFileError, "Recid '%s' is not connected with " \
             " docname '%s'" % (self.id, docname)
 
     def delete_bibdoc(self, docname):
@@ -857,21 +862,21 @@ class BibRecDocs:
         @type never_fail: bool
         @return: the newly created document object.
         @rtype: BibDoc
-        @raise InvenioWebSubmitFileError: in case of any error.
+        @raise InvenioBibDocFileError: in case of any error.
         """
         try:
             docname = normalize_docname(docname)
             if never_fail:
                 docname = self.propose_unique_docname(docname)
             if docname in self.get_bibdoc_names():
-                raise InvenioWebSubmitFileError, "%s has already a bibdoc with docname %s" % (self.id, docname)
+                raise InvenioBibDocFileError, "%s has already a bibdoc with docname %s" % (self.id, docname)
             else:
                 bibdoc = BibDoc(recid=self.id, doctype=doctype, docname=docname, human_readable=self.human_readable)
                 self.build_bibdoc_list()
                 return bibdoc
         except Exception, e:
             register_exception()
-            raise InvenioWebSubmitFileError(str(e))
+            raise InvenioBibDocFileError(str(e))
 
     def add_new_file(self, fullpath, doctype="Main", docname=None, never_fail=False, description=None, comment=None, format=None, flags=None, modification_date=None):
         """
@@ -912,7 +917,7 @@ class BibRecDocs:
         @type flags: list of string
         @return: the elaborated document object.
         @rtype: BibDoc
-        @raise InvenioWebSubmitFileError: in case of error.
+        @raise InvenioBibDocFileError: in case of error.
         """
         if docname is None:
             docname = decompose_file(fullpath)[1]
@@ -921,7 +926,7 @@ class BibRecDocs:
         docname = normalize_docname(docname)
         try:
             bibdoc = self.get_bibdoc(docname)
-        except InvenioWebSubmitFileError:
+        except InvenioBibDocFileError:
             # bibdoc doesn't already exists!
             bibdoc = self.add_bibdoc(doctype, docname, False)
             bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
@@ -930,7 +935,7 @@ class BibRecDocs:
             try:
                 bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
                 self.build_bibdoc_list()
-            except InvenioWebSubmitFileError, e:
+            except InvenioBibDocFileError, e:
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
@@ -962,7 +967,7 @@ class BibRecDocs:
         @type flags: list of string
         @return: the elaborated document object.
         @rtype: BibDoc
-        @raise InvenioWebSubmitFileError: in case of error.
+        @raise InvenioBibDocFileError: in case of error.
         @note: previous files associated with the same document will be
             considered obsolete.
         """
@@ -1001,7 +1006,7 @@ class BibRecDocs:
         @type flags: list of string
         @return: the elaborated document object.
         @rtype: BibDoc
-        @raise InvenioWebSubmitFileError: in case the same format already
+        @raise InvenioBibDocFileError: in case the same format already
             exists.
         """
         if docname is None:
@@ -1058,7 +1063,7 @@ class BibRecDocs:
         if docname:
             try:
                 bibdocs = [self.get_bibdoc(docname)]
-            except InvenioWebSubmitFileError:
+            except InvenioBibDocFileError:
                 bibdocs = self.list_bibdocs(doctype)
         else:
             bibdocs = self.list_bibdocs(doctype)
@@ -1085,7 +1090,7 @@ class BibRecDocs:
             else:
                 verbose_files = ''
 
-            t = websubmit_templates.tmpl_bibrecdoc_filelist(
+            t = bibdocfile_templates.tmpl_bibrecdoc_filelist(
                   ln=ln,
                   types = fulltypes,
                   verbose_files=verbose_files
@@ -1105,7 +1110,7 @@ class BibRecDocs:
         @type docname: string
         @return: the list of newly created bibdocs if any.
         @rtype: list of BibDoc
-        @raise InvenioWebSubmitFileError: in case of issues that can not be
+        @raise InvenioBibDocFileError: in case of issues that can not be
             fixed automatically.
         """
         bibdoc = self.get_bibdoc(docname)
@@ -1124,7 +1129,7 @@ class BibRecDocs:
                     except ValueError:
                         # Strange name
                         register_exception()
-                        raise InvenioWebSubmitFileError, "A file called %s exists under %s. This is not a valid name. After the ';' there must be an integer representing the file version. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
+                        raise InvenioBibDocFileError, "A file called %s exists under %s. This is not a valid name. After the ';' there must be an integer representing the file version. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
                     if version == 0:
                         zero_version_bug = True
                     format = name[len(file_strip_ext(name)):]
@@ -1136,7 +1141,7 @@ class BibRecDocs:
                         shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name))
                     except Exception, e:
                         register_exception()
-                        raise InvenioWebSubmitFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name), e)
+                        raise InvenioBibDocFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name), e)
                     if versions[version].has_key(format):
                         new_bibdocs.append((new_name, version))
                     else:
@@ -1145,7 +1150,7 @@ class BibRecDocs:
                 elif filename[0] != '.':
                     # Strange name
                     register_exception()
-                    raise InvenioWebSubmitFileError, "A file called %s exists under %s. This is not a valid name. There should be a ';' followed by an integer representing the file version. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
+                    raise InvenioBibDocFileError, "A file called %s exists under %s. This is not a valid name. There should be a ';' followed by an integer representing the file version. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
         else:
             # we create the corresponding storage directory
             old_umask = os.umask(022)
@@ -1162,7 +1167,7 @@ class BibRecDocs:
                     type_fd.close()
             except Exception, e:
                 register_exception()
-                raise InvenioWebSubmitFileError, e
+                raise InvenioBibDocFileError, e
             os.umask(old_umask)
 
         if not versions:
@@ -1177,7 +1182,7 @@ class BibRecDocs:
                         shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination))
                     except Exception, e:
                         register_exception()
-                        raise InvenioWebSubmitFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination), e)
+                        raise InvenioBibDocFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination), e)
 
             try:
                 recid_fd = open("%s/.recid" % bibdoc.basedir, "w")
@@ -1188,7 +1193,7 @@ class BibRecDocs:
                 type_fd.close()
             except Exception, e:
                 register_exception()
-                raise InvenioWebSubmitFileError, "Error in creating .recid and .type file for '%s' folder: '%s'" % (bibdoc.basedir, e)
+                raise InvenioBibDocFileError, "Error in creating .recid and .type file for '%s' folder: '%s'" % (bibdoc.basedir, e)
 
             self.build_bibdoc_list()
 
@@ -1204,7 +1209,7 @@ class BibRecDocs:
                     os.remove('%s/%s' % (bibdoc.basedir, filename))
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Error in removing '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), e)
+                    raise InvenioBibDocFileError, "Error in removing '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), e)
 
             Md5Folder(bibdoc.basedir).update(only_new=False)
         bibdoc._build_file_list()
@@ -1218,13 +1223,13 @@ class BibRecDocs:
                     bibdoc.import_descriptions_and_comments_from_marc()
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Error in importing description and comment from %s for record %s: %s" % (repr(bibdoc), self.id, e)
+                    raise InvenioBibDocFileError, "Error in importing description and comment from %s for record %s: %s" % (repr(bibdoc), self.id, e)
         return res
 
     def check_format(self, docname):
         """
         Check for any format related issue.
-        In case L{CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS} is
+        In case L{CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS} is
         altered or Python version changes, it might happen that a docname
         contains files which are no more docname + .format ; version, simply
         because the .format is now recognized (and it was not before, so
@@ -1235,7 +1240,7 @@ class BibRecDocs:
         @type docname: string
         @return: True if format is correct. False if a fix is needed.
         @rtype: bool
-        @raise InvenioWebSubmitFileError: in case of any error.
+        @raise InvenioBibDocFileError: in case of any error.
         """
         bibdoc = self.get_bibdoc(docname)
         correct_docname = decompose_file(docname + '.pdf')[1]
@@ -1246,7 +1251,7 @@ class BibRecDocs:
                 try:
                     dummy, dummy, format, version = decompose_file_with_version(filename)
                 except Exception:
-                    raise InvenioWebSubmitFileError('Incorrect filename "%s" for docname %s for recid %i' % (filename, docname, self.id))
+                    raise InvenioBibDocFileError('Incorrect filename "%s" for docname %s for recid %i' % (filename, docname, self.id))
                 if '%s%s;%i' % (correct_docname, format, version) != filename:
                     return False
         return True
@@ -1316,7 +1321,7 @@ class BibRecDocs:
                 self.uniformize_bibdoc(proposed_docname)
                 try:
                     self.merge_bibdocs(docname, proposed_docname)
-                except InvenioWebSubmitFileError:
+                except InvenioBibDocFileError:
                     return False
             else:
                 run_sql('UPDATE bibdoc SET docname=%s WHERE id=%s', (correct_docname, bibdoc.id))
@@ -1391,7 +1396,7 @@ class BibDoc:
     @param human_readable: whether sizes should be represented in a human
         readable format.
     @type human_readable: bool
-    @raise InvenioWebSubmitFileError: in case of error.
+    @raise InvenioBibDocFileError: in case of error.
     """
 
     def __init__ (self, docid=None, recid=None, docname=None, doctype='Main', human_readable=False):
@@ -1417,7 +1422,7 @@ class BibDoc:
                     doctype = res[0][0]
                 else:
                     #this bibdoc isn't associated with the corresponding bibrec.
-                    raise InvenioWebSubmitFileError, "Docid %s is not associated with the recid %s" % (docid, recid)
+                    raise InvenioBibDocFileError, "Docid %s is not associated with the recid %s" % (docid, recid)
             # gather the other information
             res = run_sql("SELECT id,status,docname,creation_date,modification_date,text_extraction_date,more_info FROM bibdoc WHERE id=%s LIMIT 1", (docid,), 1)
             if res:
@@ -1433,11 +1438,11 @@ class BibDoc:
                 self.doctype = doctype
             else:
                 # this bibdoc doesn't exist
-                raise InvenioWebSubmitFileError, "The docid %s does not exist." % docid
+                raise InvenioBibDocFileError, "The docid %s does not exist." % docid
         # else it is a new document
         else:
             if not docname:
-                raise InvenioWebSubmitFileError, "You should specify the docname when creating a new bibdoc"
+                raise InvenioBibDocFileError, "You should specify the docname when creating a new bibdoc"
             else:
                 self.recid = recid
                 self.doctype = doctype
@@ -1446,7 +1451,7 @@ class BibDoc:
                 if recid:
                     res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s LIMIT 1", (recid, docname), 1)
                     if res:
-                        raise InvenioWebSubmitFileError("A bibdoc called %s already exists for recid %s" % (docname, recid))
+                        raise InvenioBibDocFileError("A bibdoc called %s already exists for recid %s" % (docname, recid))
                 self.id = run_sql("INSERT INTO bibdoc (status,docname,creation_date,modification_date) "
                     "values(%s,%s,NOW(),NOW())", (self.status, docname))
                 if self.id:
@@ -1458,7 +1463,7 @@ class BibDoc:
                     self.md = res[0][1]
                     self.td = res[0][2]
                 else:
-                    raise InvenioWebSubmitFileError, "New docid cannot be created"
+                    raise InvenioBibDocFileError, "New docid cannot be created"
                 try:
                     self.basedir = _make_base_dir(self.id)
                     # we create the corresponding storage directory
@@ -1477,7 +1482,7 @@ class BibDoc:
                                 type_fd.close()
                         except Exception, e:
                             register_exception(alert_admin=True)
-                            raise InvenioWebSubmitFileError, e
+                            raise InvenioBibDocFileError, e
                         os.umask(old_umask)
                     if self.recid:
                         run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type) VALUES (%s,%s,%s)",
@@ -1486,7 +1491,7 @@ class BibDoc:
                     run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
                     run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
                     register_exception(alert_admin=True)
-                    raise InvenioWebSubmitFileError, e
+                    raise InvenioBibDocFileError, e
         # build list of attached files
         self._build_file_list('init')
 
@@ -1586,7 +1591,7 @@ class BibDoc:
         @param ln: a two letter language code to give as a hint to the OCR
             procedure.
         @type ln: string
-        @raise InvenioWebSubmitFileError: in case of error.
+        @raise InvenioBibDocFileError: in case of error.
         @note: the text is extracted and cached for later use. Use L{get_text}
             to retrieve it.
         """
@@ -1612,7 +1617,7 @@ class BibDoc:
                 run_sql("UPDATE bibdoc SET text_extraction_date=NOW() WHERE id=%s", (self.id, ))
         except InvenioWebSubmitFileConverterError, e:
             register_exception(alert_admin=True, prefix="Error in extracting text from bibdoc %i, version %i" % (self.id, version))
-            raise InvenioWebSubmitFileError, str(e)
+            raise InvenioBibDocFileError, str(e)
 
     def touch(self):
         """
@@ -1633,12 +1638,12 @@ class BibDoc:
         @param new_status: the new status. If empty the document will be
             unrestricted.
         @type new_status: string
-        @raise InvenioWebSubmitFileError: in case the reserved word
+        @raise InvenioBibDocFileError: in case the reserved word
             'DELETED' is used.
         """
         if new_status != KEEP_OLD_VALUE:
             if new_status == 'DELETED':
-                raise InvenioWebSubmitFileError('DELETED is a reserved word and can not be used for setting the status')
+                raise InvenioBibDocFileError('DELETED is a reserved word and can not be used for setting the status')
             run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, self.id))
             self.status = new_status
             self.touch()
@@ -1662,7 +1667,7 @@ class BibDoc:
         @param flags: a set of flags to be associated with the file (see
             L{CFG_BIBDOCFILE_AVAILABLE_FLAGS})
         @type flags: list of string
-        @raise InvenioWebSubmitFileError: in case of error.
+        @raise InvenioBibDocFileError: in case of error.
         """
         try:
             latestVersion = self.get_latest_version()
@@ -1672,14 +1677,14 @@ class BibDoc:
                 myversion = latestVersion + 1
             if os.path.exists(filename):
                 if not os.path.getsize(filename) > 0:
-                    raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
+                    raise InvenioBibDocFileError, "%s seems to be empty" % filename
                 if format is None:
                     format = decompose_file(filename)[2]
                 else:
                     format = normalize_format(format)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
                 if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, myversion, format)):
-                    raise InvenioWebSubmitFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
+                    raise InvenioBibDocFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
@@ -1687,7 +1692,7 @@ class BibDoc:
                         update_modification_date_of_file(destination, modification_date)
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
+                    raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
                 self.more_info.set_description(description, format, myversion)
                 self.more_info.set_comment(comment, format, myversion)
                 if flags is None:
@@ -1704,7 +1709,7 @@ class BibDoc:
                     else:
                         self.more_info.set_flag(flag, format, myversion)
             else:
-                raise InvenioWebSubmitFileError, "'%s' does not exists!" % filename
+                raise InvenioBibDocFileError, "'%s' does not exists!" % filename
         finally:
             self.touch()
             Md5Folder(self.basedir).update()
@@ -1732,7 +1737,7 @@ class BibDoc:
         @param flags: a set of flags to be associated with the file (see
             L{CFG_BIBDOCFILE_AVAILABLE_FLAGS})
         @type flags: list of string
-        @raise InvenioWebSubmitFileError: if the given format already exists.
+        @raise InvenioBibDocFileError: if the given format already exists.
         """
         try:
             if version is None:
@@ -1741,16 +1746,16 @@ class BibDoc:
                 version = 1
             if os.path.exists(filename):
                 if not os.path.getsize(filename) > 0:
-                    raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
+                    raise InvenioBibDocFileError, "%s seems to be empty" % filename
                 if format is None:
                     format = decompose_file(filename)[2]
                 else:
                     format = normalize_format(format)
                 if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, version, format)):
-                    raise InvenioWebSubmitFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
+                    raise InvenioBibDocFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
                 if os.path.exists(destination):
-                    raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
+                    raise InvenioBibDocFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
@@ -1758,7 +1763,7 @@ class BibDoc:
                         update_modification_date_of_file(destination, modification_date)
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
+                    raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
                 self.more_info.set_comment(comment, format, version)
                 self.more_info.set_description(description, format, version)
                 if flags is None:
@@ -1769,7 +1774,7 @@ class BibDoc:
                     if flag != 'PERFORM_HIDE_PREVIOUS':
                         self.more_info.set_flag(flag, format, version)
             else:
-                raise InvenioWebSubmitFileError, "'%s' does not exists!" % filename
+                raise InvenioBibDocFileError, "'%s' does not exists!" % filename
         finally:
             Md5Folder(self.basedir).update()
             self.touch()
@@ -1831,7 +1836,7 @@ class BibDoc:
 
         @param version: the version to revert to.
         @type version: integer
-        @raise InvenioWebSubmitFileError: in case of errors
+        @raise InvenioBibDocFileError: in case of errors
         """
         version = int(version)
         docfiles = self.list_version_files(version)
@@ -1899,10 +1904,10 @@ class BibDoc:
                 self.set_description(global_description, format, version)
         self._build_file_list('init')
 
-    def get_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, display_hidden=True):
+    def get_icon(self, subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, display_hidden=True):
         """
         @param subformat_re: by default the convention is that
-            L{CFG_WEBSUBMIT_ICON_SUBFORMAT_RE} is used as a subformat indicator to
+            L{CFG_BIBDOCFILE_ICON_SUBFORMAT_RE} is used as a subformat indicator to
             mean that a particular format is to be used as an icon.
             Specifiy a different subformat if you need to use a different
             convention.
@@ -1919,7 +1924,7 @@ class BibDoc:
                 return docfile
         return None
 
-    def add_icon(self, filename, format=None, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT, modification_date=None):
+    def add_icon(self, filename, format=None, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT, modification_date=None):
         """
         Attaches icon to this document.
 
@@ -1929,12 +1934,12 @@ class BibDoc:
             will be calculated after the filesystem path.
         @type format: string
         @param subformat: by default the convention is that
-            CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT is used as a subformat indicator to
+            CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT is used as a subformat indicator to
             mean that a particular format is to be used as an icon.
             Specifiy a different subformat if you need to use a different
             convention.
         @type subformat: string
-        @raise InvenioWebSubmitFileError: in case of errors.
+        @raise InvenioBibDocFileError: in case of errors.
         """
         #first check if an icon already exists
         if not format:
@@ -1944,10 +1949,10 @@ class BibDoc:
 
         self.add_file_new_format(filename, format=format, modification_date=modification_date)
 
-    def delete_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE):
+    def delete_icon(self, subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE):
         """
         @param subformat_re: by default the convention is that
-            L{CFG_WEBSUBMIT_ICON_SUBFORMAT_RE} is used as a subformat indicator to
+            L{CFG_BIBDOCFILE_ICON_SUBFORMAT_RE} is used as a subformat indicator to
             mean that a particular format is to be used as an icon.
             Specifiy a different subformat if you need to use a different
             convention.
@@ -2001,7 +2006,7 @@ class BibDoc:
             versions.append(currversion)
 
         if versions:
-            return websubmit_templates.tmpl_bibdoc_filelist(
+            return bibdocfile_templates.tmpl_bibdoc_filelist(
                 ln = ln,
                 versions = versions,
                 imageurl = imageurl,
@@ -2018,14 +2023,14 @@ class BibDoc:
 
         @param newname: the new name.
         @type newname: string
-        @raise InvenioWebSubmitFileError: if the new name corresponds to
+        @raise InvenioBibDocFileError: if the new name corresponds to
             a document already attached to the record owning this document.
         """
         try:
             newname = normalize_docname(newname)
             res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, newname))
             if res:
-                raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
+                raise InvenioBibDocFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
             try:
                 for f in os.listdir(self.basedir):
                     if not f.startswith('.'):
@@ -2037,7 +2042,7 @@ class BibDoc:
                             shutil.move(os.path.join(self.basedir, f), os.path.join(self.basedir, '%s%s;%i' % (newname, extension, version)))
             except Exception, e:
                 register_exception()
-                raise InvenioWebSubmitFileError("Error in renaming the bibdoc %s to %s for recid %s: %s" % (self.docname, newname, self.recid, e))
+                raise InvenioBibDocFileError("Error in renaming the bibdoc %s to %s for recid %s: %s" % (self.docname, newname, self.recid, e))
             run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
             self.docname = newname
         finally:
@@ -2299,7 +2304,7 @@ class BibDoc:
         for docfile in docfiles:
             if get_superformat_from_format(docfile.get_format()) == superformat:
                 return docfile
-        raise InvenioWebSubmitFileError, "No file called '%s' of format '%s', version '%s'" % (self.docname, format, version)
+        raise InvenioBibDocFileError, "No file called '%s' of format '%s', version '%s'" % (self.docname, format, version)
 
     def list_versions(self):
         """
@@ -2317,7 +2322,7 @@ class BibDoc:
         """
         Delete this document.
         @see: L{undelete} for how to undelete the document.
-        @raise InvenioWebSubmitFileError: in case of errors.
+        @raise InvenioBibDocFileError: in case of errors.
         """
         try:
             today = datetime.today()
@@ -2326,7 +2331,7 @@ class BibDoc:
             self.status = 'DELETED'
         except Exception, e:
             register_exception()
-            raise InvenioWebSubmitFileError, "It's impossible to delete bibdoc %s: %s" % (self.id, e)
+            raise InvenioBibDocFileError, "It's impossible to delete bibdoc %s: %s" % (self.id, e)
 
     def deleted_p(self):
         """
@@ -2350,13 +2355,13 @@ class BibDoc:
         Otherwise the undeleted document will be public.
         @param previous_status: the previous status the should be restored.
         @type previous_status: string
-        @raise InvenioWebSubmitFileError: in case of any error.
+        @raise InvenioBibDocFileError: in case of any error.
         """
         bibrecdocs = BibRecDocs(self.recid)
         try:
             run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (previous_status, self.id))
         except Exception, e:
-            raise InvenioWebSubmitFileError, "It's impossible to undelete bibdoc %s: %s" % (self.id, e)
+            raise InvenioBibDocFileError, "It's impossible to undelete bibdoc %s: %s" % (self.id, e)
         if self.docname.startswith('DELETED-'):
             try:
                 # Let's remove DELETED-20080214144322- in front of the docname
@@ -2364,9 +2369,9 @@ class BibDoc:
                 original_name = bibrecdocs.propose_unique_docname(original_name)
                 self.change_name(original_name)
             except Exception, e:
-                raise InvenioWebSubmitFileError, "It's impossible to restore the previous docname %s. %s kept as docname because: %s" % (original_name, self.docname, e)
+                raise InvenioBibDocFileError, "It's impossible to restore the previous docname %s. %s kept as docname because: %s" % (original_name, self.docname, e)
         else:
-            raise InvenioWebSubmitFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % self.docname
+            raise InvenioBibDocFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % self.docname
 
     def delete_file(self, format, version):
         """
@@ -2378,7 +2383,7 @@ class BibDoc:
         @note: this operation is not reversible!"""
         try:
             afile = self.get_file(format, version)
-        except InvenioWebSubmitFileError:
+        except InvenioBibDocFileError:
             return
         try:
             os.remove(afile.get_full_path())
@@ -2704,7 +2709,7 @@ class BibDocFile:
 
     def display(self, ln = CFG_SITE_LANG):
         """Returns a formatted representation of this docfile."""
-        return websubmit_templates.tmpl_bibdocfile_filelist(
+        return bibdocfile_templates.tmpl_bibdocfile_filelist(
                  ln = ln,
                  recid = self.recid,
                  version = self.version,
@@ -2738,10 +2743,10 @@ class BibDocFile:
         else:
             return (0, '')
 
-    def is_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE):
+    def is_icon(self, subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE):
         """
         @param subformat_re: by default the convention is that
-            L{CFG_WEBSUBMIT_ICON_SUBFORMAT_RE} is used as a subformat indicator to
+            L{CFG_BIBDOCFILE_ICON_SUBFORMAT_RE} is used as a subformat indicator to
             mean that a particular format is to be used as an icon.
             Specifiy a different subformat if you need to use a different
             convention.
@@ -2836,12 +2841,12 @@ class BibDocFile:
         inside websubmit_webinterface.py."""
         if os.path.exists(self.fullpath):
             if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
-                raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
+                raise InvenioBibDocFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
             stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl, download=download)
             raise apache.SERVER_RETURN, apache.DONE
         else:
             req.status = apache.HTTP_NOT_FOUND
-            raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
+            raise InvenioBibDocFileError, "%s does not exists!" % self.fullpath
 
 _RE_STATUS_PARSER = re.compile(r'^(?P<type>email|group|egroup|role|firerole|status):\s*(?P<value>.*)$', re.S + re.I)
 def check_bibdoc_authorization(user_info, status):
@@ -3196,8 +3201,8 @@ def list_versions_from_array(docfiles):
 
 def _make_base_dir(docid):
     """Given a docid it returns the complete path that should host its files."""
-    group = "g" + str(int(int(docid) / CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT))
-    return os.path.join(CFG_WEBSUBMIT_FILEDIR, group, str(docid))
+    group = "g" + str(int(int(docid) / CFG_BIBDOCFILE_FILESYSTEM_BIBDOC_GROUP_LIMIT))
+    return os.path.join(CFG_BIBDOCFILE_FILEDIR, group, str(docid))
 
 class Md5Folder:
     """Manage all the Md5 checksum about a folder"""
@@ -3206,7 +3211,7 @@ class Md5Folder:
         self.folder = folder
         try:
             self.load()
-        except InvenioWebSubmitFileError:
+        except InvenioBibDocFileError:
             self.md5s = {}
             self.update()
 
@@ -3232,7 +3237,7 @@ class Md5Folder:
             os.umask(old_umask)
         except Exception, e:
             register_exception()
-            raise InvenioWebSubmitFileError, "Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e)
+            raise InvenioBibDocFileError, "Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e)
 
     def load(self):
         """Load .md5 into the md5 dictionary"""
@@ -3248,7 +3253,7 @@ class Md5Folder:
             self.update()
         except Exception, e:
             register_exception()
-            raise InvenioWebSubmitFileError, "Encountered an exception while loading .md5 for folder '%s': '%s'" % (self.folder, e)
+            raise InvenioBibDocFileError, "Encountered an exception while loading .md5 for folder '%s': '%s'" % (self.folder, e)
 
     def check(self, filename = ''):
         """Check the specified file or all the files for which it exists a hash
@@ -3258,7 +3263,7 @@ class Md5Folder:
                 return self.md5s[filename] == calculate_md5(os.path.join(self.folder, filename))
             except Exception, e:
                 register_exception()
-                raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
+                raise InvenioBibDocFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
         else:
             for filename, md5hash in self.md5s.items():
                 try:
@@ -3266,7 +3271,7 @@ class Md5Folder:
                         return False
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
+                    raise InvenioBibDocFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
             return True
 
     def get_checksum(self, filename):
@@ -3292,7 +3297,7 @@ def calculate_md5_external(filename):
         else:
             return ret
     except Exception, e:
-        raise InvenioWebSubmitFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+        raise InvenioBibDocFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
 
 def calculate_md5(filename, force_internal=False):
     """Calculate the md5 of a physical file. This is suitable for files smaller
@@ -3311,7 +3316,7 @@ def calculate_md5(filename, force_internal=False):
             return computed_md5.hexdigest()
         except Exception, e:
             register_exception()
-            raise InvenioWebSubmitFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+            raise InvenioBibDocFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
     else:
         return calculate_md5_external(filename)
 
@@ -3353,21 +3358,21 @@ def bibdocfile_url_p(url):
     return len(splitted_url) == 2 and splitted_url[0] != '' and splitted_url[1] != ''
 
 def get_docid_from_bibdocfile_fullpath(fullpath):
-    """Given a bibdocfile fullpath (e.g. "CFG_WEBSUBMIT_FILEDIR/g0/123/bar.pdf;1")
+    """Given a bibdocfile fullpath (e.g. "CFG_BIBDOCFILE_FILEDIR/g0/123/bar.pdf;1")
     returns the docid (e.g. 123)."""
-    if not fullpath.startswith(os.path.join(CFG_WEBSUBMIT_FILEDIR, 'g')):
-        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+    if not fullpath.startswith(os.path.join(CFG_BIBDOCFILE_FILEDIR, 'g')):
+        raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
     dirname, base, extension, version = decompose_file_with_version(fullpath)
     try:
         return int(dirname.split('/')[-1])
     except:
-        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+        raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
 
 def decompose_bibdocfile_fullpath(fullpath):
-    """Given a bibdocfile fullpath (e.g. "CFG_WEBSUBMIT_FILEDIR/g0/123/bar.pdf;1")
+    """Given a bibdocfile fullpath (e.g. "CFG_BIBDOCFILE_FILEDIR/g0/123/bar.pdf;1")
     returns a quadruple (recid, docname, format, version)."""
-    if not fullpath.startswith(os.path.join(CFG_WEBSUBMIT_FILEDIR, 'g')):
-        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+    if not fullpath.startswith(os.path.join(CFG_BIBDOCFILE_FILEDIR, 'g')):
+        raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
     dirname, base, extension, version = decompose_file_with_version(fullpath)
     try:
         docid = int(dirname.split('/')[-1])
@@ -3376,7 +3381,7 @@ def decompose_bibdocfile_fullpath(fullpath):
         docname = bibdoc.get_docname()
         return recid, docname, extension, version
     except:
-        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+        raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
 
 def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
@@ -3387,7 +3392,7 @@ def decompose_bibdocfile_url(url):
     elif url.startswith('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)):
         recid_file = url[len('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)):]
     else:
-        raise InvenioWebSubmitFileError, "Url %s doesn't correspond to a valid record inside the system." % url
+        raise InvenioBibDocFileError, "Url %s doesn't correspond to a valid record inside the system." % url
     recid_file = recid_file.replace('/files/', '/')
     recid, docname, format = decompose_file(urllib.unquote(recid_file))
     if not recid and docname.isdigit():
@@ -3402,7 +3407,7 @@ def decompose_bibdocfile_old_url(url):
     g = re_bibdocfile_old_url.search(url)
     if g:
         return int(g.group(1))
-    raise InvenioWebSubmitFileError('%s is not a valid old bibdocfile url' % url)
+    raise InvenioBibDocFileError('%s is not a valid old bibdocfile url' % url)
 
 def decompose_bibdocfile_very_old_url(url):
     """Decompose an old /getfile.py? URL"""
@@ -3423,15 +3428,15 @@ def decompose_bibdocfile_very_old_url(url):
                     else:
                         docname = ''
                 else:
-                    raise InvenioWebSubmitFileError('%s has not enough params to correspond to a bibdocfile.' % url)
+                    raise InvenioBibDocFileError('%s has not enough params to correspond to a bibdocfile.' % url)
                 format = normalize_format(params.get('format', [''])[0])
                 return (recid, docname, format)
             except Exception, e:
-                raise InvenioWebSubmitFileError('Problem with %s: %s' % (url, e))
+                raise InvenioBibDocFileError('Problem with %s: %s' % (url, e))
         else:
-            raise InvenioWebSubmitFileError('%s has no params to correspond to a bibdocfile.' % url)
+            raise InvenioBibDocFileError('%s has no params to correspond to a bibdocfile.' % url)
     else:
-        raise InvenioWebSubmitFileError('%s is not a valid very old bibdocfile url' % url)
+        raise InvenioBibDocFileError('%s is not a valid very old bibdocfile url' % url)
 
 def get_docname_from_url(url):
     """Return a potential docname given a url"""

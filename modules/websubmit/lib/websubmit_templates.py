@@ -17,20 +17,17 @@
 
 __revision__ = "$Id$"
 
-import urllib
 import cgi
 import re
 import operator
 
-from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_LANG, CFG_SITE_RECORD, CFG_INSPIRE_SITE
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datetext_to_dategui, convert_datestruct_to_dategui
+from invenio.dateutils import convert_datetext_to_dategui
 from invenio.urlutils import create_html_link
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.htmlutils import escape_html
-from websubmit_config import \
-     CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION
+from invenio.websubmit_config import CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION
 
 class Template:
 
@@ -686,7 +683,7 @@ class Template:
         # if there is a file upload field, we change the encoding type
         out = """<script language="JavaScript1.1" type="text/javascript">
               """
-        for i in range(0,nbFields):
+        for i in range(0, nbFields):
             if upload[i] == 1:
                 out += "document.forms[0].encoding = \"multipart/form-data\";\n"
                 break
@@ -697,8 +694,8 @@ class Template:
                   }
                   function tester2() {
                """
-        for i in range(0,nbFields):
-            if re.search("%s\[\]" % field[i],fieldhtml[i]):
+        for i in range(0, nbFields):
+            if re.search("%s\[\]" % field[i], fieldhtml[i]):
                 fieldname = "%s[]" % field[i]
             else:
                 fieldname = field[i]
@@ -751,8 +748,8 @@ class Template:
         # # # # # # # # # # # # # # # # # # # # # # # # #
         # Fill the fields with the previously saved values
         # # # # # # # # # # # # # # # # # # # # # # # # #
-        for i in range(0,nbFields):
-            if re.search("%s\[\]"%field[i],fieldhtml[i]):
+        for i in range(0, nbFields):
+            if re.search("%s\[\]"%field[i], fieldhtml[i]):
                 fieldname = "%s[]" % field[i]
             else:
                 fieldname = field[i]
@@ -762,11 +759,11 @@ class Template:
                 if select[i] != 0:
                     # If the field is a SELECT element
                     vals = text.split("\n")
-                    tmp=""
+                    tmp = ""
                     for val in vals:
                         if tmp != "":
-                            tmp = tmp + " || "
-                        tmp = tmp + "el.options[j].value == \"%s\" || el.options[j].text == \"%s\"" % (val,val)
+                            tmp += " || "
+                        tmp += "el.options[j].value == \"%s\" || el.options[j].text == \"%s\"" % (val, val)
                     if tmp != "":
                         out += """
                                  <!--SELECT field found-->
@@ -961,7 +958,7 @@ class Template:
         else:
             for i in range(1, nbpages + 1):
                 out += """<td class="submitPage"><small>&nbsp;
-                            <a href='' onclick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;user_must_confirm_before_leaving_page = false;document.forms[0].submit();return false;">%s</a>&nbsp;</small></td>""" % (i,i)
+                            <a href='' onclick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;user_must_confirm_before_leaving_page = false;document.forms[0].submit();return false;">%s</a>&nbsp;</small></td>""" % (i, i)
             out += """<td class="submitCurrentPage">%(end_action)s</td><td class="submitEmptyPage">&nbsp;&nbsp;</td></tr></table></td>
                       <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
                         'end_action' : _("end of action"),
@@ -1122,204 +1119,6 @@ class Template:
 
         out += "</ul>"
         return out
-
-    def tmpl_filelist(self, ln, filelist='', recid='', docname='', version=''):
-        """
-        Displays the file list for a record.
-
-        Parameters:
-
-          - 'ln' *string* - The language to display the interface in
-
-          - 'recid' *int* - The record id
-
-          - 'docname' *string* - The document name
-
-          - 'version' *int* - The version of the document
-
-          - 'filelist' *string* - The HTML string of the filelist (produced by the BibDoc classes)
-        """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        title = _("record") + ' #' + '<a href="%s/%s/%s">%s</a>' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, recid)
-        if docname != "":
-            title += ' ' + _("document") + ' #' + str(docname)
-        if version != "":
-            title += ' ' + _("version") + ' #' + str(version)
-
-        out = """<div style="width:90%%;margin:auto;min-height:100px;margin-top:10px">
-                <!--start file list-->
-                  %s
-                <!--end file list--></div>
-              """ % (filelist)
-
-        return out
-
-    def tmpl_bibrecdoc_filelist(self, ln, types, verbose_files=''):
-        """
-        Displays the file list for a record.
-
-        Parameters:
-
-          - 'ln' *string* - The language to display the interface in
-
-          - 'types' *array* - The different types to display, each record in the format:
-
-               - 'name' *string* - The name of the format
-
-               - 'content' *array of string* - The HTML code produced by tmpl_bibdoc_filelist, for the right files
-
-          - 'verbose_files' - A string representing in a verbose way the
-          file information.
-        """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = ""
-        for mytype in types:
-            if mytype['name']:
-                if not (CFG_INSPIRE_SITE and mytype['name'] == 'INSPIRE-PUBLIC'):
-                    out += "<small><b>%s</b> %s:</small>" % (mytype['name'], _("file(s)"))
-            out += "<ul>"
-            for content in mytype['content']:
-                out += content
-            out += "</ul>"
-            if verbose_files:
-                out += "<pre>%s</pre>" % verbose_files
-        return out
-
-    def tmpl_bibdoc_filelist(self, ln, versions=[], imageurl='', recid='', docname='', status=''):
-        """
-        Displays the file list for a record.
-
-        Parameters:
-
-          - 'ln' *string* - The language to display the interface in
-
-          - 'versions' *array* - The different versions to display, each record in the format:
-
-               - 'version' *string* - The version
-
-               - 'content' *string* - The HTML code produced by tmpl_bibdocfile_filelist, for the right file
-
-               - 'previous' *bool* - If the file has previous versions
-
-          - 'imageurl' *string* - The URL to the file image
-
-         - 'recid' *int* - The record id
-
-         - 'docname' *string* - The name of the document
-
-         - 'status' *string* - The status of a document
-        """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = """<table border="0" cellspacing="1" class="searchbox">
-                   %(restriction_label)s
-                   <tr>
-                     <td align="left" colspan="2" class="portalboxheader">
-                       <img src='%(imageurl)s' border="0" />&nbsp;&nbsp;%(docname)s
-                     </td>
-                   </tr>""" % {
-                     'imageurl' : imageurl,
-                     'docname' : docname,
-                     'restriction_label': status and ('<tr><td colspan="2" class="restrictedfilerowheader">%s</td></tr>' % _('Restricted')) or ''
-                   }
-        for version in versions:
-            if version['previous']:
-                versiontext =  """<br />(%(see)s <a href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recID)s/files/?docname=%(docname)s&amp;version=all%(ln_link)s">%(previous)s</a>)""" % {
-                                 'see' : _("see"),
-                                 'siteurl' : CFG_SITE_URL,
-                                 'CFG_SITE_RECORD': CFG_SITE_RECORD,
-                                 'docname' : urllib.quote(docname),
-                                 'recID': recid,
-                                 'previous': _("previous"),
-                                 'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or '',
-                               }
-            else:
-                versiontext = ""
-            out += """<tr>
-                        <td class="portalboxheader">
-                          <font size="-2">%(version)s %(ver)s%(text)s</font>
-                        </td>
-                        <td>
-                          <table>
-                        """ % {
-                          'version' : _("version"),
-                          'ver' : version['version'],
-                          'text' : versiontext,
-                        }
-            for content in version['content']:
-                out += content
-            out += "</table></td></tr>"
-        out += "</table>"
-        return out
-
-    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, md, superformat, subformat, nice_size, description):
-        """
-        Displays a file in the file list.
-
-        Parameters:
-
-          - 'ln' *string* - The language to display the interface in
-
-          - 'recid' *int* - The id of the record
-
-          - 'name' *string* - The name of the file
-
-          - 'version' *string* - The version
-
-          - 'md' *datetime* - the modification date
-
-          - 'superformat' *string* - The display superformat
-
-          - 'subformat' *string* - The display subformat
-
-          - 'nice_size' *string* - The nice_size of the file
-
-          - 'description' *string* - The description that might have been associated
-          to the particular file
-        """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        urlbase = '%s/%s/%s/files/%s' % (
-            CFG_SITE_URL,
-            CFG_SITE_RECORD,
-            recid,
-            '%s%s' % (name, superformat))
-
-        urlargd = {'version' : version}
-        if subformat:
-            urlargd['subformat'] = subformat
-
-        link_label = '%s%s' % (name, superformat)
-        if subformat:
-            link_label += ' (%s)' % subformat
-
-        link = create_html_link(urlbase, urlargd, cgi.escape(link_label))
-
-        return """<tr>
-                    <td valign="top">
-                      <small>%(link)s</small>
-                    </td>
-                    <td valign="top">
-                      <font size="-2" color="green">[%(nice_size)s]</font>
-                      <font size="-2"><em>%(md)s</em>
-                    </td>
-                    <td valign="top"><em>%(description)s</em></td>
-                    </tr>""" % {
-                      'link' : link,
-                      'nice_size' : nice_size,
-                      'md' : convert_datestruct_to_dategui(md.timetuple(), ln),
-                      'description' : cgi.escape(description),
-                    }
 
     def tmpl_submit_summary (self, ln, values):
         """
@@ -1513,7 +1312,7 @@ class Template:
             else:
                 idtext = submission['id']
 
-            if operator.mod(num,2) == 0:
+            if operator.mod(num, 2) == 0:
                 color = "#e2e2e2"
             else:
                 color = "#f0f0f0"
@@ -1530,8 +1329,8 @@ class Template:
             else:
                 reference = """<font color="red">%s</font>""" % _("Reference not yet given")
 
-            cdate = str(submission['cdate']).replace(" ","&nbsp;")
-            mdate= str(submission['mdate']).replace(" ","&nbsp;")
+            cdate = str(submission['cdate']).replace(" ", "&nbsp;")
+            mdate = str(submission['mdate']).replace(" ", "&nbsp;")
 
             out += """
                      <tr bgcolor="%(color)s">

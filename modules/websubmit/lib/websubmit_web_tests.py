@@ -61,7 +61,7 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
 
     def test_submit_book(self):
         """websubmit - web test submit a book"""
-        
+
         self.browser.get(CFG_SITE_SECURE_URL)
         # login as jekyll
         self.login( username="jekyll", password="j123ekyll")

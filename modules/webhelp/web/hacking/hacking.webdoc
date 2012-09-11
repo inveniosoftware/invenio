@@ -89,6 +89,9 @@ stored and retrieved.</dd>
 <dt><a href="bibrecord-internals">BibRecord Internals</a></dt>
 <dd>Describes information useful to manipulate single records.</dd>
 
+<dt><a href="bibdocfile-internals">BibDocFile Internals</a></dt>
+<dd>Describes information useful to manipulate documents within records.</dd>
+
 <dt><a href="miscutil-internals">MiscUtil Internals</a></dt>
 <dd>Describes information useful to understand what can be found inside the miscellaneous utilities
 module, like database access, error management, date handling library, etc.</dd>

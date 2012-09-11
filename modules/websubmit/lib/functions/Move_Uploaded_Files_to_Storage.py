@@ -34,7 +34,7 @@ NOTE:
 __revision__ = "$Id$"
 
 
-from invenio import websubmit_managedocfiles
+from invenio import bibdocfile_managedocfiles
 
 def Move_Uploaded_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -69,11 +69,11 @@ def Move_Uploaded_Files_to_Storage(parameters, curdir, form, user_info=None):
     force_file_revision = (parameters.get('forceFileRevision') == '1')
 
     try:
-        websubmit_managedocfiles._read_file_revision_interface_configuration_from_disk(curdir)
+        bibdocfile_managedocfiles._read_file_revision_interface_configuration_from_disk(curdir)
     except IOError:
         return
 
-    websubmit_managedocfiles.move_uploaded_files_to_storage(curdir,
+    bibdocfile_managedocfiles.move_uploaded_files_to_storage(curdir,
                                         recid, iconsize,
                                         create_icon_doctypes,
                                         force_file_revision)

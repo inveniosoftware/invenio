@@ -21,8 +21,8 @@ __revision__ = "$Id$"
 from invenio.bibdocfile import \
      BibRecDocs, \
      decompose_file, \
-     InvenioWebSubmitFileError, \
-     CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
+     InvenioBibDocFileError, \
+     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 import os
 import re
 from invenio.websubmit_icon_creator import create_icon
@@ -176,7 +176,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                             for additionalformat in additionalformats:
                                 try:
                                     bibrecdocs.add_new_format(additionalformat)
-                                except InvenioWebSubmitFileError:
+                                except InvenioBibDocFileError:
                                     pass
                     ## Icon
                     elif documenttype == "picture":
@@ -199,7 +199,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                             docname = decompose_file(fullpath)[1]
                             try:
                                 mybibdoc = bibrecdocs.get_bibdoc(docname)
-                            except InvenioWebSubmitFileError:
+                            except InvenioBibDocFileError:
                                 mybibdoc = None
                             if iconpath is not None and mybibdoc is not None:
                                 try:
@@ -208,7 +208,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                         mybibdoc.add_icon(iconpath)
                                         has_added_default_icon_subformat_p = True
                                     else:
-                                        mybibdoc.add_icon(iconpath, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
+                                        mybibdoc.add_icon(iconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                                     ## Save the new icon filename in a text file in curdir so that
                                     ## it can be used by templates to created the recmysl
                                     try:
@@ -222,7 +222,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                         msg = "Cannot store icon filename.[%s]"
                                         msg %= str(err)
                                         raise InvenioWebSubmitFunctionWarning(msg)
-                                except InvenioWebSubmitFileError, e:
+                                except InvenioBibDocFileError, e:
                                     # Most probably icon already existed.
                                     pass
                             elif mybibdoc is not None:

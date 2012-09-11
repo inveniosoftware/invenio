@@ -21,6 +21,7 @@ SUBDIRS = bibauthorid \
           bibcirculation \
           bibclassify \
           bibconvert \
+          bibdocfile \
           bibedit \
           bibencode \
           bibexport \

@@ -607,6 +607,12 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibconvert/doc/hacking/Makefile \
      modules/bibconvert/etc/Makefile \
      modules/bibconvert/lib/Makefile \
+     modules/bibdocfile/Makefile \
+     modules/bibdocfile/bin/bibdocfile \
+     modules/bibdocfile/bin/Makefile \
+     modules/bibdocfile/doc/Makefile \
+     modules/bibdocfile/doc/hacking/Makefile \
+     modules/bibdocfile/lib/Makefile \
      modules/bibrecord/Makefile \
      modules/bibrecord/bin/Makefile \
      modules/bibrecord/bin/xmlmarc2textmarc \
@@ -882,7 +888,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/webstyle/lib/Makefile \
      modules/websubmit/Makefile \
      modules/websubmit/bin/Makefile \
-     modules/websubmit/bin/bibdocfile \
      modules/websubmit/bin/inveniounoconv \
      modules/websubmit/doc/Makefile \
      modules/websubmit/doc/admin/Makefile \

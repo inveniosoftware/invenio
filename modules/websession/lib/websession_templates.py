@@ -1214,7 +1214,7 @@ class Template:
                 if action == "cfgwebsubmit":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
                 if action == "runbibdocfile":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/submit/managedocfiles?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Document File Manager"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/%s/managedocfiles?ln=%s">%s</a>""" % (CFG_SITE_URL, CFG_SITE_RECORD, ln, _("Run Document File Manager"))
                 if action == "cfgbibsort":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibsort/bibsortadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibSort"))
             if tmp_out:

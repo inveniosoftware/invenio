@@ -23,8 +23,6 @@ __revision__ = "$Id$"
 
 import unittest
 import os
-import sys
-from warnings import warn
 from logging import StreamHandler, DEBUG
 from cStringIO import StringIO
 

@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
-WebSubmit Upload File Interface utils
+BibDocFile Upload File Interface utils
 =====================================
 
 Tools to help with creation of file management interfaces.
@@ -37,7 +37,7 @@ other:
 Theses functions are a complex interplay of HTML, Javascript and HTTP
 requests. They are not meant to be used in any type of scenario, but
 require to be used in extremely specific contexts (Currently in
-WebSubmit Response Elements, WebSubmit functions and the WebSubmit
+WebSubmit Response Elements, WebSubmit functions and the BibDocFile
 File Management interface).
 
 NOTES:
@@ -82,12 +82,13 @@ from invenio.config import \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_TMPSHAREDDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, \
+     CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.bibdocfilecli import cli_fix_marc
 from invenio.bibdocfile import BibRecDocs, \
      decompose_file, calculate_md5, BibDocFile, \
-     InvenioWebSubmitFileError, BibDocMoreInfo
+     InvenioBibDocFileError, BibDocMoreInfo
 from invenio.websubmit_functions.Shared_Functions import \
      createRelatedFormats
 from invenio.errorlib import register_exception
@@ -95,7 +96,7 @@ from invenio.dbquery import run_sql
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.urlutils import create_html_mailto
-from invenio.websubmit_config import CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
+from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 
 CFG_ALLOWED_ACTIONS = ['revise', 'delete', 'add', 'addFormat']
 
@@ -909,7 +910,7 @@ Best regards""") % {'recid': recid or ''})
         body += problem_revising
 
     if print_envelope and print_outside_form_tag:
-        body = '<form method="post" action="/submit/managedocfilesasync" id="uploadFileForm">' + body + '</form>'
+        body = '<form method="post" action="/%s/managedocfilesasync" id="uploadFileForm">' % CFG_SITE_RECORD + body + '</form>'
 
     return (0, body)
 
@@ -1913,10 +1914,10 @@ def add(file_path, bibdoc_name, rename, doctype, description, comment,
                                 has_added_default_icon_subformat_p = True
                             else:
                                 icon_suffix = icon_size.replace('>', '').replace('<', '').replace('^', '').replace('!', '')
-                                bibdoc.add_icon(iconpath, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
+                                bibdoc.add_icon(iconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                             _do_log(working_dir, 'Added icon to ' + \
                                     bibdoc.get_docname() + ': ' + iconpath)
-                        except InvenioWebSubmitFileError, e:
+                        except InvenioBibDocFileError, e:
                             # Most probably icon already existed.
                             pass
 
@@ -1951,7 +1952,7 @@ def add(file_path, bibdoc_name, rename, doctype, description, comment,
             # it was renamed)
             pending_bibdocs[bibdoc_name] = (doctype, comment, description, [])
 
-    except InvenioWebSubmitFileError, e:
+    except InvenioBibDocFileError, e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2000,10 +2001,10 @@ def add_format(file_path, bibdoc_name, recid, doctype, working_dir,
                                 # We have already added the "default" icon subformat
                                 icon_suffix = icon_size.replace('>', '').replace('<', '').replace('^', '').replace('!', '')
 
-                                bibdoc.add_icon(iconpath, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
+                                bibdoc.add_icon(iconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                             _do_log(working_dir, 'Added icon to ' + \
                                     bibdoc.get_docname() + ': ' + iconpath)
-                        except InvenioWebSubmitFileError, e:
+                        except InvenioBibDocFileError, e:
                             # Most probably icon already existed.
                             pass
         else:
@@ -2013,7 +2014,7 @@ def add_format(file_path, bibdoc_name, recid, doctype, working_dir,
                 pending_bibdocs[bibdoc_name][3].append(file_path)
             # else: we previously added a file by mistake. Do
             # not care, it will be deleted
-    except InvenioWebSubmitFileError, e:
+    except InvenioBibDocFileError, e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2121,7 +2122,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
                     _do_log(working_dir, 'Added ' + bibdoc.get_docname() + ': ' + \
                             file_path)
 
-                except InvenioWebSubmitFileError, e:
+                except InvenioBibDocFileError, e:
                     _do_log(working_dir, str(e))
                     register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
                                        'tried to revise a file %s ' \
@@ -2171,10 +2172,10 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
                                 else:
                                     # We have already added the "default" icon subformat
                                     icon_suffix = icon_size.replace('>', '').replace('<', '').replace('^', '').replace('!', '')
-                                    bibdoc.add_icon(iconpath, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
+                                    bibdoc.add_icon(iconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                                 _do_log(working_dir, 'Added icon to ' + \
                                         bibdoc.get_docname() + ': ' + iconpath)
-                            except InvenioWebSubmitFileError, e:
+                            except InvenioBibDocFileError, e:
                                 # Most probably icon already existed.
                                 pass
 
@@ -2206,7 +2207,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
             if rename and rename != bibdoc_name:
                 pending_bibdocs[rename] = pending_bibdocs[bibdoc_name]
 
-    except InvenioWebSubmitFileError, e:
+    except InvenioBibDocFileError, e:
         # Format already existed.  How come? We should
         # have checked this in Create_Upload_Files_Interface.py
         register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2230,7 +2231,7 @@ def delete(bibdoc_name, recid, working_dir, pending_bibdocs,
         if pending_bibdocs.has_key(bibdoc_name):
             del pending_bibdocs[bibdoc_name]
 
-    except InvenioWebSubmitFileError, e:
+    except InvenioBibDocFileError, e:
         # Mmh most probably we deleted two files at the same
         # second. Sleep 1 second and retry...  This might go
         # away one bibdoc improves its way to delete files
@@ -2240,7 +2241,7 @@ def delete(bibdoc_name, recid, working_dir, pending_bibdocs,
             _do_log(working_dir, 'Deleted ' + bibdoc_name)
             if pending_bibdocs.has_key(bibdoc_name):
                 del pending_bibdocs[bibdoc_name]
-        except InvenioWebSubmitFileError, e:
+        except InvenioBibDocFileError, e:
             _do_log(working_dir, str(e))
             _do_log(working_dir, repr(bibrecdocs.list_bibdocs()))
             register_exception(prefix='Move_Uploaded_Files_to_Storage ' \
@@ -2321,7 +2322,7 @@ $(document).ready(function() {
     var options = {
         target: '#uploadFileInterface', // target element(s) to be updated with server response
         success: showResponse, // post-submit callback
-        url: '/submit/managedocfilesasync%(form_url_params)s' // override for form's 'action' attribute
+        url: '/%(CFG_SITE_RECORD)s/managedocfilesasync%(form_url_params)s' // override for form's 'action' attribute
     };
 
     // bind form using 'ajaxForm'
@@ -2333,7 +2334,9 @@ $(document).ready(function() {
 function showResponse(responseText, statusText)  {
     hide_revise_panel();
 }
-    '''  % {'form_url_params': form_url_params} #'
+    '''  % {
+        'form_url_params': form_url_params,
+        'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
     javascript += '''
 /* Record position of the last clicked link that triggered the display
@@ -2550,7 +2553,7 @@ function askDelete(bibdocname, form_url_params){
             var options = {
                 target: '#uploadFileInterface',
                 success: showResponse,
-                url: '/submit/managedocfilesasync' + form_url_params
+                url: '/%(CFG_SITE_RECORD)s/managedocfilesasync' + form_url_params
             };
             $(mainForm).ajaxSubmit(options);
         } else {
@@ -2602,7 +2605,7 @@ function gray_out(visible) {
 }
 -->
 </script>
-'''
+''' % {'CFG_SITE_RECORD': CFG_SITE_RECORD}
     return javascript
 
 def get_upload_file_interface_css():
