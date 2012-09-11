@@ -966,6 +966,7 @@ WSGIRestrictStdout Off
         LogFormat "%%h %%l %%u %%t \\"%%r\\" %%>s %%b \\"%%{Referer}i\\" \\"%%{User-agent}i\\" %%D" combined_with_timing
         CustomLog %(logdir)s/apache.log combined_with_timing
         DirectoryIndex index.en.html index.html
+        Alias /static/ %(webdir)s/static/
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
         Alias /flash/ %(webdir)s/flash/
@@ -1042,6 +1043,7 @@ WSGIRestrictStdout Off
         LogFormat "%%h %%l %%u %%t \\"%%r\\" %%>s %%b \\"%%{Referer}i\\" \\"%%{User-agent}i\\" %%D" combined_with_timing
         CustomLog %(logdir)s/apache-ssl.log combined_with_timing
         DirectoryIndex index.en.html index.html
+        Alias /static/ %(webdir)s/static/
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
         Alias /flash/ %(webdir)s/flash/

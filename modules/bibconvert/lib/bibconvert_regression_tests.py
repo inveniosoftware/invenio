@@ -37,17 +37,17 @@ class BibConvertWebPagesAvailabilityTest(unittest.TestCase):
                                                expected_text="BibConvert Admin Guide"))
         return
 
-    def FIXME_TICKET_36_test_availability_bibconvert_admin_guide_parts(self):
+    def test_availability_bibconvert_admin_guide_parts(self):
         """bibconvert - availability of BibConvert Admin Guide parts"""
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/bibtex.cfg')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/dcq.cfg')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/dcq.dat')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/dcxml-to-marcxml.cfg')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/example_oaimarc2xm.xsl')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/example_oaimarc2xm_collID.kb')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/sample.cfg')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/sample.dat')
-        test_web_page_existence(CFG_SITE_URL + '/admin/bibconvert/sample.kb')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/bibtex.cfg')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/dcq.cfg')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/dcq.dat')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/dcxml-to-marcxml.cfg')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/example_oaimarc2xm.xsl')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/example_oaimarc2xm_collID.kb')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/sample.cfg')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/sample.dat')
+        test_web_page_existence(CFG_SITE_URL + '/static/bibconvert-admin-guide/sample.kb')
 
     def test_availability_bibconvert_hacking_pages(self):
         """bibconvert - availability of BibConvert Hacking Guide pages"""
