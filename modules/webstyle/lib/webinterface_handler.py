@@ -109,7 +109,7 @@ def _check_result(req, result):
         if result is None:
             result = ""
         else:
-            result = str(result)
+            result = str(result.encode('utf-8'))
 
         # unless content_type was manually set, we will attempt
         # to guess it

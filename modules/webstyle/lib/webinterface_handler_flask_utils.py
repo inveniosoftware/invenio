@@ -23,7 +23,7 @@ Invenio -> Flask adapter utilities
 from functools import wraps
 from flask import Blueprint, current_app, request, session, redirect, abort, g, \
                   render_template, jsonify, get_flashed_messages, flash, \
-                  Response, _request_ctx_stack
+                  Response, _request_ctx_stack, stream_with_context
 from invenio.webuser_flask import current_user, login_required
 from invenio.urlutils import create_url
 from invenio.sqlalchemyutils import db
@@ -110,18 +110,20 @@ class InvenioBlueprint(Blueprint):
             t = current_app.jinja_env.get_template(template_name)
             rv = t.stream(context)
 
-            ## Get real objects from Werkzeug proxy objects.
-            app = current_app._get_current_object()
-            rq = request._get_current_object()
-            def wrap_context():
-                """
-                This iterator wrapper tries to solve problem of keeping
-                request context until the template is fully rendered.
-                """
-                with app.request_context(rq.environ):
-                    for r in rv:
-                        yield r
-            return wrap_context()
+            return stream_with_context(rv)
+
+            ### Get real objects from Werkzeug proxy objects.
+            #app = current_app._get_current_object()
+            #rq = request._get_current_object()
+            #def wrap_context():
+            #    """
+            #    This iterator wrapper tries to solve problem of keeping
+            #    request context until the template is fully rendered.
+            #    """
+            #    with app.request_context(rq.environ):
+            #        for r in rv:
+            #            yield r
+            #return wrap_context()
 
         if stream:
             render = lambda template, **ctx: \

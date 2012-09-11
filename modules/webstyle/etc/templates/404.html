@@ -1,3 +1,4 @@
+{#
 ## This file is part of Invenio.
 ## Copyright (C) 2012 CERN.
 ##
@@ -14,14 +15,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+{% set title = None %}
+{% block body %}
 
-templatesdir = $(sysconfdir)/templates
-templates_DATA = page.html \
-		 404.html \
-                 _formhelpers.html \
-		 header.html \
-		 footer.html
+<div class="row">
+  <div class="offset3 span6 alert alert-error" align="center">
+    <div class="page-header">
+      <h1>{{ _("404: Page Not Found") }}</h1>
+    </div>
+    <p>
+    {{ _("The page you were looking for doesn't exist.") }}<br/>
+    {{ _("Click the following link to go to the main page:") }}
+    </p>
+    <p>
+      <a href="/">{{ _("Main page") }}</a>
+    </p>
+  </div>
+</div>
 
-EXTRA_DIST = $(templates_DATA)
-
-CLEANFILES = *~ *.tmp
+{% endblock %}

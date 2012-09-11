@@ -247,13 +247,13 @@ class Template:
   'title' : (title and show_title_p) and '<div class="headline_div"><h1 class="headline">' + cgi.escape(title) + '</h1></div>' or '',
   'titleepilogue' : titleepilogue,
 
-  'body' : body.encode('utf-8'),
+  'body' : body.decode('utf-8'),
 
   }
         if show_footer:
             out += self.tmpl_pagefooter(req, ln = ln,
                            lastupdated = lastupdated,
-                           pagefooteradd = pagefooteradd)
+                           pagefooteradd = pagefooteradd.decode('utf-8'))
         return out
 
     def tmpl_pageheader(self, req, ln=CFG_SITE_LANG, headertitle="",
@@ -484,7 +484,7 @@ template function generated it.
         except:
             lastupdated = None
 
-        out += render_template('footer.html', lastupdated=lastupdated).encode('utf-8')
+        out += render_template('footer.html', lastupdated=lastupdated)
         out += """
 </body>
 </html>

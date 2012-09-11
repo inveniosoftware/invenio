@@ -26,7 +26,8 @@ from os.path import join, exists, getmtime, splitext
 from pprint import pformat
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
-from flask import Blueprint, Flask, logging, session, request, g, url_for, current_app
+from flask import Blueprint, Flask, logging, session, request, g, \
+                url_for, current_app, Response, render_template
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError, NotFound, RequestRedirect
 
@@ -72,7 +73,8 @@ def create_invenio_flask_app():
     from flask.ext.assets import Environment, Bundle
     from invenio.webinterface_handler_flask_utils import unicodifier
     from flaskext.gravatar import Gravatar
-
+    from werkzeug.wrappers import BaseResponse
+    from werkzeug.exceptions import HTTPException
 
     from invenio.webinterface_handler_wsgi import \
                 application as legacy_application
@@ -83,26 +85,26 @@ def create_invenio_flask_app():
 
         def __call__(self, environ, start_response):
             with self.app.request_context(environ):
+                g.start_response = start_response
                 try:
                     response = self.app.full_dispatch_request()
                 except Exception, e:
-                    # e == 404
-                    try:
-                        return legacy_application(environ, start_response)
-                    except:
-                        register_exception(alert_admin=True)
-                        raise
-                    #except:
-                    #    pass
-                    #response = self.app.make_response(self.app.handle_exception(e))
+                    response = self.app.make_response(self.app.handle_exception(e))
+                    #raise
+                    #register_exception(alert_admin=True)
                 return response(environ, start_response)
 
     _app.wsgi_app = LegacyAppMiddleware(_app)
 
     @_app.errorhandler(404)
     def page_not_found(error):
-        print error, "Will try to call legacy application."
-        raise
+        try:
+            response = legacy_application(request.environ, g.start_response)
+            if not isinstance(response, BaseResponse):
+                response = str(response) #current_app.make_response(response)
+            return response
+        except HTTPException, e:
+            return render_template("404.html"), 404
 
     if CFG_FLASK_CACHE_TYPE not in [None, 'null']:
         _app.jinja_options = dict(_app.jinja_options,

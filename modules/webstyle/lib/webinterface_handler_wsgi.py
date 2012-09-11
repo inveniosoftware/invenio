@@ -446,7 +446,14 @@ def application(environ, start_response, flask_app=None):
                 ret = invenio_handler(req)
             req.flush()
         except SERVER_RETURN, status:
+            redirection, = status.args
+            from werkzeug.wrappers import BaseResponse
+            if isinstance(redirection, BaseResponse):
+                return redirection
             status = int(str(status))
+            if status == 404:
+                from werkzeug.exceptions import NotFound
+                raise NotFound()
             if status not in (OK, DONE):
                 req.status = status
                 req.headers_out['content-type'] = 'text/html'
@@ -459,7 +466,7 @@ def application(environ, start_response, flask_app=None):
                 return generate_error_page(req, admin_to_be_alerted)
             else:
                 req.flush()
-        except:
+        except Exception, e:
             register_exception(req=req, alert_admin=True)
             raise
             if not req.response_sent_p:
