@@ -278,7 +278,6 @@ def solr_add_fulltext(recid, text):
             text = remove_control_characters(text)
             utext = unicode(text, 'utf-8')
             SOLR_CONNECTION.add(id=recid, fulltext=utext)
-            SOLR_CONNECTION.commit()
             return True
         except (UnicodeDecodeError, UnicodeEncodeError):
             # forget about bad UTF-8 files
@@ -902,6 +901,8 @@ class WordTable:
                     register_exception(alert_admin=True)
                     task_update_status("ERROR")
                     self.put_into_db()
+                    if self.index_name == 'fulltext' and CFG_SOLR_URL:
+                        SOLR_CONNECTION.commit()
                     sys.exit(1)
                 write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
@@ -922,6 +923,8 @@ class WordTable:
                 if flush_count >= opt_flush:
                     self.put_into_db()
                     self.clean()
+                    if self.index_name == 'fulltext' and CFG_SOLR_URL:
+                        SOLR_CONNECTION.commit()
                     write_message("%s backing up" % (self.tablename))
                     flush_count = 0
                     self.log_progress(time_started, records_done, records_to_go)
@@ -929,6 +932,8 @@ class WordTable:
                 i_low = i_high + 1
         if flush_count > 0:
             self.put_into_db()
+            if self.index_name == 'fulltext' and CFG_SOLR_URL:
+                SOLR_CONNECTION.commit()
             self.log_progress(time_started, records_done, records_to_go)
 
     def add_recIDs_by_date(self, dates, opt_flush):
@@ -1118,6 +1123,8 @@ class WordTable:
             self.del_recID_range(arange[0], arange[1])
             count = count + arange[1] - arange[0]
         self.put_into_db()
+        if self.index_name == 'fulltext' and CFG_SOLR_URL:
+            SOLR_CONNECTION.commit()
 
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low
