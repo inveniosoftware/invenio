@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,7 +19,8 @@ webdoclibdir = $(libdir)/webdoc/invenio/admin
 
 webdoclib_DATA = bibconvert-admin-guide.webdoc
 
-sampledir=$(localstatedir)/www/admin/bibconvert
+sampledir=$(localstatedir)/www/static/bibconvert-admin-guide
+
 sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg \
 	    example_oaimarc2xm.xsl example_oaimarc2xm_collID.kb
 

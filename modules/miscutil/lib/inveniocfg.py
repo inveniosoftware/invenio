@@ -841,6 +841,7 @@ WSGIRestrictStdout Off
         LogLevel warn
         CustomLog %(logdir)s/apache.log combined
         DirectoryIndex index.en.html index.html
+        Alias /static/ %(webdir)s/static/
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
         Alias /export/ %(webdir)s/export/
@@ -911,6 +912,7 @@ WSGIRestrictStdout Off
         LogLevel warn
         CustomLog %(logdir)s/apache-ssl.log combined
         DirectoryIndex index.en.html index.html
+        Alias /static/ %(webdir)s/static/
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
         Alias /export/ %(webdir)s/export/
