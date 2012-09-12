@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2012 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -128,6 +128,8 @@ var gPrevState;
 var gState;
 // A current status
 var gCurrentStatus;
+// Submission mode. Possible values are default and textmarc
+var gSubmitMode = 'default';
 
 // a global array of visible changes associated with a currently viewed record
 // This array is cleared always when a new changes set is applied... then it is used
@@ -194,7 +196,7 @@ function resize_content() {
    */
   var bibedit_table_top = $("#bibEditContentTable").offset().top;
   var bibedit_table_height = Math.round(.93 * ($(window).height() - bibedit_table_top));
-  bibedit_table_height = parseInt(bibedit_table_height) + 'px';
+  bibedit_table_height = parseInt(bibedit_table_height, 10) + 'px';
   $("#bibEditContentTable").css('height', bibedit_table_height);
 }
 
@@ -265,7 +267,7 @@ function initMisc(){
   }
 
   // Warn user if BibEdit is being closed while a record is open.
-  window.onbeforeunload = function(){
+  window.onbeforeunload = function() {
     if (gRecID && gRecordDirty){
       return '******************** WARNING ********************\n' +
              '                  You have unsubmitted changes.\n\n' +
@@ -305,14 +307,14 @@ function initJeditable(){
     cell_id_split[0] = 'subfieldTag';
     var subfield_id = cell_id_split.join('_');
     /* Add autocomplete handler to fields in gTagsToAutocomplete */
-    var fieldInfo = $(original).parents("tr").siblings().eq(0).children().eq(1).html()
+    var fieldInfo = $(original).parents("tr").siblings().eq(0).children().eq(1).html();
     if ($.inArray(fieldInfo + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
         addHandler_autocompleteAffiliations(textarea);
     }
     textarea.bind('keydown', 'return', function(event){ form.submit(); return false;});
     initInputHotkeys(textarea);
     return(textarea);
-  }
+  };
 }
 
 /*
@@ -452,8 +454,7 @@ function onAjaxSuccess(json, onSuccess){
   if (cacheDirty){
     // Cache is dirty. Enable submit button.
     gRecordDirty = cacheDirty;
-    $('#btnSubmit').removeAttr('disabled');
-    $('#btnSubmit').css('background-color', 'lightgreen');
+    activateSubmitButton();
   }
       }
       if (onSuccess) {
@@ -477,6 +478,7 @@ function resetBibeditState(){
   gPhysCopiesNum = 0;
   gBibCircUrl = null;
 
+  clearWarnings();
   updateInterfaceAccordingToMode();
   updateRevisionsHistory();
   updateUrView();
@@ -532,11 +534,10 @@ function initStateFromHash(){
     // Invalid hash, fail...
     return;
 
-  if (gState != gPrevState
-    || (gState == 'edit' && parseInt(tmpRecID) != gRecID) || // different record number
-    (tmpRecRev != undefined && tmpRecRev != gRecRev) // different revision
-    || (tmpRecRev == undefined && gRecRev != gRecLatestRev) // latest revision requested but another open
-    || (tmpReadOnlyMode != gReadOnlyMode)){ // switched between read-only and read-write modes
+  if (gState != gPrevState || (gState == 'edit' && parseInt(tmpRecID, 10) != gRecID) || // different record number
+    (tmpRecRev != undefined && tmpRecRev != gRecRev) || // different revision
+    (tmpRecRev == undefined && gRecRev != gRecLatestRev) || // latest revision requested but another open
+    (tmpReadOnlyMode != gReadOnlyMode)){ // switched between read-only and read-write modes
 
     // We have an actual and legal change of state. Clean up and update the
     // page.
@@ -550,7 +551,7 @@ function initStateFromHash(){
         updateStatus('ready');
         break;
       case 'edit':
-        var recID = parseInt(tmpRecID);
+        var recID = parseInt(tmpRecID, 10);
         if (isNaN(recID)){
           // Invalid record ID.
           cleanUp(true, tmpRecID, 'recID', true);
@@ -713,7 +714,7 @@ function insertFieldToRecord(record, fieldId, ind1, ind2, subFields){
   /**Inserting a new field on the client side and returning the position of the newly created field*/
   newField = [subFields, ind1, ind2, '', 0];
   if (record[fieldId] == undefined){
-    record[fieldId] = [newField]
+    record[fieldId] = [newField];
     return 0;
   } else {
     record[fieldId].push(newField);
@@ -730,7 +731,7 @@ function transformRecord(record){
    * */
   result = {};
   for (fieldId in record){
-    result[fieldId] = {}
+    result[fieldId] = {};
     indicesList = []; // a list of all the indices ... utilised later when determining the positions
     for (fieldIndex in record[fieldId]){
 
@@ -738,13 +739,13 @@ function transformRecord(record){
       if (record[fieldId][fieldIndex][1] == ' '){
         indices += "_";
       }else{
-        indices += record[fieldId][fieldIndex][1]
+        indices += record[fieldId][fieldIndex][1];
       }
 
       if (record[fieldId][fieldIndex][2] == ' '){
         indices += "_";
       }else{
-        indices += record[fieldId][fieldIndex][2]
+        indices += record[fieldId][fieldIndex][2];
       }
 
       if (result[fieldId][indices] == undefined){
@@ -841,7 +842,7 @@ function compareFields(fieldId, indicators, fieldPos, field1, field2){
 function compareIndicators(fieldId, indicators, fields1, fields2){
    /*a helper function allowing to compare inside one indicator
     * excluded from compareRecords for the code clarity reason*/
-  result = []
+  result = [];
   for (fieldPos in fields2){
     if (fields1[fieldPos] == undefined){
       result.push({"change_type" : "field_added",
@@ -1223,8 +1224,7 @@ function onGetRecordSuccess(json){
   updateInterfaceAccordingToMode();
 
   if (gRecordDirty){
-    $('#btnSubmit').removeAttr('disabled');
-    $('#btnSubmit').css('background-color', 'lightgreen');
+    activateSubmitButton();
   }
   if (gTagFormat == 'MARC')
     $('#btnHumanTags').bind('click', onHumanTagsClick).removeAttr('disabled');
@@ -1263,17 +1263,32 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
         close: function() { updateStatus('ready'); },
         buttons: {
             "Submit changes": function() {
-                        createReq({recID: gRecID, requestType: 'submit',
-                          force: onSubmitClick.force}, function(json) {
-                            // Submission was successful.
-                            changeAndSerializeHash({state: 'submit', recid: gRecID});
+                        var reqData = {
+                                      recID: gRecID,
+                                      force: onSubmitClick.force,
+                                      requestType: 'submit'
+                                      };
+                        if (gSubmitMode == "textmarc") {
+                          reqData.requestType = 'submittextmarc';
+                          reqData.textmarc = $('#textmarc_textbox').val();
+                        }
+                        createReq(reqData, function(json) {
                             var resCode = json['resultCode'];
-                            cleanUp(!gNavigatingRecordSet, '', null, true);
-                            updateStatus('report', gRESULT_CODES[resCode]);
-                            displayMessage(resCode, false, [json["new_cnum"]]);
-                            updateToolbar(false);
-                            resetBibeditState();
-                            updateStatus('ready');
+                            if (resCode == 115) {
+                              // There was a textmarc parsing error
+                              displayMessage(resCode, true, json["parse_error"]);
+                              updateStatus('ready');
+                            }
+                            else {
+                              // Submission was successful.
+                              changeAndSerializeHash({state: 'submit', recid: gRecID});
+                              cleanUp(!gNavigatingRecordSet, '', null, true);
+                              updateStatus('report', gRESULT_CODES[resCode]);
+                              displayMessage(resCode, false, [json["new_cnum"]]);
+                              updateToolbar(false);
+                              resetBibeditState();
+                              updateStatus('ready');
+                            }
                         });
                         $( this ).remove();
                     },
@@ -1286,11 +1301,12 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
   $(dialogPreview.dialogDiv).parent().find('button:nth-child(1)').focus();
 }
 
-function onSubmitClick(){
+function onSubmitClick() {
   /*
    * Handle 'Submit' button (submit record).
    */
   updateStatus('updating');
+
   var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
 
   // Get preview of the record and let the user confirm submit
@@ -1300,30 +1316,152 @@ function onSubmitClick(){
 // Enable this flag to force the next submission even if cache is outdated.
 onSubmitClick.force = false;
 
-function onPreviewClick(){
+function onPreviewClick() {
   /*
    * Handle 'Preview' button (preview record).
    */
-   var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
-   createReq({'new_window': true, recID: gRecID, requestType: 'preview'
-       }, function(json){
-       // Preview was successful.
-        $(dialogPreview.dialogDiv).remove();
-        var html_preview = json['html_preview'];
-        var preview_window = openCenteredPopup('', 'Record preview', 768, 768);
-        preview_window.document.write(html_preview);
-        preview_window.document.close(); // needed for chrome and safari
-       });
+  clearWarnings();
+  var reqData = {
+              'new_window': true,
+              recID: gRecID,
+              submitMode: gSubmitMode,
+              requestType: 'preview'
+              };
+
+  if (gSubmitMode == "textmarc") {
+    reqData.textmarc = $("#textmarc_textbox").val();
+  }
+
+  var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
+  createReq(reqData, function(json) {
+      // Preview was successful.
+      $(dialogPreview.dialogDiv).remove();
+      var resCode = json['resultCode'];
+      if (resCode == 115) {
+          // There was a textmarc parsing error
+          displayMessage(resCode, true, json["parse_error"]);
+          updateStatus('ready');
+          return;
+      }
+      var html_preview = json['html_preview'];
+      var preview_window = openCenteredPopup('', 'Record preview', 768, 768);
+      preview_window.document.write(html_preview);
+      preview_window.document.close(); // needed for chrome and safari
+     });
 }
 
 function onPrintClick() {
   /*
    * Print page, makes use of special css rules @media print
    */
+  // If we are in textarea view, copy the contents to the helper div
+  $('#print_helper').text($('#textmarc_textbox').val());
   $("#bibEditContentTable").css('height', "100%");
   window.print();
   resize_content();
 }
+
+function onTextMarcBoxKeyUp() {
+  /* Handler for keyup event inside the textmarc editing area */
+  gRecordDirty = true;
+  activateSubmitButton();
+  // Disable keyup event on textarea
+  $(this).off("keyup");
+}
+
+function onTextMarcClick() {
+  /*
+  * 1) Send request to server that will return textmarc from the cache content
+  * 2) Remove editor table and display content in textbox
+  * 3) Activate flag to know we are in text marc mode (for submission)
+  */
+
+  /* Save the content in all textareas that are currently opened before changing
+  view mode
+  */
+  $(".edit_area textarea").trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));
+
+  createReq({recID: gRecID, requestType: 'getTextMarc'
+       }, function(json) {
+        // Request was successful.
+        var textmarc_box = $('<textarea>');
+        textmarc_box.attr('id', 'textmarc_textbox');
+        textmarc_box.html(json['textmarc']);
+        $('#bibEditTable').remove();
+        $('#bibEditContentTable').append(textmarc_box);
+
+        // Avoids having two different scrollbars
+        $('#bibEditContentTable').css('overflow', 'visible');
+
+        // Create an extra div to store the textarea content whenever printing
+        var print_helper = $('<div>');
+        print_helper.attr('id', 'print_helper');
+        $('#bibEditContentTable').append(print_helper);
+
+        // Bind keyup event to textarea to detect when changes have been
+        // introduced
+        textmarc_box.on("keyup", onTextMarcBoxKeyUp);
+
+        // Disable menu buttons
+        deactivateRecordMenu();
+        if (gRecordDirty) {
+          activateSubmitButton();
+        }
+
+        // Disable reference extraction in textmarc mode
+        $('#img_run_refextract, #img_extract_free_text').off('click').removeClass(
+        'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+
+        // Empty undo/redo handlers
+        var gUndoList = []; // list of possible undo operations
+        var gRedoList = []; // list of possible redo operations
+        updateUrView();
+
+        // Disable read/only mode button
+        $("#btnSwitchReadOnly").prop('disabled', true);
+
+        // Activate textmarc flag
+        gSubmitMode = 'textmarc';
+
+        // Change icon to table view
+        $("#img_textmarc").attr('src', '/img/bibedit_tableview.png');
+        $("#img_textmarc").attr('id', 'img_tableview');
+        $("#img_tableview").off("click").on("click", onTableViewClick);
+       });
+}
+
+function onTableViewClick() {
+  /*
+   * 1) Send request to validate textmarc and create a cache file with its
+   *    content
+   * 2) Get the record from the cache and display it in the table
+  */
+  createReq({recID: gRecID, textmarc: $('#textmarc_textbox').val(),
+      requestType: 'getTableView', recordDirty: gRecordDirty
+       }, function(json) {
+          var resCode = json['resultCode'];
+          if (resCode == 115) {
+            // There was a textmarc parsing error
+            displayMessage(resCode, true, json["parse_error"]);
+            updateStatus('ready');
+          }
+          else if (resCode == 116) {
+            // Change to table view was successful
+            getRecord(gRecID);
+            // Change icon to textmarc view
+            $("#img_tableview").attr('src', '/img/bibedit_textmarc.png');
+            $("#img_tableview").attr('id', 'img_textmarc');
+            $("#img_textmarc").off("click").on("click", onTextMarcClick);
+
+            // Enable back read/only mode button
+            $("#btnSwitchReadOnly").prop('disabled', true);
+
+            // Activate default submission flag
+            gSubmitMode = 'default';
+          }
+        });
+}
+
 
 function onOpenPDFClick() {
   /*
@@ -1352,11 +1490,31 @@ function record_has_pdf() {
 }
 
 function getPreview(dialog, onSuccess) {
+    /*
+     * Get preview to be added to the dialog before submission
+     */
+    clearWarnings();
     var html_preview;
-    createReq({'new_window': false, recID: gRecID, requestType: 'preview'
-       }, function(json){
+    var reqData = {
+                  'new_window': false,
+                  recID: gRecID,
+                  submitMode: gSubmitMode,
+                  requestType: 'preview'
+                  };
+    if (gSubmitMode == "textmarc") {
+      reqData.textmarc = $("#textmarc_textbox").val();
+    }
+    createReq(reqData, function(json){
        // Preview was successful.
         html_preview = json['html_preview'];
+        var resCode = json['resultCode'];
+        if (resCode == 115) {
+            // There was a parsing error
+            displayMessage(resCode, true, json["parse_error"]);
+            updateStatus('ready');
+            $(dialog.dialogDiv).remove();
+            return;
+        }
         onSuccess(dialog, html_preview);
        });
 }
@@ -1415,8 +1573,7 @@ function onRefExtractClick() {
                             displayRecord();
                             redrawFields();
                             reColorFields();
-                            $('#btnSubmit').removeAttr('disabled');
-                            $('#btnSubmit').css('background-color', 'lightgreen');
+                            activateSubmitButton();
                             $( this ).remove();
                         },
                         Cancel: function() {
@@ -1464,8 +1621,7 @@ function onRefExtractFreeTextClick() {
                               displayRecord();
                               redrawFields();
                               reColorFields();
-                              $('#btnSubmit').removeAttr('disabled');
-                              $('#btnSubmit').css('background-color', 'lightgreen');
+                              activateSubmitButton();
                               $( this ).remove();
                         }
                       }
@@ -1660,6 +1816,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gRedoList = [];
   gBibCircUrl = null;
   gPhysCopiesNum = 0;
+  gSubmitMode = "default";
 }
 
 function addHandler_autocompleteAffiliations(tg) {
@@ -2621,29 +2778,33 @@ function convertFieldIntoEditable(cell, shouldSelect){
   $(cell).unbind(editEvent);
 
   $(cell).editable(
-    function(value){
+    /* function to send edited content to */
+    function(value) {
       newVal = onContentChange(value, this);
       if (newVal.substring(0,9) == "VOLATILE:"){
         $(cell).addClass("bibEditVolatileSubfield");
         newVal = newVal.substring(9);
-        $(cell).addClass("bibEditVolatileSubfield");
-        if (!shouldSelect){
+        if (!shouldSelect) {
           // the field should start selecting all the content upon the click
+          // because it is VOLATILE
           convertFieldIntoEditable(cell, true);
         }
       }
       else{
         $(cell).removeClass("bibEditVolatileSubfield");
         if (shouldSelect){
-          // this is a volatile field any more - clicking should not
+          // this is not a volatile field any more - clicking should not
           // select all the content inside.
           convertFieldIntoEditable(cell, false);
         }
       }
       return newVal;
-    }, {
+    },
+    /* start of jEditable options */
+    {
       type: 'textarea',
       callback: function(data, settings){
+        /* Function to run after submitting edited content */
         var tmpArray = this.id.split('_');
         var tag = tmpArray[1], fieldPosition = tmpArray[2],
         subfieldIndex = tmpArray[3];

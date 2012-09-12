@@ -70,6 +70,7 @@ function displayRecord() {
 
     // Close and display table.
     table += '</table>';
+    $('#bibEditContentTable').css('overflow', 'auto');
     $('#bibEditContentTable').append(table);
 
     // now displaying the remaining controls
@@ -620,6 +621,8 @@ function getToolbarButtonSet() {
                           'right', true, onOpenPDFClick],
         'Print page': ['img_print', '/img/document-print.png', 'right',
                         false, onPrintClick],
+        'Text marc': ['img_textmarc', '/img/bibedit_textmarc.png', 'right',
+                        false, onTextMarcClick],
         'Run reference extractor on this record': ['img_run_refextract',
                                                    '/img/ref_extract.png',
                                                    'left', true,
@@ -641,8 +644,8 @@ function createTopToolbar() { /* Generate BibEdit top toolbar */
         'left': 'floatLeft'
     };
 
-    var icon_height = 40,
-        icon_width = 40;
+    var icon_height = 48,
+        icon_width = 48;
 
     var toolbar_button_set = getToolbarButtonSet();
 
@@ -662,8 +665,18 @@ function createTopToolbar() { /* Generate BibEdit top toolbar */
     });
 }
 
+function restartTextMarcViewIcon() {
+    /*
+    Change view icon to the default textmarc
+    */
+    $("#img_tableview").attr('src', '/img/bibedit_textmarc.png');
+    $("#img_tableview").attr('id', 'img_textmarc');
+}
+
 function updateToolbar(enable) {
     /* Activate or deactivate buttons present in BibEdit's top toolbar */
+    restartTextMarcViewIcon();
+
                         /* turn this .....         into this */
     var before_after = ['bibEditImgCtrlDisabled', 'bibEditImgCtrlEnabled'];
     if (!enable) before_after.reverse();
@@ -679,7 +692,13 @@ function updateToolbar(enable) {
         if (enable && requires_pdf && !record_has_pdf()) { /* Skip iteration */
             return true;
         }
-        $(sel).off('click').on('click', fn).removeClass(before).addClass(after);
+        $(sel).removeClass(before).addClass(after);
+        if (enable) {
+            $(sel).on('click', fn);
+        }
+        else {
+            $(sel).off('click');
+        }
     });
 }
 
@@ -880,10 +899,17 @@ function displayMessage(msgCode, keepContent, args) {
         msg = 'An error ocurred during the upload simulation: <br /><br />' +
             args[0] + '<br />';
         break;
+    case 115:
+        msg = 'An error ocurred while parsing the textmarc content: <br /><br />' +
+            'Line: ' + args[0] + '<br /><br />' +
+            '<strong>' + args[1] + '</strong>' + '<br /><br />' +
+            args[2] + '<br />';
+        break;
     default:
         msg = 'Result code: <b>' + msgCode + '</b>';
     }
     if (!keepContent) {
+        clearWarnings();
         $('#bibEditContentTable').html('<div class="warningMsg">' + msg +
                                        '</div>');
     } else {
@@ -1293,4 +1319,9 @@ function openCenteredPopup(pageURL, title, w, h) { /* Opens a centered popup */
             ',resizeable,scrollbars');
     }
     return targetWindow;
+}
+
+function clearWarnings() {
+    /* Removes all messages present on the top warning area */
+    $('#bibEditMessage').empty();
 }

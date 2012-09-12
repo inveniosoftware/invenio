@@ -25,6 +25,7 @@ from datetime import datetime
 import re
 import difflib
 import zlib
+import copy
 
 from invenio import bibrecord
 from invenio import bibformat
@@ -64,7 +65,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     get_record_revision_timestamps, record_revision_exists, \
     can_record_have_physical_copies, extend_record_with_template, \
     replace_references, merge_record_with_template, record_xml_output, \
-    record_is_conference, add_record_cnum
+    record_is_conference, add_record_cnum, get_xml_from_textmarc
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -73,7 +74,8 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     create_field, record_replace_field, record_move_fields, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields, record_get_field_instances, record_add_fields, \
-    record_strip_empty_fields, record_strip_empty_volatile_subfields
+    record_strip_empty_fields, record_strip_empty_volatile_subfields, \
+    record_strip_controlfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
@@ -93,7 +95,6 @@ from invenio.bibcirculation_utils import create_item_details_url
 
 from invenio.refextract_api import FullTextNotAvailable
 from invenio import xmlmarc2textmarc as xmlmarc2textmarc
-
 from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
 
 import invenio.template
@@ -351,7 +352,8 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         # User related requests.
         response.update(perform_request_user(req, request_type, recid, data))
     elif request_type in ('getRecord', 'submit', 'cancel', 'newRecord',
-        'deleteRecord', 'deleteRecordCache', 'prepareRecordMerge', 'revert', 'updateCacheRef'):
+        'deleteRecord', 'deleteRecordCache', 'prepareRecordMerge', 'revert',
+        'updateCacheRef', 'submittextmarc'):
         # 'Major' record related requests.
         response.update(perform_request_record(req, request_type, recid, uid,
                                                data))
@@ -404,6 +406,10 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         if data.has_key('txt'):
             txt = data["txt"]
         response.update(perform_request_ref_extract(recid, uid, txt))
+    elif request_type == 'getTextMarc':
+        response.update(perform_request_get_textmarc(recid, uid))
+    elif request_type == "getTableView":
+        response.update(perform_request_get_tableview(recid, uid, data))
 
     return response
 
@@ -830,6 +836,17 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             save_xml_record(recid, uid, to_upload=False, to_merge=True)
             response['resultCode'] = 12
 
+    elif request_type == 'submittextmarc':
+        # Textmarc content coming from the user
+        textmarc_record = data['textmarc']
+        xml_conversion_status = get_xml_from_textmarc(recid, textmarc_record)
+        response.update(xml_conversion_status)
+        if xml_conversion_status['resultMsg'] == 'textmarc_parsing_success':
+            create_cache_file(recid, uid,
+                create_record(response['resultXML'])[0])
+            save_xml_record(recid, uid)
+            response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV["record_submitted"]
+
     return response
 
 def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
@@ -1234,8 +1251,6 @@ def perform_request_ref_extract(recid, uid, txt=None):
     @return: xml record with references extracted
     @rtype: dictionary
     """
-    import copy
-
     sysno = ""
 
     options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
@@ -1273,8 +1288,8 @@ def perform_request_ref_extract(recid, uid, txt=None):
 
     # Using deepcopy as function create_marc_record() modifies the record passed
     textmarc_references = [ line.strip() for line
-        in xmlmarc2textmarc.create_marc_record(
-            copy.deepcopy(ref_bibrecord), sysno, options).split('\n')
+        in xmlmarc2textmarc.create_marc_record(copy.deepcopy(ref_bibrecord),
+            sysno, options).split('\n')
         if '999C5' in line ]
     response['ref_textmarc'] = '<div class="refextracted">' + '<br />'.join(textmarc_references) + "</div>"
 
@@ -1286,7 +1301,15 @@ def perform_request_preview_record(request_type, recid, uid, data):
     """
     response = {}
     if request_type == "preview":
-        if cache_exists(recid, uid):
+        if data["submitMode"] == "textmarc":
+            textmarc_record = data['textmarc']
+            xml_conversion_status = get_xml_from_textmarc(recid, textmarc_record)
+            if xml_conversion_status['resultMsg'] == 'textmarc_parsing_error':
+                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['textmarc_parsing_error']
+                response.update(xml_conversion_status)
+                return response
+            record = create_record(xml_conversion_status["resultXML"])[0]
+        elif cache_exists(recid, uid):
             dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
         else:
             record = get_bibrecord(recid)
@@ -1326,6 +1349,41 @@ def perform_request_record_has_pdf(recid):
     rec_info = BibRecDocs(recid)
     docs = rec_info.list_bibdocs()
     return {'record_has_pdf': bool(docs)}
+
+
+def perform_request_get_textmarc(recid, uid):
+    """ Get record content from cache, convert it to textmarc and return it
+    """
+    textmarc_options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
+               "delete-mode":0, "insert-mode":0, "replace-mode":0,
+               "text-marc":1}
+
+    bibrecord = get_cache_file_contents(recid, uid)[2]
+    record_strip_empty_fields(bibrecord)
+    record_strip_controlfields(bibrecord)
+
+    textmarc = xmlmarc2textmarc.create_marc_record(
+            copy.deepcopy(bibrecord), sysno="", options=textmarc_options)
+
+    return {'textmarc': textmarc}
+
+
+def perform_request_get_tableview(recid, uid, data):
+    """ Convert textmarc inputed by user to marcxml and if there are no
+    parsing errors, create cache file
+    """
+    response = {}
+    textmarc_record = data['textmarc']
+    xml_conversion_status = get_xml_from_textmarc(recid, textmarc_record)
+    response.update(xml_conversion_status)
+
+    if xml_conversion_status['resultMsg'] == 'textmarc_parsing_error':
+        response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['textmarc_parsing_error']
+    else:
+        create_cache_file(recid, uid,
+            create_record(xml_conversion_status['resultXML'])[0], data['recordDirty'])
+        response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['tableview_change_success']
+    return response
 
 
 def _get_formated_record(record, new_window):

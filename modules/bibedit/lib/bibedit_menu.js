@@ -118,6 +118,14 @@ function deactivateRecordMenu(){
   $('#btnDeleteSelected').attr('disabled', 'disabled');
 }
 
+function activateSubmitButton() {
+  /*
+   * Enables the submission of the record
+   */
+  $('#btnSubmit').removeAttr('disabled');
+  $('#btnSubmit').css('background-color', 'lightgreen');
+}
+
 function disableRecordBrowser(){
   /*
    * Disable and hide the menu record browser.

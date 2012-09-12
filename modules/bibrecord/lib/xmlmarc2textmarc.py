@@ -282,7 +282,9 @@ def create_marc_record(record, sysno, options):
     ## Get the fields of this record, and order them correctly (using the same
     ## order as that of the original MARC XML file):
     fields = []
-    for tag in record.keys():
+    tags = record.keys()
+    tags.sort()
+    for tag in tags:
         for field in record[tag]:
             fields.append((tag, field))
     record_order_fields(fields)

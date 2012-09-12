@@ -95,6 +95,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
 #      of using the numbers
 #      The dictionary is convenient at this place because it can be imported with one command
 #      unlike a number of constants
+    'record_submitted': 4,
     'editor_modifications_changed': 33,
     'disabled_hp_changeset' : 34,
     'added_positioned_subfields' : 35,
@@ -103,7 +104,9 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'error_rec_locked_by_queue' : 105,
     'error_wrong_cache_file_format' : 111,
     'error_physical_copies_exist': 112,
-    'cache_updated_with_references': 114
+    'cache_updated_with_references': 114,
+    'textmarc_parsing_error' : 115,
+    'tableview_change_success' : 116
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {

@@ -34,11 +34,18 @@ import os
 import re
 import time
 import zlib
+import tempfile
+import sys
 from datetime import datetime
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH
+    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV
 from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
@@ -69,6 +76,7 @@ from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_engine import acc_authorize_action
 from invenio.refextract_api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml
+from invenio.textmarc2xmlmarc import transform_file, ParseError
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
@@ -816,3 +824,50 @@ def add_record_cnum(recid, uid):
                                    deactivated_hp_changes, \
                                    undo_list, redo_list)
         return new_cnum
+
+def get_xml_from_textmarc(recid, textmarc_record):
+    """
+    Convert textmarc to marcxml and return the result of the conversion
+
+    @param recid: id of the record that is being converted
+    @type: int
+
+    @param textmarc_record: record content in textmarc format
+    @type: string
+
+    @return: dictionary with the following keys:
+            * resultMsg: message describing conversion status
+            * resultXML: xml resulting from conversion
+            * parse_error: in case of error, a description of it
+    @rtype: dict
+    """
+    response = {}
+    # Let's remove empty lines
+    textmarc_record = os.linesep.join([s for s in textmarc_record.splitlines() if s])
+
+    # Create temp file with textmarc to be converted by textmarc2xmlmarc
+    (file_descriptor, file_name) = tempfile.mkstemp()
+    f = os.fdopen(file_descriptor, "w")
+
+    # Write content appending sysno at beginning
+    for line in textmarc_record.splitlines():
+        f.write("%09d %s\n" % (recid, re.sub("\s+", " ", line.strip())))
+    f.close()
+
+    old_stdout = sys.stdout
+    try:
+        # Redirect output, transform, restore old references
+        new_stdout = StringIO()
+        sys.stdout = new_stdout
+        try:
+            transform_file(file_name)
+            response['resultMsg'] = 'textmarc_parsing_success'
+            response['resultXML'] = new_stdout.getvalue()
+        except ParseError, e:
+            # Something went wrong, notify user
+            response['resultXML'] = ""
+            response['resultMsg'] = 'textmarc_parsing_error'
+            response['parse_error'] = [e.lineno, " ".join(e.linecontent.split()[1:]), e.message]
+    finally:
+        sys.stdout = old_stdout
+        return response

@@ -419,6 +419,11 @@ def page_style():
                     table-layout:fixed;
                 }
 
+                #textmarc_textbox {
+                    width: 100%;
+                    height: 100%;
+                }
+
                 #bibEditTable td {
                     overflow:hidden;
                     word-wrap: break-word;
@@ -476,6 +481,10 @@ def page_style():
                     cursor: pointer;
                 }
 
+                #print_helper {
+                    display: none;
+                }
+
                 @media print {
                     img[id^='btnAddSubfield'] {
                         display:none;
@@ -487,6 +496,17 @@ def page_style():
 
                     .bibEditVolatileSubfield {
                         display:none;
+                    }
+
+                    #print_helper {
+                        display: block;
+                        overflow: visible;
+                        white-space: pre;
+                        white-space: pre-wrap;
+                    }
+
+                    #textmarc_textbox {
+                        display: none;
                     }
                 }
 
