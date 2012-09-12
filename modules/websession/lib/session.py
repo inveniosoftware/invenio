@@ -41,12 +41,18 @@ from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
     CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL, \
-    CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS
+    CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS, \
+    CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
 
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
+
+if CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS:
+    _CFG_SESSION_NON_USEFUL_KEYS = ('uid', 'user_info')
+else:
+    _CFG_SESSION_NON_USEFUL_KEYS = ('uid', 'user_info', 'websearch-last-query', 'websearch-last-query-hits')
 
 def get_session(req, sid=None):
     """
@@ -243,12 +249,23 @@ class InvenioSession(dict):
         self.update(session_dict["_data"])
         return 1
 
+    def is_useful(self):
+        """
+        Return True if the session contains some key considered
+        useful (i.e. that deserve being preserved)
+        """
+        for key in self:
+            if key not in _CFG_SESSION_NON_USEFUL_KEYS:
+                return True
+        return False
+
     def save(self):
         """
         Save the session to the database.
         """
         uid = self.get('uid', -1)
-        if not self._invalid and self._sid and self._dirty and uid > 0:
+        if not self._invalid and self._sid and self._dirty and (uid > 0 or self.is_useful()):
+            ## We store something only for real users or useful sessions.
             session_dict = {"_data" : self.copy(),
                     "_created" : self._created,
                     "_accessed": self._accessed,
@@ -262,7 +279,6 @@ class InvenioSession(dict):
             session_expiry = time.time() + self._timeout + CFG_WEBSESSION_ONE_DAY
             session_expiry = convert_datestruct_to_datetext(time.gmtime(session_expiry))
 
-            ## We store something only for real users.
             run_sql("""
                 INSERT session(
                     session_key,

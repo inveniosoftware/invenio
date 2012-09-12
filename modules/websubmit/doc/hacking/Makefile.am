@@ -17,8 +17,7 @@
 
 webdoclibdir = $(libdir)/webdoc/invenio/hacking
 
-webdoclib_DATA = bibdocfile-api.webdoc \
-                 websubmit-internals.webdoc \
+webdoclib_DATA = websubmit-internals.webdoc \
                  websubmit-file-converter.webdoc \
                  websubmit-file-stamper.webdoc \
                  websubmit-icon-creator.webdoc \

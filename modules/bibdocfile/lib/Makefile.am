@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,15 +15,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdoclibdir = $(libdir)/webdoc/invenio/admin
+pylibdir = $(libdir)/python/invenio
 
-webdoclib_DATA = bibconvert-admin-guide.webdoc
+pylib_DATA = bibdocfile_config.py file.py \
+             bibdocfile_webinterface.py \
+             bibdocfile_templates.py \
+             bibdocfile_managedocfiles.py \
+             bibdocfile.py \
+             bibdocfilecli.py \
+             bibdocfile_regression_tests.py
 
-sampledir=$(localstatedir)/www/static/bibconvert-admin-guide
+noinst_DATA = fulltext_files_migration_kit.py icon_migration_kit.py
 
-sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg \
-	    example_oaimarc2xm.xsl example_oaimarc2xm_collID.kb
+EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
 
-EXTRA_DIST = $(sample_DATA) $(webdoclib_DATA)
-
-CLEANFILES =  *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc

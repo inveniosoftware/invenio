@@ -91,7 +91,7 @@ from invenio.batchuploader_engine import perform_upload_check
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
 
-from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -1234,7 +1234,7 @@ def perform_request_get_pdf_url(recid):
     try:
         doc = docs[0]
         response['pdf_url'] = doc.get_file('pdf').get_url()
-    except (IndexError, InvenioWebSubmitFileError):
+    except (IndexError, InvenioBibDocFileError):
         # FIXME, return here some information about error.
         # We could allow the user to specify a URl and add the FFT tags automatically
         response['pdf_url'] = ''

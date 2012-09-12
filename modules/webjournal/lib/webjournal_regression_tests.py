@@ -29,7 +29,8 @@ from invenio import webjournal_utils as wju
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_SUPPORT_EMAIL, \
-			   CFG_PREFIX
+                           CFG_PREFIX, \
+                           CFG_DEVEL_SITE
 from invenio.testutils import make_test_suite, run_test_suite, \
      test_web_page_content, merge_error_messages
 
@@ -107,7 +108,10 @@ class JournalConfigVars(unittest.TestCase):
 
     def test_get_journal_alert_recipient_email(self):
         """webjournal - returns the default email address of the recipients of the email"""
-        self.assertEqual(wju.get_journal_alert_recipient_email('AtlantisTimes'),'recipients@atlantis.atl')
+        if CFG_DEVEL_SITE:
+            self.assertEqual(wju.get_journal_alert_recipient_email('AtlantisTimes'), '')
+        else:
+            self.assertEqual(wju.get_journal_alert_recipient_email('AtlantisTimes'), 'recipients@atlantis.atl')
 
     def test_get_journal_template(self):
         """webjournal - returns the journal templates name for the given template type"""

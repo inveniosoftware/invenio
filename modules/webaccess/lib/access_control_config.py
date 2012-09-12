@@ -105,21 +105,14 @@ elif CFG_OPENAIRE_SITE:
     "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, external_id_attribute_name="id"),
     }
 elif CFG_INSPIRE_SITE:
-    CFG_EXTERNAL_AUTH_DEFAULT = 'arXiv'
-    CFG_EXTERNAL_AUTH_USING_SSO = False
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
-    CFG_EXTERNAL_AUTHENTICATION = {
-        "arXiv": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
-    }
-elif CFG_INSPIRE_SITE:
     # INSPIRE specific robot configuration
     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
     CFG_EXTERNAL_AUTH_USING_SSO = False
     CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
     CFG_EXTERNAL_AUTHENTICATION = {
     "Local": None,
-    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=2),
-    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=2)
+    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False, check_user_ip=2, external_id_attribute_name='personid'),
+    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True, check_user_ip=2, external_id_attribute_name='personid')
     }
 else:
     CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
@@ -311,7 +304,7 @@ _ = gettext_set_language(CFG_SITE_LANG)
 CFG_ACC_ACTIVITIES_URLS = {
     'runbibedit' : (_("Run Record Editor"), "%s/%s/edit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/%s/multiedit/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
-    'runbibdocfile' : (_("Run Document File Manager"), "%s/submit/managedocfiles?ln=%%s" % CFG_SITE_URL),
+    'runbibdocfile' : (_("Run Document File Manager"), "%s/%s/managedocfiles?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibmerge' : (_("Run Record Merger"), "%s/%s/merge/?ln=%%s" % (CFG_SITE_URL, CFG_SITE_RECORD)),
     'runbibswordclient' : (_("Run BibSword client"), "%s/bibsword/?ln=%%s" % CFG_SITE_URL),
     'cfgbibknowledge' : (_("Configure BibKnowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),

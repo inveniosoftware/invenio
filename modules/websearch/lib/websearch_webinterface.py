@@ -92,7 +92,6 @@ from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, logoutUser, isUserSuperAdmin
-from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.weblinkback_webinterface import WebInterfaceRecordLinkbacksPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
@@ -133,6 +132,7 @@ from invenio.errorlib import register_exception
 from invenio.bibedit_webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.bibmerge_webinterface import WebInterfaceMergePages
+from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
 from invenio.search_engine import get_record
 from invenio.shellutils import mymkdir
 
@@ -677,6 +677,9 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         elif component == CFG_SITE_RECORD and path and path[0] == 'multiedit':
             return WebInterfaceMultiEditPages(), path[1:]
+
+        elif component == CFG_SITE_RECORD and path and path[0] in ('managedocfiles', 'managedocfilesasync'):
+            return WebInterfaceManageDocFilesPages(), path
 
         elif component == CFG_SITE_RECORD or component == 'record-restricted':
             try:

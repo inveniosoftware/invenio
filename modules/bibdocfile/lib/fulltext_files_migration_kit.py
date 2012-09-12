@@ -27,7 +27,7 @@ from invenio.intbitset import intbitset
 from invenio.textutils import wrap_text_in_a_box
 from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.dbquery import run_sql, OperationalError
-from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from datetime import datetime
 
 def retrieve_fulltext_recids():
@@ -52,7 +52,7 @@ def fix_recid(recid, logfile):
             if new_bibdocnames:
                 print "(created bibdocs: '%s')" % "', '".join(new_bibdocnames),
                 print >> logfile, "(created bibdocs: '%s')" % "', '".join(new_bibdocnames)
-    except InvenioWebSubmitFileError, e:
+    except InvenioBibDocFileError, e:
         print >> logfile, BibRecDocs(recid)
         print "%s -> ERROR", e
         return False

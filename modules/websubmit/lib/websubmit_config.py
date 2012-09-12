@@ -51,61 +51,8 @@ CFG_RESERVED_SUBMISSION_FILENAMES = ['SuE',
                                      'SN',
                                      'ln']
 
-## CFG_WEBSUBMIT_ICON_SUBFORMAT_RE -- a subformat is an Invenio concept to give
-## file formats more semantic. For example "foo.gif;icon" has ".gif;icon"
-## 'format', ".gif" 'superformat' and "icon" 'subformat'. That means that this
-## particular format/instance of the "foo" document, not only is a ".gif" but
-## is in the shape of an "icon", i.e. most probably it will be low-resolution.
-## This configuration variable let the administrator to decide which implicit
-## convention will be used to know which formats will be meant to be used
-## as an icon.
-CFG_WEBSUBMIT_ICON_SUBFORMAT_RE = re.compile(r"icon.*")
-
-## CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT -- this is the default subformat used
-## when creating new icons.
-CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT = "icon"
-
 ## Prefix for video uploads, Garbage Collector
 CFG_WEBSUBMIT_TMP_VIDEO_PREFIX = "video_upload_"
-
-try:
-    from invenio.config import CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC
-except ImportError:
-    CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC = {
-        'can_revise_doctypes': ['*'],
-        'can_comment_doctypes': ['*'],
-        'can_describe_doctypes': ['*'],
-        'can_delete_doctypes': ['*'],
-        'can_keep_doctypes': ['*'],
-        'can_rename_doctypes': ['*'],
-        'can_add_format_to_doctypes': ['*'],
-        'can_restrict_doctypes': ['*']}
-
-try:
-    from invenio.config import CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES
-except ImportError:
-    CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES = [
-        ('Main', 'Main document'),
-        ('LaTeX', 'LaTeX'),
-        ('Source', 'Source'),
-        ('Additional', 'Additional File'),
-        ('Audio', 'Audio file'),
-        ('Video', 'Video file'),
-        ('Script', 'Script'),
-        ('Data', 'Data'),
-        ('Figure', 'Figure'),
-        ('Schema', 'Schema'),
-        ('Graph', 'Graph'),
-        ('Image', 'Image'),
-        ('Drawing', 'Drawing'),
-        ('Slides', 'Slides')]
-
-try:
-    from invenio.config import CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS
-except ImportError:
-    CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS = [
-        ('', 'Public'),
-        ('restricted', 'Restricted')]
 
 class InvenioWebSubmitFunctionError(Exception):
     """This exception should only ever be raised by WebSubmit functions.

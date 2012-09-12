@@ -265,7 +265,7 @@ class BibUploadCallbackURLTest(GenericBibUploadTest):
         def test_simple_insert_callback_url(self):
             """bibupload - --callback-url with simple insert"""
             taskid = task_low_level_submission('bibupload', 'test', '-i', self.testfile_path, '--callback-url', CFG_SITE_URL + '/httptest/post2?%s' % urlencode({"save": self.resultfile_path}), '-v0')
-            run_shell_command(CFG_BINDIR + '/bibupload %s', [taskid])
+            run_shell_command(CFG_BINDIR + '/bibupload %s', [str(taskid)])
             results = json.loads(open(self.resultfile_path).read())
             self.failUnless('results' in results)
             self.assertEqual(len(results['results']), 1)

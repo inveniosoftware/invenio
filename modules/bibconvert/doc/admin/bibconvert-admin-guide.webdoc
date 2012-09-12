@@ -172,8 +172,8 @@ Guide</a> section below.
 <p>For a fully functional demo, consider the following sample input data:
 
 <blockquote>
-<a href="<CFG_SITE_URL>/admin/bibconvert/sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into Invenio
-<br /><a href="<CFG_SITE_URL>/admin/bibconvert/sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
+<a href="<CFG_SITE_URL>/static/bibconvert-admin-guide/sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into Invenio
+<br /><a href="<CFG_SITE_URL>/static/bibconvert-admin-guide/sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
 </blockquote>
 
 <p>To convert the above data into XML MARC, use the following command:
@@ -190,16 +190,16 @@ href="bibupload-admin-guide">BibUpload</a>.
 <p>Other useful BibConvert configuration examples:
 
 <blockquote>
-<a href="<CFG_SITE_URL>/admin/bibconvert/dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
-<br /><a href="<CFG_SITE_URL>/admin/bibconvert/dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
+<a href="<CFG_SITE_URL>/static/bibconvert-admin-guide/dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
+<br /><a href="<CFG_SITE_URL>/static/bibconvert-admin-guide/dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
 </blockquote>
 
 <blockquote>
-<a href="<CFG_SITE_URL>/admin/bibconvert/dcxml-to-marcxml.cfg">dcxml-to-marcxml.cfg</a> -- OAI XML Dublin Core to XML MARC example
+<a href="<CFG_SITE_URL>/static/bibconvert-admin-guide/dcxml-to-marcxml.cfg">dcxml-to-marcxml.cfg</a> -- OAI XML Dublin Core to XML MARC example
 </blockquote>
 
 <blockquote>
-<a href="<CFG_SITE_URL>/admin/bibconvert/bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
+<a href="<CFG_SITE_URL>/static/bibconvert-admin-guide/bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
 </blockquote>
 
 <a name="C.3"></a><h3>3 BibConvert Configuration Guide</h3>

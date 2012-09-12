@@ -17,6 +17,6 @@
 
 CLEANFILES = *~ *.tmp
 
-EXTRA_DIST = bibdocfile.in inveniounoconv.in
+EXTRA_DIST = inveniounoconv.in
 
-bin_SCRIPTS = bibdocfile inveniounoconv
+bin_SCRIPTS = inveniounoconv

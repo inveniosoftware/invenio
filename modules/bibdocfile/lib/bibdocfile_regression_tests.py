@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
         CFG_PREFIX, \
-        CFG_WEBSUBMIT_FILEDIR, \
+        CFG_BIBDOCFILE_FILEDIR, \
         CFG_SITE_RECORD
 
 from datetime import datetime
@@ -133,7 +133,7 @@ class BibDocsTest(unittest.TestCase):
         #get status
         self.assertEqual(my_new_bibdoc.get_status(), 'new status')
         #get base directory
-        self.assert_(my_new_bibdoc.get_base_dir().startswith(CFG_WEBSUBMIT_FILEDIR))
+        self.assert_(my_new_bibdoc.get_base_dir().startswith(CFG_BIBDOCFILE_FILEDIR))
         #get file number
         self.assertEqual(my_new_bibdoc.get_file_number(), 1)
         #add file new version
@@ -245,7 +245,7 @@ class BibDocFilesTest(unittest.TestCase):
         #get type
         self.assertEqual(my_new_bibdocfile.get_type(), 'Main')
         #get path
-        self.assert_(my_new_bibdocfile.get_path().startswith(CFG_WEBSUBMIT_FILEDIR))
+        self.assert_(my_new_bibdocfile.get_path().startswith(CFG_BIBDOCFILE_FILEDIR))
         self.assert_(my_new_bibdocfile.get_path().endswith('/img_test.jpg;1'))
         #get bibdocid
         self.assertEqual(my_new_bibdocfile.get_bibdocid(), my_new_bibdoc.get_id())
@@ -254,7 +254,7 @@ class BibDocFilesTest(unittest.TestCase):
         #get full name
         self.assertEqual(my_new_bibdocfile.get_full_name() , 'img_test.jpg')
         #get full path
-        self.assert_(my_new_bibdocfile.get_full_path().startswith(CFG_WEBSUBMIT_FILEDIR))
+        self.assert_(my_new_bibdocfile.get_full_path().startswith(CFG_BIBDOCFILE_FILEDIR))
         self.assert_(my_new_bibdocfile.get_full_path().endswith('/img_test.jpg;1'))
         #get format
         self.assertEqual(my_new_bibdocfile.get_format(), '.jpg')

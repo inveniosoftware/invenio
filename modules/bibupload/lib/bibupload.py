@@ -75,13 +75,13 @@ from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
 from invenio.urlutils import make_user_agent_string
-from invenio.config import CFG_WEBSUBMIT_FILEDIR
+from invenio.config import CFG_BIBDOCFILE_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, check_valid_url, download_url, \
-    KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioWebSubmitFileError, \
+    KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioBibDocFileError, \
     bibdocfile_url_p, CFG_BIBDOCFILE_AVAILABLE_FLAGS, guess_format_from_url
 
 from invenio.search_engine import search_pattern
@@ -1012,7 +1012,7 @@ def synchronize_8564(rec_id, record, record_had_FFT, pretend=False):
                         bibdoc.set_description(description[0], format)
                     if comment and not pretend:
                         bibdoc.set_comment(comment[0], format)
-                except InvenioWebSubmitFileError:
+                except InvenioBibDocFileError:
                     ## Apparently the referenced docname doesn't exist anymore.
                     ## Too bad. Let's skip it.
                     write_message("WARNING: docname %s does not seem to exist for record %s. Has it been renamed outside FFT?" % (docname, recid), stream=sys.stderr)
@@ -1355,7 +1355,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
             downloaded_urls = []
             try:
                 bibdoc = bibrecdocs.get_bibdoc(docname)
-            except InvenioWebSubmitFileError:
+            except InvenioBibDocFileError:
                 ## A bibdoc with the given docname does not exists.
                 ## So there is no chance we are going to revise an existing
                 ## format with an identical file :-)
@@ -2135,9 +2135,9 @@ def writing_rights_p():
     if _WRITING_RIGHTS is not None:
         return _WRITING_RIGHTS
     try:
-        if not os.path.exists(CFG_WEBSUBMIT_FILEDIR):
-            os.makedirs(CFG_WEBSUBMIT_FILEDIR)
-        fd, filename = tempfile.mkstemp(suffix='.txt', prefix='test', dir=CFG_WEBSUBMIT_FILEDIR)
+        if not os.path.exists(CFG_BIBDOCFILE_FILEDIR):
+            os.makedirs(CFG_BIBDOCFILE_FILEDIR)
+        fd, filename = tempfile.mkstemp(suffix='.txt', prefix='test', dir=CFG_BIBDOCFILE_FILEDIR)
         test = os.fdopen(fd, 'w')
         test.write('TEST')
         test.close()

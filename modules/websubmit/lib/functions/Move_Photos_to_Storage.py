@@ -48,11 +48,11 @@ import re
 from urllib import quote
 from cgi import escape
 
-from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from invenio.config import CFG_BINDIR, CFG_SITE_URL
 from invenio.dbquery import run_sql
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
-from invenio.websubmit_config import CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
+from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 
 def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -171,9 +171,9 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                                     _do_log(curdir, "Added icon %s" % fileiconpath)
                                 else:
                                     icon_suffix = icon_size.replace('>', '').replace('<', '').replace('^', '').replace('!', '')
-                                    bibdoc.add_icon(fileiconpath, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
+                                    bibdoc.add_icon(fileiconpath, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
                                     _do_log(curdir, "Added icon %s" % fileiconpath)
-                            except InvenioWebSubmitFileError, e:
+                            except InvenioBibDocFileError, e:
                                 # Most probably icon already existed.
                                 pass
 
@@ -311,7 +311,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
 
     # Compile a regular expression that can match the "default" icon,
     # and not larger version.
-    CFG_WEBSUBMIT_ICON_SUBFORMAT_RE_DEFAULT = re.compile(CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + '\Z')
+    CFG_BIBDOCFILE_ICON_SUBFORMAT_RE_DEFAULT = re.compile(CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT + '\Z')
 
     # Load the existing photos from the DB if we are displaying
     # this interface for the first time, and if a record exists
@@ -321,7 +321,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
             if doc.get_icon() is not None:
                 original_url = doc.list_latest_files()[0].get_url()
                 doc_id = str(doc.get_id())
-                icon_url = doc.get_icon(subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE_DEFAULT).get_url() # Get "default" icon
+                icon_url = doc.get_icon(subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE_DEFAULT).get_url() # Get "default" icon
                 description = ""
                 for bibdoc_file in doc.list_latest_files():
                     #format = bibdoc_file.get_format().lstrip('.').upper()

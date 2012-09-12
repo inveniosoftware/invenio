@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,15 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdoclibdir = $(libdir)/webdoc/invenio/admin
+CLEANFILES = *~ *.tmp
 
-webdoclib_DATA = bibconvert-admin-guide.webdoc
+EXTRA_DIST = bibdocfile.in
 
-sampledir=$(localstatedir)/www/static/bibconvert-admin-guide
-
-sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg \
-	    example_oaimarc2xm.xsl example_oaimarc2xm_collID.kb
-
-EXTRA_DIST = $(sample_DATA) $(webdoclib_DATA)
-
-CLEANFILES =  *~ *.tmp
+bin_SCRIPTS = bibdocfile

@@ -21,7 +21,7 @@
 __revision__ = "$Id$"
 
 
-from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from invenio.errorlib import register_exception
 from invenio import websubmit_file_stamper
 from invenio.websubmit_config import InvenioWebSubmitFunctionWarning, \
@@ -216,7 +216,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
     bibrecdocs = BibRecDocs(recid)
     try:
         bibdoc_file_to_stamp = bibrecdocs.get_bibdoc("%s" % name_file_to_stamp)
-    except InvenioWebSubmitFileError:
+    except InvenioBibDocFileError:
         ## Couldn't get a bibdoc object for this filename. Probably the file
         ## that we wanted to stamp wasn't attached to this record.
         wrn_msg = "Warning in Stamp_Replace_Single_File_Approval: " \
@@ -231,7 +231,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
     ## stamped:
     try:
         bibdocfile_file_to_stamp = bibdoc_file_to_stamp.get_file("pdf")
-    except InvenioWebSubmitFileError:
+    except InvenioBibDocFileError:
         ## This bibdoc doesn't have a physical file with the extension ".pdf"
         ## (take note of the lower-case extension - the bibdocfile library
         ## is case-sensitive with respect to filenames.  Log that there was
@@ -248,7 +248,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
         register_exception(prefix=wrn_msg)
         try:
             bibdocfile_file_to_stamp = bibdoc_file_to_stamp.get_file("PDF")
-        except InvenioWebSubmitFileError:
+        except InvenioBibDocFileError:
             wrn_msg = "Warning in Stamp_Replace_Single_File_Approval: " \
                       "It wasn't possible to recover a PDF " \
                       "BibDocFile object for the file with the name [%s], " \
@@ -398,7 +398,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
                                                 name_file_to_stamp, \
                                                 comment=file_comment, \
                                                 flags=('STAMPED', ))
-        except InvenioWebSubmitFileError:
+        except InvenioBibDocFileError:
             ## Unable to revise the file with the newly stamped version.
             wrn_msg = "Warning in Stamp_Replace_Single_File_Approval: " \
                       "After having stamped the file with the name [%s] " \
@@ -418,7 +418,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
             if new_file_name != "":
                 try:
                     bibdoc_file_to_stamp.change_name(new_file_name)
-                except (IOError, InvenioWebSubmitFileError):
+                except (IOError, InvenioBibDocFileError):
                     ## Unable to change the name
                     wrn_msg = "Warning in Stamp_Replace_Single_File_Approval" \
                               ": After having stamped and revised the file " \
