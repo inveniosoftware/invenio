@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,6 +26,20 @@ __revision__ = \
 
 ## do we want experimental features? (0=no, 1=yes)
 CFG_EXPERIMENTAL_FEATURES = 0
+
+## CFG_WEBSEARCH_IDXPAIRS_FIELDS -- a comma separated list of index
+## fields. This list contains all the index fields on which exact
+## phrase search should use idxPairs tables.
+CFG_WEBSEARCH_IDXPAIRS_FIELDS = ['global','abstract','title','caption']
+
+## CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH -- if true, it will eliminate
+## all the false positives when using the word pairs for search.
+## (Example: `foo bar baz' being search as `foo bar' and `bar baz' may
+## lead to false positives if there is no second-pass.)  FIXME: we
+## need this to be defined per index if we want to eliminate
+## single-quoted vs double-quoted search difference, e.g. False for
+## title search, but True for report number search.
+CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH = False
 
 class InvenioWebSearchUnknownCollectionError(Exception):
     """Exception for bad collection."""
