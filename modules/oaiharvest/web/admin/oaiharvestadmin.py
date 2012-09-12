@@ -61,7 +61,7 @@ def index(req, ln=CFG_SITE_LANG):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=CFG_SITE_LANG, mtype='', callback='yes', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=CFG_SITE_LANG, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
@@ -167,7 +167,7 @@ def delsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def testsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id = None):
+def testsource(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
@@ -185,7 +185,6 @@ def testsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id = No
         return page(title="Test OAI Source",
                     body=oha.perform_request_testsource(oai_src_id=oai_src_id,
                                                         ln=ln,
-                                                        confirm=confirm,
                                                         record_id=record_id),
                     uid=uid,
                     language=ln,
@@ -196,7 +195,7 @@ def testsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id = No
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def viewhistory(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, month = None):
+def viewhistory(req, oai_src_id=0, ln=CFG_SITE_LANG, year = None, month = None):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     d_date = datetime.datetime.now()
     if year == None:
@@ -218,9 +217,8 @@ def viewhistory(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, mon
         return page(title="View OAI source harvesting history",
                     body=oha.perform_request_viewhistory(oai_src_id=oai_src_id,
                                                     ln=ln,
-                                                    confirm=confirm,
-                                                    year = int(year),
-                                                    month = int(month)),
+                                                    year=int(year),
+                                                    month=int(month)),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -229,7 +227,7 @@ def viewhistory(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, mon
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def viewhistoryday(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, month = None, day = None, start = 0):
+def viewhistoryday(req, oai_src_id=0, ln=CFG_SITE_LANG, year=None, month=None, day=None, start=0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     d_date = datetime.datetime.now()
     if year == None:
@@ -253,11 +251,10 @@ def viewhistoryday(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, 
         return page(title="View OAI source harvesting history",
                     body=oha.perform_request_viewhistoryday(oai_src_id=oai_src_id,
                                                     ln=ln,
-                                                    confirm=confirm,
-                                                    year = int(year),
-                                                    month = int(month),
-                                                    day = int(day),
-                                                    start = int(start)),
+                                                    year=int(year),
+                                                    month=int(month),
+                                                    day=int(day),
+                                                    start=int(start)),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -266,7 +263,7 @@ def viewhistoryday(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, 
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def viewentryhistory(req, oai_id=0, ln=CFG_SITE_LANG, confirm=0, start = 0):
+def viewentryhistory(req, oai_id=0, ln=CFG_SITE_LANG, start = 0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -275,25 +272,24 @@ def viewentryhistory(req, oai_id=0, ln=CFG_SITE_LANG, confirm=0, start = 0):
                     body=e,
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
     auth = check_user(req,'cfgoaiharvest')
     if not auth[0]:
         return page(title="View OAI source harvesting history (single record)",
-                    body=oha.perform_request_viewentryhistory(oai_id = str(oai_id),
+                    body=oha.perform_request_viewentryhistory(oai_id=str(oai_id),
                                                     ln=ln,
-                                                    confirm=confirm,
-                                                    start = int(start)),
+                                                    start=int(start)),
                     uid=uid,
                     language=ln,
                     req=req,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def viewtasklogs(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
+def viewtasklogs(req, ln=CFG_SITE_LANG, task_id=0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -309,8 +305,7 @@ def viewtasklogs(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
     if not auth[0]:
         return page(title="View bibsched task logs",
                     body=oha.perform_request_viewtasklogs(ln=ln,
-                                                    confirm=confirm,
-                                                    task_id = int(task_id)),
+                                                    task_id=int(task_id)),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -319,7 +314,7 @@ def viewtasklogs(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def viewhprecord(req, ln=CFG_SITE_LANG, confirm=0, hpupdate_id = 0):
+def viewhprecord(req, ln=CFG_SITE_LANG, hpupdate_id=0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -328,24 +323,23 @@ def viewhprecord(req, ln=CFG_SITE_LANG, confirm=0, hpupdate_id = 0):
                     body=e,
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
     auth = check_user(req,'cfgoaiharvest')
     if not auth[0]:
         return page(title="Holding Pen Record",
-                    body=oha.perform_request_viewhprecord(hpupdate_id = hpupdate_id,
-                                                          ln=ln,
-                                                          confirm=confirm),
+                    body=oha.perform_request_viewhprecord(hpupdate_id=hpupdate_id,
+                                                          ln=ln),
                     uid=uid,
                     language=ln,
                     req=req,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, hpupdate_id = 0):
+def accepthprecord(req, ln=CFG_SITE_LANG, hpupdate_id = 0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -361,9 +355,7 @@ def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, hpupdate_id = 0):
     if not auth[0]:
         return page(title="Holding Pen Record",
                     metaheaderadd = oha.view_holdingpen_headers(),
-                    body=oha.perform_request_accepthprecord(hpupdate_id = hpupdate_id,
-                                                          ln=ln,
-                                                          confirm=confirm),
+                    body=oha.perform_request_accepthprecord(hpupdate_id = hpupdate_id),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -373,7 +365,7 @@ def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, hpupdate_id = 0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def delhprecord(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0, hpupdate_id = 0):
+def delhprecord(req, ln=CFG_SITE_LANG, hpupdate_id=0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -388,9 +380,8 @@ def delhprecord(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0, hpupdate_id = 0):
     auth = check_user(req,'cfgoaiharvest')
     if not auth[0]:
         return page(title="Holding Pen Record",
-                    body=oha.perform_request_delhprecord(hpupdate_id = hpupdate_id,
-                                                            ln=ln,
-                                                            confirm=confirm),
+                    body=oha.perform_request_delhprecord(hpupdate_id=hpupdate_id,
+                                                            ln=ln),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -400,7 +391,7 @@ def delhprecord(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0, hpupdate_id = 0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, **records):
+def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, **records):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -416,8 +407,7 @@ def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, **records):
     if not auth[0]:
         return page(title="OAI source - reharvesting records",
                     body=oha.perform_request_reharvest_records(oai_src_id=oai_src_id,
-                                                    ln=ln,
-                                                    confirm=confirm, record_ids = records),
+                                                    ln=ln, record_ids = records),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -426,7 +416,7 @@ def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, **records):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, confirm=0, record_id=None):
+def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id=None):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -442,8 +432,7 @@ def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, confirm=0, record_id=None)
     if not auth[0]:
         return page(title="OAI source - harvesting new records",
                     body=oha.perform_request_harvest_record(oai_src_id = oai_src_id,
-                                                    ln=ln,
-                                                    confirm=confirm, record_id = record_id),
+                                                    ln=ln, record_id = record_id),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -453,8 +442,8 @@ def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, confirm=0, record_id=None)
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def preview_original_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
-    navtrail_previous_links =oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
+def preview_original_xml(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None):
+    navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
     except Error, e:
@@ -477,7 +466,7 @@ def preview_original_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = N
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def preview_harvested_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
+def preview_harvested_xml(req, oai_src_id=None, ln=CFG_SITE_LANG, record_id=None):
     navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
@@ -506,15 +495,14 @@ def preview_harvested_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = 
 
 def getHoldingPenData(req, elementId):
     try:
-        uid = getUid(req)
-    except Error, e:
+        getUid(req)
+    except Error:
         return "unauthorised access !"
     auth = check_user(req,'cfgoaiharvest')
     if auth[0]:
         return "unauthorised access !"
 
     elements = elementId.split("_")
-    prefix = elements[0]
     resultHtml = None
     additionalData = None
 
@@ -523,7 +511,6 @@ def getHoldingPenData(req, elementId):
         resultHtml =  oha.perform_request_gethpyears(elements[0], filter);
     elif len(elements) == 3:
         # only the year is specified
-        result = ""
         filter = elements[2]
         nodeYear = int(elements[1])
         resultHtml = oha.perform_request_gethpyear(elements[0], nodeYear, filter)
@@ -542,7 +529,7 @@ def getHoldingPenData(req, elementId):
         nodeDay = int(elements[3])
         filter = elements[4]
         daySize = get_holdingpen_day_size(nodeYear, nodeMonth, nodeDay, filter);
-        resultHtml = """<li><div id="%s_pager"></div>&nbsp;</li>""" %(elementId,)
+        resultHtml = """<li><div id="%s_pager"></div>&nbsp;</li>""" % (elementId,)
         resultsPerPage = 20
         numberOfPages = math.ceil(float(daySize) / resultsPerPage)
         pages = []
@@ -569,8 +556,8 @@ def getHoldingPenData(req, elementId):
 
 def get_entries_fragment(req, year, month, day, start, limit, filter):
     try:
-        uid = getUid(req)
-    except Error, e:
+        getUid(req)
+    except Error:
         return "unauthorised access !"
     auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:

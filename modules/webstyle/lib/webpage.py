@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,7 +25,9 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
      CFG_SITE_LANG, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_SITE_NAME_INTL, \
+     CFG_SITE_NAME
 from invenio.messages import gettext_set_language
 from invenio.webuser import \
      create_userinfobox_body, \
@@ -223,3 +225,47 @@ def adderrorbox(header='', datalist=[]):
         output += '</tr>'
     output += '</tbody></table>'
     return output
+
+def error_page(title, req, ln=CFG_SITE_LANG):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    site_name = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
+
+    return page(title = _("Error"),
+                body = create_error_box(req, title=str(title), verbose=0, ln=ln),
+                description="%s - Internal Error" % site_name,
+                keywords="%s, Internal Error" % site_name,
+                uid = getUid(req),
+                language=ln,
+                req=req)
+
+def warning_page(title, req, ln=CFG_SITE_LANG):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    site_name = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
+
+    return page(title = _("Warning"),
+                body = title,
+                description="%s - Internal Error" % site_name,
+                keywords="%s, Internal Error" % site_name,
+                uid = getUid(req),
+                language=ln,
+                req=req)
+
+def write_warning(msg, type='', prologue='<br />', epilogue='<br />', req=None):
+    """Prints warning message and flushes output."""
+    if msg:
+        ret = webstyle_templates.tmpl_write_warning(
+                   msg = msg,
+                   type = type,
+                   prologue = prologue,
+                   epilogue = epilogue,
+                 )
+        if req is None:
+            return ret
+        else:
+            req.write(ret)
+    else:
+        return ''

@@ -37,7 +37,7 @@ from invenio.access_control_mailcookie import mail_cookie_create_authorize_actio
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, pageheaderonly, \
-    pagefooteronly
+    pagefooteronly, warning_page, write_warning
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, isUserSuperAdmin, \
                             isGuestUser
 from invenio import webjournal_utils
@@ -47,7 +47,7 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, get_colID, record_exists, \
      create_navtrail_links, check_user_can_view_record, record_empty, \
-     is_user_owner_of_record, print_warning
+     is_user_owner_of_record
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioBibDocFileError, \
     get_subformat_from_format
@@ -96,11 +96,11 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             if record_exists(self.recid) < 1:
                 msg = "<p>%s</p>" % _("Requested record does not seem to exist.")
-                return print_warning(req, msg)
+                return warning_page(msg, req, ln)
 
             if record_empty(self.recid):
                 msg = "<p>%s</p>" % _("Requested record does not seem to have been integrated.")
-                return print_warning(req, msg)
+                return warning_page(msg, req, ln)
 
             (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
             if auth_code and user_info['email'] == 'guest':
@@ -130,15 +130,15 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             # visible.
             try:
                 bibarchive = BibRecDocs(self.recid)
-            except InvenioBibDocFileError, e:
+            except InvenioBibDocFileError:
                 register_exception(req=req, alert_admin=True)
                 msg = "<p>%s</p><p>%s</p>" % (
                     _("The system has encountered an error in retrieving the list of files for this document."),
                     _("The error has been logged and will be taken in consideration as soon as possible."))
-                return print_warning(req, msg)
+                return warning_page(msg, req, ln)
 
             if bibarchive.deleted_p():
-                return print_warning(req, _("Requested record does not seem to exist."))
+                return warning_page(_("Requested record does not seem to exist."), req, ln)
 
             docname = ''
             format = ''
@@ -199,29 +199,29 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     redirect_to_url(req, target)
                                 else:
                                     req.status = apache.HTTP_UNAUTHORIZED
-                                    warn += print_warning(req, _("This file is restricted: ") + auth_message)
+                                    warn += write_warning(_("This file is restricted: ") + str(auth_message))
                                     break
 
                             if not docfile.hidden_p():
                                 if not readonly:
                                     ip = str(req.remote_ip)
-                                    res = doc.register_download(ip, version, format, uid)
+                                    doc.register_download(ip, version, format, uid)
                                 try:
                                     return docfile.stream(req, download=is_download)
                                 except InvenioBibDocFileError, msg:
                                     register_exception(req=req, alert_admin=True)
                                     req.status = apache.HTTP_INTERNAL_SERVER_ERROR
-                                    return print_warning(req, _("An error has happened in trying to stream the request file."))
+                                    warn += write_warning(_("An error has happened in trying to stream the request file."))
                             else:
                                 req.status = apache.HTTP_UNAUTHORIZED
-                                warn = print_warning(req, _("The requested file is hidden and can not be accessed."))
+                                warn += write_warning(_("The requested file is hidden and can not be accessed."))
 
                         except InvenioBibDocFileError, msg:
                             register_exception(req=req, alert_admin=True)
 
             if docname and format and not warn:
                 req.status = apache.HTTP_NOT_FOUND
-                warn += print_warning(req, _("Requested file does not seem to exist."))
+                warn += write_warning(_("Requested file does not seem to exist."))
             filelist = bibarchive.display("", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
 
             t = warn + bibdocfile_templates.tmpl_filelist(
@@ -242,7 +242,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                      '%s/%s/%s/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, tab_id, link_ln), \
                      tab_id == 'files',
                      unordered_tabs[tab_id]['enabled']) \
-                    for (tab_id, order) in ordered_tabs_id
+                    for (tab_id, dummy_order) in ordered_tabs_id
                     if unordered_tabs[tab_id]['visible'] == True]
             top = webstyle_templates.detailed_record_container_top(self.recid,
                                                                    tabs,
@@ -303,18 +303,18 @@ def bibdocfile_legacy_getfile(req, form):
                 try:
                     bibdoc = BibDoc(docid=docid)
                     recid = bibdoc.get_recid()
-                except InvenioBibDocFileError, e:
-                    return print_warning(req, _("An error has happened in trying to retrieve the requested file."))
+                except InvenioBibDocFileError:
+                    return warning_page(_("An error has happened in trying to retrieve the requested file."), req, ln)
             else:
-                return print_warning(req, _('Not enough information to retrieve the document'))
+                return warning_page(_('Not enough information to retrieve the document'), req, ln)
         else:
             if not name and docid:
                 ## Let's obtain the name from the docid
                 try:
                     bibdoc = BibDoc(docid)
                     name = bibdoc.get_docname()
-                except InvenioBibDocFileError, e:
-                    return print_warning(req, _("An error has happened in trying to retrieving the requested file."))
+                except InvenioBibDocFileError:
+                    return warning_page(_("An error has happened in trying to retrieving the requested file."), req, ln)
 
         format = normalize_format(format)
 
@@ -406,7 +406,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
         if argd['recid'] and argd['do'] == 0:
             # Displaying interface to manage files
             # Prepare navtrail
-            title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, argd['recid'],
+            title, dummy_description, dummy_keywords = websearch_templates.tmpl_record_page_header_content(req, argd['recid'],
                                                                                                argd['ln'])
             navtrail = '''<a class="navtrail" href="%(CFG_SITE_URL)s/help/admin">Admin Area</a> &gt;
         <a class="navtrail" href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/managedocfiles">%(manage_files)s</a> &gt;
@@ -499,18 +499,17 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
                 action = ""
 
             # Is user authorized to perform this action?
-            (auth_code, auth_msg) = acc_authorize_action(user_info,
-                                                         "submit",
-                                                         authorized_if_no_roles=not isGuestUser(getUid(req)),
-                                                         doctype=argd['doctype'],
-                                                         act=action)
-            if not acc_is_role("submit", doctype=argd['doctype'], act=action):
+            auth_code = acc_authorize_action(user_info,
+                "submit",
+                authorized_if_no_roles=not isGuestUser(getUid(req)),
+                doctype=argd['doctype'],
+                act=action)[0]
+            if auth_code and not acc_is_role("submit", doctype=argd['doctype'], act=action):
                 # There is NO authorization plugged. User should have access
                 auth_code = 0
         else:
             # User must be allowed to attach files
-            (auth_code, auth_msg) = acc_authorize_action(user_info,
-                                                         'runbibdocfile')
+            auth_code = acc_authorize_action(user_info, 'runbibdocfile')[0]
             recid = argd['recid']
 
         if auth_code:

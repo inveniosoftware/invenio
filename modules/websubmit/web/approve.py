@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,11 +25,9 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_SECURE_URL, \
-     CFG_SITE_NAME_INTL, \
      CFG_SITE_SECURE_URL
-from invenio.websubmit_config import *
 from invenio.websubmit_dblayer import get_approval_url_parameters
-from invenio.webpage import page
+from invenio.webpage import warning_page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import redirect_to_url
@@ -52,27 +50,10 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     _ = gettext_set_language(ln)
     args = wash_urlargd(req.form, {'access': (str, '')})
     if args['access'] == "":
-        return warningMsg(_("approve.py: cannot determine document reference"), req, c, ln)
+        return warning_page(_("approve.py: cannot determine document reference"), req, ln)
     url_params = get_approval_url_parameters(args['access'])
     if not url_params:
-        return warningMsg(_("approve.py: cannot find document in database"), req, c, ln)
+        return warning_page(_("approve.py: cannot find document in database"), req, ln)
     url_params['ln'] = ln
     url = "%s/submit/direct?%s" % (CFG_SITE_SECURE_URL, urllib.urlencode(url_params))
     redirect_to_url(req, url)
-
-def warningMsg(title, req, c=None, ln=CFG_SITE_LANG):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    if c is None:
-        c = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
-
-    return page(title = _("Warning"),
-                body = title,
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='submit')
-

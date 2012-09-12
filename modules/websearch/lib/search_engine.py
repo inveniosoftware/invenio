@@ -120,7 +120,7 @@ from invenio.bibrank_citation_grapher import create_citation_history_graph_and_b
 from invenio.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
                             get_table_update_time
 from invenio.webuser import getUid, collect_user_info, session_param_set
-from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
+from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
 from invenio.messages import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
     SpiresToInvenioSyntaxConverter
@@ -369,12 +369,12 @@ class CollectionRecListDataCacher(DataCacher):
         def cache_filler():
             ret = {}
             try:
-                res = run_sql("SELECT name,reclist FROM collection")
+                res = run_sql("SELECT name FROM collection")
             except Exception:
                 # database problems, return empty cache
                 return {}
-            for name, reclist in res:
-                ret[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
+            for name in res:
+                ret[name[0]] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
             return ret
 
         def timestamp_verifier():
@@ -567,8 +567,9 @@ def get_alphabetically_ordered_collection_list(level=0, ln=CFG_SITE_LANG):
        (collection name, printable collection name).
        Suitable for create_search_box()."""
     out = []
-    res = run_sql("SELECT id,name FROM collection ORDER BY name ASC")
-    for c_id, c_name in res:
+    res = run_sql("SELECT name FROM collection ORDER BY name ASC")
+    for c_name in res:
+        c_name = c_name[0]
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
         c_printable_fullname = get_coll_i18nname(c_name, ln, False)
@@ -684,7 +685,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     opfts.append(['|', word, f, 'w']) # '|' in further units
         else:
             if of.startswith("h"):
-                print_warning(req, "Matching type '%s' is not implemented yet." % cgi.escape(m), "Warning")
+                write_warning("Matching type '%s' is not implemented yet." % cgi.escape(m), "Warning", req=req)
             opfts.append(['+', "%" + p + "%", f, 'w'])
     else:
         ## B - matching type is not known: let us try to determine it by some heuristics
@@ -776,20 +777,20 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             pi = opfts[i][1]
             if pi == '*':
                 if of.startswith("h"):
-                    print_warning(req, "Ignoring standalone wildcard word.", "Warning")
+                    write_warning("Ignoring standalone wildcard word.", "Warning", req=req)
                 del opfts[i]
             if pi == '' or pi == ' ':
                 fi = opfts[i][2]
                 if fi:
                     if of.startswith("h"):
-                        print_warning(req, "Ignoring empty <em>%s</em> search term." % fi, "Warning")
+                        write_warning("Ignoring empty <em>%s</em> search term." % fi, "Warning", req=req)
                 del opfts[i]
         except:
             pass
 
     ## replace old logical field names if applicable:
     if CFG_WEBSEARCH_FIELDS_CONVERT:
-        opfts = [[o,p,wash_field(f),t] for o,p,f,t in opfts]
+        opfts = [[o, p, wash_field(f), t] for o, p, f, t in opfts]
 
     ## return search units:
     return opfts
@@ -1743,7 +1744,7 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
         ## were there hits in collections?
         if browsed_phrases_in_colls == []:
             if browsed_phrases != []:
-                #print_warning(req, """<p>No match close to <em>%s</em> found in given collections.
+                #write_warning(req, """<p>No match close to <em>%s</em> found in given collections.
                 #Please try different term.<p>Displaying matches in any collection...""" % p_orig)
                 ## try to get nbhits for these phrases in any collection:
                 for phrase in browsed_phrases:
@@ -1824,8 +1825,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     basic_search_units = create_basic_search_units(req, p, f, m, of)
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
-        print_warning(req, "Search stage 1: basic search units are: %s" % cgi.escape(repr(basic_search_units)))
-        print_warning(req, "Search stage 1: execution took %.2f seconds." % (t2 - t1))
+        write_warning("Search stage 1: basic search units are: %s" % cgi.escape(repr(basic_search_units)), req=req)
+        write_warning("Search stage 1: execution took %.2f seconds." % (t2 - t1), req=req)
     # search stage 2: do search for each search unit and verify hit presence:
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
@@ -1841,34 +1842,34 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
     if CFG_INSPIRE_SITE and of.startswith('h'):
         # fulltext/caption search warnings for INSPIRE:
-        fields_to_be_searched = [f for o,p,f,m in basic_search_units]
+        fields_to_be_searched = [f for o, p, f, m in basic_search_units]
         if 'fulltext' in fields_to_be_searched:
-            print_warning(req, _("Warning: full-text search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
+            write_warning( _("Warning: full-text search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
                           {'x_range_from_year': '2006',
-                           'x_range_to_year': '2012'})
+                           'x_range_to_year': '2012'}, req=req)
         elif 'caption' in fields_to_be_searched:
-            print_warning(req, _("Warning: figure caption search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
+            write_warning(_("Warning: figure caption search is only available for a subset of papers mostly from %(x_range_from_year)s-%(x_range_to_year)s.") % \
                           {'x_range_from_year': '2008',
-                           'x_range_to_year': '2012'})
+                           'x_range_to_year': '2012'}, req=req)
 
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         if bsu_f and len(bsu_f) < 2:
             if of.startswith("h"):
-                print_warning(req, _("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)))
+                write_warning(_("There is no index %s.  Searching for %s in all fields." % (bsu_f, bsu_p)), req=req)
             bsu_f = ''
             bsu_m = 'w'
             if of.startswith("h") and verbose:
-                print_warning(req, _('Instead searching %s.' % str([bsu_o, bsu_p, bsu_f, bsu_m])))
+                write_warning(_('Instead searching %s.' % str([bsu_o, bsu_p, bsu_f, bsu_m])), req=req)
         try:
             basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m, wl)
         except InvenioWebSearchWildcardLimitError, excp:
             basic_search_unit_hitset = excp.res
             if of.startswith("h"):
-                print_warning(req, _("Search term too generic, displaying only partial results..."))
+                write_warning(_("Search term too generic, displaying only partial results..."), req=req)
         # FIXME: print warning if we use native full-text indexing
         if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h') and not CFG_SOLR_URL:
-            print_warning(req, _("No phrase index available for fulltext yet, looking for word combination..."))
+            write_warning(_("No phrase index available for fulltext yet, looking for word combination..."), req=req)
         #check that the user is allowed to search with this tag
         #if he/she tries it
         if bsu_f and len(bsu_f) > 1 and bsu_f[0].isdigit() and bsu_f[1].isdigit():
@@ -1879,12 +1880,12 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     #we won't show you anything..
                     basic_search_unit_hitset = intbitset()
                     if verbose >= 9 and of.startswith("h"):
-                        print_warning(req, "Pattern %s hitlist omitted since \
+                        write_warning("Pattern %s hitlist omitted since \
                                             it queries in a hidden tag %s" %
-                                      (repr(bsu_p), repr(myhiddens)))
-                    display_nearest_terms_box=False #..and stop spying, too.
+                                      (repr(bsu_p), repr(myhiddens)), req=req)
+                    display_nearest_terms_box = False #..and stop spying, too.
         if verbose >= 9 and of.startswith("h"):
-            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset))
+            write_warning("Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset), req=req)
         if len(basic_search_unit_hitset) > 0 or \
            ap==0 or \
            bsu_o=="|" or \
@@ -1903,14 +1904,14 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 else: # it is WRD query
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
-                    print_warning(req, "Trying (%s,%s,%s)" % (cgi.escape(bsu_pn), cgi.escape(bsu_f), cgi.escape(bsu_m)))
+                    write_warning("Trying (%s,%s,%s)" % (cgi.escape(bsu_pn), cgi.escape(bsu_f), cgi.escape(bsu_m)), req=req)
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln, wl=wl)
                 if len(basic_search_unit_hitset) > 0:
                     # we retain the new unit instead
                     if of.startswith('h'):
-                        print_warning(req, _("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % \
+                        write_warning(_("No exact match found for %(x_query1)s, using %(x_query2)s instead...") % \
                                       {'x_query1': "<em>" + cgi.escape(bsu_p) + "</em>",
-                                       'x_query2': "<em>" + cgi.escape(bsu_pn) + "</em>"})
+                                       'x_query2': "<em>" + cgi.escape(bsu_pn) + "</em>"}, req=req)
                     basic_search_units[idx_unit][1] = bsu_pn
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
@@ -1918,25 +1919,25 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     if of.startswith('h') and display_nearest_terms_box:
                         if req:
                             if bsu_f == "recid":
-                                print_warning(req, _("Requested record does not seem to exist."))
+                                write_warning(_("Requested record does not seem to exist."), req=req)
                             else:
-                                print_warning(req, create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln))
+                                write_warning(create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln), req=req)
                     return hitset_empty
             else:
                 # stage 2-3: no hits found either, propose nearest indexed terms:
                 if of.startswith('h') and display_nearest_terms_box:
                     if req:
                         if bsu_f == "recid":
-                            print_warning(req, _("Requested record does not seem to exist."))
+                            write_warning(_("Requested record does not seem to exist."), req=req)
                         else:
-                            print_warning(req, create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln))
+                            write_warning(create_nearest_terms_box(req.argd, bsu_p, bsu_f, bsu_m, ln=ln), req=req)
                 return hitset_empty
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
         for idx_unit in range(0, len(basic_search_units)):
-            print_warning(req, "Search stage 2: basic search unit %s gave %d hits." %
-                          (basic_search_units[idx_unit][1:], len(basic_search_units_hitsets[idx_unit])))
-        print_warning(req, "Search stage 2: execution took %.2f seconds." % (t2 - t1))
+            write_warning("Search stage 2: basic search unit %s gave %d hits." %
+                          (basic_search_units[idx_unit][1:], len(basic_search_units_hitsets[idx_unit])), req=req)
+        write_warning("Search stage 2: execution took %.2f seconds." % (t2 - t1), req=req)
     # search stage 3: apply boolean query for each search unit:
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
@@ -1954,7 +1955,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             hitset_in_any_collection.union_update(this_unit_hitset)
         else:
             if of.startswith("h"):
-                print_warning(req, "Invalid set operation %s." % cgi.escape(this_unit_operation), "Error")
+                write_warning("Invalid set operation %s." % cgi.escape(this_unit_operation), "Error", req=req)
     if len(hitset_in_any_collection) == 0:
         # no hits found, propose alternative boolean query:
         if of.startswith('h') and display_nearest_terms_box:
@@ -1976,11 +1977,11 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
 
             text = websearch_templates.tmpl_search_no_boolean_hits(
                      ln=ln,  nearestterms=nearestterms)
-            print_warning(req, text)
+            write_warning(text, req=req)
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
-        print_warning(req, "Search stage 3: boolean query gave %d hits." % len(hitset_in_any_collection))
-        print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
+        write_warning("Search stage 3: boolean query gave %d hits." % len(hitset_in_any_collection), req=req)
+        write_warning("Search stage 3: execution took %.2f seconds." % (t2 - t1), req=req)
     return hitset_in_any_collection
 
 def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True, wl=0):
@@ -2013,8 +2014,8 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
         parsing_result = parser.parse_query(p)
         if verbose  and of.startswith("h"):
-            print_warning(req, "Search stage 1: search_pattern_parenthesised() searched %s." % repr(p))
-            print_warning(req, "Search stage 1: search_pattern_parenthesised() returned %s." % repr(parsing_result))
+            write_warning("Search stage 1: search_pattern_parenthesised() searched %s." % repr(p), req=req)
+            write_warning("Search stage 1: search_pattern_parenthesised() returned %s." % repr(parsing_result), req=req)
 
         # go through every pattern
         # calculate hitset for it
@@ -2030,7 +2031,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
                 #        hitset, then showing a nearest terms box exactly once,
                 #        outside this loop.
                 ap = 0
-                display_nearest_terms_box=False
+                display_nearest_terms_box = False
 
             # obtain a hitset for the current pattern
             current_hitset = search_pattern(req, current_pattern, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box, wl=wl)
@@ -2050,7 +2051,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
     # If searching with parenteses fails, perform search ignoring parentheses
     except SyntaxError:
 
-        print_warning(req, _("Search syntax misunderstood. Ignoring all parentheses in the query. If this doesn't help, please check your search and try again."))
+        write_warning(_("Search syntax misunderstood. Ignoring all parentheses in the query. If this doesn't help, please check your search and try again."), req=req)
 
         # remove the parentheses in the query. Current implementation removes all the parentheses,
         # but it could be improved to romove only these that are not inside quotes
@@ -2633,23 +2634,23 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             # some hits found in Home, so propose this search:
             if of.startswith("h") and display_nearest_terms_box:
                 url = websearch_templates.build_search_url(req.argd, cc=CFG_SITE_NAME, c=[])
-                print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
+                write_warning(_("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
                               {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln, False) for coll in colls], ', ') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
                                'x_nb_hits': len(results_in_Home),
-                               'x_url_close': '</a>'})
+                               'x_url_close': '</a>'}, req=req)
             results = {}
         else:
             # no hits found in Home, recommend different search terms:
             if of.startswith("h") and display_nearest_terms_box:
-                print_warning(req, _("No public collection matched your query. "
+                write_warning(_("No public collection matched your query. "
                                      "If you were looking for a non-public document, please choose "
-                                     "the desired restricted collection first."))
+                                     "the desired restricted collection first."), req=req)
             results = {}
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
-        print_warning(req, "Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits)
-        print_warning(req, "Search stage 4: execution took %.2f seconds." % (t2 - t1))
+        write_warning("Search stage 4: intersecting with collection universe gave %d hits." % results_nbhits, req=req)
+        write_warning("Search stage 4: execution took %.2f seconds." % (t2 - t1), req=req)
     return results
 
 def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"):
@@ -2673,7 +2674,7 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
         nb_total += len(results[coll])
     if nb_total == 0:
         if of.startswith("h"):
-            print_warning(req, aptext)
+            write_warning(aptext, req=req)
         results = results_ap
     return results
 
@@ -3389,17 +3390,6 @@ def get_modification_date(recID, fmt="%Y-%m-%d"):
         out = res[0][0]
     return out
 
-def print_warning(req, msg, msg_type='', prologue='<br />', epilogue='<br />'):
-    "Prints warning message and flushes output."
-    if req and msg:
-        req.write(websearch_templates.tmpl_print_warning(
-                   msg = msg,
-                   type = msg_type,
-                   prologue = prologue,
-                   epilogue = epilogue,
-                 ))
-        return
-
 def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS,
                       aas=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
@@ -3590,7 +3580,7 @@ class BibSortDataCacher(DataCacher):
             try:
                 data_dict_ordered = deserialize_via_marshal(res_data[0][0])
             except:
-                data_dict_ordered= {}
+                data_dict_ordered = {}
             alldicts['data_dict_ordered'] = data_dict_ordered # recid: weight
 
             if not res_buckets:
@@ -3677,7 +3667,7 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
                 #return (solution_recs, solution_scores, '', '', '')
                 comment = ''
                 if verbose > 0:
-                    comment = 'find_citations retlist %s' %[[solution_recs[i], solution_scores[i]] for i in range(len(solution_recs))]
+                    comment = 'find_citations retlist %s' % [[solution_recs[i], solution_scores[i]] for i in range(len(solution_recs))]
                 return (solution_recs, solution_scores, '(', ')', comment)
     return rank_records_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose)
 
@@ -3727,7 +3717,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
         else:
             if of.startswith('h'):
-                print_warning(req, _("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error")
+                write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
             return recIDs[index_min:]
     if tags:
         for sort_method in sorting_methods:
@@ -3756,8 +3746,8 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
             return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, '', verbose, of, ln, rg, jrec)
 
     if verbose >= 3 and of.startswith('h'):
-        print_warning(req, "Sorting (using BibSort cache) by method %s (definition %s)." \
-                      % (cgi.escape(repr(sort_method)), cgi.escape(repr(sorting_methods[sort_method]))))
+        write_warning("Sorting (using BibSort cache) by method %s (definition %s)." \
+                      % (cgi.escape(repr(sort_method)), cgi.escape(repr(sorting_methods[sort_method]))), req=req)
 
     #we should return sorted records up to irec_max(exclusive)
     dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
@@ -3769,7 +3759,7 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
     #check if all buckets have been constructed
     if len(bucket_numbers) != CFG_BIBSORT_BUCKETS:
         if verbose > 3 and of.startswith('h'):
-            print_warning(req, "Not all buckets have been constructed.. switching to old fashion sorting.")
+            write_warning("Not all buckets have been constructed.. switching to old fashion sorting.", req=req)
         if sort_or_rank == 'r':
             return rank_records_bibrank(sort_method, 0, recIDs, None, verbose)
         else:
@@ -3835,7 +3825,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
         return recIDs[index_min:]
     if len(recIDs) > CFG_WEBSEARCH_NB_RECORDS_TO_SORT:
         if of.startswith('h'):
-            print_warning(req, _("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning")
+            write_warning(_("Sorry, sorting is allowed on sets of up to %d records only. Using default sort order.") % CFG_WEBSEARCH_NB_RECORDS_TO_SORT, "Warning", req=req)
         return recIDs[index_min:]
 
     recIDs_dict = {}
@@ -3847,12 +3837,12 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
         tags, error_field = get_tags_form_sort_fields(sort_fields)
         if error_field:
             if of.startswith('h'):
-                print_warning(req, _("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error")
+                write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
             return recIDs[index_min:]
     if verbose >= 3 and of.startswith('h'):
-        print_warning(req, "Sorting by tags %s." % cgi.escape(repr(tags)))
+        write_warning("Sorting by tags %s." % cgi.escape(repr(tags)), req=req)
         if sort_pattern:
-            print_warning(req, "Sorting preferentially by %s." % cgi.escape(sort_pattern))
+            write_warning("Sorting preferentially by %s." % cgi.escape(sort_pattern), req=req)
 
     ## check if we have sorting tag defined:
     if tags:
@@ -3864,7 +3854,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
                 if CFG_CERN_SITE and tag == '773__c':
                     # CERN hack: journal sorting
                     # 773__c contains page numbers, e.g. 3-13, and we want to sort by 3, and numerically:
-                    vals.extend(["%050s" % x.split("-",1)[0] for x in get_fieldvalues(recID, tag)])
+                    vals.extend(["%050s" % x.split("-", 1)[0] for x in get_fieldvalues(recID, tag)])
                 else:
                     vals.extend(get_fieldvalues(recID, tag))
             if sort_pattern:
@@ -4074,15 +4064,15 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                 # HTML detailed format:
                 for irec in range(irec_max, irec_min, -1):
                     if record_exists(recIDs[irec]) == -1:
-                        print_warning(req, _("The record has been deleted."))
+                        write_warning(_("The record has been deleted."), req=req)
                         merged_recid = get_merged_recid(recIDs[irec])
                         if merged_recid:
-                            print_warning(req, _("The record %d replaces it." % merged_recid))
+                            write_warning(_("The record %d replaces it." % merged_recid), req=req)
                         continue
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
                                                             recIDs[irec], ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
-                    ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+                    ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
 
                     link_ln = ''
 
@@ -4177,8 +4167,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             citationhistory = create_citation_history_graph_and_box(recid, ln)
                         #debug
                         if verbose > 3:
-                            print_warning(req, "Citation graph debug: " + \
-                                          str(len(citationhistory)))
+                            write_warning("Citation graph debug: " + \
+                                          str(len(citationhistory)), req=req)
 
                         req.write(websearch_templates.tmpl_detailed_record_citations_citation_history(recid, ln, citationhistory))
                         req.write(websearch_templates.tmpl_detailed_record_citations_epilogue(recid, ln))
@@ -4198,7 +4188,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        import bibclassify_webinterface
+                        from invenio import bibclassify_webinterface
                         recid = recIDs[irec]
                         bibclassify_webinterface.main_page(req, recid, tabs, ln, webstyle_templates)
                     elif tab == 'plots':
@@ -4275,7 +4265,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                            sf=sf, so=so, sp=sp, rm=rm))
 
     else:
-        print_warning(req, _("Use different search terms."))
+        write_warning(_("Use different search terms."), req=req)
 
 def print_records_prologue(req, format, cc=None):
     """
@@ -5078,7 +5068,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 if req.header_only:
                     raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
                 else:
-                    print_warning(req, _("Requested record does not seem to exist."))
+                    write_warning(_("Requested record does not seem to exist."), req=req)
 
     elif action == "browse":
         ## 2 - browse needed
@@ -5116,7 +5106,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 if req.header_only:
                     raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
                 else:
-                    print_warning(req, _("Requested record does not seem to exist."))
+                    write_warning(_("Requested record does not seem to exist."), req=req)
             if of == "id":
                 return []
             elif of.startswith("x"):
@@ -5136,10 +5126,10 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                    print_warning(req, results_similar_comments)
+                    write_warning(results_similar_comments, req=req)
                     print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
                                   results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
-                elif of=="id":
+                elif of == "id":
                     return results_similar_recIDs
                 elif of.startswith("x"):
                     print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
@@ -5147,9 +5137,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             else:
                 # rank_records failed and returned some error message to display:
                 if of.startswith("h"):
-                    print_warning(req, results_similar_relevances_prologue)
-                    print_warning(req, results_similar_relevances_epilogue)
-                    print_warning(req, results_similar_comments)
+                    write_warning(results_similar_relevances_prologue, req=req)
+                    write_warning(results_similar_relevances_epilogue, req=req)
+                    write_warning(results_similar_comments, req=req)
                 if of == "id":
                     return []
                 elif of.startswith("x"):
@@ -5167,7 +5157,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
         if record_exists(recID) != 1:
             # record does not exist
             if of.startswith("h"):
-                print_warning(req, _("Requested record does not seem to exist."))
+                write_warning(_("Requested record does not seem to exist."), req=req)
             if of == "id":
                 return []
             elif of.startswith("x"):
@@ -5187,7 +5177,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                                 sc, pl_in_url,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
                     print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
-                elif of=="id":
+                elif of == "id":
                     return results_cocited_recIDs
                 elif of.startswith("x"):
                     print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
@@ -5195,7 +5185,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             else:
                 # cited rank_records failed and returned some error message to display:
                 if of.startswith("h"):
-                    print_warning(req, "nothing found")
+                    write_warning("nothing found", req=req)
                 if of == "id":
                     return []
                 elif of.startswith("x"):
@@ -5205,11 +5195,11 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
     else:
         ## 3 - common search needed
         query_in_cache = False
-        query_representation_in_cache = repr((p,f,colls_to_search, wl))
+        query_representation_in_cache = repr((p, f, colls_to_search, wl))
         page_start(req, of, cc, aas, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3))
 
         if of.startswith("h") and verbose and wash_colls_debug:
-            print_warning(req, "wash_colls debugging info : %s" % wash_colls_debug)
+            write_warning("wash_colls debugging info : %s" % wash_colls_debug, req=req)
 
         # search into the hosted collections only if the output format is html or xml
         if hosted_colls and (of.startswith("h") or of.startswith("x")) and not p.startswith("recid:"):
@@ -5226,25 +5216,25 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     if result[1] == None or result[1] == False:
                         # these are the searches the returned no or zero results
                         if verbose:
-                            print_warning(req, "Hosted collections (perform_search_request): %s returned no results" % result[0][1].name)
+                            write_warning("Hosted collections (perform_search_request): %s returned no results" % result[0][1].name, req=req)
                     else:
                         # these are the searches that actually returned results on time
                         hosted_colls_true_results.append(result)
                         if verbose:
-                            print_warning(req, "Hosted collections (perform_search_request): %s returned %s results in %s seconds" % (result[0][1].name, result[1], result[2]))
+                            write_warning("Hosted collections (perform_search_request): %s returned %s results in %s seconds" % (result[0][1].name, result[1], result[2]), req=req)
             else:
                 if verbose:
-                    print_warning(req, "Hosted collections (perform_search_request): there were no hosted collections results to be printed at this time")
+                    write_warning("Hosted collections (perform_search_request): there were no hosted collections results to be printed at this time", req=req)
             if hosted_colls_timeouts:
                 if verbose:
                     for timeout in hosted_colls_timeouts:
-                        print_warning(req, "Hosted collections (perform_search_request): %s timed out and will be searched again later" % timeout[0][1].name)
+                        write_warning("Hosted collections (perform_search_request): %s timed out and will be searched again later" % timeout[0][1].name, req=req)
         # we need to know for later use if there were any hosted collections to be searched even if they weren't in the end
         elif hosted_colls and ((not (of.startswith("h") or of.startswith("x"))) or p.startswith("recid:")):
             (hosted_colls_results, hosted_colls_timeouts) = (None, None)
         else:
             if verbose:
-                print_warning(req, "Hosted collections (perform_search_request): there were no hosted collections to be searched")
+                write_warning("Hosted collections (perform_search_request): there were no hosted collections to be searched", req=req)
 
         ## let's define some useful boolean variables:
         # True means there are actual or potential hosted collections results to be printed
@@ -5284,7 +5274,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                         results_in_any_collection.difference_update(results_tmp)
                     else:
                         if of.startswith("h"):
-                            print_warning(req, "Invalid set operation %s." % cgi.escape(op1), "Error")
+                            write_warning("Invalid set operation %s." % cgi.escape(op1), "Error", req=req)
                     if len(results_in_any_collection) == 0:
                         if of.startswith("h"):
                             perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -5303,7 +5293,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                         results_in_any_collection.difference_update(results_tmp)
                     else:
                         if of.startswith("h"):
-                            print_warning(req, "Invalid set operation %s." % cgi.escape(op2), "Error")
+                            write_warning("Invalid set operation %s." % cgi.escape(op2), "Error", req=req)
             except:
                 register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
@@ -5322,7 +5312,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 query_in_cache = True
                 results_in_any_collection = search_results_cache.cache[query_representation_in_cache]
                 if verbose and of.startswith("h"):
-                    print_warning(req, "Search stage 0: query found in cache, reusing cached results.")
+                    write_warning("Search stage 0: query found in cache, reusing cached results.", req=req)
             else:
                 try:
                     # added the display_nearest_terms_box parameter to avoid printing out the "Nearest terms in any collection"
@@ -5352,7 +5342,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                 search_results_cache.clear()
             search_results_cache.cache[query_representation_in_cache] = results_in_any_collection
             if verbose and of.startswith("h"):
-                print_warning(req, "Search stage 3: storing query results in cache.")
+                write_warning("Search stage 3: storing query results in cache.", req=req)
 
         # search stage 4: intersection with collection universe:
         try:
@@ -5382,7 +5372,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
         # search stage 5: apply search option limits and restrictions:
         if datetext1 != "" and results_final != {}:
             if verbose and of.startswith("h"):
-                print_warning(req, "Search stage 5: applying time etc limits, from %s until %s..." % (datetext1, datetext2))
+                write_warning("Search stage 5: applying time etc limits, from %s until %s..." % (datetext1, datetext2), req=req)
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
@@ -5409,7 +5399,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
         if pl and results_final != {}:
             pl = wash_pattern(pl)
             if verbose and of.startswith("h"):
-                print_warning(req, "Search stage 5: applying search pattern limit %s..." % cgi.escape(pl))
+                write_warning("Search stage 5: applying search pattern limit %s..." % cgi.escape(pl), req=req)
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
@@ -5476,9 +5466,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     results_final_nb[timeout[1].name] = -963
 
         # we continue past this point only if there is a hosted collection that has timed out and might offer potential results
-        if results_final_nb_total ==0 and not hosted_colls_potential_results_p:
+        if results_final_nb_total == 0 and not hosted_colls_potential_results_p:
             if of.startswith("h"):
-                print_warning(req, "No match found, please enter different search terms.")
+                write_warning("No match found, please enter different search terms.", req=req)
             elif of.startswith("x"):
                 # Print empty, but valid XML
                 print_records_prologue(req, of)
@@ -5555,13 +5545,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                                                       string.split(p) + string.split(p1) +
                                                                       string.split(p2) + string.split(p3), verbose, so, of, ln, rg, jrec)
                             if of.startswith("h"):
-                                print_warning(req, results_final_comments)
+                                write_warning(results_final_comments, req=req)
                             if results_final_recIDs_ranked:
                                 results_final_recIDs = results_final_recIDs_ranked
                             else:
                                 # rank_records failed and returned some error message to display:
-                                print_warning(req, results_final_relevances_prologue)
-                                print_warning(req, results_final_relevances_epilogue)
+                                write_warning(results_final_relevances_prologue, req=req)
+                                write_warning(results_final_relevances_epilogue, req=req)
                         elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
                             results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
 

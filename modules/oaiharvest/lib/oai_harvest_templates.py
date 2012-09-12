@@ -164,7 +164,7 @@ class Template:
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
             text += """</select><br />"""
-        except StandardError, e:
+        except StandardError:
             for val in values:
                 if lastval == val[0]:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
@@ -177,12 +177,6 @@ class Template:
         """Outputs some info"""
         _ = gettext_set_language(ln)
         text = """<br /><b><span class="info">%s</span></b>""" % infotext
-        return text
-
-    def tmpl_print_warning(self, ln, warntext):
-        """Outputs some info"""
-        _ = gettext_set_language(ln)
-        text = """<br /><span class="warning">%s</span>""" % warntext
         return text
 
     def tmpl_print_brs(self, ln, howmany):
