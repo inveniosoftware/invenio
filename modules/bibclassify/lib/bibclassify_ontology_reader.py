@@ -277,19 +277,22 @@ def _discover_ontology(ontology_name):
     log.debug("Possible patterns: %s" % possible_patterns)
     for path in places:
 
-        if os.path.isdir(path):
-            log.debug("Listing: %s" % path)
-            for filename in os.listdir(path):
-                #log.debug('Testing: %s' % filename)
-                for pattern in possible_patterns:
-                    filename_lc = filename.lower()
-                    if pattern == filename_lc and os.path.exists(os.path.join(path, filename)):
-                        filepath = os.path.abspath(os.path.join(path, filename))
-                        if (os.access(filepath, os.R_OK)):
-                            log.debug("Found taxonomy at: %s" % filepath)
-                            return filepath
-                        else:
-                            log.warning('Found taxonony at: %s, but it is not readable. Continue searching...' % filepath)
+        try:
+            if os.path.isdir(path):
+                log.debug("Listing: %s" % path)
+                for filename in os.listdir(path):
+                    #log.debug('Testing: %s' % filename)
+                    for pattern in possible_patterns:
+                        filename_lc = filename.lower()
+                        if pattern == filename_lc and os.path.exists(os.path.join(path, filename)):
+                            filepath = os.path.abspath(os.path.join(path, filename))
+                            if (os.access(filepath, os.R_OK)):
+                                log.debug("Found taxonomy at: %s" % filepath)
+                                return filepath
+                            else:
+                                log.warning('Found taxonony at: %s, but it is not readable. Continue searching...' % filepath)
+        except OSError, os_error_msg:
+            log.warning('OS Error when listing path "%s": %s' % (str(path), str(os_error_msg)))
     log.debug("No taxonomy with pattern '%s' found" % ontology_name)
 
 

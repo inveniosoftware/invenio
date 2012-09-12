@@ -623,6 +623,7 @@ INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn');
 INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn2');
 INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');
 INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');
+INSERT INTO sbmFUNDESC VALUES ('Link_Records','keep_original_edsrn2');
 INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');
 INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');
 INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');

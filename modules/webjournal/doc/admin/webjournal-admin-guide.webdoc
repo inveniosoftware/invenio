@@ -31,6 +31,9 @@
     <ul style="list-style-type:None">
     <li>5.1&nbsp;&nbsp;<a href="#editJournalElement">Edit Format Elements - Best Practices</a></li>
     </ul>
+    <ul style="list-style-type:None">
+    <li>5.2&nbsp;&nbsp;<a href="#editJournalAlertLayout">Alert layout - Best Practices</a></li>
+    </ul>
 </li>
 <li><strong>6. <a href="#addArticles">Submit Articles</a></strong>
     <ul style="list-style-type:None">
@@ -284,6 +287,24 @@ by <code>parse_url_string(..)</code>.</p>
 functions that should help you work with the WebJournal module. Please
 refer to this file for the list of available functions.</p>
 
+<h3><a name="editJournalAlertLayout">5.2 Alert HTML layout - Best practices</a></h3>
+
+<p>The HTML "alert" (or newsletter) is sent based on the homepage
+("Index" format template) of the journal of a specific issue. In order
+to maximize the chances for the newsletter to display correctly in the
+recipients mail clients, the linked CSS files are embedded into the
+source of the email. Because of the very varying level of support for
+HTML in mail clients (including web-based ones) you should check that
+the markup of your pages will be adequate for your targeted readers,
+and simply the markup if necessary.</p>
+
+<p>You can include some specific markup in your "index" format
+template to define areas that should not be sent as part of the
+newsletter. Use <code>&lt;!--START_NOT_FOR_ALERT--&gt;</code> to mark
+the beginning of an area that should not be included in the
+newsletter, and <code>&lt!--END_NOT_FOR_ALERT--&gt;</code> to mark the
+end of such area.
+<p>
 
 <h2><a name="addArticles">6. Submit Articles</a></h2>
 

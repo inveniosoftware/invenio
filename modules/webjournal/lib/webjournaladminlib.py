@@ -485,6 +485,7 @@ def perform_request_alert(journal_name, issue,
             html_file.close()
             html_string = put_css_in_file(html_string, journal_name)
             html_string = insert_journal_link(html_string, journal_name, issue, ln)
+            html_string = wash_alert(html_string)
 
         sender_email = get_journal_alert_sender_email(journal_name)
         send_email(sender_email, recipients, subject, plain_text,
@@ -878,6 +879,15 @@ def can_read_xml_config(journal_name):
     return True
 
 ######################## EMAIL HELPER FUNCTIONS ###############################
+
+CFG_WEBJOURNAL_ALERT_WASH_PATTERN = re.compile('<\!--\s*START_NOT_FOR_ALERT\s*-->.*?<\!--\s*END_NOT_FOR_ALERT\s*-->', re.MULTILINE | re.DOTALL)
+def wash_alert(html_string):
+    """
+    Remove from alert any content in-between tags <!--START_NOT_FOR_ALERT--> and
+    <!--END_NOT_FOR_ALERT-->
+    @param html_string: the HTML newsletter
+    """
+    return CFG_WEBJOURNAL_ALERT_WASH_PATTERN.sub('', html_string)
 
 def insert_journal_link(html_string, journal_name, issue, ln):
     """
