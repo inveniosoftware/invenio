@@ -3309,10 +3309,12 @@ div.subtitle {
 }
 
 .snippetbox {
-    margin-left:10px;
-    color: #000000;
-    background: #cccccc;
-    border: solid 1px #000000;
+    margin: 5px 2px 2px 10px;
+    padding: 3px;
+    color: #222;
+    background: #f5f9ff;
+    border: solid 1px #ddd;
+    font-size: small;
 }
 
 /* WebComment Refactor */
