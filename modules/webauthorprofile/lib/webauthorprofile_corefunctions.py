@@ -556,7 +556,7 @@ def _get_hepnames_data_bai(bibauthorid_data, person_id):
     hepdict = {}
     if bibauthorid_data['cid']:
         cid = bibauthorid_data['cid']
-    hepRecord = perform_request_search(rg=0, cc='HepNames', p='find a "%s"' % cid)[:CFG_WEBAUTHORPROFILE_MAX_HEP_CHOICES]
+    hepRecord = perform_request_search(rg=0, cc='HepNames', p=' "%s" ' % cid)[:CFG_WEBAUTHORPROFILE_MAX_HEP_CHOICES]
 
     hepdict['cid'] = cid
     hepdict['pid'] = person_id
