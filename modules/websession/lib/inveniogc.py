@@ -330,6 +330,21 @@ def optimise_tables():
         write_message("optimising table %s" % table_name)
         run_sql("OPTIMIZE TABLE %s" % wash_table_column_name(table_name)) # kwalitee: disable=sql
 
+def clean_sessions():
+    """
+    Deletes expired sessions only.
+    """
+    deleted_sessions = 0
+    timelimit = convert_datestruct_to_datetext(time.gmtime())
+    write_message("Deleting expired sessions since %s" % (timelimit,))
+
+    query = "DELETE LOW_PRIORITY FROM session WHERE session_expiry < %s"
+    write_message(query % (timelimit,), verbose=9)
+    deleted_sessions += run_sql(query, (timelimit,))
+
+    write_message("Deleted %d sessions" % (deleted_sessions,))
+
+
 def guest_user_garbage_collector():
     """Session Garbage Collector
 
@@ -528,10 +543,22 @@ def guest_user_garbage_collector():
 
 def main():
     """Main that construct all the bibtask."""
+    short_options = "lpgbdacTkoS"
+    long_options = ["logs", \
+                    "tempfiles", \
+                    "guests", \
+                    "bibxxx", \
+                    "documents", \
+                    "all", \
+                    "cache", \
+                    "tasks", \
+                    "check-tables", \
+                    "optimise-tables", \
+                    "sessions"]
     task_init(authorization_action='runinveniogc',
             authorization_msg="InvenioGC Task Submission",
             help_specific_usage="  -l, --logs\t\tClean old logs.\n" \
-                "  -p, --tempfiles\t\tClean old temporary files.\n" \
+                "  -p, --tempfiles\tClean old temporary files.\n" \
                 "  -g, --guests\t\tClean expired guest user related information. [default action]\n" \
                 "  -b, --bibxxx\t\tClean unreferenced bibliographic values in bibXXx tables.\n" \
                 "  -c, --cache\t\tClean cache by removing old files.\n" \
@@ -539,9 +566,10 @@ def main():
                 "  -T, --tasks\t\tClean the BibSched queue removing/archiving old DONE tasks.\n" \
                 "  -a, --all\t\tClean all of the above (but do not run check/optimise table options below).\n" \
                 "  -k, --check-tables\tCheck DB tables to discover potential problems.\n" \
-                "  -o, --optimise-tables\tOptimise DB tables to increase performance.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
+                "  -o, --optimise-tables\tOptimise DB tables to increase performance.\n" \
+                "  -S, --sessions\tClean expired sessions from the DB.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
             version=__revision__,
-            specific_params=("lpgbdacTko", ["logs", "tempfiles", "guests", "bibxxx", "documents", "all", "cache", "tasks", "check-tables", "optimise-tables"]),
+            specific_params=(short_options, long_options),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
@@ -555,6 +583,7 @@ def task_submit_check_options():
        not task_get_option('cache') and \
        not task_get_option('tasks') and \
        not task_get_option('check-tables') and \
+       not task_get_option('sessions') and \
        not task_get_option('optimise-tables'):
         task_set_option('sessions', True)
     return True
@@ -597,6 +626,9 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ('-o', '--optimise-tables'):
         task_set_option('optimise-tables', True)
         return True
+    elif key in ('-S', '--sessions'):
+        task_set_option('sessions', True)
+        return True
     elif key in ('-a', '--all'):
         task_set_option('logs', True)
         task_set_option('tempfiles', True)
@@ -605,6 +637,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option('documents', True)
         task_set_option('cache', True)
         task_set_option('tasks', True)
+        task_set_option('sessions', True)
         return True
     return False
 
@@ -628,6 +661,8 @@ def task_run_core():
         check_tables()
     if task_get_option('optimise-tables'):
         optimise_tables()
+    if task_get_option('sessions'):
+        clean_sessions()
     return True
 
 if __name__ == '__main__':
