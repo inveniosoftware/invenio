@@ -661,7 +661,8 @@ class Template:
     def tmpl_author_page(self, req, pubs, selfpubs, authorname, num_downloads,
                         aff_pubdict, citedbylist, kwtuples, authors,
                         vtuples, names_dict, person_link,
-                        bibauthorid_data, summarize_records, hepdict, collabs, ln, eval):
+                        bibauthorid_data, summarize_records, hepdict, collabs, ln, eval, oldest_cache_date,
+                        recompute_allowed):
         '''
         '''
         _ = gettext_set_language(ln)
@@ -731,6 +732,19 @@ class Template:
                               g(1, 1, cell_padding=5)(html_hepnames))
                       )
         html.append(page)
+        if oldest_cache_date:
+            rec_date = str(oldest_cache_date)
+        else:
+            rec_date = 'now'
+
+        if recompute_allowed:
+            cache_reload_link = ('<a href="%s/author/%s/?recompute=1">%s</a>'
+                      % (CFG_SITE_URL, person_link,
+                         _("Recompute Now!")))
+        else:
+            cache_reload_link = ''
+
+        html.append("<div align='right' font-size:'50%%'> Generated: %s. %s</div>" % (rec_date, cache_reload_link))
         return ' '.join(html)
 
     def tmpl_open_table(self, width_pcnt=False, cell_padding=False, height_pcnt=False):
