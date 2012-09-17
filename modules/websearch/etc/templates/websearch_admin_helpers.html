@@ -21,98 +21,40 @@
 
 {% macro collection_tree(collection, children ) %}
 
-<style>
-    .list_placeholder { 
-        height: 1.5em; line-height: 1.2em; 
-        border: 0.2em dashed #ccc;
-        border-radius-topright: 30px 20px;
-        border-radius-topleft: 30px 20px;
-    }
-    .subnode_dropspace {
-        height: 0.2em;
-    }
-</style>
 <ul class="nav nav-list">
-    <li class="nav-header">Document Server</li>
-<ul {{ kwargs|xmlattr }}  data-id="{{ collection.id }}" data-score="{{collection.score}}">
-    <li class="subnode_dropspace"> </li>
-    {% for c in collection|attr(children) recursive %}
-    <li data-id="{{ c.id }}" data-type="{{ c.type }}" data-score="{{c.score}}">
+  <li class="nav-header">{{ collection.name }}</li>
+  <li>
+  <ul {{ kwargs|xmlattr }}  data-id="{{ collection.id }}">
+    {% for c in collection|attr(children)|sort(attribute='score') recursive %}
+    <li data-id-son="{{ c.id_son }}"
+        data-id-dad="{{ c.id_dad }}"
+        data-type="{{ c.type }}">
     {% if c.type == 'v' %}
     <i>
-    <a  href="{{ url_for(".manage_collection", name=c.name) }}" >
-        {{ c.name }}
+    <a  href="{{ url_for(".manage_collection", name=c.son.name) }}" >
+        {{ c.son.name }}
     </a>
     </i>
     {% else %}
-    <a  href="{{ url_for(".manage_collection", name=c.name) }}" >
-        {{ c.name }}
+    <a  href="{{ url_for(".manage_collection", name=c.son.name) }}" >
+        {{ c.son.name }}
     </a>
     {% endif %}
-    <ul {{ kwargs|xmlattr }} data-id="{{ c.id }}" data-score="{{c.score}}">
-        {# this makes possible adding a subchild to the leaf nodes #}
-        <li class="subnode_dropspace"> </li>
-    {% if c.collection_children %}
-        {{ loop(c.collection_children) }}
+    <ul {{ kwargs|xmlattr }} data-id="{{ c.son.id }}">
+    {% if c.son.sons %}
+        {{ loop(c.son.sons|sort(attribute='score')) }}
     {% endif %}
     </ul>
     </li>
     {% endfor %}
-    <li class="subnode_dropspace"> </li>
+  </ul>
+  </li>
 </ul>
-</ul>
-
-<script>
-    // this sets the placeholders on the tree to drop the dragged element
-    function set_placeholders(ui) {
-        // removes the older placeholders
-        $(".temp_placeholder").remove();
-
-        // Adds a placeholder at the bottom of the list
-        if ($(ui.placeholder).parent().children().size() > 2 ) {
-            $(ui.placeholder).parent().append('<li class="list_placeholder temp_placeholder"></li>');
-        }
-        // this doesn't allow two placeholders next to each other
-        $(ui.placeholder).prev(".temp_placeholder").remove();
-        $(ui.placeholder).next(".temp_placeholder").remove();
-    }
-
-    // drag and drop JS code 
-    $(function() {
-        $( ".sortable" ).sortable({
-            connectWith: ".connectedSortable",
-            placeholder: "list_placeholder",
-            cursor: "move",
-            start: function(event, ui) {
-                set_placeholders(ui);
-            },
-            change: function(event, ui) {
-                set_placeholders(ui);
-            },
-            stop: function(event, ui) {
-                // Removes the temporary placeholders from the tree 
-                $(".temp_placeholder").remove();
-
-                // Makes the ajax request
-                $.ajax( '{{url_for('.modifycollectiontree')}}', {
-                    type: 'GET',
-                    data: 'id='+ $(ui.item).attr("data-id") +
-                    "&id_dad="+$(ui.item).parent().attr("data-id") + "&score=" +
-                    ui.item.index() + "&type=" + $(ui.item).parent().attr("data-type") }
-                ).done(function(data) {})
-
-            }
-        });
-        $( ".sortable" ).disableSelection();
-
-
-    });
-</script>
 {% endmacro %}
 
 {% macro collection_translations(collection) %}
 <div {{ kwargs|xmlattr }}>
-    <h2>Modify translations</h2>
+    <h2>{{ _('Modify translations') }}</h2>
     {% if config.CFG_LANGUAGE_LIST_LONG %}
         <form class="form-horizontal" method="POST" action="{{ url_for('.update_translations', id=collection.id) }}">
         {% for field in translation_form%}
@@ -128,14 +70,14 @@
 {% endmacro %}
 
 {% macro portalboxes_admin(collection) %}
-    <a href="#" >Create a new portalbox</a>
+    <a href="#" >{{ _('Create a new portalbox') }}</a>
 
     <ul id="sortable" class="nav nav-list" data-id="{{ collection.id }}">
     {% for k,l in collection.portalboxes_ln|groupby('position') -%}
         {% for portalbox in l %}
-        <li data-id="{{portalbox.id_portalbox}}" data-score="{{portalbox.score}}">
+        <li data-id="{{portalbox.id_portalbox}}">
         <a href="#" data-id="{{ portalbox.id }}" class="modalloader" >{{ portalbox.portalbox.title }}</a>
-        </li>   
+        </li>
         {% endfor %}
     {% endfor %}
     </ul>
@@ -151,7 +93,7 @@
                     type: 'GET',
                     data: 'id='+ $(ui.item).attr("data-id") +
                     "&id_collection="+$(ui.item).parent().attr("data-id") + "&score=" +
-                    ui.item.index() 
+                    ui.item.index()
                 }
                 ).done(function(data) {});
             }
@@ -161,7 +103,7 @@
         $(this).click(function(){
             $.ajax( '{{url_for('.edit_portalbox')}}', {
                 type: 'GET',
-                data: 'id='+ $(ui.item).attr("data-id") 
+                data: 'id='+ $(ui.item).attr("data-id")
               }
             ).done(function(data) {});
           });

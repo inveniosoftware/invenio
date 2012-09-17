@@ -20,32 +20,20 @@
 """WebSearch Admin Flask Blueprint"""
 
 from flask import Blueprint, session, make_response, g, render_template, \
-        request, flash, jsonify, redirect, url_for, current_app
+        request, flash, jsonify, redirect, url_for, current_app, \
+        abort
 from invenio.cache import cache
-from invenio.intbitset import intbitset as HitSet
 from invenio.sqlalchemyutils import db
 from invenio.websearch_model import Collection, CollectionCollection, \
-        Collectionname, CollectionPortalbox, OrderedList
-from invenio.websession_model import User
+        Collectionname, CollectionPortalbox
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webuser_flask import current_user
-
-from invenio.bibformat import format_record
-from invenio.search_engine import search_pattern_parenthesised,\
-        get_creation_date,\
-        perform_request_search,\
-        search_pattern
-
-from wtforms import TextField
-
 from invenio.messages import language_list_long
+from sqlalchemy.ext.orderinglist import ordering_list
 
 # imports the necessary forms
-from websearch_admin_forms import CollectionForm, TranslationsForm
+from invenio.websearch_admin_forms import CollectionForm, TranslationsForm
 
-from wtforms.ext.sqlalchemy.orm import model_form
-
-from sqlalchemy.sql import operators
 not_guest = lambda: not current_user.is_guest()
 
 blueprint = InvenioBlueprint(
@@ -53,69 +41,94 @@ blueprint = InvenioBlueprint(
         __name__,
         url_prefix="/admin/websearch",
         config=[],
-        breadcrumbs=[],
+        breadcrumbs=[(_('Configure WebSearch'), 'websearch_admin.index')],
         menubuilder=[('main.admin.websearch', _('Configure WebSearch'),
             'websearch_admin.index', 50)])
 
 
-""" Previous inputs calculations not processed """
-
-
-@cache.memoize(3600)
-
-
-
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/index', methods=['GET', 'POST'])
-#@blueprint.invenio_authenticated
-#@blueprint.invenio_authorized('usemessages')
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('cfgwebsearch')
 @blueprint.invenio_templated('websearch_admin_index.html')
 def index():
-
+    """
+    WebSearch admin interface with editable collection tree.
+    """
     collection = Collection.query.get_or_404(1)
-    orphans = Collection.query.filter(db.and_(
-            Collection.id != CollectionCollection.id_dad, \
-            id != CollectionCollection.id_son)).get_or_404(1)
+    orphans = Collection.query.filter(
+        db.not_(db.or_(
+            Collection.id.in_(db.session.query(CollectionCollection.id_son).subquery()),
+            Collection.id.in_(db.session.query(CollectionCollection.id_dad).subquery())
+        ))).all()
 
-    return dict(collection=collection)
+    return dict(collection=collection, orphans=orphans)
 
 
 @blueprint.route('/modifycollectiontree', methods=['GET', 'POST'])
-#@blueprint.invenio_authenticated
-#@blueprint.invenio_templated('websearch_admin_index.html')
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('cfgwebsearch')
 def modifycollectiontree():
     """
     Handler of the tree changing operations triggered by the drag and drop operation
     """
 
     # Get the requests parameters
-    id = request.args.get('id', 0, type=int)
+    id_son = request.args.get('id_son', 0, type=int)
     id_dad = request.args.get('id_dad', 0, type=int)
+    id_new_dad = request.args.get('id_new_dad', 0, type=int)
     score = request.args.get('score', 0, type=int)
-    score = score - 1
-    type = request.args.get('type')
+    #if id_dad == id_new_dad:
+    #    score = score + 1
+    type = request.args.get('type', 'r')
 
-    collection = Collection.query.get_or_404(id)
+    # Check if collection exits.
+    Collection.query.get_or_404(id_son)
 
-    # check to see if it is only one dad
-    if len(collection.dads) > 1:
-        return "multiple dads"
+    if id_dad > 0:
+        # Get only one record
+        cc = CollectionCollection.query.filter(
+            db.and_(
+            CollectionCollection.id_son==id_son,
+            CollectionCollection.id_dad==id_dad
+            )).one()
+        dad = Collection.query.get_or_404(id_dad)
+        dad._collection_children.remove(cc)
+        dad._collection_children.reorder()
+    else:
+        cc = CollectionCollection(
+            id_dad=id_new_dad,
+            id_son=id_son,
+            type=type)
+        db.session.add(cc)
 
-    # get the dad
-    olddad = collection.dads.pop()
-    db.session.delete(olddad)
-    newdad = Collection.query.get_or_404(id_dad)
-    newdad._collection_children.set(CollectionCollection(id_son=collection.id,
-        type=collection.type), score)
+    if id_new_dad == 0:
+        db.session.delete(cc)
+    else:
+        new_dad = Collection.query.get_or_404(id_new_dad)
+        cc.id_dad = id_new_dad
+        try:
+            descendants = Collection.query.get(id_son).descendants_ids
+            ancestors = new_dad.ancestors_ids
+            print descendants, ancestors
+            if descendants & ancestors:
+                raise
+        except:
+            ## Cycle has been detected.
+            db.session.rollback()
+            abort(406)
+        new_dad._collection_children.reorder()
+        new_dad._collection_children.insert(score, cc)
+
+    #FIXME add dbrecs rebuild for modified trees.
 
     db.session.commit()
-    return ""
-
-
+    return 'done'
 
 
 @blueprint.route('/collectiontree', methods=['GET', 'POST'])
-#@blueprint.invenio_authenticated
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('cfgwebsearch')
 def managecollectiontree():
     """
     Here is where managing the tree is possible
@@ -131,8 +144,8 @@ def managecollectiontree():
 
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
 @blueprint.route('/collection/view/<name>', methods=['GET', 'POST'])
-#@blueprint.invenio_authenticated
-#@blueprint.invenio_templated('websearch_admin_collection.html')
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('cfgwebsearch')
 def manage_collection(name):
     collection = Collection.query.filter(Collection.name==name).first_or_404()
     form = CollectionForm(request.form, obj = collection)
@@ -154,17 +167,14 @@ def manage_collection(name):
 
 
 @blueprint.route('/collection/update/<id>', methods=['POST'])
-#@blueprint.invenio_authenticated
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('cfgwebsearch')
 def update(id):
     form = CollectionForm(request.form)
-
     if  request.method == 'POST':# and form.validate():
         collection = Collection.query.filter(Collection.id==id).first_or_404()
-
         form.populate_obj(collection)
-
         db.session.commit()
-
         flash(_('Collection was updated'), "info")
         return redirect(url_for('.index'))
 
@@ -181,6 +191,8 @@ def create_collection():
 
 
 @blueprint.route('/collection/update_translations<id>', methods=['POST'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('cfgwebsearch')
 #@blueprint.invenio_authenticated
 def update_translations(id):
     """
@@ -239,8 +251,9 @@ def manage_portalboxes_order():
 
 
 @blueprint.route('/collection/edit_portalbox', methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('cfgwebsearch')
 def edit_portalbox():
-#    collection = Collection.query.filter(Collection.name==name).first_or_404()
-    portalbox = Portalbox.query.filter(Portalbox.id==request.args.get('id', 0, type=int))
+    portalbox = Portalbox.query.get(request.args.get_or_404('id', 0, type=int))
 
     return dict(portalbox = portalbox)

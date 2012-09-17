@@ -34,6 +34,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import mapped_collection, \
                                        attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
+from invenio.intbitset import intbitset
+from sqlalchemy.ext.orderinglist import ordering_list
 # Create your models here.
 
 from invenio.websession_model import User
@@ -62,24 +64,27 @@ def IntbitsetCmp(x,y):
 class OrderedList(InstrumentedList):
     def append(self, item):
         if self:
-            item.score= self[-1].score+1
+            s = sorted(self, key=lambda obj: obj.score)
+            item.score = s[-1].score+1
         else:
-            item.score= 1
+            item.score = 1
         InstrumentedList.append(self, item)
 
     def set(self, item, index=0):
         if self:
-            s = sorted(self, key=lambda obj: obj.score, reverse=True)
-            #if index == 0:
-            #    item.score = s[-1].score + 1
-            #else:
-            #if index >= len(s):
-            #    index = len(s) - 1
+            s = sorted(self, key=lambda obj: obj.score)
+            if index >= len(s):
+                old_score = s[-1].score
+                item.score = s[-1].score + 1
+            elif index < 0:
+                old_score = s[0].score
+                item.score = s[0].score
+                index = 0
+            else:
+                item.score = s[index].score + 1
 
-            item.score = s[index].score + 1
-
-            for i,it in enumerate(s[:index]):
-                it.score = item.score + (len(s[:index]) - i)
+            for i,it in enumerate(s[index:]):
+                it.score = item.score + i + 1
                 #if s[i+1].score more then break
         else:
             item.score=index
@@ -213,32 +218,37 @@ class Collection(db.Model):
     @property
     def type(self):
         p = re.compile("\d+:.*")
-        if p.match(self.dbquery.lower()) :
+        if self.dbquery is not None and \
+            p.match(self.dbquery.lower()) :
             return 'r'
         else:
             return 'v'
 
     _collection_children = db.relationship(lambda: CollectionCollection,
-                                collection_class=OrderedList,
+                                #collection_class=OrderedList,
+                                collection_class=ordering_list('score'),
                                 primaryjoin=lambda: Collection.id==CollectionCollection.id_dad,
                                 foreign_keys=lambda: CollectionCollection.id_dad,
                                 order_by=lambda: db.asc(CollectionCollection.score))
     _collection_children_r = db.relationship(lambda: CollectionCollection,
-                                collection_class=OrderedList,
+                                #collection_class=OrderedList,
+                                collection_class=ordering_list('score'),
                                 primaryjoin=lambda: db.and_(
                                     Collection.id==CollectionCollection.id_dad,
                                     CollectionCollection.type=='r'),
                                 foreign_keys=lambda: CollectionCollection.id_dad,
                                 order_by=lambda: db.asc(CollectionCollection.score))
     _collection_children_v = db.relationship(lambda: CollectionCollection,
-                                collection_class=OrderedList,
+                                #collection_class=OrderedList,
+                                collection_class=ordering_list('score'),
                                 primaryjoin=lambda: db.and_(
                                     Collection.id==CollectionCollection.id_dad,
                                     CollectionCollection.type=='v'),
                                 foreign_keys=lambda: CollectionCollection.id_dad,
                                 order_by=lambda: db.asc(CollectionCollection.score))
     collection_parents = db.relationship(lambda: CollectionCollection,
-                                collection_class=OrderedList,
+                                #collection_class=OrderedList,
+                                collection_class=ordering_list('score'),
                                 primaryjoin=lambda: Collection.id==CollectionCollection.id_son,
                                 foreign_keys=lambda: CollectionCollection.id_son,
                                 order_by=lambda: db.asc(CollectionCollection.score))
@@ -298,6 +308,28 @@ class Collection(db.Model):
                     Field.name.in_(CFG_WEBSEARCH_SEARCH_WITHIN)).all()]))
         return default
 
+    @property
+    def ancestors_ids(self):
+        """Get list of parent collection ids."""
+        output = intbitset([self.id])
+        for c in self.dads:
+            ancestors = c.dad.ancestors_ids
+            if self.id in ancestors:
+                raise
+            output |= ancestors
+        return output
+
+    @property
+    def descendants_ids(self):
+        """Get list of child collection ids."""
+        output = intbitset([self.id])
+        for c in self.sons:
+            descendants = c.son.descendants_ids
+            if self.id in descendants:
+                raise
+            output |= descendants
+        return output
+
     # Gets the list of localized names as an array
     collection_names = db.relationship(
             lambda : Collectionname,
@@ -316,7 +348,8 @@ class Collection(db.Model):
 
     portal_boxes_ln = db.relationship(
             lambda : CollectionPortalbox,
-            collection_class=OrderedList,
+            #collection_class=OrderedList,
+            collection_class=ordering_list('score'),
             primaryjoin= lambda: Collection.id==CollectionPortalbox.id_collection,
             foreign_keys= lambda: CollectionPortalbox.id_collection,
             order_by=lambda: db.asc(CollectionPortalbox.score))
@@ -400,9 +433,9 @@ class CollectionCollection(db.Model):
     son = db.relationship(Collection, primaryjoin=id_son==Collection.id,
                 backref='dads',
                 #FIX collection_class=db.attribute_mapped_collection('score'),
-                order_by=score)
+                order_by=db.asc(score))
     dad = db.relationship(Collection, primaryjoin=id_dad==Collection.id,
-            backref='sons', order_by=score)
+            backref='sons', order_by=db.asc(score))
 
 class Example(db.Model):
     """Represents a Example record."""
