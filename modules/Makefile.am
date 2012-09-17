@@ -45,6 +45,7 @@ SUBDIRS = bibauthorid \
           webauthorprofile \
           webbasket \
           webcomment \
+          webdeposit \
           webhelp \
           webjournal \
           weblinkback \

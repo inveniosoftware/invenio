@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <title>My First Flask app</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap-responsive.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap-responsive.min.css') }}" />
+
+<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
+<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
+
+</head>
+<body>
+    <div id="container">
+<!--
+    <h3>Just some links</h3>
+    {% for item in navigation %}
+        <a id="link" href="{{ item.href }}">{{ item.caption }}</a></br>
+    {% endfor %}
+
+    </br></br>
+    <h3>Submit</h3>
+    {% if validated %}
+    <p>Document Title: {{ doctitle }}</p>
+    <p>Author: {{ author }}</p>
+    <p>Abstract: {{ abstract }}</p>
+    <p>Pages num: {{ pagesnum }}</p>
+    <p>language: {{ language }}</p>
+    <p>date: {{ date }}</p>
+    <p>keywords: {{ keywords }}</p>
+    <p>keywords2: {{ keywords2 }}</p>
+    <p>notes: {{ notes }}</p>
+    <p>{{ file }}</p>-->
+    </br></br></br></br>
+    <div class="alert alert-success">Article "{{ doctitle }}" submitted successfully!</div>
+    <a href="/">Submit another Article</a>
+    </br></br></br></br></br></br>
+	{% else %}
+<div class="alert alert-error">
+	Oops! Something went wrong with the submission. <a href="/">Please try again...</a>
+</div>
+{% endif %}
+</table>
+</body>
+</html>

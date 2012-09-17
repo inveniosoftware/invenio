@@ -919,6 +919,13 @@ AC_CONFIG_FILES([config.nice  \
      modules/docextract/etc/Makefile \
      modules/docextract/doc/admin/Makefile \
      modules/docextract/doc/hacking/Makefile \
+     modules/webdeposit/Makefile \
+     modules/webdeposit/etc/Makefile \
+     modules/webdeposit/etc/static/Makefile \
+     modules/webdeposit/etc/templates/Makefile \
+     modules/webdeposit/lib/Makefile \
+     modules/webdeposit/lib/fields/Makefile \
+     modules/webdeposit/lib/forms/Makefile \
      ])
 
 ## Finally, write output files:
