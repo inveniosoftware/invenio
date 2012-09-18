@@ -73,7 +73,6 @@ from invenio.config import \
      CFG_WEBSEARCH_DETAILED_META_FORMAT, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
-     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_BIBSORT_BUCKETS
 
@@ -119,7 +118,7 @@ from invenio.bibrank_citation_grapher import create_citation_history_graph_and_b
 
 
 from invenio.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
-                            get_table_update_time, Error
+                            get_table_update_time
 from invenio.webuser import getUid, collect_user_info, session_param_set
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
@@ -398,15 +397,15 @@ def get_collection_reclist(coll, recreate_cache_if_needed=True):
     if not collection_reclist_cache.cache[coll]:
         # collection's reclist not in the cache yet, so calculate it
         # and fill the cache:
-        set = intbitset()
+        reclist = intbitset()
         query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
         res = run_sql(query, (coll, ), 1)
         if res:
             try:
-                set = intbitset(res[0][1])
+                reclist = intbitset(res[0][1])
             except:
                 pass
-        collection_reclist_cache.cache[coll] = set
+        collection_reclist_cache.cache[coll] = reclist
     # finally, return reclist:
     return collection_reclist_cache.cache[coll]
 
