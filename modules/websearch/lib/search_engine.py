@@ -5073,7 +5073,7 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
                       p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="",
                       sc=0, jrec=0, recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
                       d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG,
-                      ec=None, tab="", uid=None, wl=CFG_WEBSEARCH_WILDCARD_LIMIT, em="", **dummy):
+                      ec=None, tab="", uid=None, wl=0, em="", **dummy):
     """
     Sets the (default) values and checks others for the PRS call
     """
