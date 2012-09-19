@@ -245,8 +245,8 @@ def login_user(user, remember=False, force=False):
 
 
 def logout_user():
-    session.uid = None
-    session._uid = None
+    session.delete()
+    session[current_app.login_manager.key_user_id] = None
     current_app.login_manager.reload_user()
     return True
 
