@@ -847,6 +847,8 @@ AC_CONFIG_FILES([config.nice  \
      modules/webjournal/web/Makefile \
      modules/webjournal/web/admin/Makefile \
      modules/weblinkback/Makefile \
+     modules/weblinkback/etc/Makefile \
+     modules/weblinkback/etc/templates/Makefile \
      modules/weblinkback/lib/Makefile \
      modules/weblinkback/web/Makefile \
      modules/weblinkback/web/admin/Makefile \

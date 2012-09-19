@@ -100,6 +100,9 @@ def request_record(f):
                 k='metadata'
             if k=='comments':
                 b='webcomment'
+            if k=='linkbacks':
+                b='weblinkback'
+                k='index'
 
             t = {'key':b+'.'+k}
             t.update(v)

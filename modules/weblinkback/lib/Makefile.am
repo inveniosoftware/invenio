@@ -18,6 +18,7 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = weblinkback_config.py \
+             weblinkback_blueprint.py \
              weblinkback_dblayer.py \
              weblinkback_regression_tests.py \
              weblinkback_templates.py \
