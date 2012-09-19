@@ -24,6 +24,7 @@ import os
 import hashlib
 from os.path import join, exists, getmtime, splitext
 from pprint import pformat
+from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from flask import Blueprint, Flask, logging, session, request, g, \
@@ -64,7 +65,8 @@ def create_invenio_flask_app():
 #from flaskext.login import LoginManager
     from invenio.webuser_flask import InvenioLoginManager
     from invenio.messages import wash_language, gettext_set_language, language_list_long, is_language_rtl
-    from invenio.dateutils import convert_datetext_to_dategui
+    from invenio.dateutils import convert_datetext_to_dategui, \
+                                  convert_datestruct_to_dategui
     from invenio.urlutils import create_url
     from invenio.cache import cache
 #from invenio.webuser import collect_user_info
@@ -272,6 +274,8 @@ def create_invenio_flask_app():
         This is a special Jinja2 filter that will call convert_datetext_to_dategui
         to print a human friendly date.
         """
+        if isinstance(date, datetime):
+            return convert_datestruct_to_dategui(date.timetuple(), g.ln).decode('utf-8')
         return convert_datetext_to_dategui(date, g.ln).decode('utf-8')
 
     @_app.template_filter('invenio_url_args')
