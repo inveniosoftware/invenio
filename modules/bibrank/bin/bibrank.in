@@ -70,6 +70,7 @@ Usage: %s [options]
 __revision__ = "$Id$"
 
 try:
+    from invenio.flaskshell import *
     from invenio.bibrank import main
 except ImportError, e:
     print "Error: %s" % e
