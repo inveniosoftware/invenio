@@ -2299,7 +2299,8 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
 
         self.run_test('p=muon OR kaon;sf=title;wl=5;c=Preprints', [12])
 
-        self.run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
+        # FIXME_TICKET_1174
+        # self.run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
 
         self.run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103])
 
