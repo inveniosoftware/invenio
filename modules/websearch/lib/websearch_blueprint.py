@@ -278,7 +278,7 @@ def search():
     page = request.args.get('jrec', 1, type=int)
     facets = [{'title': g._(f.capitalize()),
                'url': url_for('.facet', name=f, qid=qid),
-               'facet': f}  for f in ['collection', 'collectionname', 'author', 'year']]
+               'facet': f}  for f in ['collection', 'author', 'year']]
 
     current_app.template_context_processors[None].append(lambda: dict(
                 collection = collection,
@@ -309,7 +309,7 @@ def facet(name, qid):
 
     limit = 50
 
-    if name == 'collectionname':
+    if name == 'collection':
         collection = Collection.query.filter(Collection.name==data['cc']).first_or_404()
         facet = []
         for c in collection.collection_children:
@@ -321,13 +321,6 @@ def facet(name, qid):
     facet=list(get_most_popular_field_values(
                             recIDs,
                             get_field_tags(name)))
-
-    if name == 'collection':
-        for i,f in enumerate(facet):
-            c = Collection.query.filter(
-                    Collection.dbquery.contains(f[0])).first()
-            if name:
-                facet[i] = f[0],f[1],c.name_ln
 
     return jsonify(facet=facet[0:limit])
 
