@@ -113,7 +113,7 @@ def make_test_suite(*test_cases):
 from invenio.config import *
 from invenio.webinterface_handler_flask import create_invenio_flask_app
 from invenio.sqlalchemyutils import db
-from flaskext.testing import TestCase, Twill
+from flask.ext.testing import TestCase, Twill
 from sqlalchemy.engine.url import URL
 
 class FlaskSQLAlchemyTest(TestCase):
@@ -183,6 +183,7 @@ def run_test_suite(testsuite, warn_user=False):
     Convenience function to embed in test suites.  Run given testsuite
     and eventually ask for confirmation of warn_user is True.
     """
+    from invenio.flaskshell import *
     if warn_user:
         warn_user_about_tests()
     res = unittest.TextTestRunner(verbosity=2).run(testsuite)
