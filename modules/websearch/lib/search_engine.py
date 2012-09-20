@@ -2241,6 +2241,9 @@ def search_unit(p, f=None, m=None, wl=0):
     elif f == 'citedby':
         # we are doing search by the citation count
         hitset = search_unit_citedby(p)
+    elif f == 'collection':
+        # we are doing search by the collection name or MARC field
+        hitset = search_unit_collection(p, m, wl=wl)
     elif m == 'a' or m == 'r':
         # we are doing either phrase search or regexp search
         if f == 'fulltext':
@@ -2747,6 +2750,19 @@ def search_unit_citedby(query):
             return get_citedby_hitset(ahitset)
         else:
             return intbitset([])
+    else:
+        return intbitset([])
+
+def search_unit_collection(query, m, wl=None):
+    """
+    Search for records satisfying the query (e.g. collection:"BOOK" or
+    collection:"Books") and return list of records in the collection.
+    """
+    if len(query):
+        ahitset = get_collection_reclist(query)
+        if not ahitset:
+            return search_unit_in_bibwords(query, 'collection', m, wl=wl)
+        return ahitset
     else:
         return intbitset([])
 

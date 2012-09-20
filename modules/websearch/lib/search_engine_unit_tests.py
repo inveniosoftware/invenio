@@ -262,10 +262,26 @@ class TestQueryParser(unittest.TestCase):
         self._check('title:"s = 630"', None, None,
                     [['+', 's = 630', 'title', 'a']])
 
+
+class TestSearchUnitFunction(unittest.TestCase):
+    """Test for washing of search query parameters."""
+
+    def test_collection_equality_results(self):
+        """search unit - getting same results for collection name."""
+
+        self.assertEqual(
+            search_engine.search_unit('Preprints', 'collection'),
+            search_engine.search_unit('PREPRINT', 'collection'))
+
+        self.assertEqual(
+            search_engine.search_unit('Books', 'collection'),
+            search_engine.search_unit('BOOK', 'collection'))
+
+
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestQueryParser,
-                             TestMiscUtilityFunctions)
-
+                             TestMiscUtilityFunctions,
+                             TestSearchUnitFunction)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
