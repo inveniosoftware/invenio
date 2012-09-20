@@ -236,3 +236,5 @@ class InvenioDB(SQLAlchemy):
 
 
 db = InvenioDB()
+# FIXME add __init__ method for db.
+_include_sqlalchemy(db, engine=None)
