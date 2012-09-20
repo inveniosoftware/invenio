@@ -2277,46 +2277,37 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
 
         self.run_test('p=ellis;f=author;sf=title;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
 
-        self.run_test('p=ellis;f=author;sf=title;rm=wrd;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
+        self.run_test('p=ellis;f=author;sf=title;wl=5;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
 
-        self.run_test('p=ellis;f=author;sf=title;rm=wrd;wl=5;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
+        self.run_test('p=ellis;f=author;sf=title;wl=5;so=a', [47, 13, 10, 12, 18, 17, 11, 9, 14, 16, 8])
 
-        self.run_test('p=ellis;f=author;sf=title;rm=wrd;wl=5;so=a', [47, 13, 10, 12, 18, 17, 11, 9, 14, 16, 8])
+        self.run_test('p=ellis;f=author;sf=title;wl=5;so=d', [8, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
 
-        self.run_test('p=ellis;f=author;sf=title;rm=wrd;wl=5;so=d', [8, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
+        self.run_test('p=ell*;sf=title;wl=5', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
 
-        self.run_test('p=ell*;sf=title;rm=wrd;wl=5', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
+        self.run_test('p=ell*;sf=title;wl=1', [10])
 
-        self.run_test('p=ell*;sf=title;rm=wrd;wl=1', [10])
+        self.run_test('p=ell*;sf=title;wl=100', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
 
-        self.run_test('p=ell*;sf=title;rm=wrd;wl=100', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 13, 47])
+        self.run_test('p=muon OR kaon;f=author;sf=title;wl=5;action=Search', [])
 
+        self.run_test('p=muon OR kaon;sf=title;wl=5;action=Search', [67, 12])
 
-        self.run_test('p=muon OR kaon;f=author;sf=title;rm=wrd;wl=5;action=Search', [])
+        self.run_test('p=muon OR kaon;sf=title;wl=5;c=Articles,Preprints', [67, 12])
 
-        self.run_test('p=muon OR kaon;sf=title;rm=wrd;wl=5;action=Search', [67, 12])
+        self.run_test('p=muon OR kaon;sf=title;wl=5;c=Articles', [67])
 
-        self.run_test('p=muon OR kaon;sf=title;rm=wrd;wl=5;c=Articles,Preprints', [67, 12])
-
-        self.run_test('p=muon OR kaon;sf=title;rm=wrd;wl=5;c=Articles', [67])
-
-        self.run_test('p=muon OR kaon;sf=title;rm=wrd;wl=5;c=Preprints', [12])
+        self.run_test('p=muon OR kaon;sf=title;wl=5;c=Preprints', [12])
 
         self.run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
 
         self.run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103])
 
-        # this should be considered a bug, because we request sorting by similarity/citation but because sf we got sorted by title
-
-        self.run_test('p=el*;sf=title;rm=citation', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 14, 9, 11, 30, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 2, 13, 47])
-
-        self.run_test('p=el*;sf=title;rm=wrd', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 14, 9, 11, 30, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 2, 13, 47])
+        self.run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 14, 9, 11, 30, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 2, 13, 47])
 
         self.run_test('p=boson;rm=citation', [1, 47, 50, 77, 95])
 
         self.run_test('p=boson;rm=wrd', [47, 50, 95, 77, 1])
-
-
 
         self.run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [])
 
