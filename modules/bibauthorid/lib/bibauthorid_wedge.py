@@ -28,6 +28,8 @@ from bibauthorid_general_utils import update_status \
 from bibauthorid_prob_matrix import ProbabilityMatrix
 import numpy
 
+import gc
+
 eps = 0.001
 
 # The lower bound of the edges being processed by the wedge algorithm.
@@ -215,7 +217,7 @@ def convert_cluster_set(cs, prob_matr):
     # step 2:
     #    + Using the prob matrix create a vector values to all other bibs.
     #    + Meld those vectors into one for each cluster.
-
+    gc.disable()
     for current, c1 in enumerate(cs.clusters):
         update_status(float(current) / len(cs.clusters), "Converting the cluster set...")
 
@@ -239,6 +241,8 @@ def convert_cluster_set(cs, prob_matr):
         c1.out_edges = reduce(meld_edges, pointers)[0]
 
     update_status_final("Converting the cluster set done.")
+    gc.collect()
+    gc.enable()
 
 def restore_cluster_set(cs):
     for cl in cs.clusters:

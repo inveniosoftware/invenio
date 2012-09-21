@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_DEVEL_SITE
 from invenio.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page, warning_page
 from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
                             page_not_authorized
 from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES, \
@@ -186,19 +186,19 @@ def interface(req,
     if not doctype or not act or not access:
         ## We don't have all the necessary information to go ahead
         ## with this submission:
-        return warningMsg(_("Not enough information to go ahead with the submission."), req, c, ln)
+        return warning_page(_("Not enough information to go ahead with the submission."), req, ln)
 
     try:
         assert(not access or re.match('\d+_\d+', access))
     except AssertionError:
         register_exception(req=req, prefix='doctype="%s", access="%s"' % (doctype, access))
-        return warningMsg(_("Invalid parameters"), req, c, ln)
+        return warning_page(_("Invalid parameters"), req, ln)
 
     if doctype and act:
         ## Let's clean the input
         details = get_details_of_submission(doctype, act)
         if not details:
-            return warningMsg(_("Invalid doctype and act parameters"), req, c, ln)
+            return warning_page(_("Invalid doctype and act parameters"), req, ln)
         doctype = details[0]
         act = details[1]
 
@@ -215,7 +215,7 @@ def interface(req,
                  """ <a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s">""" \
                  """main menu</a> to start a new submission.</b>""" \
                  % { 'doctype' : quote_plus(doctype), 'ln' : ln }
-        return warningMsg(wrnmsg, req)
+        return warning_page(wrnmsg, req, ln)
 
 
     ## retrieve the action and doctype data:
@@ -229,7 +229,7 @@ def interface(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warningMsg(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, c, ln)
+        return warning_page(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, ln)
 
     ## get the document type's long-name:
     doctype_lname = get_longname_of_doctype(doctype)
@@ -238,13 +238,13 @@ def interface(req,
         docname = doctype_lname.replace(" ", "&nbsp;")
     else:
         ## Unknown document type:
-        return warningMsg(_("Unknown document type"), req, c, ln)
+        return warning_page(_("Unknown document type"), req, ln)
 
     ## get the action's long-name:
     actname = get_longname_of_action(act)
     if actname is None:
         ## Unknown action:
-        return warningMsg(_("Unknown action"), req, c, ln)
+        return warning_page(_("Unknown action"), req, ln)
 
     ## Get the number of pages for this submission:
     num_submission_pages = get_num_pages_of_submission(subname)
@@ -252,7 +252,7 @@ def interface(req,
         nbpages = num_submission_pages
     else:
         ## Unable to determine the number of pages for this submission:
-        return warningMsg(_("Unable to determine the number of submission pages."), req, c, ln)
+        return warning_page(_("Unable to determine the number of submission pages."), req, ln)
 
     ## If unknown, get the current page of submission:
     if startPg != "" and curpage in ("", 0):
@@ -273,7 +273,7 @@ def interface(req,
         assert(curdir == os.path.abspath(curdir))
     except AssertionError:
         register_exception(req=req, prefix='indir="%s", doctype="%s", access="%s"' % (indir, doctype, access))
-        return warningMsg(_("Invalid parameters"), req, c, ln)
+        return warning_page(_("Invalid parameters"), req, ln)
 
     ## if this submission comes from another one (fromdir is then set)
     ## We retrieve the previous submission directory and put it in the proper one
@@ -283,7 +283,7 @@ def interface(req,
             assert(olddir == os.path.abspath(olddir))
         except AssertionError:
             register_exception(req=req, prefix='fromdir="%s", doctype="%s", access="%s"' % (fromdir, doctype, access))
-            return warningMsg(_("Invalid parameters"), req, c, ln)
+            return warning_page(_("Invalid parameters"), req, ln)
 
         if os.path.exists(olddir):
             os.rename(olddir, curdir)
@@ -293,7 +293,7 @@ def interface(req,
             os.makedirs(curdir)
         except Exception, e:
             register_exception(req=req, alert_admin=True)
-            return warningMsg(_("Unable to create a directory for this submission. The administrator has been alerted."), req, c, ln)
+            return warning_page(_("Unable to create a directory for this submission. The administrator has been alerted."), req, ln)
 
     ## Retrieve the previous page, as submitted to curdir (before we
     ## overwrite it with our curpage as declared from the incoming
@@ -340,7 +340,7 @@ def interface(req,
                                                      act=act, \
                                                      categ=categ)
     if not auth_code == 0:
-        return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
+        return warning_page("""<center><font color="red">%s</font></center>""" % auth_message, req, ln)
 
     ## update the "journal of submission":
     ## Does the submission already exist in the log?
@@ -376,7 +376,7 @@ def interface(req,
             assert(file_to_open == os.path.abspath(file_to_open))
         except AssertionError:
             register_exception(req=req, prefix='curdir="%s", filename="%s"' % (curdir, filename))
-            return warningMsg(_("Invalid parameters"), req, c, ln)
+            return warning_page(_("Invalid parameters"), req, ln)
 
         # Do not write reserved filenames to disk
         if filename in CFG_RESERVED_SUBMISSION_FILENAMES:
@@ -426,13 +426,13 @@ def interface(req,
                 assert(dir_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
             except AssertionError:
                 register_exception(req=req, prefix='curdir="%s", key="%s"' % (curdir, key))
-                return warningMsg(_("Invalid parameters"), req, c, ln)
+                return warning_page(_("Invalid parameters"), req, ln)
             if not os.path.exists(dir_to_open):
                 try:
                     os.makedirs(dir_to_open)
                 except:
                     register_exception(req=req, alert_admin=True)
-                    return warningMsg(_("Cannot create submission directory. The administrator has been alerted."), req, c, ln)
+                    return warning_page(_("Cannot create submission directory. The administrator has been alerted."), req, ln)
             filename = formfields.filename
             ## Before saving the file to disc, wash the filename (in particular
             ## washing away UNIX and Windows (e.g. DFS) paths):
@@ -454,7 +454,7 @@ def interface(req,
                 fp.write(filename)
                 fp.close()
             else:
-                return warningMsg(_("No file uploaded?"), req, c, ln)
+                return warning_page(_("No file uploaded?"), req, ln)
 
         ## if the found field is the reference of the document,
         ## save this value in the "journal of submissions":
@@ -498,7 +498,7 @@ def interface(req,
             msg = _("Unknown form field found on submission page.")
             register_exception(req=req, alert_admin=True, prefix=msg)
             ## The form field doesn't seem to exist - return with error message:
-            return warningMsg(_("Unknown form field found on submission page."), req, c, ln)
+            return warning_page(_("Unknown form field found on submission page."), req, ln)
 
         if element_descr[8] is None:
             val = ""
@@ -572,7 +572,7 @@ def interface(req,
                 combo = f.read()
                 f.close()
             else:
-                combo=""
+                combo = ""
             text = text.replace("<COMBO>", combo)
             # if there is a <YYYY> tag in it, replace it by the current year
             year = time.strftime("%Y");
@@ -634,7 +634,7 @@ def interface(req,
                     msg = _("Unknown form field found on submission page.")
                     register_exception(req=req, alert_admin=True, prefix=msg)
                     ## The form field doesn't seem to exist - return with error message:
-                    return warningMsg(_("Unknown form field found on submission page."), req, c, ln)
+                    return warning_page(_("Unknown form field found on submission page."), req, ln)
                 if element_descr[3] in ['D', 'R']:
                     if element_descr[3] == "D":
                         text = element_descr[9]
@@ -667,15 +667,15 @@ def interface(req,
         for i in xrange(nbFields):
             res = 1
             if not os.path.exists(os.path.join(curdir, fullcheck_field[i])):
-                res=0
+                res = 0
             else:
                 file = open(os.path.join(curdir, fullcheck_field[i]), "r")
                 text = file.read()
                 if text == '':
-                    res=0
+                    res = 0
                 else:
                     if text == "Select:":
-                        res=0
+                        res = 0
             if res == 0:
                 fld = i
                 break
@@ -824,7 +824,7 @@ def endaction(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warningMsg(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, c, ln)
+        return warning_page(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, ln)
     curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
     if os.path.exists(os.path.join(curdir, "combo%s" % doctype)):
         fp = open(os.path.join(curdir, "combo%s" % doctype), "r");
@@ -841,20 +841,20 @@ def endaction(req,
                                                      act=act, \
                                                      categ=categ)
     if not auth_code == 0:
-        return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
+        return warning_page("""<center><font color="red">%s</font></center>""" % auth_message, req, ln)
 
     # Preliminary tasks
     ## check we have minimum fields
     if not doctype or not act or not access:
         ## We don't have all the necessary information to go ahead
         ## with this submission:
-        return warningMsg(_("Not enough information to go ahead with the submission."), req, c, ln)
+        return warning_page(_("Not enough information to go ahead with the submission."), req, ln)
 
     if doctype and act:
         ## Let's clean the input
         details = get_details_of_submission(doctype, act)
         if not details:
-            return warningMsg(_("Invalid doctype and act parameters"), req, c, ln)
+            return warning_page(_("Invalid doctype and act parameters"), req, ln)
         doctype = details[0]
         act = details[1]
 
@@ -862,7 +862,7 @@ def endaction(req,
         assert(not access or re.match('\d+_\d+', access))
     except AssertionError:
         register_exception(req=req, prefix='doctype="%s", access="%s"' % (doctype, access))
-        return warningMsg(_("Invalid parameters"), req, c, ln)
+        return warning_page(_("Invalid parameters"), req, ln)
 
     ## Before continuing to process the submitted data, verify that
     ## this submission has not already been completed:
@@ -877,7 +877,7 @@ def endaction(req,
                  """ <a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s">""" \
                  """main menu</a> to start a new submission.</b>""" \
                  % { 'doctype' : quote_plus(doctype), 'ln' : ln }
-        return warningMsg(wrnmsg, req)
+        return warning_page(wrnmsg, req, ln)
 
     ## Get the number of pages for this submission:
     subname = "%s%s" % (act, doctype)
@@ -889,7 +889,7 @@ def endaction(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warningMsg(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, c, ln)
+        return warning_page(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, ln)
 
     # The following words are reserved and should not be used as field names
     reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \
@@ -900,7 +900,7 @@ def endaction(req,
         assert(curdir == os.path.abspath(curdir))
     except AssertionError:
         register_exception(req=req, prefix='indir="%s", doctype=%s, access=%s' % (indir, doctype, access))
-        return warningMsg(_("Invalid parameters"), req, c, ln)
+        return warning_page(_("Invalid parameters"), req, ln)
 
     ## If the submission directory still does not exist, we create it
     if not os.path.exists(curdir):
@@ -908,7 +908,7 @@ def endaction(req,
             os.makedirs(curdir)
         except Exception, e:
             register_exception(req=req, alert_admin=True)
-            return warningMsg(_("Unable to create a directory for this submission. The administrator has been alerted."), req, c, ln)
+            return warning_page(_("Unable to create a directory for this submission. The administrator has been alerted."), req, ln)
 
     # retrieve the original main menu url ans save it in the "mainmenu" file
     if mainmenu != "":
@@ -929,8 +929,8 @@ def endaction(req,
         nbpages = num_submission_pages
     else:
         ## Unable to determine the number of pages for this submission:
-        return warningMsg(_("Unable to determine the number of submission pages."), \
-                        req, CFG_SITE_NAME, ln)
+        return warning_page(_("Unable to determine the number of submission pages."), \
+                        req, ln)
 
     ## Retrieve the previous page, as submitted to curdir (before we
     ## overwrite it with our curpage as declared from the incoming
@@ -981,7 +981,7 @@ def endaction(req,
             assert(file_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
         except AssertionError:
             register_exception(req=req, prefix='curdir="%s", filename="%s"' % (curdir, filename))
-            return warningMsg(_("Invalid parameters"), req, c, ln)
+            return warning_page(_("Invalid parameters"), req, ln)
 
         # Do not write reserved filenames to disk
         if filename in CFG_RESERVED_SUBMISSION_FILENAMES:
@@ -1007,7 +1007,7 @@ def endaction(req,
             continue
 
         # the field is an array
-        if isinstance(formfields,types.ListType):
+        if isinstance(formfields, types.ListType):
             fp = open(file_to_open, "w")
             for formfield in formfields:
                 #stripslashes(value)
@@ -1028,14 +1028,14 @@ def endaction(req,
                 assert(dir_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
             except AssertionError:
                 register_exception(req=req, prefix='curdir="%s", key="%s"' % (curdir, key))
-                return warningMsg(_("Invalid parameters"), req, c, ln)
+                return warning_page(_("Invalid parameters"), req, ln)
 
             if not os.path.exists(dir_to_open):
                 try:
                     os.makedirs(dir_to_open)
                 except:
                     register_exception(req=req, alert_admin=True)
-                    return warningMsg(_("Cannot create submission directory. The administrator has been alerted."), req, c, ln)
+                    return warning_page(_("Cannot create submission directory. The administrator has been alerted."), req, ln)
             filename = formfields.filename
             ## Before saving the file to disc, wash the filename (in particular
             ## washing away UNIX and Windows (e.g. DFS) paths):
@@ -1057,7 +1057,7 @@ def endaction(req,
                 fp.write(filename)
                 fp.close()
             else:
-                return warningMsg(_("No file uploaded?"), req, c, ln)
+                return warning_page(_("No file uploaded?"), req, ln)
         ## if the found field is the reference of the document
         ## we save this value in the "journal of submissions"
         if uid_email != "" and uid_email != "guest":
@@ -1071,13 +1071,13 @@ def endaction(req,
         docname = doctype_lname.replace(" ", "&nbsp;")
     else:
         ## Unknown document type:
-        return warningMsg(_("Unknown document type"), req, c, ln)
+        return warning_page(_("Unknown document type"), req, ln)
 
     ## get the action's long-name:
     actname = get_longname_of_action(act)
     if actname is None:
         ## Unknown action:
-        return warningMsg(_("Unknown action"), req, c, ln)
+        return warning_page(_("Unknown action"), req, ln)
 
     ## Determine whether the action is finished
     ## (ie there are no other steps after the current one):
@@ -1115,7 +1115,7 @@ def endaction(req,
         if CFG_DEVEL_SITE:
             raise
         else:
-            return warningMsg(_("A serious function-error has been encountered. Adminstrators have been alerted. <br /><em>Please not that this might be due to wrong characters inserted into the form</em> (e.g. by copy and pasting some text from a PDF file)."), req, c, ln)
+            return warning_page(_("A serious function-error has been encountered. Adminstrators have been alerted. <br /><em>Please not that this might be due to wrong characters inserted into the form</em> (e.g. by copy and pasting some text from a PDF file)."), req, ln)
     except InvenioWebSubmitFunctionStop, e:
         ## For one reason or another, one of the functions has determined that
         ## the data-processing phase (i.e. the functions execution) should be
@@ -1237,7 +1237,7 @@ def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     try:
         uid = getUid(req)
     except Error, e:
-        return errorMsg(e, req, c, ln)
+        return error_page(e, req, ln)
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -1447,7 +1447,7 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     try:
         uid = getUid(req)
     except Error, e:
-        return errorMsg(e, req, c, ln)
+        return error_page(e, req, ln)
     #parses database to get all data
     ## first, get the list of categories
     doctype_categs = get_categories_of_doctype(doctype)
@@ -1466,7 +1466,7 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     doctype_details = get_doctype_details(doctype)
     if doctype_details is None:
         ## Doctype doesn't exist - raise error:
-        return warningMsg(_("Unable to find document type: %s") % escape(str(doctype)), req, c, ln)
+        return warning_page(_("Unable to find document type: %s") % escape(str(doctype)), req, ln)
     else:
         docFullDesc  = doctype_details[0]
         # Also update the doctype as returned by the database, since
@@ -1820,31 +1820,3 @@ def log_function(curdir, message, start_time, filename="function_log"):
         fd = open("%s/%s" % (curdir, filename), "a+")
         fd.write("""%s --- %s\n""" % (message, time_lap))
         fd.close()
-
-## FIXME: Duplicated
-
-def errorMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    return page(title = _("Error"),
-                body = create_error_box(req, title=title, verbose=0, ln=ln),
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='submit')
-
-def warningMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    return page(title = _("Warning"),
-                body = title,
-                description="%s - Warning" % c,
-                keywords="%s, Warning" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='submit')

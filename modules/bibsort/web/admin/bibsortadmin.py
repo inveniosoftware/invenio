@@ -21,9 +21,8 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
-from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument
 from invenio import bibsortadminlib as bsc
@@ -37,8 +36,8 @@ def index(req, ln=CFG_SITE_LANG, action='', bsrID='', sm_name='', sm_def_type=''
 
     try:
         uid = getUid(req)
-    except Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bsc.check_user(req,'cfgbibsort')
     if not auth[0]:
@@ -68,8 +67,8 @@ def modifytranslations(req, ln=CFG_SITE_LANG, bsrID='', trans=None, confirm=0):
 
     try:
         uid = getUid(req)
-    except Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bsc.check_user(req,'cfgbibsort')
     if not auth[0]:
@@ -84,15 +83,3 @@ def modifytranslations(req, ln=CFG_SITE_LANG, bsrID='', trans=None, confirm=0):
                     req=req)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-
-def error_page(req, ln=CFG_SITE_LANG, verbose=1):
-    """
-    Returns a default error page
-    """
-    return page(title="Internal Error",
-                body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=ln,
-                req=req)

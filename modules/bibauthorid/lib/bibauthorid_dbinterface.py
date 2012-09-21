@@ -81,8 +81,21 @@ def get_sql_time():
 
 def set_personid_row(person_id, tag, value, opt1=0, opt2=0, opt3=""):
     '''
-    Inserts data and the additional options of a person by a given personid and tag.
+    Inserts data and additional info into aidPERSONIDDATA
+    @param person_id:
+    @type person_id: int
+    @param tag:
+    @type tag: string
+    @param value:
+    @type value: string
+    @param opt1:
+    @type opt1:
+    @param opt2:
+    @type opt2:
+    @param opt3:
+    @type opt3:
     '''
+
     run_sql("INSERT INTO aidPERSONIDDATA "
             "(`personid`, `tag`, `data`, `opt1`, `opt2`, `opt3`) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
@@ -109,7 +122,9 @@ def get_personid_row(person_id, tag):
 
 def del_personid_row(tag, person_id=None, value=None):
     '''
-    Change the value associated to the given tag for a certain person.
+    Delete the value associated to the given tag for a certain person.
+    Can delete all tags regardless of person_id or value, or restrict the deletion using either of
+    both of them.
     @param person_id: ID of the person
     @type person_id: int
     @param tag: tag to be updated
@@ -153,6 +168,8 @@ def get_all_papers_of_pids(personid_list):
 def del_person_not_manually_claimed_papers(pid):
     '''
     Deletes papers from a person which have not been manually claimed.
+    @param pid:
+    @type pid: int 
     '''
     run_sql("delete from aidPERSONIDPAPERS "
             "where and (flag <> '-2' and flag <> '2') and personid=%s", (pid,))
@@ -783,6 +800,7 @@ def confirm_papers_to_person(pid, papers, user_level=0):
         ref = int(ref)
         sig = (table, ref, rec)
 
+        #Check the status of pid: the paper should be present, either assigned or rejected
         paps = run_sql("select bibref_table, bibref_value, bibrec "
                        "from aidPERSONIDPAPERS "
                        "where personid=%s "
@@ -799,10 +817,14 @@ def confirm_papers_to_person(pid, papers, user_level=0):
         assert paps or rej_paps
         assert len(paps) < 2
 
+        #if the bibrec is present with a different bibref, the present one must be moved somwhere
+        #else before we can claim the incoming one
         if paps and sig != paps[0]:
             pids_to_update.add(new_pid)
             move_signature(paps[0], new_pid)
 
+        #Make sure that the incoming claim is unique and get rid of all rejections, they are useless
+        #from now on
         run_sql("delete from aidPERSONIDPAPERS where bibref_table like %s and "
                 " bibref_value = %s and bibrec=%s"
                 , sig)
@@ -837,19 +859,22 @@ def reject_papers_from_person(pid, papers, user_level=0):
         table, ref = brr.split(':')
 
         sig = (table, ref, rec)
+        #To be rejected, a record should be present!
         records = personid_name_from_signature(sig)
         assert(records)
 
         fpid, name = records[0]
+        #If the record is assigned to a different person already, the rejection is meaningless
+        #Otherwise, we assign the paper to someone else (not important who it will eventually 
+        #get moved by tortoise) and add the rejection to the current person
+
         if fpid == pid:
+            move_signature(sig, new_pid)
+            pids_to_update.add(new_pid)
             run_sql("INSERT INTO aidPERSONIDPAPERS "
                     "(personid, bibref_table, bibref_value, bibrec, name, flag, lcul) "
                     "VALUES (%s, %s, %s, %s, %s, %s, %s)"
                     , (pid, table, ref, rec, name, -2, user_level))
-
-            move_signature(sig, new_pid)
-            pids_to_update.add(new_pid)
-
 
     update_personID_canonical_names(pids_to_update)
 
@@ -1362,7 +1387,7 @@ def populate_partial_marc_caches():
             idx = defaultdict(list)
             fn = defaultdict(list)
             for _, k, z in v[1]:
-                id[k].append(z)
+                idx[k].append(z)
                 fn[z].append(k)
             md[v[0]]['id'] = idx
             md[v[0]]['fn'] = fn
@@ -2142,7 +2167,7 @@ def check_wrong_rejection(printer, repair=False):
         all_ok = False
         for s in not_assigned:
             printer('Paper (%s:%s,%s) was rejected but never reassigned' % s)
-            to_reassign.append(s[2])
+            to_reassign.append(s)
 
 
     all_rejections = set(run_sql("select personid, bibref_table, bibref_value, bibrec "
@@ -2167,8 +2192,15 @@ def check_wrong_rejection(printer, repair=False):
         from bibauthorid_rabbit import rabbit
 
         if to_reassign:
+            #Rabbit is not designed to reassign signatures which are rejected but not assigned: 
+            #All signatures should stay assigned, if a rejection occours the signature should get
+            #moved to a new place and the rejection entry added, but never exist as a rejection only.
+            #Hence, to force rabbit to reassign it, we have to delete the rejection.
             printer("Reassigning bibrecs with missing entries: %s" % str(to_reassign))
-            rabbit(to_reassign)
+            for sig in to_reassign:
+                run_sql("delete from aidPERSONIDPAPERS where bibref_table=%s and "
+                        "bibref_value=%s and bibrec = %s and flag=-2", (sig))
+            rabbit([s[2] for s in to_reassign])
 
         if to_deal_with:
             #We got claims and rejections on the same person for the same paper. Let's forget about
@@ -2369,11 +2401,14 @@ def get_all_bibrecs():
 
 def get_bibrefrec_to_pid_flag_mapping():
     whole_table = run_sql("select bibref_table,bibref_value,bibrec,personid,flag from aidPERSONIDPAPERS")
+    gc.disable()
     ret = {}
     for x in whole_table:
         sig = (x[0], x[1], x[2])
         pid_flag = (x[3], x[4])
         ret[sig] = ret.get(sig , []) + [pid_flag]
+    gc.collect()
+    gc.enable()
     return ret
 
 def remove_all_bibrecs(bibrecs):

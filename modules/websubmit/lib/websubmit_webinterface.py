@@ -32,7 +32,6 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_SITE_NAME_INTL, \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
@@ -42,7 +41,7 @@ from invenio import webinterface_handler_config as apache
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
-from invenio.webpage import page, create_error_box
+from invenio.webpage import warning_page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, \
                             isGuestUser
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -684,18 +683,18 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         access = args['access']
         doctype = args['doctype']
         if not access or not doctype:
-            return warningMsg(_("Sorry, invalid arguments"), req=req, ln=ln)
+            return warning_page(_("Sorry, invalid arguments"), req=req, ln=ln)
         user_info = collect_user_info(req)
         email = user_info['email']
         res = run_sql("SELECT action, status FROM sbmSUBMISSIONS WHERE id=%s AND email=%s and doctype=%s", (access, email, doctype))
         if res:
             action, status = res[0]
             if status == 'finished':
-                return warningMsg(_("Note: the requested submission has already been completed"), req=req, ln=ln)
+                return warning_page(_("Note: the requested submission has already been completed"), req=req, ln=ln)
             redirect_to_url(req, CFG_SITE_SECURE_URL + '/submit/direct?' + urlencode({
                 'sub': action + doctype,
                 'access': access}))
-        return warningMsg(_("Sorry, you don't seem to have initiated a submission with the provided access number"), req=req, ln=ln)
+        return warning_page(_("Sorry, you don't seem to have initiated a submission with the provided access number"), req=req, ln=ln)
 
     def direct(self, req, form):
         """Directly redirected to an initialized submission."""
@@ -715,10 +714,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         myQuery = req.args
         if not sub:
-            return warningMsg(_("Sorry, 'sub' parameter missing..."), req, ln=ln)
+            return warning_page(_("Sorry, 'sub' parameter missing..."), req, ln=ln)
         res = run_sql("SELECT docname,actname FROM sbmIMPLEMENT WHERE subname=%s", (sub,))
         if not res:
-            return warningMsg(_("Sorry. Cannot analyse parameter"), req, ln=ln)
+            return warning_page(_("Sorry. Cannot analyse parameter"), req, ln=ln)
         else:
             # get document type
             doctype = res[0][0]
@@ -779,7 +778,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 args = '@'.join(args[:-1])
                 params.update(cgi.parse_qs(args))
             else:
-                return warningMsg(_("Sorry, invalid URL..."), req, ln=ln)
+                return warning_page(_("Sorry, invalid URL..."), req, ln=ln)
         url = "%s/submit/direct?%s" % (CFG_SITE_SECURE_URL, urlencode(params, doseq=True))
         redirect_to_url(req, url)
 
@@ -790,6 +789,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             'act': (str, ''),
             'access': (str, ''),
             'indir': (str, '')})
+        ln = args['ln']
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -802,7 +802,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             assert(curdir == os.path.abspath(curdir))
         except AssertionError:
             register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (args['indir'], args['doctype'], args['access']))
-            return warningMsg("Invalid parameters", req)
+            return warning_page("Invalid parameters", req, ln)
 
         subname = "%s%s" % (args['act'], args['doctype'])
 
@@ -916,49 +916,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     # Answer to both /submit/ and /submit
     __call__ = index
 
-def errorMsg(title, req, c=None, ln=CFG_SITE_LANG):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    if c is None:
-        c = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
-
-    return page(title = _("Error"),
-                body = create_error_box(req, title=str(title), verbose=0, ln=ln),
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='submit')
-
-def warningMsg(title, req, c=None, ln=CFG_SITE_LANG):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    if c is None:
-        c = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
-
-    return page(title = _("Warning"),
-                body = title,
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='submit')
-
-def print_warning(msg, type='', prologue='<br />', epilogue='<br />'):
-    """Prints warning message and flushes output."""
-    if msg:
-        return websubmit_templates.tmpl_print_warning(
-                   msg = msg,
-                   type = type,
-                   prologue = prologue,
-                   epilogue = epilogue,
-                 )
-    else:
-        return ''
 
 ## def retrieve_most_recent_attached_file(file_path):
 ##     """

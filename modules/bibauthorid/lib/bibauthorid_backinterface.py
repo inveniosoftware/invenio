@@ -103,6 +103,13 @@ def compare_personid_tables(personIDold_papers, personIDold_data,
 
             write_end_personid()
 
+def compare_personid_tables_easy(suffix='_copy', file='/tmp/pid_comparison'):
+    f = open(file, 'w')
+    oldPap, oldDat = group_personid('aidPERSONIDPAPERS' + suffix, 'aidPERSONIDDATA' + suffix)
+    pap, dat = group_personid('aidPERSONIDPAPERS', 'aidPERSONIDDATA')
+    compare_personid_tables(oldPap, oldDat, pap, dat, f)
+    f.close()
+
 def filter_bibrecs_outside(all_papers):
     all_bibrecs = get_all_bibrecs()
 

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -40,7 +40,6 @@ from invenio.config import \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
      CFG_INSPIRE_SITE
 
-from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
@@ -962,4 +961,41 @@ URI: http://%(host)s%(page)s
             'alerted' : admin_was_alerted and _("The system administrators have been alerted.") or '',
             'doubts' : _("In case of doubt, please contact %(x_admin_email)s.") % {'x_admin_email' : '<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin' : CFG_SITE_SUPPORT_EMAIL}}
         }
+        return out
+
+    def tmpl_warning_message(self, ln, msg):
+        """
+        Produces a warning message for the specified text
+
+        Parameters:
+
+          - 'ln' *string* - The language to display the interface in
+
+          - 'msg' *string* - The message to display
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        return """<center><font color="red">%s</font></center>""" % msg
+
+    def tmpl_write_warning(self, msg, type='', prologue='', epilogue=''):
+        """
+        Returns formatted warning message.
+
+        Parameters:
+
+          - 'msg' *string* - The message string
+
+          - 'type' *string* - the warning type
+
+          - 'prologue' *string* - HTML code to display before the warning
+
+          - 'epilogue' *string* - HTML code to display after the warning
+        """
+
+        out = '\n%s<span class="quicknote">' % (prologue)
+        if type:
+            out += '%s: ' % type
+        out += '%s</span>%s' % (msg, epilogue)
         return out

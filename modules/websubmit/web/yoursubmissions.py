@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,24 +28,22 @@ from invenio.config import \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql, Error
-from invenio.access_control_admin import *
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.messages import gettext_set_language, wash_language
-from invenio.websubmit_config import *
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
+def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedId="", deletedAction="", deletedDoctype=""):
     global uid
     ln = wash_language(ln)
 
     # load the right message language
     _ = gettext_set_language(ln)
 
-    t=""
+    t = ""
     # get user ID:
     try:
         uid = getUid(req)
@@ -56,10 +54,10 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
                                        text=auth_message)
         u_email = get_email(uid)
     except Error, e:
-        return errorMsg(str(e), req, ln=ln)
+        return error_page(str(e), req, ln=ln)
 
     if deletedId != "":
-        t += deleteSubmission(deletedId,deletedAction,deletedDoctype,u_email)
+        t += deleteSubmission(deletedId, deletedAction, deletedDoctype, u_email)
 
     # doctypes
     res = run_sql("select ldocname,sdocname from sbmDOCTYPE order by ldocname")
@@ -129,7 +127,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
 
         if currentstatus != row[3]:
             currentstatus = row[3]
-            status=row[3]
+            status = row[3]
         else:
             status = "\""
 
@@ -168,32 +166,11 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
 
 def deleteSubmission(id, action, doctype, u_email):
     global CFG_WEBSUBMIT_STORAGEDIR
-    run_sql("delete from sbmSUBMISSIONS WHERE doctype=%s and action=%s and email=%s and status='pending' and id=%s",(doctype,action,u_email,id,))
-    res = run_sql("select dir from sbmACTION where sactname=%s",(action,))
+    run_sql("delete from sbmSUBMISSIONS WHERE doctype=%s and action=%s and email=%s and status='pending' and id=%s", (doctype, action, u_email, id,))
+    res = run_sql("select dir from sbmACTION where sactname=%s", (action,))
     dir = res[0][0]
     if not ('..' in doctype or '..' in id) and id != "":
         full = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, dir, doctype, id)
         if os.path.isdir(full):
             shutil.rmtree(full)
     return ""
-
-def warningMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
-    return page(title="warning",
-                body = title,
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='yoursubmissions')
-
-def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
-    return page(title="error",
-                body = create_error_box(req, title=title,verbose=0, ln=ln),
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='yoursubmissions')
-

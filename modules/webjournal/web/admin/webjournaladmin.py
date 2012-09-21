@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,9 +23,8 @@ __lastupdated__ = """$Date$"""
 
 import invenio.webjournaladminlib as wjn
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
-from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
@@ -55,8 +54,8 @@ def index(req, ln=CFG_SITE_LANG, journal_name=None, action=""):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     try:
         journal_name = wash_journal_name(ln, journal_name)
@@ -98,8 +97,8 @@ def administrate(req, journal_name, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     try:
         journal_name = wash_journal_name(ln, journal_name)
@@ -139,8 +138,8 @@ def feature_record(req, journal_name="", recid="", img_url="", ln=CFG_SITE_LANG,
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     try:
         journal_name = wash_journal_name(ln, journal_name)
@@ -183,8 +182,8 @@ def alert(req, journal_name="", ln=CFG_SITE_LANG, sent="False", plainText=u"",
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     try:
         journal_name = wash_journal_name(ln, journal_name)
@@ -247,8 +246,8 @@ def regenerate(req, journal_name="", issue="", ln=CFG_SITE_LANG,
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     try:
         journal_name = wash_journal_name(ln, journal_name)
@@ -300,8 +299,8 @@ def issue_control(req, journal_name="", issue=[],
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
     try:
         journal_name = wash_journal_name(ln, journal_name)
         action = wash_url_argument(action, 'str')
@@ -358,8 +357,8 @@ def configure(req, journal_name=None, ln=CFG_SITE_LANG, xml_config=u'', action='
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     try:
         journal_name = wash_journal_name(ln, journal_name, guess=False)
@@ -388,13 +387,3 @@ def configure(req, journal_name=None, ln=CFG_SITE_LANG, xml_config=u'', action='
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-def error_page(req, ln=CFG_SITE_LANG, verbose=1):
-    _ = gettext_set_language(ln)
-
-    return page(title=_("Internal Error"),
-                body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=ln,
-                req=req)

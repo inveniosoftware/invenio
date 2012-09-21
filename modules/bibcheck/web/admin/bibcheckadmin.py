@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,9 +19,8 @@
 
 import cgi
 import os
-import MySQLdb
 from invenio.bibrankadminlib import check_user
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 #from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -37,8 +36,8 @@ def is_admin(req):
     uid = 0
     try:
         uid = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return (True, uid)
@@ -324,15 +323,3 @@ def delete(req, ln, fname):
                 warnings=[])
     else:
         return page_not_authorized(req=req, text=_("Not authorized"), navtrail=navtrail)
-
-def error_page(req, ln=CFG_SITE_LANG, verbose=1):
-    """Generic error .. in case one cannot find anything more specific"""
-    _ = gettext_set_language(ln)
-    return page(title=_("Internal Error"),
-                body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=ln,
-                req=req)
-
-

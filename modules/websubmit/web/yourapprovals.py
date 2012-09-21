@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ from invenio.config import \
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_find_possible_roles
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.messages import gettext_set_language, wash_language
 
@@ -40,7 +40,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
     # load the right message language
     _ = gettext_set_language(ln)
 
-    t=""
+    t = ""
     # get user ID:
     try:
         uid = getUid(req)
@@ -49,7 +49,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
                                        navmenuid='yourapprovals')
         u_email = get_email(uid)
     except Error, e:
-        return errorMsg(str(e), req, ln = ln)
+        return error_page(str(e), req, ln=ln)
 
     user_info = collect_user_info(req)
     if not user_info['precached_useapprove']:
@@ -111,13 +111,3 @@ def isRefereed(doctype, categ="*"):
     if roles:
         return True
     return False
-
-def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
-    return page(title="error",
-                body = create_error_box(req, title=title,verbose=0, ln=ln),
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                language=ln,
-                req=req,
-                navmenuid='yourapprovals')
-

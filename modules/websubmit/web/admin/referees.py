@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL
-from invenio.dbquery import run_sql, Error
+from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import \
      acc_delete_user_role, \
@@ -40,7 +40,7 @@ from invenio.access_control_admin import \
      acc_get_action_id, \
      acc_get_all_roles, \
      acc_get_role_users
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.webuser import getUid, list_registered_users, page_not_authorized
 from invenio.messages import wash_language
 
@@ -65,14 +65,14 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
         # if the role does not exists, we create it
         if roleId == 0:
             if acc_add_role(role, "referees for document type %s category %s" % (doctype, categ[1])) == 0:
-                return errorMsg("Cannot create referee role", req, uid)
+                return error_page("Cannot create referee role", req, ln)
             else:
                 roleId = acc_get_role_id(role)
             # if the action does not exist, we create it
             actionId = acc_get_action_id("referee")
             if actionId == 0:
                 if acc_add_action("referee", "", "no", ("doctype","categ")) == 0:
-                    return errorMsg("Cannot create action 'referee'", req, uid)
+                    return error_page("Cannot create action 'referee'", req, ln)
                 else:
                     actionId = acc_get_action_id("referee")
             #create arguments
@@ -80,7 +80,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
             arg2Id = acc_add_argument("categ", categ[1])
             # then link the role with the action
             if acc_add_role_action_arguments(roleId, actionId, -1, 0, 0, [arg1Id, arg2Id]) == 0:
-                return errorMsg("Cannot link role with action", req, uid)
+                return error_page("Cannot link role with action", req, ln)
         roleId = acc_get_role_id(role)
         # For each id in the array
         if isinstance(addusers, types.ListType):
@@ -224,15 +224,3 @@ def displayAddUser(doctype):
     t += '''<input class="adminbutton" type="button" onclick="document.forms[0].todo.value='adduser';document.forms[0].submit();" value="ADD" />'''
     t += '</td></tr></table>'
     return t
-
-
-def errorMsg(title, req, uid, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
-    """Prints the error page."""
-    return page(title="error",
-                    body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c,
-                    keywords="%s, Internal Error" % c,
-                    language=ln,
-                    uid=uid,
-                    req=req)
-

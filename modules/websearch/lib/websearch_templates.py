@@ -71,7 +71,7 @@ from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, creat
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
-from invenio.webuser import session_param_get, session_param_set
+from invenio.webuser import session_param_get
 
 from invenio.intbitset import intbitset
 
@@ -2374,26 +2374,6 @@ class Template:
     def tmpl_search_pageend(self, ln) :
         "page end for search page. Will display just before the page footer"
         return """</div></div>"""
-
-    def tmpl_print_warning(self, msg, type, prologue, epilogue):
-        """Prints warning message and flushes output.
-
-        Parameters:
-
-          - 'msg' *string* - The message string
-
-          - 'type' *string* - the warning type
-
-          - 'prologue' *string* - HTML code to display before the warning
-
-          - 'epilogue' *string* - HTML code to display after the warning
-        """
-
-        out = '\n%s<span class="quicknote">' % (prologue)
-        if type:
-            out += '%s: ' % type
-        out += '%s</span>%s' % (msg, epilogue)
-        return out
 
     def tmpl_print_search_info(self, ln, middle_only,
                                collection, collection_name, collection_id,
