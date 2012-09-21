@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@ from invenio import bibformatadminlib, \
                     bibformat_dblayer,\
                     bibformat_engine
 from invenio.bibrankadminlib import check_user
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -62,8 +62,8 @@ def index(req, ln=CFG_SITE_LANG):
     # If not, still display page but offer to log in
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         is_admin = True
@@ -98,8 +98,8 @@ def output_formats_manage(req, ln=CFG_SITE_LANG, sortby="code"):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -172,8 +172,8 @@ def output_format_show(req, bfo, ln=CFG_SITE_LANG,
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -245,8 +245,8 @@ def output_format_show_attributes(req, bfo, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -295,8 +295,8 @@ def output_format_show_dependencies(req, bfo, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -351,8 +351,8 @@ def output_format_update_attributes(req, bfo, ln=CFG_SITE_LANG,
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -393,8 +393,8 @@ def output_format_delete(req, bfo, ln=CFG_SITE_LANG, chosen_option=""):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -431,8 +431,8 @@ def output_format_add(req, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -464,8 +464,8 @@ def format_templates_manage(req, ln=CFG_SITE_LANG, checking='0'):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -509,8 +509,8 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -583,8 +583,8 @@ def format_template_show_attributes(req, bft, ln=CFG_SITE_LANG, new=0):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -631,8 +631,8 @@ def format_template_show_dependencies(req, bft, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -669,8 +669,8 @@ def format_template_update_attributes(req, bft, ln=CFG_SITE_LANG,
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -705,8 +705,8 @@ def format_template_delete(req, bft, ln=CFG_SITE_LANG, chosen_option=""):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -743,8 +743,8 @@ def format_template_add(req, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -864,8 +864,8 @@ def format_template_show_short_doc(req, ln=CFG_SITE_LANG, search_doc_pattern="")
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -889,8 +889,8 @@ def format_elements_doc(req, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -921,8 +921,8 @@ def format_element_show_dependencies(req, bfe, ln=CFG_SITE_LANG):
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' % (CFG_SITE_SECURE_URL, ln , _("Format Elements Documentation")))
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -998,8 +998,8 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
@@ -1137,16 +1137,3 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
                 lastupdated=__lastupdated__,
                 navtrail=navtrail,
                 req=req)
-
-def error_page(req):
-    """
-    Returns a default error page
-
-    @param req: the request object
-    @return: a web page
-    """
-    return page(title="Internal Error",
-                body = create_error_box(req, ln=CFG_SITE_LANG),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=CFG_SITE_LANG)

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,9 +22,8 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import invenio.bibindexadminlib as bic
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
-from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 def deletetag(req, fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm=-1):
@@ -32,8 +31,8 @@ def deletetag(req, fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm=-1
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -56,8 +55,8 @@ def addtag(req, fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback='yes',
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -81,8 +80,8 @@ def modifyfieldtags(req, fldID, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -105,8 +104,8 @@ def addindexfield(req, idxID, ln=CFG_SITE_LANG, fldID='', callback='yes', confir
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -129,8 +128,8 @@ def modifyindexfields(req, idxID, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -153,8 +152,8 @@ def showdetailsfieldtag(req, fldID, tagID, ln=CFG_SITE_LANG, callback='yes', con
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -178,8 +177,8 @@ def showdetailsfield(req, fldID, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -202,8 +201,8 @@ def modifyfield(req, fldID, ln=CFG_SITE_LANG, code='', callback='yes', confirm=-
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -226,8 +225,8 @@ def modifyindex(req, idxID, ln=CFG_SITE_LANG, idxNAME='', idxDESC='', callback='
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -251,8 +250,8 @@ def modifyindexstemming(req, idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='yes'
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -276,8 +275,8 @@ def modifytag(req, fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callback='
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -302,8 +301,8 @@ def deletefield(req, fldID, ln=CFG_SITE_LANG, confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -324,8 +323,8 @@ def deleteindex(req, idxID, ln=CFG_SITE_LANG, confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -346,8 +345,8 @@ def showfieldoverview(req, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -369,8 +368,8 @@ def editfields(req, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -392,8 +391,8 @@ def editfield(req, fldID, ln=CFG_SITE_LANG, mtype='', callback='yes', confirm=-1
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -417,8 +416,8 @@ def editindex(req, idxID, ln=CFG_SITE_LANG, mtype='', callback='yes', confirm=-1
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = bic.check_user(req,'cfgbibindex')
@@ -442,8 +441,8 @@ def modifyindextranslations(req, idxID, ln=CFG_SITE_LANG, sel_type='', trans = [
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -466,8 +465,8 @@ def modifyfieldtranslations(req, fldID, ln=CFG_SITE_LANG, sel_type='', trans = [
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -490,8 +489,8 @@ def addfield(req, ln=CFG_SITE_LANG, fldNAME='', code='', callback="yes", confirm
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -514,8 +513,8 @@ def addindex(req, ln=CFG_SITE_LANG, idxNAME='', callback="yes", confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -537,8 +536,8 @@ def switchtagscore(req, fldID, id_1, id_2, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -560,8 +559,8 @@ def removeindexfield(req, idxID, fldID, ln=CFG_SITE_LANG, callback="yes", confir
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -584,8 +583,8 @@ def removefieldtag(req, fldID, tagID, ln=CFG_SITE_LANG, callback="yes", confirm=
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -609,8 +608,8 @@ def index(req, ln=CFG_SITE_LANG, mtype='', content=''):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -631,8 +630,8 @@ def field(req, ln=CFG_SITE_LANG, mtype='', content=''):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = bic.check_user(req,'cfgbibindex')
     if not auth[0]:
@@ -647,11 +646,3 @@ def field(req, ln=CFG_SITE_LANG, mtype='', content=''):
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-def error_page(req, ln=CFG_SITE_LANG, verbose=1):
-    return page(title="Internal Error",
-                body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=ln,
-                req=req)

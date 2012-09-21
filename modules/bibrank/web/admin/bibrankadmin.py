@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,9 +23,8 @@ __lastupdated__ = """$Date$"""
 
 import invenio.bibrankadminlib as brc
 #reload(brc)
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
-from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 def index(req, ln=CFG_SITE_LANG):
@@ -33,8 +32,8 @@ def index(req, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
@@ -53,8 +52,8 @@ def addrankarea(req, ln=CFG_SITE_LANG, rnkcode='', template='', confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
@@ -76,8 +75,8 @@ def modifytranslations(req, rnkID='', ln=CFG_SITE_LANG, sel_type='', trans = [],
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
@@ -100,8 +99,8 @@ def modifycollection(req, ln=CFG_SITE_LANG, rnkID='', func='', colID='', confirm
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
@@ -124,8 +123,8 @@ def deleterank(req, ln=CFG_SITE_LANG, rnkID='', confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
@@ -146,8 +145,8 @@ def modifyrank(req, ln=CFG_SITE_LANG, rnkID='', rnkcode='', template='', cfgfile
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
@@ -171,8 +170,8 @@ def showrankdetails(req, ln=CFG_SITE_LANG, rnkID=''):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = brc.check_user(req,'cfgbibrank')
     if not auth[0]:
@@ -186,11 +185,3 @@ def showrankdetails(req, ln=CFG_SITE_LANG, rnkID=''):
                 lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-def error_page(req, ln=CFG_SITE_LANG, verbose=1):
-    return page(title="Internal Error",
-                body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=ln,
-                req=req)

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,14 +17,13 @@
 
 """Invenio BibKnowledge Administrator Interface."""
 
-import MySQLdb
 import os
 import cgi
 import sys
 
 from invenio import bibknowledge, bibknowledgeadminlib
 from invenio.bibrankadminlib import check_user
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, error_page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -58,8 +57,8 @@ def kb_manage(req, ln=CFG_SITE_LANG, search="", descriptiontoo=""):
     # If not, still display page but offer to log in
     try:
         uid = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
         is_admin = True
@@ -93,8 +92,8 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
 
     try:
         dummy = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -173,8 +172,8 @@ def kb_show(req, kb, sortby="to", ln=CFG_SITE_LANG, startat=0, search=""):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -217,8 +216,8 @@ def kb_show_attributes(req, kb, ln=CFG_SITE_LANG, sortby="to"):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -267,8 +266,8 @@ def kb_dynamic_update(req, kb_id, field, expression, collection,
 
     try:
         dummy = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
         #actual config call
@@ -304,8 +303,8 @@ def kb_show_dependencies(req, kb, ln=CFG_SITE_LANG, sortby="to"):
 
     try:
         uid = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -357,8 +356,8 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=CFG_SITE_LANG,
 
     try:
         dummy = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -466,8 +465,8 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
 
     try:
         dummy = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -525,8 +524,8 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
 
     try:
         dummy = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -687,8 +686,8 @@ def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
 
     try:
         dummy = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -719,8 +718,8 @@ def kb_delete(req, kb, ln=CFG_SITE_LANG, chosen_option=""):
 
     try:
         dummy = getUid(req)
-    except MySQLdb.Error:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibknowledge')
     if not auth_code:
@@ -783,13 +782,3 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
                 lastupdated=__lastupdated__,
                 navtrail=navtrail,
                 req=req)
-
-def error_page(req):
-    """
-    Returns a default error page
-    """
-    return page(title="Internal Error",
-                body = create_error_box(req, ln=CFG_SITE_LANG),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=CFG_SITE_LANG)

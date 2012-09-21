@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,9 +23,8 @@ __lastupdated__ = """$Date$"""
 
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
-from invenio.webpage import page, create_error_box, adderrorbox
+from invenio.webpage import page, adderrorbox, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
-from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
 from invenio.urlutils import wash_url_argument
@@ -35,8 +34,8 @@ def switchfmtscore(req, colID, type, id_1, id_2, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -59,8 +58,8 @@ def switchfldscore(req, colID, id_1, id_2, fmeth, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -83,8 +82,8 @@ def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=CFG_S
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -107,8 +106,8 @@ def runwebcoll(req, colID, ln=CFG_SITE_LANG, confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -129,8 +128,8 @@ def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -153,8 +152,8 @@ def modifydbquery(req, colID, ln=CFG_SITE_LANG, dbquery='', confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -176,8 +175,8 @@ def showtree(req, colID, ln=CFG_SITE_LANG):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -197,8 +196,8 @@ def modifytranslations(req, colID, ln=CFG_SITE_LANG, sel_type='', trans = [], co
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -221,8 +220,8 @@ def addcollectiontotree(req, colID, ln=CFG_SITE_LANG, add_dad='', add_son='', rt
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -247,8 +246,8 @@ def addcollection(req, colID, ln=CFG_SITE_LANG, colNAME='', dbquery='', callback
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -272,8 +271,8 @@ def modifyrankmethods(req, colID, ln=CFG_SITE_LANG, func='', rnkID='', confirm=0
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -296,8 +295,8 @@ def deletecollection(req, colID, ln=CFG_SITE_LANG, confirm=-1):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -318,8 +317,8 @@ def editcollection(req, colID=1, ln=CFG_SITE_LANG, mtype=''):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -340,8 +339,8 @@ def checkexternalcollections(req, colID, ln=CFG_SITE_LANG, icl=None, update="", 
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -365,8 +364,8 @@ def showoutputformats(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -388,8 +387,8 @@ def addexistingoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, callback='ye
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -412,8 +411,8 @@ def deleteoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, callback='yes', c
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -436,8 +435,8 @@ def removeoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID='', callback='yes', c
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -460,8 +459,8 @@ def update_external_collections(req, colID, ln=CFG_SITE_LANG, state=None, recurs
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -483,8 +482,8 @@ def update_detailed_record_options(req, colID, ln=CFG_SITE_LANG, tabs=[], recurs
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -503,8 +502,8 @@ def removefieldvalue(req, colID, ln=CFG_SITE_LANG, fldID='', fldvID='', fmeth=''
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -530,8 +529,8 @@ def removefield(req, colID, ln=CFG_SITE_LANG, fldID='', fldvID='', fmeth='', cal
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -556,8 +555,8 @@ def modifyfield(req, colID, fldID, fldvID='', ln=CFG_SITE_LANG, callback='yes', 
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -581,8 +580,8 @@ def showsearchoptions(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -604,8 +603,8 @@ def addexistingfield(req, colID, ln=CFG_SITE_LANG, fldID=-1, fldvID=-1, fmeth=''
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -636,8 +635,8 @@ def rearrangefield(req, colID, ln=CFG_SITE_LANG, fmeth='', callback='yes', confi
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -666,8 +665,8 @@ def addexistingfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', c
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -696,8 +695,8 @@ def rearrangefieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', con
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -726,8 +725,8 @@ def addnewfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, name='', value='', cal
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -752,8 +751,8 @@ def modifyfieldvalue(req, colID, fldID, fldvID, ln=CFG_SITE_LANG, name='', value
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -779,8 +778,8 @@ def showsearchfields(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -802,8 +801,8 @@ def showsortoptions(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -825,8 +824,8 @@ def modifyportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, score='', position='
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -854,8 +853,8 @@ def removeportalbox(req, colID, ln=CFG_SITE_LANG, pbxID='', sel_ln='', callback=
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -879,8 +878,8 @@ def addexistingportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, score=0, positi
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -912,8 +911,8 @@ def deleteportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, callback='yes', conf
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = check_user(req,'cfgwebsearch')
@@ -937,8 +936,8 @@ def showportalboxes(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
 
     auth = check_user(req,'cfgwebsearch')
@@ -961,8 +960,8 @@ def addportalbox(req, colID, ln=CFG_SITE_LANG, title='', body='', callback='yes'
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -986,8 +985,8 @@ def modifycollectiontree(req, colID, ln=CFG_SITE_LANG, move_up='', move_down='',
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -1015,8 +1014,8 @@ def index(req, colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
 
     try:
         uid = getUid(req)
-    except Error, e:
-        return error_page(req)
+    except:
+        return error_page('Error', req)
 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
@@ -1033,13 +1032,3 @@ def index(req, colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
                 lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-def error_page(req, ln=CFG_SITE_LANG, verbose=1):
-    _ = gettext_set_language(ln)
-
-    return page(title=_("Internal Error"),
-                body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % CFG_SITE_NAME,
-                keywords="%s, Internal Error" % CFG_SITE_NAME,
-                language=ln,
-                req=req)
