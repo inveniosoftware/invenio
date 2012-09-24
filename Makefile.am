@@ -293,7 +293,7 @@ install-solrutils:
 	Please remove it manually, if you are sure it is not needed; exit 2; fi ; \
         if test -f apache-solr*; then echo solr tarball already exists in `pwd` . \
         Please remove it manually.; exit 2; fi ; \
-	wget http://www.apache.org/dist//lucene/solr/3.1.0/apache-solr-3.1.0.tgz && \
+	wget http://archive.apache.org/dist/lucene/solr/3.1.0/apache-solr-3.1.0.tgz && \
 	tar -xzf apache-solr-3.1.0.tgz && \
 	rm apache-solr-3.1.0.tgz
 	cd $(solrdir)/contrib/ ;\
