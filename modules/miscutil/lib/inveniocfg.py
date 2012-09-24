@@ -997,7 +997,6 @@ WSGIRestrictStdout Off
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
         Alias /flash/ %(webdir)s/flash/
-        Alias /css/ %(webdir)s/css/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
@@ -1075,7 +1074,6 @@ WSGIRestrictStdout Off
         Alias /css/ %(webdir)s/css/
         Alias /js/ %(webdir)s/js/
         Alias /flash/ %(webdir)s/flash/
-        Alias /css/ %(webdir)s/css/
         Alias /export/ %(webdir)s/export/
         Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
