@@ -52,8 +52,8 @@ $(top_srcdir)/.version:
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
-check-custom-templates:
-	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
+check-upgrade:
+	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg_upgrader.py $(top_srcdir) --upgrade-check
 
 kwalitee-check:
 	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --stats $(top_srcdir)
@@ -309,135 +309,9 @@ install-solrutils:
 	cd $(solrdir)/contrib/ && \
 	jar -cf invenio-solr.jar org/invenio_software/solr/*class
 
-update-v0.3.0-tables update-v0.3.1-tables:
-	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE rnkMETHODNAME CHANGE id_rnkMETHOD id_rnkMETHOD mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE collectionname CHANGE id_collection id_collection mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE formatname CHANGE id_format id_format mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE fieldname CHANGE id_field id_field mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibrank','run BibRank','','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibrank','configure BibRank','','no');" | ${prefix}/bin/dbexec
-
-update-v0.3.2-tables:
-	echo "ALTER TABLE sbmCOLLECTION_sbmDOCTYPE CHANGE id_son id_son char(10) NOT NULL default '0';" | ${prefix}/bin/dbexec
-
-update-v0.3.3-tables:
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "ALTER TABLE flxLINKTYPEPARAMS CHANGE pname pname varchar(78) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE rnkMETHOD DROP star_category_ranges;" | ${prefix}/bin/dbexec
-	echo "DROP TABLE rnkSET;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE schTASK CHANGE arguments arguments LONGTEXT;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE schTASK CHANGE status status varchar(50);" | ${prefix}/bin/dbexec
-
-update-v0.5.0-tables:
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "ALTER TABLE session ADD INDEX uid (uid);" | ${prefix}/bin/dbexec
-	echo "UPDATE idxINDEXNAME SET ln='cs' WHERE ln='cz';" | ${prefix}/bin/dbexec
-	echo "UPDATE rnkMETHODNAME SET ln='cs' WHERE ln='cz';" | ${prefix}/bin/dbexec
-	echo "UPDATE collectionname SET ln='cs' WHERE ln='cz';" | ${prefix}/bin/dbexec
-	echo "UPDATE collection_portalbox SET ln='cs' WHERE ln='cz';" | ${prefix}/bin/dbexec
-	echo "UPDATE formatname SET ln='cs' WHERE ln='cz';" | ${prefix}/bin/dbexec
-	echo "UPDATE fieldname SET ln='cs' WHERE ln='cz';" | ${prefix}/bin/dbexec
-	echo "UPDATE idxINDEXNAME SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
-	echo "UPDATE rnkMETHODNAME SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
-	echo "UPDATE collectionname SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
-	echo "UPDATE collection_portalbox SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
-	echo "UPDATE formatname SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
-	echo "UPDATE fieldname SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
-
-update-v0.7.1-tables:
-	echo "DROP TABLE oaiHARVEST;" | ${prefix}/bin/dbexec
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibharvest','configure BibHarvest','','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiharvest','run BibHarvest oaiharvest','','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgwebcomment','configure WebComment','','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runoaiarchive','run BibHarvest oaiarchive','','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibedit','run BibEdit','','no');" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user ADD nickname varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user ADD last_login datetime NOT NULL default '0000-00-00 00:00:00';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user ADD INDEX nickname (nickname);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE sbmFIELD CHANGE subname subname varchar(13) default NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user_query_basket CHANGE alert_name alert_name varchar(30) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "TRUNCATE TABLE session;" | ${prefix}/bin/dbexec
-	@echo "**********************************************************"
-	@echo "** Do not forget to run the basket migration now:       **"
-	@echo "**    @PYTHON@ modules/webbasket/lib/webbasket_migration_kit.py "
-	@echo "** Please see the RELEASE-NOTES for details.            **"
-	@echo "**********************************************************"
-	@echo "INSERT INTO oaiARCHIVE (id, setName, setSpec, setDescription, setDefinition, setRecList) SELECT id, setName, setSpec, CONCAT_WS('', setDescription), setDefinition, setRecList FROM oaiSET;"
-
-update-v0.90.0-tables:
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "ALTER TABLE format ADD COLUMN (description varchar(255) default '');" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE format ADD COLUMN (content_type varchar(255) default '');" | ${prefix}/bin/dbexec
-
-update-v0.90.1-tables:
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "ALTER TABLE schTASK ADD INDEX status (status);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE schTASK ADD INDEX runtime (runtime);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE sbmCATEGORIES ADD COLUMN score TINYINT UNSIGNED NOT NULL DEFAULT 0;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE sbmCATEGORIES ADD PRIMARY KEY (doctype, sname);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE sbmCATEGORIES ADD KEY doctype (doctype);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiHARVEST ADD COLUMN setspecs TEXT NOT NULL DEFAULT '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE setDescription setDescription text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE p1 p1 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE f1 f1 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE m1 m1 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE p2 p2 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE f2 f2 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE m2 m2 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE p3 p3 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE f3 f3 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiARCHIVE CHANGE m3 m3 text NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ${prefix}/bin/dbexec
-	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE fmtKNOWLEDGEBASES add COLUMN kbtype char default NULL;" | ${prefix}/bin/dbexec
-
-update-v0.92.0-tables:
-	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ${prefix}/bin/dbexec
-	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE schTASK CHANGE arguments arguments mediumblob;" | ${prefix}/bin/dbexec
-	echo "UPDATE user SET note=1 WHERE nickname='admin' AND note IS NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE usergroup CHANGE name name varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE usergroup ADD login_method varchar(255) NOT NULL default 'INTERNAL';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE usergroup ADD UNIQUE KEY login_method_name (login_method(70), name);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user CHANGE settings settings blob default NULL;" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Recid', 'This function gets the recid for a document with a given report-number (as stored in the global variable rn).');" | ${prefix}/bin/dbexec
-
-update-v0.92.1-tables:
-	echo "DROP TABLE rnkCITATIONDATA;" | ${prefix}/bin/dbexec
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "UPDATE bibdoc SET status='DELETED' WHERE status='1';" | ${prefix}/bin/dbexec
-	echo "UPDATE bibdoc SET status='' WHERE status='0';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibrec ADD KEY creation_date (creation_date);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibrec ADD KEY modification_date (modification_date);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibdoc ADD KEY creation_date (creation_date);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibdoc ADD KEY modification_date (modification_date);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibdoc ADD KEY docname (docname);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiHARVEST CHANGE postprocess postprocess varchar(20) NOT NULL default 'h';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiHARVEST ADD COLUMN bibfilterprogram varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE idxINDEXNAME CHANGE ln ln char(5) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE idxINDEX ADD COLUMN stemming_language VARCHAR(10) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE rnkMETHODNAME CHANGE ln ln char(5) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE rnkDOWNLOADS CHANGE id_bibdoc id_bibdoc mediumint(9) unsigned default NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE rnkDOWNLOADS CHANGE file_format file_format varchar(10) NULL default NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE collectionname CHANGE ln ln char(5) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE collection_portalbox CHANGE ln ln char(5) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE format ADD COLUMN visibility TINYINT NOT NULL default 1;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE formatname CHANGE ln ln char(5) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE fieldname CHANGE ln ln char(5) NOT NULL default '';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_ser blob NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src text NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user DROP INDEX id, ADD PRIMARY KEY id (id);" | ${prefix}/bin/dbexec
-	echo -e 'from invenio.dbquery import run_sql;\
-	map(lambda index_id: run_sql("ALTER TABLE idxPHRASE%02dF CHANGE term term TEXT NULL DEFAULT NULL, DROP INDEX term, ADD INDEX term (term (50))" % index_id[0]), run_sql("select id from idxINDEX"))' | $(PYTHON)
-	echo "INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');" | ${prefix}/bin/dbexec
-
 update-v0.99.0-tables:
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	cat $(top_srcdir)/modules/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
+	echo "DROP TABLE IF EXISTS oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc ADD COLUMN more_info mediumblob NULL default NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD COLUMN priority tinyint(4) NOT NULL default 0;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD KEY priority (priority);" | ${prefix}/bin/dbexec
@@ -467,7 +341,7 @@ update-v0.99.5-tables:
 
 update-v0.99.6-tables: # from v0.99.6 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	cat $(top_srcdir)/modules/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
 	echo "INSERT INTO knwKBRVAL (id,m_key,m_value,id_knwKB) SELECT id,m_key,m_value,id_fmtKNOWLEDGEBASES FROM fmtKNOWLEDGEBASEMAPPINGS;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
@@ -560,69 +434,5 @@ update-v0.99.6-tables: # from v0.99.6 to v1.0.0-rc0
 	migrate_comments_populate_threads_index()' | $(PYTHON)
 	echo -e 'from invenio.access_control_firerole import repair_role_definitions;\
 	repair_role_definitions()' | $(PYTHON)
-
-update-v1.0.0-rc0-tables: # from v1.0.0-rc0 to v1.0.0
-	@echo "Nothing to do; table structure did not change between v1.0.0-rc0 and v1.0.0."
-
-update-v1.0.0-tables: # from v1.0.0 to v1.0.1
-	@echo "Nothing to do; table structure did not change between v1.0.0 and v1.0.1."
-
-update-v1.0.1-tables: # from v1.0.1 to v1.0.2
-	@echo "ALTER TABLE session ADD KEY session_expiry (session_expiry);" | ${prefix}/bin/dbexec
-
-update-db-from-v1.0-to-v1.1: # update DB from v1.0 release series to v1.1 release series
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_Embargo','Set an embargo on all the documents of a given record.');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_file');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Set_Embargo','date_format');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_role');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('User_is_Record_Owner_or_Curator','curator_flag');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Photos_to_Storage','iconformat');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO format (name, code, description, content_type, visibility) VALUES ('Podcast', 'xp', 'Sample format suitable for multimedia feeds, such as podcasts', 'application/rss+xml', 0);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE accMAILCOOKIE ADD INDEX expiration (expiration);" | ${prefix}/bin/dbexec
-	echo "UPDATE sbmFUNDESC SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
-	echo "UPDATE sbmALLFUNCDESCR SET function='Move_CKEditor_Files_to_Storage', description='Transfer files attached to the record with the CKEditor' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
-	echo "UPDATE sbmFUNCTIONS SET function='Move_CKEditor_Files_to_Storage' WHERE function='Move_FCKeditor_Files_to_Storage';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE schTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE schTASK ADD sequenceid int(8) NULL default NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE schTASK ADD INDEX sequenceid (sequenceid);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE hstTASK CHANGE proc proc varchar(255) NOT NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE hstTASK ADD sequenceid int(8) NULL default NULL;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE hstTASK ADD INDEX sequenceid (sequenceid);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE session CHANGE session_object session_object longblob;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE session CHANGE session_expiry session_expiry datetime NOT NULL default '0000-00-00 00:00:00';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE oaiREPOSITORY CHANGE setSpec setSpec varchar(255) NOT NULL default 'GLOBAL_SET';" | ${prefix}/bin/dbexec
-	echo "UPDATE oaiREPOSITORY SET setSpec='GLOBAL_SET' WHERE setSpec='';" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user_query_basket ADD COLUMN alert_desc TEXT DEFAULT NULL AFTER alert_name;" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Link_Records','Link two records toghether via MARC');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Video_Processing',NULL);" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','edsrn2');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','directRelationship');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','reverseRelationship');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Link_Records','keep_original_edsrn2');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','aspect');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','batch_template');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Video_Processing','title');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Set_RN_From_Sysno', 'Set the value of global rn variable to the report number identified by sysno (recid)');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','edsrn');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','rep_tags');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Set_RN_From_Sysno','record_search_pattern');" | ${prefix}/bin/dbexec
-	echo "UPDATE externalcollection SET name='INSPIRE' where name='SPIRES HEP';" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Notify_URL','Access URL, possibly to post content');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','url');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','data');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','admin_emails');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','content_type');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_times');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_sleeptime');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO sbmFUNDESC VALUES ('Notify_URL','user');" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibfmt DROP COLUMN id;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibfmt ADD PRIMARY KEY (id_bibrec, format);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibfmt DROP KEY id_bibrec;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE bibfmt ADD KEY last_updated (last_updated);" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE user_query_basket ADD COLUMN alert_recipient TEXT DEFAULT NULL AFTER alert_desc;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE format ADD COLUMN last_updated datetime NOT NULL default '0000-00-00' AFTER visibility;" | ${prefix}/bin/dbexec
-	echo "REPLACE INTO sbmFIELDDESC VALUES ('Upload_Files',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'\"\"\"\r\nThis is an example of element that creates a file upload interface.\r\nClone it, customize it and integrate it into your submission. Then add function \r\n\'Move_Uploaded_Files_to_Storage\' to your submission functions list, in order for files \r\nuploaded with this interface to be attached to the record. More information in \r\nthe WebSubmit admin guide.\r\n\"\"\"\r\nfrom invenio.bibdocfile_managedocfiles import create_file_upload_interface\r\nfrom invenio.websubmit_functions.Shared_Functions import ParamFromFile\r\n\r\nindir = ParamFromFile(os.path.join(curdir, \'indir\'))\r\ndoctype = ParamFromFile(os.path.join(curdir, \'doctype\'))\r\naccess = ParamFromFile(os.path.join(curdir, \'access\'))\r\ntry:\r\n    sysno = int(ParamFromFile(os.path.join(curdir, \'SN\')).strip())\r\nexcept:\r\n    sysno = -1\r\nln = ParamFromFile(os.path.join(curdir, \'ln\'))\r\n\r\n\"\"\"\r\nRun the following to get the list of parameters of function \'create_file_upload_interface\':\r\necho -e \'from invenio.bibdocfile_managedocfiles import create_file_upload_interface as f\\nprint f.__doc__\' | python\r\n\"\"\"\r\ntext = create_file_upload_interface(recid=sysno,\r\n                                 print_outside_form_tag=False,\r\n                                 include_headers=True,\r\n                                 ln=ln,\r\n                                 doctypes_and_desc=[(\'main\',\'Main document\'),\r\n                                                    (\'additional\',\'Figure, schema, etc.\')],\r\n                                 can_revise_doctypes=[\'*\'],\r\n                                 can_describe_doctypes=[\'main\'],\r\n                                 can_delete_doctypes=[\'additional\'],\r\n                                 can_rename_doctypes=[\'main\'],\r\n                                 sbm_indir=indir, sbm_doctype=doctype, sbm_access=access)[1]\r\n','0000-00-00','0000-00-00',NULL,NULL,0);" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

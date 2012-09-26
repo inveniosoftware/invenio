@@ -39,10 +39,10 @@ class TestPluginContainer(unittest.TestCase):
     """
     def test_plugin_container_wrapping_bibformat_elements(self):
         """pluginutils - wrapping bibformat elements"""
-        def format_signature(bfo, *args, **argd):
+        def format_signature(dummy_bfo, *dummy_args, **dummy_argd):
             pass
 
-        def escape_values_signature(bfo):
+        def escape_values_signature(dummy_bfo):
             pass
 
         plugin_builder = create_enhanced_plugin_builder(
