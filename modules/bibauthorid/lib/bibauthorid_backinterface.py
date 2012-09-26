@@ -28,9 +28,9 @@ from operator import itemgetter
 
 #Well this is bad, BUT otherwise there must 100+ lines
 #of the form from dbinterface import ...  # emitting
-from bibauthorid_dbinterface import *
+from invenio.bibauthorid_dbinterface import * #pylint:  disable-msg=W0614
 
-import bibauthorid_dbinterface as dbinter
+import invenio.bibauthorid_dbinterface as dbinter
 
 
 def group_personid(papers_table="aidPERSONID_PAPERS", data_table="aidPERSONID_DATA"):
@@ -103,8 +103,8 @@ def compare_personid_tables(personIDold_papers, personIDold_data,
 
             write_end_personid()
 
-def compare_personid_tables_easy(suffix='_copy', file='/tmp/pid_comparison'):
-    f = open(file, 'w')
+def compare_personid_tables_easy(suffix='_copy', filename='/tmp/pid_comparison'):
+    f = open(filename, 'w')
     oldPap, oldDat = group_personid('aidPERSONIDPAPERS' + suffix, 'aidPERSONIDDATA' + suffix)
     pap, dat = group_personid('aidPERSONIDPAPERS', 'aidPERSONIDDATA')
     compare_personid_tables(oldPap, oldDat, pap, dat, f)

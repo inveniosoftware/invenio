@@ -23,41 +23,15 @@
     frontend so to keep it as clean as possible.
 '''
 
-from itertools import groupby
-from operator import itemgetter
-from bibauthorid_name_utils import split_name_parts
-from bibauthorid_name_utils import soft_compare_names
-from bibauthorid_name_utils import create_normalized_name
+from invenio.bibauthorid_name_utils import split_name_parts #emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_name_utils import soft_compare_names
+from invenio.bibauthorid_name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611 
 import bibauthorid_dbinterface as dbinter
-from bibauthorid_dbinterface import get_personid_from_uid              #emitting
-from bibauthorid_dbinterface import create_new_person                  #emitting
-from bibauthorid_dbinterface import update_request_ticket              #emitting
-from bibauthorid_dbinterface import delete_request_ticket              #emitting
-from bibauthorid_dbinterface import get_bibref_modification_status     #emitting
-from bibauthorid_dbinterface import get_canonical_id_from_personid     #emitting
-from bibauthorid_dbinterface import get_papers_status                  #emitting
-from bibauthorid_dbinterface import get_person_db_names_count          #emitting
-from bibauthorid_dbinterface import get_person_id_from_canonical_id    #emitting
-from bibauthorid_dbinterface import get_person_names_count             #emitting
-from bibauthorid_dbinterface import get_person_db_names_set               #emitting
-from bibauthorid_dbinterface import get_person_papers                  #emitting
-from bibauthorid_dbinterface import get_persons_with_open_tickets_list #emitting
-from bibauthorid_dbinterface import get_request_ticket                 #emitting
-from bibauthorid_dbinterface import insert_user_log                    #emitting
-from bibauthorid_dbinterface import person_bibref_is_touched_old           #emitting
-from bibauthorid_dbinterface import reject_papers_from_person          #emitting
-from bibauthorid_dbinterface import reset_papers_flag                  #emitting
-from bibauthorid_dbinterface import user_can_modify_data               #emitting
-from bibauthorid_dbinterface import user_can_modify_paper              #emitting
-from bibauthorid_dbinterface import update_personID_canonical_names    #emitting
-from bibauthorid_dbinterface import get_possible_bibrecref             #emitting
-from bibauthorid_dbinterface import resolve_paper_access_right         #emitting
-from bibauthorid_dbinterface import delete_cached_author_page          #emitting
-from bibauthorid_dbinterface import confirm_papers_to_person           #emitting
-from bibauthorid_dbinterface import get_name_by_bibrecref              #emitting
-from bibauthorid_dbinterface import get_personids_and_papers_from_bibrecs
-from bibauthorid_dbinterface import get_uid_from_personid
-from bibauthorid_dbinterface import get_canonical_id_from_personid     #emitting
+
+#Well this is bad, BUT otherwise there must 100+ lines
+#of the form from dbinterface import ...  # emitting
+from invenio.bibauthorid_dbinterface import * #pylint:  disable-msg=W0614
+
 
 def set_person_data(person_id, tag, value, user_level=0):
     old = dbinter.get_personid_row(person_id, tag)
@@ -193,7 +167,6 @@ def find_personIDs_by_name_string(target):
     '''
     splitted_name = split_name_parts(target)
     family = splitted_name[0]
-    target_cleaned = create_normalized_name(splitted_name)
 
     levels = (#target + '%', #this introduces a weird problem: different results for mele, salvatore and salvatore mele
               family + ',%',
@@ -226,7 +199,6 @@ def find_personIDs_by_name_string(target):
 
 def reclaim_personid_for_new_arXiv_user(bibrecs, name, uid= -1):
     pidlist = get_personids_and_papers_from_bibrecs(bibrecs, limit_by_name=name)
-    pid = None
     for p in pidlist:
         if not get_uid_from_personid(p[0]):
             dbinter.set_personid_row(p[0], 'uid', uid)

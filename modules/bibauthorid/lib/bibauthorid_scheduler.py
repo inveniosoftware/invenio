@@ -25,6 +25,9 @@ from bibauthorid_general_utils import print_tortoise_memory_log
 import bibauthorid_config as bconfig
 from bibauthorid_general_utils import is_eq, update_status, update_status_final
 
+#python2.4 compatibility
+from bibauthorid_general_utils import bai_all as all
+
 def to_number(stry):
     return int(re.sub("\D", "", stry))
 

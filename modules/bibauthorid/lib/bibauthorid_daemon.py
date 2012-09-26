@@ -31,15 +31,8 @@ from bibauthorid_backinterface import get_user_log
 from bibauthorid_backinterface import insert_user_log
 from bibauthorid_backinterface import get_sql_time
 
-try:
-    any([True])
-except:
-    def any(x):
-        for element in x:
-            if element:
-                return True
-        return False
-
+#python 2.4 compatibility
+from bibauthorid_general_utils import bai_any as any
 
 def bibauthorid_daemon():
     """Constructs the Bibauthorid bibtask."""
@@ -285,5 +278,5 @@ def run_tortoise(from_scratch):
 
 
 def run_merge():
-    from bibauthorid_merge import merge
-    merge()
+    from bibauthorid_merge import merge_dynamic
+    merge_dynamic()

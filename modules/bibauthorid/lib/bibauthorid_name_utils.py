@@ -23,11 +23,12 @@ bibauthorid_name_utils
 '''
 
 import re
-import bibauthorid_config as bconfig
-from bibauthorid_string_utils import string_partition
+import invenio.bibauthorid_config as bconfig
+from invenio.bibauthorid_string_utils import string_partition
 from copy import deepcopy
 
-from bibauthorid_general_utils import name_comparison_print
+
+from invenio.bibauthorid_general_utils import name_comparison_print
 
 try:
     from invenio.config import CFG_ETCDIR
@@ -156,9 +157,9 @@ def split_name_parts(name_string, delete_name_additions=True,
 
 def create_canonical_name(name):
     canonical_name = create_unified_name(name, reverse=True)
-    artifact_removal = re.compile("[^a-zA-Z0-9]")
+    artifact_removal_re = re.compile("[^a-zA-Z0-9]")
     whitespace_removal = re.compile("[ ]{1,10}")
-    canonical_name = artifact_removal.sub(" ", canonical_name)
+    canonical_name = artifact_removal_re.sub(" ", canonical_name)
     canonical_name = whitespace_removal.sub(" ", canonical_name)
     canonical_name = canonical_name.strip().replace(" ", ".")
     return canonical_name
@@ -236,18 +237,18 @@ def clean_name_string(namestring, replacement=" ", keep_whitespace=True,
     @type namestring: string
     '''
 #    artifact_removal = re.compile("['`\-\[\]\_\"]")
-    artifact_removal = None
+    artifact_removal_re = None
 
     if trim_whitespaces:
         namestring.strip()
 
     if keep_whitespace:
-        artifact_removal = re.compile("[^a-zA-Z0-9,.\s]")
+        artifact_removal_re = re.compile("[^a-zA-Z0-9,.\s]")
     else:
-        artifact_removal = re.compile("[^a-zA-Z0-9,.]")
+        artifact_removal_re = re.compile("[^a-zA-Z0-9,.]")
 
     whitespace_removal = re.compile("[\s]{2,100}")
-    tmp = artifact_removal.sub(replacement, namestring)
+    tmp = artifact_removal_re.sub(replacement, namestring)
 
     return whitespace_removal.sub(" ", tmp).strip()
 
@@ -601,9 +602,9 @@ def compare_names(origin_name, target_name, initials_penalty=False):
     name_comparison_print("|- surname distance: ", surname_dist)
 
     if surname_dist > 0:
-        artifact_removal = re.compile("[^a-zA-Z0-9]")
-        fn1 = artifact_removal.sub("", no[0])
-        fn2 = artifact_removal.sub("", nt[0])
+        l_artifact_removal = re.compile("[^a-zA-Z0-9]")
+        fn1 = l_artifact_removal.sub("", no[0])
+        fn2 = l_artifact_removal.sub("", nt[0])
 
         if fn1 == fn2:
             score = 1.0

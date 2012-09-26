@@ -20,37 +20,37 @@
 from itertools import cycle, imap, chain, izip
 from operator import itemgetter
 
-from bibtask import task_sleep_now_if_required
+from invenio.bibtask import task_sleep_now_if_required
 import bibauthorid_config as bconfig
 
-from bibauthorid_comparison import cached_sym
-from bibauthorid_name_utils import compare_names as comp_names
-from bibauthorid_name_utils import split_name_parts
-from bibauthorid_name_utils import create_normalized_name
-from bibauthorid_general_utils import update_status \
+from invenio.bibauthorid_comparison import cached_sym
+from invenio.bibauthorid_name_utils import compare_names as comp_names
+from invenio.bibauthorid_name_utils import split_name_parts
+from invenio.bibauthorid_name_utils import create_normalized_name
+from invenio.bibauthorid_general_utils import update_status \
                                     , update_status_final
-from bibauthorid_matrix_optimization import maximized_mapping
-from bibauthorid_backinterface import get_all_valid_bibrecs
-from bibauthorid_backinterface import filter_bibrecs_outside
-from bibauthorid_backinterface import get_deleted_papers
-from bibauthorid_backinterface import delete_paper_from_personid
-from bibauthorid_backinterface import get_authors_from_paper
-from bibauthorid_backinterface import get_coauthors_from_paper
-from bibauthorid_backinterface import get_signatures_from_rec
-from bibauthorid_backinterface import modify_signature
-from bibauthorid_backinterface import remove_sigs
-from bibauthorid_backinterface import find_pids_by_exact_name as _find_pids_by_exact_name
-from bibauthorid_backinterface import new_person_from_signature as _new_person_from_signature
-from bibauthorid_backinterface import add_signature as _add_signature
-from bibauthorid_backinterface import update_personID_canonical_names
-from bibauthorid_backinterface import update_personID_external_ids
-from bibauthorid_backinterface import get_name_by_bibrecref
-from bibauthorid_backinterface import populate_partial_marc_caches
-from bibauthorid_backinterface import destroy_partial_marc_caches
-from bibauthorid_backinterface import get_inspire_id
-from bibauthorid_backinterface import get_person_with_extid
-from bibauthorid_backinterface import get_name_string_to_pid_dictionary
-from bibauthorid_backinterface import get_new_personid
+from invenio.bibauthorid_matrix_optimization import maximized_mapping
+from invenio.bibauthorid_backinterface import get_all_valid_bibrecs
+from invenio.bibauthorid_backinterface import filter_bibrecs_outside
+from invenio.bibauthorid_backinterface import get_deleted_papers
+from invenio.bibauthorid_backinterface import delete_paper_from_personid
+from invenio.bibauthorid_backinterface import get_authors_from_paper
+from invenio.bibauthorid_backinterface import get_coauthors_from_paper
+from invenio.bibauthorid_backinterface import get_signatures_from_rec
+from invenio.bibauthorid_backinterface import modify_signature
+from invenio.bibauthorid_backinterface import remove_sigs
+from invenio.bibauthorid_backinterface import find_pids_by_exact_name as _find_pids_by_exact_name
+from invenio.bibauthorid_backinterface import new_person_from_signature as _new_person_from_signature
+from invenio.bibauthorid_backinterface import add_signature as _add_signature
+from invenio.bibauthorid_backinterface import update_personID_canonical_names
+from invenio.bibauthorid_backinterface import update_personID_external_ids
+from invenio.bibauthorid_backinterface import get_name_by_bibrecref
+from invenio.bibauthorid_backinterface import populate_partial_marc_caches
+from invenio.bibauthorid_backinterface import destroy_partial_marc_caches
+from invenio.bibauthorid_backinterface import get_inspire_id
+from invenio.bibauthorid_backinterface import get_person_with_extid
+from invenio.bibauthorid_backinterface import get_name_string_to_pid_dictionary
+from invenio.bibauthorid_backinterface import get_new_personid
 
 USE_EXT_IDS = bconfig.RABBIT_USE_EXTERNAL_IDS
 USE_INSPIREID = bconfig.RABBIT_USE_EXTERNAL_ID_INSPIREID

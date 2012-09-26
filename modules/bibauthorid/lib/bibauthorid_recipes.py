@@ -52,7 +52,6 @@ def safe_disambiguation_iteration():
 
 def safe_merger():
     from bibauthorid_merge import merge_static
-    from bibauthorid_merge import merge_static_oldstyle
     from bibauthorid_rabbit import rabbit
     from bibauthorid_personid_maintenance import check_personid_papers \
                                                  , check_results \
@@ -69,7 +68,7 @@ def safe_merger():
 
     assert check_personid_papers()
     copy_personids()
-    merge_static_oldstyle()
+    merge_static()
     assert check_personid_papers()
     assert check_merger()
     compare_personids("/tmp/merge_diff")
@@ -89,7 +88,7 @@ def test_accuracy():
         rabbit([])
 
     assert check_personid_papers()
-    tortoise(pure = True)
+    tortoise(pure=True)
     assert check_results()
 
     return matched_claims()

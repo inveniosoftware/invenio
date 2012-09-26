@@ -19,24 +19,23 @@
 
 from operator import itemgetter
 from itertools import groupby, chain, imap, izip
-import gc
 
-from bibauthorid_general_utils import update_status \
+from invenio.bibauthorid_general_utils import update_status \
                                     , update_status_final
-from bibauthorid_matrix_optimization import maximized_mapping
-from bibauthorid_backinterface import update_personID_canonical_names
-from bibauthorid_backinterface import get_existing_result_clusters
-from bibauthorid_backinterface import get_lastname_results
-from bibauthorid_backinterface import personid_name_from_signature
-from bibauthorid_backinterface import personid_from_signature
-from bibauthorid_backinterface import move_signature
-from bibauthorid_backinterface import get_claimed_papers
-from bibauthorid_backinterface import get_new_personid
-from bibauthorid_backinterface import find_conflicts
-from bibauthorid_backinterface import get_free_pids
-from bibauthorid_backinterface import get_signature_info
-from bibauthorid_dbinterface import delete_empty_persons
-from bibauthorid_dbinterface import get_bibrefrec_to_pid_flag_mapping
+from invenio.bibauthorid_matrix_optimization import maximized_mapping
+from invenio.bibauthorid_backinterface import update_personID_canonical_names
+from invenio.bibauthorid_backinterface import get_existing_result_clusters
+from invenio.bibauthorid_backinterface import get_lastname_results
+from invenio.bibauthorid_backinterface import personid_name_from_signature
+from invenio.bibauthorid_backinterface import personid_from_signature
+from invenio.bibauthorid_backinterface import move_signature
+from invenio.bibauthorid_backinterface import get_claimed_papers
+from invenio.bibauthorid_backinterface import get_new_personid
+from invenio.bibauthorid_backinterface import find_conflicts
+from invenio.bibauthorid_backinterface import get_free_pids as backinterface_get_free_pids
+from invenio.bibauthorid_backinterface import get_signature_info
+from invenio.bibauthorid_backinterface import delete_empty_persons
+from invenio.bibauthorid_backinterface import get_bibrefrec_to_pid_flag_mapping
 
 def merge_static_classy():
     '''
@@ -103,7 +102,7 @@ def merge_static_classy():
     last_names = frozenset(name[0].split('.')[0] for name in get_existing_result_clusters())
 
     personid = get_bibrefrec_to_pid_flag_mapping()
-    free_pids = get_free_pids()
+    free_pids = backinterface_get_free_pids()
 
     for idx, last in enumerate(last_names):
         update_status(float(idx) / len(last_names), "Merging, %d/%d current: %s" % (idx, len(last_names), last))
@@ -136,7 +135,7 @@ def merge_static_classy():
         best_match = maximized_mapping([[row.get(old, 0) for old in old_pids] for row in matr])
 
         # [[bibrefrecs] -> pid]
-        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, unused in best_match]
+        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, _ in best_match]
         not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), best_match))
         not_matched_clusters = izip((results[i][1] for i in not_matched_clusters), free_pids)
 
@@ -261,7 +260,7 @@ def merge_static():
         old_pids = list(old_pids)
         best_match = maximized_mapping([[row.get(old, 0) for old in old_pids] for row in matr])
 
-        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, unused in best_match]
+        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, _ in best_match]
         not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), best_match))
         not_matched_clusters = izip((results[i][1] for i in not_matched_clusters), free_pids)
 
@@ -351,7 +350,7 @@ def merge_dynamic():
         old_pids = list(old_pids)
         best_match = maximized_mapping([[row.get(old, 0) for old in old_pids] for row in matr])
 
-        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, unused in best_match]
+        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, _ in best_match]
         not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), best_match))
         not_matched_clusters = izip((results[i][1] for i in not_matched_clusters), free_pids)
 

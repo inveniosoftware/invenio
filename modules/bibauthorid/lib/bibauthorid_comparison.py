@@ -21,15 +21,15 @@ import re
 import bibauthorid_config as bconfig
 from itertools import starmap
 from operator import mul
-from bibauthorid_name_utils import compare_names
-from bibauthorid_dbinterface import get_name_by_bibrecref
-from bibauthorid_dbinterface import get_grouped_records
-from bibauthorid_dbinterface import get_all_authors
-from bibauthorid_dbinterface import get_collaboration
-from bibauthorid_dbinterface import resolve_affiliation
-from bibauthorid_backinterface import get_key_words
-from bibrank_citation_searcher import get_citation_dict
-from bibauthorid_general_utils import metadata_comparison_print
+from invenio.bibauthorid_name_utils import compare_names
+from invenio.bibauthorid_dbinterface import get_name_by_bibrecref
+from invenio.bibauthorid_dbinterface import get_grouped_records
+from invenio.bibauthorid_dbinterface import get_all_authors
+from invenio.bibauthorid_dbinterface import get_collaboration
+from invenio.bibauthorid_dbinterface import resolve_affiliation
+from invenio.bibauthorid_backinterface import get_key_words
+from invenio.bibrank_citation_searcher import get_citation_dict
+from invenio.bibauthorid_general_utils import metadata_comparison_print
 
 
 # This module is not thread safe!
