@@ -90,6 +90,27 @@ class TestPluginContainer(unittest.TestCase):
         self.failUnless(len(external_authentications) >= 1)
         self.failUnless(len(external_authentications.get_broken_plugins()) >= 2)
 
+    def test_plugin_container_module_reloading(self):
+        """pluginutils - plugin reloading"""
+        websubmit_functions = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'websubmit_functions', '*.py'))
+        self.assertNotEqual(websubmit_functions['Is_Referee'].__doc__, "test_reloading")
+        websubmit_functions['Is_Referee'].__doc__ = "test_reloading"
+        self.assertEqual(websubmit_functions['Is_Referee'].__doc__, "test_reloading")
+
+        websubmit_functions.reload_plugins(reload=True)
+        self.assertNotEqual(websubmit_functions['Is_Referee'].__doc__, "test_reloading")
+
+    def test_plugin_container_module_caching(self):
+        """pluginutils - plugin caching"""
+        websubmit_functions = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'websubmit_functions', '*.py'))
+        self.assertNotEqual(websubmit_functions['Is_Referee'].__doc__, "test_caching")
+        websubmit_functions['Is_Referee'].__doc__ = "test_caching"
+        self.assertEqual(websubmit_functions['Is_Referee'].__doc__, "test_caching")
+
+        websubmit_functions.reload_plugins()
+        websubmit_functions_new = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'websubmit_functions', '*.py'))
+        self.assertEqual(websubmit_functions_new['Is_Referee'].__doc__, "test_caching")
+
 TEST_SUITE = make_test_suite(TestPluginContainer,)
 
 if __name__ == "__main__":

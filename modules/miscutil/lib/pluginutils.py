@@ -25,6 +25,7 @@ import sys
 import os
 import glob
 import inspect
+import imp
 
 from invenio.config import CFG_PYLIBDIR
 from invenio.textutils import wrap_text_in_a_box
@@ -72,9 +73,6 @@ class PluginContainer(object):
     @ivar _plugin_pathnames: the list of normalized plugin pathnames
         corresponding to the plugins to be loaded.
     @type _plugin_pathnames: list
-    @ivar _cached_modules: map of the current loaded modules, to be used
-        in order to refresh Python cashed modules.
-    @type _cached_modules: dict
     @ivar _plugin_builder: the plugin builder as passed to the constructor.
     @type plugin_builder: function
     @ivar api_version: the version as provided to the constructor.
@@ -91,10 +89,11 @@ class PluginContainer(object):
             plugin_pathnames=None,
             plugin_builder=None,
             api_version=None,
-            plugin_signature=None):
+            plugin_signature=None,
+            external=False):
         self._plugin_map = {}
-        self._cached_modules = {}
         self._plugin_pathnames = []
+        self._external = external
         self.api_version = api_version
         if plugin_builder is None:
             self._plugin_builder = self.default_plugin_builder
@@ -211,7 +210,7 @@ class PluginContainer(object):
                 ret[plugin_name] = plugin['error']
         return ret
 
-    def reload_plugins(self):
+    def reload_plugins(self, reload=False):
         """
         For the plugins found through iterating in the plugin_pathnames, loads
         and working plugin.
@@ -225,10 +224,12 @@ class PluginContainer(object):
             override an existing one, the latter will be overridden by
             the failed former).
         """
+        # The reload keyword argument exists for backwards compatibility.
+        # Previously, reload_plugins, would not reload a module due to a bug.
         for plugin_path in self._plugin_pathnames_iterator():
-            self._load_plugin(plugin_path)
+            self._load_plugin(plugin_path, reload=reload)
 
-    def normalize_plugin_path(plugin_path):
+    def normalize_plugin_path(self, plugin_path):
         """
         Returns a normalized plugin_path.
 
@@ -240,11 +241,10 @@ class PluginContainer(object):
         """
         invenio_path = os.path.abspath(os.path.join(CFG_PYLIBDIR, 'invenio'))
         plugin_path = os.path.abspath(plugin_path)
-        if not os.path.abspath(plugin_path).startswith(invenio_path):
+        if not self._external and not os.path.abspath(plugin_path).startswith(invenio_path):
             raise ValueError('A plugin should be stored under "%s" ("%s" was'
                 ' specified)' % (invenio_path, plugin_path))
         return plugin_path
-    normalize_plugin_path = staticmethod(normalize_plugin_path)
 
     def _plugin_pathnames_iterator(self):
         """
@@ -275,7 +275,7 @@ class PluginContainer(object):
         return plugin_name
     get_plugin_name = staticmethod(get_plugin_name)
 
-    def _load_plugin(self, plugin_path):
+    def _load_plugin(self, plugin_path, reload=False):
         """
         Load a plugin in the plugin map.
 
@@ -290,20 +290,27 @@ class PluginContainer(object):
         api_version = None
         try:
             plugin_name = self.get_plugin_name(plugin_path)
-            plugin_import_path = plugin_path[
-                len(CFG_PYLIBDIR) + 1:-len('.py')].replace('/', '.')
 
-            ## Let's refresh Python's own cache.
-            if plugin_import_path in self._cached_modules:
-                reload(self._cached_modules[plugin_import_path])
+            # Let's see if the module is already loaded
+            plugin = None
+            if plugin_name in sys.modules:
+                mod = sys.modules[plugin_name]
+                if os.path.splitext(mod.__file__)[0] == os.path.splitext(plugin_path)[0]:
+                    plugin = mod
 
-            ## Let's load the plugin module.
-            plugin = __import__(plugin_import_path)
-            self._cached_modules[plugin_import_path] = plugin
-            components = plugin_import_path.split(".")
-            for component in components[1:]:
-                ## Let's reach *the* plugin module
-                plugin = getattr(plugin, component)
+            if not plugin or reload:
+                # Let's load the plugin module.
+                plugin_fp, plugin_path, plugin_desc = imp.find_module(
+                    plugin_name, [os.path.dirname(plugin_path)]
+                )
+
+                try:
+                    plugin = imp.load_module(
+                            plugin_name, plugin_fp, plugin_path, plugin_desc
+                    )
+                finally:
+                    if plugin_fp:
+                        plugin_fp.close()
 
             ## Let's check for API version.
             api_version = getattr(plugin, '__plugin_version__', None)
