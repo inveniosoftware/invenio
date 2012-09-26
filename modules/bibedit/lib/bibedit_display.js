@@ -694,7 +694,7 @@ function updateToolbar(enable) {
         }
         $(sel).removeClass(before).addClass(after);
         if (enable) {
-            $(sel).on('click', fn);
+            $(sel).off('click').on('click', fn);
         }
         else {
             $(sel).off('click');

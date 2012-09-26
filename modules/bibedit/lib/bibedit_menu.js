@@ -95,8 +95,10 @@ function activateRecordMenu(){
   /*
    * Activate menu record controls.
    */
-  $('#imgCloneRecord').bind('click', onCloneRecordClick).removeClass(
+  if (!$('#imgCloneRecord').hasClass('bibEditImgCtrlEnabled')) {
+    $('#imgCloneRecord').on('click', onCloneRecordClick).removeClass(
     'bibEditImgCtrlDisabled').addClass('bibEditImgCtrlEnabled');
+  }
   $('#btnCancel').removeAttr('disabled');
   $('#btnDeleteRecord').removeAttr('disabled');
   $('#btnAddField').removeAttr('disabled');
@@ -106,8 +108,10 @@ function deactivateRecordMenu(){
   /*
    * Deactivate menu record controls.
    */
-  $('#imgCloneRecord').unbind('click').removeClass(
+  if (!$('#imgCloneRecord').hasClass('bibEditImgCtrlDisabled')) {
+    $('#imgCloneRecord').off('click').removeClass(
     'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+  }
   $('#btnSubmit').attr('disabled', 'disabled');
   $('#btnSubmit').css('background-color', '');
   $('#btnCancel').attr('disabled', 'disabled');

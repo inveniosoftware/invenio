@@ -709,6 +709,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 if errors_upload:
                     response['resultCode'], response['errors'] = 113, \
                         errors_upload
+                    return response
                 elif status_code == 0:
                     response['resultCode'], response['errors'] = 110, \
                         list_of_errors
@@ -840,6 +841,18 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         # Textmarc content coming from the user
         textmarc_record = data['textmarc']
         xml_conversion_status = get_xml_from_textmarc(recid, textmarc_record)
+
+        if xml_conversion_status['resultMsg'] == "textmarc_parsing_error":
+            response.update(xml_conversion_status)
+            return response
+
+        # Simulate upload to catch errors
+        errors_upload = perform_upload_check(xml_conversion_status['resultXML'], '--replace')
+        if errors_upload:
+            response['resultCode'], response['errors'] = 113, \
+                errors_upload
+            return response
+
         response.update(xml_conversion_status)
         if xml_conversion_status['resultMsg'] == 'textmarc_parsing_success':
             create_cache_file(recid, uid,

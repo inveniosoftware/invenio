@@ -76,6 +76,27 @@ class TextmarcToXMLTests(unittest.TestCase):
         expected_error = [1, "100__ $$a"]
         self.assertEqual(output['parse_error'][:-1], expected_error)
 
+    def test_accept_fft_tags_in_textmarc(self):
+        textmarc = """100__ $$aDoe, J.$$uCERN
+        FFT__ $$ahttp://scd-theses.u-strasbg.fr/1818/01/RICAUD_Helene_2008.pdf$$dFulltext"""
+        output = get_xml_from_textmarc(1, textmarc)
+
+        xml_expected_output = """<record>
+        <controlfield tag="001">1</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+            <subfield code="a">Doe, J.</subfield>
+            <subfield code="u">CERN</subfield>
+        </datafield>
+        <datafield tag="FFT" ind1=" " ind2=" ">
+            <subfield code="a">http://scd-theses.u-strasbg.fr/1818/01/RICAUD_Helene_2008.pdf</subfield>
+            <subfield code="d">Fulltext</subfield>
+        </datafield>
+        </record>"""
+
+        self.assertEqual(re.sub("\s+", " ", output['resultXML'].strip()),
+            re.sub("\s+", " ", xml_expected_output.strip()))
+
+
 TEST_SUITE = make_test_suite(TextmarcToXMLTests)
 
 if __name__ == "__main__":

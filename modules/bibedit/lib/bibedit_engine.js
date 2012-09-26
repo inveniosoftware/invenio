@@ -479,7 +479,6 @@ function resetBibeditState(){
   gBibCircUrl = null;
 
   clearWarnings();
-  updateInterfaceAccordingToMode();
   updateRevisionsHistory();
   updateUrView();
   updateBibCirculationPanel();
@@ -1301,16 +1300,85 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
   $(dialogPreview.dialogDiv).parent().find('button:nth-child(1)').focus();
 }
 
+function saveOpenedFields() {
+  /* Performs the following tasks:
+   * - Remove volatile content from field templates
+   * - Save opened content from field templates
+   * - Save opened textareas
+   * returns: promise with state of all tasks to perform
+   */
+  function removeVolatileContentFieldTemplates(removingVolatilePromise) {
+    /* Deletes volatile fields from field templates */
+    $(".bibEditVolatileSubfield:input").each(function() {
+      var deleteButtonSelector = $(this).parent().parent().find('img[id^="btnAddFieldRemove_"]');
+      if (deleteButtonSelector.length === 0) {
+        /* It is the first element on the field template */
+        $(this).parent().parent().find(".bibEditCellAddSubfieldCode").remove();
+        $(this).remove();
+      }
+      else {
+        deleteButtonSelector.click();
+      }
+    });
+    removingVolatilePromise.resolve();
+  }
+
+  function removeEmptyFieldTemplates(removingEmptyFieldTemplatePromise) {
+    var addFieldInterfaceSelector = $("tbody[id^=rowGroupAddField_]");
+    addFieldInterfaceSelector.each(function() {
+      var addSubfieldSelector = $(this).find(".bibEditCellAddSubfieldCode");
+      if (addSubfieldSelector.length === 0) {
+        /* All input have been previously removed */
+        addFieldInterfaceSelector.remove();
+      }
+    });
+    removingEmptyFieldTemplatePromise.resolve();
+  }
+
+  function saveFieldTemplatesContent(savingFieldTemplatesPromise) {
+    /* Triggers click event on all open field templates */
+    $(".bibEditTxtValue:input:not(.bibEditVolatileSubfield)").trigger($.Event( 'keyup', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));
+    savingFieldTemplatesPromise.resolve();
+  }
+
+  function saveOpenedTextareas(savingOpenedTextareasPromise) {
+    /* Saves textareas if they are opened */
+    $(".edit_area textarea").trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));
+    savingOpenedTextareasPromise.resolve();
+  }
+
+  var removingVolatilePromise = new $.Deferred();
+  var removingEmptyFieldTemplatePromise = new $.Deferred();
+  var savingFieldTemplatesPromise = new $.Deferred();
+  var savingOpenedTextareasPromise = new $.Deferred();
+
+  removeVolatileContentFieldTemplates(removingVolatilePromise);
+  removeEmptyFieldTemplates(removingEmptyFieldTemplatePromise);
+  saveFieldTemplatesContent(savingFieldTemplatesPromise);
+  saveOpenedTextareas(savingOpenedTextareasPromise);
+
+  var savingContent = $.when(removingVolatilePromise,
+                             removingEmptyFieldTemplatePromise,
+                             savingFieldTemplatesPromise,
+                             savingOpenedTextareasPromise);
+  return savingContent;
+}
+
 function onSubmitClick() {
   /*
    * Handle 'Submit' button (submit record).
    */
   updateStatus('updating');
 
-  var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
+  /* Save all opened fields before submitting */
+  var savingOpenedFields = saveOpenedFields(savingOpenedFields);
 
-  // Get preview of the record and let the user confirm submit
-  getPreview(dialogPreview, onSubmitPreviewSuccess);
+  savingOpenedFields.done(function() {
+    var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
+
+    // Get preview of the record and let the user confirm submit
+    getPreview(dialogPreview, onSubmitPreviewSuccess);
+  });
 }
 
 // Enable this flag to force the next submission even if cache is outdated.
@@ -1384,6 +1452,8 @@ function onTextMarcClick() {
   createReq({recID: gRecID, requestType: 'getTextMarc'
        }, function(json) {
         // Request was successful.
+        $("#bibEditMessage").empty();
+
         var textmarc_box = $('<textarea>');
         textmarc_box.attr('id', 'textmarc_textbox');
         textmarc_box.html(json['textmarc']);
@@ -1681,11 +1751,9 @@ function onCancelClick(){
       gBibCircUrl = null;
       // making the changes visible
       updateBibCirculationPanel();
-      updateInterfaceAccordingToMode();
       updateRevisionsHistory();
       updateUrView();
       updateToolbar(false);
-
     }
     else {
       updateStatus('ready');
@@ -1701,9 +1769,10 @@ function onCloneRecordClick(){
     updateStatus('ready');
     return;
   }
-  else if (!gRecordDirty)
+  else if (!gRecordDirty) {
     // If the record is unchanged, erase the cache.
     createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  }
   createReq({requestType: 'newRecord', newType: 'clone', recID: gRecID},
     function(json){
       var newRecID = json['newRecID'];
@@ -1793,6 +1862,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   }
   // Clear main content area.
   $('#bibEditContentTable').empty();
+  $('#bibEditMessage').empty();
   // Clear search area.
   if (typeof(searchPattern) == 'string' || typeof(searchPattern) == 'number')
     $('#txtSearchPattern').val(searchPattern);
@@ -2024,9 +2094,13 @@ function addFieldGatherInformations(fieldTmpNo){
     var ind2 = $("#txtAddFieldInd2_" + fieldTmpNo).attr("value");
     var subfieldTmpNo = $('#rowGroupAddField_' + fieldTmpNo).data('freeSubfieldTmpNo');
     var subfields = [];
-    for (i=0;i<subfieldTmpNo;i++){
+    for (i=0; i < subfieldTmpNo; i++){
       var subfieldCode = $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_' + i).attr("value");
-      var subfieldValue = $('#txtAddFieldValue_' + fieldTmpNo + '_' + i).attr("value");
+      var subfieldValueSelector = $('#txtAddFieldValue_' + fieldTmpNo + '_' + i);
+      var subfieldValue = subfieldValueSelector.attr("value");
+      if (subfieldValueSelector.hasClass("bibEditVolatileSubfield")) {
+        subfieldValue = "VOLATILE:" + subfieldValue;
+      }
       subfields.push([subfieldCode, subfieldValue]);
     }
 
@@ -2274,6 +2348,7 @@ function onAddFieldClick(){
    */
   if (failInReadOnly())
     return;
+  activateSubmitButton();
   createAddFieldInterface();
 }
 
@@ -2369,9 +2444,9 @@ function onAddFieldChange(event){
             var fieldTagID = ('#' + $(this).attr('id').replace('SubfieldCode', 'Tag')).split('_');
             fieldTagID.pop();
             fieldTagID = fieldTagID.join('_');
-            var fieldTag = $(this).parent().prev().prev().children().eq(0).val(),
-                fieldInd1 = $(this).parent().prev().prev().children().eq(1).val(),
-                fieldInd2 = $(this).parent().prev().prev().children().eq(2).val();
+            var fieldTag = $('body').find("#txtAddFieldTag_" + fieldTmpNo).val(),
+                fieldInd1 = $('body').find("#txtAddFieldInd1_" + fieldTmpNo).val(),
+                fieldInd2 = $('body').find("#txtAddFieldInd2_" + fieldTmpNo).val();
             if (fieldInd1 == '') {
                 fieldInd1 = '_';
             }
