@@ -51,6 +51,7 @@ pylib_DATA = __init__.py \
              intbitset_unit_tests.py \
              intbitset_helper.py \
              inveniocfg.py \
+             inveniocfg_unit_tests.py \
              shellutils.py \
              shellutils_unit_tests.py \
              pluginutils.py \
