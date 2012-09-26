@@ -339,6 +339,9 @@ template function generated it.
  <!--[if lt IE 8]>
     <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
  <![endif]-->
+ <!--[if gt IE 8]>
+    <style type="text/css">div.restrictedflag {filter:none;}</style>
+ <![endif]-->
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
