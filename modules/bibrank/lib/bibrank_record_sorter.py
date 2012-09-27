@@ -2,7 +2,7 @@
 ## Ranking of records using different parameters and methods on the fly.
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -433,7 +433,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
             break
 
     if len(recdict) == 0 or len(lwords) == 0:
-        return (None, "Could not find any similar documents, possibly because of error in ranking data.", "", voutput)
+        return (None, "Could not find similar documents for this query.", "", voutput)
     else: #sort if we got something to sort
         (reclist, hitset) = sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
