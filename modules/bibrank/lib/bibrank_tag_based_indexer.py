@@ -258,6 +258,7 @@ def del_recids(rank_method_code, range_rec):
                 if rec_dict.has_key(i):
                     del rec_dict[i]
         write_message("New size: %s" % len(rec_dict))
+        begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         intoDB(rec_dict, begin_date, rank_method_code)
     else:
         write_message("Create before deleting!")
