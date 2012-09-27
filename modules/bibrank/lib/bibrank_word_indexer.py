@@ -737,18 +737,6 @@ def word_index(run):
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
-
-    ## import optional modules:
-    try:
-        import psyco
-        psyco.bind(get_words_from_phrase)
-        psyco.bind(WordTable.merge_with_old_recIDs)
-        psyco.bind(update_rnkWORD)
-        psyco.bind(check_rnkWORD)
-    except StandardError,e:
-        print "Warning: Psyco", e
-        pass
-
     global languages
 
     max_recid = 0

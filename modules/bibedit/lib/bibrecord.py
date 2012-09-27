@@ -28,11 +28,6 @@ Note: Does not access the database, the input is MARCXML only."""
 
 import re
 import sys
-try:
-    import psyco
-    PSYCO_AVAILABLE = True
-except ImportError:
-    PSYCO_AVAILABLE = False
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -1526,15 +1521,3 @@ def _compare_lists(list1, list2, custom_cmp):
         if not custom_cmp(element1, element2):
             return False
     return True
-
-if PSYCO_AVAILABLE:
-    psyco.bind(_correct_record)
-    psyco.bind(_create_record_4suite)
-    psyco.bind(_create_record_rxp)
-    psyco.bind(_create_record_minidom)
-    psyco.bind(field_get_subfield_values)
-    psyco.bind(create_records)
-    psyco.bind(create_record)
-    psyco.bind(record_get_field_instances)
-    psyco.bind(record_get_field_value)
-    psyco.bind(record_get_field_values)

@@ -1718,15 +1718,6 @@ def task_run_core():
     return True
 
 
-## import optional modules:
-try:
-    import psyco
-    psyco.bind(get_words_from_phrase)
-    psyco.bind(WordTable.merge_with_old_recIDs)
-except:
-    pass
-
-
 ### okay, here we go:
 if __name__ == '__main__':
     main()

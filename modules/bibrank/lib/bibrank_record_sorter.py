@@ -675,14 +675,3 @@ def rank_method_stat(rank_method_code, reclist, lwords):
         if count.has_key(i):
             voutput += "%s-%s<br />" % (i, count[i])
         i -= 1
-
-try:
-    import psyco
-    psyco.bind(find_similar)
-    psyco.bind(rank_by_method)
-    psyco.bind(calculate_record_relevance)
-    psyco.bind(word_similarity)
-    psyco.bind(sort_record_relevance)
-except StandardError, e:
-    pass
-

@@ -120,31 +120,6 @@ except ImportError, msg:
 
 ## 3) check for recommended modules:
 try:
-    if (2**31 - 1) == sys.maxint:
-        # check for Psyco since we seem to run in 32-bit environment
-        import psyco
-    else:
-        # no need to advise on Psyco on 64-bit systems
-        pass
-except ImportError, msg:
-    print """
-    *****************************************************
-    ** IMPORT WARNING %s
-    *****************************************************
-    ** Note that Psyco is not really required but we   **
-    ** recommend it for faster Invenio operation   **
-    ** if you are running in 32-bit operating system.  **
-    **                                                 **
-    ** You can safely continue installing Invenio  **
-    ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put **
-    ** into production.)                               **
-    *****************************************************
-    """ % msg
-
-    wait_for_user("Press ENTER to continue the installation...")
-
-try:
     import rdflib
 except ImportError, msg:
     print """
