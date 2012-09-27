@@ -156,7 +156,7 @@ install-jquery-plugins:
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
 	wget http://flot.googlecode.com/files/flot-0.6.zip && \
-        wget http://trentrichardson.com/examples/timepicker/jquery-ui-timepicker-addon.js && \
+	wget -O jquery-ui-timepicker-addon.js http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js && \
 	unzip -u flot-0.6.zip && \
 	mv flot/jquery.flot.selection.min.js flot/jquery.flot.min.js flot/excanvas.min.js ./ && \
 	rm flot-0.6.zip && rm -r flot && \
