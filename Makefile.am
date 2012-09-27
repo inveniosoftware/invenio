@@ -232,7 +232,7 @@ install-ckeditor-plugin:
 	rm -rf /tmp/invenio-ckeditor-plugin
 	mkdir /tmp/invenio-ckeditor-plugin
 	(cd /tmp/invenio-ckeditor-plugin && \
-	wget 'http://download.cksource.com/CKEditor/CKEditor/CKEditor%20$(CKV)/$(CKEDITOR)' && \
+	wget 'http://invenio-software.org/download/ckeditor/$(CKEDITOR)' && \
 	unzip -u -d ${prefix}/var/www $(CKEDITOR)) && \
 	find ${prefix}/var/www/ckeditor/ -depth -name '_*' -exec rm -rf {} \; && \
 	find ${prefix}/var/www/ckeditor/ckeditor* -maxdepth 0 ! -name "ckeditor.js" -exec rm -r {} \; && \
