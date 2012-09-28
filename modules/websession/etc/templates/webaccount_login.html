@@ -18,13 +18,25 @@
 #}
 {% from "_formhelpers.html" import render_field with context %}
 {% extends "page.html" %}
-{% set title = _("Login") %}
+{% set title = None %}
 {% block body %}
-<form action="{{ url_for('.login') }}" method="POST">
-  {{ form.referer }}
-  {{ render_field(form.nickname, class_="textInput") }}
-  {{ render_field(form.password, class_="textInput") }}
-  {{ form.remember }}{{ form.remember.label }}
-  {{ form.submit }}
+
+<div class="container">
+  <div class="row">
+    <div class="span4 offset4 well">
+      <legend>{{ _('Please Sign In') }}</legend>
+      <form action="{{ url_for('.login') }}" method="POST">
+      {{ form.referer }}
+      {{ form.nickname(placeholder=_('Username or email'), class_="span4") }}
+      {{ form.password(placeholder=_('Password'), class_="span4") }}
+      <label class="checkbox">
+        {{ form.remember(class_="checkbox") }} {{ form.remember.label.text }}
+      </label>
+      {{ form.submit(class_="btn btn-info btn-block") }}
+      </form>
+    </div>
+  </div>
+</div>
+
 </form>
 {% endblock %}

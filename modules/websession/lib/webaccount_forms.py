@@ -52,4 +52,4 @@ class LoginForm(Form):
     #                validate_password])
     remember = BooleanField(_("Remember Me"))
     referer = HiddenField()
-    submit = SubmitField(_("Login"))
+    submit = SubmitField(_("Sing in"))
