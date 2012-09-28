@@ -39,19 +39,20 @@ from invenio.webcomment_model import CmtSUBSCRIPTION
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webuser_flask import current_user
 
-from invenio.bibformat import format_record
 from invenio.search_engine import search_pattern_parenthesised,\
                                   get_creation_date,\
                                   perform_request_search,\
                                   search_pattern,\
-                                  guess_primary_collection_of_a_record
+                                  guess_primary_collection_of_a_record, \
+                                  print_record
 
 from sqlalchemy.sql import operators
 from invenio.webcomment import get_mini_reviews
 from invenio.websearchadminlib import get_detailed_page_tabs,\
                                       get_detailed_page_tabs_counts
 
-from invenio.websearch_blueprint import get_collection_breadcrumbs
+from invenio.websearch_blueprint import get_collection_breadcrumbs, \
+                                        cached_format_record
 from invenio.search_engine_utils import get_fieldvalues
 
 blueprint = InvenioBlueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
@@ -59,14 +60,6 @@ blueprint = InvenioBlueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
                              breadcrumbs=[])
                              #menubuilder=[('main.search', _('Search'),
                              #              'search.index', 1)])
-
-@cache.memoize(3600)
-def cached_format_record(recIDs, of, ln='', verbose=0,
-                         search_pattern=None, xml_records=None, user_info=None,
-                         record_prefix=None, record_separator=None,
-                         record_suffix=None, prologue="", epilogue="", req=None,
-                         on_the_fly=False):
-    return format_record(recIDs, of, ln=ln, verbose=verbose).decode('utf8')
 
 def request_record(f):
     @wraps(f)

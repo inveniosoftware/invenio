@@ -20,6 +20,7 @@
 """WebSearch Flask Blueprint"""
 
 import pprint
+import json
 from string import rfind, strip
 from datetime import datetime
 from hashlib import md5
@@ -32,40 +33,34 @@ from invenio.intbitset import intbitset as HitSet
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.sqlalchemyutils import db
+from invenio.websearch_forms import EasySearchForm
 from invenio.websearch_model import Collection, CollectionCollection
 from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webuser_flask import current_user
 
-from invenio.bibformat import format_record
 from invenio.search_engine import search_pattern_parenthesised,\
                                   get_creation_date,\
                                   perform_request_search,\
-                                  search_pattern
+                                  search_pattern, \
+                                  print_record
 
 from sqlalchemy.sql import operators
+
+@cache.memoize(3600)
+def cached_format_record(recIDs, of, ln='', verbose=0,
+                         search_pattern=None, xml_records=None, user_info=None,
+                         record_prefix=None, record_separator=None,
+                         record_suffix=None, prologue="", epilogue="", req=None,
+                         on_the_fly=False):
+    return print_record(recIDs, of, ln=ln, verbose=verbose,
+                        brief_links=False).decode('utf8')
 
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              config='invenio.search_engine_config',
                              breadcrumbs=[],
                              menubuilder=[('main.search', _('Search'),
                                            'search.index', 1)])
-
-@blueprint.invenio_memoize(3600)
-def cached_format_record(recIDs, of, ln='', verbose=0,
-                         search_pattern=None, xml_records=None, user_info=None,
-                         record_prefix=None, record_separator=None,
-                         record_suffix=None, prologue="", epilogue="", req=None,
-                         on_the_fly=False):
-    return format_record(recIDs, of, ln=ln, verbose=verbose).decode('utf8')
-    #,
-    #                     search_pattern=search_pattern, xml_records=xml_records,
-    #                     user_info=user_info,
-    #                     record_prefix=record_prefix,
-    #                     record_separator=record_separator,
-    #                     record_suffix=record_suffix, prologue=prologue,
-    #                     epilogue=epilogue, req=req,
-    #                     on_the_fly=on_the_fly).decode('utf8')
 
 @blueprint.route('/', methods=['GET', 'POST'])
 #@blueprint.invenio_sorted(MsgMESSAGE)
@@ -78,10 +73,11 @@ def index(sort=False, filter=None):
     uid = current_user.get_id()
     collection = Collection.query.get_or_404(1)
 
+    current_app.template_context_processors[None].append(lambda: dict(
+                format_record=cached_format_record))
     return dict(collection=collection,
-        get_creation_date=get_creation_date,
-        format_record=lambda *args, **kwargs: \
-            format_record(*args, **kwargs).decode('utf8'))
+        easy_search_form = EasySearchForm(csrf_enabled=False),
+        get_creation_date=get_creation_date)
 
 
 @blueprint.invenio_memoize(3600)
@@ -109,6 +105,7 @@ def collection(name):
     current_app.template_context_processors[None].append(lambda: dict(
                 format_record=cached_format_record))
     return dict(collection=collection,
+        easy_search_form = EasySearchForm(csrf_enabled=False),
         get_creation_date=get_creation_date)
 
 
@@ -288,6 +285,7 @@ def search():
                 pagination = Pagination(int(ceil(page/float(rg))), rg, len(recids)),
                 rg = rg,
                 qid = qid,
+                easy_search_form = EasySearchForm(csrf_enabled=False),
                 format_record=cached_format_record))
     return dict(recids = recids)
 
@@ -297,7 +295,7 @@ from invenio.search_engine import get_field_tags, \
 
 @blueprint.route('/facet/<name>/<qid>', methods=['GET', 'POST'])
 def facet(name, qid):
-    if name not in ['collectionname', 'collection', 'author', 'year']:
+    if name not in ['collection', 'author', 'year']:
         return None
 
     data = cache.get('facet_'+qid)
@@ -318,9 +316,9 @@ def facet(name, qid):
                 facet.append((c.name, num_records, c.name_ln))
         return jsonify(facet=sorted(facet, key=lambda x:x[1], reverse=True)[0:limit])
 
-    facet=list(get_most_popular_field_values(
+    facet=get_most_popular_field_values(
                             recIDs,
-                            get_field_tags(name)))
+                            get_field_tags(name))
 
     return jsonify(facet=facet[0:limit])
 
@@ -336,7 +334,6 @@ def get_facet_recids(facet, values):
                   [get_value_recids(v, facet) for v in values],
                   HitSet())
 
-import json
 @blueprint.route('/results/<qid>', methods=['GET', 'POST'])
 def results(qid):
     data = cache.get('facet_'+qid)
@@ -416,5 +413,31 @@ def results(qid):
     else:
         return _('Your search did not match any records. Please try again.')
     #return jsonify(recids = output.tolist())
+
+
+@blueprint.route('/list/<field>', methods=['GET', 'POST'])
+def list(field):
+
+    if field not in [
+            'exactauthor',
+            'keyword',
+            'affiliation',
+            'reportnumber',
+            'collaboration']:
+        abort(406)
+
+    q = request.args.get('q', '')
+    if len(q)<3:
+        abort(406)
+
+    from invenio import bibindex_model as BibIndex
+    from invenio.bibindex_engine import get_index_id_from_index_name
+
+    IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' % get_index_id_from_index_name(field))
+
+    results = IdxPHRASE.query.filter(IdxPHRASE.term.contains(q)).all()
+    results = map(lambda r: r.term, results)
+
+    return jsonify(results = results)
 
 

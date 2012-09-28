@@ -80,20 +80,28 @@
             {%- set r_to = r_to if r_to < r_of else r_of -%}
             {{ _('Showing recods %d to %d out of %d results.') % (r_from, r_to, r_of) }}
             <div class="btn-group pull-right">
-            {%- for (k,v) in [('Most recent',{'so':'d'}), ('Most cited',{'rm':'citation'}), ('Most relevant',{'rm':'wrd'})] -%}
-              {%- set args = request.args.copy().to_dict() -%}
-              {%- set form_args = request.form.copy().to_dict() -%}
-              {%- if form_args|length() and 'filter' in form_args -%}
-                {%- do form_args.pop('filter') -%}
-                {%- do args.update(form_args) -%}
-              {%- endif -%}
-              {%- set active = v.keys()[0] in args and args[v.keys()[0]] == v.values()[0] -%}
-              {%- if active -%}
-                {%- do args.pop(v.keys()[0]) -%}
-              {%- else -%}
-                {%- do args.update(v) -%}
-              {%- endif -%}
-              <a href="{{ url_for('search.search', **args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
+
+
+            {%- set args = request.values.copy().to_dict() -%}
+            {%- set form_args = request.form.copy().to_dict() -%}
+            {%- if form_args|length() and 'filter' in form_args -%}
+              {%- do form_args.pop('filter') -%}
+              {%- do args.update(form_args) -%}
+            {%- endif -%}
+            {%- set new_args = args.copy() -%}
+            {%- if 'so' in new_args -%}
+              {%- do new_args.pop('so') -%}
+            {%- endif -%}
+            {%- if 'rm' in new_args -%}
+              {%- do new_args.pop('rm') -%}
+            {%- endif -%}
+
+            {%- for (k,v,vv) in [('Most recent', 'rm', ''), ('Most cited', 'rm', 'citation'), ('Most relevant', 'rm', 'wrd')] -%}
+              {%- set active = request.values.get(v,'') == vv -%}
+              {%- set active = v in args and args[v] == vv -%}
+              {%- set used_args = new_args.copy() -%}
+              {%- do used_args.update({v:vv}) -%}
+              <a href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
                  class="btn{{ ' active' if active }}">{{ _(k) }}</a>
             {%- endfor -%}
             </div>
@@ -102,7 +110,7 @@
 
         <hr/>
 
-        {%- set of = request.args.get('of', 'hb') -%}
+        {%- set of = request.values.get('of', 'hb') -%}
         {%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
           {%- if of[0] == 'h' -%}
             <div class="row-fluid">

@@ -30,11 +30,33 @@ are taken from `flask-admin` extension.
 import datetime
 import time
 
-from wtforms.widgets import TextInput
+from wtforms.widgets import TextInput, HTMLString, html_params
 from wtforms.fields import Field, TextField, HiddenField
 from wtforms import validators
 from flask.ext.wtf import Form
 from wtforms.ext.csrf.session import SessionSecureForm
+from wtforms.compat import text_type
+
+class RowWidget(object):
+    """
+    Renders a list of fields as a set of table rows with th/td pairs.
+    """
+    def __init__(self):
+        pass
+
+    def __call__(self, field, **kwargs):
+        html = []
+        hidden = ''
+        for subfield in field:
+            if subfield.type == 'HiddenField':
+                hidden += text_type(subfield)
+            else:
+                html.append('%s%s' % (hidden, text_type(subfield(class_="span1", placeholder=subfield.label.text))))
+                hidden = ''
+        if hidden:
+            html.append(hidden)
+        return HTMLString(''.join(html))
+
 
 class TimeField(Field):
     """A text field which stores a `time.time` matching a format."""
@@ -93,6 +115,54 @@ class TimePickerWidget(TextInput):
         c = kwargs.pop('class', '') or kwargs.pop('class_', '')
         kwargs['class'] = u'timepicker %s' % c
         return super(TimePickerWidget, self).__call__(field, **kwargs)
+
+
+class AutocompleteField(TextField):
+    def __init__(self, label=None, validators=None, data_provide="typeahead", data_source=None, **kwargs):
+        super(AutocompleteField, self).__init__(label, validators, **kwargs)
+        if data_source:
+            self.widget = TypeheadWidget(data_source, data_provide)
+
+
+class TypeheadWidget(object):
+    def __init__(self, autocomplete_list, data_provide):
+        if callable(autocomplete_list):
+            self.autocomplete_list = autocomplete_list()
+        else:
+            self.autocomplete_list = '["{}"]'.format('","'.join(autocomplete_list))
+        self.data_provide = data_provide
+
+    def __call__(self, field, **kwargs):
+        kwargs.setdefault('id', field.id)
+        kwargs.setdefault('type', 'text')
+        kwargs.setdefault('data-provide', self.data_provide)
+        kwargs.setdefault('data-source', self.autocomplete_list)
+        if 'value' not in kwargs:
+            kwargs['value'] = field._value()
+        return HTMLString(u'<input %s />' % html_params(name=field.name, **kwargs))
+
+class MultiWidget(object):
+    """
+    Renders a list of fields in one div.
+    """
+    def __init__(self, *args, **kwargs):#html_tag='div', prefix_label=True):
+        #assert html_tag in ('div', 'span')
+        #self.html_tag = html_tag
+        #self.prefix_label = prefix_label
+        print args, kwargs
+        pass
+
+    def __call__(self, field, **kwargs):
+        kwargs.setdefault('id', field.id)
+        html = []
+        html.append('<%s %s>' % (self.html_tag, html_params(**kwargs)))
+        for i, subfield in enumerate(field):
+            if not self.prefix_label or i>0:
+                html.append('<div class="controll-group">%s %s</div>' % (subfield.label, subfield()))
+            else:
+                html.append(subfield())
+        html.append('</%s>' % self.html_tag)
+        return HTMLString(''.join(html))
 
 
 def has_file_field(form):

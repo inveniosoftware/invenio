@@ -4565,7 +4565,8 @@ def get_record(recid):
     return create_record(print_record(recid, 'xm'))[0]
 
 def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.decompress,
-                 search_pattern=None, user_info=None, verbose=0, sf='', so='d', sp='', rm=''):
+                 search_pattern=None, user_info=None, verbose=0, sf='', so='d',
+                 sp='', rm='', brief_links=True):
     """
     Prints record 'recID' formatted according to 'format'.
 
@@ -4625,7 +4626,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                   user_info=user_info, verbose=verbose)
 
             # at the end of HTML brief mode, print the "Detailed record" functionality:
-            if format.lower().startswith('hb') and \
+            if brief_links and format.lower().startswith('hb') and \
                    format.lower() != 'hb_p':
                 out += websearch_templates.tmpl_print_record_brief_links(ln=ln,
                                                                          recID=recID,

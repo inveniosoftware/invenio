@@ -26,6 +26,11 @@
   {%- do portalboxes.update({k:l}) -%}
 {%- endfor -%}
 
+{% block header %}
+  {{ super() }}
+  {% js "js/websearch_typeahead.js" %}
+{% endblock %}
+
 {% block title %}
   {{ portalboxes.tp }}
   {{ super() }}
@@ -71,6 +76,13 @@
   opacity:0.6;
   font-size:80%;
 }
+
+.collection ul ul .badge {
+  color: #333;
+  background-color: #EEE;
+  border: 1px solid #999;
+}
+
 </style>
 
 {{ search_form(collection) }}
@@ -79,12 +91,12 @@
   {{ portalbox_sidebar(portalboxes.lt, class="span2") }}
 
   {% if collection.collection_children_r %}
-    <div class="span4 collection">
+    <div class="span{{ '4' if collection.collection_children_v else '8' }} collection">
       <h4>{{ _("Narrow by collections") }}</h4>
       {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list") }}
     </div>
   {% else %}
-      <div class="span{{ '8' if collection.collection_children_v else '10' }}">
+      <div class="span{{ '4' if collection.collection_children_v else '8' }}">
       {% if collection.is_restricted %}
         <strong>{{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
       {% else %}
@@ -98,7 +110,7 @@
             <div class="span11">
               {{ format_record(recid, 'hb', ln=g.ln)|safe }}
                 <p>
-                  <a href="{{ url_for('.search', recid=recid, ln=g.ln) }}">
+                  <a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">
                     {{ _("Detailed record") }}
                   </a>
                    -
@@ -114,19 +126,23 @@
   {% endif %}
 
   {% if collection.collection_children_v %}
-    <div class="span6 collection">
+    <div class="span4 collection">
       <h4>{{ _("Focus on") }}</h4>
       {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list") }}
 
       {{ search_also(collection.externalcollections_2) }}
     </div>
-  {% else %}
+  {% elif collection.externalcollections_2 %}
       <div class="span2">
         {{ search_also(collection.externalcollections_2) }}
       </div>
   {% endif %}
 
-  {{ portalbox_sidebar(portalboxes.rt, class="span2 pull-right") }}
+  {% if portalboxes.lt %}
+    {{ portalbox_sidebar(portalboxes.rt, class="span2") }}
+  {% else %}
+    {{ portalbox_sidebar(portalboxes.rt, class="offset2 span2") }}
+  {% endif %}
 
 </div>
 

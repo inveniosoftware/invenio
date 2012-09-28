@@ -20,6 +20,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = \
 	websearchadminlib.py \
 	websearch_blueprint.py \
+	websearch_forms.py \
 	websearch_flask_tests.py \
 	websearch_fixtures.py \
 	websearch_model.py \
@@ -50,6 +51,13 @@ pylib_DATA = \
 	websearch_admin_blueprint.py \
 	websearch_admin_forms.py
 
-EXTRA_DIST = $(pylib_DATA)
+
+jsdir=$(localstatedir)/www/js
+
+js_DATA = websearch_facet.js \
+          websearch_typeahead.js
+
+EXTRA_DIST = $(pylib_DATA) \
+             $(js_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

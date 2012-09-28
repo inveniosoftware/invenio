@@ -83,17 +83,27 @@ CFG_WEBSEACH_MATCHING_TYPES = {
     'a': {
         'title': "All of the words:",
         'tokenize': """
-            return '('+$.map(val.split(' '), function(e) {
+            var vals = val.split(' '),
+                result = $.map(vals, function(e) {
               return f+e;
-            }).join(' AND ')+')';
+            }).join(' AND ');
+            if (vals.length > 1) {
+                result = '(' + result +')';
+            }
+            return result;
         """
         },
     'o': {
         'title': "Any of the words:",
         'tokenize': """
-            return '('+$.map(val.split(' '), function(e) {
+            var vals = val.split(' '),
+                result = $.map(vals, function(e) {
               return f+e;
-            }).join(' OR ')+')';
+            }).join(' OR ');
+            if (vals.length > 1) {
+                result = '(' + result +')';
+            }
+            return result;
         """
         },
 

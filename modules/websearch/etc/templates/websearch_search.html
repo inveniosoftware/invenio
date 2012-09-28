@@ -37,6 +37,8 @@
 {% endblock %}
 {% block header %}
   {{ super() }}
+  {% js "js/websearch_typeahead.js" %}
+  {% js "js/websearch_facet.js" %}
   {%- set args = request.args.copy().to_dict() -%}
   {%- set jrec = (pagination.page-2)*pagination.per_page+1 if pagination.has_prev else 1 -%}
   {%- do args.update({'jrec': jrec}) -%}
@@ -76,6 +78,25 @@
   /* list alt */
   background-position: -264px -24px;
 }
+
+
+#facet_list {
+}
+
+#facet_list.affix {
+  top: 60px;
+}
+
+body {
+  position: relative;
+}
+
+#facet_list.affix-bottom {
+  position: absolute;
+  top: auto;
+  bottom: 170px;
+}
+
 </style>
 
 
@@ -96,25 +117,18 @@
 {% else %}
 
 <div class="row">
-  <div class="modal hide" id="overlay">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">×</button>
-      <h3>{{ _('Filtered records') }}</h3>
+  <div class="span2 visible-desktop">
+    <div class="row">
+    <div
+      class="accordion span2"
+      id="facet_list">
     </div>
-    <div class="modal-body">
-      <center>
-      <img alt="" src="/img/loading.gif" id="img-load" />
-      <strong>{{ _('Loading') }} ...</strong>
-      </center>
     </div>
-  </div>
-
-  <div class="hidden-phone span2 accordion" id="facet_list">
   </div>
 
   <div class="span10">
 
-    <div class="row">
+    <div class="row visible-desktop">
       <div class="span10">
         <div class="well" id="facet_filter" style="clear:both; display: none;">
           <input type="hidden" value="{{ request.args.get('p', '') }}" name="p" />
@@ -129,350 +143,39 @@
   </div>
 </div>
 
-<script>
-$(document).ready(function () {
-});
-</script>
+<div class="modal hide" id="overlay">
+  <div class="modal-body">
+    <center>
+    <img alt="" src="/img/loading.gif" id="img-load" />
+    <strong>{{ _('Filtering') }} ...</strong>
+    </center>
+  </div>
+</div>
 
 <script>
-
 (function($) {
+
+    // side facet list
+    $('#facet_list').affix({
+      offset: {
+        top: function () {
+          var $s = $('#search-box-main'),
+              h = $s.height(),
+              y = $s.offset()['top']
+          return $(window).width() <= 980 ? 165 : h }
+      , bottom: 170
+      }
+    })
+
   $('#overlay').modal({
       keyboard: false,
       backdrop: 'static'
   }).modal('hide');
 
-  $.facet = function(element, options) {
-
-    var wrap = function(a, p) {
-      if (a.length > 1) {
-        a[0] = p[0] + a[0];
-        a[a.length-1] = a[a.length-1] + p[1];
-      }
-      return a;
-    };
-
-    this.options = {};
-    element.data('facet', this);
-
-    this.init = function(element, options) {
-    /*
-     * Initialize facet plugin for `element`.
-     */
-      this.options = $.extend({}, $.fn.facet.defaultOptions, options);
-
-      var that = this,
-          filter = this.options.filter,
-          facets = this.options.facets,
-          split_by = this.options.split_by,
-          button_more = this.options.button_builder(this.options.title_more),
-          button_less = this.options.button_builder(this.options.title_less),
-          button_clear = this.options.clear_button_builder(this.options.title_clear),
-          row_builder = this.options.row_builder;
-
-      var $controls = $(this.options.controls_builder());
-      $controls.hide().appendTo(element);
-      $(this.options.control_button_builder(this.options.title_limit_to))
-        .addClass('btn-info').on('click', function() {
-          return that.updateFacets('+');
-        }).appendTo($controls);
-      $(this.options.control_button_builder(this.options.title_exclude))
-        .addClass('btn-danger').on('click', function() {
-          return that.updateFacets('-');
-        }).appendTo($controls);
-
-      for (var i in facets) {
-        var f = facets[i];
-
-        // Create selected facet filter.
-        $(this.options.filter_builder(f.facet, f.title)).hide().appendTo(filter);
-        // Create facet sidebar.
-        $(this.options.box_builder(f.facet, f.title)).hide().appendTo(element);
-        // Load sidebar options.
-        $.ajax({
-          url: f.url,
-          dataType : 'json',
-          context: $('.'+f.facet+' .accordion-inner').data('facet', f.facet)
-        }).done(function(json) {
-          var el = $(this),
-              name = el.data('facet');
-
-          /* Generate facet rows with checkboxes. */
-          $.each(json.facet, function(){
-            $(row_builder(this, name)).appendTo(el);
-          });
-
-          /* Append buttons */
-          var l = $(button_less),
-              m = $(button_more);
-          l.on('click', function(e) {
-            var controls = el.find('.controls:visible');
-            m.show();
-            if (controls.length > split_by) {
-              controls.slice(split_by).slice(-1-split_by).hide();
-            }
-            if (controls.length <= 2*split_by) {
-              l.hide();
-            }
-          }).appendTo(el);
-
-          m.on('click', function(e) {
-            var controls = el.find('.controls:not(:visible)').slice(0,split_by)
-            l.show();
-            if (controls.length < split_by) {
-              m.hide();
-            }
-            controls.show();
-          }).appendTo(el);
-
-          el.find('.controls:not(:visible)').slice(0,split_by).show();
-
-          l.hide();
-          if (json.facet.length <= split_by) {
-            m.hide();
-          }
-
-          element.trigger($.Event('loaded', {name:name, facet:json.facet}));
-
-          if (json.facet.length) {
-            $(this).parent().parent().show();
-            $(this).parent().addClass("in");
-            $controls.show();
-          }
-
-        }); // end ajax done
-      } // end for
-
-      // Filter clear button.
-      $(button_clear).on('click', $.proxy(this.clear, this)).appendTo(filter);
-
-      this.filter = {'+': {}, '-': {} };
-
-
-    }; // end init
-
-
-    this.queryString = function() {
-      var that = this,
-          limit = wrap($.map(this.filter['+'], function(k, v) {
-            var fields = $.map(k, function(i) {
-              return v+':'+ wrap(i.split(' '),'""').join(' ');
-            });
-            return wrap(fields,"()").join(' OR ');
-          }),"()").join(' AND '),
-          exclude = $.map(this.filter['-'], function(k, v) {
-            var fields = $.map(k, function(i) { return ' AND NOT '+v+':'+i });
-            return fields.join('');
-          }).join('');
-      return limit + exclude;
-    },
-
-    this.updateFacets = function(prefix) {
-      var that = this;
-      element.find('input:checked').each(function(i,el) {
-        that._addFacet(prefix, $(el).attr('name'), $(el).val());
-        $(el).attr('checked', false);
-      });
-      element.trigger($.Event('updated'));
-      return false;
-    };
-
-    this.rebuildFilter = function(filter) {
-      var that = this;
-      this._clear();
-      if ('+' in filter) {
-      $.each(filter['+'], function(k, vs) {
-        $.each(vs, function(i, v) {
-          that._addFacet('+', k, v);
-        });
-      });
-      }
-      if ('-' in filter) {
-      $.each(filter['-'], function(k, vs) {
-        $.each(vs, function(i, v) {
-          that._addFacet('-', k, v);
-        });
-      });
-      }
-      element.trigger($.Event('updated'));
-      return this;
-    }
-
-    this._addFacet = function(op, key, value) {
-      var that = this,
-          filter = $(this.options.filter),
-          add_label = true;
-
-      if (key in this.filter[op]) {
-        if ($.inArray(value, this.filter[op][key])>-1) {
-          add_label = false;
-        } else {
-          this.filter[op][key].push(value);
-        }
-      } else {
-        this.filter[op][key] = [value];
-      }
-
-      if (add_label) {
-
-        filter.find('.'+key).show().parent().show();
-        filter.find('.'+key+' span.data').append(
-          that.options.badge.clone().addClass(that.options.op_classes[op]).append(
-            that.options.close.clone().on('click', function(event) {
-              $(this).parent().remove();
-              that.delete(op, key, value);
-            })
-          ).append(value)
-        );
-      }
-    }
-
-    this.addFacet = function(op, key, value) {
-      this._addFacet(op, key, value);
-      element.trigger($.Event('updated'));
-    };
-
-
-    this._delete = function(op, key, value) {
-      var filter = $(this.options.filter),
-          r = this.filter[op][key],
-          i = $.inArray(value, r),
-          key_data = filter.find('.'+key),
-          data = key_data.find('span.data').children();
-
-      if (i>-1) {
-        this.filter[op][key].splice(i,1);
-        if (!this.filter[op][key].length) {
-          delete this.filter[op][key];
-        }
-      }
-      if (!data.length) {
-        key_data.hide();
-      }
-
-      if (filter.find('div.facets_fill:hidden').length === filter.find('div.facets_fill').length) {
-        filter.hide();
-      }
-    };
-
-    this.delete = function(op, key, value) {
-      this._delete(op, key, value);
-      element.trigger($.Event('updated'));
-    }
-
-    this._clear = function() {
-      var that = this,
-          filter = $(this.options.filter);
-      $.each(this.filter['+'], function(k, vs) {
-        filter.find('.'+k+' span.data').children().remove();
-        $.each(vs.slice(), function(i,v) {
-          that._delete('+', k, v);
-        });
-      });
-      $.each(this.filter['-'], function(k, vs) {
-        filter.find('.'+k+' span.data').children().remove();
-        $.each(vs.slice(), function(i,v) { that._delete('-', k, v); });
-      });
-      this.filter['+'] = {};
-      this.filter['-'] = {};
-      return this;
-    };
-
-    this.clear = function() {
-      this._clear()
-      element.trigger($.Event('updated'));
-      return this;
-    };
-
-    /* Finally init the plugin */
-    this.init(element, options);
-  };
-
-
-  $.fn.facet = function(options) {
-    //Using only one method off of $.fn
-    return this.each(function() {
-      (new $.facet($(this), options));
-    });
-  };
-
-
-  $.fn.facet.defaultOptions = {
-    controls_builder: function() {
-      return '<div class="btn-group" style="height: 28px; margin-bottom: 18px;"></div>';
-    },
-    control_button_builder: function(title) {
-      return '<button style="width:50%; height: 100%; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;" class="btn btn-mini" rel="tooltip" title="'+title+'">\
-        '+title+'\
-        </button>\
-        </div>';
-
-    },
-    box_builder: function(name, title) {
-      return '<div class="accordion-group">' +
-            '<div class="accordion-heading">' +
-              '<a class="accordion-toggle" data-toggle="collapse"' +
-                ' data-target=".accordion-body.' + name + '">' +
-                    title +
-                '</a>' +
-              '</div>' +
-              '<div class="' + name + ' accordion-body collapse">' +
-                '<div class="accordion-inner">' +
-                  '<!-- AJAX load -->' +
-                '</div>' +
-              '</div>' +
-            '</div>';
-    },
-    row_builder: function(data, name) {
-      return '<div class="controls" style="display:none;">'+
-              '<label class="checkbox">' +
-                '<input type="checkbox" name="'+ name +'" value="'+ data[0] +'">' +
-                data[(data.length==3)?2:0] + ' (' + data[1] + ')'+
-              '</label>' +
-            '</div>';
-    },
-    button_builder: function(title) {
-      return '<span class="btn btn-mini">'+title+'</span>';
-    },
-    clear_button_builder: function(title) {
-      return '<span class="pull-right btn btn-danger">'+title+'</span>';
-    },
-    filter_builder: function(name, title) {
-      return '<div style="margin-bottom: 2px;" class="\
-        ' + name + ' row facets_fill">\
-        <strong class="span1">' + title + ':</strong>\
-        <span class="data span6">\
-        </span>\
-        </div>';
-    },
-    badge: $('<span/>', {style: 'float:left; line-height: 18px; margin-right: 5px', 'class': 'badge'}),
-    close: $('<a/>', {'class': 'close', html:'&nbsp;×'}),
-    op_classes: {'+': 'badge-info', '-': 'badge-important'},
-    split_by: 5, // display by chunks of N elements
-    title_exclude: 'Exclude', // translationable title
-    title_limit_to: 'Limit to', // translationable title
-    title_clear: 'Clear', // translationable title
-    title_more: 'More', // translationable title
-    title_less: 'Less' // translationable title
-  };
-
-
-
   $('#facet_list').facet({
     controls_builder: function() { return ''; },
     control_button_builder: function(title) { return ''; },
-/*    row_builder: function(data, name) {
-      return '<div class="controls" style="margin-bottom: 3px; font-size: 80%; display:none;">'+
-                '<span class="btn-group"><span class="btn btn-info btn-mini" ' +
-    'onclick="$(\'#facet_list\').data(\'facet\').addFacet(\'+\',\'' +
-  name + '\',\'' + data[0] + '\');">+</span>' +
-                '<span class="btn btn-danger btn-mini" ' +
-    'onclick="$(\'#facet_list\').data(\'facet\').addFacet(\'-\',\'' +
-  name + '\',\'' + data[0] + '\');">-</span></span>&nbsp;' +
-                data[(data.length==3)?2:0] + ' (' + data[1] + ')'+
-            '<div style="clear:both;"></div></div>';
-    },
-*/  row_builder: function(data, name) {
+    row_builder: function(data, name) {
       var span_style =  'display: inline-block;' +
                         'white-space: nowrap;' +
                         'width: 50%;' +
@@ -500,36 +203,44 @@ $(document).ready(function () {
     },
     filter: $('#facet_filter'),
     facets: {{ facets|tojson|safe }},
-    title_clear: '{{ _('Clear') }} <i class="icon icon-ban-circle icon-white"></i>',
+    title_clear: '<i class="icon icon-ban-circle icon-white"></i> {{ _('Clear') }}',
     title_more: '<i class="icon icon-chevron-down"></i> {{ _('More') }}',
     title_less: '<i class="icon icon-chevron-up"></i> {{ _('Less') }}',
     title_exclude: '{{ _('Exclude') }}', // translationable title
     title_limit_to: '{{ _('Limit to') }}', // translationable title
   }).on('updated', function(event) {
     var p = $('#facet_filter input[name=p]').val();
-    $('#search-box-main input[name=p]').val(p+' '+$('#facet_list').data('facet').queryString());
+    $('#search-box-main input[name=p]')
+      .val(p+' '+$('#facet_list').data('facet').queryString());
 
-  var filter = JSON.stringify($('#facet_list').data('facet').filter);
-  if (filter != document.location.hash.substr(1)) {
-    if (filter != '{"+":{},"-":{}}') {
-      document.location.hash = filter;
-    } else {
-      document.location.hash = '';
-    }
-  }
-  $("#overlay").modal('show');
-  $.ajax('{{ url_for('.results', qid=qid) }}', {
-    type: 'POST',
-    data: $.extend( {},
-    {{ request.args.to_dict()|tojson|safe }}
-    ,{
-      'filter': filter
-    })
-  }).done(function(data) {
-    $('#search_results').html(data);
-    var hide = function() {$("#overlay").modal('hide')};
-    setTimeout(hide, 1000);
-  });
+      var filter = JSON.stringify($('#facet_list').data('facet').filter);
+      if (filter != document.location.hash.substr(1)) {
+        if (filter != '{"+":{},"-":{}}') {
+          document.location.hash = filter;
+        } else {
+          document.location.hash = '';
+        }
+      }
+
+      var showModal = true;
+      var modalShow= function() {
+        if (showModal) {
+          $("#overlay").modal('show');
+        }
+      };
+      setTimeout(modalShow, 100);
+      $.ajax('{{ url_for('.results', qid=qid) }}', {
+        type: 'POST',
+        data: $.extend( {},
+        {{ request.args.to_dict()|tojson|safe }}
+        ,{
+          'filter': filter
+        })
+      }).done(function(data) {
+        $('#search_results').html(data);
+        showModal = false;
+        $("#overlay").modal('hide');
+      });
 
   }).on('loaded', function(event) {
     var typeahead = $('form[name=search] input[name=p]').data('typeahead');
@@ -542,22 +253,33 @@ $(document).ready(function () {
         return i[0];
       });
 
-    $('#facet_list i.icon-filter').tooltip({'title':'{{ _('Limit to')}}'});
-    $('#facet_list i.icon-minus').tooltip({'title':'{{ _('Exclude')}}'});
+    $('#facet_list i.icon-filter').tooltip({
+      'title':'{{ _('Limit to')}}'
+    , 'placement': 'right'
+    });
+    $('#facet_list i.icon-minus').tooltip({
+      'title':'{{ _('Exclude')}}'
+    , 'placement': 'right'
+    });
 
+    $('#search_results').css('min-height', $('#facet_list').height())
+    $('#facet_list').affix('checkPosition');
+  }).on('exists', function(event) {
+    alert('{{ _('An item is already in the facet filter.') }}');
   });
 
+  // Enable tooltips.
   $('[rel=tooltip]').tooltip();
 
+  // Rebuild facet filter on hash change.
   $(window).bind('hashchange', function() {
-
     var hash_filter = jQuery.parseJSON(document.location.hash.substr(1));
     if (JSON.stringify($('#facet_list').data('facet').filter) != hash_filter) {
       $('#facet_list').data('facet').rebuildFilter(hash_filter || {});
     }
-
   });
 
+  // Trigger history change.
   if (document.location.hash.length > 2) {
     $(window).trigger('hashchange');
   }

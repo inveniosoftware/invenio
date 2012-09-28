@@ -29,7 +29,7 @@
       {%- endif -%}
     {%- endif -%}
 
-    <a href="/record/{{ recID }}">
+    <a href="{{ url_for('record.metadata', recid=recID) }}">
       {{ _("Detailed record") }}
     </a>
      -
@@ -53,7 +53,7 @@
     {%- set num_comments = rinfo.get_nb_comments() -%}
     {%- if num_comments -%}
      -
-    <a href="/record/{{ recID }}/comments">
+    <a href="{{ url_for('webcomment.comments', recid=recID) }}">
       {{ _("%i comments") % num_comments if num_comments > 1 else _("1 comment") }}
     </a>
     {%- endif -%}
@@ -64,7 +64,7 @@
     {%- set num_reviews = rinfo.get_nb_reviews() -%}
     {%- if num_reviews -%}
      -
-    <a href="/record/{{ recID }}/comments">
+    <a href="{{ url_for('webcomment.reviews', recid=recID) }}">
       {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
     </a>
     {%- endif -%}
@@ -143,17 +143,98 @@
 
 {% endmacro %}
 
+
+{% macro _search_simple_box(collection) %}
+  {% for f in easy_search_form if not f.name=='csrf_token' %}
+  <div class="control-group">
+    <label class="control-label">
+      {{ f.label.text }}
+    </label>
+    <div class="controls controls-row">
+      {{ f|safe }}
+    </div>
+  </div>
+  {% endfor %}
+{% endmacro %}
+
+
 {% macro _search_advanced_box(collection) %}
+
+  <div class="control-group">
+    <label class="control-label">
+      <strong>{{ _('what') }}:</strong>
+    </label>
+    <div class="controls">
+      <input type="text" name="p1" value="" class="span3"/>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">
+      <strong>{{ _('where') }}:</strong>
+    </label>
+    <div class="controls">
+    <select class="span2" name="f">
+      {% for code, name in collection.search_within.iteritems() %}
+      <option value="{{ code }}">
+        {{ name }}
+      </option>
+      {% endfor %}
+    </select>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">
+      <strong>{{ _('how') }}:</strong>
+    </label>
+    <div class="controls">
+      <select class="span2" name="m1">
+        {%- for k,v in config.CFG_WEBSEACH_MATCHING_TYPES.iteritems() -%}
+          <option value="{{ k }}">{{ _(v.title)|safe }}</option>
+        {%- endfor -%}
+      </select>
+    <span id="addtosearch" class="btn">
+      <i class="icon-ok"></i>
+    </span>
+    </div>
+  </div>
+
+  {% for id, soo in collection.search_options|groupby('id_field') %}
+  <hr/>
+  <div class="control-group">
+    <label class="control-label">{{ soo[0].field.name_ln }}</label>
+    <div class="controls">
+    <select class="span2" name="{{ soo[0].field.code }}">
+      <option value="">*** {{ _('select') }} ***</option>
+      {% for so in soo %}
+      <option value="{{ so.fieldvalue.value }}">
+        {{ so.fieldvalue.name }}
+      </option>
+      {% endfor %}
+    </select>
+    <span data-target="p" data-source="{{ soo[0].field.code }}" class="btn appender">
+      <i class="icon-ok"></i>
+    </span>
+    </div>
+  </div>
+  {% endfor %}
+
+{% endmacro %}
+
+{% macro search_box(collection) %}
   <div style="padding: 0px;" class="dropdown-menu donothide">
     <div class="row">
       <div class="span6" style="min-width: 400px;">
 
         <div class="modal-header">
           <button type="button" style="z-index:9999; position: relative;" class="close" onclick="$('.dropdown.open').removeClass('open')">×</button>
-          <label class="control-label">
-            <strong>{{ _('Add to search') }}</strong>
-          </label>
-          <div style="padding-top:4px;" class="controls btn-group" data-toggle="buttons-radio">
+          <div class="control" style="margin-bottom: 0px;">
+            <label class="control-label">
+              <strong>{{ _('Add to search') }}</strong>
+            </label>
+            <div class="controls">
+            <div style="padding-top:4px;" class="btn-group" data-toggle="buttons-radio">
               <label class="btn btn-mini active">
                 <input style="display:none;" type="radio" name="op1" value="a" checked/>{{ _('AND') }}
               </label>
@@ -164,63 +245,36 @@
                 <input style="display:none;" type="radio" name="op1" value="n"/>{{ _('AND NOT') }}
               </label>
             </div>
-
+            </div>
+          </div>
         </div><!-- end modal-header-->
 
-        <div class="modal-body">
+        <div style="max-height: 800px;" class="modal-body">
 
-          <div class="control-group">
-            <label style="padding-top:1px;" class="control-label">
-              <select style="width:100%;" name="m1">
-                {%- for k,v in config.CFG_WEBSEACH_MATCHING_TYPES.iteritems() -%}
-                  <option value="{{ k }}">{{ _(v.title)|safe }}</option>
-                {%- endfor -%}
-              </select>
-            </label>
-            <div class="controls">
-              <input type="text" name="p1" value="" class="span3"/>
-            </div>
-          </div>
+<div class="tab-content">
+  <div class="tab-pane active" id="simple-search">
+    {{ _search_simple_box(collection) }}
+  </div>
+  <div class="tab-pane" id="advanced-search">
+    {{ _search_advanced_box(collection) }}
+  </div>
+</div>
 
-          <div class="control-group">
-            <label class="control-label">{{ _('in') }}:</label>
-            <div class="controls">
-            <select class="span2" name="f">
-              {% for code, name in collection.search_within.iteritems() %}
-              <option value="{{ code }}">
-                {{ name }}
-              </option>
-              {% endfor %}
-            </select>
-            <span id="addtosearch" class="btn">
-              <i class="icon-ok"></i>
-            </span>
-            </div>
-          </div>
-
-          {% for id, soo in collection.search_options|groupby('id_field') %}
-          <hr/>
-          <div class="control-group">
-            <label class="control-label">{{ soo[0].field.name_ln }}</label>
-            <div class="controls">
-            <select class="span2" name="{{ soo[0].field.code }}">
-              <option value="">*** {{ _('select') }} ***</option>
-              {% for so in soo %}
-              <option value="{{ so.fieldvalue.value }}">
-                {{ so.fieldvalue.name }}
-              </option>
-              {% endfor %}
-            </select>
-            <span data-target="p" data-source="{{ soo[0].field.code }}" class="btn appender">
-              <i class="icon-ok"></i>
-            </span>
-            </div>
-          </div>
-          {% endfor %}
 
         </div><!-- end modal-body -->
 
         <div class="modal-footer">
+          <small><ul class="nav nav-pills nav-pill-gray pull-left" style="margin-bottom: 0px; text-align: left;">
+            <li class="active">
+              <a href="#simple-search" data-toggle="tab">simple</a>
+            </li>
+            <li>
+              <a href="#advanced-search" data-toggle="tab">advanced</a>
+            </li>
+          </ul></small>
+          <button name="action_browse" class="btn">
+            <i class="icon-list"></i> {{ _("Browse") }}
+          </button>
           <button name="action_search" type="submit" class="btn btn-primary">
             <i class="icon-search icon-white"></i> {{ _("Search") }}
           </button>
@@ -230,17 +284,21 @@
     </div><!-- end row -->
   </div><!-- end dropdown-menu -->
 
+<style>
+.nav.nav-pill-gray > .active > a,
+.nav.nav-pill-gray > li > a:hover {
+  background: none;
+  text-decoration: underline;
+  color: inherit;
+}
+</style>
 {% endmacro %}
 
 {% macro search_form(collection) %}
   <div id="search-box-main" class="row">
     <div class="span12">
       <div class="control-group well">
-        <form action="{{ url_for('.search') }}" name="search" method="get" class="form-horizontal" style="
-    width: 80%;
-    margin: 0px;
-    float: left;
-">
+        <form action="{{ url_for('.search') }}" name="search" method="get" class="pull-left form-horizontal" style="margin: 0px;">
           <label for="p" class="control-label">
             {%- set nbrecs = collection.nbrecs -%}
             {%- if not collection.nbrecs -%}
@@ -250,8 +308,19 @@
           </label>
           <div class="controls">
             <div id="searchdropdown" style="float: left;" class="dropdown">
+            {% set search_placeholder = _('Input query') %}
+            {% if collection.examples %}
+              {% set search_placeholder = (collection.examples|random).example.body %}
+            {% endif %}
               <div class="input-append">
-                <input autocomplete="off" data-provide="typeahead" data-items="4" name="p" class="span5" type="text" placeholder="{{ _("Input query") }}" value="{{ request.args.get('p', '') }}" autofocus/><!--
+                <input autocomplete="off"
+                  data-provide="typeahead"
+                  data-items="4"
+                  name="p"
+                  class="span5"
+                  type="text"
+                  placeholder="{{ _('Example') }}: {{ search_placeholder }}"
+                  value="{{ request.args.get('p', '') }}" autofocus/><!--
                 No space!
               --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn">
                   <i class="caret"></i>
@@ -262,7 +331,9 @@
  # This is a dirty hack for browser without Javascript support.
  #}
 <script>
-  var box = {{ _search_advanced_box(collection)|tojson|safe }};
+  var box = {{ search_box(collection)|tojson|safe }};
+  //var box = {{ _search_simple_box(collection)|tojson|safe }};
+  //var box = {{ _search_advanced_box(collection)|tojson|safe }};
   document.write(box);
 </script>
 
@@ -284,9 +355,8 @@
           </div><!-- end controls -->
         </form>
 
-        <form action="{{ url_for('.search') }}" name="settings" method="get" style="
-          margin: 0px;
-          " class="form-inline">
+        <form action="{{ url_for('.search') }}" name="settings" method="get"
+              style="margin: 0px;" class="pull-right form-inline">
           <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
 
 
@@ -295,12 +365,20 @@
             <i class="icon-cog"></i>
             <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu donothide">
-            <li style="width: 100%; float: left; padding: 3px 15px;">
-          <div class="control-group">
-            <label class="control-label">{{ _('View') }}</label>
-            <div class="controls">
-              <select name="rg" class="pull-right span2">
+          <ul class="dropdown-menu donothide clearfix"
+              style="min-width: 300px; padding-bottom: 0px;">
+            <li class="nav-header">{{ _('Search settings') }}</li>
+
+            <li class="divider"></li>
+            <li class="clearfix nav-list">
+
+          <div class="control-group clearfix">
+            <label class="control-label pull-left">{{ _('Display on page') }}</label>
+            <div class="controls pull-right">
+              <select
+                      name="rg"
+                      style="height: inherit; line-height: inherit;"
+                      class="btn-small span2">
               {%- for i in [10, 25, 50, 100, 250, 500] -%}
               {%- if i <= config.CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS -%}
                 <option value="{{ i }}"{{ ' selected' if request.args.get('rg',10)==i.__str__() }}>{{ i }} {{ _('results') }}</option>
@@ -309,37 +387,69 @@
               </select>
             </div>
           </div>
-          <div class="control-group">
-            <label class="control-label">{{ _('Action') }}</label>
-            <div class="controls">
-              <div class="btn-group" data-toggle="buttons-radio" onclick="return false;">
-              <label class="btn btn-small active">
-                <input style="display:none;" type="radio" name="actiona" value="search" checked="checked">
-                {{ _('Search') }}
-              </label>
-              <label class="btn btn-small">
-                <input style="display:none;" type="radio" name="actiona" value="browse" checked="">
-                {{ _('Browse') }}
-              </label>
-              </div>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label">{{ _('Output format') }}</label>
-            <div class="controls">
-              <select name="of" class="pull-right span2">
+
+
+          <div class="control-group clearfix">
+            <label class="control-label pull-left">{{ _('Output format') }}</label>
+            <div class="controls pull-right">
+              <select
+                      name="of"
+                      style="height: inherit; line-height: inherit;"
+                      class="btn-small span2">
               {%- for i in collection.formatoptions -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
               {%- endfor -%}
               </select>
             </div>
           </div>
+
+          <div class="clearfix">
+            <label class="control-label pull-left">{{ _('Sort by most') }}</label>
+            <div class="controls pull-right">
+            <div class="btn-group" data-toggle="buttons-radio">
+            {%- for (k,v,vv) in [('recent', 'rm', ''), ('cited', 'rm', 'citation'), ('relevant', 'rm', 'wrd')] -%}
+              <label class="btn btn-mini {{ 'active' if request.args.get(v,'') == vv}}">
+                <input style="display:none;"
+                  type="radio"
+                  name="{{ v }}"
+                  value="{{ vv }}"
+                  {{ 'checked="checked"' if request.args.get(v,'') == vv}}>
+                {{ _(k) }}
+              </label>
+            {%- endfor -%}
+            </div>
+            </div>
+          </div>
             </li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
+
             <li class="divider"></li>
-            <li style="padding: 0 15px 3px 15px;;">
-              <button class="btn">
+            <li class="clearfix nav-list">
+            <div class="control-group clearfix">
+              <label class="control-label pull-left">{{ _('Search form') }}</label>
+            <div class="controls pull-right">
+            <div class="btn-group" data-toggle="buttons-radio">
+            {%- for (k,v) in [(_('Simple'), 'simple'), (_('Advanced'), 'advanced')] -%}
+              {%- set active = v=='simple' -%}
+              <label class="btn btn-mini">
+                <input style="display:none;"
+                  type="radio"
+                  name="box"
+                  value="{{ v }}"
+                  {{ 'checked="checked"' if active}}>
+                {{ k }}
+              </label>
+            {%- endfor -%}
+            </div>
+            </div>
+            </div>
+            </li>
+
+            <li class="modal-footer nav-list clearfix">
+              <label class="checkbox pull-left">
+                <input type="checkbox" name="remember" value="1" checked="checked">
+                {{ _('remember settings') }}
+              </label>
+              <button class="btn btn-small pull-right">
                 <i class="icon-ok"></i> {{ _('Apply') }}
               </button>
             </li>
@@ -361,6 +471,13 @@
       $('.donothide').remove();
       return true; // ensure form still submits
     });
+
+    $('#settingsdropdown select').buttonSelect({
+      button: '<div class="btn btn-mini" />'
+    , span: '<span class="btn btn-mini" style="width: 80px;" />'
+    , next: '<i class="icon icon-chevron-right"></i>'
+    , prev: '<i class="icon icon-chevron-left"></i>'
+    })
 
     if (!("autofocus" in $("form[name=search] input[name=q]"))) {
       // ensure we get the focus always in search input
@@ -397,15 +514,74 @@
       return false;
     };
 
-    $('#addtosearch').on('click', addtosearch_callback);
-    $('[name=p1]').keypress(function(event) {
-      if ( event.which == 13 ) {
-        event.preventDefault();
-        addtosearch_callback(event);
+
+    function perform_easy_search() {
+        // get values
+        var p = $('[name=p]'),
+            val = p.val(),
+            op1 = $('[name=op1]:checked').val(),
+            op = (op1=='a' && val=="")?'':op1_fn[op1],
+            author = $('#author').val(),
+            title = $('#title').val(),
+            rn = $('#rn').val(),
+            aff = $('#aff').val()
+            cn = $('#cn').val(),
+            k = $('#k').val(),
+            //eprinttype = $('#eprint-type').val(),
+            //eprintnumber = $('#eprint-number').val(),
+            j = $('#journal-name').val(),
+            jvol = $('#journal-vol').val(),
+            jpage = $('#journal-page').val();
+
+        if (val !== "") {
+          val += ' ';
+        }
+        // filter and build
+        var query = [];
+        if (author !== '') { query.push('author:' + author); }
+        if (title !== '') { query.push('title:' + title); }
+        if (rn !== '') { query.push('reportnumber:' + rn); }
+        if (aff !== '') { query.push('affiliation:' + aff); }
+        if (cn !== '') { query.push('collaboration:' + cn); }
+        if (k !== '') { query.push('keyword:' + k); }
+        if (j !== '') { query.push('journal:' + j); }
+        if (jvol !== '') { query.push('909C4v:' + jvol); }
+        if (jpage !== '') { query.push('909C4c:' + jpage); }
+        //query = query.replace(/topcite (\d+)?\+/, 'topcite $1->99999');
+        //query = query.replace(' and ', ' ');
+        //query = query.replace(/ /g, '+');
+        //window.location = search_url;
+        if (query.length > 0) {
+          p.val(val+op+query.join(' '+op1_fn[op1]));
+        }
+    };
+
+    $('.donothide .btn-primary').on('click', function(e) {
+      if ($('.modal-footer li.active a').attr('href') === '#simple-search') {
+        perform_easy_search();
+      } else {
+        addtosearch_callback(e);
+        $('#searchdropdown .appender').trigger('click');
       }
     });
 
-    $('#searchdropdown .appender').on('click', function(e) {
+    $('form[name=search] button[name=action_browse]').on('click', function(e) {
+      $('form[name=search] button[name=action_search]')
+        .attr('name', 'action_browse');
+      $('.donothide .btn-primary').trigger('click');
+    });
+
+    $('#advanced-search #addtosearch').on('click', addtosearch_callback);
+    $('#advanced-search [name=p1]').keypress(function(event) {
+      if ( event.which == 13 ) {
+        if ($(this).val() !== '') {
+          event.preventDefault();
+          addtosearch_callback(event);
+        }
+      }
+    });
+
+    $('#searchdropdown #advanced-search .appender').on('click', function(e) {
         var op1 = $('[name=op1]:checked').val(),
             btn = $(this),
             source = $('[name='+btn.attr('data-source')+']'),
@@ -422,11 +598,6 @@
         }
         e.stopPropagation();
         return false;
-    });
-
-    $('#searchdropdown .btn-primary').on('click', function(e) {
-      addtosearch_callback(e);
-      $('#searchdropdown .appender').trigger('click');
     });
 
     $('html').on('click.dropdown', '.dropdown .donothide', function (e) {
@@ -447,7 +618,7 @@
 
     var sources = {
     {% for id, soo in collection.search_options|groupby('id_field') %}
-      '{{ soo[0].field.code }}:': [{% for so in soo %}
+      '{{ soo[0].field.code }}': [{% for so in soo %}
             '{{ so.fieldvalue.name }}' {{ ',' if not loop.last }}
             {% endfor %}
         ]{{ ',' if not loop.last }}
@@ -458,120 +629,56 @@
     source.push('{{ soo[0].field.code }}:');
     {% endfor %}
 
-    var orig = {
-      lookup: $.fn.typeahead.Constructor.prototype.lookup,
-      render: $.fn.typeahead.Constructor.prototype.render,
-      matcher:$.fn.typeahead.Constructor.prototype.matcher,
-      select:$.fn.typeahead.Constructor.prototype.select
-    };
-
-    $.extend($.fn.typeahead.Constructor.prototype, {
-      lookup: function(event) {
-        var query = this.$element.val(),
-        m = query.lastIndexOf(':'),
-        type = query.substr(0,m),
-        n = type.lastIndexOf(' ');
-        if (0<n && n<m) {
-          type = type.substr(n+1);
-        }
-        if (m>query.lastIndexOf(' ') && type in sources) {
-          this.options.type = 'data';
-          this.source = this.options.sources[type];
-        } else {
-          this.options.type = 'search';
-          this.source = source;
-        }
-        orig.lookup.call(this);
-      },
-      select: function() {
-        var val = this.$menu.find('.active').attr('data-value');
-
-        if (this.options.type == 'data') {
-        var m = this.query.lastIndexOf(':'),
-            newVal = this.$element.val().substr(0, m);
-        if (~m) {
-          newVal += ':"';
-        }
-        this.$element.val(newVal+val+'" ');
-        this.$element.change();
-        this.options.type = 'search';
-        return this.hide();
-        }
-
-        if (this.options.type == 'search') {
-        var m = this.query.lastIndexOf(' '),
-            im = (m<0)?0:m+1,
-            p = this.$element.val(),
-            op = ("+-|".indexOf(p[im])>-1)?p[im]:'',
-            newVal = p.substr(0, m);
-        if (~m) {
-          newVal += ' ';
-        }
-        this.$element.val(newVal+op+val);
-        this.$element.change();
-        return this.hide();
-        }
-
-        orig.select.call(this);
-        return this;
-      },
-
-      /*
-      render: function(items) {
-
-      if (this.options.type != 'email') {
-        orig.render.call(this, items);
-        return this;
-      }
-
-      var that = this,
-        text = this.query.replace(/@.*$/, ''),
-        val;
-
-      items = $(items).map(function(i, item) {
-        val = text + '@' + item;
-        i = $(that.options.item).attr('data-value', val);
-        i.find('a').html(that.highlighter(val));
-        return i[0];
-      });
-
-      items.first().addClass('active');
-      this.$menu.html(items);
-      return this;
-      },
-      */
-      matcher: function(item) {
-
-        if (this.options.type == 'data') {
-        var m = this.query.lastIndexOf(':'),
-          search;
-
-        search = this.query.substr(m + 1).toLowerCase();
-        return search.length && ~item.toLowerCase().indexOf(search);
-        }
-
-        if (this.options.type == 'search') {
-        var m = this.query.lastIndexOf(' '),
-          search;
-
-        search = this.query.substr(m + 1).toLowerCase();
-        offset = 0;
-        if (search.length && "+-|".indexOf(search[0]) > -1) {
-          offset = 1;
-        }
-        return search.length && ~item.toLowerCase().indexOf(search.substr(offset));
-        }
-
-        return orig.matcher.call(this, item);
-      }
-    });
+    sources['author'] = function(query) {
+            var typeahead = this
+            $.ajax({
+              type: 'GET',
+              url: '{{ url_for('search.list', field='exactauthor') }}',
+              data: $.param({
+                q: query.substr(query.lastIndexOf(':')+1)
+              }),
+              success: function(data) {
+                typeahead.process(data.results)
+              }
+            })
+          };
 
 
-    $('form[name=search] input[name=p]').typeahead({
+
+    $('form[name=search] input[name=p]').searchTypeahead({
       source: source,
       sources: sources,
       type: 'search'
     });
+
+    $('body').on(
+      'focus.typeahead.data-api',
+      '[data-provide="typeahead-url"]',
+      function (e) {
+        var $this = $(this)
+        if ($this.data('typeahead')) return
+        e.preventDefault()
+        var data_url = $this.data('source')
+        var options = {
+          source: function(query) {
+            var typeahead = this
+            $.ajax({
+              type: 'GET',
+              url: data_url,
+              data: $.param({
+                q: query
+              }),
+              success: function(data) {
+                typeahead.process(data.results)
+              }
+            })
+          }
+        }
+        var data = $.extend({}, $this.data(), options)
+        $this.typeahead(data)
+      }
+    );
+
 
   });
 
