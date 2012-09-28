@@ -406,13 +406,6 @@ def deserialize_via_marshal(astring):
     """Decompress and deserialize string into a Python object via marshal."""
     return marshal.loads(decompress(astring))
 
-try:
-    import psyco
-    psyco.bind(serialize_via_marshal)
-    psyco.bind(deserialize_via_marshal)
-except StandardError, e:
-    pass
-
 def wash_table_column_name(colname):
     """
     Evaluate table-column name to see if it is clean.

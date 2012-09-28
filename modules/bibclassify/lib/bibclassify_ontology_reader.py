@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,12 +33,6 @@ The main method from this module is get_regular_expressions.
 This module is standalone safe.
 
 """
-
-try:
-    import psyco
-    psyco.full()
-except:
-    pass
 
 from datetime import datetime, timedelta
 import cPickle

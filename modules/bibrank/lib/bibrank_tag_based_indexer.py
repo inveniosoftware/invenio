@@ -260,6 +260,7 @@ def del_recids(rank_method_code, range_rec):
                 if rec_dict.has_key(i):
                     del rec_dict[i]
         write_message("New size: %s" % len(rec_dict))
+        begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         intoDB(rec_dict, begin_date, rank_method_code)
     else:
         write_message("Create before deleting!")
@@ -327,16 +328,6 @@ def bibrank_engine(run):
     """Run the indexing task.
     Return 1 in case of success and 0 in case of failure.
     """
-
-    try:
-        import psyco
-        psyco.bind(single_tag_rank)
-        psyco.bind(single_tag_rank_method_exec)
-        psyco.bind(serialize_via_marshal)
-        psyco.bind(deserialize_via_marshal)
-    except StandardError, e:
-        pass
-
     startCreate = time.time()
     try:
         options["run"] = []

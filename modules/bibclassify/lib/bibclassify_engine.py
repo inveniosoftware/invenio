@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,12 +32,6 @@ code are left in this module.
 
 This module is STANDALONE safe
 """
-
-try:
-    import psyco
-    psyco.full()
-except:
-    pass
 
 import os
 import random
