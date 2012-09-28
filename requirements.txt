@@ -1,0 +1,13 @@
+# Invenio requirements.
+MySQL-python==1.2.3
+rdflib==2.4.2
+reportlab==2.5
+python-dateutil<=1.9999
+python-magic==0.4.2
+http://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz
+http://sourceforge.net/projects/numpy/files/NumPy/1.6.2/numpy-1.6.2.tar.gz
+ftp://xmlsoft.org/libxml2/python/libxml2-python-2.6.21.tar.gz
+ftp://xmlsoft.org/libxslt/python/libxml2-python-2.6.21.tar.gz
+mechanize==0.2.5
+python-Levenshtein==0.10.2
+pyPdf==1.13

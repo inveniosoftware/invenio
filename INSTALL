@@ -36,17 +36,16 @@ Contents
               python-4suite-xml python-simplejson python-xml \
               python-libxml2 python-libxslt1 gnuplot poppler-utils \
               gs-common clisp gettext libapache2-mod-wsgi unzip \
-              python-dateutil python-rdflib \
-              python-gnuplot python-magic pdftk html2text giflib-tools \
-              pstotext netpbm python-pypdf python-chardet python-lxml
-	      python-sqlalchemy python-sqlalchemy-ext \
-	      python-flask
+              pdftk html2text giflib-tools \
+              pstotext netpbm python-chardet
 
         You also need to install following packages from PyPi
 	by running:
 
-          $ sudo pip install fixture Flask-Assets Flask-Cache \
-	      Flask-SQLAlchemy Flask-Testing wtforms Flask-WTF
+          $ sudo pip install -r requirements.txt
+          $ sudo pip install -r requirements-extra.txt
+          $ sudo pip install -r requirements-flask.txt
+          $ sudo pip install -r requirements-flask-ext.txt
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
