@@ -183,7 +183,7 @@ class SimulatedModPythonRequest(object):
                 self.__replace_https = True
 
     def get_content_type(self):
-        return request.mimetype
+        return request.__mimetype
 
     def send_http_header(self):
         if not self.__response_sent_p:
@@ -193,6 +193,7 @@ class SimulatedModPythonRequest(object):
 
             ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
             #print self.__low_level_headers
+            self.__low_level_headers = [('Content-Type', request.__mimetype)]
             self.__write = self.__start_response(self.__status, self.__low_level_headers)
             self.__response_sent_p = True
             #print "Response sent: %s" % self.__headers
