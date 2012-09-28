@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -127,30 +127,6 @@ except ImportError, msg:
     )
 
 ## 3) check for recommended modules:
-try:
-    if (2**31 - 1) == sys.maxint:
-        # check for Psyco since we seem to run in 32-bit environment
-        import psyco
-    else:
-        # no need to advise on Psyco on 64-bit systems
-        pass
-except ImportError, msg:
-    warning_messages.append("""
-    *****************************************************
-    ** IMPORT WARNING %s
-    *****************************************************
-    ** Note that Psyco is not really required but we   **
-    ** recommend it for faster Invenio operation       **
-    ** if you are running in 32-bit operating system.  **
-    **                                                 **
-    ** You can safely continue installing Invenio      **
-    ** now, and add this module anytime later.  (I.e.  **
-    ** even after your Invenio installation is put     **
-    ** into production.)                               **
-    *****************************************************
-    """ % msg
-    )
-
 try:
     import rdflib
 except ImportError, msg:
@@ -492,5 +468,3 @@ elif warning_messages:
     the installation now and solve these issues later, if you wish.
     """ % {'n_wrn': len(warning_messages)}
     wait_for_user("Press ENTER to continue the installation...")
-
-

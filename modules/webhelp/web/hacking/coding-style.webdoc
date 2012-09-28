@@ -79,8 +79,7 @@ pylint: disable=C0301''.)</p>
 <p>Do not forget to run pychecker on your code either.  It is another
 source code checker that catches some situations better and some
 situations worse than pylint.  If you develop in Emacs, run C-c C-w
-(M-x py-pychecker-run RET) on your buffers frequently.  (Note that
-using psyco on classes may lead to false pychecker warnings.)</p>
+(M-x py-pychecker-run RET) on your buffers frequently.</p>
 
 <p>You can check the kwalitee of your code by running ``python
 modules/miscutil/lib/kwalitee.py --check-all *.py'' on your files.

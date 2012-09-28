@@ -43,10 +43,9 @@ Contents
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
 
-          $ sudo aptitude install python-psyco sbcl cmucl \
-              pylint pychecker pyflakes python-profiler python-epydoc \
-              libapache2-mod-xsendfile openoffice.org python-utidylib \
-              python-beautifulsoup
+          $ sudo aptitude install sbcl cmucl pylint pychecker pyflakes \
+              python-profiler python-epydoc libapache2-mod-xsendfile \
+              openoffice.org python-utidylib python-beautifulsoup
 
         Moreover, you should install some Message Transfer Agent (MTA)
         such as Postfix so that Invenio can email notification
@@ -124,8 +123,6 @@ Contents
              <http://4suite.org/>
           - (optional) feedparser, for web journal creation:
              <http://feedparser.org/>
-          - (optional) Psyco, if you are running on a 32-bit OS:
-             <http://psyco.sourceforge.net/>
           - (optional) RDFLib, to use RDF ontologies and thesauri:
              <http://rdflib.net/>
           - (optional) mechanize, to run regression web test suite:
