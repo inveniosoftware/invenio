@@ -1421,8 +1421,8 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         """websearch - record belongs to different restricted collections with different rights, search from a not dad collection"""
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Multimedia+%26+Arts&sc=1&p=recid%3A105&f=&action_search=Search&c=Pictures&c=Poetry&c=Atlantis+Times',
                                                username='admin',
-                                               expected_text=['No match found in collection', '3 hits'],
-                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A105&sc=1')
+                                               expected_text='No match found in collection',
+                                               expected_link_label='3 hits')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1467,8 +1467,8 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=recid%3A98&f=&action_search=Search&c=Books&c=Reports',
                                                username='admin',
                                                password='',
-                                               expected_text=['No match found in collection <em>Books, Reports, Theses</em>', '2 hits'],
-                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A98&sc=1')
+                                               expected_text='No match found in collection <em>Books, Reports, Theses</em>',
+                                               expected_link_label='2 hits')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1477,8 +1477,8 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=recid%3A98&f=&action_search=Search&c=Books&c=Reports',
                                                username='hyde',
                                                password='h123yde',
-                                               expected_text=['No match found in collection <em>Books, Reports</em>', '1 hits'],
-                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A98&sc=1')
+                                               expected_text='No match found in collection <em>Books, Reports</em>',
+                                               expected_link_label='1 hits')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1524,8 +1524,8 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=CERN+Divisions&sc=1&p=recid%3A106&f=&action_search=Search&c=Experimental+Physics+(EP)&c=Theoretical+Physics+(TH)',
                                                username='admin',
                                                password='',
-                                               expected_text=['No match found in collection <em>Experimental Physics (EP), Theoretical Physics (TH)</em>.', '1 hits'],
-                                               expected_link_target=CFG_SITE_SECURE_URL+'/search?ln=en&p=recid%3A106&sc=1')
+                                               expected_text='No match found in collection <em>Experimental Physics (EP), Theoretical Physics (TH)</em>.',
+                                               expected_link_label='1 hits')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
