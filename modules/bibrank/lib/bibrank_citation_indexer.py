@@ -676,16 +676,13 @@ def ref_analyzer(citation_informations, dicts,
                 remove_from_missing(refnumber)
 
             if len(recids) > 1:
+                store_citation_warning('multiple-matches', refnumber)
                 msg = "Whoops: record '%d' report number value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, refnumber, repr(recids))
                 write_message(msg, stream=sys.stderr)
-                try:
-                    raise ValueError(msg)
-                except ValueError:
-                    register_exception(alert_admin=True)
 
-            for recid in list(recids)[:1]: # take only the first one
+            for recid in list(recids)[:1]:  # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
@@ -709,14 +706,11 @@ def ref_analyzer(citation_informations, dicts,
 
             # check reference value to see whether it is well formed:
             if not re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK.match(p):
+                store_citation_warning('not-well-formed', p)
                 msg = "Whoops, record '%d' reference value '%s' " \
                       "is not well formed; skipping it." % (thisrecid, p)
                 write_message(msg, stream=sys.stderr)
-                try:
-                    raise ValueError(msg)
-                except ValueError:
-                    register_exception(alert_admin=True)
-                continue # skip this ill-formed value
+                continue  # skip this ill-formed value
 
             recids = search_unit(p, field) - INTBITSET_OF_DELETED_RECORDS
             write_message("These match searching %s in %s: %s" \
@@ -728,16 +722,13 @@ def ref_analyzer(citation_informations, dicts,
                 remove_from_missing(p)
 
             if len(recids) > 1:
+                store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' reference value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, p, repr(recids))
                 write_message(msg, stream=sys.stderr)
-                try:
-                    raise ValueError(msg)
-                except ValueError:
-                    register_exception(alert_admin=True)
 
-            for recid in list(recids)[:1]: # take only the first one
+            for recid in list(recids)[:1]:  # take only the first one
                 add_to_dicts(thisrecid, recid)
 
     mesg = "done fully"
@@ -768,14 +759,11 @@ def ref_analyzer(citation_informations, dicts,
                 remove_from_missing(p)
 
             if len(recids) > 1:
+                store_citation_warning('multiple-matches', p)
                 msg = "Whoops: record '%d' DOI value '%s' " \
                       "matches many records; taking only the first one. %s" % \
                       (thisrecid, p, repr(recids))
                 write_message(msg, stream=sys.stderr)
-                try:
-                    raise ValueError(msg)
-                except ValueError:
-                    register_exception(alert_admin=True)
 
             for recid in list(recids)[:1]: # take only the first one
                 add_to_dicts(thisrecid, recid)
@@ -1028,3 +1016,12 @@ def tagify(parsedtag):
             t = '_'
         tag += t
     return tag
+
+
+def store_citation_warning(warning_type, cit_info):
+    r = run_sql("""SELECT 1 FROM rnkCITATIONDATAERR
+                   WHERE type = %s
+                   AND citinfo = %s""", (warning_type, cit_info))
+    if not r:
+        run_sql("""INSERT INTO rnkCITATIONDATAERR (type, citinfo)
+                   VALUES (%s, %s)""", (warning_type, cit_info))
