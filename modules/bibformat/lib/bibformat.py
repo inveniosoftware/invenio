@@ -458,17 +458,18 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
 # Utility functions
 ##
 
-def get_output_format_content_type(of):
+def get_output_format_content_type(of, default_content_type="text/html"):
     """
     Returns the content type (for example 'text/html' or 'application/ms-excel') \
     of the given output format.
 
     @param of: the code of output format for which we want to get the content type
+    @param default_content_type: default content-type when content-type was not set up
     """
     content_type = bibformat_dblayer.get_output_format_content_type(of)
 
     if content_type == '':
-        content_type = 'text/html'
+        content_type = default_content_type
 
     return content_type
 
