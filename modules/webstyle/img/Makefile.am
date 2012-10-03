@@ -58,6 +58,7 @@ img_DATA = add-small.png \
            balloon_left_shadow.png \
            balloon_top_left_shadow.png \
            balloon_top_shadow.png \
+           bibedit_extract_url.png \
            bibedit_tableview.png \
            bibedit_textmarc.png \
            blankicon.gif \

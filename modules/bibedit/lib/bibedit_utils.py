@@ -75,7 +75,8 @@ from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_engine import acc_authorize_action
 from invenio.refextract_api import extract_references_from_record_xml, \
-                                   extract_references_from_string_xml
+                                   extract_references_from_string_xml, \
+                                   extract_references_from_url_xml
 from invenio.textmarc2xmlmarc import transform_file, ParseError
 
 # Precompile regexp:
@@ -731,7 +732,7 @@ def merge_record_with_template(rec, template_name):
 
 #################### Reference extraction ####################
 
-def replace_references(recid, txt=None, inspire=CFG_INSPIRE_SITE, uid=None):
+def replace_references(recid, uid=None, txt=None, url=None):
     """Replace references for a record
 
     The record itself is not updated, the marc xml of the document with updated
@@ -743,26 +744,33 @@ def replace_references(recid, txt=None, inspire=CFG_INSPIRE_SITE, uid=None):
     * inspire: format of ther references
     """
     # Parse references
-    if not txt:
-        references_xml = extract_references_from_record_xml(recid, inspire=inspire)
+    if txt is not None:
+        references_xml = extract_references_from_string_xml(txt, is_only_references=True)
+    elif url is not None:
+        references_xml = extract_references_from_url_xml(url)
     else:
-        references_xml = extract_references_from_string_xml(txt, inspire=inspire)
+        references_xml = extract_references_from_record_xml(recid)
     references = create_record(references_xml.encode('utf-8'))
 
     dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+    out_xml = None
 
-    if references[0]:
-        fields_to_add = record_get_field_instances(references[0],
+    references_to_add = record_get_field_instances(references[0],
                                                    tag='999',
-                                                   ind1='%',
-                                                   ind2='%')
+                                                   ind1='C',
+                                                   ind2='5')
+    refextract_status = record_get_field_instances(references[0],
+                                                   tag='999',
+                                                   ind1='C',
+                                                   ind2='6')
+
+    if references_to_add:
         # Replace 999 fields
         record_delete_fields(record, '999')
-        record_add_fields(record, '999', fields_to_add)
+        record_add_fields(record, '999', references_to_add)
+        record_add_fields(record, '999', refextract_status)
         # Update record references
         out_xml = record_xml_output(record)
-    else:
-        out_xml = None
 
     return out_xml
 
@@ -784,6 +792,7 @@ def record_is_conference(record):
     if "CONFERENCES" in tag_980_content:
         return True
     return False
+
 
 def add_record_cnum(recid, uid):
     """
@@ -824,6 +833,7 @@ def add_record_cnum(recid, uid):
                                    deactivated_hp_changes, \
                                    undo_list, redo_list)
         return new_cnum
+
 
 def get_xml_from_textmarc(recid, textmarc_record):
     """

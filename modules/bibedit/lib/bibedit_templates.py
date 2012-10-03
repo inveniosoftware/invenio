@@ -514,8 +514,18 @@ def page_style():
                   * - Dialog refextract
                   */
 
+                #input_extract_url {
+                    position: absolute;
+                    width: 410px;
+                    top: 45px;
+                }
+
                 .dialog-box-centered {
                     margin-top: 300px;
+                    text-align: center;
+                }
+
+                .dialog-box-centered-no-margin {
                     text-align: center;
                 }
 

@@ -239,7 +239,7 @@ def perform_request_init(uid, ln, req, lastupdated):
             "</script>\n"
     # Add scripts (the ordering is NOT irrelevant).
     scripts = ['jquery-ui.min.js',  'jquery.jeditable.mini.js', 'jquery.hotkeys.js',
-               'json2.js', 'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
+               'json2.js', 'bibedit_refextract.js', 'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
                'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
                'bibedit_clipboard.js']
 
@@ -406,6 +406,8 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         if data.has_key('txt'):
             txt = data["txt"]
         response.update(perform_request_ref_extract(recid, uid, txt))
+    elif request_type in ('refextracturl', ):
+        response.update(perform_request_ref_extract_url(recid, uid, data['url']))
     elif request_type == 'getTextMarc':
         response.update(perform_request_get_textmarc(recid, uid))
     elif request_type == "getTableView":
@@ -1251,6 +1253,94 @@ def perform_request_bibcatalog(request_type, recid, uid):
         response['resultCode'] = 31
     return response
 
+
+def _add_curated_references_to_record(recid, uid, bibrec):
+    """
+    Adds references from the cache that have been curated (contain $$9CURATOR)
+    to the bibrecord object
+
+    @param recid: record id, used to retrieve cache
+    @param uid: id of the current user, used to retrieve cache
+    @param bibrec: bibrecord object to add references to
+    """
+    dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+    for field_instance in record_get_field_instances(record, "999", "C", "5"):
+        for subfield_instance in field_instance[0]:
+            if subfield_instance[0] == '9' and subfield_instance[1] == 'CURATOR':
+                # Add reference field on top of references, removing first $$o
+                field_instance = ([subfield for subfield in field_instance[0]
+                                   if subfield[0] != 'o'], field_instance[1],
+                                   field_instance[2], field_instance[3],
+                                   field_instance[4])
+                record_add_fields(bibrec, '999', [field_instance],
+                                  field_position_local=0)
+
+
+def _xml_to_textmarc_references(bibrec):
+    """
+    Convert XML record to textmarc and return the lines related to references
+
+    @param bibrec: bibrecord object to be converted
+
+    @return: textmarc lines with references
+    @rtype: string
+    """
+    sysno = ""
+
+    options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
+               "delete-mode":0, "insert-mode":0, "replace-mode":0,
+               "text-marc":1}
+
+    # Using deepcopy as function create_marc_record() modifies the record passed
+    textmarc_references = [ line.strip() for line
+        in xmlmarc2textmarc.create_marc_record(copy.deepcopy(bibrec),
+            sysno, options).split('\n')
+        if '999C5' in line ]
+
+    return textmarc_references
+
+
+def perform_request_ref_extract_url(recid, uid, url):
+    """
+    Making use of the refextractor API, extract references from the url
+    received from the client
+
+    @param recid: opened record id
+    @param uid: active user id
+    @param url: URL to extract references from
+
+    @return response to be returned to the client code
+    """
+    response = {}
+    try:
+        recordExtended = replace_references(recid, uid, url=url)
+    except FullTextNotAvailable:
+        response['ref_xmlrecord'] = False
+        response['ref_msg'] = "File not found. Server returned code 404"
+        return response
+    except:
+        response['ref_xmlrecord'] = False
+        response['ref_msg'] = """Error while fetching PDF. Bad URL or file could
+                                 not be retrieved """
+        return response
+
+    if not recordExtended:
+        response['ref_msg'] = """No references were found in the given PDF """
+        return response
+
+    ref_bibrecord = create_record(recordExtended)[0]
+    _add_curated_references_to_record(recid, uid, ref_bibrecord)
+
+    response['ref_bibrecord'] = ref_bibrecord
+    response['ref_xmlrecord'] = record_xml_output(ref_bibrecord)
+
+    textmarc_references = _xml_to_textmarc_references(ref_bibrecord)
+
+    response['ref_textmarc'] = '<div class="refextracted">' + '<br />'.join(textmarc_references) + "</div>"
+
+    return response
+
+
 def perform_request_ref_extract(recid, uid, txt=None):
     """ Handle request to extract references in the given record
 
@@ -1264,49 +1354,54 @@ def perform_request_ref_extract(recid, uid, txt=None):
     @return: xml record with references extracted
     @rtype: dictionary
     """
-    sysno = ""
 
-    options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
-               "delete-mode":0, "insert-mode":0, "replace-mode":0,
-               "text-marc":1}
+    text_no_references_found_msg = """ No references extracted. The automatic
+                            extraction did not recognize any reference in the
+                            pasted text.<br /><br />If you want to add the references
+                            manually, an easily recognizable format is:<br/><br/>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[1] Phys. Rev A71 (2005) 42<br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;[2] ATLAS-CMS-2007-333
+                            """
+
+    pdf_no_references_found_msg = """ No references were found in the attached
+                                    PDF.
+                                  """
 
     response = {}
+    response['ref_xmlrecord'] = False
+    recordExtended = None
     try:
         if txt:
-            recordExtended = replace_references(recid, txt.decode('utf-8'), uid=uid)
+            recordExtended = replace_references(recid, uid,
+                                                txt=txt.decode('utf-8'))
+            if not recordExtended:
+                response['ref_msg'] = text_no_references_found_msg
         else:
-            recordExtended = replace_references(recid, uid=uid)
-    except (FullTextNotAvailable, KeyError):
-        response['ref_xmlrecord'] = False
+            recordExtended = replace_references(recid, uid)
+            if not recordExtended:
+                response['ref_msg'] = pdf_no_references_found_msg
+    except FullTextNotAvailable:
+        response['ref_msg'] = """ The fulltext is not available.
+                              """
+    except:
+        response['ref_msg'] = """ An error ocurred while extracting references.
+                              """
+
+    if not recordExtended:
         return response
 
     ref_bibrecord = create_record(recordExtended)[0]
 
-    # 1) Retrieve record from cache
-    # 2) Add 999C5 from cache to ref_bibrecord if $$9 CURATOR
-    dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
-    for field_instance in record_get_field_instances(record, "999", "C", "5"):
-        for subfield_instance in field_instance[0]:
-            if subfield_instance[0] == '9' and subfield_instance[1] == 'CURATOR':
-                # Add reference field on top of references, removing first $$o
-                field_instance = ([subfield for subfield in field_instance[0]
-                                   if subfield[0] != 'o'], field_instance[1],
-                                   field_instance[2], field_instance[3],
-                                   field_instance[4])
-                record_add_fields(ref_bibrecord, '999', [field_instance],
-                                  field_position_local=0)
+    _add_curated_references_to_record(recid, uid, ref_bibrecord)
 
     response['ref_bibrecord'] = ref_bibrecord
     response['ref_xmlrecord'] = record_xml_output(ref_bibrecord)
 
-    # Using deepcopy as function create_marc_record() modifies the record passed
-    textmarc_references = [ line.strip() for line
-        in xmlmarc2textmarc.create_marc_record(copy.deepcopy(ref_bibrecord),
-            sysno, options).split('\n')
-        if '999C5' in line ]
+    textmarc_references = _xml_to_textmarc_references(ref_bibrecord)
     response['ref_textmarc'] = '<div class="refextracted">' + '<br />'.join(textmarc_references) + "</div>"
 
     return response
+
 
 def perform_request_preview_record(request_type, recid, uid, data):
     """ Handle request to preview record with formatting
@@ -1480,6 +1575,7 @@ def perform_request_init_template_interface():
 
     return body, errors, warnings
 
+
 def perform_request_ajax_template_interface(data):
     """Handle Ajax requests by redirecting to appropriate function."""
     response = {}
@@ -1490,6 +1586,7 @@ def perform_request_ajax_template_interface(data):
         response.update(perform_request_edit_template(data))
 
     return response
+
 
 def perform_request_edit_template(data):
     """ Handle request to edit a template """

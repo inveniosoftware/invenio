@@ -626,10 +626,13 @@ function getToolbarButtonSet() {
         'Run reference extractor on this record': ['img_run_refextract',
                                                    '/img/ref_extract.png',
                                                    'left', true,
-                                                   onRefExtractClick],
+                                                   refextract.onRefExtractClick],
         'Extract references from text': ['img_extract_free_text',
                                          '/img/edit-paste.png', 'left',
-                                         false, onRefExtractFreeTextClick]
+                                         false, refextract.onRefExtractFreeTextClick],
+        'Extract references from URL': ['img_extract_ref_url',
+                                         '/img/bibedit_extract_url.png', 'left',
+                                         false, refextract.onRefExtractURLClick]
     };
 
     return toolbar_button_set;
