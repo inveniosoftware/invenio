@@ -354,7 +354,7 @@ def create_invenio_flask_app():
             candidate = getattr(plugin_code, 'blueprint')
             if isinstance(candidate, InvenioBlueprint):
                 return candidate
-        raise ValueError('%s is not a valid external authentication plugin' % plugin_name)
+        raise ValueError('%s is not a valid blueprint plugin' % plugin_name)
 
 
 ## Let's load all the blueprints that are composing this Invenio instance
