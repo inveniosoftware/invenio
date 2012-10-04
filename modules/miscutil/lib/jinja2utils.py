@@ -20,6 +20,7 @@ from jinja2 import nodes
 from jinja2.ext import Extension
 from flask import current_app
 from flask.ext.assets import Environment, Bundle
+from flask import _request_ctx_stack
 
 ENV_PREFIX = '_collected_'
 
@@ -116,7 +117,7 @@ class CollectionExtension(Extension):
             values.append(value)
         except:
             values = [value]
-        current_app.logger.info(values)
+        #current_app.logger.info(values)
         setattr(self.environment, ENV_PREFIX+tag, values)
         return ''
         #return values
@@ -134,7 +135,7 @@ class CollectionExtension(Extension):
         tag = parser.stream.current.value
         lineno = next(parser.stream).lineno
         value = parser.parse_tuple()
-        current_app.logger.info("%s: Collecting %s (%s)" % (parser.name, tag, value))
+        #current_app.logger.info("%s: Collecting %s (%s)" % (parser.name, tag, value))
 
         # Return html tag with link to corresponding script file.
         if self.environment.use_bundle is False:
@@ -152,3 +153,24 @@ class CollectionExtension(Extension):
                 lineno=lineno),
             [], [], '')
 
+
+def render_template_to_string(input, _from_string=False, **context):
+    """Renders a template from the template folder with the given
+    context and return the.
+
+    :param input: the string template, or name of the template to be
+                  rendered, or an iterable with template names
+                  the first one existing will be rendered
+    :param context: the variables that should be available in the
+                    context of the template.
+
+    :note: code based on
+    [https://github.com/mitsuhiko/flask/blob/master/flask/templating.py]
+    """
+    ctx = _request_ctx_stack.top
+    ctx.app.update_template_context(context)
+    if _from_string:
+        template = ctx.app.jinja_env.from_string(input)
+    else:
+        template = ctx.app.jinja_env.get_or_select_template(input)
+    return template.render(context)

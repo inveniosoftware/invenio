@@ -17,6 +17,8 @@
 
 templatesdir = $(sysconfdir)/templates
 templates_DATA = webgroup_index.html \
+		 webaccount_display.html \
+		 webaccount_edit.html \
 		 webaccount_login.html \
 		 webaccount_logout.html
 

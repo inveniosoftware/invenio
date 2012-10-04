@@ -20,6 +20,7 @@
 """WebAccount Forms"""
 
 from invenio.webinterface_handler_flask_utils import _
+from invenio.wtforms_utils import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
 from flask.ext.wtf import Form, SubmitField, BooleanField, TextField, \
                          TextAreaField, PasswordField, Required, \
                          HiddenField,  validators
@@ -53,3 +54,8 @@ class LoginForm(Form):
     remember = BooleanField(_("Remember Me"))
     referer = HiddenField()
     submit = SubmitField(_("Sing in"))
+
+
+class ChangeUserEmailSettingsForm(InvenioBaseForm):
+    email = TextField(_("New email"))
+

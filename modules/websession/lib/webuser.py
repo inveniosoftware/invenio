@@ -228,6 +228,10 @@ def getUid(req):
         else:
             return -1
 
+
+from invenio.webuser_flask import current_user
+getUid = lambda req: current_user.get_id()
+
 def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
     """
@@ -1175,6 +1179,9 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_usepaperattribution' : False,
         'precached_canseehiddenmarctags' : False,
     }
+
+    from invenio.webuser_flask import current_user
+    return current_user._get_current_object()
 
     try:
         is_req = False

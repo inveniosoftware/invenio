@@ -60,6 +60,7 @@ pylib_DATA = __init__.py \
              intbitset_helper.py \
              inveniocfg.py \
              inveniocfg_unit_tests.py \
+	     settings.py \
              shellutils.py \
              shellutils_unit_tests.py \
              sqlalchemyutils.py \

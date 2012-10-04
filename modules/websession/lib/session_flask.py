@@ -38,8 +38,7 @@ from warnings import warn
 from invenio.sqlalchemyutils import db
 from invenio.webuser_flask import current_user
 from invenio.config import \
-    CFG_SITE_SECURE_URL, \
-    CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
+    CFG_SITE_SECURE_URL
 
 __all__ = ["InvenioSession", "InvenioSessionInterface"]
 
@@ -47,7 +46,7 @@ __all__ = ["InvenioSession", "InvenioSessionInterface"]
 CFG_SUPPORT_HTTPS = False ## FIXME: add support for redirecting to HTTPS
 
 # Store session information in memory cache (Redis, Memcache, ...).
-CFG_SESSION_USE_CACHE = True
+CFG_SESSION_USE_CACHE = False
 # Session key prefix for storing in db.
 CFG_SESSION_KEY_PREFIX = 'session::'
 
@@ -64,7 +63,7 @@ class InvenioSession(dict, SessionMixin):
         SessionMixin.__init__(self)
         self.sid = sid
         self.logging_in = False
-        current_app.logger.info("initializing session with sid=%s" % sid)
+        #current_app.logger.info("initializing session with sid=%s" % sid)
 
     def need_https(self):
         """
@@ -109,7 +108,7 @@ class InvenioSession(dict, SessionMixin):
         that was used to create it.
         """
         remote_ip = request.remote_addr
-        current_app.logger.info("checking session IP against %s" % remote_ip)
+        #current_app.logger.info("checking session IP against %s" % remote_ip)
 
         if '_https_ip' not in self:
             self['_https_ip'] = remote_ip
@@ -135,18 +134,18 @@ class InvenioSession(dict, SessionMixin):
         return self.get('_uid', -1)
 
     def _set_uid(self, uid):
-        current_app.logger.info("setting uid to %s" % uid)
+        #current_app.logger.info("setting uid to %s" % uid)
         if self.get('_uid') != uid:
-            current_app.logger.info("detected logging in...")
+            #current_app.logger.info("detected logging in...")
             self.logging_in = True
         self['_uid'] = uid
 
     def _get_user_info(self):
         if 'user_info' in self and not self.logging_in:
-            current_app.logger.info("accessing user_info")
+            #current_app.logger.info("accessing user_info")
             return self['user_info']
 
-        current_app.logger.info("reloading user_info")
+        #current_app.logger.info("reloading user_info")
         current_user.reload()
         self.logging_in = False
         return self['user_info']
@@ -170,7 +169,7 @@ class InvenioSessionInterface(SessionInterface):
 
     def generate_sid(self):
         sid = uuid4().hex
-        current_app.logger.info("generating new session id: %s" % sid)
+        #current_app.logger.info("generating new session id: %s" % sid)
         return sid
 
     def get_session_expiration_time(self, app, session):
@@ -181,11 +180,11 @@ class InvenioSessionInterface(SessionInterface):
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name) or \
               request.args.get('session_id')
-        current_app.logger.info("opening session %s" % sid)
+        #current_app.logger.info("opening session %s" % sid)
         if not sid:
             sid = self.generate_sid()
             return self.session_class(sid=sid)
-        current_app.logger.info("loading session data sid: %s" % sid)
+        #current_app.logger.info("loading session data sid: %s" % sid)
         try:
             if CFG_SESSION_USE_CACHE:
                 data = self.serializer.loads(cache.get(CFG_SESSION_KEY_PREFIX+sid))
@@ -213,11 +212,11 @@ class InvenioSessionInterface(SessionInterface):
         return self.session_class(sid=sid)
 
     def save_session(self, app, session, response):
-        current_app.logger.info("saving session %s" % session.sid)
+        #current_app.logger.info("saving session %s" % session.sid)
         domain = self.get_cookie_domain(app)
         from invenio.websession_model import Session
         if not session:
-            current_app.logger.info("empty session detected. Deleting it")
+            #current_app.logger.info("empty session detected. Deleting it")
             response.delete_cookie(app.session_cookie_name,
                                     domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',
@@ -236,7 +235,6 @@ class InvenioSessionInterface(SessionInterface):
             current_app.logger.info("detected logging in. generating new sid")
             sid = self.generate_sid()
             ## And remove the cookie that has been set
-            current_app.logger.info("... and delete previous one")
             session.delete(clear=False)
             response.delete_cookie(app.session_cookie_name, domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',

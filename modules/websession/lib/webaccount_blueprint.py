@@ -73,3 +73,66 @@ def logout():
                             using_sso = CFG_EXTERNAL_AUTH_USING_SSO,
                             logout_sso = CFG_EXTERNAL_AUTH_LOGOUT_SSO)
 
+def _invenio_settings_plugin_builder(plugin_name, plugin_code):
+    """
+    Handy function to bridge pluginutils with (Invenio) user settings.
+    """
+    from invenio.settings import Settings
+    if 'settings' in dir(plugin_code):
+        candidate = getattr(plugin_code, 'settings')
+        return candidate
+        #FIXME
+        if isinstance(candidate, Settings):
+            return candidate
+    raise ValueError('%s is not a valid settings plugin' % plugin_name)
+
+
+import os
+from invenio.config import CFG_PYLIBDIR
+from invenio.pluginutils import PluginContainer
+_USER_SETTINGS = PluginContainer(
+    os.path.join(CFG_PYLIBDIR, 'invenio', '*_user_settings.py'),
+    plugin_builder=_invenio_settings_plugin_builder)
+
+
+@blueprint.route('/v2/display', methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+def index():
+    # load plugins
+    plugins = [a for a in [s() for (k,s) in _USER_SETTINGS.items()] if a.is_authorized]
+    return render_template('webaccount_display.html',
+                           plugins = plugins)
+
+
+@blueprint.route('/v2/edit/<name>', methods=['GET', 'POST'])
+@blueprint.invenio_set_breadcrumb(_("Edit"))
+@blueprint.invenio_authenticated
+def edit(name):
+    if name not in _USER_SETTINGS:
+        flash(_('Invalid plugin name'), 'error')
+        return redirect(url_for('.index'))
+
+    plugin = _USER_SETTINGS[name]()
+    form = None
+
+    if request.method == 'POST':
+        if plugin.form_builder:
+            form = plugin.form_builder(request.form)
+
+        if True or not form or form.validate():
+            plugin.store(request.form)
+            plugin.save()
+            flash(_('Data has been saved.'), 'success')
+            return redirect(url_for('.index'))
+
+        flash(_('Please, corrent errors.'), 'error')
+
+    # get post data or load data from settings
+    if not form and plugin.form_builder:
+        from werkzeug.datastructures import MultiDict
+        form = plugin.form_builder(MultiDict(plugin.load()))
+
+    return render_template(getattr(plugin, 'edit_template', '') or 'webaccount_edit.html',
+            plugin = plugin,
+            form = form)
+

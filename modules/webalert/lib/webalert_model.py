@@ -50,14 +50,14 @@ class UserQueryBasket(db.Model):
                 primary_key=True)
     date_creation = db.Column(db.Date, nullable=True)
     date_lastrun = db.Column(db.Date, nullable=True,
-                server_default='0000-00-00')
+                server_default='0001-01-01')
     alert_name = db.Column(db.String(30), nullable=False,
                 server_default='',
             index=True)
     notification = db.Column(db.Char(1), nullable=False,
                 server_default='y')
     user = db.relationship(User, backref='query_baskets')
-    query = db.relationship(WebQuery, backref='user_baskets')
+    webquery = db.relationship(WebQuery, backref='user_baskets')
     basket = db.relationship(BskBASKET, backref='user_queries')
 
 __all__ = ['UserQueryBasket']

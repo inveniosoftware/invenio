@@ -1,0 +1,82 @@
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""WebBasket User Settings"""
+
+from flask import Blueprint, session, make_response, g, render_template, \
+                  request, flash, jsonify, redirect, url_for, current_app
+from invenio.webinterface_handler_flask_utils import _
+from invenio.sqlalchemyutils import db
+from invenio.jinja2utils import render_template_to_string
+from invenio.webuser_flask import current_user
+from invenio.jinja2utils import render_template_to_string
+from invenio.settings import Settings, UserSettingsStorage, \
+                             ModelSettingsStorageBuilder
+from invenio.websession_model import User
+from invenio.webaccount_forms import ChangeUserEmailSettingsForm
+
+class WebBasketSettings(Settings):
+
+    keys = []
+    #form_builder = WebBasketUserSettingsForm
+    storage_builder = UserSettingsStorage
+
+    def __init__(self):
+        super(WebBasketSettings, self).__init__()
+        self.icon = 'shopping-cart'
+        self.title = _('Baskets WIP')
+        #self.view = url_for('youraccount.index')
+        #self.edit = url_for('youraccount.edit', name=__name__.split('.')[-1])
+
+    def widget(self):
+        uid = current_user.get_id()
+        baskets = [] #FIXME add loading baskets
+
+        template = """
+{{ _('You have') }}
+<div class="btn-group">
+  <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+     <strong class="text-info">{{ baskets|length }}</strong>
+     {{ _('personal baskets') }}
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu">
+  {%- for b in baskets -%}
+    <li>
+        <a href="#">
+            {{ b.name }}
+        </a>
+    </li>
+  {%- endfor -%}
+  </ul>
+</div>"""
+
+        return render_template_to_string(template, _from_string=True,
+                                         baskets=baskets)
+
+    widget.size = 4
+
+    @property
+    def is_authorized(self):
+        return current_user.is_authenticated() and \
+               current_user.is_authorized('usebaskets')
+
+## Compulsory plugin interface
+settings = WebBasketSettings
+#__all__ = ['WebBasketSettings']

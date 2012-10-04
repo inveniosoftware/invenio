@@ -39,7 +39,6 @@ from invenio.config import \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_CERN_SITE, \
      CFG_INSPIRE_SITE, \
-     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
      CFG_BIBAUTHORID_ENABLED, \
      CFG_SITE_RECORD
 
@@ -84,7 +83,7 @@ class GuestUser(dict):
             self._create_guest()
         else:
             # Minimal information about user.
-            self['id'] = 0
+            self['id'] = self['uid'] = 0
             self['email'] = ''
             self['guest'] = '1'
 
@@ -107,7 +106,6 @@ class GuestUser(dict):
         #from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
         #from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
         #from invenio.access_control_config import SUPERADMINROLE, CFG_EXTERNAL_AUTH_USING_SSO
-        #if CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL > 0:
         #    self['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(self)
         #self['precached_usebaskets'] = acc_authorize_action(self, 'usebaskets')[0] == 0
         #self['precached_useloans'] = acc_authorize_action(self, 'useloans')[0] == 0
@@ -122,6 +120,12 @@ class GuestUser(dict):
         #self['precached_useadmin'] = True
         #self['precached_usestats'] = True
         #self['precached_usegroups'] = True
+
+        for k in ['usegroups', 'usestats', 'useadmin',
+                  'usebaskets', 'useloans', 'usegroups',
+                  'usealerts', 'usemessages', 'usestats',
+                  'viewsubmissions', 'useapprove']:
+            self['precached_'+k] = True
 
     def refresh(self, update_session=True):
         """
@@ -147,6 +151,10 @@ class GuestUser(dict):
 
     def is_authenticated(self):
         return not self.is_guest()
+
+    def is_authorized(self, name, **kwargs):
+        from invenio.access_control_engine import acc_authorize_action
+        return acc_authorize_action(self, name)[0] == 0
 
     def is_active(self):
         return not self.is_guest()
@@ -174,7 +182,7 @@ class UserInfo(GuestUser):
         user = User.query.get(session.uid)
         if user is None:
             return
-        self['id'] = user.id or None
+        self['id'] = self['uid'] = user.id or None
         self['nickname'] = user.nickname or ''
         self['email'] = user.email or ''
         self['note'] = user.note or ''

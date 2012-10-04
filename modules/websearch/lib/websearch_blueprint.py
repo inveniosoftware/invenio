@@ -63,11 +63,6 @@ blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                                            'search.index', 1)])
 
 @blueprint.route('/', methods=['GET', 'POST'])
-#@blueprint.invenio_sorted(MsgMESSAGE)
-#@blueprint.invenio_filtered(MsgMESSAGE, columns={
-#                    'subject':operators.startswith_op,
-#                    'user_from.nickname':operators.contains_op},
-#                    form=FilterMsgMESSAGEForm)
 @blueprint.invenio_templated('websearch_index.html')
 def index(sort=False, filter=None):
     uid = current_user.get_id()
@@ -441,3 +436,9 @@ def list(field):
     return jsonify(results = results)
 
 
+@blueprint.route('/search/dispatch', methods=['GET', 'POST'])
+def dispatch():
+    action = request.args.get('action')
+    if action not in ['addtobasket', 'export']:
+        abort(406)
+    return redirect(request.referrer)

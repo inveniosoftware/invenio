@@ -26,25 +26,39 @@ from invenio.sqlalchemyutils import db
 from sqlalchemy.ext.hybrid import hybrid_property
 from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
 # Create your models here.
+#from invenio.webuser import get_default_user_preferences
+
+from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
+    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT
+def get_default_user_preferences():
+    user_preference = {
+        'login_method': ''}
+
+    if CFG_EXTERNAL_AUTH_DEFAULT in CFG_EXTERNAL_AUTHENTICATION:
+        user_preference['login_method'] = CFG_EXTERNAL_AUTH_DEFAULT
+    return user_preference
+
+
 
 #TODO Consider using standard cPickle or pickle
 #     (then just remove pickler=MarshalPickle()).
 class MarshalPickle(object):
-    def __init__(self, set_empty=False):
+    def __init__(self, set_empty=False, default=None):
         self.set_empty = set_empty
+        self.default = default or {}
 
     def dumps(self, obj, protocol=None):
         if obj is not None:
             obj = serialize_via_marshal(obj)
         elif self.set_empty:
-            obj = serialize_via_marshal({})
+            obj = serialize_via_marshal(self.default)
         return obj
 
     def loads(self, obj):
         try:
             obj = deserialize_via_marshal(obj)
         except:
-            obj = {}
+            obj = self.default
         return obj
 
 
@@ -60,8 +74,12 @@ class User(db.Model):
                 server_default='')
     _password = db.Column(db.LargeBinary, name="password", nullable=False)
     note = db.Column(db.String(255), nullable=True)
-    settings = db.Column(db.PickleType(pickler=MarshalPickle(set_empty=True)),
-                         nullable=True)
+    settings = db.Column(
+                db.PickleType(
+                    pickler=MarshalPickle(
+                        set_empty=True,
+                        default=get_default_user_preferences())),
+                nullable=True)
     nickname = db.Column(db.String(255), nullable=False,
                 server_default='')
     last_login = db.Column(db.DateTime, nullable=False,

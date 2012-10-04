@@ -62,5 +62,7 @@ class EasySearchForm(InvenioBaseForm):
         data_source=lambda: url_for('search.list', field='keyword'))
     journal = FormField(JournalForm, widget=RowWidget())
 
-
+class WebSearchUserSettingsForm(InvenioBaseForm):
+    of = SelectField(_('Results per page'),
+                    choices=[('10', '10'), (u'25', '25'), ('50', '50'), ('100', '100')])
 

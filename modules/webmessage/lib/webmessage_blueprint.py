@@ -56,7 +56,7 @@ class MessagesMenu(object):
                 UserMsgMESSAGE.status == CFG_WEBMESSAGE_STATUS_CODE['NEW']
             )).scalar()
 
-        out = _('Messages')
+        out = '<i class="icon-envelope icon-white"></i>'#_('Messages')
         if unread:
             out += ' <span class="badge badge-important">%d</span>' % unread
         out += """
@@ -85,7 +85,7 @@ blueprint = InvenioBlueprint('yourmessages', __name__, url_prefix="/yourmessages
             menubuilder=[('main.personalize.messages', _('Your messages'),
                           'yourmessages.index', 10),
                          ('main.messages', MessagesMenu(),
-                          'yourmessages.index', 20, [], not_guest)],
+                          'yourmessages.index', -3, [], not_guest)],
             breadcrumbs=[(_("Your Account"), 'youraccount.display'),
                          ('Your Messages', 'yourmessages.display')])
 

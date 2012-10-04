@@ -35,7 +35,7 @@ from invenio.webinterface_handler_flask_utils import _
 from flask.ext.wtf import Form
 from invenio.wtforms_utils import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
 from wtforms import DateTimeField, BooleanField, TextField, TextAreaField, \
-                    PasswordField, validators
+                    PasswordField, RadioField, validators
 
 
 def msg_split_addr(value):
@@ -110,3 +110,9 @@ class FilterMsgMESSAGEForm(FilterForm):
     #sent_date = FilterTextField(_('Sent date'))
     subject = FilterTextField(_('Subject'))
     #body = TextAreaField(_('Body'))
+
+
+class WebMessageUserSettingsForm(InvenioBaseForm):
+    webmessage_email_alert = RadioField(_('Email notifications'),
+    choices=[(0, _('Disable')), (1, _('Enable'))])
+

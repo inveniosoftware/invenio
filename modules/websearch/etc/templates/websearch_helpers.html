@@ -413,7 +413,7 @@
                   type="radio"
                   name="{{ v }}"
                   value="{{ vv }}"
-                  {{ 'checked="checked"' if request.args.get(v,'') == vv}}>
+                  {{ 'checked="checked"'|safe if request.args.get(v,'') == vv}}>
                 {{ _(k) }}
               </label>
             {%- endfor -%}
@@ -435,7 +435,7 @@
                   type="radio"
                   name="box"
                   value="{{ v }}"
-                  {{ 'checked="checked"' if active}}>
+                  {{ 'checked="checked"'|safe if active}}>
                 {{ k }}
               </label>
             {%- endfor -%}
@@ -445,11 +445,20 @@
             </li>
 
             <li class="modal-footer nav-list clearfix">
-              <label class="checkbox pull-left">
-                <input type="checkbox" name="remember" value="1" checked="checked">
-                {{ _('remember settings') }}
-              </label>
-              <button class="btn btn-small pull-right">
+              {%- if not current_user.is_guest() -%}
+              <button name="action_save"
+                      rel="tooltip"
+                      title="{{ _('store permanently in user settings') }}"
+                      data-placement="bottom"
+                      class="btn btn-primary btn-small pull-left">
+                <i class="icon-hdd icon-white"></i> {{ _('Save') }}
+              </button>
+              {%- endif -%}
+              <button name="action_search"
+                      rel="tooltip"
+                      title="{{ _('use settings in current search') }}"
+                      data-placement="bottom"
+                      class="btn btn-small pull-right">
                 <i class="icon-ok"></i> {{ _('Apply') }}
               </button>
             </li>
@@ -472,11 +481,18 @@
       return true; // ensure form still submits
     });
 
-    $('#settingsdropdown select').buttonSelect({
+    $('#settingsdropdown select[name="of"]').buttonSelect({
       button: '<div class="btn btn-mini" />'
     , span: '<span class="btn btn-mini" style="width: 80px;" />'
     , next: '<i class="icon icon-chevron-right"></i>'
     , prev: '<i class="icon icon-chevron-left"></i>'
+    })
+
+    $('#settingsdropdown select[name="rg"]').buttonSelect({
+      button: '<div class="btn btn-mini" />'
+    , span: '<span class="btn btn-mini" style="width: 80px;" />'
+    , next: '<i class="icon icon-plus"></i>'
+    , prev: '<i class="icon icon-minus"></i>'
     })
 
     if (!("autofocus" in $("form[name=search] input[name=q]"))) {
