@@ -6050,7 +6050,13 @@ def prs_log_query(kwargs=None, req=None, uid=None, of=None, ln=None, p=None, f=N
                colls_to_search=None, results_final_nb_total=None, em=None, **dummy):
     # log query:
     try:
-        id_query = log_query(req.remote_host, req.args, uid)
+        if req:
+            from flask import request
+            req = request
+        id_query = log_query(req.host,
+            '&'.join(map(lambda (k,v): k+'='+v, req.args.to_dict().items())),
+            uid)
+        #id_query = log_query(req.remote_host, req.args, uid)
         if of.startswith("h") and id_query and (em == '' or EM_REPOSITORY["alert"] in em):
             if not of in ['hcs']:
                 # display alert/RSS teaser for non-summary formats:
@@ -6181,6 +6187,8 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
     else:
+        prs_log_query(kwargs=kwargs, **kwargs)
+
         # yes, some hits found: good!
         # collection list may have changed due to not-exact-match-found policy so check it out:
         for coll in results_final.keys():
@@ -6215,9 +6223,6 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             prs_summarize_records(kwargs=kwargs, **kwargs)
         else:
             prs_print_records(kwargs=kwargs, **kwargs)
-
-
-        prs_log_query(kwargs=kwargs, **kwargs)
 
 
 # this is a copy of the prs_display_results with output parts removed, needed for external modules
