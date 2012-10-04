@@ -505,7 +505,7 @@ def get_persons_from_recids(recids, return_alt_names=False,
         #because it was not fully processed by it's creator. Anyway it's safe to try to create one
         #before failing miserably
         if not canonical:
-            update_personID_canonical_names(pid)
+            update_personID_canonical_names([pid])
         canonical = get_canonical_name(pid)
 
         #assert len(canonical) == 1
@@ -900,7 +900,7 @@ def confirm_papers_to_person(pid, papers, user_level=0):
     @type papers: (('100:7531,9024',),)
     '''
 
-    new_pid = get_new_personid()
+
     pids_to_update = set([pid])
 
 
@@ -918,6 +918,14 @@ def confirm_papers_to_person(pid, papers, user_level=0):
                        "and bibrec=%s "
                        "and flag > -2"
                        , (pid, rec))
+
+        other_paps = run_sql("select bibref_table, bibref_value, bibrec "
+                       "from aidPERSONIDPAPERS "
+                       "where personid <> %s "
+                       "and bibrec=%s "
+                       "and flag > -2"
+                       , (pid, rec))
+
         rej_paps = run_sql("select bibref_table, bibref_value, bibrec "
                        "from aidPERSONIDPAPERS "
                        "where personid=%s "
@@ -925,17 +933,36 @@ def confirm_papers_to_person(pid, papers, user_level=0):
                        "and flag = -2"
                        , (pid, rec))
 
-        assert paps or rej_paps
-        assert len(paps) < 2
+        # All papers that are being claimed should be present in aidPERSONIDPAPERS, thus:
+        # assert paps or rej_paps or other_paps, 'There should be at least something regarding this bibrec!'
+        # should always be valid.
+        # BUT, it usually happens that claims get done out of the browser/session cache which is hours/days old,
+        # hence it happens that papers are claimed which no longer exists in the system.
+        # For the sake of mental sanity, instead of crashing from now on we just ignore such cases.
+        if not (paps or other_paps or rej_paps):
+            continue
 
-        #if the bibrec is present with a different bibref, the present one must be moved somwhere
-        #else before we can claim the incoming one
-        if paps and sig != paps[0]:
-            pids_to_update.add(new_pid)
-            move_signature(paps[0], new_pid)
+        # It should not happen that a paper is assigned more then once to the same person.
+        # But sometimes it happens in rare unfortunate cases of bad concurrency circumstances,
+        # so we try to fix it directly instead of crashing here.
+        # Once a better solution for dealing with concurrency will be found, the following asserts
+        # shall be reenabled, to allow better control on what happens.
 
-        #Make sure that the incoming claim is unique and get rid of all rejections, they are useless
-        #from now on
+        # assert len(paps) < 2, "This paper should not be assigned to this person more then once! %s" % paps
+        # assert len(other_paps) < 2, "There should not be more then one copy of this paper! %s" % other_paps
+
+        # if the bibrec is present with a different bibref, the present one must be moved somwhere
+        # else before we can claim the incoming one
+        if paps:
+            for pap in paps:
+                #kick out all unwanted signatures
+                if  sig != pap:
+                    new_pid = get_new_personid()
+                    pids_to_update.add(new_pid)
+                    move_signature(pap, new_pid)
+
+        # Make sure that the incoming claim is unique and get rid of all rejections, they are useless
+        # from now on
         run_sql("delete from aidPERSONIDPAPERS where bibref_table like %s and "
                 " bibref_value = %s and bibrec=%s"
                 , sig)
@@ -970,14 +997,17 @@ def reject_papers_from_person(pid, papers, user_level=0):
         table, ref = brr.split(':')
 
         sig = (table, ref, rec)
-        #To be rejected, a record should be present!
+        # To be rejected, a record should be present!
         records = personid_name_from_signature(sig)
-        assert(records)
+        # For the sake of mental sanity (see commentis in confirm_papers_to_personid, just ignore in case this paper is no longer existent
+        # assert(records)
+        if not records:
+            continue
 
         fpid, name = records[0]
-        #If the record is assigned to a different person already, the rejection is meaningless
-        #Otherwise, we assign the paper to someone else (not important who it will eventually 
-        #get moved by tortoise) and add the rejection to the current person
+        # If the record is assigned to a different person already, the rejection is meaningless
+        # Otherwise, we assign the paper to someone else (not important who it will eventually 
+        # get moved by tortoise) and add the rejection to the current person
 
         if fpid == pid:
             move_signature(sig, new_pid)
@@ -1013,7 +1043,10 @@ def reset_papers_flag(pid, papers):
                        "and flag = -2"
                        , (pid, rec))
 
-        assert paps or rej_paps
+        # again, see confirm_papers_to_person for the sake of mental sanity
+        # assert paps or rej_paps
+        if not paps or rej_paps:
+            continue
         assert len(paps) < 2
 
         run_sql("delete from aidPERSONIDPAPERS where bibref_table like %s and "
@@ -1175,47 +1208,6 @@ def filter_modified_record_ids(bibrecs, date):
                           , (x[2], date))[0][0]
         , bibrecs)
 
-
-def get_cached_author_page(pageparam):
-    '''
-    Return cached authorpage
-    @param: pageparam (int personid)
-    @return (id, 'authorpage_cache', personid, authorpage_html, date_cached)
-    '''
-            #TABLE: id, tag, identifier, data, date
-    caches = run_sql("select id, object_name, object_key, object_value, last_updated \
-                      from aidCACHE \
-                      where object_name='authorpage_cache' and object_key=%s",
-                          (str(pageparam),))
-    if len(caches) >= 1:
-        return caches[0]
-    else:
-        return []
-
-def delete_cached_author_page(personid):
-    '''
-    Deletes from the author page cache the page concerning one person
-    '''
-    run_sql("delete from aidCACHE where object_name='authorpage_cache' and object_key=%s", (str(personid),))
-
-def update_cached_author_page_timestamp(pageparam):
-    '''
-    Updates cached author page timestamp
-    @param pageparam: int personid
-    '''
-    #TABLE: id, tag, identifier, data, date
-    run_sql("update aidCACHE set last_updated=now() where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
-
-
-def update_cached_author_page(pageparam, page):
-    '''
-    Updates cached author page, deleting old caches for same pageparam
-    @param pageparam: int personid
-    @param page: string html authorpage
-    '''
-            #TABLE: id, tag, identifier, data, date
-    run_sql("delete from aidCACHE where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
-    run_sql("insert into aidCACHE values (Null,'authorpage_cache',%s,%s,now())", (str(pageparam), str(page)))
 
 def get_user_log(transactionid='', userinfo='', userid='', personID='', action='', tag='', value='', comment='', only_most_recent=False):
     '''
@@ -1483,14 +1475,13 @@ def populate_partial_marc_caches():
         return
 
     def br_dictionarize(maptable):
-        gc.collect()
         gc.disable()
         md = defaultdict(dict)
         maxiters = len(set(map(itemgetter(0), maptable)))
         for i, v in enumerate(groupby(maptable, itemgetter(0))):
             if i % 1000 == 0:
                 update_status(float(i) / maxiters, 'br_dictionarizing...')
-            if i % 500000 == 0:
+            if i % 1000000 == 0:
                 update_status(float(i) / maxiters, 'br_dictionarizing...GC')
                 gc.collect()
             idx = defaultdict(list)
@@ -1514,7 +1505,7 @@ def populate_partial_marc_caches():
     del bibrec_bib10x
 
     update_status(.25, 'Populating get_grouped_records_table_cache')
-    bibrec_bib70x = sorted(run_sql("select id_bibrec_id_bibxxx,field_number from bibrec_bib70x"))
+    bibrec_bib70x = sorted(run_sql("select id_bibrec,id_bibxxx,field_number from bibrec_bib70x"))
     update_status(.375, 'Populating get_grouped_records_table_cache')
     brd_b70x = br_dictionarize(bibrec_bib70x)
     del bibrec_bib70x
@@ -1548,11 +1539,14 @@ def _get_grouped_records_using_caches(brr, *args):
     tuples = [MARC_100_700_CACHE['b%s' % str(brr[0])][i] for i in ids]
     results = {}
     for t in tuples:
-        if t[0] in args:
+        present = [x for x in args if x in t[0]]
+        assert len(present) <= 1
+        if present:
+            arg = present[0]
             try:
-                results[t[0]].append(t[1])
+                results[arg].append(t[1])
             except KeyError:
-                results[t[0]] = [t[1]]
+                results[arg] = [t[1]]
     for arg in args:
         if arg not in results.keys():
             results[arg] = []
@@ -1602,7 +1596,7 @@ def _get_grouped_records_from_db(bibrefrec, *args):
     for arg in args:
         qry = run_sql("SELECT value "
                       "FROM %s "
-                      "WHERE tag LIKE '%s' "
+                      "WHERE tag LIKE '%%%s%%' "
                       "AND id IN %s" %
                       (target_table, arg, grouped_s))
         ret[arg] = [q[0] for q in qry]
@@ -1833,9 +1827,13 @@ class Bib_matrix(object):
         return ret
 
     def _resolve_entry(self, bibs):
-        entry = sorted(self._bibmap[bib] for bib in bibs)
-        assert entry[0] < entry[1]
-        return entry[0] + ((entry[1] - 1) * entry[1]) / 2
+        assert len(bibs) == 2
+        first = self._bibmap[bibs[0]]
+        second = self._bibmap[bibs[1]]
+        if first > second:
+            first, second = second, first
+        assert first < second
+        return first + ((second - 1) * second) / 2
 
     def __setitem__(self, bibs, val):
         entry = self._resolve_entry(bibs)
@@ -2099,7 +2097,7 @@ def check_duplicated_papers(printer, repair=False):
             all_ok = False
             dups = sorted(bibrec)
             dups = [x for i, x in enumerate(dups[0:len(dups) - 1]) if x == dups[i + 1]]
-            printer("Person %d has duplicated papers: %s", (pid, dups))
+            printer("Person %d has duplicated papers: %s" % (pid, dups))
 
             if repair:
                 for dupbibrec in dups:

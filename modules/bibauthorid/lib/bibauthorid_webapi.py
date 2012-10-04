@@ -67,7 +67,7 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
         uid = userinfo.split('||')[0]
     else:
         uid = ''
-    dbapi.update_personID_canonical_names(person_id, overwrite=True, suggested=canonical_name)
+    dbapi.update_personID_canonical_names([person_id], overwrite=True, suggested=canonical_name)
     dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.', userid=uid)
 
 def get_canonical_id_from_person_id(person_id):
@@ -845,7 +845,7 @@ def arxiv_login(req):
 
     try:
         found_bibrecs = set(reduce(add, [perform_request_search(p='037:' + str(arx), of='id', rg=0)for arx in arxiv_p_ids]))
-    except IndexError:
+    except (IndexError, TypeError):
         found_bibrecs = set()
 
     #found_bibrecs = [567700, 567744]
@@ -1260,7 +1260,6 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
 
     #This is the only point which modifies a person, so this can trigger the
     #deletion of a cached page
-    dbapi.delete_cached_author_page(pid)
     webauthorapi.expire_all_cache_for_personid(pid)
 
     return True

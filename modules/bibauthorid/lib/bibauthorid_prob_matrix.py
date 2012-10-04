@@ -77,12 +77,11 @@ class ProbabilityMatrix(object):
         @param cluster_set: A cluster set object, used to initialize
         the matrix.
         '''
-        def check_for_cleaning(cur_calc):
-            if cur_calc % 10000000 == 0:
-                clear_comparison_caches()
+        last_cleaned = 0
 
         old_matrix = self._bib_matrix
         cached_bibs = self.__get_up_to_date_bibs()
+        have_cached_bibs = bool(cached_bibs)
         self._bib_matrix = Bib_matrix(cluster_set)
 
         ncl = cluster_set.num_all_bibs
@@ -93,15 +92,20 @@ class ProbabilityMatrix(object):
         cur_calc, opti = 0, 0
         for cl1 in cluster_set.clusters:
             update_status((float(opti) + cur_calc) / expected, "Prob matrix: calc %d, opti %d." % (cur_calc, opti))
+
+            #clean caches
+            if cur_calc - last_cleaned > 2000000:
+                clear_comparison_caches()
+                last_cleaned = cur_calc
+
             for cl2 in cluster_set.clusters:
                 if id(cl1) < id(cl2) and not cl1.hates(cl2):
                     for bib1 in cl1.bibs:
                         for bib2 in cl2.bibs:
-                            if bib1 in cached_bibs and bib2 in cached_bibs:
+                            if have_cached_bibs and bib1 in cached_bibs and bib2 in cached_bibs:
                                 val = old_matrix[bib1, bib2]
                                 if not val:
                                     cur_calc += 1
-                                    check_for_cleaning(cur_calc)
                                     val = compare_bibrefrecs(bib1, bib2)
                                 else:
                                     opti += 1
@@ -109,7 +113,6 @@ class ProbabilityMatrix(object):
                                         assert _debug_is_eq_v(val, compare_bibrefrecs(bib1, bib2))
                             else:
                                 cur_calc += 1
-                                check_for_cleaning(cur_calc)
                                 val = compare_bibrefrecs(bib1, bib2)
 
                             self._bib_matrix[bib1, bib2] = val
