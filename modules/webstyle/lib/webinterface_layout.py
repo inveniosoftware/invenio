@@ -252,6 +252,12 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAlertsPages = WebInterfaceDumbPages
 
+try:
+    from invenio.goto_webinterface import WebInterfaceGotoPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceGotoPages = WebInterfaceDumbPages
+
 if CFG_OPENAIRE_SITE:
     try:
         from invenio.openaire_deposit_webinterface import \
@@ -316,6 +322,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
                    'linkbacks',
                    'author',
                    'textmining',
+                   'goto',
                ] + test_exports + openaire_exports
 
     def __init__(self):
@@ -355,6 +362,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     #author = WebInterfaceAuthorPages()
     textmining = WebInterfaceDocExtract()
     yourcomments = WebInterfaceYourCommentsPages()
+    goto = WebInterfaceGotoPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.

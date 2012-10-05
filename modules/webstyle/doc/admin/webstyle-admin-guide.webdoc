@@ -45,6 +45,11 @@
      <li>2.4&nbsp;&nbsp;<a href="#det_page_cust_look_tabs">Customizing look of tabs</a></li>
      </ul>
 </li>
+<li><strong>3. <a href="#red">Custom Redirections</a></strong>
+     <ul style="list-style-type:None">
+     <li>3.1&nbsp;&nbsp;<a href="#red_cli">Command Line Interface</a></li>
+     </ul>
+</li>
 </ul>
 
 <h2><a name="overview">1. Overview</a></h2>
@@ -521,3 +526,44 @@ file could be found for the record).<p>
 tabs), you can modify the <code>detailed_record_container(..)</code> and
 <code>detailed_record_mini_panel(..)</code> functions inside your
 <code>webstyle_templates.py</code> file.</p>
+
+<h3><a name="red">Custom Redirections</a></h3>
+<p>It is possible to create custom redirections to URLs within Invenio, by registering a given
+<em>unique label</em> to be used after path <strong>/goto/</strong>.
+</p>
+<p>FIXME</p>
+
+<h4><a name="red_cli">Command Line Interface</a></h4>
+<pre>
+Usage: gotoadmin [options]
+
+Options:
+  -h, --help            show this help message and exit
+
+  Plugin Administration Options:
+    --list-plugins      List available GOTO plugins and their documentation
+    --list-broken-plugins
+                        List broken GOTO plugins
+
+  Redirection Manipultation Options:
+    -r LABEL, --register-redirection=LABEL
+                        Register a redirection with the provided LABEL
+    -u LABEL, --update-redirection=LABEL
+                        Update the redirection specified by the provided LABEL
+    -g LABEL, --get-redirection=LABEL
+                        Get all information about a redirection specified by
+                        LABEL
+    -d LABEL, --drop-redirection=LABEL
+                        Drop an existing redirection specified by LABEL
+
+  Specific Options:
+    -P PLUGIN, --plugin=PLUGIN
+                        Specify the plugin to use when registering or updating
+                        a redirection
+    -j PARAMETERS, --json-parameters=PARAMETERS
+                        Specify the parameters to provide to the plugin
+                        (serialized in JSON)
+    -p PARAM=VALUE, --parameter=PARAM=VALUE
+                        Specify a single PARAM=VALUE parameter to be provided
+                        to the plugin (alternative to the JSON serialization)
+</pre>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,13 +26,21 @@ import httplib
 import os
 import urlparse
 import mechanize
+from urllib2 import urlopen, HTTPError
 
-from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_DEVEL_SITE
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_DEVEL_SITE
 from invenio.bibdocfile import calculate_md5
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.goto_engine import CFG_GOTO_PLUGINS, register_redirection, drop_redirection, update_redirection
 
+def get_final_url(url):
+    """Perform a GET request to the given URL, discarding the result and return
+    the final one in case of redirections"""
+    response = urlopen(url)
+    response.read()
+    return response.url
 
-class WebStyleWSGIUtilsTest(unittest.TestCase):
+class WebStyleWSGIUtilsTests(unittest.TestCase):
     """Test WSGI Utils."""
 
     if CFG_DEVEL_SITE:
@@ -62,7 +70,64 @@ class WebStyleWSGIUtilsTest(unittest.TestCase):
             self.assertEqual(body, body2, "Body sent differs from body received")
 
 
-TEST_SUITE = make_test_suite(WebStyleWSGIUtilsTest)
+class WebStyleGotoTests(unittest.TestCase):
+    """Test the goto framework"""
+    def tearDown(self):
+        drop_redirection('first_record')
+        drop_redirection('invalid_external')
+        drop_redirection('latest_article')
+        drop_redirection('latest_pdf_article')
+
+    def test_plugin_availability(self):
+        """webstyle - test GOTO plugin availability"""
+        self.failUnless('goto_plugin_simple' in CFG_GOTO_PLUGINS)
+        self.failUnless('goto_plugin_latest_record' in CFG_GOTO_PLUGINS)
+        self.failUnless('goto_plugin_cern_hr_documents' in CFG_GOTO_PLUGINS)
+        self.failIf(CFG_GOTO_PLUGINS.get_broken_plugins())
+
+    def test_simple_relative_redirection(self):
+        """webstyle - test simple relative redirection via goto_plugin_simple"""
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/1'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/1')
+
+    def test_simple_absolute_redirection(self):
+        """webstyle - test simple absolute redirection via goto_plugin_simple"""
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': CFG_SITE_URL + '/record/1'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/1')
+
+    def test_simple_absolute_redirection_https(self):
+        """webstyle - test simple absolute redirection to https via goto_plugin_simple"""
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': CFG_SITE_SECURE_URL + '/record/1'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_SECURE_URL + '/record/1')
+
+    def test_invalid_external_redirection(self):
+        """webstyle - test simple absolute redirection to https via goto_plugin_simple"""
+        register_redirection('invalid_external', 'goto_plugin_simple', parameters={'url': 'http://www.google.com'})
+        self.assertRaises(HTTPError, get_final_url, CFG_SITE_URL + '/goto/google')
+
+    def test_latest_article_redirection(self):
+        """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
+        register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article'), CFG_SITE_URL + '/record/108')
+
+    def FIXME_test_latest_pdf_article_redirection(self):
+        """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
+        register_redirection('latest_pdf_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles', 'format': '.pdf'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_pdf_article'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
+
+    def FIXME_test_URL_argument_in_redirection(self):
+        """webstyle - test redirecting while passing arguments on the URL"""
+        register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article?format=.pdf'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
+
+    def test_updating_redirection(self):
+        """webstyle - test updating redirection"""
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/1'})
+        update_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/2'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/2')
+
+
+TEST_SUITE = make_test_suite(WebStyleWSGIUtilsTests, WebStyleGotoTests)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

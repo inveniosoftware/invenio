@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,8 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = webdoc gotoadmin
+from invenio.dbquery import run_sql
 
-EXTRA_DIST = webdoc.in gotoadmin.in
+depends_on = ['invenio_release_1_1_0']
 
-CLEANFILES = *~ *.tmp
+def info():
+    return "New goto table"
+
+def do_upgrade():
+    run_sql("""
+CREATE TABLE IF NOT EXISTS goto (
+  label varchar(150) NOT NULL,
+  plugin varchar(150) NOT NULL,
+  parameters text NOT NULL,
+  creation_date datetime NOT NULL,
+  modification_date datetime NOT NULL,
+  PRIMARY KEY (label),
+  KEY (creation_date),
+  KEY (modification_date)
+) ENGINE=MyISAM;
+""")
+
+def estimate():
+    """  Estimate running time of upgrade in seconds (optional). """
+    return 1

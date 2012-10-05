@@ -1,5 +1,8 @@
+#!@PYTHON@
+## -*- mode: python; coding: utf-8; -*-
+
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,8 +18,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = webdoc gotoadmin
+"""GOTO CLI interface."""
 
-EXTRA_DIST = webdoc.in gotoadmin.in
+try:
+    from invenio.goto_engine import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
 
-CLEANFILES = *~ *.tmp
+main()
+
