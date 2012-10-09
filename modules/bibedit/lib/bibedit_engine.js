@@ -279,6 +279,10 @@ function initMisc(){
              ' * Submit (to save your changes permanently)\n      or\n' +
              ' * Cancel (to discard your changes)';
     }
+    else {
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'},
+        function() {}, false);
+    }
   };
 
   //Initialising the BibCircualtion integration plugin
