@@ -22,7 +22,7 @@ from invenio.config import CFG_SITE_URL, CFG_BINDIR, CFG_PREFIX
 from invenio.dbquery import run_sql
 
 import os
-import popen2
+import subprocess
 import time
 
 
@@ -95,14 +95,12 @@ def get_bibsched_mode():
     """
     Gets bibsched running mode: AUTOMATIC or MANUAL
     """
-    child_stdout, child_stdin = popen2.popen2("%s status" %
-                                os.path.join(CFG_BINDIR, 'bibsched'))
-    child_stdin.close()
-    output = child_stdout.readlines()
-    child_stdout.close()
+    process = subprocess.Popen([os.path.join(CFG_BINDIR, 'bibsched'), 'status'], stdout=subprocess.PIPE)
+    output = process.communicate()[0]
     try:
-        if output[1].split()[-1] in ['MANUAL', 'AUTOMATIC']:
-            return output[1].split()[-1]
+        status = output.split('\n')[1].split()[-1]
+        if status in ['MANUAL', 'AUTOMATIC']:
+            return status
         else:
             return 'Unknown'
     except IndexError:
