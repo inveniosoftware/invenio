@@ -4809,6 +4809,11 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     if user_info:
         can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
 
+    can_edit_record = False
+    if check_user_can_edit_record(user_info, recID):
+        can_edit_record = True
+
+
     out = ""
 
     # sanity check:
@@ -4848,7 +4853,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                                                          so=so,
                                                                          sp=sp,
                                                                          rm=rm,
-                                                                         display_claim_link=display_claim_this_paper)
+                                                                         display_claim_link=display_claim_this_paper,
+                                                                         display_edit_link=can_edit_record)
         return out
 
     if format == "marcxml" or format == "oai_dc":
@@ -5139,7 +5145,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                                                          so=so,
                                                                          sp=sp,
                                                                          rm=rm,
-                                                                         display_claim_link=display_claim_this_paper)
+                                                                         display_claim_link=display_claim_this_paper,
+                                                                         display_edit_link=can_edit_record)
 
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
@@ -6828,3 +6835,23 @@ def perform_external_collection_search_with_em(req, current_collection, pattern_
                             print_search_info=em == "" or EM_REPOSITORY["search_info"] in em,
                             print_see_also_box=em == "" or EM_REPOSITORY["see_also_box"] in em,
                             print_body=em == "" or EM_REPOSITORY["body"] in em)
+
+
+def check_user_can_edit_record(req, recid):
+    """ Check if user has authorization to modify a collection
+    the recid belongs to
+    """
+    record_collections = get_all_collections_of_a_record(recid)
+    if not record_collections:
+        # Check if user has access to all collections
+        auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                       collection='')
+        if auth_code == 0:
+            return True
+    else:
+        for collection in record_collections:
+            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                                                           collection=collection)
+            if auth_code == 0:
+                return True
+    return False

@@ -3411,7 +3411,7 @@ class Template:
 
         return out
 
-    def tmpl_print_record_brief_links(self, ln, recID, sf='', so='d', sp='', rm='', display_claim_link=False):
+    def tmpl_print_record_brief_links(self, ln, recID, sf='', so='d', sp='', rm='', display_claim_link=False, display_edit_link=False):
         """Displays links for brief record on-the-fly
 
         Parameters:
@@ -3496,7 +3496,13 @@ class Template:
             else:
                 out += "<!--not showing reviews links-->"
 
-
+        if display_edit_link:
+            out += '<span class="moreinfo"> - %s</span>' % \
+                    create_html_link('%s/%s/edit/?ln=%s#state=edit&recid=%s' % \
+                                     (CFG_SITE_URL, CFG_SITE_RECORD, ln, str(recID)),
+                                     {},
+                                     link_label=_("Edit record"),
+                                     linkattrd={'class': "moreinfo"})
         out += '</div>'
         return out
 
