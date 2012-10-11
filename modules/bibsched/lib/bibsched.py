@@ -755,7 +755,7 @@ order to let this task run. The current priority is %s. New value:" \
     def put_line(self, row, header=False, motd=False):
         ## ROW: (id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host)
         ##       0  1    2    3       4         5      6        7         8        9
-        col_w = [7 , 25, 15, 21, 7, 11, 21, 60]
+        col_w = [8 , 25, 15, 21, 7, 12, 21, 60]
         maxx = self.width
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
             self.item_status = row[5]
