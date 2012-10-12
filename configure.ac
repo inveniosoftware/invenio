@@ -916,6 +916,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/docextract/bin/Makefile \
      modules/docextract/bin/docextract \
      modules/docextract/bin/refextract \
+     modules/docextract/bin/convert_journals \
      modules/docextract/doc/Makefile \
      modules/docextract/lib/Makefile \
      modules/docextract/etc/Makefile \

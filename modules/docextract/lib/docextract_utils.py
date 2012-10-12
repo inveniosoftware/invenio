@@ -18,6 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 VERBOSITY = None
+USE_BIBTASK = False
 
 import sys
 from datetime import datetime
@@ -25,21 +26,22 @@ from datetime import datetime
 from invenio.bibtask import write_message as bibtask_write_message
 
 
-def setup_loggers(verbosity):
-    global VERBOSITY
+def setup_loggers(verbosity, use_bibtask=False):
+    global VERBOSITY, USE_BIBTASK
 
     if verbosity > 8:
         print 'Setting up loggers: verbosity=%s' % verbosity
 
     VERBOSITY = verbosity
+    USE_BIBTASK = use_bibtask
 
 
 def write_message(msg, stream=sys.stdout, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
-    if VERBOSITY is None:
+    if USE_BIBTASK:
         return bibtask_write_message(msg, stream, verbose)
-    elif msg and VERBOSITY >= verbose:
+    elif VERBOSITY and msg and VERBOSITY >= verbose:
         if VERBOSITY > 8:
             print >>stream, datetime.now().strftime('[%H:%M:%S] '),
         print >>stream, msg

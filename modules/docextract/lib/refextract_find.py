@@ -93,14 +93,31 @@ def find_numeration_in_body(docbody):
     ref_details = None
     found_title = False
 
+    # No numeration unless we find one
+    ref_details = {
+        'title_marker_same_line': False,
+        'marker': None,
+        'marker_pattern': None,
+    }
+
     for line in docbody:
         # Move past blank lines
         if line.isspace():
             continue
 
         # Is this line numerated like a reference line?
+        m_num = None
         mark_match = regex_match_list(line, marker_patterns)
         if mark_match:
+            # Check if it's the first reference
+            # Something like [1] or (1), etc.
+            try:
+                m_num = mark_match.group('marknum')
+                if m_num != '1':
+                    continue
+            except IndexError:
+                pass
+
             mark = mark_match.group('mark')
             mk_ptn = mark_match.re.pattern
             ref_details = {
@@ -108,19 +125,8 @@ def find_numeration_in_body(docbody):
                 'marker_pattern': mk_ptn,
                 'title_marker_same_line': False,
             }
-            # Check if it's the first reference
-            # Something like [1] or (1), etc.
-            m_num = re_num.search(mark)
-            if m_num and m_num.group(0) == '1':
-                # 1st ref truly found
-                break
-        else:
-            # No numeration
-            ref_details = {
-                'title_marker_same_line': False,
-                'marker': None,
-                'marker_pattern': None,
-            }
+
+            break
 
     return ref_details, found_title
 

@@ -125,7 +125,7 @@ class WebInterfaceAPIDocExtract(WebInterfaceDirectory):
 class WebInterfaceDocExtract(WebInterfaceDirectory):
     """DocExtract API"""
     _exports = ['api',
-        ('extract-references', 'extract_references'),
+        ('', 'extract'),
         ('example.pdf', 'example_pdf'),
     ]
 
@@ -139,11 +139,11 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
         finally:
             f.close()
 
-    def extract_references_template(self):
+    def extract_template(self):
         """Template for reference extraction page"""
         return """Please specify a pdf or a url or some references to parse
 
-        <form action="extract-references" method="post"
+        <form action="" method="post"
                                             enctype="multipart/form-data">
             <p>PDF: <input type="file" name="pdf" /></p>
             <p>arXiv: <input type="text" name="arxiv" /></p>
@@ -153,7 +153,7 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
         </form>
         """
 
-    def extract_references(self, req, form):
+    def extract(self, req, form):
         """Refrences extraction page
 
         This page can be used for authors to test their pdfs against our
@@ -171,7 +171,7 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
             url = form['url'].value
             references_xml = extract_references_from_url_xml(url)
         elif 'txt' in form and form['txt'].value:
-            txt = form['txt'].value
+            txt = form['txt'].value.decode('utf-8', errors='ignore')
             references_xml = extract_references_from_string_xml(txt)
         else:
             references_xml = None
@@ -179,7 +179,7 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
         # If we have not uploaded anything yet
         # Display the form that allows us to do so
         if not references_xml:
-            out = self.extract_references_template()
+            out = self.extract_template()
         else:
             out = """
             <style type="text/css">
@@ -188,7 +188,7 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
             """
             out += format_record(0,
                                 'hdref',
-                                xml_record=references_xml.encode('utf-8'),
+                                xml_record=references_xml,
                                 user_info=user_info)
 
         # Render the page (including header, footer)

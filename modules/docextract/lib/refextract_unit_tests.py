@@ -29,10 +29,13 @@ import re
 from invenio.testutils import make_test_suite, run_test_suite
 # Import the minimal necessary methods and variables needed to run Refextract
 from invenio.docextract_utils import setup_loggers
-from invenio.refextract_tag import identify_ibids, tag_numeration
+from invenio.refextract_tag import identify_ibids, \
+                                   find_numeration, \
+                                   find_numeration_more
 from invenio import refextract_re
 from invenio.refextract_find import get_reference_section_beginning
 from invenio.refextract_api import search_from_reference
+from invenio.refextract_text import rebuild_reference_lines
 
 
 class ReTest(InvenioTestCase):
@@ -83,29 +86,41 @@ class IbidTest(InvenioTestCase):
 
     def test_identify_ibids_empty(self):
         r = identify_ibids("")
-        self.assertEqual(r, ({}, {}, ''))
+        self.assertEqual(r, ({}, ''))
 
     def test_identify_ibids_simple(self):
         ref_line = u"""[46] E. Schrodinger, Sitzungsber. Preuss. Akad. Wiss. Phys. Math. Kl. 24, 418(1930); ibid, 3, 1(1931)"""
         r = identify_ibids(ref_line.upper())
-        self.assertEqual(r, ({85: 4}, {85: u'IBID'}, u'[46] E. SCHRODINGER, SITZUNGSBER. PREUSS. AKAD. WISS. PHYS. MATH. KL. 24, 418(1930); ____, 3, 1(1931)'))
+        self.assertEqual(r, ({85: u'IBID'}, u'[46] E. SCHRODINGER, SITZUNGSBER. PREUSS. AKAD. WISS. PHYS. MATH. KL. 24, 418(1930); ____, 3, 1(1931)'))
 
 
-class TagNumerationTest(InvenioTestCase):
+class FindNumerationTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=1)
 
     def test_vol_page_year(self):
         "<vol>, <page> (<year>)"
         ref_line = u"""24, 418 (1930)"""
-        r = tag_numeration(ref_line)
-        self.assertEqual(r.strip(': '), u"<cds.VOL>24</cds.VOL> <cds.YR>(1930)</cds.YR> <cds.PG>418</cds.PG>")
+        r = find_numeration(ref_line)
+        self.assertEqual(r['volume'], u"24")
+        self.assertEqual(r['year'], u"1930")
+        self.assertEqual(r['page'], u"418")
 
     def test_vol_year_page(self):
         "<vol>, (<year>) <page> "
         ref_line = u"""24, (1930) 418"""
-        r = tag_numeration(ref_line)
-        self.assertEqual(r.strip(': '), u"<cds.VOL>24</cds.VOL> <cds.YR>(1930)</cds.YR> <cds.PG>418</cds.PG>")
+        r = find_numeration(ref_line)
+        self.assertEqual(r['volume'], u"24")
+        self.assertEqual(r['year'], u"1930")
+        self.assertEqual(r['page'], u"418")
+
+    def test_year_title_volume_page(self):
+        "<year>, <title> <vol> <page> "
+        ref_line = u"""1930 <cds.JOURNAL>J.Phys.</cds.JOURNAL> 24, 418"""
+        r = find_numeration_more(ref_line)
+        self.assertEqual(r['volume'], u"24")
+        self.assertEqual(r['year'], u"1930")
+        self.assertEqual(r['page'], u"418")
 
 
 class FindSectionTest(InvenioTestCase):
@@ -120,7 +135,7 @@ class FindSectionTest(InvenioTestCase):
         ])
         self.assertEqual(sect, {
             'marker': '[1]',
-            'marker_pattern': u'^\\s*(?P<mark>\\[\\s*(?P<marknum>\\d+)\\s*\\])',
+            'marker_pattern': u'\\s*(?P<mark>\\[\\s*(?P<marknum>\\d+)\\s*\\])',
             'start_line': 1,
             'title_string': 'References',
             'title_marker_same_line': False,
@@ -223,11 +238,72 @@ class SearchTest(InvenioTestCase):
         self.assert_('B76' in pattern)
         self.assert_('477' in pattern)
 
+
+class RebuildReferencesTest(unittest.TestCase):
+    def setUp(self):
+        setup_loggers(verbosity=9)
+
+    def test_simple(self):
+        marker_pattern = ur"^\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+        refs = [
+            u"[1] hello",
+            u"hello2",
+            u"[2] foo",
+        ]
+        rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+        self.assertEqual(rebuilt_refs, [
+            u"[1] hello hello2",
+            u"[2] foo",
+        ])
+
+    # def test_pagination_removal(self):
+    #     marker_pattern = ur"^\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+    #     refs = [
+    #         u"[1] hello",
+    #         u"hello2",
+    #         u"[42]",
+    #         u"[2] foo",
+    #     ]
+    #     rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+    #     self.assertEqual(rebuilt_refs, [
+    #         u"[1] hello hello2",
+    #         u"[2] foo",
+    #     ])
+
+    def test_pagination_non_removal(self):
+        marker_pattern = ur"^\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+        refs = [
+            u"[1] hello",
+            u"hello2",
+            u"[2]",
+            u"foo",
+        ]
+        rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+        self.assertEqual(rebuilt_refs, [
+            u"[1] hello hello2",
+            u"[2] foo",
+        ])
+
+    def test_2_lines_together(self):
+        marker_pattern = ur"\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"
+        refs = [
+            u"[1] hello",
+            u"hello2 [2] foo",
+        ]
+        rebuilt_refs = rebuild_reference_lines(refs, marker_pattern)
+        self.assertEqual(rebuilt_refs, [
+            u"[1] hello hello2",
+            u"[2] foo",
+        ])
+        print 'rebuilt_refs', repr(rebuilt_refs)
+
+
 TEST_SUITE = make_test_suite(ReTest,
                              IbidTest,
-                             TagNumerationTest,
+                             FindNumerationTest,
                              FindSectionTest,
-                             SearchTest)
+                             SearchTest,
+                             RebuildReferencesTest)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

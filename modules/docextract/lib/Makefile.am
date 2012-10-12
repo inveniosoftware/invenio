@@ -23,6 +23,9 @@ pylib_DATA = docextract_pdf.py \
              docextract_task.py \
              docextract_webinterface.py \
              docextract_webinterface_unit_tests.py \
+             docextract_record.py \
+             docextract_record_regression_tests.py \
+             docextract_convert_journals.py \
              refextract.py \
              refextract_task.py \
              refextract_config.py \
@@ -32,7 +35,7 @@ pylib_DATA = docextract_pdf.py \
              refextract_api_unit_tests.py \
              refextract_api_regression_tests.py \
              refextract_text.py \
-             refextract_xml.py \
+             refextract_record.py \
              refextract_find.py \
              refextract_tag.py \
              refextract_cli.py \

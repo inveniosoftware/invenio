@@ -81,6 +81,7 @@ def load_kbs(kbs_files):
         'books': build_books_kb(kbs_files['books']),
         'publishers': load_kb(kbs_files['publishers'], build_publishers_kb),
         'special_journals': build_special_journals_kb(kbs_files['special-journals']),
+        'collaborations': load_kb(kbs_files['collaborations'], build_collaborations_kb),
     }
 
 
@@ -199,8 +200,7 @@ def institute_num_pattern_to_regex(pattern):
                             ('yyyy', r'[12]\d{3}'),
                             ('yy',   r'\d\d'),
                             ('s',    r'\s*'),
-                            (r'/',   r'\/'),
-                          ]
+                            (r'/',   r'\/')]
     # first, escape certain characters that could be sensitive to a regexp:
     pattern = re_report_num_chars_to_escape.sub(r'\\\g<1>', pattern)
 
@@ -371,7 +371,7 @@ def build_reportnum_kb(fpath):
             try:
                 rawline = rawline.decode("utf-8")
             except UnicodeError:
-                write_message("*** Unicode problems in %s for line %e" \
+                write_message("*** Unicode problems in %s for line %e"
                                  % (fpath, kb_line_num), sys.stderr, verbose=0)
                 raise UnicodeError("Error: Unable to parse report number kb (line: %s)" % str(kb_line_num))
 
@@ -437,7 +437,7 @@ def build_reportnum_kb(fpath):
 
     # return the preprint reference patterns and the replacement strings
     # for non-standard categ-strings:
-    return (preprint_reference_search_regexp_patterns, \
+    return (preprint_reference_search_regexp_patterns,
             standardised_preprint_reference_categories)
 
 
@@ -535,7 +535,8 @@ def build_publishers_kb(fpath):
         publishers = {}
         for line in source:
             try:
-                publishers[line[0]] = line[1]
+                pattern = re.compile(ur'(\b|^)%s(\b|$)' % line[0], re.I|re.U)
+                publishers[line[0]] = {'pattern': pattern, 'repl': line[1]}
             except IndexError:
                 write_message('Invalid line in books kb %s' % line, verbose=1)
     finally:
@@ -587,9 +588,9 @@ def build_journals_re_kb(fpath):
     @see build_journals_kb
     """
     def make_tuple(match):
-        regexp = re.compile(match.group('seek'), re.UNICODE)
-        repl = '<cds.JOURNAL>%s</cds.JOURNAL>' % match.group('repl')
-        return (regexp, repl)
+        regexp = match.group('seek')
+        repl = match.group('repl')
+        return regexp, repl
 
     kb = []
 
@@ -635,7 +636,7 @@ def load_kb_from_file(path, builder):
             try:
                 rawline = rawline.decode("utf-8").rstrip("\n")
             except UnicodeError:
-                raise StandardError("Unicode problems in kb %s at line %s" \
+                raise StandardError("Unicode problems in kb %s at line %s"
                                                              % (path, rawline))
 
             # Test line to ensure that it is a correctly formatted
@@ -645,7 +646,7 @@ def load_kb_from_file(path, builder):
             if m_kb_line:  # good KB line
                 yield m_kb_line.group('seek'), m_kb_line.group('repl')
             else:
-                raise StandardError("Badly formatted kb '%s' at line %s" \
+                raise StandardError("Badly formatted kb '%s' at line %s"
                                                             % (path, rawline))
 
     try:
@@ -728,9 +729,8 @@ def build_journals_kb(knowledgebase):
         if raw_repl_phrase not in kb:
             # The replace-phrase was not in the KB as a seek phrase
             # It should be added.
-            seek_ptn = re.compile(r'(?<!\/)\b(' + \
-                                   re.escape(raw_repl_phrase) + \
-                                   r')[^A-Z0-9]', re.UNICODE)
+            pattern = ur'(?<!\/)\b(%s)[^A-Z0-9]' % re.escape(raw_repl_phrase)
+            seek_ptn = re.compile(pattern, re.U)
             kb[raw_repl_phrase] = seek_ptn
             standardised_titles[raw_repl_phrase] = repl_term
             seek_phrases.append(raw_repl_phrase)
@@ -741,4 +741,17 @@ def build_journals_kb(knowledgebase):
     write_message('Processed journals kb', verbose=3)
 
     # return the raw knowledge base:
-    return (kb, standardised_titles, seek_phrases)
+    return kb, standardised_titles, seek_phrases
+
+
+def build_collaborations_kb(knowledgebase):
+    kb = {}
+    for pattern, collab in knowledgebase:
+        prefix = ur"(?:^|[\(\"\[\s]|(?<=\W))\s*(?:(?:the|and)\s+)?"
+        collaboration_pattern = ur"(?:\s*coll(?:aborations?|\.)?)?"
+        suffix = ur"(?=$|[><\]\)\"\s.,:])"
+        pattern = pattern.replace(' ', '\s')
+        pattern = pattern.replace('Collaboration', collaboration_pattern)
+        re_pattern = "%s(%s)%s" % (prefix, pattern, suffix)
+        kb[collab] = re.compile(re_pattern, re.I|re.U)
+    return kb

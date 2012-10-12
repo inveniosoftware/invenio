@@ -98,6 +98,9 @@ Contents
              <http://sourceforge.net/projects/mysql-python>
           - (mandatory) Pyparsing, for document parsing
              <http://pyparsing.wikispaces.com/>
+          - (mandatory) Required for Python-2.4 only.
+             It is already built-in in Python-2.6
+             <http://effbot.org/zone/element-index.htm>
           - (recommended) python-dateutil, for complex date processing:
              <http://labix.org/python-dateutil>
           - (recommended) PyXML, for XML processing:

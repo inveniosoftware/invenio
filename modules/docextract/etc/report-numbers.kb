@@ -63,8 +63,6 @@ ATL COM PHYS           ---ATL-COM-PHYS
 TL COM PHYS            ---ATL-COM-PHYS
 ATL COM TILECAL        ---ATL-COM-TILECAL
 ATL COM LARG           ---ATL-COM-LARG
-ATL CONF               ---ATL-CONF
-ATLAS CONF             ---ATL-CONF
 ATL DAQ                ---ATL-DAQ
 ATL DAQ CONF           ---ATL-DAQ-CONF
 ATL GEN                ---ATL-GEN
@@ -74,7 +72,11 @@ ATL MUON               ---ATL-MUON
 ATL PUB MUON           ---ATL-PUB-MUON
 ATL PHYS               ---ATL-PHYS
 ATL PHYS PUB           ---ATL-PHYS-PUB
+ATL PHYSPUB            ---ATL-PHYS-PUB
+ATLPHYS PUB            ---ATL-PHYS-PUB
 ATL PHYS INT           ---ATL-PHYS-INT
+ATL PHYSINT            ---ATL-PHYS-INT
+ATLPHYS INT            ---ATL-PHYS-INT
 ATL TECH               ---ATL-TECH
 ATL TILECAL            ---ATL-TILECAL
 ATL SOFT               ---ATL-SOFT
@@ -138,6 +140,7 @@ CERN ATS               ---CERN-ATS
 CERN                   ---CERN
 CMS CR                 ---CMS-CR
 CMS NOTE               ---CMS-NOTE
+CMS EXO                ---CMS-EXO
 LHCB                   ---LHCB
 SN ATLAS               ---SN-ATLAS
 PAS SUSY               ---CMS-PAS-SUS

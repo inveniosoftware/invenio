@@ -151,7 +151,7 @@ def get_surname_initial_author_pattern(incl_numeration=False):
 
 
 invalid_surnames = (
-    'Supergravity', 'Collaboration', 'Theoretical', 'Appendix'
+    'Supergravity', 'Collaboration', 'Theoretical', 'Appendix', 'Phys', 'Paper'
 )
 invalid_prefixes = (
     'at',
@@ -309,7 +309,7 @@ def make_auth_regex_str(etal, initial_surname_author=None, surname_initial_autho
     # End of all author name patterns
 
     \)?                # A possible closing bracket to finish the author group
-    (?=[\s,.;])        # Consolidate by checking we are not partially matching
+    (?=[\s,.;:])        # Consolidate by checking we are not partially matching
                        # something else
 
     """ % { 'etal'       : etal,
@@ -379,7 +379,7 @@ re_auth_with_number = re.compile(make_auth_regex_str(
 re_comma_or_and_at_start = re.compile("^(,|((,\s*)?[Aa][Nn][Dd]|&))\s", re.UNICODE)
 
 
-def make_extra_author_regex_str():
+def make_collaborations_regex_str():
     """ From the authors knowledge-base, construct a single regex holding the or'd possibilities of patterns
     which should be included in $h subfields. The word 'Collaboration' is also converted to 'Coll', and
     used in finding matches. Letter case is not considered during the search.
@@ -404,7 +404,7 @@ def make_extra_author_regex_str():
                """to read from KB %(kb)s.\n""" \
                % {'kb' : fpath}
         write_message(emsg, sys.stderr, verbose=0)
-        raise IOError("Error: Unable to open author kb '%s'" % fpath)
+        raise IOError("Error: Unable to open collaborations kb '%s'" % fpath)
 
     for line_num, rawline in enumerate(fh):
         try:
@@ -412,7 +412,7 @@ def make_extra_author_regex_str():
         except UnicodeError:
             write_message("*** Unicode problems in %s for line %d" \
                              % (fpath, line_num), sys.stderr, verbose=0)
-            raise UnicodeError("Error: Unable to parse author kb (line: %s)" % str(line_num))
+            raise UnicodeError("Error: Unable to parse collaboration kb (line: %s)" % str(line_num))
         if rawline.strip() and rawline[0].strip() != '#':
             add_to_auth_list(rawline)
             ## Shorten collaboration to 'coll'
@@ -430,17 +430,7 @@ def make_extra_author_regex_str():
 
 ## Create the regular expression used to find user-specified 'extra' authors
 ## (letter case is not concidered when matching)
-re_extra_auth = re.compile(make_extra_author_regex_str(), re.IGNORECASE)
-
-
-def get_single_and_extra_author_pattern():
-    """Generates a simple, one-hit-only, author name pattern, matching just one author
-    name, but ALSO INCLUDING author names generated from the knowledge base. The author
-    patterns are the same ones used inside the main 'author group' pattern generator.
-    This function is used not for reference extraction, but for author extraction.
-    @return: (string) the union of the built-in author pattern, with the kb defined
-    patterns."""
-    return get_single_author_pattern() + "|" + make_extra_author_regex_str()
+re_collaborations = re.compile(make_collaborations_regex_str(), re.I|re.U)
 
 
 def get_single_author_pattern():
@@ -458,4 +448,4 @@ def get_single_author_pattern():
 
 
 ## Targets single author names
-re_single_author_pattern = re.compile(get_single_and_extra_author_pattern(), re.VERBOSE)
+re_single_author_pattern = re.compile(get_single_author_pattern(), re.VERBOSE)

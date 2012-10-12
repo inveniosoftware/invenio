@@ -85,12 +85,22 @@ def extract_references_from_url_xml(url):
     return marcxml
 
 
-def extract_references_from_file_xml(path, recid=1):
+def extract_references_from_file_xml(path, recid=None):
     """Extract references from a local pdf file
 
     The single parameter is the path to the file
     It raises FullTextNotAvailable if the file does not exist
     The result is given in marcxml.
+    """
+    return extract_references_from_file(path=path, recid=recid).to_xml()
+
+
+def extract_references_from_file(path, recid=None):
+    """Extract references from a local pdf file
+
+    The single parameter is the path to the file
+    It raises FullTextNotAvailable if the file does not exist
+    The result is given as a bibrecord class.
     """
     if not os.path.isfile(path):
         raise FullTextNotAvailable()
@@ -104,7 +114,23 @@ def extract_references_from_file_xml(path, recid=1):
     return parse_references(reflines, recid=recid)
 
 
-def extract_references_from_string_xml(source, is_only_references=True):
+def extract_references_from_string_xml(source,
+                                       is_only_references=True,
+                                       recid=None):
+    """Extract references from a string
+
+    The single parameter is the document
+    The result is given as a bibrecord class.
+    """
+    r = extract_references_from_string(source=source,
+                                       is_only_references=is_only_references,
+                                       recid=recid)
+    return r.to_xml()
+
+
+def extract_references_from_string(source,
+                                   is_only_references=True,
+                                   recid=None):
     """Extract references from a string
 
     The single parameter is the document
@@ -121,7 +147,7 @@ def extract_references_from_string_xml(source, is_only_references=True):
             refs_info['end_line'] = len(docbody) - 1,
 
         reflines = rebuild_reference_lines(docbody, refs_info['marker_pattern'])
-    return parse_references(reflines)
+    return parse_references(reflines, recid=recid)
 
 
 def extract_references_from_record_xml(recid):
@@ -148,7 +174,7 @@ def replace_references(recid):
     """
     # Parse references
     references_xml = extract_references_from_record_xml(recid)
-    references = create_record(references_xml.encode('utf-8'))
+    references = create_record(references_xml)
     # Record marc xml
     record = get_record(recid)
 
@@ -183,7 +209,7 @@ def update_references(recid, overwrite=True):
         # Check for references in record
         record = get_record(recid)
         if record and record_has_field(record, '999'):
-            raise RecordHasReferences('Record has references and overwrite ' \
+            raise RecordHasReferences('Record has references and overwrite '
                                       'mode is disabled: %s' % recid)
 
     if get_fieldvalues(recid, '999C59'):
@@ -196,7 +222,7 @@ def update_references(recid, overwrite=True):
     (temp_fd, temp_path) = mkstemp(prefix=CFG_REFEXTRACT_FILENAME,
                                    dir=CFG_TMPSHAREDDIR)
     temp_file = os.fdopen(temp_fd, 'w')
-    temp_file.write(references_xml.encode('utf-8'))
+    temp_file.write(references_xml)
     temp_file.close()
 
     # Update record

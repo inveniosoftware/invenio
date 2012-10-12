@@ -164,7 +164,7 @@ def task_run_core(name, func, extra_vars=None):
         name = "%s:%s" % (name, task_get_option('task_specific_name'))
     write_message("Starting %s" % name)
 
-    if not extra_vars:
+    if extra_vars is None:
         extra_vars = {}
 
     records = fetch_concerned_records(name)

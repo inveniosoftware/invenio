@@ -837,7 +837,7 @@ def replace_references(recid, uid=None, txt=None, url=None):
         references_xml = extract_references_from_url_xml(url)
     else:
         references_xml = extract_references_from_record_xml(recid)
-    references = create_record(references_xml.encode('utf-8'))
+    references = create_record(references_xml)
 
     dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
     out_xml = None
