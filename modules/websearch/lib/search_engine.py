@@ -136,6 +136,7 @@ re_operators = re.compile(r'\s([\+\-\|])\s')
 re_pattern_wildcards_after_spaces = re.compile(r'(\s)[\*\%]+')
 re_pattern_single_quotes = re.compile("'(.*?)'")
 re_pattern_double_quotes = re.compile("\"(.*?)\"")
+re_pattern_parens_quotes = re.compile(r'[\'\"]{1}[^\'\"]*(\([^\'\"]*\))[^\'\"]*[\'\"]{1}')
 re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
 re_pattern_spaces_after_colon = re.compile(r'(:\s+)')
 re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
@@ -1952,8 +1953,8 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         p = spires_syntax_converter.convert_query(p)
 
     # sanity check: do not call parenthesised parser for search terms
-    # like U(1):
-    if not re_pattern_parens.search(p):
+    # like U(1) but still call it for searches like ('U(1)' | 'U(2)'):
+    if not re_pattern_parens.search(re_pattern_parens_quotes.sub('_', p)):
         return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
 
     # Try searching with parentheses

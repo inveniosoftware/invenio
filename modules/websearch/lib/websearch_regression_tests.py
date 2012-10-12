@@ -1372,6 +1372,13 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=%28U%281%29+OR+SL%282%2CZ%29%29',
                                                expected_text="[57, 79, 80, 88]"))
 
+    def test_special_terms_u1_and_sl_in_quotes(self):
+        """websearch - query for special terms, ('SL(2,Z)' OR 'U(1)')"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + "/search?of=id&p=%28%27SL%282%2CZ%29%27+OR+%27U%281%29%27%29",
+                                               expected_text="[57, 79, 80, 88, 96]"))
+
+
 class WebSearchJournalQueryTest(unittest.TestCase):
     """Test of the search results for journal pubinfo queries."""
 
