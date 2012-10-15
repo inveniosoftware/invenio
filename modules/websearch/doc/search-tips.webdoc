@@ -25,6 +25,8 @@
 <en>How to find any value in any field:</en>
 <fr>Comment chercher n'importe quel mot dans n'importe quel champ:</fr>
 <it>Come cercare dei termini in qualsiasi campo:</it>
+<ca>Com cercar qualsevol valor en qualsevol camp:</ca>
+<es>Cómo buscar cualquier valor en cualquier campo:</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -45,6 +47,9 @@
   <fr>Une recherche vide retourne toutes les entrées de la base de donnée.</fr>
   <it>Non specificando alcun termine per la ricerca vengono riportati tutti i
   record del database.</it>
+  <ca>Una cerca buida retorna tots els registres de la base de dades</ca>
+  <es>Una búsqueda vacía devuelve todos los registros de la base de
+  datos</es>
 </lang>
 </td>
 </tr>
@@ -55,6 +60,8 @@
 <en>How to find documents in a particular collection:</en>
 <fr>Comment trouver un document classé dans une collection spécifique:</fr>
 <it>Come trovare documenti appartenenti ad una particolare collezione:</it>
+<ca>Com cercar documents en una col·lecció específica:</ca>
+<es>Cómo buscar documentos en una colección específica:</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -93,6 +100,14 @@
   e seleziona delle sotto-collezioni come Preprints o Thesis o
   seleziona/deseleziona le caselle di selezione accanto alle collezioni
   desiderate prima di effettuare la ricerca.</it>
+  <ca>Feu clic a un dels enllaços de sota la casella de cerca per
+  veure i seleccionar subcol·leccions com Preprints o Theses, o bé
+  marqueu/desmarqueu les caselles del costat abans de fer la
+  cerca.</ca>
+  <es>Haga clic sobre uno de los enlaces de debajo de la casilla de
+  búsqueda para visitar subcolecciones como Preprints o Theses, o
+  marque/desmarque las casillas de al lado antes de efectar la
+  búsqueda.</es>
 </lang>
 </td>
 </tr>
@@ -125,6 +140,11 @@
 <it>Se desideri dei documenti appartenenti a una 'collezione' non proposta
 in maniera predefinita, come i documenti NA60, inseriscila come un termine
 della ricerca.</it>
+<ca>Si voleu documents d'una col·lecció no proposada per defecte, com
+els documents NA60, escrivi el nom de la col·lecció a la petició.</ca>
+<es>Si desea documentos de una colección no propuesta por defecto,
+como los documentos NA60, escriba el nombre de la colección a la
+petició.</es>
 </lang>
 </td>
 </tr>
@@ -135,12 +155,16 @@ della ricerca.</it>
   <fr>plus d'informations sur le choix des termes de recherche...</fr>
   <it>maggiori informazioni riguardo a come scegliere in maniera appropriata
   i termini di rcerca...</it>
+  <ca>més sobre com escollir els termes de cerca...</ca>
+  <es>más sobre como escoger los términos de búsqueda...</es>
 </lang></a></small></div>
 
 <h5><lang>
 <en>How to search for words/phrases (within titles, abstracts, etc):</en>
 <fr>Comment chercher un ou plusieurs mots, une phrase (dans le titre, l'abstract, etc.):</fr>
 <it>Come effettuare una ricerca di parole/frasi (all'interno di titoli, abstract, ecc.)</it>
+<ca>Com cercar paraules o frases (dins el títol, resum, etc.):</ca>
+<es>Como buscar palabras o frases (dentro del título, resumen, etc.):</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -164,6 +188,10 @@ della ricerca.</it>
       <em>boson</em>.</fr>
   <it>Restituisce i record contenenti le parole <em>higgs</em> e
       <em>boson</em>.</it>
+  <ca>Retorna els registres que contenen la paraula <em>higgs</em> i
+      <em>boson</em>.</ca>
+  <es>Devuelve los registros que contienen la palabra <em>higgs</em> y
+      <em>boson</em>.</es>
 </lang>
 </td>
 </tr>
@@ -187,6 +215,10 @@ della ricerca.</it>
       dans le titre.</fr>
   <it>Restituisce i record contenenti la frase <em>'higgs boson'</em> nel
       titolo.</it>
+  <ca>Retorna els registres que contenen la frase <em>'higgs
+      boson'</em>.</ca>
+  <es>Devuelve los registros que contienen la frase <em>'higgs
+      boson'</em>.</es>
 </lang>
 
 </td>
@@ -214,6 +246,12 @@ della ricerca.</it>
   <it>Restituisce i record il cui titolo è esattamente <em>"Higgs boson"</em>
       ma non i record quali <em>"Overview of Higgs boson
       production"</em>.</it>
+  <ca>Retorna els registres que tinguin com a títol exacte <em>«Higgs
+      boson»</em> però no registres com <em>«Overview of Higgs boson
+      production»</em>.</ca>
+  <es>Devuelve los registros que tengan como título exacto <em>«Higgs
+      boson»</em> pero no registros como <em>«Overview of Higgs boson
+      production»</em>.</es>
 </lang>
 
 <br/>(Note: For some indexes such as <em>any
@@ -230,6 +268,8 @@ expressions.  Both behave the same usual way.)
    <fr>plus d'informations sur la recherche de mots ou de
        phrases...</fr>
    <it>maggiori informazioni sulla ricerca per parole e frasi...</it>
+   <ca>més informació sobre cerques a paraules o frases...</ca>
+   <es>más información sobre búsquedas en palabras o frases...</es>
 </lang>
 </a></small></div>
 
@@ -237,6 +277,8 @@ expressions.  Both behave the same usual way.)
 <en>How to use truncation:</en>
 <fr>Comment utiliser la troncature:</fr>
 <it>Come utilizzare la troncatura</it>
+<ca>Com utilitzar el truncament:</ca>
+<es>Como utilizar el truncamiento:</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -260,6 +302,10 @@ expressions.  Both behave the same usual way.)
       <em>muons</em>, <em>muonic</em>, etc.</fr>
   <it>Restituisce i record contenenti le parole <em>muon</em>, <em>muons</em>,
       <em>muonic</em>, ecc.</it>
+  <ca>Retorna els registres que contenen les paraules <em>muon</em>,
+      <em>muons</em>, <em>muonic</em>, etc.</ca>
+  <es>Devuelve los registros que contienen las palabras <em>muon</em>,
+      <em>muons</em>, <em>muonic</em>, etc.</es>
 </lang>
 </td>
 </tr>
@@ -269,6 +315,8 @@ expressions.  Both behave the same usual way.)
   <en>more on truncation...</en>
   <fr>plus d'informations au sujet de la troncature ...</fr>
   <it>maggiori informazioni sulla troncatura...</it>
+  <ca>més informació sobre el truncament...</ca>
+  <es>más información sobre el truncamiento...</es>
 </lang>
 </a></small></div>
 
@@ -276,6 +324,8 @@ expressions.  Both behave the same usual way.)
 <en>How to use boolean operators:</en>
 <fr>Comment utiliser les opérateurs booléens:</fr>
 <it>Come utilizzare gli operatori booleani:</it>
+<ca>Com utilitzar els operadors booleans:</ca>
+<es>Como utilizar los operadores booleanos:</es>
 </lang></h5>
 
 
@@ -308,6 +358,10 @@ expressions.  Both behave the same usual way.)
   <en>Return records containing both <em>muon</em> and <em>kaon</em>.</en>
   <fr>Retourne les notices contenant à la fois <em>muon</em> et <em>kaon</em>.</fr>
   <it>Restituisce i record contenenti sia <em>muon</em> che <em>kaon</em>.</it>
+  <ca>Retorna els registres que contenen les paraules <em>muon</em> i
+      <em>kaon</em>.</ca>
+  <es>Devuelve los registros que contienen las palabras <em>muon</em> y
+      <em>kaon</em>.</es>
 </lang>
 </td>
 </tr>
@@ -328,6 +382,10 @@ expressions.  Both behave the same usual way.)
   <en>Return records containing either <em>muon</em> or <em>kaon</em>.</en>
   <fr>Retourne les notices contenant soit <em>muon</em>, soit <em>kaon</em>.</fr>
   <it>Restituisce i record contenenti <em>muon</em> e/o <em>kaon</em>.</it>
+  <ca>Retorna els registres que contenen ja sigui <em>muon</em> o
+      <em>kaon</em>.</ca>
+  <es>Devuelve los registros que contienen bien <em>muon</em> o
+      <em>kaon</em>.</es>
 </lang>
 </td>
 </tr>
@@ -348,6 +406,10 @@ expressions.  Both behave the same usual way.)
   <en>Return records containing <em>muon</em> but not <em>kaon</em>.</en>
   <fr>Retourne les notices contenant <em>muon</em>, mais pas <em>kaon</em>.</fr>
   <it>Restituisce i record contenenti <em>muon</em> ma non <em>kaon</em>.</it>
+  <ca>Retorna els registres que contenen <em>muon</em> però no
+      <em>kaon</em>.</ca>
+  <es>Devuelve los registros que contienen <em>muon</em> pero no
+      <em>kaon</em>.</es>
 </lang>
 </td>
 </tr>
@@ -400,6 +462,8 @@ expressions.  Both behave the same usual way.)
 <en>How to find documents from a certain period:</en>
 <fr>Comment chercher un document d'une certaine période:</fr>
 <it>Come cercare i documenti a partire da un certo periodo:</it>
+<ca>Com cercar documents d'un període específic:</ca>
+<es>Como buscar documentos de un período específico:</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -421,6 +485,8 @@ expressions.  Both behave the same usual way.)
   <en>Type <em>2003</em> and select the <em>_(year)_</em> field.</en>
   <fr>Saisissez <em>2003</em> and sélectionnez le champ <em>_(year)_</em>.</fr>
   <it>Digita <em>2003</em> e seleziona il campo <em>_(year)_</em>.</it>
+  <ca>Escriviu <em>2003</em> i seleccioneu el camp <em>_(year)_</em>.</ca>
+  <es>Escriba <em>2003</em> y seleccione el campo <em>_(year)_</em>.</es>
 </lang>
 </td>
 </tr>
@@ -441,6 +507,8 @@ expressions.  Both behave the same usual way.)
   <en>Alternatively, type <code>'_(year)_:'</code> followed by value.</en>
   <fr>Alternativement, saisissez <code>'_(year)_:'</code> suivi de l'année.</fr>
   <it>In alternativa, digita <code>'_(year)_:'</code> seguito dall'anno.</it>
+  <ca>Alternativament, escriviu <code>'_(year)_:'</code> seguit del valor.</ca>
+  <es>Alternativamente, escriba <code>'_(year)_:'</code> seguido del valor.</es>
 </lang>
 </td>
 </tr>
@@ -461,6 +529,8 @@ expressions.  Both behave the same usual way.)
   <en>You can enter specific year range.</en>
   <fr>Vous pouvez également définir un intervalle temporel.</fr>
   <it>Puoi inserire specifici intervalli di anni.</it>
+  <ca>També podeu entrar l'intèrval temporal.</ca>
+  <es>También puede entrar el intérvalo temporal.</es>
 </lang>
 </td>
 </tr>
@@ -552,6 +622,8 @@ expressions.  Both behave the same usual way.)
 <en>How to search for authors:</en>
 <fr>Comment chercher un document par auteur:</fr>
 <it>Come effettuare ricerche su autori:</it>
+<ca>Com cercar per autor:</ca>
+<es>Como buscar por autor:</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -577,6 +649,10 @@ expressions.  Both behave the same usual way.)
   <it>Alcuni autori hanno dei nomi univoci e le loro pubblicazioni possono
       essere recuperate ricercando il cognome nel campo
       <code>_(any field)_</code>.</it>
+  <ca>Alguns autors tenen noms únics i les seves publicacions es poden
+      obtenir cercant el seu nom al camp <code>_(any field)_</code>.</ca>
+  <es>Algunos autores tienen nombres únicos y sus publicaciones se pueden
+      obtener buscando su nombre en el campo <code>_(any field)_</code>.</es>
 </lang>
 </td>
 </tr>
@@ -601,6 +677,10 @@ expressions.  Both behave the same usual way.)
       recherche _(author)_.</fr>
   <it>Per migliorare i risultati della ricerca, digita il cognome seguito dalla
   virgola, seguita dalla(e) iniziale(i) e seleziona il campo _(author)_.</it>
+  <ca>Per millorar els resultats, escriviu el cognom, coma i la
+      inicial i seleccioneu el camp _(author)_</ca>
+  <es>Para mejorar los resultados, escriba el apellido, coma y la
+      inicial y seleccione el campo _(author)_</es>
 </lang>
 </td>
 </tr>
@@ -622,6 +702,8 @@ expressions.  Both behave the same usual way.)
   <fr>Parfois, les auteurs peuvent être inscrits avec leur prénom
   complet.</fr>
   <it>A volte gli autori sono indicizzati tramite il loro nome completo.</it>
+  <ca>Els autors també poden estar indexats pel seu nom sencer.</ca>
+  <es>Los autores también pueden estar indexados pel su nombre completo.</es>
 </lang>
 </td>
 </tr>
@@ -647,6 +729,11 @@ expressions.  Both behave the same usual way.)
   <it>Come ricercare i tutti gli articoli di J.Ellis scritti tra il 1990 e il
   1993, utilizzando la troncatura per ricuperare tutti i nomi di battesimo
   che cominciano con J.</it>
+  <ca>Cercar documents escrits per J. Ellis escrits entre 1990 i 1993, 
+      usant el truncament per trobar tots els noms que comencin per J.</ca>
+  <es>Buscar documentos escritos por J. Ellis escritos entre 1990 y 1993, 
+      usando la truncación para encontrar todos los nombress que empiecen
+       per J.</es>
 </lang>
 </td>
 </tr>
@@ -656,6 +743,8 @@ expressions.  Both behave the same usual way.)
   <en>more on author searches...</en>
   <fr>plus d'informations au sujet de la recherche par auteur...</fr>
   <it>maggiori informazioni sulla ricerca tramite nome dell'autore...</it>
+  <ca>més informació sobre la cerca per autor...</ca>
+  <es>más información sobre la búsqueda por autor...</es>
 </lang>
 </a></small></div>
 
@@ -663,6 +752,8 @@ expressions.  Both behave the same usual way.)
 <en>More information:</en>
 <fr>Plus d'informations:</fr>
 <it>Ulteriori informazioni:</it>
+<ca>Més informació:</ca>
+<es>Más información:</es>
 </lang></h5>
 
 <lang>
@@ -679,4 +770,12 @@ expressions.  Both behave the same usual way.)
       spiegate in maniera estesa ulteriori funzionalità quali caratteri speciali,
       espressioni regolari, ricerca nel testo integrale,
       ricerca tramite citazioni.</it>
+  <ca>Més explicacions sobre caràcters especials, expressions
+      regulars, cerca en el text complet, cerca en les cites, i altres
+      funcionalitats estan explicades a la
+      <a href="search-guide<lang:link/>">Guia de cerca</a>.</ca>
+  <es>Más explicaciones sobre caracteres especiales, expresiones
+      regulares, búsqueda en el texto completo, búsqueda en las citas,
+      y otras funcionalitades están explicadas en la
+      <a href="search-guide<lang:link/>">Guia de búsqueda</a>.</es>
 </lang>
