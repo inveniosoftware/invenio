@@ -1760,6 +1760,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
        spaces if it would give some hits.  See the Search Internals
        document for detailed description.  (ap=0 forbits the
        alternative pattern usage, ap=1 permits it.)
+       'ap' is also internally used for allowing hidden tag search
+       (for requests coming from webcoll, for example). In this
+       case ap=9
 
        The 'of' argument governs whether to print or not some
        information to the user in case of no match found.  (Usually it
@@ -1801,6 +1804,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if req:
         user_info = collect_user_info(req)
         can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+    if not req and ap == 9: # special request, coming from webcoll
+        can_see_hidden = True
     if can_see_hidden:
         myhiddens = []
 
@@ -1834,9 +1839,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     if verbose >= 9 and of.startswith("h"):
                         print_warning(req, "Pattern %s hitlist omitted since \
                                             it queries in a hidden tag %s" %
-                                      (repr(bsu_p), repr(myhiddens)))
+                                      (cgi.escape(repr(bsu_p)), repr(myhiddens)))
                     display_nearest_terms_box=False #..and stop spying, too.
-
         if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset))
         if len(basic_search_unit_hitset) > 0 or \
