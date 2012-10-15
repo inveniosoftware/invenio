@@ -921,7 +921,7 @@ def arxiv_login(req):
             pinfo = dict()
             session['personinfo'] = pinfo
             pinfo["ticket"] = []
-        session.save()
+        session.dirty = True
 
     session_bareinit(req)
     session = get_session(req)
@@ -947,7 +947,7 @@ def arxiv_login(req):
     else:
         session['personinfo']['arxiv_name'] = ''
 
-    session.save()
+    session.dirty = True
 
     try:
         arxiv_p_ids = uinfo['external_arxivids'].split(';')
@@ -995,7 +995,7 @@ def arxiv_login(req):
             if e['pid'] == t['pid'] and e['bibref'] == t['bibref']:
                 ticket.remove(e)
         ticket.append(t)
-    session.save()
+    session.dirty = True
     return pid
 
 def external_user_can_perform_action(uid):
