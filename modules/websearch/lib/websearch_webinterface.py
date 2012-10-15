@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -454,6 +454,10 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
+
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
@@ -528,6 +532,10 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         record_primary_collection = guess_primary_collection_of_a_record(self.recid)
 
@@ -651,6 +659,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                         text = auth_msg,\
                         navmenuid='search')
 
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
+
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
         req.argd = argd
@@ -690,6 +702,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     return page_not_authorized(req, "../", \
                         text = auth_msg,\
                         navmenuid='search')
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
@@ -1252,6 +1268,10 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
 
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
