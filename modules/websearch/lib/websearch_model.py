@@ -302,10 +302,8 @@ class Collection(db.Model):
         """
         default = {'':g._('any field')}
         found = dict((o.field.code, o.field.name_ln) for o in self._search_within)
-        default.update(found or zip(map(lambda x:x.replace(' ',''),
-                CFG_WEBSEARCH_SEARCH_WITHIN),
-                [f.name_ln for f in Field.query.filter(
-                    Field.name.in_(CFG_WEBSEARCH_SEARCH_WITHIN)).all()]))
+        default.update(found or {(f.name.replace(' ',''), f.name_ln) for f in Field.query.filter(
+                    Field.name.in_(CFG_WEBSEARCH_SEARCH_WITHIN)).all()})
         return default
 
     @property

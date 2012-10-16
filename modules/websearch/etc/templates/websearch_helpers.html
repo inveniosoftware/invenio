@@ -483,7 +483,32 @@
     $("form[name=search]").submit(function() {
       $('.donothide').remove();
       return true; // ensure form still submits
-    });
+    })
+
+    {% if collection.examples %}
+    var $popexample = $("form[name=search] label[for=p]")
+    $popexample.popover({
+      title: '{{ _('Search examples') }}'
+    , content: '<small>{%- for e in collection.examples -%}<a href="{{ url_for('search.search', p=e.example.body) }}" class="muted">{{ e.example.body }} </a><br/>{%- endfor -%}</small>'
+    , trigger: 'manual'
+    , placement: 'bottom'
+    , html: true
+    })
+
+    $("form[name=search] input[name=p]").on('focus', function() {
+      $(this).popover('hide')
+    })
+
+    $("form[name=search]").parent().hover(function() {
+      if (!$("form[name=search] input[name=p]").is( ":focus" )) {
+        $popexample.popover('show')
+      } else {
+        $popexample.popover('hide')
+      }
+    }, function() {
+      $popexample.popover('hide')
+    })
+    {% endif %}
 
     $('#settingsdropdown select[name="of"]').buttonSelect({
       button: '<div class="btn btn-mini" />'
