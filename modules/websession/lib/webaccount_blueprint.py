@@ -81,9 +81,6 @@ def _invenio_settings_plugin_builder(plugin_name, plugin_code):
     if 'settings' in dir(plugin_code):
         candidate = getattr(plugin_code, 'settings')
         return candidate
-        #FIXME
-        if isinstance(candidate, Settings):
-            return candidate
     raise ValueError('%s is not a valid settings plugin' % plugin_name)
 
 

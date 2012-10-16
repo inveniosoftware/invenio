@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,17 +26,36 @@ from invenio.websession_model import User
 from invenio.webuser_flask import current_user, login_user, logout_user
 
 class Storage(object):
+    """
+    Generic storage engine for settings.
 
+    It allows to load and store key-value data only for specified keys.
+    """
     _keys = []
     _data = {}
 
     def __init__(self, keys):
+        """
+        @param keys: allowed keys in the storage.
+        """
         self._keys = keys
 
-    def load(self):
-        return dict((k, self._data.get(k, None)) for k in self._keys)
+    def load(self, default=None):
+        """
+        Loads values from storage system.
+
+        @return: Filtered dictionary and for non-existing keys returns `default`
+        """
+        return dict((k, self._data.get(k, default)) for k in self._keys)
 
     def store(self, data):
+        """
+        Stores data in storage system.
+
+        @param data: multivalue dictionary.
+        For keys with only one value in the value list it stores this single
+        value instead of whole list.
+        """
         self._data.update(map(
             lambda (k,v): (k, v[0] if len(v) == 1 else v),
             filter(
@@ -45,11 +64,16 @@ class Storage(object):
             )))
 
     def save(self):
+        """
+        Implement this method for persistent storage system.
+        """
         pass
 
 
 class UserSettingsStorage(Storage):
-
+    """
+    Storage engine using User settings object for data persistency.
+    """
     def __init__(self, keys, attr=None):
         self._keys = keys
         self._user = User.query.get(current_user.get_id())
@@ -74,10 +98,18 @@ class UserSettingsStorage(Storage):
 
 
 def UserSettingsAttributeStorage(attr):
+    """
+    Class factory for 2nd level user settings.
+    """
     return lambda self, key: UserSettingsStorage(key, attr)
 
-def ModelSettingsStorageBuilder(query_builder):
 
+def ModelSettingsStorageBuilder(query_builder):
+    """
+    Class factory for database model storage system.
+
+    @param query_builder: callable that returns valid SQLAlchemy model instance.
+    """
     class ModelSettingsStorage(Storage):
 
         def __init__(self, keys):
@@ -95,21 +127,33 @@ def ModelSettingsStorageBuilder(query_builder):
 
 
 class Settings(object):
-
-    keys = []
-    storage_builder = Storage
-    form_builder = None
+    """
+    Settings object designed for user account page with widgets.
+    """
+    keys = [] ## list of valid setting keys
+    storage_builder = Storage ## storage builder factory method
+    form_builder = None ## form builder factory method
 
     def __init__(self):
+        ## initializes storage system
         self.storage = self.storage_builder(self.keys)
 
     def load(self):
+        """
+        Loads data from storage system.
+        """
         return self.storage.load()
 
     def store(self, data):
+        """
+        Stores data in storage system.
+        """
         self.storage.store(data)
 
     def save(self):
+        """
+        Commit data in persistent storage system.
+        """
         self.storage.save()
 
 

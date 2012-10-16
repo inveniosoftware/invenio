@@ -194,11 +194,6 @@ def create_invenio_flask_app():
         """
         try:
             from invenio.webuser_flask import UserInfo, current_user
-            try:
-                _app.logger.info("==== %s ====" % str(type(current_user._get_current_object())))
-                #return current_user._get_current_object()
-            except:
-                _app.logger.info("==== CREATING NEW UserInfo OBJECT ====")
             return UserInfo()
         except:
             return None

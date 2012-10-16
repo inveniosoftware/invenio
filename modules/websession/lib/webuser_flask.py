@@ -61,16 +61,44 @@ class GuestUser(dict):
     """
     This is the default object for representing an guest user.
     """
-    def __init__(self):
+    def __init__(self, login_time=False, refresh=False):
         """
         Create user information dictionary from current session or gather them
         based on `session.uid`.
         """
+
+        # set default values
+        self.update({
+            'remote_ip' : '',
+            'remote_host' : '',
+            'referer' : '',
+            'uri' : '',
+            'agent' : '',
+            'uid' :-1,
+            'nickname' : '',
+            'email' : '',
+            'group' : [],
+            'guest' : '1',
+            'session' : None,
+            'precached_permitted_restricted_collections' : [],
+            'precached_usebaskets' : False,
+            'precached_useloans' : False,
+            'precached_usegroups' : False,
+            'precached_usealerts' : False,
+            'precached_usemessages' : False,
+            'precached_viewsubmissions' : False,
+            'precached_useapprove' : False,
+            'precached_useadmin' : False,
+            'precached_usestats' : False,
+            'precached_viewclaimlink' : False,
+            'precached_usepaperclaim' : False,
+            'precached_usepaperattribution' : False,
+            'precached_canseehiddenmarctags' : False,
+        })
+
         if 'user_info' in session:
-            current_app.logger.info("creating UserInfo from session")
             self.update(session['user_info'])
         else:
-            current_app.logger.info("creating new UserInfo")
             self.reload(update_session=False)
         # Always refresh when creating itself.
         self.refresh()
@@ -96,48 +124,18 @@ class GuestUser(dict):
         db.session.commit()
         self.update(u.__dict__)
 
-    def _precache(self):
-        """
-        Calculate prermitions for user actions.
-        """
-        current_app.logger.info("Precache UserInfo ...")
-        #from invenio.access_control_engine import acc_authorize_action
-        #from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
-        #from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
-        #from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
-        #from invenio.access_control_config import SUPERADMINROLE, CFG_EXTERNAL_AUTH_USING_SSO
-        #from invenio.search_engine import get_permitted_restricted_collections
-        #self['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(self)
-        #self['precached_usebaskets'] = acc_authorize_action(self, 'usebaskets')[0] == 0
-        #self['precached_useloans'] = acc_authorize_action(self, 'useloans')[0] == 0
-        #self['precached_usegroups'] = acc_authorize_action(self, 'usegroups')[0] == 0
-        #self['precached_usealerts'] = acc_authorize_action(self, 'usealerts')[0] == 0
-        #self['precached_usemessages'] = acc_authorize_action(self, 'usemessages')[0] == 0
-        #self['precached_usestats'] = acc_authorize_action(self, 'runwebstatadmin')[0] == 0
-        #self['precached_viewsubmissions'] = isUserSubmitter(self)
-        #self['precached_useapprove'] = isUserReferee(self)
-        #self['precached_useadmin'] = isUserAdmin(self)
-        #self['precached_usebaskets'] = True
-        #self['precached_useadmin'] = True
-        #self['precached_usestats'] = True
-        #self['precached_usegroups'] = True
-
-        for k in ['usegroups', 'usestats', 'useadmin',
-                  'usebaskets', 'useloans', 'usegroups',
-                  'usealerts', 'usemessages', 'usestats',
-                  'viewsubmissions', 'useapprove']:
-            self['precached_'+k] = True
-
     def refresh(self, update_session=True):
         """
         Refresh request information.
         """
         current_app.logger.info("Refresh UserInfo ...")
+        #FIXME: we should support IPV6 too. (hint for FireRole)
         self['remote_ip'] = request.remote_addr or ''
         self['remote_host'] = request.environ.get('REMOTE_HOST', '')
         self['referer'] = request.referrer
         self['uri'] = request.url or ''
         self['agent'] = request.user_agent or 'N/A'
+        self['session'] = session.sid
         if update_session:
             session['user_info'] = dict(self)
 
@@ -146,7 +144,6 @@ class GuestUser(dict):
         Reload user information and precached access list.
         """
         self._login()
-        self._precache()
         if update_session:
             session['user_info'] = dict(self)
 
@@ -180,9 +177,14 @@ class UserInfo(GuestUser):
         """
         current_app.logger.info("Login UserInfo ...")
         from invenio.websession_model import User
-        user = User.query.get(session.uid)
+
+        try:
+            user = User.query.get(session.uid)
+        except:
+            user = None
+
         if user is None:
-            #self.__class__ = GuestUser
+            self.__class__ = GuestUser
             return
         self['id'] = self['uid'] = user.id or None
         self['nickname'] = user.nickname or ''
@@ -192,6 +194,60 @@ class UserInfo(GuestUser):
         self.settings = user.settings or {}
         self['guest'] = str(int(user.guest)) # '1' or '0'
         current_app.logger.info(dict(self))
+        self._precache()
+
+    def _precache(self):
+        """
+        Calculate prermitions for user actions.
+        """
+        from invenio.webuser import isUserSubmitter, isUserReferee, isUserAdmin
+        from invenio.access_control_engine import acc_authorize_action
+        from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
+        from invenio.search_engine import get_permitted_restricted_collections
+        self['precached_permitted_restricted_collections'] = \
+            get_permitted_restricted_collections(self)
+        self['precached_usebaskets'] = acc_authorize_action(self, 'usebaskets')[0] == 0
+        self['precached_useloans'] = acc_authorize_action(self, 'useloans')[0] == 0
+        self['precached_usegroups'] = acc_authorize_action(self, 'usegroups')[0] == 0
+        self['precached_usealerts'] = acc_authorize_action(self, 'usealerts')[0] == 0
+        self['precached_usemessages'] = acc_authorize_action(self, 'usemessages')[0] == 0
+        self['precached_usestats'] = acc_authorize_action(self, 'runwebstatadmin')[0] == 0
+        self['precached_viewsubmissions'] = isUserSubmitter(self)
+        self['precached_useapprove'] = isUserReferee(self)
+        self['precached_useadmin'] = isUserAdmin(self)
+        self['precached_canseehiddenmarctags'] = acc_authorize_action(self, 'runbibedit')[0] == 0
+        usepaperclaim = False
+        usepaperattribution = False
+        viewclaimlink = False
+
+        if (CFG_BIBAUTHORID_ENABLED
+            and acc_is_user_in_role(self, acc_get_role_id("paperclaimviewers"))):
+            usepaperclaim = True
+
+        if (CFG_BIBAUTHORID_ENABLED
+            and acc_is_user_in_role(self, acc_get_role_id("paperattributionviewers"))):
+            usepaperattribution = True
+
+        viewlink = False
+        try:
+            viewlink = session['personinfo']['claim_in_process']
+        except (KeyError, TypeError):
+            pass
+
+        if (CFG_BIBAUTHORID_ENABLED
+            and usepaperattribution
+            and viewlink):
+            viewclaimlink = True
+
+#                if (CFG_BIBAUTHORID_ENABLED
+#                    and ((usepaperclaim or usepaperattribution)
+#                         and acc_is_user_in_role(self, acc_get_role_id("paperattributionlinkviewers")))):
+#                    viewclaimlink = True
+
+        self['precached_viewclaimlink'] = viewclaimlink
+        self['precached_usepaperclaim'] = usepaperclaim
+        self['precached_usepaperattribution'] = usepaperattribution
+
 
 
 KEY_USER_ID = '_uid'
@@ -211,7 +267,6 @@ class InvenioLoginManager(object):
     def setup_app(self, app):
         app.login_manager = self
         app.before_request(self._load_user)
-        app.after_request(self._update_session)
         #app.after_request(self._update_remember_cookie)
 
     def unauthorized_handler(self, callback):
@@ -228,12 +283,6 @@ class InvenioLoginManager(object):
         #FIXME add remember me
         self.reload_user()
 
-    def _update_session(self, response):
-        from flask import session
-        session.update({'user_info':dict(current_user)})
-        #current_app.save_session(session, response)
-        return response
-
     def reload_user(self):
         ctx = _request_ctx_stack.top
         uid = session.get(self.key_user_id, None)
@@ -246,7 +295,7 @@ class InvenioLoginManager(object):
                 logout_user()
             else:
                 ctx.user = user
-        ctx.user.reload(update_session=True)
+        #ctx.user.reload(update_session=True)
 
 # A proxy for current user
 current_user = LocalProxy(lambda: _request_ctx_stack.top.user)

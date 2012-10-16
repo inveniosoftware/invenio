@@ -1151,6 +1151,16 @@ def collect_user_info(req, login_time=False, refresh=False):
     is saved into req._user_info (for caching purpouses)
     setApacheUser & setUid will properly reset it.
     """
+    from invenio.webuser_flask import current_user
+    return current_user._get_current_object()
+
+    ##
+    ## NOT USED ANYMORE
+    ## please see webuser_flask.py
+    ##
+
+    #FIXME move EXTERNAL SSO functionality
+
     from invenio.search_engine import get_permitted_restricted_collections
     user_info = {
         'remote_ip' : '',
@@ -1179,9 +1189,6 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_usepaperattribution' : False,
         'precached_canseehiddenmarctags' : False,
     }
-
-    from invenio.webuser_flask import current_user
-    return current_user._get_current_object()
 
     try:
         is_req = False
