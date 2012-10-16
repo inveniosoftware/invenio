@@ -99,6 +99,7 @@ class BibRankCitationRankingTest(unittest.TestCase):
         """bibrank - search results ranked by number of citations, verbose output"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
+                                               username="admin",
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 
     def test_detailed_record_citations_tab(self):
