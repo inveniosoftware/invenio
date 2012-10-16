@@ -29,6 +29,15 @@
     display: block;
     margin-top: 0px;
   }
+
+  .brand img {
+    height: 20px;
+    opacity: 0.6;
+  }
+
+  .brand:hover img {
+    opacity: 0.95;
+  }
   </style>
   <div class="navbar navbar-fixed-top navbar-inverse">
     <div class="navbar-inner">
@@ -39,7 +48,7 @@
             <span class="icon-bar"></span>
         </a>
         <a class="brand" href="{{ url_for('search.index') }}">
-          {{ config.CFG_SITE_NAME_INTL[g.ln] }}
+          <img src="/img/logo_white.png" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}" />
         </a>
         <ul class="nav pull-right">
           <li>
