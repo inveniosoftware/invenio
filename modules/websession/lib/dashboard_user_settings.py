@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebAccount User Settings"""
+"""Dashboard User Settings"""
 
 from flask import Blueprint, session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app
@@ -26,35 +26,26 @@ from invenio.webinterface_handler_flask_utils import _
 from invenio.webuser_flask import current_user
 from invenio.jinja2utils import render_template_to_string
 from invenio.settings import Settings, UserSettingsStorage, \
-                             ModelSettingsStorageBuilder
+                             ModelSettingsStorageBuilder, \
+                             UserSettingsAttributeStorage
 from invenio.websession_model import User
 from invenio.webaccount_forms import ChangeUserEmailSettingsForm
 
-class WebAccountSettings(Settings):
+class DashboardSettings(Settings):
 
-    keys = ['email']
-    form_builder = ChangeUserEmailSettingsForm
-    storage_builder = ModelSettingsStorageBuilder(
-        lambda: User.query.get(current_user.get_id()))
-
+    keys = ['order']
+    storage_builder = UserSettingsAttributeStorage('dashboard_settings')
+    widget = None
     def __init__(self):
-        super(WebAccountSettings, self).__init__()
+        super(DashboardSettings, self).__init__()
         self.icon = 'user'
-        self.title = _('Account')
-        self.edit = url_for('youraccount.edit', name=__name__.split('.')[-1])
+        self.title = _('Dashboard')
 
-    def widget(self):
-        template = """
-{{  _("You are logged in as %s") | format(current_user.nickname) }}
-"""
-        return render_template_to_string(template, _from_string=True)
-
-    widget.size = 4
 
     @property
     def is_authorized(self):
         return current_user.is_authenticated()
 
 ## Compulsory plugin interface
-settings = WebAccountSettings
-#__all__ = ['WebAccountSettings']
+settings = DashboardSettings
+#__all__ = ['DashboardSettings']

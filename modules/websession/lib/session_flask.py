@@ -212,7 +212,7 @@ class InvenioSessionInterface(SessionInterface):
         return self.session_class(sid=sid)
 
     def save_session(self, app, session, response):
-        #current_app.logger.info("saving session %s" % session.sid)
+        current_app.logger.info("saving session %s" % session.sid)
         domain = self.get_cookie_domain(app)
         from invenio.websession_model import Session
         if not session:

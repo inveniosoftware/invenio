@@ -19,21 +19,41 @@
 {% from "_formhelpers.html" import render_field with context %}
 {% extends "page.html" %}
 {% set title = _('Your Account') %}
+
+{% block title %}
+<div class="page-header">
+  <h1>{{ title }}
+  <small class="clearfix">
+    <div class="pull-right">
+      <input placeholder="{{ _('Filter widgets') }}"
+             type="text"
+             name="widget"
+             autofocus />
+    </div>
+  </small>
+  </h1>
+</div>
+{% endblock %}
+
+{% block header %}
+  {{ super() }}
+  {% css "js/redmond/jquery-ui-1.8.17.custom.css" %}
+  {% js "js/jquery-ui.min.js" %}
+  {#
+  {% js "js/jquery-ui-timepicker-addon.js" %}
+  #}
+{% endblock header %}
+
 {% block body %}
 
 <div class="container">
   <div class="row">
-    <div class="span10">
-    <ul class="thumbnails">
-    {%- for p in plugins -%}
-      <li id="{{ p.__class__.__name__}}" class="span{{ p.widget.size }}">
+    <div class="span12">
+    <ul id="widgets" class="thumbnails">
+    {%- for p in plugins if p.widget -%}
+      <li id="{{ p.__class__.__name__}}" class="widget span{{ p.widget.size }}">
         <div class="thumbnail">
           <div class="caption">
-            {%- if p.edit -%}
-            <a class="btn btn-small pull-right" href="{{ p.edit|safe }}">
-               <i class="icon-wrench"></i>
-            </a>
-            {%- endif -%}
             <h4>
             {%- if p.icon -%}
               <small><i
@@ -48,7 +68,12 @@
             {%- else -%}
               {{ p.title|safe }}
             {%- endif -%}
-
+            <small>
+              {%- if p.edit -%}
+              &nbsp;<a class="edit" href="{{ p.edit|safe }}"><i class="icon-wrench"></i></a>
+              {%- endif -%}
+              <button type="button" class="close">&nbsp;&times;</button>
+            </small>
             </h4>
             <div style="
               overflow: hidden;
@@ -66,5 +91,64 @@
     </div>
   </div>
 </div>
+
+<script>
+  $(function() {
+    $('input[name=widget]').keyup(function(e) {
+      var filter = $(this).val()
+
+      if (filter.length > 0 && e.keyCode === 13) {
+          var l = $('#widgets li:visible').find('a.edit').first().attr('href')
+          if (l.length > 0) {
+            window.location.href = l
+          }
+          return false
+      }
+
+      $('#widgets li').each(function(i, li) {
+        if ($(li).find('.caption').text().indexOf(filter) > -1 || filter == '') {
+          $(this).show()
+        } else {
+          $(this).hide()
+        }
+      })
+    })
+
+    $("#widgets li").each(function() {
+      var $e = $(this)
+      $e.find('.close').on('click', function() {
+        $e.hide()
+      })
+    })
+
+    $( "#widgets" ).sortable({
+      update: function(event, ui) {
+        var newOrder = $(this).sortable('toArray');
+        $.ajax({
+          url: '{{ url_for('youraccount.edit', name='dashboard_user_settings') }}'
+        , type: 'POST'
+        , data: $.param({
+            order: newOrder
+          }, true)
+        });
+      }
+    });
+    $( "#widgets" ).disableSelection();
+  });
+</script>
+
+<style>
+#widgets li .thumbnail {
+  background: white;
+}
+
+#widgets li.ui-sortable-placeholder {
+  background: #CCC;
+  height: 120px;
+  display: block;
+  float: left;
+  visibility: visible!important;
+}
+</style>
 
 {% endblock %}

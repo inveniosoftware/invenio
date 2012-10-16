@@ -55,9 +55,10 @@
           split_by = this.options.split_by,
           button_more = this.options.button_builder(this.options.title_more),
           button_less = this.options.button_builder(this.options.title_less),
-          button_clear = this.options.clear_button_builder(this.options.title_clear),
+          //button_clear = this.options.clear_button_builder(this.options.title_clear),
           row_builder = this.options.row_builder;
 
+      /*
       var $controls = $(this.options.controls_builder());
       $controls.hide().appendTo(element);
       $(this.options.control_button_builder(this.options.title_limit_to))
@@ -68,19 +69,20 @@
         .addClass('btn-danger').on('click', function() {
           return that.updateFacets('-');
         }).appendTo($controls);
+      */
 
       for (var i in facets) {
         var f = facets[i];
 
         // Create selected facet filter.
-        $(this.options.filter_builder(f.facet, f.title)).hide().appendTo(filter);
+        $(this.options.filter_builder(f.facet, f.title)).appendTo(filter);
         // Create facet sidebar.
-        $(this.options.box_builder(f.facet, f.title)).hide().appendTo(element);
+        $(this.options.box_builder(f.facet, f.title)).appendTo(element);
         // Load sidebar options.
         $.ajax({
           url: f.url,
           dataType : 'json',
-          context: $('.'+f.facet+' .accordion-inner').data('facet', f.facet)
+          context: $('.'+f.facet+' .context').data('facet', f.facet)
         }).done(function(json) {
           var el = $(this),
               name = el.data('facet');
@@ -93,16 +95,6 @@
           /* Append buttons */
           var l = $(button_less),
               m = $(button_more);
-          l.on('click', function(e) {
-            var controls = el.find('.controls:visible');
-            m.show();
-            if (controls.length > split_by) {
-              controls.slice(split_by).slice(-1-split_by).hide();
-            }
-            if (controls.length <= 2*split_by) {
-              l.hide();
-            }
-          }).appendTo(el);
 
           m.on('click', function(e) {
             var controls = el.find('.controls:not(:visible)').slice(0,split_by)
@@ -112,6 +104,17 @@
             }
             controls.show();
           }).appendTo(el);
+
+          l.on('click', function(e) {
+            var controls = el.find('.controls:visible');
+            m.show();
+            if (controls.length > split_by) {
+              controls.slice(split_by).slice(-1-split_by).hide();
+            }
+            if (controls.length <= 2*split_by) {
+              l.hide();
+            }
+          }).addClass('pull-right').appendTo(el);
 
           el.find('.controls:not(:visible)').slice(0,split_by).show();
 
@@ -124,15 +127,15 @@
 
           if (json.facet.length) {
             $(this).parent().parent().show();
-            $(this).parent().addClass("in");
-            $controls.show();
+            //$(this).parent().addClass("in");
+            //$controls.show();
           }
 
         }); // end ajax done
       } // end for
 
       // Filter clear button.
-      $(button_clear).on('click', $.proxy(this.clear, this)).appendTo(filter);
+      //$(button_clear).on('click', $.proxy(this.clear, this)).appendTo(filter);
 
       this.filter = {'+': {}, '-': {} };
 
@@ -158,7 +161,6 @@
       var that = this;
       this.$element.find('input:checked').each(function(i,el) {
         that._addFacet(prefix, $(el).attr('name'), $(el).val());
-        $(el).attr('checked', false);
       });
       this.$element.trigger($.Event('updated'));
       return false;
@@ -186,8 +188,7 @@
     }
 
   , _addFacet: function(op, key, value) {
-      var that = this,
-          filter = $(this.options.filter)
+      var that = this
 
       if (key in this.filter[op]) {
         if ($.inArray(value, this.filter[op][key])>-1) {
@@ -202,6 +203,7 @@
       var op2 = op == '+' ? '-' : '+'
       this._delete(op2, key, value)
 
+      /*
       filter.find('.'+key).show().parent().show();
       filter.find('.'+key+' span.data').append(
         that.options.badge.clone().addClass(that.options.op_classes[op]).append(
@@ -211,7 +213,8 @@
           })
         ).append(value)
       );
-
+      */
+      this.$element.trigger($.Event('added', {op: op, key: key, value: value}));
       return true;
     }
 
@@ -226,27 +229,46 @@
   , _delete: function(op, key, value) {
       var filter = $(this.options.filter),
           r = this.filter[op][key],
-          i = $.inArray(value, r),
-          key_data = filter.find('.'+key),
-          data = key_data.find('span.data').children();
+          i = $.inArray(value, r)
 
       if (i>-1) {
         this.filter[op][key].splice(i,1);
         if (!this.filter[op][key].length) {
           delete this.filter[op][key];
+          this.$element.trigger($.Event('deleted', {op: op, key: key, value: value}));
         }
-      }
-      if (!data.length) {
-        key_data.hide();
-      }
-
-      if (filter.find('div.facets_fill:hidden').length === filter.find('div.facets_fill').length) {
-        filter.hide();
       }
     }
 
   , delete: function(op, key, value) {
       this._delete(op, key, value);
+      this.$element.trigger($.Event('updated'));
+    }
+
+  , toggleFacet: function(op, key, value) {
+      if (key in this.filter[op]) {
+        if ($.inArray(value, this.filter[op][key])>-1) {
+          return this.delete(op, key, value)
+        }
+      }
+      return this.addFacet(op, key, value)
+    }
+
+  , resetKey: function(key) {
+      var that = this,
+          filter = this.filter
+      if ('+' in filter && key in filter['+'] && filter['+'][key].length) {
+        var values = $.extend([], filter['+'][key])
+        $.each(values, function(i, v) {
+          that._delete('+', key, v)
+        })
+      }
+      if ('-' in filter && key in filter['-'] && filter['-'][key].length) {
+        var values = $.extend([], filter['-'][key])
+        $.each(values, function(i, v) {
+          that._delete('-', key, v)
+        })
+      }
       this.$element.trigger($.Event('updated'));
     }
 
@@ -267,12 +289,12 @@
       this.filter['-'] = {};
       return this;
     }
+
   , clear: function() {
       this._clear()
       this.$element.trigger($.Event('updated'));
       return this;
     }
-
   }
 
   /* FACET PLUGIN DEFINITION
@@ -289,16 +311,6 @@
   }
 
   $.fn.facet.defaults = {
-    controls_builder: function() {
-      return '<div class="btn-group" style="height: 28px; margin-bottom: 18px;"></div>';
-    },
-    control_button_builder: function(title) {
-      return '<button style="width:50%; height: 100%; white-space: nowrap; overflow:hidden; text-overflow:ellipsis;" class="btn btn-mini" rel="tooltip" title="'+title+'">\
-        '+title+'\
-        </button>\
-        </div>';
-
-    },
     box_builder: function(name, title) {
       return '<div class="accordion-group">' +
             '<div class="accordion-heading">' +
@@ -308,7 +320,7 @@
                 '</a>' +
               '</div>' +
               '<div class="' + name + ' accordion-body collapse">' +
-                '<div class="accordion-inner">' +
+                '<div class="accordion-inner context">' +
                   '<!-- AJAX load -->' +
                 '</div>' +
               '</div>' +
@@ -348,5 +360,31 @@
   };
 
   $.fn.facet.Constructor = Facet
+
+  $(function () {
+    $('body').on('click.facet.data-api', '[data-facet="toggle"]', function (e) {
+      var $t = $(e.currentTarget),
+          action = $t.attr('data-facet-action'),
+          target = $t.attr('data-target')
+      if (e.shiftKey) {
+        action = (action=='+')?'-':'+'
+        $t.attr('data-facet-action')
+      }
+
+      $(target).data('facet').toggleFacet(
+        action,
+        $t.attr('data-facet-key'),
+        $t.attr('data-facet-value')
+      )
+    })
+
+    $('body').on('click.facet.data-api', '[data-facet="reset-key"]', function (e) {
+      var $t = $(e.currentTarget),
+          target = $t.attr('data-target')
+      $(target).data('facet').resetKey(
+        $t.attr('data-facet-key')
+      )
+    })
+  })
 
 }( window.jQuery )

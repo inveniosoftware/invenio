@@ -76,6 +76,7 @@ class User(db.Model):
     note = db.Column(db.String(255), nullable=True)
     settings = db.Column(
                 db.PickleType(
+                    mutable=True,
                     pickler=MarshalPickle(
                         set_empty=True,
                         default=get_default_user_preferences())),

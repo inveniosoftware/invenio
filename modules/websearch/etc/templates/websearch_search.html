@@ -120,7 +120,7 @@ body {
   <div class="span2 visible-desktop">
     <div class="row">
     <div
-      class="accordion span2"
+      class="accordion span2 facet"
       id="facet_list">
     </div>
     </div>
@@ -155,17 +155,19 @@ body {
 <script>
 (function($) {
 
-    // side facet list
-    $('#facet_list').affix({
-      offset: {
-        top: function () {
-          var $s = $('#search-box-main'),
-              h = $s.height(),
-              y = $s.offset()['top']
-          return $(window).width() <= 980 ? 165 : h }
-      , bottom: 170
-      }
-    })
+  var popupTimer // global popup timer
+
+  // side facet list
+  $('#facet_list').affix({
+    offset: {
+      top: function () {
+        var $s = $('#search-box-main'),
+            h = $s.height(),
+            y = $s.offset()['top']
+        return $(window).width() <= 980 ? 165 : h }
+    , bottom: 170
+    }
+  })
 
   $('#overlay').modal({
       keyboard: false,
@@ -173,41 +175,33 @@ body {
   }).modal('hide');
 
   $('#facet_list').facet({
-    controls_builder: function() { return ''; },
-    control_button_builder: function(title) { return ''; },
+    button_builder: function(title) {
+      return '<a style="cursor:pointer" class="muted"><small>'+title+' ...</small></a> ';
+    },
     row_builder: function(data, name) {
-      var span_style =  'display: inline-block;' +
-                        'white-space: nowrap;' +
-                        'width: 50%;' +
-                        'overflow: hidden;' +
-                        'text-overflow: ellipsis;',
-          title = data[(data.length==3)?2:0];
-
-      return '<div class="controls" style="margin-bottom: 2px; line-height: 14px; font-size: 10px; display:none;">'+
-                '<i style="margin-top: -2px; cursor:pointer;" class="icon icon-filter" ' +
-    'onclick="$(\'#facet_list\').data(\'facet\').addFacet(\'+\',\'' +
-  name + '\',\'' + data[0] + '\');"></i>' +
-                '<i style="margin-top: -2px; cursor:pointer;" class="icon icon-minus" ' +
-    'onclick="$(\'#facet_list\').data(\'facet\').addFacet(\'-\',\'' +
-  name + '\',\'' + data[0] + '\');"></i> <span title="'+title+'" style="'+ span_style +'">' +
-                title +
-            '</span> <span class="pull-right">(' + data[1] + ')</span>'+
-            '<div style="clear:both;"></div></div>';
+      var title = data[(data.length==3)?2:0],
+          counter = data[1]
+      return '<li class="controls" style="display:none">'+
+                 '<a style="cursor:pointer" ' +
+                    'data-target="#facet_list" ' +
+                    'data-facet="toggle" ' +
+                    'data-facet-action="+" '+
+                    'data-facet-key="' + name + '" '+
+                    'data-facet-value="' + title + '">' +
+        title +
+        '</a> <small class="muted">('+counter+')</small>' +
+        '</li>'
     },
-
-    clear_button_builder: function(title) {
-      return '<span class="pull-right btn btn-danger">'+title+'</span> \
-              <span onclick="$(\'form[name=search]\').submit()" class="btn">\
-              <i class="icon icon-ok"></i> {{ _('Apply') }}</span> \
-              <div style="clear:both;"></div>';
+    box_builder: function(name, title) {
+      return '<div class="'+name+'">' +
+      '<a style="cursor:pointer" ' +
+         'data-facet="reset-key" '+
+         'data-target="#facet_list" ' +
+         'data-facet-key="'+ name +'"><strong>'+
+        title + '</strong></a>' +
+        '<ul class="context unstyled"><ul></div>'
     },
-    filter: $('#facet_filter'),
-    facets: {{ facets|tojson|safe }},
-    title_clear: '<i class="icon icon-ban-circle icon-white"></i> {{ _('Clear') }}',
-    title_more: '<i class="icon icon-chevron-down"></i> {{ _('More') }}',
-    title_less: '<i class="icon icon-chevron-up"></i> {{ _('Less') }}',
-    title_exclude: '{{ _('Exclude') }}', // translationable title
-    title_limit_to: '{{ _('Limit to') }}', // translationable title
+    facets: {{ facets|tojson|safe }}
   }).on('updated', function(event) {
     var p = $('#facet_filter input[name=p]').val();
     $('#search-box-main input[name=p]')
@@ -253,6 +247,106 @@ body {
         return i[0];
       });
 
+    $('[data-facet="toggle"]').addClass('muted').each(function(i) {
+
+      var $e = $(this),
+          filterContent = function() {
+            return '{{ _('Default action is <em class="text-info">limit</em>, however you can also <abbr title="you can use shift+left click"><em class="text-error">exclude</em></abbr> selected term from results.')|safe }}<br/><a class="btn btn-small btn-error" style="cursor:pointer" ' +
+              'data-target="#facet_list" ' +
+              'data-facet="toggle" ' +
+              'data-facet-action="-" '+
+              'data-facet-key="' + $e.attr('data-facet-key') + '" '+
+              'data-facet-value="' + $e.attr('data-facet-value') + '">' +
+        '{{ _('Exclude') }}' + '</a>'
+      }
+
+      $(this).popover({
+        html: true
+      , placement: 'right'
+      , trigger: 'manual'
+      , delay: {show: 200, hide: 1000}
+      , content: filterContent
+      , title: '{{ _('Did you know?') }}'
+      })
+
+      $(this).on('mouseenter', function() {
+        var popupFunc = function() {$e.popover('show')}
+        if (popupTimer)
+          clearTimeout(popupTimer)
+        popupTimer = setTimeout(popupFunc, 750)
+      })
+      $(this).parent().on('mouseleave', function() {
+        if (popupTimer)
+          clearTimeout(popupTimer)
+        $e.popover('hide')
+      })
+
+    })
+// on hover add button in popover
+    $('[data-facet="reset-key"]').addClass('text-info')
+
+    $('[data-facet="reset-key"]').each(function(e) {
+      $(this).on('click', function() {
+        $('[data-facet-key="'+ $(this).attr('data-facet-key') +'"]')
+          .attr('data-facet-action', '+')
+          .removeClass('text-error')
+          .removeClass('text-info')
+          .css('font-weight', 'normal')
+        $(this).removeClass('muted').addClass('text-info')
+      })
+    })
+
+
+    $('#search_results').css('min-height', $('#facet_list').height())
+    $('#facet_list').affix('checkPosition');
+
+    if (document.location.hash.length > 2) {
+      $(window).trigger('hashchange');
+    }
+
+  }).on('deleted', function(event) {
+
+    $('[data-facet-key="'+event.key+'"]')
+      .filter('[data-facet-value="'+event.value+'"]')
+      .each(function(e) {
+        $(this)
+          .removeClass('text-error')
+          .removeClass('text-info')
+          .css('font-weight', 'normal')
+          .attr('data-facet-action', '+')
+      })
+
+    var resetKey = false
+    try {
+      if ($(this).data('facet').filter['+'][event.key].length +
+          $(this).data('facet').filter['-'][event.key].length == 0) {
+        resetKey = true
+      }
+    } catch(err) {
+      resetKey = true
+    }
+    if (resetKey) {
+      $('[data-facet="reset-key"]')
+        .filter('[data-facet-key="'+event.key+'"]')
+        .addClass('text-info')
+    }
+
+  }).on('added', function(event) {
+
+    var type = (event.op == '+')?'info':'error'
+    $('[data-facet-key="'+event.key+'"]')
+      .filter('[data-facet-value="'+event.value+'"]')
+      .each(function(e) {
+        $(this)
+          .addClass('text-'+type)
+          .css('font-weight', 'bold')
+      })
+
+    $('[data-facet="reset-key"]')
+      .filter('[data-facet-key="'+event.key+'"]')
+      .removeClass('text-info')
+      .addClass('muted')
+{#
     $('#facet_list i.icon-filter').tooltip({
       'title':'{{ _('Limit to')}}'
     , 'placement': 'right'
@@ -261,9 +355,8 @@ body {
       'title':'{{ _('Exclude')}}'
     , 'placement': 'right'
     });
+#}
 
-    $('#search_results').css('min-height', $('#facet_list').height())
-    $('#facet_list').affix('checkPosition');
   }).on('exists', function(event) {
     alert('{{ _('An item is already in the facet filter.') }}');
   });

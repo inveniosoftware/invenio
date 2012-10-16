@@ -40,6 +40,9 @@
 {% block body %}
 
 <style>
+.websearch .nav > li > ul > li {
+  float: left;
+}
 .websearch .nav > li > a {
   white-space: nowrap;
 }
@@ -87,13 +90,13 @@
 
 {{ search_form(collection) }}
 
-<div class="row websearch"><!-- row 2 -->
+<div class="row websearch clearfix"><!-- row 2 -->
   {{ portalbox_sidebar(portalboxes.lt, class="span2") }}
 
   {% if collection.collection_children_r %}
-    <div class="span{{ '4' if collection.collection_children_v else '8' }} collection">
+    <div class="span{{ '4' if collection.collection_children_v else '8' }} collection clearfix">
       <h4>{{ _("Narrow by collections") }}</h4>
-      {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list") }}
+      {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
     </div>
   {% else %}
       <div class="span{{ '4' if collection.collection_children_v else '8' }}">
@@ -126,9 +129,9 @@
   {% endif %}
 
   {% if collection.collection_children_v %}
-    <div class="span4 collection">
+    <div class="span4 collection clearfix">
       <h4>{{ _("Focus on") }}</h4>
-      {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list") }}
+      {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list clearfix") }}
 
       {{ search_also(collection.externalcollections_2) }}
     </div>
@@ -145,7 +148,5 @@
   {% endif %}
 
 </div>
-
-<div style="clear: both;"></div>
 
 {% endblock %}

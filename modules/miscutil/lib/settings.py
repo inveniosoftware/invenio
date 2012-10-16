@@ -23,7 +23,7 @@ Invenio utilities to settings manipulation.
 
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
-from invenio.webuser_flask import current_user
+from invenio.webuser_flask import current_user, login_user, logout_user
 
 class Storage(object):
 
@@ -37,10 +37,12 @@ class Storage(object):
         return dict((k, self._data.get(k, None)) for k in self._keys)
 
     def store(self, data):
-        self._data.update(filter(
-            lambda (k,v): k in self._keys,
-            data.items()
-            ))
+        self._data.update(map(
+            lambda (k,v): (k, v[0] if len(v) == 1 else v),
+            filter(
+                lambda (k,v): k in self._keys,
+                data.lists()
+            )))
 
     def save(self):
         pass
@@ -48,18 +50,31 @@ class Storage(object):
 
 class UserSettingsStorage(Storage):
 
-    def __init__(self, keys):
+    def __init__(self, keys, attr=None):
         self._keys = keys
         self._user = User.query.get(current_user.get_id())
-        self._data = dict(self._user.settings)
+        self._attr = attr
+        if self._attr is None:
+            self._data = dict(self._user.settings)
+        else:
+            self._data = dict(self._user.settings.get(self._attr, {}))
 
     def save(self):
         data = dict(self._user.settings)
-        data.update(self.load())
+        if self._attr is None:
+            data.update(self.load())
+        else:
+            values = data.get(self._attr, {})
+            values.update(self.load())
+            data[self._attr] = values
+
         self._user.settings = data
         db.session.merge(self._user)
         db.session.commit()
 
+
+def UserSettingsAttributeStorage(attr):
+    return lambda self, key: UserSettingsStorage(key, attr)
 
 def ModelSettingsStorageBuilder(query_builder):
 

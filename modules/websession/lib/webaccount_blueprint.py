@@ -37,7 +37,7 @@ from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       InvenioWebSessionWarning
 
 from invenio.webaccount_forms import LoginForm
-from invenio.webuser_flask import login_user, logout_user
+from invenio.webuser_flask import login_user, logout_user, current_user
 
 blueprint = InvenioBlueprint('youraccount', __name__, url_prefix="/youraccount",
                 breadcrumbs=[(_("Your Account"), 'youraccount.index')],
@@ -100,6 +100,12 @@ _USER_SETTINGS = PluginContainer(
 def index():
     # load plugins
     plugins = [a for a in [s() for (k,s) in _USER_SETTINGS.items()] if a.is_authorized]
+
+    dashboard_settings = current_user.settings.get('dashboard_settings', {})
+    order = dashboard_settings.get('order', [])
+    plugins = sorted(plugins, key=lambda w: order.index(w.__class__.__name__) \
+                                  if w.__class__.__name__ in order else len(order))
+
     return render_template('webaccount_display.html',
                            plugins = plugins)
 
@@ -119,7 +125,7 @@ def edit(name):
         if plugin.form_builder:
             form = plugin.form_builder(request.form)
 
-        if True or not form or form.validate():
+        if not form or form.validate():
             plugin.store(request.form)
             plugin.save()
             flash(_('Data has been saved.'), 'success')

@@ -253,7 +253,7 @@ def search():
     colls_to_search = request.args.get('cc')
     wl = request.args.get('wl')
 
-    recids = perform_request_search(**argd)
+    recids = perform_request_search(req=request, **argd)
     qid = md5(repr((p,f,colls_to_search, wl))).hexdigest()
     if 'facet' not in session:
         session['facet'] = {}
@@ -268,7 +268,7 @@ def search():
 
     rg = request.args.get('rg', 10, type=int)
     page = request.args.get('jrec', 1, type=int)
-    facets = [{'title': g._(f.capitalize()),
+    facets = [{'title': g._('Any '+f.capitalize()),
                'url': url_for('.facet', name=f, qid=qid),
                'facet': f}  for f in ['collection', 'author', 'year']]
 

@@ -106,7 +106,8 @@ class GuestUser(dict):
         #from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
         #from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
         #from invenio.access_control_config import SUPERADMINROLE, CFG_EXTERNAL_AUTH_USING_SSO
-        #    self['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(self)
+        #from invenio.search_engine import get_permitted_restricted_collections
+        #self['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(self)
         #self['precached_usebaskets'] = acc_authorize_action(self, 'usebaskets')[0] == 0
         #self['precached_useloans'] = acc_authorize_action(self, 'useloans')[0] == 0
         #self['precached_usegroups'] = acc_authorize_action(self, 'usegroups')[0] == 0
@@ -181,13 +182,16 @@ class UserInfo(GuestUser):
         from invenio.websession_model import User
         user = User.query.get(session.uid)
         if user is None:
+            #self.__class__ = GuestUser
             return
         self['id'] = self['uid'] = user.id or None
         self['nickname'] = user.nickname or ''
         self['email'] = user.email or ''
         self['note'] = user.note or ''
         self.update(user.settings or {})
+        self.settings = user.settings or {}
         self['guest'] = str(int(user.guest)) # '1' or '0'
+        current_app.logger.info(dict(self))
 
 
 KEY_USER_ID = '_uid'
@@ -207,6 +211,7 @@ class InvenioLoginManager(object):
     def setup_app(self, app):
         app.login_manager = self
         app.before_request(self._load_user)
+        app.after_request(self._update_session)
         #app.after_request(self._update_remember_cookie)
 
     def unauthorized_handler(self, callback):
@@ -222,6 +227,12 @@ class InvenioLoginManager(object):
     def _load_user(self):
         #FIXME add remember me
         self.reload_user()
+
+    def _update_session(self, response):
+        from flask import session
+        session.update({'user_info':dict(current_user)})
+        #current_app.save_session(session, response)
+        return response
 
     def reload_user(self):
         ctx = _request_ctx_stack.top
