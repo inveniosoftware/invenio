@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -99,6 +99,7 @@ class BibRankCitationRankingTest(unittest.TestCase):
         """bibrank - search results ranked by number of citations, verbose output"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
+                                               username="admin",
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 
     def test_detailed_record_citations_tab(self):
