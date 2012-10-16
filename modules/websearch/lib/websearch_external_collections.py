@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -61,13 +61,13 @@ def print_external_results_overview(req, current_collection, pattern_list, field
     vprint = get_verbose_print(req, 'External collection (print_external_results_overview): ', verbosity_level)
 
     pattern = bind_patterns(pattern_list)
-    vprint(3, 'pattern = ' + pattern)
+    vprint(3, 'pattern = %s' % cgi.escape(pattern))
 
     if not pattern:
         return (None, None, None, None)
 
     basic_search_units = create_basic_search_units(None, pattern, field)
-    vprint(3, 'basic_search_units = ' + str(basic_search_units))
+    vprint(3, 'basic_search_units = %s' % cgi.escape(repr(basic_search_units)))
 
     (search_engines, seealso_engines) = select_external_engines(current_collection, external_collection)
     vprint(3, 'search_engines = ' + str(search_engines))
@@ -334,7 +334,7 @@ def calculate_hosted_collections_results(req, pattern_list, field, hosted_collec
     if not hosted_collections: return (None, None)
 
     vprint = get_verbose_print(req, 'Hosted collections: ', verbosity_level)
-    vprint(3, 'pattern_list = ' + str(pattern_list) + ', field = ' + str(field))
+    vprint(3, 'pattern_list = %s, field = %s' % (cgi.escape(pattern_list), cgi.escape(field)))
 
     # firstly we calculate the search parameters, i.e. the actual hosted search engines and the basic search units
     (hosted_search_engines, basic_search_units) = \
@@ -368,7 +368,7 @@ def calculate_hosted_collections_search_params(req,
     vprint = get_verbose_print(req, 'Hosted collections (calculate_hosted_collections_search_params): ', verbosity_level)
 
     pattern = bind_patterns(pattern_list)
-    vprint(3, 'pattern = ' + pattern)
+    vprint(3, 'pattern = %s' % cgi.escape(pattern))
 
     # if for any strange reason there is no pattern, just return
     # UPDATE : let search go on even there is no pattern (an empty pattern_list and field)
@@ -376,7 +376,7 @@ def calculate_hosted_collections_search_params(req,
 
     # calculate the basic search units
     basic_search_units = create_basic_search_units(None, pattern, field)
-    vprint(3, 'basic_search_units = ' + str(basic_search_units))
+    vprint(3, 'basic_search_units = %s' % cgi.escape(repr(basic_search_units)))
 
     # calculate the set of hosted search engines
     hosted_search_engines = select_hosted_search_engines(hosted_collections)

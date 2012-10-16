@@ -279,6 +279,10 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             if acc_authorize_action(req, 'runbibedit')[0] != 0:
                 argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
+
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
@@ -370,6 +374,10 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
             if acc_authorize_action(req, 'runbibedit')[0] != 0:
                 argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         record_primary_collection = guess_primary_collection_of_a_record(self.recid)
 
@@ -500,6 +508,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             if auth_code != 0:
                 argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
+
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
         req.argd = argd
@@ -546,6 +558,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             auth_code, auth_message = acc_authorize_action(req, 'runbibedit')
             if auth_code != 0:
                 argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
@@ -1141,6 +1157,10 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         if CFG_WEBSEARCH_WILDCARD_LIMIT > 0 and (argd['wl'] > CFG_WEBSEARCH_WILDCARD_LIMIT or argd['wl'] == 0):
             if acc_authorize_action(req, 'runbibedit')[0] != 0:
                 argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
