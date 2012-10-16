@@ -234,20 +234,6 @@ In this case BibUpload will try to do an update (for records having
 either 001 or 970 identifiers), or an insert (for the other ones).
 </p>
 
-<a name="3.5"></a><h3>3.5 Updating preformatted output formats</h3>
-
-<p>BibFormat can use this special upload mode during which metadata will
-not be updated, only the preformatted output formats for records:
-
-<pre>
-    -f, --format        Upload only the format (FMT) fields.
-                        The original content is not changed, and neither its modification date.
-</pre>
-
-This is useful for <code>bibreformat</code> daemon only; human
-administrators don't need to explicitly know about this mode.
-</p>
-
 <a name="3.6"></a><h3>3.6 Uploading fulltext files</h3>
 
 <p>The fulltext files can be uploaded and revised via a special FFT

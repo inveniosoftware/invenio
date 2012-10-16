@@ -25,7 +25,6 @@ __revision__ = "$Id$"
 
 import re
 import unittest
-import datetime
 import os
 import time
 import sys
@@ -43,7 +42,8 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDI
      CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
      CFG_BINDIR, \
      CFG_SITE_RECORD, \
-     CFG_DEVEL_SITE
+     CFG_DEVEL_SITE, \
+     CFG_BIBUPLOAD_REFERENCE_TAG
 from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio import bibupload
 from invenio.search_engine import print_record, get_record
@@ -140,29 +140,32 @@ def wipe_out_record_from_all_tables(recid):
     the time being for test cases.
     """
     # delete all the linked bibdocs
-    for bibdoc in BibRecDocs(recid).list_bibdocs():
-        bibdoc.expunge()
-    # delete from bibrec:
-    run_sql("DELETE FROM bibrec WHERE id=%s", (recid,))
-    # delete from bibrec_bibxxx:
-    for i in range(0, 10):
-        for j in range(0, 10):
-            run_sql("DELETE FROM %(bibrec_bibxxx)s WHERE id_bibrec=%%s" %  # kwalitee: disable=sql
-                    {'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)},
-                    (recid,))
-    # delete all unused bibxxx values:
-    for i in range(0, 10):
-        for j in range(0, 10):
-            run_sql("DELETE %(bibxxx)s FROM %(bibxxx)s " \
-                    " LEFT JOIN %(bibrec_bibxxx)s " \
-                    " ON %(bibxxx)s.id=%(bibrec_bibxxx)s.id_bibxxx " \
-                    " WHERE %(bibrec_bibxxx)s.id_bibrec IS NULL" % \
-                    {'bibxxx': "bib%i%ix" % (i, j),
-                     'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)})
-    # delete from bibfmt:
-    run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s", (recid,))
-    # delete from bibrec_bibdoc:
-    run_sql("DELETE FROM bibrec_bibdoc WHERE id_bibrec=%s", (recid,))
+    try:
+        for bibdoc in BibRecDocs(recid).list_bibdocs():
+            bibdoc.expunge()
+        # delete from bibrec:
+        run_sql("DELETE FROM bibrec WHERE id=%s", (recid,))
+        # delete from bibrec_bibxxx:
+        for i in range(0, 10):
+            for j in range(0, 10):
+                run_sql("DELETE FROM %(bibrec_bibxxx)s WHERE id_bibrec=%%s" %  # kwalitee: disable=sql
+                        {'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)},
+                        (recid,))
+        # delete all unused bibxxx values:
+        for i in range(0, 10):
+            for j in range(0, 10):
+                run_sql("DELETE %(bibxxx)s FROM %(bibxxx)s " \
+                        " LEFT JOIN %(bibrec_bibxxx)s " \
+                        " ON %(bibxxx)s.id=%(bibrec_bibxxx)s.id_bibxxx " \
+                        " WHERE %(bibrec_bibxxx)s.id_bibrec IS NULL" % \
+                        {'bibxxx': "bib%i%ix" % (i, j),
+                        'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)})
+        # delete from bibfmt:
+        run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s", (recid,))
+        # delete from bibrec_bibdoc:
+        run_sql("DELETE FROM bibrec_bibdoc WHERE id_bibrec=%s", (recid,))
+    except Exception, err:
+        print >> sys.stderr, "Exception captured while wiping records: %s" % err
 
 
 def try_url_download(url):
@@ -638,12 +641,6 @@ class BibUploadMoreInfoTest(GenericBibUploadTest):
                                      cPickle.dumps(dic[namespace][key]),
                                      "Value for namespace '%s' and key '%s' varies between MoreInfo and the dictionary. moreinfo value: '%s' dictionary value: '%s'" % \
                                          (namespace, key, repr(more_info.get_data(namespace, key)), repr(dic[namespace][key])))
-    def setUp(self):
-        GenericBibUploadTest.setUp(self)
-
-    def tearDown(self):
-        GenericBibUploadTest.tearDown(self)
-
     def test_relation_moreinfo_insert(self):
         """bibupload - Testing the upload of BibRelation and corresponding MoreInfo field"""
         # Cleaning existing data
@@ -931,6 +928,7 @@ class BibUploadInsertModeTest(GenericBibUploadTest):
         # We retrieve the inserted xml
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
+        inserted_hm = print_record(recid, 'hm')
         # Compare if the two MARCXML are the same
         self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
                                           self.test), '')
@@ -1055,7 +1053,6 @@ class BibUploadAppendModeTest(GenericBibUploadTest):
         # Compare if the two MARCXML are the same
         self.assertEqual(compare_xmbuffers(after_append_xm, self.test_expected_xm), '')
         self.assertEqual(compare_hmbuffers(after_append_hm, self.test_expected_hm), '')
-        # clean up after ourselves:
 
     def test_retrieve_updated_005_tag(self):
         """bibupload - append mode, updating 005 control tag after modifiction """
@@ -1474,7 +1471,10 @@ class BibUploadReplaceModeTest(GenericBibUploadTest):
 
 
 class BibUploadReferencesModeTest(GenericBibUploadTest):
-    """Testing references mode."""
+    """Testing references mode.
+    NOTE: in the past this was done by calling bibupload --reference|-z
+    which is now simply implying bibupload --correct.
+    """
 
     def setUp(self):
         """Initialize the MARCXML variable"""
@@ -1488,7 +1488,7 @@ class BibUploadReferencesModeTest(GenericBibUploadTest):
         </record>"""
         self.test_reference = """<record>
         <controlfield tag="001">123456789</controlfield>
-        <datafield tag =\"""" + bibupload.CFG_BIBUPLOAD_REFERENCE_TAG + """\" ind1="C" ind2="5">
+        <datafield tag =\"""" + CFG_BIBUPLOAD_REFERENCE_TAG + """\" ind1="C" ind2="5">
         <subfield code="m">M. Lüscher and P. Weisz, String excitation energies in SU(N) gauge theories beyond the free-string approximation,</subfield>
         <subfield code="s">J. High Energy Phys. 07 (2004) 014</subfield>
         </datafield>
@@ -1499,7 +1499,7 @@ class BibUploadReferencesModeTest(GenericBibUploadTest):
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
-        <datafield tag =\"""" + bibupload.CFG_BIBUPLOAD_REFERENCE_TAG + """\" ind1="C" ind2="5">
+        <datafield tag =\"""" + CFG_BIBUPLOAD_REFERENCE_TAG + """\" ind1="C" ind2="5">
         <subfield code="m">M. Lüscher and P. Weisz, String excitation energies in SU(N) gauge theories beyond the free-string approximation,</subfield>
         <subfield code="s">J. High Energy Phys. 07 (2004) 014</subfield>
         </datafield>
@@ -1512,7 +1512,7 @@ class BibUploadReferencesModeTest(GenericBibUploadTest):
         001__ 123456789
         100__ $$aTester, T$$uCERN
         %(reference_tag)sC5 $$mM. Lüscher and P. Weisz, String excitation energies in SU(N) gauge theories beyond the free-string approximation,$$sJ. High Energy Phys. 07 (2004) 014
-        """ % {'reference_tag': bibupload.CFG_BIBUPLOAD_REFERENCE_TAG}
+        """ % {'reference_tag': CFG_BIBUPLOAD_REFERENCE_TAG}
         # insert test record:
         test_insert = self.test_insert.replace('<controlfield tag="001">123456789</controlfield>',
                                                '')
@@ -1537,7 +1537,6 @@ class BibUploadReferencesModeTest(GenericBibUploadTest):
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test_reference)
         # We call the main function with the record as a parameter
-
         dummy, recid, dummy = bibupload.bibupload_records(recs, opt_mode='reference')[0]
         # We retrieve the inserted xml
         reference_xm = print_record(recid, 'xm')
@@ -1546,226 +1545,6 @@ class BibUploadReferencesModeTest(GenericBibUploadTest):
         self.assertEqual(compare_xmbuffers(reference_xm, self.test_reference_expected_xm), '')
         self.assertEqual(compare_hmbuffers(reference_hm, self.test_reference_expected_hm), '')
 
-class BibUploadFMTModeTest(GenericBibUploadTest):
-    """Testing FMT mode."""
-
-    def setUp(self):
-        """Initialize the MARCXML variable"""
-        GenericBibUploadTest.setUp(self)
-        self.new_xm_with_fmt = """
-        <record>
-         <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="FMT" ind1=" " ind2=" ">
-          <subfield code="f">HB</subfield>
-          <subfield code="g">Test. Okay.</subfield>
-          <subfield code="d">2008-03-14 15:14:00</subfield>
-         </datafield>
-         <datafield tag="100" ind1=" " ind2=" ">
-          <subfield code="a">Bar, Baz</subfield>
-          <subfield code="u">Foo</subfield>
-         </datafield>
-         <datafield tag="245" ind1=" " ind2=" ">
-          <subfield code="a">On the quux and huux</subfield>
-         </datafield>
-        </record>
-        """
-        self.expected_xm_after_inserting_new_xm_with_fmt = """
-        <record>
-         <controlfield tag="001">123456789</controlfield>
-         <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1=" " ind2=" ">
-          <subfield code="a">Bar, Baz</subfield>
-          <subfield code="u">Foo</subfield>
-         </datafield>
-         <datafield tag="245" ind1=" " ind2=" ">
-          <subfield code="a">On the quux and huux</subfield>
-         </datafield>
-        </record>
-        """
-        self.expected_hm_after_inserting_new_xm_with_fmt = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aBar, Baz$$uFoo
-        245__ $$aOn the quux and huux
-        """
-        self.recid76_xm_before_all_the_tests = print_record(76, 'xm')
-        self.recid76_hm_before_all_the_tests = print_record(76, 'hm')
-        self.recid76_fmts = run_sql("""SELECT last_updated, value, format FROM bibfmt WHERE id_bibrec=76""")
-        self.recid76_xm_with_fmt = """
-        <record>
-         <controlfield tag="001">76</controlfield>
-         <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="FMT" ind1=" " ind2=" ">
-          <subfield code="f">HB</subfield>
-          <subfield code="g">Test. Here is some format value.</subfield>
-         </datafield>
-         <datafield tag="100" ind1=" " ind2=" ">
-          <subfield code="a">Doe, John</subfield>
-          <subfield code="u">CERN</subfield>
-         </datafield>
-         <datafield tag="245" ind1=" " ind2=" ">
-          <subfield code="a">On the foos and bars</subfield>
-         </datafield>
-        </record>
-        """
-        self.recid76_xm_with_fmt_only_first = """
-        <record>
-         <controlfield tag="001">76</controlfield>
-         <datafield tag="FMT" ind1=" " ind2=" ">
-          <subfield code="f">HB</subfield>
-          <subfield code="g">Test. Let us see if this gets inserted well.</subfield>
-         </datafield>
-        </record>
-        """
-        self.recid76_xm_with_fmt_only_second = """
-        <record>
-         <controlfield tag="001">76</controlfield>
-         <datafield tag="FMT" ind1=" " ind2=" ">
-          <subfield code="f">HB</subfield>
-          <subfield code="g">Test. Yet another test, to be run after the first one.</subfield>
-         </datafield>
-         <datafield tag="FMT" ind1=" " ind2=" ">
-          <subfield code="f">HD</subfield>
-          <subfield code="g">Test. Let's see what will be stored in the detailed format field.</subfield>
-         </datafield>
-        </record>
-        """
-
-    def tearDown(self):
-        """Helper function that restores recID 76 MARCXML, using the
-           value saved before all the tests started to execute.
-           (see self.recid76_xm_before_all_the_tests).
-           Does not restore HB and HD formats.
-        """
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_before_all_the_tests)
-        dummy, recid, dummy = bibupload.bibupload_records(recs, opt_mode='replace')[0]
-        for (last_updated, value, bibformat) in self.recid76_fmts:
-            run_sql("""UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=76 AND format=%s""", (last_updated, value, bibformat))
-        inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm, self.recid76_xm_before_all_the_tests), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm, self.recid76_hm_before_all_the_tests), '')
-
-    def test_inserting_new_record_containing_fmt_tag(self):
-        """bibupload - FMT tag, inserting new record containing FMT tag"""
-        recs = bibupload.xml_marc_to_records(self.new_xm_with_fmt)
-        dummy, new_recid, _ = bibupload.bibupload_records(recs, opt_mode='insert')[0]
-        xm_after = print_record(new_recid, 'xm')
-        hm_after = print_record(new_recid, 'hm')
-        hb_after = print_record(new_recid, 'hb')
-        self.assertEqual(compare_xmbuffers(xm_after,
-                                          self.expected_xm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))), '')
-        self.assertEqual(compare_hmbuffers(hm_after,
-                                          self.expected_hm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))), '')
-        self.assertEqual(run_sql("SELECT last_updated from bibfmt WHERE format='HB' AND id_bibrec=%s", (new_recid, ))[0][0], datetime.datetime(2008, 3, 14, 15, 14))
-        self.failUnless(hb_after.startswith("Test. Okay."))
-
-    def test_updating_existing_record_formats_in_format_mode(self):
-        """bibupload - FMT tag, updating existing record via format mode"""
-        xm_before = print_record(76, 'xm')
-        hm_before = print_record(76, 'hm')
-        # insert first format value:
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt_only_first)
-        bibupload.bibupload_records(recs, opt_mode='format')[0]
-        xm_after = print_record(76, 'xm')
-        hm_after = print_record(76, 'hm')
-        hb_after = print_record(76, 'hb')
-        self.assertEqual(xm_after, xm_before)
-        self.assertEqual(hm_after, hm_before)
-        self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
-        # now insert another format value and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt_only_second)
-        bibupload.bibupload_records(recs, opt_mode='format')
-        xm_after = print_record(76, 'xm')
-        hm_after = print_record(76, 'hm')
-        hb_after = print_record(76, 'hb')
-        hd_after = print_record(76, 'hd')
-        self.assertEqual(xm_after, xm_before)
-        self.assertEqual(hm_after, hm_before)
-        self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
-        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
-
-    def test_updating_existing_record_formats_in_correct_mode(self):
-        """bibupload - FMT tag, updating existing record via correct mode"""
-        xm_before = print_record(76, 'xm')
-        hm_before = print_record(76, 'hm')
-        # insert first format value:
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt_only_first)
-        bibupload.bibupload_records(recs, opt_mode='correct')
-        xm_after = print_record(76, 'xm')
-        hm_after = print_record(76, 'hm')
-        hb_after = print_record(76, 'hb')
-        self.assertEqual(compare_xmbuffers(xm_after, xm_before), '')
-        self.assertEqual(compare_hmbuffers(hm_after, hm_before), '')
-        self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
-        # now insert another format value and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt_only_second)
-        bibupload.bibupload_records(recs, opt_mode='correct')
-        xm_after = print_record(76, 'xm')
-        hm_after = print_record(76, 'hm')
-        hb_after = print_record(76, 'hb')
-        hd_after = print_record(76, 'hd')
-        self.assertEqual(compare_xmbuffers(xm_after, xm_before), '')
-        self.assertEqual(compare_hmbuffers(hm_after, hm_before), '')
-        self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
-        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
-
-    def test_updating_existing_record_formats_in_replace_mode(self):
-        """bibupload - FMT tag, updating existing record via replace mode"""
-        # insert first format value:
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt_only_first)
-        bibupload.bibupload_records(recs, opt_mode='replace')
-        xm_after = print_record(76, 'xm')
-        hm_after = print_record(76, 'hm')
-        hb_after = print_record(76, 'hb')
-
-        self.assertEqual(compare_xmbuffers(xm_after,
-                                          '<record><controlfield tag="001">76</controlfield></record>'), '')
-        self.assertEqual(compare_hmbuffers(hm_after,
-                                          '000000076 001__ 76'), '')
-        self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
-        # now insert another format value and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt_only_second)
-        bibupload.bibupload_records(recs, opt_mode='replace')
-        xm_after = print_record(76, 'xm')
-        hm_after = print_record(76, 'hm')
-        hb_after = print_record(76, 'hb')
-        hd_after = print_record(76, 'hd')
-        self.assertEqual(compare_xmbuffers(xm_after, """
-                                           <record>
-                                           <controlfield tag="001">76</controlfield>
-                                           </record>"""), '')
-        self.assertEqual(compare_hmbuffers(hm_after, '000000076 001__ 76'), '')
-        self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
-        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
-        # final insertion and recheck:
-        recs = bibupload.xml_marc_to_records(self.recid76_xm_with_fmt)
-        bibupload.bibupload_records(recs, opt_mode='replace')
-        xm_after = print_record(76, 'xm')
-        hm_after = print_record(76, 'hm')
-        hb_after = print_record(76, 'hb')
-        hd_after = print_record(76, 'hd')
-        self.assertEqual(compare_xmbuffers(xm_after, """
-                                           <record>
-                                           <controlfield tag="001">76</controlfield>
-                                           <controlfield tag="003">SzGeCERN</controlfield>
-                                           <datafield tag="100" ind1=" " ind2=" ">
-                                           <subfield code="a">Doe, John</subfield>
-                                           <subfield code="u">CERN</subfield>
-                                           </datafield>
-                                           <datafield tag="245" ind1=" " ind2=" ">
-                                           <subfield code="a">On the foos and bars</subfield>
-                                           </datafield>
-                                           </record>
-                                           """), '')
-        self.assertEqual(compare_hmbuffers(hm_after, """
-                                          001__ 76
-                                          003__ SzGeCERN
-                                          100__ $$aDoe, John$$uCERN
-                                          245__ $$aOn the foos and bars
-                                          """), '')
-        self.failUnless(hb_after.startswith("Test. Here is some format value."))
-        self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
 
 class BibUploadRecordsWithSYSNOTest(GenericBibUploadTest):
     """Testing uploading of records that have external SYSNO present."""
@@ -2286,7 +2065,6 @@ class BibUploadRecordsWithOAIIDTest(GenericBibUploadTest):
         # Note that OAI fields are repeated but with different
         # subfields, this is to test whether bibupload would not
         # mistakenly pick up wrong values.
-        GenericBibUploadTest.setUp(self)
         self.xm_testrec1 = """
         <record>
          <controlfield tag="001">123456789</controlfield>
@@ -2514,9 +2292,6 @@ class BibUploadRecordsWithOAIIDTest(GenericBibUploadTest):
 
 class BibUploadRecordsWithDOITest(GenericBibUploadTest):
     """Testing uploading of records with DOI."""
-
-    def tearDown(self):
-        GenericBibUploadTest.tearDown(self)
 
     def setUp(self):
         """Initialize the MARCXML test records."""
@@ -3330,6 +3105,7 @@ class BibUploadPretendTest(GenericBibUploadTest):
         task_set_task_param('pretend', True)
 
     def tearDown(self):
+        GenericBibUploadTest.tearDown(self)
         task_set_task_param('pretend', False)
 
     def _get_tables_fingerprint():
@@ -5570,7 +5346,6 @@ TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,
                              BibUploadRecordsWithSYSNOTest,
                              BibUploadRecordsWithEXTOAIIDTest,
                              BibUploadRecordsWithOAIIDTest,
-                             BibUploadFMTModeTest,
                              BibUploadIndicatorsTest,
                              BibUploadUpperLowerCaseTest,
                              BibUploadControlledProvenanceTest,
@@ -5582,7 +5357,6 @@ TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,
                              BibUploadBibRelationsTest,
                              BibUploadRecordsWithDOITest,
                              )
-
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

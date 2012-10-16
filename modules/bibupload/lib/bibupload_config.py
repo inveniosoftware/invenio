@@ -26,5 +26,11 @@ __revision__ = "$Id$"
 CFG_BIBUPLOAD_CONTROLFIELD_TAGS = ['001', '002', '003', '004',
                                    '005', '006', '007', '008']
 
-CFG_BIBUPLOAD_SPECIAL_TAGS = ['FMT', 'FFT', 'BDR', 'BDM']
+CFG_BIBUPLOAD_SPECIAL_TAGS = ['FFT', 'BDR', 'BDM']
 
+CFG_BIBUPLOAD_DELETE_CODE = '0'
+
+CFG_BIBUPLOAD_DELETE_VALUE = "__DELETE_FIELDS__"
+
+CFG_BIBUPLOAD_OPT_MODES = ['insert', 'replace', 'replace_or_insert', 'reference',
+        'correct', 'append', 'holdingpen', 'delete']

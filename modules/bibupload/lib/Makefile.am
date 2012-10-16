@@ -24,7 +24,9 @@ pylib_DATA = bibupload_config.py \
              batchuploader_engine.py \
              batchuploader_templates.py \
              batchuploader.py \
-             batchuploader_regression_tests.py
+             batchuploader_regression_tests.py \
+ 	     bibupload_revisionverifier.py \
+	     bibupload_revisionverifier_regression_tests.py
 
 jsdir=$(localstatedir)/www/js
 
