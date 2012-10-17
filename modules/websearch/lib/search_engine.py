@@ -1726,6 +1726,53 @@ def get_coll_sons(coll, type='r', public_only=1):
             coll_sons.append(name[0])
     return coll_sons
 
+class CollectionAllChildrenDataCacher(DataCacher):
+    """Cache for all children of a collection (regular & virtual, public & private)"""
+    def __init__(self):
+
+        def cache_filler():
+
+            def get_all_children(coll, type='r', public_only=1):
+                """Return a list of all children of type 'type' for collection 'coll'.
+                   If public_only, then return only non-restricted child collections.
+                   If type='*', then return both regular and virtual collections.
+                """
+                children = []
+                if type == '*':
+                    sons = get_coll_sons(coll, 'r', public_only) + get_coll_sons(coll, 'v', public_only)
+                else:
+                    sons = get_coll_sons(coll, type, public_only)
+                for child in sons:
+                    children.append(child)
+                    children.extend(get_all_children(child, type, public_only))
+                return children
+
+            ret = {}
+            collections = collection_reclist_cache.cache.keys()
+            for collection in collections:
+                ret[collection] = get_all_children(collection, '*', public_only=0)
+            return ret
+
+        def timestamp_verifier():
+            return max(get_table_update_time('collection'), get_table_update_time('collection_collection'))
+
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+try:
+    if not collection_allchildren_cache.is_ok_p:
+        raise Exception
+except Exception:
+    collection_allchildren_cache = CollectionAllChildrenDataCacher()
+
+def get_collection_allchildren(coll, recreate_cache_if_needed=True):
+    """Returns the list of all children of a collection."""
+    if recreate_cache_if_needed:
+        collection_allchildren_cache.recreate_cache_if_needed()
+    if coll not in collection_allchildren_cache.cache:
+        return [] # collection does not exist; return empty list
+    return collection_allchildren_cache.cache[coll]
+
+
 def get_coll_real_descendants(coll, type='_', get_hosted_colls=True):
     """Return a list of all descendants of collection 'coll' that are defined by a 'dbquery'.
        IOW, we need to decompose compound collections like "A & B" into "A" and "B" provided
@@ -2687,134 +2734,95 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
     results = {}  # all final results
     results_nbhits = 0
 
-    # obtain user_info
-    if isinstance(req, cStringIO.OutputType):
+    # calculate the list of recids (restricted or not) that the user has rights to access and we should display (only those)
+    records_that_can_be_displayed = intbitset()
+
+    if not req or isinstance(req, cStringIO.OutputType): # called from CLI
         user_info = {}
-    else:
-        user_info = collect_user_info(req)
-
-    try:
-        recids_in_any_collection = list(hitset_in_any_collection)
-    except:
-        # the user displayed a specific collection
-        recids_in_any_collection = []
-
-    # let's get the restricted collections the user has rights to view
-    restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
-
-    if not recids_in_any_collection or \
-        (not req or isinstance(req, cStringIO.OutputType)):
-        # we were called from CLI, then we will return all recids,
-        # the public and the restricted ones, or the user displayed
-        # a specific collection
         for coll in colls:
             results[coll] = hitset_in_any_collection & get_collection_reclist(coll)
             results_nbhits += len(results[coll])
+        records_that_can_be_displayed = hitset_in_any_collection
+        permitted_restricted_collections = []
+
     else:
+        user_info = collect_user_info(req)
+        policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
+        # let's get the restricted collections the user has rights to view
+        permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
+
         # let's build the list of the both public and restricted
-        # daughter collections of the collection from which the user
-        # started his/her search. This list of daughter colls will be
+        # child collections of the collection from which the user
+        # started his/her search. This list of children colls will be
         # used in the warning proposing a search in that collections
-        daughter_colls = list(colls)
         current_coll = req.argd['cc'] # current_coll: coll from which user started his/her search
-        if restricted_collections:
-            for restricted_coll in restricted_collections:
-                restricted_coll_ancestors = get_coll_ancestors(restricted_coll)
-                if current_coll in restricted_coll_ancestors:
-                    daughter_colls.append(restricted_coll)
+        current_coll_children = get_collection_allchildren(current_coll) # real & virtual
+        # add all restricted collections, that the user has access to, and are under the current collection
+        # do not use set here, in order to maintain a specific order:
+        # children of 'cc' (real, virtual, restricted), rest of 'c' that are  not cc's children
+        colls_to_be_displayed = [coll for coll in current_coll_children if coll in colls or coll in permitted_restricted_collections]
+        colls_to_be_displayed.extend([coll for coll in colls if coll not in colls_to_be_displayed])
 
-        # let's enrich the list of colls where we are looking for
-        # with the restricted collections the user has access to
-        final_colls = set(colls)
-        final_colls.update(restricted_collections)
-        final_colls = list(final_colls)
-        for coll in final_colls:
-            if coll in restricted_collections:  # restricted collection
-                for recid in recids_in_any_collection:
-                    # let's get the restricted collections each recid belongs to
-                    restricted_collections_for_recid = \
-                        get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
-                    if coll in restricted_collections_for_recid:
-                        # coll is restricted, user has rights to view it and
-                        # the recid belongs to this restricted coll
-                        restricted_coll = coll
-                        restricted_coll_ancestors = get_coll_ancestors(restricted_coll)
-                        # let's hang the results found from the correct coll
-                        if current_coll in restricted_coll_ancestors:
-                            # restricted_coll hangs from current_coll
-                            direct_dad = 1
-                            for coll in final_colls:
-                                if coll in restricted_coll_ancestors:
-                                     # current_coll is not direct dad of restricted_coll
-                                    if results.has_key(coll):
-                                        results[coll].union_update(hitset_in_any_collection & \
-                                                                   get_collection_reclist(restricted_coll))
-                                    else:
-                                        results.update({coll : hitset_in_any_collection & \
-                                                        get_collection_reclist(restricted_coll)})
-                                    results_nbhits += len(results[coll])
-                                    direct_dad = 0
-
-                            if direct_dad:
-                                # current_coll is direct dad of restricted_coll
-                                if results.has_key(coll):
-                                    results[restricted_coll].union_update(hitset_in_any_collection & \
-                                                                          get_collection_reclist(restricted_coll))
-                                else:
-                                    results.update({restricted_coll : hitset_in_any_collection & \
-                                                    get_collection_reclist(restricted_coll)})
-                                results_nbhits += len(results[restricted_coll])
-
-                        elif coll == current_coll:
-                            # user started his/her search from a restricted collection
-                            if results.has_key(coll):
-                                results[coll].union_update(hitset_in_any_collection & \
-                                                           get_collection_reclist(coll))
-                            else:
-                                results.update({coll : hitset_in_any_collection & \
-                                                get_collection_reclist(coll)})
-                            results_nbhits += len(results[coll])
-
-            else: # public collection
-                if results.has_key(coll):
-                    results[coll].union_update(hitset_in_any_collection & \
-                                               get_collection_reclist(coll))
+        if policy == 'ANY':# the user needs to have access to at least one collection that restricts the records
+            #we need this to be able to remove records that are both in a public and restricted collection
+            permitted_recids = intbitset()
+            notpermitted_recids = intbitset()
+            for collection in restricted_collection_cache.cache:
+                if collection in permitted_restricted_collections:
+                    permitted_recids |= get_collection_reclist(collection)
                 else:
-                    results.update({coll : hitset_in_any_collection & \
-                                    get_collection_reclist(coll)})
-                results_nbhits += len(results[coll])
+                    notpermitted_recids |= get_collection_reclist(collection)
+            records_that_can_be_displayed = hitset_in_any_collection - (notpermitted_recids - permitted_recids)
+
+        else:# the user needs to have access to all collections that restrict a records
+            notpermitted_recids = intbitset()
+            for collection in restricted_collection_cache.cache:
+                if collection not in permitted_restricted_collections:
+                    notpermitted_recids |= get_collection_reclist(collection)
+            records_that_can_be_displayed = hitset_in_any_collection - notpermitted_recids
+
+        for coll in colls_to_be_displayed:
+            results[coll] = results.get(coll, intbitset()).union_update(records_that_can_be_displayed & get_collection_reclist(coll))
+            results_nbhits += len(results[coll])
 
     if results_nbhits == 0:
         # no hits found, try to search in Home and restricted and/or hidden collections:
         results = {}
-        results_in_Home = hitset_in_any_collection & \
-                            get_collection_reclist(CFG_SITE_NAME)
-        results_in_restricted_collections = 0
-        results_in_hidden_collections = 0
-        for coll in restricted_collections:
+        results_in_Home = records_that_can_be_displayed & get_collection_reclist(CFG_SITE_NAME)
+        results_in_restricted_collections = intbitset()
+        results_in_hidden_collections = intbitset()
+        for coll in permitted_restricted_collections:
             if not get_coll_ancestors(coll): # hidden collection
-                results_in_hidden_collections += len(hitset_in_any_collection & \
-                                                     get_collection_reclist(coll))
+                results_in_hidden_collections.union_update(records_that_can_be_displayed & get_collection_reclist(coll))
             else:
-                results_in_restricted_collections += len(hitset_in_any_collection & \
-                                                         get_collection_reclist(coll))
+                results_in_restricted_collections.union_update(records_that_can_be_displayed & get_collection_reclist(coll))
 
-        total_results = results_in_restricted_collections + len(results_in_Home)
+        # in this way, we do not count twice, records that are both in Home collection and in a restricted collection
+        total_results = len(results_in_Home.union(results_in_restricted_collections))
 
         if total_results > 0:
             # some hits found in Home and/or restricted collections, so propose this search:
             if of.startswith("h") and display_nearest_terms_box:
                 url = websearch_templates.build_search_url(req.argd, cc=CFG_SITE_NAME, c=[])
+                len_colls_to_display = len(colls_to_be_displayed)
+                # trim the list of collections to first two, since it might get very large
                 write_warning(_("No match found in collection %(x_collection)s. Other collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
-                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln, False) for coll in daughter_colls], ', ') + '</em>',
+                              {'x_collection': '<em>' + \
+                                    string.join([get_coll_i18nname(coll, ln, False) for coll in colls_to_be_displayed[:2]], ', ') + \
+                                    (len_colls_to_display > 2 and ' et al' or '') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
                                'x_nb_hits': total_results,
                                'x_url_close': '</a>'}, req=req)
+                # display the hole list of collections in a comment
+                if len_colls_to_display > 2:
+                    write_warning("<!--No match found in collection <em>%(x_collection)s</em>.-->" %\
+                                  {'x_collection': string.join([get_coll_i18nname(coll, ln, False) for coll in colls_to_be_displayed], ', ')},
+                                  req=req)
         else:
             # no hits found, either user is looking for a document and he/she has not rights
             # or user is looking for a hidden document:
             if of.startswith("h") and display_nearest_terms_box:
-                if results_in_hidden_collections:
+                if len(results_in_hidden_collections) > 0:
                     write_warning(_("No public collection matched your query. "
                                          "If you were looking for a hidden document, please type "
                                          "the correct URL for this record."), req=req)

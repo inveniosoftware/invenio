@@ -41,6 +41,11 @@ CFG_WEBSEARCH_IDXPAIRS_FIELDS = ['global','abstract','title','caption']
 ## title search, but True for report number search.
 CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH = False
 
+## Maximum number of collections to be displayed on the search results
+## page. All the rest of the collections will be hidden by a
+## "See more collections" link.
+CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT = 10
+
 class InvenioWebSearchUnknownCollectionError(Exception):
     """Exception for bad collection."""
     def __init__(self, colname):

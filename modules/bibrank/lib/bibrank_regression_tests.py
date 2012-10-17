@@ -93,6 +93,7 @@ class BibRankCitationRankingTest(unittest.TestCase):
         """bibrank - search results ranked by number of citations"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&of=id',
+                                               username="admin",
                                                expected_text="[85, 77, 84]"))
 
     def test_search_results_ranked_by_citations_verbose(self):

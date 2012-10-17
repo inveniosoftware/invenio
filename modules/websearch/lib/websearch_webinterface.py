@@ -991,6 +991,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                 if acc_authorize_action(req, 'runbibedit')[0] != 0:
                     argd['wl'] = CFG_WEBSEARCH_WILDCARD_LIMIT
 
+            req.argd = argd
             recIDs = perform_request_search(req, of="id",
                                                           c=argd['c'], cc=argd['cc'],
                                                           p=argd['p'], f=argd['f'],

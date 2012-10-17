@@ -398,7 +398,7 @@ class WebSearchTestCollections(unittest.TestCase):
                 args = {'as': aas}
                 browser.open(make_url('/collection/Preprints', **args))
 
-                for jrec in (11, 21, 11, 28):
+                for jrec in (11, 21, 11, 27):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
                     if aas:
                         args['as'] = aas
@@ -1166,18 +1166,34 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
         """websearch - search engine Web API for successful query, respect sorting parameters"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               expected_text="[84, 85]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               username="admin",
                                                expected_text="[77, 84, 85]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
+                                               expected_text="[85, 84]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
+                                               username="admin",
                                                expected_text="[77, 85, 84]"))
 
     def test_search_engine_web_api_respect_ranking_parameter(self):
         """websearch - search engine Web API for successful query, respect ranking parameters"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               expected_text="[84, 85]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id',
+                                               username="admin",
                                                expected_text="[77, 84, 85]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
+                                               expected_text="[85, 84]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
+                                               username="admin",
                                                expected_text="[85, 77, 84]"))
 
     def test_search_engine_web_api_for_existing_record(self):
@@ -1391,11 +1407,20 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
 
     def test_restricted_record_in_different_colls_as_authorized_user_of_one_coll(self):
         """websearch - record belongs to different restricted collections with different rights, balthasar has rights to one of them"""
-        error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=recid:105&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
-                                               username='balthasar',
-                                               password='b123althasar',
-                                               expected_text=['ALEPH Theses', '[CERN-THESIS-99-074]'],
-                                               unexpected_text=['No public collection matched your query.'])
+        from invenio.config import CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY
+        policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
+        if policy == 'ANY':
+            error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=recid:105&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                                   username='balthasar',
+                                                   password='b123althasar',
+                                                   expected_text=['[CERN-THESIS-99-074]'],
+                                                   unexpected_text=['No public collection matched your query.'])
+        else:
+            error_messages = test_web_page_content(CFG_SITE_URL + '/search?&sc=1&p=recid:105&c=Articles+%26+Preprints&c=Books+%26+Reports&c=Multimedia+%26+Arts',
+                                                   username='balthasar',
+                                                   password='b123althasar',
+                                                   expected_text=['No public collection matched your query.'],
+                                                   unexpected_text=['[CERN-THESIS-99-074]'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1422,7 +1447,7 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Multimedia+%26+Arts&sc=1&p=recid%3A105&f=&action_search=Search&c=Pictures&c=Poetry&c=Atlantis+Times',
                                                username='admin',
                                                expected_text='No match found in collection',
-                                               expected_link_label='3 hits')
+                                               expected_link_label='1 hits')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1449,7 +1474,8 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Articles+%26+Preprints&sc=1&p=109&f=recid',
                                                username='hyde',
                                                password='h123yde',
-                                               expected_text=['Notes', 'LEP Center-of-Mass Energies in Presence of Opposite'])
+                                               expected_text=['No public collection matched your query'],
+                                               unexpected_text=['LEP Center-of-Mass Energies in Presence of Opposite'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1467,8 +1493,8 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=recid%3A98&f=&action_search=Search&c=Books&c=Reports',
                                                username='admin',
                                                password='',
-                                               expected_text='No match found in collection <em>Books, Reports, Theses</em>',
-                                               expected_link_label='2 hits')
+                                               expected_text='No match found in collection <em>Books, Theses, Reports</em>',
+                                               expected_link_label='1 hits')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1477,8 +1503,8 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
         error_messages = test_web_page_content(CFG_SITE_URL + '/search?ln=en&cc=Books+%26+Reports&sc=1&p=recid%3A98&f=&action_search=Search&c=Books&c=Reports',
                                                username='hyde',
                                                password='h123yde',
-                                               expected_text='No match found in collection <em>Books, Reports</em>',
-                                               expected_link_label='1 hits')
+                                               expected_text='No public collection matched your query',
+                                               unexpected_text='No match found in collection')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
@@ -1625,6 +1651,7 @@ class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
                                                               'Theses', '4', 'records found'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
+
 
 class WebSearchRestrictedPicturesTest(unittest.TestCase):
     """
@@ -2095,6 +2122,10 @@ class WebSearchJournalQueryTest(unittest.TestCase):
         """websearch - journal publication info query, title only"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&f=journal&p=Phys.+Lett.+B',
+                                               expected_text="[78, 85, 87]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&f=journal&p=Phys.+Lett.+B',
+                                               username='admin',
                                                expected_text="[77, 78, 85, 87]"))
 
     def test_query_journal_full_pubinfo(self):
@@ -2447,7 +2478,7 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
             # should return every document in the system
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
-                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 107, 108, 109, 113]'))
+                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113]'))
 
 
 class WebSearchDateQueryTest(unittest.TestCase):
