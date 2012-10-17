@@ -743,9 +743,9 @@ class Collection:
             #     (note: explicitly remove DELETED records)
             if CFG_CERN_SITE:
                 reclist = search_pattern_parenthesised(None, self.dbquery + \
-                                         ' -980__:"DELETED" -980__:"DUMMY"')
+                                         ' -980__:"DELETED" -980__:"DUMMY"', ap=9) #ap=9 for allow queries containing hidden tags
             else:
-                reclist = search_pattern_parenthesised(None, self.dbquery + ' -980__:"DELETED"')
+                reclist = search_pattern_parenthesised(None, self.dbquery + ' -980__:"DELETED"', ap=9) #ap=9 allow queries containing hidden tags
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
         # store the results:
         self.nbrecs = len(reclist_with_nonpublic_subcolls)
