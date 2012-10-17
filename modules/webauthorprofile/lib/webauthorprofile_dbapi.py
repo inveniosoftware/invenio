@@ -42,6 +42,17 @@ def _create_db_tables():
         ) ENGINE=MyISAM;
         """)
 
+def get_cache_oldest_date(key):
+    """
+    Returns the oldest date for a given object_key
+    """
+    date = run_sql("select min(last_updated) from wapCACHE where object_key=%s and object_status <> 'Expired'",
+                    (key,))
+    if date:
+        return date[0][0]
+    else:
+        return None
+
 def get_cached_element(name, key):
     '''
     Returns a cached element as [element_value, last_updated, is_up_to_date, is_present_in_cache]

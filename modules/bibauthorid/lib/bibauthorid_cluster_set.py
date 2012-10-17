@@ -19,14 +19,17 @@
 
 from itertools import chain, groupby, izip, cycle
 from operator import itemgetter
-from bibauthorid_matrix_optimization import maximized_mapping
-from bibauthorid_backinterface import save_cluster
-from bibauthorid_backinterface import get_all_papers_of_pids
-from bibauthorid_backinterface import get_bib10x, get_bib70x
-from bibauthorid_backinterface import get_all_modified_names_from_personid
-from bibauthorid_backinterface import get_signatures_from_bibrefs
-from bibauthorid_name_utils import generate_last_name_cluster_str
+from invenio.bibauthorid_matrix_optimization import maximized_mapping
+from invenio.bibauthorid_backinterface import save_cluster
+from invenio.bibauthorid_backinterface import get_all_papers_of_pids
+from invenio.bibauthorid_backinterface import get_bib10x, get_bib70x
+from invenio.bibauthorid_backinterface import get_all_modified_names_from_personid
+from invenio.bibauthorid_backinterface import get_signatures_from_bibrefs
+from invenio.bibauthorid_name_utils import generate_last_name_cluster_str
 
+
+#python2.4 compatibility
+from bibauthorid_general_utils import bai_all as all
 
 class Blob(object):
     def __init__(self, personid_records):
@@ -42,7 +45,7 @@ class Blob(object):
         self.claimed = set()
         self.assigned = set()
         self.rejected = set()
-        for pid, unused, flag in personid_records:
+        for pid, _, flag in personid_records:
             if flag > 1:
                 self.claimed.add(pid)
             elif flag >= -1:
@@ -61,7 +64,7 @@ def create_blobs_by_pids(pids):
     all_bibs = get_all_papers_of_pids(pids)
     all_bibs = ((x[0], (int(x[1]), x[2], x[3]), x[4]) for x in all_bibs)
     bibs_dict = groupby(sorted(all_bibs, key=itemgetter(1)), key=itemgetter(1))
-    blobs = [Blob(list(bibs)) for unused, bibs in bibs_dict]
+    blobs = [Blob(list(bibs)) for _, bibs in bibs_dict]
 
     return blobs
 
@@ -94,10 +97,14 @@ def group_blobs(blobs):
 
 class ClusterSet(object):
     class Cluster(object):
-        def __init__(self, bibs, hate = []):
+        def __init__(self, bibs, hate=None):
             # hate is a symetrical relation
             self.bibs = set(bibs)
-            self.hate = set(hate)
+            if hate:
+                self.hate = set(hate)
+            else:
+                self.hate = set([])
+            self.personid = None
 
         def hates(self, other):
             return other in self.hate
@@ -115,6 +122,8 @@ class ClusterSet(object):
     def __init__(self):
         self.clusters = []
         self.update_bibs()
+        self.num_all_bibs = None
+        self.last_name = None
 
     def update_bibs(self):
         self.num_all_bibs = sum(len(cl.bibs) for cl in self.clusters)
@@ -136,7 +145,7 @@ class ClusterSet(object):
         self.clusters = cluster_dict.values()
 
         for i, cl in enumerate(self.clusters):
-            cl.hate = set(chain(self.clusters[:i], self.clusters[i+1:]))
+            cl.hate = set(chain(self.clusters[:i], self.clusters[i + 1:]))
 
         for ind in independent:
             bad_clusters = [cluster_dict[i] for i in ind[2] if i in cluster_dict]
@@ -243,8 +252,8 @@ def delayed_cluster_sets_from_marktables():
 
     all_refs = ((name, refs, len(list(get_signatures_from_bibrefs(refs))))
                 for name, refs in name_buket.items())
-    all_refs = sorted(all_refs, key = itemgetter(2))
-    return ([delayed_create_from_mark(refs, name) for name, refs, size in all_refs],
+    all_refs = sorted(all_refs, key=itemgetter(2))
+    return ([delayed_create_from_mark(refs, name) for name, refs, _ in all_refs],
              map(itemgetter(0), all_refs),
              map(itemgetter(2), all_refs))
 

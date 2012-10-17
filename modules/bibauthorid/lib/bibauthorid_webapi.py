@@ -31,7 +31,6 @@ import invenio.search_engine as search_engine
 from search_engine import perform_request_search
 from cgi import escape
 from time import gmtime, strftime, ctime
-from invenio.dbquery import OperationalError
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.webuser import collect_user_info, get_session, getUid
 from invenio.webuser import isUserSuperAdmin
@@ -43,7 +42,9 @@ from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.config import CFG_SITE_URL
 from invenio.mailutils import send_email
 
-from invenio.bibauthorid_dbinterface import get_personiID_external_ids    #export
+from operator import add
+
+from invenio.bibauthorid_dbinterface import get_personiID_external_ids    #export #pylint: disable-msg=W0614
 
 def get_person_redirect_link(pid):
     '''
@@ -66,7 +67,7 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
         uid = userinfo.split('||')[0]
     else:
         uid = ''
-    dbapi.update_personID_canonical_names((person_id,), overwrite=True, suggested=canonical_name)
+    dbapi.update_personID_canonical_names([person_id], overwrite=True, suggested=canonical_name)
     dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.', userid=uid)
 
 def get_canonical_id_from_person_id(person_id):
@@ -505,122 +506,6 @@ def is_valid_canonical_id(cid):
     else:
         return False
 
-
-#def confirm_person_bibref_assignments(person_id, bibrefs, uid):
-#    '''
-#    Confirms a bibref-bibrec assignment to a person. That internally
-#    raises the flag of the entry to 2, which means 'user confirmed' and
-#    sets the user level to the highest level of the user provided as param
-#
-#    @param person_id: the id of the person to confirm the assignment to
-#    @type person_id: int
-#    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
-#    @type bibrefs: list of strings
-#    @param uid: the id of the user that arranges the confirmation
-#    @type uid: int
-#
-#    @return: True if the process ran smoothly, False if there was an error
-#    @rtype: boolean
-#    '''
-#    pid = wash_integer_id(person_id)
-#    refs = []
-#
-#    if pid < 0:
-#        return False
-#
-#    if not isinstance(bibrefs, list) or not len(bibrefs):
-#        return False
-#    else:
-#        for bibref in bibrefs:
-#            if is_valid_bibref(bibref):
-#                refs.append((bibref,))
-#            else:
-#                return False
-#
-#    try:
-#        dbapi.confirm_papers_to_person((pid,), refs, get_user_level(uid))
-#    except OperationalError:
-#        return False
-#
-#    return True
-#
-#
-#def repeal_person_bibref_assignments(person_id, bibrefs, uid):
-#    '''
-#    Repeals a bibref-bibrec assignment from a person. That internally
-#    sets the flag of the entry to -2, which means 'user repealed' and
-#    sets the user level to the highest level of the user provided as param
-#
-#    @param person_id: the id of the person to repeal the assignment from
-#    @type person_id: int
-#    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
-#    @type bibrefs: list of strings
-#    @param uid: the id of the user that arranges the repulsion
-#    @type uid: int
-#
-#    @return: True if the process ran smoothly, False if there was an error
-#    @rtype: boolean
-#    '''
-#    pid = wash_integer_id(person_id)
-#    refs = []
-#
-#    if pid < 0:
-#        return False
-#
-#    if not isinstance(bibrefs, list) or not len(bibrefs):
-#        return False
-#    else:
-#        for bibref in bibrefs:
-#            if is_valid_bibref(bibref):
-#                refs.append((bibref,))
-#            else:
-#                return False
-#
-#    try:
-#        dbapi.reject_papers_from_person((pid,), refs, get_user_level(uid))
-#    except OperationalError:
-#        return False
-#
-#    return True
-#
-#
-#def reset_person_bibref_decisions(person_id, bibrefs):
-#    '''
-#    Resets a bibref-bibrec assignment of a person. That internally
-#    sets the flag of the entry to 0, which means 'no user interaction' and
-#    sets the user level to 0 to give the record free for claiming/curation
-#
-#    @param person_id: the id of the person to reset the assignment from
-#    @type person_id: int
-#    @param bibrefs: the bibref-bibrec pairs that unambiguously identify records
-#    @type bibrefs: list of strings
-#
-#    @return: True if the process ran smoothly, False if there was an error
-#    @rtype: boolean
-#    '''
-#    pid = wash_integer_id(person_id)
-#    refs = []
-#
-#    if pid < 0:
-#        return False
-#
-#    if not isinstance(bibrefs, list) or not len(bibrefs):
-#        return False
-#    else:
-#        for bibref in bibrefs:
-#            if is_valid_bibref(bibref):
-#                refs.append((bibref,))
-#            else:
-#                return False
-#
-#    try:
-#        dbapi.reset_papers_flag((person_id,), refs)
-#    except OperationalError:
-#        return False
-#
-#    return True
-#
-#
 def add_person_comment(person_id, message):
     '''
     Adds a comment to a person after enriching it with meta-data (date+time)
@@ -921,7 +806,7 @@ def arxiv_login(req):
             pinfo = dict()
             session['personinfo'] = pinfo
             pinfo["ticket"] = []
-        session.save()
+        session.dirty = True
 
     session_bareinit(req)
     session = get_session(req)
@@ -947,7 +832,7 @@ def arxiv_login(req):
     else:
         session['personinfo']['arxiv_name'] = ''
 
-    session.save()
+    session.dirty = True
 
     try:
         arxiv_p_ids = uinfo['external_arxivids'].split(';')
@@ -959,9 +844,8 @@ def arxiv_login(req):
     #'external_firstname': 'Henning',
 
     try:
-        found_bibrecs = set(zip(*[perform_request_search(p='037:' + str(arx), of='id', rg=0)
-                              for arx in arxiv_p_ids])[0])
-    except IndexError:
+        found_bibrecs = set(reduce(add, [perform_request_search(p='037:' + str(arx), of='id', rg=0)for arx in arxiv_p_ids]))
+    except (IndexError, TypeError):
         found_bibrecs = set()
 
     #found_bibrecs = [567700, 567744]
@@ -995,7 +879,7 @@ def arxiv_login(req):
             if e['pid'] == t['pid'] and e['bibref'] == t['bibref']:
                 ticket.remove(e)
         ticket.append(t)
-    session.save()
+    session.dirty = True
     return pid
 
 def external_user_can_perform_action(uid):
@@ -1364,19 +1248,18 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
 
     if action in ['confirm', 'assign']:
         dbapi.insert_user_log(userinfo, pid, 'assign', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
-        dbapi.confirm_papers_to_person((str(pid),), [[bibref]], user_level)
+        dbapi.confirm_papers_to_person(pid, [bibref], user_level)
     elif action in ['repeal']:
         dbapi.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
-        dbapi.reject_papers_from_person((str(pid),), [[bibref]], user_level)
+        dbapi.reject_papers_from_person(pid, [bibref], user_level)
     elif action in ['reset']:
         dbapi.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
-        dbapi.reset_papers_flag((str(pid),), [[bibref]])
+        dbapi.reset_papers_flag(pid, [bibref])
     else:
         return False
 
     #This is the only point which modifies a person, so this can trigger the
     #deletion of a cached page
-    dbapi.delete_cached_author_page(pid)
     webauthorapi.expire_all_cache_for_personid(pid)
 
     return True

@@ -21,17 +21,19 @@ import bibauthorid_config as bconfig
 from datetime import datetime
 import os
 
-from bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
-from bibauthorid_cluster_set import delayed_cluster_sets_from_personid
-from bibauthorid_wedge import wedge
-from bibauthorid_name_utils import generate_last_name_cluster_str
-from bibauthorid_backinterface import empty_results_table
-from bibauthorid_backinterface import remove_result_cluster
-from bibauthorid_general_utils import bibauthor_print
-from bibauthorid_prob_matrix import prepare_matirx
-from bibauthorid_scheduler import schedule, matrix_coefs
-from bibauthorid_least_squares import to_function as create_approx_func
+from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
+from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_personid
+from invenio.bibauthorid_wedge import wedge
+from invenio.bibauthorid_name_utils import generate_last_name_cluster_str
+from invenio.bibauthorid_backinterface import empty_results_table
+from invenio.bibauthorid_backinterface import remove_result_cluster
+from invenio.bibauthorid_general_utils import bibauthor_print
+from invenio.bibauthorid_prob_matrix import prepare_matirx
+from invenio.bibauthorid_scheduler import schedule, matrix_coefs
+from invenio.bibauthorid_least_squares import to_function as create_approx_func
 
+#python2.4 compatibility
+from invenio.bibauthorid_general_utils import bai_all as all
 
 '''
     There are three main entry points to tortoise
@@ -62,7 +64,7 @@ from bibauthorid_least_squares import to_function as create_approx_func
 
 def tortoise_from_scratch():
     bibauthor_print("Preparing cluster sets.")
-    cluster_sets, lnames, sizes = delayed_cluster_sets_from_marktables()
+    cluster_sets, _lnames, sizes = delayed_cluster_sets_from_marktables()
     bibauthor_print("Building all matrices.")
     exit_statuses = schedule_create_matrix(
         cluster_sets,
@@ -74,7 +76,7 @@ def tortoise_from_scratch():
     empty_results_table()
 
     bibauthor_print("Preparing cluster sets.")
-    cluster_sets, lnames, sizes = delayed_cluster_sets_from_marktables()
+    cluster_sets, _lnames, sizes = delayed_cluster_sets_from_marktables()
     bibauthor_print("Starting disambiguation.")
     exit_statuses = schedule_wedge_and_store(
         cluster_sets,
@@ -94,7 +96,7 @@ def tortoise(pure=False,
 
     if not skip_matrix_creation:
         bibauthor_print("Preparing cluster sets.")
-        clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
+        clusters, _lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
         bibauthor_print("Building all matrices.")
         exit_statuses = schedule_create_matrix(
             clusters,
@@ -104,7 +106,7 @@ def tortoise(pure=False,
         assert all(stat == os.EX_OK for stat in exit_statuses)
 
     bibauthor_print("Preparing cluster sets.")
-    clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
+    clusters, _lnames, sizes = delayed_cluster_sets_from_personid(pure, last_run)
     bibauthor_print("Starting disambiguation.")
     exit_statuses = schedule_wedge_and_store(
         clusters,

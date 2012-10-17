@@ -23,25 +23,28 @@
     use the data base. It should have an interface for
     all other files in the module.
 '''
-import bibauthorid_config as bconfig
+import invenio.bibauthorid_config as bconfig
 import numpy
 import cPickle
 from cPickle import UnpicklingError
 import os
 import gc
 
+#python2.4 compatibility
+from invenio.bibauthorid_general_utils import bai_all as all
+
 from itertools import groupby, count, ifilter, chain, imap
 from operator import itemgetter
 
-from search_engine import perform_request_search
-from access_control_engine import acc_authorize_action
+from invenio.search_engine import perform_request_search
+from invenio.access_control_engine import acc_authorize_action
 
 
-from bibauthorid_name_utils import split_name_parts
-from bibauthorid_name_utils import create_canonical_name
-from bibauthorid_name_utils import create_normalized_name
-from bibauthorid_general_utils import bibauthor_print
-from bibauthorid_general_utils import update_status \
+from invenio.bibauthorid_name_utils import split_name_parts
+from invenio.bibauthorid_name_utils import create_canonical_name
+from invenio.bibauthorid_name_utils import create_normalized_name
+from invenio.bibauthorid_general_utils import bibauthor_print
+from invenio.bibauthorid_general_utils import update_status \
                                     , update_status_final
 from dbquery import run_sql
 
@@ -49,6 +52,9 @@ try:
     from collections import defaultdict
 except ImportError:
     class defaultdict(dict):
+        '''
+        Implementation of defaultdict to supply missing collections library in python <= 2.4
+        '''
         def __init__(self, default_factory, *args, **kwargs):
             super(defaultdict, self).__init__(*args, **kwargs)
             self.default_factory = default_factory
@@ -188,6 +194,11 @@ def get_personid_from_uid(uid):
         return  ([-1], False)
 
 def get_uid_from_personid(pid):
+    '''
+    Get the invenio user id associated to a pid if exists.
+    @param pid: person_id
+    @type pid: int
+    '''
     uid = run_sql("select data from aidPERSONIDDATA where tag='uid' and personid = %s", (pid,))
     if uid:
         return uid[0][0]
@@ -196,6 +207,9 @@ def get_uid_from_personid(pid):
 
 
 def get_new_personid():
+    '''
+    Get a free personid number
+    '''
     pids = (run_sql("select max(personid) from aidPERSONIDDATA")[0][0],
             run_sql("select max(personid) from aidPERSONIDPAPERS")[0][0])
 
@@ -209,6 +223,11 @@ def get_new_personid():
         return 0
 
 def get_existing_personids(with_papers_only=False):
+    '''
+    Get a set of existing person_ids.
+    @param with_papers_only: if True, returns only ids holding papers discarding ids holding only information in aidPERSONIDDATA
+    @type with_papers_only: Bool
+    '''
     if not with_papers_only:
         try:
             pids_data = set(map(int, zip(*run_sql("select distinct personid from aidPERSONIDDATA"))[0]))
@@ -224,12 +243,19 @@ def get_existing_personids(with_papers_only=False):
 
 
 def get_existing_result_clusters():
+    '''
+    Get existing relult clusters, for private use of Tortoise and merger
+    '''
     return run_sql("select distinct personid from aidRESULTS")
 
 
 def create_new_person(uid= -1, uid_is_owner=False):
     '''
     Create a new person. Set the uid as owner if requested.
+    @param uid: User id to associate to the newly created person
+    @type uid: int
+    @param uid_is_owner: If true, the person will hold the uid as owned, otherwise the id is only remembered as the creator
+    @type uid_is_owner: bool
     '''
     pid = get_new_personid()
     if uid_is_owner:
@@ -239,11 +265,20 @@ def create_new_person(uid= -1, uid_is_owner=False):
     return pid
 
 def create_new_person_from_uid(uid):
+    '''
+    Commodity stub for create_new_person(...)
+    @param uid: user id
+    @type uid: int
+    '''
     return create_new_person(uid, uid_is_owner=True)
 
 def new_person_from_signature(sig, name=None):
     '''
     Creates a new person from a signature.
+    @param sig: signature tuple ([100|700],bibref,bibrec)
+    @type sig: tuple
+    @param name:
+    @type name: string
     '''
     pid = get_new_personid()
     add_signature(sig, name, pid)
@@ -253,6 +288,12 @@ def new_person_from_signature(sig, name=None):
 def add_signature(sig, name, pid):
     '''
     Inserts a signature in personid.
+    @param sig: signature tuple
+    @type sig: tuple
+    @param name: name string
+    @type name: string
+    @param pid: personid to which assign the signature
+    @type pid: int
     '''
     if not name:
         name = get_name_by_bibrecref(sig)
@@ -265,7 +306,11 @@ def add_signature(sig, name, pid):
 
 def move_signature(sig, pid):
     '''
-    Inserts a signature in personid.
+    Moves a signature to a different person id
+    @param sig: signature tuple
+    @type sig: tuple
+    @param pid: personid 
+    @type pid: int
     '''
     run_sql("update aidPERSONIDPAPERS set personid=%s "
             "where bibref_table like %s and  bibref_value=%s "
@@ -273,8 +318,13 @@ def move_signature(sig, pid):
              (pid,) + sig)
 
 def find_conflicts(sig, pid):
-    """
-    """
+    '''
+    Helper for merger algorithm, find signature given personid
+    @param sig: signature tuple
+    @type sig: tuple
+    @param pid: personid id
+    @type pid: integer
+    '''
     return run_sql("select bibref_table, bibref_value, bibrec, flag "
                    "from aidPERSONIDPAPERS where "
                    "personid = %s and "
@@ -323,12 +373,22 @@ def delete_request_ticket(person_id, ticket_id=None):
 
 
 def get_all_personids_by_name(regexpr):
+    '''
+    Search personids matching SQL expression in the name field
+    @param regexpr: string SQL regexp
+    @type regexpr: string
+    '''
     return run_sql("select personid, name "
                    "from aidPERSONIDPAPERS "
                    "where name like %s",
                    (regexpr,))
 
 def get_personids_by_canonical_name(target):
+    '''
+    Find personids by canonical name
+    @param target:
+    @type target:
+    '''
     pid = run_sql("select personid from aidPERSONIDDATA where "
                   "tag='canonical_name' and data like %s", (target,))
     if pid:
@@ -399,6 +459,21 @@ def get_papers_status(paper):
 
 def get_persons_from_recids(recids, return_alt_names=False,
                             return_all_person_papers=False):
+    '''
+    Helper for search engine indexing. Gives back a dictionary with important info about a person, for example:
+     get_persons_from_recids([1], True, True) returns
+      ({1: [16591L]},
+      {16591L: {'alternatative_names': ['Wong, Yung Chow'],
+      'canonical_id': 'Y.C.Wong.1',
+      'person_records': [275304, 1, 51394, 128250, 311629]}})
+
+    @param recids:
+    @type recids:
+    @param return_alt_names:
+    @type return_alt_names:
+    @param return_all_person_papers:
+    @type return_all_person_papers:
+    '''
     rec_2_pid = dict()
     pid_2_data = dict()
     all_pids = set()
@@ -556,6 +631,8 @@ def get_person_db_names_set(pid):
 def get_personids_from_bibrec(bibrec):
     '''
     Returns all the personids associated to a bibrec.
+    @param bibrec: record id
+    @type bibrec: int
     '''
 
     pids = run_sql("select distinct personid from aidPERSONIDPAPERS where bibrec=%s and flag > -2", (bibrec,))
@@ -567,6 +644,11 @@ def get_personids_from_bibrec(bibrec):
 
 def get_personids_and_papers_from_bibrecs(bibrecs, limit_by_name=None):
     '''
+    Gives back a list of tuples (personid, set_of_papers_owned_by) limited to the given list of bibrecs.
+    @param bibrecs:
+    @type bibrecs:
+    @param limit_by_name:
+    @type limit_by_name:
     '''
     if not bibrecs:
         return []
@@ -609,6 +691,35 @@ def get_person_papers(pid, flag,
                       show_affiliations=False,
                       show_date=False,
                       show_experiment=False):
+    '''
+    Get all papers of person with flag greater than flag. Gives back a dictionary like:
+     get_person_papers(16591,-2,True,True,True,True,True,True) returns
+      [{'affiliation': ['Hong Kong U.'],
+      'authorname': 'Wong, Yung Chow',
+      'data': '100:1,1',
+      'date': ('1961',),
+      'experiment': [],
+      'flag': 0,
+      'rt_status': False,
+      'title': ('Isoclinic N planes in Euclidean 2N space, Clifford parallels in elliptic (2N-1) space, and the Hurwitz matrix equations',)},
+        ...]
+    @param pid:
+    @type pid:
+    @param flag:
+    @type flag:
+    @param show_author_name:
+    @type show_author_name:
+    @param show_title:
+    @type show_title:
+    @param show_rt_status:
+    @type show_rt_status:
+    @param show_affiliations:
+    @type show_affiliations:
+    @param show_date:
+    @type show_date:
+    @param show_experiment:
+    @type show_experiment:
+    '''
     query = "bibref_table, bibref_value, bibrec, flag"
     if show_author_name:
         query += ", name"
@@ -789,12 +900,12 @@ def confirm_papers_to_person(pid, papers, user_level=0):
     @type papers: (('100:7531,9024',),)
     '''
 
-    new_pid = get_new_personid()
-    pids_to_update = set(pid)
+
+    pids_to_update = set([pid])
 
 
     for p in papers:
-        bibref, rec = p[0].split(",")
+        bibref, rec = p.split(",")
         rec = int(rec)
         table, ref = bibref.split(":")
         ref = int(ref)
@@ -806,29 +917,56 @@ def confirm_papers_to_person(pid, papers, user_level=0):
                        "where personid=%s "
                        "and bibrec=%s "
                        "and flag > -2"
-                       , (pid[0], rec))
+                       , (pid, rec))
+
+        other_paps = run_sql("select bibref_table, bibref_value, bibrec "
+                       "from aidPERSONIDPAPERS "
+                       "where personid <> %s "
+                       "and bibrec=%s "
+                       "and flag > -2"
+                       , (pid, rec))
+
         rej_paps = run_sql("select bibref_table, bibref_value, bibrec "
                        "from aidPERSONIDPAPERS "
                        "where personid=%s "
                        "and bibrec=%s "
                        "and flag = -2"
-                       , (pid[0], rec))
+                       , (pid, rec))
 
-        assert paps or rej_paps
-        assert len(paps) < 2
+        # All papers that are being claimed should be present in aidPERSONIDPAPERS, thus:
+        # assert paps or rej_paps or other_paps, 'There should be at least something regarding this bibrec!'
+        # should always be valid.
+        # BUT, it usually happens that claims get done out of the browser/session cache which is hours/days old,
+        # hence it happens that papers are claimed which no longer exists in the system.
+        # For the sake of mental sanity, instead of crashing from now on we just ignore such cases.
+        if not (paps or other_paps or rej_paps):
+            continue
 
-        #if the bibrec is present with a different bibref, the present one must be moved somwhere
-        #else before we can claim the incoming one
-        if paps and sig != paps[0]:
-            pids_to_update.add(new_pid)
-            move_signature(paps[0], new_pid)
+        # It should not happen that a paper is assigned more then once to the same person.
+        # But sometimes it happens in rare unfortunate cases of bad concurrency circumstances,
+        # so we try to fix it directly instead of crashing here.
+        # Once a better solution for dealing with concurrency will be found, the following asserts
+        # shall be reenabled, to allow better control on what happens.
 
-        #Make sure that the incoming claim is unique and get rid of all rejections, they are useless
-        #from now on
+        # assert len(paps) < 2, "This paper should not be assigned to this person more then once! %s" % paps
+        # assert len(other_paps) < 2, "There should not be more then one copy of this paper! %s" % other_paps
+
+        # if the bibrec is present with a different bibref, the present one must be moved somwhere
+        # else before we can claim the incoming one
+        if paps:
+            for pap in paps:
+                #kick out all unwanted signatures
+                if  sig != pap:
+                    new_pid = get_new_personid()
+                    pids_to_update.add(new_pid)
+                    move_signature(pap, new_pid)
+
+        # Make sure that the incoming claim is unique and get rid of all rejections, they are useless
+        # from now on
         run_sql("delete from aidPERSONIDPAPERS where bibref_table like %s and "
                 " bibref_value = %s and bibrec=%s"
                 , sig)
-        add_signature(sig, None, pid[0])
+        add_signature(sig, None, pid)
         run_sql("update aidPERSONIDPAPERS "
                 "set personid = %s "
                 ", flag = %s "
@@ -836,7 +974,7 @@ def confirm_papers_to_person(pid, papers, user_level=0):
                 "where bibref_table = %s "
                 "and bibref_value = %s "
                 "and bibrec = %s"
-                , (pid[0], '2', user_level,
+                , (pid, '2', user_level,
                    table, ref, rec))
 
     update_personID_canonical_names(pids_to_update)
@@ -859,14 +997,17 @@ def reject_papers_from_person(pid, papers, user_level=0):
         table, ref = brr.split(':')
 
         sig = (table, ref, rec)
-        #To be rejected, a record should be present!
+        # To be rejected, a record should be present!
         records = personid_name_from_signature(sig)
-        assert(records)
+        # For the sake of mental sanity (see commentis in confirm_papers_to_personid, just ignore in case this paper is no longer existent
+        # assert(records)
+        if not records:
+            continue
 
         fpid, name = records[0]
-        #If the record is assigned to a different person already, the rejection is meaningless
-        #Otherwise, we assign the paper to someone else (not important who it will eventually 
-        #get moved by tortoise) and add the rejection to the current person
+        # If the record is assigned to a different person already, the rejection is meaningless
+        # Otherwise, we assign the paper to someone else (not important who it will eventually 
+        # get moved by tortoise) and add the rejection to the current person
 
         if fpid == pid:
             move_signature(sig, new_pid)
@@ -886,7 +1027,7 @@ def reset_papers_flag(pid, papers):
     @type papers: (('100:7531,9024',),)
     '''
     for p in papers:
-        bibref, rec = p[0].split(",")
+        bibref, rec = p.split(",")
         table, ref = bibref.split(":")
         sig = (table, ref, rec)
 
@@ -894,21 +1035,24 @@ def reset_papers_flag(pid, papers):
                        "from aidPERSONIDPAPERS "
                        "where personid=%s "
                        "and bibrec=%s "
-                       , (pid[0], rec))
+                       , (pid, rec))
         rej_paps = run_sql("select bibref_table, bibref_value, bibrec "
                        "from aidPERSONIDPAPERS "
                        "where personid=%s "
                        "and bibrec=%s "
                        "and flag = -2"
-                       , (pid[0], rec))
+                       , (pid, rec))
 
-        assert paps or rej_paps
+        # again, see confirm_papers_to_person for the sake of mental sanity
+        # assert paps or rej_paps
+        if not paps or rej_paps:
+            continue
         assert len(paps) < 2
 
         run_sql("delete from aidPERSONIDPAPERS where bibref_table like %s and "
                 "bibref_value = %s and bibrec = %s",
                 (sig))
-        add_signature(sig, None, pid[0])
+        add_signature(sig, None, pid)
 
 
 def user_can_modify_data(uid, pid):
@@ -1064,47 +1208,6 @@ def filter_modified_record_ids(bibrecs, date):
                           , (x[2], date))[0][0]
         , bibrecs)
 
-
-def get_cached_author_page(pageparam):
-    '''
-    Return cached authorpage
-    @param: pageparam (int personid)
-    @return (id, 'authorpage_cache', personid, authorpage_html, date_cached)
-    '''
-            #TABLE: id, tag, identifier, data, date
-    caches = run_sql("select id, object_name, object_key, object_value, last_updated \
-                      from aidCACHE \
-                      where object_name='authorpage_cache' and object_key=%s",
-                          (str(pageparam),))
-    if len(caches) >= 1:
-        return caches[0]
-    else:
-        return []
-
-def delete_cached_author_page(personid):
-    '''
-    Deletes from the author page cache the page concerning one person
-    '''
-    run_sql("delete from aidCACHE where object_name='authorpage_cache' and object_key=%s", (str(personid),))
-
-def update_cached_author_page_timestamp(pageparam):
-    '''
-    Updates cached author page timestamp
-    @param pageparam: int personid
-    '''
-    #TABLE: id, tag, identifier, data, date
-    run_sql("update aidCACHE set last_updated=now() where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
-
-
-def update_cached_author_page(pageparam, page):
-    '''
-    Updates cached author page, deleting old caches for same pageparam
-    @param pageparam: int personid
-    @param page: string html authorpage
-    '''
-            #TABLE: id, tag, identifier, data, date
-    run_sql("delete from aidCACHE where object_name='authorpage_cache' and object_key=%s", (str(pageparam),))
-    run_sql("insert into aidCACHE values (Null,'authorpage_cache',%s,%s,now())", (str(pageparam), str(page)))
 
 def get_user_log(transactionid='', userinfo='', userid='', personID='', action='', tag='', value='', comment='', only_most_recent=False):
     '''
@@ -1309,9 +1412,7 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
 
 def personid_get_recids_affected_since(last_timestamp):
     '''
-    Returns a list of recids which have been manually changed since timestamp
-    @TODO: extend the system to track and signal even automatic updates (unless a full reindex is
-        acceptable in case of magic automatic update)
+    Returns a list of recids which have been manually changed since timestamp)
     @param: last_timestamp: last update, datetime.datetime
     '''
     vset = set(int(v[0].split(',')[1]) for v in run_sql(
@@ -1374,14 +1475,13 @@ def populate_partial_marc_caches():
         return
 
     def br_dictionarize(maptable):
-        gc.collect()
         gc.disable()
         md = defaultdict(dict)
         maxiters = len(set(map(itemgetter(0), maptable)))
         for i, v in enumerate(groupby(maptable, itemgetter(0))):
             if i % 1000 == 0:
                 update_status(float(i) / maxiters, 'br_dictionarizing...')
-            if i % 500000 == 0:
+            if i % 1000000 == 0:
                 update_status(float(i) / maxiters, 'br_dictionarizing...GC')
                 gc.collect()
             idx = defaultdict(list)
@@ -1399,25 +1499,25 @@ def populate_partial_marc_caches():
         return dict((i[0], (i[1], i[2])) for i in bibtable)
 
     update_status(.0, 'Populating get_grouped_records_table_cache')
-    bibrec_bib10x = sorted(run_sql("select * from bibrec_bib10x"))
+    bibrec_bib10x = sorted(run_sql("select id_bibrec,id_bibxxx,field_number from bibrec_bib10x"))
     update_status(.125, 'Populating get_grouped_records_table_cache')
     brd_b10x = br_dictionarize(bibrec_bib10x)
     del bibrec_bib10x
 
     update_status(.25, 'Populating get_grouped_records_table_cache')
-    bibrec_bib70x = sorted(run_sql("select * from bibrec_bib70x"))
+    bibrec_bib70x = sorted(run_sql("select id_bibrec,id_bibxxx,field_number from bibrec_bib70x"))
     update_status(.375, 'Populating get_grouped_records_table_cache')
     brd_b70x = br_dictionarize(bibrec_bib70x)
     del bibrec_bib70x
 
     update_status(.5, 'Populating get_grouped_records_table_cache')
-    bib10x = (run_sql("select * from bib10x"))
+    bib10x = (run_sql("select id,tag,value from bib10x"))
     update_status(.625, 'Populating get_grouped_records_table_cache')
     bibd_10x = bib_dictionarize(bib10x)
     del bib10x
 
     update_status(.75, 'Populating get_grouped_records_table_cache')
-    bib70x = (run_sql("select * from bib70x"))
+    bib70x = (run_sql("select id,tag,value from bib70x"))
     update_status(.875, 'Populating get_grouped_records_table_cache')
     bibd_70x = bib_dictionarize(bib70x)
     del bib70x
@@ -1439,11 +1539,14 @@ def _get_grouped_records_using_caches(brr, *args):
     tuples = [MARC_100_700_CACHE['b%s' % str(brr[0])][i] for i in ids]
     results = {}
     for t in tuples:
-        if t[0] in args:
+        present = [x for x in args if x in t[0]]
+        assert len(present) <= 1
+        if present:
+            arg = present[0]
             try:
-                results[t[0]].append(t[1])
+                results[arg].append(t[1])
             except KeyError:
-                results[t[0]] = [t[1]]
+                results[arg] = [t[1]]
     for arg in args:
         if arg not in results.keys():
             results[arg] = []
@@ -1493,7 +1596,7 @@ def _get_grouped_records_from_db(bibrefrec, *args):
     for arg in args:
         qry = run_sql("SELECT value "
                       "FROM %s "
-                      "WHERE tag LIKE '%s' "
+                      "WHERE tag LIKE '%%%s%%' "
                       "AND id IN %s" %
                       (target_table, arg, grouped_s))
         ret[arg] = [q[0] for q in qry]
@@ -1724,9 +1827,13 @@ class Bib_matrix(object):
         return ret
 
     def _resolve_entry(self, bibs):
-        entry = sorted(self._bibmap[bib] for bib in bibs)
-        assert entry[0] < entry[1]
-        return entry[0] + ((entry[1] - 1) * entry[1]) / 2
+        assert len(bibs) == 2
+        first = self._bibmap[bibs[0]]
+        second = self._bibmap[bibs[1]]
+        if first > second:
+            first, second = second, first
+        assert first < second
+        return first + ((second - 1) * second) / 2
 
     def __setitem__(self, bibs, val):
         entry = self._resolve_entry(bibs)
@@ -1903,13 +2010,16 @@ def get_full_personid_data(table_name="`aidPERSONIDDATA`"):
                    "opt1, opt2, opt3 from %s" % table_name)
 
 def get_name_string_to_pid_dictionary():
+    '''
+    Get a dictionary which maps name strigs to person ids
+    '''
     namesdict = {}
     all_names = run_sql("select personid,name from aidPERSONIDPAPERS")
     for x in all_names:
         namesdict.setdefault(x[1], set()).add(x[0])
     return namesdict
 
-#could be useful to optimize rabbit, still unused, watch out.
+#could be useful to optimize rabbit, still unused and untested, watch out.
 def get_bibrecref_to_pid_dictuonary():
     brr2pid = {}
     all_brr = run_sql("select personid,bibref_table,bibref_value.bibrec from aidPERSONIDPAPERS")
@@ -1987,7 +2097,7 @@ def check_duplicated_papers(printer, repair=False):
             all_ok = False
             dups = sorted(bibrec)
             dups = [x for i, x in enumerate(dups[0:len(dups) - 1]) if x == dups[i + 1]]
-            printer("Person %d has duplicated papers: %s", (pid, dups))
+            printer("Person %d has duplicated papers: %s" % (pid, dups))
 
             if repair:
                 for dupbibrec in dups:
@@ -2262,7 +2372,7 @@ def check_merger():
 def check_results():
     is_ok = True
 
-    all_result_rows = run_sql("select * from aidRESULTS")
+    all_result_rows = run_sql("select personid,bibref_table,bibref_value,bibrec from aidRESULTS")
 
     keyfunc = lambda x: x[1:]
     duplicated = (d for d in (list(d) for k, d in groupby(sorted(all_result_rows, key=keyfunc), key=keyfunc)) if len(d) > 1)
@@ -2397,9 +2507,15 @@ def check_claim_inspireid_contradiction():
             print
 
 def get_all_bibrecs():
+    '''
+    Get all record ids present in aidPERSONIDPAPERS
+    '''
     return [x[0] for x in run_sql("select distinct bibrec from aidPERSONIDPAPERS")]
 
 def get_bibrefrec_to_pid_flag_mapping():
+    '''
+    create a map between signatures and personid/flag
+    '''
     whole_table = run_sql("select bibref_table,bibref_value,bibrec,personid,flag from aidPERSONIDPAPERS")
     gc.disable()
     ret = {}
@@ -2412,15 +2528,28 @@ def get_bibrefrec_to_pid_flag_mapping():
     return ret
 
 def remove_all_bibrecs(bibrecs):
+    '''
+    Remove give record ids from aidPERSONIDPAPERS table
+    @param bibrecs:
+    @type bibrecs:
+    '''
     bibrecs_s = list_2_SQL_str(bibrecs)
     run_sql("delete from aidPERSONIDPAPERS where bibrec in %s" % bibrecs_s)
 
 
 def empty_results_table():
+    '''
+    Get rid of all tortoise results
+    '''
     run_sql("TRUNCATE aidRESULTS")
 
 
 def save_cluster(named_cluster):
+    '''
+    Save a cluster in aidRESULTS
+    @param named_cluster:
+    @type named_cluster:
+    '''
     name, cluster = named_cluster
     for bib in cluster.bibs:
         run_sql("INSERT INTO aidRESULTS "
@@ -2430,12 +2559,22 @@ def save_cluster(named_cluster):
 
 
 def remove_result_cluster(name):
+    '''
+    Remove result cluster using name string
+    @param name:
+    @type name:
+    '''
     run_sql("DELETE FROM aidRESULTS "
             "WHERE personid like '%s.%%'"
             % name)
 
 
 def personid_name_from_signature(sig):
+    '''
+    Find personid and name string of a signature
+    @param sig:
+    @type sig:
+    '''
     ret = run_sql("select personid, name "
                   "from aidPERSONIDPAPERS "
                   "where bibref_table = %s and bibref_value = %s and bibrec = %s "
@@ -2445,6 +2584,11 @@ def personid_name_from_signature(sig):
     return ret
 
 def personid_from_signature(sig):
+    '''
+    Find personid owner of a signature
+    @param sig:
+    @type sig:
+    '''
     ret = run_sql("select personid, flag "
                   "from aidPERSONIDPAPERS "
                   "where bibref_table = %s and bibref_value = %s and bibrec = %s "
@@ -2454,6 +2598,11 @@ def personid_from_signature(sig):
     return ret
 
 def get_signature_info(sig):
+    '''
+    Get personid and flag relative to a signature
+    @param sig:
+    @type sig:
+    '''
     ret = run_sql("select personid, flag "
                   "from aidPERSONIDPAPERS "
                   "where bibref_table = %s and bibref_value = %s and bibrec = %s "
@@ -2462,6 +2611,11 @@ def get_signature_info(sig):
     return ret
 
 def get_claimed_papers(pid):
+    '''
+    Find all papers which have been manually claimed
+    @param pid:
+    @type pid:
+    '''
     return run_sql("select bibref_table, bibref_value, bibrec "
                    "from aidPERSONIDPAPERS "
                    "where personid = %s "
@@ -2470,6 +2624,9 @@ def get_claimed_papers(pid):
 
 
 def copy_personids():
+    '''
+    Make a copy of aidPERSONID tables to aidPERSONID*_copy tables for later comparison/restore
+    '''
     run_sql("DROP TABLE IF EXISTS  `aidPERSONIDDATA_copy`")
     run_sql("CREATE TABLE `aidPERSONIDDATA_copy` ( "
             "`personid` BIGINT( 8 ) UNSIGNED NOT NULL , "
@@ -2510,6 +2667,9 @@ def copy_personids():
             "FROM `aidPERSONIDPAPERS")
 
 def delete_empty_persons():
+    '''
+    find and eliminate empty persons (not holding papers nor any other information that canonical_name
+    '''
     pp = run_sql("select personid from aidPERSONIDPAPERS")
     pp = set(p[0] for p in pp)
     pd = run_sql("select personid from aidPERSONIDDATA")
@@ -2522,6 +2682,9 @@ def delete_empty_persons():
 
 
 def restore_personids():
+    '''
+    Restore personid tables from last copy saved with copy_personids
+    '''
     run_sql("TRUNCATE  `aidPERSONIDDATA`")
     run_sql("INSERT INTO `aidPERSONIDDATA` "
             "SELECT * "
@@ -2564,6 +2727,11 @@ def get_free_pids():
 
 
 def remove_results_outside(many_names):
+    '''
+    Delete results from aidRESULTS not including many_names
+    @param many_names:
+    @type many_names:
+    '''
     many_names = frozenset(many_names)
     res_names = frozenset(x[0].split(".")[0] for x in run_sql("select personid from aidRESULTS"))
 
@@ -2572,6 +2740,10 @@ def remove_results_outside(many_names):
 
 
 def get_signatures_from_bibrefs(bibrefs):
+    '''
+    @param bibrefs:
+    @type bibrefs:
+    '''
     bib10x = ifilter(lambda x: x[0] == 100, bibrefs)
     bib10x_s = list_2_SQL_str(bib10x, lambda x: x[1])
     bib70x = ifilter(lambda x: x[0] == 700, bibrefs)
@@ -2598,11 +2770,21 @@ def get_signatures_from_bibrefs(bibrefs):
 
 
 def get_all_valid_bibrecs():
+    '''
+    Returns a list of valid record ids
+    '''
     collection_restriction_pattern = " or ".join(["980__a:\"%s\"" % x for x in bconfig.LIMIT_TO_COLLECTIONS])
     return perform_request_search(p="%s" % collection_restriction_pattern, rg=0)
 
 
 def get_coauthor_pids(pid, exclude_bibrecs=None):
+    '''
+    Find personids sharing bibrecs with given pid, eventually excluding a given set of common bibrecs.
+    @param pid:
+    @type pid:
+    @param exclude_bibrecs:
+    @type exclude_bibrecs:
+    '''
     papers = get_person_bibrecs(pid)
     if exclude_bibrecs:
         papers = set(papers) - set(exclude_bibrecs)

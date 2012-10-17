@@ -35,7 +35,7 @@ from invenio.session import get_session
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id
 from invenio.bibauthorid_webapi import get_personiID_external_ids
-from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string, get_uid_from_personid
+from invenio.bibauthorid_frontinterface import get_uid_from_personid
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
 from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
 from invenio.messages import gettext_set_language, wash_language
@@ -375,7 +375,7 @@ class Template:
         @type verbiage_dict: dict
         '''
         #batchprocess?mconfirm=True&bibrefs=['100:17,16']&pid=1
-        str = ('<!--0!--><span id="aid_status_details"> '
+        string = ('<!--0!--><span id="aid_status_details"> '
                 '<a rel="nofollow" id="aid_confirm" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_check.png" alt="%(alt_confirm)s" />'
                 '%(confirm_text)s</a><br />'
@@ -385,7 +385,7 @@ class Template:
                 '<a rel="nofollow" id="aid_to_other" href="%(url)s/person/action?to_other_person=True&selection=%(ref)s">'
                 '<img src="%(url)s/img/aid_to_other.png" alt="%(alt_to_other)s" />'
                 '%(to_other_text)s</a> </span>')
-        return (str
+        return (string
                 % ({'url': CFG_SITE_URL, 'ref': bibref, 'pid': pid,
                     'alt_confirm':verbiage_dict['alt_confirm'],
                     'confirm_text':verbiage_dict['confirm_text'],
@@ -931,7 +931,7 @@ class Template:
             h('  <div id="tabData">')
             r = verbiage_dict['data_ns']
             h('<noscript><h5>%s</h5></noscript>' % r)
-            canonical_name = get_canonical_id_from_person_id(person_id)
+            canonical_name = str(get_canonical_id_from_person_id(person_id))
             if '.' in str(canonical_name) and not isinstance(canonical_name, int):
                 canonical_name = canonical_name[0:canonical_name.rindex('.')]
             h('<div><div> <strong> Canonical name setup </strong>')
@@ -957,9 +957,9 @@ class Template:
             external_ids = get_personiID_external_ids(person_id)
             h('<div>')
             h('<strong> External IDs </strong><br>')
-            for id in external_ids:
+            for idx in external_ids:
                 for k in external_ids[id]:
-                    h('  %s : %s <br>' % (id, k))
+                    h('  %s : %s <br>' % (idx, k))
             h('</div>')
 
             h("  </div>")

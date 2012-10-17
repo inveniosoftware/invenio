@@ -32,7 +32,7 @@ from invenio.webauthorprofile_corefunctions import get_pubs, get_person_names_di
     get_institute_pub_dict, get_coauthors, get_summarize_records, \
     get_total_downloads, get_cited_by_list, get_kwtuples, get_venuetuples, \
     get_veryfy_my_pubs_list_link, get_hepnames_data, get_self_pubs, \
-    get_collabtuples
+    get_collabtuples, get_person_oldest_date, expire_all_cache_for_person
 
 
 #from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
@@ -44,6 +44,7 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url
 from invenio.jsonutils import json_unicode_to_utf8
 
+import datetime
 
 
 import invenio.template
@@ -96,6 +97,8 @@ CFG_INSPIRE_UNWANTED_KEYWORDS_START = ['talk',
                                       'thesis']
 CFG_INSPIRE_UNWANTED_KEYWORDS_MIDDLE = ['GeV',
                                         '((']
+
+RECOMPUTE_ALLOWED_DELAY = datetime.timedelta(minutes=30)
 
 class WebAuthorPages(WebInterfaceDirectory):
     """
@@ -211,10 +214,15 @@ class WebAuthorPages(WebInterfaceDirectory):
         argd = wash_urlargd(form,
                             {'ln': (str, CFG_SITE_LANG),
                              'verbose': (int, 0),
-                             'recid': (int, -1)
+                             'recid': (int, -1),
+                             'recompute': (int, 0)
                              })
 
         ln = argd['ln']
+
+        expire_cache = False
+        if 'recompute' in argd and argd['recompute']:
+            expire_cache = True
 
         if CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID:
             try:
@@ -251,7 +259,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         req.write(pageheaderonly(req=req, title=title_message,
                                  metaheaderadd=metaheaderadd, language=ln))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
-        self.create_authorpage_websearch(req, form, self.person_id, ln)
+        self.create_authorpage_websearch(req, form, self.person_id, ln, expire_cache)
         return page_end(req, 'hb', ln)
 
 
@@ -341,7 +349,19 @@ class WebAuthorPages(WebInterfaceDirectory):
             # req.write("Search param %s does not represent a valid person, please correct your query"%
             #(str(self.original_search_parameter),))
 
-    def create_authorpage_websearch(self, req, form, person_id, ln='en'):
+    def create_authorpage_websearch(self, req, form, person_id, ln='en', expire_cache=False):
+
+        recompute_allowed = True
+
+        oldest_cache_date = get_person_oldest_date(person_id)
+        if oldest_cache_date:
+            delay = datetime.datetime.now() - oldest_cache_date
+            if delay > RECOMPUTE_ALLOWED_DELAY:
+                if expire_cache:
+                    recompute_allowed = False
+                    expire_all_cache_for_person(person_id)
+            else:
+                recompute_allowed = False
 
         if CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID:
             if person_id < 0:
@@ -405,13 +425,15 @@ class WebAuthorPages(WebInterfaceDirectory):
             vtuples = str(vtuples)
 
         person_link, person_linkStatus = get_veryfy_my_pubs_list_link(person_id)
-        if not person_link:
+        if not person_link or not person_linkStatus:
             bibauthorid_data = {"is_baid": True, "pid":person_id, "cid": None}
-            person_link = 'None'
+            person_link = str(person_id)
         else:
             bibauthorid_data = {"is_baid": True, "pid":person_id, "cid": person_link}
 
         hepdict, hepdictStatus = get_hepnames_data(person_id)
+
+        oldest_cache_date = get_person_oldest_date(person_id)
 
         #req.write("\nPAGE CONTENT START\n")
         #req.write(str(time.time()))
@@ -473,7 +495,9 @@ class WebAuthorPages(WebInterfaceDirectory):
                                             hepdict, \
                                             collab, \
                                             ln, \
-                                            beval))
+                                            beval, \
+                                            oldest_cache_date,
+                                            recompute_allowed))
 
 
 

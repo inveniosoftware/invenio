@@ -168,17 +168,26 @@ def meld_edges(p1, p2):
     '''
     out_edges1, verts1 = p1
     out_edges2, verts2 = p2
+    vsum = verts1 + verts2
+    invsum = 1. / vsum
+
+    #special_numbers = Bib_matrix.special_numbers #local reference optimization
 
     def median(e1, e2):
-        if e1[0] in Bib_matrix.special_numbers:
-            return e1
 
-        if e2[0] in Bib_matrix.special_numbers:
+    #dirty optimization, should check if value is in dictionary instead
+    # if e1[0] in special_numbers: return e1
+    # if e2[0] in special_numbers: return e2
+        if e1[0] < 0:
+            return e1
+        if e2[0] < 0:
             return e2
 
-        inter_cert = e1[1] * verts1 + e2[1] * verts2
-        inter_prob = e1[0] * e1[1] * verts1 + e2[0] * e2[1] * verts2
-        return (inter_prob / inter_cert, inter_cert / (verts1 + verts2))
+        i1 = e1[1] * verts1
+        i2 = e2[1] * verts2
+        inter_cert = i1 + i2
+        inter_prob = e1[0] * i1 + e2[0] * i2
+        return (inter_prob / inter_cert, inter_cert * invsum)
 
     assert len(out_edges1) == len(out_edges2), "Invalid arguments for meld edges"
     size = len(out_edges1)
@@ -196,12 +205,12 @@ def convert_cluster_set(cs, prob_matr):
     @param type: cluster set
     @return: a mapping from a number to a bibrefrec.
     '''
+    gc.disable()
 
     # step 1:
     #    + Assign a number to each bibrefrec.
     #    + Replace the arrays of bibrefrecs with arrays of numbers.
     #    + Store the result and prepare it to be returned.
-
     result_mapping = []
     for clus in cs.clusters:
         start = len(result_mapping)
@@ -217,7 +226,9 @@ def convert_cluster_set(cs, prob_matr):
     # step 2:
     #    + Using the prob matrix create a vector values to all other bibs.
     #    + Meld those vectors into one for each cluster.
-    gc.disable()
+
+    special_symbols = Bib_matrix.special_symbols #locality optimization
+
     for current, c1 in enumerate(cs.clusters):
         update_status(float(current) / len(cs.clusters), "Converting the cluster set...")
 
@@ -226,22 +237,23 @@ def convert_cluster_set(cs, prob_matr):
 
         for v1 in c1.bibs:
             pointer = numpy.ndarray(shape=(len(result_mapping), 2), dtype=float, order='C')
-            pointer.fill(Bib_matrix.special_symbols[None])
+            pointer.fill(special_symbols[None])
+            rm = result_mapping[v1] #locality optimization
             for c2 in cs.clusters:
                 if c1 != c2 and not c1.hates(c2):
                     for v2 in c2.bibs:
-                        val = prob_matr[result_mapping[v1], result_mapping[v2]]
-                        if val in Bib_matrix.special_symbols:
-                            numb = Bib_matrix.special_symbols[val]
+                        val = prob_matr[rm, result_mapping[v2]]
+                        try:
+                            numb = special_symbols[val]
                             val = (numb, numb)
+                        except KeyError:
+                            pass
                         assert len(val) == 2, "Edge coding failed"
                         pointer[v2] = val
             pointers.append((pointer, 1))
-
         c1.out_edges = reduce(meld_edges, pointers)[0]
 
     update_status_final("Converting the cluster set done.")
-    gc.collect()
     gc.enable()
 
 def restore_cluster_set(cs):
@@ -266,7 +278,7 @@ def group_edges(cs):
     plus = []
     minus = []
     pairs = []
-
+    gc.disable()
     for current, cl1 in enumerate(cs.clusters):
         update_status(float(current) / len(cs.clusters), "Grouping all edges...")
 
@@ -288,6 +300,7 @@ def group_edges(cs):
 
     bibauthor_print("Positive edges: %d, Negative edges: %d, Value edges: %d."
                      % (len(plus), len(minus), len(pairs)))
+    gc.enable()
     return plus, minus, pairs
 
 

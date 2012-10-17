@@ -32,7 +32,7 @@ from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_i
     gathered_names_by_personid, get_canonical_id_from_personid, get_coauthor_pids, \
     get_person_names_count, get_existing_personids
 from invenio.webauthorprofile_dbapi import get_cached_element, precache_element, cache_element, \
-    expire_all_cache_for_person, get_expired_person_ids
+    expire_all_cache_for_person, get_expired_person_ids, get_cache_oldest_date
 from invenio.search_engine_summarizer import summarize_records
 from invenio.bibrank_citation_searcher import get_cited_by_list as real_get_cited_by_list
 from invenio.search_engine import get_most_popular_field_values
@@ -127,6 +127,19 @@ def _foo(x, y, z):
     foo function to test the caching mechanism
     '''
     return [x, y, z]
+
+def get_person_oldest_date(person_id):
+    """
+    Returns oldest date of cached data for person ID, None if not available
+    """
+    return get_cache_oldest_date('pid:' + str(person_id))
+
+def expire_caches_for_person(person_id):
+    """
+    Expires all caches for personid.
+    """
+
+    expire_all_cache_for_person(person_id)
 
 def get_pubs(person_id):
     '''

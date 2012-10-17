@@ -19,6 +19,8 @@
 
 import operator
 from itertools import izip, starmap, repeat
+#python2.4 compatibility
+from bibauthorid_general_utils import bai_all as all
 
 def approximate(xs, ys, power):
     assert len(xs) == len(ys)
@@ -83,7 +85,7 @@ def to_function(poly):
     power = len(poly) - 1
     def func(x):
         arr = [1.]
-        for i in xrange(power):
+        for _ in xrange(power):
             arr.append(arr[-1] * x)
 
         assert len(arr) == len(poly)

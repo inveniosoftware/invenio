@@ -163,6 +163,21 @@ class InvenioSession(dict):
         if random.randint(1, CFG_WEBSESSION_CLEANUP_CHANCE) == 1:
             self.cleanup()
 
+    def get_dirty(self):
+        """
+        Is this session dirty?
+        """
+        return self._dirty
+
+    def set_dirty(self, dummy=True):
+        """
+        Flag this session as dirty. It takes a parameter, just in order
+        to be used within a property
+        """
+        self._dirty = True
+
+    dirty = property(get_dirty, set_dirty)
+
     def __setitem__(self, key, value):
         if self.get(key) != value:
             dict.__setitem__(self, key, value)
@@ -296,6 +311,8 @@ class InvenioSession(dict):
             """, (session_key, session_expiry, session_object, uid,
                 session_expiry, session_object, uid))
             add_cookies(self._req, self.make_cookies())
+        ## No more dirty :-)
+        self._dirty = False
 
     def delete(self):
         """

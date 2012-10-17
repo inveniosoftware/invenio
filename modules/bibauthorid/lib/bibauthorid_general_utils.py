@@ -26,6 +26,31 @@ from datetime import datetime
 PRINT_TS = bconfig.DEBUG_TIMESTAMPS
 PRINT_TS_US = bconfig.DEBUG_TIMESTAMPS_UPDATE_STATUS and PRINT_TS
 
+
+#python2.4 compatibility layer.
+try:
+    any([True])
+except:
+    def any(x):
+        for element in x:
+            if element:
+                return True
+        return False
+bai_any = any
+
+try:
+    all([True])
+except:
+    def all(x):
+        for element in x:
+            if not element:
+                return False
+        return True
+bai_all = all
+#end of python2.4 compatibility. Please remove this horror as soon as all systems will have
+#been ported to python2.6+
+
+
 def __print_func(*args):
     if PRINT_TS:
         print datetime.now(),
