@@ -158,6 +158,7 @@ re_operators = re.compile(r'\s([\+\-\|])\s')
 re_pattern_wildcards_after_spaces = re.compile(r'(\s)[\*\%]+')
 re_pattern_single_quotes = re.compile("'(.*?)'")
 re_pattern_double_quotes = re.compile("\"(.*?)\"")
+re_pattern_parens_quotes = re.compile(r'[\'\"]{1}[^\'\"]*(\([^\'\"]*\))[^\'\"]*[\'\"]{1}')
 re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
 re_pattern_spaces_after_colon = re.compile(r'(:\s+)')
 re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
@@ -1829,6 +1830,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
        spaces if it would give some hits.  See the Search Internals
        document for detailed description.  (ap=0 forbits the
        alternative pattern usage, ap=1 permits it.)
+       'ap' is also internally used for allowing hidden tag search
+       (for requests coming from webcoll, for example). In this
+       case ap=9
 
        The 'of' argument governs whether to print or not some
        information to the user in case of no match found.  (Usually it
@@ -1870,6 +1874,8 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if req:
         user_info = collect_user_info(req)
         can_see_hidden = user_info.get('precached_canseehiddenmarctags', False)
+    if not req and ap == 9: # special request, coming from webcoll
+        can_see_hidden = True
     if can_see_hidden:
         myhiddens = []
 
@@ -1915,7 +1921,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     if verbose >= 9 and of.startswith("h"):
                         write_warning("Pattern %s hitlist omitted since \
                                             it queries in a hidden tag %s" %
-                                      (repr(bsu_p), repr(myhiddens)), req=req)
+                                      (cgi.escape(repr(bsu_p)), repr(myhiddens)), req=req)
                     display_nearest_terms_box = False #..and stop spying, too.
         if verbose >= 9 and of.startswith("h"):
             write_warning("Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset), req=req)
@@ -2033,8 +2039,8 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         p = spires_syntax_converter.convert_query(p)
 
     # sanity check: do not call parenthesised parser for search terms
-    # like U(1):
-    if not re_pattern_parens.search(p):
+    # like U(1) but still call it for searches like ('U(1)' | 'U(2)'):
+    if not re_pattern_parens.search(re_pattern_parens_quotes.sub('_', p)):
         return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box, wl=wl)
 
     # Try searching with parentheses
