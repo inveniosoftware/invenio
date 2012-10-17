@@ -85,4 +85,7 @@ CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = @prefix@/etc/bibconvert/config
 ## helper style of variables for BibDocFile:
 CFG_BIBDOCFILE_FILEDIR = @localstatedir@/data/files
 
+## helper style of variables for WebDeposit
+CFG_WEBDEPOSIT_UPLOAD_FOLDER = @localstatedir@/tmp/webdeposit_uploads
+
 ## - end of file -

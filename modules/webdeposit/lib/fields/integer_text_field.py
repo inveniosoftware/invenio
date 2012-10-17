@@ -1,5 +1,5 @@
 from wtforms import IntegerField
-from webdeposit_utils import is_number
+from invenio.webdeposit_utils import is_number
 
 __all__ = ['IntegerTextField']
 

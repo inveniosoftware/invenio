@@ -18,38 +18,23 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """WebDeposit Flask Blueprint"""
-
+import os
+import json
+from werkzeug import *
 from flask import g, render_template, \
-                  request, jsonify, redirect, url_for, current_app
+                  request, jsonify, redirect, url_for, current_app, \
+                  send_from_directory
+from wtforms import Form
+
 from invenio.cache import cache
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from werkzeug import *
 from invenio.SherpaRomeo import SherpaRomeoSearch
-import json
+
 from webdeposit_utils import *
-from wtforms import Form
-from invenio.config import CFG_PYLIBDIR
-from invenio.pluginutils import PluginContainer
-import os
-
-def plugin_builder(plugin_name, plugin_code):
-    all = getattr(plugin_code, '__all__')
-    for name in all:
-        candidate = getattr(plugin_code, name)
-        if issubclass(candidate, Form):
-            return candidate
-
-CFG_FORMS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'webdeposit_forms', '*.py'), plugin_builder=plugin_builder)
-
-
-""" Change the names of the forms
-    from the file names to the class names """
-forms = []
-for form in CFG_FORMS.itervalues():
-    if form is not None:
-        forms.append((form.__name__, form))
+from webdeposit_load_forms import forms
 
 globals().update(forms)
+
 
 #from invenio.webuser_flask import current_user
 
@@ -88,6 +73,22 @@ def submit():
     else:
         return render_template('websubmit_submitted.html', validated=False)
 
+
+@blueprint.route('/websubmit_add/_upload', methods=['GET', 'POST'])
+def plupload():
+    if request.method == 'POST':
+       saved_files_urls = []
+       for key, file in request.files.iteritems():
+           if file:
+               uploaded_file = request.files['file']
+               filename = secure_filename(uploaded_file.filename)
+               upload_folder = '/opt/invenio/var/tmp'
+               uploaded_file.save(os.path.join(upload_folder, filename))
+               send_from_directory(upload_folder, filename)
+               #uploaded_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+               #send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
+               #saved_files_urls.append(url_for('uploaded_file', filename=filename))
+    return ""
 
 @blueprint.route('/websubmit_add/_autocomplete', methods=['GET', 'POST'])
 def autocomplete():
@@ -144,7 +145,7 @@ def autocomplete_ISSN_Conditions():
 
 
 @blueprint.route('/websubmit_add/_errorCheck')
-def errorCheck():
+def error_check():
     val = request.args.get('attribute')
     name = request.args.get('name')
 
@@ -184,15 +185,16 @@ def add(draftid=None):
     from invenio.webuser_flask import current_user
 
     form = ArticleForm()
-    if current_user.get_id() == 0:
+    if current_user.get_id() == 0 or not form._drafting: #if guest user or drafting is not enabled
         return render_template('websubmit_add.html', form=form, drafts=[])
 
-    if draftid is None: # get the latest draft        
+    if draftid is None: # get the latest draft
 
         draftid = get_current_draft(current_user.get_id())
 
         if draftid is None:
             draftid = new_draft(current_user.get_id())
+            return redirect(url_for("websubmit.add", draftid=draftid))
 
         draft = get_draft(current_user.get_id(), draftid)
 
@@ -214,7 +216,7 @@ def add(draftid=None):
 
     conditions = draft_field_get(current_user.get_id(), draftid, "conditions")
     drafts = get_drafts(current_user.get_id())
-    if type(conditions) is not str and conditions is not None :
+    if not isinstance(conditions, str) and conditions is not None :
         conds = []
         for condition in conditions:
             conds.append(escape(condition))

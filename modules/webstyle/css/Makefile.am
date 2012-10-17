@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdir = $(localstatedir)/www/img
+webdir = $(localstatedir)/www/css
 
 web_DATA = invenio.css invenio-ie7.css tablesorter.css jquery.ajaxPager.css
 

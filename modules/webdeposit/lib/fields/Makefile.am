@@ -22,6 +22,7 @@ pylib_DATA = __init__.py \
              integer_text_field.py \
              journal_field.py \
              publisher_field.py \
-             title_field.py
+             title_field.py \
+             date_field.py
 
 CLEANFILES = *~ *.tmp *.pyc

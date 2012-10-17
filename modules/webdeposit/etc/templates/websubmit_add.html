@@ -1,8 +1,11 @@
 {% extends "page.html" %}
 {% block header %}
+    {{ super() }}
     {% js 'js/jquery-ui.min.js' %}
     {% css 'img/jquery-ui.css' %}
-    {{ super() }}
+    {% js 'js/plupload.full.js' %}
+    {% js 'js/jquery.plupload.queue.js' %}
+    {% css 'css/jquery.plupload.queue.css' %}
 {% endblock %}
 
 {% block body %}
@@ -47,9 +50,42 @@ div#conditions{
       margin-top:50px;
 }
 </style>
+
 <script type=text/javascript>
   $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
 </script>
+
+<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
+
+<!-- Plupload js -->
+
+
+<script type="text/javascript">
+// Convert divs to queue widgets when the DOM is ready
+$(function() {
+     // Setup html5 version
+     $(".pluploader").pluploadQueue({
+         // General settings
+         runtimes : 'html5',
+         url : $SCRIPT_ROOT + '_upload',
+         max_file_size : '10mb',
+         chunk_size : '1mb',
+         unique_names : true,
+
+         // Resize images on clientside if we can
+         resize : {width : 320, height : 240, quality : 90},
+
+         // Specify what files to browse for
+         filters : [
+             {title : "Image files", extensions : "jpg, gif, png"},
+             {title : "Zip files", extensions : "zip"}
+         ]
+     });
+});
+</script>
+
+
+<!------------------->
 
 <script type=text/javascript>
 
@@ -132,9 +168,6 @@ var oldJournal;
     });
   });
 
-$(function() {
-	$("#date").datepicker();
-});
 
   $(function() {
     $('select').change( function() {
@@ -171,7 +204,14 @@ $(function() {
 
 $(document).ready(function() {
 
+
+
   $(function() {
+
+
+            $(".datepicker").datepicker();
+
+
       $("#submitButton").click(function(e ) {
           e.preventDefault();
           emptyForm = checkEmptyFields();
@@ -349,30 +389,33 @@ $(function() {
 </script>
 
 
-	    <h3>Submit an Article</h3>
-	    <div style="width 550px;">
-	    <div class="btn-group" style="float:left;">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            Saved Drafts
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu">
-          {% for draft in drafts %}
-            <li> <a href="{{ draft.id }}">
-                    {% if  draft.doctitle is none %}
-                        Untitled
-                    {% else %}
-                        {{ draft.doctitle }}
-                    {% endif %}
-                 </a>
-            </li>
-          {% endfor %}
-          </ul>
-        </div>
+	    <h3>{{ form._title }}</h3>
 
-        <a href="/submit/websubmit_add/0"><button class="btn btn-small btn-primary" type="button" style="float:left; margin-left:220px;"><i class="icon-edit"></i> New Draft</button></a>
-        <a href="/submit/websubmit_delete/{{ draftid }}"><button class="btn btn-small btn-danger" type="button" style="float:left; margin-left:10px;"><i class="icon-remove"></i> Delete Draft</button></a>
-     </div>
+	    <div style="width 550px;">
+	    {% if form._drafting %}
+    	    <div class="btn-group" style="float:left;">
+              <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                Saved Drafts
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu">
+              {% for draft in drafts %}
+                <li> <a href="{{ draft.id }}">
+                        {% if  draft.doctitle is none %}
+                            Untitled
+                        {% else %}
+                            {{ draft.doctitle }}
+                        {% endif %}
+                     </a>
+                </li>
+              {% endfor %}
+              </ul>
+            </div>
+
+            <a href="/submit/websubmit_add/0"><button class="btn btn-small btn-primary" type="button" style="float:left; margin-left:220px;"><i class="icon-edit"></i> New Draft</button></a>
+            <a href="/submit/websubmit_delete/{{ draftid }}"><button class="btn btn-small btn-danger" type="button" style="float:left; margin-left:10px;"><i class="icon-remove"></i> Delete Draft</button></a>
+         </div>
+       {% endif %}
     <div id="container">
 	<form enctype="multipart/form-data" name="submitForm" id="submitForm"  action="submit" method="post">
 	<table>
@@ -412,7 +455,7 @@ $(function() {
 
 		{{ field.label }}</td>
             <td>
-            {{ field }}
+            {{ field(class_=field.short_name) }}
 
             <div class="livesearch" id="{{ field.name }}-search"></div>
 
@@ -424,11 +467,17 @@ $(function() {
             </td>
 
 		{% else %}
-
+		</td></tr>
+        <tr><td></td>
             <td style="float:right;" ></br><input id="submitButton" class="btn btn-primary btn-large"
                 name="submitButton" type="submitButton" value="Submit Article"></td>
 		{% endif %}
-        <td style="height:20px; width:20px;"><div id="wait-{{ field.name }}" style="height:20px; width:20px; margin-bottom:20px; display:none;"><img src="{{ url_for('static', filename='img/loading.gif') }}"/></div></td>
+        <td style="height:20px; width:20px;">
+                <div id="wait-{{ field.name }}"
+                style="height:20px; width:20px; margin-bottom:20px; display:none;">
+                <img src="{{ url_for('static', filename='img/loading.gif') }}"/>
+                </div>
+        </td>
 	    </tr>
         <tr><td colspan="2">
 

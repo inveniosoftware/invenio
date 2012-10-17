@@ -358,6 +358,41 @@ uninstall-jquery-tokeninput:
 	@echo "** The JQuery Tokeninput was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
+install-plupload-plugin:
+	@echo "***********************************************************"
+	@echo "** Installing Plupload plugin, please wait...            **"
+	@echo "***********************************************************"
+	rm -rf /tmp/plupload-plugin
+	mkdir /tmp/plupload-plugin
+	(cd /tmp/plupload-plugin && \
+	wget -O plupload-plugin.zip 'http://plupload.com/downloads/plupload_1_5_5.zip' && \
+	unzip -u plupload-plugin.zip && \
+	mkdir -p ${prefix}/var/www/js/plupload/i18n/ && \
+	cp -R plupload/js/jquery.plupload.queue ${prefix}/var/www/js/plupload/ && \
+	cp -R plupload/js/jquery.ui.plupload ${prefix}/var/www/js/plupload/ && \
+	cp plupload/js/plupload.browserplus.js ${prefix}/var/www/js/plupload/plupload.browserplus.js && \
+	cp plupload/js/plupload.flash.js ${prefix}/var/www/js/plupload/plupload.flash.js && \
+	cp plupload/js/plupload.flash.swf ${prefix}/var/www/js/plupload/plupload.flash.swf && \
+	cp plupload/js/plupload.full.js ${prefix}/var/www/js/plupload/plupload.full.js && \
+	cp plupload/js/plupload.gears.js ${prefix}/var/www/js/plupload/plupload.gears.js && \
+	cp plupload/js/plupload.html4.js ${prefix}/var/www/js/plupload/plupload.html4.js && \
+	cp plupload/js/plupload.html5.js ${prefix}/var/www/js/plupload/plupload.html5.js && \
+	cp plupload/js/plupload.js ${prefix}/var/www/js/plupload/plupload.js && \
+	cp plupload/js/plupload.silverlight.js ${prefix}/var/www/js/plupload/plupload.silverlight.js && \
+	cp plupload/js/plupload.silverlight.xap ${prefix}/var/www/js/plupload/plupload.silverlight.xap && \
+	cp plupload/js/i18n/*.js ${prefix}/var/www/js/plupload/i18n/ && \
+	rm -fr /tmp/plupload-plugin )
+	@echo "***********************************************************"
+	@echo "** The Plupload plugin was successfully installed.       **"
+	@echo "***********************************************************"
+
+uninstall-plupload-plugin:
+	rm -rf ${prefix}/var/www/js/plupload
+	@echo "***********************************************************"
+	@echo "** The Plupload was successfully uninstalled.            **"
+	@echo "***********************************************************"
+
+
 uninstall-pdfa-helper-files:
 	rm -f ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
 	@echo "***********************************************************"

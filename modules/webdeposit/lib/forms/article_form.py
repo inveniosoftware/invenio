@@ -1,57 +1,47 @@
-from wtforms import Form, Field, TextField, TextAreaField, SelectMultipleField, DateField, FileField, SubmitField
-from invenio.SherpaRomeo import SherpaRomeoSearch, SherpaRomeoXMLParser
-from invenio.config import CFG_PYLIBDIR
-from invenio.pluginutils import PluginContainer
 import os
+from wtforms import Form, TextField, TextAreaField, SelectMultipleField, DateField, FileField, SubmitField
 
-
-def plugin_builder(plugin_name, plugin_code):
-    all = getattr(plugin_code, '__all__')
-    for name in all:
-        candidate = getattr(plugin_code, name)
-        if issubclass(candidate, Field):
-            return candidate
-
-CFG_FIELDS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'webdeposit_fields', '*.py'), plugin_builder=plugin_builder)
-
-""" Change the names of the fields
-    from the file names to the class names """
-fields = []
-for field in CFG_FIELDS.itervalues():
-    fields.append((field.__name__, field))
+from invenio.SherpaRomeo import SherpaRomeoSearch, SherpaRomeoXMLParser
+from invenio.webinterface_handler_flask_utils import _
+from invenio.webdeposit_load_fields import fields
+from invenio.webdeposit_field_widgets import date_widget, plupload_widget
 
 globals().update(fields)
-
 __all__ = ['ArticleForm']
 
 class ArticleForm(Form):
 
-    publisher = PublisherField('Publisher')
-    journal = JournalField('Journal Title')
+    publisher = PublisherField(_('Publisher'))
+    journal = JournalField(_('Journal Title'))
     issn = TextField('ISSN')
-    doctitle = TitleField('Document Title')
-    author = AuthorField('Author of the Document')
-    abstract = TextAreaField('Abstract')
-    pagesnum = IntegerTextField('Number of Pages')
-    languages = [("en", "English"), \
-                ("fre", "French"), \
-                ("ger", "German"), \
-                ("dut", "Dutch"), \
-                ("ita", "Italian"), \
-                ("spa", "Spanish"), \
-                ("por", "Portuguese"), \
-                ("gre", "Greek"), \
-                ("slo", "Slovak"), \
-                ("cze", "Czech"), \
-                ("hun", "Hungarian"), \
-                ("pol", "Polish"), \
-                ("nor", "Norwegian"), \
-                ("swe", "Swedish"), \
-                ("fin", "Finnish"), \
-                ("rus", "Russian") ]
+    doctitle = TitleField(_('Document Title'))
+    author = AuthorField(_('Author of the Document'))
+    abstract = TextAreaField(_('Abstract'))
+    pagesnum = IntegerTextField(_('Number of Pages'))
+    languages = [("en", _("English")), \
+                ("fre", _("French")), \
+                ("ger", _("German")), \
+                ("dut", _("Dutch")), \
+                ("ita", _("Italian")), \
+                ("spa", _("Spanish")), \
+                ("por", _("Portuguese")), \
+                ("gre", _("Greek")), \
+                ("slo", _("Slovak")), \
+                ("cze", _("Czech")), \
+                ("hun", _("Hungarian")), \
+                ("pol", _("Polish")), \
+                ("nor", _("Norwegian")), \
+                ("swe", _("Swedish")), \
+                ("fin", _("Finnish")), \
+                ("rus", _("Russian")) ]
     language = SelectMultipleField(choices=languages)
-    date = DateField(u'Date of Document')
-    keywords = TextField(u'Keywords',)
-    notes = TextAreaField(u'Additional Notes or Comments')
-    file = FileField(u'File')
+    date = Date(_('Date of Document'), widget=date_widget)
+    keywords = TextField(_('Keywords'))
+    notes = TextAreaField(_('Additional Notes or Comments'))
+    file = FileField(_('File'))
+    plupload_file = FileField(_('File'), widget=plupload_widget)
     submit = SubmitField()
+
+    #configuration variables
+    _title = _("Submit an Article")
+    _drafting = True #enable and disable drafting

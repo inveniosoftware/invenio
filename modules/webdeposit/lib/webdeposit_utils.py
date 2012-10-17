@@ -1,6 +1,8 @@
 from werkzeug.contrib.cache import RedisCache
+from invenio.sqlalchemyutils import db
 
 rediscache = RedisCache("localhost", default_timeout=9000)
+
 
 # Draft Functions
 
@@ -18,7 +20,7 @@ def draft_field_set(userID, draftID, fieldName, value):
 
 def new_draft(userID):
     userID = str(userID)
-    draftID = getNewDraftID(userID)
+    draftID = get_new_draft_id(userID)
     drafts = rediscache.get(userID + ":drafts")
     if drafts is None:
         rediscache.set(str(userID) + ":drafts", str(draftID))
@@ -29,7 +31,7 @@ def new_draft(userID):
     return draftID
 
 
-def getNewDraftID(userID):
+def get_new_draft_id(userID):
     return rediscache.inc(str(userID) + ":draftcounter", delta=1)
 
 

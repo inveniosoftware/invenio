@@ -926,6 +926,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/webdeposit/lib/Makefile \
      modules/webdeposit/lib/fields/Makefile \
      modules/webdeposit/lib/forms/Makefile \
+     modules/webdeposit/lib/dep_types/Makefile \
      ])
 
 ## Finally, write output files:
