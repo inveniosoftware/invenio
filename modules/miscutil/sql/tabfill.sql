@@ -503,6 +503,7 @@ INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','counterpath');
 INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','rnformat');
 INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','yeargen');
 INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','nblength');
+INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','initialvalue');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Approval_Request_to_Referee','categ_file_appreq');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Approval_Request_to_Referee','categ_rnseek_appreq');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Approval_Request_to_Referee','edsrn');

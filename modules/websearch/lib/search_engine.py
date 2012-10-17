@@ -97,7 +97,8 @@ from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL, \
-    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
+    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS, \
+    CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.intbitset import intbitset
 from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
@@ -286,6 +287,33 @@ def is_user_owner_of_record(user_info, recid):
             return True
     return False
 
+###FIXME: This method needs to be refactorized
+def is_user_viewer_of_record(user_info, recid):
+    """
+    Check if the user is allow to view the record based in the marc tags
+    inside CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
+    i.e. his email is inside the 506__m tag or he is inside an e-group listed
+    in the 506__m tag
+
+    @param user_info: the user_info dictionary that describe the user.
+    @type user_info: user_info dictionary
+    @param recid: the record identifier.
+    @type recid: positive integer
+    @return: True if the user is 'allow to view' the record; False otherwise
+    @rtype: bool
+    """
+
+    authorized_emails_or_group = []
+    for tag in CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS:
+        authorized_emails_or_group.extend(get_fieldvalues(recid, tag))
+    for email_or_group in authorized_emails_or_group:
+        if email_or_group in user_info['group']:
+            return True
+        email = email_or_group.strip().lower()
+        if user_info['email'].strip().lower() == email:
+            return True
+    return False
+
 def check_user_can_view_record(user_info, recid):
     """
     Check if the user is authorized to view the given recid. The function
@@ -312,6 +340,11 @@ def check_user_can_view_record(user_info, recid):
     if is_user_owner_of_record(user_info, recid):
         ## Perfect! It's authorized then!
         return (0, '')
+
+    if is_user_viewer_of_record(user_info, recid):
+        ## Perfect! It's authorized then!
+        return (0, '')
+
     restricted_collections = get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
     if restricted_collections:
         ## If there are restricted collections the user must be authorized to all/any of them (depending on the policy)
