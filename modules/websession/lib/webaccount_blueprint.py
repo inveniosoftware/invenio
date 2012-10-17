@@ -98,7 +98,7 @@ def index():
     # load plugins
     plugins = [a for a in [s() for (k,s) in _USER_SETTINGS.items()] if a.is_authorized]
 
-    dashboard_settings = current_user.settings.get('dashboard_settings', {})
+    dashboard_settings = current_user.get('dashboard_settings', {})
     order = dashboard_settings.get('order', [])
     plugins = sorted(plugins, key=lambda w: order.index(w.__class__.__name__) \
                                   if w.__class__.__name__ in order else len(order))
