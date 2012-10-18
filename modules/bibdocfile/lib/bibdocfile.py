@@ -167,10 +167,11 @@ def _get_magic_cookies():
     thread_id = get_ident()
     if thread_id not in _magic_cookies:
         _magic_cookies[thread_id] = {
-            magic.MAGIC_NONE : magic.open(magic.MAGIC_NONE),
-            magic.MAGIC_COMPRESS : magic.open(magic.MAGIC_COMPRESS),
-            magic.MAGIC_MIME : magic.open(magic.MAGIC_MIME),
-            magic.MAGIC_COMPRESS + magic.MAGIC_MIME : magic.open(magic.MAGIC_COMPRESS + magic.MAGIC_MIME)
+            magic.MAGIC_NONE: magic.open(magic.MAGIC_NONE),
+            magic.MAGIC_COMPRESS: magic.open(magic.MAGIC_COMPRESS),
+            magic.MAGIC_MIME: magic.open(magic.MAGIC_MIME),
+            magic.MAGIC_COMPRESS + magic.MAGIC_MIME: magic.open(magic.MAGIC_COMPRESS + magic.MAGIC_MIME),
+            magic.MAGIC_MIME_TYPE: magic.open(magic.MAGIC_MIME_TYPE),
         }
         for key in _magic_cookies[thread_id].keys():
             _magic_cookies[thread_id][key].load()
@@ -302,51 +303,66 @@ def guess_format_from_url(url):
 
     @param url: the URL for which the extension shuld be guessed.
     @type url: string
-    @return: the recognized extension or empty string if it's impossible to
+    @return: the recognized extension or '.bin' if it's impossible to
         recognize it.
     @rtype: string
     """
+    def guess_via_magic(local_path):
+        if CFG_HAS_MAGIC:
+            try:
+                magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME_TYPE]
+                mimetype = magic_cookie.file(local_path)
+                ext = _mimes.guess_extension(mimetype)
+                if ext:
+                    ## Normalize some common magic mis-interpreation
+                    ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
+                    return normalize_format(ext)
+            except Exception:
+                pass
+
     ## Let's try to guess the extension by considering the URL as a filename
     ext = decompose_file(url, skip_version=True, only_known_extensions=True)[2]
     if ext.startswith('.'):
         return ext
 
-    if is_url_a_local_file(url) and CFG_HAS_MAGIC:
-        ## if the URL corresponds to a local file, let's try to use
-        ## the Python magic library to guess it
-        try:
-            magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME]
-            mimetype = magic_cookie.file(url)
-            ext = _mimes.guess_extension(mimetype)
-            if ext:
-                return normalize_format(ext)
-        except Exception:
-            pass
+    if is_url_a_local_file(url):
+        ## The URL corresponds to a local file, so we can safely consider
+        ## traditional extensions after the dot.
+        ext = decompose_file(url, skip_version=True, only_known_extensions=False)[2]
+        if ext.startswith('.'):
+            return ext
+        ## No extensions? Let's use Magic.
+        ext = guess_via_magic(url)
+        if ext:
+            return ext
     else:
         ## Since the URL is remote, let's try to perform a HEAD request
         ## and see the corresponding headers
         try:
             response = open_url(url, head_request=True)
         except (InvenioBibdocfileUnauthorizedURL, urllib2.URLError):
-            return ""
-        format = get_format_from_http_response(response)
-        if format:
-            return format
+            return ".bin"
+        ext = get_format_from_http_response(response)
+        if ext:
+            return ext
 
         if CFG_HAS_MAGIC:
             ## Last solution: let's download the remote resource
             ## and use the Python magic library to guess the extension
+            filename = ""
             try:
-                filename = download_url(url, format='')
-                magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME]
-                mimetype = magic_cookie.file(filename)
-                os.remove(filename)
-                ext = _mimes.guess_extension(mimetype)
-                if ext:
-                    return normalize_format(ext)
-            except Exception:
-                pass
-    return ""
+                try:
+                    filename = download_url(url, format='')
+                    ext = guess_via_magic(filename)
+                    if ext:
+                        return ext
+                except Exception:
+                    pass
+            finally:
+                if os.path.exists(filename):
+                    ## Let's free space
+                    os.remove(filename)
+    return ".bin"
 
 _docname_re = re.compile(r'[^-\w.]*')
 def normalize_docname(docname):
@@ -3648,12 +3664,18 @@ def get_format_from_http_response(response):
     if content_disposition:
         filename = parse_content_disposition(content_disposition)
         if filename:
-            format = decompose_file(filename)[2]
+            format = decompose_file(filename, only_known_extensions=False)[2]
+            if format:
+                return format
+
     content_type = info.getheader('Content-Type')
     if content_type:
         content_type = parse_content_type(content_type)
         ext = _mimes.guess_extension(content_type)
         if ext:
+            if ext == '.asc':
+                ## Workaroung .asc -> .txt
+                ext = '.txt'
             format = normalize_format(ext)
 
     return format
