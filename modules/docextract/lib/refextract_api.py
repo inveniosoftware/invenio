@@ -36,7 +36,7 @@ from invenio.refextract_engine import parse_references, \
 from invenio.refextract_text import extract_references_from_fulltext
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM
-from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from invenio.search_engine import get_record
 from invenio.bibtask import task_low_level_submission
 from invenio.bibrecord import record_delete_fields, record_xml_output, \
@@ -210,7 +210,7 @@ def list_pdfs(recid):
         for ext in ('pdf', 'pdfa', 'PDF'):
             try:
                 yield doc.get_file(ext)
-            except InvenioWebSubmitFileError:
+            except InvenioBibDocFileError:
                 pass
 
 

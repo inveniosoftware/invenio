@@ -76,7 +76,7 @@ class RefextractInvenioTest(unittest.TestCase):
         self.old_inspire = refextract_xml.CFG_INSPIRE_SITE
         refextract_xml.CFG_INSPIRE_SITE = False
 
-        setup_loggers(verbosity=9)
+        setup_loggers(verbosity=0)
         self.maxDiff = 2000
         self.kb_journals = None
         self.kb_journals_re = None
@@ -222,7 +222,7 @@ class RefextractTest(unittest.TestCase):
             "< 9999999>",
             "CERN EX---CERN-EX",
         ]
-        setup_loggers(verbosity=9)
+        setup_loggers(verbosity=0)
         self.maxDiff = 2500
 
     def tearDown(self):
@@ -2430,13 +2430,12 @@ Rev. D 80 034030 1-25"""
 
 class TaskTest(unittest.TestCase):
     def setUp(self):
-        setup_loggers(verbosity=9)
+        setup_loggers(verbosity=0)
 
     def test_task_run_core(self):
         from invenio.refextract_task import task_run_core
         task_run_core(1)
 
-
+TEST_SUITE = make_test_suite(RefextractTest)
 if __name__ == '__main__':
-    test_suite = make_test_suite(RefextractTest)
-    run_test_suite(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

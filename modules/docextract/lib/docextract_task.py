@@ -51,7 +51,7 @@ def fetch_last_updated(name):
     row = run_sql(select_sql, (name,))
     if not row:
         sql = "INSERT INTO xtrJOB (name, last_updated, last_recid) " \
-            "VALUES (%s, NOW(), 0)"
+            "VALUES (%s, '1970-01-01', 0)"
         run_sql(sql, (name,))
         row = run_sql(select_sql, (name,))
 

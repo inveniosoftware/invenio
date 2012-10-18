@@ -42,13 +42,12 @@ class RefextractApiTest(unittest.TestCase):
 
     def test_no_overwrite(self):
         try:
-            update_references(1, overwrite=False)
+            update_references(92, overwrite=False)
             self.fail()
         except RecordHasReferences:
             # As expected
             pass
 
-
+TEST_SUITE = make_test_suite(RefextractApiTest)
 if __name__ == '__main__':
-    test_suite = make_test_suite(RefextractApiTest)
-    run_test_suite(test_suite, warn_user=True)
+    run_test_suite(TEST_SUITE)

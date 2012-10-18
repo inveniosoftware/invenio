@@ -32,9 +32,8 @@ import sys
 import re
 import bibclassify_config as bconfig
 
-from refextract import replace_undesirable_characters, \
-        find_reference_section, find_end_of_reference_section
-
+from invenio.docextract_pdf import replace_undesirable_characters
+from invenio.refextract_find import find_reference_section, find_end_of_reference_section
 
 log = bconfig.get_logger("bibclassify.text_normalizer")
 
