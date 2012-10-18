@@ -2150,11 +2150,14 @@ def writing_rights_p():
     return True
 
 def post_results_to_callback_url(results, callback_url):
+    write_message("Sending feedback to %s" % callback_url)
     if not CFG_JSON_AVAILABLE:
         from warnings import warn
         warn("--callback-url used but simplejson/json not available")
         return
     json_results = json.dumps(results)
+
+    write_message("Message to send: %s" % json_results, verbose=9)
     ## <scheme>://<netloc>/<path>?<query>#<fragment>
     scheme, netloc, path, query, fragment = urlparse.urlsplit(callback_url)
     ## See: http://stackoverflow.com/questions/111945/is-there-any-way-to-do-http-put-in-python
@@ -2165,15 +2168,20 @@ def post_results_to_callback_url(results, callback_url):
     else:
         raise ValueError("Scheme not handled %s for callback_url %s" % (scheme, callback_url))
     if task_get_option('oracle_friendly'):
+        write_message("Oracle friendly mode requested", verbose=9)
         request = urllib2.Request(callback_url, data=urllib.urlencode({'results': json_results}))
-        request.add_header('User-Agent', make_user_agent_string('BibUpload'))
         request.add_header('Content-Type', 'application/x-www-form-urlencoded')
     else:
         request = urllib2.Request(callback_url, data=json_results)
         request.add_header('Content-Type', 'application/json')
-        request.get_method = lambda: 'POST'
     request.add_header('User-Agent', make_user_agent_string('BibUpload'))
-    return opener.open(request)
+    write_message("Headers about to be sent: %s" % request.headers, verbose=9)
+    write_message("Data about to be sent: %s" % request.data, verbose=9)
+    res = opener.open(request)
+    msg = res.read()
+    write_message("Result of posting the feedback: %s %s" % (res.code, res.msg), verbose=9)
+    write_message("Returned message is: %s" % msg, verbose=9)
+    return res
 
 def task_run_core():
     """ Reimplement to add the body of the task."""

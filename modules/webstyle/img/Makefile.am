@@ -47,7 +47,7 @@ img_DATA = add-small.png \
            aid_to_other.png \
            aid_to_other_gray.png \
            ajax-loader.gif \
-	         application_pdf.png \
+           application_pdf.png \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
            balloon_bottom_shadow.png \
@@ -205,6 +205,10 @@ img_DATA = add-small.png \
            table_row_delete.png \
            table_row_insert.png \
            table_sort.png \
+           test \
+           testgif \
+           test.foo \
+           test.gif \
            tick.gif \
            tree_branch.gif \
            up.gif \

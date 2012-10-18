@@ -21,16 +21,19 @@
 
 __revision__ = "$Id$"
 
+import os
 import unittest
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization, bibdocfile_url_p
+from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC
 from invenio.dbquery import run_sql
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
         CFG_PREFIX, \
         CFG_BIBDOCFILE_FILEDIR, \
-        CFG_SITE_RECORD
+        CFG_SITE_RECORD, \
+        CFG_WEBDIR, \
+        CFG_TMPDIR
 
 from datetime import datetime
 import time
@@ -57,6 +60,100 @@ class BibDocFsInfoTest(unittest.TestCase):
         self.my_bibdoc.delete_file('.gif', 2)
         self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 1)
         self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], True)
+
+class BibDocFileGuessFormat(unittest.TestCase):
+    """Regression tests for guess_format_from_url"""
+
+    def test_guess_format_from_url_local_no_ext(self):
+        """bibdocfile - guess_format_from_url(), local URL, no extension"""
+        self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'test')), '.bin')
+
+    if CFG_HAS_MAGIC:
+        def test_guess_format_from_url_local_no_ext_with_magic(self):
+            """bibdocfile - guess_format_from_url(), local URL, no extension, with magic"""
+            self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'testgif')), '.gif')
+    else:
+        def test_guess_format_from_url_local_no_ext_with_magic(self):
+            """bibdocfile - guess_format_from_url(), local URL, no extension, no magic"""
+            self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'testgif')), '.bin')
+
+    def test_guess_format_from_url_local_unknown_ext(self):
+        """bibdocfile - guess_format_from_url(), local URL, unknown extension"""
+        self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'test.foo')), '.foo')
+
+    def test_guess_format_from_url_local_known_ext(self):
+        """bibdocfile - guess_format_from_url(), local URL, unknown extension"""
+        self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'test.gif')), '.gif')
+
+    def test_guess_format_from_url_remote_no_ext(self):
+        """bibdocfile - guess_format_from_url(), remote URL, no extension"""
+        self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/test'), '.bin')
+
+    if CFG_HAS_MAGIC:
+        def test_guess_format_from_url_remote_no_ext_with_magic(self):
+            """bibdocfile - guess_format_from_url(), remote URL, no extension, with magic"""
+            self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/testgif'), '.gif')
+    else:
+        def test_guess_format_from_url_remote_no_ext_with_magic(self):
+            """bibdocfile - guess_format_from_url(), remote URL, no extension, no magic"""
+            self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/testgif'), '.bin')
+
+    if CFG_HAS_MAGIC:
+        def test_guess_format_from_url_remote_unknown_ext(self):
+            """bibdocfile - guess_format_from_url(), remote URL, unknown extension, with magic"""
+            self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/test.foo'), '.gif')
+    else:
+        def test_guess_format_from_url_remote_unknown_ext(self):
+            """bibdocfile - guess_format_from_url(), remote URL, unknown extension, no magic"""
+            self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/test.foo'), '.bin')
+
+    def test_guess_format_from_url_remote_known_ext(self):
+        """bibdocfile - guess_format_from_url(), remote URL, known extension"""
+        self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/test.gif'), '.gif')
+
+    def test_guess_format_from_url_local_gpl_license(self):
+        local_path = os.path.join(CFG_TMPDIR, 'LICENSE')
+        print >> open(local_path, 'w'), """
+            GNU GENERAL PUBLIC LICENSE
+               Version 2, June 1991
+
+ Copyright (C) 1989, 1991 Free Software Foundation, Inc.
+                       59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+                Preamble
+
+  The licenses for most software are designed to take away your
+freedom to share and change it.  By contrast, the GNU General Public
+License is intended to guarantee your freedom to share and change free
+software--to make sure the software is free for all its users.  This
+General Public License applies to most of the Free Software
+Foundation's software and to any other program whose authors commit to
+using it.  (Some other Free Software Foundation software is covered by
+the GNU Library General Public License instead.)  You can apply it to
+your programs, too.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+this service if you wish), that you receive source code or can get it
+if you want it, that you can change the software or use pieces of it
+in new free programs; and that you know you can do these things.
+
+  To protect your rights, we need to make restrictions that forbid
+anyone to deny you these rights or to ask you to surrender the rights.
+These restrictions translate to certain responsibilities for you if you
+distribute copies of the software, or if you modify it.
+[...]
+"""
+        try:
+            if CFG_HAS_MAGIC:
+                self.assertEqual(guess_format_from_url(local_path), '.txt')
+            else:
+                self.assertEqual(guess_format_from_url(local_path), '.bin')
+        finally:
+            os.remove(local_path)
 
 
 class BibRecDocsTest(unittest.TestCase):
@@ -315,6 +412,7 @@ TEST_SUITE = make_test_suite(BibRecDocsTest,
                              BibDocFilesTest,
                              CheckBibDocAuthorizationTest,
                              BibDocFileURLTest,
-                             BibDocFsInfoTest)
+                             BibDocFsInfoTest,
+                             BibDocFileGuessFormat)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
