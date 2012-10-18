@@ -330,9 +330,15 @@ def guess_format_from_url(url):
         content_type = info.getheader('Content-Type')
         if content_type:
             content_type = parse_content_type(content_type)
-            ext = _mimes.guess_extension(content_type)
-            if ext:
-                return normalize_format(ext)
+            if content_type not in ('text/plain', 'application/octet-stream'):
+                ## We actually ignore these mimetypes since they are the
+                ## defaults often returned by Apache in case the mimetype
+                ## was not known
+                ext = _mimes.guess_extension(content_type)
+                if ext:
+                    ## Normalize some common magic mis-interpreation
+                    ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
+                    return normalize_format(ext)
         if CFG_HAS_MAGIC:
             ## Last solution: let's download the remote resource
             ## and use the Python magic library to guess the extension
