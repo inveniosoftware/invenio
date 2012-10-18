@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.5\n"
+"Project-Id-Version: CDS-Invenio 0.99.6\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2012-02-21 13:36+0100\n"
+"POT-Creation-Date: 2012-10-18 16:35+0200\n"
 "PO-Revision-Date: 2008-06-13 13:00+0100\n"
 "Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: JA <cds.support@cern.ch>\n"
@@ -3825,8 +3825,8 @@ msgstr ""
 #: modules/webcomment/web/admin/webcommentadmin.py:125
 #: modules/webcomment/web/admin/webcommentadmin.py:159
 #: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:738
-#: modules/websearch/lib/websearch_webinterface.py:822
+#: modules/websearch/lib/websearch_webinterface.py:753
+#: modules/websearch/lib/websearch_webinterface.py:837
 #: modules/websearch/web/admin/websearchadmin.py:1070
 #: modules/websession/lib/websession_webinterface.py:812
 #: modules/webstyle/lib/webstyle_templates.py:527
@@ -4445,19 +4445,19 @@ msgid "See also: similar author names"
 msgstr "似た著者名："
 
 #: modules/websearch/lib/websearch_templates.py:2996
-#: modules/websearch/lib/websearch_webinterface.py:753
+#: modules/websearch/lib/websearch_webinterface.py:768
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "コレクション %s が見つかりません。"
 
 #: modules/websearch/lib/websearch_templates.py:3008
-#: modules/websearch/lib/websearch_webinterface.py:751
+#: modules/websearch/lib/websearch_webinterface.py:766
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "%s というコレクションは存在しません。"
 
 #: modules/websearch/lib/websearch_templates.py:3010
-#: modules/websearch/lib/websearch_webinterface.py:752
+#: modules/websearch/lib/websearch_webinterface.py:767
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "%s の閲覧から始めてください。"
@@ -4557,12 +4557,12 @@ msgstr ""
 msgid "Breakdown of papers by citations:"
 msgstr ""
 
-#: modules/websearch/lib/websearch_webinterface.py:420
+#: modules/websearch/lib/websearch_webinterface.py:428
 #, fuzzy
 msgid "You are not authorized to view this area."
 msgstr "あなたはこのバスケットの所有者ではありません"
 
-#: modules/websearch/lib/websearch_webinterface.py:755
+#: modules/websearch/lib/websearch_webinterface.py:770
 msgid "Not found"
 msgstr "見つかりません"
 
