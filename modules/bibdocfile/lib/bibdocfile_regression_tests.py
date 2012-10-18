@@ -96,7 +96,7 @@ class BibDocFileGuessFormat(unittest.TestCase):
     else:
         def test_guess_format_from_url_remote_no_ext_with_magic(self):
             """bibdocfile - guess_format_from_url(), remote URL, no extension, no magic"""
-            self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/testgif'), '.bin')
+            self.failUnless(guess_format_from_url(CFG_SITE_URL + '/img/testgif') in ('.bin', '.gif'))
 
     if CFG_HAS_MAGIC:
         def test_guess_format_from_url_remote_unknown_ext(self):
@@ -105,7 +105,7 @@ class BibDocFileGuessFormat(unittest.TestCase):
     else:
         def test_guess_format_from_url_remote_unknown_ext(self):
             """bibdocfile - guess_format_from_url(), remote URL, unknown extension, no magic"""
-            self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/test.foo'), '.bin')
+            self.failUnless(guess_format_from_url(CFG_SITE_URL + '/img/test.foo') in ('.bin', '.gif'))
 
     def test_guess_format_from_url_remote_known_ext(self):
         """bibdocfile - guess_format_from_url(), remote URL, known extension"""
