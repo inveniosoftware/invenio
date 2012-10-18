@@ -1,7 +1,7 @@
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -60,7 +60,7 @@ from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, http_check_credentials, logoutUser
+    collect_user_info, http_check_credentials, logoutUser, isUserSuperAdmin
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
@@ -320,6 +320,10 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 text = auth_msg,\
                 navmenuid='search')
 
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
+
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)
         if out == []:
@@ -384,6 +388,10 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
                 return page_not_authorized(req, "../",
                     text="You are not authorized to view this record.",
                     navmenuid='search')
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         # Keep all the arguments, they might be reused in the
         # record page itself to derivate other queries
@@ -476,6 +484,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
                     return redirect_to_url(req, target)
 
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
+
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
         req.argd = argd
@@ -526,6 +538,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             except (KeyError, ValueError):
                 pass
 
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)
@@ -990,6 +1005,10 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text = auth_msg,\
                 navmenuid='search')
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not isUserSuperAdmin(user_info):
+            argd['verbose'] = 0
 
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)

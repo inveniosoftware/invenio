@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -101,6 +101,7 @@ class BibRankCitationRankingTest(unittest.TestCase):
         """bibrank - search results ranked by number of citations, verbose output"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
+                                               username="admin",
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 
 class BibRankExtCitesTest(unittest.TestCase):

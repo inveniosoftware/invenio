@@ -2,7 +2,7 @@
 ## $Id$
 
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2012 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -52,13 +52,13 @@ def print_external_results_overview(req, current_collection, pattern_list, field
     vprint = get_verbose_print(req, 'External collection (print_external_results_overview): ', verbosity_level)
 
     pattern = bind_patterns(pattern_list)
-    vprint(3, 'pattern = ' + pattern)
+    vprint(3, 'pattern = %s' % cgi.escape(pattern))
 
     if not pattern:
         return (None, None, None, None)
 
     basic_search_units = create_basic_search_units(None, pattern, field)
-    vprint(3, 'basic_search_units = ' + str(basic_search_units))
+    vprint(3, 'basic_search_units = %s' % cgi.escape(repr(basic_search_units)))
 
     (search_engines, seealso_engines) = select_external_engines(current_collection, external_collection)
     vprint(3, 'search_engines = ' + str(search_engines))
