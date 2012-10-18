@@ -179,6 +179,10 @@ img_DATA = add-small.png \
            table_row_delete.png \
            table_row_insert.png \
            table_sort.png \
+           test \
+           testgif \
+           test.foo \
+           test.gif \
            tick.gif \
            tree_branch.gif \
            up.gif \
@@ -227,7 +231,7 @@ img_DATA = add-small.png \
            wb-unsubscribe.png \
            white_field.gif \
            wsignout.gif \
-	   compare.png
+           compare.png
 
 tmpdir=$(localstatedir)/tmp
 
