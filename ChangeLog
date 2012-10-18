@@ -1,3 +1,22 @@
+CDS Invenio v0.99.6 (released 2012-10-18)
+=========================================
+
+2012-10-18  Tibor Simko  <tibor.simko@cern.ch>
+
+	I18N: PO file update for the release of v0.99.6
+
+2012-10-18  Ludmila Marian <ludmila.marian@gmail.com>
+
+	WebSearch: XSS and verbose improvements
+	* The use of 'verbose' parameter for search pages is restricted
+          to superadmins only, since it could expose potentially sensitive
+          information, such as record IDs even though record content would
+          remain restricted.
+
+	* External search XSS vulnerability fix (escapes strings when
+          printing debug information via 'verbose' parameter in the external
+          search facility).
+
 CDS Invenio v0.99.5 (released 2012-02-21)
 =========================================
 
