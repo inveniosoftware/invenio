@@ -6,6 +6,58 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.2 -- released 2012-10-19
+-------------------------------------
+
+ *) BibConvert: fix for static files in admin guide
+
+ *) BibEdit: regression test case fix
+
+ *) BibFormat: fix call to bfe_primary_report_number; revert fix for
+    format validation report
+
+ *) BibHarvest: OAI harvesting via HTTP proxy
+
+ *) BibRank: begin_date initialisation in del_recids(); INSERT DELAYED
+    INTO rnkPAGEVIEWS; user-friendlier message for similar docs
+
+ *) BibUpload: clarify correct/replace mode help
+
+ *) WebJournal: catch ValueError when reading cache; use
+    CFG_TMPSHAREDDIR in admin UI
+
+ *) WebSearch: allow webcoll to query hidden tags; external collection
+    search fix; external search XSS vulnerability fix; fix for
+    parentheses inside quotes; get_collection_reclist() fix; more uses
+    of `rg` configurable default; 'verbose' mode available to admins
+    only; XSS and verbose improvements
+
+ *) WebSession: fix possibly undefined variables; prevent nickname
+    modification
+
+ *) WebStyle: workaround IE bug with cache and HTTPS
+
+ *) WebSubmit: configurable Document File Manager; fix JS check for
+    mandatory fields; unoconv calling fix
+
+ *) bibdocfile: guess_format_from_url() improvement;
+    guess_format_from_url() improvements; INSERT DELAYED INTO
+    rnkDOWNLOADS
+
+ *) global: removal of psyco
+
+ *) I18N: Spanish and Catalan updates to Search Tips; updates to
+    German translation
+
+ *) installation: fix for jQuery UI custom; fix md5sum example
+    arguments; new index on session.session_expiry
+
+ *) intbitset: fix memory leak
+
+ *) inveniogc: tmp directory removal improvements
+
+ *) urlutils: MS Office redirection workaround
+
 CDS Invenio v0.99.6 -- released 2012-10-18
 ------------------------------------------
 

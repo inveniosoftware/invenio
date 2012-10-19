@@ -1,66 +1,72 @@
 --------------------------------------------------------------------
-Invenio v1.0.1 is released
-June 28, 2012
+Invenio v1.0.2 is released
+October 19, 2012
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.1 was released on June 28, 2012.
+Invenio v1.0.2 was released on October 19, 2012.
 
 This is a minor bugfix release only.  It is recommended to all Invenio
-sites using v1.0.0 or previous releases.
+sites using v1.0.1 or previous releases.
 
 What's new:
 -----------
 
- *) BibFormat: fix format validation report; fix opensearch prefix
-    exclusion in RSS; fix retrieval of collection identifier
+ *) BibConvert: fix for static files in admin guide
 
- *) BibIndex: new unit tests for the Greek stemmer
+ *) BibEdit: regression test case fix
 
- *) BibSched: improve low level submission arg parsing; set ERROR
-    status when wrong params; task can stop immediately when sleeping
+ *) BibFormat: fix call to bfe_primary_report_number; revert fix for
+    format validation report
 
- *) BibSword: remove dangling documentation
+ *) BibHarvest: OAI harvesting via HTTP proxy
 
- *) BibUpload: fix setting restriction in -a/-ir modes
+ *) BibRank: begin_date initialisation in del_recids(); INSERT DELAYED
+    INTO rnkPAGEVIEWS; user-friendlier message for similar docs
 
- *) WebAlert: simplify HTML markup
+ *) BibUpload: clarify correct/replace mode help
 
- *) WebComment: only logged users to use report abuse
+ *) WebJournal: catch ValueError when reading cache; use
+    CFG_TMPSHAREDDIR in admin UI
 
- *) WebJournal: hide deleted records
+ *) WebSearch: allow webcoll to query hidden tags; external collection
+    search fix; external search XSS vulnerability fix; fix for
+    parentheses inside quotes; get_collection_reclist() fix; more uses
+    of `rg` configurable default; 'verbose' mode available to admins
+    only; XSS and verbose improvements
 
- *) WebSearch: adapt test cases for citation summary; fix collection
-    order on the search page; look at access control when webcolling;
-    sorting in citesummary breakdown links
+ *) WebSession: fix possibly undefined variables; prevent nickname
+    modification
 
- *) WebSession: simplify HTML markup
+ *) WebStyle: workaround IE bug with cache and HTTPS
 
- *) WebSubmit: capitalise doctypes in Doc File Manager; check
-    authorizations in endaction; check for problems when archiving;
-    ensure unique tmp file name for upload; fix email formatting; fix
-    Move_to_Done function; remove 8564_ field from demo templates;
-    skip file upload if necessary; update CERN-specific config
+ *) WebSubmit: configurable Document File Manager; fix JS check for
+    mandatory fields; unoconv calling fix
 
- *) bibdocfile: BibRecDocs recID argument type check
+ *) bibdocfile: guess_format_from_url() improvement;
+    guess_format_from_url() improvements; INSERT DELAYED INTO
+    rnkDOWNLOADS
 
- *) data cacher: deletes cache before refilling it
+ *) global: removal of psyco
 
- *) dbquery: fix dbexec CLI WRT max allowed packet
+ *) I18N: Spanish and Catalan updates to Search Tips; updates to
+    German translation
 
- *) I18N: updates to Greek translation
+ *) installation: fix for jQuery UI custom; fix md5sum example
+    arguments; new index on session.session_expiry
 
- *) installation: fix circular install-jquery-plugins; fix demo user
-    initialisation; fix jQuery tablesorter download URL; fix jQuery
-    uploadify download URL; more info about max_allowed_packet; remove
-    unneeded rxp binary package
+ *) intbitset: fix memory leak
+
+ *) inveniogc: tmp directory removal improvements
+
+ *) urlutils: MS Office redirection workaround
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.1.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.1.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.1.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.2.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.2.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.2.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -70,25 +76,23 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from Invenio v1.0.0, then:
+If you are upgrading from Invenio v1.0.1, then:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.1.tar.gz
-     $ cd invenio-1.0.1
+     $ tar xvfz invenio-1.0.2.tar.gz
+     $ cd invenio-1.0.2
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
      $ make check-custom-templates
+     $ make update-v1.0.1-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
-                  --exclude bibformat/format_templates/RSS.xsl \
-                  --exclude bibconvert/config/DEMOBOOcreate.tpl \
-                  --exclude bibconvert/config/DEMOPICcreate.tpl \
-                  --exclude bibconvert/config/DEMOTHEcreate.tpl \
+                  --exclude bibformat/format_templates/Default_HTML_brief.bft \
                   /opt/invenio/etc/
 
  c) Restart your Apache server and your bibsched queue.

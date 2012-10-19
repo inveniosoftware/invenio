@@ -44,9 +44,6 @@ The CERN development team currently consists of:
  - Jiri Kuncar <jiri.kuncar@cern.ch>
      Contributions to the Czech translation.
 
- - Olivier Canévet <olivier.canevet@cern.ch>
-     Fixes for WebComment report abuse facility.
-
  - Jan Aage Lavik <jan.age.lavik@cern.ch>
      Improvements to BibMatch with remote matching capabilities,
      improvements to plot extractor, improvements to harvesting and
@@ -57,9 +54,6 @@ The CERN development team currently consists of:
      BibHarvest.  Record comparison library functions, for BibRecord.
      Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
      undo/redo.
-
- - Roman Chyla <roman.chyla@cern.ch>
-     WSGI handler accepts UTF-8 strings.
 
  - Samuele Carli <samuele.carli@cern.ch>
      Fixes for basket export facility and adding external items to
@@ -82,11 +76,6 @@ The EPFL development team currently consists of:
 
 The SLAC development team currently consists of:
 
- - Joe Blaylock <jrbl@slac.stanford.edu>
-     Rewrite of SPIRES query syntax parser, support for nested
-     parenthesis for WebSearch, fuzzy author name tokenizer,
-     enrichment of author pages with h-index.
-
  - Mike Sullivan <sul@slac.stanford.edu>
      Improvements to author pages.
 
@@ -102,15 +91,26 @@ currently consists of:
  - Jay Luker <lbjay@reallywow.com>
      Improvements to the emergency notification sending facility.
 
- - Benoit Thiell <bthiell@cfa.harvard.edu>
-     Fixes for BibRecord library, detailed record links, improvements
-     to code kwalitee in numerous modules.  Improvements to
-     BibClassify.
+ - Roman Chyla <roman.chyla@cern.ch>
+     WSGI handler accepts UTF-8 strings.
 
 Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Joe Blaylock <jrbl@slac.stanford.edu>
+     Rewrite of SPIRES query syntax parser, support for nested
+     parenthesis for WebSearch, fuzzy author name tokenizer,
+     enrichment of author pages with h-index.
+
+ - Benoit Thiell <bthiell@cfa.harvard.edu>
+     Fixes for BibRecord library, detailed record links, improvements
+     to code kwalitee in numerous modules.  Improvements to
+     BibClassify.
+
+ - Olivier Canévet <olivier.canevet@cern.ch>
+     Fixes for WebComment report abuse facility.
 
  - Belinda Chan <belinda.chan@cern.ch>
      User documentation for personal features like alerts and baskets.
