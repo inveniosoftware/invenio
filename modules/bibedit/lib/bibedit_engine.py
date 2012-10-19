@@ -66,7 +66,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     can_record_have_physical_copies, extend_record_with_template, \
     replace_references, merge_record_with_template, record_xml_output, \
     record_is_conference, add_record_cnum, get_xml_from_textmarc, \
-    record_locked_by_user_details
+    record_locked_by_user_details, crossref_process_template
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -79,7 +79,8 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_strip_controlfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
-    CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
+    CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
+    CFG_INSPIRE_SITE
 from invenio.search_engine import record_exists, search_pattern
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
@@ -97,6 +98,8 @@ from invenio.bibcirculation_utils import create_item_details_url
 from invenio.refextract_api import FullTextNotAvailable
 from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
+
+from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -516,17 +519,39 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             template_filename = data['templateFilename']
             template = get_record_template(template_filename)
             if not template:
-                response['resultCode']  = 108
+                response['resultCode'] = 108
             else:
                 record = create_record(template)[0]
                 if not record:
-                    response['resultCode']  = 109
+                    response['resultCode'] = 109
                 else:
                     record_add_field(record, '001',
                                      controlfield_value=str(new_recid))
                     create_cache_file(new_recid, uid, record, True)
-                    response['resultCode'], response['newRecID']  = 7, new_recid
+                    response['resultCode'], response['newRecID'] = 7, new_recid
 
+        elif new_type == 'import':
+            # Import data from external source, using DOI
+            doi = data['doi']
+            if not doi:
+                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_no_doi_specified']
+            else:
+                try:
+                    marcxml_template = get_marcxml_for_doi(doi)
+                except CrossrefError, inst:
+                    response['resultCode'] = \
+                        CFG_BIBEDIT_AJAX_RESULT_CODES_REV[inst.code]
+                except:
+                    response['resultCode'] = 0
+                else:
+                    record = crossref_process_template(marcxml_template, CFG_INSPIRE_SITE)
+                    if not record:
+                        response['resultCode'] = 109
+                    else:
+                        record_add_field(record, '001',
+                                         controlfield_value=str(new_recid))
+                        create_cache_file(new_recid, uid, record, True)
+                        response['resultCode'], response['newRecID'] = 7, new_recid
         elif new_type == 'clone':
             # Clone an existing record (from the users cache).
             existing_cache = cache_exists(recid, uid)

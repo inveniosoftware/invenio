@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -54,7 +54,7 @@ from invenio.bibrecord import create_record, create_records, \
     record_order_subfields, record_get_field_instances, \
     record_add_field, field_get_subfield_codes, field_add_subfield, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
-    record_get_field_values, print_rec
+    record_get_field_values, print_rec, record_modify_subfield
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -78,6 +78,9 @@ from invenio.refextract_api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
                                    extract_references_from_url_xml
 from invenio.textmarc2xmlmarc import transform_file, ParseError
+from invenio.bibauthorid_name_utils import split_name_parts, \
+                                        create_normalized_name
+from invenio.bibknowledge import get_kbr_values
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
@@ -924,3 +927,70 @@ def get_xml_from_textmarc(recid, textmarc_record):
     finally:
         sys.stdout = old_stdout
         return response
+
+
+#################### crossref utils ####################
+
+def crossref_process_template(template, change=False):
+    """
+    Creates record from template based on xml template
+    @param change: if set to True, makes changes to the record (translating the
+        title, unifying autroh names etc.), if not - returns record without
+        any changes
+    @return: record
+    """
+    record = create_record(template)[0]
+    if change:
+        crossref_translate_title(record)
+        crossref_normalize_name(record)
+    return record
+
+
+def crossref_translate_title(record):
+    """
+    Convert the record's title to the Inspire specific abbreviation
+    of the title (using JOURNALS knowledge base)
+    @return: changed record
+    """
+    # probably there is only one 773 field
+    # but just in case let's treat it as a list
+    for field in record_get_field_instances(record, '773'):
+        title = field[0][0][1]
+        new_title = get_kbr_values("JOURNALS", title, searchtype='e')
+        if new_title:
+            # returned value is a list, and we need only the first value
+            new_title = new_title[0][0]
+            position = field[4]
+            record_modify_subfield(rec=record, tag='773', subfield_code='p', \
+            value=new_title, subfield_position=0, field_position_global=position)
+
+
+def crossref_normalize_name(record):
+    """
+    Changes the format of author's name (often with initials) to the proper,
+    unified one, using bibauthor_name_utils tools
+    @return: changed record
+    """
+    # pattern for removing the spaces between two initials
+    pattern_initials = '([A-Z]\\.)\\s([A-Z]\\.)'
+    # first, change the main author
+    for field in record_get_field_instances(record, '100'):
+        main_author = field[0][0][1]
+        new_author = create_normalized_name(split_name_parts(main_author))
+        # remove spaces between initials
+        # two iterations are required
+        for _ in range(2):
+            new_author = re.sub(pattern_initials, '\g<1>\g<2>', new_author)
+        position = field[4]
+        record_modify_subfield(rec=record, tag='100', subfield_code='a', \
+        value=new_author, subfield_position=0, field_position_global=position)
+
+    # then, change additional authors
+    for field in record_get_field_instances(record, '700'):
+        author = field[0][0][1]
+        new_author = create_normalized_name(split_name_parts(author))
+        for _ in range(2):
+            new_author = re.sub(pattern_initials, '\g<1>\g<2>',new_author)
+        position = field[4]
+        record_modify_subfield(rec=record, tag='700', subfield_code='a', \
+            value=new_author, subfield_position=0, field_position_global=position)

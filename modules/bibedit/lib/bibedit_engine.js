@@ -1784,6 +1784,57 @@ function bindNewRecordHandlers(){
       }, false);
       event.preventDefault();
     });
+  //binding import function
+  $('#lnkNewTemplateRecordImport_crossref').bind('click', function(event){
+      var doiElement = $('#doi_crossref');
+      if (!doiElement.val()) {
+        //if no DOI specified
+        errorDoi(117, doiElement)
+      } else {
+        updateStatus('updating');
+        createReq({requestType: 'newRecord', newType: 'import', doi: doiElement.val()},function(json){
+        if (json['resultCode'] == 7) {
+          getRecord(json['newRecID'], 0, onGetTemplateSuccess); // recRev = 0 -> current revision
+        } else {
+          errorDoi(json['resultCode'], doiElement);
+          updateStatus('error', 'Error !');
+        }
+        }, false);
+      }
+      event.preventDefault();
+    });
+  // bind enter key with "crossref" link clicked
+  $('#doi_crossref').bind('keyup', function (e){
+    if (e.which == 13){
+      $('#lnkNewTemplateRecordImport_crossref').click();
+    }
+  });
+}
+
+function errorDoi(code, element){
+  /*
+  * Displays a warning message in the import from crossref textbox
+  */
+  var msg;
+  switch(code) {
+    case 117:
+      msg = "Please input the DOI";
+      break;
+    case 118:
+      msg = "Record with given DOI was not found";
+      break;
+    case 119:
+      msg = "This is not a correct DOI, please correct it";
+      break;
+    case 120:
+      msg = "Crossref account is not set up. Contact the site admin.";
+      break;
+    default:
+      msg = "Error while importing data";
+  }
+  var warning = '<span class="doiWarning" style="padding-left: 5px; color: #ff0000;">' + msg + '</span>'
+  $(".doiWarning").remove();
+  element.after(warning);
 }
 
 

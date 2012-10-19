@@ -947,31 +947,41 @@ function displayMessage(msgCode, keepContent, args) {
     }
 }
 
+
 function displayNewRecordScreen() {
-    /*
-     * Display options for creating a new record: An empty record or a template
-     * selected from a list of templates.
-     */
-    var msg = '<ul><li style="padding-bottom: 20px;">' +
-        '<a href="#" id="lnkNewEmptyRecord"><b>Empty record</b></a></li>' +
-        '<li style="padding-bottom: 10px;">Use record template:' + '<table>';
-    var templatesCount = gRECORD_TEMPLATES.length;
-    if (!templatesCount) msg += '<tr><td style="padding-left: 10px;">' +
-                                'No record templates found' + '</td></tr>';
-    else {
-        for (var i = 0, n = templatesCount; i < n; i++) {
-        msg += '<tr style="border-width: 1px;">' +
-            '<td style="padding-left: 10px; padding-right: 10px;">' +
-                '<a href="#" id="lnkNewTemplateRecord_' + i + '"><b>' +
-                gRECORD_TEMPLATES[i][1] + '</b></a></td>' +
-            '<td style="padding-left: 10px; padding-right: 10px;">' + '<td>' +
-                gRECORD_TEMPLATES[i][2] +
-            '</td></tr>';
-        }
-    }
-    msg += '</table></li>';
-    $('#bibEditContentTable').html(msg);
+  /*
+   * Display options for creating a new record: An empty record or a template
+   * selected from a list of templates.
+   */
+  var msg = '<ul><li style="padding-bottom: 20px;">' +
+    '<a href="#" id="lnkNewEmptyRecord"><b>Empty record</b></a></li>' +
+    '<li style="padding-bottom: 10px;">Use record template:' +
+    '<table>';
+  var templatesCount = gRECORD_TEMPLATES.length;
+  if (!templatesCount)
+    msg += '<tr><td style="padding-left: 10px;">No record templates found' +
+      '</td></tr>';
+  else{
+    for (var i=0, n=templatesCount; i<n; i++)
+      msg += '<tr style="border-width: 1px;">' +
+  '<td style="padding-left: 10px; padding-right: 10px;">' +
+  '<a href="#" id="lnkNewTemplateRecord_' + i + '"><b>' +
+  gRECORD_TEMPLATES[i][1] + '</b></a></td>' +
+  '<td style="padding-left: 10px; padding-right: 10px;">' +
+  '<td>' + gRECORD_TEMPLATES[i][2] + '</td></tr>';
+  }
+  msg += '</table></li>';
+  //Create another list for data imported from other sources (e.g. crossref)
+  msg += '<li style="padding-bottom: 10px;">Import data from:' +
+    '<table><tr style="border-width: 1px;">' +
+    '<td style="padding-left: 10px; padding-right: 10px;">' +
+    '<a href="#" id="lnkNewTemplateRecordImport_crossref"><b>Crossref</b></a></td>' +
+    '<td style="padding-left: 10px; padding-right: 10px;">' +
+    '<td><input id="doi_crossref" style="width:200px" type="text" placeholder="Input the DOI of the publication" /></td></tr>' +
+    '</table></li>';
+  $('#bibEditContentTable').html(msg);
 }
+
 
 function displayCacheOutdatedScreen(requestType) {
     /*

@@ -106,7 +106,11 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'error_physical_copies_exist': 112,
     'cache_updated_with_references': 114,
     'textmarc_parsing_error' : 115,
-    'tableview_change_success' : 116
+    'tableview_change_success' : 116,
+    'error_no_doi_specified': 117,
+    'error_crossref_record_not_found': 118,
+    'error_crossref_malformed_doi': 119,
+    'error_crossref_no_account' : 120
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {
