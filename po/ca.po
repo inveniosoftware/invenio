@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.1\n"
+"Project-Id-Version: Invenio 1.0.2\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-06-26 13:05+0200\n"
+"POT-Creation-Date: 2012-10-19 05:34+0200\n"
 "PO-Revision-Date: 2012-02-02 20:07+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
@@ -36,7 +36,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:665
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:1107
+#: modules/websearch/lib/search_engine.py:1111
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
 msgstr "I NO"
@@ -79,7 +79,7 @@ msgstr "Zona d'administració"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4493
+#: modules/websearch/lib/search_engine.py:4501
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -116,7 +116,7 @@ msgstr "Consells de cerca"
 #: modules/websearch/doc/search-guide.webdoc:750
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
-#: modules/miscutil/lib/inveniocfg.py:453
+#: modules/miscutil/lib/inveniocfg.py:456
 msgid "abstract"
 msgstr "resum"
 
@@ -132,7 +132,7 @@ msgstr "resum"
 #: modules/websearch/doc/search-guide.webdoc:755
 #: modules/websearch/doc/search-guide.webdoc:790
 #: modules/websearch/doc/search-guide.webdoc:825
-#: modules/miscutil/lib/inveniocfg.py:458
+#: modules/miscutil/lib/inveniocfg.py:461
 msgid "fulltext"
 msgstr "text complet"
 
@@ -148,7 +148,7 @@ msgstr "text complet"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/websearch/lib/search_engine.py:1129
+#: modules/websearch/lib/search_engine.py:1133
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
 msgstr "Expressió regular:"
@@ -165,7 +165,7 @@ msgstr "Expressió regular:"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:1125
+#: modules/websearch/lib/search_engine.py:1129
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
 msgstr "Totes les paraules:"
@@ -182,17 +182,21 @@ msgstr "Totes les paraules:"
 #: modules/websearch/doc/search-guide.webdoc:758
 #: modules/websearch/doc/search-guide.webdoc:793
 #: modules/websearch/doc/search-guide.webdoc:828
-#: modules/miscutil/lib/inveniocfg.py:455
+#: modules/miscutil/lib/inveniocfg.py:458
 msgid "report number"
 msgstr "número d'informe"
 
-#: modules/websearch/doc/search-tips.webdoc:406
-#: modules/websearch/doc/search-tips.webdoc:413
-#: modules/websearch/doc/search-tips.webdoc:414
-#: modules/websearch/doc/search-tips.webdoc:415
-#: modules/websearch/doc/search-tips.webdoc:433
-#: modules/websearch/doc/search-tips.webdoc:434
-#: modules/websearch/doc/search-tips.webdoc:435
+#: modules/websearch/doc/search-tips.webdoc:470
+#: modules/websearch/doc/search-tips.webdoc:477
+#: modules/websearch/doc/search-tips.webdoc:478
+#: modules/websearch/doc/search-tips.webdoc:479
+#: modules/websearch/doc/search-tips.webdoc:480
+#: modules/websearch/doc/search-tips.webdoc:481
+#: modules/websearch/doc/search-tips.webdoc:499
+#: modules/websearch/doc/search-tips.webdoc:500
+#: modules/websearch/doc/search-tips.webdoc:501
+#: modules/websearch/doc/search-tips.webdoc:502
+#: modules/websearch/doc/search-tips.webdoc:503
 #: modules/websearch/doc/search-guide.webdoc:354
 #: modules/websearch/doc/search-guide.webdoc:389
 #: modules/websearch/doc/search-guide.webdoc:424
@@ -205,7 +209,7 @@ msgstr "número d'informe"
 #: modules/websearch/doc/search-guide.webdoc:761
 #: modules/websearch/doc/search-guide.webdoc:796
 #: modules/websearch/doc/search-guide.webdoc:831
-#: modules/miscutil/lib/inveniocfg.py:461
+#: modules/miscutil/lib/inveniocfg.py:464
 msgid "year"
 msgstr "any"
 
@@ -221,7 +225,7 @@ msgstr "any"
 #: modules/websearch/doc/search-guide.webdoc:759
 #: modules/websearch/doc/search-guide.webdoc:794
 #: modules/websearch/doc/search-guide.webdoc:829
-#: modules/miscutil/lib/inveniocfg.py:456
+#: modules/miscutil/lib/inveniocfg.py:459
 msgid "subject"
 msgstr "matèria"
 
@@ -237,7 +241,7 @@ msgstr "matèria"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/websearch/lib/search_engine.py:1128
+#: modules/websearch/lib/search_engine.py:1132
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "Partial phrase:"
 msgstr "Frase parcial:"
@@ -254,35 +258,37 @@ msgstr "Frase parcial:"
 #: modules/websearch/doc/search-guide.webdoc:757
 #: modules/websearch/doc/search-guide.webdoc:792
 #: modules/websearch/doc/search-guide.webdoc:827
-#: modules/miscutil/lib/inveniocfg.py:457
+#: modules/miscutil/lib/inveniocfg.py:460
 msgid "reference"
 msgstr "referència"
 
-#: modules/websearch/doc/search-tips.webdoc:37
-#: modules/websearch/doc/search-tips.webdoc:68
-#: modules/websearch/doc/search-tips.webdoc:106
-#: modules/websearch/doc/search-tips.webdoc:154
-#: modules/websearch/doc/search-tips.webdoc:177
-#: modules/websearch/doc/search-tips.webdoc:201
-#: modules/websearch/doc/search-tips.webdoc:246
-#: modules/websearch/doc/search-tips.webdoc:286
-#: modules/websearch/doc/search-tips.webdoc:297
-#: modules/websearch/doc/search-tips.webdoc:317
-#: modules/websearch/doc/search-tips.webdoc:337
+#: modules/websearch/doc/search-tips.webdoc:39
+#: modules/websearch/doc/search-tips.webdoc:75
+#: modules/websearch/doc/search-tips.webdoc:121
+#: modules/websearch/doc/search-tips.webdoc:178
+#: modules/websearch/doc/search-tips.webdoc:205
+#: modules/websearch/doc/search-tips.webdoc:233
+#: modules/websearch/doc/search-tips.webdoc:288
+#: modules/websearch/doc/search-tips.webdoc:336
+#: modules/websearch/doc/search-tips.webdoc:347
 #: modules/websearch/doc/search-tips.webdoc:371
-#: modules/websearch/doc/search-tips.webdoc:405
-#: modules/websearch/doc/search-tips.webdoc:426
-#: modules/websearch/doc/search-tips.webdoc:446
-#: modules/websearch/doc/search-tips.webdoc:480
-#: modules/websearch/doc/search-tips.webdoc:498
-#: modules/websearch/doc/search-tips.webdoc:517
+#: modules/websearch/doc/search-tips.webdoc:395
+#: modules/websearch/doc/search-tips.webdoc:433
+#: modules/websearch/doc/search-tips.webdoc:469
+#: modules/websearch/doc/search-tips.webdoc:492
+#: modules/websearch/doc/search-tips.webdoc:514
 #: modules/websearch/doc/search-tips.webdoc:550
-#: modules/websearch/doc/search-tips.webdoc:575
-#: modules/websearch/doc/search-tips.webdoc:583
-#: modules/websearch/doc/search-tips.webdoc:586
-#: modules/websearch/doc/search-tips.webdoc:588
-#: modules/websearch/doc/search-tips.webdoc:599
-#: modules/websearch/doc/search-tips.webdoc:620
+#: modules/websearch/doc/search-tips.webdoc:568
+#: modules/websearch/doc/search-tips.webdoc:587
+#: modules/websearch/doc/search-tips.webdoc:622
+#: modules/websearch/doc/search-tips.webdoc:651
+#: modules/websearch/doc/search-tips.webdoc:659
+#: modules/websearch/doc/search-tips.webdoc:662
+#: modules/websearch/doc/search-tips.webdoc:664
+#: modules/websearch/doc/search-tips.webdoc:666
+#: modules/websearch/doc/search-tips.webdoc:668
+#: modules/websearch/doc/search-tips.webdoc:679
+#: modules/websearch/doc/search-tips.webdoc:702
 #: modules/websearch/doc/search-guide.webdoc:226
 #: modules/websearch/doc/search-guide.webdoc:250
 #: modules/websearch/doc/search-guide.webdoc:276
@@ -483,7 +489,7 @@ msgstr "referència"
 #: modules/websearch/doc/search-guide.webdoc:5296
 #: modules/websearch/doc/search-guide.webdoc:5316
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:131
-#: modules/miscutil/lib/inveniocfg.py:452
+#: modules/miscutil/lib/inveniocfg.py:455
 msgid "author"
 msgstr "autor"
 
@@ -504,7 +510,7 @@ msgstr "Guia de Cerca"
 #: modules/websearch/doc/search-guide.webdoc:754
 #: modules/websearch/doc/search-guide.webdoc:789
 #: modules/websearch/doc/search-guide.webdoc:824
-#: modules/miscutil/lib/inveniocfg.py:463
+#: modules/miscutil/lib/inveniocfg.py:466
 msgid "experiment"
 msgstr "experiment"
 
@@ -520,7 +526,7 @@ msgstr "experiment"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:777
 #: modules/websearch/doc/search-guide.webdoc:812
-#: modules/websearch/lib/search_engine.py:1126
+#: modules/websearch/lib/search_engine.py:1130
 #: modules/websearch/lib/websearch_templates.py:1113
 msgid "Any of the words:"
 msgstr "Al menys una de les paraules:"
@@ -537,32 +543,32 @@ msgstr "Al menys una de les paraules:"
 #: modules/websearch/doc/search-guide.webdoc:753
 #: modules/websearch/doc/search-guide.webdoc:788
 #: modules/websearch/doc/search-guide.webdoc:823
-#: modules/miscutil/lib/inveniocfg.py:460
+#: modules/miscutil/lib/inveniocfg.py:463
 msgid "division"
 msgstr "divisió"
 
-#: modules/websearch/doc/search-tips.webdoc:39
-#: modules/websearch/doc/search-tips.webdoc:70
-#: modules/websearch/doc/search-tips.webdoc:108
-#: modules/websearch/doc/search-tips.webdoc:156
-#: modules/websearch/doc/search-tips.webdoc:179
-#: modules/websearch/doc/search-tips.webdoc:203
-#: modules/websearch/doc/search-tips.webdoc:248
-#: modules/websearch/doc/search-tips.webdoc:288
-#: modules/websearch/doc/search-tips.webdoc:299
-#: modules/websearch/doc/search-tips.webdoc:319
-#: modules/websearch/doc/search-tips.webdoc:339
+#: modules/websearch/doc/search-tips.webdoc:41
+#: modules/websearch/doc/search-tips.webdoc:77
+#: modules/websearch/doc/search-tips.webdoc:123
+#: modules/websearch/doc/search-tips.webdoc:180
+#: modules/websearch/doc/search-tips.webdoc:207
+#: modules/websearch/doc/search-tips.webdoc:235
+#: modules/websearch/doc/search-tips.webdoc:290
+#: modules/websearch/doc/search-tips.webdoc:338
+#: modules/websearch/doc/search-tips.webdoc:349
 #: modules/websearch/doc/search-tips.webdoc:373
-#: modules/websearch/doc/search-tips.webdoc:408
-#: modules/websearch/doc/search-tips.webdoc:428
-#: modules/websearch/doc/search-tips.webdoc:448
-#: modules/websearch/doc/search-tips.webdoc:482
-#: modules/websearch/doc/search-tips.webdoc:500
-#: modules/websearch/doc/search-tips.webdoc:519
+#: modules/websearch/doc/search-tips.webdoc:397
+#: modules/websearch/doc/search-tips.webdoc:435
+#: modules/websearch/doc/search-tips.webdoc:472
+#: modules/websearch/doc/search-tips.webdoc:494
+#: modules/websearch/doc/search-tips.webdoc:516
 #: modules/websearch/doc/search-tips.webdoc:552
-#: modules/websearch/doc/search-tips.webdoc:577
-#: modules/websearch/doc/search-tips.webdoc:601
-#: modules/websearch/doc/search-tips.webdoc:622
+#: modules/websearch/doc/search-tips.webdoc:570
+#: modules/websearch/doc/search-tips.webdoc:589
+#: modules/websearch/doc/search-tips.webdoc:624
+#: modules/websearch/doc/search-tips.webdoc:653
+#: modules/websearch/doc/search-tips.webdoc:681
+#: modules/websearch/doc/search-tips.webdoc:704
 #: modules/websearch/doc/search-guide.webdoc:227
 #: modules/websearch/doc/search-guide.webdoc:251
 #: modules/websearch/doc/search-guide.webdoc:277
@@ -782,31 +788,33 @@ msgstr "Cerca"
 msgid "Citation Metrics"
 msgstr "Mètrica de citacions"
 
-#: modules/websearch/doc/search-tips.webdoc:35
-#: modules/websearch/doc/search-tips.webdoc:66
-#: modules/websearch/doc/search-tips.webdoc:104
-#: modules/websearch/doc/search-tips.webdoc:152
-#: modules/websearch/doc/search-tips.webdoc:175
-#: modules/websearch/doc/search-tips.webdoc:199
-#: modules/websearch/doc/search-tips.webdoc:244
-#: modules/websearch/doc/search-tips.webdoc:284
-#: modules/websearch/doc/search-tips.webdoc:295
-#: modules/websearch/doc/search-tips.webdoc:315
-#: modules/websearch/doc/search-tips.webdoc:335
+#: modules/websearch/doc/search-tips.webdoc:37
+#: modules/websearch/doc/search-tips.webdoc:73
+#: modules/websearch/doc/search-tips.webdoc:119
+#: modules/websearch/doc/search-tips.webdoc:176
+#: modules/websearch/doc/search-tips.webdoc:203
+#: modules/websearch/doc/search-tips.webdoc:231
+#: modules/websearch/doc/search-tips.webdoc:286
+#: modules/websearch/doc/search-tips.webdoc:334
+#: modules/websearch/doc/search-tips.webdoc:345
 #: modules/websearch/doc/search-tips.webdoc:369
-#: modules/websearch/doc/search-tips.webdoc:403
-#: modules/websearch/doc/search-tips.webdoc:424
-#: modules/websearch/doc/search-tips.webdoc:444
-#: modules/websearch/doc/search-tips.webdoc:478
-#: modules/websearch/doc/search-tips.webdoc:496
-#: modules/websearch/doc/search-tips.webdoc:515
+#: modules/websearch/doc/search-tips.webdoc:393
+#: modules/websearch/doc/search-tips.webdoc:431
+#: modules/websearch/doc/search-tips.webdoc:467
+#: modules/websearch/doc/search-tips.webdoc:490
+#: modules/websearch/doc/search-tips.webdoc:512
 #: modules/websearch/doc/search-tips.webdoc:548
-#: modules/websearch/doc/search-tips.webdoc:559
-#: modules/websearch/doc/search-tips.webdoc:561
-#: modules/websearch/doc/search-tips.webdoc:564
-#: modules/websearch/doc/search-tips.webdoc:573
-#: modules/websearch/doc/search-tips.webdoc:597
-#: modules/websearch/doc/search-tips.webdoc:618
+#: modules/websearch/doc/search-tips.webdoc:566
+#: modules/websearch/doc/search-tips.webdoc:585
+#: modules/websearch/doc/search-tips.webdoc:620
+#: modules/websearch/doc/search-tips.webdoc:631
+#: modules/websearch/doc/search-tips.webdoc:633
+#: modules/websearch/doc/search-tips.webdoc:636
+#: modules/websearch/doc/search-tips.webdoc:638
+#: modules/websearch/doc/search-tips.webdoc:640
+#: modules/websearch/doc/search-tips.webdoc:649
+#: modules/websearch/doc/search-tips.webdoc:677
+#: modules/websearch/doc/search-tips.webdoc:700
 #: modules/websearch/doc/search-guide.webdoc:224
 #: modules/websearch/doc/search-guide.webdoc:248
 #: modules/websearch/doc/search-guide.webdoc:274
@@ -1007,7 +1015,7 @@ msgstr "Mètrica de citacions"
 #: modules/websearch/doc/search-guide.webdoc:5294
 #: modules/websearch/doc/search-guide.webdoc:5314
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:129
-#: modules/miscutil/lib/inveniocfg.py:450
+#: modules/miscutil/lib/inveniocfg.py:453
 msgid "any field"
 msgstr "qualsevol camp"
 
@@ -1057,7 +1065,7 @@ msgstr "Anomena i desa"
 #: modules/websearch/doc/search-guide.webdoc:752
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
-#: modules/miscutil/lib/inveniocfg.py:459
+#: modules/miscutil/lib/inveniocfg.py:462
 msgid "collection"
 msgstr "col·lecció"
 
@@ -1077,7 +1085,7 @@ msgstr "Guia d'administració de WebSearch"
 #: modules/websearch/doc/search-guide.webdoc:742
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/websearch/lib/search_engine.py:1127
+#: modules/websearch/lib/search_engine.py:1131
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "Exact phrase:"
 msgstr "Frase exacta:"
@@ -1095,8 +1103,8 @@ msgstr "Ajuda per als lliuraments"
 #: modules/websearch/doc/search-guide.webdoc:664
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:951
-#: modules/websearch/lib/search_engine.py:1106
+#: modules/websearch/lib/search_engine.py:955
+#: modules/websearch/lib/search_engine.py:1110
 #: modules/websearch/lib/websearch_templates.py:1162
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "OR"
@@ -1110,7 +1118,7 @@ msgstr "O"
 #: modules/websearch/doc/search-guide.webdoc:663
 #: modules/websearch/doc/search-guide.webdoc:766
 #: modules/websearch/doc/search-guide.webdoc:801
-#: modules/websearch/lib/search_engine.py:1105
+#: modules/websearch/lib/search_engine.py:1109
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
 msgstr "I"
@@ -1127,32 +1135,32 @@ msgstr "I"
 #: modules/websearch/doc/search-guide.webdoc:756
 #: modules/websearch/doc/search-guide.webdoc:791
 #: modules/websearch/doc/search-guide.webdoc:826
-#: modules/miscutil/lib/inveniocfg.py:454
+#: modules/miscutil/lib/inveniocfg.py:457
 msgid "keyword"
 msgstr "paraula clau"
 
-#: modules/websearch/doc/search-tips.webdoc:36
-#: modules/websearch/doc/search-tips.webdoc:67
-#: modules/websearch/doc/search-tips.webdoc:105
-#: modules/websearch/doc/search-tips.webdoc:153
-#: modules/websearch/doc/search-tips.webdoc:176
-#: modules/websearch/doc/search-tips.webdoc:200
-#: modules/websearch/doc/search-tips.webdoc:245
-#: modules/websearch/doc/search-tips.webdoc:285
-#: modules/websearch/doc/search-tips.webdoc:296
-#: modules/websearch/doc/search-tips.webdoc:316
-#: modules/websearch/doc/search-tips.webdoc:336
+#: modules/websearch/doc/search-tips.webdoc:38
+#: modules/websearch/doc/search-tips.webdoc:74
+#: modules/websearch/doc/search-tips.webdoc:120
+#: modules/websearch/doc/search-tips.webdoc:177
+#: modules/websearch/doc/search-tips.webdoc:204
+#: modules/websearch/doc/search-tips.webdoc:232
+#: modules/websearch/doc/search-tips.webdoc:287
+#: modules/websearch/doc/search-tips.webdoc:335
+#: modules/websearch/doc/search-tips.webdoc:346
 #: modules/websearch/doc/search-tips.webdoc:370
-#: modules/websearch/doc/search-tips.webdoc:404
-#: modules/websearch/doc/search-tips.webdoc:425
-#: modules/websearch/doc/search-tips.webdoc:445
-#: modules/websearch/doc/search-tips.webdoc:479
-#: modules/websearch/doc/search-tips.webdoc:497
-#: modules/websearch/doc/search-tips.webdoc:516
+#: modules/websearch/doc/search-tips.webdoc:394
+#: modules/websearch/doc/search-tips.webdoc:432
+#: modules/websearch/doc/search-tips.webdoc:468
+#: modules/websearch/doc/search-tips.webdoc:491
+#: modules/websearch/doc/search-tips.webdoc:513
 #: modules/websearch/doc/search-tips.webdoc:549
-#: modules/websearch/doc/search-tips.webdoc:574
-#: modules/websearch/doc/search-tips.webdoc:598
-#: modules/websearch/doc/search-tips.webdoc:619
+#: modules/websearch/doc/search-tips.webdoc:567
+#: modules/websearch/doc/search-tips.webdoc:586
+#: modules/websearch/doc/search-tips.webdoc:621
+#: modules/websearch/doc/search-tips.webdoc:650
+#: modules/websearch/doc/search-tips.webdoc:678
+#: modules/websearch/doc/search-tips.webdoc:701
 #: modules/websearch/doc/search-guide.webdoc:225
 #: modules/websearch/doc/search-guide.webdoc:249
 #: modules/websearch/doc/search-guide.webdoc:275
@@ -1353,12 +1361,12 @@ msgstr "paraula clau"
 #: modules/websearch/doc/search-guide.webdoc:5295
 #: modules/websearch/doc/search-guide.webdoc:5315
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:130
-#: modules/miscutil/lib/inveniocfg.py:451
+#: modules/miscutil/lib/inveniocfg.py:454
 msgid "title"
 msgstr "títol"
 
-#: modules/websearch/doc/search-tips.webdoc:72
-#: modules/websearch/doc/search-tips.webdoc:110
+#: modules/websearch/doc/search-tips.webdoc:79
+#: modules/websearch/doc/search-tips.webdoc:125
 #: modules/websearch/lib/websearch_templates.py:1275
 msgid "Narrow by collection:"
 msgstr "Limitar per col·lecció:"
@@ -1371,7 +1379,7 @@ msgstr "Afegeix-lo al cistell personal"
 msgid "WebSubmit Admin Guide"
 msgstr "Guia d'administració de WebSubmit"
 
-#: modules/websearch/doc/search-tips.webdoc:290
+#: modules/websearch/doc/search-tips.webdoc:340
 #: modules/websubmit/lib/websubmit_templates.py:1118
 #: modules/bibharvest/lib/oai_harvest_admin.py:409
 #: modules/bibharvest/lib/oai_harvest_admin.py:417
@@ -2335,7 +2343,7 @@ msgid "Apr"
 msgstr "abr"
 
 #: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
-#: modules/websearch/lib/search_engine.py:879
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
 msgstr "mai"
@@ -2369,67 +2377,67 @@ msgid "Dec"
 msgstr "des"
 
 #: modules/miscutil/lib/dateutils.py:215
-#: modules/websearch/lib/search_engine.py:878
+#: modules/websearch/lib/search_engine.py:882
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
 msgstr "gener"
 
 #: modules/miscutil/lib/dateutils.py:216
-#: modules/websearch/lib/search_engine.py:878
+#: modules/websearch/lib/search_engine.py:882
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
 msgstr "febrer"
 
 #: modules/miscutil/lib/dateutils.py:217
-#: modules/websearch/lib/search_engine.py:878
+#: modules/websearch/lib/search_engine.py:882
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
 msgstr "març"
 
 #: modules/miscutil/lib/dateutils.py:218
-#: modules/websearch/lib/search_engine.py:878
+#: modules/websearch/lib/search_engine.py:882
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
 msgstr "abril"
 
 #: modules/miscutil/lib/dateutils.py:220
-#: modules/websearch/lib/search_engine.py:879
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
 msgstr "juny"
 
 #: modules/miscutil/lib/dateutils.py:221
-#: modules/websearch/lib/search_engine.py:879
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
 msgstr "juliol"
 
 #: modules/miscutil/lib/dateutils.py:222
-#: modules/websearch/lib/search_engine.py:879
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
 msgstr "agost"
 
 #: modules/miscutil/lib/dateutils.py:223
-#: modules/websearch/lib/search_engine.py:880
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
 msgstr "setembre"
 
 #: modules/miscutil/lib/dateutils.py:224
-#: modules/websearch/lib/search_engine.py:880
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
 msgstr "octubre"
 
 #: modules/miscutil/lib/dateutils.py:225
-#: modules/websearch/lib/search_engine.py:880
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
 msgstr "novembre"
 
 #: modules/miscutil/lib/dateutils.py:226
-#: modules/websearch/lib/search_engine.py:880
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
 msgstr "desembre"
@@ -2512,35 +2520,35 @@ msgstr ""
 msgid "Thank you!"
 msgstr "Gràcies!"
 
-#: modules/miscutil/lib/inveniocfg.py:462
+#: modules/miscutil/lib/inveniocfg.py:465
 msgid "journal"
 msgstr "revista"
 
-#: modules/miscutil/lib/inveniocfg.py:464
+#: modules/miscutil/lib/inveniocfg.py:467
 msgid "record ID"
 msgstr "el número registre"
 
-#: modules/miscutil/lib/inveniocfg.py:477
+#: modules/miscutil/lib/inveniocfg.py:480
 msgid "word similarity"
 msgstr "semblança de paraules"
 
-#: modules/miscutil/lib/inveniocfg.py:478
+#: modules/miscutil/lib/inveniocfg.py:481
 msgid "journal impact factor"
 msgstr "factor d'impacte de la revista<"
 
-#: modules/miscutil/lib/inveniocfg.py:479
+#: modules/miscutil/lib/inveniocfg.py:482
 msgid "times cited"
 msgstr "vegades citat"
 
-#: modules/miscutil/lib/inveniocfg.py:480
+#: modules/miscutil/lib/inveniocfg.py:483
 msgid "time-decay cite count"
 msgstr "comptador de cites en el temps"
 
-#: modules/miscutil/lib/inveniocfg.py:481
+#: modules/miscutil/lib/inveniocfg.py:484
 msgid "all-time-best cite rank"
 msgstr "classificació per màxim número de cites"
 
-#: modules/miscutil/lib/inveniocfg.py:482
+#: modules/miscutil/lib/inveniocfg.py:485
 msgid "time-decay cite rank"
 msgstr "classificació per cites en el temps"
 
@@ -3063,19 +3071,19 @@ msgstr "Les vostres cerques"
 #: modules/websession/lib/websession_webinterface.py:215
 #: modules/websession/lib/websession_webinterface.py:237
 #: modules/websession/lib/websession_webinterface.py:279
-#: modules/websession/lib/websession_webinterface.py:509
-#: modules/websession/lib/websession_webinterface.py:532
-#: modules/websession/lib/websession_webinterface.py:560
-#: modules/websession/lib/websession_webinterface.py:576
-#: modules/websession/lib/websession_webinterface.py:628
-#: modules/websession/lib/websession_webinterface.py:651
-#: modules/websession/lib/websession_webinterface.py:677
-#: modules/websession/lib/websession_webinterface.py:743
-#: modules/websession/lib/websession_webinterface.py:792
-#: modules/websession/lib/websession_webinterface.py:827
-#: modules/websession/lib/websession_webinterface.py:858
-#: modules/websession/lib/websession_webinterface.py:930
-#: modules/websession/lib/websession_webinterface.py:968
+#: modules/websession/lib/websession_webinterface.py:521
+#: modules/websession/lib/websession_webinterface.py:544
+#: modules/websession/lib/websession_webinterface.py:572
+#: modules/websession/lib/websession_webinterface.py:588
+#: modules/websession/lib/websession_webinterface.py:640
+#: modules/websession/lib/websession_webinterface.py:663
+#: modules/websession/lib/websession_webinterface.py:689
+#: modules/websession/lib/websession_webinterface.py:755
+#: modules/websession/lib/websession_webinterface.py:804
+#: modules/websession/lib/websession_webinterface.py:839
+#: modules/websession/lib/websession_webinterface.py:870
+#: modules/websession/lib/websession_webinterface.py:942
+#: modules/websession/lib/websession_webinterface.py:980
 #: modules/websubmit/web/publiline.py:133
 #: modules/websubmit/web/publiline.py:154
 #: modules/websubmit/web/yourapprovals.py:91
@@ -3103,15 +3111,15 @@ msgstr "%s personalitza, mostra les cerques"
 #: modules/websession/lib/websession_webinterface.py:218
 #: modules/websession/lib/websession_webinterface.py:240
 #: modules/websession/lib/websession_webinterface.py:281
-#: modules/websession/lib/websession_webinterface.py:511
-#: modules/websession/lib/websession_webinterface.py:534
-#: modules/websession/lib/websession_webinterface.py:563
-#: modules/websession/lib/websession_webinterface.py:579
-#: modules/websession/lib/websession_webinterface.py:597
-#: modules/websession/lib/websession_webinterface.py:607
-#: modules/websession/lib/websession_webinterface.py:630
-#: modules/websession/lib/websession_webinterface.py:653
-#: modules/websession/lib/websession_webinterface.py:679
+#: modules/websession/lib/websession_webinterface.py:523
+#: modules/websession/lib/websession_webinterface.py:546
+#: modules/websession/lib/websession_webinterface.py:575
+#: modules/websession/lib/websession_webinterface.py:591
+#: modules/websession/lib/websession_webinterface.py:609
+#: modules/websession/lib/websession_webinterface.py:619
+#: modules/websession/lib/websession_webinterface.py:642
+#: modules/websession/lib/websession_webinterface.py:665
+#: modules/websession/lib/websession_webinterface.py:691
 #, python-format
 msgid "%s, personalize"
 msgstr "%s, personalitza"
@@ -3125,7 +3133,7 @@ msgstr "%s, personalitza"
 #: modules/webstyle/lib/webstyle_templates.py:619
 #: modules/webstyle/lib/webstyle_templates.py:621
 #: modules/websubmit/lib/websubmit_engine.py:1736
-#: modules/websubmit/lib/websubmit_webinterface.py:1127
+#: modules/websubmit/lib/websubmit_webinterface.py:1103
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
 #: modules/bibedit/lib/bibedit_webinterface.py:205
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:496
@@ -4680,9 +4688,9 @@ msgstr "Administració de WebComment"
 #: modules/webcomment/web/admin/webcommentadmin.py:199
 #: modules/webcomment/web/admin/webcommentadmin.py:235
 #: modules/webcomment/web/admin/webcommentadmin.py:273
-#: modules/websearch/lib/websearch_webinterface.py:946
+#: modules/websearch/lib/websearch_webinterface.py:962
 #: modules/websearch/web/admin/websearchadmin.py:1040
-#: modules/websession/lib/websession_webinterface.py:924
+#: modules/websession/lib/websession_webinterface.py:936
 #: modules/webstyle/lib/webstyle_templates.py:584
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:333
@@ -4935,60 +4943,60 @@ msgstr "No esteu autoritzats a utilitzar missatges."
 msgid "Read a message"
 msgstr "Llegir un missatge"
 
-#: modules/websearch/lib/search_engine.py:742
-#: modules/websearch/lib/search_engine.py:769
-#: modules/websearch/lib/search_engine.py:4516
-#: modules/websearch/lib/search_engine.py:4569
+#: modules/websearch/lib/search_engine.py:746
+#: modules/websearch/lib/search_engine.py:773
+#: modules/websearch/lib/search_engine.py:4524
+#: modules/websearch/lib/search_engine.py:4577
 msgid "Search Results"
 msgstr "Resultats de la cerca"
 
-#: modules/websearch/lib/search_engine.py:871
+#: modules/websearch/lib/search_engine.py:875
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
 msgstr "qualsevol dia"
 
-#: modules/websearch/lib/search_engine.py:877
+#: modules/websearch/lib/search_engine.py:881
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
 msgstr "qualsevol mes"
 
-#: modules/websearch/lib/search_engine.py:885
+#: modules/websearch/lib/search_engine.py:889
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
 msgstr "qualsevol any"
 
-#: modules/websearch/lib/search_engine.py:926
-#: modules/websearch/lib/search_engine.py:945
+#: modules/websearch/lib/search_engine.py:930
+#: modules/websearch/lib/search_engine.py:949
 msgid "any public collection"
 msgstr "qualsevol col·lecció pública"
 
-#: modules/websearch/lib/search_engine.py:930
+#: modules/websearch/lib/search_engine.py:934
 msgid "remove this collection"
 msgstr "esborrar aquesta col·lecció"
 
-#: modules/websearch/lib/search_engine.py:941
+#: modules/websearch/lib/search_engine.py:945
 msgid "add another collection"
 msgstr "afegir una altra col·lecció"
 
-#: modules/websearch/lib/search_engine.py:951
+#: modules/websearch/lib/search_engine.py:955
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "rank by"
 msgstr "prioritzar per"
 
-#: modules/websearch/lib/search_engine.py:971
+#: modules/websearch/lib/search_engine.py:975
 msgid "HTML brief"
 msgstr "HTML breu"
 
-#: modules/websearch/lib/search_engine.py:1084
+#: modules/websearch/lib/search_engine.py:1088
 #: modules/websearch/lib/websearch_webcoll.py:557
 msgid "latest first"
 msgstr "el darrer primer"
 
-#: modules/websearch/lib/search_engine.py:1689
+#: modules/websearch/lib/search_engine.py:1693
 msgid "No values found."
 msgstr "No s'han trobat valors."
 
-#: modules/websearch/lib/search_engine.py:1807
+#: modules/websearch/lib/search_engine.py:1816
 #, fuzzy, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
@@ -4997,7 +5005,7 @@ msgstr ""
 "Atenció: la cerca a text complet només està disponible per a un subconjunt "
 "de documents, majoritàriament d'entre 2006-2010."
 
-#: modules/websearch/lib/search_engine.py:1811
+#: modules/websearch/lib/search_engine.py:1820
 #, fuzzy, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
@@ -5006,32 +5014,32 @@ msgstr ""
 "Atenció: la cerca als peus d'imatges només està disponible per a un "
 "subconjunt de documents, majoritàriament d'entre 2008-2010."
 
-#: modules/websearch/lib/search_engine.py:1820
+#: modules/websearch/lib/search_engine.py:1829
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 "Encara no hi ha índex de frases per al text complet, cercant per combinació "
 "de paraules..."
 
-#: modules/websearch/lib/search_engine.py:1861
+#: modules/websearch/lib/search_engine.py:1869
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "No s'ha trobat cap coincidència exacta per %(x_query1)s, però canviant-lo "
 "per %(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1871
-#: modules/websearch/lib/search_engine.py:1880
-#: modules/websearch/lib/search_engine.py:4488
-#: modules/websearch/lib/search_engine.py:4526
-#: modules/websearch/lib/search_engine.py:4577
+#: modules/websearch/lib/search_engine.py:1879
+#: modules/websearch/lib/search_engine.py:1888
+#: modules/websearch/lib/search_engine.py:4496
+#: modules/websearch/lib/search_engine.py:4534
+#: modules/websearch/lib/search_engine.py:4585
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
 msgid "Requested record does not seem to exist."
 msgstr "El registre que sol·liciteu no existeix."
 
-#: modules/websearch/lib/search_engine.py:2002
+#: modules/websearch/lib/search_engine.py:2010
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
@@ -5040,7 +5048,7 @@ msgstr ""
 "de la cerca.  Si així no funciona, repasseu la vostra cerca i torneu-ho a "
 "provar."
 
-#: modules/websearch/lib/search_engine.py:2324
+#: modules/websearch/lib/search_engine.py:2332
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5050,7 +5058,7 @@ msgstr ""
 "col·leccions públicas donen %(x_url_open)s%(x_nb_hits)d resultats"
 "%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2333
+#: modules/websearch/lib/search_engine.py:2341
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5058,27 +5066,27 @@ msgstr ""
 "No s'ha trobat cap coincidència en col·leccions públiques. Si esteu cercant "
 "documents no públics, escolliu primer la col·lecció restringida."
 
-#: modules/websearch/lib/search_engine.py:2450
+#: modules/websearch/lib/search_engine.py:2458
 #, python-format
 msgid "There are no records referring to %s."
 msgstr "No hi ha registres que es refereixin a %s."
 
-#: modules/websearch/lib/search_engine.py:2452
+#: modules/websearch/lib/search_engine.py:2460
 #, python-format
 msgid "There are no records cited by %s."
 msgstr "No hi ha registres citats per %s."
 
-#: modules/websearch/lib/search_engine.py:2457
+#: modules/websearch/lib/search_engine.py:2465
 #, python-format
 msgid "No word index is available for %s."
 msgstr "No hi ha cap índex de paraules disponible per a %s."
 
-#: modules/websearch/lib/search_engine.py:2468
+#: modules/websearch/lib/search_engine.py:2476
 #, python-format
 msgid "No phrase index is available for %s."
 msgstr "No hi ha cap índex de frases disponible per a %s."
 
-#: modules/websearch/lib/search_engine.py:2513
+#: modules/websearch/lib/search_engine.py:2521
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -5087,7 +5095,7 @@ msgstr ""
 "El terme de cerca %(x_term)s dins l'índex %(x_index)s no s'ha trobat en cap "
 "registre. Els termes aproximats, a qualsevol col·lecció, són:"
 
-#: modules/websearch/lib/search_engine.py:2517
+#: modules/websearch/lib/search_engine.py:2525
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -5095,7 +5103,7 @@ msgstr ""
 "El terme de cerca %s no s'ha trobat en cap registre. Els termes aproximats, "
 "a qualsevol col·lecció, són:"
 
-#: modules/websearch/lib/search_engine.py:3273
+#: modules/websearch/lib/search_engine.py:3281
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -5104,35 +5112,35 @@ msgstr ""
 "Només es permet ordenar en conjunts de fins a %d registres.  Ordenat per "
 "defecte (\"primer els més recents\")."
 
-#: modules/websearch/lib/search_engine.py:3297
+#: modules/websearch/lib/search_engine.py:3305
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr "No és possible ordenar per %s.  Ha quedat ordenat per títol."
 
-#: modules/websearch/lib/search_engine.py:3490
-#: modules/websearch/lib/search_engine.py:3819
-#: modules/websearch/lib/search_engine.py:3997
-#: modules/websearch/lib/search_engine.py:4020
+#: modules/websearch/lib/search_engine.py:3498
+#: modules/websearch/lib/search_engine.py:3827
+#: modules/websearch/lib/search_engine.py:4005
 #: modules/websearch/lib/search_engine.py:4028
 #: modules/websearch/lib/search_engine.py:4036
-#: modules/websearch/lib/search_engine.py:4082
+#: modules/websearch/lib/search_engine.py:4044
+#: modules/websearch/lib/search_engine.py:4090
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "El registre ha estat suprimit."
 
-#: modules/websearch/lib/search_engine.py:3718
+#: modules/websearch/lib/search_engine.py:3726
 msgid "Use different search terms."
 msgstr "Useu termes diferents de cerca."
 
-#: modules/websearch/lib/search_engine.py:4798
+#: modules/websearch/lib/search_engine.py:4806
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "No s'ha trobat cap coincidència en l'intèrval de temps especificat. "
 "Descartant aquesta condició..."
 
-#: modules/websearch/lib/search_engine.py:4825
+#: modules/websearch/lib/search_engine.py:4833
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "No s'ha trobat cap coincidència en les limitacions que heu especificat. "
@@ -5470,19 +5478,19 @@ msgid "1 review"
 msgstr "1 ressenya"
 
 #: modules/websearch/lib/websearch_templates.py:3525
-#: modules/websearch/lib/websearch_webinterface.py:963
+#: modules/websearch/lib/websearch_webinterface.py:979
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "No s'ha trobat la col·lecció %s"
 
 #: modules/websearch/lib/websearch_templates.py:3537
-#: modules/websearch/lib/websearch_webinterface.py:959
+#: modules/websearch/lib/websearch_webinterface.py:975
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Sembla ser que la col·lecció %s no existeix."
 
 #: modules/websearch/lib/websearch_templates.py:3539
-#: modules/websearch/lib/websearch_webinterface.py:960
+#: modules/websearch/lib/websearch_webinterface.py:976
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "Podeu començar a cercar des de %s."
@@ -5581,11 +5589,11 @@ msgstr "Classificació d'articles per cita:"
 msgid "Additional Citation Metrics"
 msgstr "Altres mètriques de citacions"
 
-#: modules/websearch/lib/websearch_webinterface.py:573
+#: modules/websearch/lib/websearch_webinterface.py:581
 msgid "You are not authorized to view this area."
 msgstr "No esteu autoritzats a veure aquesta àrea."
 
-#: modules/websearch/lib/websearch_webinterface.py:965
+#: modules/websearch/lib/websearch_webinterface.py:981
 msgid "Not found"
 msgstr "No s'ha trobat"
 
@@ -5983,7 +5991,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:622
 #: modules/websession/lib/websession_templates.py:2331
-#: modules/websession/lib/websession_webinterface.py:1007
+#: modules/websession/lib/websession_webinterface.py:1019
 msgid "Your Groups"
 msgstr "Els vostres grups"
 
@@ -6027,7 +6035,7 @@ msgid "Your Tickets"
 msgstr "Les vostres tasques"
 
 #: modules/websession/lib/websession_templates.py:643
-#: modules/websession/lib/websession_webinterface.py:626
+#: modules/websession/lib/websession_webinterface.py:638
 msgid "Your Administrative Activities"
 msgstr "Les vostres activitats administratives"
 
@@ -6151,13 +6159,13 @@ msgstr "Recorda la identificació en aquest ordinador."
 #: modules/websession/lib/websession_templates.py:1177
 #: modules/websession/lib/websession_webinterface.py:102
 #: modules/websession/lib/websession_webinterface.py:197
-#: modules/websession/lib/websession_webinterface.py:742
-#: modules/websession/lib/websession_webinterface.py:826
+#: modules/websession/lib/websession_webinterface.py:754
+#: modules/websession/lib/websession_webinterface.py:838
 msgid "login"
 msgstr "identificació"
 
 #: modules/websession/lib/websession_templates.py:905
-#: modules/websession/lib/websession_webinterface.py:530
+#: modules/websession/lib/websession_webinterface.py:542
 msgid "Lost your password?"
 msgstr "Heu perdut la contrasenya?"
 
@@ -6209,7 +6217,7 @@ msgstr "Torneu a escriure la contrasenya"
 
 # Confirmar segons el contexte
 #: modules/websession/lib/websession_templates.py:1039
-#: modules/websession/lib/websession_webinterface.py:929
+#: modules/websession/lib/websession_webinterface.py:941
 msgid "register"
 msgstr "donar-se d'alta"
 
@@ -6360,7 +6368,7 @@ msgstr "Edita els %s membres del grup"
 #: modules/websession/lib/websession_templates.py:1553
 #: modules/websession/lib/websession_templates.py:1693
 #: modules/websession/lib/websession_templates.py:1695
-#: modules/websession/lib/websession_webinterface.py:1067
+#: modules/websession/lib/websession_webinterface.py:1079
 msgid "Create new group"
 msgstr "Crear un nou grup"
 
@@ -6783,32 +6791,32 @@ msgstr ""
 msgid "%s Personalize, Your Settings"
 msgstr "%s Personalitzar, els vostres paràmetres"
 
-#: modules/websession/lib/websession_webinterface.py:334
-#: modules/websession/lib/websession_webinterface.py:403
-#: modules/websession/lib/websession_webinterface.py:465
-#: modules/websession/lib/websession_webinterface.py:478
-#: modules/websession/lib/websession_webinterface.py:491
+#: modules/websession/lib/websession_webinterface.py:339
+#: modules/websession/lib/websession_webinterface.py:415
+#: modules/websession/lib/websession_webinterface.py:477
+#: modules/websession/lib/websession_webinterface.py:490
+#: modules/websession/lib/websession_webinterface.py:503
 msgid "Settings edited"
 msgstr "S'han editat els paràmetres"
 
-#: modules/websession/lib/websession_webinterface.py:336
-#: modules/websession/lib/websession_webinterface.py:402
-#: modules/websession/lib/websession_webinterface.py:443
-#: modules/websession/lib/websession_webinterface.py:467
-#: modules/websession/lib/websession_webinterface.py:480
-#: modules/websession/lib/websession_webinterface.py:486
+#: modules/websession/lib/websession_webinterface.py:341
+#: modules/websession/lib/websession_webinterface.py:414
+#: modules/websession/lib/websession_webinterface.py:455
+#: modules/websession/lib/websession_webinterface.py:479
+#: modules/websession/lib/websession_webinterface.py:492
+#: modules/websession/lib/websession_webinterface.py:498
 msgid "Show account"
 msgstr "Mostrar el compte"
 
-#: modules/websession/lib/websession_webinterface.py:340
+#: modules/websession/lib/websession_webinterface.py:345
 msgid "Unable to change login method."
 msgstr "No ha estat possible canviar el mètode d'identificació."
 
-#: modules/websession/lib/websession_webinterface.py:348
+#: modules/websession/lib/websession_webinterface.py:353
 msgid "Switched to internal login method."
 msgstr "El mètode d'identificació canviat a l'intern."
 
-#: modules/websession/lib/websession_webinterface.py:349
+#: modules/websession/lib/websession_webinterface.py:354
 msgid ""
 "Please note that if this is the first time that you are using this account "
 "with the internal login method then the system has set for you a randomly "
@@ -6820,11 +6828,11 @@ msgstr ""
 "aleatòria.  Feu clic en el botó següent per a que s'us enviï, via correu "
 "electrònic, un enllaç per a reiniciar-la:"
 
-#: modules/websession/lib/websession_webinterface.py:357
+#: modules/websession/lib/websession_webinterface.py:362
 msgid "Send Password"
 msgstr "Enviar la contrasenya"
 
-#: modules/websession/lib/websession_webinterface.py:367
+#: modules/websession/lib/websession_webinterface.py:372
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
@@ -6833,7 +6841,7 @@ msgstr ""
 "No és possible canviar al mètode d'autenticació extern %s, perquè no consta "
 "la vostra adreça de correu electrònic."
 
-#: modules/websession/lib/websession_webinterface.py:371
+#: modules/websession/lib/websession_webinterface.py:376
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
@@ -6842,11 +6850,11 @@ msgstr ""
 "No és possible canviar al mètode d'autenticació extern %s, perquè el sistem "
 "extern desconeix la vostra adreça de correu electrònic."
 
-#: modules/websession/lib/websession_webinterface.py:375
+#: modules/websession/lib/websession_webinterface.py:380
 msgid "Login method successfully selected."
 msgstr "Mètode d'identificació seleccionat correctament."
 
-#: modules/websession/lib/websession_webinterface.py:377
+#: modules/websession/lib/websession_webinterface.py:382
 #, python-format
 msgid ""
 "The external login method %s does not support email address based logins.  "
@@ -6856,11 +6864,16 @@ msgstr ""
 "adreça de correu electrònic.  Poseu-vos en cotacte amb els administradors de "
 "la instal·lació."
 
-#: modules/websession/lib/websession_webinterface.py:396
+#: modules/websession/lib/websession_webinterface.py:394
+#, fuzzy
+msgid "Your nickname has not been updated"
+msgstr "Aquest ítem ha estat actualitzat."
+
+#: modules/websession/lib/websession_webinterface.py:408
 msgid "Settings successfully edited."
 msgstr "S'han editat els paràmetres correctament."
 
-#: modules/websession/lib/websession_webinterface.py:397
+#: modules/websession/lib/websession_webinterface.py:409
 #, python-format
 msgid ""
 "Note that if you have changed your email address, you will have to "
@@ -6870,112 +6883,112 @@ msgstr ""
 "%(x_url_open)stornar a posar la vostra contrasenya%(x_url_close)s un altre "
 "cop."
 
-#: modules/websession/lib/websession_webinterface.py:405
-#: modules/websession/lib/websession_webinterface.py:899
+#: modules/websession/lib/websession_webinterface.py:417
+#: modules/websession/lib/websession_webinterface.py:911
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "L'àlies %s no és vàlid."
 
-#: modules/websession/lib/websession_webinterface.py:406
-#: modules/websession/lib/websession_webinterface.py:412
-#: modules/websession/lib/websession_webinterface.py:425
-#: modules/websession/lib/websession_webinterface.py:447
-#: modules/websession/lib/websession_webinterface.py:453
-#: modules/websession/lib/websession_webinterface.py:890
-#: modules/websession/lib/websession_webinterface.py:895
-#: modules/websession/lib/websession_webinterface.py:900
-#: modules/websession/lib/websession_webinterface.py:911
+#: modules/websession/lib/websession_webinterface.py:418
+#: modules/websession/lib/websession_webinterface.py:424
+#: modules/websession/lib/websession_webinterface.py:437
+#: modules/websession/lib/websession_webinterface.py:459
+#: modules/websession/lib/websession_webinterface.py:465
+#: modules/websession/lib/websession_webinterface.py:902
+#: modules/websession/lib/websession_webinterface.py:907
+#: modules/websession/lib/websession_webinterface.py:912
+#: modules/websession/lib/websession_webinterface.py:923
 msgid "Please try again."
 msgstr "Torneu-ho a provar."
 
-#: modules/websession/lib/websession_webinterface.py:408
-#: modules/websession/lib/websession_webinterface.py:414
-#: modules/websession/lib/websession_webinterface.py:421
-#: modules/websession/lib/websession_webinterface.py:427
-#: modules/websession/lib/websession_webinterface.py:449
-#: modules/websession/lib/websession_webinterface.py:455
-#: modules/websession/lib/websession_webinterface.py:502
+#: modules/websession/lib/websession_webinterface.py:420
+#: modules/websession/lib/websession_webinterface.py:426
+#: modules/websession/lib/websession_webinterface.py:433
+#: modules/websession/lib/websession_webinterface.py:439
+#: modules/websession/lib/websession_webinterface.py:461
+#: modules/websession/lib/websession_webinterface.py:467
+#: modules/websession/lib/websession_webinterface.py:514
 msgid "Edit settings"
 msgstr "Edita els paràmetres"
 
 # Fallida?  Impossible editar...
-#: modules/websession/lib/websession_webinterface.py:409
-#: modules/websession/lib/websession_webinterface.py:415
-#: modules/websession/lib/websession_webinterface.py:422
-#: modules/websession/lib/websession_webinterface.py:428
-#: modules/websession/lib/websession_webinterface.py:504
+#: modules/websession/lib/websession_webinterface.py:421
+#: modules/websession/lib/websession_webinterface.py:427
+#: modules/websession/lib/websession_webinterface.py:434
+#: modules/websession/lib/websession_webinterface.py:440
+#: modules/websession/lib/websession_webinterface.py:516
 msgid "Editing settings failed"
 msgstr "L'edició dels paràmetres ha fallat"
 
-#: modules/websession/lib/websession_webinterface.py:411
-#: modules/websession/lib/websession_webinterface.py:894
+#: modules/websession/lib/websession_webinterface.py:423
+#: modules/websession/lib/websession_webinterface.py:906
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "L'adreça de correu electrònic %s no és vàlida."
 
-#: modules/websession/lib/websession_webinterface.py:417
-#: modules/websession/lib/websession_webinterface.py:904
+#: modules/websession/lib/websession_webinterface.py:429
+#: modules/websession/lib/websession_webinterface.py:916
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr ""
 "L'adreça de correu electrònic %s que heu entrat ja existeix a la base de "
 "dades."
 
-#: modules/websession/lib/websession_webinterface.py:419
-#: modules/websession/lib/websession_webinterface.py:906
+#: modules/websession/lib/websession_webinterface.py:431
+#: modules/websession/lib/websession_webinterface.py:918
 msgid "Or please try again."
 msgstr "O proveu-ho de nou."
 
-#: modules/websession/lib/websession_webinterface.py:424
+#: modules/websession/lib/websession_webinterface.py:436
 #, python-format
 msgid "Desired nickname %s is already in use."
 msgstr "L'àlies %s ja està en ús."
 
-#: modules/websession/lib/websession_webinterface.py:433
+#: modules/websession/lib/websession_webinterface.py:445
 msgid "Users cannot edit passwords on this site."
 msgstr "En aquest lloc, els usuaris no poden editar les seves contrasenyes."
 
-#: modules/websession/lib/websession_webinterface.py:441
+#: modules/websession/lib/websession_webinterface.py:453
 msgid "Password successfully edited."
 msgstr "S'ha editat la contrasenya correctament."
 
-#: modules/websession/lib/websession_webinterface.py:444
+#: modules/websession/lib/websession_webinterface.py:456
 msgid "Password edited"
 msgstr "Contrasenya modificada"
 
-#: modules/websession/lib/websession_webinterface.py:446
-#: modules/websession/lib/websession_webinterface.py:889
+#: modules/websession/lib/websession_webinterface.py:458
+#: modules/websession/lib/websession_webinterface.py:901
 msgid "Both passwords must match."
 msgstr "Les dues contrasenyes han de coincidir."
 
-#: modules/websession/lib/websession_webinterface.py:450
-#: modules/websession/lib/websession_webinterface.py:456
+#: modules/websession/lib/websession_webinterface.py:462
+#: modules/websession/lib/websession_webinterface.py:468
 msgid "Editing password failed"
 msgstr "El canvi de la contrasenya ha fallat"
 
-#: modules/websession/lib/websession_webinterface.py:452
+#: modules/websession/lib/websession_webinterface.py:464
 msgid "Wrong old password inserted."
 msgstr "Anterior contrassenya incorrecta."
 
-#: modules/websession/lib/websession_webinterface.py:468
-#: modules/websession/lib/websession_webinterface.py:481
-#: modules/websession/lib/websession_webinterface.py:495
+#: modules/websession/lib/websession_webinterface.py:480
+#: modules/websession/lib/websession_webinterface.py:493
+#: modules/websession/lib/websession_webinterface.py:507
 msgid "User settings saved correctly."
 msgstr "S'han guardat correctament els paràmetres d'usuario."
 
-#: modules/websession/lib/websession_webinterface.py:488
+#: modules/websession/lib/websession_webinterface.py:500
 msgid "Editing bibcatalog authorization failed"
 msgstr "Ha fallat l'edició de l'autorització de bibcatalog"
 
-#: modules/websession/lib/websession_webinterface.py:489
+#: modules/websession/lib/websession_webinterface.py:501
 msgid "Empty username or password"
 msgstr "La identificació o la contrasenya estan buits"
 
-#: modules/websession/lib/websession_webinterface.py:498
+#: modules/websession/lib/websession_webinterface.py:510
 msgid "Unable to update settings."
 msgstr "No s'ha pogut actualitzar els paràmetres."
 
-#: modules/websession/lib/websession_webinterface.py:559
+#: modules/websession/lib/websession_webinterface.py:571
 msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
@@ -6983,16 +6996,16 @@ msgstr ""
 "No es pot enviar la petició de reinicialització de la contrasenya ja que "
 "esteu usant un sistema de autenticació extern."
 
-#: modules/websession/lib/websession_webinterface.py:575
+#: modules/websession/lib/websession_webinterface.py:587
 msgid "The entered email address does not exist in the database."
 msgstr ""
 "L'adreça de correu electrònic que heu entrat no existeix a la base de dades"
 
-#: modules/websession/lib/websession_webinterface.py:589
+#: modules/websession/lib/websession_webinterface.py:601
 msgid "Password reset request for"
 msgstr "Petició de reiniciar la contrasenya de"
 
-#: modules/websession/lib/websession_webinterface.py:593
+#: modules/websession/lib/websession_webinterface.py:605
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
@@ -7000,48 +7013,48 @@ msgstr ""
 "L'adreça de correu electrònic que heu entrat és incorrecte.  Comproveu si us "
 "plau que estigui escrita correctament (ex., Set.Ciencies@exemple.cat)."
 
-#: modules/websession/lib/websession_webinterface.py:594
+#: modules/websession/lib/websession_webinterface.py:606
 msgid "Incorrect email address"
 msgstr "Adreça de correu electrònic incorrecte"
 
-#: modules/websession/lib/websession_webinterface.py:604
+#: modules/websession/lib/websession_webinterface.py:616
 msgid "Reset password link sent"
 msgstr "S'ha enviat l'enllaç per a reiniciar la contrasenya"
 
-#: modules/websession/lib/websession_webinterface.py:649
+#: modules/websession/lib/websession_webinterface.py:661
 msgid "Delete Account"
 msgstr "Suprimeix compte"
 
-#: modules/websession/lib/websession_webinterface.py:675
+#: modules/websession/lib/websession_webinterface.py:687
 msgid "Logout"
 msgstr "Sortir"
 
 # Repassar. Softcatala en diu 'entrada'
-#: modules/websession/lib/websession_webinterface.py:741
-#: modules/websession/lib/websession_webinterface.py:790
-#: modules/websession/lib/websession_webinterface.py:825
+#: modules/websession/lib/websession_webinterface.py:753
+#: modules/websession/lib/websession_webinterface.py:802
+#: modules/websession/lib/websession_webinterface.py:837
 msgid "Login"
 msgstr "Identificació"
 
-#: modules/websession/lib/websession_webinterface.py:856
+#: modules/websession/lib/websession_webinterface.py:868
 msgid "Register"
 msgstr "Donar-se d'alta"
 
-#: modules/websession/lib/websession_webinterface.py:859
-#: modules/websession/lib/websession_webinterface.py:931
+#: modules/websession/lib/websession_webinterface.py:871
+#: modules/websession/lib/websession_webinterface.py:943
 #, python-format
 msgid "%s  Personalize, Main page"
 msgstr "%s  Personalitzar, pàgina inicial"
 
-#: modules/websession/lib/websession_webinterface.py:876
+#: modules/websession/lib/websession_webinterface.py:888
 msgid "Your account has been successfully created."
 msgstr "El vostre compte ha estat creat correctament."
 
-#: modules/websession/lib/websession_webinterface.py:877
+#: modules/websession/lib/websession_webinterface.py:889
 msgid "Account created"
 msgstr "Compte creat"
 
-#: modules/websession/lib/websession_webinterface.py:879
+#: modules/websession/lib/websession_webinterface.py:891
 msgid ""
 "In order to confirm its validity, an email message containing an account "
 "activation key has been sent to the given email address."
@@ -7049,14 +7062,14 @@ msgstr ""
 "Per a confirmar la seva validesa, s'ha enviat un missatge a aquesta adreça "
 "que té una clau d'activació del compte."
 
-#: modules/websession/lib/websession_webinterface.py:880
+#: modules/websession/lib/websession_webinterface.py:892
 msgid ""
 "Please follow instructions presented there in order to complete the account "
 "registration process."
 msgstr ""
 "Seguiu les instruccions indicades per completar el procés d'alta del compte."
 
-#: modules/websession/lib/websession_webinterface.py:882
+#: modules/websession/lib/websession_webinterface.py:894
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -7064,41 +7077,41 @@ msgstr ""
 "S'us enviarà un segon correu electrònic quan el compte s'hagi activat i el "
 "pugueu usar."
 
-#: modules/websession/lib/websession_webinterface.py:885
+#: modules/websession/lib/websession_webinterface.py:897
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
 msgstr "Ja podeu accedir al vostre %(x_url_open)scompte%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:892
-#: modules/websession/lib/websession_webinterface.py:897
-#: modules/websession/lib/websession_webinterface.py:902
-#: modules/websession/lib/websession_webinterface.py:908
-#: modules/websession/lib/websession_webinterface.py:913
-#: modules/websession/lib/websession_webinterface.py:917
-#: modules/websession/lib/websession_webinterface.py:921
-#: modules/websession/lib/websession_webinterface.py:926
+#: modules/websession/lib/websession_webinterface.py:904
+#: modules/websession/lib/websession_webinterface.py:909
+#: modules/websession/lib/websession_webinterface.py:914
+#: modules/websession/lib/websession_webinterface.py:920
+#: modules/websession/lib/websession_webinterface.py:925
+#: modules/websession/lib/websession_webinterface.py:929
+#: modules/websession/lib/websession_webinterface.py:933
+#: modules/websession/lib/websession_webinterface.py:938
 msgid "Registration failure"
 msgstr "Ha fallat l'alta"
 
-#: modules/websession/lib/websession_webinterface.py:910
+#: modules/websession/lib/websession_webinterface.py:922
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "L'àlies sol·licitat %s ja existeix a la base de dades."
 
-#: modules/websession/lib/websession_webinterface.py:915
+#: modules/websession/lib/websession_webinterface.py:927
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
 "Els usuaris no poden donar-se d'alta ells mateixos; només ho pot fer "
 "l'administrador."
 
-#: modules/websession/lib/websession_webinterface.py:919
+#: modules/websession/lib/websession_webinterface.py:931
 msgid ""
 "The site is having troubles in sending you an email for confirming your "
 "email address."
 msgstr ""
 "Tenim problemes per enviar-vos un correu per confirmar la vostra adreça."
 
-#: modules/websession/lib/websession_webinterface.py:919
+#: modules/websession/lib/websession_webinterface.py:931
 #: modules/websubmit/lib/websubmit_webinterface.py:141
 msgid ""
 "The error has been logged and will be taken in consideration as soon as "
@@ -7107,32 +7120,32 @@ msgstr ""
 "L'error ha estat annotat i el tindrem en compte de seguida que sigui "
 "possible."
 
-#: modules/websession/lib/websession_webinterface.py:966
+#: modules/websession/lib/websession_webinterface.py:978
 msgid "Your tickets"
 msgstr "Les vostres tasques"
 
-#: modules/websession/lib/websession_webinterface.py:1002
-#: modules/websession/lib/websession_webinterface.py:1047
-#: modules/websession/lib/websession_webinterface.py:1108
-#: modules/websession/lib/websession_webinterface.py:1172
-#: modules/websession/lib/websession_webinterface.py:1231
-#: modules/websession/lib/websession_webinterface.py:1304
+#: modules/websession/lib/websession_webinterface.py:1014
+#: modules/websession/lib/websession_webinterface.py:1059
+#: modules/websession/lib/websession_webinterface.py:1120
+#: modules/websession/lib/websession_webinterface.py:1184
+#: modules/websession/lib/websession_webinterface.py:1243
+#: modules/websession/lib/websession_webinterface.py:1316
 msgid "You are not authorized to use groups."
 msgstr "No esteu autoritzats a usar grups."
 
-#: modules/websession/lib/websession_webinterface.py:1133
+#: modules/websession/lib/websession_webinterface.py:1145
 msgid "Join New Group"
 msgstr "Unir-se a un nou grup"
 
-#: modules/websession/lib/websession_webinterface.py:1187
+#: modules/websession/lib/websession_webinterface.py:1199
 msgid "Leave Group"
 msgstr "Sortir del grup"
 
-#: modules/websession/lib/websession_webinterface.py:1259
+#: modules/websession/lib/websession_webinterface.py:1271
 msgid "Edit Group"
 msgstr "Editar el grup"
 
-#: modules/websession/lib/websession_webinterface.py:1333
+#: modules/websession/lib/websession_webinterface.py:1345
 msgid "Edit group members"
 msgstr "Editar els membres del grup"
 
@@ -7383,7 +7396,7 @@ msgid "Upload"
 msgstr "Penjar"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:859
-#: modules/websubmit/lib/websubmit_webinterface.py:464
+#: modules/websubmit/lib/websubmit_webinterface.py:440
 #: modules/bibedit/lib/bibeditmulti_templates.py:305
 msgid "Apply changes"
 msgstr "Desar els canvis"
@@ -7562,7 +7575,7 @@ msgstr ""
 "L'acció que heu escollit no està suportada per a aquest tipus de document."
 
 #: modules/websubmit/lib/websubmit_engine.py:1749
-#: modules/websubmit/lib/websubmit_webinterface.py:1143
+#: modules/websubmit/lib/websubmit_webinterface.py:1119
 #: modules/websubmit/web/approve.py:81
 msgid "Warning"
 msgstr "Atenció"
@@ -8268,29 +8281,29 @@ msgid "Edit record"
 msgstr "Editeu el registre"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:418
-#: modules/websubmit/lib/websubmit_webinterface.py:473
+#: modules/websubmit/lib/websubmit_webinterface.py:449
 msgid "Document File Manager"
 msgstr "Gestió de fitxers del document"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:419
-#: modules/websubmit/lib/websubmit_webinterface.py:473
+#: modules/websubmit/lib/websubmit_webinterface.py:449
 #, python-format
 msgid "Record #%i"
 msgstr "Registre #%i"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:465
+#: modules/websubmit/lib/websubmit_webinterface.py:441
 msgid "Cancel all changes"
 msgstr "Cancel·lar tots els canvis"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:937
+#: modules/websubmit/lib/websubmit_webinterface.py:913
 msgid "Sorry, 'sub' parameter missing..."
 msgstr "Falta el paràmetre «sub»..."
 
-#: modules/websubmit/lib/websubmit_webinterface.py:940
+#: modules/websubmit/lib/websubmit_webinterface.py:916
 msgid "Sorry. Cannot analyse parameter"
 msgstr "No s'ha pogut analitzar el paràmetre"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:1001
+#: modules/websubmit/lib/websubmit_webinterface.py:977
 msgid "Sorry, invalid URL..."
 msgstr "URL no válido..."
 
