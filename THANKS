@@ -99,14 +99,24 @@ contributed to the project:
   - Genis Musulmanbekov <genis@jinr.ru>
     Contributions to the Russian translation.
 
- - Andrey Tremba <metandrey@gmail.com>
-   Contributions to the Russian translation.
+  - Andrey Tremba <metandrey@gmail.com>
+    Contributions to the Russian translation.
 
- - Cornelia Plott <c.plott@fz-juelich.de>
-   Contributions to the German translation.
+  - Cornelia Plott <c.plott@fz-juelich.de>
+    Contributions to the German translation.
 
- - Johnny Mariéthoz <johnny.mariethoz@rero.ch>
-   Patch to improve BibRecDocs argument checking.
+  - Johnny Mariéthoz <johnny.mariethoz@rero.ch>
+    Patch to improve BibRecDocs argument checking.
+
+  - Alexander Wagner <a.wagner@fz-juelich.de>
+    Contributions to the German translation.
+
+  - Miguel Martín <miguelm@unizar.es>
+    Patch to fix traceback in get_collection_reclist() occurring for
+    misspelled collection names in access control rules.
+
+  - Stefan Hesselbach <s.hesselbach@gsi.de>
+    Patch for OAI harvesting via HTTP proxy.
 
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
