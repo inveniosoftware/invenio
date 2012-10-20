@@ -337,7 +337,7 @@ def calculate_hosted_collections_results(req, pattern_list, field, hosted_collec
     if not hosted_collections: return (None, None)
 
     vprint = get_verbose_print(req, 'Hosted collections: ', verbosity_level)
-    vprint(3, 'pattern_list = %s, field = %s' % (cgi.escape(pattern_list), cgi.escape(field)))
+    vprint(3, 'pattern_list = %s, field = %s' % (cgi.escape(repr(pattern_list)), cgi.escape(field)))
 
     # firstly we calculate the search parameters, i.e. the actual hosted search engines and the basic search units
     (hosted_search_engines, basic_search_units) = \
