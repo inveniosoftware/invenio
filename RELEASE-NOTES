@@ -76,25 +76,25 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from Invenio v1.0.1, then:
+If you are upgrading from Invenio v1.0.x, then:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.2.tar.gz
-     $ cd invenio-1.0.2
+     $ tar xvfz invenio-1.1.0.tar.gz
+     $ cd invenio-1.1.0
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
-     $ make check-custom-templates
-     $ make update-v1.0.1-tables
+     $ make check-upgrade
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
                   --exclude bibformat/format_templates/Default_HTML_brief.bft \
                   /opt/invenio/etc/
      FIXME: add note about need to run bibdocfile --fix-bibdocfsinfo-cache
+     $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade
 
  c) Restart your Apache server and your bibsched queue.
 

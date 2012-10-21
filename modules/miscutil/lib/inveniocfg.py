@@ -57,6 +57,14 @@ Options to update DB tables:
    --reset-fieldnames       reset tables to take account of new I18N names from PO files
    --reset-recstruct-cache  reset record structure cache according to CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE
 
+Options to upgrade your installation:
+    --upgrade                       apply all pending upgrades
+    --upgrade-check                 run pre-upgrade checks for all pending upgrades
+    --upgrade-show-pending          show pending upgrades ready to be applied
+    --upgrade-show-applied          show history of applied upgrades
+    --upgrade-create-standard-recipe create a new upgrade recipe (for developers)
+    --upgrade-create-release-recipe create a new release upgrade recipe (for developers)
+
 Options to help the work:
    --list                   print names and values of all options from conf files
    --get <some-opt>         get value of a given option from conf files
@@ -67,19 +75,30 @@ Options to help the work:
 __revision__ = "$Id$"
 
 from ConfigParser import ConfigParser
+from optparse import OptionParser, OptionGroup, IndentedHelpFormatter, Option, \
+    OptionError
 import os
 import re
 import shutil
 import socket
 import sys
 
+
 def print_usage():
     """Print help."""
     print __doc__
 
+
+def get_version():
+    """ Get running version of Invenio """
+    from invenio.config import CFG_VERSION
+    return CFG_VERSION
+
+
 def print_version():
     """Print version information."""
-    print __revision__
+    print get_version()
+
 
 def convert_conf_option(option_name, option_value):
     """
@@ -1163,14 +1182,23 @@ def cli_cmd_get(conf, varname):
     third-party programs to access values of conf options such as
     CFG_PREFIX.  Return None if VARNAME is not found.
     """
-    # do not pay attention to upper/lower case:
-    varname = varname.lower()
-    # do not pay attention to section names yet:
-    all_options = {}
-    for section in conf.sections():
-        for option in conf.options(section):
-            all_options[option] = conf.get(section, option)
-    return  all_options.get(varname, None)
+    try:
+        if not varname:
+            raise Exception("ERROR: Please specify a configuration variable.")
+        varname = varname.lower()
+        # do not pay attention to section names yet:
+        all_options = {}
+        for section in conf.sections():
+            for option in conf.options(section):
+                all_options[option] = conf.get(section, option)
+        varvalue = all_options.get(varname, None)
+        if varvalue is None:
+            raise Exception()
+        print varvalue
+    except Exception, e:
+        if e.message:
+            print e.message
+        sys.exit(1)
 
 def cli_cmd_list(conf):
     """
@@ -1254,150 +1282,298 @@ def cli_cmd_detect_system_details(conf):
         print "* ERROR: cannot import dbquery"
     print ">>> System details detected successfully."
 
-def main():
-    """Main entry point."""
+
+def cli_cmd_upgrade(conf):
+    """
+    Command for applying upgrades
+    """
+    from invenio.inveniocfg_upgrader import cmd_upgrade
+    cmd_upgrade(conf)
+
+def cli_cmd_upgrade_check(conf):
+    """
+    Command for running pre-upgrade checks
+    """
+    from invenio.inveniocfg_upgrader import cmd_upgrade_check
+    cmd_upgrade_check(conf)
+
+
+def cli_cmd_upgrade_show_pending(conf):
+    """
+    Command for showing upgrades ready to be applied
+    """
+    from invenio.inveniocfg_upgrader import cmd_upgrade_show_pending
+    cmd_upgrade_show_pending(conf)
+
+
+def cli_cmd_upgrade_show_applied(conf):
+    """
+    Command for showing all upgrades already applied.
+    """
+    from invenio.inveniocfg_upgrader import cmd_upgrade_show_applied
+    cmd_upgrade_show_applied(conf)
+
+
+def cli_cmd_upgrade_create_release_recipe(conf, path):
+    """
+    Create a new release upgrade recipe (for developers).
+    """
+    from invenio.inveniocfg_upgrader import cmd_upgrade_create_release_recipe
+    cmd_upgrade_create_release_recipe(conf, path)
+
+
+def cli_cmd_upgrade_create_standard_recipe(conf, path, depends_on=None,
+                                          release=False):
+    """
+    Create a new upgrade recipe (for developers).
+    """
+    from invenio.inveniocfg_upgrader import cmd_upgrade_create_standard_recipe
+    cmd_upgrade_create_standard_recipe(conf, path, depends_on=depends_on,
+                                       release=release)
+
+
+def prepare_option_parser():
+    """Parse the command line options."""
+
+    class InvenioOption(Option):
+        """
+        Option class that implements the action 'store_append_const' which will
+
+        1) append <const> to list in options.<dest>
+        2) take a value and store in options.<const>
+
+        Useful for e.g. appending a const to an actions list, while also taking
+        an option value and storing it.
+
+        This ensures that we can run actions in the order they are given on the
+        command-line.
+
+        Python 2.4 compatibility note: *append_const* action is not available in
+        Python 2.4, so it is implemented here, together with the new action
+        *store_append_const*.
+        """
+        ACTIONS = Option.ACTIONS + ("store_append_const", "append_const")
+        STORE_ACTIONS = Option.STORE_ACTIONS + ("store_append_const", "append_const")
+        TYPED_ACTIONS = Option.TYPED_ACTIONS + ("store_append_const", )
+        ALWAYS_TYPED_ACTIONS = Option.ALWAYS_TYPED_ACTIONS + ("store_append_const", )
+        CONST_ACTIONS = getattr(Option, 'CONST_ACTIONS', ()) + ("store_append_const", "append_const")
+
+        def take_action(self, action, dest, opt, value, values, parser):
+            if action == "store_append_const":
+                # Combination of 'store' and 'append_const' actions
+                values.ensure_value(dest, []).append(self.const)
+                value_dest = self.const.replace('-', '_')
+                setattr(values, value_dest, value)
+            elif action == "append_const" and not hasattr(Option, 'CONST_ACTIONS'):
+                values.ensure_value(dest, []).append(self.const)
+            else:
+                Option.take_action(self, action, dest, opt, value, values, parser)
+
+        def _check_const(self):
+            if self.action not in self.CONST_ACTIONS and self.const is not None:
+                raise OptionError(
+                    "'const' must not be supplied for action %r" % self.action,
+                    self)
+
+        CHECK_METHODS = [
+            Option._check_action,
+            Option._check_type,
+            Option._check_choice,
+            Option._check_dest,
+            _check_const,
+            Option._check_nargs,
+            Option._check_callback,
+        ]
+
+    parser = OptionParser(option_class=InvenioOption, description="Invenio configuration and administration CLI tool", formatter=IndentedHelpFormatter(max_help_position=31))
+
+    parser.add_option("-V", "--version", action="store_true", help="print version number")
+
+    finish_options = OptionGroup(parser, "Options to finish your installation")
+    finish_options.add_option("", "--create-apache-conf", dest='actions', const='create-apache-conf', action="append_const", help="create Apache configuration files")
+    finish_options.add_option("", "--create-tables", dest='actions', const='create-tables', action="append_const", help="create DB tables for Invenio")
+    finish_options.add_option("", "--load-webstat-conf", dest='actions', const='load-webstat-conf', action="append_const", help="load the WebStat configuration")
+    finish_options.add_option("", "--drop-tables", dest='actions', const='drop-tables', action="append_const", help="drop DB tables of Invenio")
+    finish_options.add_option("", "--check-openoffice", dest='actions', const='check-openoffice', action="append_const", help="check for correctly set up of openoffice temporary directory")
+    parser.add_option_group(finish_options)
+
+    demotest_options = OptionGroup(parser, "Options to set up and test a demo site")
+    demotest_options.add_option("", "--create-demo-site", dest='actions', const='create-demo-site', action="append_const", help="create demo site")
+    demotest_options.add_option("", "--load-demo-records", dest='actions', const='load-demo-records', action="append_const", help="load demo records")
+    demotest_options.add_option("", "--remove-demo-records", dest='actions', const='remove-demo-records', action="append_const", help="remove demo records, keeping demo site")
+    demotest_options.add_option("", "--drop-demo-site", dest='actions', const='drop-demo-site', action="append_const", help="drop demo site configurations too")
+    demotest_options.add_option("", "--run-unit-tests", dest='actions', const='run-unit-tests', action="append_const", help="run unit test suite (needs demo site)")
+    demotest_options.add_option("", "--run-regression-tests", dest='actions', const='run-regression-tests', action="append_const", help="run regression test suite (needs demo site)")
+    demotest_options.add_option("", "--run-web-tests", dest='actions', const='run-web-tests', action="append_const", help="run web tests in a browser (needs demo site, Firefox, Selenium IDE)")
+    parser.add_option_group(demotest_options)
+
+    config_options = OptionGroup(parser, "Options to update config files in situ")
+    config_options.add_option("", "--update-all", dest='actions', const='update-all', action="append_const", help="perform all the update options")
+    config_options.add_option("", "--update-config-py", dest='actions', const='update-config-py', action="append_const", help="update config.py file from invenio.conf file")
+    config_options.add_option("", "--update-dbquery-py", dest='actions', const='update-dbquery-py', action="append_const", help="update dbquery.py with DB credentials from invenio.conf")
+    config_options.add_option("", "--update-dbexec", dest='actions', const='update-dbexec', action="append_const", help="update dbexec with DB credentials from invenio.conf")
+    config_options.add_option("", "--update-bibconvert-tpl", dest='actions', const='update-bibconvert-tpl', action="append_const", help="update bibconvert templates with CFG_SITE_URL from invenio.conf")
+    config_options.add_option("", "--update-web-tests", dest='actions', const='update-web-tests', action="append_const", help="update web test cases with CFG_SITE_URL from invenio.conf")
+    parser.add_option_group(config_options)
+
+    reset_options = OptionGroup(parser, "Options to update DB tables")
+    reset_options.add_option("", "--reset-all", dest='actions', const='reset-all', action="append_const", help="perform all the reset options")
+    reset_options.add_option("", "--reset-sitename", dest='actions', const='reset-sitename', action="append_const", help="reset tables to take account of new CFG_SITE_NAME*")
+    reset_options.add_option("", "--reset-siteadminemail", dest='actions', const='reset-siteadminemail', action="append_const", help="reset tables to take account of new CFG_SITE_ADMIN_EMAIL")
+    reset_options.add_option("", "--reset-fieldnames", dest='actions', const='reset-fieldnames', action="append_const", help="reset tables to take account of new I18N names from PO files")
+    reset_options.add_option("", "--reset-recstruct-cache", dest='actions', const='reset-recstruct-cache', action="append_const", help="reset record structure cache according to CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
+    parser.add_option_group(reset_options)
+
+    upgrade_options = OptionGroup(parser, "Options to upgrade your installation")
+    upgrade_options.add_option("", "--upgrade", dest='actions', const='upgrade', action="append_const", help="apply all pending upgrades")
+    upgrade_options.add_option("", "--upgrade-check", dest='actions', const='upgrade-check', action="append_const", help="run pre-upgrade checks for pending upgrades")
+    upgrade_options.add_option("", "--upgrade-show-pending", dest='actions', const='upgrade-show-pending', action="append_const", help="show pending upgrades")
+    upgrade_options.add_option("", "--upgrade-show-applied", dest='actions', const='upgrade-show-applied', action="append_const", help="show history of applied upgrades")
+    upgrade_options.add_option("", "--upgrade-create-standard-recipe", dest='actions', metavar='REPOSITORY[,DIR]', const='upgrade-create-standard-recipe', action="store_append_const", help="create a new standard upgrade recipe (for developers)")
+    upgrade_options.add_option("", "--upgrade-create-release-recipe", dest='actions', metavar='REPOSITORY[,DIR]', const='upgrade-create-release-recipe', action="store_append_const", help="create a new release upgrade recipe (for developers)")
+    parser.add_option_group(upgrade_options)
+
+    helper_options = OptionGroup(parser, "Options to help the work")
+    helper_options.add_option("", "--list", dest='actions', const='list', action="append_const", help="print names and values of all options from conf files")
+    helper_options.add_option("", "--get", dest='actions', const='get', action="store_append_const", metavar="OPTION", help="get value of a given option from conf files")
+    helper_options.add_option("", "--conf-dir", action="store", metavar="PATH", help="path to directory where invenio*.conf files are [optional]")
+    helper_options.add_option("", "--detect-system-details", dest='actions', const='detect-system-details', action="append_const", help="print system details such as Apache/Python/MySQL versions")
+    parser.add_option_group(helper_options)
+
+    parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know', help='use with care!')
+
+    return parser
+
+
+def prepare_conf(options):
+    """ Read configuration files """
     conf = ConfigParser()
-    if '--help' in sys.argv or \
-       '-h' in sys.argv:
-        print_usage()
-    elif '--version' in sys.argv or \
-         '-V' in sys.argv:
+    confdir = getattr(options, 'conf_dir', None)
+
+    if confdir is None:
+        ## try to detect path to conf dir (relative to this bin dir):
+        confdir = re.sub(r'/bin$', '/etc', sys.path[0])
+
+    if confdir and not os.path.exists(confdir):
+        raise Exception("ERROR: bad --conf-dir option value - directory does not exists.")
+        sys.exit(1)
+
+    ## read conf files:
+    for conffile in [confdir + os.sep + 'invenio.conf',
+                     confdir + os.sep + 'invenio-autotools.conf',
+                     confdir + os.sep + 'invenio-local.conf', ]:
+
+        if os.path.exists(conffile):
+            conf.read(conffile)
+        else:
+            if not conffile.endswith("invenio-local.conf"):
+                # invenio-local.conf is optional, otherwise stop
+                raise Exception("ERROR: Badly guessed conf file location %s (Please use --conf-dir option.)" % conffile)
+    return conf
+
+
+def main(*cmd_args):
+    """Main entry point."""
+    # Allow easier testing
+    if not cmd_args:
+        cmd_args = sys.argv[1:]
+
+    # Parse arguments
+    parser = prepare_option_parser()
+    (options, dummy_args) = parser.parse_args(list(cmd_args))
+
+    if getattr(options, 'version', False):
         print_version()
     else:
-        confdir = None
-        if '--conf-dir' in sys.argv:
-            try:
-                confdir = sys.argv[sys.argv.index('--conf-dir') + 1]
-            except IndexError:
-                pass # missing --conf-dir argument value
-            if not os.path.exists(confdir):
-                print "ERROR: bad or missing --conf-dir option value."
-                sys.exit(1)
-        else:
-            ## try to detect path to conf dir (relative to this bin dir):
-            confdir = re.sub(r'/bin$', '/etc', sys.path[0])
-        ## read conf files:
-        for conffile in [confdir + os.sep + 'invenio.conf',
-                         confdir + os.sep + 'invenio-autotools.conf',
-                         confdir + os.sep + 'invenio-local.conf',]:
-            if os.path.exists(conffile):
-                conf.read(conffile)
-            else:
-                if not conffile.endswith("invenio-local.conf"):
-                    # invenio-local.conf is optional, otherwise stop
-                    print "ERROR: Badly guessed conf file location", conffile
-                    print "(Please use --conf-dir option.)"
-                    sys.exit(1)
-        ## decide what to do:
-        done = False
-        for opt_idx in range(0, len(sys.argv)):
-            opt = sys.argv[opt_idx]
-            if opt == '--conf-dir':
-                # already treated before, so skip silently:
-                pass
-            elif opt == '--get':
-                try:
-                    varname = sys.argv[opt_idx + 1]
-                except IndexError:
-                    print "ERROR: bad or missing --get option value."
-                    sys.exit(1)
-                if varname.startswith('-'):
-                    print "ERROR: bad or missing --get option value."
-                    sys.exit(1)
-                varvalue = cli_cmd_get(conf, varname)
-                if varvalue is not None:
-                    print varvalue
-                else:
-                    sys.exit(1)
-                done = True
-            elif opt == '--list':
-                cli_cmd_list(conf)
-                done = True
-            elif opt == '--detect-system-details':
-                cli_cmd_detect_system_details(conf)
-                done = True
-            elif opt == '--create-tables':
-                cli_cmd_create_tables(conf)
-                done = True
-            elif opt == '--load-webstat-conf':
-                cli_cmd_load_webstat_conf(conf)
-                done = True
-            elif opt == '--drop-tables':
-                cli_cmd_drop_tables(conf)
-                done = True
-            elif opt == '--check-openoffice':
-                cli_check_openoffice(conf)
-                done = True
-            elif opt == '--create-demo-site':
-                cli_cmd_create_demo_site(conf)
-                done = True
-            elif opt == '--load-demo-records':
-                cli_cmd_load_demo_records(conf)
-                done = True
-            elif opt == '--remove-demo-records':
-                cli_cmd_remove_demo_records(conf)
-                done = True
-            elif opt == '--drop-demo-site':
-                cli_cmd_drop_demo_site(conf)
-                done = True
-            elif opt == '--run-unit-tests':
-                cli_cmd_run_unit_tests(conf)
-                done = True
-            elif opt == '--run-regression-tests':
-                cli_cmd_run_regression_tests(conf)
-                done = True
-            elif opt == '--run-web-tests':
-                cli_cmd_run_web_tests(conf)
-                done = True
-            elif opt == '--update-all':
-                cli_cmd_update_config_py(conf)
-                cli_cmd_update_dbquery_py(conf)
-                cli_cmd_update_dbexec(conf)
-                cli_cmd_update_bibconvert_tpl(conf)
-                cli_cmd_update_web_tests(conf)
-                done = True
-            elif opt == '--update-config-py':
-                cli_cmd_update_config_py(conf)
-                done = True
-            elif opt == '--update-dbquery-py':
-                cli_cmd_update_dbquery_py(conf)
-                done = True
-            elif opt == '--update-dbexec':
-                cli_cmd_update_dbexec(conf)
-                done = True
-            elif opt == '--update-bibconvert-tpl':
-                cli_cmd_update_bibconvert_tpl(conf)
-                done = True
-            elif opt == '--update-web-tests':
-                cli_cmd_update_web_tests(conf)
-                done = True
-            elif opt == '--reset-all':
-                cli_cmd_reset_sitename(conf)
-                cli_cmd_reset_siteadminemail(conf)
-                cli_cmd_reset_fieldnames(conf)
-                cli_cmd_reset_recstruct_cache(conf)
-                done = True
-            elif opt == '--reset-sitename':
-                cli_cmd_reset_sitename(conf)
-                done = True
-            elif opt == '--reset-siteadminemail':
-                cli_cmd_reset_siteadminemail(conf)
-                done = True
-            elif opt == '--reset-fieldnames':
-                cli_cmd_reset_fieldnames(conf)
-                done = True
-            elif opt == '--reset-recstruct-cache':
-                cli_cmd_reset_recstruct_cache(conf)
-                done = True
-            elif opt == '--create-apache-conf':
-                cli_cmd_create_apache_conf(conf)
-                done = True
-            elif opt.startswith("-") and opt != '--yes-i-know':
-                print "ERROR: unknown option", opt
-                sys.exit(1)
-        if not done:
+        # Read configuration
+        try:
+            conf = prepare_conf(options)
+        except Exception, e:
+            print e
+            sys.exit(1)
+
+        ## Decide what to do
+        actions = getattr(options, 'actions', None)
+
+        if not actions:
             print """ERROR: Please specify a command.  Please see '--help'."""
             sys.exit(1)
+
+        for action in actions:
+            if action == 'get':
+                cli_cmd_get(conf, getattr(options, 'get', None))
+            elif action == 'list':
+                cli_cmd_list(conf)
+            elif action == 'detect-system-details':
+                cli_cmd_detect_system_details(conf)
+            elif action == 'create-tables':
+                cli_cmd_create_tables(conf)
+            elif action == 'load-webstat-conf':
+                cli_cmd_load_webstat_conf(conf)
+            elif action == 'drop-tables':
+                cli_cmd_drop_tables(conf)
+            elif action == 'check-openoffice':
+                cli_check_openoffice(conf)
+            elif action == 'create-demo-site':
+                cli_cmd_create_demo_site(conf)
+            elif action == 'load-demo-records':
+                cli_cmd_load_demo_records(conf)
+            elif action == 'remove-demo-records':
+                cli_cmd_remove_demo_records(conf)
+            elif action == 'drop-demo-site':
+                cli_cmd_drop_demo_site(conf)
+            elif action == 'run-unit-tests':
+                cli_cmd_run_unit_tests(conf)
+            elif action == 'run-regression-tests':
+                cli_cmd_run_regression_tests(conf)
+            elif action == 'run-web-tests':
+                cli_cmd_run_web_tests(conf)
+            elif action == 'update-all':
+                cli_cmd_update_config_py(conf)
+                cli_cmd_update_dbquery_py(conf)
+                cli_cmd_update_dbexec(conf)
+                cli_cmd_update_bibconvert_tpl(conf)
+                cli_cmd_update_web_tests(conf)
+            elif action == 'update-config-py':
+                cli_cmd_update_config_py(conf)
+            elif action == 'update-dbquery-py':
+                cli_cmd_update_dbquery_py(conf)
+            elif action == 'update-dbexec':
+                cli_cmd_update_dbexec(conf)
+            elif action == 'update-bibconvert-tpl':
+                cli_cmd_update_bibconvert_tpl(conf)
+            elif action == 'update-web-tests':
+                cli_cmd_update_web_tests(conf)
+            elif action == 'reset-all':
+                cli_cmd_reset_sitename(conf)
+                cli_cmd_reset_siteadminemail(conf)
+                cli_cmd_reset_fieldnames(conf)
+                cli_cmd_reset_recstruct_cache(conf)
+            elif action == 'reset-sitename':
+                cli_cmd_reset_sitename(conf)
+            elif action == 'reset-siteadminemail':
+                cli_cmd_reset_siteadminemail(conf)
+            elif action == 'reset-fieldnames':
+                cli_cmd_reset_fieldnames(conf)
+            elif action == 'reset-recstruct-cache':
+                cli_cmd_reset_recstruct_cache(conf)
+            elif action == 'create-apache-conf':
+                cli_cmd_create_apache_conf(conf)
+            elif action == 'upgrade':
+                cli_cmd_upgrade(conf)
+            elif action == 'upgrade-check':
+                cli_cmd_upgrade_check(conf)
+            elif action == 'upgrade-show-pending':
+                cli_cmd_upgrade_show_pending(conf)
+            elif action == 'upgrade-show-applied':
+                cli_cmd_upgrade_show_applied(conf)
+            elif action == 'upgrade-create-standard-recipe':
+                cli_cmd_upgrade_create_standard_recipe(conf, getattr(options, 'upgrade_create_standard_recipe', None))
+            elif action == 'upgrade-create-release-recipe':
+                cli_cmd_upgrade_create_release_recipe(conf, getattr(options, 'upgrade_create_release_recipe', None))
+            else:
+                print "ERROR: Unknown command", action
+                sys.exit(1)
 
 if __name__ == '__main__':
     main()

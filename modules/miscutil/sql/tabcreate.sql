@@ -4186,4 +4186,13 @@ CREATE TABLE IF NOT EXISTS `wapCACHE` (
   INDEX `last_updated-b` (`last_updated`),
   INDEX `status-b` (`object_status`)
 ) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS upgrade (
+  upgrade varchar(255) NOT NULL,
+  applied DATETIME NOT NULL,
+  PRIMARY KEY (upgrade)
+) ENGINE=MyISAM;
+
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
+
 -- end of file
