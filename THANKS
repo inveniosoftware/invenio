@@ -1,7 +1,7 @@
 Invenio THANKS
 ==============
 
-Several people outside the Invenio Development Team
+Several people besides the core Invenio Development Team
 contributed to the project:
 
   - Thierry Thomas <thierry@FreeBSD.org>
@@ -117,6 +117,15 @@ contributed to the project:
 
   - Stefan Hesselbach <s.hesselbach@gsi.de>
     Patch for OAI harvesting via HTTP proxy.
+
+  - Bessem Amira <bessem.amira@cnudst.rnrt.tn>
+    Contributions to the Arabic translation.
+
+  - Kevin M. Flannery <flannery@fnal.gov>
+    Patch for WebSubmit's Move_Photos_to_Storage.
+
+  - Thomas McCauley <thomas.mccauley@cern.ch>
+    Improvements to Invenio Connector.
 
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
