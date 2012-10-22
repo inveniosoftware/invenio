@@ -16,11 +16,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """BibFormat element - Prints server info
 """
-__revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, \
+from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, \
         CFG_SITE_NAME, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL, \
         CFG_SITE_RECORD
+
 
 def format_element(bfo, var=''):
     '''
@@ -38,7 +38,7 @@ def format_element(bfo, var=''):
     '''
     recID = bfo.recID
     if var == '':
-        out =  ''
+        out = ''
     elif var in ['name', 'CFG_SITE_NAME']:
         out = CFG_SITE_NAME
     elif var in ['i18n_name', 'CFG_SITE_NAME_INTL']:
@@ -57,15 +57,28 @@ def format_element(bfo, var=''):
         out = CFG_SITE_URL
         if not out.endswith('/'):
             out += '/'
+    elif var in ['CFG_BASE_URL']:
+        out = CFG_BASE_URL
+        if not out.endswith('/'):
+            out += '/'
     elif var == 'searchurl':
+        out = CFG_BASE_URL + '/search'
+        if not out.endswith('/'):
+            out += '/'
+    elif var == 'absolutesearchurl':
         out = CFG_SITE_URL + '/search'
         if not out.endswith('/'):
             out += '/'
     elif var == 'recurl':
+        out = CFG_BASE_URL
+        if not out.endswith('/'):
+            out += '/'
+        out += CFG_SITE_RECORD + '/' + str(recID)
+    elif var == 'absoluterecurl':
         out = CFG_SITE_URL
         if not out.endswith('/'):
             out += '/'
-        out += CFG_SITE_RECORD +'/' + str(recID)
+        out += CFG_SITE_RECORD + '/' + str(recID)
     else:
         out = 'Unknown variable: %s' % (var)
     return out

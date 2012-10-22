@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import cgi
 from urllib import quote
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_BASE_URL
 
 def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     """
@@ -38,7 +38,7 @@ def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='y
 
     if len(keywords) > 0:
         if link == 'yes':
-            keywords = ['<a href="' + CFG_SITE_URL + '/search?f=keyword&amp;p='+ \
+            keywords = ['<a href="' + CFG_BASE_URL + '/search?f=keyword&amp;p='+ \
                         quote('"' + keyword + '"') + \
                         '&amp;ln='+ bfo.lang+ \
                         '">' + cgi.escape(keyword) + '</a>'

@@ -24,7 +24,7 @@ __revision__ = "$Id: bfe_CERN_plots.py,v 1.3 2009/03/17 10:55:15 jerome Exp $"
 
 from invenio.bibdocfile import BibRecDocs
 from invenio.urlutils import create_html_link
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
+from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
 
 def format_element(bfo, width="", caption="yes", max="-1"):
     """
@@ -63,7 +63,7 @@ def format_element(bfo, width="", caption="yes", max="-1"):
                       (img_location, caption_text, width)
 
                 link = create_html_link(urlbase='%s/%s/%s/plots#%d' %
-                                                (CFG_SITE_URL, CFG_SITE_RECORD, bfo.recID,\
+                                                (CFG_BASE_URL, CFG_SITE_RECORD, bfo.recID,\
                                                  index),
                                         urlargd={},
                                         link_label=img)

@@ -416,7 +416,7 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
 
     Can be used in that way in XSL stylesheet
     (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
-    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
 
     if recID is string, value is converted to int
     if recID is Node, first child node (text node) is taken as value
@@ -459,7 +459,7 @@ def eval_bibformat_4suite(ctx, recID, template_code):
 
     Can be used in that way in XSL stylesheet
     (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
-    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
 
     if recID is string, value is converted to int
     if recID is Node, first child node (text node) is taken as value

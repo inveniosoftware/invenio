@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_BASE_URL
 from invenio.urlutils import create_html_link
 from invenio.access_control_engine import acc_authorize_action
 
@@ -45,7 +45,7 @@ def format_element(bfo, remote_server_id, link_label="Push via Sword"):
     else:
         sword_arguments['status'] = 'select_server'
 
-    return create_html_link(CFG_SITE_URL + '/bibsword',
+    return create_html_link(CFG_BASE_URL + '/bibsword',
                             sword_arguments,
                             link_label)
 

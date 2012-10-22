@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.bibformat_elements.bfe_fulltext import get_files, sort_alphanumerically
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
 from cgi import escape
 
 def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes', show_subformat_icons='no'):
@@ -58,7 +58,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
 
     additional_str = ''
     if additionals:
-        additional_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/'+ CFG_SITE_RECORD +'/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
+        additional_str = separator + '<small>(<a '+style+' href="'+CFG_BASE_URL+'/'+ CFG_SITE_RECORD +'/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
     #if old_versions:
@@ -69,10 +69,10 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         if len(main_urls.keys()) == 1 and len(main_urls.items()[0][1]) == 1 and \
                (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 0 and \
                show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (CFG_SITE_URL, _("Download fulltext"))
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (CFG_BASE_URL, _("Download fulltext"))
 
         elif show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_SITE_URL, _("Download fulltext"))
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_BASE_URL, _("Download fulltext"))
         else:
             file_icon = ''
 
@@ -110,10 +110,10 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         if len(main_urls.keys()) == 0 and \
                len(cern_urls) == 1 and len(others_urls) == 0 and \
                show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (CFG_SITE_URL, _("Download fulltext"))
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (CFG_BASE_URL, _("Download fulltext"))
 
         elif show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_SITE_URL, _("Download fulltext"))
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_BASE_URL, _("Download fulltext"))
         else:
             file_icon = ''
 
@@ -130,9 +130,9 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         if len(main_urls.keys()) == 0 and \
                (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 1 and \
                show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (CFG_SITE_URL, _("Download fulltext"))
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (CFG_BASE_URL, _("Download fulltext"))
         elif show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_SITE_URL, _("Download fulltext"))
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_BASE_URL, _("Download fulltext"))
         else:
             file_icon = ''
         external_link = len(others_urls) == 1 and _('external link') or _('external links')

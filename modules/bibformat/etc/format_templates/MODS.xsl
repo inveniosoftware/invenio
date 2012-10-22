@@ -2427,7 +2427,7 @@ Revision 1.2 - Added Log Comment  2003/03/24 19:37:42  ckeith
     <!-- [ Contributed by RERO  20090304 -->
     <!-- Put in <location><url access="object in context"></url></location> the entire record URL -->
     <location>
-      <url access="object in context"><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" /></url>
+      <url access="object in context"><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" /></url>
     </location>
     <!-- Contributed by RERO ] -->
     <!-- 1.21  tmee-->

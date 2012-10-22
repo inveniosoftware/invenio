@@ -29,18 +29,18 @@ def format_element(bfo, separator='; '):
     @param separator: a separator between citations
     """
     from urllib import quote
-    from invenio.config import CFG_SITE_URL
+    from invenio.config import CFG_BASE_URL
 
     primary_report_numbers = bfo.fields('037__a')
     additional_report_numbers = bfo.fields('088__a')
 
-    primary_citations = ['<a href="' + CFG_SITE_URL + \
+    primary_citations = ['<a href="' + CFG_BASE_URL + \
                          '/search?f=reference&amp;p=' + quote(report_number) + \
                          '&amp;ln='+ bfo.lang +'">' + \
                          cgi.escape(report_number) + '</a>' \
                          for report_number in primary_report_numbers]
 
-    additional_citations = ['<a href="' + CFG_SITE_URL + \
+    additional_citations = ['<a href="' + CFG_BASE_URL + \
                             '/search?f=reference&amp;p=' + quote(report_number)+ \
                             '&amp;ln='+ bfo.lang + '">' + \
                             cgi.escape(report_number) + '</a>' \

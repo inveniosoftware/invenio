@@ -24,7 +24,7 @@
 * Must be done in a collection that holds video records with thumbnails, title and author
 """
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_BASE_URL
 from invenio.bibdocfile import BibRecDocs
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search 
@@ -134,7 +134,7 @@ def get_video_authors(recid):
 def get_video_record_url(recid):
     """ Return the URL of a video record
     """
-    return CFG_SITE_URL + "/record/" + str(recid)
+    return CFG_BASE_URL + "/record/" + str(recid)
 
 def get_video_duration(recid):
     """ Return the duration of a video

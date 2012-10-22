@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.search_engine import get_record
 from invenio.bibrecord import record_get_field, field_get_subfield_values
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_BASE_URL
 
 def format_element(bfo):
     """
@@ -43,7 +43,7 @@ def format_element(bfo):
         except:
             publication_title = ""
 
-        a("<a href=\"%s/record/%s\"><b>%s</b></a>" % (CFG_SITE_URL, str(recid), publication_title))
+        a("<a href=\"%s/record/%s\"><b>%s</b></a>" % (CFG_BASE_URL, str(recid), publication_title))
 
     return "\n".join(results)
 

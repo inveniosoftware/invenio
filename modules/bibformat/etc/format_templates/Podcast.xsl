@@ -68,7 +68,7 @@ exclude-result-prefixes="marc fn">
                 <xsl:value-of select="../../datafield[@tag='245' and @ind1=' ' and @ind2=' ']/subfield[@code='a']" />
         </title>
         <link>
-                <xsl:value-of select="fn:eval_bibformat(../../controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+                <xsl:value-of select="fn:eval_bibformat(../../controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;absoluterecurl&quot;>')" />
         </link>
         <description>
 		<xsl:value-of select="fn:eval_bibformat(../../controlfield[@tag=001],'&lt;BFE_ABSTRACT print_lang=&quot;auto&quot;  separator_en=&quot; &quot;   separator_fr=&quot; &quot;  escape=&quot;4&quot; >')" />

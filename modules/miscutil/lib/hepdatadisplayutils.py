@@ -21,7 +21,7 @@
 
 #symbols replacement dictionary
 
-from invenio.config import CFG_HEPDATA_URL, CFG_HEPDATA_PLOTSIZE, CFG_LOGDIR, CFG_SITE_URL
+from invenio.config import CFG_HEPDATA_URL, CFG_HEPDATA_PLOTSIZE, CFG_LOGDIR, CFG_BASE_URL
 import re
 import urllib2
 import os
@@ -652,7 +652,7 @@ def render_hepdata_dataset_html(dataset, recid, seq, display_link=True):
         link_txt = "Go to the record"
 
     if display_link:
-        c.append("<a href=\"%s/record/%s\">%s</a>" % (CFG_SITE_URL, str(dataset.recid), link_txt))
+        c.append("<a href=\"%s/record/%s\">%s</a>" % (CFG_BASE_URL, str(dataset.recid), link_txt))
     else:
         if record_doi:
             c.append("%s" % link_txt)
@@ -662,9 +662,9 @@ def render_hepdata_dataset_html(dataset, recid, seq, display_link=True):
 
 
     # rendering files links
-    plain_file_url = "%s/record/%s/files/Data.txt" % ( CFG_SITE_URL, str(dataset.recid))
-    c.append("<tr><td colspan=\"%(colspan)s\" style=\"text-align: left;\"><a href=\"%(plain_file_url)s\"><img src=\"%(site_url)s/img/file-icon-text-15x20.gif\"></img><br>Plain</td>" % {
-        "site_url" : CFG_SITE_URL,
+    plain_file_url = "%s/record/%s/files/Data.txt" % ( CFG_BASE_URL, str(dataset.recid))
+    c.append("<tr><td colspan=\"%(colspan)s\" style=\"text-align: left;\"><a href=\"%(plain_file_url)s\"><img src=\"%(base_url)s/img/file-icon-text-15x20.gif\"></img><br>Plain</td>" % {
+        "base_url" : CFG_BASE_URL,
         "plain_file_url" : plain_file_url,
         "colspan" : str(dataset.num_columns)
         })
