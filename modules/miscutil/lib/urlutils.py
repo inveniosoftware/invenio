@@ -795,4 +795,9 @@ def auto_version_url(file_path):
         @param file_path: path to the file, e.g js/foo.js
         @return: file_path with modification time appended to URL
     """
-    return file_path + "?%s" % md5(open(CFG_WEBDIR + os.sep + file_path).read()).hexdigest()
+    file_md5 = ""
+    try:
+        file_md5 = md5(open(CFG_WEBDIR + os.sep + file_path).read()).hexdigest()
+    except IOError:
+        pass
+    return file_path + "?%s" % file_md5

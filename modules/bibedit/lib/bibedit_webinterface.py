@@ -115,12 +115,13 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             redirect_to_url(req, '%s/%s/edit/#state=edit&recid=%s&recrev=%s' % (
                     CFG_SITE_SECURE_URL, CFG_SITE_RECORD, self.recid, ""))
 
-        elif recid is not None and json_data['requestType'] == "getRecord":
+        elif recid is not None:
             json_response.update({'recID': recid})
-            # Authorize access to record.
-            if not user_can_edit_record_collection(req, recid):
-                json_response.update({'resultCode': 101})
-                return json.dumps(json_response)
+            if json_data['requestType'] == "getRecord":
+                # Authorize access to record.
+                if not user_can_edit_record_collection(req, recid):
+                    json_response.update({'resultCode': 101})
+                    return json.dumps(json_response)
 
         # Handle request.
         if not ajax_request:

@@ -65,7 +65,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     get_record_revision_timestamps, record_revision_exists, \
     can_record_have_physical_copies, extend_record_with_template, \
     replace_references, merge_record_with_template, record_xml_output, \
-    record_is_conference, add_record_cnum, get_xml_from_textmarc
+    record_is_conference, add_record_cnum, get_xml_from_textmarc, \
+    record_locked_by_user_details
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -95,7 +96,8 @@ from invenio.bibcirculation_utils import create_item_details_url
 
 from invenio.refextract_api import FullTextNotAvailable
 from invenio import xmlmarc2textmarc as xmlmarc2textmarc
-from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError, \
+                               InvenioBibDocFileError
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -562,6 +564,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             response['resultCode'] = 102
         elif not read_only_mode and not existing_cache and \
                 record_locked_by_other_user(recid, uid):
+            name, email, locked_since = record_locked_by_user_details(recid, uid)
+            response['locked_details'] = {'name': name,
+                                          'email': email,
+                                          'locked_since': locked_since}
             response['resultCode'] = 104
         elif not read_only_mode and existing_cache and \
                 cache_expired(recid, uid) and \
@@ -1442,13 +1448,17 @@ def perform_request_get_pdf_url(recid):
     response = {}
     rec_info = BibRecDocs(recid)
     docs = rec_info.list_bibdocs()
-    try:
-        doc = docs[0]
-        response['pdf_url'] = doc.get_file('pdf').get_url()
-    except (IndexError, InvenioWebSubmitFileError):
-        # FIXME, return here some information about error.
-        # We could allow the user to specify a URl and add the FFT tags automatically
-        response['pdf_url'] = ''
+    doc_pdf_url = ""
+    for doc in docs:
+        try:
+            doc_pdf_url = doc.get_file('pdf').get_url()
+        except (InvenioWebSubmitFileError, InvenioBibDocFileError):
+            continue
+        if doc_pdf_url:
+            response['pdf_url'] = doc_pdf_url
+            break
+    if not doc_pdf_url:
+        response['pdf_url'] = ""
     return response
 
 
@@ -1509,9 +1519,9 @@ def _get_formated_record(record, new_window):
     result = ''
     if new_window:
         result =  """ <html><head><title>Record preview</title>
-                      <script type="text/javascript" src="https://inspireheptest.cern.ch/js/jquery.min.js"></script>
-                      <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css"></head>
-                   """%{'cssurl': CFG_SITE_URL,
+                      <script type="text/javascript" src="%(site_url)s/js/jquery.min.js"></script>
+                      <link rel="stylesheet" href="%(site_url)s/img/invenio%(cssskin)s.css" type="text/css"></head>
+                   """%{'site_url': CFG_SITE_URL,
                          'cssskin': CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or ''
                         }
         result += get_mathjax_header(True) + '<body>'

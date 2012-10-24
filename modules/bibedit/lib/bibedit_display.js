@@ -259,11 +259,13 @@ function redrawFields(tag, skipAddFileds) {
         var result = '',
             i, n;
         if (validMARC.reControlTag.test(tag)) {
-            for (i = 0, n = fields.length; i < n; i++)
-            result += createControlField(tag, fields[i], i);
+            for (i = 0, n = fields.length; i < n; i++) {
+                result += createControlField(tag, fields[i], i);
+            }
         } else {
-            for (i = 0, n = fields.length; i < n; i++)
-            result += createField(tag, fields[i], i);
+            for (i = 0, n = fields.length; i < n; i++) {
+                result += createField(tag, fields[i], i);
+            }
         }
         prevRowGroup.after(result);
     }
@@ -274,6 +276,16 @@ function redrawFields(tag, skipAddFileds) {
             addChangeControl(changeNr, skipAddFileds);
         }
     }
+}
+
+function redrawFieldPosition(tag, fieldPosition) {
+    /*
+        Redraws only the field indicated by fieldPosition
+    */
+    var currentFieldSelector = $("#rowGroup_"  + tag + "_" + fieldPosition);
+    currentFieldSelector.after(
+    createField(tag, gRecord[tag][fieldPosition], fieldPosition));
+    currentFieldSelector.remove();
 }
 
 /// The Holding Pen changes connected functions
@@ -843,9 +855,14 @@ function displayMessage(msgCode, keepContent, args) {
     case 4:
         msg = 'Your modifications have now been submitted. ' +
               'They will be processed as soon as the task queue is empty.<br />';
+
         if (typeof args !== 'undefined') {
-            if (typeof args[0] !== 'undefined') {
-                msg += '<br /><strong>The conference cnum is ' + args[0] + '</strong>';
+            if (typeof args[0] !== "undefined") {
+                msg += 'Changes will be visible in ' + '<a href="' + gSITE_URL + '/record/' +
+                    args[0] + '" target="_blank">' + gSITE_URL + '/record/' + args[0] + "</a><br />";
+            }
+            if (typeof args[1] !== 'undefined') {
+                msg += '<br /><strong>The conference cnum is ' + args[1] + '</strong>';
             }
         }
         break;
@@ -863,11 +880,18 @@ function displayMessage(msgCode, keepContent, args) {
             'browse the history on the left menu';
         break;
     case 104:
-        msg = 'This record is currently being edited by another user. Please ' +
-            'try again later.';
+        var name = args.name,
+            email = args.email,
+            locked_since = args.locked_since;
+        name = (name) ? name : "";
+        email = (email) ? email : "";
+        locked_since = (locked_since) ? locked_since : "";
+        msg = 'This record is being edited by user ' + '<strong>' + name +
+              ' (' + email + ') ' + "</strong>" + 'since ' + "<strong>" +
+              locked_since + "</strong>" + '. Please try again later.';
         break;
     case 105:
-        msg = 'This record cannot be safely edited at the moment. Please ' +
+        msg = 'Changes to this record are currently being processed. Please ' +
             'try again in a few minutes.';
         break;
     case 106:
@@ -914,8 +938,9 @@ function displayMessage(msgCode, keepContent, args) {
     }
     if (!keepContent) {
         clearWarnings();
-        $('#bibEditContentTable').html('<div class="warningMsg">' + msg +
-                                       '</div>');
+        $('#bibEditContentTable').empty();
+        $('#bibEditMessage').html('<div class="warningMsg">' + msg +
+                                       '</div>').slideDown('slow');
     } else {
         $('#bibEditMessage').html('<div class="warningMsg">' + msg +
                                   '</div>').slideDown('slow');
