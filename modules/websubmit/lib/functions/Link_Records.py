@@ -37,7 +37,7 @@ NOTE: Used to link Conference papers and Slides records ($i Conference paper/Sli
 
 
 Example:
-http://cdsweb.cern.ch/record/1372158
+http://cds.cern.ch/record/1372158
 7870_ $$iSlides$$rLHCb-TALK-2011-087$$w1353576
 We need to include in the submission form for LHCb-PROC a field for the related repnr, from which to create the 7870 field. It would be perfect if at the same time the inverse 7870 field could be inserted in the TALK record:
 7870_ $$iConference paper$$rLHCb-PROC-2011-041$$w1372158

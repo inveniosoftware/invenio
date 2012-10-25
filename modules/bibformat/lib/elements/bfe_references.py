@@ -68,7 +68,7 @@ def format_element(bfo, reference_prefix, reference_suffix):
         if reference.has_key('t'):
             ejournal = bfo.kb("ejournals", reference.get('t', ""))
             if ejournal != "":
-                ref_out += ' <small> <a href="https://cdsweb.cern.ch/ejournals.py?publication='\
+                ref_out += ' <small> <a href="https://cds.cern.ch/ejournals.py?publication='\
                       + reference['t'].replace(" ", "+") \
                 +"&amp;volume="+reference.get('v', "")+"&amp;year="+\
                 reference.get('y', "")+"&amp;page="+\

@@ -817,14 +817,14 @@ class WebCommentTransformationHTMLMarkupTest(unittest.TestCase):
                          body_expected)
 
         washer = EmailWasher()
-        body_input = '<a href="https://cdsweb.cern.ch/">CDS</a>'
-        body_expected = '<https://cdsweb.cern.ch/>(CDS)'
+        body_input = '<a href="https://cds.cern.ch/">CDS</a>'
+        body_expected = '<https://cds.cern.ch/>(CDS)'
         self.assertEqual(washer.wash(body_input),
                          body_expected)
 
         washer = EmailWasher()
-        body_input = '<a href="https://cdsweb.cern.ch/">https://cdsweb.cern.ch/</a>'
-        body_expected = '<https://cdsweb.cern.ch/>'
+        body_input = '<a href="https://cds.cern.ch/">https://cds.cern.ch/</a>'
+        body_expected = '<https://cds.cern.ch/>'
         self.assertEqual(washer.wash(body_input),
                          body_expected)
 

@@ -203,7 +203,7 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
                 curl_input_file = os.path.join(CFG_TMPDIR, 'curl_test.xml')
                 open(curl_input_file, "w").write(self.marcxml)
                 try:
-                    ## curl -F 'file=@localfile.xml' -F 'mode=-i' [-F 'callback_url=http://...'] [-F 'nonce=1234'] http://cdsweb.cern.ch/batchuploader/robotupload -A invenio_webupload
+                    ## curl -F 'file=@localfile.xml' -F 'mode=-i' [-F 'callback_url=http://...'] [-F 'nonce=1234'] http://cds.cern.ch/batchuploader/robotupload -A invenio_webupload
                     code, result, err = run_shell_command("/usr/bin/curl -v -F file=@%s -F 'mode=-i' -F callback_url=%s -F nonce=1234 %s -A %s", [curl_input_file, self.callback_url, self.legacy_url, make_user_agent_string('BatchUploader')])
                     self.failUnless("[INFO]" in result, '[INFO] not find in results: %s, %s' % (result, err))
                     current_task = get_last_taskid()

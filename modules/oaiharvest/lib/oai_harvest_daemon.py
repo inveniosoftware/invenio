@@ -1540,7 +1540,7 @@ Examples:
 Manual (single-shot) harvesting mode:
    Save to /tmp/z.xml records from CDS added/modified between 2004-04-01
    and 2004-04-02, in MARCXML:
-     $ oaiharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml http://cdsweb.cern.ch/oai2d
+     $ oaiharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml http://cds.cern.ch/oai2d
 Automatic (periodical) harvesting mode:
    Schedule daily harvesting of all repositories defined in OAIHarvest admin:
      $ oaiharvest -s 24h

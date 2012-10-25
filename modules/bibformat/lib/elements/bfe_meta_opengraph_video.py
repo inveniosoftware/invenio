@@ -74,7 +74,7 @@ def format_element(bfo):
 
                 <link rel="image_src" href="%(image_url)s" />
                 <link rel="video_src" href="%(CFG_CERN_PLAYER_URL)s?file=%(mp4_url_relative)s&streamer=%(CFG_STREAMER_URL)s&provider=rtmp&stretching=exactfit&image=%(image_url)s"/>
-                ''' % {'CFG_CERN_PLAYER_URL': "https://cdsweb.cern.ch/mediaplayer.swf",
+                ''' % {'CFG_CERN_PLAYER_URL': "https://cds.cern.ch/mediaplayer.swf",
                        'CFG_STREAMER_URL': "rtmp://wowza.cern.ch:1935/vod",
                        'width': width,
                        'height': height,

@@ -188,7 +188,7 @@ BibClassify sources <em>bibclassify [options]</em>.</li>
 </span></p>
 
 <p>As an example, running BibClassify on document
-<a href="http://cdsweb.cern.ch/<CFG_SITE_RECORD>/547024">nucl-th/0204033</a> using the
+<a href="http://cds.cern.ch/<CFG_SITE_RECORD>/547024">nucl-th/0204033</a> using the
 high-energy physics RDF/SKOS taxonomy (<code>HEP.rdf</code>) would yield the
 following results (based on the HEP taxonomy from October 10th 2008):
 

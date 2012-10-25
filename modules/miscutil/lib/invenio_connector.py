@@ -22,7 +22,7 @@ Tools to connect to distant Invenio servers using Invenio APIs.
 Example of use:
 
 from InvenioConnector import *
-cds = InvenioConnector("http://cdsweb.cern.ch")
+cds = InvenioConnector("http://cds.cern.ch")
 
 results = cds.search("higgs")
 
@@ -74,7 +74,7 @@ except ImportError:
     CFG_CERN_SITE = 0
     CFG_USER_AGENT = "invenio_connector"
 
-CFG_CDS_URL = "http://cdsweb.cern.ch/"
+CFG_CDS_URL = "http://cds.cern.ch/"
 
 class InvenioConnectorAuthError(Exception):
     """

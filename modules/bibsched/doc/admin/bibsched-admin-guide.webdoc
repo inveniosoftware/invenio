@@ -122,7 +122,7 @@ interface, only the latest log will be displayed.</p>
 
 <h2>Bibsched command line interface</h2>
 <pre>
-    Usage: /soft/cdsweb/bin/bibsched [options] [start|stop|restart|monitor|status]
+    Usage: /opt/invenio/bin/bibsched [options] [start|stop|restart|monitor|status]
 
     The following commands are available for bibsched:
 

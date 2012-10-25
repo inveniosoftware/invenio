@@ -292,22 +292,22 @@ class RefextractTest(unittest.TestCase):
     def test_url_recognition(self):
         """ refextract - test url example """
 
-        ex_url_lines = ["""[1] <a href="http://cdsweb.cern.ch/">CERN Document Server</a>; http://cdsweb.cern.ch/ then http://www.itp.ucsb.edu/online/susyc99/discussion/; hello world <a href="http://uk.yahoo.com/">Yahoo!</a>""",
-                """[2] CERN Document Server <a href="http://cdsweb.cern.ch/">CERN Document Server</a>""",
-                """[3] A list of authors, and a title. http://cdsweb.cern.ch/"""]
+        ex_url_lines = ["""[1] <a href="http://cds.cern.ch/">CERN Document Server</a>; http://cds.cern.ch/ then http://www.itp.ucsb.edu/online/susyc99/discussion/; hello world <a href="http://uk.yahoo.com/">Yahoo!</a>""",
+                """[2] CERN Document Server <a href="http://cds.cern.ch/">CERN Document Server</a>""",
+                """[3] A list of authors, and a title. http://cds.cern.ch/"""]
 
         references_expected = u"""<record>
    <controlfield tag="001">1234</controlfield>
       <subfield code="u">http://uk.yahoo.com/</subfield>
       <subfield code="z">Yahoo!</subfield>
    </datafield>
-      <subfield code="u">http://cdsweb.cern.ch/</subfield>
+      <subfield code="u">http://cds.cern.ch/</subfield>
       <subfield code="z">CERN Document Server</subfield>
    </datafield>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">[3]</subfield>
       <subfield code="m">A list of authors, and a title</subfield>
-      <subfield code="u">http://cdsweb.cern.ch/</subfield>
+      <subfield code="u">http://cds.cern.ch/</subfield>
    </datafield>"""
         out = self.extract_references(ex_url_lines)
         #Compare the recieved output with the expected references

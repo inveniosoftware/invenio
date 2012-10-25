@@ -92,8 +92,8 @@ Please refer to <a href="<CFG_SITE_URL>/help/admin/bibupload-admin-guide<lang:li
              <th class="adminheader">actions</th>
             </tr>
             <tr>
-             <td class="admintdright">cdsweb</td>
-             <td class="admintdleft">http://cdsweb.cern.ch/oai2d</td>
+             <td class="admintdright">cds</td>
+             <td class="admintdleft">http://cds.cern.ch/oai2d</td>
              <td class="admintdleft">marcxml</td>
              <td class="admintdleft">daily</td>
              <td class="admintdleft">NULL</td>
@@ -199,13 +199,13 @@ $ oaiharvest -s 24h
 <p>In other cases, administrators may want to perform periodical harvesting only on specific sources:
 <blockquote>
 <pre>
-$ oaiharvest -r cdsweb -s 12h
+$ oaiharvest -r cds -s 12h
 </pre>
 </blockquote>
 
 <p>Another option is that administrators may want to harvest from certain repositories within two specific dates. This will be regarded as a one-off operation and will not affect the last update value of the source:
 <blockquote>
 <pre>
-$oaiharvest -r cdsweb -d 2005-05-05:2005-05-30
+$oaiharvest -r cds -d 2005-05-05:2005-05-30
 </pre>
 </blockquote>

@@ -950,7 +950,7 @@ def build_issns_from_distant_site(url):
     @param url: the url to load issn from (in the *exact* form: http://www.mysite.com/)
     """
     ## Parse the results of the http request:
-    ## http://cdsweb.cern.ch/search?cc=Periodicals&ot=022,210&of=tm&rg=9000
+    ## http://cds.cern.ch/search?cc=Periodicals&ot=022,210&of=tm&rg=9000
 
     pattern_field = re.compile(r'''
     \D*(?P<docid>\d*)              #document id
@@ -1043,7 +1043,7 @@ def print_info():
  and prints archive as dict structure.
 
  Usage: python bfe_issn.py [Options] [url]
- Example: python bew_issn.py http://cdsweb.cern.ch/
+ Example: python bew_issn.py http://cds.cern.ch/
 
  Options:
    -h, --help      print this help

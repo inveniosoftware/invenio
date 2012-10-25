@@ -152,7 +152,7 @@ a typical workflow:</p>
   </tr>
   <tr valign="top">
     <td>
-    <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-url_bar.png" alt="http://cdsweb.cern.ch/search?recid=946417&amp;ln=en&amp;of=hd"/>
+    <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-url_bar.png" alt="Use output format HD"/>
     </td>
 
     <td width="50%">When Invenio has to display a record, it

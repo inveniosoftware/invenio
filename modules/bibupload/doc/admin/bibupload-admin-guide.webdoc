@@ -544,7 +544,7 @@ where value can be any string you wish. Such string will be then added to the JS
 <p>If it is needed to use the batch upload function from within command line, this can be achieved with a curl call, like:
 <blockquote>
 <pre>
-$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload [-F 'callback_url=http://...'] -A invenio_webupload
+$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cds.cern.ch/batchuploader/robotupload [-F 'callback_url=http://...'] -A invenio_webupload
 <pre>
 </blockquote></p>
 
@@ -559,12 +559,12 @@ command line parameter of bibupload (see the previous paragraph <a href="#3.7">O
 <p>A second more <em>RESTful</em> interface is also available: it will suffice to append to the URL the specific mode (among "<em>insert</em>",
 "<em>append</em>", "<em>correct</em>", "<em>delete</em>", "<em>replace</em>"), as in:
 <pre>
-http://cdsweb.cern.ch/batchuploader/robotupload/insert
+http://cds.cern.ch/batchuploader/robotupload/insert
 </pre>
 </p>
 <p>The <em>callback_url</em> argument can be put in query part of the URL as in:
 <pre>
-http://cdsweb.cern.ch/batchuploader/robotupload/insert?callback_url=http://myhandler
+http://cds.cern.ch/batchuploader/robotupload/insert?callback_url=http://myhandler
 </pre>
 <p>
 
@@ -575,16 +575,16 @@ the final JSON data.</p>
 
 <p>The MARCXML content should then be specified as the body of the request. With <em>curl</em> this can be implemented as in:
 <pre>
-$ curl -T localfile.xml http://cdsweb.cern.ch/batchuploader/robotupload/insert?callback_url=http://... -A invenio_webupload -H "Content-Type: application/marcxml+xml"
+$ curl -T localfile.xml http://cds.cern.ch/batchuploader/robotupload/insert?callback_url=http://... -A invenio_webupload -H "Content-Type: application/marcxml+xml"
 </pre>
 
 <p>The <em>nonce</em> argument that can be passed to BibUpload as described in the previous paragraph can also be specified with both robotupload interfaces. E.g.:
 <pre>
-$ curl -F 'file=@localfile.xml' -F 'nonce=1234' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload -F 'callback_url=http://...' -A invenio_webupload
+$ curl -F 'file=@localfile.xml' -F 'nonce=1234' -F 'mode=-i' http://cds.cern.ch/batchuploader/robotupload -F 'callback_url=http://...' -A invenio_webupload
 </pre>
 and
 <pre>
-$ curl -T localfile.xml http://cdsweb.cern.ch/batchuploader/robotupload/insert?nonce=1234&callback_url=http://... -A invenio_webupload -H "Content-Type: application/marcxml+xml"
+$ curl -T localfile.xml http://cds.cern.ch/batchuploader/robotupload/insert?nonce=1234&callback_url=http://... -A invenio_webupload -H "Content-Type: application/marcxml+xml"
 </pre>
 </p>
 

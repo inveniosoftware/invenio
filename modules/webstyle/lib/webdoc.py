@@ -649,7 +649,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
 
         # 5 Step
         ## Replace defined tags with their value from config file
-        ## Eg. replace <CFG_SITE_URL> with 'http://cdsweb.cern.ch/':
+        ## Eg. replace <CFG_SITE_URL> with 'http://cds.cern.ch/':
         for defined_tag, value in defined_tags.iteritems():
             if defined_tag.upper() == '<CFG_SITE_NAME_INTL>':
                 localized_webdoc = localized_webdoc.replace(defined_tag, \

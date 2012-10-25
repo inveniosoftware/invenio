@@ -154,12 +154,12 @@ specifying long complicated query-strings every time, you can use short-hand <em
 <h4>Match remote installations</h4>
 
 <p>By default, BibMatch will try to match records on the local installation. In order to match against records on a remote Invenio installation
-(like <a href="http://cdsweb.cern.ch" target=_blank>http://cdsweb.cern.ch</a> or <a href="http://inspire-hep.net" target=_blank>http://inspire-hep.net</a>)
+(like <a href="http://cds.cern.ch" target=_blank>http://cds.cern.ch</a> or <a href="http://inspire-hep.net" target=_blank>http://inspire-hep.net</a>)
  you can use the option <em>-r</em>:</p>
 
 <blockquote>
 <pre>
- $ bibmatch -r "http://cdsweb.cern.ch" -q "[020__a] or [0247_a]" -b output_results < input.xml
+ $ bibmatch -r "http://cds.cern.ch" -q "[020__a] or [0247_a]" -b output_results < input.xml
 </pre>
 </blockquote>
 
@@ -168,7 +168,7 @@ specifying long complicated query-strings every time, you can use short-hand <em
 
 <blockquote>
 <pre>
- $ bibmatch -r "http://cdsweb.cern.ch" --user admin -q "[020__a] or [0247_a]" -b output_results < input.xml
+ $ bibmatch -r "http://cds.cern.ch" --user admin -q "[020__a] or [0247_a]" -b output_results < input.xml
 </pre>
 </blockquote>
 

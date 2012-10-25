@@ -52,7 +52,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
     def _lookup(self, component, path):
         def restupload(req, form):
             """Interface for robots used like this:
-                $ curl --data-binary '@localfile.xml' http://cdsweb.cern.ch/batchuploader/robotupload/[insert|replace|correct|append]?[callback_url=http://...]&nonce=1234 -A invenio_webupload
+                $ curl --data-binary '@localfile.xml' http://cds.cern.ch/batchuploader/robotupload/[insert|replace|correct|append]?[callback_url=http://...]&nonce=1234 -A invenio_webupload
             """
             filepath, mimetype = handle_file_post(req)
             argd = wash_urlargd(form, {'callback_url': (str, None), 'nonce': (str, None), 'special_treatment': (str, None)})
@@ -60,7 +60,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
 
         def legacyrobotupload(req, form):
             """Interface for robots used like this:
-                $ curl -F 'file=@localfile.xml' -F 'mode=-i' [-F 'callback_url=http://...'] [-F 'nonce=1234'] http://cdsweb.cern.ch/batchuploader/robotupload -A invenio_webupload
+                $ curl -F 'file=@localfile.xml' -F 'mode=-i' [-F 'callback_url=http://...'] [-F 'nonce=1234'] http://cds.cern.ch/batchuploader/robotupload -A invenio_webupload
             """
             argd = wash_urlargd(form, {'mode': (str, None), 'callback_url': (str, None), 'nonce': (str, None), 'special_treatment': (str, None)})
             return cli_upload(req, form.get('file', None), argd['mode'], argd['callback_url'], argd['nonce'], argd['special_treatment'])

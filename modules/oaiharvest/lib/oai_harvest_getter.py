@@ -140,7 +140,7 @@ def harvest(server, script, http_param_dict , method="POST", output="",
         Parameters:
 
          server - *str* the server URL to harvest
-                  eg: cdsweb.cern.ch
+                  eg: cds.cern.ch
 
          script - *str* path to the OAI script on the server to harvest
                   eg: /oai2d
@@ -213,7 +213,7 @@ def OAI_Request(server, script, params, method="POST", secure=False,
     Parameters:
 
         server - *str* the server URL to harvest
-                 eg: cdsweb.cern.ch
+                 eg: cds.cern.ch
 
         script - *str* path to the OAI script on the server to harvest
                  eg: /oai2d

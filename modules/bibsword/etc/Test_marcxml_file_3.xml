@@ -158,11 +158,11 @@
     <subfield code="y">Access to fulltext</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">http://cdsweb.cern.ch/record/1037562/files/phys-conf-2007-008.pdf</subfield>
+    <subfield code="u">http://cds.cern.ch/record/1037562/files/phys-conf-2007-008.pdf</subfield>
     <subfield code="y">Access to fulltext</subfield>
   </datafield>
   <datafield tag="856" ind1="4" ind2=" ">
-    <subfield code="u">http://cdsweb.cern.ch/record/1037562/files/phys-conf-2007-008.ps.gz</subfield>
+    <subfield code="u">http://cds.cern.ch/record/1037562/files/phys-conf-2007-008.ps.gz</subfield>
     <subfield code="y">Access to fulltext</subfield>
   </datafield>
 </record>

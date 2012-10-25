@@ -88,14 +88,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         'acq_details_step1', 'acq_details_step2']
 
     def index(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation"""
+        """http://cds.cern.ch/admin2/bibcirculation"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.index(req, ln)
 
 
     def borrower_search(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/borrowers_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/borrowers_search"""
         argd = wash_urlargd(form, {'empty_barcode': (str, None),
                                    'redirect_to_new_request': (str, "no"),
                                     'ln': (str, "en")})
@@ -113,13 +113,13 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def item_search(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/holdings_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/holdings_search"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.item_search(req, [], ln)
 
     def item_search_result(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/item_search_result"""
+        """http://cds.cern.ch/admin2/bibcirculation/item_search_result"""
         argd = wash_urlargd(form, {'p': (str, ''), 'f': (str, ''),
                                    'ln': (str, "en")})
         p  = argd['p']
@@ -132,7 +132,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.item_search_result(req, p, f, ln)
 
     def borrower_notification(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/borrower_notification"""
+        """http://cds.cern.ch/admin2/bibcirculation/borrower_notification"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'borrower_email': (str, None),
             'template': (str, None), 'message': (str, None), 'load_msg_template': (str, None),
             'subject': (str, None), 'send_message': (str, None), 'ln': (str, "en")})
@@ -155,7 +155,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_pending_requests(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_pending_requests"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_pending_requests"""
         argd = wash_urlargd(form, {'request_id': (str, None), 'print_data': (str, None),
                                    'ln': (str, "en")})
         request_id = argd['request_id']
@@ -166,7 +166,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def delete_copy_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/delete_copy_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/delete_copy_step1"""
         argd = wash_urlargd(form, {'barcode': (str, ''), 'ln': (str, "en")})
 
         barcode = argd['barcode']
@@ -175,7 +175,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.delete_copy_step1(req, barcode, ln)
 
     def delete_copy_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/delete_copy_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/delete_copy_step2"""
         argd = wash_urlargd(form, {'barcode': (str, ''), 'ln': (str, "en")})
 
         barcode = argd['barcode']
@@ -184,14 +184,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.delete_copy_step2(req, barcode, ln)
 
     def loan_return(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/loan_return"""
+        """http://cds.cern.ch/admin2/bibcirculation/loan_return"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.loan_return(req, ln)
 
 
     def loan_on_desk_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/loan_on_desk_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/loan_on_desk_step1"""
         argd = wash_urlargd(form, {'key': (str, None), 'string': (str, None), 'ln': (str, "en")})
         key = argd['key']
         string = argd['string']
@@ -204,7 +204,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def loan_on_desk_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/loan_on_desk_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/loan_on_desk_step2"""
         argd = wash_urlargd(form, {'user_id': (int, None), 'ln': (str, "en")})
         user_id = argd['user_id']
         ln = argd['ln']
@@ -217,7 +217,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def loan_on_desk_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/loan_on_desk_step4"""
+        """http://cds.cern.ch/admin2/bibcirculation/loan_on_desk_step4"""
         argd = wash_urlargd(form, {'user_id': (int, None), 'barcode': (str, None),
                                     'ln': (str, "en")})
         user_id = argd['user_id']
@@ -233,7 +233,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def loan_on_desk_step4(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/loan_on_desk_step5"""
+        """http://cds.cern.ch/admin2/bibcirculation/loan_on_desk_step5"""
         argd = wash_urlargd(form, {'list_of_barcodes': (str, None), 'user_id': (int, None),
                         'datepickerhidden': (str, None), 'note': (str, None), 'ln': (str, "en")})
         list_of_barcodes = argd['list_of_barcodes']
@@ -255,7 +255,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def loan_on_desk_confirm(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/loan_on_desk_confirm"""
+        """http://cds.cern.ch/admin2/bibcirculation/loan_on_desk_confirm"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'borrower_id': (str, None),
                                     'ln': (str, "en")})
         barcode = argd['barcode']
@@ -265,7 +265,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_new_loan(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_new_loan"""
+        """http://cds.cern.ch/admin2/bibcirculation/register_new_loan"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'borrower_id': (str, None),
                                    'request_id': (str, None), 'new_note': (str, None),
                                    'print_data': (str, None), 'ln': (str, "en")})
@@ -284,7 +284,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def loan_return_confirm(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/loan_return_confirm"""
+        """http://cds.cern.ch/admin2/bibcirculation/loan_return_confirm"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'ln': (str, "en")})
         barcode = argd['barcode']
         ln = argd['ln']
@@ -295,7 +295,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_next_waiting_loan_request(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_next_waiting_loan_request"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_next_waiting_loan_request"""
         argd = wash_urlargd(form, {'recid': (str, None), 'barcode': (str, None),
                                     'check_id': (str, None), 'ln': (str, "en")})
         recid    = argd['recid']
@@ -306,7 +306,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def make_new_loan_from_request(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/make_new_loan_from_request"""
+        """http://cds.cern.ch/admin2/bibcirculation/make_new_loan_from_request"""
         argd = wash_urlargd(form, {'check_id': (str, None), 'barcode': (str, None),
                                     'ln': (str, "en")})
         check_id = argd['check_id']
@@ -317,7 +317,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def all_requests(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/all_requests"""
+        """http://cds.cern.ch/admin2/bibcirculation/all_requests"""
         argd = wash_urlargd(form, {'request_id': (str, None), 'ln': (str, "en")})
         request_id = argd['request_id']
         ln = argd['ln']
@@ -325,7 +325,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_item_req_historical_overview(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_item_req_historical_overview"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_item_req_historical_overview"""
         argd = wash_urlargd(form, {'recid': (str, None), 'ln': (str, "en")})
         recid = argd['recid']
         ln = argd['ln']
@@ -333,7 +333,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_item_loans_historical_overview(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_item_loans_historical_overview"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_item_loans_historical_overview"""
         argd = wash_urlargd(form, {'recid': (str, None), 'ln': (str, "en")})
         recid = argd['recid']
         ln = argd['ln']
@@ -341,14 +341,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     #def all_loans_test(self, req, form):
-    #    """http://cdsweb.cern.ch/admin2/bibcirculation/all_loans"""
+    #    """http://cds.cern.ch/admin2/bibcirculation/all_loans"""
     #    argd = wash_urlargd(form, {'ln': (str, "en")})
     #    ln = argd['ln']
     #    return bal.all_loans_test(req, ln)
 
 
     def all_loans(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/all_loans"""
+        """http://cds.cern.ch/admin2/bibcirculation/all_loans"""
         argd = wash_urlargd(form, {'msg': (str, None), 'ln': (str, "en")})
         msg = argd['msg']
         ln = argd['ln']
@@ -357,7 +357,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def bor_loans_historical_overview(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/bor_loans_historical_overview"""
+        """http://cds.cern.ch/admin2/bibcirculation/bor_loans_historical_overview"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
         ln = argd['ln']
@@ -365,7 +365,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def bor_requests_historical_overview(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/bor_requests_historical_overview"""
+        """http://cds.cern.ch/admin2/bibcirculation/bor_requests_historical_overview"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
         ln = argd['ln']
@@ -373,7 +373,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_item_requests_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/borrowers_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/borrowers_search"""
         argd = wash_urlargd(form, {'recid': (str, None), 'request_id': (str, None),
                                     'ln': (str, "en")})
         recid = argd['recid']
@@ -383,7 +383,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_item_loans_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/borrowers_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/borrowers_search"""
         argd = wash_urlargd(form, {'recid': (str, None), 'barcode': (str, None),
                             'loan_id': (str, None), 'force': (str, None), 'ln': (str, "en")})
         recid = argd['recid']
@@ -395,7 +395,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_borrower_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/borrowers_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/borrowers_search"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'update': (str, 'False'),
                                    'ln': (str, "en")})
         borrower_id = argd['borrower_id']
@@ -411,7 +411,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_item_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/"""
+        """http://cds.cern.ch/admin2/bibcirculation/"""
         argd = wash_urlargd(form, {'recid': (str, None), 'ln': (str, "en")})
         recid = argd['recid']
         ln = argd['ln']
@@ -425,7 +425,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_library_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_library_details"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_library_details"""
         argd = wash_urlargd(form, {'library_id': (str, None), 'ln': (str, "en")})
         library_id = argd['library_id']
         ln = argd['ln']
@@ -433,7 +433,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_borrower_requests_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_borrower_requests_details"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_borrower_requests_details"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'request_id': (str, None),
                                     'ln': (str, "en")})
         borrower_id = argd['borrower_id']
@@ -443,7 +443,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_borrower_loans_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_borrower_loans_details"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_borrower_loans_details"""
         argd = wash_urlargd(form, {'recid': (str, None), 'barcode': (str, None),
                                     'borrower_id': (str, None), 'renewall': (str, None),
                                     'force': (str, None), 'loan_id': (str, None),
@@ -460,7 +460,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def borrower_search_result(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/borrower_search_result"""
+        """http://cds.cern.ch/admin2/bibcirculation/borrower_search_result"""
         argd = wash_urlargd(form, {'column': (str, "name"), 'string': (str, ''),
                                    'redirect_to_new_request': (str, "no"), 'ln': (str, "en")})
         column = argd['column']
@@ -480,7 +480,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def associate_barcode(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/associate_barcode"""
+        """http://cds.cern.ch/admin2/bibcirculation/associate_barcode"""
         argd = wash_urlargd(form, {'request_id': (str, None), 'recid': (str, None),
                                     'borrower_id': (str, None), 'ln': (str, "en")})
         request_id = argd['request_id']
@@ -491,7 +491,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_borrower_notes(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_borrower_notes"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_borrower_notes"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'delete_key': (str, None),
                                     'library_notes': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
@@ -503,7 +503,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_loans_notes(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_loans_notes"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_loans_notes"""
         argd = wash_urlargd(form, {'loan_id': (str, None), 'recid': (str, None),
                                     'delete_key': (str, None), 'library_notes': (str, None),
                                     'back': (str, ""), 'ln': (str, "en")})
@@ -518,7 +518,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_item_loans_notes(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_item_loans_notes"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_item_loans_notes"""
         argd = wash_urlargd(form, {'loan_id': (str, None), 'add_notes': (str, None),
                                     'new_note': (str, None), 'ln': (str, "en")})
         loan_id = argd['loan_id']
@@ -531,7 +531,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def new_item(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/new_item"""
+        """http://cds.cern.ch/admin2/bibcirculation/new_item"""
         argd = wash_urlargd(form, {'isbn': (str, None), 'ln': (str, "en")})
         isbn = argd['isbn']
         ln = argd['ln']
@@ -539,14 +539,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def add_new_borrower_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_borrower_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_borrower_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.add_new_borrower_step1(req, ln)
 
 
     def add_new_borrower_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_borrower_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_borrower_step2"""
         argd = wash_urlargd(form, {'name': (str, ''), 'email': (str, ''),
             'phone': (str, ''), 'address': (str, ''), 'mailbox': (str, ''),
             'notes': (str, ''), 'ln': (str, "en")})
@@ -569,7 +569,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                                           mailbox, notes, ln)
 
     def update_borrower_info_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_borrower_info_step1"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
         ln = argd['ln']
@@ -577,7 +577,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_borrower_info_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_borrower_info_step2"""
         argd = wash_urlargd(form, {'borrower_id': (int, None), 'name': (str, ''),
             'email': (str, ''), 'phone': (str, ''), 'address': (str, ''),
             'mailbox': (str, ''), 'ln': (str, "en")})
@@ -600,14 +600,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                                               mailbox, ln)
 
     def add_new_library_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_library_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_library_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.add_new_library_step1(req, ln)
 
 
     def add_new_library_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_library_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_library_step2"""
         argd = wash_urlargd(form, {'name': (str, ''), 'email': (str, ''),
             'phone': (str, ''), 'address': (str, ''), 'type': (str, ''),
             'notes': (str, None), 'ln': (str, "en")})
@@ -630,7 +630,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def add_new_library_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_library_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_library_step3"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
             'phone': (str, None), 'address': (str, None), 'type': (str, None),
             'notes': (str, None), 'ln': (str, "en")})
@@ -646,14 +646,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_library_info_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_library_info_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.update_library_info_step1(req, ln)
 
 
     def update_library_info_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_library_info_step2"""
         argd = wash_urlargd(form, {'column': (str, None), 'string': (str, None),
                                     'ln': (str, "en")})
         column = argd['column']
@@ -667,7 +667,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_library_info_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_library_info_step3"""
         argd = wash_urlargd(form, {'library_id': (str, None), 'ln': (str, "en")})
         library_id = argd['library_id']
         ln = argd['ln']
@@ -675,7 +675,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_library_info_step4(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step4"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_library_info_step4"""
         argd = wash_urlargd(form, {'name': (str, ''), 'email': (str, ''),
             'phone': (str, ''), 'address': (str, ''), 'library_id': (str, ''),
             'lib_type': (str, ''), 'ln': (str, "en")})
@@ -699,7 +699,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_library_info_step5(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step5"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_library_info_step5"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
                         'phone': (str, None), 'address': (str, None), 'library_id': (str, None),
                         'lib_type': (str, None), 'ln': (str, "en")})
@@ -717,28 +717,28 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def new_book_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/new_book_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/new_book_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.new_book_step1(req, ln)
 
 
     def new_book_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/new_book_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/new_book_step2"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.new_book_step2(req, ln)
 
 
     def add_new_copy_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_copy_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_copy_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.add_new_copy_step1(req, ln)
 
 
     def add_new_copy_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_copy_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_copy_step2"""
         argd = wash_urlargd(form, {'p': (str, None), 'f': (str, None), 'ln': (str, "en")})
         p  = argd['p']
         f  = argd['f']
@@ -751,7 +751,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def add_new_copy_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_copy_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_copy_step3"""
         argd = wash_urlargd(form, {'recid': (str, None), 'barcode': (str, None),
                                    'ln': (str, "en")})
         recid   = argd['recid']
@@ -761,7 +761,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def add_new_copy_step4(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_copy_step4"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_copy_step4"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'library': (str, ''),
             'location': (str, ''), 'collection': (str, ''), 'description': (str, ''),
             'loan_period': (str, ''), 'status': (str, ''),
@@ -820,14 +820,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_item_info_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_item_info_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.update_item_info_step1(req, ln)
 
 
     def update_item_info_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_item_info_step2"""
         argd = wash_urlargd(form, {'p': (str, '()'), 'f': (str, '()'), 'ln': (str, "en")})
         p = argd['p']
         f = argd['f']
@@ -839,7 +839,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_item_info_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_item_info_step3"""
         argd = wash_urlargd(form, {'recid': (int, 0), 'ln': (str, "en")})
         recid = argd['recid']
         ln = argd['ln']
@@ -847,7 +847,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_item_info_step4(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step4"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_item_info_step4"""
         argd = wash_urlargd(form, {'barcode': (str, '()'), 'ln': (str, "en")})
         barcode = argd['barcode']
         ln = argd['ln']
@@ -855,7 +855,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_item_info_step5(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step5"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_item_info_step5"""
         argd = wash_urlargd(form, {'barcode': (str, ''), 'old_barcode': (str, ''),
             'library': (int, 0), 'location': (str, 'Unknown'), 'collection': (str, 'Unknown'),
             'description': (str, ''), 'loan_period': (str, '4 weeks'),
@@ -889,7 +889,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_item_info_step6(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step6"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_item_info_step6"""
         argd = wash_urlargd(form, {'barcode': (str, '-'), 'old_barcode': (str, '-'),
             'library_id': (int, 0), 'location': (str, 'Unknown'), 'collection': (str, 'Unknown'),
             'description': (str, ''), 'loan_period': (str, '4 weeks'),
@@ -916,14 +916,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def search_library_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/search_library_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/search_library_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.search_library_step1(req=req, ln=ln)
 
 
     def search_library_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/search_library_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/search_library_step2"""
         argd = wash_urlargd(form, {'column': (str, ''), 'string': (str, ''), 'ln': (str, "en")})
         column = argd['column']
         string = argd['string']
@@ -935,7 +935,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_library_notes(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_library_notes"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_library_notes"""
         argd = wash_urlargd(form, {'library_id': (str, None), 'delete_key': (str, None),
                                     'library_notes': (str, None), 'ln': (str, "en")})
         library_id = argd['library_id']
@@ -946,7 +946,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def change_due_date_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/change_due_date_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/change_due_date_step1"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'borrower_id': (str, None),
                                     'ln': (str, "en")})
         barcode = argd['barcode']
@@ -956,7 +956,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def change_due_date_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/change_due_date_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/change_due_date_step2"""
         argd = wash_urlargd(form, {'new_due_date': (str, None), 'loan_id': (str, None),
                                     'borrower_id': (str, None), 'ln': (str, "en")})
         new_due_date = argd['new_due_date']
@@ -967,7 +967,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def claim_book_return(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/claim_book_return"""
+        """http://cds.cern.ch/admin2/bibcirculation/claim_book_return"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'recid': (str, None),
                             'loan_id': (str, None), 'template': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
@@ -979,7 +979,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def all_expired_loans(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/all_expired_loans"""
+        """http://cds.cern.ch/admin2/bibcirculation/all_expired_loans"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
 
@@ -987,7 +987,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_waiting_requests(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_waiting_requests"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_waiting_requests"""
         argd = wash_urlargd(form, {'request_id': (str, None), 'print_data': (str, None),
                                     'ln': (str, "en")})
         request_id = argd['request_id']
@@ -997,7 +997,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def create_new_loan_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/create_new_loan_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/create_new_loan_step1"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
         ln = argd['ln']
@@ -1005,7 +1005,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def create_new_loan_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/create_new_loan_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/create_new_loan_step2"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'barcode': (str, None),
                                     'notes': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
@@ -1016,7 +1016,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def create_new_request_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/create_new_request_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/create_new_request_step1"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'p': (str, None),
                             'f': (str, None), 'search': (str, None), 'ln': (str, "en")})
 
@@ -1035,7 +1035,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def create_new_request_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/create_new_request_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/create_new_request_step2"""
         argd = wash_urlargd(form, {'recid': (str, None), 'borrower_id': (str, None),
                             'ln': (str, "en")})
         recid = argd['recid']
@@ -1045,7 +1045,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def create_new_request_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/create_new_request_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/create_new_request_step3"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'barcode': (str, None),
                                     'recid': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
@@ -1056,7 +1056,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def create_new_request_step4(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/create_new_request_step4"""
+        """http://cds.cern.ch/admin2/bibcirculation/create_new_request_step4"""
         argd = wash_urlargd(form, {'period_from': (str, None), 'period_to': (str, None),
                     'barcode': (str, None), 'borrower_id': (str, None), 'recid': (str, None),
                     'ln': (str, "en")})
@@ -1071,7 +1071,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def place_new_request_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/place_new_request_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/place_new_request_step1"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'recid': (str, None),
                             'key': (str, None), 'string': (str, None), 'ln': (str, "en")})
         barcode = argd['barcode']
@@ -1091,7 +1091,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def place_new_request_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/place_new_request_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/place_new_request_step2"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'recid': (str, None),
                                     'user_info': (str, None), 'ln': (str, "en")})
         barcode = argd['barcode']
@@ -1106,7 +1106,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def place_new_request_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/place_new_request_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/place_new_request_step3"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'recid': (str, None),
                     'user_info': (str, None), 'period_from': (str, None),
                     'period_to': (str, None), 'ln': (str, "en")})
@@ -1125,7 +1125,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def place_new_loan_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/place_new_loan_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/place_new_loan_step1"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'recid': (str, None),
                             'key': (str, None), 'string': (str, None), 'ln': (str, "en")})
         barcode = argd['barcode']
@@ -1145,7 +1145,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def place_new_loan_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/place_new_loan_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/place_new_loan_step2"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'recid': (str, None),
                                     'user_info': (str, None), 'ln': (str, "en")})
         barcode = argd['barcode']
@@ -1156,7 +1156,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def place_new_loan_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/place_new_loan_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/place_new_loan_step3"""
         argd = wash_urlargd(form, {'barcode': (str, None), 'recid': (str, None),
             'ccid': (str, None), 'name': (str, None), 'email': (str, None),
             'phone': (str, None), 'address': (str, None), 'mailbox': (str, None),
@@ -1178,7 +1178,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def order_new_copy_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/order_new_copy_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/order_new_copy_step1"""
         argd = wash_urlargd(form, {'recid': (str, None), 'ln': (str, "en")})
         recid = argd['recid']
         ln = argd['ln']
@@ -1186,7 +1186,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.order_new_copy_step1(req, recid, ln)
 
     def ordered_books(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/ordered_books"""
+        """http://cds.cern.ch/admin2/bibcirculation/ordered_books"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
 
@@ -1194,7 +1194,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_purchase_notes(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_purchase_notes"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_purchase_notes"""
         argd = wash_urlargd(form, {'purchase_id': (str, None), 'delete_key': (str, None),
                                    'library_notes': (str, None), 'ln': (str, "en")})
         purchase_id = argd['purchase_id']
@@ -1206,7 +1206,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_request_step0(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_step0"""
+        """http://cds.cern.ch/admin2/bibcirculation/register_ill_request_step0"""
         argd = wash_urlargd(form, {'recid': (str, None), 'key': (str, None),
                                     'string': (str, None), 'ln': (str, "en")})
         recid = argd['recid']
@@ -1217,7 +1217,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_request_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/register_ill_request_step1"""
         argd = wash_urlargd(form, {'recid': (str, None), 'user_info': (str, None),
                                     'ln': (str, "en")})
         recid = argd['recid']
@@ -1227,7 +1227,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.register_ill_request_step1(req, recid, user_info, ln)
 
     def register_ill_request_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/register_ill_request_step2"""
         argd = wash_urlargd(form, {'recid': (str, None), 'user_info': (str, None),
                 'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
                 'notes': (str, None), 'only_edition': (str, None), 'ln': (str, "en")})
@@ -1244,7 +1244,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                                               notes, only_edition, ln)
 
     def list_ill_request(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/list_ill_request"""
+        """http://cds.cern.ch/admin2/bibcirculation/list_ill_request"""
         argd = wash_urlargd(form, {'status': (str, None), 'ln': (str, "en")})
         status = argd['status']
         ln = argd['ln']
@@ -1252,7 +1252,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.list_ill_request(req, status, ln)
 
     def list_acquisition(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/list_acquisition"""
+        """http://cds.cern.ch/admin2/bibcirculation/list_acquisition"""
         argd = wash_urlargd(form, {'status': (str, None), 'ln': (str, "en")})
         status = argd['status']
         ln = argd['ln']
@@ -1260,7 +1260,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.list_acquisition(req, status, ln)
 
     def ill_request_details_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/ill_request_details_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/ill_request_details_step1"""
 
         argd = wash_urlargd(form, {'delete_key': (str, None), 'ill_request_id': (str, None),
                                    'new_status': (str, None), 'ln': (str, "en")})
@@ -1273,7 +1273,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.ill_request_details_step1(req, delete_key, ill_request_id, new_status, ln)
 
     def ill_request_details_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/ill_request_details_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/ill_request_details_step2"""
 
         argd = wash_urlargd(form, {'delete_key': (str, None),
             'ill_request_id': (str, None), 'new_status': (str, None),
@@ -1391,7 +1391,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                                         library_notes, book_info, article_info, ln)
 
     def acq_details_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/acq_details_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/acq_details_step1"""
 
         argd = wash_urlargd(form, {'delete_key': (str, None), 'ill_request_id': (str, None),
                                    'new_status': (str, None), 'ln': (str, "en")})
@@ -1404,7 +1404,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.acq_details_step1(req, delete_key, ill_request_id, new_status, ln)
 
     def acq_details_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/ill_request_details_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/ill_request_details_step2"""
 
         argd = wash_urlargd(form, {'ill_request_id': (str, None),
             'new_status': (str, None), 'library_id': (str, None),
@@ -1524,14 +1524,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
                                                purchase_notes, library_notes, ln)
 
     def add_new_vendor_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_vendor_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_vendor_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.add_new_vendor_step1(req, ln)
 
 
     def add_new_vendor_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_vendor_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_vendor_step2"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
         'phone': (str, None), 'address': (str, None), 'notes': (str, None), 'ln': (str, "en")})
 
@@ -1556,7 +1556,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def add_new_vendor_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_vendor_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/add_new_vendor_step3"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
             'phone': (str, None), 'address': (str, None), 'notes': (str, None),
             'ln': (str, "en")})
@@ -1572,14 +1572,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_vendor_info_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_vendor_info_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_vendor_info_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.update_vendor_info_step1(req, ln)
 
 
     def update_vendor_info_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_vendor_info_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_vendor_info_step2"""
         argd = wash_urlargd(form, {'column': (str, None), 'string': (str, None),
             'ln': (str, "en")})
 
@@ -1594,7 +1594,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_vendor_info_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_vendor_info_step3"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_vendor_info_step3"""
         argd = wash_urlargd(form, {'vendor_id': (str, None), 'ln': (str, "en")})
         vendor_id = argd['vendor_id']
         ln = argd['ln']
@@ -1602,7 +1602,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_vendor_info_step4(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_vendor_info_step4"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_vendor_info_step4"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
             'phone': (str, None), 'address': (str, None), 'vendor_id': (str, None),
             'ln': (str, "en")})
@@ -1628,7 +1628,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def update_vendor_info_step5(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/update_vendor_info_step5"""
+        """http://cds.cern.ch/admin2/bibcirculation/update_vendor_info_step5"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
             'phone': (str, None), 'address': (str, None), 'vendor_id': (str, None),
             'ln': (str, "en")})
@@ -1644,14 +1644,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def search_vendor_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/search_vendor_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/search_vendor_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.search_vendor_step1(req, ln)
 
 
     def search_vendor_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/search_vendor_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/search_vendor_step2"""
         argd = wash_urlargd(form, {'column': (str, ''), 'string': (str, ''), 'ln': (str, "en")})
         column = argd['column']
         string = argd['string']
@@ -1664,7 +1664,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_vendor_details(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_vendor_details"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_vendor_details"""
         argd = wash_urlargd(form, {'vendor_id': (str, None), 'ln': (str, "en")})
         vendor_id = argd['vendor_id']
         ln = argd['ln']
@@ -1672,7 +1672,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def get_vendor_notes(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/get_vendor_notes"""
+        """http://cds.cern.ch/admin2/bibcirculation/get_vendor_notes"""
         argd = wash_urlargd(form, {'vendor_id': (str, None), 'add_notes': (str, None),
                                     'new_note': (str, None), 'ln': (str, "en")})
         vendor_id = argd['vendor_id']
@@ -1683,7 +1683,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_request_with_no_recid_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en"), 'borrower_id': (str, None)})
         ln = argd['ln']
         borrower_id = argd['borrower_id']
@@ -1694,7 +1694,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_request_with_no_recid_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
 
         argd = wash_urlargd(form, {'title': (str, ''), 'authors': (str, ''),
             'place': (str, ''), 'publisher': (str, ''), 'year': (str, ''),
@@ -1858,7 +1858,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_book_request(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/holdings_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/holdings_search"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
         ln = argd['ln']
         borrower_id = argd['borrower_id']
@@ -1866,7 +1866,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_book_request_result(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/item_search_result"""
+        """http://cds.cern.ch/admin2/bibcirculation/item_search_result"""
         argd = wash_urlargd(form, {'borrower_id': (str, None),'p': (str, None),
                                     'f': (str, None), 'ln': (str, "en")})
         p = argd['p']
@@ -1876,7 +1876,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.register_ill_book_request_result(req, borrower_id, p, f, ln)
 
     def register_ill_book_request_from_borrower_page(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/holdings_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/holdings_search"""
         argd = wash_urlargd(form, {'borrower_id': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
         ln = argd['ln']
@@ -2005,7 +2005,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_article_request_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
 
         argd = wash_urlargd(form, {'periodical_title': (str, None),
             'article_title': (str, None), 'author': (str, None),
@@ -2081,14 +2081,14 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def ill_search(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/holdings_search"""
+        """http://cds.cern.ch/admin2/bibcirculation/holdings_search"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
         return bal.ill_search(req, ln)
 
 
     def ill_search_result(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/item_search_result"""
+        """http://cds.cern.ch/admin2/bibcirculation/item_search_result"""
         argd = wash_urlargd(form, {'p': (str, None), 'f': (str, None), 'date_from': (str, None),
                                         'date_to': (str, None), 'ln': (str, "en")})
         p = argd['p']
@@ -2107,7 +2107,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.ill_search_result(req, p, f, date_from, date_to, ln)
 
     def merge_libraries_step1(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/merge_libraries_step1"""
+        """http://cds.cern.ch/admin2/bibcirculation/merge_libraries_step1"""
         argd = wash_urlargd(form, {'library_id': (int, None), 'p': (str, None),
                                     'f': (str, None), 'ln': (str, None)})
 
@@ -2122,7 +2122,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.merge_libraries_step1(req, library_id, f, p, ln)
 
     def merge_libraries_step2(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/merge_libraries_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/merge_libraries_step2"""
         argd = wash_urlargd(form, {'library_from': (int, None), 'library_to': (int, None),
                                              'ln': (str, "en")})
 
@@ -2133,7 +2133,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         return bal.merge_libraries_step2(req, library_from, library_to, ln)
 
     def merge_libraries_step3(self, req, form):
-        """http://cdsweb.cern.ch/admin2/bibcirculation/merge_libraries_step2"""
+        """http://cds.cern.ch/admin2/bibcirculation/merge_libraries_step2"""
         argd = wash_urlargd(form, {'library_from': (int, None), 'library_to': (int, None),
                                              'ln': (str, "en")})
 

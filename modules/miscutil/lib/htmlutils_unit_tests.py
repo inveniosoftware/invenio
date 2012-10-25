@@ -222,32 +222,32 @@ class HTMLAutomaticLinksTransformation(unittest.TestCase):
 
     def test_transform_link(self):
         """htmlutils - transforming a link"""
-        body_input = 'https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es'
-        body_expected = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es</a>'
+        body_input = 'https://cds.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es'
+        body_expected = '<a href="https://cds.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">https://cds.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es</a>'
         self.assertEqual(self.washer.wash(html_buffer=body_input,
                                           automatic_link_transformation=True),
                          body_expected)
 
     def test_transform_several_links(self):
         """htmlutils - transforming several links"""
-        body_input = 'some text https://cdsweb.cern.ch/collection/Videos?ln=es more text https://cdsweb.cern.ch/search?p=%27CERN+News'
-        body_expected = 'some text <a href="https://cdsweb.cern.ch/collection/Videos?ln=es">https://cdsweb.cern.ch/collection/Videos?ln=es</a> more text <a href="https://cdsweb.cern.ch/search?p=%27CERN">https://cdsweb.cern.ch/search?p=%27CERN</a>+News'
+        body_input = 'some text https://cds.cern.ch/collection/Videos?ln=es more text https://cds.cern.ch/search?p=%27CERN+News'
+        body_expected = 'some text <a href="https://cds.cern.ch/collection/Videos?ln=es">https://cds.cern.ch/collection/Videos?ln=es</a> more text <a href="https://cds.cern.ch/search?p=%27CERN">https://cds.cern.ch/search?p=%27CERN</a>+News'
         self.assertEqual(self.washer.wash(html_buffer=body_input,
                                           automatic_link_transformation=True),
                          body_expected)
 
     def test_transform_just_valid_links(self):
         """htmlutils - transforming just valid links"""
-        body_input = body_input = 'some text https://cdsweb.cern.ch/collection/Videos?ln=es more text https://cdsweb..cern/search?p=%27CERN+News'
-        body_expected = 'some text <a href="https://cdsweb.cern.ch/collection/Videos?ln=es">https://cdsweb.cern.ch/collection/Videos?ln=es</a> more text https://cdsweb..cern/search?p=%27CERN+News'
+        body_input = body_input = 'some text https://cds.cern.ch/collection/Videos?ln=es more text https://cds..cern/search?p=%27CERN+News'
+        body_expected = 'some text <a href="https://cds.cern.ch/collection/Videos?ln=es">https://cds.cern.ch/collection/Videos?ln=es</a> more text https://cds..cern/search?p=%27CERN+News'
         self.assertEqual(self.washer.wash(html_buffer=body_input,
                                           automatic_link_transformation=True),
                          body_expected)
 
     def test_not_transform_link(self):
         """htmlutils - not transforming a link"""
-        body_input = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
-        body_expected = '<a href="https://cdsweb.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
+        body_input = '<a href="https://cds.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
+        body_expected = '<a href="https://cds.cern.ch/collection/Multimedia%20%26%20Outreach?ln=es">Multimedia</a>'
         self.assertEqual(self.washer.wash(html_buffer=body_input,
                                           automatic_link_transformation=True),
                          body_expected)
