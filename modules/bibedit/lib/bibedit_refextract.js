@@ -141,7 +141,7 @@
 		* Handle click on refextract from URL button
 		*
 		*/
-		var dialogContent = '<input type="text" id="input_extract_url" placeholder="URL to extract references">';
+		var dialogContent = '<input type="text" id="input_extract_url" class="bibedit_input" placeholder="URL to extract references">';
 		dialogReferences = createDialog("Extract references from URL", dialogContent, 200, 500);
 		dialogReferences.contentParagraph.addClass('dialog-box-centered-no-margin');
 		dialogReferences.dialogDiv.dialog({
@@ -170,7 +170,7 @@
 		*/
 
 		/* Create the modal dialog that will contain the references */
-		var dialogContent = "Paste your references:<br/><textarea id='reffreetext' rows=38 cols=80></textarea>"
+		var dialogContent = "Paste your references:<br/><textarea id='reffreetext' class='bibedit_input'></textarea>"
 		dialogReferences = createDialog("Paste references", dialogContent, 750, 700);
 		dialogReferences.dialogDiv.dialog({
 			buttons: {

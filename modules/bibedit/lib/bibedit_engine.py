@@ -172,7 +172,6 @@ def perform_request_init(uid, ln, req, lastupdated):
     tag_names = get_name_tags_all()
     protected_fields = ['001']
     protected_fields.extend(CFG_BIBEDIT_PROTECTED_FIELDS.split(','))
-    history_url = '"' + CFG_SITE_URL + '/admin/bibedit/bibeditadmin.py/history"'
     cern_site = 'false'
 
     if not CFG_JSON_AVAILABLE:
@@ -192,6 +191,7 @@ def perform_request_init(uid, ln, req, lastupdated):
 
 
     body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
+    body += '<link rel="stylesheet" type="text/css" href="/img/bibedit.css" />'
 
     if CFG_CERN_SITE:
         cern_site = 'true'
@@ -200,7 +200,6 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gPROTECTED_FIELDS': protected_fields,
             'gSITE_URL': '"' + CFG_SITE_URL + '"',
             'gSITE_RECORD': '"' + CFG_SITE_RECORD + '"',
-            'gHISTORY_URL': history_url,
             'gCERN_SITE': cern_site,
             'gHASH_CHECK_INTERVAL': CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL,
             'gCHECK_SCROLL_INTERVAL': CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL,

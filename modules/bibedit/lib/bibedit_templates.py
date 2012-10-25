@@ -173,13 +173,13 @@ class Template:
             '          <tr class="bibEditMenuMore"><td>' \
             '          <div class="bibEditURMenuSection">\n' \
             '             <div class="bibEditURDetailsSection" id="bibEditURUndoListLayer">\n' \
-            '                 <div class="bibEditURButtonLayer"><button id="btnUndo">&lt;</button></div>\n' \
+            '                 <div class="bibEditURButtonLayer"><button id="btnUndo" class="menu-btn">&lt;</button></div>\n' \
             '                 <div id="undoOperationVisualisationField" class="bibEditHiddenElement bibEditURPreviewBox">\n' \
             '                     <div id="undoOperationVisualisationFieldContent"></div>\n' \
             '                 </div>\n' \
             '             </div>' \
             '             <div class="bibEditURDetailsSection" id="bibEditURRedoListLayer">\n' \
-            '                 <div class="bibEditURButtonLayer"><button id="btnRedo">&gt;</button></div>' \
+            '                 <div class="bibEditURButtonLayer"><button id="btnRedo" class="menu-btn">&gt;</button></div>' \
             '                 <div id="redoOperationVisualisationField" class="bibEditHiddenElement bibEditURPreviewBox">\n' \
             '                     <div id="redoOperationVisualisationFieldContent"></div>' \
             '                 </div>\n' \
@@ -216,7 +216,7 @@ class Template:
             ' class="bibEditBibCircPanel">' \
             '    Number of copies: ' \
             '       <div id="bibEditBibCirculationCopies">0</div><br/>' \
-            '    <button id="bibEditBibCirculationBtn">' \
+            '    <button id="bibEditBibCirculationBtn" class="menu-btn">' \
             'Edit physical copies</button>' \
             ' </td></tr></table></div></div>' \
             % {
@@ -232,8 +232,7 @@ class Template:
             'height=600,left=150,top=150,resizable=yes,scrollbars=yes\');' \
             'return false;' % CFG_SITE_URL)
 
-        return '    %(page_style)s\n' \
-            '    <div id="bibEditMenu">\n' \
+        return '    <div id="bibEditMenu">\n' \
             '      <div class="bibEditMenuSection">\n' \
             '        %(recordmenu)s\n' \
             '      </div>\n' \
@@ -260,7 +259,6 @@ class Template:
             '        %(lnkSpecialChar)s %(lnkhelp)s\n' \
             '      </div>\n' \
             '    </div>\n' % {
-                'page_style': page_style(),
                 'recordmenu': recordmenu,
                 'viewmenu': viewmenu,
                 'fieldmenu': fieldmenu,
@@ -324,15 +322,18 @@ def inp(_type, _class='', **kargs):
         args += '%s="%s" ' % (karg, kargs[karg])
     return '<input %s%s%s/>' % (_type, _class, args)
 
-def button(_type, value, _class='', **kargs):
+def button(_type, value, _class="", **kargs):
     """Create an HTML <button> element."""
     _type = 'type="%s" ' % _type
+    class_result = "class='menu-btn "
     if _class:
-        _class = 'class="%s" ' % _class
+        class_result += "%s' " % _class
+    else:
+        class_result += "'"
     args = ''
     for karg in kargs:
         args += '%s="%s" ' % (karg, kargs[karg])
-    return '<button %s%s%s>%s</button>' % (_type, _class, args, value)
+    return '<button %s%s%s>%s</button>' % (_type, class_result, args, value)
 
 def link(value, _class='', **kargs):
     """Create an HTML <a> (link) element."""
@@ -345,250 +346,4 @@ def link(value, _class='', **kargs):
 
 def page_style():
     """Apply styling for bibedit elements"""
-    style = """<style type="text/css">"""
-    style += """
-                .pagefooter {
-                    display: none;
-                }
-
-                .revisionLine {
-                    font-size:12px;
-                    color: rgb(90, 134, 196);
-                }
-
-                .floatRight {
-                    float: right;
-                }
-
-                .floatLeft {
-                    float: left;
-                }
-
-                #Toptoolbar {
-                    overflow: auto;
-                }
-
-                #bibEditContent {
-                    margin-left: 175px;
-                    width: 750px;
-                }
-
-                #bibEditContentTable {
-                    overflow: auto;
-                    border-top:1px solid;
-                    border-color: #575757;
-                    margin-top: 5px;
-                }
-
-                #bibEditMenu {
-                    width: 135px;
-                    float: left;
-                    padding-left: 10px;
-                    font-size: 0.8em;
-                    z-index:1;
-                }
-
-                #bibEditMessage {
-                    display: none;
-                    margin: 3px 3px 3px 3px;
-                    width: 740px;
-                }
-
-                .warningMsg{
-                    padding: 10px 10px 2px 10px;
-                    background-color: #FAD163;
-                }
-
-                div.refextracted {
-                    line-height:25px;
-                }
-
-                #bibEditMenu .bibEditMenuSection {
-                    margin-bottom: 10px;
-                }
-
-                #bibEditMenu .bibEditMenuSectionHeader {
-                    font-weight: bold;
-                }
-
-                #bibEditTable {
-                    background-color: rgb(255, 255, 255);
-                    border: 1px solid #A1A1A1;
-                    border-collapse: collapse;
-                    width: 100%;
-                    table-layout:fixed;
-                }
-
-                #textmarc_textbox {
-                    width: 100%;
-                    height: 100%;
-                }
-
-                #bibEditTable td {
-                    overflow:hidden;
-                    word-wrap: break-word;
-                 }
-
-                 #bibEditTable td textarea{
-                    max-width: 615px;
-                    min-height: 65px;
-                    max-height: 600px;
-                }
-
-                .bibEditCellFieldTag:focus {
-                    outline: none;
-                }
-
-                #bibEditMenu .bibEditMenuSection table {
-                    width: 100%;
-                }
-
-                #bibEditMenu form {
-                    margin: 0px;
-                }
-
-                #bibEditMenu .bibEditImgExpandMenuSection,
-                #bibEditMenu .bibEditImgCompressMenuSection {
-                    margin: 0px;
-                    text-align: left;
-                    vertical-align: bottom;
-                }
-
-                #bibEditMenu a, #bibEditMenu button, #bibEditMenu input,
-                #bibEditMenu select {
-                    font-size: 0.8em;
-                }
-                #bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
-                #bibEditMenu input, #bibEditMenu select {
-                    margin: 1px;
-                }
-                #bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
-                    width: 100%;
-                }
-                #bibEditMenu .bibEditImgCtrlEnabled {
-                    cursor: pointer;
-                    opacity: 1.0;
-                    vertical-align: bottom;
-                }
-
-                #bibEditMenu .bibEditImgCtrlDisabled {
-                    cursor: default;
-                    opacity: 0.4;
-                    vertical-align: bottom;
-                }
-
-                .bibEditRevHistoryEntryContent{
-                    cursor: pointer;
-                }
-
-                #print_helper {
-                    display: none;
-                }
-
-                @media print {
-                    img[id^='btnAddSubfield'] {
-                        display:none;
-                    }
-
-                    .pagefooter {
-                        display: none;
-                    }
-
-                    .bibEditVolatileSubfield {
-                        display:none;
-                    }
-
-                    #print_helper {
-                        display: block;
-                        overflow: visible;
-                        white-space: pre;
-                        white-space: pre-wrap;
-                    }
-
-                    #textmarc_textbox {
-                        display: none;
-                    }
-                }
-
-                 /* jQuery-UI Theming used for:
-                  * - Dialog refextract
-                  */
-
-                #input_extract_url {
-                    position: absolute;
-                    width: 410px;
-                    top: 45px;
-                }
-
-                .dialog-box-centered {
-                    margin-top: 300px;
-                    text-align: center;
-                }
-
-                .dialog-box-centered-no-margin {
-                    text-align: center;
-                }
-
-                .dialog-icon {
-                    float: left;
-                    margin: 12px 7px 10px 0;
-                }
-
-                /* jQuery-UI Theming used for:
-                 * - Autocomplete menu
-                 */
-
-                .ui-autocomplete-loading {
-                    background: white url('/img/ui-anim_basic_16x16.gif') right center no-repeat;
-                }
-
-                .ui-corner-all {
-                    -moz-border-radius: 4px 4px 4px 4px;
-                }
-
-                .ui-widget-overlay {
-                    -moz-background-clip: border;
-                    -moz-background-origin: padding;
-                    -moz-background-size: auto auto;
-                    background-attachment: scroll;
-                    background-position: 50%% 50%%;
-                    background-repeat: repeat;
-                    background-color: #666666;
-                    opacity: 0.5;
-                    left: 0;
-                    position: absolute;
-                    top: 0;
-                }
-
-                .ui-widget {
-                    font-size: .8em;
-                }
-
-                .ui-menu .ui-menu-item a {
-                    display: block;
-                    line-height: .8;
-                    padding: 0.2em 0.4em;
-                    text-decoration: none;
-                    background-color: white;
-                    color: black;
-                }
-
-                .ui-menu {
-                    list-style: none outside none;
-                    margin-left: 1em;
-                    padding-left: 1em;
-                }
-
-                .ui-autocomplete {
-                    cursor: default;
-                    width: 300px;
-                }
-
-                .ui-dialog-content {
-                    background-color: red;
-                }
-
-                /* End of jQuery UI Theming */
-            """
-    style += "</style>"
     return style

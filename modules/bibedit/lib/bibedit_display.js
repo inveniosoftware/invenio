@@ -1200,7 +1200,7 @@ function displayRevisionHistoryEntry(recId, revisionId) {
         '<div class="bibEditRevHistoryEntryContent" id="bibEditRevHistoryEntry_' +
         revisionId + '">' + checkImg + timeString +
         '</div><div class="bibEditRevHistoryEntryControls">' +
-        '<div style="display:table-row;">' + mergeWithNewestControl +
+        '<div>' + mergeWithNewestControl +
         compareWithCurrentControl + revertToRevisionControl +
         "</div></div></div>\n";
 

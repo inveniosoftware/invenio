@@ -1,0 +1,674 @@
+/*
+ * This file is part of Invenio.
+ * Copyright (C) 2012 CERN.
+ *
+ * Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+.bibEditHistCompare {
+   float: left;
+   margin: 0px 10px 5px 0px;
+   font-size: small;
+   width: 70%;
+}
+
+/* BibEdit - new interface */
+
+.bibEditBtnBold {
+  font-weight: bold
+}
+
+#bibEditMenu .bibEditMenuSection table {
+  width: 100%;
+}
+
+#bibEditMenu form {
+  margin: 0px;
+}
+
+#bibEditMenu .bibEditImgExpandMenuSection,
+#bibEditMenu .bibEditImgCompressMenuSection {
+  margin: 0px;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+#bibEditMenu a, #bibEditMenu button, #bibEditMenu input, #bibEditMenu select {
+  font-size: 0.8em;
+}
+
+#bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
+#bibEditMenu input, #bibEditMenu select {
+  margin: 1px;
+}
+
+#bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
+  width: 100%;
+}
+
+.bibEditImgCtrlEnabled {
+  cursor: pointer;
+  opacity: 1.0;
+  vertical-align: bottom;
+}
+
+.bibEditImgCtrlDisabled {
+  cursor: default;
+  opacity: 0.4;
+  vertical-align: bottom;
+}
+
+.bibEditColFieldBox {
+  min-width: 14px;
+  max-width: 14px;
+  width: 14px;
+}
+
+#bibEditColFieldTag {
+  min-width: 48px;
+  max-width: 100px;
+  width: 48px;
+  border-right: 1px solid #A1A1A1;
+}
+
+#bibEditColSubfieldTag {
+  width: 28px;
+  min-width: 28px;
+  max-width: 80px;
+  border-right: 1px solid #A1A1A1;
+}
+
+#bibEditColSubfieldAdd {
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+}
+
+#bibEditTable .bibEditCellContent:hover,
+#bibEditTable .bibEditCellContentProtected:hover{
+  background: lightyellow;
+}
+
+#bibEditTable .bibEditFieldColored {
+  background-color: rgb(235, 235, 235);
+  border: 1px solid #A1A1A1;
+}
+
+#bibEditTable .bibEditSelected {
+  background: lightblue;
+}
+
+#bibEditTable .bibEditVolatileSubfield {
+  color: grey;
+}
+
+#bibEditTable .bibEditCellField,
+#bibEditTable .bibEditCellFieldTag,
+#bibEditTable .bibEditCellSubfield,
+#bibEditTable .bibEditCellSubfieldTag {
+  vertical-align: top;
+}
+
+#bibEditTable .bibEditCellFieldTag {
+  font-weight: bold;
+}
+
+#bibEditTable .bibEditCellContentProtected {
+  font-weight: bold;
+}
+
+#bibEditTable textarea {
+  min-height: 36px;
+}
+
+#bibEditTable .bibEditCellAddSubfields {
+  vertical-align: bottom;
+}
+
+#bibEditTable img {
+  cursor: pointer;
+}
+
+#bibEditTable .bibEditBtnMoveSubfieldUp {
+  float: left;
+}
+
+#bibEditTable .bibEditBtnMoveSubfieldDown {
+  float: right;
+}
+
+#bibEditTable input[type="text"]:not(.bibEditInputError){
+  border: 2px inset grey;
+}
+
+#bibEditTable input[type="checkbox"] {
+  margin: 1px 0px 0px;
+  padding: 0px;
+}
+
+#bibEditTable .bibEditBtnClear {
+  margin-left: 20px;
+}
+
+#bibEditTable .bibEditTxtTag {
+  width: 34px;
+}
+
+#bibEditTable .bibEditTxtInd {
+  width: 14px;
+}
+
+#bibEditTable .bibEditCellAddSubfieldCode {
+  text-align: right;
+}
+
+#bibEditTable .bibEditTxtSubfieldCode {
+  width: 14px;
+}
+
+#bibEditTable .bibEditTxtValue {
+  width: 100%;
+}
+
+#bibEditTable .bibEditInputError {
+  border: 2px solid red;
+}
+
+#bibEditMessage {
+  background: rgb(250, 209, 99);
+}
+
+.bibEditAddFieldManipulationsBar {
+    display: table;
+}
+.bibEditAddFieldFormSelectTemplate {
+    display: table-cell;
+    width: 400px;
+}
+.bibEditAddFieldFormCreateSimilar {
+    display: table-cell;
+}
+
+.bibeditscrollArea {
+    width: 200px;
+    height: 75px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-color: #6699CC;
+    border-width: 1px;
+    border-style: solid;
+    float: left;
+    overflow: auto;
+}
+
+.bibeditscrollArea ul {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.bibeditHPCorrection{
+    border-width: 1px;
+    background-color: #FAEBD7;
+    font-size: smaller;
+    border-style: groove;
+    display: inline-block;
+    border-color: RosyBrown;
+    margin:5px 3px 3px 5px;
+    padding: 2px;
+}
+
+#bibeditHPChanges{
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 150px;
+}
+
+.bibeditHPHiddenElement{
+    visibility: hidden;
+    display: none;
+}
+
+.bibeditHPPanelEntry{
+    border-width: 1px;
+    border-style: dotted;
+    display: table;
+    background-color: #feffff;
+    border-color: #cbcccc;
+    margin-bottom: 5px;
+}
+
+.bibeditHPContentPreviewBox {
+    position: absolute;
+    z-index:0;
+    border-style: dotted;
+    border-width: 1px;
+    background-color: #fefeff;
+    top: 0px;
+    height: 500px;
+    overflow: auto;
+    width: 500px;
+}
+
+.bibeditHPControl{
+    display:table-cell;
+    width:20%;
+    margin:0px;
+}
+
+.bibeditHPEntryNumber{
+    display: table-cell;
+    width: 80%;
+}
+
+.bibeditHPEntryDateSection{
+    font-size: smaller;
+    width: 60%;
+    margin: 0px;
+    display: table-cell;
+}
+
+.bibeditHPDetailsOpener{
+    display: table-cell;
+    width: 20%;
+}
+.bibeditHPInformationsSection{
+
+}
+
+.bibeditHPDetailsOpener{
+    display: table-cell;
+    cursor: pointer;
+}
+
+.bibeditHPEntryControlsPanel{
+    display: table-row;
+}
+
+.bibeditHPEntryRow1{
+    display: table-row;
+}
+
+.bibeditHPEntryRow2{
+    display: table-row;
+}
+
+.bibeditHPEntryCol1{
+    display: table-cell;
+}
+
+.bibeditHPEntryCol2{
+    display: table-cell;
+    max-width: 28px;
+    min-width: 28px;
+    margin: 0px;
+}
+
+.bibeditHPPanelEntryDisabled {
+    background-color: #eeeeee;
+    color: #BBBBBB;
+}
+
+.bibEditRevHistorySelectedEntry {
+    background-color: #cccccc;
+    border: 1px solid #C7C7C7;
+}
+
+.bibEditRevHistoryEntry {
+    background-color: #efefef;
+    border: 1px solid #C7C7C7;
+}
+
+.bibEditRevHistoryEntryContent {
+    display: table-cell;
+    font-size: 80%;
+    cursor: pointer;
+}
+
+.bibEditRevHistoryEntryControls {
+    display: table-cell;
+}
+
+.bibEditRevHistoryLink {
+    display: table-cell;
+    border-style: none;
+}
+
+.bibEditRevHistoryLinkImg {
+    border-width: 0px;
+    border-style: none;
+}
+.bibEditRevHistoryMenuSection {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.bibEditHiddenElement {
+    display: none;
+}
+
+.bibEditURPreviewBox {
+    border-color: #dddddd;
+    border-style: dotted;
+}
+.bibEditURPairRow {
+    background-color: white;
+}
+
+.bibEditUROddRow {
+    background-color: #eeeeee;
+}
+
+.bibEditURPreviewHeader{
+    font-weight: bolder;
+}
+
+.bibEditURDescHeader{
+    font-weight: bolder;
+}
+
+.bibEditURDescEmptyCell{
+    width:20px;
+}
+
+.bibEditURDescChar{
+    font-style: italic;
+}
+
+.bibEditURDescVal{
+}
+
+.bibEditURMenuSection{
+    display: table-row;
+    width: 138px;
+    max-width: 138px;
+    overflow: visible;
+}
+
+.bibEditURDetailsSection{
+    display: table-cell;
+    max-width: 64px;
+    width: 64px;
+}
+
+.bibEditURPreviewBox{
+    max-width: 138px;
+    width: 138px;
+}
+
+.bibEditURDescEntry {
+    max-width: 138px;
+    width: 138px;
+    max-height: 20px;
+    overflow: visible;
+}
+
+.bibEditURDescEntryDetails {
+    position: relative;
+    left: 138px;
+    top: -20px;
+    overflow: visible;
+    background-color: white;
+    border-style: dotted;
+    border-width: 1px;
+    width: 300px;
+}
+
+.bibEditURDescEntrySelected{
+    background-color: #aaaaaa;
+}
+
+.bibEditBibCircPanel{
+    font-weight: normal;
+}
+
+.menu-btn {
+    background:#5B74A8;
+    background:-moz-linear-gradient(top,#5B74A8 0%,#5B74A8 100%);
+    background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#5B74A8),color-stop(100%,#5B74A8));
+    background:-webkit-linear-gradient(top,#5B74A8 0%,#5B74A8 100%);
+    background:-o-linear-gradient(top,#5B74A8 0%,#5B74A8 100%);
+    background:-ms-linear-gradient(top,#5B74A8 0%,#5B74A8 100%);
+    background:linear-gradient(top,#5B74A8 0%,#5B74A8 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#5B74A8',endColorstr='#5B74A8',GradientType=0);
+    padding:2px 6px;
+    color:#fff;
+    font-family:'Helvetica',sans-serif;
+    font-size:11px;
+    border-radius:0;
+    -moz-border-radius:0;
+    -webkit-border-radius:0;
+    border:1px solid #1A356E
+}
+
+.menu-btn[disabled="disabled"] {
+    opacity: 0.4;
+}
+
+.pagefooter {
+    display: none;
+}
+
+.revisionLine {
+    font-size:12px;
+    color: rgb(90, 134, 196);
+}
+
+.floatRight {
+    float: right;
+}
+
+.floatLeft {
+    float: left;
+}
+
+#Toptoolbar {
+    overflow: auto;
+}
+
+#bibEditContent {
+    margin-left: 175px;
+    width: 750px;
+}
+
+#bibEditContentTable {
+    overflow: auto;
+    border-top:1px solid;
+    border-color: #575757;
+    margin-top: 5px;
+}
+
+#bibEditMenu {
+    width: 135px;
+    float: left;
+    padding-left: 10px;
+    font-size: 0.8em;
+    z-index:1;
+    background-color: #EEEEEE;
+    border: 1px solid #C7C7C7;
+    padding: 10px;
+}
+
+#bibEditMessage {
+    display: none;
+    margin: 3px 3px 3px 3px;
+    width: 740px;
+}
+
+.warningMsg{
+    padding: 10px 10px 2px 10px;
+    background-color: #FAD163;
+}
+
+div.refextracted {
+    line-height:25px;
+}
+
+#bibEditMenu .bibEditMenuSection {
+    margin-bottom: 10px;
+}
+
+#bibEditMenu .bibEditMenuSectionHeader {
+    font-weight: bold;
+}
+
+#bibEditTable {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid #A1A1A1;
+    border-collapse: collapse;
+    width: 100%;
+    table-layout:fixed;
+}
+
+#textmarc_textbox {
+    width: 100%;
+    height: 100%;
+}
+
+#bibEditTable td {
+    padding: 1px 1px;
+    font-size: 0.8em;
+    overflow:hidden;
+    word-wrap: break-word;
+ }
+
+ #bibEditTable td textarea {
+    max-width: 615px;
+    min-height: 65px;
+    max-height: 600px;
+}
+
+.bibEditCellFieldTag:focus {
+    outline: none;
+}
+
+#print_helper {
+    display: none;
+}
+
+@media print {
+    img[id^='btnAddSubfield'] {
+        display:none;
+    }
+
+    .pagefooter {
+        display: none;
+    }
+
+    .bibEditVolatileSubfield {
+        display:none;
+    }
+
+    #print_helper {
+        display: block;
+        overflow: visible;
+        white-space: pre;
+        white-space: pre-wrap;
+    }
+
+    #textmarc_textbox {
+        display: none;
+    }
+}
+
+ /* jQuery-UI Theming used for:
+  * - Dialog refextract
+  */
+
+.bibedit_input {
+    border: 2px solid #DDECF7;
+    padding: 2px;
+}
+
+#input_extract_url {
+    width: 410px;
+    margin-top: 30px;
+}
+
+#reffreetext {
+    width: 99%;
+    height: 590px;
+}
+
+.dialog-box-centered {
+    margin-top: 300px;
+    text-align: center;
+}
+
+.dialog-box-centered-no-margin {
+    text-align: center;
+}
+
+.dialog-icon {
+    float: left;
+    margin: 12px 7px 10px 0;
+}
+
+/* jQuery-UI Theming used for:
+ * - Autocomplete menu
+ */
+
+.ui-autocomplete-loading {
+    background: white url('/img/ui-anim_basic_16x16.gif') right center no-repeat;
+}
+
+.ui-corner-all {
+    -moz-border-radius: 4px 4px 4px 4px;
+}
+
+.ui-widget-overlay {
+    -moz-background-clip: border;
+    -moz-background-origin: padding;
+    -moz-background-size: auto auto;
+    background-attachment: scroll;
+    background-position: 50%% 50%%;
+    background-repeat: repeat;
+    background-color: #666666;
+    opacity: 0.5;
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+
+.ui-widget {
+    font-size: .8em;
+}
+
+.ui-menu .ui-menu-item a {
+    display: block;
+    line-height: .8;
+    padding: 0.2em 0.4em;
+    text-decoration: none;
+    background-color: white;
+    color: black;
+}
+
+.ui-menu {
+    list-style: none outside none;
+    margin-left: 1em;
+    padding-left: 1em;
+}
+
+.ui-autocomplete {
+    cursor: default;
+    width: 300px;
+}
+
+.ui-dialog-content {
+    background-color: red;
+}

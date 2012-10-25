@@ -16,6 +16,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/invenio
+webdir=$(localstatedir)/www/img
+jsdir=$(localstatedir)/www/js
 
 pylib_DATA = bibedit_config.py \
              bibedit_dblayer.py \
@@ -31,8 +33,6 @@ pylib_DATA = bibedit_config.py \
              bibeditmulti_webinterface.py \
              bibeditmulti_engine.py
 
-jsdir=$(localstatedir)/www/js
-
 js_DATA = bibedit_display.js \
           bibedit_engine.js \
           bibedit_keys.js \
@@ -46,6 +46,8 @@ js_DATA = bibedit_display.js \
           bibedit_engine_unit_tests.conf \
           bibedit_refextract.js
 
+web_DATA = bibedit.css
+
 install-data-hook:
 	## Let's initialize an empty jquery.min.js, so that if the admin does not
 	## run make install-jquery-plugins, at least when jquery.min.js is
@@ -54,6 +56,7 @@ install-data-hook:
 
 
 EXTRA_DIST = $(pylib_DATA) \
-             $(js_DATA)
+             $(js_DATA) \
+             $(web_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
