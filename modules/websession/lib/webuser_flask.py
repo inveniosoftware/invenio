@@ -143,6 +143,7 @@ class GuestUser(dict):
         """
         Reload user information and precached access list.
         """
+        self.refresh(update_session)
         self._login()
         if update_session:
             session['user_info'] = dict(self)

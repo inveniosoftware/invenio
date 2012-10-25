@@ -53,7 +53,7 @@ class LoginForm(Form):
     #                validate_password])
     remember = BooleanField(_("Remember Me"))
     referer = HiddenField()
-    submit = SubmitField(_("Sing in"))
+    submit = SubmitField(_("Sign in"))
 
 
 class ChangeUserEmailSettingsForm(InvenioBaseForm):

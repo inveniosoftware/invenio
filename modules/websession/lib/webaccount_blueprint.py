@@ -92,7 +92,7 @@ _USER_SETTINGS = PluginContainer(
     plugin_builder=_invenio_settings_plugin_builder)
 
 
-@blueprint.route('/v2/display', methods=['GET', 'POST'])
+@blueprint.route('/display', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 def index():
     # load plugins
@@ -107,7 +107,7 @@ def index():
                            plugins = plugins)
 
 
-@blueprint.route('/v2/edit/<name>', methods=['GET', 'POST'])
+@blueprint.route('/edit/<name>', methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Edit"))
 @blueprint.invenio_authenticated
 def edit(name):
