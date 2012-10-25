@@ -2781,24 +2781,8 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
     # calculate the list of recids (restricted or not) that the user has rights to access and we should display (only those)
     records_that_can_be_displayed = intbitset()
 
-    try:
-        recids_in_any_collection = list(hitset_in_any_collection)
-    except:
-        # the user displayed a specific collection
-        recids_in_any_collection = []
-
-    # let's get the restricted collections the user has rights to view
-    from invenio.search_engine import get_permitted_restricted_collections
-    restricted_collections = user_info.get('precached_permitted_restricted_collections', None)
-    if restricted_collections is None:
-        restricted_collections = get_permitted_restricted_collections(user_info)
-        user_info['precached_permitted_restricted_collections'] = restricted_collections
-
-    if not recids_in_any_collection or \
-        (not req or isinstance(req, cStringIO.OutputType)):
-        # we were called from CLI, then we will return all recids,
-        # the public and the restricted ones, or the user displayed
-        # a specific collection
+    if not req or isinstance(req, cStringIO.OutputType): # called from CLI
+        user_info = {}
         for coll in colls:
             results[coll] = hitset_in_any_collection & get_collection_reclist(coll)
             results_nbhits += len(results[coll])
@@ -2815,76 +2799,26 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         # child collections of the collection from which the user
         # started his/her search. This list of children colls will be
         # used in the warning proposing a search in that collections
-        daughter_colls = list(colls)
         try:
             current_coll = req.argd['cc'] # current_coll: coll from which user started his/her search
         except:
-            from invenio.websearch_model import Collection
             from flask import request
-            current_coll = request.args.get('cc', Collection.query.get(1).name) # current_coll: coll from which user started his/her search
+            current_coll = request.args.get('cc', CFG_SITE_NAME) # current_coll: coll from which user started his/her search
 
-        if restricted_collections:
-            for restricted_coll in restricted_collections:
-                restricted_coll_ancestors = get_coll_ancestors(restricted_coll)
-                if current_coll in restricted_coll_ancestors:
-                    daughter_colls.append(restricted_coll)
+        current_coll_children = get_collection_allchildren(current_coll) # real & virtual
+        # add all restricted collections, that the user has access to, and are under the current collection
+        # do not use set here, in order to maintain a specific order:
+        # children of 'cc' (real, virtual, restricted), rest of 'c' that are  not cc's children
+        colls_to_be_displayed = [coll for coll in current_coll_children if coll in colls or coll in permitted_restricted_collections]
+        colls_to_be_displayed.extend([coll for coll in colls if coll not in colls_to_be_displayed])
 
-        # let's enrich the list of colls where we are looking for
-        # with the restricted collections the user has access to
-        final_colls = set(colls)
-        final_colls.update(restricted_collections)
-        final_colls = list(final_colls)
-        for coll in final_colls:
-            if coll in restricted_collections:  # restricted collection
-                for recid in recids_in_any_collection:
-                    # let's get the restricted collections each recid belongs to
-                    restricted_collections_for_recid = \
-                        get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
-                    if coll in restricted_collections_for_recid:
-                        # coll is restricted, user has rights to view it and
-                        # the recid belongs to this restricted coll
-                        restricted_coll = coll
-                        restricted_coll_ancestors = get_coll_ancestors(restricted_coll)
-                        # let's hang the results found from the correct coll
-                        if current_coll in restricted_coll_ancestors:
-                            # restricted_coll hangs from current_coll
-                            direct_dad = 1
-                            for coll in final_colls:
-                                if coll in restricted_coll_ancestors:
-                                     # current_coll is not direct dad of restricted_coll
-                                    if results.has_key(coll):
-                                        results[coll].union_update(hitset_in_any_collection & \
-                                                                   get_collection_reclist(restricted_coll))
-                                    else:
-                                        results.update({coll : hitset_in_any_collection & \
-                                                        get_collection_reclist(restricted_coll)})
-                                    results_nbhits += len(results[coll])
-                                    direct_dad = 0
-
-                            if direct_dad:
-                                # current_coll is direct dad of restricted_coll
-                                if results.has_key(coll):
-                                    results[restricted_coll].union_update(hitset_in_any_collection & \
-                                                                          get_collection_reclist(restricted_coll))
-                                else:
-                                    results.update({restricted_coll : hitset_in_any_collection & \
-                                                    get_collection_reclist(restricted_coll)})
-                                results_nbhits += len(results[restricted_coll])
-
-                        elif coll == current_coll:
-                            # user started his/her search from a restricted collection
-                            if results.has_key(coll):
-                                results[coll].union_update(hitset_in_any_collection & \
-                                                           get_collection_reclist(coll))
-                            else:
-                                results.update({coll : hitset_in_any_collection & \
-                                                get_collection_reclist(coll)})
-                            results_nbhits += len(results[coll])
-
-            else: # public collection
-                if results.has_key(coll):
-                    results[coll].union_update(hitset_in_any_collection & \
-                                               get_collection_reclist(coll))
+        if policy == 'ANY':# the user needs to have access to at least one collection that restricts the records
+            #we need this to be able to remove records that are both in a public and restricted collection
+            permitted_recids = intbitset()
+            notpermitted_recids = intbitset()
+            for collection in restricted_collection_cache.cache:
+                if collection in permitted_restricted_collections:
+                    permitted_recids |= get_collection_reclist(collection)
                 else:
                     notpermitted_recids |= get_collection_reclist(collection)
             records_that_can_be_displayed = hitset_in_any_collection - (notpermitted_recids - permitted_recids)

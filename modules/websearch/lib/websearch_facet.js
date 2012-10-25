@@ -50,97 +50,105 @@
 
       var that = this,
           element = this.$element,
-          filter = this.options.filter,
-          facets = this.options.facets,
-          split_by = this.options.split_by,
-          button_more = this.options.button_builder(this.options.title_more),
-          button_less = this.options.button_builder(this.options.title_less),
-          //button_clear = this.options.clear_button_builder(this.options.title_clear),
-          row_builder = this.options.row_builder;
+          facets = this.options.facets
 
-      /*
-      var $controls = $(this.options.controls_builder());
-      $controls.hide().appendTo(element);
-      $(this.options.control_button_builder(this.options.title_limit_to))
-        .addClass('btn-info').on('click', function() {
-          return that.updateFacets('+');
-        }).appendTo($controls);
-      $(this.options.control_button_builder(this.options.title_exclude))
-        .addClass('btn-danger').on('click', function() {
-          return that.updateFacets('-');
-        }).appendTo($controls);
-      */
+      this.options.url_map = {}
 
       for (var i in facets) {
         var f = facets[i];
-
-        // Create selected facet filter.
-        $(this.options.filter_builder(f.facet, f.title)).appendTo(filter);
+        this.options.url_map[f.facet] = f.url
         // Create facet sidebar.
         $(this.options.box_builder(f.facet, f.title)).appendTo(element);
-        // Load sidebar options.
-        $.ajax({
-          url: f.url,
-          dataType : 'json',
-          context: $('.'+f.facet+' .context').data('facet', f.facet)
-        }).done(function(json) {
-          var el = $(this),
-              name = el.data('facet');
 
-          /* Generate facet rows with checkboxes. */
-          $.each(json.facet, function(){
-            $(row_builder(this, name)).appendTo(el);
-          });
-
-          /* Append buttons */
-          var l = $(button_less),
-              m = $(button_more);
-
-          m.on('click', function(e) {
-            var controls = el.find('.controls:not(:visible)').slice(0,split_by)
-            l.show();
-            if (controls.length < split_by) {
-              m.hide();
-            }
-            controls.show();
-          }).appendTo(el);
-
-          l.on('click', function(e) {
-            var controls = el.find('.controls:visible');
-            m.show();
-            if (controls.length > split_by) {
-              controls.slice(split_by).slice(-1-split_by).hide();
-            }
-            if (controls.length <= 2*split_by) {
-              l.hide();
-            }
-          }).addClass('pull-right').appendTo(el);
-
-          el.find('.controls:not(:visible)').slice(0,split_by).show();
-
-          l.hide();
-          if (json.facet.length <= split_by) {
-            m.hide();
-          }
-
-          element.trigger($.Event('loaded', {name:name, facet:json.facet}));
-
-          if (json.facet.length) {
-            $(this).parent().parent().show();
-            //$(this).parent().addClass("in");
-            //$controls.show();
-          }
-
-        }); // end ajax done
+        this.createFacetBox(f, $('.'+f.facet+' .context'), {})
       } // end for
-
-      // Filter clear button.
-      //$(button_clear).on('click', $.proxy(this.clear, this)).appendTo(filter);
 
       this.filter = {'+': {}, '-': {} };
 
 
     } // end init function
+
+  , createFacetBox: function(facet, element, data) {
+      var that = this,
+          split_by = this.options.split_by,
+          button_more = this.options.button_builder(this.options.title_more),
+          button_less = this.options.button_builder(this.options.title_less),
+          row_builder = this.options.row_builder
+
+      $(element).data('facet', facet)
+      // Load sidebar options.
+      $.ajax({
+        url: facet.url,
+        dataType : 'json',
+        data: data,
+        context: {element: element, facet: facet, that: this, data: data}
+      }).done(function(json) {
+        var el = this.element,
+            options = this.facet,
+            name = options.facet,
+            data = this.data,
+            context = this
+
+        /* Generate facet rows with checkboxes. */
+        $.each(json.facet, function(){
+          var $row = $(row_builder(this, name))
+          if (data.parent) {
+            $row.on('click', function() {
+              context.that.delete('+', name, data.parent)
+              context.that.delete('-', name, data.parent)
+              el.trigger($.Event('deleted', {op: '', key: name, value: data.parent}));
+            })
+          }
+          $row.appendTo(el);
+        });
+
+        /* Append buttons */
+        var l = $(button_less),
+            m = $(button_more);
+
+        m.on('click', function(e) {
+          var controls = el.find('.controls:not(:visible)').slice(0,split_by)
+          l.show();
+          if (controls.length < split_by) {
+            m.hide();
+          }
+          controls.show();
+          return false
+        }).appendTo(el);
+
+        l.on('click', function(e) {
+          var controls = el.find('.controls:visible');
+          m.show();
+          if (controls.length > split_by) {
+            controls.slice(split_by).slice(-1-split_by).hide();
+          }
+          if (controls.length <= 2*split_by) {
+            l.hide();
+          }
+          return false
+        }).addClass('pull-right').appendTo(el);
+
+        el.find('.controls:not(:visible)').slice(0,split_by).show();
+
+        l.hide();
+        if (json.facet.length <= split_by) {
+          m.hide();
+        }
+
+        element.trigger($.Event('loaded', {
+          name:name
+        , facet:json.facet
+        , options: options
+        }));
+
+        if (json.facet.length) {
+          el.parent().parent().show();
+          //$(this).parent().addClass("in");
+          //$controls.show();
+        }
+
+      }); // end ajax done
+    }
 
   , queryString: function() {
       var that = this,
@@ -203,23 +211,12 @@
       var op2 = op == '+' ? '-' : '+'
       this._delete(op2, key, value)
 
-      /*
-      filter.find('.'+key).show().parent().show();
-      filter.find('.'+key+' span.data').append(
-        that.options.badge.clone().addClass(that.options.op_classes[op]).append(
-          that.options.close.clone().on('click', function(event) {
-            $(this).parent().remove();
-            that.delete(op, key, value);
-          })
-        ).append(value)
-      );
-      */
-      this.$element.trigger($.Event('added', {op: op, key: key, value: value}));
       return true;
     }
 
   , addFacet: function(op, key, value) {
       if (this._addFacet(op, key, value)) {
+        this.$element.trigger($.Event('added', {op: op, key: key, value: value}));
         this.$element.trigger($.Event('updated'));
       } else {
         this.$element.trigger($.Event('exists'));
@@ -227,21 +224,23 @@
     }
 
   , _delete: function(op, key, value) {
-      var filter = $(this.options.filter),
-          r = this.filter[op][key],
+      var r = this.filter[op][key],
           i = $.inArray(value, r)
 
       if (i>-1) {
         this.filter[op][key].splice(i,1);
         if (!this.filter[op][key].length) {
           delete this.filter[op][key];
-          this.$element.trigger($.Event('deleted', {op: op, key: key, value: value}));
         }
+        return true
       }
+      return false
     }
 
   , delete: function(op, key, value) {
-      this._delete(op, key, value);
+      if (this._delete(op, key, value)) {
+        this.$element.trigger($.Event('deleted', {op: op, key: key, value: value}));
+      }
       this.$element.trigger($.Event('updated'));
     }
 
@@ -273,16 +272,13 @@
     }
 
   , _clear: function() {
-      var that = this,
-          filter = $(this.options.filter);
+      var that = this
       $.each(this.filter['+'], function(k, vs) {
-        filter.find('.'+k+' span.data').children().remove();
         $.each(vs.slice(), function(i,v) {
           that._delete('+', k, v);
         });
       });
       $.each(this.filter['-'], function(k, vs) {
-        filter.find('.'+k+' span.data').children().remove();
         $.each(vs.slice(), function(i,v) { that._delete('-', k, v); });
       });
       this.filter['+'] = {};
@@ -339,14 +335,6 @@
     },
     clear_button_builder: function(title) {
       return '<span class="pull-right btn btn-danger">'+title+'</span>';
-    },
-    filter_builder: function(name, title) {
-      return '<div style="margin-bottom: 2px;" class="\
-        ' + name + ' row facets_fill">\
-        <strong class="span1">' + title + ':</strong>\
-        <span class="data span6">\
-        </span>\
-        </div>';
     },
     badge: $('<span/>', {style: 'float:left; line-height: 18px; margin-right: 5px', 'class': 'badge'}),
     close: $('<a/>', {'class': 'close', html:'&nbsp;×'}),

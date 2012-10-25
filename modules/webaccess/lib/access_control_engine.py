@@ -57,6 +57,7 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     current_app.logger.info(type(req))
     if type(req) not in [int, long]:
         req = current_user.get_id()
+
     current_app.logger.info(req)
     user_info = collect_user_info(req) #FIXME
     roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
@@ -80,8 +81,8 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
             return (20, CFG_WEBACCESS_WARNING_MSGS[20] % cgi.escape(name_action))
 
     ## User is not authorized
-    in_a_web_request_p = bool(user_info['uri'])
-    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
+    in_a_web_request_p = bool(user_info.get('uri', ''))
+    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info.get('uri', '')), CFG_WEBACCESS_MSGS[1]) or "")))
 
 def acc_get_authorized_emails(name_action, **arguments):
     """

@@ -302,8 +302,14 @@ def facet(name, qid):
 
     limit = 50
 
+
+
     if name == 'collection':
-        collection = Collection.query.filter(Collection.name==data['cc']).first_or_404()
+        parent = request.args.get('parent', None)
+        if parent is not None:
+            collection = Collection.query.filter(Collection.name==parent).first_or_404()
+        else:
+            collection = Collection.query.filter(Collection.name==data['cc']).first_or_404()
         facet = []
         for c in collection.collection_children:
             num_records = len(c.reclist.intersection(recIDsHitSet))

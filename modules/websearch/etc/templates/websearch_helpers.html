@@ -93,7 +93,7 @@
     {% endif %}
     #}
     <a href="{{ url_for(".collection", name=collection.name) }}">
-      {{ collection.name_ln }}&nbsp;<span class="badge">{{ collection.nbrecs }}</span>
+      {{ collection.name_ln }}&nbsp;<small class="muted">({{ collection.nbrecs }})</small>
     </a>
   {% if collection.collection_children and idxs|length < limit %}
     {%- do idxs.append(loop.index) -%}
@@ -312,10 +312,12 @@
           </label>
           <div class="controls">
             <div id="searchdropdown" style="float: left;" class="dropdown">
+            {#
             {% set search_placeholder = _('Input query') %}
             {% if collection.examples %}
               {% set search_placeholder = (collection.examples|random).example.body %}
             {% endif %}
+            #}
               <div class="input-append">
                 <input autocomplete="off"
                   data-provide="typeahead"
@@ -323,7 +325,7 @@
                   name="p"
                   class="span5"
                   type="text"
-                  placeholder="{{ _('Example') }}: {{ search_placeholder }}"
+                  {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
                   value="{{ request.args.get('p', '') }}" autofocus/><!--
                 No space!
               --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn">
