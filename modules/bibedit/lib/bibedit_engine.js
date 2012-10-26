@@ -422,7 +422,7 @@ function onAjaxSuccess(json, onSuccess){
       : gSITE_URL + '/'+ gSITE_RECORD +'/edit/';
     return;
   }
-  else if ($.inArray(resCode, [101, 102, 103, 104, 105, 106, 107, 108, 109]) != -1) {
+  else if ($.inArray(resCode, [101, 102, 104, 105, 106, 107, 108, 109]) != -1) {
     cleanUp(!gNavigatingRecordSet, null, null, true, true);
     displayMessage(resCode);
     if (resCode == 107) {
@@ -439,39 +439,39 @@ function onAjaxSuccess(json, onSuccess){
     /* Warn the user leaving toolbar active */
     updateStatus('error', gRESULT_CODES[resCode], true);
   }
-  else{
+  else {
     var cacheOutdated = json['cacheOutdated'];
     var requestType = createReq.transactions[json['ID']];
-    if (cacheOutdated && requestType == 'submit'){
+    if (cacheOutdated && requestType == 'submit') {
       // User wants to submit, but cache is outdated. Outdated means that the
       // DB version of the record has changed after the cache was created.
       displayCacheOutdatedScreen(requestType);
       $('#lnkMergeCache').bind('click', onMergeClick);
       $('#lnkForceSubmit').bind('click', function(event){
-  onSubmitClick.force = true;
-  onSubmitClick();
-  event.preventDefault();
+        onSubmitClick.force = true;
+        onSubmitClick();
+        event.preventDefault();
       });
       $('#lnkDiscardChanges').bind('click', function(event){
-  onCancelClick();
-  event.preventDefault();
+        onCancelClick();
+        event.preventDefault();
       });
       updateStatus('error', 'Error: Record cache is outdated');
     }
-    else{
-      if (requestType != 'getRecord'){
-  // On getRecord requests the below actions will be performed in
-  // onGetRecordSuccess (after cleanup).
-  var cacheMTime = json['cacheMTime'];
-  if (cacheMTime)
-    // Store new cache modification time.
-    gCacheMTime = cacheMTime;
-  var cacheDirty = json['cacheDirty'];
-  if (cacheDirty){
-    // Cache is dirty. Enable submit button.
-    gRecordDirty = cacheDirty;
-    activateSubmitButton();
-  }
+    else {
+      if (requestType != 'getRecord') {
+        // On getRecord requests the below actions will be performed in
+        // onGetRecordSuccess (after cleanup).
+        var cacheMTime = json['cacheMTime'];
+        if (cacheMTime)
+          // Store new cache modification time.
+          gCacheMTime = cacheMTime;
+        var cacheDirty = json['cacheDirty'];
+        if (cacheDirty){
+          // Cache is dirty. Enable submit button.
+          gRecordDirty = cacheDirty;
+          activateSubmitButton();
+        }
       }
       if (onSuccess) {
           // No critical errors; call onSuccess function.
@@ -1247,14 +1247,19 @@ function onGetRecordSuccess(json){
   gRedoList = json['redoList'];
   updateUrView();
 
-  // Display record.
   displayRecord();
   // Activate menu record controls.
   activateRecordMenu();
+
   // the current mode should is indicated by the result from the server
   gReadOnlyMode = (json['inReadOnlyMode'] != undefined) ? json['inReadOnlyMode'] : false;
   gRecLatestRev = (json['latestRevision'] != undefined) ? json['latestRevision'] : null;
   gRecRevisionHistory = (json['revisionsHistory'] != undefined) ? json['revisionsHistory'] : null;
+
+  if (json["resultCode"] === 103) {
+    gReadOnlyMode = true;
+    displayMessage(json["resultCode"], true);
+  }
 
   updateInterfaceAccordingToMode();
 
@@ -1800,6 +1805,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gCacheMTime = null;
   gSelectionMode = false;
   gReadOnlyMode = false;
+  $('#btnSwitchReadOnly').html("Read-only");
   gHoldingPenLoadedChanges = null;
   gHoldingPenChanges = null;
   gUndoList = [];

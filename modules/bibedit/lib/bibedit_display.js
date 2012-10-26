@@ -859,7 +859,8 @@ function displayMessage(msgCode, keepContent, args) {
         msg = 'This record does not exist. Please try another record ID.';
         break;
     case 103:
-        msg = 'Cannot edit deleted record.';
+        msg = 'The record is marked as deleted. It is possible to ' +
+            'browse the history on the left menu';
         break;
     case 104:
         msg = 'This record is currently being edited by another user. Please ' +

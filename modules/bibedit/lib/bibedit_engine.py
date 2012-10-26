@@ -561,8 +561,6 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
         if record_status == 0:
             response['resultCode'] = 102
-        elif record_status == -1:
-            response['resultCode'] = 103
         elif not read_only_mode and not existing_cache and \
                 record_locked_by_other_user(recid, uid):
             response['resultCode'] = 104
@@ -653,6 +651,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             if template_to_merge:
                 record = merge_record_with_template(record, template_to_merge)
                 create_cache_file(recid, uid, record, True)
+
+            if record_status == -1:
+                # The record was deleted
+                response['resultCode'] = 103
 
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
