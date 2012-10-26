@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_ETCDIR, \
      CFG_CACHEDIR, \
-     CFG_TMPSHAREDDIR, \
+     CFG_TMPDIR, \
      CFG_SITE_SUPPORT_EMAIL
 from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
@@ -752,7 +752,7 @@ def move_drafts_articles_to_ready(journal_name, issue):
                 record_xml = format_record(recid, of='xm')
                 if not record_xml:
                     continue
-                new_record_xml_path = os.path.join(CFG_TMPSHAREDDIR,
+                new_record_xml_path = os.path.join(CFG_TMPDIR,
                                                    'webjournal_publish_' + \
                                                    str(recid) + '.xml')
                 if os.path.exists(new_record_xml_path):
