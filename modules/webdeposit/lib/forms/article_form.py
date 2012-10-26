@@ -14,7 +14,7 @@ class ArticleForm(Form):
     publisher = PublisherField(_('Publisher'))
     journal = JournalField(_('Journal Title'))
     issn = TextField('ISSN')
-    doctitle = TitleField(_('Document Title'))
+    title = TitleField(_('Document Title'))
     author = AuthorField(_('Author of the Document'))
     abstract = TextAreaField(_('Abstract'))
     pagesnum = IntegerTextField(_('Number of Pages'))

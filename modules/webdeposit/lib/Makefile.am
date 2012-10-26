@@ -24,9 +24,9 @@ pylib_DATA = __init__.py \
              webdeposit_utils.py \
              webdeposit_load_fields.py \
              webdeposit_load_forms.py \
+             webdeposit_field_widgets.py \
+             webdeposit_model.py \
              sherpa_romeo.py \
-             xmlDict.py \
-             webdeposit_field_widgets.py
-
+             xmlDict.py
 
 CLEANFILES = *~ *.tmp *.pyc

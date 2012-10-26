@@ -68,7 +68,7 @@ $(function() {
          // General settings
          runtimes : 'html5',
          url : $SCRIPT_ROOT + '_upload',
-         max_file_size : '10mb',
+         max_file_size : '60mb',
          chunk_size : '1mb',
          unique_names : true,
 
@@ -77,15 +77,16 @@ $(function() {
 
          // Specify what files to browse for
          filters : [
-             {title : "Image files", extensions : "jpg, gif, png"},
-             {title : "Zip files", extensions : "zip"}
+             {title : "Image files", extensions : "jpg,gif,png,tif"},
+             {title : "Compressed files", extensions : "zip,tar,gz"},
+             {title : "PDF files", extensions : "pdf"},
          ]
      });
 });
 </script>
 
 
-<!------------------->
+<!-- --------------- -->
 
 <script type=text/javascript>
 
@@ -400,11 +401,11 @@ $(function() {
               </a>
               <ul class="dropdown-menu">
               {% for draft in drafts %}
-                <li> <a href="{{ draft.id }}">
-                        {% if  draft.doctitle is none %}
+                <li> <a href="{{ draft.draft_id }}">
+                        {% if  draft.title is none %}
                             Untitled
                         {% else %}
-                            {{ draft.doctitle }}
+                            {{ draft.title }}
                         {% endif %}
                      </a>
                 </li>
@@ -413,7 +414,7 @@ $(function() {
             </div>
 
             <a href="/submit/websubmit_add/0"><button class="btn btn-small btn-primary" type="button" style="float:left; margin-left:220px;"><i class="icon-edit"></i> New Draft</button></a>
-            <a href="/submit/websubmit_delete/{{ draftid }}"><button class="btn btn-small btn-danger" type="button" style="float:left; margin-left:10px;"><i class="icon-remove"></i> Delete Draft</button></a>
+            <a href="/submit/websubmit_delete/{{ draft_id }}"><button class="btn btn-small btn-danger" type="button" style="float:left; margin-left:10px;"><i class="icon-remove"></i> Delete Draft</button></a>
          </div>
        {% endif %}
     <div id="container">

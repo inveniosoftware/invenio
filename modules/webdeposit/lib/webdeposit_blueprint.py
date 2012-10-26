@@ -19,8 +19,10 @@
 
 """WebDeposit Flask Blueprint"""
 import os
+import shutil
 import json
 from werkzeug import *
+from glob import iglob
 from flask import g, render_template, \
                   request, jsonify, redirect, url_for, current_app, \
                   send_from_directory
@@ -76,19 +78,92 @@ def submit():
 
 @blueprint.route('/websubmit_add/_upload', methods=['GET', 'POST'])
 def plupload():
+    #r = rediscache.get("request")
+    #rediscache.set("request", r + "\n" + str(request.form))
     if request.method == 'POST':
-       saved_files_urls = []
-       for key, file in request.files.iteritems():
-           if file:
-               uploaded_file = request.files['file']
-               filename = secure_filename(uploaded_file.filename)
-               upload_folder = '/opt/invenio/var/tmp'
-               uploaded_file.save(os.path.join(upload_folder, filename))
-               send_from_directory(upload_folder, filename)
+        try:
+            chunks = request.form['chunks']
+            chunk = request.form['chunk']
+        except KeyError:
+            chunks = None
+            pass
+        name = request.form['name']
+        uploaded_files_urls = []
+
+        upload_folder = '/opt/invenio/var/tmp/webdeposit_uploads'
+        current_chunk = request.files['file']
+
+        try:
+            filename = name + "_" + chunk
+        except Exception:
+            filename = name
+        current_chunk.save(os.path.join(upload_folder, filename))
+
+        if chunks is None: #file is a single chunk
+            file_path = os.path.join(upload_folder, name)
+            from invenio.webuser_flask import current_user
+            form = ArticleForm()
+            form_type = form.__class__.__name__
+            current_draft_id = get_current_draft(current_user.get_id()).draft_id
+            draft_field_list_add(current_user.get_id(), \
+                                 current_draft_id, \
+                                 form_type, \
+                                 "files", \
+                                 file_path)
+        elif int(chunk) == int(chunks) - 1:
+            '''All chunks have been uploaded!
+                start merging the chunks'''
+
+            chunk_files = []
+            for filename in iglob(os.path.join(upload_folder, name + '_*')):
+                chunk_files.append(filename)
+
+            #Sort files in numerical order
+            chunk_files.sort(key=lambda x: int(x.split("_")[-1]))
+
+            file_path = os.path.join(upload_folder, name)
+            destination = open(file_path, 'wb')
+            for filename in chunk_files:
+                shutil.copyfileobj(open(filename, 'rb'), destination)
+            destination.close()
+
+            from invenio.webuser_flask import current_user
+            form = ArticleForm()
+            form_type = form.__class__.__name__
+            current_draft_id = get_current_draft(current_user.get_id()).draft_id
+            draft_field_list_add(current_user.get_id(), \
+                                 current_draft_id, \
+                                 form_type, \
+                                 "files", \
+                                 file_path)
+
+#               from random import randint
+#               filename = filename + str(randint(1, 10000))
+        #else:
+            #Concatenate the rest chunks to the first file
+        #    chunked_file = open(os.path.join(upload_folder, name), 'wb')
+         #   shutil.copyfileobj(current_chunk, chunked_file)
+          #  chunked_file.close()
+
+#        for key, file in request.files.iteritems():
+#           if file:
+#               uploaded_file = request.files['file']
+#               filename = secure_filename(uploaded_file.filename)
+#               
+#               from random import randint
+#               filename = filename + str(randint(1, 10000))
+
+               #uploaded_files_urls.append(url_for('get_file_url', filename=filename))
+    #return uploaded_files_urls[0]
                #uploaded_file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
                #send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
                #saved_files_urls.append(url_for('uploaded_file', filename=filename))
     return ""
+
+@blueprint.route('/websubmit_add/uploads/<path:filename>')
+def get_file_url(filename):
+    return send_from_directory('/opt/invenio/var/tmp/webdeposit_uploads', \
+                               filename)#as_attachment=True
 
 @blueprint.route('/websubmit_add/_autocomplete', methods=['GET', 'POST'])
 def autocomplete():
@@ -132,14 +207,17 @@ def autocomplete_ISSN_Conditions():
     s = SherpaRomeoSearch()
 
     s.searchTitle(query)
-    current_draft = get_current_draft(current_user.get_id())
+    current_draft_id = get_current_draft(current_user.get_id()).draft_id
 
     response = dict()
     response['issn'] = s.parser.getISSN()
     response['conditions'] = s.parser.getConditions()
 
-    draft_field_set(current_user.get_id(), current_draft, "issn", response['issn'])
-    draft_field_set(current_user.get_id(), current_draft, "conditions", response['conditions'])
+    form = ArticleForm()
+    form_type = form.__class__.__name__
+
+    draft_field_set(current_user.get_id(), current_draft_id, form_type, "issn", response['issn'])
+    draft_field_set(current_user.get_id(), current_draft_id, form_type, "conditions", response['conditions'])
 
     return json.dumps(response)
 
@@ -151,80 +229,97 @@ def error_check():
 
     from invenio.webuser_flask import current_user
 
-    current_draftID = get_current_draft(current_user.get_id())
-    draft_field_set(current_user.get_id(), current_draftID, str(name), str(val))
+    form = ArticleForm()
+    form_type = form.__class__.__name__
+
+    current_draft_id = get_current_draft(current_user.get_id()).draft_id
+    draft_field_set(current_user.get_id(), current_draft_id, form_type, str(name), str(val))
+
 
 
     if name == "issn" or name == "journal" :
-        draft_field_set(current_user.get_id(), current_draftID, "conditions", None)
+        draft_field_set(current_user.get_id(), current_draft_id, form_type, "conditions", None)
     elif name == "date":
-        draft_field_set(current_user.get_id(), current_draftID, "date", str(val))
+        draft_field_set(current_user.get_id(), current_draft_id, form_type, "date", str(val))
 
-    form = ArticleForm()
+
     form.__dict__["_fields"][name].process_data(val)
 
     return jsonify(form.__dict__["_fields"][name].pre_validate())
 
 
 @blueprint.route('/websubmit_delete/')
-@blueprint.route('/websubmit_delete/<int:draftid>')
-def delete(draftid=None):
+@blueprint.route('/websubmit_delete/<int:draft_id>')
+def delete(draft_id=None):
     from invenio.webuser_flask import current_user
 
-    if draftid is None:
-        draftid = get_current_draft(current_user.get_id())
+    if draft_id is None:
+        draft_id = get_current_draft(current_user.get_id()).draft_id
 
-    latestDraft = delete_draft(current_user.get_id(), str(draftid))
+    latestDraft = delete_draft(current_user.get_id(), str(draft_id))
 
-    return redirect(url_for("websubmit.add", draftid=latestDraft))
+    return redirect(url_for("websubmit.add", draft_id=latest_draft))
 
 
 @blueprint.route('/websubmit_add/')
-@blueprint.route('/websubmit_add/<int:draftid>')
-def add(draftid=None):
+@blueprint.route('/websubmit_add/<int:draft_id>')
+def add(draft_id=None):
     from invenio.webuser_flask import current_user
 
     form = ArticleForm()
+    form_type = form.__class__.__name__
+
     if current_user.get_id() == 0 or not form._drafting: #if guest user or drafting is not enabled
         return render_template('websubmit_add.html', form=form, drafts=[])
 
-    if draftid is None: # get the latest draft
+    if draft_id is None: # get the latest draft
 
-        draftid = get_current_draft(current_user.get_id())
+        draft_id = get_current_draft(current_user.get_id()).draft_id
 
-        if draftid is None:
-            draftid = new_draft(current_user.get_id())
-            return redirect(url_for("websubmit.add", draftid=draftid))
+        if draft_id is None:
+            draft_id = new_draft(current_user.get_id(), form_type)
+            return redirect(url_for("websubmit.add", draft_id=draft_id))
 
-        draft = get_draft(current_user.get_id(), draftid)
+        draft = get_draft(current_user.get_id(), draft_id, form_type)
 
-    elif draftid == 0:
-        draftid = new_draft(current_user.get_id())
-        return redirect(url_for("websubmit.add", draftid=draftid))
-        draft = get_draft(current_user.get_id(), str(draftid))
+    elif draft_id == 0:
+        draft_id = new_draft(current_user.get_id(), form_type)
+        return redirect(url_for("websubmit.add", draft_id=draft_id))
+        draft = get_draft(current_user.get_id(), str(draft_id))
     else:
-        draft = get_draft(current_user.get_id(), draftid)
+        draft = get_draft(current_user.get_id(), draft_id, form_type)
         if draft is None:
-            draftid = new_draft(current_user.get_id())
-            return redirect(url_for("websubmit.add", draftid=draftid))
+            draft_id = new_draft(current_user.get_id())
+            return redirect(url_for("websubmit.add", draft_id=draft_id))
 
-    set_current_draft(current_user.get_id(), draftid)
+    set_current_draft(current_user.get_id(), draft_id)
 
     for fieldName, fieldData in form.data.iteritems():
         if fieldName in draft:
             form[fieldName].process_data(draft[fieldName])
 
-    conditions = draft_field_get(current_user.get_id(), draftid, "conditions")
-    drafts = get_drafts(current_user.get_id())
+    conditions = draft_field_get(current_user.get_id(), draft_id, form_type, "conditions")
+    drafts = draft_field_get_all(current_user.get_id(), form_type, "title")
     if not isinstance(conditions, str) and conditions is not None :
         conds = []
         for condition in conditions:
             conds.append(escape(condition))
         conditions = conds
-        return render_template('websubmit_add.html', form=form, conditions=conditions, drafts=drafts, draftid=draftid)
+        return render_template('websubmit_add.html', \
+                               form=form, \
+                               conditions=conditions, \
+                               drafts=drafts, \
+                               draft_id=draft_id)
     elif conditions is not None:
         conditions = [escape(conditions)]
-        return render_template('websubmit_add.html', form=form, conditions=conditions, drafts=drafts, draftid=draftid)
+        return render_template('websubmit_add.html', \
+                               form=form, \
+                               conditions=conditions, \
+                               drafts=drafts, \
+                               draft_id=draft_id)
     else:
-        return render_template('websubmit_add.html', form=form, drafts=drafts, draftid=draftid)
+        return render_template('websubmit_add.html', \
+                               form=form, \
+                               drafts=drafts, \
+                               draft_id=draft_id)
 

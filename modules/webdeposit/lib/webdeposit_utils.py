@@ -1,24 +1,92 @@
+from sqlalchemy import func
 from werkzeug.contrib.cache import RedisCache
 from invenio.sqlalchemyutils import db
+from webdeposit_model import WebSubmitDraft
 
-rediscache = RedisCache("localhost", default_timeout=9000)
+import datetime
+import json
 
+#rediscache = RedisCache("localhost", default_timeout=9000)
 
-# Draft Functions
+""" Draft Functions
+    implementation with redis cache of the functions is provided in comments 
+"""
+def draft_field_get(user_id, draft_id, form_type, fieldName):
+    user_id = int(user_id)
+    draft_id = int(draft_id)
+    websubmit_draft = WebSubmitDraft(draft_id=draft_id, \
+                                     user_id=user_id, \
+                                     form_type=form_type)
+    draft = db.session.query(WebSubmitDraft).filter_by(draft_id=draft_id, \
+                                                       user_id=user_id, \
+                                                       form_type=form_type)[0]
+    values = json.loads(draft.form_values)
 
-def draft_field_get(userID, draftID, fieldName):
+    try:
+        return values[fieldName]
+    except KeyError:
+        return None
+    """
     userID = str(userID)
     draftID = str(draftID)
     return rediscache.get(userID + ":" + draftID + ":" + fieldName)
+    """
 
+def draft_field_set(user_id, draft_id, form_type, field_name, value):
+    user_id = int(user_id)
+    draft_id = int(draft_id)
 
-def draft_field_set(userID, draftID, fieldName, value):
+    websubmit_draft = WebSubmitDraft(draft_id=draft_id, \
+                                     user_id=user_id, \
+                                     form_type=form_type)
+    draft = db.session.query(WebSubmitDraft).filter_by(draft_id=draft_id, \
+                                                       user_id=user_id, \
+                                                       form_type=form_type)[0]
+    values = json.loads(draft.form_values) #get dict
+    values[field_name] = value #change value
+    values = json.dumps(values) #encode back to json
+    draft.form_values = values
+    db.session.commit()
+
+    """
     userID = str(userID)
     draftID = str(draftID)
     rediscache.set(userID + ":" + draftID + ":" + fieldName, value)
+    """
+
+def draft_field_list_add(user_id, draft_id, form_type, field_name, value):
+    user_id = int(user_id)
+    draft_id = int(draft_id)
+
+    draft = db.session.query(WebSubmitDraft).filter_by(draft_id=draft_id, \
+                                                       user_id=user_id, \
+                                                       form_type=form_type)[0]
+    values = json.loads(draft.form_values) #get dict
+
+    try:
+        if isinstance(values[field_name], list):
+            values[field_name].append(value)
+        else:
+            new_values_list = [values[field_name]]
+            new_values_list.append(value)
+            values[field_name] = new_list
+    except KeyError:
+        values[field_name] = [value]
+
+    values = json.dumps(values) #encode back to json
+    draft.form_values = values
+    db.session.commit()
 
 
-def new_draft(userID):
+def new_draft(user_id, form_type):
+    user_id = int(user_id)
+
+    websubmit_draft = WebSubmitDraft(user_id=user_id, form_type=form_type, form_values='{}')
+    db.session.add(websubmit_draft)
+    db.session.commit()
+    return websubmit_draft.draft_id
+
+    """
     userID = str(userID)
     draftID = get_new_draft_id(userID)
     drafts = rediscache.get(userID + ":drafts")
@@ -29,13 +97,20 @@ def new_draft(userID):
         rediscache.set(str(userID) + ":drafts", newdrafts)
 
     return draftID
-
+    """
 
 def get_new_draft_id(userID):
     return rediscache.inc(str(userID) + ":draftcounter", delta=1)
 
 
-def get_draft(userID, draftID):
+def get_draft(user_id, draft_id, form_type):
+    user_id = int(user_id)
+    draft_id = int(draft_id)
+    draft = db.session.query(WebSubmitDraft).filter_by(draft_id=draft_id, user_id=user_id, form_type=form_type)[0]
+    form_values = json.loads(draft.form_values)
+
+    return form_values
+    """
     userID = str(userID)
     if draftID is None:
         return None
@@ -73,9 +148,16 @@ def get_draft(userID, draftID):
                      "notes"     : notes, \
                      "conditions": conditions
                     }
+    """
 
 
-def delete_draft(userID, draftID):
+def delete_draft(user_id, draft_id, form_type):
+    user_id = int(user_id)
+    draft_id = int(draft_id)
+
+    db.session.query(WebSubmitDraft).filter_by(draft_id=draft_id, user_id=user_id, form_type=form_type).delete()
+    db.session.commit()
+    """
     userID = str(userID)
     draftID = str(draftID)
     drafts = rediscache.get(userID + ":drafts")
@@ -95,8 +177,24 @@ def delete_draft(userID, draftID):
     set_current_draft(userID, draftIDs[i])
     #return the last draft
     return draftIDs[i]
+    """
 
-def get_drafts(userID):
+def draft_field_get_all(user_id, form_type, field_name):
+    user_id = int(user_id)
+    all_drafts = []
+    for draft in db.session.query(WebSubmitDraft).filter_by(user_id=user_id, \
+                                                            form_type=form_type):
+        draft_values = json.loads(draft.form_values)
+        try:
+            tmp_draft = {"draft_id" : int(draft.draft_id), field_name : draft_values[field_name]}
+        except KeyError:
+            tmp_draft = {"draft_id" : int(draft.draft_id), field_name : None}
+        all_drafts.append(tmp_draft)
+
+
+    return all_drafts
+
+    """
     userID = str(userID)
     drafts = rediscache.get(userID + ":drafts")
     if drafts is None:
@@ -108,15 +206,25 @@ def get_drafts(userID):
         allDrafts.append(tempDraft)
 
     return allDrafts
+    """
 
+def set_current_draft(user_id, draft_id):
+    draft = db.session.query(WebSubmitDraft).filter_by(draft_id=draft_id)[0]
+    draft.timestamp = datetime.datetime.now()
+    db.session.commit()
 
-def set_current_draft(userID, draftID):
+    """
     draftID = str(draftID)
     rediscache.set(str(userID) + ":current_draft", draftID)
+    """
 
 def get_current_draft(userID):
+    websubmit_draft = db.session.query(WebSubmitDraft).filter(\
+                     WebSubmitDraft.timestamp == func.max(WebSubmitDraft.timestamp).select())[0]
+    return websubmit_draft
+    """
     return rediscache.get(str(userID) + ":current_draft")
-
+    """
 
 # Misc functions
 
