@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,7 +19,7 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibrankadminlib.py \
              bibrank_tag_based_indexer.py bibrank_tag_based_indexer_unit_tests.py \
-             bibrank_word_indexer.py \
+             bibrank_word_indexer.py bibrank_word_searcher.py \
              bibrank_record_sorter.py bibrank_record_sorter_unit_tests.py \
              bibrank_downloads_indexer.py bibrank_downloads_indexer_unit_tests.py \
              bibrank_downloads_similarity.py \
@@ -29,7 +29,8 @@ pylib_DATA = bibrankadminlib.py \
              bibrank_regression_tests.py bibrank.py \
              bibrankadmin_regression_tests.py \
              bibrankgkb.py \
-             bibrank_citerank_indexer.py bibrank_citerank_indexer_unit_tests.py
+             bibrank_citerank_indexer.py bibrank_citerank_indexer_unit_tests.py \
+             bibrank_bridge_config.py
 
 EXTRA_DIST = $(pylib_DATA)
 

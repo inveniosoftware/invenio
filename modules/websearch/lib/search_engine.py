@@ -74,7 +74,8 @@ from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
-     CFG_BIBSORT_BUCKETS
+     CFG_BIBSORT_BUCKETS, \
+     CFG_XAPIAN_ENABLED
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
@@ -86,9 +87,10 @@ from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_tokenizer import author_name_requires_phrase_search, \
+from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requires_phrase_search, \
      BibIndexPairTokenizer
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
+from invenio.bibindexadminlib import get_idx_indexer
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
@@ -127,7 +129,8 @@ from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
     SpiresToInvenioSyntaxConverter
 
 from invenio import webinterface_handler_config as apache
-from invenio.solrutils import solr_get_bitset
+from invenio.solrutils_bibindex_searcher import solr_get_bitset
+from invenio.xapianutils_bibindex_searcher import xapian_get_bitset
 
 
 try:
@@ -2205,8 +2208,8 @@ def search_unit(p, f=None, m=None, wl=0):
                 hitset_synonyms |= search_unit(p_synonym, f, m, wl)
 
     ## look up hits:
-    if CFG_SOLR_URL and f == 'fulltext':
-        # redirect to Solr/Lucene
+    if f == 'fulltext' and get_idx_indexer('fulltext') == 'SOLR' and CFG_SOLR_URL:
+        # redirect to Solr
         try:
             return search_unit_in_solr(p, f, m)
         except:
@@ -2214,7 +2217,18 @@ def search_unit(p, f=None, m=None, wl=0):
             # results from Solr. Let us alert the admin of these
             # problems and let us simply return empty results to the
             # end user.
-            register_exception(alert_admin=True)
+            register_exception()
+            return hitset
+    elif f == 'fulltext' and get_idx_indexer('fulltext') == 'XAPIAN' and CFG_XAPIAN_ENABLED:
+        # redirect to Xapian
+        try:
+            return search_unit_in_xapian(p, f, m)
+        except:
+            # There were troubles with getting full-text search
+            # results from Xapian. Let us alert the admin of these
+            # problems and let us simply return empty results to the
+            # end user.
+            register_exception()
             return hitset
     if f == 'datecreated':
         hitset = search_unit_in_bibrec(p, p, 'c')
@@ -2641,14 +2655,27 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
 
 def search_unit_in_solr(p, f=None, m=None):
     """
-    Query the Solr full-text index and return an intbitset corresponding
+    Query a Solr index and return an intbitset corresponding
     to the result.  Parameters (p,f,m) are usual search unit ones.
     """
     if m and (m == 'a' or m == 'r'): # phrase/regexp query
         if p.startswith('%') and p.endswith('%'):
             p = p[1:-1] # fix for partial phrase
         p = '"' + p + '"'
-    return solr_get_bitset(p, CFG_SOLR_URL)
+    return solr_get_bitset(f, p)
+
+
+def search_unit_in_xapian(p, f=None, m=None):
+    """
+    Query a Xapian index and return an intbitset corresponding
+    to the result.  Parameters (p,f,m) are usual search unit ones.
+    """
+    if m and (m == 'a' or m == 'r'): # phrase/regexp query
+        if p.startswith('%') and p.endswith('%'):
+            p = p[1:-1] # fix for partial phrase
+        p = '"' + p + '"'
+    return xapian_get_bitset(f, p)
+
 
 def search_unit_in_bibrec(datetext1, datetext2, type='c'):
     """
@@ -3841,7 +3868,7 @@ def get_tags_form_sort_fields(sort_fields):
     return tags, ''
 
 
-def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
+def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pattern=None, verbose=0, sort_order='d', of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, field=''):
     """Initial entry point for ranking records, acts like a dispatcher.
        (i) rank_method_code is in bsrMETHOD, bibsort buckets can be used;
        (ii)rank_method_code is not in bsrMETHOD, use bibrank;
@@ -3858,7 +3885,7 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
                 if verbose > 0:
                     comment = 'find_citations retlist %s' % [[solution_recs[i], solution_scores[i]] for i in range(len(solution_recs))]
                 return (solution_recs, solution_scores, '(', ')', comment)
-    return rank_records_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose)
+    return rank_records_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose, field, rg, jrec)
 
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
@@ -4915,7 +4942,11 @@ def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, us
         # check snippets only if URL contains fulltext
         # FIXME: make it work for CLI too, via new function arg
         if keywords:
-            snippets = get_pdf_snippets(recID, keywords)
+            snippets = ''
+            try:
+                snippets = get_pdf_snippets(recID, keywords, user_info)
+            except:
+                register_exception()
             if snippets:
                 out += snippets
 
@@ -5441,7 +5472,7 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
         # record well exists, so find similar ones to it
         t1 = os.times()[4]
         results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-                                rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose)
+                                rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
         if results_similar_recIDs:
             t2 = os.times()[4]
             cpu_time = t2 - t1
@@ -5883,7 +5914,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                 results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                              rank_records(req, rm, 0, results_final[coll],
                                                           string.split(p) + string.split(p1) +
-                                                          string.split(p2) + string.split(p3), verbose, so, of, ln, rg=0, jrec=0)
+                                                          string.split(p2) + string.split(p3), verbose, so, of, ln, rg, jrec, kwargs['f'])
                 if of.startswith("h"):
                     write_warning(results_final_comments, req=req)
                 if results_final_recIDs_ranked:
@@ -6144,7 +6175,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             if rm: # do we have to rank?
                 results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
                                                                                string.split(p) + string.split(p1) +
-                                                                               string.split(p2) + string.split(p3), verbose, so, of, ln)
+                                                                               string.split(p2) + string.split(p3), verbose, so, of, ln, field=kwargs['f'])
                 if results_final_for_all_colls_rank_records_output[0]:
                     recIDs = results_final_for_all_colls_rank_records_output[0]
             elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
@@ -6194,7 +6225,7 @@ def prs_rank_results(kwargs=None, results_final=None, req=None, colls_to_search=
     if rm: # do we have to rank?
         results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
                                                                        string.split(p) + string.split(p1) +
-                                                                       string.split(p2) + string.split(p3), verbose, so, of)
+                                                                       string.split(p2) + string.split(p3), verbose, so, of, field=kwargs['f'])
         if results_final_for_all_colls_rank_records_output[0]:
             recIDs = results_final_for_all_colls_rank_records_output[0]
     elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?

@@ -32,6 +32,8 @@ etc_DATA = bibrankgkb.cfg \
            template_download_users.cfg \
            template_single_tag_rank_method.cfg \
            template_word_similarity.cfg \
+           template_word_similarity_solr.cfg \
+           template_word_similarity_xapian.cfg \
            wrd.cfg \
            citation.cfg \
            citerank_citation_t.cfg \
@@ -55,6 +57,8 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              template_download_users.cfg \
              template_single_tag_rank_method.cfg.in \
              template_word_similarity.cfg \
+             template_word_similarity_solr.cfg \
+             template_word_similarity_xapian.cfg \
              wrd.cfg \
              citation.cfg \
              citerank_citation_t.cfg \

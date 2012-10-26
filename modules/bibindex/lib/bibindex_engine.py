@@ -39,7 +39,8 @@ from invenio.config import \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
      CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
      CFG_BIBINDEX_SPLASH_PAGES, \
-     CFG_SOLR_URL
+     CFG_SOLR_URL, \
+     CFG_XAPIAN_ENABLED
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, \
     CFG_CHECK_MYSQL_THREADS
@@ -47,6 +48,7 @@ from invenio.bibindex_engine_tokenizer import \
      BibIndexFuzzyNameTokenizer, BibIndexExactNameTokenizer, \
      BibIndexPairTokenizer, BibIndexWordTokenizer, \
      BibIndexPhraseTokenizer
+from invenio.bibindexadminlib import get_idx_indexer
 from invenio.bibdocfile import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, \
      download_url, BibRecDocs
@@ -63,12 +65,10 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.htmlutils import get_links_in_html_page
-from invenio.textutils import remove_control_characters
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.solrutils_bibindex_indexer import solr_add_fulltext, solr_commit
+from invenio.xapianutils_bibindex_indexer import xapian_add
 
-if CFG_SOLR_URL:
-    import solr
-    SOLR_CONNECTION = solr.SolrConnection(CFG_SOLR_URL)
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -102,6 +102,9 @@ nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 base_process_size = 4500 # process base size
 _last_word_table = None
+
+fulltext_added = intbitset() # stores ids of records whose fulltexts have been added
+
 
 def list_union(list1, list2):
     "Returns union of the two lists."
@@ -267,23 +270,6 @@ def get_words_from_date_tag(datestring, stemming_language=None):
             out.append("-".join(parts[:nb]))
     return out
 
-def solr_add_fulltext(recid, text):
-    """
-    Helper function that dispatches TEXT to Solr for given record ID.
-    Returns True/False upon success/failure.
-    """
-    if recid:
-        try:
-            # Remove any illegal characters
-            text = remove_control_characters(text)
-            utext = unicode(text, 'utf-8')
-            SOLR_CONNECTION.add(id=recid, fulltext=utext)
-            return True
-        except (UnicodeDecodeError, UnicodeEncodeError):
-            # forget about bad UTF-8 files
-            pass
-    return False
-
 def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
@@ -307,11 +293,23 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
             if not bibdoc.has_text(require_up_to_date=True):
                 bibdoc.extract_text(perform_ocr=perform_ocr)
-            if CFG_SOLR_URL:
-                # we are relying on Solr to provide full-text
-                # indexing, so dispatch text Solr and return nothing
-                # here:
-                solr_add_fulltext(bibdoc.recid, bibdoc.get_text())
+
+            indexer = get_idx_indexer('fulltext')
+            if indexer != 'native':
+                recid = bibdoc.recid
+                # Adds fulltexts of all files once per records
+                if not recid in fulltext_added:
+                    bibrecdocs = BibRecDocs(recid)
+                    text = bibrecdocs.get_text()
+                    if indexer == 'SOLR' and CFG_SOLR_URL:
+                        solr_add_fulltext(recid, text)
+                    elif indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
+                        xapian_add(recid, 'fulltext', text)
+
+                    fulltext_added.add(recid)
+                # we are relying on an external information retrieval system
+                # to provide full-text indexing, so dispatch text to it and
+                # return nothing here:
                 return []
             else:
                 return get_words_from_phrase(bibdoc.get_text(), stemming_language)
@@ -346,11 +344,17 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                         tmptext = convert_file(tmpdoc, output_format='.txt')
                         text = open(tmptext).read()
                         os.remove(tmptext)
-                        if CFG_SOLR_URL:
-                            # we are relying on Solr to provide full-text
-                            # indexing, so dispatch text Solr and return nothing
-                            # here:
-                            solr_add_fulltext(None, text) # FIXME: use real record ID
+
+                        indexer = get_idx_indexer('fulltext')
+                        if indexer != 'native':
+                            if indexer == 'SOLR' and CFG_SOLR_URL:
+                                solr_add_fulltext(None, text) # FIXME: use real record ID
+                            if indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
+                                #xapian_add(None, 'fulltext', text) # FIXME: use real record ID
+                                pass
+                            # we are relying on an external information retrieval system
+                            # to provide full-text indexing, so dispatch text to it and
+                            # return nothing here:
                             tmpwords = []
                         else:
                             tmpwords = get_words_from_phrase(text, stemming_language)
@@ -902,7 +906,7 @@ class WordTable:
                     task_update_status("ERROR")
                     self.put_into_db()
                     if self.index_name == 'fulltext' and CFG_SOLR_URL:
-                        SOLR_CONNECTION.commit()
+                        solr_commit()
                     sys.exit(1)
                 write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
@@ -924,7 +928,7 @@ class WordTable:
                     self.put_into_db()
                     self.clean()
                     if self.index_name == 'fulltext' and CFG_SOLR_URL:
-                        SOLR_CONNECTION.commit()
+                        solr_commit()
                     write_message("%s backing up" % (self.tablename))
                     flush_count = 0
                     self.log_progress(time_started, records_done, records_to_go)
@@ -933,7 +937,7 @@ class WordTable:
         if flush_count > 0:
             self.put_into_db()
             if self.index_name == 'fulltext' and CFG_SOLR_URL:
-                SOLR_CONNECTION.commit()
+                solr_commit()
             self.log_progress(time_started, records_done, records_to_go)
 
     def add_recIDs_by_date(self, dates, opt_flush):
@@ -1034,7 +1038,7 @@ class WordTable:
                     for recid in xrange(int(recID1), int(recID2) + 1):
                         for bibdocfile in BibRecDocs(recid).list_latest_files():
                             res.add((recid, bibdocfile.get_url()))
-                for row in res:
+                for row in sorted(res):
                     recID, phrase = row
                     if not wlist.has_key(recID):
                         wlist[recID] = []
@@ -1124,7 +1128,7 @@ class WordTable:
             count = count + arange[1] - arange[0]
         self.put_into_db()
         if self.index_name == 'fulltext' and CFG_SOLR_URL:
-            SOLR_CONNECTION.commit()
+            solr_commit()
 
     def del_recID_range(self, low, high):
         """Deletes records with 'recID' system number between low

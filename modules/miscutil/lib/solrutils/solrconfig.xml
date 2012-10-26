@@ -1093,7 +1093,8 @@
 
     <queryResponseWriter name="bitset_stream" class="org.invenio_software.solr.InvenioBitsetStreamResponseWriter"/>
 
-
+    <requestHandler name="/mlt" class="solr.MoreLikeThisHandler">
+    </requestHandler>
 
 
 

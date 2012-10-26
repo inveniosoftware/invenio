@@ -1388,6 +1388,16 @@ class BibRecDocs:
                 return True
         return False
 
+    def get_text(self):
+        """
+        @return: concatenated texts of all bibdocs separated by " ": string
+        """
+        texts = []
+        for bibdoc in self.list_bibdocs():
+            texts.append(bibdoc.get_text())
+
+        return " ".join(texts)
+
 
 class BibDoc:
     """
@@ -2901,6 +2911,9 @@ def check_bibdoc_authorization(user_info, status):
     @rtype: (int, string)
     @raise ValueError: in case of unexpected parsing error.
     """
+    if not status:
+        return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+
     def parse_status(status):
         g = _RE_STATUS_PARSER.match(status)
         if g:

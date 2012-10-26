@@ -443,6 +443,58 @@ this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
             CFG_LOGDIR + '/invenio.' + stream, err)
         return 0
 
+
+def raise_exception(exception_type = Exception,
+                    msg = '',
+                       stream='error',
+                       req=None,
+                       prefix='',
+                       suffix='',
+                       alert_admin=False,
+                       subject=''):
+    """
+    Log error exception to invenio.err and warning exception to invenio.log.
+    Errors will be logged together with client information (if req is
+    given).
+
+    It does not require a previously risen exception.
+
+    Note:   For sanity reasons, dynamic params such as PREFIX, SUFFIX and
+            local stack variables are checked for length, and only first 500
+            chars of their values are printed.
+
+    @param exception_type: exception type to be used internally
+
+    @param msg: error message
+
+    @param stream: 'error' or 'warning'
+
+    @param req: mod_python request
+
+    @param prefix: a message to be printed before the exception in
+    the log
+
+    @param suffix: a message to be printed before the exception in
+    the log
+
+    @param alert_admin: wethever to send the exception to the administrator via
+        email. Note this parameter is bypassed when
+                CFG_SITE_ADMIN_EMAIL_EXCEPTIONS is set to a value different than 1
+    @param subject: overrides the email subject
+
+    @return: 1 if successfully wrote to stream, 0 if not
+    """
+    try:
+        raise exception_type(msg)
+    except:
+        return register_exception(stream=stream,
+                                  req=req,
+                                  prefix=prefix,
+                                  suffix=suffix,
+                                  alert_admin=alert_admin,
+                                  subject=subject)
+
+
 def send_error_report_to_admin(header, url, time_msg,
                                browser, client, error,
                                sys_error, traceback_msg):

@@ -1324,6 +1324,16 @@ def get_idx(idxID=''):
     except StandardError, e:
         return ""
 
+
+def get_idx_indexer(name):
+    """Returns the indexer field value"""
+
+    try:
+        return run_sql("SELECT indexer FROM idxINDEX WHERE NAME=%s", (name, ))[0][0]
+    except StandardError, e:
+        return (0, e)
+
+
 def get_fld_tags(fldID='', tagID=''):
     """Returns tags associated with a field.
     fldID - field id

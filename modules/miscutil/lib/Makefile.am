@@ -67,7 +67,16 @@ pylib_DATA = __init__.py \
              plotextractor_unit_tests.py \
              plotextractor_regression_tests.py \
              plotextractor_config.py \
-             solrutils.py \
+             solrutils_bibindex_indexer.py \
+             solrutils_bibindex_searcher.py \
+             solrutils_bibrank_indexer.py \
+             solrutils_bibrank_searcher.py \
+             solrutils_config.py \
+             xapianutils_bibindex_indexer.py \
+             xapianutils_bibindex_searcher.py \
+             xapianutils_bibrank_indexer.py \
+             xapianutils_bibrank_searcher.py \
+             xapianutils_config.py \
              remote_debugger.py \
              remote_debugger_config.py \
              remote_debugger_wsgi_reload.py \

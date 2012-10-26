@@ -575,8 +575,7 @@ def latex_to_html(text):
 
     return text
 
-def get_pdf_snippets(recID, patterns):
-
+def get_pdf_snippets(recID, patterns, user_info):
     """
     Extract text snippets around 'patterns' from the newest PDF file of 'recID'
     The search is case-insensitive.
@@ -590,12 +589,13 @@ def get_pdf_snippets(recID, patterns):
     @param max_snippets: max number of snippets to include
     @return: snippet
     """
-    from invenio.bibdocfile import BibRecDocs
+    from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization
 
     text_path = ""
     text_path_courtesy = ""
     for bd in BibRecDocs(recID).list_bibdocs():
-        if bd.get_text():
+        # Show excluded fulltext in snippets on Inspire, otherwise depending on authorization
+        if bd.get_text() and (CFG_INSPIRE_SITE or not check_bibdoc_authorization(user_info, bd.get_status())[0]):
             text_path = bd.get_text_path()
             text_path_courtesy = bd.get_status()
             if CFG_INSPIRE_SITE and not text_path_courtesy:
@@ -623,7 +623,7 @@ def get_pdf_snippets(recID, patterns):
 
         if out:
             out_courtesy = ""
-            if text_path_courtesy:
+            if CFG_INSPIRE_SITE and text_path_courtesy:
                 out_courtesy = '<strong>Snippets courtesy of ' + text_path_courtesy + '</strong><br>'
             return """<div class="snippetbox">%s%s</div>""" % (out_courtesy, out)
         else:

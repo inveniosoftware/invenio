@@ -539,6 +539,14 @@
         at the same time, so i will use 'id' name -->
    <field name="id" type="string" indexed="true" stored="true" required="true" />
    <field name="recid" type="int" indexed="true" stored="true" required="false" />
+
+   <field name="abstract" type="invenioText" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+   <field name="author" type="invenioText" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+   <field name="fulltext" type="invenioText" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+   <field name="keyword" type="invenioText" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+   <field name="title" type="invenioText" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+
+
 <!-- JI
    <field name="abstract" type="text" indexed="true" stored="true"/>
    <field name="publication" type="text" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
@@ -573,8 +581,6 @@
    <field name="caption" type="text" indexed="true" stored="false" multiValued="true" />
 -->
 
-   <field name="fulltext" type="invenioText" indexed="true" stored="false" multiValued="true"/>
-      
    <!-- rca: for the purposes of comparison
    <field name="text_py" type="textgen_py" indexed="true" stored="false" multiValued="true"/>
    <field name="text_java" type="textgen_java" indexed="true" stored="false" multiValued="true"/>
@@ -584,6 +590,9 @@
    <!-- catchall field, containing all other searchable text fields (implemented
         via copyField further on in this schema  
    <field name="all" type="text" indexed="true" stored="false" multiValued="true"/> -->
+   <field name="global" type="invenioText" indexed="true" stored="false" multiValued="true" termVectors="true"/>
+   <field name="mlt" type="invenioText" indexed="true" stored="false" multiValued="true" termVectors="true"/>
+
 
    <!-- catchall text field that indexes tokens both normally and in reverse for efficient
         leading wildcard queries. -->
@@ -649,7 +658,7 @@
  <uniqueKey>id</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
- <defaultSearchField>fulltext</defaultSearchField>
+ <defaultSearchField>global</defaultSearchField>
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
  <solrQueryParser defaultOperator="OR"/>
@@ -658,6 +667,17 @@
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
     
+   <copyField source="abstract" dest="global"/>
+   <copyField source="author" dest="global"/>
+   <copyField source="fulltext" dest="global"/>
+   <copyField source="keyword" dest="global"/>
+   <copyField source="title" dest="global"/>
+
+   <copyField source="abstract" dest="mlt"/>
+   <copyField source="author" dest="mlt"/>
+   <copyField source="keyword" dest="mlt"/>
+   <copyField source="title" dest="mlt"/>
+
 <!--JI
    <copyField source="id" dest="recid"/>
    <copyField source="reportnumber" dest="all"/>

@@ -27,6 +27,13 @@ import mimetools
 from invenio import intbitset
 from invenio.urlutils import make_invenio_opener
 from invenio.jsonutils import json
+from invenio.config import CFG_SOLR_URL
+
+
+if CFG_SOLR_URL:
+    import solr
+    SOLR_CONNECTION = solr.SolrConnection(CFG_SOLR_URL) # pylint: disable=E1101
+
 
 SOLRUTILS_OPENER = make_invenio_opener('solrutils')
 
@@ -52,12 +59,28 @@ def solr_get_facets(bitset, solr_url):
     u = SOLRUTILS_OPENER.open(r)
     return json.load(u)
 
-def solr_get_bitset(query, solr_url):
-    invenio_query_url = "%s/select?qt=invenio_query&q=fulltext:%s" % (solr_url, urllib.quote(query))
+
+def solr_get_bitset(index, query):
+    """
+    Queries an index and returns the ids as intbitset. Expects the Solr extension classes to be enabled
+    to retrieve and intbitset result directly.
+    """
+    invenio_query_url = "%s/select?qt=invenio_query&q=%s:%s" % (CFG_SOLR_URL, index, urllib.quote(query))
 
     # query to get a bitset
     bitset = intbitset.intbitset()
     u = SOLRUTILS_OPENER.open(invenio_query_url)
     data = u.read()
     bitset.fastload(data)
+    return bitset
+
+
+def solr_get_bitset_via_solrpy(index, query):
+    """
+    Queries an index and returns the ids as intbitset.
+    """
+    bitset = intbitset.intbitset()
+    response = SOLR_CONNECTION.query('%s:%s' % (index, query))
+    for hit in response.results:
+        bitset.add(int(hit["id"]))
     return bitset

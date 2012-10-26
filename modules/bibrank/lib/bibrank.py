@@ -90,9 +90,10 @@ from invenio.bibrank_tag_based_indexer import \
      download_weight_total, \
      file_similarity_by_times_downloaded, \
      index_term_count
-from invenio.bibrank_word_indexer import word_similarity
-from invenio.bibrank_citerank_indexer import citerank
-# pylint: enable=W0611
+from invenio.bibrank_word_indexer import word_similarity #@UnusedImport
+from invenio.bibrank_citerank_indexer import citerank #@UnusedImport
+from invenio.solrutils_bibrank_indexer import word_similarity_solr #@UnusedImport
+from invenio.xapianutils_bibrank_indexer import word_similarity_xapian #@UnusedImport
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by

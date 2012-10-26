@@ -1746,6 +1746,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
   description varchar(255) NOT NULL default '',
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
   stemming_language varchar(10) NOT NULL default '',
+  indexer varchar(10) NOT NULL default 'native',
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
 ) ENGINE=MyISAM;
