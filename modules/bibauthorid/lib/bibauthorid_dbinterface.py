@@ -114,7 +114,7 @@ def get_personid_row(person_id, tag):
 
     @param person_id: id of the person to read the attribute from
     @type person_id: int
-    @param tag: the tag to read. 
+    @param tag: the tag to read.
     @type tag: string
 
     @return: the data associated with a virtual author
@@ -175,7 +175,7 @@ def del_person_not_manually_claimed_papers(pid):
     '''
     Deletes papers from a person which have not been manually claimed.
     @param pid:
-    @type pid: int 
+    @type pid: int
     '''
     run_sql("delete from aidPERSONIDPAPERS "
             "where and (flag <> '-2' and flag <> '2') and personid=%s", (pid,))
@@ -2308,7 +2308,7 @@ def check_wrong_rejection(printer, repair=False):
         from bibauthorid_rabbit import rabbit
 
         if to_reassign:
-            #Rabbit is not designed to reassign signatures which are rejected but not assigned: 
+            #Rabbit is not designed to reassign signatures which are rejected but not assigned:
             #All signatures should stay assigned, if a rejection occours the signature should get
             #moved to a new place and the rejection entry added, but never exist as a rejection only.
             #Hence, to force rabbit to reassign it, we have to delete the rejection.

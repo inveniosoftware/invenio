@@ -19,7 +19,7 @@
 '''
     bibauthorid_frontinterface
     This file aims to filter and modify the interface given by
-    bibauthorid_bdinterface in order to make it usable by the 
+    bibauthorid_bdinterface in order to make it usable by the
     frontend so to keep it as clean as possible.
 '''
 
@@ -27,6 +27,7 @@ from invenio.bibauthorid_name_utils import split_name_parts #emitting #pylint: d
 from invenio.bibauthorid_name_utils import soft_compare_names
 from invenio.bibauthorid_name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611 
 import bibauthorid_dbinterface as dbinter
+from cgi import escape
 
 #Well this is bad, BUT otherwise there must 100+ lines
 #of the form from dbinterface import ...  # emitting
@@ -197,12 +198,44 @@ def find_personIDs_by_name_string(target):
 
     return names
 
-def reclaim_personid_for_new_arXiv_user(bibrecs, name, uid= -1):
+def find_top5_personid_for_new_arXiv_user(bibrecs, name):
+
+    top5_list = []
+
     pidlist = get_personids_and_papers_from_bibrecs(bibrecs, limit_by_name=name)
+
     for p in pidlist:
         if not get_uid_from_personid(p[0]):
-            dbinter.set_personid_row(p[0], 'uid', uid)
-            return p[0]
-    return create_new_person(uid, uid_is_owner=True)
+            top5_list.append(p[0])
+            if len(top5_list) > 4:
+                break
 
+    escaped_name = ""
+
+    if name:
+        escaped_name = escape(name, quote=True)
+    else:
+        return top5_list
+
+    pidlist = find_personIDs_by_name_string(escaped_name)
+
+    for p in pidlist:
+        if not get_uid_from_personid(p[0]) and not p[0] in top5_list:
+            top5_list.append(p[0])
+            if len(top5_list) > 4:
+                break
+
+    return top5_list
+
+
+def check_personids_availability(picked_profile, uid):
+
+    if picked_profile == -1:
+        return create_new_person(uid, uid_is_owner=True)
+    else:
+        if not get_uid_from_personid(picked_profile):
+            dbinter.set_personid_row(picked_profile, 'uid', uid)
+            return picked_profile
+        else:
+            return create_new_person(uid, uid_is_owner=True)
 

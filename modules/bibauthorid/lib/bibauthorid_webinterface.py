@@ -2376,9 +2376,12 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         self._session_bareinit(req)
         argd = wash_urlargd(
             form,
-            {'ln': (str, CFG_SITE_LANG)})
+            {'ln': (str, CFG_SITE_LANG),
+             'chosen_profile': (int, None)})
 
         ln = argd['ln']
+        chosen_profile = argd['chosen_profile']
+
         # ln = wash_language(argd['ln'])
         _ = gettext_set_language(ln)
 
@@ -2409,8 +2412,32 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
         req.write(body)
 
+        req.write("USERID: %s " % str(uid))
+
+        if chosen_profile == None:
+            archive_user_info = webapi.arxiv_login(req)
+        elif chosen_profile == -1:
+            archive_user_info = webapi.arxiv_login(req, -1)
+        else:
+            archive_user_info = webapi.arxiv_login(req, chosen_profile)
         # now do what will take time...
-        pid = webapi.arxiv_login(req)
+
+        #req.write("ARXIV USER INFO: %s" % str(archive_user_info))
+
+        if archive_user_info[0] == "pid":  ##### differentiate the two cases
+            pid = archive_user_info[1]
+        elif archive_user_info[0] == "chosen pid not available":
+            pid = archive_user_info[1]
+            req.write(TEMPLATE.tmpl_profile_not_available())
+        elif archive_user_info[0] == "pid assigned by user":
+            pid = archive_user_info[1]
+            req.write(TEMPLATE.tmpl_profile_assigned_by_user())
+        else :
+            req.write(TEMPLATE.tmpl_claim_profile())
+            req.write(TEMPLATE.tmpl_profile_option(archive_user_info[1]))
+            req.write(pagefooteronly(req=req))
+            return
+
         #session must be read after webapi.arxiv_login did it's stuff
         session = get_session(req)
         pinfo = session["personinfo"]
