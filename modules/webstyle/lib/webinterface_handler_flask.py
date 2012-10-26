@@ -192,24 +192,8 @@ def create_invenio_flask_app():
         Function should not raise an exception if uid is not valid
         or User was not found in database.
         """
-        try:
-            from invenio.webuser_flask import UserInfo, current_user
-            return UserInfo()
-        except:
-            return None
-
-    @_app.before_request
-    def _populate_user_info():
-        """
-        Before every request being handled, let's compute the user_info dictionary
-        which is used everywhere in Invenio to describe a user.
-
-        This user_info dictionary is also stored in the session (under the 'user_info'
-        key) and in the Flask global variable (under the 'user_info' attribute).
-        """
-        #from invenio.webuser_flask import UserInfo
-        #g.user_info = UserInfo(session)
-        pass
+        from invenio.webuser_flask import UserInfo
+        return UserInfo(uid)
 
     @_app.before_request
     def _guess_language():

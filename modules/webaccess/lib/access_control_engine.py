@@ -55,11 +55,15 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     from flask import current_app
     current_app.logger.info(req)
     current_app.logger.info(type(req))
-    if type(req) not in [int, long]:
-        req = current_user.get_id()
+    if type(req) is dict:
+        uid = req.get('uid', None)
+        user_info = req
+    elif type(req) not in [int, long]:
+        uid = current_user.get_id()
+        user_info = collect_user_info(uid) #FIXME
+    else:
+        user_info = collect_user_info(req)
 
-    current_app.logger.info(req)
-    user_info = collect_user_info(req) #FIXME
     roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
     current_app.logger.info(user_info)
     current_app.logger.info(roles)

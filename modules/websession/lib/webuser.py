@@ -229,25 +229,16 @@ def getUid(req):
             return -1
 
 
-from invenio.webuser_flask import current_user
+from invenio.webuser_flask import current_user, login_user, logout_user
 getUid = lambda req: current_user.get_id()
 
 def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
     """
-    if hasattr(req, '_user_info'):
-        del req._user_info
-    session.invalidate()
-    session['_uid'] = uid
-    if remember_me:
-        session.set_timeout(86400)
-    session.set_remember_me(remember_me)
     if uid > 0:
-        user_info = collect_user_info(req, login_time=True)
-        session['user_info'] = user_info
-        req._user_info = user_info
+        login_user(uid, rememeber_me)
     else:
-        del session['user_info']
+        logout_user()
     return uid
 
 def session_param_del(req, key):

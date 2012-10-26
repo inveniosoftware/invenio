@@ -36,6 +36,7 @@ from flask import g, current_app, request
 from warnings import warn
 
 from invenio.sqlalchemyutils import db
+from invenio.websession_model import Session
 from invenio.webuser_flask import current_user
 from invenio.config import \
     CFG_SITE_SECURE_URL
@@ -63,7 +64,6 @@ class InvenioSession(dict, SessionMixin):
         SessionMixin.__init__(self)
         self.sid = sid
         self.logging_in = False
-        #current_app.logger.info("initializing session with sid=%s" % sid)
 
     def need_https(self):
         """
@@ -76,11 +76,6 @@ class InvenioSession(dict, SessionMixin):
         """
         Delete the session.
         """
-        if CFG_SESSION_USE_CACHE:
-            cache.delete(CFG_SESSION_KEY_PREFIX+self.sid)
-        else:
-            from invenio.websession_model import Session
-            Session.query.filter(Session.session_key==self.sid).delete()
         if clear:
             self.clear()
 
@@ -88,7 +83,6 @@ class InvenioSession(dict, SessionMixin):
         """
         Declare the session as invalid.
         """
-        self.delete()
         self._invalid = 1
 
     def set_remember_me(self, remember_me=True):
@@ -134,25 +128,17 @@ class InvenioSession(dict, SessionMixin):
         return self.get('_uid', -1)
 
     def _set_uid(self, uid):
-        #current_app.logger.info("setting uid to %s" % uid)
         if self.get('_uid') != uid:
-            #current_app.logger.info("detected logging in...")
             self.logging_in = True
         self['_uid'] = uid
 
     def _get_user_info(self):
-        if 'user_info' in self and not self.logging_in:
-            #current_app.logger.info("accessing user_info")
-            return self['user_info']
-
-        #current_app.logger.info("reloading user_info")
-        current_user.reload()
-        self.logging_in = False
-        return self['user_info']
+        return current_user
 
     uid = property(_get_uid, _set_uid)
     user_info = property(_get_user_info)
     del _get_uid, _set_uid, _get_user_info
+
 
 class InvenioSerializer(object):
     @staticmethod
@@ -163,13 +149,87 @@ class InvenioSerializer(object):
     def dumps(data):
         return zlib.compress(cPickle.dumps(data, -1))
 
+
+class InvenioSessionStorage(object):
+    """
+    Session storage slub.
+    """
+    def set(self, name, value, timeout=None):
+        """
+        Stores data in a key-value storage system for defined time.
+        """
+        pass
+
+    def get(self, name):
+        """
+        Returns data from the key-value storage system.
+        """
+        pass
+
+    def delete(self, name):
+        """
+        Deletes data from the key-value storage system.
+        """
+        pass
+
+
+class InvenioCacheSessionStorage(InvenioSessionStorage):
+    """
+    Implements session cache (redis) storage.
+    """
+    def set(self, name, value, timeout=None):
+        cache.set(CFG_SESSION_KEY_PREFIX+name,
+                  value,
+                  timeout=3600)
+
+    def get(self, name):
+        return cache.get(CFG_SESSION_KEY_PREFIX+name)
+
+    def delete(self, name):
+        cache.delete(CFG_SESSION_KEY_PREFIX+name)
+
+
+class InvenioDBSessionStorage(InvenioSessionStorage):
+    """
+    Implements database backend for session storage.
+    """
+    def set(self, name, value, timeout=None):
+        session_expiry = datetime.utcnow() + timeout
+        s = Session()
+        s.uid = current_user.get_id()
+        s.session_key = name
+        s.session_object = value
+        s.session_expiry = session_expiry
+        #FIXME REPLACE OR UPDATE
+        db.session.merge(s)
+        db.session.commit()
+
+    def get(self, name):
+        s = Session.query.filter(db.and_(
+            Session.session_key == name,
+            Session.session_expiry >= db.func.current_timestamp())).one()
+        return s.session_object
+
+    def delete(self, name):
+        Session.query.filter(Session.session_key==name).delete()
+        db.session.commit()
+
+
 class InvenioSessionInterface(SessionInterface):
+    """
+    The session interface replaces standard Flask session
+    implementation.
+    """
     serializer = InvenioSerializer()
     session_class = InvenioSession
+    storage = InvenioDBSessionStorage() if not CFG_SESSION_USE_CACHE \
+              else InvenioCacheSessionStorage()
 
     def generate_sid(self):
+        """
+        Generates unique session identifier.
+        """
         sid = uuid4().hex
-        #current_app.logger.info("generating new session id: %s" % sid)
         return sid
 
     def get_session_expiration_time(self, app, session):
@@ -180,26 +240,15 @@ class InvenioSessionInterface(SessionInterface):
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name) or \
               request.args.get('session_id')
-        #current_app.logger.info("opening session %s" % sid)
         if not sid:
             sid = self.generate_sid()
             return self.session_class(sid=sid)
-        #current_app.logger.info("loading session data sid: %s" % sid)
         try:
-            if CFG_SESSION_USE_CACHE:
-                data = self.serializer.loads(cache.get(CFG_SESSION_KEY_PREFIX+sid))
-            else:
-                from invenio.websession_model import Session
-                from datetime import datetime
-                s = Session.query.filter(db.and_(
-                    Session.session_key == sid,
-                    Session.session_expiry >= db.func.current_timestamp())).one()
-                data = self.serializer.loads(s.session_object)
+            data = self.serializer.loads(self.storage.get(sid))
 
             session = self.session_class(data, sid=sid)
             session['_uid'] = session.uid
             session['uid'] = session.uid
-            session['user_info'] = session.user_info
             current_app.logger.info("initilized session")
             if session.check_ip(request):
                 return session
@@ -216,7 +265,6 @@ class InvenioSessionInterface(SessionInterface):
         domain = self.get_cookie_domain(app)
         from invenio.websession_model import Session
         if not session:
-            #current_app.logger.info("empty session detected. Deleting it")
             response.delete_cookie(app.session_cookie_name,
                                     domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',
@@ -235,26 +283,17 @@ class InvenioSessionInterface(SessionInterface):
             current_app.logger.info("detected logging in. generating new sid")
             sid = self.generate_sid()
             ## And remove the cookie that has been set
-            session.delete(clear=False)
+            self.storage.delete(session.sid)
+            session.clear()
             response.delete_cookie(app.session_cookie_name, domain=domain)
             response.delete_cookie(app.session_cookie_name + 'stub',
                                    domain=domain)
             session.sid = sid
-        #FIXME REPLACE OR UPDATE
         current_app.logger.info(str(dict(session)))
         session['_uid'] = uid
-        session['user_info'] = session.user_info
-        if CFG_SESSION_USE_CACHE:
-            cache.set(CFG_SESSION_KEY_PREFIX+sid, self.serializer.dumps(dict(session)),
-                      timeout = timeout)
-        else:
-            s = Session()
-            s.session_key = sid
-            s.session_expiry = session_expiry
-            s.session_object = self.serializer.dumps(dict(session))
-            s.uid = uid or -1
-            db.session.merge(s)
-            db.session.commit()
+        self.storage.set(sid,
+                         self.serializer.dumps(dict(session)),
+                         timeout = timeout)
 
         if not CFG_SUPPORT_HTTPS:
             response.set_cookie(app.session_cookie_name, sid,
@@ -277,3 +316,4 @@ class InvenioSessionInterface(SessionInterface):
                                 domain=domain)
             response.set_cookie(app.session_cookie_name + 'stub', 'NO',
                                 httponly=True, domain=domain)
+

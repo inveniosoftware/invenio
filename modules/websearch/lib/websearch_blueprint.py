@@ -255,8 +255,6 @@ def search():
 
     recids = perform_request_search(req=request, **argd)
     qid = md5(repr((p,f,colls_to_search, wl))).hexdigest()
-    if 'facet' not in session:
-        session['facet'] = {}
 
     if (request.args.get('so') or request.args.get('rm')):
         recids.reverse()

@@ -55,7 +55,7 @@ def login():
             user = User.query.filter(db.and_(
                 User.nickname==form.nickname.data,
                 User.password==form.password.data)).one()
-            login_user(user) #, remember=form.remember.data)
+            login_user(user.get_id(), remember_me=form.remember.data)
             flash(_("You have been logged in."), "info")
             return redirect(request.form.get("referer", url_for(".login")))
         except:
