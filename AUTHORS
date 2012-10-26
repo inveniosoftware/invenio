@@ -44,6 +44,27 @@ The CERN development team currently consists of:
  - Jiri Kuncar <jiri.kuncar@cern.ch>
      Contributions to the Czech translation.
 
+ - Esteban J. G. Gabancho <esteban.jose.garcia.gabancho@cern.ch>
+     Initial release of WebApiKey, enhancements for WebSubmit.
+
+ - Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
+     Initial release of Invenio Upgrader and jsonutils; patches for
+     pluginutils,
+
+ - Patrick Glauner <patrick.oliver.glauner@cern.ch>
+     Cleanup of SQL queries for several modules.
+
+ - Raquel Jimenez Encinar <raquel.jimenez.encinar@cern.ch>
+     Errorlib refactoring, improvements to search UI, discussion tab,
+     merged record redirect, adaptation to new web test framework.
+
+ - Vasanth Venkatraman <vasanth.venkatraman@cern.ch>
+     Improvements to BibUpload version treatment, monotask and
+     sequence tasks for BibSched.
+
+ - Thorsten Schwander <thorsten.schwander@gmail.com>
+     Improvements to dbdump.
+
  - Jan Aage Lavik <jan.age.lavik@cern.ch>
      Improvements to BibMatch with remote matching capabilities,
      improvements to plot extractor, improvements to harvesting and
@@ -63,6 +84,15 @@ The CERN development team currently consists of:
  - Alessio Deiana <alessio.deiana@cern.ch>
      Improvements to data cacher and cite summary.
 
+ - Daniel Stanculescu <daniel.stanculescu@cern.ch>
+     Improvements to Unicode treatment for textutils.
+
+ - Sebastian Witowski <sebastian.witowski@cern.ch>
+     Improvements to multi-record editor.
+
+ - Laura Rueda <laura.rueda@cern.ch>
+     Mechanize compatibility for Invenio Connector.
+
  - Annette Holtkamp <annette.holtkamp@cern.ch>
      Updates to `Howto MARC' guide.
 
@@ -80,6 +110,9 @@ The SLAC development team currently consists of:
  - Mike Sullivan <sul@slac.stanford.edu>
      Improvements to author pages.
 
+ - Eduardo Benavidez <eduardo.benavidez@gmail.com>
+     Improvements to BibCatalog.
+
 The Harvard-Smithsonian Center for Astrophysics development team
 currently consists of:
 
@@ -94,6 +127,14 @@ currently consists of:
 
  - Roman Chyla <roman.chyla@cern.ch>
      WSGI handler accepts UTF-8 strings.
+
+The Cornell development team currently consists of:
+
+ - Simeon Warner <simeon.warner@cornell.edu>
+     Team leader.
+
+ - Peter Halliday <phalliday@cornell.edu>
+     Configurable /record URL name space, improvements to dbquery.
 
 Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
@@ -110,11 +151,21 @@ order:
      to code kwalitee in numerous modules.  Improvements to
      BibClassify.
 
+ - Nikola Yolov <nikola.yolov@cern.ch>
+     Improvements and refactoring of BibAuthorID, fixes for
+     WebAuthorProfile.
+
+ - Lewis Barnes <lewis.barnes@cern.ch>
+     Amendments for INSPIRE linking style.
+
  - Olivier Canévet <olivier.canevet@cern.ch>
      Fixes for WebComment report abuse facility.
 
  - Belinda Chan <belinda.chan@cern.ch>
      User documentation for personal features like alerts and baskets.
+
+ - Carmen Alvarez Perez <carmen.alvarez.perez@cern.ch>
+     Improvements to WebStat.
 
  - Henning Weiler <henning.weiler@cern.ch>
      Initial implementation of BibAuthorID module, with Samuele Carli.
@@ -122,14 +173,30 @@ order:
  - Juan Francisco Pereira Corral <juan.francisco.pereira.corral@cern.ch>
      Fix taxonomy regression test, for BibKnowledge.
 
+ - Stamen Todorov Peev <stamen.peev@cern.ch>
+     Enrichment of Dublin Core XSL stylesheet.
+
  - Jan Iwaszkiewicz <jan.iwaszkiewicz@cern.ch>
      Full-text snippet feature for full-text search.
+
+ - Björn Oltmanns <bjoern.oltmanns@gmail.com>
+     Initial release of BibEncode, multi-node support for BibSched,
+     style refactoring for WebComment.
+
+ - Christopher Dickinson <christopher.dickinson@cern.ch>
+     Patch for auto-suggest facility.
 
  - Christopher Hayward <christopher.james.hayward@cern.ch>
      Improvements to the reference extraction tool.
 
  - Travis Brooks <travis@slac.stanford.edu>
      Support for SPIRES search syntax and other improvements.
+
+ - Juliusz Sompolski <julsomp@gmail.com>
+     Reimplementation of pdf2hocr2pdf.
+
+ - Jurga Girdzijauskaite <jurga.gird@gmail.com>
+     Contributions to the Lithuanian translation.
 
  - Tony Ohls <tony.ohls@cern.ch>
      Fixes for regexp treatment in BibConvert.
@@ -229,6 +296,9 @@ order:
 
  - Alberto Pepe <alberto.pepe@cern.ch>
      BibClassify, OAIHarvest Admin.
+
+ - Øyvind Østlund <oyvind.ostlund@cern.ch>
+     Sample BibTeX to MARCXML conversion, for BibConvert.
 
  - Nikolay Dyankov <ndyankov@gmail.com>
      XML-based BFX formatting engine, for BibFormat.
