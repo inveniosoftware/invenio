@@ -3010,9 +3010,9 @@ class Template:
                                        'number' : _("%s records found") % \
                                        ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')}
         if count > CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT:
-            for action in ('more', 'less'):
-                out += """<a class="%scolls" style="%s color:red; font-size:small" href="#"><i>%s</i></a>""" % \
-                       (action, action=='less' and 'display:none;' or '', _("Display %s collections" % action))
+            out += """<a class="lesscolls" style="display:none; color:red; font-size:small" href="#"><i>%s</i></a>""" % _("Show less collections")
+            out += """<a class="morecolls" style="color:red; font-size:small" href="#"><i>%s</i></a>""" % _("Show all collections")
+
         out += "</td></tr></tbody></table>"
         return out
 
