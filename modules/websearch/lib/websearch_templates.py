@@ -1489,7 +1489,7 @@ class Template:
 
         body = '''<table class="latestadditionsbox">'''
         if grid_layout:
-            body += '<div>'
+            body += '<tr><td><div>'
         for recid in recids:
             if grid_layout:
                 body += '''
@@ -1513,7 +1513,7 @@ class Template:
                       }
         if grid_layout:
             body += '''<div style="clear:both"></div>'''
-            body += '''</div>'''
+            body += '''</div></td></tr>'''
         body += "</table>"
         if more_link:
             body += '<div align="right"><small>' + \
