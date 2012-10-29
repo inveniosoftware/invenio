@@ -38,6 +38,10 @@ pylib_DATA = webdoc.py \
 
 wsgiweb_DATA = invenio.wsgi
 
+jsdir=$(localstatedir)/www/js
+
+js_DATA = bootstrap-select.js
+
 EXTRA_DIST = $(pylib_DATA) $(wsgiweb_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

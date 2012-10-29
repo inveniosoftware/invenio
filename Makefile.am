@@ -53,7 +53,7 @@ dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
 # Bootstrap version
-BOOTSTRAPV = 2.0.4
+BOOTSTRAPV = 2.1.1
 
 check-upgrade:
 	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg_upgrader.py $(top_srcdir) --upgrade-check
