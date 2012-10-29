@@ -32,7 +32,8 @@ from invenio.dbquery import run_sql
 from urllib import quote
 
 def format_element(bfo, categories, label="Subscribe by RSS",
-           rss_icon_url="/img/rss.png", cc='', css_class="rssLink"):
+                   rss_icon_url="/img/rss.png", cc='', css_class="rssLink",
+                   rss_icon_width='16px', rss_icon_height='16px'):
     """
     Display RSS links to journal articles, in one or several
     categories, or to the whole journal (if 'cc' parameter is used).
@@ -47,6 +48,8 @@ def format_element(bfo, categories, label="Subscribe by RSS",
     @param categories: comma-separated list of journal categories that will be linked from this RSS. If 'all', use all. If empty, try to use current category.
     @param label: label of the RSS link
     @param rss_icon_url: if provided, display the RSS icon in front of the label
+    @param rss_icon_width: if provided, declared width for the RSS icon
+    @param rss_icon_height: if provided, declared height for the RSS icon
     @param cc: if provided, use as root collection for the journal, and ignore 'categories' parameter.
     @param css_class: CSS class of the RSS link.
     """
@@ -106,7 +109,9 @@ def format_element(bfo, categories, label="Subscribe by RSS",
         if rss_icon_url.startswith('/'):
             # Build an absolute URL
             rss_icon_url = CFG_SITE_URL + rss_icon_url
-        link_label += '<img src="%s" alt="RSS" border="0"/> ' % rss_icon_url
+        link_label += '<img src="%s" alt="RSS" border="0"%s%s/> ' % \
+                      (rss_icon_url, rss_icon_width and ' width="%s"' % rss_icon_width or '',
+                       rss_icon_height and ' height="%s"' % rss_icon_height or '')
     if label:
         link_label += _(label)
 
