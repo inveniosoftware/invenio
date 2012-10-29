@@ -1721,6 +1721,9 @@ def acc_delete_all_settings():
     """simply remove all data affiliated with webaccess by truncating
     tables accROLE, accACTION, accARGUMENT and those connected. """
 
+    from invenio.sqlalchemyutils import db
+    db.session.commit()
+
     run_sql("""TRUNCATE accROLE""")
     run_sql("""TRUNCATE accACTION""")
     run_sql("""TRUNCATE accARGUMENT""")
