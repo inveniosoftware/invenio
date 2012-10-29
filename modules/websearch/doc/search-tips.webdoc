@@ -419,12 +419,16 @@ expressions.  Both behave the same usual way.)
   <en>more on Boolean queries...</en>
   <fr>plus d'informations au sujet des requêtes booléennes...</fr>
   <it>maggiori informazioni sulle richieste di ricerca booleane...</it>
+  <ca>més informació sobre cerques booleanes...</ca>
+  <es>más información sobre búsquedas booleanas...</es>
 </lang>
 </a></small></div>
 
 <h5><lang>
 <en>How to use parentheses:</en>
 <fr>Comment utiliser les parenthèses:</fr>
+<ca>Com utilitzar els parèntesis:</ca>
+<es>Como utilizar los paréntesis:</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -446,6 +450,12 @@ expressions.  Both behave the same usual way.)
       and <em>ellis</em> or <em>perelstein</em>.  Nested parentheses are supported.</en>
   <fr>Retourne les notices contenant soit <em>gravity</em> ou <em>supergravity</em>,
       et <em>ellis</em> ou <em>perelstein</em>. Les parenthèses imbriquées sont supportées.</fr>
+  <ca>Retorna els registres que contenen ja sigui<em>gravity</em>
+     o <em>supergravity</em>, i <em>ellis</em> o <em>perelstein</em>.
+     Es poden aniuar parèntesis.</ca>
+  <es>Devuelve los registros que contienen bien <em>gravity</em>
+     o <em>supergravity</em>, y <em>ellis</em> o <em>perelstein</em>.
+     Se pueden anidar paréntesis.</es>
 </lang>
 </td>
 </tr>
@@ -454,6 +464,8 @@ expressions.  Both behave the same usual way.)
 <lang>
   <en>more on parentheses...</en>
   <fr>plus d'informations au sujet des parenthèses...</fr>
+  <ca>més informació sobre els parèntesis...</ca>
+  <es>más información sobre los paréntesis...</es>
 </lang>
 </a></small></div>
 
@@ -540,12 +552,16 @@ expressions.  Both behave the same usual way.)
   <en>more on span queries...</en>
   <fr>plus d'informations au sujet des requêtes par périodes...</fr>
   <it>maggiori informazioni sulle ricerche tramite intervalli di tempo...</it>
+  <ca>més informació sobre cerques per períodes...</ca>
+  <es>más información sobre búsquedas por períodos...</es>
 </lang>
 </a></small></div>
 
 <h5><lang>
 <en>How to search inside citation network:</en>
 <fr>Comment rechercher dans le graphe des citations:</fr>
+<ca>Com cercar dins la xarxa de cites:</ca>
+<es>Como buscar dentro de la red de citas:</es>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -565,6 +581,8 @@ expressions.  Both behave the same usual way.)
 <lang>
   <en>Return papers that are cited between 3 and 30 times.</en>
   <fr>Retourne les articles cités entre 3 et 30 fois.</fr>
+  <ca>Retorna els articles citats entre 3 i 30 vegades.</ca>
+  <es>Devuelve los artículos citados entre 3 y 30 veces.</es>
 </lang>
 </td>
 </tr>
@@ -586,6 +604,10 @@ expressions.  Both behave the same usual way.)
   by <em>ellis</em>.  Useful for citation alerts.</en>
   <fr>Retourne tous les articles qui citent n'importe lequel des articles
   écrits par <em>ellis</em>. Utile pour être alerté de nouvelles citations.</fr>
+  <ca>Retorna els articles que en citen qualsevol dels escrits
+  per <em>ellis</em>.  Útil per alertes de cites.</ca>
+  <es>Devuelve los artículos que citan qualquiera de los escrits
+  por <em>ellis</em>.  Útil para alertas de citas.</es>
 </lang>
 </td>
 </tr>
@@ -607,6 +629,10 @@ expressions.  Both behave the same usual way.)
   by <em>ellis</em>.</en>
   <fr>Retourne tous les articles cités par n'importe lequel des articles écrits
   par <em>ellis</em>.</fr>
+  <ca>Retorna els articles que són citats per qualsevol dels escrits
+  per <em>ellis</em>.</ca>
+  <es>Devuelve los artículos que son citados por qualquera de los escritos
+  por <em>ellis</em>.</es>
 </lang>
 </td>
 </tr>
@@ -615,6 +641,8 @@ expressions.  Both behave the same usual way.)
 <lang>
   <en>more on refersto/citedby operators...</en>
   <fr>plus d'informations au sujet des opérateurs refersto/citedby...</fr>
+  <ca>més informació sobre els operadors refersto/citedby...</ca>
+  <es>más información sobre los operadores refersto/citedby...</es>
 </lang>
 </a></small></div>
 
