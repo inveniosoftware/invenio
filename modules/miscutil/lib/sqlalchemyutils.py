@@ -234,6 +234,23 @@ class InvenioDB(SQLAlchemy):
         return schemadiff.getDiffOfModelAgainstDatabase(self.metadata,
             self.engine, excludeTables=excludeTables)
 
+    def apply_driver_hacks(self, app, info, options):
+        """
+        This method is called before engine creation.
+        """
+        # Don't forget to apply hacks defined on parent object.
+        super(InvenioDB, self).apply_driver_hacks(app, info, options)
+        if info.drivername == 'mysql':
+            options['execution_options'] = {'autocommit': True }
+            from sqlalchemy.interfaces import PoolListener
+            class AutocommitListener(PoolListener):
+                """Autocommit Listener for fixing bug in MySQL 5.5"""
+                def connect(self, dbapi_con, con_record):
+                    """Calls autocommit on raw mysql connection."""
+                    dbapi_con.autocommit(True)
+            # Assign listener.
+            options.setdefault('listeners', [AutocommitListener()])
+
 
 db = InvenioDB()
 # FIXME add __init__ method for db.
