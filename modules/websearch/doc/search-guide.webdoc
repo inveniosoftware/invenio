@@ -56,28 +56,26 @@ Seite stellt Tipps und Tricks vor, die für eine effektive Suche
 nützlich sind.</p>
 </de>
 <es>
-<p> El motor de búsqueda de este sistema trata de ofrecer la
-tecnología más actual de búsqueda web, desarrollada por buscadores tan
-populares como <a href="http://google.com/"> Google </a>.  Sin
-embargo, la naturaleza de una búsqueda bibliográfica difiere
-considerablemente de la de una página Web. La alternativa propuesta
-es la de proporcionar numerosas extensiones que hagan
-posible búsquedas de estructura compleja y precisa, incluso combinando
+<p>El indexador de este sistema trata de ofrecer la tecnología más
+actual de búsqueda web, desarrollada por buscadores tan populares
+como <a href="http://google.com/">Google</a>.  Sin embargo, la
+naturaleza de la búsqueda bibliográfica difiere considerablemente de
+la de una página Web. Ofrecemos muchas extensiones para permitir una
+búsqueda estructurada compleja y precisa, incluso combinando
 metadatos, texto completo y citas bibliográficas en una misma
 consulta.  Esta página ofrece una serie consejos útiles para conseguir
 una búsqueda más eficaz.</p>
 </es>
 <ca>
-<p> El motor de cerca d'aquest sistema tracta d'oferir la tecnologia
-més actual de cerca web, desenvolupada per cercadors tant populars com
-<a href="http://google.com/"> Google </a>.  La naturalesa d'una
-cerca bibliogràfica, però, difereix considerablement de la d'una
-página Web. L'alternativa proposada és la de proporcionar
-nombroses extensions que permetin cerques d'estructura complexa i
-precisa, inclosa la combinació de metadades, text complet i
-referències bibliogràfiques a una mateixa cerca.  Aquesta pàgina
-ofereix una sèrie de consells útils per aconseguir una cerca més
-eficaç.</p>
+<p>El cercador d'aquest sistema tracta d'oferir la tecnologia més
+actual de cerca web, desenvolupada per cercadors tant populars com
+<a href="http://google.com/">Google</a>.  La naturalesa de la cerca
+bibliogràfica, però, difereix considerablement de la d'una página
+Web. Oferim nombroses extensions que permetin una cerques estructurada
+complexa i precisa, incloent-ho la combinació de metadades, text
+complet i referències bibliogràfiques en una mateixa cerca.  Aquesta
+pàgina ofereix una sèrie de consells útils per aconseguir una cerca
+més eficaç.</p>
 </ca>
 </lang>
 
@@ -153,7 +151,7 @@ eficaç.</p>
 </de>
 <es>
 <h3><strong class="headerboxbodylogo">Índice</strong></h3>
-&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Búsqueda simple versus avanzada</a>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#simpleadvanced">Búsqueda simple y avanzada</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Búsqueda guiada</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Búsqueda por palabras versus búsqueda por frases</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Consultas booleanas</a>
@@ -164,10 +162,10 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Búsqueda por metadatos estructurados</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Expresiones regulares</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Consultas por rango</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Refersto/citedby search operators</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Operadores para buscar citas: refersto/citedby</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combinación de metadatos/texto completo/cita bibliográfica</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Preguntas frecuentes</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Elegir correctamente los términos de búsqueda (speed-wise)</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Elegir correctamente los términos de búsqueda (en términos de velocidad)</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">¿Cómo localizar publicaciones a partir del autor?</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">¿Cómo ordenar acorde a cierto patrón de ordenación?</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">¿Cómo obtener documentos de otros servidores? (Google, SPIRES, KEK)</a>
@@ -180,17 +178,17 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Cerca guiada</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Cerca per paraules versus cerca per frases</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Consultes booleanes</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#parens">Parentheses</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Caracters especials i puntuació</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Caracters internacionals</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#parens">Parèntesis</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Caràcters especials i puntuació</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Caràcters internacionals</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Truncaments i cercques per arrel</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Cerca por metadadess estructurades</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Cerca per metadades estructurades</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Expressions regulars</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Consultes per rang</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Refersto/citedby search operators</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Operadors per cercar citacions: refersto/citedby</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combinació de metadades/text complet/referència bibliogràfica</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Preguntes freqüents</a>
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Escollir correctament els térmes de cerca (speed-wise)</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Escollir correctament els térmes de cerca (en termes de velocitat)</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-search-for-author">Com localitzar publicacions a partir de l'autor?</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-sort-pattern">Com ordenar d'acord a un patró d'ordenació?</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-hepdoc">Com obtenir documents d'altres servidors? (Google, SPIRES, KEK)</a>
@@ -263,7 +261,7 @@ consulta en el campo de texto, acompañado de la posibilidad de
 seleccionar uno de los índices comunes sobre los que efectuar la
 consulta.  Se introducen las palabras clave a buscar y se acciona la
 consulta mediante la tecla de retorno (o intro).  Por ejemplo, si
-interesa recuperar documentos sobre <em>modelos estándar</em> que han
+interesa recuperar documentos sobre <em>standard model</em> que han
 sido escritos por (o que mencionan a) <em>Ellis</em>, debemos
 escribir:</p>
 
@@ -280,7 +278,7 @@ escribir:</p>
 
 <p>y en la página de resultados de la búsqueda podemos volver a añadir o
 quitar palabras clave para obtener mayor precisión en los resultados,
-tal y como se especifica en más <a href="#boolean">adelante</a>.</p>
+tal y como se especifica <a href="#boolean">más adelante</a>.</p>
 </es>
 <ca>
 <p>La cerca per defecte és la <strong>cerca simple</strong>, que
@@ -288,8 +286,8 @@ fonamentalment permet escriure la consulta dins un camp de text,
 seguit de la possibilitat d'escollir un dels índexs comuns sobre els
 que realitzar la consulta.  S'introdueixen les paraules clau a buscar
 i s'acciona la consulta mitjançant la tecla de retorn (intro).  Per
-exemple, si interessa recuperar documents sobre <em>models
-estàndard</em> que han estat escrits per (o que fan esment a)
+exemple, si interessa recuperar documents sobre <em>standard
+model</em> que han estat escrits per (o que fan esment a)
 <em>Ellis</em>, haurem d'escriure:</p>
 
     <form action="<CFG_SITE_URL>/search" method="get">
@@ -305,7 +303,7 @@ estàndard</em> que han estat escrits per (o que fan esment a)
 
 <p>i a la pàgina dels resultats de la cerca podem tornar a afegir o
 treure paraules clau per tal d'obtenir més precisió als resultats, tal
-i com s'especifica més <a href="#boolean">endavant</a>.</p>
+i com s'especifica <a href="#boolean">més endavant</a>.</p>
 </ca>
 </lang>
 
@@ -700,8 +698,8 @@ publicación y <em>2001</em> en el año, escribiremos lo siguiente:</p>
     </form>
 </blockquote>
 
-<p>Obsérvese que si utilizamos una sintaxis especial, la Búsqueda
-Simple ofrece prácticamente la misma funcionalidad que la avanzada,
+<p>Obsérvese que si utilizamos una sintaxis especial, la búsqueda
+simple ofrece prácticamente la misma funcionalidad que la avanzada,
 tal y como se indica en las siguientes secciones de esta guía.  Este
 apartado de búsqueda simple-versus-avanzada no se refiere tanto a las
 funcionalidades disponibles, sino a la forma de búsqueda que podemos
@@ -710,8 +708,8 @@ al uso común de los términos de simple/avanzado que podemos encontrar
 en otros motores de búsqueda.</p>
 
 <p>En realidad, gran parte de la explicación que sigue a continuación,
-responde a la cuestión de "cómo un usuario avanzado puede utilizar la
-interficie de búsqueda simple".  Recordamos que en cualquier momento
+responde a la cuestión de «cómo un usuario avanzado puede utilizar la
+interficie de búsqueda simple».  Recordamos que en cualquier momento
 es posible recurrir a la ayuda de la búsqueda avanzada para conseguir
 más asistencia.</p>
 </es>
@@ -838,19 +836,19 @@ J</em> -transcrit exactament d'aquesta manera- i també les paraules
     </form>
 </blockquote>
 
-<p>Observis que si fem servir una sintaxi especial, la Cerca Simple
+<p>Observeu que si fem servir una sintaxi especial, la cerca simple
 ofereix pràcticament la mateixa funcionalitat que l'avançada, tal i
 com s'explica a les següents seccions d'aquesta guia.  Aquest apartat
 de cerca simple-versus-avançada no es refereix tant a les
 funcionalitats disponibles, com a la forma de cerca que podem
 configurar mitjançant petites modificacions.  El sistema s'ha adaptat
 a l'ús comú dels termes simple/avançat que podem trobar a altres
-motors de cerca.</p>
+cercadors.</p>
 
 <p>En realitat, gran part de l'explicació que segueix a continuació,
-respòn a la qüestió de "com un usuari avançat pot utilitzar la
-interficie de cerca simple".  Recordem que en qualsevol moment és
-posible recòrrer a l'ajuda de la cerca avanzada per aconseguir més
+respòn a la qüestió de «com un usuari avançat pot utilitzar la
+interfície de cerca simple».  Recordeu que en qualsevol moment és
+posible recórrer a l'ajuda de la cerca avanzada per aconseguir més
 assistència.</p>
 </ca>
 </lang>
@@ -860,8 +858,8 @@ assistència.</p>
 <en>Search guidance</en>
 <fr>Aide à la recherche</fr>
 <de>Grundlagen</de>
-<es>Búsqueda guiada</es>
-<ca>Cerca guiada</ca>
+<es>Ayuda a la búsqueda</es>
+<ca>Ajuda a la cerca</ca>
 </lang>
 </a></h3>
 
@@ -929,14 +927,7 @@ alors possible de corriger votre requête petit à petit.</p>
 </fr>
 
 <es>
-<p> Gracias al sistema de búsqueda en múltiples etapas y a la ayuda
-que se proporciona en cada una de estas etapas, por lo general resulta
-suficiente escribir la palabra de búsqueda y revisar los resultados
-qué nos devuelve el sistema.  Si los resultados no son pertinentes, o
-son excesivos o insuficientes, es posible añadir o quitar palabras de
-la consulta hasta conseguir resultados más satisfactorios.</p>
-
-<p> Después de recibir una consulta, el motor de búsqueda la analiza
+<p>Después de recibir una consulta, el motor de búsqueda la analiza
 y, en caso de no localizar ninguna coincidencia en la base de datos,
 el sistema tratará de guiar al usuario.  Un ejemplo de ello son las
 listas de los términos indexados que se encuentran más cercanos al
@@ -961,21 +952,22 @@ fórmula de consulta booleana utilizada no puede localizarlos.  Así
 mismo, el motor de búsqueda también realiza de forma oculta acciones
 alternativas para mejorar los resultados, como por ejemplo eliminar
 puntuación, etc.</p>
+
+<p>Gracias al sistema de búsqueda en múltiples etapas y a la ayuda
+que se proporciona en cada una de estas etapas, por lo general resulta
+suficiente escribir la palabra de búsqueda y revisar los resultados
+qué nos devuelve el sistema.  Si los resultados no son pertinentes, o
+son excesivos o insuficientes, es posible añadir o quitar palabras de
+la consulta hasta conseguir resultados más satisfactorios.</p>
 </es>
 
 <ca>
-<p> Gràcies al sistema de cerca en múltiples etapes i a l'ajuda que es
-va proporcionant a cadascuna d'aquestes etapes, pel general resulta
-suficient teclejar l'objetcte de cerca i observar que ens retorna el
-sistema. Si no quedem satisfets, podem afegir/treure paraules de la
-nostra consulta fins aconseguir uns resultats satisfactoris.</p>
-
-<p> Després de rebre una consulta, el motor de cerca l'analizarà i
-tractarà sempre de guiar a l'usuari en cas de que no localitzi cap
-coincidència a la base de dades.  Un exemple d'això son les llistes
-dels termes indexats que es troben més propers al terme introduït a la
-consulta en cas que no es trobin coincidències per errors ortogràfics
-o de transcripció:</p>
+<p>Un cop rebuda la consulta, el cercador l'analizarà i tractarà
+sempre de guiar a l'usuari en cas de que no localitzi cap coincidència
+a la base de dades.  Un exemple d'això son les llistes dels termes
+indexats que es troben més propers al terme introduït a la consulta en
+cas que no es trobin coincidències per errors ortogràfics o de
+transcripció:</p>
 
     <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -993,8 +985,14 @@ avisa de forma similar quan detecta que els termes de cerca no es
 troben, o quan detecta que si que existeixen però la fórmula de
 consulta booleana emprada no aconsegueix localitzar-los.  Així mateix,
 el motor de cerca també realitza de forma oculta accions alternatives
-per a millorar els resultat,s com, per exemple, eliminar puntuació,
+per a millorar els resultats com, per exemple, eliminar puntuació,
 etc.</p>
+
+<p>Gràcies al sistema de cerca en múltiples etapes i a l'ajuda que es
+va proporcionant a cadascuna d'aquestes etapes, pel general resulta
+suficient teclejar l'objecte de cerca i revisar que ens retorna el
+sistema. Si no quedem satisfets, podem afegir/treure paraules de la
+nostra consulta fins aconseguir uns resultats satisfactoris.</p>
 </ca>
 </lang>
 
@@ -1217,8 +1215,8 @@ ce guide concernant les <a href="#regexp">expressions régulières</a>.</p>
 <p>El modo de búsqueda por defecto es la <strong>búsqueda por
 palabras</strong>.  Ello significa que se ignoran los espacios en
 blanco, pero también que el motor de búsqueda lo interpreta por
-defecto como "añade automáticamente una Y booleana entre las palabras
-introducidas", del mismo modo que hace Google.  Por ejemplo, para
+defecto como «añade automáticamente una Y booleana entre las palabras
+introducidas», del mismo modo que hace Google.  Por ejemplo, para
 recuperar todos los registros que contengan tanto la palabra
 <em>ellis</em> como <em>muon</em> en cualquier parte del
 registro, debemos escribir:</p>
@@ -1280,8 +1278,8 @@ por frases:
       </blockquote>
       </form>
 
-    Observemos como se introduciría la búsqueda de un autor que a
-    veces aparece escrito como <em>Ellis, J</em> y otras como
+    Podemos observar como se introduciría la búsqueda de un autor que
+    a veces aparece escrito como <em>Ellis, J</em> y otras como
     <em>Ellis, Jonathan Richard</em> (incluyendo otros autores, como
     <em>De Lellis, Jim</em>) en una misma acción de búsqueda:
 
@@ -1297,7 +1295,7 @@ por frases:
       </form>
 
     (Para más información, se recomienda ver también la búsqueda
-    específica por <a href="#howto-search-for-author">autor</a>.)
+    específica <a href="#howto-search-for-author">por autor</a>.)
 </li>
 </ol>
 
@@ -1308,25 +1306,25 @@ por frase que suele utilizarse en el contexto de los buscadores web,
 el uso de la búsqueda por frase exacta resulta mucho más efectiva y
 rápida cuanto más se conocen y especifican los valores a recuperar.</p>
 
-
-<p>Otro interesante modo de búsqueda aparte de la búsqueda por palabra
-o por frase es el uso de la <strong>expresión regular de
-búsqueda</strong>, que se efectúa a partir del uso de parentesis en
-lugar de entrecomillado.  Por ejemplo, la búsqueda anterior según el
-modo de en parte de la frase <code>'muon decay'</code> es equivalente a
-la expresión regular<code>/muon decay/</code>.  La sintaxis de las
+<p>Otro modo interesante de búsqueda, aparte de la búsqueda por
+palabra o por frase, es el uso de la <strong>búsqueda por expresión
+regular</strong>, que se efectúa entre barras inclinadas en lugar de
+entrecomillado.  Por ejemplo, la búsqueda anterior según el modo de en
+parte de la frase <code>'muon decay'</code> es equivalente a la
+expresión regular<code>/muon decay/</code>.  La sintaxis de las
 expresiones regulares es muy potente, y permite construir búsquedas
 muy complejas.  Para obtener más información, recomendamos la consulta
-de la sección <a href="#regexp">expresión regular</a> de esta guia.</p>
+de la sección <a href="#regexp">expresión regular</a> de esta
+guia.</p>
 </es>
 
 <ca>
 <p>El mode de cerca per defecte es la <strong>cerca per
-paraules</strong>.  Aquest mode implica s'ignorian els espais en
+paraules</strong>.  Aquest mode implica que s'ignoren els espais en
 blanc, però també que el motor de cerca els interpreti per defecte com
-a "afegeis automàticament una I booleana entre les paraules
-introduïdes", de la mateixa forma que fa Google.  Per exemple, per
-recuperar tots els registres que continguin tant la paraula
+a «afegeix automàticament una I booleana entre les paraules
+introduïdes«, com fa Google.  Per exemple, per recuperar tots els
+registres que continguin tant la paraula
 <em>ellis</em> com <em>muon</em> a qualsevol part del registre,
 haurem d'escriure:</p>
 
@@ -1347,11 +1345,12 @@ sentència entre cometes.  Existeixen dues formes de cerca per frase:
 <ol>
 
 <li>La introducció de cometes dobles indica al motor de cerca
-<strong>cerca la frase exacta</strong>. Aquesta forma de cerca per
-frase retornara resultats només en el cas que els camps de metadades
-localitzats siguin exactament igual al patró sol·licitat. Per exemple,
-per recuperar tots els documents escrits per <em>Ellis, J</em> escrit
-exactament d'aquesta manera, hem d'escriure:
+    <strong>cerca la frase exacta</strong>. Aquesta forma de cerca per
+    frase retornara resultats només en el cas que els camps de
+    metadades localitzats siguin exactament igual al patró
+    sol·licitat. Per exemple, per recuperar tots els documents escrits
+    per <em>Ellis, J</em> escrit exactament d'aquesta manera, hem
+    d'escriure:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -1366,14 +1365,14 @@ exactament d'aquesta manera, hem d'escriure:
       </form>
 </li>
 <li>La introducció de comentes simples indica al motor de cerca
-l'acció de <strong>cercar a alguna part de la frase</strong>.  A
-diferència de la cerca per frase exacta aquest mètode permet que
-existeixi text abans/desprès del patró sol•licitat.  Aquest métode és
-similar al de "cerca per frase" que utilitzen Google i altres motors
-de cerca quan cerquen expressions dins del text complet de les pàgines
-web.  Per exemple, per localitzar tots els títols que continguin
-l'expressió <em>muon decay</em> independentment de la posició que
-aquesta ocupi dins el títol, escriurem:
+    l'acció de <strong>cercar a alguna part de la frase</strong>.  A
+    diferència de la cerca per frase exacta aquest mètode permet que
+    existeixi text abans/desprès del patró sol•licitat.  Aquest métode
+    és similar al de «cerca per frase» que utilitzen Google i altres
+    motors de cerca quan cerquen expressions dins del text complet de
+    les pàgines web.  Per exemple, per localitzar tots els títols que
+    continguin l'expressió <em>muon decay</em> independentment de la
+    posició que aquesta ocupi dins el títol, escriurem:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -1386,10 +1385,10 @@ aquesta ocupi dins el títol, escriurem:
       </blockquote>
       </form>
 
-    Observem como s’introduiria la cerca d’un autor que de vegades
-    apareix escrit com <em>Ellis, J</em> y altres com <em>Ellis,
-    Jonathan Richard</em> (incloent altres autors com <em>De Lellis,
-    Jim</em>) en una mateixa acció de cerca:
+    Podem observar com s'introduiria la cerca d'un autor que de
+    vegades apareix escrit com <em>Ellis, J</em> y altres
+    com <em>Ellis, Jonathan Richard</em> (incloent altres autors
+    com <em>De Lellis, Jim</em>) en una mateixa acció de cerca:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -1408,21 +1407,21 @@ aquesta ocupi dins el títol, escriurem:
 </ol>
 
 <p>La diferència entre cercar per frase exacta o cercar per part de la
-frase Pot semblar poc evident a primera vista.  Ara bé, mentre que la
-cerca per part de la frase s’equipara a la cerca per frase que
-acostuma a aplicar-se dins el context dels cercadors web, l’ús de la
+frase pot semblar poc evident a primera vista.  Ara bé, mentre que la
+cerca per part de la frase s'equipara a la cerca per frase que
+acostuma a aplicar-se dins el context dels cercadors web, l'ús de la
 cerca per frase exacta resulta molt més efectiva i ràpida com més es
 coneguin i especifiquin els valors a recuperar.</p>
 
-<p>Un altra interessant forma de cerca apart de la cerca per paraula o
-frase, és l’ús de la <strong>expressió regular de cerca</strong>, que
-es realitza a partir del ús de barres inclinades en lloc de cometes.
-Per exemple, la cerca anterior segons el mode de ‘part de la frase’ de
-l’expressió <code>'muon decay'</code> és equivalent a l’expressió
-regular<code>/muon decay/</code>.  La sintaxi de les expressions
+<p>Un altra forma interessant de cerca, a més de la cerca per paraula
+o frase, és l'ús de la <strong>cerca per expressió regular</strong>,
+que s'expressa entre barres inclinades en comptes de cometes.  Per
+exemple, la cerca anterior segons el mode de cerca parcial de la frase
+<code>'muon decay'</code> és equivalent a l'expressió
+regular <code>/muon decay/</code>.  La sintaxi de les expressions
 regulars és molt potent, i permet construir cerques molt complexes.
-Per obtenir més informació, recomanem la consulta de la secció <a
-href="#regexp">expressió regular</a> d’aquesta guia.</p>
+Per obtenir més informació, recomanem la consulta de la
+secció <a href="#regexp">expressió regular</a> d'aquesta guia.</p>
 </ca>
 </lang>
 
@@ -1593,165 +1592,158 @@ idem (simplification syntaxique)
 </table>
 </blockquote>
 </fr>
+
 <es>
-Ya hemos visto como la inclusión de un espacio en blanco es
-equivalente a la adición de un operador booleano en la búsqueda por
-palabras. El resto de operadores booleanos son:
+  Ya hemos visto como la inclusión de un espacio en blanco es
+  equivalente a la adición de un operador booleano en la búsqueda por
+  palabras. El resto de operadores booleanos son:
 <blockquote>
-<table border="1" cellpadding="10">
-<tr>
-<td rowspan="3" align="center">
-<strong>+<br/>AND</strong>
-</td>
-<td>
-   <code>ellis +muon</code>
-</td>
-<td>
-  recupera todos los registros que contengan ambas palabras:
-  <em>ellis</em> y la palabra <em>muon</em>
-</td>
-</tr>
-<tr>
-<td>
-   <code>ellis muon</code>
-</td>
-<td>
- ídem, "syntactic sugar"(*ver nota)
-</td>
-</tr>
-<tr>
-<td>
-   <code>ellis and muon</code>
-</td>
-<td>
- ídem, "syntactic sugar"
-</td>
-</tr>
-<tr>
-<td rowspan="2" align="center">
-<strong>-<br/>NOT</strong>
-</td>
-<td>
- <code>ellis -muon</code>
-</td>
-<td>
-recupera todos los registros que contengan la palabra
-                        <em>ellis</em> pero que no contenga la palabra <em>muon</em>
-</td>
-</tr>
-<tr>
-<td>
-   <code>ellis not muon</code>
-</td>
-<td>
-ditto, "syntactic sugar"
-</td>
-</tr>
-<tr>
-<td rowspan="2" align="center">
-<strong>|<br/>OR</strong>
-</td>
-<td>
-   <code>ellis |acelerador</code>
-</td>
-<td>
-recupera todos los registros que contengan al menos, una de las dos palabras
-</td>
-</tr>
-<tr>
-<td>
-  <code>ellis or muon</code>
-</td>
-<td>
-ídem, "syntactic sugar"
-</td>
-</tr>
-<tr>
-<td colspan="2"><font size="1">(*)Nota de la traducción española: syntactic sugar es una espresión
-utilizada en inglés para describir "otra forma similar de llamar a una función"</font></td>
-</tr>
-</table>
+  <table border="1" cellpadding="10">
+    <tr>
+      <td rowspan="3" align="center">
+	<strong>+<br/>AND</strong>
+      </td>
+      <td>
+	<code>ellis +muon</code>
+      </td>
+      <td>
+	recupera todos los registros que contengan ambas palabras:
+	<em>ellis</em> y la palabra <em>muon</em>
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<code>ellis muon</code>
+      </td>
+      <td>
+	ídem, simplificación sintáctica
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<code>ellis and muon</code>
+      </td>
+      <td>
+	ídem, simplificación sintáctica
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2" align="center">
+	<strong>-<br/>NOT</strong>
+      </td>
+      <td>
+	<code>ellis -muon</code>
+      </td>
+      <td>
+	recupera todos los registros que contengan la palabra
+	<em>ellis</em> pero que no contenga la palabra <em>muon</em>
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<code>ellis not muon</code>
+      </td>
+      <td>
+	lo mismo, simplificación sintáctica
+      </td>
+    </tr>
+    <tr>
+      <td rowspan="2" align="center">
+	<strong>|<br/>OR</strong>
+      </td>
+      <td>
+	<code>ellis |muon</code>
+      </td>
+      <td>
+	recupera todos los registros que contengan al menos, una de las dos palabras
+      </td>
+    </tr>
+    <tr>
+      <td>
+	<code>ellis or muon</code>
+      </td>
+      <td>
+	ídem, simplificación sintáctica
+      </td>
+    </tr>
+  </table>
 </blockquote>
 </es>
 
 <ca>
-Hem vist com la inclusió d’un espai en blanc és equivalent a l’adició
-d’un operador booleà a la cerca per paraules.  La resta d’operadors
-booleans són:
-<blockquote>
-<table border="1" cellpadding="10">
-<tr>
-<td rowspan="3" align="center">
-<strong>+<br/>AND</strong>
-</td>
-<td>
-   <code>ellis +muon</code>
-</td>
-<td>
-  Recupera tots els registres que contenen ambdues paraules:
-  <em>ellis</em> i la paraula <em>muon</em>
-</td>
-</tr>
-<tr>
-<td>
-   <code>ellis muon</code>
-</td>
-<td>
- ídem, "syntactic sugar" (*veure nota)
-</td>
-</tr>
-<tr>
-<td>
-   <code>ellis and muon</code>
-</td>
-<td>
- ídem, "syntactic sugar"
-</td>
-</tr>
-<tr>
-<td rowspan="2" align="center">
-<strong>-<br/>NOT</strong>
-</td>
-<td>
- <code>ellis -muon</code>
-</td>
-<td>
-recupera tots els registres que contenen la paraula <em>ellis</em> però que no contenen la paraula <em>muon</em>
-</td>
-</tr>
-<tr>
-<td>
-   <code>ellis not muon</code>
-</td>
-<td>
-ídem, "syntactic sugar"
-</td>
-</tr>
-<tr>
-<td rowspan="2" align="center">
-<strong>|<br/>OR</strong>
-</td>
-<td>
-   <code>ellis |muon</code>
-</td>
-<td>
-recupera tots els registres que contenen, com a mínim, una de les dues paraules
-</td>
-</tr>
-<tr>
-<td>
-  <code>ellis or muon</code>
-</td>
-<td>
-ídem, "syntactic sugar"
-</td>
-</tr>
-<tr>
-<td colspan="2"><sup>(*)</sup><font size="1">Nota de la traducció catalana: syntactic sugar es una espressió
-emprada en anglès per a descriure "altre forma similar de cridar una funció"</font></td>
-</tr>
-</table>
-</blockquote>
+  Hem vist com la inclusió d'un espai en blanc és equivalent a afegir un
+  operador booleà a la cerca per paraules.  La resta d'operadors
+  booleans són:
+  <blockquote>
+    <table border="1" cellpadding="10">
+      <tr>
+	<td rowspan="3" align="center">
+	  <strong>+<br/>AND</strong>
+	</td>
+	<td>
+	  <code>ellis +muon</code>
+	</td>
+	<td>
+	  Recupera tots els registres que contenen ambdues paraules:
+	  <em>ellis</em> i la paraula <em>muon</em>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <code>ellis muon</code>
+	</td>
+	<td>
+	  ídem, simplificació sintàctica
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <code>ellis and muon</code>
+	</td>
+	<td>
+	  ídem, simplificació sintàctica
+	</td>
+      </tr>
+      <tr>
+	<td rowspan="2" align="center">
+	  <strong>-<br/>NOT</strong>
+	</td>
+	<td>
+	  <code>ellis -muon</code>
+	</td>
+	<td>
+	  recupera tots els registres que contenen la paraula <em>ellis</em> però que no contenen la paraula <em>muon</em>
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <code>ellis not muon</code>
+	</td>
+	<td>
+	  ídem, simplificació sintàctica
+	</td>
+      </tr>
+      <tr>
+	<td rowspan="2" align="center">
+	  <strong>|<br/>OR</strong>
+	</td>
+	<td>
+	  <code>ellis |muon</code>
+	</td>
+	<td>
+	  recupera tots els registres que contenen, com a mínim, una de les dues paraules
+	</td>
+      </tr>
+      <tr>
+	<td>
+	  <code>ellis or muon</code>
+	</td>
+	<td>
+	  ídem, simplificació sintàctica
+	</td>
+      </tr>
+    </table>
+  </blockquote>
 </ca>
 </lang>
 
@@ -1807,6 +1799,7 @@ append <code>-decay</code>:</p>
 to get a refined list.  Keep adding/removing terms until you are
 satisfied.
 </en>
+
 <fr>
 <p>Les opérations logiques sont chaînées de gauche à droite.
 Par exemple, si vous cherchez les documents écrits par Ellis sur les muons
@@ -1859,9 +1852,8 @@ pour obtenir une liste plus précise. Ajoutez/supprimez d'autres termes jusqu'à
 
 <es>
 <p>Los operadores lógicos se disponen de forma automática de izquierda
-a derecha.  Logical operations are automatically chained from left to
-right.  Por ejemplo, si queremos buscar documentos escritos por Ellis
-sobre muon o kaon, escribiremos:</p>
+a derecha.  Por ejemplo, si queremos buscar documentos escritos por
+Ellis sobre muon o kaon, escribiremos:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -1916,7 +1908,7 @@ precisión en la búsqueda.
 
 <ca>
 
-<p>Els operadors lògics es disposen de forma automàtica d’esquerre
+<p>Els operadors lògics es disposen de forma automàtica d'esquerre
 a dreta.  Per exemple, si es volen recuperar documents escrits per Ellis
 sobre muon o kaon, escriurem:</p>
 
@@ -1932,8 +1924,8 @@ sobre muon o kaon, escriurem:</p>
       </form>
 
 es realitzarà una cerca equivalent a <code>(muon OR kaon)
-AND ellis</code>.  Notis també que s’obtenen resultats diferents si
-s’introdueix
+AND ellis</code>.  Notis també que s'obtenen resultats diferents si
+s'introdueix
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -1946,9 +1938,9 @@ s’introdueix
       </blockquote>
       </form>
 
-que si s’introdueix <code>(ellis AND muon) OR kaon</code>.
+que si s'introdueix <code>(ellis AND muon) OR kaon</code>.
 
-<p>La disposició dels elements d’esquerre a dreta permet refinar
+<p>La disposició dels elements d'esquerre a dreta permet refinar
 fàcilment una cerca afegint o traient paraules utilitzant els
 operadors AND/NOT +/-.
 Per exemple, per excloure els documents sobre desintegració a la cerca
@@ -1965,7 +1957,7 @@ anterior, només cal afegir <code>-decay</code>:</p>
       </blockquote>
       </form>
 
-Amb el que s’obtindria una llista més filtrada.  Es poden afegir o
+Amb el que s'obtindria una llista més filtrada.  Es poden afegir o
 traure tants elements com sigui convenient, fins aconseguir més
 precisió a la cerca.  </ca>
 </lang>
@@ -1974,6 +1966,8 @@ precisió a la cerca.  </ca>
 <lang>
 <en>Parentheses</en>
 <fr>Parenthèses</fr>
+<es>Paréntesis</es>
+<ca>Parèntesis</ca>
 </lang>
 </a></h3>
 
@@ -1981,9 +1975,19 @@ precisió a la cerca.  </ca>
 <en>
 You can also use parentheses in your queries to group boolean expressions together:
 </en>
+
 <fr>
 Vous pouvez aussi utiliser des parenthèses pour grouper des expressions booléennes:
 </fr>
+
+<es>
+También se pueden utilizar paréntesis para agrupar las expresiones booleanas:
+</es>
+
+<ca>
+També es poden utilitzar parèntesis per agrupar les expressiones booleanes:
+</ca>
+
 </lang>
 
     <form action="<CFG_SITE_URL>/search" method="get">
@@ -2006,6 +2010,7 @@ and either <em>ellis</em> or <em>perelstein</em> anywhere in the record.</p>
 <p>Note that you can use any number of parentheses in the query.  Nested
 parentheses, such as <code>foo AND (bar OR (fuux NOT quux))</code>, are also supported.</p>
 </en>
+
 <fr>
 <p>Cette requête retourne toutes les notices contenant soit <em>gravity</em> ou <em>supergravity</em>,
 et soit <em>ellis</em> ou <em>perelstein</em> n'importe où dans la notice.</p>
@@ -2014,6 +2019,28 @@ et soit <em>ellis</em> ou <em>perelstein</em> n'importe où dans la notice.</p>
 parenthèses imbriquées, telles que <code>foo AND (bar OR (fuux NOT quux))</code>, sont également
 supportées.</p>
 </fr>
+
+<es>
+  <p>Esta búsqueda devuelve registros que contengan
+    tanto <em>gravity</em> o <em>supergravity</em>, o
+    bien <em>ellis</em> o <em>perelstein</em> en cualquier parte del
+    registro.</p>
+
+  <p>Obsérvese que puede usar cualquier número de paréntesis en la
+    búsqueda.  También es posible incluir paréntesis dentro de otros,
+    como <code>esto AND (aquello OR (más NOT lejos))</code>.</p>
+</es>
+
+<ca>
+  <p>Aquesta cerca retorna registres que contingin bé <em>gravity</em>
+    o <em>supergravity</em>, o bé <em>ellis</em> o <em>perelstein</em>
+    a cualsevol part del registre.</p>
+
+  <p>Observeu que podeu usar qualsevol nombre de parèntesis en la
+    cerca.  També és possible incloure parèntesis dins d'altres,
+    como <code>això AND (allò OR (més NOT lluny))</code>.</p>
+</ca>
+
 </lang>
 
 <h3><a name="punctuation">
@@ -2233,7 +2260,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:</p>
 </es>
 
 <ca>
-<p>Quan s’indexen les paraules, es posa especial atenció en que siguin
+<p>Quan s'indexen les paraules, es posa especial atenció en que siguin
 indexades amb i sense puntuació.  Això fa possible la cerca de termes
 que contenen caràcters especials, com per exemple <em>C++</em>,
 textualment:</p>
@@ -2260,7 +2287,7 @@ textualment:</p>
       </blockquote>
       </form>
 
-  Per exemple, per recuperar registres que contenen l’expresió LaTeX
+  Per exemple, per recuperar registres que contenen l'expresió LaTeX
    <code>$e^{+}e^{-}$</code> al títol, cal escriure:
 
       <form action="<CFG_SITE_URL>/search" method="get">
@@ -2288,7 +2315,7 @@ textualment:</p>
       </blockquote>
       </form>
 
-  Observis que aquesta cerca és sensible a les majúscules:
+  Observeu que aquesta cerca és sensible a les majúscules:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -2407,7 +2434,7 @@ escritos por (o sobre) Пушкин, debemos escribir:</p>
 </es>
 
 <ca>
-<p>El motor de cerca es basa en l’estàndard Unicode UTF-8, lo que fa
+<p>El motor de cerca es basa en l'estàndard Unicode UTF-8, que fa
 possible introduir cadenes de cerca en qualsevol llengua que es trobi
 a la base de dades.  Per exemple, per recuperar documents escrits per
 (o sobre) Пушкин, cal escriure:</p>
@@ -2423,8 +2450,10 @@ a la base de dades.  Per exemple, per recuperar documents escrits per
       </blockquote>
       </form>
 
-  Notis que no és necessari introduir accents per aconseguir registres
-que contenen paraules accentuades.  Per exemple, escriurem <code>Lemaitre</code> para recuperar articles de <em>Lemaître</em>:
+Observeu que no és necessari introduir accents per aconseguir
+registres que contenen paraules accentuades.  Per exemple,
+escriurem <code>Lemaitre</code> para recuperar articles
+de <em>Lemaître</em>:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -2676,7 +2705,7 @@ comience con "Neutrino mass", debemos escribir:
 </es>
 
 <ca>
-<p>El truncament d’una paraula es realitza a través de l’ús del símbol
+<p>El truncament d'una paraula es realitza a través de l'ús del símbol
   asterisc (*).  Aquest comodí indica al motor de cerca que retorni
   qualsevol número de caràcters en el seu lloc.  Per exemple, per
   recuperar registres que continguin les paraules <em>astronomia</em>,
@@ -2709,7 +2738,7 @@ comience con "Neutrino mass", debemos escribir:
       </blockquote>
       </form>
 
-   Notis que el comodí s’ignora si es tracta d’utilitzar-lo amb
+   Notis que el comodí s'ignora si es tracta d'utilitzar-lo amb
    paraules massa curtes, com per exemple <em>a*</em>:
 
       <form action="<CFG_SITE_URL>/search" method="get">
@@ -2744,7 +2773,7 @@ comience con "Neutrino mass", debemos escribir:
    de fer servir els comodins: tant podem utilitzar <code>'foo bar
    baz'</code> com <code>"*foo bar baz*"</code>.
    Això ajuda a comprendre perquè la cerca de
-   paraules a una part de la frase és lenta: degut a l’ús de dos
+   paraules a una part de la frase és lenta: degut a l'ús de dos
    asteriscs davant i darrera del text, tots i cadascun dels registres
    de la base de dades es comproven per determinar si es corresponen o
    no amb la cerca introduïda.  Actualment no hi ha cap índex de cerca
@@ -2756,6 +2785,8 @@ comience con "Neutrino mass", debemos escribir:
 <lang>
 <en>Structured metadata search</en>
 <fr>Recherche structurée</fr>
+<es>Búsquedas estructuradas</es>
+<ca>Cerques estructurades</ca>
 <de>Strukturierte Metadatensuche</de>
 </lang>
 </a></h3>
@@ -2930,13 +2961,13 @@ comience con "Neutrino mass", debemos escribir:
 
 <ca>
 
-<p>La cerca realitzada utilitzant diversos camps bibliogràfics (Tals
-com títol, autor) es realitza a través d’una sintaxi similar a
-l’emprada per Google en les Seves cerques tipus <code>"site:"</code>.
-Si un terme de cerca es precedit per un nom de camp seguit per dos
-punts aquest terme es cerca únicament dins el camp especificat.  Per
+<p>La cerca realitzada utilitzant diversos camps bibliogràfics (com
+títol, autor) es realitza a través d'una sintaxi similar a l'emprada
+per Google en les seves cerques tipus <code>"site:"</code>.  Si un
+terme de cerca es precedit per un nom de camp seguit per dos punts
+aquest terme es cerca únicament dins el camp especificat.  Per
 exemple, per recuperar documents que contenen la paraula
-<em>ellis</em> dins l’índex d’autors, cal escriure:</p>
+<em>ellis</em> dins l'índex d'autors, cal escriure:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -2964,7 +2995,7 @@ exemple, per recuperar documents que contenen la paraula
       </blockquote>
       </form>
 
-   Per recuperar documents escrits per l’experiment <em>NA60</em> de l’any <em>2001</em>, cal escriure:
+   Per recuperar documents escrits per l'experiment <em>NA60</em> de l'any <em>2001</em>, cal escriure:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -2977,7 +3008,7 @@ exemple, per recuperar documents que contenen la paraula
       </blockquote>
       </form>
 
-   Els camps d’ús comú amb aquesta tècnica són:
+   Els camps d'ús comú amb aquesta tècnica són:
      <code>author</code>, <code>title</code>,
     <code>reportnumber</code>, <code>abstract</code>,
     <code>keyword</code>, <code>year</code>, <code>experiment</code>,
@@ -3043,9 +3074,10 @@ by any number of any characters, and end by the letter <em>s</em>.
 </fr>
 <es>
 <p>El uso del modo de búsqueda por expresión regular está dirigida
-sobre todo a usuarios avanzados que conocen la sintaxis tradicional
-Unix/POSIX regexp.  En el interfaz de consulta simple se puede forzar
-este modo usando barras inclinadas en lugar de comillas:</p>
+sobre todo a usuarios avanzados que conocen la sintaxis tradicional de
+expressión regular Unix/POSIX.  En el interfaz de consulta simple se
+puede forzar este modo usando barras inclinadas en lugar de
+comillas:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3058,7 +3090,7 @@ este modo usando barras inclinadas en lugar de comillas:</p>
       </blockquote>
       </form>
 
-mientras que en el modo de búsqueda Avanzado se puede seleccionar
+mientras que en el modo de búsqueda avanzado se puede seleccionar
 explícitamente este modo de búsqueda seleccionandolo en el menú
 desplegable.  En el ejemplo anterior se recuperarían todos los títulos
 que comienzan por la letra <em>E</em>, seguida de cualquier número o
@@ -3066,10 +3098,10 @@ cualquier carácter, y que terminen por la letra <em>s</em>.
 </es>
 
 <ca>
-<p>L’ ús del mode de cerca per expressió regular està dirigida
-sobretot a usuaris avançats que coneixen la sintaxi tradicional
-Unix/POSIX regexp.  A l’interficie de consulta simple es pot forçar
-aquest mode utilitzant les Barres inclinades enlloc de comentes:</p>
+<p>L'ús del mode de cerca per expressió regular està dirigida sobretot
+a usuaris avançats que coneixen la sintaxi tradicional d'expressió
+regular Unix/POSIX.  A l'interfície de consulta simple es pot forçar
+aquest mode utilitzant les barres inclinades enlloc de comentes:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3082,8 +3114,8 @@ aquest mode utilitzant les Barres inclinades enlloc de comentes:</p>
       </blockquote>
       </form>
 
-Al mode de cerca Avançada es pot seleccionar explícitament aquest mode
-de cerca seleccionant-lo al menú desplegable.  a l’exemple anterior es
+Al mode de cerca avançada es pot seleccionar explícitament aquest mode
+de cerca seleccionant-lo al menú desplegable.  A l'exemple anterior es
 recuperarien tots els títols que comencen per la lletra <em>E</em>,
 seguida de qualsevol número o qualsevol caràcter, i que acabin per la
 lletra <em>s</em>.
@@ -3139,7 +3171,7 @@ como <em>Ellis, John</em>:</p>
 </es>
 
 <ca>
-<p>Un altre exemple similar és el de la cerca per autor d’un autor que
+<p>Un altre exemple similar és el de la cerca per autor d'un autor que
 ha estat introduït a la base de dades com <em>Ellis, J</em> o bé com
 <em>Ellis, John</em>:</p>
 
@@ -3335,7 +3367,7 @@ equivalente a:
 </es>
 
 <ca>
-<p>Observis que també poden emprar-se caràcters d’interval com
+<p>Observeu que també poden emprar-se caràcters d'interval com
 <code>[a-k]</code> i contadors de concurrència com <code>{3}</code>.
 Per ejemple, podem recuperar tots els pre-prints que no es
 corresponguin amb la política de catalogació <em>AAAA</em> per
@@ -3354,7 +3386,7 @@ descriure anys, opcionalment seguida per <em>?</em> o per altre
       </form>
 
 També poden emprar-se altres classe de caràcters com
-<protect><code>[:alnum:]</code></protect>, que a l’exemple anterior seria
+<protect><code>[:alnum:]</code></protect>, que a l'exemple anterior seria
 equivalent a:
 
       <form action="<CFG_SITE_URL>/search" method="get">
@@ -3453,7 +3485,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon decay year:1983->1992" />
+      <input size="40" type="text" name="p" value="muon decay year:1983-&gt;1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3484,7 +3516,7 @@ sobre <em>par motor</em> publicados entre <em>1983</em> y
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992" />
+      <input size="40" type="text" name="p" value="muon decay year:1983-&gt;1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3517,7 +3549,7 @@ escriure:</p>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="destintegraci&oacute; muon any:1983->1992" />
+      <input size="40" type="text" name="p" value="muon decay year:1983-&gt;1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3525,7 +3557,7 @@ escriure:</p>
       </blockquote>
       </form>
 
-Per recuperar tots els documents d’autors els noms dels quals estiguin
+Per recuperar tots els documents d'autors els noms dels quals estiguin
 dins El rang que va des de <em>Ellis, J</em> fins <em>Ellis, Qqq</em>,
 cal escriure:
 
@@ -3546,6 +3578,8 @@ cal escriure:
 <lang>
 <en>Refersto and citedby search operators</en>
 <fr>Opérateurs de recherche refersto/citedby</fr>
+<es>Operadores de búsqueda refersto/citedby</es>
+<ca>Operadors de cerca refersto/citedby</ca>
 </lang>
 </a></h3>
 
@@ -3558,6 +3592,15 @@ cal escriure:
    les opérateurs de recherche <code>citedby</code> et <code>refersto</code>.
    Par exemple, pour trouver qui cite hep-th/0201100, vous pouvez entrer:</p>
 </fr>
+<es><p>Es posible buscar en la red de citas con los operadores de
+    búsqueda <code>citedby</code> y <code>refersto</code>.  Por
+    ejemplo, para encontrar quien cita hep-th/0201100, puede
+    escribir:</p>
+</es>
+<ca><p>És possible cercar en la xarxa de citacions amb els operadors
+    de cerca <code>citedby</code> i <code>refersto</code>.  Per
+    exemple, per trobar qui cita hep-th/0201100, podeu escriure:</p>
+</ca>
 </lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3576,6 +3619,14 @@ cal escriure:
 <fr>
    <p>Par exemple, pour trouver quels articles sont cités par Klebanov, saisissez:</p>
 </fr>
+<es>
+  <p>Por ejemplo, para encontrar que artículos son citados por
+  Klebanov, escriba:</p>
+</es>
+<ca>
+  <p>Per exemple, per trobar quins articles són citados per Klebanov,
+  escriviu:</p>
+</ca>
 </lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3594,6 +3645,14 @@ cal escriure:
 <fr>
    <p>Pour mettre en place une alerte dès qu'un nouvel article cite l'auteur I. Klebanov, saisissez:</p>
 </fr>
+<es>
+  <p>Para activar una alerta para nuevos documentos que citen el autor
+  I. Klebanov, escriba:</p>
+</es>
+<ca>
+  <p>Per activar una alerta para nous documents que citin l'autor
+  I. Klebanov, escriviu:</p>
+</ca>
 </lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3616,6 +3675,19 @@ cal escriure:
     exemple, pour trouver tous les articles qui citent des articles marqués
     du mot clé gravitino, saisissez:</p>
 </fr>
+<es>
+  <p>Obsérvese en cuenta que los operadores de
+    búsqueda <code>refersto</code> y <code>citedby</code> funcionan en
+    cualquier búsqueda regular.  Por ejemplo, para buscar todos los
+    documentos que citen documentos que contengan la palabra clave
+    gravitino, escriba:</p>
+</es>
+<ca>
+  <p>Observeu que els operadors de cerca <code>refersto</code>
+    i <code>citedby</code> funcionen en cualsevol cerca regular.  Per
+    exemple, per cercar tots els documents que citin documents que
+    contenguinn la paraula clau gravitino, escriviu:</p>
+</ca>
 </lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3639,6 +3711,20 @@ cal escriure:
        Papadimitriou, mais qui ne citent en retour aucun des articles de
        Papadimitriou, indiquez:</p>
 </fr>
+<es>
+  <p>Obsérvese también que estos operadores se pueden combinar
+    libremente con las búsquedas de metadatos habituales.  Por
+    ejemplo, para encontrar documentos escritos por Klebanov que sean
+    citados por Papadimitriou pero que ellos mismos no citen ninguno
+    de los documentos de Papadimitriou, escriba:</p>
+</es>
+<ca>
+  <p>Observeu també que aquests operadors es poden combinar lliurement
+    amb les cerques de metadades habituals.  Per exemple, per trobar
+    documents escrits per Klebanov que siguin citats por Papadimitriou
+    pero que ells mateixos no citin cap de los documents de
+    Papadimitriou, escriviu:</p>
+</ca>
 </lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3663,6 +3749,20 @@ cal escriure:
   exemple, pour trouver les articles qui citent uniquement les articles de
   I. Klebanov mentionnant O(N) dans leur titre, saisissez:</p>
 </fr>
+<ca>
+  <p>Finalmente, puede utilizar las sintaxis para marcar expresiones
+    regulares o de búsqueda por frase para combinar expresiones de
+    búsqueda en el mismo operador refersto/citedby.  Por ejemplo, para
+    encontrar documentos que solo citen aquellos documentos de
+    I. Klebanov que mencionen O(N) en el título, escriba:</p>
+</ca>
+<ca>
+  <p>Finalment, podeu utilitzar les sintaxis per marcar expressions
+    regulars o de cerca per frase per combinar expressions de cerca en
+    el mateix operador refersto/citedby.  Per exemple, per trobar
+    documents que només citin aquells documents de I. Klebanov que
+    mencionen O(N) al títol, escriviu:</p>
+</ca>
 </lang>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3795,11 +3895,11 @@ cal escriure:
 <p>Toda la sintaxis mencionada anteriormente se puede combinar en una
 misma consulta.  Por ejemplo, para recuperar documentos que contienen
 la palabra <em>ellis</em> dentro del campo autor, y que no contienen
-palabras como <em>muon</em>, 'muonic', etc., en ningún otro
-campo, y que contienen (o subcadena de palabras, para ser más
-precisos) ‘dense quark matter’ dentro del campo de resumen, y que han sido
-publicados dentro de los años que comienzan por los dígitos '200',
-debe escribirse:</p>
+palabras como <em>muon</em>, 'muonic', etc., en ningún otro campo, y
+que contienen la frase (o subcadena de palabras, para ser más
+precisos) 'dense quark matter' dentro del campo de resumen, y que han
+sido publicados dentro de los años que comienzan por los dígitos
+'200', debe escribirse:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3816,9 +3916,9 @@ Obsérvese que la opción de índice global “cualquier campo” por defecto
 contiene únicamente términos de metadatos, no del texto completo ni de
 las citas bibliográficass.  Es necesario especificar explícitamente
 las opciones de buscar en el índice <code>texto completo</code> o de
-<code>cita bibliográfica</code> si se desea buscar en estos campos.
-Por ejemplo, para recuperar el término <em>Higgs</em> tanto dentro de
-los metadatos, las citas o el texto completo, debe escribirse:
+<code>referencia</code> si se desea buscar en estos campos.  Por
+ejemplo, para recuperar el término <em>Higgs</em> tanto dentro de los
+metadatos, las citas o el texto completo, debe escribirse:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3854,11 +3954,11 @@ escribirse:
 <ca>
 <p>Tota la sintaxi mencionada anteriorment es pot combinar en una
 mateixa consulta.  Per exemple, per recuperar documents que contenen
-la paraula <em>ellis</em> dins el camp d’autor, i que no contenen
-paraules com <em>muon</em>, 'muonic', etc., a cap altre
-camp, i que contenen la frase (o subcadena de paraules, per ser més
-precisos) ‘dense quark matter’ dins el camp de resum, i que han estat
-publicats dins els anys que comencen pels dígits '200', cal escriure:</p>
+la paraula <em>ellis</em> dins el camp d'autor, i que no contenen
+paraules com <em>muon</em>, 'muonic', etc., a cap altre camp, i que
+contenen la frase (o subcadena de paraules, per ser més precisos)
+‘dense quark matter' dins el camp de resum, i que han estat publicats
+dins els anys que comencen pels dígits '200', cal escriure:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3871,13 +3971,13 @@ publicats dins els anys que comencen pels dígits '200', cal escriure:</p>
       </blockquote>
       </form>
 
-Observis que l’opció d’índex global “qualsevol camp” per defecte conté
+Observeu que l'opció d'índex global «qualsevol camp» per defecte conté
 només els termes de metadades, no del text complet ni de les
 referències bibliogràfiques.  Cal especificar explícitament les
-opcions de cercar a l’índex <code>text complet</code> o de
-<code>referència bibliogràfica</code> si volem cercar per aquests
-camps.  Per exemple, per recuperar el terme <em>Higgs</em> tant dins
-les metadades, les referències o el text complet, cal escriure:
+opcions de cercar a l'índex <code>text complet</code> o de
+<code>referència</code> si volem cercar per aquests camps.  Per
+exemple, per recuperar el terme <em>Higgs</em> tant dins les
+metadades, les referències o el text complet, cal escriure:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -3891,7 +3991,7 @@ les metadades, les referències o el text complet, cal escriure:
       </form>
 
    Això permet una interessant combinació de metadades, text complet i
-   referències dins una mateixe cerca.  Per exemple, per recuperar
+   referències dins una mateixa cerca.  Per exemple, per recuperar
    tots els documents escrits per <em>Lin</em> que en el text complet
    continguin les paraules <em>Schwarzschild</em> and <em>AdS</em>,
    que citi la revista <em>Adv. Theor. Math. Phys.</em>, cal escriure:
@@ -3925,8 +4025,8 @@ les metadades, les referències o el text complet, cal escriure:
 <en>How to wisely choose your search terms (speed-wise)</en>
 <fr>Comment sélectionner vos termes de recherche de manière intelligente (en termes de vitesse)</fr>
 <de>Wie wähle ich am geschicktesten meinen Suchbegriff</de>
-<es>Escoger correctamente los términos de búsqueda (speed-wise)</es>
-<ca>Escollir correctament els térmes de cerca (speed-wise)</ca>
+<es>Escoger correctamente los términos de búsqueda (para un buen rendimiento)</es>
+<ca>Escollir correctament els térmes de cerca (per a un bon rendiment)</ca>
 </lang>
 </a></h4>
 
@@ -3960,38 +4060,39 @@ les metadades, les referències o el text complet, cal escriure:
 </fr>
 
 <es>
-<ul>
-<li>Siempre que sea posible, es preferible realizar búsquedas por
-palabra antes que por frase.  Es preferible buscar por <code>agujero
-negro</code> que por <code>"agujero negro"</code>.</li>
-<li>Se aconseja evitar vocablos comunes tales como <code>y</code>,
-<code>de</code>, o siglas como <code>CERN</code>.</li>
-<li>Si la búsqueda versa sobre información específica en los
-metadatos, como por ejemplo, <em>número de registro</em>, seleccionar
-el índice correspondiente.</li>
-<li>Si la búsqueda versa sobre una colección específica de documentos,
-como por ejemplo, <em>Tesis</em>, elegir en primer lugar la colección
-<a href="<CFG_SITE_URL>/?c=Theses">Tesis</a>, e iniciar la búsqueda a partir
-de aquí.</li>
-</ul>
+  <ul>
+    <li>Siempre que sea posible, es preferible realizar búsquedas por
+      palabra antes que por frase.  Es preferible buscar por <code>black
+	hole</code> que por <code>"black hole"</code>.</li>
+    <li>Se aconseja evitar vocablos comunes tales como <code>and</code>,
+      <code>of</code>, o siglas como <code>CERN</code>.</li>
+    <li>Si la búsqueda versa sobre información específica en los
+      metadatos, como por ejemplo, <em>report number</em>, seleccione
+      el índice correspondiente.</li>
+    <li>Si la búsqueda versa sobre una colección específica de documentos,
+      como por ejemplo, <em>Tesis</em>, elegir en primer lugar la colección
+      <a href="<CFG_SITE_URL>/?c=Theses">Tesis</a>, e inicie la búsqueda
+      a partir de aquí.</li>
+  </ul>
 </es>
 
 <ca>
-<ul>
-<li>Sempre que sigui possible, es preferible realitzar cerques per
-paraula abans que per frase.  Es preferible una cerca per <code>forat
-negre</code> que per <code>"forat negre"</code>.</li>
-<li>S’aconsella evitar mots comuns tals com les
-preposicions<code>i</code>, <code>de</code>, o sigles com
-<code>CERN</code>.</li>
-<li>Si la cerca versa sobre informació específica a les metadades, com
-per exemple, <em>número de registre</em>, cal seleccionar l’índex
-corresponent.</li>
-<li>Si la cerca versa sobre una col•lecció específica de documents,
-com per exemple, <em>Tesis</em>, cal escollir en primer lloc la
-col•lecció <a href="<CFG_SITE_URL>/?c=Theses">Tesis</a>, e iniciar la cerca
-a partir de aquí.</li>
-</ul>
+  <ul>
+    <li>Sempre que sigui possible, és preferible realitzar cerques per
+      paraula abans que per frase.  Es preferible una cerca per <code>black
+	hole</code> que per <code>"black hole"</code>.</li>
+    <li>S'aconsella evitar mots comuns tals com les
+      preposicions <code>and</code>, <code>of</code>, o sigles com
+      <code>CERN</code>.</li>
+    <li>Si la cerca versa sobre informació específica a les metadades, com
+      per exemple, <em>report number</em>, cal seleccionar l'índex
+      corresponent.</li>
+    <li>Si la cerca versa sobre una col·lecció específica de
+      documents, com per exemple, <em>Tesis</em>, cal escollir en
+      primer lloc la
+      col·lecció <a href="<CFG_SITE_URL>/?c=Theses">Tesis</a>, e
+      inicieu la cerca a partir de aquí.</li>
+  </ul>
 </ca>
 </lang>
 
@@ -4000,8 +4101,8 @@ a partir de aquí.</li>
 <en>How to search for publications by a given author</en>
 <fr>Comment rechercher les publications d'un auteur donné</fr>
 <de>Wie suche ich nach Publikationen eines bestimmten Autors</de>
-<es>¿Como localizar publicaciones a partir del autor?</es>
-<ca>Com localitzar publicacions a partir de l'autor?</ca>
+<es>Cómo localizar publicaciones a partir del autor</es>
+<ca>Com localitzar publicacions a partir de l'autor</ca>
 </lang>
 </a></h4>
 
@@ -4104,16 +4205,17 @@ orthographié de cette manière, saisissez:
 </fr>
 
 <es>
-<p>La búsqueda por autor puede realizarse de diversas formas, cada una
-de las cuales presenta sus ventajas y desventajas.</p>
+  <p>La búsqueda por autor puede realizarse de diversas formas, cada una
+    de las cuales presenta sus ventajas y desventajas.</p>
 
-<ol>
-<li>En primer lugar, es necesario anotar que el modo de búsqueda por
-palabras no es el que más adecuado en este tipo de búsqueda.  Si se
-selecciona la búsqueda por palabras <code>Ellis J</code> dentro del
-índice de autores, ello se interpretará como dos consultas (para las
-palabras <code>Ellis</code> y <code>J</code>) que se efectuarán en
-primer lugar, y una booleana Y que se realizará después.
+  <ol>
+    <li>En primer lugar, es necesario anotar que el modo de búsqueda
+      por palabras no es el que más adecuado en este tipo de búsqueda.
+      Si se selecciona la búsqueda por palabras <code>Ellis J</code>
+      dentro del índice de autores, ello se interpretará como dos
+      consultas (para las palabras <code>Ellis</code>
+      y <code>J</code>) que se efectuarán en primer lugar, y una
+      booleana Y que se realizará después.
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4126,21 +4228,24 @@ primer lugar, y una booleana Y que se realizará después.
       </blockquote>
       </form>
 
-<p>La consulta realizada de este modo recuperará también un documento
-que presenta como primer autor a <em> Ellis, R </em> y como segundo
-autor <em>Finch, A J</em>, lo cual, probablemente, no es lo deseado.
-La búsqueda se ha realizado muy rápidamente y se han recuperado
-registros sobre el autor requerido, sin embargo, los resultados
-recuperados siguiendo este método pueden no ser pertinentes, tal y
-como ocurre en el ejemplo citado anteriormente. En lugar de buscar por
-palabras, la técnica más conveniente que debe aplicarse en este caso
-es la búsquda por frase, que permite conseguir mayor precisión.</p>
-</li>
-<li>Es habitual que los nombres de autores que se introducen a través
-de los formularios contengan únicamente la inicial del nombre, como
-por ejemplo, <em>Ellis, J</em>.  Para obtener un listado de las
-publicaciones de dicho autor con el nombre escrito exactamente de ese
-modo, debemos escribir:
+      <p>La consulta realizada de este modo recuperará también un
+	documento que presenta como primer autor a <em> Ellis, R </em>
+	y como segundo autor <em>Finch, A J</em>, lo cual,
+	probablemente, no es lo deseado.  La búsqueda se ha realizado
+	muy rápidamente y se han recuperado registros sobre el autor
+	requerido, sin embargo, los resultados recuperados siguiendo
+	este método pueden no ser pertinentes, tal y como ocurre en el
+	ejemplo citado anteriormente. En lugar de buscar por palabras,
+	la técnica más conveniente que debe aplicarse en este caso es
+	la búsquda por frase, que permite conseguir mayor
+	precisión.</p>
+    </li>
+
+    <li>Es habitual encontrarse que los nombres de autores contengan
+      únicamente la inicial del nombre, como por ejemplo, <em>Ellis,
+      J</em>.  Para obtener un listado de las publicaciones de dicho
+      autor con el nombre escrito exactamente de ese modo, debemos
+      escribir:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4155,17 +4260,17 @@ modo, debemos escribir:
 </es>
 
 <ca>
-<p>La cerca per autor es pot realitzar de diverses formes, cadascuna
-de les quals presenta els seus avantatges i les seves desavantatges.</p>
+  <p>La cerca per autor es pot realitzar de diverses formes, cadascuna
+    de les quals presenta els seus avantatges i les seves
+    desavantatges.</p>
 
-<ol>
-
-<li>En primer lloc, cal notar que el mode de cerca per paraules no és
-el més adient en aquests casos. Si es selecciona la cerca per paraules
-<code>Ellis J</code> dins l’índex d’autors, s’interpretarà como a dues
-consultes (per a les paraules <code>Ellis</code> i <code>J</code>) que
-es realitzaran en primer lloc, i una booleana I que es realitzarà
-després.
+  <ol>
+    <li>En primer lloc, cal notar que el mode de cerca per paraules no
+      és el més adient en aquests casos. Si es selecciona la cerca per
+      paraules <code>Ellis J</code> dins l'índex d'autors,
+      s'interpretarà como a dues consultes (per a les
+      paraules <code>Ellis</code> i <code>J</code>) que es realitzaran
+      en primer lloc, i una booleana I que es realitzarà després.
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4178,20 +4283,23 @@ després.
       </blockquote>
       </form>
 
-<p>La consulta realitzada d’aquesta forma recuperarà també un document
-que tingui com a primer autor a <em> Ellis, R </em> i com a segon
-autor a <em>Finch, A J</em>, fet que, probablement, no es el desitjat.
-La cerca s’ha realitzat amb molta rapidesa i s’han recuperat registres
-sobre l’autor requerit, ara bé, els resultats obtinguts seguint aquest
-métode poden no ser pertinents, tal i com passa a l’exemple citat
-anteriorment.  En lloc de cercar per paraules, la tècnica més
-convenient que s’ha d’aplicar en aquests casos és la cerca per frase,
-que permet aconseguir major grau de precisió.</p>
-</li>
-<li>Es habitual que els noms d’autors que s’introdueixen a través dels
-formularis continguin únicament la inicial del nom, com per exemple,
-<em>Ellis, J</em>.  Per obtenir un llistat de les publicacions de tal
-autor amb el nom escrit exactament d’aquesta manera, cal escriure:
+      <p>La consulta realitzada d'aquesta forma recuperarà també un
+	document que tingui com a primer autor a <em>Ellis, R </em> i
+	com a segon autor a <em>Finch, A J</em>, fet que,
+	probablement, no es el desitjat.  La cerca s'ha realitzat amb
+	molta rapidesa i s'han recuperat registres sobre l'autor
+	requerit, ara bé, els resultats obtinguts seguint aquest
+	mètode poden no ser pertinents, tal i com passa a l'exemple
+	citat anteriorment.  En lloc de cercar per paraules, la
+	tècnica més convenient que s'ha d'aplicar en aquests casos és
+	la cerca per frase, que permet aconseguir major grau de
+	precisió.</p>
+    </li>
+
+    <li>Es habitual trobar-se que els noms d'autors continguin
+      únicament la inicial del nom, com per exemple, <em>Ellis,
+      J</em>.  Per obtenir un llistat de les publicacions de tal autor
+      amb el nom escrit exactament d'aquesta manera, cal escriure:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4203,7 +4311,6 @@ autor amb el nom escrit exactament d’aquesta manera, cal escriure:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
 </ca>
 </lang>
 
@@ -4437,20 +4544,21 @@ administrateurs</a> de <CFG_SITE_NAME_INTL> de manière à ce qu'ils vous aident
 de la base de données. Une base de données au contenu cohérent
 garantit des résultats satisfaisants lors de la recherche d'auteurs.</p>
 </fr>
+
 <es>
-<p>Esta técnica de búsqueda confiere mayor precisión y evita falsos
-resultados aparentemente positivos.  (La presunción de que no existen
-otros autores cuyo nombre se escriba como <em>Ellis, J</em>, en
-ocasiones puede no ser cierta<a
-href="#author-full-names"><sup>*</sup></a>.)  La búsqueda se realizará
-con mucha rapidez.</p>
+  <p>Esta técnica de búsqueda confiere mayor precisión y evita falsos
+     positivos.  (La presunción de que no existen otros autores cuyo
+     nombre se escriba como <em>Ellis, J</em>, en ocasiones puede no
+     ser cierta <a href="#author-full-names"><sup>*</sup></a>.)  La
+     búsqueda se realizará con mucha rapidez.</p>
 </li>
-<li> Algunas veces, en algunos documentos, el nombre propio de un
-autor se escribe de forma abreviada, (como <em>Ellis, J</em>) y otras
-de forma completa (como <em>Ellis, John</em>; y en algunas ocasiones
-también con el nombre compuesto:<em>Ellis, John Rolfe</em>).  Para
-obtener una lista de publicaciones del autor con todas sus formas en
-una misma búsqueda, se puede utilizar el operador booleano O:
+
+<li>Algunas veces, en algunos documentos, el nombre propio de un autor
+  se escribe de forma abreviada, (como <em>Ellis, J</em>) y otras de
+  forma completa (como <em>Ellis, John</em>; y en algunas ocasiones
+  también con el nombre compuesto:<em>Ellis, John Rolfe</em>).  Para
+  obtener una lista de publicaciones del autor con todas sus formas en
+  una misma búsqueda, se puede utilizar el operador booleano O:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4463,16 +4571,16 @@ una misma búsqueda, se puede utilizar el operador booleano O:
       </blockquote>
       </form>
 
-<p>Este modo de búsqueda nos ofrece aún mayor precisión y evita falsos
-resultados positivos (o no pertinentes).  (La presunción de que no hay
-más autores que se escriban como <em>Ellis, J</em> O <em>Ellis,
-John</em>, en ocasiones puede no ser cierta <a
-href="#author-full-names"><sup>*</sup></a>.)  La búsqueda es muy
-rápida.</p>
+  <p>Este modo de búsqueda nos ofrece aún mayor precisión y evita
+    falsos resultados positivos (o no pertinentes).  (La presunción de
+    que no hay más autores que se escriban como <em>Ellis, J</em>
+    O <em>Ellis, John</em>, en ocasiones puede no ser
+    cierta <a href="#author-full-names"><sup>*</sup></a>.)  La
+    búsqueda es muy rápida.</p>
 </li>
-<li>Para localizar todas las formas introducidas en el ejemplo
-anterior con un único término de búsqueda, podemos probar de utilizar
-una búsqueda con comodín:
+
+<li>Aunque, la alternativa más general es usar una búsqueda parcial de
+  frase con comodín:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4485,19 +4593,21 @@ una búsqueda con comodín:
       </blockquote>
       </form>
 
-<p>Ello recuperará todos los nombres de autor que comienzan con el
-texto <code>Ellis, J</code>, no sólo con las formas requeridas en el
-ejemplo <em>Ellis, J</em> y <em>Ellis, John</em>, sino también
-<em>Ellis, Jim</em>, o <em>Ellis, John Rolfe</em>, o <em>Ellis,
-Jonathan Richard</em>.</p>
+  <p>Ello recuperará todos los nombres de autor que comienzan con el
+    texto <code>Ellis, J</code>, esto es, no sólo con las formas
+    requeridas en el ejemplo <em>Ellis, J</em> y <em>Ellis, John</em>,
+    sino también <em>Ellis, Jim</em>, o <em>Ellis, John Rolfe</em>,
+    o <em>Ellis, Jonathan Richard</em>.</p>
 
-<p>Esta búsqueda retornará muchos más resultados, pero puede resultar
-conveniente en el caso en que se desconozca la forma de introducción
-de los nombres en la base de datos.  Sin embargo, aumenta el riesgo de
-obtener resultados poco pertinentes.  La búsqueda es relativamente rápida.</p>
+  <p>Esta búsqueda retornará muchos más resultados, pero puede
+    resultar conveniente en el caso en que se desconozca la forma de
+    introducción de los nombres en la base de datos.  Sin embargo,
+    aumenta el riesgo de obtener resultados poco pertinentes.  La
+    búsqueda es relativamente rápida.</p>
 </li>
+
 <li>Aparte de esta última, la alternativa general más utilizada es el
-uso de una búsqueda por parte de la frase:
+  uso de una búsqueda por parte de la frase:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4510,24 +4620,25 @@ uso de una búsqueda por parte de la frase:
       </blockquote>
       </form>
 
-<p>Esta búsqueda recupera no sólo todos los autores mencionados, sino
-también todos aquellos cuyos nombres contengan la expresión
-<code>Ellis, J</code> en cualquier parte de su nombre, como por
-ejemplo <em>De Lellis, Jim</em>.  Ello aumenta enormemente las
-posibilidades de obtener registros con un alto riesgo de ser poco
-pertinentes.  La búsqueda es relativamente lenta.</p>
+  <p>Esta búsqueda recupera no sólo todos los autores mencionados,
+    sino también todos aquellos cuyos nombres contengan la expresión
+    <code>Ellis, J</code> en cualquier parte de su nombre, como por
+    ejemplo <em>De Lellis, Jim</em>.  Ello aumenta enormemente las
+    posibilidades de obtener registros con un alto riesgo de ser poco
+    pertinentes.  La búsqueda es relativamente lenta.</p>
 
-<p>(Obsérvese que este modo de búsqueda puede resultar muy práctico
-para apellidos compuestos tales como <em>Pepe-Altarelli, M</em> o
-<em>'t Hooft, G</em> en la que una consulta puntual de usuario por
-<em>Hooft, G</em> recuperará el autor requerido, a diferencia de los
-métodos mencionados anteriormente.)</p>
+  <p>(Obsérvese que este modo de búsqueda puede resultar muy práctico
+    para apellidos compuestos tales como <em>Pepe-Altarelli, M</em> o
+    <em>'t Hooft, G</em> en la que una consulta puntual de usuario por
+    <em>Hooft, G</em> recuperará el autor requerido, a diferencia de los
+    métodos mencionados anteriormente.)</p>
 </li>
-<li>Finalmente, anotar que es posible utilizar la <a
-href="#regexp">sintaxis de expresión regular</a> para construir
-consultas complejas para buscar por autor.  Un ejemplo sencillo es la
-búsqueda de un autor introducido en la base de datos tanto como
-<em>Ellis, J</em> como <em>Ellis, John</em>:
+
+<li>Finalmente, anotar que es posible utilizar
+ la <a href="#regexp">sintaxis de expresión regular</a> para construir
+ consultas complejas para buscar por autor.  Un ejemplo sencillo es la
+ búsqueda de un autor introducido en la base de datos tanto como
+ <em>Ellis, J</em> como <em>Ellis, John</em>:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4540,39 +4651,40 @@ búsqueda de un autor introducido en la base de datos tanto como
       </blockquote>
       </form>
 
-Se recomienda la consulta de <a href="#regexp">búsqueda por
-expresiones regulares</a> para conocer más acerca de las posibilidades
-de este modo de búsqueda.
+  Consulte la guía de <a href="#regexp">búsqueda por expresiones
+  regulares</a> para conocer más acerca de las posibilidades de este
+  modo de búsqueda.
 </li>
 </ol>
 
 <p><a name="author-full-names"><strong><sup>*</sup>NOTA:</strong></a>
-Si es autor de su propia lista de publicaciones y detecta que algunas
-veces su nombre se escribe de forma abreviada y a veces completo, o si
-desea identificar sus publicaciones entre diversos autores con la
-misma forma abreviada, por favor contacte con los<a
-href="mailto:<CFG_SITE_ADMIN_EMAIL>">administradores</a> de <CFG_SITE_NAME_INTL> que
-trataran de trabajar conjuntamente para implementar una forma
-consistente y normalizada de introducción de su nombre en toda la base
-de datos.  Sólo una base de datos con contenido consistente puede
-garantizar una búqueda por autores exitosa.</p>
+  Si usted es responsable de su lista de publicaciones y detecta que
+  algunas veces su nombre se escribe de forma abreviada y a veces
+  completo, o si desea identificar sus publicaciones entre diversos
+  autores con la misma forma abreviada, por favor contacte con
+  los<a href="mailto:<CFG_SITE_ADMIN_EMAIL>">administradores</a>
+  de <CFG_SITE_NAME_INTL> que trataran de trabajar conjuntamente para
+  implementar una forma consistente y normalizada de introducción de
+  su nombre en toda la base de datos.  Sólo una base de datos con
+  contenido consistente puede garantizar una búqueda por autores
+  satisfactoria.</p>
 </es>
 
-
 <ca>
-<p>Aquesta tècnica de cerca confereix major grau de precisió i evita falsos
-resultats aparentement positius.  (La presumpció de que no existeixen
-altres autores els noms dels quals s’escrigui com <em>Ellis, J</em>, en
-ocasions pot no ser certa<a
-href="#author-full-names"><sup>*</sup></a>.)  La cerca es realitzarà
-con amb molta rapidesa.</p>
+  <p>Aquesta tècnica de cerca confereix major grau de precisió i evita
+    falsos resultats aparentement positius.  (La presumpció de que no
+    existeixen altres autores els noms dels quals s'escrigui
+    com <em>Ellis, J</em>, en ocasions pot no ser
+    certa<a href="#author-full-names"><sup>*</sup></a>.)  La cerca es
+    realitzarà con amb molta rapidesa.</p>
 </li>
-<li> Algunes vegadess, en alguns documents, el nom propi d’un
-autor s’escriu de forma abreujada, (com <em>Ellis, J</em>) i altres
-de forma completa (com <em>Ellis, John</em>; i en altres ocasions
-també amb el nom compost:<em>Ellis, John Rolfe</em>).  Per
-obtenir una llista de publicacions de l’autor amb totes les seves formes en
-una mateixa cerca, es pot utilitzar l’operador booleà O:
+
+<li>Algunes vegadess, en alguns documents, el nom propi d'un autor
+  s'escriu de forma abreujada, (com <em>Ellis, J</em>) i altres de
+  forma completa (com <em>Ellis, John</em>; i en altres ocasions també
+  amb el nom compost:<em>Ellis, John Rolfe</em>).  Per obtenir una
+  llista de publicacions de l'autor amb totes les seves formes en una
+  mateixa cerca, es pot utilitzar l'operador booleà O:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4585,15 +4697,17 @@ una mateixa cerca, es pot utilitzar l’operador booleà O:
       </blockquote>
       </form>
 
-<p>Aquest mode de cerca ens ofereix encara major grau de precisió i
-evita falsos resultats positius (o no pertinents).  (La presumpció de
-que no hi ha més autors que s’escriguin com <em>Ellis, J</em> O
-<em>Ellis, John</em>, en ocasions pot no ser certa <a
-href="#author-full-names"><sup>*</sup></a>.)  La cerca és molt ràpida.</p>
+  <p>Aquest mode de cerca ens ofereix encara major grau de precisió i
+    evita falsos resultats positius (o no pertinents).  (La presumpció
+    de que no hi ha més autors que s'escriguin com <em>Ellis, J</em> O
+    <em>Ellis, John</em>, en ocasions pot no ser
+    certa <a href="#author-full-names"><sup>*</sup></a>.)  La cerca és
+    molt ràpida.</p>
 </li>
-<li>Per localitzar totes les formes introduïdes a l’exemple anterior
-amb un únic terme de cerca, podem provar d’emprar una cerca amb
-comodí:
+
+<li>Per localitzar totes les formes introduïdes a l'exemple anterior
+  amb un únic terme de cerca, podem provar d'emprar una cerca amb
+  comodí:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4606,19 +4720,20 @@ comodí:
       </blockquote>
       </form>
 
-<p>Això recuperarà tots els noms d’autor que comencen amb el text
-<code>Ellis, J</code>, no només amb les formes requerides a l’exemple
-<em>Ellis, J</em> i <em>Ellis, John</em>, sinó també <em>Ellis,
-Jim</em>, o <em>Ellis, John Rolfe</em>, o <em>Ellis,Jonathan
-Richard</em>.</p>
+  <p>Això recuperarà tots els noms d'autor que comencen amb el text
+    <code>Ellis, J</code>, no només amb les formes requerides a
+    l'exemple <em>Ellis, J</em> i <em>Ellis, John</em>, sinó
+    també <em>Ellis, Jim</em>, o <em>Ellis, John Rolfe</em>,
+    o <em>Ellis,Jonathan Richard</em>.</p>
 
-<p>Aquesta cerca retornarà molts més resultats, però pot resultar
-convenient en el cas que es desconegui la forma d’introducció dels
-noms a la base de dades.  Ara bé, augmenta el risc d’obtenir resultats
-poc pertinents. La cerca és relativament ràpida.</p>
+  <p>Aquesta cerca retornarà molts més resultats, però pot resultar
+    convenient en el cas que es desconegui la forma d'introducció dels
+    noms a la base de dades.  Ara bé, augmenta el risc d'obtenir
+    resultats poc pertinents. La cerca és relativament ràpida.</p>
 </li>
-<li>Apart d’aquesta darrera, l’alternativa general més emprada és la
-cerca per part de la frase:
+
+<li>Apart d'aquesta darrera, l'alternativa general més emprada és la
+  cerca per part de la frase:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4631,24 +4746,25 @@ cerca per part de la frase:
       </blockquote>
       </form>
 
-<p>Aquesta cerca recupera no només tots els autors mencionats, sinó
-també tots aquells els noms dels quals continguin l’expresió
-<code>Ellis, J</code> a qualsevol part del seu nom, com per exemple
-<em>De Lellis, Jim</em>.  Això augmenta enormement les possibilitats
-d’obtenir registres amb un alt risc de ser poc pertinents.  La cerca
-és relativament lenta.</p>
+  <p>Aquesta cerca recupera no només tots els autors mencionats, sinó
+    també tots aquells els noms dels quals continguin l'expresió
+    <code>Ellis, J</code> a qualsevol part del seu nom, com per exemple
+    <em>De Lellis, Jim</em>.  Això augmenta enormement les
+    possibilitats d'obtenir registres amb un alt risc de ser poc
+    pertinents.  La cerca és relativament lenta.</p>
 
-<p>(Observis que aquest mode de cerca pot resultar molt pràctic per a
-cognoms compostos, tals com <em>Pepe-Altarelli, M</em> o <em>'t Hooft,
-G</em> en els que una consulta d’una consulta puntual de usuario por
-<em>Hooft, G</em> recuperarà l’autor requerit, a diferència dels
-mètodes mencionats anteriorment.)</p>
+  <p>(Observeu que aquest mode de cerca pot resultar molt pràctic per
+    a cognoms compostos, tals com <em>Pepe-Altarelli, M</em> o <em>'t
+    Hooft, G</em> en els que una consulta d'una consulta puntual de
+    usuari per <em>Hooft, G</em> recuperarà l'autor requerit, a
+    diferència dels mètodes mencionats anteriorment.)</p>
 </li>
-<li>Finalment, anotar que es possible emprar la <a
-href="#regexp">sintaxi de expressió regular</a> per construir
-consultes complexes per fer cerques per autor.  Un exemple senzill és
-la cerca d’un autor introduït a la base de dades tant per <em>Ellis,
-J</em> com per <em>Ellis, John</em>:
+
+<li>Finalment, anotar que es possible emprar la
+<a href="#regexp">sintaxi de expressió regular</a> per construir
+  consultes complexes per fer cerques per autor.  Un exemple senzill
+  és la cerca d'un autor introduït a la base de dades tant
+  per <em>Ellis, J</em> com per <em>Ellis, John</em>:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -4661,22 +4777,24 @@ J</em> com per <em>Ellis, John</em>:
       </blockquote>
       </form>
 
-Es recomana la consulta de <a href="#regexp">cerca per expressions
-regulars</a> per conèixer més sobre les possibilitats d’aquest mode de
-cerca.
+  Consulteu la guia de <a href="#regexp">cerca per expressions
+  regulars</a> per conèixer més sobre les possibilitats d'aquest mode
+  de cerca.
 </li>
 </ol>
 
 <p><a name="author-full-names"><strong><sup>*</sup>NOTA:</strong></a>
-Si es autor de la seva pròpia llista de publicacions i detecta que
-algunes vegades el seu nom s’escriu de forma abreujada i de vegades
-complet, o si desitja identificar les seves publicacions entre
-diversos autors amb la mateixa forma abreujada, sis plau, contacti amb
-els <a href="mailto:<CFG_SITE_ADMIN_EMAIL>">administradors</a> de <CFG_SITE_NAME_INTL>
-que tractaran de treballar-hi conjuntament per implementar una forma
-consistent i normalitzada d’introducció del seu nom a tota la base de
-dades.  Només una base de dades amb contingut consistent pot garantir
-una cerca per autors exitosa.</p>
+  Si sou responsable de la vostra pròpia llista de publicacions i
+  detecteu que algunes vegades el seu nom s'escriu de forma abreujada
+  i de vegades complet, o si desitgeu identificar les vostres
+  publicacions entre diversos autors amb la mateixa forma abreujada,
+  sis plau, contacteu amb els
+  <a href="mailto:<CFG_SITE_ADMIN_EMAIL>">administradors</a>
+  de <CFG_SITE_NAME_INTL> que tractaran de treballar-hi conjuntament
+  per implementar una forma consistent i normalitzada d'introducció
+  del vostre nom a tota la base de dades.  Només una base de dades amb
+  contingut consistent pot garantir una cerca per autors
+  satisfactòria.</p>
 </ca>
 </lang>
 
@@ -4766,8 +4884,8 @@ una cerca per autors exitosa.</p>
       la <a
       href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH&amp;ln=fr">liste
       triée</a> selon ce paramètre.</p>
-
 </fr>
+
 <es>
 <p>Es posible seleccionar un campo determinado en función del tipo de
    ordenación de los resultados de búsqueda, por ejemplo para
@@ -4775,77 +4893,78 @@ una cerca per autors exitosa.</p>
    ocasiones puede ocurrir que se desee ordenar los documentos por el
    código de referencia y que un mismo documento tenga más de uno.
    Por ejemplo, los códigos <em>hep-ph/0204140</em>,
-   <em>CERN-TH-2002-069</em> y <em>RM3-TH-02-4</em> apuntan todos <a
+   <em>CERN-TH-2002-069</em> y <em>RM3-TH-02-4</em> apuntan
+   todos <a
    href="<CFG_SITE_URL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">al
    mismo documento</a>. Si se ordena el conjunto de resultados de
    búsqueda contenidos en el documento, el sistema tendrá en cuenta el
    primer número de informe, que puede ser cualquiera de los tres.  En
    ocasiones se puede desear clasificar un documento según un
-   determinado código de referencia <em> hep-ph </em>, u otro <em>
-   CERN> </em> según si se ha publicado en una colección de
+   determinado código de referencia <em>hep-ph</em>, u otro <em>
+   CERN</em> según si se ha publicado en una colección de
    publicaciones de CERN o hep-ph. ¿Como se puede influir en el motor
    de búsqueda para priorizar un código antes que otro?</p>
 
    <p>En otras palabras, el motor de búsqueda responde por defecto a
-   una pregunta similar a “ordena por el primer autor” u “ordena por
-   el primer código de informe”, pero en ocasiones se desea instar al
-   buscador para que ordene por el “primer código de informe que
-   comience por el texto <em>CERN-</em>".  Esta opción es posible a
-   través del uso de un paràmetre de ordenación “invisible” denominado
+   una pregunta similar a «ordena por el primer autor» u «ordena por
+   el primer código de informe», pero en ocasiones se desea instar al
+   buscador para que ordene por el «primer código de informe que
+   comience por el texto <em>CERN-</em>».  Esta opción es posible a
+   través del uso de un paràmetre de ordenación «invisible» denominado
    <code>sp</code> (para a "ordenar según un patrón") que permite
    ordenar siguiendo un patron de preferencia dado.  Este parámetro es
-   “invisible” desde el punto de vista de que no está presente en el
+   «invisible» desde el punto de vista de que no está presente en el
    interfaz de búsqueda, sino que debe ser añadido manualmente en el
    URL de la búsqueda.
 
    Por ejemplo, para recuperar todas las publicaciones del CERN-TH del
-   año 2001 ordenados por su código, debe buscarse por
+   año 2001 ordenados por su código CERN-TH, debe buscarse por
    <code>CERN-TH-2001*</code> dentro del índice <code>código de
    informe</code>, y en la página de resultados de búsqueda, cuando
    esté satisfecho con los resultados obtenidos, añadir
-   <code>&amp;sp=CERN-TH</code> en el URL a fin de ordenar los resultados
-   sgún los códigos de informe CERN-TH, y conseguir una correcta <a
-   href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
+   <code>&amp;sp=CERN-TH</code> en el URL a fin de ordenar los
+   resultados sgún los códigos de informe CERN-TH, y conseguir una
+   correcta <a href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
    ordenación del listado</a> de todas las publicaciones CERN-TH del
    2001.</p>
 </es>
 
 <ca>
-<p>Es possible seleccionar un camp determinat en funció del tipus
-   d’ordenació dels resultats de la cerca, per exemple per ordenar els
-   resultats pel títol principal. D’aquesta forma, en ocasions pot
+<p>És possible seleccionar un camp determinat en funció del tipus
+   d'ordenació dels resultats de la cerca, per exemple per ordenar els
+   resultats pel títol principal. D'aquesta forma, de vegades pot
    passar que es desitgi ordenar els documents pel codi de referència
-   i que un mateix document en tingui més d’un.  Per exemple, els
+   i que un mateix document en tingui més d'un.  Per exemple, els
    codis <em>hep-ph/0204140</em>, <em>CERN-TH-2002-069</em> i
    <em>RM3-TH-02-4</em> apunten tots <a
    href="<CFG_SITE_URL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">al
-   mateix document</a>. Si s’ordena el conjunt de resultats de cerca
+   mateix document</a>. Si s'ordena el conjunt de resultats de cerca
    que conté el document, el sistema tindrà en consideració el primer
-   número d’informe, que pot ser qualsevol dels tres.  En ocasions es
+   número d'informe, que pot ser qualsevol dels tres.  En ocasions es
    desitja classificar un document segons un determinat codi de
    referència <em> hep-ph </em>, o altre <em> CERN> </em> segons si ha
    estat publicat a una col•lecció de publicacions CERN o hep-ph. Com
    es pot influir en el motor de cerca per prioritzar un codi abans de
-   l’altre?</p>
+   l'altre?</p>
 
    <p>En altres paraules, el motor de cerca respon per defecte a una
-   pregunta semblant a “ordena pel primer autor” o “ordena pel primer
-   codi d’informe”, però en ocasions es pot desitjar instar al
-   cercador per tal que ordeni pel “primer codi d’informe que comenci
-   pel text <em>CERN-</em>".  Aquesta darrera opció és possible a
-   través d’un paràmetre d’ordenació “invisible” denominat
-   <code>sp</code> (per a "ordenar segons un patró") que permet
+   pregunta semblant a «ordena pel primer autor» o «ordena pel primer
+   codi d'informe», però en ocasions es pot desitjar instar al
+   cercador per tal que ordeni pel «primer codi d'informe que comenci
+   pel text <em>CERN-</em>».  Aquesta darrera opció és possible a
+   través d'un paràmetre d'ordenació «invisible» denominat
+   <code>sp</code> (per a «ordenar segons un patró») que permet
    ordenar segons un patró de preferència donat.  Aquest paràmetre és
-   “invisible” des del punt de vista que no és present a l’interfície
-   de cerca, sinó que ha d’afegir-se manualment a la URL de cerca.
+   «invisible» des del punt de vista que no és present a l'interfície
+   de cerca, sinó que ha d'afegir-se manualment a la URL de cerca.
 
    Per exemple, per recuperar totes les publicacions del CERN-TH de
-   l’any 2001 ordenats pel seu codi, cal cercar per
-   <code>CERN-TH-2001*</code> dins l’índex de <code>códi
-   d’informe</code>, i a la pàgina de resultats de cerca, quan
-   s’estigui satisfet amb els resultats obtinguts, afegir
-   <code>&amp;sp=CERN-TH</code> a la URL per tal d’ordenar els resultats
-   segons els codis d’informe CERN-TH, i aconseguir una correcta <a
+   l'any 2001 ordenats pel seu codi, cal cercar per
+   <code>CERN-TH-2001*</code> dins l'índex de <code>codi
+   d'informe</code>, i a la pàgina de resultats de cerca, quan
+   s'estigui satisfet amb els resultats obtinguts, afegiu
+   <code>&amp;sp=CERN-TH</code> a la URL per tal d'ordenar els resultats
+   segons els codis d'informe CERN-TH, i aconseguir una correcta <a
    href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
    ordenació de la llista </a> de totes les publicacions CERN-TH del
    2001.</p>
@@ -4890,39 +5009,39 @@ réponses de ces moteurs.</p>
    moteurs de recherche.  Par exemple, SPIRES et KEK ne supportent pas
    la recherche par mot dans "tous les champs".</p>
 </fr>
-<ca>
-<p>A la pàgina de resultats de cerca, s'ofereixen automàticament
-enllaços a altres servidors com <a
-href="http://google.com/">Google</a>, <a
-href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a> o <a
-href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> sota el nom
-de "Proveu la vostra cerca a...".  Amb un simple clic sobre els
-enllaços proposats es pot enviar la cerca realitzada en aquests
-cercadors.</p>
-
-<p>Observis que els enllaços a altres cercadors no es mostren si el
-cercador no suporta la cerca.  Per exemple, SPIRES o KEK no poden
-cercar termes dintre del camp "qualsevol camp", de forma que en
-aquests casos, el sistema no els enllaçarà.</p>
-
-</ca>
 
 <es>
-<p>En la página de resultadoss de búsqueda, se oferecen automáticament
-enlaces a otros servidores tales como <a
-href="http://google.com/">Google</a>, <a
-href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a> o <a
-href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> bajo el
-nombre de "Intentar la búsqueda en...".  Con un simple cic sobre los
-enlaces propuestos se puede enviar la búsqueda realizada en dichos
-buscadores.</p>
+  <p>En la página de resultadoss de búsqueda, se oferecen
+    automáticament enlaces a otros servidores tales como
+    <a href="http://google.com/">Google</a>,
+    <a href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a>
+    o <a href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a>
+    bajo el nombre de "Intentar la búsqueda en...".  Con un simple cic
+    sobre los enlaces propuestos se puede enviar la búsqueda realizada
+    en dichos buscadores.</p>
 
-<p>Obsérvese que los enlaces a otros cercadores no se muestran si el
-buscador no soporta el tipo de búsqueda.  Por ejemplo, SPIRES o KEK no
-pueden buscar términos dentro del campo "cualquier campo", de forma
-que en estos casos, el sistema no los enlazará.</p>
-
+  <p>Obsérvese que los enlaces a otros cercadores no se muestran si el
+    buscador no soporta el tipo de búsqueda.  Por ejemplo, SPIRES o
+    KEK no pueden buscar términos dentro del campo «cualquier campo»,
+    de forma que en estos casos, el sistema no los enlazará.</p>
 </es>
+
+<ca>
+  <p>A la pàgina de resultats de cerca, s'ofereixen automàticament
+    enllaços a altres servidors com
+    <a href="http://google.com/">Google</a>,
+    <a href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a>
+    o <a href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a>
+    sota el nom de «Proveu la vostra cerca a...».  Amb un simple clic
+    sobre els enllaços proposats es pot enviar la cerca realitzada en
+    aquests cercadors.</p>
+
+  <p>Observeu que els enllaços a altres cercadors no es mostren si el
+    cercador no suporta la cerca.  Per exemple, SPIRES o KEK no poden
+    cercar termes dintre del camp «qualsevol camp», de forma que en
+    aquests casos, el sistema no els enllaçarà.</p>
+</ca>
+
 </lang>
 
 <h4><a name="howto-fulltext">
@@ -4930,8 +5049,8 @@ que en estos casos, el sistema no los enlazará.</p>
 <en>How to search in fulltext files</en>
 <fr>Comment rechercher le contenu des fichiers</fr>
 <de>Wie kann ich in verknüpften Volltextdateien suchen</de>
-<es>¿Cómo buscar en ficheros a texto completo?</es>
-<ca>Com cercar a fitxers a text complet?</ca>
+<es>Cómo buscar en ficheros a texto completo</es>
+<ca>Com cercar a fitxers a text complet</ca>
 </lang>
 </a></h4>
 
@@ -5011,12 +5130,13 @@ saisissez:
 
 </fr>
 
-<ca>
-<p>Si un registre de metadades té arxius a text complet associats
-<CFG_SITE_NAME_INTL> tractarà de extraure la informació textual dels arxius e
-indexar-la a un índex de <code>text complet</code>separat.  Per
-recuperar tots els documents que contenen el terme <em>e-</em>al text
-complet dels seus documents associats, cal escriure:</p>
+<es>
+<p>Si un registro de metadatos contiene archivos a texto completo
+  asociados, <CFG_SITE_NAME_INTL> tratará de extraer la información
+  textual de los archivos e indexarla en un índice de <code>texto
+  completo</code>separado.  Para recuperar todos los documentos que
+  contienen el término <em>e-</em> en el texto completo de sus
+  documentos asociados, debemos escribir:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5029,12 +5149,50 @@ complet dels seus documents associats, cal escriure:</p>
       </blockquote>
       </form>
 
-Recordem que les paraules del text complet no s'inclouen a l'índex
-global 'qualsevol camp' predeterminat, però és possible realitzar una
-combinació lliure de text complet i metadades dins una mateixa cerca.
-Per exemple, per recuperar tots els articles escrits per
-<em>Ellis</em> que continguin la paraula <em>muon</em> tant a les
-metadades como all text complet, cal escriure:
+   Recuerde que las palabras del texto completo no se incluyen en el
+   índice global «cualquier campo» predeterminado, pero es posible
+   realizar una combinación libre de texto completo y metadatos en una
+   misma búsqueda.  Por ejemplo, para recuperar todos los artículos
+   escritos por <em>Ellis</em> que contengan la palabra <em>muon</em>
+   tanto en los metadatos como en el texto completo, debemos escribir:
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
+</es>
+
+<ca>
+  <p>Si un registre de metadades té arxius a text complet associats
+    <CFG_SITE_NAME_INTL> tractarà de extraure la informació textual
+    dels arxius e indexar-la a un índex de <code>text complet</code>
+    separat.  Per recuperar tots els documents que contenen el
+    terme <em>e-</em>al text complet dels seus documents associats,
+    cal escriure:</p>
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="fulltext:e-" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
+
+    Recordeu que les paraules del text complet no s'inclouen a l'índex
+    global «qualsevol camp» predeterminat, però és possible realitzar
+    una combinació lliure de text complet i metadades dins una mateixa
+    cerca.  Per exemple, per recuperar tots els articles escrits per
+    <em>Ellis</em> que continguin la paraula <em>muon</em> tant a les
+    metadades como all text complet, cal escriure:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5049,45 +5207,6 @@ metadades como all text complet, cal escriure:
 
 
 </ca>
-<es>
-<p>Si un registro de metadatos contiene archivos a texto completo
-asociados, <CFG_SITE_NAME_INTL> tratará de extraer la información textual de
-los archivos e indexarla en un índice de <code>texto
-completo</code>separado.  Para recuperar todos los documentos que
-contienen el término <em>e-</em> en el texto completo de sus
-documentos asociados, debemos escribir:</p>
-
-      <form action="<CFG_SITE_URL>/search" method="get">
-      <input type="hidden" name="ln" value="<lang:current />" />
-      <blockquote>
-      <input size="40" type="text" name="p" value="fulltext:e-" />
-      <select name="f"><option value="">_(any field)_</option>
-                       <option value="title">_(title)_</option>
-                       <option value="author">_(author)_</option></select>
-      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-      </blockquote>
-      </form>
-
-Recordamos que las palabras del texto completo no se incluyen en el
-índice global 'cualquier campo' predeterminado, pero es posible
-realizar una combinación libre de texto completo y metadatos en una
-misma búsqueda.  Por ejemplo, para recuperar todos los artículos
-escritos por <em>Ellis</em> que contengan la palabra <em>muon</em>
-tanto en los metadatos como en el texto completo, debemos escribir:
-
-      <form action="<CFG_SITE_URL>/search" method="get">
-      <input type="hidden" name="ln" value="<lang:current />" />
-      <blockquote>
-      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
-      <select name="f"><option value="">_(any field)_</option>
-                       <option value="title">_(title)_</option>
-                       <option value="author">_(author)_</option></select>
-      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-      </blockquote>
-      </form>
-
-
-</es>
 </lang>
 
 <h4><a name="howto-citations">
@@ -5232,12 +5351,14 @@ mais qui le citent, saisissez:
       </form>
 
 </fr>
+
 <es>
-<p>Si un registro de metadatos contiene un fichero de texto asociado,
-<CFG_SITE_NAME_INTL> trata de extraer las citas automaticamente del fichero e
-indexarlas en un índice separado de <code>citas</code>.  Para
-recuperar todos los registros que citan a <em>Ellis</em> en sus
-listados de citas bibliogáficas, escribiremos:</p>
+  <p>Si un registro de metadatos contiene un fichero de texto asociado,
+    <CFG_SITE_NAME_INTL> trata de extraer las citas automaticamente
+    del fichero e indexarlas en un índice separadode
+    <code>citas</code>.  Para recuperar todos los registros que citan
+    a <em>Ellis</em> en sus listados de citas bibliogáficas,
+    escribiremos:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5250,9 +5371,9 @@ listados de citas bibliogáficas, escribiremos:</p>
       </blockquote>
       </form>
 
-Para recuperar todos los registros que citan el pre-print
-<em>hep-ph/0103062</em>en sus listados de citas bibliográficas,
-escribiremos:
+    Para recuperar todos los registros que citan el pre-print
+    <em>hep-ph/0103062</em> en sus listados de citas bibliográficas,
+    escribiremos:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5265,9 +5386,9 @@ escribiremos:
       </blockquote>
       </form>
 
-Para recuperar todos los documentos que citan un artículo de
-<em>Giddings</em> y <em>Ross</em>publicado en <em>Physical Review
-D</em> volumen <em>61</em> y en el año <em>2000</em>, escribiremos:
+   Para recuperar todos los documentos que citan un artículo de
+   <em>Giddings</em> y <em>Ross</em>publicado en <em>Physical Review
+   D</em> volumen <em>61</em> y en el año <em>2000</em>, escribiremos:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5280,12 +5401,12 @@ D</em> volumen <em>61</em> y en el año <em>2000</em>, escribiremos:
       </blockquote>
       </form>
 
-Recuerde que los términos de las citaciones no estan incluidos dentro
-del índice “cualquier campo” en la búsqueda global predeterminada,
-pero puede realizar una combinación libre entre búsqueda por cita
-bibliogràfica y por metadatos.  Por ejemplo, para recuperar todos los
-artículos sobre <em>modelo estándar</em> que no han sido escritos por
-<em>Ellis</em> pero lo citan, escribiremos:
+   Recuerde que los términos de las citaciones no estan incluidos
+   dentro del índice «cualquier campo» en la búsqueda global
+   predeterminada, pero puede realizar una combinación libre entre
+   búsqueda por cita bibliogràfica y por metadatos.  Por ejemplo, para
+   recuperar todos los artículos sobre <em>standard model</em> que no
+   han sido escritos por <em>Ellis</em> pero lo citan, escribiremos:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5297,15 +5418,15 @@ artículos sobre <em>modelo estándar</em> que no han sido escritos por
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
 </es>
 
 <ca>
-<p>Si un registre de metadades conté un fitxer de text associat,
-<CFG_SITE_NAME_INTL> tracta de extraure les referències automàticament del
-fitxer e indexar-les a un índex separat de <code>referències</code>.
-Para recuperar tots els registres que citen a <em>Ellis</em> en els
-seus llistats de referències bibliogràfiques, escriurem:</p>
+  <p>Si un registre de metadades conté un fitxer de text associat,
+    <CFG_SITE_NAME_INTL> tracta de extraure les referències
+    automàticament del fitxer e indexar-les a un índex separat
+    de <code>referències</code>.  Para recuperar tots els registres
+    que citen a <em>Ellis</em> en els seus llistats de referències
+    bibliogràfiques, escriurem:</p>
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5318,9 +5439,9 @@ seus llistats de referències bibliogràfiques, escriurem:</p>
       </blockquote>
       </form>
 
-Per recuperar tots els registres que citen el pre-print
-<em>hep-ph/0103062</em>en els seus llistats de referències
-bibliogràfiques, escriurem:
+   Per recuperar tots els registres que citen el pre-print
+   <em>hep-ph/0103062</em>en els seus llistats de referències
+   bibliogràfiques, escriurem:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5333,9 +5454,9 @@ bibliogràfiques, escriurem:
       </blockquote>
       </form>
 
-Per recuperar tots els documents que citen un article de
-<em>Giddings</em> i <em>Ross</em>publicat a <em>Physical Review D</em>
-volum <em>61</em> i a l’any <em>2000</em>, escriurem:
+   Per recuperar tots els documents que citen un article de
+   <em>Giddings</em> i <em>Ross</em>publicat a <em>Physical Review
+   D</em> volum <em>61</em> i a l'any <em>2000</em>, escriurem:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
@@ -5348,14 +5469,14 @@ volum <em>61</em> i a l’any <em>2000</em>, escriurem:
       </blockquote>
       </form>
 
-Recordi que els termes de les referències no estan inclosos dins
-l’índex “qualsevol camp” a la cerca global predeterminada, però pot
-realitzar una combinació lliure entre cerca por referència i per
-metadades.
+   Recordeu que els termes de les referències no estan inclosos dins
+   l'índex «qualsevol camp» a la cerca global predeterminada, però pot
+   realitzar una combinació lliure entre cerca por referència i per
+   metadades.
 
-Per exemple, per recuperar tots els articles sobre <em>model
-estàndar</em> que no han estat escrits per <em>Ellis</em> però el
-citen, escriurem:
+   Per exemple, per recuperar tots els articles sobre <em>standard
+   model</em> que no han estat escrits per <em>Ellis</em> però el
+   citen, escriurem:
 
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
