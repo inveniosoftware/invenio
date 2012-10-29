@@ -36,6 +36,7 @@ Bibencode: Encode a given video and profile using FFmpeg.
 """
 
 try:
+    from invenio.flaskshell import *
     from invenio.bibencode import main
 except ImportError, e:
     print "Error: %s" % e

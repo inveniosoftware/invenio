@@ -26,6 +26,7 @@
 
 import sys
 
+from invenio.flaskshell import *
 from invenio.config import CFG_PYLIBDIR
 
 sys.path.append("%s/invenio" % (CFG_PYLIBDIR))

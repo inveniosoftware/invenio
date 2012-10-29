@@ -37,6 +37,7 @@ except ImportError, e:
     sys.exit(1)
 
 try:
+    from invenio.flaskshell import *
     from invenio.search_engine import perform_request_search
     from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
     from invenio.config import *

@@ -24,6 +24,7 @@
 
 __revision__ = "$Id$"
 
+from invenio.flaskshell import *
 from invenio.oai_repository_updater import main
 
 ### okay, here we go:
