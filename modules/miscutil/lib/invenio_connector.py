@@ -74,7 +74,7 @@ except ImportError:
     CFG_CERN_SITE = 0
     CFG_USER_AGENT = "invenio_connector"
 
-CFG_CDS_URL = "http://cds.cern.ch/"
+CFG_CDS_URL = "https://cds.cern.ch/"
 
 class InvenioConnectorAuthError(Exception):
     """
@@ -491,7 +491,7 @@ class CDSInvenioConnector(InvenioConnector):
         self.browser = mechanize.Browser(factory=_SGMLParserFactory(i_want_broken_xhtml_support=True))
         self.browser.set_handle_robots(False)
         self.browser.open(self.server_url)
-        self.browser.follow_link(text_regex="login")
+        self.browser.follow_link(text_regex="Sign in")
         self.browser.select_form(nr=0)
         self.browser.form['ctl00$ContentPlaceHolder1$txtFormsLogin'] = self.user
         self.browser.form['ctl00$ContentPlaceHolder1$txtFormsPassword'] = self.password
