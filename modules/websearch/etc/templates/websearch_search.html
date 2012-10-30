@@ -209,41 +209,51 @@ body {
     facets: {{ facets|tojson|safe }}
   }).on('updated', function(event) {
     var p = $('#facet_filter input[name=p]').val()
+      , facet = $('#facet_list').data('facet')
 
     $('#search-box-main input[name=p]')
-      .val(p+' '+$('#facet_list').data('facet').queryString());
+      .val(p+' '+facet.queryString());
 
-      var filter = JSON.stringify($('#facet_list').data('facet').filter);
-      if (filter != document.location.hash.substr(1)) {
-        if (filter != '{"+":{},"-":{}}') {
-          document.location.hash = filter;
-        } else {
-          document.location.hash = '';
-        }
+    var filter = JSON.stringify(facet.filter);
+    if (filter != document.location.hash.substr(1)) {
+      if (filter != '[]') {
+        document.location.hash = filter;
+      } else {
+        document.location.hash = '';
       }
+    }
 
-      var showModal = true;
-      var modalShow= function() {
-        if (showModal) {
-          $("#overlay").modal('show');
-        }
-      };
-      setTimeout(modalShow, 100);
-      $.ajax('{{ url_for('.results', qid=qid) }}', {
-        type: 'POST',
-        data: $.extend( {},
-        {{ request.args.to_dict()|tojson|safe }}
-        ,{
-          'filter': filter
-        })
-      }).done(function(data) {
-        $('#search_results').html(data);
-        showModal = false;
-        $("#overlay").modal('hide');
-      });
+    var showModal = true;
+    var modalShow= function() {
+      if (showModal) {
+        $("#overlay").modal('show');
+      }
+    };
+    setTimeout(modalShow, 100);
+    $.ajax('{{ url_for('.results', qid=qid) }}', {
+      type: 'POST',
+      data: $.extend( {},
+      {{ request.args.to_dict()|tojson|safe }}
+      ,{
+        'filter': filter
+      })
+    }).done(function(data) {
+      $('#search_results').html(data);
+      showModal = false;
+      $("#overlay").modal('hide');
+    });
 
   }).on('loaded', function(event) {
     var typeahead = $('form[name=search] input[name=p]').data('typeahead')
+      , facet = $('#facet_list').data('facet')
+
+    // Move out from library
+    var expand = jQuery.grep(facet.filter, function (a) {
+      return a[0] == '!'
+    })
+    $.each(expand, function(i,v) {
+      facet.$element.trigger($.Event('added', {op: v[0], key: v[1], value: v[2]}));
+    });
 
     if ($.inArray(event.name+':', typeahead.options.source)<0) {
       $('form[name=search] input[name=p]').data('typeahead')
@@ -307,6 +317,7 @@ body {
                 $el_clicked.hasClass('text-error')) {
               $ul.remove()
               $el_clicked.addClass('expandable')
+              $('#facet_list').data('facet').filter = $('#facet_list').data('facet').exclude('!', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
             }
           }
         }
@@ -348,8 +359,7 @@ body {
 
     var resetKey = false
     try {
-      if ($(this).data('facet').filter['+'][event.key].length +
-          $(this).data('facet').filter['-'][event.key].length == 0) {
+      if ($(this).data('facet').findByKey(event.key).length == 0) {
         resetKey = true
       }
     } catch(err) {
@@ -367,9 +377,11 @@ body {
     $('[data-facet-key="'+event.key+'"]')
       .filter('[data-facet-value="'+event.value+'"]')
       .each(function(e) {
-        $(this)
-          .addClass('text-'+type)
-          .css('font-weight', 'bold')
+        if (event.op != '!') {
+          $(this)
+            .addClass('text-'+type)
+            .css('font-weight', 'bold')
+        }
       })
       .filter('.expandable')
       .each(function() {
@@ -395,6 +407,7 @@ body {
               , data = {parent: event.value}
               , $ul = $('<ul class="context unstyled"><ul>').clone().appendTo($el_clicked.parent())
 
+            $('#facet_list').data('facet').filter.push(['!', event.key, event.value])
             $('#facet_list').data('facet').createFacetBox(facet, $ul, data)
           //}
         }
@@ -415,9 +428,10 @@ body {
 
   // Rebuild facet filter on hash change.
   $(window).bind('hashchange', function() {
-    var hash_filter = jQuery.parseJSON(document.location.hash.substr(1));
+    var hash_filter = document.location.hash.substr(1)
+      , filter = jQuery.parseJSON(hash_filter);
     if (JSON.stringify($('#facet_list').data('facet').filter) != hash_filter) {
-      $('#facet_list').data('facet').rebuildFilter(hash_filter || {});
+      $('#facet_list').data('facet').rebuildFilter(filter || []);
     }
   });
 

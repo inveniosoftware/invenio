@@ -34,7 +34,17 @@
         a[a.length-1] = a[a.length-1] + p[1];
       }
       return a;
-    };
+    }
+    this.groupByKey = function(a) {
+      var group = {}
+      a.map(function(value) {
+        if (! (value[1] in group)) {
+          group[value[1]] = []
+        }
+        group[value[1]].push(value[2])
+      })
+      return group
+    }
 
     this.init()
   }
@@ -63,10 +73,44 @@
         this.createFacetBox(f, $('.'+f.facet+' .context'), {})
       } // end for
 
-      this.filter = {'+': {}, '-': {} };
+      this.filter = []
 
 
     } // end init function
+
+  , limitTo: function() {
+      return jQuery.grep(this.filter, function (a) { return a[0] == '+' })
+    }
+
+  , excludeTo: function() {
+      return jQuery.grep(this.filter, function (a) { return a[0] == '-' })
+    }
+
+  , expand: function() {
+      return jQuery.grep(this.filter, function (a) { return a[0] == '!' })
+    }
+
+  , find: function(op, key, value) {
+      return jQuery.grep(this.filter, function (a) {
+        return a[0] == op && a[1] == key && a[2] == value
+      })
+    }
+
+  , findByKey: function(key) {
+      return jQuery.grep(this.filter, function (a) {
+        return (a[0] == '+' || a[0] == '-') && a[1] == key
+      })
+    }
+
+  , exclude: function(op, key, value) {
+      return jQuery.grep(this.filter, function (a) {
+        return a[0] != op || a[1] != key || a[2] != value
+      })
+    }
+
+  , exists: function(op, key, value) {
+      return this.find(op, key, value).length > 0
+    }
 
   , createFacetBox: function(facet, element, data) {
       var that = this,
@@ -152,13 +196,13 @@
 
   , queryString: function() {
       var that = this,
-          limit = that.wrap($.map(this.filter['+'], function(k, v) {
+          limit = that.wrap($.map(that.groupByKey(that.limitTo()), function(k, v) {
             var fields = $.map(k, function(i) {
               return v+':'+ that.wrap(i.split(' '),'""').join(' ');
             });
             return that.wrap(fields,"()").join(' OR ');
           }),"()").join(' AND '),
-          exclude = $.map(this.filter['-'], function(k, v) {
+          exclude = $.map(that.groupByKey(that.excludeTo()), function(k, v) {
             var fields = $.map(k, function(i) { return ' AND NOT '+v+':'+i });
             return fields.join('');
           }).join('');
@@ -177,35 +221,28 @@
   , rebuildFilter: function(filter) {
       var that = this;
       this._clear();
-      if ('+' in filter) {
-      $.each(filter['+'], function(k, vs) {
-        $.each(vs, function(i, v) {
-          that._addFacet('+', k, v);
-        });
+      this.filter = filter
+      $.each(this.limitTo(), function(i,v) {
+        that._addFacet(v[0], v[1], v[2]);
+        that.$element.trigger($.Event('added', {op: v[0], key: v[1], value: v[2]}));
       });
-      }
-      if ('-' in filter) {
-      $.each(filter['-'], function(k, vs) {
-        $.each(vs, function(i, v) {
-          that._addFacet('-', k, v);
-        });
+      $.each(this.excludeTo(), function(i,v) {
+        that._addFacet(v[0], v[1], v[2]);
+        that.$element.trigger($.Event('added', {op: v[0], key: v[1], value: v[2]}));
       });
-      }
+
       this.$element.trigger($.Event('updated'));
       return this;
     }
 
   , _addFacet: function(op, key, value) {
-      var that = this
+      var that = this,
+          values = this.find(op, key, value)
 
-      if (key in this.filter[op]) {
-        if ($.inArray(value, this.filter[op][key])>-1) {
-          return false;
-        } else {
-          this.filter[op][key].push(value);
-        }
+      if (values.length > 0) {
+        return false
       } else {
-        this.filter[op][key] = [value];
+        this.filter.push([op, key, value])
       }
 
       var op2 = op == '+' ? '-' : '+'
@@ -224,14 +261,10 @@
     }
 
   , _delete: function(op, key, value) {
-      var r = this.filter[op][key],
-          i = $.inArray(value, r)
+      var excluded = this.exclude(op, key, value)
 
-      if (i>-1) {
-        this.filter[op][key].splice(i,1);
-        if (!this.filter[op][key].length) {
-          delete this.filter[op][key];
-        }
+      if (excluded.length < this.filter.length) {
+        this.filter = excluded
         return true
       }
       return false
@@ -245,8 +278,10 @@
     }
 
   , toggleFacet: function(op, key, value) {
-      if (key in this.filter[op]) {
-        if ($.inArray(value, this.filter[op][key])>-1) {
+      var keys = this.findByKey(key),
+          exclude = this.exclude(op, key, value)
+      if (keys.length > 0) {
+        if (exclude.length < this.filter.length) {
           return this.delete(op, key, value)
         }
       }
@@ -254,35 +289,18 @@
     }
 
   , resetKey: function(key) {
-      var that = this,
-          filter = this.filter
-      if ('+' in filter && key in filter['+'] && filter['+'][key].length) {
-        var values = $.extend([], filter['+'][key])
-        $.each(values, function(i, v) {
-          that._delete('+', key, v)
-        })
-      }
-      if ('-' in filter && key in filter['-'] && filter['-'][key].length) {
-        var values = $.extend([], filter['-'][key])
-        $.each(values, function(i, v) {
-          that._delete('-', key, v)
-        })
-      }
+      this.filter = jQuery.grep(this.filter, function (a) {
+        return a[1] != key
+      })
+
       this.$element.trigger($.Event('updated'));
     }
 
   , _clear: function() {
-      var that = this
-      $.each(this.filter['+'], function(k, vs) {
-        $.each(vs.slice(), function(i,v) {
-          that._delete('+', k, v);
-        });
-      });
-      $.each(this.filter['-'], function(k, vs) {
-        $.each(vs.slice(), function(i,v) { that._delete('-', k, v); });
-      });
-      this.filter['+'] = {};
-      this.filter['-'] = {};
+      this.filter = jQuery.grep(this.filter, function (a) {
+        // keep additional information about filter
+        return a[0] == '+' || a[0] == '-'
+      })
       return this;
     }
 

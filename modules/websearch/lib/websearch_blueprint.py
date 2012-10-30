@@ -24,6 +24,7 @@ import json
 from string import rfind, strip
 from datetime import datetime
 from hashlib import md5
+from itertools import groupby
 
 from flask import Blueprint, session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app,\
@@ -347,6 +348,19 @@ def results(qid):
     except KeyError:
         return ''
 
+    sortkeytype= lambda v:v[0]
+    sortfacet= lambda v:v[1]
+    data = sorted(filter, key=sortkeytype)
+    out = {}
+    for t,vs in groupby(data, key=sortkeytype):
+        out[t] = {}
+        for v,k in groupby(sorted(vs, key=sortfacet), key=sortfacet):
+            out[t][v] = map(lambda i:i[2], k)
+
+    print out
+    filter = out
+    #filter = dict(map(lambda (k,v): (k, groupby(v, key=sortfacet)),
+    #                  groupby(filter, key=sortkeytype)))
 
     output = recIDsHitSet
 
