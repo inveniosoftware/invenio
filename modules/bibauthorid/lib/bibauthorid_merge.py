@@ -43,7 +43,7 @@ def merge_static_classy():
         Use it after tortoise.
         This function is static: if aid* tables are changed while it's running,
         probably everything will crash and a black hole will open, eating all your data.
-        
+
         NOTE: this is more elegant that merge_static but much slower. Will have to be improved
                before it can replace it.
     '''
@@ -279,7 +279,7 @@ def merge_dynamic():
         This function merges aidPERSONIDPAPERS with aidRESULTS.
         Use it after tortoise.
         This function is dynamic: it allows aid* tables to be changed while it is still running,
-        hence the claiming faciity for example can stay online during the merge. This comfort 
+        hence the claiming faciity for example can stay online during the merge. This comfort
         however is paid off in term of speed.
     '''
     last_names = frozenset(name[0].split('.')[0] for name in get_existing_result_clusters())

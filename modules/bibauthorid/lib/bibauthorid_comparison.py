@@ -29,7 +29,9 @@ from invenio.bibauthorid_dbinterface import get_collaboration
 from invenio.bibauthorid_dbinterface import resolve_affiliation
 from invenio.bibauthorid_backinterface import get_key_words
 from invenio.bibrank_citation_searcher import get_citation_dict
-from invenio.bibauthorid_general_utils import metadata_comparison_print
+#metadat_comparison_print commented everywhere to increase performances,
+#import and calls left here to make future debug easier.
+#from invenio.bibauthorid_general_utils import metadata_comparison_print
 
 
 # This module is not thread safe!
@@ -43,7 +45,7 @@ from invenio.bibauthorid_general_utils import metadata_comparison_print
 # use_rec = itemgetter(2)
 
 try:
-    a = itemgetter(2, 5, 3)(range(10))
+    _ = itemgetter(2, 5, 3)(range(10))
     use_refrec = lambda x : x
     use_ref = itemgetter(0, 1)
     use_rec = itemgetter(2)
@@ -376,22 +378,22 @@ def _compare_citations_by(bib1, bib2):
 
 # unfortunately, we have to do all comparisons
 if bconfig.CFG_INSPIRE_SITE:
-        cbrr_func_weight = (
+    cbrr_func_weight = (
                    (_compare_affiliations, 1.),
                    (_compare_names, 5.),
                    (_compare_citations, .5),
                    (_compare_citations_by, .5),
                    (_compare_key_words, 2.),
-                  )
+                   )
 elif bconfig.CFG_ADS_SITE:
-        cbrr_func_weight = (
+    cbrr_func_weight = (
             (_compare_email, 3.),
             (_compare_unified_affiliations, 2.),
             (_compare_names, 5.),
     #        register(_compare_citations, .5)
     #        register(_compare_citations_by, .5)
             (_compare_key_words, 2.)
-                       )
+            )
 
 else:
-        cbrr_func_weight = ((_compare_names, 5.),)
+    cbrr_func_weight = ((_compare_names, 5.),)

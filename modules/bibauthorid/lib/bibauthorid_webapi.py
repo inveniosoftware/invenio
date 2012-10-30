@@ -44,7 +44,7 @@ from invenio.mailutils import send_email
 
 from operator import add
 
-from invenio.bibauthorid_dbinterface import get_personiID_external_ids    #export #pylint: disable-msg=W0614
+from invenio.bibauthorid_dbinterface import get_personiID_external_ids    #pylint: disable-msg=W0614
 
 def get_person_redirect_link(pid):
     '''
@@ -80,7 +80,7 @@ def get_canonical_id_from_person_id(person_id):
     @return: result from the request or person_id on failure
     @rtype: int
     '''
-    if not person_id or not (isinstance(person_id, str) or isinstance(person_id, int)):
+    if not person_id or not (isinstance(person_id, str) or isinstance(person_id, (int, long))):
         return person_id
 
     canonical_name = person_id
@@ -215,7 +215,7 @@ def get_papers_by_person_id(person_id= -1, rec_status= -2, ext_out=False):
     @return: list of record ids
     @rtype: list of int
     '''
-    if not isinstance(person_id, int):
+    if not isinstance(person_id, (int, long)):
         try:
             person_id = int(person_id)
         except (ValueError, TypeError):
@@ -311,7 +311,7 @@ def get_person_names_from_id(person_id= -1):
     @rtype: tuple of tuple
     '''
 #    #retrieve all rows for the person
-    if (not person_id > -1) or (not isinstance(person_id, int)):
+    if (not person_id > -1) or (not isinstance(person_id, (int, long))):
         return []
 
     return dbapi.get_person_names_count(person_id)
@@ -330,7 +330,7 @@ def get_person_db_names_from_id(person_id= -1):
     @rtype: tuple of tuple
     '''
 #    #retrieve all rows for the person
-    if (not person_id > -1) or (not isinstance(person_id, int)):
+    if (not person_id > -1) or (not isinstance(person_id, (int, long))):
         return []
 
     return dbapi.get_person_db_names_count(person_id)
@@ -346,7 +346,7 @@ def get_longest_name_from_pid(person_id= -1):
     @return: returns the longest normalized name of a person
     @rtype: string
     '''
-    if (not person_id > -1) or (not isinstance(person_id, int)):
+    if (not person_id > -1) or (not isinstance(person_id, (int, long))):
         return "This doesn't look like a person ID!"
 
     longest_name = ""
@@ -781,7 +781,7 @@ def set_processed_external_recids(pid, recid_list):
     dbapi.set_processed_external_recids(pid, recid_list_str)
 
 
-def arxiv_login(req):
+def arxiv_login(req, picked_profile=None):
     '''
     Log in through arxive. If user already associated to a personid, returns the personid.
     If user has no pid, try to guess which personid to associate based on surname and papers
@@ -807,6 +807,9 @@ def arxiv_login(req):
             session['personinfo'] = pinfo
             pinfo["ticket"] = []
         session.dirty = True
+
+
+
 
     session_bareinit(req)
     session = get_session(req)
@@ -853,11 +856,15 @@ def arxiv_login(req):
     uid = getUid(req)
     pid, pid_found = dbapi.get_personid_from_uid([[uid]])
 
-    if not pid_found:
-        pid = dbapi.reclaim_personid_for_new_arXiv_user(found_bibrecs,
-                    nameapi.create_normalized_name(nameapi.split_name_parts(surname + ', ' + name)), uid)
-    else:
+    if pid_found:
         pid = pid[0]
+    else:
+        if picked_profile == None:
+            top5_list = dbapi.find_top5_personid_for_new_arXiv_user(found_bibrecs,
+                nameapi.create_normalized_name(nameapi.split_name_parts(surname + ', ' + name)))
+            return ("top5_list", top5_list)
+        else:
+            pid = dbapi.check_personids_availability(picked_profile, uid)
 
     pid_bibrecs = set([i[0] for i in dbapi.get_all_personids_recs(pid, claimed_only=True)])
     missing_bibrecs = found_bibrecs - pid_bibrecs
@@ -879,8 +886,17 @@ def arxiv_login(req):
             if e['pid'] == t['pid'] and e['bibref'] == t['bibref']:
                 ticket.remove(e)
         ticket.append(t)
+
     session.dirty = True
-    return pid
+
+    if picked_profile != None and picked_profile != pid and picked_profile != -1:
+
+        return ("chosen pid not available", pid)
+    elif picked_profile != None and picked_profile == pid and picked_profile != -1:
+        return ("pid assigned by user", pid)
+    else:
+        return ("pid", pid)
+
 
 def external_user_can_perform_action(uid):
     '''

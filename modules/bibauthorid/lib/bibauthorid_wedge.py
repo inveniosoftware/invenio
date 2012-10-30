@@ -138,7 +138,7 @@ def do_wedge(cluster_set, deep_debug=False):
         cl2 = bib_map[v2]
         if cl1 != cl2 and not cl1.hates(cl2):
             if deep_debug:
-                export_to_dot(cluster_set, "/tmp/%s%d.dot" % (cluster_set.last_name, current), cluster_set.mapping, (v1, v2, unused))
+                export_to_dot(cluster_set, "/tmp/%s%d.dot" % (cluster_set.last_name, current), bib_map, (v1, v2, unused))
 
             if decide(cl1, cl2):
                 wedge_print("Wedge: Joined!")
@@ -158,7 +158,7 @@ def do_wedge(cluster_set, deep_debug=False):
     bibauthor_print("")
 
     if deep_debug:
-        export_to_dot(cluster_set, "/tmp/%sfinal.dot" % cluster_set.last_name, cluster_set.mapping)
+        export_to_dot(cluster_set, "/tmp/%sfinal.dot" % cluster_set.last_name, bib_map)
 
 def meld_edges(p1, p2):
     '''
@@ -329,7 +329,7 @@ def export_to_dot(cs, fname, graph_info, extra_edge=None):
     fptr.write("    overlap=prism\n")
 
     for idx, bib in enumerate(graph_info):
-        fptr.write('    %d [color=black label="%s"];\n' % (idx, get_name_by_bibrecref(bib)))
+        fptr.write('    %d [color=black label="%s"];\n' % (idx, get_name_by_bibrecref(idx)))
 
     if extra_edge:
         v1, v2, (prob, cert) = extra_edge

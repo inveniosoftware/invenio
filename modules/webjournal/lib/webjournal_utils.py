@@ -321,11 +321,11 @@ def get_journal_articles(journal_name, issue, category,
         return []
 
 
-    recids_issue = search_pattern(p='773__n:%s' % issue)
+    recids_issue = search_pattern(p='773__n:%s -980:DELETED' % issue)
     recids_rule = search_pattern(p=matching_rule[0][1])
     if issue[0] == '0':
         # search for 09/ and 9/
-        recids_issue.union_update(search_pattern(p='773__n:%s' % issue.lstrip('0')))
+        recids_issue.union_update(search_pattern(p='773__n:%s -980:DELETED' % issue.lstrip('0')))
 
     recids_rule.intersection_update(recids_issue)
     recids = [recid for recid in recids_rule if record_exists(recid) == 1]

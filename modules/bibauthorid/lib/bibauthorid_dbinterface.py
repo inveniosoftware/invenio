@@ -114,7 +114,7 @@ def get_personid_row(person_id, tag):
 
     @param person_id: id of the person to read the attribute from
     @type person_id: int
-    @param tag: the tag to read. 
+    @param tag: the tag to read.
     @type tag: string
 
     @return: the data associated with a virtual author
@@ -175,7 +175,7 @@ def del_person_not_manually_claimed_papers(pid):
     '''
     Deletes papers from a person which have not been manually claimed.
     @param pid:
-    @type pid: int 
+    @type pid: int
     '''
     run_sql("delete from aidPERSONIDPAPERS "
             "where and (flag <> '-2' and flag <> '2') and personid=%s", (pid,))
@@ -304,7 +304,7 @@ def add_signature(sig, name, pid):
             "VALUES (%s, %s, %s, %s, %s)"
             , (pid, str(sig[0]), sig[1], sig[2], name))
 
-def move_signature(sig, pid):
+def move_signature(sig, pid, force_claimed=False, unclaim=False):
     '''
     Moves a signature to a different person id
     @param sig: signature tuple
@@ -312,10 +312,16 @@ def move_signature(sig, pid):
     @param pid: personid 
     @type pid: int
     '''
-    run_sql("update aidPERSONIDPAPERS set personid=%s "
-            "where bibref_table like %s and  bibref_value=%s "
-            "and bibrec=%s and flag <> 2 and flag <> -2",
-             (pid,) + sig)
+    upd = "update aidPERSONIDPAPERS set personid=%s" % pid
+    if unclaim:
+        upd += ',flag=0 '
+    sel = " where bibref_table like '%s' and bibref_value=%s and bibrec=%s " % sig
+
+    sql = upd + sel
+    if not force_claimed:
+        sql += '  and flag <> 2 and flag <> -2'
+
+    run_sql(sql)
 
 def find_conflicts(sig, pid):
     '''
@@ -1010,7 +1016,7 @@ def reject_papers_from_person(pid, papers, user_level=0):
         # get moved by tortoise) and add the rejection to the current person
 
         if fpid == pid:
-            move_signature(sig, new_pid)
+            move_signature(sig, new_pid, force_claimed=True, unclaim=True)
             pids_to_update.add(new_pid)
             run_sql("INSERT INTO aidPERSONIDPAPERS "
                     "(personid, bibref_table, bibref_value, bibrec, name, flag, lcul) "
@@ -2302,7 +2308,7 @@ def check_wrong_rejection(printer, repair=False):
         from bibauthorid_rabbit import rabbit
 
         if to_reassign:
-            #Rabbit is not designed to reassign signatures which are rejected but not assigned: 
+            #Rabbit is not designed to reassign signatures which are rejected but not assigned:
             #All signatures should stay assigned, if a rejection occours the signature should get
             #moved to a new place and the rejection entry added, but never exist as a rejection only.
             #Hence, to force rabbit to reassign it, we have to delete the rejection.
