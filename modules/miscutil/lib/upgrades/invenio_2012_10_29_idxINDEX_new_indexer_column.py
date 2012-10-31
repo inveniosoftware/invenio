@@ -22,20 +22,16 @@ from invenio.dbquery import run_sql
 depends_on = ['invenio_release_1_1_0']
 
 def info():
-    return "New Solr and Xapian ranking bridge upgrade"
+    return "New idxINDEX.indexer column"
 
 def do_upgrade():
-    """ Implement your upgrades here  """
     run_sql("ALTER TABLE idxINDEX ADD COLUMN indexer varchar(10) NOT NULL default 'native' AFTER stemming_language;")
 
 def estimate():
-    """  Estimate running time of upgrade in seconds (optional). """
     return 1
 
 def pre_upgrade():
-    """  Run pre-upgrade checks (optional). """
     pass
 
 def post_upgrade():
-    """  Run post-upgrade checks (optional). """
     pass
