@@ -1204,8 +1204,11 @@ def FormatField(value, fn):
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
 
-        str = re.search(par[0], value)
-
+        stri = re.search(par[0], value)
+        if stri:
+            stri = stri.group(0)
+        else:
+            stri = ""
         header = string.atoi(par[1])
         headerplus = par[2]
         starting = string.atoi(par[3])
@@ -1220,9 +1223,9 @@ def FormatField(value, fn):
 
             counter = counter + 1
             if (counter >= starting):
-                tmp2.append(value[:header] + headerplus + wrd + str)
+                tmp2.append(value[:header] + headerplus + wrd + stri)
             else:
-                tmp2.append(value[:header] + wrd + str)
+                tmp2.append(value[:header] + wrd + stri)
         if (last != ""):
             counter = counter + 1
             if (counter >= starting):
