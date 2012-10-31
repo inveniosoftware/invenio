@@ -214,10 +214,11 @@ body {
     $('#search-box-main input[name=p]')
       .val(p+' '+facet.queryString());
 
-    var filter = JSON.stringify(facet.filter);
-    if (filter != document.location.hash.substr(1)) {
+    var filter = JSON.stringify(facet.filter)
+      , hash = decodeURIComponent(document.location.hash)
+    if (filter != hash.substr(1)) {
       if (filter != '[]') {
-        document.location.hash = filter;
+        document.location.hash = encodeURIComponent(filter);
       } else {
         document.location.hash = '';
       }
@@ -428,7 +429,8 @@ body {
 
   // Rebuild facet filter on hash change.
   $(window).bind('hashchange', function() {
-    var hash_filter = document.location.hash.substr(1)
+    var hash = decodeURIComponent(document.location.hash)
+      , hash_filter = hash.substr(1)
       , filter = jQuery.parseJSON(hash_filter);
     if (JSON.stringify($('#facet_list').data('facet').filter) != hash_filter) {
       $('#facet_list').data('facet').rebuildFilter(filter || []);
