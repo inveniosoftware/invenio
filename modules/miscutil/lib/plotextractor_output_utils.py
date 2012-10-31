@@ -13,7 +13,7 @@ import re
 import sys
 
 from invenio.config import CFG_TMPDIR
-from invenio.textutils import encode_for_xml
+from invenio.textutils import encode_for_xml, wash_for_utf8
 from invenio.bibrecord import field_xml_output
 
 DUMMY_IMAGE_TMP = os.path.join(CFG_TMPDIR, 'plotextractor_dummy.png')
@@ -161,6 +161,7 @@ def assemble_caption(begin_line, begin_index, end_line, end_index, lines):
     # clean out characters not allowed in MARCXML
     # not allowed: & < >
     try:
+        caption = wash_for_utf8(caption)
         caption = encode_for_xml(caption.encode('utf-8', 'xmlcharrefreplace'), wash=True)
     except: # that damn encode thing threw an error on astro-ph/0601014
         sys.stderr.write(caption)
@@ -252,7 +253,7 @@ def create_contextfiles(extracted_image_data):
             context_filepath = image + '.context'
             fd = open(context_filepath, 'w')
             for context_line in contexts:
-                fd.write(context_line + '\n\n')
+                fd.write(wash_for_utf8(context_line) + '\n\n')
             fd.close()
             #write_message(context_filepath + ' written.')
 
