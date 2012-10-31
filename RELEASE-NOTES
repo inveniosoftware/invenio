@@ -95,7 +95,11 @@ If you are upgrading from Invenio v1.0.1, then:
                   --exclude bibformat/format_templates/Default_HTML_brief.bft \
                   /opt/invenio/etc/
 
- c) Restart your Apache server and your bibsched queue.
+ c) Update your jQuery tablesorter library:
+
+     $ sudo -u www-data make install-jquery-plugins
+
+ d) Restart your Apache server and your bibsched queue.
 
 If you are upgrading from a previous Invenio release (notably from
 v0.99 release series), then please see a dedicated Invenio Upgrade

@@ -153,7 +153,7 @@ install-jquery-plugins:
 	wget https://raw.github.com/akaihola/jquery-autogrow/master/jquery.autogrow.js --no-check-certificate && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
 	wget http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip -O uploadify.zip && \
-	unzip jquery.tablesorter.zip && \
+	unzip jquery.tablesorter.zip -d tablesorter && \
 	rm jquery.tablesorter.zip && \
 	unzip -u uploadify.zip -d uploadify && \
 	mv uploadify/swfobject.js ./ && \
@@ -189,8 +189,6 @@ uninstall-jquery-plugins:
 	rm -f jquery.effects.highlight.min.js && \
 	rm -f jquery.MultiFile.pack.js && \
 	rm -f jquery.jeditable.mini.js && \
-	rm -f jquery.tablesorter.js && \
-	rm -f jquery.tablesorter.pager.js && \
 	rm -f ui.datepicker.min.js && \
 	rm -f jquery.autogrow.js && \
 	rm -f json2.js && \

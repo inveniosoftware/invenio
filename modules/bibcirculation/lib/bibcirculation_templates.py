@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -263,7 +263,7 @@ class Template:
         out = """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_holdings').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -506,7 +506,7 @@ class Template:
             out += """<br />
                       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                       <script src="/js/jquery.js" type="text/javascript"></script>
-                      <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                      <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                       <script type="text/javascript">
                       $(document).ready(function() {
                         $('#table_loans').tablesorter()
@@ -608,7 +608,7 @@ class Template:
                    <br />
                    <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                    <script src="/js/jquery.js" type="text/javascript"></script>
-                   <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                   <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                    <script type="text/javascript">
                    $(document).ready(function() {
                         $('#table_requests').tablesorter()
@@ -695,7 +695,7 @@ class Template:
                     <br /> <br />
                     <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                     <script src="/js/jquery.js" type="text/javascript"></script>
-                    <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                    <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                     <script type="text/javascript">
                     $(document).ready(function() {
                         $('#table_hist').tablesorter()
@@ -1638,7 +1638,7 @@ class Template:
             <br />
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -2668,7 +2668,7 @@ class Template:
             out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -2834,7 +2834,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3083,7 +3083,7 @@ class Template:
                     <br /> <br />
                     <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                     <script src="/js/jquery.js" type="text/javascript"></script>
-                    <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                    <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                     <script type="text/javascript">
                       $(document).ready(function() {
                         $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3170,7 +3170,7 @@ class Template:
             out += """<div class="bibcircbottom">
                       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                       <script src="/js/jquery.js" type="text/javascript"></script>
-                      <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                      <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                       <script type="text/javascript">
                         $(document).ready(function() {
                           $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3275,7 +3275,7 @@ class Template:
              <div class="bibcircbottom">
              <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_holdings').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3363,7 +3363,7 @@ class Template:
         out += """<div class="bibcircbottom">
                   <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                   <script src="/js/jquery.js" type="text/javascript"></script>
-                  <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                  <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                   <script type="text/javascript">
                   $(document).ready(function() {
                     $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3804,7 +3804,7 @@ class Template:
             out += """
          <style type="text/css"> @import url("/img/tablesorter.css"); </style>
          <script src="/js/jquery.js" type="text/javascript"></script>
-         <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
          <script type="text/javascript">
            $(document).ready(function() {
              $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3914,7 +3914,7 @@ class Template:
 
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <script src="/js/jquery.js" type="text/javascript"></script>
-        <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
           $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -4526,8 +4526,8 @@ class Template:
             <br />
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.pager.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.pager.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#tablesorter-loans')
@@ -4649,7 +4649,7 @@ class Template:
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -6488,7 +6488,7 @@ class Template:
         out += """
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
            <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -9874,7 +9874,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <script src="/js/jquery.js" type="text/javascript"></script>
-        <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
            $(document).ready(function() {
               $('#table_orders').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -11045,7 +11045,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <script src="/js/jquery.js" type="text/javascript"></script>
-        <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
           $('#table_ill').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -15072,7 +15072,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <script src="/js/jquery.js" type="text/javascript"></script>
-        <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
           $('#table_ill').tablesorter({widthFixed: true, widgets: ['zebra']})
