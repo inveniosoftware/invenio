@@ -51,7 +51,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     if key in ('-o', '--overdue-letters'):
         task_set_option('overdue-letters', True)
     elif key in ('-b', '--update-borrowers'):
-        task_set_option('update_borrowers', True)
+        task_set_option('update-borrowers', True)
     else:
         return False
     return True

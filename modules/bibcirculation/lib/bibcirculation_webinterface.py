@@ -28,6 +28,7 @@ import cgi
 
 # others invenio imports
 from invenio.config import CFG_SITE_LANG, \
+                           CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
@@ -189,7 +190,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/ill/display?%s" % (CFG_SITE_SECURE_URL,
+        redirect_to_url(req, "%s/ill/book_request_step1?%s" % (CFG_SITE_SECURE_URL,
                                                           req.args))
 
     def book_request_step1(self, req, form):
@@ -204,14 +205,14 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "%s/ill/display" % \
+            return page_not_authorized(req, "%s/ill/book_request_step1" % \
                                        (CFG_SITE_SECURE_URL,),
                                        navmenuid="ill")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
-                    'referer' : "%s/ill/display%s" % (
+                    'referer' : "%s/ill/book_request_step1%s" % (
                         CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
@@ -307,7 +308,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/book_request_step2%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : ln}, {})), norobot=True)
 
@@ -394,7 +395,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/book_request_step2%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -483,7 +484,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/acq_request_step1%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -555,7 +556,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/acq_request_step2%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -630,7 +631,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/article_request_step1%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 
@@ -682,7 +683,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/ill/article_request_step2%s" % (
-                        CFG_SITE_URL,
+                        CFG_SITE_SECURE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
 

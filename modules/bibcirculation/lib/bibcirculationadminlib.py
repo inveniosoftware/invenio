@@ -211,13 +211,8 @@ def borrower_search_result(req, column, string, redirect_to_new_request=False,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
-
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1?ln=%s">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     if len(result) == 1:
         if redirect_to_new_request:
@@ -427,13 +422,8 @@ def borrower_notification(req, borrower_id, borrower_email, template, message,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
-
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1?ln=%s">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     return page(title="Borrower Notification",
                  uid=id_user,
@@ -487,8 +477,8 @@ def get_next_waiting_loan_request(req, recid, barcode, check_id,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1?ln=%s">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
 
     body = bc_templates.tmpl_get_next_waiting_loan_request(result=result,
@@ -581,8 +571,8 @@ def loan_return(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL)
+                              'href="%s/admin2/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1?ln=%s">Circulation Management' \
+                              '</a> ' % (CFG_SITE_SECURE_URL, CFG_SITE_SECURE_URL, ln)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -2139,10 +2129,11 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes,
     _ = gettext_set_language(ln)
 
     if delete_key and borrower_id:
-        borrower_notes = eval(db.get_borrower_notes(borrower_id))
-        if delete_key in borrower_notes.keys():
-            del borrower_notes[delete_key]
-            db.update_borrower_notes(borrower_id, borrower_notes)
+        if looks_like_dictionary(db.get_borrower_notes(borrower_id)):
+            borrower_notes = eval(db.get_borrower_notes(borrower_id))
+            if delete_key in borrower_notes.keys():
+                del borrower_notes[delete_key]
+                db.update_borrower_notes(borrower_id, borrower_notes)
 
     elif library_notes:
         if db.get_borrower_notes(borrower_id):
@@ -2196,10 +2187,11 @@ def get_loans_notes(req, loan_id, delete_key,
     _ = gettext_set_language(ln)
 
     if delete_key and loan_id:
-        loans_notes = eval(db.get_loan_notes(loan_id))
-        if delete_key in loans_notes.keys():
-            del loans_notes[delete_key]
-            db.update_loan_notes(loan_id, loans_notes)
+        if looks_like_dictionary(db.get_loan_notes(loan_id)):
+            loans_notes = eval(db.get_loan_notes(loan_id))
+            if delete_key in loans_notes.keys():
+                del loans_notes[delete_key]
+                db.update_loan_notes(loan_id, loans_notes)
 
     elif library_notes:
         if db.get_loan_notes(loan_id):
@@ -3365,9 +3357,13 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
     # if item on loan and new status is CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF,
     # item has to be returned.
     if is_on_loan and status == CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF:
-
         db.update_item_status(CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, old_barcode)
         db.return_loan(old_barcode)
+
+    if not is_on_loan and status == CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN:
+        status = db.get_copy_details(barcode)[7]
+        infos.append(_("Item <strong>[%s]</strong> updated, but the <strong>status was not modified</strong>.") % (old_barcode))
+
 
     # update item information.
     db.update_item_info(old_barcode, library_id, collection, location,
@@ -3788,7 +3784,12 @@ def create_new_request_step1(req, borrower_id, p="", f="", search=None,
     _ = gettext_set_language(ln)
 
     infos = []
-    borrower = db.get_borrower_details(borrower_id)
+
+    if borrower_id != None:
+        borrower = db.get_borrower_details(borrower_id)
+    else:
+        message = _('Empty borrower ID.')
+        return borrower_search(req, message, False, ln)
 
     if search and p == '':
         infos.append(_('Empty string.') + ' ' + _('Please, try again.'))
@@ -4988,9 +4989,10 @@ def acq_details_step1(req, delete_key, ill_request_id, new_status,
     infos = []
 
     if delete_key and ill_request_id:
-        library_notes = eval(db.get_ill_request_notes(ill_request_id))
-        del library_notes[delete_key]
-        db.update_ill_request_notes(ill_request_id, library_notes)
+        if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
+            library_notes = eval(db.get_ill_request_notes(ill_request_id))
+            del library_notes[delete_key]
+            db.update_ill_request_notes(ill_request_id, library_notes)
 
     if new_status:
         db.update_ill_request_status(ill_request_id, new_status)
@@ -5101,12 +5103,16 @@ def acq_details_step2(req, delete_key, ill_request_id, new_status,
     _ = gettext_set_language(ln)
 
     if delete_key and ill_request_id:
-        library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        del library_previous_notes[delete_key]
-        db.update_ill_request_notes(ill_request_id, library_previous_notes)
+        if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
+            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
+            del library_previous_notes[delete_key]
+            db.update_ill_request_notes(ill_request_id, library_previous_notes)
 
     if db.get_ill_request_notes(ill_request_id):
-        library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
+        if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
+            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
+        else:
+            library_previous_notes = {}
     else:
         library_previous_notes = {}
 
@@ -5140,9 +5146,10 @@ def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
     _ = gettext_set_language(ln)
 
     if delete_key and purchase_id:
-        purchase_notes = eval(db.get_purchase_notes(purchase_id))
-        del purchase_notes[delete_key]
-        db.update_purchase_notes(purchase_id, purchase_notes)
+        if looks_like_dictionary(db.get_purchase_notes(purchase_id)):
+            purchase_notes = eval(db.get_purchase_notes(purchase_id))
+            del purchase_notes[delete_key]
+            db.update_purchase_notes(purchase_id, purchase_notes)
 
     list_of_vendors = db.get_list_of_vendors()
     order_details = db.get_order_details(purchase_id)

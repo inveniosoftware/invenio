@@ -229,7 +229,17 @@ else:
     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
     CFG_BIBCIRCULATION_LOANS_EMAIL = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 
-CFG_BIBCIRCULATION_HOLIDAYS = []
+if CFG_CERN_SITE:
+    CFG_BIBCIRCULATION_HOLIDAYS = ['2011-12-22', '2011-12-23', '2011-12-26', '2011-12-27',
+                                   '2011-12-28', '2011-12-29', '2011-12-30', '2012-01-02',
+                                   '2012-01-03', '2012-01-04', '2012-04-06', '2012-04-09',
+                                   '2012-05-01', '2012-05-17', '2012-05-28', '2012-09-06',
+                                   '2012-12-24', '2012-12-25', '2012-12-26', '2012-12-27',
+                                   '2012-12-28', '2012-12-31', '2013-01-01', '2013-01-02',
+                                   '2013-01-03', '2013-01-04']
+
+else:
+    CFG_BIBCIRCULATION_HOLIDAYS = []
 
 CFG_BIBCIRCULATION_WORKING_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 

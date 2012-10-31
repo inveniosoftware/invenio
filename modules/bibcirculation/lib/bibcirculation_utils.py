@@ -47,19 +47,12 @@ from invenio.bibcirculation_config import \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED
 from invenio.urlutils import create_html_link, make_invenio_opener
-from invenio.config import CFG_SITE_URL, CFG_TMPDIR
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
-     CFG_BIBCIRCULATION_WORKING_DAYS, \
-     CFG_BIBCIRCULATION_HOLIDAYS
 from invenio.messages import gettext_set_language
-
-import datetime, time, re
 
 BIBCIRCULATION_OPENER = make_invenio_opener('BibCirculation')
 
 DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None)(, ?'[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None))*)?\}$")
 
-from invenio.messages import gettext_set_language
 
 def search_user(column, string):
     if string is not None:
