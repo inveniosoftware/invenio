@@ -22,8 +22,10 @@ Solr utilities.
 """
 
 
+import time
 from invenio.config import CFG_SOLR_URL
-from invenio.bibtask import write_message, task_get_option, task_update_progress
+from invenio.bibtask import write_message, task_get_option, task_update_progress, \
+                            task_sleep_now_if_required
 from invenio.dbquery import run_sql
 from invenio.search_engine import get_fieldvalues, record_exists
 from invenio.textutils import remove_control_characters
@@ -34,6 +36,7 @@ from invenio.bibrank_bridge_config import CFG_MARC_ABSTRACT, \
                                           CFG_MARC_TITLE, \
                                           CFG_MARC_KEYWORD
 from invenio.solrutils_bibindex_indexer import remove_invalid_solr_characters
+from invenio.bibindex_engine import create_range_list
 
 
 if CFG_SOLR_URL:
@@ -90,6 +93,7 @@ def solr_add_range(lower_recid, upper_recid):
             solr_add(recid, abstract, author, fulltext, keyword, title)
 
     SOLR_CONNECTION.commit()
+    task_sleep_now_if_required(can_stop_too=True)
 
 
 def solr_add(recid, abstract, author, fulltext, keyword, title):
@@ -109,11 +113,36 @@ def word_similarity_solr(run):
     return word_index(run)
 
 
+def get_recIDs_by_date(dates=""):
+    """Returns recIDs modified between DATES[0] and DATES[1].
+       If DATES is not set, then returns records modified since the last run of
+       the ranking method.
+    """
+    if not dates:
+        write_message("Using the last update time for the rank method")
+        res = run_sql('SELECT last_updated FROM rnkMETHOD WHERE name="wrd"')
+
+        if not res:
+            return
+        if not res[0][0]:
+            dates = ("0000-00-00",'')
+        else:
+            dates = (res[0][0],'')
+
+    if dates[1]:
+        res = run_sql('SELECT id FROM bibrec WHERE modification_date >= %s AND modification_date <= %s ORDER BY id ASC', (dates[0], dates[1]))
+    else:
+        res = run_sql('SELECT id FROM bibrec WHERE modification_date >= %s ORDER BY id ASC', (dates[0],))
+
+    return create_range_list([row[0] for row in res])
+
+
 def word_index(run): # pylint: disable=W0613
     """
     Runs the indexing task.
     """
     id_option = task_get_option("id")
+    # Indexes passed ids and id ranges
     if len(id_option):
         for id_elem in id_option:
             lower_recid= id_elem[0]
@@ -121,13 +150,18 @@ def word_index(run): # pylint: disable=W0613
             write_message("Solr ranking indexer called for %s-%s" % (lower_recid, upper_recid))
             solr_add_all(lower_recid, upper_recid)
 
+    # Indexes modified ids since last run
     else:
-        max_recid = 0
-        res = run_sql("SELECT max(id) FROM bibrec")
-        if res and res[0][0]:
-            max_recid = int(res[0][0])
-
-        write_message("Solr ranking indexer called for %s-%s" % (1, max_recid))
-        solr_add_all(1, max_recid)
+        starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        id_ranges = get_recIDs_by_date()
+        if not id_ranges:
+            write_message("No new records. Solr index is up to date")
+        else:
+            for ids_range in id_ranges:
+                lower_recid= ids_range[0]
+                upper_recid = ids_range[1]
+                write_message("Solr ranking indexer called for %s-%s" % (lower_recid, upper_recid))
+                solr_add_all(lower_recid, upper_recid)
+            run_sql('UPDATE rnkMETHOD SET last_updated=%s WHERE name="wrd"', (starting_time, ))
 
     write_message("Solr ranking indexer completed")
