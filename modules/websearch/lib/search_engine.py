@@ -336,9 +336,6 @@ def check_user_can_view_record(user_info, recid):
     policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
     if isinstance(recid, str):
         recid = int(recid)
-    if record_public_p(recid):
-        ## The record is already known to be public.
-        return (0, '')
     ## At this point, either webcoll has not yet run or there are some
     ## restricted collections. Let's see first if the user own the record.
     if is_user_owner_of_record(user_info, recid):
@@ -350,10 +347,13 @@ def check_user_can_view_record(user_info, recid):
         return (0, '')
 
     restricted_collections = get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False)
+    if not restricted_collections and record_public_p(recid):
+        ## The record is public and not part of any restricted collection
+        return (0, '')
     if restricted_collections:
         ## If there are restricted collections the user must be authorized to all/any of them (depending on the policy)
         auth_code, auth_msg = 0, ''
-        for collection in get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False):
+        for collection in restricted_collections:
             (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
             if auth_code and policy != 'ANY':
                 ## Ouch! the user is not authorized to this collection
