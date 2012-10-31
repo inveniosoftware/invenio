@@ -42,7 +42,9 @@
 $(function () {
 
   var reloadTab = function(path) {
-    $('#record_content').load(path);
+    $.post(path, function(data) {
+      $('#record_content').html(data);
+    });
     $('#record-links li.active').removeClass('active');
     $('#record-links a[href="'+path+'"]').parent().addClass('active');
   };
