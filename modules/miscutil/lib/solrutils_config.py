@@ -29,4 +29,6 @@ CFG_SOLR_INVALID_CHAR_REPLACEMENTS = {
     u'\uDC50' : u"",
     u'\uDC94' : u"",
     u'\uDF0E' : u"",
+    u'\uDC46' : u"",
+    u'\uDC92' : u"",
 }
