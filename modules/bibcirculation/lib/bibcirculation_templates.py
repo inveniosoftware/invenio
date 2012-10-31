@@ -305,7 +305,7 @@ class Template:
         out = """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             """
 
@@ -650,7 +650,7 @@ class Template:
             out += """<br />
                       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                       <script src="/js/jquery.js" type="text/javascript"></script>
-                      <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                      <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                       <script type="text/javascript">
                       $(document).ready(function() {
                         $('#table_loans').tablesorter()
@@ -748,7 +748,7 @@ class Template:
                    <br />
                    <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                    <script src="/js/jquery.js" type="text/javascript"></script>
-                   <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                   <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                    <script type="text/javascript">
                    $(document).ready(function() {
                         $('#table_requests').tablesorter()
@@ -840,7 +840,7 @@ class Template:
                     <br /> <br />
                     <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                     <script src="/js/jquery.js" type="text/javascript"></script>
-                    <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                    <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                     <script type="text/javascript">
                     $(document).ready(function(){
                         $('#table_hist').tablesorter()
@@ -1767,7 +1767,7 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
             out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -2927,7 +2927,7 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
             out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3106,7 +3106,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                 @import url("/img/tablesorter.css");
             </style>
             <script src="/js/jquery.min.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <style type="text/css">
                 @import url("/js/tablesorter/themes/blue/style.css");
             </style>
@@ -3483,7 +3483,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
                     <br /> <br />
                     <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                     <script src="/js/jquery.js" type="text/javascript"></script>
-                    <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                    <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                     <script type="text/javascript">
                       $(document).ready(function() {
                         $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3572,7 +3572,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
             out += """<div class="bibcircbottom">
                       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                       <script src="/js/jquery.js" type="text/javascript"></script>
-                      <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                      <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                       <script type="text/javascript">
                         $(document).ready(function() {
                           $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3686,7 +3686,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
              <div class="bibcircbottom">
              <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_holdings').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -3776,7 +3776,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overv
         out += """<div class="bibcircbottom">
                   <style type="text/css"> @import url("/img/tablesorter.css"); </style>
                   <script src="/js/jquery.js" type="text/javascript"></script>
-                  <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+                  <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
                   <script type="text/javascript">
                   $(document).ready(function() {
                     $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -4640,7 +4640,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             out += """
          <style type="text/css"> @import url("/img/tablesorter.css"); </style>
          <script src="/js/jquery.js" type="text/javascript"></script>
-         <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+         <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
          <script type="text/javascript">
            $(document).ready(function() {
              $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -4754,7 +4754,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
 
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <script src="/js/jquery.js" type="text/javascript"></script>
-        <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
           $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -5393,7 +5393,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
-            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
             <script type="text/javascript">
             $(document).ready(function() {
               $('#table_loans').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -10884,7 +10884,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <script src="/js/jquery.js" type="text/javascript"></script>
-        <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
            $(document).ready(function() {
               $('#table_orders').tablesorter({widthFixed: true, widgets: ['zebra']})
@@ -15555,7 +15555,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <script src="/js/jquery.js" type="text/javascript"></script>
-        <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+        <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
         <script type="text/javascript">
         $(document).ready(function() {
           $('#table_ill').tablesorter({widthFixed: true, widgets: ['zebra']})

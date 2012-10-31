@@ -151,7 +151,7 @@ install-jquery-plugins:
 	wget http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip -O uploadify.zip && \
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
 	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
-	unzip jquery.tablesorter.zip && \
+	unzip jquery.tablesorter.zip -d tablesorter && \
 	rm jquery.tablesorter.zip && \
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
@@ -197,8 +197,6 @@ uninstall-jquery-plugins:
 	rm -f jquery.flot.min.js && \
 	rm -f excanvas.min.js && \
 	rm -f jquery-ui-timepicker-addon.min.js && \
-	rm -f jquery.tablesorter.js && \
-	rm -f jquery.tablesorter.pager.js && \
 	rm -f json2.js && \
 	rm -f jquery.uploadify.min.js && \
 	rm -rf tablesorter && \
