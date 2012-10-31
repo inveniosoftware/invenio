@@ -1578,7 +1578,7 @@ def get_custom_summary_data(query, tag):
         tag = CFG_JOURNAL_TAG.replace("%", "p")
 
     # First get records of the year
-    recids = perform_request_search(p=query, of="id")
+    recids = perform_request_search(p=query, of="id", wl=0)
 
     # Then return list by tag
     pub = list(get_most_popular_field_values(recids, tag))
