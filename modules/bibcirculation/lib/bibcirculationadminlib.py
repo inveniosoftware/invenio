@@ -3302,7 +3302,7 @@ def update_item_info_step4(req, barcode, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def update_item_info_step5(req, barcode, old_barcode, library, location,
+def update_item_info_step5(req, barcode, old_barcode, library_id, location,
                            collection, description, loan_period, status,
                            expected_arrival_date, recid, ln=CFG_SITE_LANG):
 
@@ -3316,8 +3316,8 @@ def update_item_info_step5(req, barcode, old_barcode, library, location,
 
     _ = gettext_set_language(ln)
 
-    library_name = db.get_library_name(library)
-    tup_infos = (barcode, old_barcode, library, library_name, location,
+    library_name = db.get_library_name(library_id)
+    tup_infos = (barcode, old_barcode, library_id, library_name, location,
                  collection, description, loan_period, status,
                  expected_arrival_date, recid)
 
