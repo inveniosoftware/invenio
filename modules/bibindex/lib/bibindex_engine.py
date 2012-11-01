@@ -37,7 +37,6 @@ from invenio.config import \
      CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
      CFG_BIBINDEX_SYNONYM_KBRS, \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
-     CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
      CFG_BIBINDEX_SPLASH_PAGES, \
      CFG_SOLR_URL, \
      CFG_XAPIAN_ENABLED
@@ -283,16 +282,11 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
        to fulltext documents, for all knows file extensions as
        specified by global CONV_PROGRAMS config variable.
     """
-    re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
     write_message("... reading fulltext files from %s started" % url_direct_or_indirect, verbose=2)
     try:
         if bibdocfile_url_p(url_direct_or_indirect):
             write_message("... %s is an internal document" % url_direct_or_indirect, verbose=2)
             bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
-            perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
-            write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
-            if not bibdoc.has_text(require_up_to_date=True):
-                bibdoc.extract_text(perform_ocr=perform_ocr)
 
             indexer = get_idx_indexer('fulltext')
             if indexer != 'native':

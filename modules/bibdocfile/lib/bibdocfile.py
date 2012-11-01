@@ -117,7 +117,9 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY, \
     CFG_SITE_RECORD, \
     CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS, \
-    CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE
+    CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
+    CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES
+from invenio.bibtask import write_message
 
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
@@ -1388,12 +1390,17 @@ class BibRecDocs:
                 return True
         return False
 
-    def get_text(self):
+    def get_text(self, extract_text_if_necessary=True):
         """
         @return: concatenated texts of all bibdocs separated by " ": string
         """
         texts = []
         for bibdoc in self.list_bibdocs():
+            if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
+                re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
+                perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
+                write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
+                bibdoc.extract_text(perform_ocr=perform_ocr)
             texts.append(bibdoc.get_text())
 
         return " ".join(texts)
