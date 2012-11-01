@@ -71,7 +71,10 @@ def get_widget_html(language, max_photos, collections, separator, ln):
             try:
                 title = photo_record.fields('246_1a', escape=1)[0]
             except KeyError:
-                title = ""
+                try:
+                    title = photo_record.fields('245__a', escape=1)[0]
+                except:
+                    title = ""
         else:
             try:
                 title = photo_record.fields('245__a', escape=1)[0]

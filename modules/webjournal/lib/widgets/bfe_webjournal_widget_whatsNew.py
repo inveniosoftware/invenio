@@ -125,7 +125,10 @@ def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
                     try:
                         title = temp_rec.fields('246_1a')[0]
                     except:
-                        continue
+                        try:
+                            title = temp_rec.field('245__a')
+                        except:
+                            continue
                 else:
                     try:
                         title = temp_rec.field('245__a')

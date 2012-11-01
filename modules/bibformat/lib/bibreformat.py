@@ -481,7 +481,7 @@ def task_run_core():
             cds_query['matching']      = ""
 
         if task_has_option("recids"):
-            recids = split_cli_ids_arg(task_get_option('recids'))
+            recids = list(split_cli_ids_arg(task_get_option('recids')))
         else:
             recids = []
 

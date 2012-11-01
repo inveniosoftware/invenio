@@ -397,6 +397,14 @@ class FormattingElements(unittest.TestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
+    def test_language_handling_in_whatsnew_widget(self):
+        """webjournal - check handling of ln parameter in "what's new" widget"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/News?ln=fr' ,
+                                               expected_link_label="Scissor-beak",
+                                               expected_link_target=CFG_SITE_URL + "/journal/AtlantisTimes/2009/03/Science/105?ln=fr")
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
 TEST_SUITE = make_test_suite(ArticlesRelated,
                              CategoriesRelated,
                              JournalConfigVars,
