@@ -451,7 +451,7 @@
             </li>
 
             <li class="modal-footer nav-list clearfix">
-              {%- if not current_user.is_guest() -%}
+              {%- if not current_user.is_guest -%}
               <button name="action_save"
                       rel="tooltip"
                       title="{{ _('store permanently in user settings') }}"

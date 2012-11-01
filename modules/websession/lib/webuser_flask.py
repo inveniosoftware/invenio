@@ -88,38 +88,49 @@ CFG_USER_DEFAULT_INFO = {
 
 class UserInfo(CombinedMultiDict):
 
-    def __init__(self, uid=None):
+    def __init__(self, uid=None, force=False):
         """
         Keeps information about user.
         """
         def on_update(self):
+            """ Changes own status when the user info is modified. """
             self.modified = True
+
         self.modified = False
         self.uid = uid
+        self.req = self._get_request_info()
+        acc = {}
 
         if uid > 0:
-            data = cache.get(self.get_key())
-            if data is None:
-                data = self._login(uid, precache=True)
+            data = self._login(uid, force)
+            acc = self._precache(data, force)
         else:
             data = self._create_guest()
 
-        self.req = self._get_request_info()
         self.info = CallbackDict(data, on_update)
         #FIXME remove req after everybody start using flask request.
-        CombinedMultiDict.__init__(self, [self.info, self.req, dict(CFG_USER_DEFAULT_INFO)])
+        CombinedMultiDict.__init__(self, [self.info, acc, self.req, dict(CFG_USER_DEFAULT_INFO)])
         self.save()
 
+
     def get_key(self):
+        """ Generates key for caching user information. """
+        key = 'current_user::' + str(self.uid)
+        return key
+
+
+    def get_acc_key(self):
+        """ Generates key for caching autorizations. """
         key = 'current_user::' + str(self.uid) + \
               '::' + str(request.remote_addr)
         return key
+
 
     def save(self):
         """
         Saves modified data pernamently for logged users.
         """
-        if not self.is_guest() and self.modified:
+        if not self.is_guest and self.modified:
             cache.set(self.get_key(), dict(self.info),
                       timeout=CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT*3600)
 
@@ -127,9 +138,10 @@ class UserInfo(CombinedMultiDict):
         """
         Reloads user login information and saves them.
         """
-        data = self._login(self.uid)
+        data = self._login(self.uid, force=True)
+        acc = self._precache(data, force=True)
         self.info.update(data)
-        CombinedMultiDict.__init__(self, [self.info, self.req, dict(CFG_USER_DEFAULT_INFO)])
+        CombinedMultiDict.__init__(self, [self.info, acc, self.req, dict(CFG_USER_DEFAULT_INFO)])
         self.save()
 
     def _get_request_info(self):
@@ -164,12 +176,16 @@ class UserInfo(CombinedMultiDict):
         return data
 
 
-    def _login(self, uid, precache=False):
+    def _login(self, uid, force=False):
         """
         Get account information about currently logged user from database.
 
         Should raise an exception when session.uid is not valid User.id.
         """
+        data = cache.get(self.get_key())
+        if not force and data is not None:
+            return data
+
         from invenio.websession_model import User
         data = {}
 
@@ -183,43 +199,55 @@ class UserInfo(CombinedMultiDict):
             data['settings'] = user.settings or {}
             data['guest'] = str(int(user.guest)) # '1' or '0'
             self.modified = True
-            if precache:
-                self._precache(data)
         except:
             data = self._create_guest()
 
         return data
 
-    def _precache(self, data):
+    def _precache(self, info, force=False):
         """
         Calculate prermitions for user actions.
+
+        FIXME: compatibility layer only !!!
         """
+        # get autorization key
+        acc_key = self.get_acc_key()
+        acc = cache.get(acc_key)
+        if not force and acc is not None:
+            return acc
+
+        #FIXME: acc_authorize_action should use flask request directly
+        user_info = info
+        user_info.update(self.req)
+
         from invenio.webuser import isUserSubmitter, isUserReferee, isUserAdmin
         from invenio.access_control_engine import acc_authorize_action
         from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
         from invenio.search_engine import get_permitted_restricted_collections
+
+        data = {}
         data['precached_permitted_restricted_collections'] = \
-            get_permitted_restricted_collections(data)
-        data['precached_usebaskets'] = acc_authorize_action(data, 'usebaskets')[0] == 0
-        data['precached_useloans'] = acc_authorize_action(data, 'useloans')[0] == 0
-        data['precached_usegroups'] = acc_authorize_action(data, 'usegroups')[0] == 0
-        data['precached_usealerts'] = acc_authorize_action(data, 'usealerts')[0] == 0
-        data['precached_usemessages'] = acc_authorize_action(data, 'usemessages')[0] == 0
-        data['precached_usestats'] = acc_authorize_action(data, 'runwebstatadmin')[0] == 0
-        data['precached_viewsubmissions'] = isUserSubmitter(data)
-        data['precached_useapprove'] = isUserReferee(data)
-        data['precached_useadmin'] = isUserAdmin(data)
-        data['precached_canseehiddenmarctags'] = acc_authorize_action(data, 'runbibedit')[0] == 0
+            get_permitted_restricted_collections(user_info)
+        data['precached_usebaskets'] = acc_authorize_action(user_info, 'usebaskets')[0] == 0
+        data['precached_useloans'] = acc_authorize_action(user_info, 'useloans')[0] == 0
+        data['precached_usegroups'] = acc_authorize_action(user_info, 'usegroups')[0] == 0
+        data['precached_usealerts'] = acc_authorize_action(user_info, 'usealerts')[0] == 0
+        data['precached_usemessages'] = acc_authorize_action(user_info, 'usemessages')[0] == 0
+        data['precached_usestats'] = acc_authorize_action(user_info, 'runwebstatadmin')[0] == 0
+        data['precached_viewsubmissions'] = isUserSubmitter(user_info)
+        data['precached_useapprove'] = isUserReferee(user_info)
+        data['precached_useadmin'] = isUserAdmin(user_info)
+        data['precached_canseehiddenmarctags'] = acc_authorize_action(user_info, 'runbibedit')[0] == 0
         usepaperclaim = False
         usepaperattribution = False
         viewclaimlink = False
 
         if (CFG_BIBAUTHORID_ENABLED
-            and acc_is_user_in_role(data, acc_get_role_id("paperclaimviewers"))):
+            and acc_is_user_in_role(user_info, acc_get_role_id("paperclaimviewers"))):
             usepaperclaim = True
 
         if (CFG_BIBAUTHORID_ENABLED
-            and acc_is_user_in_role(data, acc_get_role_id("paperattributionviewers"))):
+            and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
             usepaperattribution = True
 
         viewlink = False
@@ -242,18 +270,28 @@ class UserInfo(CombinedMultiDict):
         data['precached_usepaperclaim'] = usepaperclaim
         data['precached_usepaperattribution'] = usepaperattribution
 
+        cache.set(acc_key, data,
+                  timeout = CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT*3600)
+        return data
+
     def is_authenticated(self):
-        return not self.is_guest()
+        return not self.is_guest
 
     def is_authorized(self, name, **kwargs):
         from invenio.access_control_engine import acc_authorize_action
         return acc_authorize_action(self, name)[0] == 0
 
+    @property
     def is_active(self):
-        return not self.is_guest()
+        return not self.is_guest
 
+    @property
     def is_guest(self):
         return True if self['email']=='' else False
+
+    @property
+    def is_admin(self):
+        return self.get('precached_useadmin', False)
 
     def get_id(self):
         return self.get('id', None)
@@ -315,7 +353,8 @@ class InvenioLoginManager(object):
 current_user = LocalProxy(lambda: _request_ctx_stack.top.user)
 
 def login_user(uid, remember_me=False, force=False):
-    #if (not force) and (not user.is_active()):
+    #FIXME: create user info from uid
+    #if not force and not user.is_active:
     #    return False
 
     current_app.logger.info("logging user %d" % uid)

@@ -63,7 +63,7 @@ def create_invenio_flask_app():
     from invenio.pluginutils import PluginContainer, create_enhanced_plugin_builder
     from invenio.session_flask import InvenioSessionInterface
 #from flaskext.login import LoginManager
-    from invenio.webuser_flask import InvenioLoginManager
+    from invenio.webuser_flask import InvenioLoginManager, current_user
     from invenio.messages import wash_language, gettext_set_language, language_list_long, is_language_rtl
     from invenio.dateutils import convert_datetext_to_dategui, \
                                   convert_datestruct_to_dategui
@@ -300,8 +300,6 @@ def create_invenio_flask_app():
         menubuilder = filter(lambda x: x.display(), current_app.config['menubuilder_map']['main'].\
                         children.itervalues())
 
-        from invenio.webuser_flask import current_user
-
         def get_css_bundle():
             collection = get_css_collection()
             #TODO add settings for CSS filters
@@ -369,7 +367,8 @@ def create_invenio_flask_app():
 
     _app.config['menubuilder_map'].update({
             'main.admin': Menu('main.admin', _('Administration'),
-                                'help.admin', 9998),
+                                'help.admin', 9998, [],
+                                lambda: current_user.is_admin),
             'main.help': Menu('main.help', _('Help'), 'help', 9999)})
 
     menu = {'main': Menu('main', '', '')}

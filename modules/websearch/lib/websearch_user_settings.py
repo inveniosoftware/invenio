@@ -62,7 +62,7 @@ for these queries.') | format(queries) }}
 
     @property
     def is_authorized(self):
-        return not current_user.is_guest()
+        return not current_user.is_guest
 
 ## Compulsory plugin interface
 settings = WebSearchSettings

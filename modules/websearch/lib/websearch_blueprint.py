@@ -225,7 +225,7 @@ def _create_neareset_term_box():
 def search():
 
     uid = current_user.get_id()
-    user = User.query.get(uid) if not current_user.is_guest() else None
+    user = User.query.get(uid) if not current_user.is_guest else None
     url_args = SearchUrlargs(user=user, session=session, **request.args)
     current_app.logger.info('URL'+str(url_args.args))
 
@@ -239,7 +239,7 @@ def search():
         (auth_code, auth_msg) = acc_authorize_action(uid,
                                         VIEWRESTRCOLL,
                                         collection=collection.name)
-        if auth_code and current_user.is_guest():
+        if auth_code and current_user.is_guest:
             return redirect(url_for('youraccount.login',
                                     referer=request.url))
         elif auth_code:

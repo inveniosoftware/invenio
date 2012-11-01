@@ -16,7 +16,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% set guest = current_user.is_guest() %}
+{% set guest = current_user.is_guest %}
 {% set usealerts = current_user['precached_usealerts'] %}
 {% set usemessages = current_user['precached_usemessages'] %}
 {% set usebaskets = current_user['precached_usebaskets'] %}

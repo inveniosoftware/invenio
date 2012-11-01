@@ -78,7 +78,7 @@ class MessagesMenu(object):
         """ % {'url': url_for('yourmessages.menu')}
         return out
 
-not_guest = lambda: not current_user.is_guest()
+not_guest = lambda: not current_user.is_guest
 
 blueprint = InvenioBlueprint('yourmessages', __name__, url_prefix="/yourmessages",
             config='invenio.webmessage_config',

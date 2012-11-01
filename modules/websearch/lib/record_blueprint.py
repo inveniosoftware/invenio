@@ -78,7 +78,7 @@ def request_record(f):
 
         g.record = record = Bibrec.query.get(recid)
         user = None
-        if not current_user.is_guest():
+        if not current_user.is_guest:
             user = User.query.get(current_user.get_id())
         title = get_fieldvalues(recid, '245__a')[0]
         b = get_collection_breadcrumbs(collection, [(_('Home'),'')])

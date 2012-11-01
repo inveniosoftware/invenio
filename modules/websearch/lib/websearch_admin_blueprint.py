@@ -34,7 +34,7 @@ from sqlalchemy.ext.orderinglist import ordering_list
 # imports the necessary forms
 from invenio.websearch_admin_forms import CollectionForm, TranslationsForm
 
-not_guest = lambda: not current_user.is_guest()
+not_guest = lambda: not current_user.is_guest
 
 blueprint = InvenioBlueprint(
         'websearch_admin',

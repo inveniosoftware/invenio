@@ -52,8 +52,8 @@
         </a>
         <ul class="nav pull-right">
           <li>
-          {% if current_user.is_guest() %}
-            <a href="{{ url_for('youraccount.login') }}">
+          {% if current_user.is_guest %}
+            <a href="{{ url_for('youraccount.login', referer=request.url) }}">
               <i class="icon icon-white icon-user"></i> {{ _("guest") }}
             </a>
           {% else %}
@@ -67,8 +67,8 @@
           <ul class="dropdown-menu">
             <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
             <li class="divider"></li>
-            {% if current_user.is_guest() %}
-            <li><a href="{{ url_for('youraccount.login') }}">
+            {% if current_user.is_guest %}
+            <li><a href="{{ url_for('youraccount.login', referer=request.url) }}">
               <i class="icon icon-lock"></i> {{ _("Login") }}
             </a></li>
             {% else %}
