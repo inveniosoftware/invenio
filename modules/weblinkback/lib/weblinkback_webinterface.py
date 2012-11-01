@@ -73,7 +73,7 @@ class WebInterfaceRecordLinkbacksPages(WebInterfaceDirectory):
         uid = getUid(req)
         user_info = collect_user_info(req)
 
-        (auth_code, auth_msg) = check_user_can_view_linkbacks(req, self.recid)
+        (auth_code, auth_msg) = check_user_can_view_linkbacks(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             # Ask to login
             target = '/youraccount/login' + \
