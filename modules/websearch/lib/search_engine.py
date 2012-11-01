@@ -5831,7 +5831,7 @@ def get_all_field_values(tag):
     @return: the list of values
     @rtype: list of strings
     """
-    table = 'bib%2dx' % int(tag[:2])
+    table = 'bib%02dx' % int(tag[:2])
     return [row[0] for row in run_sql("SELECT DISTINCT(value) FROM %s WHERE tag=%%s" % table, (tag, ))]
 
 def get_most_popular_field_values(recids, tags, exclude_values=None, count_repetitive_values=True):
