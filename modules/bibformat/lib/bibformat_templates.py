@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -506,7 +506,7 @@ class Template:
                 }
             -->
         </style>
-        <script src="%(siteurl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
+        <script src="%(siteurl)s/static/bibformat-admin-interface/js_quicktags.js" type="text/javascript"></script>
         <script type="text/javascript">
 
         /* Ask user confirmation before leaving page */
@@ -767,7 +767,7 @@ class Template:
         <head>
         <title>BibFormat Short Documentation of Format Elements</title>
         <link rel="stylesheet" href="%(siteurl)s/img/invenio.css">
-        <script src="%(siteurl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
+        <script src="%(siteurl)s/static/bibformat-admin-interface/js_quicktags.js" type="text/javascript"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         </head>
         <body>
@@ -1946,5 +1946,3 @@ class Template:
 
         out += '''</form></fieldset></div>'''
         return out
-
-
