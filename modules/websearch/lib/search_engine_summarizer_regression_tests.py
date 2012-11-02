@@ -32,6 +32,10 @@ class WebSearchSummarizerTests(InvenioTestCase):
         from invenio.search_engine_summarizer import summarize_records
         summarize_records(intbitset(range(1, 100)), 'hcs', 'en')
 
+    def test_extended(self):
+        from invenio.search_engine_summarizer import summarize_records
+        summarize_records(intbitset(range(1, 100)), 'hcs2', 'en')
+
     def test_xml(self):
         from invenio.search_engine_summarizer import summarize_records
         summarize_records(intbitset(range(1, 100)), 'xcs', 'en')

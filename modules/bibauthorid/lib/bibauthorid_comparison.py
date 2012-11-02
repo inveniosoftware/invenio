@@ -20,6 +20,7 @@
 import re
 from invenio import bibauthorid_config as bconfig
 from itertools import starmap
+
 from operator import mul, itemgetter
 from invenio.bibauthorid_name_utils import compare_names
 from invenio.bibauthorid_dbinterface import get_name_by_bibrecref
@@ -28,11 +29,10 @@ from invenio.bibauthorid_dbinterface import get_all_authors
 from invenio.bibauthorid_dbinterface import get_collaboration
 from invenio.bibauthorid_dbinterface import resolve_affiliation
 from invenio.bibauthorid_backinterface import get_key_words
-#from invenio.bibrank_citation_searcher import get_citation_dict
+from invenio.bibrank_citation_searcher import get_cited_by, get_refers_to
 #metadat_comparison_print commented everywhere to increase performances,
 #import and calls left here to make future debug easier.
 from invenio.bibauthorid_general_utils import metadata_comparison_print
-
 
 # This module is not thread safe!
 # Be sure to use processes instead of
@@ -54,15 +54,6 @@ except:
     use_refrec = lambda x: x
     use_ref = lambda x: x[0:2]
     use_rec = lambda x: x[2]
-
-# At first glance this may look silly.
-# However, if we load the dictionaries
-# uncoditionally there will be only
-# one instance of them in the memory after
-# fork
-
-cit_dict = None#get_citation_dict("citationdict")
-recit_dict = None#get_citation_dict("reversedict")
 
 caches = []
 def create_new_cache():
@@ -375,7 +366,7 @@ def _compare_coauthors(bib1, bib2):
 
 @cached_arg(use_rec)
 def _find_citations(bib):
-    return set(cit_dict.get(bib[2], ()))
+    return get_cited_by(bib[2])
 
 
 @cached_sym(use_rec)
@@ -392,7 +383,7 @@ def _compare_citations(bib1, bib2):
 
 @cached_arg(use_rec)
 def _find_citations_by(bib):
-    return set(recit_dict.get(bib[2], ()))
+    return get_refers_to(bib[2])
 
 
 @cached_sym(use_rec)

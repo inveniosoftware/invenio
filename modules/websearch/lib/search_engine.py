@@ -126,12 +126,14 @@ webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
-    calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by, \
+    calculate_co_cited_with_list, get_records_with_num_cites, \
     get_refersto_hitset, get_citedby_hitset
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 
-from invenio.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
+from invenio.dbquery import run_sql, \
+                            run_sql_with_limit, \
+                            wash_table_column_name, \
                             get_table_update_time
 from invenio.webuser import getUid, collect_user_info, session_param_set
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
@@ -4415,6 +4417,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                                  sp=sp,
                                                                                                  rm=rm))
                         # Self-cited
+                        from invenio.bibrank_selfcites_indexer import get_self_cited_by
                         selfcited = get_self_cited_by(recid)
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))

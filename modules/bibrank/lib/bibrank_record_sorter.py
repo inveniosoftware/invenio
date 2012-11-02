@@ -41,7 +41,8 @@ from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibrank_citation_searcher import get_cited_by, \
                                               get_cited_by_weight, \
-                                              get_citation_dict
+                                              get_citation_dict, \
+                                              get_cited_by_count
 from invenio.intbitset import intbitset
 from invenio.bibrank_word_searcher import find_similar
 # Do not remove these lines, it is necessary for func_object = globals().get(function)
@@ -425,11 +426,13 @@ def find_citations(rank_method_code, recID, hitset, verbose):
         recidint = int(recID)
     except (TypeError, ValueError):
         recidint = None
-
+    ret = []
     if recidint:
-        myrecords = get_cited_by(recidint)
+        myrecords = get_cited_by(recidint) #this is a simple list
+        ret = get_cited_by_weight(myrecords)
     else:
-        myrecords = hitset
+        ret = get_cited_by_weight(hitset)
+    ret.sort(lambda x, y: cmp(x[1], y[1]))      #ascending by the second member of the tuples
 
     if len(myrecords) > CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
         cites_counts = get_citation_dict('citations_counts')

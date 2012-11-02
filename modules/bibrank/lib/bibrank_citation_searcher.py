@@ -21,10 +21,11 @@ __revision__ = "$Id$"
 
 import re
 
-from invenio.dbquery import run_sql, get_table_update_time, OperationalError, \
-        deserialize_via_marshal
+from invenio.dbquery import run_sql
 from invenio.intbitset import intbitset
 from invenio.data_cacher import DataCacher
+from operator import itemgetter
+
 
 class CitationDictsDataCacher(DataCacher):
     """
@@ -32,38 +33,55 @@ class CitationDictsDataCacher(DataCacher):
     reversedict, selfcitdict, selfcitedbydict).
     """
     def __init__(self):
-        def cache_filler():
+        def initial_fill():
             alldicts = {}
-            try:
-                res = run_sql("SELECT object_name,object_value FROM rnkCITATIONDATA")
-            except OperationalError:
-                # database problems, return empty cache
-                return {}
-            for row in res:
-                object_name = row[0]
-                object_value = row[1]
-                try:
-                    object_value_dict = deserialize_via_marshal(object_value)
-                except:
-                    object_value_dict = {}
-                alldicts[object_name] = object_value_dict
-                if object_name == 'citationdict':
-                    # for cited:M->N queries, it is interesting to cache also
-                    # some preprocessed citationdict:
-                    alldicts['citationdict_keys'] = object_value_dict.keys()
-                    alldicts['citationdict_keys_intbitset'] = intbitset(object_value_dict.keys())
+            from invenio.bibrank_tag_based_indexer import fromDB
+            weights = fromDB('citation')
+
+            alldicts['citations_weights'] = weights
+            # for cited:M->N queries, it is interesting to cache also
+            # some preprocessed citationdict:
+            alldicts['citations_keys'] = intbitset(weights.keys())
+
+            # Citation counts
+            alldicts['citations_counts'] = [t for t in weights.iteritems()]
+            alldicts['citations_counts'].sort(key=itemgetter(1), reverse=True)
+
+            # Self-cites
+            from invenio.bibrank_selfcites_indexer import get_all_precomputed_selfcites
+            selfcites = {}
+            for recid, counts in get_all_precomputed_selfcites():
+                selfcites[recid] = weights.get(recid, 0) - counts
+            alldicts['selfcites_weights'] = selfcites
+            alldicts['selfcites_counts'] = [(recid, selfcites.get(recid, cites)) for recid, cites in alldicts['citations_counts']]
+            alldicts['selfcites_counts'].sort(key=itemgetter(1), reverse=True)
+
             return alldicts
-        def timestamp_verifier():
-            res = run_sql("""SELECT DATE_FORMAT(last_updated, '%Y-%m-%d %H:%i:%s')
-                             FROM rnkMETHOD WHERE name='citation'""")
-            if res:
-                return res[0][0]
+
+        def incremental_fill():
+            self.cache = None
+            return initial_fill()
+
+        def cache_filler():
+            if self.cache:
+                cache = incremental_fill()
             else:
-                return '0000-00-00 00:00:00'
+                cache = initial_fill()
+            return cache
+
+        from invenio.bibrank_tag_based_indexer import get_lastupdated
+
+        def timestamp_verifier():
+            citation_lastupdate = get_lastupdated('citation')
+            if citation_lastupdate:
+                return citation_lastupdate.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                return "0000-00-00 00:00:00"
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 CACHE_CITATION_DICTS = None
+
 
 def get_citation_dict(dictname):
     """
@@ -83,98 +101,99 @@ def get_citation_dict(dictname):
         CACHE_CITATION_DICTS = CitationDictsDataCacher()
     else:
         CACHE_CITATION_DICTS.recreate_cache_if_needed()
-    return CACHE_CITATION_DICTS.cache.get(dictname, {})
+    return CACHE_CITATION_DICTS.cache[dictname]
+
 
 def get_refers_to(recordid):
     """Return a list of records referenced by this record"""
-    ret = []
-    cache_cited_by_dictionary = get_citation_dict("reversedict")
-    if cache_cited_by_dictionary.has_key(recordid):
-        ret = cache_cited_by_dictionary[recordid]
-    return ret
+    rows = run_sql("SELECT citee FROM rnkCITATIONDICT WHERE citer = %s",
+                   [recordid])
+    return set(r[0] for r in rows)
+
 
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
-    ret = []
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
-    if cache_cited_by_dictionary.has_key(recordid):
-        ret = cache_cited_by_dictionary[recordid]
-    return ret
+    rows = run_sql("SELECT citer FROM rnkCITATIONDICT WHERE citee = %s",
+                   [recordid])
+    return set(r[0] for r in rows)
+
 
 def get_cited_by_count(recordid):
     """Return how many records cite given RECORDID."""
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
-    return len(cache_cited_by_dictionary.get(recordid, []))
+    rows = run_sql("SELECT 1 FROM rnkCITATIONDICT WHERE citee = %s",
+                   [recordid])
+    return len(rows)
 
-def get_records_with_num_cites(numstr, allrecs = intbitset([])):
+
+def get_records_with_num_cites(numstr, allrecs=intbitset([])):
     """Return an intbitset of record IDs that are cited X times,
        X defined in numstr.
        Warning: numstr is string and may not be numeric! It can
        be 10,0->100 etc
     """
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
-    cache_cited_by_dictionary_keys = get_citation_dict("citationdict_keys")
-    cache_cited_by_dictionary_keys_intbitset = get_citation_dict("citationdict_keys_intbitset")
-    matches = intbitset([])
+    cache_cited_by_dictionary_counts = get_citation_dict("citations_counts")
+    matches = intbitset()
     #once again, check that the parameter is a string
-    if not (type(numstr) == type("thisisastring")):
-        return intbitset([])
-    numstr = numstr.replace(" ",'')
-    numstr = numstr.replace('"','')
+    if type(numstr) != type("thisisastring"):
+        return matches
+    numstr = numstr.replace(" ", '')
+    numstr = numstr.replace('"', '')
 
     num = 0
     #first, check if numstr is just a number
-    singlenum = re.findall("(^\d+$)", numstr)
+    singlenum = re.findall("^\d+$", numstr)
     if singlenum:
         num = int(singlenum[0])
         if num == 0:
             #we return recids that are not in keys
-            return allrecs - cache_cited_by_dictionary_keys_intbitset
-        for k in cache_cited_by_dictionary_keys:
-            li = cache_cited_by_dictionary[k]
-            if len(li) == num:
-                matches.add(k)
-        return matches
+            return allrecs - get_citation_dict("citations_keys")
+        else:
+            return intbitset([recid for recid, cit_count \
+                        in cache_cited_by_dictionary_counts \
+                        if cit_count == num])
 
-    #try to get 1->10 or such
+    # Try to get 1->10 or such
     firstsec = re.findall("(\d+)->(\d+)", numstr)
     if firstsec:
-        first = 0
-        sec = -1
-        try:
-            first = int(firstsec[0][0])
-            sec = int(firstsec[0][1])
-        except:
-            return intbitset([])
-        if (first == 0):
-            #start with those that have no cites..
-            matches = allrecs - cache_cited_by_dictionary_keys_intbitset
-        if (first <= sec):
-            for k in cache_cited_by_dictionary_keys:
-                li = cache_cited_by_dictionary[k]
-                if len(li) >= first:
-                    if len(li) <= sec:
-                        matches.add(k)
-            return matches
+        first = int(firstsec[0][0])
+        sec = int(firstsec[0][1])
+        if first == 0:
+            # Start with those that have no cites..
+            matches = allrecs - get_citation_dict("citations_keys")
+        if first <= sec:
+            matches += intbitset([recid for recid, cit_count
+                             in cache_cited_by_dictionary_counts \
+                             if first <= cit_count <= sec])
+        return matches
 
+    # Try to get 10+
     firstsec = re.findall("(\d+)\+", numstr)
     if firstsec:
         first = firstsec[0]
-        for k in cache_cited_by_dictionary_keys:
-            li = cache_cited_by_dictionary[k]
-            if len(li) > int(first):
-                matches.add(k)
+        matches = intbitset([recid for recid, cit_count
+                         in cache_cited_by_dictionary_counts \
+                         if cit_count > int(first)])
+
     return matches
 
-def get_cited_by_list(recordlist):
+
+def get_cited_by_list(recids):
     """Return a tuple of ([recid,list_of_citing_records],...) for all the
        records in recordlist.
     """
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
-    result = []
-    for recid in recordlist:
-        result.append([recid, cache_cited_by_dictionary.get(recid, [])])
-    return result
+    if not recids:
+        return []
+
+    in_sql = ','.join('%s' for dummy in recids)
+    rows = run_sql("""SELECT citer, citee FROM rnkCITATIONDICT
+                       WHERE citee IN (%s)""" % in_sql, recids)
+
+    cites = {}
+    for citer, citee in rows:
+        cites.setdefault(citee, set()).add(citer)
+
+    return [(recid, cites.get(recid, [])) for recid in recids]
+
 
 def get_refersto_hitset(ahitset):
     """
@@ -182,132 +201,83 @@ def get_refersto_hitset(ahitset):
     the given ahitset.  Useful for search engine's
     refersto:author:ellis feature.
     """
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
     out = intbitset()
     if ahitset:
         try:
             for recid in ahitset:
-                out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+                out += get_cited_by(recid)
         except OverflowError:
             # ignore attempt to iterate over infinite ahitset
             pass
     return out
+
+
+def get_cited_by_weight(recordlist):
+    """Return a tuple of ([recid,number_of_citing_records],...) for all the
+       records in recordlist.
+    """
+    weights = get_citation_dict("citations_weights")
+
+    result = []
+    for recid in recordlist:
+        result.append([recid, weights.get(recid, 0)])
+
+    return result
+
 
 def get_citedby_hitset(ahitset):
     """
     Return a hitset of records that are cited by records in the given
     ahitset.  Useful for search engine's citedby:author:ellis feature.
     """
-    cache_cited_by_dictionary = get_citation_dict("reversedict")
     out = intbitset()
     if ahitset:
         try:
             for recid in ahitset:
-                out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+                out += get_refers_to(recid)
         except OverflowError:
             # ignore attempt to iterate over infinite ahitset
             pass
     return out
 
-def get_cited_by_weight(recordlist):
-    """Return a tuple of ([recid,number_of_citing_records],...) for all the
-       records in recordlist.
-    """
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
-    result = []
-    for recid in recordlist:
-        result.append([recid, len(cache_cited_by_dictionary.get(recid, []))])
-    return result
 
 def calculate_cited_by_list(record_id, sort_order="d"):
     """Return a tuple of ([recid,citation_weight],...) for all the
        record citing RECORD_ID.  The resulting recids is sorted by
        ascending/descending citation weights depending or SORT_ORDER.
     """
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
-    citation_list = []
     result = []
-    # determine which record cite RECORD_ID:
-    if cache_cited_by_dictionary:
-        citation_list = cache_cited_by_dictionary.get(record_id, [])
-    #add weights i.e. records that cite each of the entries in citation_list
+
+    citation_list = get_cited_by(record_id)
+
+    # Add weights i.e. records that cite each of the entries in citation_list
+    weights = get_citation_dict("citations_weights")
     for c in citation_list:
-        ccited = cache_cited_by_dictionary.get(c, [])
-        result.append([c, len(ccited)])
-    # sort them:
-    if result:
-        if sort_order == "d":
-            result.sort(lambda x, y: cmp(y[1], x[1]))
-        else:
-            result.sort(lambda x, y: cmp(x[1], y[1]))
+        result.append([c, weights.get(c, 0)])
 
+    # sort them
+    reverse = sort_order == "d"
+    result.sort(key=itemgetter(1), reverse=reverse)
     return result
 
-def get_author_cited_by(authorstring):
-    """Return a list of doc ids [y1,y2,..] for the
-       author given as param, such that y1,y2.. cite that author
-    """
-    citations = []
-    res = run_sql("select hitlist from rnkAUTHORDATA where aterm=%s",
-                  (authorstring,))
-    if res and res[0] and res[0][0]:
-        #has to be prepared for corrupted data!
-        try:
-            citations = deserialize_via_marshal(res[0][0])
-        except:
-            citations = []
-    return citations
-
-def get_self_cited_by(record_id):
-    """Return a list of doc ids [y1,y2,..] for the
-       rec id x given as param, so that x cites y1,y2,.. and x and each y share an author
-    """
-    cache_selfcit_dictionary = get_citation_dict("selfcitdict")
-    result = []
-    if cache_selfcit_dictionary and cache_selfcit_dictionary.has_key(record_id):
-        result.extend(cache_selfcit_dictionary[record_id])
-    if not result:
-        return None
-    return result
-
-def get_self_cited_in(record_id):
-    """Return a list of doc ids [y1,y2,..] for the
-       rec id x given as param, so that x is cited in y1,y2,.. and x and each y share an author
-    """
-    cache_selfcitedby_dictionary = get_citation_dict("selfcitedbydict")
-    result = []
-    if cache_selfcitedby_dictionary and cache_selfcitedby_dictionary.has_key(record_id):
-        result.extend(cache_selfcitedby_dictionary[record_id])
-    if not result:
-        return None
-    return result
 
 def calculate_co_cited_with_list(record_id, sort_order="d"):
     """Return a tuple of ([recid,co-cited weight],...) for records
        that are co-cited with RECORD_ID.  The resulting recids is sorted by
        ascending/descending citation weights depending or SORT_ORDER.
     """
-    cache_cited_by_dictionary = get_citation_dict("citationdict")
-    cache_reference_list_dictionary = get_citation_dict("reversedict")
     result = []
     result_intermediate = {}
-    citation_list = []
-    if cache_cited_by_dictionary:
-        citation_list = cache_cited_by_dictionary.get(record_id, [])
-    for cit_id in citation_list:
-        reference_list = []
-        if cache_reference_list_dictionary:
-            reference_list = cache_reference_list_dictionary.get(cit_id, [])
-        for ref_id in reference_list:
-            if not result_intermediate.has_key(ref_id):
+
+    for cit_id in get_cited_by(record_id):
+        for ref_id in get_refers_to(cit_id):
+            if ref_id not in result_intermediate:
                 result_intermediate[ref_id] = 1
-            else: result_intermediate[ref_id] += 1
+            else:
+                result_intermediate[ref_id] += 1
     for key, value in result_intermediate.iteritems():
-        if not (key==record_id):
+        if key != record_id:
             result.append([key, value])
-    if result:
-        if sort_order == "d":
-            result.sort(lambda x, y: cmp(y[1], x[1]))
-        else:
-            result.sort(lambda x, y: cmp(x[1], y[1]))
+    reverse = sort_order == "d"
+    result.sort(key=itemgetter(1), reverse=reverse)
     return result

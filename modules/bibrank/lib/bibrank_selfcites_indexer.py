@@ -221,6 +221,11 @@ def compute_simple_self_citations(recid, tags):
     return compute_self_citations(recid, tags, get_authors_from_record)
 
 
+def get_all_precomputed_selfcites():
+    sql = "SELECT id_bibrec, count FROM rnkSELFCITES"
+    return run_sql(sql)
+
+
 def get_self_citations_count(recids, algorithm='simple',
                                   precompute=CFG_BIBRANK_SELFCITES_PRECOMPUTE):
     """Depending on our site we config, we either:
@@ -338,6 +343,22 @@ def get_record_coauthors(recid):
     sql = 'SELECT authorid FROM rnkEXTENDEDAUTHORS WHERE id = %s'
     return (r[0] for r in run_sql(sql, (recid, )))
 
+
+def get_self_cited_by(recid, precompute=CFG_BIBRANK_SELFCITES_PRECOMPUTE):
+    if not precompute:
+        tags = get_authors_tags()
+        selfcites_fun = ALL_ALGORITHMS['simple']
+        results = selfcites_fun(recid, tags)
+    else:
+        function = SELFCITES_CONFIG.get("rank_method", "function")
+        algorithm = SELFCITES_CONFIG.get(function, 'algorithm')
+        selfcites_fun = ALL_ALGORITHMS[algorithm]
+        results = selfcites_fun(recid, tags)
+
+    return results
+
+
+SELFCITES_CONFIG = load_config_file('selfcites')
 
 ALL_ALGORITHMS = {
     'friends': compute_friends_self_citations,

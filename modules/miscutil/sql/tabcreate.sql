@@ -3029,14 +3029,14 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
 
 -- a table for citations. record-cites-record
 
-CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
-  id mediumint(8) unsigned NOT NULL auto_increment,
-  object_name varchar(255) NOT NULL,
-  object_value longblob,
-  last_updated datetime NOT NULL default '0000-00-00',
-  PRIMARY KEY id (id),
-  UNIQUE KEY object_name (object_name)
+CREATE TABLE IF NOT EXISTS rnkCITATIONDICT (
+  citee int(10) unsigned NOT NULL,
+  citer int(10) unsigned NOT NULL,
+  last_updated datetime NOT NULL,
+  PRIMARY KEY id (citee, citer),
+  KEY reverse (citer, citee)
 ) ENGINE=MyISAM;
+
 
 -- a table for missing citations. This should be scanned by a program
 -- occasionally to check if some publication has been cited more than
@@ -4671,6 +4671,7 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_l
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_hstRECORD_marcxml_longblob',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_06_new_citation_dict_table',NOW());
 
 -- master upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_29_idxINDEX_new_indexer_column',NOW());
