@@ -877,7 +877,8 @@ def create_file_upload_interface(recid,
             'revise_format_warning': _('Alternative formats uploaded for current version of this file will be removed'),
             'previous_versions_label': _('Keep previous versions'),
             'cancel': _('Cancel'),
-            'upload': _('Upload')}
+            'upload': _('Upload'),
+            'submit_or_button': form_url_params and 'button' or 'submit'}
         body += '''
         <input type="hidden" name="recid" value="%(recid)i"/>
         <input type="hidden" name="ln" value="%(ln)s"/>
@@ -2326,7 +2327,11 @@ $(document).ready(function() {
     };
 
     // bind form using 'ajaxForm'
-    $('form:has(#balloonReviseFileInput)').ajaxForm(options);
+    var this_form = $('form:has(#balloonReviseFileInput)')
+    $('#bibdocfilemanagedocfileuploadbutton').click(function() {
+                this_form.bibdocfilemanagedocfileuploadbuttonpressed=true;
+                this_form.ajaxSubmit(options);
+    })
 
 });
 
@@ -2769,7 +2774,7 @@ revise_balloon = '''
               <div id="restrictionBox" style="display:none">%(restrictions)s</div>
               <div id="keepPreviousVersions" style="display:none"><input type="checkbox" id="balloonReviseFileKeep" name="keepPreviousFiles" checked="checked" /><label for="balloonReviseFileKeep">%(previous_versions_label)s</label>&nbsp;<small>[<a href="" onclick="alert('%(previous_versions_help)s');return false;">?</a>]</small></div>
               <p id="warningFormats" style="display:none"><img src="%(CFG_SITE_URL)s/img/warning.png" alt="Warning"/> %(revise_format_warning)s&nbsp;[<a href="" onclick="alert('%(revise_format_help)s');return false;">?</a>]</p>
-              <div style="text-align:right;margin-top:5px"><input type="button" value="%(cancel)s" onclick="javascript:hide_revise_panel();"/> <input type="submit" value="%(upload)s"/></div>
+              <div style="text-align:right;margin-top:5px"><input type="button" value="%(cancel)s" onclick="javascript:hide_revise_panel();"/> <input type="%(submit_or_button)s" id="bibdocfilemanagedocfileuploadbutton" value="%(upload)s"/></div>
             </td>
           </tr>
         </table>
