@@ -357,7 +357,6 @@ def login_user(uid, remember_me=False, force=False):
     #if not force and not user.is_active:
     #    return False
 
-    current_app.logger.info("logging user %d" % uid)
     session.uid = uid
     session.set_remember_me(remember_me)
     current_app.login_manager.reload_user()

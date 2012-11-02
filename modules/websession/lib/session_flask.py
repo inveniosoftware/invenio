@@ -39,7 +39,8 @@ from invenio.sqlalchemyutils import db
 from invenio.websession_model import Session
 from invenio.webuser_flask import current_user
 from invenio.config import \
-    CFG_SITE_SECURE_URL
+    CFG_SITE_SECURE_URL, \
+    CFG_FLASK_CACHE_TYPE
 
 __all__ = ["InvenioSession", "InvenioSessionInterface"]
 
@@ -47,9 +48,9 @@ __all__ = ["InvenioSession", "InvenioSessionInterface"]
 CFG_SUPPORT_HTTPS = False ## FIXME: add support for redirecting to HTTPS
 
 # Store session information in memory cache (Redis, Memcache, ...).
-CFG_SESSION_USE_CACHE = False
+CFG_SESSION_IN_CACHE = CFG_FLASK_CACHE_TYPE not in [None, 'null']
 # Session key prefix for storing in db.
-CFG_SESSION_KEY_PREFIX = 'session::'
+CFG_CACHE_KEY_PREFIX_SESSION = 'session::'
 
 from invenio.cache import cache
 
@@ -102,7 +103,6 @@ class InvenioSession(dict, SessionMixin):
         that was used to create it.
         """
         remote_ip = request.remote_addr
-        #current_app.logger.info("checking session IP against %s" % remote_ip)
 
         if '_https_ip' not in self:
             self['_https_ip'] = remote_ip
@@ -178,15 +178,15 @@ class InvenioCacheSessionStorage(InvenioSessionStorage):
     Implements session cache (redis) storage.
     """
     def set(self, name, value, timeout=None):
-        cache.set(CFG_SESSION_KEY_PREFIX+name,
+        cache.set(CFG_CACHE_KEY_PREFIX_SESSION+name,
                   value,
                   timeout=3600)
 
     def get(self, name):
-        return cache.get(CFG_SESSION_KEY_PREFIX+name)
+        return cache.get(CFG_CACHE_KEY_PREFIX_SESSION+name)
 
     def delete(self, name):
-        cache.delete(CFG_SESSION_KEY_PREFIX+name)
+        cache.delete(CFG_CACHE_KEY_PREFIX_SESSION+name)
 
 
 class InvenioDBSessionStorage(InvenioSessionStorage):
@@ -222,7 +222,7 @@ class InvenioSessionInterface(SessionInterface):
     """
     serializer = InvenioSerializer()
     session_class = InvenioSession
-    storage = InvenioDBSessionStorage() if not CFG_SESSION_USE_CACHE \
+    storage = InvenioDBSessionStorage() if not CFG_SESSION_IN_CACHE \
               else InvenioCacheSessionStorage()
 
     def generate_sid(self):
@@ -249,7 +249,6 @@ class InvenioSessionInterface(SessionInterface):
             session = self.session_class(data, sid=sid)
             session['_uid'] = session.uid
             session['uid'] = session.uid
-            current_app.logger.info("initilized session")
             if session.check_ip(request):
                 return session
         except Exception, err:
@@ -257,11 +256,10 @@ class InvenioSessionInterface(SessionInterface):
             pass
         except:
             current_app.logger.warning("Error: loading session object")
-        current_app.logger.info("returning empty session")
+        current_app.logger.warning("returning empty session")
         return self.session_class(sid=sid)
 
     def save_session(self, app, session, response):
-        current_app.logger.info("saving session %s" % session.sid)
         domain = self.get_cookie_domain(app)
         from invenio.websession_model import Session
         if not session:
@@ -280,7 +278,6 @@ class InvenioSessionInterface(SessionInterface):
         sid = session.sid
         if session.logging_in:
             ## The user just logged in, better change the session ID
-            current_app.logger.info("detected logging in. generating new sid")
             sid = self.generate_sid()
             ## And remove the cookie that has been set
             self.storage.delete(session.sid)
@@ -289,7 +286,6 @@ class InvenioSessionInterface(SessionInterface):
             response.delete_cookie(app.session_cookie_name + 'stub',
                                    domain=domain)
             session.sid = sid
-        current_app.logger.info(str(dict(session)))
         session['_uid'] = uid
         self.storage.set(sid,
                          self.serializer.dumps(dict(session)),
