@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -9,7 +9,7 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -17,7 +17,11 @@
 
 webappdir = $(localstatedir)/www/admin/bibformat
 
-webapp_DATA = bibformatadmin.py js_quicktags.js
+webapp_DATA = bibformatadmin.py
+
+staticdir=$(localstatedir)/www/static/bibformat-admin-interface
+
+static_DATA = js_quicktags.js
 
 EXTRA_DIST =  $(webapp_DATA)
 
