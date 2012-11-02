@@ -683,10 +683,15 @@
               url: '{{ url_for('search.list', field='exactauthor') }}',
               data: $.param({
                 q: query.substr(query.lastIndexOf(':')+1)
-              }),
-              success: function(data) {
-                typeahead.process(data.results)
-              }
+              })
+            }).done(function(data) {
+              var a = [query.substr(query.lastIndexOf(':')+1)]
+                , b = data.results
+                , c = a.concat(b)
+              typeahead.process(c)
+            }).fail(function(data) {
+              var a = [query.substr(query.lastIndexOf(':')+1)]
+              typeahead.process(a)
             })
           };
 
@@ -714,10 +719,9 @@
               url: data_url,
               data: $.param({
                 q: query
-              }),
-              success: function(data) {
-                typeahead.process(data.results)
-              }
+              })
+            }).done(function(data) {
+              typeahead.process(data.results)
             })
           }
         }

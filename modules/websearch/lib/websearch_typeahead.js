@@ -60,18 +60,19 @@
       orig.lookup.call(this);
     },
     select: function() {
-      var val = this.$menu.find('.active').attr('data-value');
+      var val = this.$menu.find('.active').attr('data-value')
+        , cwrap = (val.lastIndexOf(' ') > 0)?'"':''
 
       if (this.options.type == 'data') {
-      var m = this.query.lastIndexOf(':'),
-          newVal = this.$element.val().substr(0, m);
-      if (~m) {
-        newVal += ':"';
-      }
-      this.$element.val(newVal+val+'" ');
-      this.$element.change();
-      this.options.type = 'search';
-      return this.hide();
+        var m = this.query.lastIndexOf(':')
+          , newVal = this.$element.val().substr(0, m);
+        if (~m) {
+          newVal += ':'+cwrap;
+        }
+        this.$element.val(newVal+val+cwrap+' ');
+        this.$element.change();
+        this.options.type = 'search';
+        return this.hide();
       }
 
       if (this.options.type == 'search') {
