@@ -22,7 +22,8 @@
 import unittest
 
 from invenio.config import CFG_SITE_URL, \
-                           CFG_SITE_RECORD
+                           CFG_SITE_RECORD, \
+                           CFG_DATABASE_NAME
 from invenio.testutils import make_test_suite, \
                                    run_test_suite, \
                                    test_web_page_content, \
@@ -59,7 +60,7 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
 
 
 def get_max_auto_increment_id(table):
-    return run_sql("SELECT Auto_increment FROM information_schema.tables WHERE table_name=%s AND table_schema = 'invenio'", (table,))[0][0] - 1
+    return run_sql("SELECT Auto_increment FROM information_schema.tables WHERE table_name=%s AND table_schema=%s", (table, CFG_DATABASE_NAME))[0][0] - 1
 
 
 def remove_test_data():
