@@ -673,25 +673,3 @@ def strip_accents(x):
     y = re_unicode_uppercase_n.sub("N", y)
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
-
-def remove_control_characters(text):
-    """
-    Replaces control characters* with space in a given string
-    and returns it.
-
-    * except \n (10) \t (9) and \r (13)
-
-    @param text: string to strip characters from
-    @type text: string
-
-    @return: string without control characters*
-    @rtype: string
-    """
-    exceptions = (9, 10, 13)
-    res = []
-    for c in text:
-        if ord(c) >= 32 or ord(c) in exceptions:
-            res.append(c)
-        else:
-            res.append(' ')
-    return ''.join(res)

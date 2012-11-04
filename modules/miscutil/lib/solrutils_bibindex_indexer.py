@@ -23,8 +23,7 @@ Solr utilities.
 
 
 from invenio.config import CFG_SOLR_URL
-from invenio.textutils import remove_control_characters
-from invenio.solrutils_config import CFG_SOLR_INVALID_CHAR_REPLACEMENTS
+from invenio.solrutils_config import CFG_SOLR_INVALID_CHAR_RANGES
 
 
 if CFG_SOLR_URL:
@@ -32,13 +31,16 @@ if CFG_SOLR_URL:
     SOLR_CONNECTION = solr.SolrConnection(CFG_SOLR_URL) # pylint: disable=E1101
 
 
-def remove_invalid_solr_characters(utext):
-    for char in CFG_SOLR_INVALID_CHAR_REPLACEMENTS:
-        try:
-            utext = utext.replace(char, CFG_SOLR_INVALID_CHAR_REPLACEMENTS[char])
-        except:
-            pass
-    return utext
+def replace_invalid_solr_characters(utext):
+    def replace(x):
+        o = ord(x)
+        for r in CFG_SOLR_INVALID_CHAR_RANGES:
+            if r[0] <= o <= r[1]:
+                return r[2]
+        return x
+
+    utext_elements = map(replace, utext)
+    return ''.join(utext_elements)
 
 
 def solr_add_fulltext(recid, text):
@@ -48,9 +50,8 @@ def solr_add_fulltext(recid, text):
     """
     if recid:
         try:
-            text = remove_control_characters(text)
             utext = unicode(text, 'utf-8')
-            utext = remove_invalid_solr_characters(utext)
+            utext = replace_invalid_solr_characters(utext)
             SOLR_CONNECTION.add(id=recid, abstract="", author="", fulltext=utext, keyword="", title="")
             return True
         except (UnicodeDecodeError, UnicodeEncodeError):

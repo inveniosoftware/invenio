@@ -16,19 +16,5 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-CFG_SOLR_INVALID_CHAR_REPLACEMENTS = {
-    u'\uFFFF' : u"",
-    u'\uD835' : u"",
-    u'\uDC60' : u"",
-    u'\uDC3F' : u"",
-    u'\uDCAA' : u"",
-    u'\uDC4A' : u"",
-    u'\uDCD1' : u"",
-    u'\uDC4D' : u"",
-    u'\uDF07' : u"",
-    u'\uDC50' : u"",
-    u'\uDC94' : u"",
-    u'\uDF0E' : u"",
-    u'\uDC46' : u"",
-    u'\uDC92' : u"",
-}
+# Syntax (lower, upper, replacement): replace char if in range(lower, upper + 1)
+CFG_SOLR_INVALID_CHAR_RANGES = ((0, 8, ' '), (11, 12, ' '), (14, 31, ' '), (55296, 57343, ''), (65534, 65535, ''))
