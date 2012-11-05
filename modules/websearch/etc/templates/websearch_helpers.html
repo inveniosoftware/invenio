@@ -166,7 +166,7 @@
 
   <div class="control-group">
     <label class="control-label">
-      <strong>{{ _('what') }}:</strong>
+      <strong>{{ _('what') }}?</strong>
     </label>
     <div class="controls">
       <input type="text" name="p1" value="" class="span3"/>
@@ -175,11 +175,11 @@
 
   <div class="control-group">
     <label class="control-label">
-      <strong>{{ _('where') }}:</strong>
+      <strong>{{ _('where') }}?</strong>
     </label>
     <div class="controls">
     <select class="span2" name="f">
-      {% for code, name in collection.search_within.iteritems() %}
+      {% for (code, name) in collection.search_within %}
       <option value="{{ code }}">
         {{ name }}
       </option>
@@ -190,12 +190,12 @@
 
   <div class="control-group">
     <label class="control-label">
-      <strong>{{ _('how') }}:</strong>
+      <strong>{{ _('how') }}?</strong>
     </label>
     <div class="controls">
       <select class="span2" name="m1">
-        {%- for k,v in config.CFG_WEBSEACH_MATCHING_TYPES.iteritems() -%}
-          <option value="{{ k }}">{{ _(v.title)|safe }}</option>
+        {%- for v in config.CFG_WEBSEACH_MATCHING_TYPES|sort(attribute='order') -%}
+          <option value="{{ v.code }}">{{ _(v.title)|safe }}</option>
         {%- endfor -%}
       </select>
     <span id="addtosearch" class="btn">
@@ -295,6 +295,16 @@
   text-decoration: underline;
   color: inherit;
 }
+
+#searchdropdown .searchexamples i.pull-right {
+  margin-right: -6px;
+  margin-top: 3px;
+  opacity: .25;
+}
+
+#searchdropdown .searchexamples .after-fix {
+  padding-right: 20px;
+}
 </style>
 {% endmacro %}
 
@@ -320,24 +330,39 @@
             #}
               <div class="input-prepend input-append">
                 <div class="dropdown add-on">
-                  <a class="searchexamples dropdown-toggle"
-                     rel="tooltip" title="{{ _('Search examples') }}"
+                  <a class="dropdown-toggle"
+                     rel="tooltip" title="{{ _('Search Tips and Examples') }}"
                      data-placement="bottom"
                      data-delay="100"
                      data-toggle="dropdown" role="button"
                      href="#"><i class="icon-question-sign"></i></a>
-                  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" style="text-align: left;">
-                    <li class="nav-header">
-                      <a style="margin-top: -3px;" class="pull-right" href="/help/search-tips">
-                        {{ _("Search Tips") }}
-                        <i style="margin-top:-1px;" class="icon-info-sign"></i>
+                  <ul class="searchexamples dropdown-menu" role="menu" aria-labelledby="dLabel" style="text-align: left;">
+                    <li>
+                      <a href="/help/search-tips">
+                        <i class="pull-right icon-info-sign"></i>
+                        <strong>{{ _("Search Tips") }}</strong>
                       </a>
+                    </li>
+                    <li>
+                      <a href="/help/search-guide">
+                        <i class="pull-right icon-leaf"></i>
+                        <strong>{{ _("Search Guide") }}</strong>
+                      </a>
+                    </li>
+                    {% if collection.examples %}
+                    <li class="divider"></li>
+                    <li class="nav-header">
                       {{ _('Search examples') }}
                     </li>
-                    <li class="divider"></li>
                   {%- for e in collection.examples if e.example.body -%}
-                    <li><a href="{{ url_for('search.search', p=e.example.body) }}" class="muted">{{ e.example.body }}</a></li>
+                    <li>
+                      <a href="{{ url_for('search.search', p=e.example.body) }}">
+                        <i class="pull-right icon-chevron-right"></i>
+                        <span class="after-fix">{{ e.example.body }}</span>
+                      </a>
+                    </li>
                   {%- endfor -%}
+                  {% endif %}
                   </ul>
                 </div><!--
                 No space!
@@ -531,8 +556,8 @@
 
     var op1_fn = {'a': 'AND ', 'o': 'OR ', 'n': 'AND NOT '},
         m1_fn = {
-        {%- for k,v in config.CFG_WEBSEACH_MATCHING_TYPES.iteritems() -%}
-          '{{ k }}': function(val, f) {
+        {%- for v in config.CFG_WEBSEACH_MATCHING_TYPES -%}
+          '{{ v.code }}': function(val, f) {
             {{ v.tokenize|safe }}
           }{{ ',' if not loop.last }}
         {%- endfor -%}
@@ -655,8 +680,8 @@
       $('#searchdropdown').removeClass('open');
     });
 
-    var source = $.map({{ collection.search_within.keys()[1:]|tojson|safe }},
-          function(val, i) { return val+':';}); //['author:', 'title:', 'isbn:'];
+    var source = $.map({{ collection.search_within[1:]|tojson|safe }},
+          function(val, i) { return val[0]+':';}); //['author:', 'title:', 'isbn:'];
     source.push('AND ');
     source.push('OR ');
     source.push('AND NOT ');

@@ -1144,10 +1144,8 @@ def collect_user_info(req, login_time=False, refresh=False):
     """
 
     if type(req) in [long, int]:
-        from invenio.websession_model import User
-        user = dict(User.query.get(req))
-        user['uid'] = user['id']
-        return user
+        from invenio.webuser_flask import UserInfo
+        return UserInfo(req)
 
     from invenio.webuser_flask import current_user
     return current_user._get_current_object()

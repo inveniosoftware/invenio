@@ -23,6 +23,7 @@ websearch database models.
 
 # General imports.
 import re
+from operator import itemgetter
 from flask import g
 from sqlalchemy.ext.mutable import Mutable
 from invenio.intbitset import intbitset
@@ -300,11 +301,12 @@ class Collection(db.Model):
         """
         Collect search within options.
         """
-        default = {'':g._('any field')}
-        found = dict((o.field.code, o.field.name_ln) for o in self._search_within)
-        default.update(found or dict((f.name.replace(' ',''), f.name_ln) for f in Field.query.filter(
-                    Field.name.in_(CFG_WEBSEARCH_SEARCH_WITHIN)).all()))
-        return default
+        default = [('', g._('any field'))]
+        found = [(o.field.code, o.field.name_ln) for o in self._search_within]
+        if not found:
+            found = [(f.name.replace(' ',''), f.name_ln) for f in Field.query.filter(
+                    Field.name.in_(CFG_WEBSEARCH_SEARCH_WITHIN)).all()]
+        return default + sorted(found, key=itemgetter(1))
 
     @property
     def ancestors_ids(self):

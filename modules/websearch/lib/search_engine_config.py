@@ -79,9 +79,11 @@ CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
                                'reference']
 
 
-CFG_WEBSEACH_MATCHING_TYPES = {
-    'a': {
-        'title': "All of the words:",
+CFG_WEBSEACH_MATCHING_TYPES = [
+        {
+        'code': 'a',
+        'title': "all of the words",
+        'order': 1,
         'tokenize': """
             var vals = val.split(' '),
                 result = $.map(vals, function(e) {
@@ -93,8 +95,10 @@ CFG_WEBSEACH_MATCHING_TYPES = {
             return result;
         """
         },
-    'o': {
-        'title': "Any of the words:",
+        {
+        'code': 'o',
+        'title': "any of the words",
+        'order': 2,
         'tokenize': """
             var vals = val.split(' '),
                 result = $.map(vals, function(e) {
@@ -106,27 +110,30 @@ CFG_WEBSEACH_MATCHING_TYPES = {
             return result;
         """
         },
-
-    'e': {
-        'title': "Exact phrase:",
+        {
+        'code': 'e',
+        'title': "exact phrase",
+        'order': 3,
         'tokenize': """
             return f+'"'+val+'"';
         """
         },
-
-    'p': {
-        'title': "Partial phrase:",
+        {
+        'code': 'p',
+        'title': "partial phrase",
+        'order': 4,
         'tokenize': """
             return f+"'"+val+"'";
         """
         },
-
-    'r': {
-        'title': "Regular expression:",
+        {
+        'code': 'r',
+        'title': "regular expression",
+        'order': 5,
         'tokenize': """
             return f+'/'+val+'/';
         """
         }
-    }
+    ]
 
 

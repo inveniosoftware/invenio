@@ -284,25 +284,25 @@ body {
         html: true
       , placement: 'right'
       , trigger: 'manual'
-      , delay: {show: 200, hide: 1000}
       , content: filterContent
       , title: '{{ _('Did you know?') }}'
       }).on('mouseenter', function() {
         var popupFunc = function() {$e.popover('show')}
         if (popupTimer)
           clearTimeout(popupTimer)
-        popupTimer = setTimeout(popupFunc, 750)
+        popupTimer = setTimeout(popupFunc, 2000)
+      }).on('click', function() {
+        if (popupTimer)
+          clearTimeout(popupTimer)
+        $e.popover('hide')
       }).parent().on('mouseleave', function() {
-          if (popupTimer)
-            clearTimeout(popupTimer)
-          $e.popover('hide')
+        if (popupTimer)
+          clearTimeout(popupTimer)
+        $e.popover('hide')
       })
-
-
     }).on('click', function(event) {
         var $el_clicked = $(this),
             options = $('#facet_list').data('facet').options
-
 
         if (!$el_clicked.hasClass('expandable') && $el_clicked.attr('data-facet-key') === 'collection') {
           if ($el_clicked.parent().has('ul')) {

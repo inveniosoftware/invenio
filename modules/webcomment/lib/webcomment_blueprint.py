@@ -67,8 +67,8 @@ blueprint = InvenioBlueprint('webcomment', __name__,
                             config='invenio.webcomment_config',
                             #breadcrumbs=[(_('Comments'),
                             #              'webcomment.subscribtions')],
-                            menubuilder=[('main.personalize.subscriptions',
-                                          _('Subscriptions'),
+                            menubuilder=[('main.personalize.comment_subscriptions',
+                                          _('Your Comment Subscriptions'),
                                           'webcomment.subscriptions', 20)])
 
 from invenio.record_blueprint import request_record
