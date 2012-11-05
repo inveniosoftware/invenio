@@ -128,7 +128,7 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-          {%- for i in collection.formatoptions -%}
+          {%- for i in collection.formatoptions if i.content_type == 'text/html' -%}
             {%- set used_args = new_args.copy() -%}
             {%- do used_args.update({'of':i.code}) -%}
             <li><a
