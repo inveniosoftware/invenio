@@ -1160,6 +1160,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'es_desc'        : (str, ''),
                                    'es_url'         : (str, ''),
                                    'copy'           : (int, 0),
+                                   'referer'        : (str, ''),
                                    'of'             : (str, ''),
                                    'ln'             : (str, CFG_SITE_LANG)})
 
@@ -1198,6 +1199,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                 es_desc=argd['es_desc'],
                                 es_url=argd['es_url'],
                                 copy=argd['copy'],
+                                referer=argd['referer'],
                                 ln=argd['ln'])
 
             # register event in webstat
@@ -1212,9 +1214,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
             if ( argd['recid'] and argd['colid'] >= 0 ):
-                url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&copy=%i&bskid=%i&colid=%i&recid=%s&wait=1&ln=%s'
+                url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&copy=%i&referer=%s&bskid=%i&colid=%i&recid=%s&wait=1&ln=%s'
                 url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                         argd['copy'],
+                        urllib.quote(argd['referer']),
                         bskid,
                         argd['colid'],
                         '&recid='.join(str(recid) for recid in argd['recid']),
@@ -1247,6 +1250,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                  es_desc=argd['es_desc'],
                                                  es_url=argd['es_url'],
                                                  copy=argd['copy'],
+                                                 referer=argd['referer'],
                                                  ln=argd['ln'])
             navtrail = '<a class="navtrail" href="%s/youraccount/'\
                        'display?ln=%s">%s</a>'

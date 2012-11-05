@@ -2200,6 +2200,7 @@ def perform_request_create_basket(req, uid,
                                   es_desc='',
                                   es_url='',
                                   copy = False,
+                                  referer = '',
                                   ln=CFG_SITE_LANG):
     """if new_basket_name and topic infos are given create a basket and return topic number,
     else return body with warnings of basket creation form.
@@ -2226,10 +2227,10 @@ def perform_request_create_basket(req, uid,
         #topics = map(lambda x: x[0], topics_infos)
         return (bskid, topic)
     else:
-        referer = get_referer(req) # URL of the referring page
+        local_referer = get_referer(req) # URL of the referring page
         url = CFG_SITE_URL + '/yourbaskets/create_basket'
         import string
-        if string.find(referer, url) == 0:
+        if string.find(local_referer, url) == 0:
             if not new_basket_name:
                 try:
                     raise InvenioWebBasketWarning(_('Please provide a name for the new basket.'))
@@ -2256,6 +2257,7 @@ def perform_request_create_basket(req, uid,
                                                       es_desc,
                                                       es_url,
                                                       copy,
+                                                      referer,
                                                       ln)
         if warnings:
             warnings_html += webbasket_templates.tmpl_warnings(warnings, ln)
