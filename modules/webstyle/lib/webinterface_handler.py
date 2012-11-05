@@ -121,7 +121,7 @@ def _check_result(req, result):
             else:
                 req.content_type = 'text/plain'
 
-        if req.header_only:
+        if req.method == 'HEAD':
             if req.status in (apache.HTTP_NOT_FOUND, ):
                 raise apache.SERVER_RETURN, req.status
         else:
@@ -418,7 +418,7 @@ def create_handler(root):
                 req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
 
             try:
-                if req.header_only and not RE_SPECIAL_URI.match(req.uri):
+                if req.method == 'HEAD' and not RE_SPECIAL_URI.match(req.uri):
                     return root._traverse(req, path, True, guest_p)
                 else:
                     ## bibdocfile have a special treatment for HEAD

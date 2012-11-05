@@ -5402,7 +5402,7 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
     title, description, keywords = \
            websearch_templates.tmpl_record_page_header_content(req, recid, ln)
 
-    if req is not None and not req.header_only:
+    if req is not None and req.method != 'HEAD':
         page_start(req, of, cc, aas, ln, uid, title, description, keywords, recid, tab, em)
 
     # Default format is hb but we are in detailed -> change 'of'
@@ -5427,7 +5427,7 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
         elif of.startswith("h"):
-            if req.header_only:
+            if req.method == 'HEAD':
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
             else:
                 write_warning(_("Requested record does not seem to exist."), req=req)
@@ -5470,7 +5470,7 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                     d1y=None, d1m=None, d1d=None, d2y=None, d2m=None, d2d=None,
                     dt=None, jrec=None, ec=None, action=None, em=None,
                     verbose=None, **dummy):
-    if req and not req.header_only:
+    if req and req.method != 'HEAD':
         page_start(req, of, cc, aas, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3),
                    em=em)
     if of.startswith("h"):
@@ -5481,7 +5481,7 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
     if record_exists(p[6:]) != 1:
         # record does not exist
         if of.startswith("h"):
-            if req.header_only:
+            if req.method == 'HEAD':
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
             else:
                 write_warning(_("Requested record does not seem to exist."), req=req)

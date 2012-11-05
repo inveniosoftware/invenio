@@ -2958,7 +2958,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
     def normal_streaming(size):
         req.set_content_length(size)
         req.send_http_header()
-        if not req.header_only:
+        if req.method != 'HEAD':
             req.sendfile(fullpath)
         return ""
 
@@ -2967,7 +2967,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
         req.status = apache.HTTP_PARTIAL_CONTENT
         req.send_http_header()
-        if not req.header_only:
+        if req.method != 'HEAD':
             req.sendfile(fullpath, the_range[0], the_range[1])
         return ""
 
@@ -2986,7 +2986,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         content_length += len('--%s--\r\n' % boundary)
         req.set_content_length(content_length)
         req.send_http_header()
-        if not req.header_only:
+        if req.method != 'HEAD':
             for arange in ranges:
                 req.write('--%s\r\n' % boundary, 0)
                 req.write('Content-Type: %s\r\n' % mime, 0)
