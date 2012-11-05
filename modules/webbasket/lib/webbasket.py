@@ -2199,6 +2199,7 @@ def perform_request_create_basket(req, uid,
                                   es_title='',
                                   es_desc='',
                                   es_url='',
+                                  copy = False,
                                   ln=CFG_SITE_LANG):
     """if new_basket_name and topic infos are given create a basket and return topic number,
     else return body with warnings of basket creation form.
@@ -2254,6 +2255,7 @@ def perform_request_create_basket(req, uid,
                                                       es_title,
                                                       es_desc,
                                                       es_url,
+                                                      copy,
                                                       ln)
         if warnings:
             warnings_html += webbasket_templates.tmpl_warnings(warnings, ln)
