@@ -105,9 +105,9 @@ def format_element(bfo, lowest_issue):
     # FIXME: Submit the form with id instead of form nr.
     archive_title = "<h2>%s</h2>" % _("Archive")
     archive_form = '''
-    <form id="archiveselectform" class="archiveform" action="%(CFG_SITE_URL)s/journal/search" name="search" method="get">
+    <form id="archiveselectform" class="archiveform" action="%(CFG_SITE_URL)s/journal/search" name="searchbyissue" method="get">
         <em>%(select_year_label)s </em>
-        <select name="archive_year" onchange="document.forms[1].submit();">
+        <select name="archive_year" onchange="document.searchbyissue.submit();">
             %(select_year_list)s
         </select>
         <br />
@@ -121,7 +121,7 @@ def format_element(bfo, lowest_issue):
         <input type="submit" value="Go" name="archive_select" />
     </form>
     <hr />
-    <form class="archiveform" action="%(CFG_SITE_URL)s/journal/search" name="search" method="get">
+    <form class="archiveform" action="%(CFG_SITE_URL)s/journal/search" name="searchbydate" method="get">
         <em>%(custom_date_label)s <small>(dd/mm/yyyy  -> e.g. 01/03/2006)</small>: </em>
         <input type="text" value="" maxlength="10" size="10" name="archive_date" />
         <input type="hidden" value="%(journal_name)s" name="name" />
