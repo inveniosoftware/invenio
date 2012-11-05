@@ -142,6 +142,18 @@ def create_invenio_flask_app():
     ## Cache
     _app.config['CACHE_TYPE'] = CFG_FLASK_CACHE_TYPE
     cache.init_app(_app)
+    if CFG_FLASK_CACHE_TYPE == 'redis':
+        def with_try_except_block(f):
+            def decorator(*args, **kwargs):
+                try:
+                    return f(*args, **kwargs)
+                except Exception, e:
+                    register_exception(alert_admin=True)
+                    pass
+            return decorator
+
+        ## When the redis is down, we would like to keep the site running.
+        cache.cache._client.execute_command = with_try_except_block(cache.cache._client.execute_command)
 
     _flask_log_handler = RotatingFileHandler(os.path.join(CFG_LOGDIR, 'flask.log'))
     _flask_log_handler.setFormatter(Formatter(
