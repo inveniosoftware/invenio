@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """WebSubmit module web tests."""
-
+import time
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
@@ -52,7 +52,15 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_name="DEMOART_DATE", text="11/01/2001")
         self.fill_textbox(textbox_name="DEMOART_KW", text="test keyword1\ntest keyword2\ntest keyword3")
         self.fill_textbox(textbox_name="DEMOART_NOTE", text="I don't think I have any additional comments.\nBut maybe I'll input some quotes here: \" ' ` and the rest.")
-        self.fill_textbox(textbox_name="DEMOART_FILE", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        self.find_element_by_xpath_with_timeout("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']")
+        self.browser.find_element_by_xpath("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']").click()
+        self.wait_element_displayed_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.fill_textbox(textbox_id="balloonReviseFileInput", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        self.find_element_by_id_with_timeout("bibdocfilemanagedocfileuploadbutton")
+        self.browser.find_element_by_id("bibdocfilemanagedocfileuploadbutton").click()
+        self.wait_element_hidden_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.find_elements_by_class_name_with_timeout('reviseControlFileColumn')
+        self.page_source_test(expected_text=['revise', 'tree_branch.gif'])
         self.find_element_by_name_with_timeout("endS")
         self.browser.find_element_by_name("endS").click()
         self.page_source_test(expected_text=['Submission Complete!', \
@@ -198,7 +206,15 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_name="DEMOART_DATE", text="11/01/2001")
         self.fill_textbox(textbox_name="DEMOART_KW", text="test keyword1\ntest keyword2\ntest keyword3")
         self.fill_textbox(textbox_name="DEMOART_NOTE", text="I don't think I have any additional comments.\nBut maybe I'll input some quotes here: \" ' ` and the rest.")
-        self.fill_textbox(textbox_name="DEMOART_FILE", text="/opt/invenio/lib/webtest/invenio/test.tar.gz")
+        self.find_element_by_xpath_with_timeout("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']")
+        self.browser.find_element_by_xpath("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']").click()
+        self.wait_element_displayed_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.fill_textbox(textbox_id="balloonReviseFileInput", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        self.find_element_by_id_with_timeout("bibdocfilemanagedocfileuploadbutton")
+        self.browser.find_element_by_id("bibdocfilemanagedocfileuploadbutton").click()
+        self.wait_element_hidden_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.find_elements_by_class_name_with_timeout('reviseControlFileColumn')
+        self.page_source_test(expected_text=['revise', 'tree_branch.gif'])
         self.find_element_by_name_with_timeout("endS")
         self.browser.find_element_by_name("endS").click()
         self.page_source_test(expected_text=['Submission Complete!', \
@@ -223,7 +239,13 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.fill_textbox(textbox_name="DEMOART_DATE", text="11/01/2001")
         self.fill_textbox(textbox_name="DEMOART_KW", text="test keyword1\ntest keyword2\ntest keyword3")
         self.fill_textbox(textbox_name="DEMOART_NOTE", text="I don't think I have any additional comments.\nBut maybe I'll input some quotes here: \" ' ` and the rest.")
-        self.fill_textbox(textbox_name="DEMOART_FILE", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        self.find_element_by_xpath_with_timeout("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']")
+        self.browser.find_element_by_xpath("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']").click()
+        self.fill_textbox(textbox_id="balloonReviseFileInput", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        self.find_element_by_id_with_timeout("bibdocfilemanagedocfileuploadbutton")
+        self.browser.find_element_by_id("bibdocfilemanagedocfileuploadbutton").click()
+        self.find_elements_by_class_name_with_timeout('reviseControlFileColumn')
+        self.page_source_test(expected_text=['revise', 'tree_branch.gif'])
         self.find_element_by_name_with_timeout("endS")
         self.browser.find_element_by_name("endS").click()
         self.page_source_test(expected_text=['Submission Complete!', \
@@ -238,6 +260,55 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.login(username="jekyll", password="j123ekyll", go_to_login_page=False)
         self.page_source_test(expected_text=['Submit New Record', \
                                              'Demo Thesis Submission'])
+    def test_revise_picture_admin(self):
+        """websubmit - web test submit and revise picture as admin"""
+        self.browser.get(CFG_SITE_SECURE_URL + '?ln=en')
+        # login as admin
+        self.login( username="admin", password="")
+        self.find_element_by_link_text_with_timeout("Submit")
+        self.browser.find_element_by_link_text("Submit").click()
+        self.find_element_by_link_text_with_timeout("Demo Picture Submission")
+        self.browser.find_element_by_link_text("Demo Picture Submission").click()
+        self.find_element_by_id_with_timeout("comboEXP")
+        self.browser.find_element_by_id("comboEXP").click()
+        self.find_element_by_xpath_with_timeout("//input[@value='Submit New File']")
+        self.browser.find_element_by_xpath("//input[@value='Submit New File']").click()
+        self.find_element_by_name_with_timeout("DEMOPIC_RN")
+        self.browser.find_element_by_name("DEMOPIC_RN").clear()
+        self.fill_textbox(textbox_name="DEMOPIC_RN", text="CERN-GE-9806033")
+        self.find_element_by_name_with_timeout("endS")
+        self.browser.find_element_by_name("endS").click()
+        time.sleep(2)
+        self.handle_popup_dialog()
+        time.sleep(2)
+        self.find_element_by_link_text_with_timeout("revise")
+        self.browser.find_element_by_link_text("revise").click()
+        self.find_element_by_id_with_timeout("balloonReviseFileInput")
+        self.wait_element_displayed_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.fill_textbox(textbox_id="balloonReviseFileInput", text="/opt/invenio/lib/webtest/invenio/test.png")
+        self.find_element_by_id_with_timeout("bibdocfilemanagedocfileuploadbutton")
+        self.browser.find_element_by_id("bibdocfilemanagedocfileuploadbutton").click()
+        time.sleep(1)
+        self.wait_element_displayed_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.find_element_by_xpath_with_timeout("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']")
+        self.browser.find_element_by_xpath("//div[@id='uploadFileInterface']//input[@type='button' and @value='Add new file']").click()
+        self.choose_selectbox_option_by_value(selectbox_id='fileDoctype', value='Additional')
+        self.fill_textbox(textbox_name="rename", text="Tiger")
+        self.fill_textbox(textbox_id="balloonReviseFileInput", text="/opt/invenio/lib/webtest/invenio/test.pdf")
+        self.find_element_by_id_with_timeout("bibdocfilemanagedocfileuploadbutton")
+        self.browser.find_element_by_id("bibdocfilemanagedocfileuploadbutton").click()
+        time.sleep(1)
+        self.wait_element_hidden_with_timeout(self.browser.find_element_by_id("balloonReviseFileInput"))
+        self.page_source_test(expected_text='Tiger')
+        self.browser.find_element_by_xpath("//div[@id='uploadFileInterface']//tr[@class='even']//a[text()='delete']").click()
+        self.handle_popup_dialog()
+        time.sleep(1)
+        self.find_element_by_name_with_timeout("Submit")
+        self.browser.find_element_by_name("Submit").click()
+        self.handle_popup_dialog()
+        time.sleep(2)
+        self.page_source_test(expected_text=['Submission Complete!', \
+                                             'Your document has the following reference(s): <b>CERN-GE-9806033'])
 
 TEST_SUITE = make_test_suite(InvenioWebSubmitWebTest, )
 
