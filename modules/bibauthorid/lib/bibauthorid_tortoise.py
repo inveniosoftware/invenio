@@ -20,6 +20,9 @@
 import bibauthorid_config as bconfig
 from datetime import datetime
 import os
+import cPickle
+
+from itertools import groupby, chain
 
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_personid
@@ -31,6 +34,8 @@ from invenio.bibauthorid_general_utils import bibauthor_print
 from invenio.bibauthorid_prob_matrix import prepare_matirx
 from invenio.bibauthorid_scheduler import schedule, matrix_coefs
 from invenio.bibauthorid_least_squares import to_function as create_approx_func
+
+import multiprocessing as mp
 
 #python2.4 compatibility
 from invenio.bibauthorid_general_utils import bai_all as all
@@ -116,26 +121,134 @@ def tortoise(pure=False,
 
 
 def tortoise_last_name(name, from_mark=False, pure=False):
+    bibauthor_print('Start working on %s' % name)
     assert not(from_mark and pure)
 
     lname = generate_last_name_cluster_str(name)
 
     if from_mark:
-        clusters, lnames, sizes = delayed_cluster_sets_from_marktables()
+        bibauthor_print(' ... from mark!')
+        clusters, lnames, sizes = delayed_cluster_sets_from_marktables([lname])
+        bibauthor_print(' ... delayed done')
     else:
+        bibauthor_print(' ... from pid, pure')
         clusters, lnames, sizes = delayed_cluster_sets_from_personid(pure)
+        bibauthor_print(' ... delayed pure done!')
 
-    try:
-        idx = lnames.index(lname)
-        cluster = clusters[idx]
-        size = sizes[idx]
-        bibauthor_print("Found, %s(%s). Total number of bibs: %d." % (name, lname, size))
-        cluster_set = cluster()
-        create_matrix(cluster_set, True)
-        wedge_and_store(cluster_set)
-    except IndexError:
-        bibauthor_print("Sorry, %s(%s) not found in the last name clusters" % (name, lname))
+#    try:
+    idx = lnames.index(lname)
+    cluster = clusters[idx]
+    size = sizes[idx]
+    bibauthor_print("Found, %s(%s). Total number of bibs: %d." % (name, lname, size))
+    cluster_set = cluster()
+    create_matrix(cluster_set, True)
+    wedge_and_store(cluster_set)
+#    except IndexError:
+#        bibauthor_print("Sorry, %s(%s) not found in the last name clusters" % (name, lname))
 
+def _collect_statistics_lname_coeff(params):
+    lname = params[0]
+    coeff = params[1]
+
+    clusters, lnames, sizes = delayed_cluster_sets_from_marktables([lname])
+    idx = lnames.index(lname)
+    cluster = clusters[idx]
+    size = sizes[idx]
+    bibauthor_print("Found, %s. Total number of bibs: %d." % (lname, size))
+    cluster_set = cluster()
+    create_matrix(cluster_set, False)
+
+    bibs = cluster_set.num_all_bibs
+    expected = bibs * (bibs - 1) / 2
+    bibauthor_print("Start working on %s. Total number of bibs: %d, "
+                    "maximum number of comparisons: %d"
+                    % (cluster_set.last_name, bibs, expected))
+
+    result = wedge(cluster_set, True, coeff)
+    remove_result_cluster(cluster_set.last_name)
+    return (coeff, lname, result)
+
+def _create_matrix(lname):
+
+    clusters, lnames, sizes = delayed_cluster_sets_from_marktables([lname])
+    idx = lnames.index(lname)
+    cluster = clusters[idx]
+    size = sizes[idx]
+    bibauthor_print("Found, %s. Total number of bibs: %d." % (lname, size))
+    cluster_set = cluster()
+    create_matrix(cluster_set, True)
+
+    bibs = cluster_set.num_all_bibs
+    expected = bibs * (bibs - 1) / 2
+    bibauthor_print("Start working on %s. Total number of bibs: %d, "
+                    "maximum number of comparisons: %d"
+                    % (cluster_set.last_name, bibs, expected))
+    cluster_set.store()
+
+def tortoise_tweak_coefficient(lastnames, min_coef, max_coef, stepping, destfile):
+    bibauthor_print('Coefficient tweaking!')
+    bibauthor_print('Cluster sets from mark...')
+
+    lnames = set([generate_last_name_cluster_str(n) for n in lastnames])
+    coefficients = [x/100. for x in range(int(min_coef*100),int(max_coef*100),int(stepping*100))]
+
+    pool = mp.Pool()
+
+    pool.map(_create_matrix, lnames)
+    ress = pool.map(_collect_statistics_lname_coeff, ((x,y) for x in lnames for y in coefficients))
+
+    f = open(destfile, 'w')
+    cPickle.dump(ress,f)
+    f.close()
+
+def tortoise_coefficient_statistics(statfile, parsed_output=None):
+    f = open(statfile,'r')
+    stats = cPickle.load(f)
+    f.close()
+
+    # general statistics: number of tests, different coefficients, different clusters
+    total_tests = len(stats)
+    used_coeffs = set(x[0] for x in stats)
+    user_clusters = set(x[1] for x in stats)
+    assert total_tests == len(used_coeffs) * len(user_clusters)
+
+    grouped_stats = groupby(sorted(stats), lambda x: x[0])
+    cluster_sizes_per_coeff = [ (g[0], [len(k[2]) for k in g[1]] ) for g in grouped_stats]
+
+    # average number of clusters per coefficient
+    avg_clusters_per_coeff = [ (k[0], sum(k[1])/len(k[1])) for k in cluster_sizes_per_coeff ]
+
+
+    edges_min_max_avg_per_coeff = []
+    grouped_stats = groupby(sorted(stats), lambda x: x[0])
+    for coeff in grouped_stats:
+        edgeslist =  [ [x[2] for x in cluster[2]] for cluster in coeff[1] ]
+        minedges = [min(x) for x in edgeslist if x]
+        maxedges = [max(x) for x in edgeslist if x]
+        avgs = [sum(x)/float(len(x)) for x in edgeslist if x]
+
+        minedge = min(minedges)
+        maxedge = max(maxedges)
+        avg = sum(avgs)/float(len(avgs))
+
+        edges_min_max_avg_per_coeff.append((coeff[0],minedge,maxedge,avg))
+
+
+    print "Total tests: ", total_tests
+    print "Used coefficients: ", used_coeffs
+    print "Used clusters: ", len(user_clusters)
+    print "Average clusters per coefficient: "
+    for x in sorted(avg_clusters_per_coeff, key=lambda x: x[0]):
+        print '  - ', x
+    print "Edges stats per coefficient: "
+    for x in edges_min_max_avg_per_coeff:
+        print ' - ', 'Coeff: ', x[0], 'Min: ', x[1], " Max: ", x[2], " Avg: ", x[3]
+
+    if parsed_output:
+        f = open(parsed_output, 'w')
+        d = {'edges_coeff_min_max_avg':edges_min_max_avg_per_coeff, 'avg_clust_per_coeff':avg_clusters_per_coeff}
+        cPickle.dump(d, f)
+        f.close()
 
 def create_matrix(cluster_set, force):
     bibs = cluster_set.num_all_bibs

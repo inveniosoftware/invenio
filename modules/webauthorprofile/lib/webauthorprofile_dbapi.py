@@ -98,7 +98,7 @@ def cache_element(name, key, value):
 
 def expire_cache_element(name, key):
     '''
-    Sets cache element status to 'Expired' 
+    Sets cache element status to 'Expired'
     '''
     run_sql("update wapCACHE set object_status=%s where "
             "object_name=%s and object_key=%s", ('Expired', str(name), str(key)))

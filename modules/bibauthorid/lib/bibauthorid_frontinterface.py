@@ -25,7 +25,7 @@
 
 from invenio.bibauthorid_name_utils import split_name_parts #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_name_utils import soft_compare_names
-from invenio.bibauthorid_name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611 
+from invenio.bibauthorid_name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611
 import bibauthorid_dbinterface as dbinter
 from cgi import escape
 
@@ -36,7 +36,8 @@ from invenio.bibauthorid_dbinterface import * #pylint:  disable-msg=W0614
 
 def set_person_data(person_id, tag, value, user_level=0):
     old = dbinter.get_personid_row(person_id, tag)
-    if old[0] != value:
+    old_data = [tup[0] for tup in old]
+    if value not in old_data:
         dbinter.set_personid_row(person_id, tag, value, opt2=user_level)
 
 def get_person_data(person_id, tag):

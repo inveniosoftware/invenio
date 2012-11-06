@@ -19,6 +19,7 @@
 
 from itertools import chain, groupby, izip, cycle
 from operator import itemgetter
+import cPickle
 from invenio.bibauthorid_matrix_optimization import maximized_mapping
 from invenio.bibauthorid_backinterface import save_cluster
 from invenio.bibauthorid_backinterface import get_all_papers_of_pids
@@ -26,6 +27,7 @@ from invenio.bibauthorid_backinterface import get_bib10x, get_bib70x
 from invenio.bibauthorid_backinterface import get_all_modified_names_from_personid
 from invenio.bibauthorid_backinterface import get_signatures_from_bibrefs
 from invenio.bibauthorid_name_utils import generate_last_name_cluster_str
+from invenio.bibauthorid_general_utils import  bibauthor_print
 
 
 #python2.4 compatibility
@@ -242,18 +244,27 @@ def delayed_create_from_mark(bibrefs, last_name):
     return ret
 
 
-def delayed_cluster_sets_from_marktables():
+def delayed_cluster_sets_from_marktables(limit_to_surnames=False):
     # { name -> [(table, bibref)] }
+    bibauthor_print('Delayed_cluster_set_from_marktables limited to %s' % str(limit_to_surnames))
+
     name_buket = {}
+    if limit_to_surnames:
+        limit_to_surnames = set([generate_last_name_cluster_str(s) for s in limit_to_surnames])
+
     for tab, ref, name in chain(izip(cycle((100,)), *izip(*get_bib10x())),
                                 izip(cycle((700,)), *izip(*get_bib70x()))):
         name = generate_last_name_cluster_str(name)
+        if limit_to_surnames and not name in limit_to_surnames:
+            continue
         name_buket[name] = name_buket.get(name, []) + [(tab, ref)]
+
+    bibauthor_print('Delayed_cluster_set_from_marktables going to get %s  signatures....' % str(len(name_buket)))
 
     all_refs = ((name, refs, len(list(get_signatures_from_bibrefs(refs))))
                 for name, refs in name_buket.items())
     all_refs = sorted(all_refs, key=itemgetter(2))
-    return ([delayed_create_from_mark(refs, name) for name, refs, _ in all_refs],
+    return ([delayed_create_from_mark(set(refs), name) for name, refs, _ in all_refs],
              map(itemgetter(0), all_refs),
              map(itemgetter(2), all_refs))
 

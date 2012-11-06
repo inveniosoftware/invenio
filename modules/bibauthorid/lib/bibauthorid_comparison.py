@@ -28,10 +28,10 @@ from invenio.bibauthorid_dbinterface import get_all_authors
 from invenio.bibauthorid_dbinterface import get_collaboration
 from invenio.bibauthorid_dbinterface import resolve_affiliation
 from invenio.bibauthorid_backinterface import get_key_words
-from invenio.bibrank_citation_searcher import get_citation_dict
+#from invenio.bibrank_citation_searcher import get_citation_dict
 #metadat_comparison_print commented everywhere to increase performances,
 #import and calls left here to make future debug easier.
-#from invenio.bibauthorid_general_utils import metadata_comparison_print
+from invenio.bibauthorid_general_utils import metadata_comparison_print
 
 
 # This module is not thread safe!
@@ -61,8 +61,8 @@ except:
 # one instance of them in the memory after
 # fork
 
-cit_dict = get_citation_dict("citationdict")
-recit_dict = get_citation_dict("reversedict")
+cit_dict = None#get_citation_dict("citationdict")
+recit_dict = None#get_citation_dict("reversedict")
 
 caches = []
 def create_new_cache():
@@ -85,7 +85,7 @@ def jaccard(set1, set2):
     '''
     This is no longer jaccard distance.
     '''
-    #metadata_comparison_print("Jaccard: Found %d items in the first set and %d in nthe second set" % (len(set1), len(set2)))
+    metadata_comparison_print("Jaccard: Found %d items in the first set and %d in nthe second set" % (len(set1), len(set2)))
 
     if not set1 or not set2:
         return '?'
@@ -93,7 +93,7 @@ def jaccard(set1, set2):
     match = len(set1 & set2)
     ret = match / float(len(set1) + len(set2) - match)
 
-    #metadata_comparison_print("Jaccard: %d common items; returning %f" % (match, ret))
+    metadata_comparison_print("Jaccard: %d common items; returning %f" % (match, ret))
     return ret
 
 
@@ -137,7 +137,20 @@ def cached_arg(reducing):
     return deco
 
 
+def check_comparison(fn):
+    allowed = ['+','-']
+    def checked(a,b):
+        val = fn(a,b)
+        if isinstance(val, tuple):
+            assert (val[0] >= 0 and val[0] <= 1), 'COMPARISON: Returned value not in range %s' % str(val)
+            assert (val[1] >= 0 and val[1] <= 1), 'COMPARISON: Returned compatibility not in range %s' % str(val)
+        else:
+            assert val in allowed, 'COMPARISON: returned not tuple value not in range %s' % str(val)
+        return val
+    return checked
+
 # The main function of this module
+@check_comparison
 def compare_bibrefrecs(bibref1, bibref2):
     '''
     This function compares two bibrefrecs (100:123,456) using all metadata
@@ -157,36 +170,43 @@ def compare_bibrefrecs(bibref1, bibref2):
                 first values in ignored).
     '''
 
+    metadata_comparison_print("")
+    metadata_comparison_print("Started comparing %s vs %s"% (str(bibref1),str(bibref2)))
     # try first the metrics, which might return + or -
     papers = _compare_papers(bibref1, bibref2)
     if papers != '?':
         return papers
 
-    if bconfig.CFG_INSPIRE_SITE:
-        insp_ids = _compare_inspireid(bibref1, bibref2)
-        if insp_ids != '?':
-            return insp_ids, 1.
+#    if bconfig.CFG_INSPIRE_SITE:
+#        insp_ids = _compare_inspireid(bibref1, bibref2)
+#        if insp_ids != '?':
+#            return insp_ids
 
-    results = [(func(bibref1, bibref2), weight) for func, weight in cbrr_func_weight]
-
-
-    coll = _compare_collaboration(bibref1, bibref2)
-    if coll == '?':
-        coll = _compare_coauthors(bibref1, bibref2)
-
-    results.append((coll, 3.))
+    results = []
+    for func, weight, fname in cbrr_func_weight:
+        r = func(bibref1,bibref2)
+        assert r == '?' or (r <= 1 and r>=0), 'COMPARISON %s returned %s for %s' % (fname, str(r),str(len(results)))
+        results.append((r, weight))
 
     total_weights = sum(res[1] for res in results)
-    #metadata_comparison_print("Final vector: %s." % str(results))
+
+    metadata_comparison_print("Final comparison vector: %s." % str(results))
+
     results = filter(lambda x: x[0] != '?', results)
 
     if not results:
+        metadata_comparison_print("Final result: Skipped all tests, returning 0,0")
         return 0, 0
 
     cert = sum(starmap(mul, results))
     prob = sum(res[1] for res in results)
-    return cert / prob, prob / total_weights
+    vals =  cert / prob, prob / total_weights
+    assert vals[0] >= 0 and vals[0] <= 1, 'COMPARISON: RETURNING VAL out of range'
+    assert vals[1] >= 0 and vals[1] <= 1, 'COMPARISON: RETURNING PROB out of range'
 
+    metadata_comparison_print("Final result: %s" % str(vals))
+
+    return vals
 
 @cached_arg(use_refrec)
 def _find_affiliation(bib):
@@ -195,12 +215,14 @@ def _find_affiliation(bib):
 
 
 def _compare_affiliations(bib1, bib2):
-    #metadata_comparison_print("Comparing affiliations.")
+    metadata_comparison_print("Comparing affiliations.")
 
     aff1 = _find_affiliation(bib1)
     aff2 = _find_affiliation(bib2)
 
     ret = jaccard(aff1, aff2)
+
+    metadata_comparison_print("Affiliations: %s %s %s", (str(aff1), str(aff2), str(ret)))
     return ret
 
 
@@ -211,12 +233,14 @@ def _find_unified_affiliation(bib):
 
 
 def _compare_unified_affiliations(bib1, bib2):
-    #metadata_comparison_print("Comparing affiliations.")
+    metadata_comparison_print("Comparing unified affiliations.")
 
     aff1 = _find_affiliation(bib1)
     aff2 = _find_affiliation(bib2)
 
     ret = jaccard(aff1, aff2)
+
+    metadata_comparison_print("Affiliations: %s %s %s", (str(aff1), str(aff2), str(ret)))
     return ret
 
 
@@ -227,21 +251,22 @@ def _find_inspireid(bib):
 
 
 def _compare_inspireid(bib1, bib2):
-    #metadata_comparison_print("Comparing inspire ids.")
+    metadata_comparison_print("Comparing inspire ids.")
 
     iids1 = _find_inspireid(bib1)
     iids2 = _find_inspireid(bib2)
 
-    #metadata_comparison_print("Found %d, %d different inspire ids for the two sets." % (len(iids1), len(iids2)))
+    metadata_comparison_print("Found %d, %d different inspire ids for the two sets." % (len(iids1), len(iids2)))
     if (len(iids1) != 1 or
         len(iids2) != 1):
         return '?'
+
     elif iids1 == iids2:
-        #metadata_comparison_print("The ids are the same.")
-        return 1.
+        metadata_comparison_print("The ids are the same.")
+        return 1
     else:
-        #metadata_comparison_print("The ids are different.")
-        return 0.
+        metadata_comparison_print("The ids are different.")
+        return 0
 
 
 @cached_arg(use_refrec)
@@ -251,26 +276,27 @@ def _find_email(bib):
 
 
 def _compare_email(bib1, bib2):
-    #metadata_comparison_print("Comparing email addresses.")
+    metadata_comparison_print("Comparing email addresses.")
 
     iids1 = _find_email(bib1)
     iids2 = _find_email(bib2)
 
-    #metadata_comparison_print("Found %d, %d different email addresses for the two sets." % (len(iids1), len(iids2)))
+    metadata_comparison_print("Found %d, %d different email addresses for the two sets." % (len(iids1), len(iids2)))
     if (len(iids1) != 1 or
         len(iids2) != 1):
         return '?'
     elif iids1 == iids2:
-        #metadata_comparison_print("The addresses are the same.")
+        metadata_comparison_print("The addresses are the same.")
         return 1.0
     else:
-        #metadata_comparison_print("The addresses are there, but different.")
+        metadata_comparison_print("The addresses are there, but different.")
         return 0.3
 
 
 def _compare_papers(bib1, bib2):
-    #metadata_comparison_print("Checking if the two bib refs are in the same paper.")
+    metadata_comparison_print("Checking if the two bib refs are in the same paper...")
     if bib1[2] == bib2[2]:
+        metadata_comparison_print("  ... Yes they are! Are you crazy, man?")
         return '-'
     return '?'
 
@@ -279,13 +305,16 @@ get_name_by_bibrecref = cached_arg(use_ref)(get_name_by_bibrecref)
 
 @cached_sym(use_ref)
 def _compare_names(bib1, bib2):
-    #metadata_comparison_print("Comparing names.")
+    metadata_comparison_print("Comparing names.")
 
     name1 = get_name_by_bibrecref(bib1)
     name2 = get_name_by_bibrecref(bib2)
 
+    metadata_comparison_print(" Found %s and %s" % (name1,name2))
     if name1 and name2:
-        return compare_names(name1, name2, False)
+        cmpv = compare_names(name1, name2, False)
+        metadata_comparison_print(" cmp(%s,%s) = %s" % (name1, name2, str(cmpv)))
+        return cmpv
     return '?'
 
 
@@ -297,11 +326,12 @@ def _find_key_words(bib):
 
 @cached_sym(use_rec)
 def _compare_key_words(bib1, bib2):
-    #metadata_comparison_print("Comparing key words.")
+    metadata_comparison_print("Comparing key words.")
     words1 = _find_key_words(bib1)
     words2 = _find_key_words(bib2)
-
-    return jaccard(words1, words2)
+    cmpv = jaccard(words1, words2)
+    metadata_comparison_print(" key words got (%s vs %s) for %s"% (words1, words2, cmpv))
+    return cmpv
 
 @cached_arg(use_rec)
 def _find_collaboration(bib):
@@ -311,12 +341,12 @@ def _find_collaboration(bib):
 
 @cached_sym(use_rec)
 def _compare_collaboration(bib1, bib2):
-    #metadata_comparison_print("Comparing collaboration.")
+    metadata_comparison_print("Comparing collaboration.")
 
     colls1 = _find_collaboration(bib1)
     colls2 = _find_collaboration(bib2)
 
-    #metadata_comparison_print("Found %d, %d different collaborations for the two sets." % (len(colls1), len(colls2)))
+    metadata_comparison_print("Found %d, %d different collaborations for the two sets." % (len(colls1), len(colls2)))
     if (len(colls1) != 1 or
         len(colls2) != 1):
         return '?'
@@ -333,12 +363,14 @@ def _find_coauthors(bib):
 
 @cached_sym(use_rec)
 def _compare_coauthors(bib1, bib2):
-    #metadata_comparison_print("Comparing authors.")
+    metadata_comparison_print("Comparing authors.")
 
     aths1 = _find_coauthors(bib1)
     aths2 = _find_coauthors(bib2)
 
-    return jaccard(aths1, aths2)
+    cmpv = jaccard(aths1, aths2)
+    metadata_comparison_print("   coauthors lists as %s"% (cmpv))
+    return cmpv
 
 
 @cached_arg(use_rec)
@@ -348,12 +380,14 @@ def _find_citations(bib):
 
 @cached_sym(use_rec)
 def _compare_citations(bib1, bib2):
-    #metadata_comparison_print("Comparing citations.")
+    metadata_comparison_print("Comparing citations.")
 
     cites1 = _find_citations(bib1)
     cites2 = _find_citations(bib2)
 
-    return jaccard(cites1, cites2)
+    cmpv = jaccard(cites1, cites2)
+    metadata_comparison_print(" citations as %s" % cmpv)
+    return cmpv
 
 
 @cached_arg(use_rec)
@@ -363,12 +397,16 @@ def _find_citations_by(bib):
 
 @cached_sym(use_rec)
 def _compare_citations_by(bib1, bib2):
-    #metadata_comparison_print("Comparing citations by.")
+    metadata_comparison_print("Comparing citations by.")
 
     cites1 = _find_citations_by(bib1)
     cites2 = _find_citations_by(bib2)
 
-    return jaccard(cites1, cites2)
+    cmpv =  jaccard(cites1, cites2)
+
+    metadata_comparison_print(" citations by as %s" % cmpv)
+
+    return cmpv
 
 
 # compare_bibrefrecs
@@ -379,21 +417,24 @@ def _compare_citations_by(bib1, bib2):
 # unfortunately, we have to do all comparisons
 if bconfig.CFG_INSPIRE_SITE:
     cbrr_func_weight = (
-                   (_compare_affiliations, 1.),
-                   (_compare_names, 5.),
-                   (_compare_citations, .5),
-                   (_compare_citations_by, .5),
-                   (_compare_key_words, 2.),
+                   (_compare_inspireid, 2., 'inspID'),
+                   (_compare_affiliations, .3, 'aff'),
+                   (_compare_names, .8, 'names'),
+                   #(_compare_citations, .1, 'cit'),
+                   #(_compare_citations_by, .1, 'citby'),
+                   (_compare_key_words, .1, 'kw'),
+                   (_compare_collaboration, .3, 'collab'),
+                   (_compare_coauthors, .1,'coauth')
                    )
 elif bconfig.CFG_ADS_SITE:
     cbrr_func_weight = (
-            (_compare_email, 3.),
-            (_compare_unified_affiliations, 2.),
-            (_compare_names, 5.),
+            (_compare_email, 3.,'email'),
+            (_compare_unified_affiliations, 2., 'aff'),
+            (_compare_names, 5.,'names'),
     #        register(_compare_citations, .5)
     #        register(_compare_citations_by, .5)
-            (_compare_key_words, 2.)
+            (_compare_key_words, 2.,'kw')
             )
 
 else:
-    cbrr_func_weight = ((_compare_names, 5.),)
+    cbrr_func_weight = ((_compare_names, 5.,'names'),)
