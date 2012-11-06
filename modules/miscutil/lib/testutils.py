@@ -697,6 +697,32 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element="page source")
 
+    def wait_element_displayed_with_timeout(self, element, timeout=30):
+        """ Wait until the given element is displayed, or timeout is reached
+        @param element: object we want to wait to be displayed
+        @type element: selenium.webdriver.remote.webelement.WebElement
+        @param timeout: time in seconds before throwing an exception
+        if element does not become visible
+        @type timeout: int
+        """
+        try:
+            WebDriverWait(self.browser, timeout).until(lambda x: element.is_displayed())
+        except:
+            raise InvenioWebTestCaseException(element=element)
+
+    def wait_element_hidden_with_timeout(self, element, timeout=30):
+        """ Wait until the given element is hidden, or timeout is reached
+        @param element: object we want to wait to be hidden
+        @type element: selenium.webdriver.remote.webelement.WebElement
+        @param timeout: time in seconds before throwing an exception
+        if element does not become hidden
+        @type timeout: int
+        """
+        try:
+            WebDriverWait(self.browser, timeout).until(lambda x: not element.is_displayed())
+        except:
+            raise InvenioWebTestCaseException(element=element)
+
     def login(self, username="guest", password="", force_ln='en', go_to_login_page=True):
         """ Login function
         @param username: the username (nickname or email)
