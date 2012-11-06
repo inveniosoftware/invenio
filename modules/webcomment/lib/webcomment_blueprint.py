@@ -68,7 +68,7 @@ blueprint = InvenioBlueprint('webcomment', __name__,
                             #breadcrumbs=[(_('Comments'),
                             #              'webcomment.subscribtions')],
                             menubuilder=[('main.personalize.comment_subscriptions',
-                                          _('Your Comment Subscriptions'),
+                                          _('Your comment subscriptions'),
                                           'webcomment.subscriptions', 20)])
 
 from invenio.record_blueprint import request_record
@@ -269,7 +269,7 @@ def unsubscribe(recid=None):
 #FIXME replace by Record `get title` when available
 from invenio.search_engine_utils import get_fieldvalues
 
-@blueprint.invenio_set_breadcrumb(_("Your Subscriptions"))
+@blueprint.invenio_set_breadcrumb(_("Your comment subscriptions"))
 @blueprint.route('/comments/subscriptions', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 def subscriptions():
