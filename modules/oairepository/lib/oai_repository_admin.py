@@ -385,7 +385,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
                             m2=%s,
                             p3=%s,
                             f3=%s,
-                            m3=%s,
+                            m3=%s
                          WHERE id=%s""",
                       (oai_set_name,
                        oai_set_spec,
