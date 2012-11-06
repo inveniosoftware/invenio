@@ -257,11 +257,14 @@ body {
     });
 
     if ($.inArray(event.name+':', typeahead.options.source)<0) {
-      $('form[name=search] input[name=p]').data('typeahead')
-        .options.source.push(event.name+':');
+      typeahead.options.source.push(event.name+':');
     }
-    $('form[name=search] input[name=p]').data('typeahead')
-      .options.sources[event.name] = $.map(event.facet, function(i) {
+
+    if (! typeahead.options.sources ) {
+      typeahead.options.sources = {}
+    }
+
+    typeahead.options.sources[event.name] = $.map(event.facet, function(i) {
         return i[0];
       });
 

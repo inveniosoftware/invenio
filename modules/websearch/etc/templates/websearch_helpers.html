@@ -232,7 +232,7 @@
       <div class="span6" style="min-width: 400px;">
 
         <div class="modal-header">
-          <button type="button" style="z-index:9999; position: relative;" class="close" onclick="$('.dropdown.open').removeClass('open')">×</button>
+          <button type="button" style="z-index:9999; position: relative;" class="close" onclick="$('.dropdown').removeClass('open open-permanent')">×</button>
           <div class="control" style="margin-bottom: 0px;">
             <label class="control-label">
               <strong>{{ _('Add to search') }}</strong>
@@ -270,10 +270,10 @@
         <div class="modal-footer">
           <small><ul class="nav nav-pills nav-pill-gray pull-left" style="margin-bottom: 0px; text-align: left;">
             <li class="active">
-              <a href="#simple-search" data-toggle="tab">simple</a>
+              <a href="#simple-search" data-toggle="tab">{{ _('simple') }}</a>
             </li>
             <li>
-              <a href="#advanced-search" data-toggle="tab">advanced</a>
+              <a href="#advanced-search" data-toggle="tab">{{ _('advanced') }}</a>
             </li>
           </ul></small>
           <button name="action_browse" class="btn">
@@ -305,6 +305,11 @@
 #searchdropdown .searchexamples .after-fix {
   padding-right: 20px;
 }
+
+.open-permanent .donothide {
+  display: block!important;
+}
+
 </style>
 {% endmacro %}
 
@@ -375,7 +380,7 @@
                   {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
                   value="{{ request.args.get('p', '') }}" autofocus/><!--
                 No space!
-             --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn">
+             --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn add-open-permanent">
                   <i class="caret"></i>
                 </span>
               </div>
@@ -415,7 +420,7 @@
 
 
         <div id="settingsdropdown" class="pull-right btn-group dropdown">
-          <button class="btn dropdown-toggle" data-target="#settingsdropdown" data-toggle="dropdown">
+          <button class="btn dropdown-toggle add-open-permanent" data-target="#settingsdropdown" data-toggle="dropdown">
             <i class="icon-cog"></i>
             <span class="caret"></span>
           </button>
@@ -670,15 +675,15 @@
         return false;
     });
 
-    $('html').on('click.dropdown', '.dropdown .donothide', function (e) {
-      if (!$(e.target).hasClass('close')) {
-        e.stopPropagation();
-      }
-    });
+    $('.add-open-permanent').on('click', function(e) {
+      $(this).parents('.dropdown').addClass('open-permanent')
+    })
 
-    $('html').on('click.dropdown.donothide.data-api', function (e) {
-      $('#searchdropdown').removeClass('open');
-    });
+    $(document).on('click', function(e) {
+      if ($(e.target).parents('.donothide').length <= 0) {
+        $('.open-permanent').removeClass('open-permanent')
+      }
+    })
 
     var source = $.map({{ collection.search_within[1:]|tojson|safe }},
           function(val, i) { return val[0]+':';}); //['author:', 'title:', 'isbn:'];
