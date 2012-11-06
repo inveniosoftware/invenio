@@ -86,6 +86,7 @@ tmpdir = $(prefix)/var/tmp
 tmp_DATA = intbitset_example.int
 
 EXTRA_DIST = $(pylib_DATA) \
+             $(tmp_DATA) \
              testimport.py \
              kwalitee.py \
              pep8.py \
@@ -95,8 +96,22 @@ EXTRA_DIST = $(pylib_DATA) \
              intbitset_impl.c \
              intbitset_setup.py \
              intbitset.pyx \
-             $(tmp_DATA)
-
+             solrutils \
+             solrutils/schema.xml \
+             solrutils/java_sources.txt \
+             solrutils/org \
+             solrutils/org/invenio_software \
+             solrutils/org/invenio_software/solr \
+             solrutils/org/invenio_software/solr/BitSetFieldCollector.java \
+             solrutils/org/invenio_software/solr/InvenioFacetComponent.java \
+             solrutils/org/invenio_software/solr/FieldCollectorBase.java \
+             solrutils/org/invenio_software/solr/IntFieldCollector.java \
+             solrutils/org/invenio_software/solr/FieldCollector.java \
+             solrutils/org/invenio_software/solr/InvenioQueryComponent.java \
+             solrutils/org/invenio_software/solr/InvenioBitsetStreamResponseWriter.java \
+             solrutils/org/invenio_software/solr/InvenioBitSet.java \
+             solrutils/org/invenio_software/solr/StringFieldCollector.java \
+             solrutils/solrconfig.xml
 
 all:
 	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
