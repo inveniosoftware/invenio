@@ -310,7 +310,7 @@ def facet(name, qid):
         else:
             collection = Collection.query.filter(Collection.name==data['cc']).first_or_404()
         facet = []
-        for c in collection.collection_children:
+        for c in collection.collection_children_r:
             num_records = len(c.reclist.intersection(recIDsHitSet))
             if num_records:
                 facet.append((c.name, num_records, c.name_ln))

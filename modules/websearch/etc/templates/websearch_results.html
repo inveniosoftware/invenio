@@ -128,7 +128,7 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-          {%- for i in collection.formatoptions if i.content_type == 'text/html' -%}
+          {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
             {%- set used_args = new_args.copy() -%}
             {%- do used_args.update({'of':i.code}) -%}
             <li><a
@@ -183,7 +183,7 @@
            </span>
             <span class="span4">
               <select name="of" class="span2">
-              {%- for i in collection.formatoptions -%}
+              {%- for i in collection.formatoptions if i.content_type != 'text/html' and i.visibility == 1 -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
               {%- endfor -%}
               </select>

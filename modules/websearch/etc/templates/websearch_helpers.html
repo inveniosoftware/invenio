@@ -455,7 +455,7 @@
                       name="of"
                       style="height: inherit; line-height: inherit;"
                       class="btn-small span2">
-              {%- for i in collection.formatoptions if i.content_type == 'text/html' -%}
+              {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
               {%- endfor -%}
               </select>

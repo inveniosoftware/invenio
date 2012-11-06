@@ -187,7 +187,8 @@ class Collection(db.Model):
         if len(self._formatoptions):
             return self._formatoptions
         else:
-            return [{'code': 'hb', 'name': "HTML %s" % g._("brief")}]
+            return [{'code': 'hb', 'name': "HTML %s" % g._("brief"),
+                     'content_type': 'text/html'}]
 
     @property
     def name_ln(self):
