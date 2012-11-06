@@ -464,12 +464,6 @@ template function generated it.
             if lastupdated.startswith("$Date: ") or \
             lastupdated.startswith("$Id: "):
                 lastupdated = convert_datecvs_to_datestruct(lastupdated)
-                              #convert_datestruct_to_dategui(\
-                              #   convert_datecvs_to_datestruct(lastupdated),
-                              #   ln=ln)
-            msg_lastupdated = _("Last updated") + ": " + lastupdated
-        else:
-            msg_lastupdated = ""
 
         out = """
 <div class="pagefooter">
