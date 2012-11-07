@@ -27,7 +27,8 @@ pylib_DATA = bibdocfile_config.py file.py \
              bibdocfile_managedocfiles.py \
              bibdocfile.py \
              bibdocfilecli.py \
-             bibdocfile_regression_tests.py
+             bibdocfile_regression_tests.py \
+             bibdocfile_web_tests.py
 
 noinst_DATA = fulltext_files_migration_kit.py icon_migration_kit.py
 
