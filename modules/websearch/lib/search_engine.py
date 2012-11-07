@@ -2686,7 +2686,7 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
     to intersect later on with the 'real' query.
     """
     set = intbitset()
-    if type.startswith("m"):
+    if type and type.startswith("m"):
         type = "modification_date"
     else:
         type = "creation_date" # by default we are searching for creation dates
@@ -2872,7 +2872,7 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
        'hitset' intersection to each collection within search
        'results'.
 
-       If the final 'results' set is to be empty, and 'ap'
+       If the final set is to be empty, and 'ap'
        (approximate pattern) is true, and then print the `warningtext'
        and return the original 'results' set unchanged.  If 'ap' is
        false, then return empty results set.
@@ -2882,14 +2882,15 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
     else:
         results_ap = {} # will return empty dict in case of no hits found
     nb_total = 0
+    final_results = {}
     for coll in results.keys():
-        results[coll].intersection_update(hitset)
-        nb_total += len(results[coll])
+        final_results[coll] = results[coll].intersection(hitset)
+        nb_total += len(final_results[coll])
     if nb_total == 0:
         if of.startswith("h"):
             write_warning(aptext, req=req)
-        results = results_ap
-    return results
+        final_results = results_ap
+    return final_results
 
 def create_similarly_named_authors_link_box(author_name, ln=CFG_SITE_LANG):
     """Return a box similar to ``Not satisfied...'' one by proposing
@@ -5752,15 +5753,13 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
         if verbose and of.startswith("h"):
             write_warning("Search stage 5: applying time etc limits, from %s until %s..." % (datetext1, datetext2), req=req)
         try:
-            new_res = intersect_results_with_hitset(req,
-                                                    results_final,
-                                                    search_unit_in_bibrec(datetext1, datetext2, dt),
-                                                    ap,
-                                                    aptext= _("No match within your time limits, "
-                                                              "discarding this condition..."),
-                                                    of=of)
-            results_final.clear()
-            results_final.update(new_res)
+            results_final = intersect_results_with_hitset(req,
+                                                          results_final,
+                                                          search_unit_in_bibrec(datetext1, datetext2, dt),
+                                                          ap,
+                                                          aptext= _("No match within your time limits, "
+                                                                    "discarding this condition..."),
+                                                          of=of)
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
@@ -5783,15 +5782,13 @@ def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=No
         if verbose and of.startswith("h"):
             write_warning("Search stage 5: applying search pattern limit %s..." % cgi.escape(pl), req=req)
         try:
-            new_res = intersect_results_with_hitset(req,
-                                                    results_final,
-                                                    search_pattern_parenthesised(req, pl, ap=0, ln=ln, wl=wl),
-                                                    ap,
-                                                    aptext=_("No match within your search limits, "
-                                                            "discarding this condition..."),
-                                                    of=of)
-            results_final.clear()
-            results_final.update(new_res)
+            results_final = intersect_results_with_hitset(req,
+                                                          results_final,
+                                                          search_pattern_parenthesised(req, pl, ap=0, ln=ln, wl=wl),
+                                                          ap,
+                                                          aptext=_("No match within your search limits, "
+                                                                   "discarding this condition..."),
+                                                          of=of)
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
