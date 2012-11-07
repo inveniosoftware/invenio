@@ -139,6 +139,24 @@ except ImportError, msg:
     """ % msg
     )
 
+
+## Check Werkzeug version
+werkzeug_ver = werkzeug.__version__.split(".")
+if werkzeug_ver[0] == "0" and int(werkzeug_ver[1]) < 8:
+    error_messages.append(
+    """
+    *****************************************************
+    ** Werkzeug version %s detected
+    *****************************************************
+    ** Your are using an outdated version of Werkzeug  **
+    ** with known problems. Please upgrade Werkzeug to **
+    ** at least v0.8 by running e.g.:                  **
+    **   pip install Werkzeug --upgrade                **
+    *****************************************************
+    """ % werkzeug.__version__
+    )
+
+
 ## 3) check for recommended modules:
 try:
     import rdflib
