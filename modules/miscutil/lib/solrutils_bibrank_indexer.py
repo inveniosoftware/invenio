@@ -37,6 +37,7 @@ from invenio.bibrank_bridge_config import CFG_MARC_ABSTRACT, \
                                           CFG_MARC_KEYWORD
 from invenio.solrutils_bibindex_indexer import remove_invalid_solr_characters
 from invenio.bibindex_engine import create_range_list
+from invenio.errorlib import register_exception
 
 
 if CFG_SOLR_URL:
@@ -100,13 +101,15 @@ def solr_add(recid, abstract, author, fulltext, keyword, title):
     """
     Helper function that adds word similarity ranking relevant indexes to Solr.
     """
-    SOLR_CONNECTION.add(id=recid,
-                        abstract=remove_invalid_solr_characters(abstract),
-                        author=remove_invalid_solr_characters(author),
-                        fulltext=remove_invalid_solr_characters(fulltext),
-                        keyword=remove_invalid_solr_characters(keyword),
-                        title=remove_invalid_solr_characters(title))
-
+    try:
+        SOLR_CONNECTION.add(id=recid,
+                            abstract=remove_invalid_solr_characters(abstract),
+                            author=remove_invalid_solr_characters(author),
+                            fulltext=remove_invalid_solr_characters(fulltext),
+                            keyword=remove_invalid_solr_characters(keyword),
+                            title=remove_invalid_solr_characters(title))
+    except:
+        register_exception(alert_admin=True)
 
 
 def word_similarity_solr(run):
