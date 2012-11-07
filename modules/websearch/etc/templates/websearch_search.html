@@ -20,15 +20,13 @@
 {% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, record_brief_links with context %}
 {% from "websearch_results.html" import render_search_results with context %}
 {% extends "page.html" %}
-{% set title = collection.name_ln if collection.id > 1 else None %}
+{# set title = collection.name_ln if collection.id > 1 else None #}
+{% set title = None %}
 
 {%- set portalboxes = dict() -%}
 {%- for k,l in collection.portalboxes_ln|groupby('position') -%}
   {%- do portalboxes.update({k:l}) -%}
 {%- endfor -%}
-
-{% block breadcrumb %}
-{% endblock %}
 
 {% block title %}
   {{ portalboxes.tp }}
@@ -265,8 +263,8 @@ body {
     }
 
     typeahead.options.sources[event.name] = $.map(event.facet, function(i) {
-        return i[0];
-      });
+      return i[0];
+    });
 
     $('[data-facet="toggle"]')
       .filter('[data-facet-key="'+event.name+'"]')
@@ -303,6 +301,7 @@ body {
           clearTimeout(popupTimer)
         $e.popover('hide')
       })
+
     }).on('click', function(event) {
         var $el_clicked = $(this),
             options = $('#facet_list').data('facet').options
@@ -345,8 +344,13 @@ body {
     $('#search_results').css('min-height', $('#facet_list').height())
     $('#facet_list').affix('checkPosition');
 
-    if (document.location.hash.length > 2) {
-      $(window).trigger('hashchange');
+    //if (document.location.hash.length > 2) {
+    //  $(window).trigger('hashchange');
+    //}
+
+    // When we load data we should select facets from filter.
+    if (facet.findByKey(event.name).length > 0) {
+      facet.rebuildFilter(facet.filter)
     }
 
   }).on('deleted', function(event) {
@@ -378,11 +382,13 @@ body {
   }).on('added', function(event) {
 
     var type = (event.op == '+')?'info':'error'
+      , other_type = (event.op == '-')?'info':'error'
     $('[data-facet-key="'+event.key+'"]')
       .filter('[data-facet-value="'+event.value+'"]')
       .each(function(e) {
         if (event.op != '!') {
           $(this)
+            .removeClass('text-'+other_type)
             .addClass('text-'+type)
             .css('font-weight', 'bold')
         }
@@ -411,8 +417,11 @@ body {
               , data = {parent: event.value}
               , $ul = $('<ul class="context unstyled"><ul>').clone().appendTo($el_clicked.parent())
 
-            $('#facet_list').data('facet').filter.push(['!', event.key, event.value])
-            $('#facet_list').data('facet').createFacetBox(facet, $ul, data)
+            var data_facet = $('#facet_list').data('facet')
+            if (data_facet.find('!', event.key, event.value).length == 0) {
+              data_facet.filter.push(['!', event.key, event.value])
+            }
+            data_facet.createFacetBox(facet, $ul, data)
           //}
         }
       })
@@ -440,9 +449,12 @@ body {
     }
   });
 
-  // Trigger history change.
+  // Parse hash URI component.
   if (document.location.hash.length > 2) {
-    $(window).trigger('hashchange');
+    var hash = decodeURIComponent(document.location.hash)
+      , hash_filter = hash.substr(1)
+      , filter = jQuery.parseJSON(hash_filter);
+    $('#facet_list').data('facet').filter = filter || []
   }
 
 })(jQuery);

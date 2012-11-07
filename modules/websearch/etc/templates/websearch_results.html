@@ -77,7 +77,7 @@
                title="{{ _('Add to basket') }}"></i>
           </button>
         </span>
-        <p class="help-inline">
+        <p class="help-inline hidden-phone">
           {%- set r_from = (pagination.page-1)*pagination.per_page+1 -%}
           {%- set r_to = pagination.page*pagination.per_page -%}
           {%- set r_of = recids|length -%}
@@ -183,7 +183,7 @@
            </span>
             <span class="span4">
               <select name="of" class="span2">
-              {%- for i in collection.formatoptions if i.content_type != 'text/html' and i.visibility == 1 -%}
+              {%- for i in export_formats -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
               {%- endfor -%}
               </select>

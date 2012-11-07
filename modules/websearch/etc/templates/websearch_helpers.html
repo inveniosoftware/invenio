@@ -316,106 +316,13 @@
 {% macro search_form(collection) %}
   <div id="search-box-main" class="row">
     <div class="span12">
-      <div class="control-group well">
-        <form action="{{ url_for('.search') }}" name="search" method="get" class="pull-left form-horizontal" style="margin: 0px;">
-          <label for="p" class="control-label">
-            {%- set nbrecs = collection.nbrecs -%}
-            {%- if not collection.nbrecs -%}
-            {%- set nbrecs = 0 -%}
-            {%- endif -%}
-            {{ _("Search %d records for:")|format(nbrecs) }}
-          </label>
-          <div class="controls">
-            <div id="searchdropdown" style="float: left;" class="dropdown">
-            {#
-            {% set search_placeholder = _('Input query') %}
-            {% if collection.examples %}
-              {% set search_placeholder = (collection.examples|random).example.body %}
-            {% endif %}
-            #}
-              <div class="input-prepend input-append">
-                <div class="dropdown add-on">
-                  <a class="dropdown-toggle"
-                     rel="tooltip" title="{{ _('Search Tips and Examples') }}"
-                     data-placement="bottom"
-                     data-delay="100"
-                     data-toggle="dropdown" role="button"
-                     href="#"><i class="icon-question-sign"></i></a>
-                  <ul class="searchexamples dropdown-menu" role="menu" aria-labelledby="dLabel" style="text-align: left;">
-                    <li>
-                      <a href="/help/search-tips">
-                        <i class="pull-right icon-info-sign"></i>
-                        <strong>{{ _("Search Tips") }}</strong>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/help/search-guide">
-                        <i class="pull-right icon-leaf"></i>
-                        <strong>{{ _("Search Guide") }}</strong>
-                      </a>
-                    </li>
-                    {% if collection.examples %}
-                    <li class="divider"></li>
-                    <li class="nav-header">
-                      {{ _('Search examples') }}
-                    </li>
-                  {%- for e in collection.examples if e.example.body -%}
-                    <li>
-                      <a href="{{ url_for('search.search', p=e.example.body) }}">
-                        <i class="pull-right icon-chevron-right"></i>
-                        <span class="after-fix">{{ e.example.body }}</span>
-                      </a>
-                    </li>
-                  {%- endfor -%}
-                  {% endif %}
-                  </ul>
-                </div><!--
-                No space!
-             --><input autocomplete="off"
-                  data-provide="typeahead"
-                  data-items="4"
-                  name="p"
-                  class="span5"
-                  type="text"
-                  {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
-                  value="{{ request.args.get('p', '') }}" autofocus/><!--
-                No space!
-             --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn add-open-permanent">
-                  <i class="caret"></i>
-                </span>
-              </div>
-
-{#
- # This is a dirty hack for browser without Javascript support.
- #}
-<script>
-  var box = {{ search_box(collection)|tojson|safe }};
-  //var box = {{ _search_simple_box(collection)|tojson|safe }};
-  //var box = {{ _search_advanced_box(collection)|tojson|safe }};
-  document.write(box);
-</script>
-
-              <!-- Hidden configuration fields -->
-              {% if collection.id != 1 %}
-              <input type="hidden" name="cc" value="{{ collection.name }}" />
-              {% endif %}
-              {{ _search_hidden_options() }}
-              <!-- end of configuration fields -->
-
-              <button name="action_search" type="submit" class="btn btn-primary">
-                <i class="icon-search icon-white"></i> {{ _("Search") }}
-              </button>
-              {#
-              <span class="help-inline">
-                <a href="/help/search-tips">{{ _("Search Tips") }}</a>
-              </span>
-              #}
-            </div>
-          </div><!-- end controls -->
-        </form>
+    <div class="well well-small"
+         style="margin-bottom: 20px; margin-left: -9px; margin-right: -9px;">
+      <div class="row">
 
         <form action="{{ url_for('.search') }}" name="settings" method="get"
-              style="margin: 0px;" class="pull-right form-inline">
+              style="margin-bottom: 0px; position: relative; z-index: 1;"
+              class="pull-right form-inline">
           <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
 
 
@@ -524,10 +431,121 @@
           </ul>
         </div>
         </form>
-        <div style="clear: both;"></div>
 
-      </div><!-- end controll-group well -->
+
+
+        <form action="{{ url_for('.search') }}"
+              name="search"
+              method="get"
+              style="margin-bottom: 0px;"
+              class="form-horizontal span11">
+        <div class="row">
+          <div class="span2 visible-desktop">
+            <label for="p"
+                style="padding-top: 5px; text-align: right; font-size: 90%;">
+              {%- set nbrecs = collection.nbrecs -%}
+              {%- if not collection.nbrecs -%}
+              {%- set nbrecs = 0 -%}
+              {%- endif -%}
+              {{ _("Search %d records for:")|format(nbrecs) }}
+            </label>
+          </div>
+          <div class="span9">
+            <div id="searchdropdown"
+                 class="dropdown">
+            {#
+            {% set search_placeholder = _('Input query') %}
+            {% if collection.examples %}
+              {% set search_placeholder = (collection.examples|random).example.body %}
+            {% endif %}
+            #}
+              <div class="input-prepend input-append">
+                <div class="dropdown add-on">
+                  <a class="dropdown-toggle"
+                     rel="tooltip" title="{{ _('Search Tips and Examples') }}"
+                     data-placement="bottom"
+                     data-delay="100"
+                     data-toggle="dropdown" role="button"
+                     href="#"><i class="icon-question-sign"></i></a>
+                  <ul class="searchexamples dropdown-menu" role="menu" aria-labelledby="dLabel" style="text-align: left;">
+                    <li>
+                      <a href="/help/search-tips">
+                        <i class="pull-right icon-info-sign"></i>
+                        <strong>{{ _("Search Tips") }}</strong>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/help/search-guide">
+                        <i class="pull-right icon-leaf"></i>
+                        <strong>{{ _("Search Guide") }}</strong>
+                      </a>
+                    </li>
+                    {% if collection.examples %}
+                    <li class="divider"></li>
+                    <li class="nav-header">
+                      {{ _('Search examples') }}
+                    </li>
+                  {%- for e in collection.examples if e.example.body -%}
+                    <li>
+                      <a href="{{ url_for('search.search', p=e.example.body) }}">
+                        <i class="pull-right icon-chevron-right"></i>
+                        <span class="after-fix">{{ e.example.body }}</span>
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                  {% endif %}
+                  </ul>
+                </div><!--
+                No space!
+             --><input autocomplete="off"
+                  data-provide="typeahead"
+                  data-items="4"
+                  name="p"
+                  class="span6"
+                  type="text"
+                  style="min-width:200px;"
+                  {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
+                  value="{{ request.args.get('p', '') }}" autofocus/><!--
+                No space!
+             --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn add-open-permanent">
+                  <i class="caret"></i>
+                </span>
+              </div>
+
+{#
+ # This is a dirty hack for browser without Javascript support.
+ #}
+<script>
+  var box = {{ search_box(collection)|tojson|safe }};
+  //var box = {{ _search_simple_box(collection)|tojson|safe }};
+  //var box = {{ _search_advanced_box(collection)|tojson|safe }};
+  document.write(box);
+</script>
+
+              <!-- Hidden configuration fields -->
+              {% if collection.id != 1 %}
+              <input type="hidden" name="cc" value="{{ collection.name }}" />
+              {% endif %}
+              {{ _search_hidden_options() }}
+              <!-- end of configuration fields -->
+
+              <button name="action_search" type="submit" class="btn btn-primary">
+                <i class="icon-search icon-white"></i>
+                <span class="hidden-phone">{{ _("Search") }}</span>
+              </button>
+              {#
+              <span class="help-inline">
+                <a href="/help/search-tips">{{ _("Search Tips") }}</a>
+              </span>
+              #}
+            </div>
+          </div><!-- end controls -->
+        </div>
+        </form>
+
+      </div><!-- end sub row -->
     </div><!-- end span12 -->
+    </div>
   </div><!-- end row -->
 
 
