@@ -104,6 +104,7 @@
       {% if collection.is_restricted %}
         <strong>{{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
       {% else %}
+        {% if collection.reclist %}
         {% for recid in collection.reclist %}
           <div class="row-fluid">
             <div class="span1">
@@ -125,6 +126,7 @@
              </div>
           </div>
         {% endfor %}
+        {% endif %}
       {% endif %}
       </div>
   {% endif %}
