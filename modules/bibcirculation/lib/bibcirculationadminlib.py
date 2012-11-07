@@ -4954,6 +4954,7 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status,
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_SECURE_URL,)
 
+    title = _("ILL request details")
     if infos == []:
         body = bc_templates.tmpl_ill_request_details_step1(
                                     ill_request_id=ill_request_id,
@@ -4961,7 +4962,6 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status,
                                     libraries=libraries,
                       ill_request_borrower_details=ill_request_borrower_details,
                                     ln=ln)
-        title = _("ILL request details")
     else:
         body = bc_templates.tmpl_display_infos(infos, ln)
 
