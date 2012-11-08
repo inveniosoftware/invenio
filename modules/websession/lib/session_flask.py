@@ -44,8 +44,7 @@ from invenio.config import \
 
 __all__ = ["InvenioSession", "InvenioSessionInterface"]
 
-#CFG_SUPPORT_HTTPS = CFG_SITE_SECURE_URL.startswith("https://")
-CFG_SUPPORT_HTTPS = False ## FIXME: add support for redirecting to HTTPS
+CFG_SUPPORT_HTTPS = CFG_SITE_SECURE_URL.startswith("https://")
 
 # Store session information in memory cache (Redis, Memcache, ...).
 CFG_SESSION_IN_CACHE = CFG_FLASK_CACHE_TYPE not in [None, 'null']
