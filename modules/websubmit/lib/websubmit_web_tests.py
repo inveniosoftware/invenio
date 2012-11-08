@@ -229,6 +229,16 @@ class InvenioWebSubmitWebTest(InvenioWebTestCase):
         self.page_source_test(expected_text=['Submission Complete!', \
                                              'Your document has the following reference(s): <b>DEMO-ARTICLE-'])
 
+    def test_access_restricted_submission_as_guest(self):
+        """websubmit - web test guest must login to access restricted submission"""
+        self.browser.get(CFG_SITE_SECURE_URL + '/submit?ln=en&doctype=DEMOTHE')
+        self.page_source_test(expected_text=['Password', 'Lost your password?'],
+                              unexpected_text=['Submit New Record', \
+                                               'Demo Thesis Submission'])
+        self.login(username="jekyll", password="j123ekyll", go_to_login_page=False)
+        self.page_source_test(expected_text=['Submit New Record', \
+                                             'Demo Thesis Submission'])
+
 TEST_SUITE = make_test_suite(InvenioWebSubmitWebTest, )
 
 if __name__ == '__main__':
