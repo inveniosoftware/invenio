@@ -127,6 +127,10 @@ contributed to the project:
   - Thomas McCauley <thomas.mccauley@cern.ch>
     Improvements to Invenio Connector.
 
+The Flask SSLify plugin was adapted from the original version developed
+by Kenneth Reitz <_@kennethreitz.com>.
+<https://github.com/kennethreitz/flask-sslify>
+
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
 All Rights Reserved''.
