@@ -40,8 +40,12 @@ from invenio.config import CFG_PYLIBDIR, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
     CFG_LOGDIR, CFG_SITE_LANG, CFG_WEBDIR, \
     CFG_ETCDIR, CFG_DEVEL_SITE, \
-    CFG_FLASK_CACHE_TYPE
+    CFG_FLASK_CACHE_TYPE, \
+    CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, CFG_WEBSESSION_ONE_DAY
+
+CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
+CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
 def create_invenio_flask_app():
     """
@@ -58,7 +62,6 @@ def create_invenio_flask_app():
     db.init_cfg(_app)
     # Register Flask application in flask-sqlalchemy extension
     db.init_app(_app)
-
 
     from invenio.pluginutils import PluginContainer, create_enhanced_plugin_builder
     from invenio.session_flask import InvenioSessionInterface
@@ -77,9 +80,28 @@ def create_invenio_flask_app():
     from flaskext.gravatar import Gravatar
     from werkzeug.wrappers import BaseResponse
     from werkzeug.exceptions import HTTPException
-
+    from invenio.flask_sslify import SSLify
     from invenio.webinterface_handler_wsgi import \
                 application as legacy_application
+
+    if CFG_HAS_HTTPS_SUPPORT:
+        # Makes request always run over HTTPS.
+        _sslify = SSLify(_app)
+
+        if not CFG_FULL_HTTPS:
+            @_sslify.criteria_handler
+            def criteria():
+                """Extends criteria when to stay on HTTP site."""
+                _force_https = False
+                if request.blueprint in current_app.blueprints:
+                    _force_https = current_app.blueprints[request.blueprint]._force_https
+
+                view_func = current_app.view_functions.get(request.endpoint)
+                if view_func is not None and hasattr(view_func, '_force_https'):
+                    _force_https = view_func._force_https
+
+                return not (_force_https or session.need_https())
+
 
     class LegacyAppMiddleware(object):
         def __init__(self, app):

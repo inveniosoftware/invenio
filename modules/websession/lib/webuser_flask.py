@@ -350,7 +350,13 @@ class InvenioLoginManager(object):
         ctx.user.save() #.reload(update_session=True)
 
 # A proxy for current user
-current_user = LocalProxy(lambda: _request_ctx_stack.top.user)
+def _request_top_user():
+    try:
+        return _request_ctx_stack.top.user
+    except:
+        return UserInfo()
+
+current_user = LocalProxy(_request_top_user)
 
 def login_user(uid, remember_me=False, force=False):
     #FIXME: create user info from uid

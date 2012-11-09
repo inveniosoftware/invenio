@@ -262,17 +262,19 @@ class InvenioSessionInterface(SessionInterface):
         domain = self.get_cookie_domain(app)
         from invenio.websession_model import Session
         if not session:
-            response.delete_cookie(app.session_cookie_name,
-                                    domain=domain)
-            response.delete_cookie(app.session_cookie_name + 'stub',
-                                    domain=domain)
+            current_app.logger.error("Empty session: " + str(request.url))
             return
+        #    response.delete_cookie(app.session_cookie_name,
+        #                            domain=domain)
+        #    response.delete_cookie(app.session_cookie_name + 'stub',
+        #                            domain=domain)
+        #    return
         timeout = self.get_session_expiration_time(app, session)
         session_expiry = datetime.utcnow() + timeout
         max_age = cookie_expiry = None
         uid = session.uid
         if uid > -1 and session.permanent:
-            max_age = app.permanent_session_lifetime.total_seconds()
+            max_age = app.permanent_session_lifetime
             cookie_expiry = session_expiry
         sid = session.sid
         if session.logging_in:

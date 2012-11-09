@@ -19,13 +19,14 @@
 
 """WebAccount Flask Blueprint"""
 
+from werkzeug.urls import url_unquote
 from flask import Blueprint, session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import User, Usergroup, UserUsergroup
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webinterface_handler import wash_urlargd
-from invenio.config import CFG_SITE_LANG
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.access_control_config import \
      CFG_EXTERNAL_AUTH_USING_SSO, \
      CFG_EXTERNAL_AUTH_LOGOUT_SSO
@@ -39,6 +40,9 @@ from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
 from invenio.webaccount_forms import LoginForm
 from invenio.webuser_flask import login_user, logout_user, current_user
 
+CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
+CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
+
 blueprint = InvenioBlueprint('youraccount', __name__, url_prefix="/youraccount",
                 breadcrumbs=[(_("Your Account"), 'youraccount.index')],
                 menubuilder=[('main.personalize', _('Personalize'),
@@ -47,6 +51,7 @@ blueprint = InvenioBlueprint('youraccount', __name__, url_prefix="/youraccount",
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Login"))
+@blueprint.invenio_force_https
 def login():
     form = LoginForm(request.values, csrf_enabled=False)
     if form.validate_on_submit():
@@ -57,7 +62,13 @@ def login():
                 User.password==form.password.data)).one()
             login_user(user.get_id(), remember_me=form.remember.data)
             flash(_("You have been logged in."), "info")
-            return redirect(request.form.get("referer", url_for(".login")))
+            # Change HTTP method to https if needed.
+            referer = url_unquote(request.form.get("referer", url_for(".login")))
+            if CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and \
+                request.url.startswith('https://') and \
+                referer.startswith('http://'):
+                referer = referer.replace('http://', 'https://', 1)
+            return redirect(referer)
         except:
             flash(_("Problem with login."), "error")
 

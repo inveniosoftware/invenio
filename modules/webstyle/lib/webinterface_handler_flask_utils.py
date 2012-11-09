@@ -64,13 +64,25 @@ class InvenioBlueprint(Blueprint):
 
 
     def __init__(self, name, import_name, url_prefix=None, config=None,
-                 breadcrumbs=None, menubuilder=None):
+                 breadcrumbs=None, menubuilder=None, force_https=False):
+        """
+        Invenio extension of standard Flask blueprint.
+
+        @param name: blueprint unique text identifier
+        @param import_name: class name (usually __name__)
+        @param url_prefix: URL prefix for all blueprints' view functions
+        @param config: importable config class
+        @param breadcrumbs: list of breadcrumbs
+        @param menubuilder: list of menus
+        @param force_https: requires blueprint to be accessible only via https
+        """
         Blueprint.__init__(self, name, import_name, url_prefix=url_prefix)
         self.config = config
         self.breadcrumbs = breadcrumbs or []
         self.breadcrumbs_map = {}
         self.menubuilder = menubuilder or []
         self.menubuilder_map = {}
+        self._force_https = force_https
 
     def invenio_set_breadcrumb(self, label, name=None):
         def decorator(f):
@@ -252,6 +264,16 @@ class InvenioBlueprint(Blueprint):
             return decorated_function
         return decorator
 
+    @property
+    def invenio_force_https(self):
+        """
+        Decorator: This forces the view function be available only through
+        HTTPS.
+        """
+        def decorator(f):
+            f._force_https = True
+            return f
+        return decorator
 
     def invenio_authenticated(self, f):
         """
