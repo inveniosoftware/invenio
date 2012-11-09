@@ -789,12 +789,12 @@ def pre_check_bibsched():
     logger = logging.getLogger('invenio_upgrader')
     logger.info("Checking bibsched process...")
 
-    output = subprocess.Popen(["%s/bin/bibsched" % CFG_PREFIX, "status"],
-                   stdout=subprocess.PIPE).communicate()[0]
+    output, error = subprocess.Popen(["%s/bin/bibsched" % CFG_PREFIX, "status"],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
 
     is_manual = False
     is_0_running = False
-    for line in output.splitlines():
+    for line in (output + error).splitlines():
         if 'BibSched queue running mode: MANUAL' in line:
             is_manual = True
         if 'Running processes: 0' in line:
