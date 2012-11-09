@@ -26,7 +26,8 @@ pylib_DATA = __init__.py \
              errorlib_model.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
-             data_cacher.py \
+             flask_sslify.py \
+	     data_cacher.py \
              dbdump.py \
              web_api_key.py \
              web_api_key_unit_tests.py \
