@@ -41,7 +41,8 @@ from invenio.websearch_forms import EasySearchForm
 from invenio.websearch_model import Collection, CollectionCollection, Format
 from invenio.websearch_webinterface import wash_search_urlargd
 from invenio.websession_model import User
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
+                                  register_template_context_processor
 from invenio.webuser_flask import current_user
 from invenio import bibindex_model as BibIndex
 from invenio.bibindex_engine import get_index_id_from_index_name
@@ -81,12 +82,13 @@ def index():
     """ Renders homepage. """
     collection = Collection.query.get_or_404(1)
     # inject functions to the template
-    current_app.template_context_processors[None].append(
-        lambda: dict(
+    @register_template_context_processor
+    def index_context():
+        return dict(
             easy_search_form = EasySearchForm(csrf_enabled=False),
             format_record=cached_format_record,
             get_creation_date=get_creation_date
-        ))
+        )
     return dict(collection=collection)
 
 
@@ -116,11 +118,13 @@ def collection(name):
     #FIXME cache per language
     b = get_collection_breadcrumbs(collection, [(_('Home'),'')])
     current_app.config['breadcrumbs_map'][request.endpoint] = b
-    current_app.template_context_processors[None].append(lambda: dict(
-                format_record=cached_format_record))
-    return dict(collection=collection,
-        easy_search_form = EasySearchForm(csrf_enabled=False),
-        get_creation_date=get_creation_date)
+    @register_template_context_processor
+    def index_context():
+        return dict(
+            format_record=cached_format_record,
+            easy_search_form = EasySearchForm(csrf_enabled=False),
+            get_creation_date=get_creation_date)
+    return dict(collection=collection)
 
 
 class Pagination(object):
@@ -307,7 +311,9 @@ def search():
                'url': url_for('.facet', name=f, qid=qid),
                'facet': f}  for f in ['collection', 'author', 'year']]
 
-    current_app.template_context_processors[None].append(lambda: dict(
+    @register_template_context_processor
+    def index_context():
+        return dict(
                 collection = collection,
                 facets = facets,
                 RecordInfo = RecordInfo,
@@ -321,7 +327,7 @@ def search():
                 export_formats=Format.query.filter(db.and_(
                     Format.content_type != 'text/html',
                     Format.visibility == 1
-                    )).order_by(Format.name).all()))
+                    )).order_by(Format.name).all())
     return dict(recids = recids)
 
 
@@ -462,13 +468,15 @@ def results(qid):
 
     rg = request.form.get('rg', 10, type=int)
     page = request.form.get('jrec', 1, type=int)
-    current_app.template_context_processors[None].append(lambda: dict(
+    @register_template_context_processor
+    def index_context():
+        return dict(
                 collection = collection,
                 RecordInfo = RecordInfo,
                 create_nearest_terms_box = _create_neareset_term_box,
                 pagination = Pagination(int(ceil(page/float(rg))), rg, len(recids)),
                 rg = rg,
-                format_record=cached_format_record))
+                format_record=cached_format_record)
 
     if len(recids):
         return render_template('websearch_results.html',

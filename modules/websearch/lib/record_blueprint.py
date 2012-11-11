@@ -36,7 +36,8 @@ from invenio.websearch_model import Collection, CollectionCollection
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec
 from invenio.webcomment_model import CmtSUBSCRIPTION
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
+                                  register_template_context_processor
 from invenio.webuser_flask import current_user
 
 from invenio.search_engine import search_pattern_parenthesised,\
@@ -103,17 +104,19 @@ def request_record(f):
             if v['visible']:
                 g.record_tab_keys.append(b+'.'+k)
 
-        current_app.template_context_processors[None].append(lambda: dict(
-            recid = recid,
-            record = record,
-            user = user,
-            tabs = tabs,
-            title = title,
-            get_mini_reviews = lambda *args, **kwargs: get_mini_reviews(
-                                      *args, **kwargs).decode('utf8'),
-            collection = collection,
-            format_record = cached_format_record
-            ))
+        @register_template_context_processor
+        def record_context():
+            return dict(
+                recid = recid,
+                record = record,
+                user = user,
+                tabs = tabs,
+                title = title,
+                get_mini_reviews = lambda *args, **kwargs: get_mini_reviews(
+                                          *args, **kwargs).decode('utf8'),
+                collection = collection,
+                format_record = cached_format_record
+                )
         return f(recid, *args, **kwargs)
     return decorated
 

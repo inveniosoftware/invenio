@@ -33,6 +33,8 @@ from sqlalchemy.sql import operators
 ## Placemark for the i18n function
 _ = lambda x:x
 
+def register_template_context_processor(f):
+    g._template_context_processor.append(f)
 
 class InvenioBlueprint(Blueprint):
 
@@ -253,10 +255,9 @@ class InvenioBlueprint(Blueprint):
                 if form is not None:
                     current_app.logger.info("Values %s" % request.values)
                     filter_form = form(request.values)
-                    # This is ugly hack because it is not possible to call
-                    # context_processor() method after request is started.
-                    current_app.template_context_processors[None].append(
-                                lambda: dict(filter_form=filter_form))
+                    @register_template_context_processor
+                    def inject_filter_form():
+                        return dict(filter_form=filter_form)
                 # Generate ClauseElement for filtered columns.
                 kwargs['filter'] = db.and_(*where)
                 current_app.logger.info("Where: %s" % kwargs['filter'])

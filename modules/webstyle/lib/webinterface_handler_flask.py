@@ -230,6 +230,17 @@ def create_invenio_flask_app():
         return UserInfo(uid)
 
     @_app.before_request
+    def reset_template_context_processor():
+        g._template_context_processor = []
+
+    @_app.context_processor
+    def _inject_template_context():
+        context = {}
+        for func in g._template_context_processor:
+            context.update(func())
+        return context
+
+    @_app.before_request
     def _guess_language():
         """
         Before every request being handled, let's compute the language needed to

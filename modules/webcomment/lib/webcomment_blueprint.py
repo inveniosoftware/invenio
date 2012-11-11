@@ -37,7 +37,8 @@ from invenio.websession_model import User
 from invenio.webcomment_model import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
                                      CmtACTIONHISTORY
 from invenio.webcomment_forms import AddCmtRECORDCOMMENTForm
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
+                                     register_template_context_processor
 from invenio.webuser_flask import current_user
 from invenio.config import CFG_PREFIX, \
      CFG_SITE_LANG, \
@@ -275,8 +276,9 @@ from invenio.search_engine_utils import get_fieldvalues
 def subscriptions():
     uid = current_user.get_id()
     all = CmtSUBSCRIPTION.query.filter(CmtSUBSCRIPTION.id_user==uid).all()
-    current_app.template_context_processors[None].append(lambda: dict(
-        get_title = lambda r: get_fieldvalues(r, '245__a')[0]))
+    @register_template_context_processor
+    def get_title():
+        return dict(get_title = lambda r: get_fieldvalues(r, '245__a')[0])
     return render_template('webcomment_subscriptions.html', subscriptions=all)
 
 
