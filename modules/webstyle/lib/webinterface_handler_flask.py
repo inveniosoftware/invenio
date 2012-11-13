@@ -163,9 +163,13 @@ def create_invenio_flask_app():
     _app.config['SESSION_COOKIE_NAME'] = CFG_WEBSESSION_COOKIE_NAME
     _app.config['PERMANENT_SESSION_LIFETIME'] = CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER * CFG_WEBSESSION_ONE_DAY
     _app.config['USE_X_SENDFILE'] = CFG_BIBDOCFILE_USE_XSENDFILE
-    _app.config['DEBUG'] = False #CFG_DEVEL_SITE
-    _app.debug = False #True #CFG_DEVEL_SITE
+    _app.config['DEBUG'] = CFG_DEVEL_SITE
+    _app.debug = CFG_DEVEL_SITE
     _app.config['CFG_LANGUAGE_LIST_LONG'] = [(lang, longname.decode('utf-8')) for (lang, longname) in language_list_long()]
+
+
+    from flask_debugtoolbar import DebugToolbarExtension
+    _toolbar = DebugToolbarExtension(_app)
 
     ## Invenio is all using str objects. Let's change them to unicode
     _app.config.update(unicodifier(dict(_app.config)))
