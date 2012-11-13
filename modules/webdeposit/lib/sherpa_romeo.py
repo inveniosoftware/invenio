@@ -1,64 +1,71 @@
 # This Python file uses the following encoding: utf-8
-from xmlDict import *
+from xmlDict import XmlDictConfig, ElementTree
 import urllib2
 from werkzeug.contrib.cache import RedisCache
 
 
-class SherpaRomeoSearch:
+class SherpaRomeoSearch(object):
 
-    def searchPublisher(self, query):
+    def search_publisher(self, query):
         cleanquery = query.replace(" ", "+")
         url = "http://www.sherpa.ac.uk/romeo/api29.php?pub=" + cleanquery
         self.parser = SherpaRomeoXMLParser()
-        self.parser.parseURL(url)
-        return self.parser.getPublishers()
+        self.parser.parse_url(url)
+        return self.parser.get_publishers()
 
-    def searchTitle(self, query):
+    def search_journal(self, query):
         cleanquery = query.replace(" ", "+")
         url = "http://www.sherpa.ac.uk/romeo/api29.php?jtitle=" + cleanquery + "&qtype=contains"
         self.parser = SherpaRomeoXMLParser()
-        self.parser.parseURL(url)
-        return self.parser.getTitles()
+        self.parser.parse_url(url)
+        return self.parser.get_journals()
+
+    def search_journal_exact(self, query):
+        cleanquery = query.replace(" ", "+")
+        url = "http://www.sherpa.ac.uk/romeo/api29.php?jtitle=" + cleanquery + "&qtype=exact"
+        self.parser = SherpaRomeoXMLParser()
+        self.parser.parse_url(url)
+        return self.parser.get_journals()
 
 
-class SherpaRomeoXMLParser:
+class SherpaRomeoXMLParser(object):
 
     def __init__(self):
         self.parsed = False
 
 
-    def parseURL(self, url):
+    def parse_url(self, url):
         print url
         self.url = url
         #example
         #url = 'http://www.sherpa.ac.uk/romeo/api29.php?jtitle=Annals%20of%20Physics'
 
-        foundTitle = url.find("jtitle=")
-        if foundTitle != -1:
+        found_title = url.find("jtitle=")
+        if found_title != -1:
             self.type = "title"
-            self.query = url[foundTitle + 7:(len(url) - 15)]
+            self.query = url[found_title + 7:(len(url) - 15)]
         else:
             self.type = "pub"
-            foundPublisher = url.find("pub=")
-            if foundPublisher != -1:
-                self.query = url[foundTitle + 4:len(url)]
+            found_publisher = url.find("pub=")
+            if found_publisher != -1:
+                self.query = url[found_title + 4:len(url)]
 
         cache = RedisCache("localhost", default_timeout=9000)
-        cachedXML = cache.get(self.type + ":" + self.query)
-        if not cachedXML:
+        cached_xml = cache.get(self.type + ":" + self.query)
+        if not cached_xml:
             print self.type + ":" + self.query + " is not cached!"
             self.data = urllib2.urlopen(url).read()
             root = ElementTree.XML(self.data)
             self.xml = XmlDictConfig(root)
             cache.set(self.type + ":" + self.query, self.data)
         else:
-            self.data = cachedXML
+            self.data = cached_xml
             root = ElementTree.XML(self.data)
             self.xml = XmlDictConfig(root)
 
         self.parsed = True
 
-    def getTitles(self):
+    def get_journals(self):
         titles = list()
         if self.xml['header']['outcome'] == 'notFound' \
            or self.xml['header']['outcome'] == 'failed':
@@ -76,7 +83,7 @@ class SherpaRomeoXMLParser:
 
         return titles
 
-    def getPublishers(self):
+    def get_publishers(self):
         if self.xml['header']['outcome'] == 'notFound' \
            or self.xml['header']['outcome'] == 'failed':
             return []
@@ -93,47 +100,33 @@ class SherpaRomeoXMLParser:
 
         return publishers
 
-
-    def getConditions(self):
-        #returns a publisher=>conditions dictionary
+    def get_conditions(self):
         if self.xml['header']['outcome'] == 'notFound' \
             or self.xml['header']['outcome'] == 'failed'\
             or self.xml['header']['outcome'] == 'uniqueZetoc' :
             return {}
-        conditions = dict()
-
-        if self.xml['header']['outcome'] == 'singleJournal':
+        elif self.xml['header']['outcome'] == 'singleJournal':
+            try:
+                return self.xml['publishers']['publisher']['conditions']['condition']
+            except TypeError:
+                pass
+        elif self.xml['header']['outcome'] == 'publisherFound':
             return self.xml['publishers']['publisher']['conditions']['condition']
 
+        #there are no publishers
+        #maybe the query returned multiple results
+        url = "http://www.sherpa.ac.uk/romeo/api29.php?issn=" + self.get_issn()
+        data = urllib2.urlopen(url).read()
+        root = ElementTree.XML(data)
+        xml = XmlDictConfig(root)
         try:
-            pubs = self.xml['publishers']['publisher']
-        except TypeError:
-            #there are no publishers
-            #maybe the query returned multiple results
-            url = "http://www.sherpa.ac.uk/romeo/api29.php?issn=" + self.getISSN()
-            data = urllib2.urlopen(url).read()
-            root = ElementTree.XML(data)
-            xml = XmlDictConfig(root)
             return xml['publishers']['publisher']['conditions']['condition']
+        except TypeError:
+            return None
 
-        for p in pubs:
-            try:
-                conditions[p['name']] = p['conditions']['condition']
-            except TypeError:
-                #there are no conditions
-                #maybe the query returned multiple results
-                if self.getISSN() is None:
-                    continue;
-                url = "http://www.sherpa.ac.uk/romeo/api29.php?issn=" + self.getISSN()
-                print url
-                data = urllib2.urlopen(url).read()
-                root = ElementTree.XML(data)
-                xml = XmlDictConfig(root)
-                return xml['publishers']['publisher']['conditions']['condition']
 
-        return conditions
 
-    def getISSN(self):
+    def get_issn(self):
         if self.xml['header']['outcome'] == 'notFound' \
            or self.xml['header']['outcome'] == 'failed':
             return []
@@ -146,7 +139,6 @@ class SherpaRomeoXMLParser:
                 if j['jtitle'].replace(" ", "+").lower() == self.query.lower():
                     return j['issn']
                 issns[j['jtitle']] = j['issn']
-
 
             return issns
 

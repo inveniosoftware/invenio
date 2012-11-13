@@ -2,10 +2,11 @@
 {% block header %}
     {{ super() }}
     {% js 'js/jquery-ui.min.js' %}
-    {% css 'img/jquery-ui.css' %}
     {% js 'js/plupload.full.js' %}
     {% js 'js/jquery.plupload.queue.js' %}
     {% css 'css/jquery.plupload.queue.css' %}
+    {% css 'img/jquery-ui-1.8.23.custom.css' %}
+    
 {% endblock %}
 
 {% block body %}
@@ -47,7 +48,7 @@ div#conditions{
   margin-right: auto ;
       padding: 20px;*/
       clear:both;
-      margin-top:50px;
+      margin-top:10px;
 }
 </style>
 
@@ -57,31 +58,7 @@ div#conditions{
 
 <script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
 
-<!-- Plupload js -->
-
-<script type="text/javascript">
-// Convert divs to queue widgets when the DOM is ready
-$(function() {
-     // Setup html5 version
-     $(".pluploader").pluploadQueue({
-         // General settings
-         runtimes : 'html5',
-         url : $SCRIPT_ROOT + '_upload',
-         max_file_size : '460mb',
-         chunk_size : '1mb',
-         unique_names : true,
-
-         // Resize images on clientside if we can
-         resize : {width : 320, height : 240, quality : 90},
-
-         // Specify what files to browse for
-         filters : [
-             {title : "Image files", extensions : "jpg,gif,png,tif"},
-             {title : "Compressed files", extensions : "zip,tar,gz"},
-             {title : "PDF files", extensions : "pdf"},
-         ]
-     });
-});
+<script type=text/javascript>
 
     var ajaxRequest = $.ajax({});
     $(function() {
@@ -99,12 +76,12 @@ var oldJournal;
   $(function() {
     $('input').change( function() {
         name = this.name;
-        $.getJSON($SCRIPT_ROOT + '_errorCheck/{{ draft_id }}', {
+        $.getJSON($SCRIPT_ROOT + '_errorCheck', {
             name: this.name,
             attribute: $('input[name="'+this.name+'"]').val()
         }, function(data) {
           if (data.error == 1) {
-              errorMsg = data.error_message;
+              errorMsg = data.errorMessage; 
               $('#submitButton').attr('disabled', 'disabled');
               $('#error-'+name).html(errorMsg);
               $('#error-'+name).show('slow');
@@ -117,7 +94,6 @@ var oldJournal;
               emptyForm = checkEmptyFields();
               if (emptyForm[0] == 0){
                   $('#empty-fields-error').hide('slow');
-                  $('#submitButton').removeAttr('disabled');
               }
               else {
                   $('#empty-fields-error').html(emptyForm[1]);
@@ -130,16 +106,15 @@ var oldJournal;
     });
   });
 
-
   $(function() {
     $('textarea').change( function() {
         name = this.name;
-        $.getJSON($SCRIPT_ROOT + '_errorCheck/{{ draft_id }}', {
+        $.getJSON($SCRIPT_ROOT + '_errorCheck', {
             name: this.name,
             attribute: $('textarea[name="'+this.name+'"]').val()
         }, function(data) {
           if (data.error == "1"){
-              errorMsg = data.error_message;
+              errorMsg = data.errorMessage;
               $('#submitButton').attr('disabled', 'disabled');
               $('#error-'+name).html(errorMsg);
               $('#error-'+name).show('slow');
@@ -168,12 +143,12 @@ var oldJournal;
   $(function() {
     $('select').change( function() {
         name = this.name;
-        $.getJSON($SCRIPT_ROOT + '_errorCheck/{{ draft_id }}', {
+        $.getJSON($SCRIPT_ROOT + '_errorCheck', {
             name: this.name,
             attribute: $('select[name="'+this.name+'"]').val()[0]
         }, function(data) {
           if (data.error == "1"){
-              errorMsg = data.error_message;
+              errorMsg = data.errorMessage;
               $('#submitButton').attr('disabled', 'disabled');
               $('#error-'+name).html(errorMsg);
               $('#error-'+name).show('slow');
@@ -203,9 +178,11 @@ $(document).ready(function() {
 
 
   $(function() {
-
-      $(".datepicker").datepicker();
-
+  
+          
+            $(".datepicker").datepicker();
+        
+  
       $("#submitButton").click(function(e ) {
           e.preventDefault();
           emptyForm = checkEmptyFields();
@@ -248,7 +225,7 @@ function type(o){
 
 $(function() {
     $("input#journal").autocomplete({
-        source: "_autocomplete/{{ draft_id }}?type=journal",
+        source: "_autocomplete?type=journal",
         open: function(event, ui) {
             $('div#wait-journal').hide('slow');
         },
@@ -259,13 +236,13 @@ $(function() {
             var selected = ui.item.value;
             $('#conditions').html('<img src="{{ url_for('static', filename='img/loading.gif') }}"/>');
             $('#conditions').show('slow');
-
-            $.getJSON($SCRIPT_ROOT + '_errorCheck/{{ draft_id }}', {
+            
+            $.getJSON($SCRIPT_ROOT + '_errorCheck', {
                 name: 'journal',
                 attribute: selected
             }, function(data) {});
-
-            $.getJSON($SCRIPT_ROOT + '_ISSN/{{ draft_id }}', {
+            
+            $.getJSON($SCRIPT_ROOT + '_ISSN', {
                 title: selected
             }, function(data) {
                   $("input#issn").val(data.issn);
@@ -273,6 +250,7 @@ $(function() {
                   if (jQuery.isEmptyObject(data.conditions))
                       cond += "<strong> not found</strong>";
                   else {
+                    cond = "";
                       if( type(data.conditions) === 'String' ) {
                           cond += data.conditions;
                       }
@@ -307,7 +285,7 @@ $(function() {
 /*
     (function () {
         var oldVal;
-
+        
         $('input#journal').bind('DOMAttrModified textInput input change keypress paste focus', function () {
             var val = this.value;
             if (val !== oldVal) {
@@ -320,55 +298,49 @@ $(function() {
         });
     }());
 */
+    
 
     $("input#journal").change( function() {
         $('#issn').val('');
         $('#conditions').hide('slow');
     });
-
+    
     $("input#issn").change( function() {
         $('#conditions').hide('slow');
     });
 
     $("input#publisher").autocomplete({
-        source: "_autocomplete/{{ draft_id }}?type=publisher",
+        source: "_autocomplete?type=publisher",
         minLength: 5,
         select: function(event, ui) {
             var selected = ui.item.value;
-            $.getJSON($SCRIPT_ROOT + '_errorCheck/{{ draft_id }}', {
+            $.getJSON($SCRIPT_ROOT + '_errorCheck', {
                 name: 'publisher',
                 attribute: selected
             }, function(data) {});
         }
     });
-
-    {% for field in form %}
-
-    {% if field.autocomplete %}
-
-    $("input#{{ field.name }}").autocomplete({
-        source: "_autocomplete/{{ draft_id }}?type={{ field.name }}",
+    
+     $("input#author").autocomplete({
+        source: "_autocomplete?type=author",
         minLength: 5,
         select: function(event, ui) {
             var selected = ui.item.value;
-            $.getJSON($SCRIPT_ROOT + '_errorCheck/{{ draft_id }}', {
-                name: '{{ field.name }}',
+            $.getJSON($SCRIPT_ROOT + '_errorCheck', {
+                name: 'author',
                 attribute: selected
             }, function(data) {});
         }
     });
-
-    {% endif %}
-
-    {% endfor %}
-
 });
 
 $(function() {
     $("input#publisher").change(function(){
-
+        
     });
 });
+
+//////////////////////////////
 
   $(function() {
     $('#keywords').keyup( function() {
@@ -388,7 +360,7 @@ $(function() {
 
         tempkeywords = $('#keywords2').val();
         $('#keywords2').val(tempkeywords+" "+keywords);
-
+        
     });
   });
 
@@ -400,110 +372,35 @@ $(function() {
 </script>
 
 
-	    <h3>{{ form._title }}</h3>
-
-	    <div style="width 550px;">
-	    {% if form._drafting %}
-    	    <div class="btn-group" style="float:left;">
-              <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                Saved Drafts
-                <span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu">
-              {% for draft in drafts %}
-                <li> <a href="/submit/websubmit/{{ draft.doc_type }}/{{ draft.draft_id }}">
-                    {% if draft_id == draft.draft_id %}
-                        <strong>
-                    {% endif %}
-                        {% if  draft.title is none %}
-                            Untitled
-                        {% else %}
-                            {{ draft.title }}
-                        {% endif %}
-                         <small><span class="muted">{{ draft.timestamp }}</small>
-                    {% if draft_id == draft.draft_id %}
-                        </strong>
-                    {% endif %}
-                     </a>
-                </li>
-              {% endfor %}
-              </ul>
-            </div>
-            <a href="/submit/{{ doc_type }}/new/"><button class="btn btn-small btn-primary" type="button" style="float:left; margin-left:220px;"><i class="icon-edit"></i> New Draft</button></a>
-            <a href="/submit/{{ doc_type }}/websubmit_delete/{{ draft_id }}"><button class="btn btn-small btn-danger" type="button" style="float:left; margin-left:10px;"><i class="icon-remove"></i> Delete Draft</button></a>
-         </div>
-       {% endif %}
+	    <h3>Select a Document Type</h3>
+	    
+	    
     <div id="container">
-	<form enctype="multipart/form-data" name="submitForm" id="submitForm"  action="submit" method="post">
-	<table>
-	    {% for field in form %}
-	    <tr>
-		<td width="50%">
+	
+        <div class="accordion" id="accordion2">
 
-		{% if "submit" not in field.__html__() %}
-                <div style="float:left; margin-right:5px; margin-top:2px;" >{{ field._icon_html|safe }}</div>
-		{{ field.label }}</td>
-            <td>
-            {{ field(class_=field.short_name) }}
-
-            <div class="livesearch" id="{{ field.name }}-search"></div>
-
-            {% if ("keywords" in field.__html__()) %}
-                </td><tr><td></td>
-                <td colspan="2">
-                <div id="editable"></div>
-            {% endif %}
-            </td>
-
-		{% else %}
-		</td></tr>
-        <tr><td></td>
-            <td style="float:right;" ></br><input id="submitButton" class="btn btn-primary btn-large"
-                name="submitButton" type="submitButton" value="Submit {{ doc_type }}"></td>
-		{% endif %}
-        <td style="height:20px; width:20px;">
-                <div id="wait-{{ field.name }}"
-                style="position: absolute; height: 20px; width: 20px; margin-top: -17px; display:none;">
-                <img src="{{ url_for('static', filename='img/loading.gif') }}"/>
+        {% for doc_group, doc_types in docs.items() %}
+        
+          <div class="accordion-group">
+                <div class="accordion-heading">
+                      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{ loop.index }}">
+                        <i class="icon-list"></i> {{ doc_group }}
+                      </a>
                 </div>
-        </td>
-	    </tr>
-        <tr><td colspan="2">
-
-            <div class="alert alert-error" id="error-{{ field.name }}" style="font-size:12px; display:none;">error message</div>
-
-            </td></tr>
-        {% if ("issn" in field.__html__()) %}
-                <tr>
-                <td colspan="3">
-                {% if conditions is defined %}
-                    <div class="alert alert-info" id="conditions" style="display:block;">
-                    <strong>Policies</strong>
-                    <ul>
-                    {% for condition in conditions %}
-                      <li>{{ condition }}</li>
-                    {% endfor %}
-                    </ul>
-                {% else %}
-                    <div class="alert alert-info" id="conditions">
-                {% endif %}
+                <div id="collapse{{ loop.index }}" class="accordion-body collapse">
+                      <div class="accordion-inner">
+                      {% for doc_type in doc_types %}
+                            <a href="{{ doc_type.type }}">{{ doc_type.name }}<br>
+                       {% endfor %}
+                      </div>
                 </div>
-                    </td>
-                    </tr>
-        {% endif %}
-
-        {% if ("keywords" in field.__html__()) %}
-            <tr style="display:none;">
-            <td width="50%">
-            <input id="keywords2" name="keywords2" type="text" value=""></td>
-            </tr>
-        {% endif %}
-
-        {% endfor %}
-
-	</table>
-	</form>
-    <div class="alert alert-error" id="empty-fields-error" style="font-size:12px; display:none;"></div>
-</div>
+          </div>
+          
+          {% endfor %}
+        
+        </div>
+	</div>
+        <div class="alert alert-error" id="empty-fields-error" style="font-size:12px; display:none;"></div>
+    </div>
 
 {% endblock %}

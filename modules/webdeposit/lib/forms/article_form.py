@@ -1,7 +1,6 @@
-import os
-from wtforms import Form, TextField, TextAreaField, SelectMultipleField, DateField, FileField, SubmitField
+from wtforms import Form, \
+                    SubmitField
 
-from invenio.SherpaRomeo import SherpaRomeoSearch, SherpaRomeoXMLParser
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_load_fields import fields
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget
@@ -9,15 +8,16 @@ from invenio.webdeposit_field_widgets import date_widget, plupload_widget
 globals().update(fields)
 __all__ = ['ArticleForm']
 
+
 class ArticleForm(Form):
 
     publisher = PublisherField(_('Publisher'))
     journal = JournalField(_('Journal Title'))
-    issn = TextField('ISSN')
+    issn = ISSNField('ISSN')
     title = TitleField(_('Document Title'))
     author = AuthorField(_('Author of the Document'))
-    abstract = TextAreaField(_('Abstract'))
-    pagesnum = IntegerTextField(_('Number of Pages'))
+    abstract = AbstractField(_('Abstract'))
+    pagesnum = PagesNumberField(_('Number of Pages'))
     languages = [("en", _("English")), \
                 ("fre", _("French")), \
                 ("ger", _("German")), \
@@ -33,15 +33,15 @@ class ArticleForm(Form):
                 ("nor", _("Norwegian")), \
                 ("swe", _("Swedish")), \
                 ("fin", _("Finnish")), \
-                ("rus", _("Russian")) ]
-    language = SelectMultipleField(choices=languages)
+                ("rus", _("Russian"))]
+    language = LanguageField(label="Language", choices=languages)
     date = Date(_('Date of Document'), widget=date_widget)
-    keywords = TextField(_('Keywords'))
-    notes = TextAreaField(_('Additional Notes or Comments'))
-    file = FileField(_('File'))
-    plupload_file = FileField(_('File'), widget=plupload_widget)
+    keywords = KeywordsField(_('Keywords'))
+    notes = NotesField(_('Additional Notes or Comments'))
+    file = FileUploadField(_('File'))
+    plupload_file = FileUploadField(_('File'), widget=plupload_widget)
     submit = SubmitField()
 
-    #configuration variables
+    """ Form Configuration variables """
     _title = _("Submit an Article")
-    _drafting = True #enable and disable drafting
+    _drafting = True  #enable and disable drafting

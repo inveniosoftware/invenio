@@ -1,7 +1,7 @@
 from wtforms import IntegerField
-from invenio.webdeposit_utils import is_number
 
 __all__ = ['IntegerTextField']
+
 
 class IntegerTextField(IntegerField):
 
@@ -9,11 +9,7 @@ class IntegerTextField(IntegerField):
         super(IntegerTextField, self).__init__(name, **kwargs)
 
     def pre_validate(self):
-        value = self.data
-        from websubmit_form_fields import is_number
-        if not is_number(value):
-            return dict(error=1, \
-                        errorMessage='Pages number must be a number! duh')
+            return dict(error=0, error_message='')
 
     def autocomplete(self):
         return []

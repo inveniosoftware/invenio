@@ -18,6 +18,7 @@
 pylibdir = $(libdir)/python/invenio/webdeposit_forms
 
 pylib_DATA = __init__.py \
-             article_form.py
+             article_form.py \
+             photo_form.py
 
 CLEANFILES = *~ *.tmp *.pyc

@@ -1,4 +1,3 @@
-from wtforms import DateField
 from wtforms.widgets import html_params, HTMLString
 
 def date_widget(field, **kwargs):

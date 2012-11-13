@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = forms fields dep_types
+SUBDIRS = forms fields doc_types
 
 pylibdir = $(libdir)/python/invenio
 
@@ -24,9 +24,12 @@ pylib_DATA = __init__.py \
              webdeposit_utils.py \
              webdeposit_load_fields.py \
              webdeposit_load_forms.py \
+             webdeposit_load_doc_types.py \
+             webdeposit_load_doc_metadata.py \
              webdeposit_field_widgets.py \
              webdeposit_model.py \
              sherpa_romeo.py \
+             orcid.py \
              xmlDict.py
 
 CLEANFILES = *~ *.tmp *.pyc

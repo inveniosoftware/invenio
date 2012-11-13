@@ -18,7 +18,8 @@
 templatesdir = $(sysconfdir)/templates
 templates_DATA = \
 		 websubmit_add.html \
-		 websubmit_submitted.html
+		 websubmit_submitted.html \
+		 websubmit_doc_types.html
 
 EXTRA_DIST = $(templates_DATA)
 
