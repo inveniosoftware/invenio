@@ -75,6 +75,12 @@ blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              menubuilder=[('main.search', _('Search'),
                                            'search.index', 1)])
 
+@cache.memoize()
+def get_export_formats():
+    return Format.query.filter(db.and_(
+                    Format.content_type != 'text/html',
+                    Format.visibility == 1
+                    )).order_by(Format.name).all()
 
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.invenio_templated('websearch_index.html')
@@ -217,17 +223,32 @@ class RecordInfo(object):
     def __init__(self, recid):
         self.recid = recid
 
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, self.recid)
+
     def get_nb_reviews(self, count_deleted=False):
-        return get_nb_reviews(self.recid, count_deleted)
+        @cache.cached(key_prefix='record_info::get_nb_reviews::'+str(self.recid)+'::'+str(count_deleted))
+        def cached():
+            return get_nb_reviews(self.recid, count_deleted)
+        return cached()
 
     def get_nb_comments(self, count_deleted=False):
-        return get_nb_comments(self.recid, count_deleted)
+        @cache.cached(key_prefix='record_info::get_nb_comments::'+str(self.recid)+'::'+str(count_deleted))
+        def cached():
+            return get_nb_comments(self.recid, count_deleted)
+        return cached()
 
     def get_cited_by_count(self):
-        return get_cited_by_count(self.recid)
+        @cache.cached(key_prefix='record_info::get_cided_by_count::'+str(self.recid))
+        def cached():
+            return get_cited_by_count(self.recid)
+        return cached()
 
     def get_fieldvalues(self, fieldname):
-        return get_fieldvalues(self.recid, fieldname)
+        @cache.cached(key_prefix='record_info::get_fieldvalues::'+str(self.recid)+'::'+str(fieldname))
+        def cached():
+            return get_fieldvalues(self.recid, fieldname)
+        return cached()
 
 
 def _create_neareset_term_box(argd_orig):
@@ -324,10 +345,7 @@ def search():
                 easy_search_form = EasySearchForm(csrf_enabled=False),
                 format_record=cached_format_record,
                 #FIXME: move to DB layer
-                export_formats=Format.query.filter(db.and_(
-                    Format.content_type != 'text/html',
-                    Format.visibility == 1
-                    )).order_by(Format.name).all())
+                export_formats=get_export_formats())
     return dict(recids = recids)
 
 
@@ -481,10 +499,7 @@ def results(qid):
     if len(recids):
         return render_template('websearch_results.html',
                         recids=recids,
-                        export_formats=Format.query.filter(db.and_(
-                            Format.content_type != 'text/html',
-                            Format.visibility == 1
-                            )).order_by(Format.name).all())
+                        export_formats=get_export_formats())
     else:
         return _('Your search did not match any records. Please try again.')
     #return jsonify(recids = output.tolist())

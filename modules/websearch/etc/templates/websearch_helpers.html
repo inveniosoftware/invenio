@@ -456,7 +456,7 @@
             {#
             {% set search_placeholder = _('Input query') %}
             {% if collection.examples %}
-              {% set search_placeholder = (collection.examples|random).example.body %}
+              {% set search_placeholder = (collection.examples|random).body %}
             {% endif %}
             #}
               <div class="input-prepend input-append">
@@ -485,11 +485,11 @@
                     <li class="nav-header">
                       {{ _('Search examples') }}
                     </li>
-                  {%- for e in collection.examples if e.example.body -%}
+                  {%- for e in collection.examples if e.body -%}
                     <li>
-                      <a href="{{ url_for('search.search', p=e.example.body) }}">
+                      <a href="{{ url_for('search.search', p=e.body) }}">
                         <i class="pull-right icon-chevron-right"></i>
-                        <span class="after-fix">{{ e.example.body }}</span>
+                        <span class="after-fix">{{ e.body }}</span>
                       </a>
                     </li>
                   {%- endfor -%}

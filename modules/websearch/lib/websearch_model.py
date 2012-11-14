@@ -27,6 +27,7 @@ from operator import itemgetter
 from flask import g
 from sqlalchemy.ext.mutable import Mutable
 from invenio.intbitset import intbitset
+from invenio.cache import cache
 from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
 from invenio.search_engine import collection_restricted_p
 from invenio.sqlalchemyutils import db
@@ -161,6 +162,9 @@ external_collection_mapper = attribute_multi_dict_collection(
 class Collection(db.Model):
     """Represents a Collection record."""
 
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, self.id)
+
     __tablename__ = 'collection'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True)
@@ -183,27 +187,43 @@ class Collection(db.Model):
         creator=lambda k,v:Collectionname(ln_type=k, value=v))
 
     _formatoptions = association_proxy('formats', 'format')
-    @property
+
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def formatoptions(self):
         if len(self._formatoptions):
-            return self._formatoptions
+            return [dict(f) for f in self._formatoptions]
         else:
             return [{'code': 'hb', 'name': "HTML %s" % g._("brief"),
                      'content_type': 'text/html'}]
 
+    formatoptions = property(formatoptions)
+
+    _examples_example = association_proxy('_examples', 'example')
     @property
-    def name_ln(self):
-        try:
-            return db.object_session(self).query(Collectionname).\
-                with_parent(self).filter(db.and_(Collectionname.ln==g.ln,
-                    Collectionname.type=='ln')).first().value
-        except:
-            return self.name
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
+    def examples(self):
+        return list(self._examples_example)
 
     @property
+    def name_ln(self):
+        from invenio.search_engine import get_coll_i18nname
+        return get_coll_i18nname(self.name, g.ln)
+        # Another possible implementation with cache memoize
+        # @cache.memoize
+        #try:
+        #    return db.object_session(self).query(Collectionname).\
+        #        with_parent(self).filter(db.and_(Collectionname.ln==g.ln,
+        #            Collectionname.type=='ln')).first().value
+        #except:
+        #    return self.name
+
+    @property
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def portalboxes_ln(self):
         return db.object_session(self).query(CollectionPortalbox).\
-            with_parent(self).filter(CollectionPortalbox.ln==g.ln).\
+            with_parent(self).\
+            options(db.joinedload_all(CollectionPortalbox.portalbox)).\
+            filter(CollectionPortalbox.ln==g.ln).\
             order_by(db.desc(CollectionPortalbox.score)).all()
 
     @property
@@ -215,6 +235,7 @@ class Collection(db.Model):
             first()
 
     @property
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def is_restricted(self):
         return collection_restricted_p(self.name)
 
@@ -296,9 +317,10 @@ class Collection(db.Model):
                         order_by=lambda: CollectionFieldFieldvalue.score)
 
     _search_within = _make_field_fieldvalue('sew')
-    search_options = _make_field_fieldvalue('seo')
+    _search_options = _make_field_fieldvalue('seo')
 
     @property
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def search_within(self):
         """
         Collect search within options.
@@ -311,6 +333,12 @@ class Collection(db.Model):
         return default + sorted(found, key=itemgetter(1))
 
     @property
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
+    def search_options(self):
+        return self._search_options
+
+    @property
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def ancestors_ids(self):
         """Get list of parent collection ids."""
         output = intbitset([self.id])
@@ -322,6 +350,7 @@ class Collection(db.Model):
         return output
 
     @property
+    @cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def descendants_ids(self):
         """Get list of child collection ids."""
         output = intbitset([self.id])
@@ -455,7 +484,7 @@ class CollectionExample(db.Model):
                 db.ForeignKey(Example.id), primary_key=True)
     score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
                 server_default='0')
-    collection = db.relationship(Collection, backref='examples',
+    collection = db.relationship(Collection, backref='_examples',
                 order_by=score)
     example = db.relationship(Example, backref='collections',
                 order_by=score)
@@ -606,8 +635,10 @@ class Formatname(db.Model):
 
 class Field(db.Model):
     """Represents a Field record."""
-    def __init__(self):
-        pass
+
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, self.id)
+
     __tablename__ = 'field'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True)
@@ -622,12 +653,14 @@ class Field(db.Model):
 
     @property
     def name_ln(self):
-        try:
-            return db.object_session(self).query(Fieldname).\
-                with_parent(self).filter(db.and_(Fieldname.ln==g.ln,
-                    Fieldname.type=='ln')).first().value
-        except:
-            return self.name
+        from invenio.search_engine import get_field_i18nname
+        return get_field_i18nname(self.name, g.ln)
+        #try:
+        #    return db.object_session(self).query(Fieldname).\
+        #        with_parent(self).filter(db.and_(Fieldname.ln==g.ln,
+        #            Fieldname.type=='ln')).first().value
+        #except:
+        #    return self.name
 
 
 class Fieldvalue(db.Model):

@@ -41,6 +41,8 @@
 
 {% block body %}
 
+{% dyncache 24*60*60, collection.name %}
+
 <style>
 .websearch .nav > li > ul > li {
   float: left;
@@ -158,5 +160,7 @@
   $('[rel=tooltip]').tooltip();
 })(jQuery);
 </script>
+
+{% endcache %}
 
 {% endblock %}

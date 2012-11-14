@@ -190,6 +190,12 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     if param:
         param = tuple(param)
 
+    try:
+        from flask import current_app
+        current_app.logger.info(sql + str(param))
+    except:
+        pass
+
     dbhost = CFG_DATABASE_HOST
     if run_on_slave and CFG_DATABASE_SLAVE:
         dbhost = CFG_DATABASE_SLAVE

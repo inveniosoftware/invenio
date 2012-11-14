@@ -74,7 +74,7 @@ def create_invenio_flask_app():
     from invenio.urlutils import create_url
     from invenio.cache import cache
 #from invenio.webuser import collect_user_info
-    from invenio.jinja2utils import CollectionExtension
+    from invenio.jinja2utils import CollectionExtension, DynCacheExtension
     from invenio.webmessage_mailutils import email_quoted_txt2html
     from flask.ext.assets import Environment, Bundle
     from invenio.webinterface_handler_flask_utils import unicodifier
@@ -163,8 +163,8 @@ def create_invenio_flask_app():
     _app.config['SESSION_COOKIE_NAME'] = CFG_WEBSESSION_COOKIE_NAME
     _app.config['PERMANENT_SESSION_LIFETIME'] = CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER * CFG_WEBSESSION_ONE_DAY
     _app.config['USE_X_SENDFILE'] = CFG_BIBDOCFILE_USE_XSENDFILE
-    _app.config['DEBUG'] = CFG_DEVEL_SITE
-    _app.debug = CFG_DEVEL_SITE
+    _app.config['DEBUG'] = CFG_DEVEL_SITE == 1
+    _app.debug = CFG_DEVEL_SITE == 1
     _app.config['CFG_LANGUAGE_LIST_LONG'] = [(lang, longname.decode('utf-8')) for (lang, longname) in language_list_long()]
 
 
@@ -223,6 +223,7 @@ def create_invenio_flask_app():
                (tag, hash('|'.join(collection)), tag),
                *collection))
     _app.jinja_env.add_extension(CollectionExtension)
+    _app.jinja_env.add_extension(DynCacheExtension)
     _app.jinja_env.add_extension('jinja2.ext.do')
 
     # Let's create Gravatar bridge.
