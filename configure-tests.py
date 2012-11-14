@@ -126,6 +126,22 @@ try:
     import flask.ext.testing
     import wtforms
     import flask.ext.wtf
+
+    ## Check Werkzeug version
+    werkzeug_ver = werkzeug.__version__.split(".")
+    if werkzeug_ver[0] == "0" and int(werkzeug_ver[1]) < 8:
+        error_messages.append(
+    """
+    *****************************************************
+    ** Werkzeug version %s detected
+    *****************************************************
+    ** Your are using an outdated version of Werkzeug  **
+    ** with known problems. Please upgrade Werkzeug to **
+    ** at least v0.8 by running e.g.:                  **
+    **   pip install Werkzeug --upgrade                **
+    *****************************************************
+    """ % werkzeug.__version__
+        )
 except ImportError, msg:
     error_messages.append("""
     *************************************************
@@ -137,23 +153,6 @@ except ImportError, msg:
     ** fix the problem before continuing!          **
     *************************************************
     """ % msg
-    )
-
-
-## Check Werkzeug version
-werkzeug_ver = werkzeug.__version__.split(".")
-if werkzeug_ver[0] == "0" and int(werkzeug_ver[1]) < 8:
-    error_messages.append(
-    """
-    *****************************************************
-    ** Werkzeug version %s detected
-    *****************************************************
-    ** Your are using an outdated version of Werkzeug  **
-    ** with known problems. Please upgrade Werkzeug to **
-    ** at least v0.8 by running e.g.:                  **
-    **   pip install Werkzeug --upgrade                **
-    *****************************************************
-    """ % werkzeug.__version__
     )
 
 
