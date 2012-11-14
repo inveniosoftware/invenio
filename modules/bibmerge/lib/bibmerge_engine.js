@@ -847,6 +847,7 @@ function ajaxGetRecordCompare(_recid1, _recid2) {
     changeAndSerializeHash({recid1: _recid1, recid2: _recid2});
     gRecID1 = _recid1;
     gRecID2 = _recid2;
+    gRecord2Mode = _mode;
     initFieldGroupHeaders('.bibMergeHeaderFieldnum'); //initialize all of them
     panelDisabled(false);
   });
@@ -865,6 +866,7 @@ function onclickSubmitButton() {
   if (displayAlert('confirmSubmit')){
       var _data = {
         requestType: 'submit',
+        record2Mode: gRecord2Mode,
         recID1: gRecID1
       };
       if (checkbox == true)
