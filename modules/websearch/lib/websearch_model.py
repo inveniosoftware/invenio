@@ -382,12 +382,6 @@ class Collectionname(db.Model):
                 server_default='sn')
     value = db.Column(db.String(255), nullable=False)
 
-    def __init__(self, collection, ln, type, value):
-        self.id_collection = collection.id
-        self.ln = ln
-        self.type = type
-        self.value = value
-
     @db.hybrid_property
     def ln_type(self):
         return (self.ln, self.type)
