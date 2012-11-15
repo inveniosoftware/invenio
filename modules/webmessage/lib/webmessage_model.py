@@ -100,7 +100,8 @@ class MsgMESSAGE(db.Model):
         self._sent_to_user_nicks = value
         to_add = set(self.user_nicks)-set(old_user_nicks)
         to_del = set(old_user_nicks)-set(self.user_nicks)
-        to_del = to_del-set([u.nickname for u in User.query.\
+        if len(self.group_names):
+            to_del = to_del-set([u.nickname for u in User.query.\
                 join(User.usergroups).filter(
                 Usergroup.name.in_(self.group_names)).\
                 all()])

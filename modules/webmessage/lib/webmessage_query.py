@@ -462,12 +462,16 @@ def update_user_inbox_for_reminders(uid):
         MsgMESSAGE.received_date<=datetime.now()
         #MsgMESSAGE.received_date<=db.func.current_timestamp()
         )).all()
-    print expired_reminders
-    res = UserMsgMESSAGE.query.filter(db.and_(
-        UserMsgMESSAGE.id_user_to==uid,
-        UserMsgMESSAGE.id_msgMESSAGE.in_([i for i, in expired_reminders]))).\
-        update({UserMsgMESSAGE.status: new_status}, synchronize_session='fetch')
-    return res
+
+    if len(expired_reminders):
+        filter = db.and_(
+            UserMsgMESSAGE.id_user_to==uid,
+            UserMsgMESSAGE.id_msgMESSAGE.in_(
+                [i for i, in expired_reminders]))
+
+        res = UserMsgMESSAGE.query.filter(filter).\
+            update({UserMsgMESSAGE.status: new_status}, synchronize_session='fetch')
+        return res
 
 
 def get_nicknames_like(pattern):
