@@ -6361,6 +6361,16 @@ def perform_request_log(req, date=""):
     req.write("</html>")
     return "\n"
 
+def get_all_field_values(tag):
+    """
+    Return all existing values stored for a given tag.
+    @param tag: the full tag, e.g. 909C0b
+    @type tag: string
+    @return: the list of values
+    @rtype: list of strings
+    """
+    table = 'bib%02dx' % int(tag[:2])
+    return [row[0] for row in run_sql("SELECT DISTINCT(value) FROM %s WHERE tag=%%s" % table, (tag, ))]
 
 def get_most_popular_field_values(recids, tags, exclude_values=None, count_repetitive_values=True):
     """
@@ -6460,16 +6470,3 @@ def perform_external_collection_search_with_em(req, current_collection, pattern_
                             print_search_info=em == "" or EM_REPOSITORY["search_info"] in em,
                             print_see_also_box=em == "" or EM_REPOSITORY["see_also_box"] in em,
                             print_body=em == "" or EM_REPOSITORY["body"] in em)
-
-
-
-def get_all_field_values(tag):
-    """
-    Return all existing values stored for a given tag.
-    @param tag: the full tag, e.g. 909C0b
-    @type tag: string
-    @return: the list of values
-    @rtype: list of strings
-    """
-    table = 'bib%2dx' % int(tag[:2])
-    return [row[0] for row in run_sql("SELECT DISTINCT(value) FROM %s WHERE tag=%%s" % table, (tag, ))]

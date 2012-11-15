@@ -27,7 +27,7 @@ from fnmatch import fnmatch
 from urlparse import urlparse, urlunparse
 
 from wsgiref.validate import validator
-from wsgiref.util import FileWrapper, guess_scheme
+from wsgiref.util import FileWrapper
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.
@@ -114,7 +114,7 @@ class SimulatedModPythonRequest(object):
         self.__errors = environ['wsgi.errors']
         self.__headers_in = table([])
         self.__tainted = False
-        self.__is_https = int(guess_scheme(self.__environ) == 'https')
+        self.__is_https = self.__environ.get('wsgi.url_scheme') == 'https'
         self.__replace_https = False
         self.track_writings = False
         self.__what_was_written = ""
