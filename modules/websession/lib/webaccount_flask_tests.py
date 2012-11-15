@@ -1,6 +1,7 @@
 from flask import current_app, request
 from invenio.sqlalchemyutils import db
 from flask import session, g
+from invenio.webuser_flask import current_user, login_user, logout_user
 
 from invenio.testutils import make_flask_test_suite, run_test_suite, \
                               FlaskSQLAlchemyTest
@@ -20,13 +21,31 @@ fixture = SQLAlchemyFixture(
 class WebAccountTest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData)
+    def test_low_level_login(data, self):
+        users = data.UserData
+
+        assert current_user.is_guest
+        login_user(users.admin.id)
+        assert current_user.get_id() == users.admin.id
+        logout_user()
+        assert current_user.get_id() != users.admin.id
+        assert current_user.is_guest
+        login_user(users.romeo.id)
+        assert not current_user.is_guest
+        assert current_user.get_id() == users.romeo.id
+        login_user(users.admin.id)
+        assert current_user.get_id() == users.admin.id
+        logout_user()
+
+
+    @fixture.with_data(UserData)
     def test_login(data, self):
         users = data.UserData
 
         # Valid credentials.
         for name, u in users:
             response = self.login(u.nickname, u.password)
-            assert '<p class="flash-info">You have been logged in.</p>' in response.data
+            assert 'You have been' in response.data
             self.logout()
 
         # Empty form should not work.
@@ -47,9 +66,8 @@ class WebAccountTest(FlaskSQLAlchemyTest):
         NEW_PASSWORD = 'admin'
         users = data.UserData
 
-        # Valid credentials.
         response = self.login(users.admin.nickname, users.admin.password)
-        assert '<p class="flash-info">You have been logged in.</p>' in response.data
+        assert 'You have been logged in' in response.data
         self.logout()
 
         admin = User.query.filter(User.id == users.admin.id).one()
@@ -66,7 +84,7 @@ class WebAccountTest(FlaskSQLAlchemyTest):
 
         # Valid credentials.
         response = self.login(users.admin.nickname, NEW_PASSWORD)
-        assert '<p class="flash-info">You have been logged in.</p>' in response.data
+        assert 'You have been logged in' in response.data
         self.logout()
 
 

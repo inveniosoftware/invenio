@@ -29,7 +29,7 @@ fixture = SQLAlchemyFixture(
 def p(c, level=0):
     if c:
         print ' '*level, '- ',c.name
-        for i in c.collection_children_r:
+        for i in c.collection_children:
             p(i, level+1)
 
 
@@ -39,15 +39,9 @@ class WebSearchCollectionTest(FlaskSQLAlchemyTest):
     def test_loading_collection_tree(data, self):
         users = data.UserData
         collections = data.CollectionData
-        p(Collection.query.order_by(Collection.id).first())
-
         print
-        for c in Collection.query.all():
-            print dict(c)
-            print c.names
-
-        print len(dict(data.CollectionCollectionData))
-
+        p(Collection.query.order_by(Collection.id).first())
+        print
 
     @fixture.with_data(ExternalcollectionData, CollectionData)
     def test_external_collection(data, self):

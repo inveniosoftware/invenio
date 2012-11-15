@@ -75,19 +75,19 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
         assert juliet not in m.recipients
 
         response = self.login(users.admin.nickname, users.admin.password)
-        assert '<p class="flash-info">You have been logged in.</p>' in response.data
+        assert 'You have been logged in' in response.data
         response = self.client.get("/yourmessages/", follow_redirects=True)
         assert 'Message 1 Subject' in response.data
         self.logout()
 
         response = self.login(users.romeo.nickname, users.romeo.password)
-        assert '<p class="flash-info">You have been logged in.</p>' in response.data
+        assert 'You have been logged in' in response.data
         response = self.client.get("/yourmessages/", follow_redirects=True)
         assert 'Message 1 Subject' in response.data
         self.logout()
 
         response = self.login(users.juliet.nickname, users.juliet.password)
-        assert '<p class="flash-info">You have been logged in.</p>' in response.data
+        assert 'You have been logged in' in response.data
         response = self.client.get("/yourmessages/", follow_redirects=True)
         assert 'Message 1 Subject' not in response.data
         self.logout()
@@ -153,7 +153,7 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
 
         while datetime.now() <= received:
             time.sleep(1)
-            print '.'
+            print '.',
 
         time.sleep(1)
 

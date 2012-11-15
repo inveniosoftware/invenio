@@ -117,8 +117,7 @@ from flask.ext.testing import TestCase, Twill
 from sqlalchemy.engine.url import URL
 
 class FlaskSQLAlchemyTest(TestCase):
-    #FIXME: add CFG_DATABASE_TYPE
-    #engine = CFG_DATABASE_TYPE
+    engine = CFG_DATABASE_TYPE
     username = CFG_DATABASE_USER
     password = CFG_DATABASE_PASS
     host = CFG_DATABASE_HOST
@@ -166,14 +165,9 @@ class FlaskSQLAlchemyTest(TestCase):
 def make_flask_test_suite(*test_cases):
     """ Build up a Flask test suite given separate test cases"""
     from operator import add
-    #FIXME read test configuration
-    db_settings = {
-        'PostgreSQL': {'engine': 'postgresql'},
-        'SQLite': {'engine': 'sqlite+pysqlite', 'username': None,
-                   'password': None, 'host': None, 'database': None}
-        }
+    from invenio.config import CFG_DEVEL_TEST_DATABASE_ENGINES
     create_type = lambda c: [type(k+c.__name__, (c,), d)
-                             for k,d in db_settings.iteritems()]
+                             for k,d in CFG_DEVEL_TEST_DATABASE_ENGINES.iteritems()]
 
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                 for case in reduce(add, map(create_type, test_cases))])
@@ -879,7 +873,7 @@ def build_and_run_flask_test_suite():
     """
 
     test_modules = []
-
+    import invenio
     for candidate in os.listdir(os.path.dirname(invenio.__file__)):
         base, ext = os.path.splitext(candidate)
 
@@ -894,4 +888,3 @@ def build_and_run_flask_test_suite():
 
     complete_suite = unittest.TestSuite(test_modules)
     run_test_suite(complete_suite)
-
