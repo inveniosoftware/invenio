@@ -28,7 +28,8 @@ from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from flask import Blueprint, Flask, logging, session, request, g, \
-                url_for, current_app, Response, render_template
+                url_for, current_app, Response, render_template, \
+                redirect, flash
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError, NotFound, RequestRedirect
 
@@ -129,6 +130,14 @@ def create_invenio_flask_app():
             return response
         except HTTPException, e:
             return render_template("404.html"), 404
+
+    @_app.errorhandler(401)
+    def do_login_first(error):
+        """Displays login page when user is not authorised."""
+        if request.is_xhr:
+            return 'You need to be authorised', 401
+        flash(_('You need to be authorised.'), 'error')
+        return redirect(url_for('youraccount.login', referer=request.referer))
 
     if CFG_FLASK_CACHE_TYPE not in [None, 'null']:
         _app.jinja_options = dict(_app.jinja_options,
@@ -454,4 +463,3 @@ def create_invenio_flask_app():
         pass
 
     return _app
-
