@@ -31,6 +31,9 @@ from invenio.bibcirculation_config import \
     CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING, \
     CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, \
     CFG_BIBCIRCULATION_REQUEST_STATUS_CANCELLED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_NEW, \
+    CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED, \
+    CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_ILL_STATUS_RETURNED, \
     CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED, \
     CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED, \
@@ -3008,6 +3011,8 @@ def get_recid(barcode):
 
 def get_ill_requests_details(borrower_id):
     """
+    This function is also used by the Aleph Service for the display of ILLs 
+    of the user for termination sheet.
     """
 
     res = run_sql("""SELECT id, item_info, id_crcLIBRARY,
@@ -3018,12 +3023,16 @@ def get_ill_requests_details(borrower_id):
                             status, library_notes, request_type
                        FROM crcILLREQUEST
                       WHERE id_crcBORROWER=%s
-                        AND status!=%s
-                        AND status!=%s
-                        AND status!=%s
-                  """, (borrower_id, CFG_BIBCIRCULATION_ILL_STATUS_RETURNED,
-                        CFG_BIBCIRCULATION_ILL_STATUS_RECEIVED,
-                        CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED))
+                        AND status in (%s, %s, %s)
+                        AND request_type in (%s, %s)
+                   ORDER BY FIELD(status, %s, %s, %s)
+                  """, (borrower_id, CFG_BIBCIRCULATION_ILL_STATUS_NEW,
+                        CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED,
+                        CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN,
+                        'article', 'book',
+                        CFG_BIBCIRCULATION_ILL_STATUS_ON_LOAN,
+                        CFG_BIBCIRCULATION_ILL_STATUS_NEW,
+                        CFG_BIBCIRCULATION_ILL_STATUS_REQUESTED))
 
     return res
 
