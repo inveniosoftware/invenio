@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% macro record_brief_links(recID) %}
+{% macro record_brief_links(recID, i) %}
   {%- set rinfo = RecordInfo(recID) -%}
   <p>
     {%- set similar = "recid:%d" % recID -%}
@@ -30,11 +30,15 @@
     {%- endif -%}
 
     <a class="text-success"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}v"
        href="{{ url_for('record.metadata', recid=recID) }}">
       {{ _("Detailed record") }}
     </a>
      -
     <a class="text-success"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}s"
        href="{{ url_for('.search', p=similar, rm='wrd') }}">
       {{ _("Similar records") }}
     </a>
@@ -44,7 +48,9 @@
     {%- set num_citations = rinfo.get_cited_by_count() -%}
     {%- if num_citations -%}
      -
-    <a href="{{ url_for('.search', p="refersto:recid:%d" % recID) }}">
+    <a href="{{ url_for('.search', p="refersto:recid:%d" % recID) }}"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}r">
       {{ _("Cited by %i records") % num_citations if num_citations > 1 else _("Cited by 1 record") }}
     </a>
     {%- endif -%}
@@ -55,7 +61,9 @@
     {%- set num_comments = rinfo.get_nb_comments() -%}
     {%- if num_comments -%}
      -
-    <a href="{{ url_for('webcomment.comments', recid=recID) }}">
+    <a href="{{ url_for('webcomment.comments', recid=recID) }}"
+       data-hotkey-action="click"
+       data-hotkey-value="g{{ i }}c">
       <i class="icon-comment"></i>
       {{ _("%i comments") % num_comments if num_comments > 1 else _("1 comment") }}
     </a>
@@ -505,7 +513,12 @@
                   type="text"
                   style="min-width:200px;"
                   {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
-                  value="{{ request.args.get('p', '') }}" autofocus/><!--
+                  tabindex="1"
+                  value="{{ request.args.get('p', '') }}"
+                  {%- if request.endpoint == 'search.index' -%}
+                  autofocus
+                  {%- endif -%}
+                  /><!--
                 No space!
              --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn add-open-permanent">
                   <i class="caret"></i>

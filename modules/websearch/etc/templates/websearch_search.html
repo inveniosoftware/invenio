@@ -38,6 +38,8 @@
   {% js "js/websearch_typeahead.js" %}
   {% js "js/websearch_facet.js" %}
   {% js "js/bootstrap-select.js" %}
+  {% js "js/jquery.hotkeys.js" %}
+  {% js "js/websearch_hotkeys.js" %}
   {%- set args = request.args.copy().to_dict() -%}
   {%- set jrec = (pagination.page-2)*pagination.per_page+1 if pagination.has_prev else 1 -%}
   {%- do args.update({'jrec': jrec}) -%}
@@ -159,6 +161,7 @@ body {
 (function($) {
 
   var popupTimer // global popup timer
+    , hotkeys = Hotkeys({})
 
   // side facet list
   $('#facet_list').affix({

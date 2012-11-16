@@ -57,6 +57,7 @@ pylib_DATA = \
 jsdir=$(localstatedir)/www/js
 
 js_DATA = websearch_facet.js \
+          websearch_hotkeys.js \
           websearch_typeahead.js
 
 EXTRA_DIST = $(pylib_DATA) \
