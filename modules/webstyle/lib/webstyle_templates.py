@@ -375,7 +375,7 @@ template function generated it.
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
  <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
- <script type="text/javascript" src="%(cssurl)s/js/jquery/bootstrap.min.js"></script>
+ <script type="text/javascript" src="%(cssurl)s/js/bootstrap.js"></script>
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
