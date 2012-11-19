@@ -592,16 +592,16 @@
           p1 = $('[name=p1]').val(),
           f = $('[name=f]').val(),
           p = $('[name=p]'),
-          val = p.val(),
+          val = $.trim(p.val()),
           op = (op1=='a' && val=="")?'':op1_fn[op1];
       if (val !== "") {
-        val += ' ';
+        val += ' ' + op;
       }
       if (p1 === "") { return false; }
       if (f !== "") {
         f +=':';
       }
-      p.val(val+op+m1_fn[m1](p1,f));
+      p.val(val+m1_fn[m1](p1,f));
       $('[name=p1]').val('');
       e.stopPropagation();
       return false;
@@ -611,7 +611,7 @@
     function perform_easy_search() {
         // get values
         var p = $('[name=p]'),
-            val = p.val(),
+            val = $.trim(p.val()),
             op1 = $('[name=op1]:checked').val(),
             op = (op1=='a' && val=="")?'':op1_fn[op1],
             author = $('#author').val(),
@@ -627,7 +627,7 @@
             jpage = $('#journal-page').val();
 
         if (val !== "") {
-          val += ' ';
+          val += ' ' + op;
         }
         // filter and build
         var query = [];
@@ -645,7 +645,7 @@
         //query = query.replace(/ /g, '+');
         //window.location = search_url;
         if (query.length > 0) {
-          p.val(val+op+query.join(' '+op1_fn[op1]));
+          p.val(val+query.join(' '+op1_fn[op1]));
         }
     };
 
@@ -679,14 +679,14 @@
             btn = $(this),
             source = $('[name='+btn.attr('data-source')+']'),
             target = $('[name='+btn.attr('data-target')+']'),
-            val = target.val(),
+            val = $.trim(target.val()),
             op = (op1=='a' && val=="")?'':op1_fn[op1];
         if (val !== "") {
-          val += ' ';
+          val += ' ' + op;
         }
         if (source.val() === "") { return false }
         if (source.val().length > 0) {
-          target.val(val+op+source.attr('name')+':"'+source.val()+'"');
+          target.val(val+source.attr('name')+':"'+source.val()+'"');
           source.val('');
         }
         e.stopPropagation();
