@@ -338,7 +338,6 @@ class InvenioLoginManager(object):
     def reload_user(self):
         ctx = _request_ctx_stack.top
         uid = session.get(self.key_user_id, None)
-        current_app.logger.info("loading user: %s" % str(uid))
         if uid is None:
             ctx.user = self.guest_user()
         else:
@@ -378,7 +377,6 @@ def logout_user():
 def login_required(fn):
     @wraps(fn)
     def decorated_view(*args, **kwargs):
-        current_app.logger.info(current_user.get_id())
         if not current_user.is_authenticated():
             return current_app.login_manager.unauthorized()
         return fn(*args, **kwargs)
