@@ -654,6 +654,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibformat/doc/admin/Makefile \
      modules/bibformat/doc/hacking/Makefile \
      modules/bibformat/etc/Makefile \
+     modules/bibformat/etc/templates/Makefile \
      modules/bibformat/etc/format_templates/Makefile \
      modules/bibformat/etc/output_formats/Makefile \
      modules/bibformat/lib/Makefile \

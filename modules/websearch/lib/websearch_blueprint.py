@@ -565,9 +565,27 @@ def export():
     """
     of = request.values.get('of', 'xm')
     recids = request.values.getlist('recid', type=int)
+    rg = request.args.get('rg', len(recids), type=int)
+    page = request.args.get('jrec', 1, type=int)
     content_type = Format.query.filter(Format.code==of).one()
-    #FIXME add prefix, suffix, if needed
-    response = make_response(format_records(recids, of=of, ln=g.ln))
+    name = request.args.get('cc')
+    if name:
+        collection = Collection.query.filter(Collection.name==name).first_or_404()
+    else:
+        collection = Collection.query.get_or_404(1)
+
+    @register_template_context_processor
+    def index_context():
+        return dict(
+                collection = collection,
+                RecordInfo = RecordInfo,
+                rg = rg,
+                pagination = Pagination(int(ceil(page/float(rg))),
+                                        rg,
+                                        len(recids)))
+
+    from invenio.bibformat import print_records
+    response = make_response(print_records(recids, of=of, ln=g.ln))
     response.content_type=content_type
     return response
 

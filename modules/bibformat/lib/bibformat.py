@@ -52,6 +52,7 @@ from invenio.config import \
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.access_control_engine import acc_authorize_action
+from invenio.jinja2utils import render_template_to_string
 import getopt
 import sys
 
@@ -489,6 +490,31 @@ def get_output_format_content_type(of, default_content_type="text/html"):
         content_type = default_content_type
 
     return content_type
+
+
+def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
+                  search_pattern='', on_the_fly=False, **ctx):
+    """
+    Returns records using Jinja template.
+    """
+    import time
+    context = ctx or {}
+    context.update(dict(
+        time = time,
+        recids = recIDs,
+        verbose = verbose,
+        format_record = lambda recID: format_record(recID,
+            of=of, ln=ln, verbose=verbose, search_pattern=search_pattern,
+            on_the_fly=on_the_fly or verbose>0).decode('utf8')
+        ))
+
+    return render_template_to_string(
+        ['format_records_%s.tpl' % of,
+         'format_records_%s.tpl' % of[0],
+         'format_records_%s.tpl' % get_output_format_content_type(of).\
+                                   replace('/', '_')],
+        **context)
+
 
 def usage(exitcode=1, msg=""):
     """
