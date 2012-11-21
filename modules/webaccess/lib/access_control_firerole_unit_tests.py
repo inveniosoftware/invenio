@@ -36,7 +36,8 @@ class AccessControlFireRoleTest(unittest.TestCase):
     def setUp(self):
         """setting up helper variables for tests"""
         self.user_info = {'email' : 'foo.bar@cern.ch', 'uid': 1000,
-            'group' : ['patata', 'cetriolo'], 'remote_ip' : '127.0.0.1'}
+            'group' : ['patata', 'cetriolo'], 'remote_ip' : '127.0.0.1',
+            'guest' : '0'}
         self.guest = collect_user_info({})
 
     def test_compile_role_definition_empty(self):
@@ -82,6 +83,11 @@ class AccessControlFireRoleTest(unittest.TestCase):
         self.failUnless(serialize(compile_role_definition(
             "allow email /.*@cern.ch/\nallow groups 'patata' "
             "# a comment\ndeny any")))
+
+    def test_compile_role_definition_guest_field(self):
+        """firerole - compiling guest field role definitions"""
+        self.failUnless(serialize(compile_role_definition(
+            "allow guest '1'")))
 
     def test_compile_role_definition_complex(self):
         """firerole - compiling complex role definitions"""
@@ -168,6 +174,23 @@ class AccessControlFireRoleTest(unittest.TestCase):
             compile_role_definition("deny uid '-1'\nallow all")))
         self.assertEqual(True, acc_firerole_check_user(self.user_info,
             compile_role_definition("deny uid '-1'\nallow all")))
+
+    def test_firerole_guest(self):
+        """firerole - firerole core testing with guest"""
+        self.assertEqual(False, acc_firerole_check_user(self.guest,
+            compile_role_definition("deny guest '1'\nallow all")))
+        self.assertEqual(True, acc_firerole_check_user(self.guest,
+            compile_role_definition("deny guest '0'\nallow all")))
+
+        self.assertEqual(True, acc_firerole_check_user(self.user_info,
+            compile_role_definition("deny guest '1'\nallow all")))
+        self.assertEqual(False, acc_firerole_check_user(self.user_info,
+            compile_role_definition("deny guest '0'\nallow all")))
+
+        self.assertEqual(False, acc_firerole_check_user(self.user_info,
+            compile_role_definition("deny guest '1'\ndeny all")))
+        self.assertEqual(False, acc_firerole_check_user(self.user_info,
+            compile_role_definition("deny guest '0'\ndeny all")))
 
 TEST_SUITE = make_test_suite(AccessControlFireRoleTest,)
 

@@ -65,6 +65,8 @@ def format_element(bfo, category_prefix, category_suffix, separator=" | ",
         if journal_name == 'CERNBulletin' and \
                category == 'Training and Development':
             category = 'Training'
+            if ln == 'fr':
+                category = 'Formations'
         category_link = create_html_link(category_url, {},
                                          _(category),
                                          linkattrd=linkattrd)

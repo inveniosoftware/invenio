@@ -16,16 +16,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Prints the record ID.
+"""BibFormat element - Prints the record URL.
 """
 
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL
-                           
 
-def format_element(bfo):
+def format_element(bfo, with_ln="yes"):
     """
-    Prints the record id.
+    Prints the record URL.
+
+    @param with_ln: if "yes" include "ln" attribute in the URL
     """
-    return CFG_SITE_URL + "/record/" + bfo.control_field('001')
+    url = CFG_SITE_URL + "/record/" + bfo.control_field('001')
+
+    if with_ln.lower() == "yes":
+        url += "?ln=" + bfo.lang
+
+    return url
