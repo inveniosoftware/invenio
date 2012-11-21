@@ -1,0 +1,28 @@
+{% macro function_display(fun, task_counter) -%}
+    {% set comma2 = joiner(",") %}
+    [
+    {% for w in fun %}
+        {% if w is not iterable %}
+            {{ comma2() }}
+            </br>
+            {% if fun.index(w) == task_counter[-1] %}
+                <b>
+            {% endif %}
+            {{ w.func_name }}(
+            {% if w.func_closure is defined %}
+                {% if w.func_closure is iterable %}
+                    {% set comma = joiner(", ") %}
+                    {% for arg in w.func_closure %}
+                        {{ comma() }}
+                        {{ arg.cell_contents }}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
+            )
+            {% if fun.index(w) == task_counter[-1] %}
+                </b>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    </br>]
+{%- endmacro %}

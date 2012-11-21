@@ -1,0 +1,73 @@
+{% extends "layout_workflow_details.html" %}
+{% import 'bibworkflow_utils.html' as utils %}
+{% block body %}
+
+{% macro status_image(status_id) -%}
+    {% if status_id == 0 %}
+        <img src="/static/images/icons/new.png" />
+    {% endif %}
+    {% if status_id == 1 %}
+        <img src="/static/images/icons/running.png" />
+    {% endif %}
+    {% if status_id == 2 %}
+        <img src="/static/images/icons/pending.png" />
+    {% endif %}
+    {% if status_id == 3 %}
+        <img src="/static/images/icons/error.png" />
+    {% endif %}
+    {% if status_id == 4 %}
+        <img src="/static/images/icons/done.png" />
+    {% endif %}
+{%- endmacro %}
+<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">{{ workflow_metadata.name }}</h3>
+</div>
+<div class="modal-body">
+    <div class="row-fluid">
+        <div class="span12">
+                        Owner: <b>{{ workflow_metadata.uid }}</b> | Creation date: <b>{{ workflow_metadata.created }}</b> | Last modification date: <b>{{ workflow_metadata.modified }}</b>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="span5">
+           Workflow definition:
+           <div class="well">
+               {{ utils.function_display(workflow_func, [-1]) }}
+           </div>
+                       
+            Workflow status
+            <div class="well">
+                <div id="workflow_preview">
+                    <p>All objects count: {{ workflow_metadata.counter_initial }}</p>
+                    <p>Finished objects count: {{ workflow_metadata.counter_finished }}</p>
+                    <p>Halted objects count: {{ workflow_metadata.counter_halted }}</p>
+                    <p>Error objects count: {{ workflow_metadata.counter_error }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="span7">
+           Error message
+           <div class="well">
+                <div class="workflow_message">
+                    <p>{{ workflow_metadata.error_msg }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        Log:
+        <pre>{{ log }}</pre>
+    </div>
+</div>
+<div class="modal-footer">
+        <input type="submit" class="btn" name="{{workflow_metadata.id}}_beginning" value="Restart from BEGINNING" />
+        <input type="submit" class="btn" name="{{workflow_metadata.id}}_current" value="Restart from CURRENT task" />
+        <button id="extra" class="btn">Assign ticket <i class="icon-flag"></i></button>
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+</div>
+
+
+
+
+{% endblock %}

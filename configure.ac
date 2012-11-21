@@ -933,6 +933,16 @@ AC_CONFIG_FILES([config.nice  \
      modules/webdeposit/lib/deposition_fields/Makefile \
      modules/webdeposit/lib/deposition_forms/Makefile \
      modules/webdeposit/lib/deposition_types/Makefile \
+     modules/bibworkflow/Makefile \
+     modules/bibworkflow/bin/Makefile \
+     modules/bibworkflow/doc/Makefile \
+     modules/bibworkflow/etc/Makefile \
+     modules/bibworkflow/etc/workflows/Makefile \
+     modules/bibworkflow/etc/templates/Makefile \
+     modules/bibworkflow/etc/tasks/Makefile \
+     modules/bibworkflow/lib/Makefile \
+     modules/bibworkflow/lib/workers/Makefile \
+     modules/bibworkflow/web/Makefile \
      ])
 
 ## Finally, write output files:

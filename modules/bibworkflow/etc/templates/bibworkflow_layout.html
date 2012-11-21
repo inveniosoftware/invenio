@@ -1,0 +1,20 @@
+{% css 'css/bibworkflow_style.css' %}
+{% extends "page.html" %}
+{% block body %}
+    <div class="row-fluid">
+        <div class="span2">
+            <div class="well sidebar-nav">
+                <ul class="nav nav-list">
+                    <li><a href="/admin/bibworkflow/index" {% if request.path == "/admin/bibworkflow/index" %} class="active" {% endif %}>Running workflows</a></li>
+                    <li><a href="/admin/bibworkflow/workflows" {% if request.path == "/admin/bibworkflow/workflows" %} class="active" {% endif %}>Defined workflows</a></li>
+                    <li>Logs</li>
+                </ul>
+            </div>
+        </div>
+        <div class="span10">
+            {% block body2 %}{% endblock %}
+        </div>
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    </div>
+  </div>
+{% endblock %}

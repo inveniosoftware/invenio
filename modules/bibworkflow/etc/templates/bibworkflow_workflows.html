@@ -1,0 +1,62 @@
+{% extends "bibworkflow_layout.html" %}
+{% block body2 %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#example_my_workflow").popover({
+                                    trigger: 'hover',
+                                    placement: 'right',
+                                    content: "Workflow has been started."
+                                    });  
+            $("input[type=submit]").bind('click', function(){
+                            w_name = $(this).attr('name');
+                            $(this).attr('disabled','disabled');
+                            jQuery.ajax({
+                                url: "/admin/bibworkflow/run_workflow?workflow_name=" + w_name,
+                                success: function(json){
+                                    $("#myModal").html(json);
+                                    $('#myModal').modal('show');
+                                    activate_button();
+                                    }
+                                })
+            });
+        });
+        function activate_button(){
+            $("input[type=submit]").removeAttr("disabled");
+        }
+    </script>
+    <h1>Workflows</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Workflow name</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for workflow in workflows %}
+            <tr>
+                <td>{{ workflow }}</td>
+                <td><input id="example_{{ workflow }} 
+                " class="btn" type="submit" rel="popover" name="{{ workflow }}"/></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1>Broken workflows</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Workflow name</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for workflow in broken_workflows %}
+            <tr>
+                <td>{{ workflow }}</td>
+                <td><input class="btn" type="submit" name="{{ workflow }}"/></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

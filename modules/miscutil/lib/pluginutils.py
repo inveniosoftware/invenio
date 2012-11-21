@@ -31,6 +31,7 @@ from invenio.errorlib import register_exception
 from invenio.config import CFG_PYLIBDIR
 from invenio.textutils import wrap_text_in_a_box
 
+
 class InvenioPluginContainerError(Exception):
     """
     Exception raised when some error happens during plugin loading.

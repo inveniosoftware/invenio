@@ -47,7 +47,8 @@ from invenio.webdeposit_utils import get_current_form, \
                                      get_workflow, \
                                      draft_field_get_all
 from invenio.webuser_flask import current_user
-from invenio.webdeposit_workflow import CFG_WEBDEPOSIT_WORKFLOW_STATUS
+from invenio.bibworkflow_engine import CFG_WORKFLOW_STATUS
+from invenio.bibworkflow_model import Workflow
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
                               url_prefix='/deposit',
@@ -186,14 +187,12 @@ def error_check(deposition_type, uuid):
                     subfield_name)
     uuid, form = get_current_form(current_user.get_id(), uuid=uuid)
 
-
     #if field_name == "issn" or field_name == "journal":
     #    draft_field_set(current_user.get_id(), uuid, "conditions", None)
-
     try:
         # insert value into the form
         form.__dict__["_fields"][field_name].process_data(value)
-    except  (KeyError, AttributeError):
+    except (KeyError, AttributeError):
         # check for subfield
         if subfield_name is not None:
 
@@ -238,14 +237,14 @@ def index_deposition_types():
     """ Renders the deposition types (workflows) list """
     current_app.config['breadcrumbs_map'][request.endpoint] = [
                         (_('Home'), '')] + blueprint.breadcrumbs
-    drafts = dict(db.session.query(WebDepositDraft.deposition_type,
+    drafts = dict(db.session.query(Workflow.name,
                     db.func.count(db.func.distinct(WebDepositDraft.uuid))).\
                   join(WebDepositDraft.workflow).\
                   filter(db.and_(
-                    WebDepositDraft.user_id == current_user.get_id(),
-                    WebDepositWorkflow.status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['running']
+                    Workflow.user_id == current_user.get_id(),
+                    Workflow.status == CFG_WORKFLOW_STATUS['running']
                   )).\
-                  group_by(WebDepositDraft.deposition_type).all())
+                  group_by(Workflow.name).all())
 
     return render_template('webdeposit_index_deposition_types.html', \
                            deposition_types=deposition_types,
@@ -324,7 +323,7 @@ def add(deposition_type, uuid=None):
     if status == 0:
         # render current step of the workflow
         return render_template('webdeposit_add.html', **workflow.get_output())
-    elif status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['finished']:
+    elif status == CFG_WORKFLOW_STATUS['finished']:
         flash(_('Deposition %s has been successfully finished.') % (uuid, ),
               'success')
         return redirect(url_for('.index_deposition_types'))

@@ -80,7 +80,7 @@ div#conditions{
         {% for draft in drafts %}
           <li> <a href="{{ url_for('webdeposit.add', deposition_type=draft.deposition_type, uuid=draft.uuid) }}">
             {{ '<strong>'|safe if uuid == draft.uuid }}
-              {{ draft.deposition_type }}:
+              {{ draft.workflow.deposition_type }}:
               {% if draft.form_values and draft.form_values.title %}
                   {{ draft.form_values.title }}
               {% else %}

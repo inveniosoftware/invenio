@@ -1,0 +1,105 @@
+{% extends "page.html" %}
+{% block body %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("tbody > tr").bind('click', function(){
+                            hp_id = $(this).attr('name');
+                            jQuery.ajax({
+                                url: "/entry_details/" + hp_id,
+                                success: function(json){
+                                    $("#myModal").html(json);
+                                    $('#myModal').modal('show');}
+                                })
+            });
+            
+            $(".entry_message_button").bind('click', function(){
+                            hp_id = $(this).attr('name');
+                            TINY.box.show({url:"/match_details/1" + hp_id,width:"800",height:"600", animate:false});
+            });
+        });
+    </script>
+    <form id="search_form">
+        Text, author, etc.: <input type="text" name="search_input" />
+        Creation date period: <input type="date" name="start_date" /> to <input type="date" name="end_date" /><br />
+        Owner: <input type="text" name="owner" />
+        Category: <select type="text" name="owner" />
+                    <option value="">Accelerator Physics</option>
+                    <option value="">Atmospheric and Oceanic Physics</option>
+                    <option value="">Atomic Physics</option>
+                    <option value="">Atomic and Molecular Clusters</option>
+                    <option value="">Chemical Physics</option>
+                    <option value="">Classical Physics</option>
+                    <option value="">Computational Physics</option>
+                    <option value="">Data Analysis</option>
+                    <option value="">Data Analysis</option>
+                    <option value="">Statistics and Probability</option>
+        </select>
+        <input class="btn" type="submit" value="Search" />
+    </form>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Source</th>
+                <th>Category</th>
+                <th>Publisher</th>
+                <th>User</th>
+                <th>State</th>
+                <th>Owner</th>
+                <th>Creation date</th>
+                <th>T. ID</th>
+                <th>I. ID</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in entries %}
+            <tr name="{{ entry.id }}" title="{{ entry.title }}">
+                <td>{{ entry.title|truncate(20) }}</td>
+                <td>{{ entry.source }}</td>
+                <td>{{ entry.category }}</td>
+                <td>{{ entry.publisher }}</td>
+                <td>{{ entry.wfe_object.user }}</td>
+                <td>{{ entry.wfe_object.state }}</td>
+                <td>{{ entry.wfe_object.owner }}</td>
+                <td>{{ entry.wfe_object.created }}</td>
+                <td>
+                    {% if entry.ticket_id %} 
+                        <a href="https://inspirert.cern.ch/Ticket/Display.html?id={{ entry.ticket_id }}" target="_blank">
+                            {{ entry.ticket_id }}
+                        </a> 
+                    {% endif %}
+                </td>
+                <td>
+                    {% if entry.invenio_id %} 
+                        <a href="http://inspirehep.net/record/{{ entry.invenio_id }}" target="_blank">
+                            {{ entry.invenio_id }}
+                        </a> 
+                    {% endif %}
+                </td>
+                <td class="row">
+                        <div class="span4">
+                            <a href="#" class="btn btn-mini btn-success">
+                                <i class="icon-ok icon-white"></i>
+                                <span><strong>Accept</strong></span>            
+                            </a>
+                        </div>
+                        <div class="span4">
+                            <a href="#" class="btn btn-mini btn-danger">
+                                <i class="icon-remove icon-white"></i>
+                                <span><strong>Reject</strong></span>          
+                            </a>
+                        </div>
+                        <div class="span4">
+                            <a href="#" class="btn btn-mini">
+                                <i class="icon-edit"></i>
+                                <span><strong>&nbsp;&nbsp;Edit&nbsp;&nbsp;</strong></span>       
+                            </a>    
+                        </div>
+                </td>
+            </tr>
+            
+            {% endfor %}
+        </tbody>
+        </table>
+{% endblock %}

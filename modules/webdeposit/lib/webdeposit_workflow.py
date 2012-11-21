@@ -17,18 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask import render_template
 from invenio.webdeposit_model import WebDepositWorkflow
 from invenio.webdeposit_workflow_utils import create_deposition_document
+from invenio.bibworkflow_engine import BibWorkflowEngine,\
+                                       CFG_WORKFLOW_STATUS
+from invenio.bibworkflow_object import BibWorkflowObject
+from invenio.bibworkflow_model import Workflow, WfeObject
+from invenio.bibworkflow_client import run_workflow, restart_workflow
 from invenio.sqlalchemyutils import db
 from uuid import uuid1 as new_uuid
-import json
-
-CFG_WEBDEPOSIT_WORKFLOW_STATUS = {
-    'running': 0,
-    'finished': 1,
-    'error': -1
-    }
 
 
 class DepositionWorkflow(object):
@@ -46,28 +43,20 @@ class DepositionWorkflow(object):
         return fun_name2
     """
 
-    def __init__(self, obj=None, engine=None, workflow=None,
-                 uuid=None, deposition_type=None):
-        if obj is None:
-            self.obj = dict()
-        else:
-            self.obj = obj
+    def __init__(self, engine=None, workflow=None,
+                 uuid=None, deposition_type=None, user_id=None):
+
+        self.obj = {}
+        self.set_user_id(user_id)
+        self.set_uuid(uuid)
 
         if deposition_type is not None:
             self.set_deposition_type(deposition_type)
 
-        self.obj['break'] = False
-        self.eng = engine
         self.current_step = 0
-        self.obj['step'] = self.current_step
+        self.set_engine(engine)
+        self.set_object()
         self.set_workflow(workflow)
-        self.set_uuid(uuid)
-
-    def set_workflow(self, workflow):
-        """ Sets the workflow
-        """
-        self.workflow = workflow
-        self.steps_num = len(workflow)
 
     def set_uuid(self, uuid=None):
         """ Sets the uuid or obtains a new one
@@ -75,30 +64,67 @@ class DepositionWorkflow(object):
         """
         if uuid is None:
             uuid = new_uuid()
-            self.obj['uuid'] = uuid
+            self.uuid = uuid
             # Then the workflow was not created before
-            dep_create = create_deposition_document(self.obj['deposition_type'])
-            dep_create(self.obj, self.eng)
+            #dep_create = create_deposition_document(self.get_deposition_type(),
+            #                                        self.get_user_id())
+            #dep_create(self.obj, self.eng)
         else:
-            self.obj['uuid'] = uuid
+            self.uuid = uuid
             # synchronize the workflow object
-            self.update_workflow_object()
+            #self.update_workflow_object()
 
     def get_uuid(self):
-        return self.obj['uuid']
+        return self.uuid
+
+    def set_engine(self, engine=None):
+        if engine is None:
+            engine = BibWorkflowEngine(name=self.get_deposition_type(), uuid=self.get_uuid(), \
+                                       user_id=self.get_user_id(), module_name="webdeposit")
+        self.eng = engine
+        self.eng.save()
+
+    def set_workflow(self, workflow):
+        """ Sets the workflow """
+
+        self.eng.setWorkflow(workflow)
+        self.workflow = workflow
+        self.steps_num = len(workflow)
+
+    def set_object(self):
+        self.bib_obj = BibWorkflowObject(data=self.obj, workflow_id=self.get_uuid(), user_id=self.get_user_id())
+
+    def get_object(self):
+        return self.bib_obj
 
     def set_deposition_type(self, deposition_type=None):
         if deposition_type is not None:
             self.obj['deposition_type'] = deposition_type
 
+    def get_deposition_type(self):
+        return self.obj['deposition_type']
+
+    def set_user_id(self, user_id=None):
+        if user_id is not None:
+            self.user_id = user_id
+        else:
+            from invenio.webuser_flask import current_user
+            self.user_id = current_user.get_id()
+
+        self.obj['user_id'] = self.user_id
+
+    def get_user_id(self):
+        return self.user_id
+
     def get_status(self):
+        return 0
         if self.current_step >= self.steps_num:
-            return CFG_WEBDEPOSIT_WORKFLOW_STATUS['finished']
-        return CFG_WEBDEPOSIT_WORKFLOW_STATUS['running']
+            return CFG_WORKFLOW_STATUS['finished']
+        return CFG_WORKFLOW_STATUS['running']
 
     def get_output(self):
-        user_id = self.obj['user_id']
-        uuid = self.obj['uuid']
+        user_id = self.user_id
+        uuid = self.get_uuid()
 
         from invenio.webdeposit_utils import get_form, \
                                              draft_field_get_all
@@ -114,11 +140,12 @@ class DepositionWorkflow(object):
                     uuid=uuid)
 
     def run(self):
-        while True:
-            self.run_next_step()
-            if self.obj['break']:
-                self.obj['break'] = False
-                break
+        starting_point = self.bib_obj.db_obj.task_counter
+        restart_workflow(self.eng, [self.bib_obj], starting_point)
+        #run_workflow(self.eng, [self.bib_obj])
+        #restart_workflow
+        #run(self.get_deposition_type(), [self.bib_obj])
+        #run_by_wid(self.get_uuid(), [self.obj])
 
     def run_next_step(self):
         if self.current_step >= self.steps_num:
@@ -153,10 +180,7 @@ class DepositionWorkflow(object):
         return self.current_step
 
     def get_workflow_from_db(self):
-        uuid = self.get_uuid()
-        wf = db.session.query(WebDepositWorkflow).filter(\
-                                 WebDepositWorkflow.uuid == uuid).one()
-        return wf
+        return Workflow.query.filter(Workflow.uuid == self.get_uuid()).first()
 
     def update_db(self):
         uuid = self.get_uuid()
@@ -174,11 +198,14 @@ class DepositionWorkflow(object):
         db.session.commit()
 
     def update_workflow_object(self):
+        obj = WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid()).first()
+
+        bib_obj = BibWorkflowObject(id=obj.id, workflow_id=self.get_uuid())
+        self.set_object(bib_obj)
+
         wf = self.get_workflow_from_db()
-        obj = dict(**wf.obj_json)
-        obj['deposition_type'] = wf.deposition_type
-        obj['step'] = wf.current_step
-        self.current_step = wf.current_step
+        self.set_user_id(wf.user_id)
+        self.set_deposition_type(wf.name)
         self.obj.update(obj)
 
     def cook_json(self):
