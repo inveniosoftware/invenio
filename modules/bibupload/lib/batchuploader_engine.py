@@ -54,7 +54,9 @@ def cli_allocate_record(req):
         _log(msg)
         return _write(req, msg)
     if not _check_client_useragent(req):
-        msg = "[ERROR] Sorry, this useragent cannot use the service."
+        user_info = collect_user_info(req)
+        client_useragent = user_info['agent']
+        msg = '[ERROR] Sorry, the "%s" useragent cannot use the service.' % client_useragent
         _log(msg)
         return _write(req, msg)
 
@@ -73,7 +75,9 @@ def cli_upload(req, file_content=None, mode=None):
         _log(msg)
         return _write(req, msg)
     if not _check_client_useragent(req):
-        msg = "[ERROR] Sorry, this useragent cannot use the service."
+        user_info = collect_user_info(req)
+        client_useragent = user_info['agent']
+        msg = '[ERROR] Sorry, the "%s" useragent cannot use the service.' % client_useragent
         _log(msg)
         return _write(req, msg)
 
