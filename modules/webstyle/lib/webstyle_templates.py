@@ -452,7 +452,6 @@ template function generated it.
           'msg_submit' : _("Submit"),
           'msg_personalize' : _("Personalize"),
           'msg_help' : _("Help"),
-          'languagebox' : self.tmpl_language_selection_box(req, ln),
           'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
           'inspect_templates_message' : inspect_templates_message
         }
