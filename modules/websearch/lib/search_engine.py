@@ -856,7 +856,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
             req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
         else:
             # we are doing XML output:
-            req.content_type = "text/xml"
+            req.content_type = get_output_format_content_type(of, 'text/xml')
             req.send_http_header()
             req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
     elif of.startswith('t') or str(of[0:3]).isdigit():
@@ -953,8 +953,9 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
                                  rssurl=rssurl,
                                  body_css_classes=body_css_classes))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
-    #else:
-    #    req.send_http_header()
+    else:
+        req.content_type = content_type
+        req.send_http_header()
 
 def page_end(req, of="hb", ln=CFG_SITE_LANG):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."

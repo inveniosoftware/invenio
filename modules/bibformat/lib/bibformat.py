@@ -474,18 +474,19 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
             omit = False
     return out
 
-def get_output_format_content_type(of):
+def get_output_format_content_type(of, default_content_type="text/html"):
     """
     Returns the content type (for example 'text/html' or 'application/ms-excel') \
     of the given output format.
 
     @param of: the code of output format for which we want to get the content type
+    @param default_content_type: default content-type when content-type was not set up
     @return: the content-type to use for this output format
     """
     content_type = bibformat_dblayer.get_output_format_content_type(of)
 
     if content_type == '':
-        content_type = 'text/html'
+        content_type = default_content_type
 
     return content_type
 
