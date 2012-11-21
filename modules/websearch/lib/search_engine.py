@@ -490,25 +490,8 @@ def get_available_output_formats(visible_only=False):
                        })
     return formats
 
-class SearchResultsCache(DataCacher):
-    """
-    Provides temporary lazy cache for Search Results.
-    Useful when users click on `next page'.
-    """
-    def __init__(self):
-        def cache_filler():
-            return {}
-        def timestamp_verifier():
-            return '1970-01-01 00:00:00' # lazy cache is always okay;
-                                         # its filling is governed by
-                                         # CFG_WEBSEARCH_SEARCH_CACHE_SIZE
-        DataCacher.__init__(self, cache_filler, timestamp_verifier)
-
-try:
-    if not search_results_cache.is_ok_p:
-        raise Exception
-except Exception:
-    search_results_cache = SearchResultsCache()
+# Flask cache for search results.
+from invenio.cache import search_results_cache, get_search_results_cache_key
 
 class CollectionI18nNameDataCacher(DataCacher):
     """
@@ -2771,6 +2754,59 @@ def search_unit_collection(query, m, wl=None):
     else:
         return intbitset([])
 
+
+def get_records_that_can_be_displayed(user_info,
+                                      hitset_in_any_collection,
+                                      current_coll=CFG_SITE_NAME,
+                                      colls=None):
+    """
+    Return records that can be displayed.
+    """
+    records_that_can_be_displayed = intbitset()
+
+    if colls is None:
+        colls = [current_coll]
+
+    # let's get the restricted collections the user has rights to view
+    permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
+
+    policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
+
+    current_coll_children = get_collection_allchildren(current_coll) # real & virtual
+
+    # add all restricted collections, that the user has access to, and are under the current collection
+    # do not use set here, in order to maintain a specific order:
+    # children of 'cc' (real, virtual, restricted), rest of 'c' that are  not cc's children
+    colls_to_be_displayed = [coll for coll in current_coll_children if coll in colls or coll in permitted_restricted_collections]
+    colls_to_be_displayed.extend([coll for coll in colls if coll not in colls_to_be_displayed])
+
+    if policy == 'ANY':# the user needs to have access to at least one collection that restricts the records
+        #we need this to be able to remove records that are both in a public and restricted collection
+        permitted_recids = intbitset()
+        notpermitted_recids = intbitset()
+        for collection in restricted_collection_cache.cache:
+            if collection in permitted_restricted_collections:
+                permitted_recids |= get_collection_reclist(collection)
+            else:
+                notpermitted_recids |= get_collection_reclist(collection)
+        records_that_can_be_displayed = hitset_in_any_collection - (notpermitted_recids - permitted_recids)
+
+    else:# the user needs to have access to all collections that restrict a records
+        notpermitted_recids = intbitset()
+        for collection in restricted_collection_cache.cache:
+            if collection not in permitted_restricted_collections:
+                notpermitted_recids |= get_collection_reclist(collection)
+        records_that_can_be_displayed = hitset_in_any_collection - notpermitted_recids
+
+    if records_that_can_be_displayed.is_infinite():
+        # We should not return infinite results for user.
+        records_that_can_be_displayed = intbitset()
+        for coll in colls_to_be_displayed:
+            records_that_can_be_displayed |= get_collection_reclist(coll)
+
+    return records_that_can_be_displayed
+
+
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
 
@@ -2784,7 +2820,6 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
     results_nbhits = 0
 
     # calculate the list of recids (restricted or not) that the user has rights to access and we should display (only those)
-    records_that_can_be_displayed = intbitset()
 
     if not req or isinstance(req, cStringIO.OutputType): # called from CLI
         user_info = {}
@@ -2796,7 +2831,6 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
 
     else:
         user_info = collect_user_info(req)
-        policy = CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY.strip().upper()
         # let's get the restricted collections the user has rights to view
         permitted_restricted_collections = user_info.get('precached_permitted_restricted_collections', [])
 
@@ -2817,23 +2851,10 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         colls_to_be_displayed = [coll for coll in current_coll_children if coll in colls or coll in permitted_restricted_collections]
         colls_to_be_displayed.extend([coll for coll in colls if coll not in colls_to_be_displayed])
 
-        if policy == 'ANY':# the user needs to have access to at least one collection that restricts the records
-            #we need this to be able to remove records that are both in a public and restricted collection
-            permitted_recids = intbitset()
-            notpermitted_recids = intbitset()
-            for collection in restricted_collection_cache.cache:
-                if collection in permitted_restricted_collections:
-                    permitted_recids |= get_collection_reclist(collection)
-                else:
-                    notpermitted_recids |= get_collection_reclist(collection)
-            records_that_can_be_displayed = hitset_in_any_collection - (notpermitted_recids - permitted_recids)
-
-        else:# the user needs to have access to all collections that restrict a records
-            notpermitted_recids = intbitset()
-            for collection in restricted_collection_cache.cache:
-                if collection not in permitted_restricted_collections:
-                    notpermitted_recids |= get_collection_reclist(collection)
-            records_that_can_be_displayed = hitset_in_any_collection - notpermitted_recids
+        records_that_can_be_displayed = get_records_that_can_be_displayed(
+                                          user_info,
+                                          hitset_in_any_collection,
+                                          current_coll, colls)
 
         for coll in colls_to_be_displayed:
             results[coll] = results.get(coll, intbitset()).union_update(records_that_can_be_displayed & get_collection_reclist(coll))
@@ -5715,9 +5736,15 @@ def prs_simple_search(results_in_any_collection, kwargs=None, req=None, of=None,
                     only_hosted_colls_actual_or_potential_results_p=None, query_representation_in_cache=None,
                     ap=None, hosted_colls_actual_or_potential_results_p=None, wl=None, em=None,
                     **dummy):
-    if search_results_cache.cache.has_key(query_representation_in_cache):
+    try:
+        results_in_cache = intbitset().fastload(
+            search_results_cache.get(query_representation_in_cache))
+    except:
+        results_in_cache = None
+
+    if results_in_cache is not None:
         # query is not in the cache already, so reuse it:
-        results_in_any_collection.union_update(search_results_cache.cache[query_representation_in_cache])
+        results_in_any_collection.union_update(results_in_cache)
         if verbose and of.startswith("h"):
             write_warning("Search stage 0: query found in cache, reusing cached results.", req=req)
     else:
@@ -5761,12 +5788,18 @@ def prs_intersect_results_with_collrecs(results_final, results_in_any_collection
 
 
 def prs_store_results_in_cache(query_representation_in_cache, results_in_any_collection, req=None, verbose=None, of=None, **dummy):
-    if CFG_WEBSEARCH_SEARCH_CACHE_SIZE and not search_results_cache.cache.has_key(query_representation_in_cache):
-        if len(search_results_cache.cache) > CFG_WEBSEARCH_SEARCH_CACHE_SIZE:
-            search_results_cache.clear()
-        search_results_cache.cache[query_representation_in_cache] = results_in_any_collection
-        if verbose and of.startswith("h"):
-            write_warning(req, "Search stage 3: storing query results in cache.", req=req)
+    # FIXME: probably not needed for Redis
+    #if CFG_WEBSEARCH_SEARCH_CACHE_SIZE and not search_results_cache.cache.has_key(query_representation_in_cache):
+    #    if len(search_results_cache.cache) > CFG_WEBSEARCH_SEARCH_CACHE_SIZE:
+    #        search_results_cache.clear()
+    search_results_cache.set(query_representation_in_cache,
+                             results_in_any_collection.fastdump(),
+                             timeout=60*5)
+    search_results_cache.set(query_representation_in_cache + '::cc',
+                             dummy.get('cc', CFG_SITE_NAME),
+                             timeout=60*5)
+    if verbose and of.startswith("h"):
+        write_warning(req, "Search stage 3: storing query results in cache.", req=req)
 
 
 def prs_apply_search_limits(results_final, kwargs=None, req=None, of=None, cc=None, ln=None, _=None,
@@ -6092,7 +6125,7 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
                     dt=None, jrec=None, ec=None, action=None, colls_to_search=None, wash_colls_debug=None,
                     verbose=None, wl=None, em=None, **dummy):
 
-    query_representation_in_cache = repr((p, f, colls_to_search, wl))
+    query_representation_in_cache = get_search_results_cache_key(**kwargs)
     page_start(req, of, cc, aas, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3), em=em)
 
     if of.startswith("h") and verbose and wash_colls_debug:
@@ -6272,7 +6305,7 @@ def perform_request_cache(req, action="show"):
     out += "<h1>Search Cache</h1>"
     # clear cache if requested:
     if action == "clear":
-        search_results_cache.clear()
+        search_results_cache.delete_many(CFG_SEARCH_RESULTS_CACHE_PREFIX+'*')
     req.write(out)
     # show collection reclist cache:
     out = "<h3>Collection reclist cache</h3>"
@@ -6280,11 +6313,13 @@ def perform_request_cache(req, action="show"):
     out += "<br />- reclist cache timestamp: %s" % collection_reclist_cache.timestamp
     out += "<br />- reclist cache contents:"
     out += "<blockquote>"
-    for coll in collection_reclist_cache.cache.keys():
-        if collection_reclist_cache.cache[coll]:
-            out += "%s (%d)<br />" % (coll, len(collection_reclist_cache.cache[coll]))
+    for coll in collection_reclist_cache.get_many(
+            CFG_SEARCH_RESULTS_CACHE_PREFIX+'*'):
+        out += "%s<br />" % (coll,)
     out += "</blockquote>"
     req.write(out)
+    return
+    #FIXME get more info from Flask Cache
     # show search results cache:
     out = "<h3>Search Cache</h3>"
     out += "- search cache usage: %d queries cached (max. ~%d)" % \

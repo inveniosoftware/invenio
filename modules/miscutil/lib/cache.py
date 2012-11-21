@@ -17,5 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from hashlib import md5
 from flaskext.cache import Cache
 cache = Cache()
+
+# For now we just use the same cache.
+
+CFG_SEARCH_RESULTS_CACHE_PREFIX = "search_results::"
+
+def get_search_query_id(**kwargs):
+    p = kwargs.get('p', '')
+    f = kwargs.get('f', '')
+    cc = kwargs.get('cc', '')
+    wl = kwargs.get('wl', '')
+    return md5(repr((p, f, cc, wl))).hexdigest()
+
+
+def get_search_results_cache_key(**kwargs):
+    return CFG_SEARCH_RESULTS_CACHE_PREFIX + get_search_query_id(**kwargs)
+
+
+def get_search_results_cache_key_from_qid(qid):
+    return CFG_SEARCH_RESULTS_CACHE_PREFIX + qid
+
+search_results_cache = cache

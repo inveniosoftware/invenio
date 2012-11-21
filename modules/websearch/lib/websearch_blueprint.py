@@ -32,7 +32,8 @@ from flask import Blueprint, session, make_response, g, render_template, \
                   abort
 from sqlalchemy.sql import operators
 
-from invenio.cache import cache
+from invenio.cache import cache, search_results_cache, get_search_query_id, \
+                          get_search_results_cache_key_from_qid
 from invenio.intbitset import intbitset as HitSet
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -53,6 +54,7 @@ from invenio.search_engine import search_pattern_parenthesised,\
                                   print_record, \
                                   get_field_tags, \
                                   get_most_popular_field_values, \
+                                  get_records_that_can_be_displayed, \
                                   create_nearest_terms_box
 from invenio.bibformat import format_records
 
@@ -308,20 +310,13 @@ def search():
     f = request.args.get('f')
     colls_to_search = request.args.get('cc')
     wl = request.args.get('wl')
-
-    recids = perform_request_search(req=request, **argd)
-    qid = md5(repr((p,f,colls_to_search, wl))).hexdigest()
-
-    if (request.args.get('so') or request.args.get('rm')):
-        recids.reverse()
-
-    cache.set('facet_'+qid, {
-        'recids': HitSet(recids).fastdump(),
-        'cc': collection.name
-        }, timeout=60*5) # 5 minutes
-
     rg = request.args.get('rg', 10, type=int)
     page = request.args.get('jrec', 1, type=int)
+    qid = get_search_query_id(**argd)
+
+    recids = perform_request_search(req=request, **argd)
+    if (request.args.get('so') or request.args.get('rm')):
+        recids.reverse()
 
     def get_facet_title(facet):
         if facet == 'collection' and collection.id > 1:
@@ -349,6 +344,27 @@ def search():
     return dict(recids = recids)
 
 
+def get_current_user_records_that_can_be_displayed(qid):
+    """
+    Returns records that current user can display.
+
+    @param qid: query identifier
+
+    @return: records in intbitset
+    """
+    @search_results_cache.memoize(timeout=60*5)
+    def get_records_for_user(qid, uid):
+        key = get_search_results_cache_key_from_qid(qid)
+        data = search_results_cache.get(key)
+        if data is None:
+            abort(406)
+        cc = search_results_cache.get(key+'::cc')
+        return get_records_that_can_be_displayed(current_user,
+                                                 HitSet().fastload(data), cc)
+    # Simplifies API
+    return get_records_for_user(qid, current_user.get_id())
+
+
 @blueprint.route('/facet/<name>/<qid>', methods=['GET', 'POST'])
 def facet(name, qid):
     """
@@ -360,17 +376,15 @@ def facet(name, qid):
     @return: jsonified facet list sorted by number of records
     """
     if name not in ['collection', 'author', 'year']:
-        return None
-
-    data = cache.get('facet_'+qid)
-    if data is None:
         abort(406)
+
     try:
-        recIDsHitSet = HitSet().fastload(data['recids'])
+        recIDsHitSet = get_current_user_records_that_can_be_displayed(qid)
         recIDs = recIDsHitSet.tolist()
-    except KeyError:
+    except:
         recIDs = []
 
+    cc = search_results_cache.get(get_search_results_cache_key_from_qid(qid)+'::cc')
     limit = 50
 
 
@@ -380,7 +394,7 @@ def facet(name, qid):
         if parent is not None:
             collection = Collection.query.filter(Collection.name==parent).first_or_404()
         else:
-            collection = Collection.query.filter(Collection.name==data['cc']).first_or_404()
+            collection = Collection.query.filter(Collection.name==cc).first_or_404()
         facet = []
         for c in collection.collection_children_r:
             num_records = len(c.reclist.intersection(recIDsHitSet))
@@ -413,17 +427,19 @@ def results(qid):
 
     @param qid: query indentifier
     """
-    data = cache.get('facet_'+qid)
-    if data is None:
+    try:
+        recIDsHitSet = get_current_user_records_that_can_be_displayed(qid)
+        recIDs = recIDsHitSet.tolist()
+    except KeyError:
+        return 'KeyError'
+    except:
         return _('Please reload the page')
 
-    filter = json.loads(request.form.get('filter'))
-    collection = Collection.query.filter(Collection.name==data['cc']).first_or_404()
+    cc = search_results_cache.get(
+            get_search_results_cache_key_from_qid(qid)+'::cc')
 
-    try:
-       recIDsHitSet = HitSet().fastload(data['recids'])
-    except KeyError:
-        return ''
+    filter = json.loads(request.form.get('filter'))
+    collection = Collection.query.filter(Collection.name==cc).first_or_404()
 
     sortkeytype= lambda v:v[0]
     sortfacet= lambda v:v[1]
