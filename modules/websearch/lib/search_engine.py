@@ -5789,16 +5789,13 @@ def prs_intersect_results_with_collrecs(results_final, results_in_any_collection
 
 
 def prs_store_results_in_cache(query_representation_in_cache, results_in_any_collection, req=None, verbose=None, of=None, **dummy):
-    # FIXME: probably not needed for Redis
-    #if CFG_WEBSEARCH_SEARCH_CACHE_SIZE and not search_results_cache.cache.has_key(query_representation_in_cache):
-    #    if len(search_results_cache.cache) > CFG_WEBSEARCH_SEARCH_CACHE_SIZE:
-    #        search_results_cache.clear()
-    search_results_cache.set(query_representation_in_cache,
-                             results_in_any_collection.fastdump(),
-                             timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
-    search_results_cache.set(query_representation_in_cache + '::cc',
-                             dummy.get('cc', CFG_SITE_NAME),
-                             timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
+    if CFG_WEBSEARCH_SEARCH_CACHE_SIZE > 0:
+        search_results_cache.set(query_representation_in_cache,
+                                 results_in_any_collection.fastdump(),
+                                 timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
+        search_results_cache.set(query_representation_in_cache + '::cc',
+                                 dummy.get('cc', CFG_SITE_NAME),
+                                 timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     if verbose and of.startswith("h"):
         write_warning(req, "Search stage 3: storing query results in cache.", req=req)
 
