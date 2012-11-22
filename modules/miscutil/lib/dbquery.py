@@ -43,6 +43,7 @@ import atexit
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
+    CFG_DEVEL_SITE, \
     CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
     CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
 
@@ -190,17 +191,13 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     if param:
         param = tuple(param)
 
-    try:
-        from flask import current_app
-        current_app.logger.info(sql + str(param))
-    except:
-        pass
-
     dbhost = CFG_DATABASE_HOST
     if run_on_slave and CFG_DATABASE_SLAVE:
         dbhost = CFG_DATABASE_SLAVE
 
-    ### log_sql_query(dbhost, sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
+    if CFG_DEVEL_SITE > 8:
+        log_sql_query(dbhost, sql, param)
+
     try:
         db = _db_login(dbhost)
         cur = db.cursor()
@@ -326,10 +323,10 @@ def log_sql_query(dbhost, sql, param=None):
        to enable logging of all SQL queries, please uncomment one line
        in run_sql() above. Useful for fine-level debugging only!
     """
+    from flask import current_app
     from invenio.config import CFG_LOGDIR
     from invenio.dateutils import convert_datestruct_to_datetext
     from invenio.textutils import indent_text
-    log_path = CFG_LOGDIR + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
     message += indent_text('Host:\n' + indent_text(str(dbhost), 2, wrap=True), 2)
@@ -337,9 +334,7 @@ def log_sql_query(dbhost, sql, param=None):
     message += indent_text('Params:\n' + indent_text(str(param), 2, wrap=True), 2)
     message += '-----------------------------\n\n'
     try:
-        log_file = open(log_path, 'a+')
-        log_file.writelines(message)
-        log_file.close()
+        current_app.logger.info(message)
     except:
         pass
 
