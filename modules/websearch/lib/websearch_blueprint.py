@@ -32,6 +32,7 @@ from flask import Blueprint, session, make_response, g, render_template, \
                   abort
 from sqlalchemy.sql import operators
 
+from invenio.config import CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT
 from invenio.cache import cache, search_results_cache, get_search_query_id, \
                           get_search_results_cache_key_from_qid
 from invenio.intbitset import intbitset as HitSet
@@ -352,7 +353,7 @@ def get_current_user_records_that_can_be_displayed(qid):
 
     @return: records in intbitset
     """
-    @search_results_cache.memoize(timeout=60*5)
+    @search_results_cache.memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     def get_records_for_user(qid, uid):
         key = get_search_results_cache_key_from_qid(qid)
         data = search_results_cache.get(key)
@@ -409,12 +410,12 @@ def facet(name, qid):
     return jsonify(facet=facet[0:limit])
 
 
-@blueprint.invenio_memoize(60*5)
+@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT/2)
 def get_value_recids(value, facet):
     p = '"'+str(value)+'"'
     return search_pattern(p=p, f=facet)
 
-@blueprint.invenio_memoize(60)
+@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT/4)
 def get_facet_recids(facet, values):
     return reduce(lambda x,y: x.union(y),
                   [get_value_recids(v, facet) for v in values],

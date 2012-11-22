@@ -54,6 +54,7 @@ from invenio.config import \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
      CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
+     CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, \
      CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
@@ -5794,10 +5795,10 @@ def prs_store_results_in_cache(query_representation_in_cache, results_in_any_col
     #        search_results_cache.clear()
     search_results_cache.set(query_representation_in_cache,
                              results_in_any_collection.fastdump(),
-                             timeout=60*5)
+                             timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     search_results_cache.set(query_representation_in_cache + '::cc',
                              dummy.get('cc', CFG_SITE_NAME),
-                             timeout=60*5)
+                             timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
     if verbose and of.startswith("h"):
         write_warning(req, "Search stage 3: storing query results in cache.", req=req)
 
