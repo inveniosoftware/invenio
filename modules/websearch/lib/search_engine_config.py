@@ -46,6 +46,9 @@ CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH = False
 ## "See more collections" link.
 CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT = 10
 
+## Prefix used for search results cache.
+CFG_SEARCH_RESULTS_CACHE_PREFIX = "search_results::"
+
 class InvenioWebSearchUnknownCollectionError(Exception):
     """Exception for bad collection."""
     def __init__(self, colname):

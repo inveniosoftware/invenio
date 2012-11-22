@@ -492,7 +492,7 @@ def get_available_output_formats(visible_only=False):
     return formats
 
 # Flask cache for search results.
-from invenio.cache import search_results_cache, get_search_results_cache_key
+from invenio.websearch_cache import search_results_cache, get_search_results_cache_key
 
 class CollectionI18nNameDataCacher(DataCacher):
     """

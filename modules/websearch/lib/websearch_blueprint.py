@@ -33,8 +33,10 @@ from flask import Blueprint, session, make_response, g, render_template, \
 from sqlalchemy.sql import operators
 
 from invenio.config import CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT
-from invenio.cache import cache, search_results_cache, get_search_query_id, \
-                          get_search_results_cache_key_from_qid
+from invenio.cache import cache
+from invenio.websearch_cache import search_results_cache, \
+                                    get_search_query_id, \
+                                    get_search_results_cache_key_from_qid
 from invenio.intbitset import intbitset as HitSet
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL

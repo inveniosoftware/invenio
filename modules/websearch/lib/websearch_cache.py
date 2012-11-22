@@ -17,5 +17,32 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flaskext.cache import Cache
-cache = Cache()
+from hashlib import md5
+from invenio.cache import cache
+from invenio.search_engine_config import CFG_SEARCH_RESULTS_CACHE_PREFIX
+
+def get_search_query_id(**kwargs):
+    """
+    Returns unique query indentifier.
+    """
+    p = kwargs.get('p', '')
+    f = kwargs.get('f', '')
+    cc = kwargs.get('cc', '')
+    wl = kwargs.get('wl', '')
+    return md5(repr((p, f, cc, wl))).hexdigest()
+
+
+def get_search_results_cache_key(**kwargs):
+    """
+    Returns key for search results cache.
+    """
+    return CFG_SEARCH_RESULTS_CACHE_PREFIX + get_search_query_id(**kwargs)
+
+
+def get_search_results_cache_key_from_qid(qid):
+    """
+    Returns key for search results cache from query identifier.
+    """
+    return CFG_SEARCH_RESULTS_CACHE_PREFIX + qid
+
+search_results_cache = cache
