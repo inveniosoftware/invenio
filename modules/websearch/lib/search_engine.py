@@ -6304,9 +6304,6 @@ def perform_request_cache(req, action="show"):
     req.write("<html>")
     out = ""
     out += "<h1>Search Cache</h1>"
-    # clear cache if requested:
-    if action == "clear":
-        search_results_cache.delete_many(CFG_SEARCH_RESULTS_CACHE_PREFIX+'*')
     req.write(out)
     # show collection reclist cache:
     out = "<h3>Collection reclist cache</h3>"
@@ -6318,20 +6315,6 @@ def perform_request_cache(req, action="show"):
             CFG_SEARCH_RESULTS_CACHE_PREFIX+'*'):
         out += "%s<br />" % (coll,)
     out += "</blockquote>"
-    req.write(out)
-    return
-    #FIXME get more info from Flask Cache
-    # show search results cache:
-    out = "<h3>Search Cache</h3>"
-    out += "- search cache usage: %d queries cached (max. ~%d)" % \
-           (len(search_results_cache.cache), CFG_WEBSEARCH_SEARCH_CACHE_SIZE)
-    if len(search_results_cache.cache):
-        out += "<br />- search cache contents:"
-        out += "<blockquote>"
-        for query, hitset in search_results_cache.cache.items():
-            out += "<br />%s ... %s" % (query, hitset)
-        out += """<p><a href="%s/search/cache?action=clear">clear search results cache</a>""" % CFG_SITE_URL
-        out += "</blockquote>"
     req.write(out)
     # show field i18nname cache:
     out = "<h3>Field I18N names cache</h3>"
