@@ -412,6 +412,7 @@ def _get_institute_pub_dict_bai(recids, names_list, person_id):
                     affdict[affs[name][0]] = set([rec])
     return affdict
 
+
 def _get_person_names_dicts_bai(person_id):
     '''
     returns a dict with longest name, normalized names variations and db names variations.
@@ -436,7 +437,9 @@ def _get_person_names_dicts_bai(person_id):
         except KeyError:
             db_names_dict[aname] = acount
 
-    return {'longest':longest_name, 'names_dict':names_dict, 'db_names_dict':db_names_dict}
+    return {'longest': longest_name, 'names_dict': names_dict,
+            'db_names_dict': db_names_dict}
+
 
 def _get_total_downloads_bai(pubs):
     '''
@@ -454,6 +457,7 @@ def _get_total_downloads_bai(pubs):
             totaldownloads = totaldownloads + recsloads[k]
     return totaldownloads
 
+
 def _get_veryfy_my_pubs_list_link_bai(person_id):
     '''
     canonical name links
@@ -465,23 +469,26 @@ def _get_veryfy_my_pubs_list_link_bai(person_id):
         person_link = cid
     return person_link
 
+
 def _get_kwtuples_bai(pubs, person_id):
     '''
-    Returns the keyword tuples for given personid.
+    Returns the list of keyword tuples for given personid.
     @param person_id: int person id
     '''
-    tup = get_most_popular_field_values(pubs,
-                            (KEYWORD_TAG, FKEYWORD_TAG), count_repetitive_values=False)
+    tup = get_most_popular_field_values(pubs, (KEYWORD_TAG, FKEYWORD_TAG),
+                                        count_repetitive_values=False)
     return tup
+
 
 def _get_collabtuples_bai(pubs, person_id):
     '''
-    Returns the keyword tuples for given personid.
+    Returns the list keyword tuples for given personid.
     @param person_id: int person id
     '''
-    tup = get_most_popular_field_values(pubs,
-                            COLLABORATION_TAG, count_repetitive_values=False)
+    tup = get_most_popular_field_values(pubs, COLLABORATION_TAG,
+                                        count_repetitive_values=False)
     return tup
+
 
 def _get_coauthors_bai(personid, collabs):
     def canonical_name(pid):
@@ -672,22 +679,23 @@ def _get_veryfy_my_pubs_list_link_fallback(person_id):
     '''
     return ''
 
+
 def _get_kwtuples_fallback(pubs, person_id):
     '''
-    Returns the keyword tuples for given personid.
+    Returns the list of keyword tuples for given personid.
     @param person_id: int person id
     '''
-    tup = get_most_popular_field_values(pubs,
-                            (KEYWORD_TAG, FKEYWORD_TAG), count_repetitive_values=False)
+    tup = get_most_popular_field_values(pubs, (KEYWORD_TAG, FKEYWORD_TAG),
+                                        count_repetitive_values=False)
     return tup
 
 def _get_collabtuples_fallback(pubs, person_id):
     '''
-    Returns the keyword tuples for given personid.
+    Returns the list of keyword tuples for given personid.
     @param person_id: int person id
     '''
-    tup = get_most_popular_field_values(pubs,
-                            COLLABORATION_TAG, count_repetitive_values=False)
+    tup = get_most_popular_field_values(pubs, COLLABORATION_TAG,
+                                        count_repetitive_values=False)
     return tup
 
 def _get_coauthors_fallback(personid, collabs):
