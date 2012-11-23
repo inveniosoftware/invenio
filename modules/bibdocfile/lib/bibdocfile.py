@@ -103,7 +103,6 @@ from invenio.bibrecord import record_get_field_instances, \
 from invenio.urlutils import create_url, make_user_agent_string
 from invenio.textutils import nice_size
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webuser import collect_user_info
 from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
 from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
@@ -2047,13 +2046,32 @@ class BibDoc:
             versions.append(currversion)
 
         if versions:
+
+            file_status_for_guests = ''
+            status = self.status.strip()
+            if status:
+                user_info = {'agent': '',
+                             'email': 'guest',
+                             'group': [],
+                             'guest': '1',
+                             'nickname': '',
+                             'referer': '',
+                             'remote_host': '',
+                             'remote_ip': '',
+                             'session': None,
+                             'uid': -1,
+                             'uri': ''}
+                (auth_code, auth_message) = check_bibdoc_authorization(user_info, status)
+                if auth_code:
+                    file_status_for_guests = 'Restricted'
+
             return bibdocfile_templates.tmpl_bibdoc_filelist(
                 ln = ln,
                 versions = versions,
                 imageurl = imageurl,
                 docname = self.docname,
                 recid = self.recid,
-                status = self.status
+                status = file_status_for_guests
                 )
         else:
             return ""
