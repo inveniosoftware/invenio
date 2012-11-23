@@ -4124,8 +4124,10 @@ CREATE TABLE IF NOT EXISTS upgrade (
   PRIMARY KEY (upgrade)
 ) ENGINE=MyISAM;
 
+-- maint-1.1 upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_release_1_1_0',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_location',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
 
 -- end of file
