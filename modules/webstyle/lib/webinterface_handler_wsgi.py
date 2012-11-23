@@ -22,6 +22,7 @@ import sys
 import os
 import re
 import cgi
+import gc
 import inspect
 from fnmatch import fnmatch
 from urlparse import urlparse, urlunparse
@@ -491,6 +492,22 @@ def application(environ, start_response):
     finally:
         for (callback, data) in req.get_cleanups():
             callback(data)
+        if hasattr(req, '_session'):
+            ## The session handler saves for caching a request_wrapper
+            ## in req.
+            ## This saves req as an attribute, creating a circular
+            ## reference.
+            ## Since we have have reached the end of the request handler
+            ## we can safely drop the request_wrapper so to avoid
+            ## memory leaks.
+            delattr(req, '_session')
+        if hasattr(req, '_user_info'):
+            ## For the same reason we can delete the user_info.
+            delattr(req, '_user_info')
+
+        ## as suggested in
+        ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
+        del gc.garbage[:]
     return []
 
 def generate_error_page(req, admin_was_alerted=True, page_already_started=False):
