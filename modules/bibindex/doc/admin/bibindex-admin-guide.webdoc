@@ -60,10 +60,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6 <a href="#3.6">Configure Removal of HTML Code</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.7 <a href="#3.7">Configure Accent Stripping</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8 <a href="#3.8">Configure Fulltext Indexing</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.8.1 <a href="#3.8.1">Configure Solr Fulltext Indexing</a><br/>
 <strong>4. <a href="#4">Run BibIndex Daemon</a></strong><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Run BibIndex daemon</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Checking and repairing indexes</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">Reindexing</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.4 <a href="#4.4">Solr fulltext indexing</a><br/>
 
 <a name="1"></a><h2>1. Overview</h2>
 <a name="2"></a><h2>2. Configure Metadata Tags and Fields</h2>
@@ -164,6 +166,39 @@ together with the metadata, so that both are searched by default, you
 can go to BibIndex Admin interface and in the Manage Logical Fields
 explicitly add the tag <code>8564_u</code> under <code>any
 field</code> field.</p>
+
+<a name="3.8.1"></a><h3>3.8.1 Configure Solr Fulltext Indexing</h3>
+
+<p>Solr can be used to index fulltext and to serve fulltext queries. To use it, the following steps are necessary:</p>
+
+<p>First, Solr is installed:</p>
+<blockquote>
+<pre>
+$ cd &lt;invenio source tree&gt;
+$ sudo make install-solrutils
+</pre>
+</blockquote>
+
+<p>Second, <code>invenio-local.conf</code> is amended:</p>
+<blockquote>
+<pre>
+CFG_SOLR_URL = http://localhost:8983/solr
+</pre>
+</blockquote>
+
+<p>Third, Solr is set to index fulltext:</p>
+<blockquote>
+<pre>
+UPDATE idxINDEX SET indexer='SOLR' WHERE name='fulltext'
+</pre>
+</blockquote>
+
+<p>Fourth, Solr is started:</p>
+<blockquote>
+<pre>
+&lt;invenio installation&gt;/lib/apache-solr-3.1.0/example$ sudo -u www-data java -jar start.jar
+</pre>
+</blockquote>
 
 <a name="4"></a><h2>4. Run BibIndex Daemon</h2>
 
@@ -289,3 +324,9 @@ once the indexing process is successfully over.  For the time being,
 if reindexing takes several hours in your installation (e.g. if you
 have 1,000,000 records), you may want to mysqlhotcopy your tables and
 run reindexing on those copies yourself.</p>
+
+<a name="4.4"></a><h3>4.4 Solr fulltext indexing</h3>
+
+<p>If Solr is used for both fulltext and ranking, only the <code>BibRank</code>
+daemon shall run. Since Solr documents can only be overriden and not updated, the
+<code>BibRank</code> daemon also indexes fulltext.</p>

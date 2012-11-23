@@ -38,6 +38,7 @@
 <strong>5.<a href="#brm">BibRank Methods</a></strong><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1.<a href="#str">Single tag rank method</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.<a href="#wrd">Word Similarity/Similar Records</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.1.<a href="#wrdsolr">Solr Word Similarity/Similar Records</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.3.<a href="#tdcc">Time-dependent citation counts</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.4.<a href="#lbr">Link-based ranking</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.5.<a href="#tdlbr">Time-dependent link-based ranking</a><br/>
@@ -384,6 +385,45 @@ default_min_relevance = 75
 </blockquote>
 <p>Tip: When executing a search using a ranking method, you can add "verbose=1" to the list of parameteres
 in the URL to see which terms have been used in the ranking.</p>
+
+<a name="wrdsolr"></a><h4>5.2.1 Solr Word Similarity/Similar Records</h4>
+<p>The Solr Word Similarity/Similar Records method uses Solr to serve word similarity ranking and similar records queries. To use it, the following steps are necessary:</p>
+
+<p>First, Solr is installed:</p>
+<blockquote>
+<pre>
+$ cd &lt;invenio source tree&gt;
+$ sudo make install-solrutils
+</pre>
+</blockquote>
+
+<p>Second, <code>invenio-local.conf</code> is amended:</p>
+<blockquote>
+<pre>
+CFG_SOLR_URL = http://localhost:8983/solr
+</pre>
+</blockquote>
+
+<p>Third, <code>idxINDEX</code> is amended:</p>
+<blockquote>
+<pre>
+UPDATE idxINDEX SET indexer='SOLR' WHERE name='fulltext'
+</pre>
+</blockquote>
+
+<p>Fourth, the Solr word similarity ranking method is used:</p>
+<blockquote>
+<pre>
+&lt;invenio installation&gt;/etc/bibrank$ sudo -u www-data cp template_word_similarity_solr.cfg wrd.cfg
+</pre>
+</blockquote>
+
+<p>Fifth, Solr is started:</p>
+<blockquote>
+<pre>
+&lt;invenio installation&gt;/lib/apache-solr-3.1.0/example$ sudo -u www-data java -jar start.jar
+</pre>
+</blockquote>
 
 <a name="tdcc"></a><h3>5.3 Time-dependent citation counts</h3>
 <p>This ranking method is an extension of the well known "rank by number of citation" method. The difference is that the citations are weighted differently,
