@@ -44,15 +44,35 @@
     </xsl:if>
   </xsl:template>
   <xsl:template match="record">
+    <!-- DOI -->
+    <xsl:if test="datafield[@tag=024 and @ind1=7 and (subfield[@code='2']='doi' or subfield[@code='2']='DOI')]">
+      <xsl:for-each select="datafield[@tag=024 and @ind1=7 and (subfield[@code='2']='doi' or subfield[@code='2']='DOI')]">
+        <dc:identifier><xsl:text>doi:</xsl:text><xsl:value-of select="subfield[@code='a']"/></dc:identifier>
+      </xsl:for-each>
+    </xsl:if>
+    <!-- Link to main record -->
+    <dc:identifier><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')"/></dc:identifier>
+    <!-- Language -->
     <xsl:for-each select="datafield[@tag=041]">
       <dc:language><xsl:value-of select="subfield[@code='a']"/></dc:language>
     </xsl:for-each>
+    <!-- Author/Creator -->
     <xsl:for-each select="datafield[@tag=100]">
       <dc:creator><xsl:value-of select="subfield[@code='a']"/></dc:creator>
     </xsl:for-each>
     <xsl:for-each select="datafield[@tag=700]">
       <dc:creator><xsl:value-of select="subfield[@code='a']"/></dc:creator>
     </xsl:for-each>
+    <!-- Corporate Author/Creator, if no main author/creator -->
+    <xsl:if test="not (datafield[@tag=100 and subfield[@code='a']] or datafield[@tag=700 and subfield[@code='a']])">
+      <xsl:for-each select="datafield[@tag=110 and subfield[@code='a']]">
+	<dc:creator><xsl:value-of select="subfield[@code='a']"/></dc:creator>
+      </xsl:for-each>
+      <xsl:for-each select="datafield[@tag=710 and subfield[@code='a']]">
+	<dc:creator><xsl:value-of select="subfield[@code='a']"/></dc:creator>
+      </xsl:for-each>
+    </xsl:if>
+    <!-- Title -->
     <xsl:for-each select="datafield[@tag=245]">
       <dc:title>
         <xsl:value-of select="subfield[@code='a']"/>
@@ -65,11 +85,17 @@
     <xsl:for-each select="datafield[@tag=111]">
       <dc:title><xsl:value-of select="subfield[@code='a']"/></dc:title>
     </xsl:for-each>
+    <!-- Subject -->
     <xsl:for-each select="datafield[@tag=650 and @ind1=1 and @ind2=7]">
       <dc:subject><xsl:value-of select="subfield[@code='a']"/></dc:subject>
     </xsl:for-each>
+    <!-- Abstract -->
     <xsl:for-each select="datafield[@tag=520]">
       <dc:description><xsl:value-of select="subfield[@code='a']"/></dc:description>
+    </xsl:for-each>
+    <!-- Publisher -->
+    <xsl:for-each select="datafield[@tag=260]">
+      <dc:publisher><xsl:value-of select="subfield[@code='b']"/></dc:publisher>
     </xsl:for-each>
     <xsl:choose>
       <!-- BEG OpenAIRE part
@@ -101,16 +127,41 @@
             <dc:source><xsl:value-of select="subfield[@code='p']" />, <xsl:value-of select="subfield[@code='n']" /> (<xsl:value-of select="subfield[@code='y']" />) pp. <xsl:value-of select="subfield[@code='c']" /></dc:source>
           </xsl:if>
         </xsl:for-each>
-        <xsl:for-each select="datafield[@tag=260]">
-          <dc:date><xsl:value-of select="subfield[@code='c']"/></dc:date>
-        </xsl:for-each>
+	<!-- Date. Please keep ISO 8601 format -->
+	<xsl:variable name="date" select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_DATE date_format=&quot;%Y-%m-%d&quot; source_formats=&quot;%d %b %Y&quot; source_fields=&quot;269__c,260__c&quot;>')" />
+	<xsl:if test="$date">
+	  <dc:date><xsl:value-of select="$date"/></dc:date>
+	</xsl:if>
       </xsl:when>
       <!-- END OpenAIRE part -->
       <xsl:otherwise>
-        <xsl:for-each select="datafield[@tag=856 and @ind1=4]">
+	<!-- Main report number-->
+	<xsl:for-each select="datafield[@tag=037]">
+          <dc:identifier><xsl:value-of select="subfield[@code='a']"/></dc:identifier>
+        </xsl:for-each>
+	<!-- Additional report number-->
+	<xsl:for-each select="datafield[@tag=088]">
+          <dc:identifier><xsl:value-of select="subfield[@code='a']"/></dc:identifier>
+        </xsl:for-each>
+	<!-- OAI Identifier -->
+	<xsl:value-of disable-output-escaping="yes" select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_OAI_IDENTIFIER instance_prefix=&quot;&lt;dc:identifier>&quot; separator=&quot;&quot; instance_suffix=&quot;&lt;/dc:identifier>&quot;>')"/>
+	<!-- Link to record files -->
+<!--        <xsl:for-each select="datafield[@tag=856 and @ind1=4]">
           <dc:identifier><xsl:value-of select="subfield[@code='u']"/></dc:identifier>
         </xsl:for-each>
-        <dc:date><xsl:value-of select="fn:creation_date(controlfield[@tag=001])"/></dc:date>
+-->
+	<!-- Date. Please keep ISO 8601 format -->
+	<xsl:variable name="date" select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_DATE date_format=&quot;%Y-%m-%d&quot; source_formats=&quot;%d %b %Y&quot; source_fields=&quot;269__c,260__c&quot;>')" />
+	<xsl:choose>
+	  <xsl:when test="$date">
+	    <!-- Metadata date -->
+	    <dc:date><xsl:value-of select="$date"/></dc:date>
+	  </xsl:when>
+	  <xsl:otherwise>
+	    <!-- Record creation date-->
+	    <dc:date><xsl:value-of select="fn:creation_date(controlfield[@tag=001])"/></dc:date>
+	  </xsl:otherwise>
+	</xsl:choose>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
