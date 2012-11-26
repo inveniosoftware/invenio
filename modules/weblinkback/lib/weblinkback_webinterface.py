@@ -26,7 +26,7 @@ from invenio.webuser import getUid, collect_user_info, page_not_authorized
 from invenio.weblinkback import check_user_can_view_linkbacks, \
                                 perform_sendtrackback, \
                                 perform_request_display_record_linbacks, \
-                                perform_request_display_approved_latest_added_linkbacks
+                                perform_request_display_approved_latest_added_linkbacks_to_accessible_records
 from invenio.weblinkback_dblayer import approve_linkback, \
                                         reject_linkback
 from invenio.weblinkback_config import CFG_WEBLINKBACK_LATEST_COUNT_DEFAULT, \
@@ -232,7 +232,9 @@ class WebInterfaceRecentLinkbacksPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
 
-        body = perform_request_display_approved_latest_added_linkbacks(argd['rg'], argd['ln'], weblinkback_templates=weblinkback_templates)
+        user_info = collect_user_info(req)
+
+        body = perform_request_display_approved_latest_added_linkbacks_to_accessible_records(argd['rg'], argd['ln'], user_info, weblinkback_templates=weblinkback_templates)
 
         navtrail = 'Recent Linkbacks'
 

@@ -29,7 +29,8 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, \
                                        CFG_WEBLINKBACK_LIST_TYPE, \
                                        CFG_WEBLINKBACK_TRACKBACK_SUBSCRIPTION_ERROR_MESSAGE, \
                                        CFG_WEBLINKBACK_PAGE_TITLE_STATUS, \
-                                       CFG_WEBLINKBACK_BROKEN_COUNT
+                                       CFG_WEBLINKBACK_BROKEN_COUNT, \
+                                       CFG_WEBLINKBACK_LATEST_FACTOR
 from invenio.weblinkback_dblayer import create_linkback, \
                                         get_url_list, \
                                         get_all_linkbacks, \
@@ -187,6 +188,17 @@ def infix_exists_for_url_in_list(url, list_type):
     return False
 
 
+def get_latest_linkbacks_to_accessible_records(rg, linkbacks, user_info):
+    result = []
+    for linkback in linkbacks:
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, linkback[2]) # pylint: disable=W0612
+        if not auth_code:
+            result.append(linkback)
+            if len(result) == rg:
+                break
+    return result
+
+
 def perform_request_display_record_linbacks(req, recid, show_admin, weblinkback_templates, ln): # pylint: disable=W0613
     """
     Display linkbacks of a record
@@ -210,13 +222,14 @@ def perform_request_display_record_linbacks(req, recid, show_admin, weblinkback_
     return out
 
 
-def perform_request_display_approved_latest_added_linkbacks(rg, ln, weblinkback_templates):
+def perform_request_display_approved_latest_added_linkbacks_to_accessible_records(rg, ln, user_info, weblinkback_templates):
     """
-    Display approved latest added linbacks
+    Display approved latest added linbacks to accessible records
     @param rg: count of linkbacks to display
     @param weblinkback_templates: template object reference
     """
-    latest_linkbacks = get_approved_latest_added_linkbacks(rg)
+    latest_linkbacks = get_approved_latest_added_linkbacks(rg * CFG_WEBLINKBACK_LATEST_FACTOR)
+    latest_linkbacks = get_latest_linkbacks_to_accessible_records(rg, latest_linkbacks, user_info)
     latest_linkbacks_in_days = split_in_days(latest_linkbacks)
 
     out = weblinkback_templates.tmpl_get_latest_linkbacks_top(rg, ln)
