@@ -409,7 +409,13 @@ def facet(name, qid):
                             recIDs,
                             get_field_tags(name))
 
-    return jsonify(facet=facet[0:limit])
+    if request.is_xhr:
+        return jsonify(facet=facet[0:limit])
+    else:
+        response = make_response('<html><body>%s</body></html>' % \
+            str(facet[0:limit]))
+        response.mimetype = 'text/html'
+        return response
 
 
 @blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT/2)
@@ -441,7 +447,10 @@ def results(qid):
     cc = search_results_cache.get(
             get_search_results_cache_key_from_qid(qid)+'::cc')
 
-    filter = json.loads(request.form.get('filter'))
+    try:
+        filter = json.loads(request.values.get('filter', '[]'))
+    except:
+        return _('Invalid filter data')
     collection = Collection.query.filter(Collection.name==cc).first_or_404()
 
     sortkeytype= lambda v:v[0]
@@ -488,13 +497,13 @@ def results(qid):
         output.difference_update(exclude)
 
     #TODO sort
-    if request.form.get('so'):
+    if request.values.get('so'):
         recids = output.tolist()
-    elif request.form.get('rm'):
+    elif request.values.get('rm'):
         from invenio.bibrank_record_sorter import rank_records
         ranked = rank_records(
-                    request.form.get('rm'),
-                    0, output, request.form.get('p').split())
+                    request.values.get('rm'),
+                    0, output, request.values.get('p').split())
         if ranked[0]:
             recids = ranked[0]
             recids.reverse()
@@ -503,8 +512,8 @@ def results(qid):
     else:
         recids = output.tolist()
 
-    rg = request.form.get('rg', 10, type=int)
-    page = request.form.get('jrec', 1, type=int)
+    rg = request.values.get('rg', 10, type=int)
+    page = request.values.get('jrec', 1, type=int)
     @register_template_context_processor
     def index_context():
         return dict(

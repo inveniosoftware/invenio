@@ -200,4 +200,11 @@
       </form>
 {% endmacro %}
 
+{% if not request.is_xhr %}
+{% extends 'page.html' %}
+{% block body %}
 {{ render_search_results(recids, collection, pagination, format_record) }}
+{% endblock %}
+{% else %}
+{{ render_search_results(recids, collection, pagination, format_record) }}
+{% endif %}
