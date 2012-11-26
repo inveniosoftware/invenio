@@ -121,7 +121,7 @@ try:
     import flask
     import fixture
     import flask.ext.assets
-    import flaskext.cache
+    import flask.ext.cache
     import flask.ext.sqlalchemy
     import flask.ext.testing
     import wtforms

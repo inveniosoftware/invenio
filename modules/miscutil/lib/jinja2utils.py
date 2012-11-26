@@ -21,7 +21,7 @@ from jinja2.ext import Extension
 from flask import current_app
 from flask.ext.assets import Environment, Bundle
 from flask import _request_ctx_stack
-from flaskext.cache import JINJA_CACHE_ATTR_NAME
+from flask.ext.cache import JINJA_CACHE_ATTR_NAME
 
 ENV_PREFIX = '_collected_'
 
