@@ -20,6 +20,7 @@
 """
 __revision__ = "$Id$"
 
+import re
 from urllib import quote
 from cgi import escape
 from invenio.config import CFG_SITE_URL
@@ -33,7 +34,8 @@ def format_element(bfo, limit, separator=' ; ',
            affiliation_suffix=')',
            interactive="no",
            highlight="no",
-           link_author_pages="no"):
+           link_author_pages="no",
+           relator_code_pattern=None):
     """
     Prints the list of authors of a record.
 
@@ -46,6 +48,7 @@ def format_element(bfo, limit, separator=' ; ',
     @param affiliation_suffix: suffix printed after each affiliation
     @param interactive: if yes, enable user to show/hide authors when there are too many (html + javascript)
     @param highlight: highlights authors corresponding to search query if set to 'yes'
+    @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
     """
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
@@ -55,6 +58,10 @@ def format_element(bfo, limit, separator=' ; ',
 
     authors.extend(authors_1)
     authors.extend(authors_2)
+
+    if relator_code_pattern:
+        p = re.compile(relator_code_pattern)
+        authors = filter(lambda x: p.match(x.get('4', '')), authors)
 
     nb_authors = len(authors)
 
