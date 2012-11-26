@@ -45,10 +45,13 @@ class Template:
         """
         _ = gettext_set_language(ln)
 
+        url = get_trackback_url(recid)
         out = '<h4>'
         out += _("Trackback URL: ")
-        out += get_trackback_url(recid)
+        out += '<a href="%s" onclick="return false" rel="nofollow">%s</a>' % (url, url)
         out += '</h4>'
+        out += '<div class="comment-subscribe">Trackbacks are used in blog systems to refer to external content. Please copy and paste this trackback URL to the appropriate field of your blog post if you want to refer to this record.</div>'
+        out += '<br/>'
 
         return out
 
