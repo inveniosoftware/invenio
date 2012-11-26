@@ -221,6 +221,7 @@ You may want to customise your invenio-local.conf configuration accordingly."""
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
+                elem = elem.strip()
                 if option_name in ['CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES']:
                     # 3d1) integer values
                     out += "%i, " % int(elem)
