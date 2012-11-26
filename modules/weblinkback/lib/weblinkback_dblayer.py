@@ -24,6 +24,7 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
                                        CFG_WEBLINKBACK_DEFAULT_USER, \
                                        CFG_WEBLINKBACK_PAGE_TITLE_STATUS
+from invenio.textutils import xml_entities_to_utf8
 
 
 def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME["ASC"]):
@@ -372,10 +373,11 @@ def get_url_title(url):
                        WHERE url=%s and title<>"" and broken=0
                     """, (url, ))
 
+    res = url
     if len(title) != 0:
-        return title[0][0]
-    else:
-        return url
+        res = title[0][0]
+
+    return xml_entities_to_utf8(res)
 
 
 def increment_broken_count(url):

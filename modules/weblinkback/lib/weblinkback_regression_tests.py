@@ -572,6 +572,16 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         self.assertEqual(9, len(self.get_all_from_table("lnkENTRYLOG")))
         self.assertEqual(12, len(self.get_all_from_table("lnkLOG")))
 
+    def test_url_xml_entity_removal(self):
+        """weblinkback - URL XML entity removal"""
+        url = 'This is a&nbsp;test'
+        run_sql("INSERT INTO lnkENTRYURLTITLE ( url, title) VALUES ('URL1', %s)", (url,))
+        self.assertEqual('This is a\xc2\xa0test', get_url_title(url))
+
+        url = 'This &#8220;is&#8221; &nbsp;&#8220;&#8221;test&#8221;"'
+        run_sql("INSERT INTO lnkENTRYURLTITLE ( url, title) VALUES ('URL2', %s)", (url,))
+        self.assertEqual('This \xe2\x80\x9cis\xe2\x80\x9d \xc2\xa0\xe2\x80\x9c\xe2\x80\x9dtest\xe2\x80\x9d"', get_url_title(url))
+
 
 def get_title_of_page_mock1(url=""): # pylint: disable=W0613
     return "MOCK_TITLE1"
