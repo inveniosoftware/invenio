@@ -130,9 +130,14 @@ def perform_request_article(req, journal_name, issue_number, ln,
         register_exception(req=req)
         return e.user_box(req)
 
+    user_info = collect_user_info(req)
+    bfo = BibFormatObject(recid, ln=ln, user_info=user_info)
+    bfo.req = req
+
     # if it is cached, return it
     cached_html = get_article_page_from_cache(journal_name, category,
-                                              recid, issue_number, ln)
+                                              recid, issue_number, ln,
+                                              bfo)
 
     if cached_html and not editor:
         return cached_html
@@ -155,9 +160,6 @@ def perform_request_article(req, journal_name, issue_number, ln,
 
 
     # create a record and get HTML back from bibformat
-    user_info = collect_user_info(req)
-    bfo = BibFormatObject(recid, ln=ln, user_info=user_info)
-    bfo.req = req
     verbosity = 0
     if editor:
         # Increase verbosity only for editors/admins

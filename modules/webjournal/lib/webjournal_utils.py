@@ -39,7 +39,8 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_DEVEL_SITE
+     CFG_DEVEL_SITE, \
+     CFG_CERN_SITE
 from invenio.dbquery import run_sql
 from invenio.bibformat_engine import BibFormatObject
 from invenio.search_engine import search_pattern, record_exists
@@ -1556,7 +1557,8 @@ def cache_article_page(html, journal_name, category, recid, issue, ln):
     cached_file.write(html)
     cached_file.close()
 
-def get_article_page_from_cache(journal_name, category, recid, issue, ln):
+NOT_FOR_ALERT_COMMENTS_RE = re.compile('<!--\s*START_NOT_FOR_ALERT\s*-->.*?<!--\s*END_NOT_FOR_ALERT\s*-->', re.IGNORECASE | re.DOTALL)
+def get_article_page_from_cache(journal_name, category, recid, issue, ln, bfo=None):
     """
     Gets an article view of a journal from cache.
     False if not in cache.
@@ -1574,6 +1576,13 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln):
         cached_file = open(cache_path).read()
     except:
         return False
+
+    if CFG_CERN_SITE and bfo:
+        try:
+            from invenio.bibformat_elements import bfe_webjournal_cern_toolbar
+            cached_file = NOT_FOR_ALERT_COMMENTS_RE.sub(bfe_webjournal_cern_toolbar.format_element(bfo), cached_file, 1)
+        except ImportError, e:
+            pass
 
     return cached_file
 
