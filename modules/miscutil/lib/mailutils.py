@@ -50,6 +50,16 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_DEVEL_SITE
 
+try:
+    from invenio.config import \
+         CFG_MISCUTIL_SMTP_USER,\
+         CFG_MISCUTIL_SMTP_PASS,\
+         CFG_MISCUTIL_SMTP_TLS
+except ImportError:
+    CFG_MISCUTIL_SMTP_USER = ''
+    CFG_MISCUTIL_SMTP_PASS = ''
+    CFG_MISCUTIL_SMTP_TLS = False
+
 from invenio.messages import wash_language, gettext_set_language
 from invenio.textutils import guess_minimum_encoding
 from invenio.errorlib import register_exception
@@ -207,6 +217,12 @@ This message would have been sent to the following recipients:
                 server.set_debuglevel(1)
             else:
                 server.set_debuglevel(0)
+            if CFG_MISCUTIL_SMTP_TLS:
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+            if CFG_MISCUTIL_SMTP_USER and CFG_MISCUTIL_SMTP_PASS:
+                server.login(CFG_MISCUTIL_SMTP_USER, CFG_MISCUTIL_SMTP_PASS)
             server.sendmail(fromaddr, toaddr, body)
             server.quit()
             sent = True

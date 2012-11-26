@@ -37,12 +37,12 @@ class TestPluginContainer(unittest.TestCase):
     """
     PluginContainer TestSuite.
     """
-    def FIXME_test_plugin_container_wrapping_bibformat_elements(self):
+    def test_plugin_container_wrapping_bibformat_elements(self):
         """pluginutils - wrapping bibformat elements"""
-        def format_signature(dummy_bfo, *dummy_args, **dummy_argd):
+        def format_signature(bfo, *dummy_args, **dummy_argd):
             pass
 
-        def escape_values_signature(dummy_bfo):
+        def escape_values_signature(bfo):
             pass
 
         plugin_builder = create_enhanced_plugin_builder(
