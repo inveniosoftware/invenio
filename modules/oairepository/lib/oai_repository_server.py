@@ -386,18 +386,21 @@ def print_record(recid, prefix='marcxml', verb='ListRecords', set_spec=None):
         status = 'deleted'
 
     if not record_exists_result and CFG_OAI_DELETED_POLICY not in ('persistent', 'transient'):
-        return
+        return ""
 
     idents = get_field(recid, CFG_OAI_ID_FIELD)
-    try:
-        assert idents, "No OAI ID for record %s, please do your checks!" % recid
-    except AssertionError, err:
-        register_exception(alert_admin=True)
-        return
-    try:
-        assert len(idents) == 1, "More than OAI ID found for recid %s. Considering only the first one, but please do your checks: %s" % (recid, idents)
-    except AssertionError, err:
-        register_exception(alert_admin=True)
+    if not idents:
+        return ""
+    ## FIXME: Move these checks in a bibtask
+    #try:
+        #assert idents, "No OAI ID for record %s, please do your checks!" % recid
+    #except AssertionError, err:
+        #register_exception(alert_admin=True)
+        #return ""
+    #try:
+        #assert len(idents) == 1, "More than OAI ID found for recid %s. Considering only the first one, but please do your checks: %s" % (recid, idents)
+    #except AssertionError, err:
+        #register_exception(alert_admin=True)
     ident = idents[0]
 
     header_body = EscapedXMLString('')

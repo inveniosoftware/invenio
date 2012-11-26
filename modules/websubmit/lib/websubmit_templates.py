@@ -21,7 +21,8 @@ import cgi
 import re
 import operator
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD, \
+     CFG_SITE_SECURE_URL
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.urlutils import create_html_link
@@ -42,7 +43,7 @@ class Template:
         }
 
 
-    def tmpl_submit_home_page(self, ln, catalogues):
+    def tmpl_submit_home_page(self, ln, catalogues, user_info=None):
         """
         The content of the home page of the submit engine
 
@@ -51,10 +52,20 @@ class Template:
           - 'ln' *string* - The language to display the interface in
 
           - 'catalogues' *string* - The HTML code for the catalogues list
+
+          - 'user_info' *dict* - The user info object
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
+
+        login_note = ""
+        if user_info and user_info['guest'] == '1':
+            login_note = '<em>(' + create_html_link(CFG_SITE_SECURE_URL + '/youraccount/login',
+                                          urlargd={'referer': CFG_SITE_SECURE_URL + user_info['uri'],
+                                                   'ln': ln},
+                                          link_label=cgi.escape(_("Login to display all document types you can access"))) + \
+                                          ')</em>'
 
         return """
           <script type="text/javascript" language="Javascript1.2">
@@ -62,7 +73,7 @@ class Template:
           </script>
            <table class="searchbox" width="100%%" summary="">
               <tr>
-                  <th class="portalboxheader">%(document_types)s:</th>
+                  <th class="portalboxheader">%(document_types)s: %(login_note)s</th>
               </tr>
               <tr>
                   <td class="portalboxbody">
@@ -83,6 +94,7 @@ class Template:
               'please_select' : _("Please select the type of document you want to submit"),
               'catalogues' : catalogues,
               'ln' : ln,
+              'login_note' : login_note,
             }
 
     def tmpl_submit_home_catalog_no_content(self, ln):

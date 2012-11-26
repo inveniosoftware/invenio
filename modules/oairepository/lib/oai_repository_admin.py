@@ -228,7 +228,7 @@ def perform_request_editset(oai_set_id=None, oai_set_name='',
                              oai_set_op2)
         out += "<br />"
         if res[0] == 1:
-            out += oaiharvest_templates.tmpl_print_info("OAI set definition #%s edited." % oai_set_id)
+            out += oaiharvest_templates.tmpl_print_info(ln, "OAI set definition #%s edited." % oai_set_id)
             out += "<br />"
         else:
             out += webstyle_templates.tmpl_write_warning("A problem was encountered: <br/>" + cgi.escape(res[1]))
@@ -385,7 +385,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
                             m2=%s,
                             p3=%s,
                             f3=%s,
-                            m3=%s,
+                            m3=%s
                          WHERE id=%s""",
                       (oai_set_name,
                        oai_set_spec,

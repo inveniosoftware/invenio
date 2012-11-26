@@ -17114,7 +17114,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                 <td align="center">
                     <select name="borrower_id" size="8"
                           style='border: 1px solid #cfcfcf'>
-            """ % (CFG_SITE_URL, type, title, authors, place, publisher, year,
+            """ % (CFG_SITE_URL, request_type, title, authors, place, publisher, year,
                    edition, this_edition_only, isbn, standard_number,
                    budget_code, cash, period_of_interest_from,
                    period_of_interest_to, additional_comments)
