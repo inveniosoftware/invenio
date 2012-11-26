@@ -24,9 +24,11 @@ webuser_config.py - magic constants for webuser module.
 ## Used by merge_usera_into_userb, contains the list of which SQL tables refer
 ## to the external key id_user, and what column contains this information.
 CFG_WEBUSER_USER_TABLES = (
-    ("rnkPAGEVIEWS", "id_user"),
-    ("rnkDOWNLOADS", "id_user"),
-    ("session", "uid"),
+    ## The next tables are disabled because they are often too big
+    ## and not so critical to deserve merging
+    #("rnkPAGEVIEWS", "id_user"),
+    #("rnkDOWNLOADS", "id_user"),
+    #("session", "uid"),
     ("user_usergroup", "id_user"),
     ("user_accROLE", "id_user"),
     ("user_query", "id_user"),
