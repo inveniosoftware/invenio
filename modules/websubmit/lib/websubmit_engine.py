@@ -1236,6 +1236,7 @@ def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     # get user ID:
     try:
         uid = getUid(req)
+        user_info = collect_user_info(req)
     except Error, e:
         return error_page(e, req, ln)
 
@@ -1244,7 +1245,8 @@ def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
 
     finaltext = websubmit_templates.tmpl_submit_home_page(
                     ln = ln,
-                    catalogues = catalogues_text
+                    catalogues = catalogues_text,
+                    user_info = user_info,
                 )
 
     return page(title=_("Submit"),
