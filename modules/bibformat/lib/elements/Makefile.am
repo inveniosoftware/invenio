@@ -67,6 +67,7 @@ pylib_DATA = __init__.py \
 	bfe_meta_opengraph_video.py \
 	bfe_meta.py \
 	bfe_notes.py \
+	bfe_oai_identifier.py \
 	bfe_oai_marcxml.py \
 	bfe_pagination.py \
 	bfe_photo_resources_brief.py \
@@ -100,6 +101,7 @@ pylib_DATA = __init__.py \
 	bfe_webauthorpage_data.py \
 	bfe_xml_record.py \
 	bfe_year.py
+
 
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements
 
