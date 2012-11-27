@@ -646,8 +646,7 @@ order to let this task run. The current priority is %s. New value:" \
         task_id = self.currentrow[0]
         process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
-        #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
-            #self.display_in_footer("a process is already running!")
+
         if status == "WAITING":
             if process in self.helper_modules:
                 if run_sql("""UPDATE schTASK SET status='SCHEDULED', host=%s
@@ -738,18 +737,14 @@ order to let this task run. The current priority is %s. New value:" \
             self.display_in_footer("Cannot initialise running processes")
 
     def change_auto_mode(self):
+        program = os.path.join(CFG_BINDIR, "bibsched")
         if self.auto_mode:
-            program = os.path.join(CFG_BINDIR, "bibsched")
             COMMAND = "%s -q halt" % program
-            os.system(COMMAND)
-
-            self.auto_mode = 0
         else:
-            program = os.path.join(CFG_BINDIR, "bibsched")
             COMMAND = "%s -q start" % program
-            os.system(COMMAND)
+        os.system(COMMAND)
 
-            self.auto_mode = 1
+        self.auto_mode = not self.auto_mode
         self.stdscr.refresh()
 
     def put_line(self, row, header=False, motd=False):
@@ -994,20 +989,24 @@ class BibSched(object):
     def filter_for_allowed_tasks(self):
         """ Removes all tasks that are not allowed in this Invenio instance
         """
-        n_waiting = []
-        n_active = []
-        if "bibupload" not in self.allowed_task_types:
-            self.node_relevant_bibupload_tasks = ()
-        for task_id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_waiting_tasks:
+
+        def relevant_task(task_id, proc, runtime, status, priority, host, sequenceid):
+            # if host and self.hostname != host:
+            #     return False
+
             procname = proc.split(':')[0]
-            if procname in self.allowed_task_types:
-                n_waiting.append((task_id, proc, runtime, status, priority, host, sequenceid))
-        for task_id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_active_tasks:
-            procname = proc.split(':')[0]
-            if procname in self.allowed_task_types:
-                n_active.append((task_id, proc, runtime, status, priority, host, sequenceid))
-        self.node_relevant_active_tasks = tuple(n_active)
-        self.node_relevant_waiting_tasks = tuple(n_waiting)
+            if procname not in self.allowed_task_types:
+                return False
+
+            return True
+
+        def filter_tasks(tasks):
+            return tuple(t for t in tasks if relevant_task(*t))
+
+        self.node_relevant_bibupload_tasks = filter_tasks(self.node_relevant_bibupload_tasks)
+        self.node_relevant_active_tasks = filter_tasks(self.node_relevant_active_tasks)
+        self.node_relevant_waiting_tasks = filter_tasks(self.node_relevant_waiting_tasks)
+        self.node_relevant_sleeping_tasks = filter_tasks(self.node_relevant_sleeping_tasks)
 
     def is_task_safe_to_execute(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
@@ -1053,7 +1052,7 @@ class BibSched(object):
         those with higher or equal priority."""
         higher = []
         lower = []
-        ### !!! We allready have this in node_relevant_active_tasks
+        ### !!! We already have this in node_relevant_active_tasks
         for other_task_id, task_proc, runtime, status, task_priority, task_host, sequenceid in self.node_relevant_active_tasks:
         # for other_task_id, task_proc, runtime, status, task_priority, task_host in self.node_relevant_active_tasks:
         # for other_task_id, task_proc, task_priority, status in self.get_running_tasks():
@@ -1078,6 +1077,8 @@ class BibSched(object):
                 Log("Trying to run %s" % task_id)
 
             if priority < -10:
+                if debug:
+                    Log("Cannot run because priority < -10")
                 return False
 
             lower, higher = self.split_active_tasks_by_priority(task_id, priority)
@@ -1170,9 +1171,16 @@ class BibSched(object):
                         Log("Cannot run because this is a monotask and there are other tasks running: %s" % (self.node_relevant_active_tasks, ))
                     return False
 
-                if len(self.node_relevant_active_tasks) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
+                def task_in_same_host(task_id, proc, runtime, status, priority, host, sequenceid):
+                    return host == self.hostname
+
+                def filter_by_host(tasks):
+                    return tuple(t for t in tasks if task_in_same_host(*t))
+
+                node_active_tasks = filter_by_host(self.node_relevant_active_tasks)
+                if len(node_active_tasks) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
                     if debug:
-                        Log("Cannot run because all resources (%s) are used (%s), active: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(self.node_relevant_active_tasks), self.node_relevant_active_tasks))
+                        Log("Cannot run because all resources (%s) are used (%s), active: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(node_active_tasks), node_active_tasks))
                     return False
 
                 if status in ("SLEEPING", "ABOUT TO SLEEP"):
@@ -1223,83 +1231,88 @@ class BibSched(object):
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
                 return True
 
+    def check_errors(self):
+        sql = "SELECT count(id) FROM schTASK WHERE status='ERROR'" \
+              " OR status='DONE WITH ERRORS' OR STATUS='CERROR'"
+        if run_sql(sql)[0][0] > 0:
+            errors = run_sql("""SELECT id,proc,status FROM schTASK
+                                WHERE status = 'ERROR'
+                                OR status = 'DONE WITH ERRORS'
+                                OR status = 'CERROR'""")
+            msg_errors = ["    #%s %s -> %s" % row for row in errors]
+            msg = 'BibTask with ERRORS:\n%s' % "\n".join(msg_errors)
+            err_types = set(e[2] for e in errors if e[2])
+            if 'ERROR' in err_types or 'DONE WITH ERRORS' in err_types:
+                raise StandardError(msg)
+            else:
+                raise RecoverableError(msg)
+
+    def calculate_rows(self):
+        """Return all the node_relevant_active_tasks to work on."""
+        try:
+            self.check_errors()
+        except RecoverableError, msg:
+            register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
+            run_sql("UPDATE schTASK SET status='ERRORS REPORTED' WHERE status='CERROR'")
+
+        max_bibupload_priority, min_bibupload_priority = run_sql(
+                    """SELECT MAX(priority), MIN(priority)
+                        FROM schTASK
+                        WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
+                                'ABOUT TO STOP', 'ABOUT TO SLEEP',
+                                'SCHEDULED', 'CONTINUING')
+                        AND proc = 'bibupload'
+                        AND runtime <= NOW()""")[0]
+        if max_bibupload_priority > min_bibupload_priority:
+            run_sql(
+            """UPDATE schTASK SET priority = %s
+                WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
+                                'ABOUT TO STOP', 'ABOUT TO SLEEP',
+                                'SCHEDULED', 'CONTINUING')
+                AND proc = 'bibupload'
+                AND runtime <= NOW()
+                AND priority < %s""", (max_bibupload_priority,
+                                        max_bibupload_priority))
+
+        ## The bibupload tasks are sorted by id, which means by the order they were scheduled
+        self.node_relevant_bibupload_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
+               FROM schTASK WHERE status IN ('WAITING', 'SLEEPING')
+               AND proc = 'bibupload'
+               AND runtime <= NOW()
+               ORDER BY id ASC LIMIT 1""", n=1)
+        ## The other tasks are sorted by priority
+        self.node_relevant_waiting_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
+               FROM schTASK WHERE (status='WAITING' AND runtime <= NOW())
+               OR status = 'SLEEPING'
+               ORDER BY priority DESC, runtime ASC, id ASC""")
+        self.node_relevant_sleeping_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
+               FROM schTASK WHERE status = 'SLEEPING'
+               ORDER BY priority DESC, runtime ASC, id ASC""")
+        self.node_relevant_active_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host,sequenceid
+               FROM schTASK WHERE status IN ('RUNNING', 'CONTINUING',
+                                             'SCHEDULED', 'ABOUT TO STOP',
+                                             'ABOUT TO SLEEP')""")
+        self.active_tasks_all_nodes = tuple(self.node_relevant_active_tasks)
+        ## Remove tasks that can not be executed on this host
+        self.filter_for_allowed_tasks()
+
     def watch_loop(self):
-        def check_errors():
-            sql = "SELECT count(id) FROM schTASK WHERE status='ERROR'" \
-                  " OR status='DONE WITH ERRORS' OR STATUS='CERROR'"
-            if run_sql(sql)[0][0] > 0:
-                errors = run_sql("""SELECT id,proc,status FROM schTASK
-                                    WHERE status = 'ERROR'
-                                    OR status = 'DONE WITH ERRORS'
-                                    OR status = 'CERROR'""")
-                msg_errors = ["    #%s %s -> %s" % row for row in errors]
-                msg = 'BibTask with ERRORS:\n%s' % "\n".join(msg_errors)
-                err_types = set(e[2] for e in errors if e[2])
-                if 'ERROR' in err_types or 'DONE WITH ERRORS' in err_types:
-                    raise StandardError(msg)
-                else:
-                    raise RecoverableError(msg)
-
-        def calculate_rows():
-            """Return all the node_relevant_active_tasks to work on."""
-            try:
-                check_errors()
-            except RecoverableError, msg:
-                register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
-                run_sql("UPDATE schTASK SET status='ERRORS REPORTED' WHERE status='CERROR'")
-
-            max_bibupload_priority, min_bibupload_priority = run_sql(
-                        """SELECT MAX(priority), MIN(priority)
-                           FROM schTASK
-                           WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
-                                    'ABOUT TO STOP', 'ABOUT TO SLEEP',
-                                    'SCHEDULED', 'CONTINUING')
-                           AND proc = 'bibupload'
-                           AND runtime <= NOW()""")[0]
-            if max_bibupload_priority > min_bibupload_priority:
-                run_sql(
-                """UPDATE schTASK SET priority = %s
-                   WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
-                                    'ABOUT TO STOP', 'ABOUT TO SLEEP',
-                                    'SCHEDULED', 'CONTINUING')
-                   AND proc = 'bibupload'
-                   AND runtime <= NOW()
-                   AND priority < %s""", (max_bibupload_priority,
-                                          max_bibupload_priority))
-            ## The bibupload tasks are sorted by id, which means by the order they were scheduled
-            self.node_relevant_bibupload_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host, sequenceid
-                   FROM schTASK WHERE status IN ('WAITING', 'SLEEPING')
-                   AND proc = 'bibupload'
-                   AND runtime <= NOW()
-                   ORDER BY id ASC LIMIT 1""", n=1)
-            ## The other tasks are sorted by priority
-            self.node_relevant_waiting_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host, sequenceid
-                   FROM schTASK WHERE (status='WAITING' AND runtime <= NOW())
-                   OR status = 'SLEEPING'
-                   ORDER BY priority DESC, runtime ASC, id ASC""")
-            self.node_relevant_sleeping_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host, sequenceid
-                   FROM schTASK WHERE status = 'SLEEPING'
-                   ORDER BY priority DESC, runtime ASC, id ASC""")
-            self.node_relevant_active_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host,sequenceid
-                   FROM schTASK WHERE status IN ('RUNNING', 'CONTINUING',
-                                                 'SCHEDULED', 'ABOUT TO STOP',
-                                                 'ABOUT TO SLEEP')""")
-            self.active_tasks_all_nodes = tuple(self.node_relevant_active_tasks)
-            ## Remove tasks that can not be executed on this host
-            self.filter_for_allowed_tasks()
-
         ## Cleaning up scheduled task not run because of bibsched being
         ## interrupted in the middle.
-        run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
+        run_sql("""UPDATE schTASK
+                   SET status = 'WAITING'
+                   WHERE status = 'SCHEDULED'
+                   AND host = %s""", (self.hostname, ))
 
         try:
             while True:
-                #Log("New bibsched cycle")
-                calculate_rows()
+                if self.debug:
+                    Log("New bibsched cycle")
+                self.calculate_rows()
                 ## Let's first handle running node_relevant_active_tasks.
                 for task in self.node_relevant_active_tasks:
                     if self.handle_task(*task):
