@@ -166,9 +166,9 @@ def clean_tempfiles():
 
     write_message("- deleting temporary old "
             "RefExtract files")
-    gc_exec_command('find %s %s -name "refextract_task_*"'
+    gc_exec_command('find %s %s -name "refextract*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_TMPDIR, CFG_TMPSHAREDDIR, \
+            % (CFG_TMPDIR, CFG_TMPSHAREDDIR,
                CFG_MAX_ATIME_RM_REFEXTRACT, vstr))
 
     write_message("- deleting temporary old bibdocfiles")

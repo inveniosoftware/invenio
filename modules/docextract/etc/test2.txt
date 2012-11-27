@@ -1,0 +1,73 @@
+TITLE
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sagittis iaculis vulputate. Aenean enim dolor, lobortis eu eleifend ac, accumsan at eros. Sed felis lectus, convallis quis ultricies non, feugiat sit amet diam. Aliquam nec laoreet lacus. Praesent fermentum cursus sapien quis volutpat. Fusce non augue ac nulla porttitor accumsan ut faucibus dolor. Suspendisse eu orci vel lacus ornare aliquam sit amet vitae odio. Nulla justo neque, dictum ac viverra vitae, volutpat at turpis. Nam non odio sem. Maecenas dignissim scelerisque pellentesque.
+
+Cras volutpat posuere dui at pretium. Duis id ullamcorper odio. Vivamus eu bibendum sem. Vestibulum eget orci magna, vel placerat dui. Etiam neque enim, egestas sit amet scelerisque eget, bibendum et est. Praesent in pretium orci. Morbi eu lacus turpis, non porta tortor. Cras ornare massa urna, sit amet interdum velit. Sed enim diam, gravida ac adipiscing vel, lobortis sed dui. Quisque diam metus, pulvinar sed rhoncus nec, ultricies quis metus. Vivamus ullamcorper massa ut enim luctus vehicula. Maecenas malesuada bibendum tincidunt.
+
+Etiam gravida risus a elit aliquet aliquam. Cras id varius mi. Nulla non leo enim, elementum ornare leo. Praesent ornare tincidunt sodales. Nunc vulputate augue eget ligula scelerisque mollis at sed libero. Suspendisse luctus auctor rutrum. Fusce volutpat quam id urna posuere sagittis. In ultrices diam sit amet est adipiscing volutpat.
+
+Curabitur consectetur sodales diam, et ultricies ipsum consequat ut. Proin ut est erat, in tristique sem. Vivamus egestas volutpat consectetur. Praesent tristique arcu sit amet ante hendrerit mattis. Duis dictum erat vitae mauris convallis iaculis luctus mauris gravida. Duis iaculis porta vestibulum. Nulla facilisi. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Quisque id rhoncus nibh. Morbi pharetra sollicitudin felis, ut tincidunt felis interdum semper. Integer sit amet leo sit amet tellus interdum semper. Vestibulum non est magna. Quisque tempor facilisis quam, nec lobortis turpis feugiat ut. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae;
+
+Nam vel risus eget velit venenatis venenatis vitae ac metus. In hac habitasse platea dictumst. Donec non elit nisi, et auctor arcu. Nam vel magna elit, at mollis turpis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Duis at rhoncus eros. Nulla at neque nunc. Maecenas porttitor arcu non leo volutpat vitae scelerisque magna sollicitudin. Donec a viverra arcu. Mauris eget turpis nulla, a sollicitudin erat. Phasellus tincidunt adipiscing ante in iaculis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla commodo, neque sed dignissim ultricies, mi urna mollis nunc, ac lobortis neque purus in tellus.
+
+REFERENCES
+
+[1] <a href="http://cdsweb.cern.ch/">CERN Document Server</a> J. Maldacena, Adv. Theor. Math. Phys. 2 (1998) 231; hep-th/9711200. http://cdsweb.cern.ch/ then http://www.itp.ucsb.edu/online/susyc99/discussion/. ; L. Susskind, J. Math. Phys. 36 (1995) 6377; hep-th/9409089. hello world a<a href="http://uk.yahoo.com/">Yahoo!</a>. Fin.
+[1] J. Maldacena, Adv. Theor. Math. Phys. 2 (1998) 231; hep-th/9711200. http://cdsweb.cern.ch/
+[2] S. Gubser, I. Klebanov and A. Polyakov, Phys. Lett. B428 (1998) 105; hep-th/9802109. http://cdsweb.cern.ch/search.py?AGE=hello-world&ln=en
+[3] E. Witten, Adv. Theor. Math. Phys. 2 (1998) 253; hep-th/9802150.
+[4] O. Aharony, S. Gubser, J. Maldacena, H. Ooguri and Y. Oz, hep-th/9905111.
+[5] L. Susskind, J. Math. Phys. 36 (1995) 6377; hep-th/9409089.
+[6] L. Susskind and E. Witten, hep-th/9805114.
+[7] W. Fischler and L. Susskind, hep-th/9806039; N. Kaloper and A. Linde, Phys. Rev. D60 (1999) 105509, hep-th/9904120.
+[8] R. Bousso, JHEP 9906:028 (1999); hep-th/9906022.
+[9] R. Penrose and W. Rindler, Spinors and Spacetime, volume 2, chapter 9 (Cambridge University Press, Cambridge, 1986).
+[10] R. Britto-Pacumio, A. Strominger and A. Volovich, JHEP 9911:013 (1999); hep-th/9905211. blah hep-th/9905211 blah hep-ph/9711200
+[11] V. Balasubramanian and P. Kraus, Commun. Math. Phys. 208 (1999) 413; hep-th/9902121.
+[12] V. Balasubramanian and P. Kraus, Phys. Rev. Lett. 83 (1999) 3605; hep-th/9903190.
+[13] P. Kraus, F. Larsen and R. Siebelink, hep-th/9906127.
+[14] L. Randall and R. Sundrum, Phys. Rev. Lett. 83 (1999) 4690; hep-th/9906064. this is a test RN of a different type: CERN-LHC-Project-Report-2006-003. more text.
+[15] S. Gubser, hep-th/9912001.
+[16] H. Verlinde, hep-th/9906182; H. Verlinde, hep-th/9912018; J. de Boer, E. Verlinde and H. Verlinde, hep-th/9912012.
+[17] E. Witten, remarks at ITP Santa Barbara conference, "New dimensions in field theory and string theory": http://www.itp.ucsb.edu/online/susyc99/discussion/.
+[18] D. Page and C. Pope, Commun. Math. Phys. 127 (1990) 529.
+[19] M. Duff, B. Nilsson and C. Pope, Physics Reports 130 (1986), chapter 9.
+[20] D. Page, Phys. Lett. B79 (1978) 235.
+[21] M. Cassidy and S. Hawking, Phys. Rev. D57 (1998) 2372, hep-th/9709066; S. Hawking, Phys. Rev. D52 (1995) 5681.
+[22] K. Skenderis and S. Solodukhin, hep-th/9910023.
+[23] M. Henningson and K. Skenderis, JHEP 9807:023 (1998), hep-th/9806087.
+[24] C. Fefferman and C. Graham, "Conformal Invariants", in Elie Cartan et les Mathematiques d'aujourd'hui (Asterisque, 1985) 95.
+[25] C. Graham and J. Lee, Adv. Math. 87 (1991) 186. <a href="http://cdsweb.cern.ch/">CERN Document Server</a>
+[26] E. Witten and S.-T. Yau, hep-th/9910245.
+[27] R. Emparan, JHEP 9906:036 (1999); hep-th/9906040.
+[28] A. Chamblin, R. Emparan, C. Johnson and R. Myers, Phys. Rev. D59 (1999) 64010, hep-th/9808177; S. Hawking, C. Hunter and D. Page, Phys. Rev. D59 (1999) 44033, hep-th/9809035.
+[29] S. Sethi and L. Susskind, Phys. Lett. B400 (1997) 265, hep-th/9702101; T. Banks and N. Seiberg, Nucl. Phys. B497 (1997) 41, hep-th/9702187.
+[30] R. Emparan, C. Johnson and R. Myers, Phys. Rev. D60 (1999) 104001; hep-th/9903238.
+[31] S. Hawking, C. Hunter and M. Taylor-Robinson, Phys. Rev. D59 (1999) 064005; hep-th/9811056.
+[32] J. Dowker, Class. Quant. Grav. 16 (1999) 1937; hep-th/9812202.
+[33] J. Brown and J. York, Phys. Rev. D47 (1993) 1407.
+[34] D. Freedman, S. Mathur, A. Matsuis and L. Rastelli, Nucl. Phys. B546 (1999) 96; hep-th/9804058. More text, followed by an IBID A 546 (1999) 96
+[35] D. Freedman, S. Mathur, A. Matsuis and L. Rastelli, Nucl. Phys. B546 (1999) 96; hep-th/9804058. More text, followed by an IBID A
+[37] some misc  lkjslkdjlksjflksj [hep-th/9804058] lkjlkjlkjlkj [hep-th/0001567], hep-th/1212321, some more misc, Nucl. Phys. B546 (1999) 96
+[38] R. Emparan, C. Johnson and R.... Myers, Phys. Rev. D60 (1999) 104001; this is :: .... misc! hep-th/9903238. and some ...,.,.,.,::: more hep-ph/9912000
+[10] A. Ceresole, G. Dall Agata and R. D Auria, JHEP 11(1999) 009, [hep-th/9907216].
+[12] D.P. Jatkar and S. Randjbar-Daemi, Phys. Lett. B460, 281 (1999) [hep-th/9904187].
+[14] G. DallAgata, Phys. Lett. B460, (1999) 79, [hep-th/9904198].
+[13] S.M. Donaldson, Instantons and Geometric Invariant Theory, Comm. Math. Phys., 93, (1984), 453-460.
+[16] Becchi C., Blasi A., Bonneau G., Collina R., Delduc F., Commun. Math. Phys., 1988, 120, 121.
+[26]: N. Nekrasov, A. Schwarz, Instantons on noncommutative R4 and (2, 0) superconformal six-dimensional theory, Comm. Math. Phys., 198, (1998), 689-703.
+[2] H. J. Bhabha, Rev. Mod. Phys. 17, 200(1945); ibid, 21, 451(1949); S. Weinberg, Phys. Rev. 133, B1318(1964); ibid, 134, 882(1964); D. L. Pursey, Ann. Phys(N. Y)32, 157(1965); W. K. Tung, Phys, Rev. Lett. 16, 763(1966); Phys. Rev. 156, 1385(1967); W. J. Hurley, Phys. Rev. Lett. 29, 1475(1972).
+[21] E. Schrodinger, Sitzungsber. Preuss. Akad. Wiss. Phys. Math. Kl. 24, 418(1930); ibid, 3, 1(1931); K. Huang, Am. J. Phys. 20, 479(1952); H. Jehle, Phys, Rev. D3, 306(1971); G. A. Perkins, Found. Phys. 6, 237(1976); J. A. Lock, Am. J. Phys. 47, 797(1979); A. O. Barut et al, Phys. Rev. D23, 2454(1981); ibid, D24, 3333(1981); ibid, D31, 1386(1985); Phys. Rev. Lett. 52, 2009(1984).
+[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).
+[40] O.O. Vaneeva, R.O. Popovych and C. Sophocleous, Enhanced Group Analysis and Exact Solutions of Vari-able Coefficient Semilinear Diffusion Equations with a Power Source, Acta Appl. Math., doi:10.1007/s10440-008-9280-9, 46 p., arXiv:0708.3457.
+[41] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.
+[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic, Phys. Rev. Lett. 44, 912, (1980).
+[43] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); Hayward and Yellow et al., eds. Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990);
+[44] M. I. Moli_ero, and J. C. Oller, Performance test of the CMS link alignment system
+[45] Hush, D.R., R.Leighton, and B.G. Horne, 1993. "Progress in supervised Neural Netw. What's new since Lippmann?" IEEE Signal Process. Magazine 10, 8-39
+[15] Nucl. Phys., B372, 3 (1992); T.G. Rizzo, Phys. Rev. D40, 3035 (1989); Proceedings of the 1990 Summer Study on High Energy Physics. ed E. Berger, June 25-July 13, 1990, Snowmass Colorado (World Scientific, Singapore, 1992) p. 233; V. Barger, J.L. Hewett and T.G. Rizzo, Phys. Rev. D42, 152 (1990); J.L. Hewett, Phys. Lett. B238, 98 (1990);
+[234] Hawking S., P. van Niewenhuizen, L.S. Durkin, D. Freeman, some title of some journal
+[235] Hawking S., D. Freeman, some title of some journal
+[236] Hawking S. and D. Freeman, another random title of some random journal
+[237] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); G. Altarelli et al., Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990); Phys. Lett. B261, 146 (1991); ibidem B263, 459 (1991);
+[238] M. Birse and M. Banerjee, Phys. Rev. D31, 118 (1985).

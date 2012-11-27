@@ -59,7 +59,7 @@ from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
 from invenio.bibindex_engine_washer import wash_index_term
 from invenio.bibtask import task_init, write_message, get_datetime, \
-    task_set_option, task_get_option, task_get_task_param, task_update_status, \
+    task_set_option, task_get_option, task_get_task_param, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
@@ -892,16 +892,14 @@ class WordTable:
                 # calculate chunk group of recIDs and treat it:
                 i_high = min(i_low + opt_flush - flush_count - 1, arange[1])
                 i_high = min(i_low + chunksize - chunksize_count - 1, i_high)
+
                 try:
                     self.chk_recID_range(i_low, i_high)
-                except StandardError, e:
-                    write_message("Exception caught: %s" % e, sys.stderr)
-                    register_exception(alert_admin=True)
-                    task_update_status("ERROR")
-                    self.put_into_db()
+                except StandardError:
                     if self.index_name == 'fulltext' and CFG_SOLR_URL:
                         solr_commit()
-                    sys.exit(1)
+                    raise
+
                 write_message("%s adding records #%d-#%d started" % \
                         (self.tablename, i_low, i_high))
                 if CFG_CHECK_MYSQL_THREADS:
@@ -1216,14 +1214,7 @@ class WordTable:
                 i_high = min(i_low + opt_flush - flush_count - 1, arange[1])
                 i_high = min(i_low + chunksize - chunksize_count - 1, i_high)
 
-                try:
-                    self.fix_recID_range(i_low, i_high)
-                except StandardError, e:
-                    write_message("Exception caught: %s" % e, sys.stderr)
-                    register_exception(alert_admin=True)
-                    task_update_status("ERROR")
-                    self.put_into_db()
-                    sys.exit(1)
+                self.fix_recID_range(i_low, i_high)
 
                 flush_count = flush_count + i_high - i_low + 1
                 chunksize_count = chunksize_count + i_high - i_low + 1
@@ -1259,7 +1250,7 @@ class WordTable:
                 "%s - %sR tables.\nRunning 'bibindex --repair' is " \
                 "recommended." % (self.tablename, self.tablename[:-1])
         write_message("EMERGENCY: " + error_message, stream=sys.stderr)
-        raise StandardError, error_message
+        raise StandardError(error_message)
 
     def fix_recID_range(self, low, high):
         """Try to fix reverse index database consistency (e.g. table idxWORD01R) in the low,high doc-id range.
@@ -1330,7 +1321,7 @@ class WordTable:
                     "recommended; see the BibIndex Admin Guide." % \
                     (self.tablename, self.tablename[:-1])
             write_message("EMERGENCY: " + error_message, stream=sys.stderr)
-            raise StandardError, error_message
+            raise StandardError(error_message)
 
 def main():
     """Main that construct all the bibtask."""
@@ -1397,7 +1388,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     if key in ("-a", "--add"):
         task_set_option("cmd", "add")
         if ("-x", "") in opts or ("--del", "") in opts:
-            raise StandardError, "Can not have --add and --del at the same time!"
+            raise StandardError("Can not have --add and --del at the same time!")
     elif key in ("-k", "--check"):
         task_set_option("cmd", "check")
     elif key in ("-r", "--repair"):
@@ -1417,8 +1408,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ("-M", "--maxmem"):
         task_set_option("maxmem", int(value))
         if task_get_option("maxmem") < base_process_size + 1000:
-            raise StandardError, "Memory usage should be higher than %d kB" % \
-                (base_process_size + 1000)
+            raise StandardError("Memory usage should be higher than %d kB" % \
+                (base_process_size + 1000))
     elif key in ("-f", "--flush"):
         task_set_option("flush", int(value))
     else:
@@ -1537,7 +1528,7 @@ def task_run_core():
                     error_message = "Missing IDs of records to delete from " \
                             "index %s." % wordTable.tablename
                     write_message(error_message, stream=sys.stderr)
-                    raise StandardError, error_message
+                    raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
                 if task_get_option("id"):
                     wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
@@ -1562,14 +1553,13 @@ def task_run_core():
                 error_message = "Invalid command found processing %s" % \
                     wordTable.tablename
                 write_message(error_message, stream=sys.stderr)
-                raise StandardError, error_message
+                raise StandardError(error_message)
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception(alert_admin=True)
-            task_update_status("ERROR")
             if _last_word_table:
                 _last_word_table.put_into_db()
-            sys.exit(1)
+            raise
 
         wordTable.report_on_table_consistency()
         task_sleep_now_if_required(can_stop_too=True)
@@ -1606,7 +1596,7 @@ def task_run_core():
                     error_message = "Missing IDs of records to delete from " \
                             "index %s." % wordTable.tablename
                     write_message(error_message, stream=sys.stderr)
-                    raise StandardError, error_message
+                    raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
                 if task_get_option("id"):
                     wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
@@ -1630,14 +1620,13 @@ def task_run_core():
                 error_message = "Invalid command found processing %s" % \
                         wordTable.tablename
                 write_message(error_message, stream=sys.stderr)
-                raise StandardError, error_message
+                raise StandardError(error_message)
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception()
-            task_update_status("ERROR")
             if _last_word_table:
                 _last_word_table.put_into_db()
-            sys.exit(1)
+            raise
 
         wordTable.report_on_table_consistency()
         task_sleep_now_if_required(can_stop_too=True)
@@ -1675,7 +1664,7 @@ def task_run_core():
                     error_message = "Missing IDs of records to delete from " \
                             "index %s." % wordTable.tablename
                     write_message(error_message, stream=sys.stderr)
-                    raise StandardError, error_message
+                    raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
                 if task_get_option("id"):
                     wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
@@ -1700,14 +1689,13 @@ def task_run_core():
                 error_message = "Invalid command found processing %s" % \
                         wordTable.tablename
                 write_message(error_message, stream=sys.stderr)
-                raise StandardError, error_message
+                raise StandardError(error_message)
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception()
-            task_update_status("ERROR")
             if _last_word_table:
                 _last_word_table.put_into_db()
-            sys.exit(1)
+            raise
 
         wordTable.report_on_table_consistency()
         task_sleep_now_if_required(can_stop_too=True)

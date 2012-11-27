@@ -1,0 +1,30 @@
+## This file holds text which must be recognised alongside authors, and hence included in the $h subfields.
+## Matches using this data do not affect how references are split.
+## (Just simply appends to the most recent $h subfield for the datafield, or makes a new one).
+## Do not append an 's' to the end.
+## Insert only the Upper cased version.
+CMS Collaboration
+ATLAS Collaboration
+ALICE Collaboration
+LEP Collaboration
+CDF Collaboration
+D0 Collaboration
+ALEPH Collaboration
+DELPHI Collaboration
+L3 Collaboration
+OPAL Collaboration
+CTEQ Collaboration
+GEANT4 Collaboration
+LHC-B Collaboration
+CDF II Collaboration
+RD 48 Collaboration
+SLD Collaboration
+H1 Collaboration
+COMPASS Collaboration
+HERMES Collaboration
+European Muon Collaboration
+Spin Muon Collaboration
+E143 Collaboration
+Particle Data Group Collaboration
+ATLAS Inner Detector software group Collaboration
+DØ Collaboration

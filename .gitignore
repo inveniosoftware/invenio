@@ -38,10 +38,11 @@ modules/bibclassify/bin/bibclassify
 modules/bibconvert/bin/bibconvert
 modules/bibdocfile/bin/bibdocfile
 modules/bibedit/bin/bibedit
-modules/refextract/bin/refextract
 modules/bibrecord/bin/textmarc2xmlmarc
 modules/bibrecord/bin/xmlmarc2textmarc
 modules/bibrecord/bin/xmlmarclint
+modules/docextract/bin/refextract
+modules/docextract/bin/docextract
 modules/bibencode/bin/bibencode
 modules/bibexport/bin/bibexport
 modules/bibformat/bin/bibreformat

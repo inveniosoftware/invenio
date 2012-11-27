@@ -176,7 +176,8 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC',
                        'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES',
                        'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
-                       'CFG_DEVEL_TEST_DATABASE_ENGINES']:
+                       'CFG_DEVEL_TEST_DATABASE_ENGINES',
+                       'CFG_REFEXTRACT_KBS_OVERRIDE']:
         try:
             option_value = option_value[1:-1]
         except TypeError:

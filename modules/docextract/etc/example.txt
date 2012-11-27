@@ -1,0 +1,17 @@
+MyDocument
+RANDOM TEXT
+RANDOM TEXT
+RANDOM TEXT
+
+References
+
+[1] D. Clowe, A. Gonzalez, and M. Markevitch, Astrophys. J. 604, 596 (2004).
+[2]   C. L. Sarazin, X-Ray Emission from Clusters of Galaxies (Cambridge University Press, Cambridge 1988).
+[3]   M. Girardi, G. Giuricin, F. Mardirossian, M. Mezzetti, and W. Boschin, Astrophys.  J. 505, 74 (1998).
+[4]   D. A. White, C. Jones, and W. Forman, Mon. Not. R. Astron. Soc. 292, 419 (1997).
+[5]   V.C. Rubin, N. Thonnard, and W. K. Ford, Astrophys. J. 238, 471(1980).
+[6]   A. Bosma, Astron. J. 86, 1825 (1981).
+[7]   S.M. Faber and J.S. Gallagher, Ann. Rev. Astron. Astrophys. 17,135 (1979).
+[8]   M. Persic, P. Salucci, and F. Stel, Mon. Not. R. Astron. Soc. 281, 27 (1996).
+[9]   M. Lowewnstein and R. E. White, Astrophys. J. 518, 50 (1999).
+[10]  D. P. Clemens, Astrophys. J. 295, 422 (1985).

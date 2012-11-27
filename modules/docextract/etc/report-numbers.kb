@@ -1,0 +1,233 @@
+*****LANL*****
+<s/syymm999>
+<syymm999>
+
+ACC PHYS	---acc-phys
+ADAP ORG	---adap-org
+ALG GEOM	---alg-geom
+AO SCI		---ao-sci
+AUTO FMS	---auto-fms
+BAYES AN	---bayes-an
+CD HG		---cd-hg
+CMP LG		---cmp-lg
+COMP GAS	---comp-gas
+DG GA		---dg-ga
+FUNCT AN	---funct-an
+GR QC		---gr-qc
+ARXIVHEP EX	---hep-ex
+ARXIVHEP PH	---hep-ph
+ARXIVHEP TH	---hep-th
+LC OM		---lc-om
+MTRL TH		---mtrl-th
+NEURO CEL	---neuro-cel
+NEURO DEV	---neuro-dev
+NEURO SCI	---neuro-sci
+PATT SOL	---patt-sol
+
+
+*****FermiLab*****
+< 9999>
+< 999>
+< yy 999 [AET ]>
+< yyyy 999 [AET ]>
+< yyyy 99>
+
+FERMILAB CONF	---FERMILAB-Conf
+FERMILAB FN	    ---FERMILAB-FN
+FERMILAB PUB	---FERMILAB-Pub
+FERMILAB TM	    ---FERMILAB-TM
+FERMILAB DESIGN ---FERMILAB-Design
+FERMILAB THESIS ---FERMILAB-Thesis
+FERMILAB MASTERS---FERMILAB-Masters
+
+*****Fermilab DØ notes*****
+< 9999>
+
+DØ NOTE---DØ-Note
+
+*****CERN*****
+< yy 999>
+<syyyy 999>
+
+ALEPH                  ---ALEPH
+ALICE                  ---ALICE
+ALICE INT              ---ALICE-INT
+ALICE NOTE             ---ALICE-INT
+ATL CAL                ---ATL-CAL
+ATL COM                ---ATL-COM
+ATL COM SOFT           ---ATL-COM-SOFT
+ATL COM PUB            ---ATL-COM-DAQ
+ATL COM DAQ            ---ATL-COM-DAQ
+ATL COM MUON           ---ATL-COM-MUON
+ATL COM PHYS           ---ATL-COM-PHYS
+TL COM PHYS            ---ATL-COM-PHYS
+ATL COM TILECAL        ---ATL-COM-TILECAL
+ATL COM LARG           ---ATL-COM-LARG
+ATL CONF               ---ATL-CONF
+ATLAS CONF             ---ATL-CONF
+ATL DAQ                ---ATL-DAQ
+ATL DAQ CONF           ---ATL-DAQ-CONF
+ATL GEN                ---ATL-GEN
+ATL INDET              ---ATL-INDET
+ATL LARG               ---ATL-LARG
+ATL MUON               ---ATL-MUON
+ATL PUB MUON           ---ATL-PUB-MUON
+ATL PHYS               ---ATL-PHYS
+ATL PHYS PUB           ---ATL-PHYS-PUB
+ATL PHYS INT           ---ATL-PHYS-INT
+ATL TECH               ---ATL-TECH
+ATL TILECAL            ---ATL-TILECAL
+ATL SOFT               ---ATL-SOFT
+ATL SOFT PUB           ---ATL-SOFT-PUB
+ATL IS EN              ---ATL-IS-EN
+ATL IS QA              ---ATL-IS-QA
+ATL LARG PUB           ---ATL-LARG-PUB
+ATL COM LARG           ---ATL-COM-LARG
+TL COM LARG            ---ATL-COM-LARG
+ATLCOM LARG            ---ATL-COM-LARG
+ATL MAGNET PUB         ---ATL-MAGNET-PUB
+CERN AB                ---CERN-AB
+CERN ALEPH             ---CERN-ALEPH
+CERN ALEPH PHYSIC      ---CERN-ALEPH-PHYSIC
+CERN ALEPH PUB         ---CERN-ALEPH-PUB
+CERN ALICE INT         ---CERN-ALICE-INT
+CERN ALICE PUB         ---CERN-ALICE-PUB
+CERN ALI               ---CERN-ALI
+CERN AS                ---CERN-AS
+CERN AT                ---CERN-AT
+CERN ATL COM CAL       ---CERN-ATL-COM-CAL
+CERN ATL COM DAQ       ---CERN-ATL-COM-DAQ
+CERN ATL COM GEN       ---CERN-ATL-COM-GEN
+CERN ATL COM INDET     ---CERN-ATL-COM-INDET
+CERN ATL COM LARG      ---CERN-ATL-COM-LARG
+CERN ATL COM MUON      ---CERN-ATL-COM-MUON
+CERN ATL COM PHYS      ---CERN-ATL-COM-PHYS
+CERN ATL COM TECH      ---CERN-ATL-COM
+CERN ATL COM TILECAL   ---CERN-ATL-COM
+CERN ATL DAQ           ---CERN-ATL-DAQ
+CERN ATL SOFT          ---CERN-ATL-SOFT
+CERN ATL SOFT INT      ---CERN-ATL-SOFT-INT
+CERN ATL SOFT PUB      ---CERN-ATL-SOFT-PUB
+CERN CMS               ---CERN-CMS
+CERN CMS CR            ---CERN-CMS-CR
+CERN CMS NOTE          ---CERN-CMS-NOTE
+CERN CN                ---CERN-CN
+CERN DD                ---CERN-DD
+CERN DELPHI            ---CERN-DELPHI
+CERN ECP               ---CERN-ECP
+CERN EF                ---CERN-EF
+CERN ECP               ---CERN-EP
+CERN EST               ---CERN-EST
+CERN ETT               ---CERN-ETT
+CERN IT                ---CERN-IT
+CERN LHCB              ---CERN-LHCB
+CERN LHCC              ---CERN-LHCC
+CERN LHC               ---CERN-LHC
+CERN LHC PHO           ---CERN-LHC-PHO
+CERN LHC PROJECT REPORT---CERN-LHC-Project-Report
+CERN OPEN              ---CERN-OPEN
+CERN PPE               ---CERN-PPE
+CERN PS                ---CERN-PS
+CERN SL                ---CERN-SL
+CERN SPSC              ---CERN-SPSC
+CERN ST                ---CERN-ST
+CERN TH                ---CERN-TH
+CERN THESIS            ---CERN-THESIS
+CERN TIS               ---CERN-TIS
+CERN ATS               ---CERN-ATS
+CERN                   ---CERN
+CMS CR                 ---CMS-CR
+CMS NOTE               ---CMS-NOTE
+LHCB                   ---LHCB
+SN ATLAS               ---SN-ATLAS
+PAS SUSY               ---CMS-PAS-SUS
+CMS PAS EXO            ---CMS-PAS-EXO
+CMS PAS HIN            ---CMS-PAS-HIN
+CMS PAS QCD            ---CMS-PAS-QCD
+CMS PAS TOP            ---CMS-PAS-TOP
+CMS PAS SUS            ---CMS-PAS-SUS
+CMS PAS BPH            ---CMS-PAS-BPH
+CMS PAS SMP            ---CMS-PAS-SMP
+CMS PAS HIG            ---CMS-PAS-HIG
+CMS PAS EWK            ---CMS-PAS-EWK
+CMS PAS BTV            ---CMS-PAS-BTV
+CMS PAS FWD            ---CMS-PAS-FWD
+CMS PAS TRK            ---CMS-PAS-TRK
+CMS PAS SMP            ---CMS-PAS-SMP
+CMS PAS PFT            ---CMS-PAS-PFT
+CMS PAS MUO            ---CMS-PAS-MUO
+CMS PAS JME            ---CMS-PAS-JME
+CMS PAS EGM            ---CMS-PAS-EGM
+CMS PAS DIF            ---CMS-PAS-DIF
+ATLTILECAL PUB         ---ATLTILECAL-PUB
+ATLAS TECH PUB         ---ATLAS-TECH-PUB
+TLCOM MAGNET           ---TLCOM-MAGNET
+ATLLARG                ---ATL-LARG
+
+*****CERN MORE*****
+< yyyy 999>
+< yyyy 99>
+< yyyy 9>
+< yy 99>
+< yy 9>
+CERN LHCB       ---CERN-LHCB
+CERN LHCC       ---CERN-LHCC
+CERN PHESS      ---CERN-PHESS
+
+
+*****CERN EVEN MORE*****
+< 9>
+
+CMS UG TP       ---CMS-UG-TP
+
+
+*****CERN DIFFERENT FORMAT*****
+< 9999999>
+CERN GE         ---CERN-GE
+
+
+*****LHC*****
+< 999>
+< 9999>
+
+CERN CLIC NOTE          ---CERN-CLIC-Note
+LHC PROJECT NOTE        ---LHC-Project-Note
+CERN LHC PROJECT REPORT ---CERN-LHC-Project-Report
+LHC PROJECT REPORT      ---CERN-LHC-Project-Report
+CLIC NOTE               ---CERN-CLIC-Note
+ATLAS TDR               ---ATL-TDR
+CMS TDR                 ---CMS-TDR
+ATC TT ID               ---ATC-TT-ID
+ATC TT IN               ---ATC-TT-IN
+LHCCP                   ---LHCCP
+
+*****KEK*****
+< 9999>
+< yy 999>
+< yyyy 999>
+
+KEK CP        ---KEK-CP
+KEK INT       ---KEK-Internal
+KEK INTERNAL  ---KEK-Internal
+KEK PREPRINT  ---KEK-Preprint
+KEK TH	      ---KEK-TH
+
+
+*****DESY*****
+< yy 999>
+< yyyy 999>
+
+DESY		---DESY
+DESY M		---DESY M
+
+
+*****SLAC*****
+< 999>
+< 9999>
+< yy 99>
+
+SLAC AP		---SLAC-AP
+SLAC PUB	---SLAC-PUB
+SLAC R		---SLAC-R
+SLAC TN		---SLAC-TN
+SLAC WP		---SLAC-WP

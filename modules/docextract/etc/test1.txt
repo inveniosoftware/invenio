@@ -1,0 +1,781 @@
+BABAR-PUB-08/042
+SLAC-PUB-13397
+
+arXiv:0809.4120v1 [hep-ex] 24 Sep 2008
+
+√
+Measurement of the e+ e− → b¯ cross section between s=10.54 and 11.20 GeV
+b
+
+B. Aubert,1 M. Bona,1 Y. Karyotakis,1 J. P. Lees,1 V. Poireau,1 E. Prencipe,1 X. Prudent,1 V. Tisserand,1
+J. Garra Tico,2 E. Grauges,2 L. Lopezab ,3 A. Palanoab,3 M. Pappagalloab,3 G. Eigen,4 B. Stugu,4 L. Sun,4
+G. S. Abrams,5 M. Battaglia,5 D. N. Brown,5 R. N. Cahn,5 R. G. Jacobsen,5 L. T. Kerth,5 Yu. G. Kolomensky,5
+G. Lynch,5 I. L. Osipenkov,5 M. T. Ronan,5, ∗ K. Tackmann,5 T. Tanabe,5 C. M. Hawkes,6 N. Soni,6 A. T. Watson,6
+H. Koch,7 T. Schroeder,7 D. Walker,8 D. J. Asgeirsson,9 B. G. Fulsom,9 C. Hearty,9 T. S. Mattison,9
+J. A. McKenna,9 M. Barrett,10 A. Khan,10 V. E. Blinov,11 A. D. Bukin,11 A. R. Buzykaev,11 V. P. Druzhinin,11
+V. B. Golubev,11 A. P. Onuchin,11 S. I. Serednyakov,11 Yu. I. Skovpen,11 E. P. Solodov,11 K. Yu. Todyshev,11
+M. Bondioli,12 S. Curry,12 I. Eschrich,12 D. Kirkby,12 A. J. Lankford,12 P. Lund,12 M. Mandelkern,12
+E. C. Martin,12 D. P. Stoker,12 S. Abachi,13 C. Buchanan,13 J. W. Gary,14 F. Liu,14 O. Long,14 B. C. Shen,14, ∗
+G. M. Vitug,14 Z. Yasin,14 L. Zhang,14 V. Sharma,15 C. Campagnari,16 T. M. Hong,16 D. Kovalskyi,16
+M. A. Mazur,16 J. D. Richman,16 T. W. Beck,17 A. M. Eisner,17 C. J. Flacco,17 C. A. Heusch,17 J. Kroseberg,17
+W. S. Lockman,17 A. J. Martinez,17 T. Schalk,17 B. A. Schumm,17 A. Seiden,17 M. G. Wilson,17 L. O. Winstrom,17
+C. H. Cheng,18 D. A. Doll,18 B. Echenard,18 F. Fang,18 D. G. Hitlin,18 I. Narsky,18 T. Piatenko,18 F. C. Porter,18
+R. Andreassen,19 G. Mancinelli,19 B. T. Meadows,19 K. Mishra,19 M. D. Sokoloﬀ,19 P. C. Bloom,20
+W. T. Ford,20 A. Gaz,20 J. F. Hirschauer,20 M. Nagel,20 U. Nauenberg,20 J. G. Smith,20 K. A. Ulmer,20
+S. R. Wagner,20 R. Ayad,21, † A. Soﬀer,21, ‡ W. H. Toki,21 R. J. Wilson,21 D. D. Altenburg,22 E. Feltresi,22
+A. Hauke,22 H. Jasper,22 M. Karbach,22 J. Merkel,22 A. Petzold,22 B. Spaan,22 K. Wacker,22 M. J. Kobel,23
+W. F. Mader,23 R. Nogowski,23 K. R. Schubert,23 R. Schwierz,23 A. Volk,23 D. Bernard,24 G. R. Bonneaud,24
+E. Latour,24 M. Verderi,24 P. J. Clark,25 S. Playfer,25 J. E. Watson,25 M. Andreottiab ,26 D. Bettonia ,26 C. Bozzia ,26
+R. Calabreseab ,26 A. Cecchiab ,26 G. Cibinettoab ,26 P. Franchiniab ,26 E. Luppiab ,26 M. Negriniab ,26 A. Petrellaab ,26
+L. Piemontesea ,26 V. Santoroab ,26 R. Baldini-Ferroli,27 A. Calcaterra,27 R. de Sangro,27 G. Finocchiaro,27
+S. Pacetti,27 P. Patteri,27 I. M. Peruzzi,27, § M. Piccolo,27 M. Rama,27 A. Zallo,27 A. Buzzoa ,28 R. Contriab ,28
+M. Lo Vetereab ,28 M. M. Macria ,28 M. R. Mongeab ,28 S. Passaggioa,28 C. Patrignaniab,28 E. Robuttia ,28
+A. Santroniab ,28 S. Tosiab ,28 K. S. Chaisanguanthum,29 M. Morii,29 A. Adametz,30 J. Marks,30 S. Schenk,30
+U. Uwer,30 V. Klose,31 H. M. Lacker,31 D. J. Bard,32 P. D. Dauncey,32 J. A. Nash,32 M. Tibbetts,32 P. K. Behera,33
+X. Chai,33 M. J. Charles,33 U. Mallik,33 J. Cochran,34 H. B. Crawley,34 L. Dong,34 W. T. Meyer,34 S. Prell,34
+E. I. Rosenberg,34 A. E. Rubin,34 Y. Y. Gao,35 A. V. Gritsan,35 Z. J. Guo,35 C. K. Lae,35 N. Arnaud,36
+J. B´quilleux,36 A. D’Orazio,36 M. Davier,36 J. Firmino da Costa,36 G. Grosdidier,36 A. H¨cker,36 V. Lepeltier,36
+e
+o
+F. Le Diberder,36 A. M. Lutz,36 S. Pruvot,36 P. Roudeau,36 M. H. Schune,36 J. Serrano,36 V. Sordini,36, ¶
+A. Stocchi,36 G. Wormser,36 D. J. Lange,37 D. M. Wright,37 I. Bingham,38 J. P. Burke,38 C. A. Chavez,38
+J. R. Fry,38 E. Gabathuler,38 R. Gamet,38 D. E. Hutchcroft,38 D. J. Payne,38 C. Touramanis,38 A. J. Bevan,39
+C. K. Clarke,39 K. A. George,39 F. Di Lodovico,39 R. Sacco,39 M. Sigamani,39 G. Cowan,40 H. U. Flaecher,40
+D. A. Hopkins,40 S. Paramesvaran,40 F. Salvatore,40 A. C. Wren,40 D. N. Brown,41 C. L. Davis,41 A. G. Denig,42
+M. Fritsch,42 W. Gradl,42 G. Schott,42 K. E. Alwyn,43 D. Bailey,43 R. J. Barlow,43 Y. M. Chia,43 C. L. Edgar,43
+G. Jackson,43 G. D. Laﬀerty,43 T. J. West,43 J. I. Yi,43 J. Anderson,44 C. Chen,44 A. Jawahery,44 D. A. Roberts,44
+G. Simi,44 J. M. Tuggle,44 C. Dallapiccola,45 X. Li,45 E. Salvati,45 S. Saremi,45 R. Cowan,46 D. Dujmic,46
+P. H. Fisher,46 G. Sciolla,46 M. Spitznagel,46 F. Taylor,46 R. K. Yamamoto,46 M. Zhao,46 P. M. Patel,47
+S. H. Robertson,47 A. Lazzaroab,48 V. Lombardoa,48 F. Palomboab,48 J. M. Bauer,49 L. Cremaldi,49
+R. Godang,49, ∗∗ R. Kroeger,49 D. A. Sanders,49 D. J. Summers,49 H. W. Zhao,49 M. Simard,50 P. Taras,50
+F. B. Viaud,50 H. Nicholson,51 G. De Nardoab ,52 L. Listaa ,52 D. Monorchioab,52 G. Onoratoab,52 C. Sciaccaab ,52
+G. Raven,53 H. L. Snoek,53 C. P. Jessop,54 K. J. Knoepfel,54 J. M. LoSecco,54 W. F. Wang,54 G. Benelli,55
+L. A. Corwin,55 K. Honscheid,55 H. Kagan,55 R. Kass,55 J. P. Morris,55 A. M. Rahimi,55 J. J. Regensburger,55
+S. J. Sekula,55 Q. K. Wong,55 N. L. Blount,56 J. Brau,56 R. Frey,56 O. Igonkina,56 J. A. Kolb,56 M. Lu,56
+R. Rahmat,56 N. B. Sinev,56 D. Strom,56 J. Strube,56 E. Torrence,56 G. Castelliab ,57 N. Gagliardiab ,57
+M. Margoniab ,57 M. Morandina ,57 M. Posoccoa,57 M. Rotondoa ,57 F. Simonettoab ,57 R. Stroiliab ,57 C. Vociab ,57
+P. del Amo Sanchez,58 E. Ben-Haim,58 H. Briand,58 G. Calderini,58 J. Chauveau,58 P. David,58 L. Del Buono,58
+O. Hamon,58 Ph. Leruste,58 J. Ocariz,58 A. Perez,58 J. Prendki,58 S. Sitt,58 L. Gladney,59 M. Biasiniab ,60
+
+2
+R. Covarelliab ,60 E. Manoniab ,60 C. Angeliniab ,61 G. Batignaniab ,61 S. Bettariniab ,61 M. Carpinelliab ,61, ††
+A. Cervelliab ,61 F. Fortiab ,61 M. A. Giorgiab ,61 A. Lusianiac ,61 G. Marchioriab,61 M. Morgantiab ,61 N. Neriab ,61
+E. Paoloniab ,61 G. Rizzoab ,61 J. J. Walsha ,61 D. Lopes Pegna,62 C. Lu,62 J. Olsen,62 A. J. S. Smith,62
+A. V. Telnov,62 F. Anullia ,63 E. Baracchiniab,63 G. Cavotoa,63 D. del Reab ,63 E. Di Marcoab ,63 R. Facciniab ,63
+F. Ferrarottoa,63 F. Ferroniab ,63 M. Gasperoab ,63 P. D. Jacksona,63 L. Li Gioia ,63 M. A. Mazzonia ,63 S. Morgantia ,63
+G. Pireddaa ,63 F. Polciab ,63 F. Rengaab ,63 C. Voenaa ,63 M. Ebert,64 T. Hartmann,64 H. Schr¨der,64 R. Waldi,64
+o
+T. Adye,65 B. Franek,65 E. O. Olaiya,65 F. F. Wilson,65 S. Emery,66 M. Escalier,66 L. Esteve,66 S. F. Ganzhur,66
+G. Hamel de Monchenault,66 W. Kozanecki,66 G. Vasseur,66 Ch. Y`che,66 M. Zito,66 X. R. Chen,67 H. Liu,67
+e
+W. Park,67 M. V. Purohit,67 R. M. White,67 J. R. Wilson,67 M. T. Allen,68 D. Aston,68 R. Bartoldus,68
+P. Bechtle,68 J. F. Benitez,68 K. Bertsche,68 Y. Cai,68 R. Cenci,68 J. P. Coleman,68 M. R. Convery,68 F. J. Decker,68
+J. C. Dingfelder,68 J. Dorfan,68 G. P. Dubois-Felsmann,68 W. Dunwoodie,68 S. Ecklund,68 R. Erickson,68
+R. C. Field,68 A. Fisher,68 J. Fox,68 A. M. Gabareen,68 S. J. Gowdy,68 M. T. Graham,68 P. Grenier,68 C. Hast,68
+W. R. Innes,68 R. Iverson,68 J. Kaminski,68 M. H. Kelsey,68 H. Kim,68 P. Kim,68 M. L. Kocian,68 A. Kulikov,68
+D. W. G. S. Leith,68 S. Li,68 B. Lindquist,68 S. Luitz,68 V. Luth,68 H. L. Lynch,68 D. B. MacFarlane,68
+H. Marsiske,68 R. Messner,68 D. R. Muller,68 H. Neal,68 S. Nelson,68 A. Novokhatski,68 C. P. O’Grady,68 I. Ofte,68
+A. Perazzo,68 M. Perl,68 B. N. Ratcliﬀ,68 C. Rivetta,68 A. Roodman,68 A. A. Salnikov,68 R. H. Schindler,68
+J. Schwiening,68 J. Seeman,68 A. Snyder,68 D. Su,68 M. K. Sullivan,68 K. Suzuki,68 S. K. Swain,68
+J. M. Thompson,68 J. Va’vra,68 D. Van Winkle,68 A. P. Wagner,68 M. Weaver,68 C. A. West,68 U. Wienands,68
+W. J. Wisniewski,68 M. Wittgen,68 W. Wittmer,68 D. H. Wright,68 H. W. Wulsin,68 Y. Yan,68 A. K. Yarritu,68
+K. Yi,68 G. Yocky,68 C. C. Young,68 V. Ziegler,68 P. R. Burchat,69 A. J. Edwards,69 S. A. Majewski,69
+T. S. Miyashita,69 B. A. Petersen,69 L. Wilden,69 S. Ahmed,70 M. S. Alam,70 J. A. Ernst,70 B. Pan,70 M. A. Saeed,70
+S. B. Zain,70 S. M. Spanier,71 B. J. Wogsland,71 R. Eckmann,72 J. L. Ritchie,72 A. M. Ruland,72 C. J. Schilling,72
+R. F. Schwitters,72 B. W. Drummond,73 J. M. Izen,73 X. C. Lou,73 F. Bianchiab ,74 D. Gambaab ,74 M. Pelliccioniab ,74
+M. Bombenab ,75 L. Bosisioab,75 C. Cartaroab,75 G. Della Riccaab ,75 L. Lanceriab ,75 L. Vitaleab ,75 V. Azzolini,76
+N. Lopez-March,76 F. Martinez-Vidal,76 D. A. Milanes,76 A. Oyanguren,76 J. Albert,77 Sw. Banerjee,77
+B. Bhuyan,77 H. H. F. Choi,77 K. Hamano,77 R. Kowalewski,77 M. J. Lewczuk,77 I. M. Nugent,77 J. M. Roney,77
+R. J. Sobie,77 T. J. Gershon,78 P. F. Harrison,78 J. Ilic,78 T. E. Latham,78 G. B. Mohanty,78 H. R. Band,79
+X. Chen,79 S. Dasu,79 K. T. Flood,79 Y. Pan,79 M. Pierini,79 R. Prepost,79 C. O. Vuosalo,79 and S. L. Wu79
+(The BABAR Collaboration)
+1
+
+Laboratoire de Physique des Particules, IN2P3/CNRS et Universit´ de Savoie, F-74941 Annecy-Le-Vieux, France
+e
+2
+Universitat de Barcelona, Facultat de Fisica, Departament ECM, E-08028 Barcelona, Spain
+3
+INFN Sezione di Baria ; Dipartmento di Fisica, Universit` di Barib , I-70126 Bari, Italy
+a
+4
+University of Bergen, Institute of Physics, N-5007 Bergen, Norway
+5
+Lawrence Berkeley National Laboratory and University of California, Berkeley, California 94720, USA
+6
+University of Birmingham, Birmingham, B15 2TT, United Kingdom
+7
+Ruhr Universit¨t Bochum, Institut f¨r Experimentalphysik 1, D-44780 Bochum, Germany
+a
+u
+8
+University of Bristol, Bristol BS8 1TL, United Kingdom
+9
+University of British Columbia, Vancouver, British Columbia, Canada V6T 1Z1
+10
+Brunel University, Uxbridge, Middlesex UB8 3PH, United Kingdom
+11
+Budker Institute of Nuclear Physics, Novosibirsk 630090, Russia
+12
+University of California at Irvine, Irvine, California 92697, USA
+13
+University of California at Los Angeles, Los Angeles, California 90024, USA
+14
+University of California at Riverside, Riverside, California 92521, USA
+15
+University of California at San Diego, La Jolla, California 92093, USA
+16
+University of California at Santa Barbara, Santa Barbara, California 93106, USA
+17
+University of California at Santa Cruz, Institute for Particle Physics, Santa Cruz, California 95064, USA
+18
+California Institute of Technology, Pasadena, California 91125, USA
+19
+University of Cincinnati, Cincinnati, Ohio 45221, USA
+20
+University of Colorado, Boulder, Colorado 80309, USA
+21
+Colorado State University, Fort Collins, Colorado 80523, USA
+22
+Technische Universit¨t Dortmund, Fakult¨t Physik, D-44221 Dortmund, Germany
+a
+a
+23
+Technische Universit¨t Dresden, Institut f¨r Kern- und Teilchenphysik, D-01062 Dresden, Germany
+a
+u
+24
+Laboratoire Leprince-Ringuet, CNRS/IN2P3, Ecole Polytechnique, F-91128 Palaiseau, France
+25
+University of Edinburgh, Edinburgh EH9 3JZ, United Kingdom
+26
+INFN Sezione di Ferraraa ; Dipartimento di Fisica, Universit` di Ferrarab , I-44100 Ferrara, Italy
+a
+27
+INFN Laboratori Nazionali di Frascati, I-00044 Frascati, Italy
+
+3
+INFN Sezione di Genovaa ; Dipartimento di Fisica, Universit` di Genovab , I-16146 Genova, Italy
+a
+29
+Harvard University, Cambridge, Massachusetts 02138, USA
+30
+Universit¨t Heidelberg, Physikalisches Institut, Philosophenweg 12, D-69120 Heidelberg, Germany
+a
+31
+Humboldt-Universit¨t zu Berlin, Institut f¨r Physik, Newtonstr. 15, D-12489 Berlin, Germany
+a
+u
+32
+Imperial College London, London, SW7 2AZ, United Kingdom
+33
+University of Iowa, Iowa City, Iowa 52242, USA
+34
+Iowa State University, Ames, Iowa 50011-3160, USA
+35
+Johns Hopkins University, Baltimore, Maryland 21218, USA
+36
+Laboratoire de l’Acc´l´rateur Lin´aire, IN2P3/CNRS et Universit´ Paris-Sud 11,
+ee
+e
+e
+Centre Scientiﬁque d’Orsay, B. P. 34, F-91898 Orsay Cedex, France
+37
+Lawrence Livermore National Laboratory, Livermore, California 94550, USA
+38
+University of Liverpool, Liverpool L69 7ZE, United Kingdom
+39
+Queen Mary, University of London, London, E1 4NS, United Kingdom
+40
+University of London, Royal Holloway and Bedford New College, Egham, Surrey TW20 0EX, United Kingdom
+41
+University of Louisville, Louisville, Kentucky 40292, USA
+42
+Johannes Gutenberg-Universit¨t Mainz, Institut f¨r Kernphysik, D-55099 Mainz, Germany
+a
+u
+43
+University of Manchester, Manchester M13 9PL, United Kingdom
+44
+University of Maryland, College Park, Maryland 20742, USA
+45
+University of Massachusetts, Amherst, Massachusetts 01003, USA
+46
+Massachusetts Institute of Technology, Laboratory for Nuclear Science, Cambridge, Massachusetts 02139, USA
+47
+McGill University, Montr´al, Qu´bec, Canada H3A 2T8
+e
+e
+48
+INFN Sezione di Milanoa ; Dipartimento di Fisica, Universit` di Milanob , I-20133 Milano, Italy
+a
+49
+University of Mississippi, University, Mississippi 38677, USA
+50
+Universit´ de Montr´al, Physique des Particules, Montr´al, Qu´bec, Canada H3C 3J7
+e
+e
+e
+e
+51
+Mount Holyoke College, South Hadley, Massachusetts 01075, USA
+52
+INFN Sezione di Napolia ; Dipartimento di Scienze Fisiche,
+Universit` di Napoli Federico IIb , I-80126 Napoli, Italy
+a
+53
+NIKHEF, National Institute for Nuclear Physics and High Energy Physics, NL-1009 DB Amsterdam, The Netherlands
+54
+University of Notre Dame, Notre Dame, Indiana 46556, USA
+55
+Ohio State University, Columbus, Ohio 43210, USA
+56
+University of Oregon, Eugene, Oregon 97403, USA
+57
+INFN Sezione di Padovaa ; Dipartimento di Fisica, Universit` di Padovab , I-35131 Padova, Italy
+a
+58
+Laboratoire de Physique Nucl´aire et de Hautes Energies,
+e
+IN2P3/CNRS, Universit´ Pierre et Marie Curie-Paris6,
+e
+Universit´ Denis Diderot-Paris7, F-75252 Paris, France
+e
+59
+University of Pennsylvania, Philadelphia, Pennsylvania 19104, USA
+60
+INFN Sezione di Perugiaa ; Dipartimento di Fisica, Universit` di Perugiab , I-06100 Perugia, Italy
+a
+61
+INFN Sezione di Pisaa ; Dipartimento di Fisica,
+Universit` di Pisab ; Scuola Normale Superiore di Pisac , I-56127 Pisa, Italy
+a
+62
+Princeton University, Princeton, New Jersey 08544, USA
+63
+INFN Sezione di Romaa ; Dipartimento di Fisica,
+Universit` di Roma La Sapienzab , I-00185 Roma, Italy
+a
+64
+Universit¨t Rostock, D-18051 Rostock, Germany
+a
+65
+Rutherford Appleton Laboratory, Chilton, Didcot, Oxon, OX11 0QX, United Kingdom
+66
+CEA, Irfu, SPP, Centre de Saclay, F-91191 Gif-sur-Yvette, France
+67
+University of South Carolina, Columbia, South Carolina 29208, USA
+68
+Stanford Linear Accelerator Center, Stanford, California 94309, USA
+69
+Stanford University, Stanford, California 94305-4060, USA
+70
+State University of New York, Albany, New York 12222, USA
+71
+University of Tennessee, Knoxville, Tennessee 37996, USA
+72
+University of Texas at Austin, Austin, Texas 78712, USA
+73
+University of Texas at Dallas, Richardson, Texas 75083, USA
+74
+INFN Sezione di Torinoa ; Dipartimento di Fisica Sperimentale, Universit` di Torinob , I-10125 Torino, Italy
+a
+75
+INFN Sezione di Triestea ; Dipartimento di Fisica, Universit` di Triesteb , I-34127 Trieste, Italy
+a
+76
+IFIC, Universitat de Valencia-CSIC, E-46071 Valencia, Spain
+77
+University of Victoria, Victoria, British Columbia, Canada V8W 3P6
+78
+Department of Physics, University of Warwick, Coventry CV4 7AL, United Kingdom
+79
+University of Wisconsin, Madison, Wisconsin 53706, USA
+28
+
+We report e+ e− → b¯ cross section measurements by the BABAR experiment performed during an
+b
+energy scan in the range of 10.54 to 11.20 GeV at the PEP-II e+ e− collider. A total relative error
+of about 5% is reached in more than three hundred center-of-mass energy steps, separated by about
+5 MeV. These measurements can be used to derive precise information on the parameters of the
+
+4
+Υ(10860) and Υ(11020) resonances. In particular we show that their widths may be smaller than
+previously measured.
+PACS numbers: 13.25.Hw, 14.40.Nd
+
+Recent discoveries of non-baryonic charmonium states
+that do not behave as two-quark states [1] call for a search
+for other resonances belonging to this possible new spectroscopy. Given the charmonium content of these new
+states, one could infer the presence of similar resonances
+containing b quark pairs. The observed J P C = 1−− exotic states (Y (4260), Y (4350), and Y (4660) [2]) scaled up
+by the mass diﬀerence between the J/ψ and the Υ(1S)
+(∆M ∼ 6360 MeV/c2 ) would be exotic bottomonium
+states with masses above the Υ(4S) and below 11.2 GeV.
+Moreover, the Υ(10860) and the Υ(11020) states, which
+are candidate Υ(5S) and Υ(6S) respectively, were observed in the same region [3, 4].
+Between March 28 and April 7, 2008 the PEP-II e+ e−
+collider [5] delivered colliding beams at a center-of-mass
+√
+energy ( s) in the range of 10.54 to 11.20 GeV. First,
+an energy scan over the whole range in 5 MeV steps,
+collecting approximately 25 pb−1 per step for a total of
+about 3.3 fb−1 , was performed.√ was then followed by
+It
+a 600 pb−1 scan in the range of s=10.96 to 11.10 GeV,
+in 8 steps with non-regular energy spacing, performed
+in order to investigate the Υ(6S) region. This data set
+outclasses the previous scans [3, 4] by a factor > 30 in the
+luminosity and ∼ 4 in the size of the energy steps. Across
+the scan, the energy of the positron beam was kept ﬁxed
+at 3.12 GeV, while the electron beam energy was varied
+√
+accordingly, to set the required s. This produced a
+variation of the boost of the center-of-mass frame during
+the scan.
+√
+In this Letter we present, for each step in s, the mea0
+0
+surement of Rb (s) = σb (s)/σµµ (s), where σµµ = 4πα2 /3s
+is the lowest-order cross section for e+ e− → µ+ µ− and
+σb is the total cross section for e+ e− → bb(γ), including
+bb states produced in initial state radiation (ISR) below
+the open beauty threshold, i.e. the Υ(1S), Υ(2S), and
+Υ(3S) resonances.
+The particles produced in the collisions are detected by
+the BABAR detector, described elsewhere [6]. Chargedparticle tracking is provided by a ﬁve-layer silicon vertex tracker (SVT) and a 40-layer drift chamber (DCH).
+In addition to providing precise position information for
+tracking, the SVT and DCH also measure the speciﬁc
+ionization (dE/dx), which is used for particle identiﬁcation of low-momentum charged particles. At higher
+momenta (p > 0.7 GeV/c) pions and kaons are identiﬁed by Cherenkov radiation detected in a ring-imaging
+device (DIRC). The position and energy of neutral clusters (photons) are measured with an electromagnetic
+calorimeter (EMC) consisting of 6580 thallium-doped
+CsI crystals. These systems are mounted inside a 1.5T solenoidal super-conducting magnet. Muon identiﬁ-
+
+cation is provided by the magnetic ﬂux return system
+instrumented with Resistive Plate Chambers and Limited Streamer Tubes. The full detector is simulated, for
+background and eﬃciency studies, with a Monte Carlo
+program (MC) based on GEANT4 [7].
+To measure Rb , we count the number of events passing a selection that enriches the sample in events containing B mesons (Nh ) and those passing an independent di-muon selection (Nµ ) at each energy point and
+at a reference energy below the open beauty production
+threshold. Indicating with a prime the quantities at the
+reference energy, we write:
+0
+Rb (s) σµµ (s) − σISR (s) ǫB (s)
+
+Nh (s) =
++
+X
+
+(1)
+
+σX (s) ǫX (s) + σISR (s) ǫISR (s) L(s)
+
+′
+Nh =
+
+′
+′
+σX ǫ′ + σISR ǫ′
+ISR
+X
+X
+
+L′
+
+Nµ (s) = σµµ (s) ǫµ (s) L(s)
+′
+′
+Nµ = σµµ ǫ′ L′
+µ
+
+(2)
+(3)
+(4)
+
+where ǫB is the eﬃciency for open b production to satisfy
+the hadronic selection, X represents the diﬀerent background components described later, σi represents the
+cross-sections for the process i, ǫi the corresponding efﬁciency, and L is√ integrated luminosity collected at
+the
+′
+a given value of s. Measurements of Nµ and Nµ are
+needed in order to normalize the hadronic rates to the
+collected luminosities. As reference we choose the sam√
+ple collected at s=10.54 GeV, about 40 MeV below the
+Υ(4S) mass, taken during 2006-2007. Special mention
+is made of the ISR sample, the production of Υ(nS)
+(n = 1, 2, 3) mesons via initial state radiation: albeit
+part of the signal, this process can occur at the reference
+energy and has an eﬃciency and an energy dependence
+of the cross-section diﬀerent from the open beauty production.
+Solving the system of equations one obtains:
+Rb =
+
+′
+Nh (s) Nh
+− ′ κσǫ (s)
+Nµ (s) Nµ
+
+ǫµ (s)ξµ
++ RISR (s),
+ǫB (s)
+
+(5)
+
+where we deﬁned:
+ǫ′
+µ
+×
+ǫµ (s)
+X RX (s)ǫX (s) + RISR (s) ǫISR (s)
+, (6)
+×
+′ ′
+′
+′
+X RX ǫX + RISR ǫISR
+
+κσǫ (s) =
+
+5
+0
+0
+and Ri = σi /σµµ for each process and ξµ = σµµ /σµµ , as√
+sumed independent of s. It should be noted that these
+equations assume that the background scales with the integrated luminosity, i.e. that the machine background is
+negligible, and that the di-muon selection leaves a negligible level of background.
+We select the b-enriched sample by requiring at least
+three tracks in the event, a total visible energy in the
+event greater than 4.5 GeV, and a vertex reconstructed
+from the observed charged tracks within 5 mm of the
+beam crossing point in the plane transverse to the beam
+axis and 6 cm along the beam axis. These quantities are
+computed using exclusively tracks in the ﬁducial volume
+of the DCH (i.e. forming an angle with the beam axis
+0.41 < θ < 2.54 rad). A further rejection of the main
+backgrounds, e+ e− → q q , q = u, d, s, c events (“contin¯
+uum” events) and e+ e− → ℓ+ ℓ− , ℓ = e, µ, τ events, is obtained by means of a cut on the ratio of the second and zeroth Fox-Wolfram moments [8], R2 , calculated using only
+the charged tracks. After optimization of the statistical
+sensitivity, we require R2 < 0.2. Events that pass this selection at the reference energy comprise 91% continuum,
+2% two photon (e+ e− → e+ e− γ ∗ γ ∗ → e+ e− Xh ), and 7%
+ISR (e+ e− → Υ(nS)γISR ) events.
+To select di-muon events, we require that two tracks
+have an invariant mass greater than 7.5 GeV/c2 ; their
+angle with the beam axis in the center-of-mass frame,
+θcms , must satisfy cos θcms < 0.7485, and the two muons
+must be collinear to within 10o . To exploit the fact that
+muons are minimum ionizing particles, we require that at
+least one of them leaves a signal in the EMC, and neither
+deposits more than 1 GeV.
+In the following we describe the method used to derive
+the inputs to Eq. 5 and the corresponding errors, separating correlated and uncorrelated errors. The covariance
+matrix for the measurements of Rb at diﬀerent energies is
+2
+2
+Vij = σstat (si ) + σunc (si ) δij +σcorr (si )σcorr (sj ), where
+σstat (si ), σcorr (si ), and σunc (si ) are the statistical, correlated, and uncorrelated systematic error respectively,
+and δij is the Kronecker delta.
+The eﬃciency for the di-muon selection ǫµ is extracted
+from a sample of fully simulated√
+MC events generated
+with KK2f [9] at several values of s. Due to the change
+in boost this eﬃciency is found to change by 1.5% over
+the whole range and the MC statistics error we assign
+to the corresponding correction is 0.2%. The correlated
+uncertainty on the absolute scale of the eﬃciency is estimated to be 1% and to come primarily from uncertainties
+in the simulation of the trigger, of the quantities used
+in the selection and of the tracking eﬃciency. We also
+account for diﬀerences in the trigger conﬁgurations between the scan data and the reference data taken during
+the year 2007 and estimate the eﬃciency on the reference
+data to be lower by (0.5 ± 0.2)%. The same generator is
+consistently used to extract ξµ = 1.48 ± 0.02, where this
+correlated error is due to the uncertainty on the cross-
+
+section.
+The eﬃciency for e+ e− → b¯ events is estimated by usb
+ing EvtGen [10] as generator, separately for each possible
+∗
+two-body ﬁnal state including B, Bs , and Bs mesons, and
+√
+at diﬀerent values of s. Because we ignore the relative
+composition in terms of ﬁnal states at each energy we
+consider the largest and the smallest eﬃciencies among
+the allowed ﬁnal states and take their mean value as the
+central value and half their diﬀerence as uncorrelated error. The correlated error on the absolute scale of ǫB is
+estimated by varying the selection criteria and it is found
+to amount to 1.3%.
+The calculation of the double ratio κσǫ requires the de√
+pendence on s of ǫµ , which has already been discussed,
+and the cross-sections and eﬃciencies for the ISR and
+the background processes.
+The ISR cross-section is computed to second-order according to Ref. [11]. The corresponding eﬃciency (ǫISR )
+is estimated with MC simulation to be 41% on average.
+The relative eﬃciency change across the scan, estimated
+to be ∼ 5%, is used as a correlated uncertainty and it
+propagates to an error on Rb of at most 0.7%.
+The cross-section for two-photon events scales as the
+square of the logarithm of s, and the corresponding eﬃciency is considered to be ﬂat. The product of the crosssection and the eﬃciency (σγγ ǫγγ ) before the R2 is ﬁtted
+from the distribution of the direction of the missing momentum and then multiplied by the R2 cut eﬃciency. We
+attribute 50% uncertainty to this estimate, leading to a
+relative correlated error of at most 0.2%. Finally, the
+product of the continuum cross-section and eﬃciency is
+computed by subtracting the ISR and two photon com′
+ponents from Nh (see Eq. 2). The continuum contribu√
+tion to R (Rcont ) is assumed to be constant with s,
+while the corresponding eﬃciency (ǫcont ) was estimated
+on a sample of MC events generated with JETSET [12].
+No correction to account for the fact that the reference
+data were taken in a diﬀerent data-taking period was
+found necessary. The relative change of ǫcont over the
+whole scan range is estimated to be 3% and a 0.2% systematic error due to MC statistics is assigned to it. We
+also ﬁnd that the distribution of R2 is not perfectly reproduced by the MC. We therefore estimate the scaling
+of ǫcont separately with and without the R2 < 0.2 requirement and take the diﬀerence among the results as a
+correlated systematic error. Its contribution depends on
+the value of Rb and it is at most 2%.
+√
+To measure s of each point we ﬁt the distribution of
+the invariant mass of the two muons in the selected dimuon sample with a function made of a Gaussian with
+an exponential tail on the side below the peak mass. We
+√
+then use the mean of the Gaussian as estimator of s
+and we determine a bias of (20.9±1.5) MeV for this quantity by comparing the Υ(3S) mass measured on the data
+taken during the ∼ 100 pb−1 scan performed by PEP-II
+at the beginning of the last data-taking period with the
+
+2
+1.8
+
+BB
+
+Rb
+
+Rb
+
+6
+
+B*B *
+Bs B s *
+B s Bs Bs * Bs *
+B*B
+
+0.6
+0.5
+
+1.6
+1.4
+
+0.4
+
+1.2
+0.3
+
+1
+0.8
+
+0.2
+
+0.6
+0.4
+
+0.1
+
+0.2
+0
+
+10.6
+
+10.7
+
+10.8
+
+10.9
+
+11
+
+11.1
+
+11.2
+
+s [GeV]
+
+0
+
+10.6
+
+10.7
+
+10.8
+
+10.9
+
+11
+
+11.1
+
+11.2
+
+s [GeV]
+
+√
+(∗) ¯ (∗)
+FIG. 1: (Left) Measured Rb as a function of s with the position of the opening thresholds of the e+ e− → B(s) B(s) processes
+indicated by dotted lines. (Right) A zoom of the same plot with the result of the ﬁt described in the text superimposed. The
+errors on data represent the statistical and the uncorrelated systematic errors added in quadrature.
+
+TABLE I: Contributions to the relative correlated systematic
+error on Rb .
+Contribution
+Relative error (%)
+µµ MC statistics
+0.2
+µµ radiative corrections
+1.4
+ǫµ
+1.3
+ǫB
+1.3
+ǫcont
+< 2.0
+ǫISR
+< 0.7
+σγγ ǫγγ
+< 0.2
+
+resonant depolarization result [13]. We correct for this
+bias, that comes from the (strongly) non linear impact
+of the momentum resolution in the invariant mass, and
+√
+verify on simulated events that it does not depend on s.
+
+TABLE II: Fit results for the Υ(10860) and Υ(11020) resonances resulting from the ﬁt described in the text. The φ
+phases are relative to the interfering continuum. The corresponding world averages [17] are also reported.
+Υ(10860)
+Υ(11020)
+mass (GeV)
+10.876 ± 0.002 10.996 ± 0.002
+width (MeV)
+43 ± 4
+37 ± 3
+φ (rad)
+2.11 ± 0.12
+0.12 ± 0.07
+PDG mass (GeV) 10.865 ± 0.008 11.019 ± 0.008
+PDG width (MeV)
+110 ± 13
+79 ± 16
+
+√
+The resulting measurements of Rb as a function of s
+are shown in Fig. 1, where the error bars represent the
+sum of the statistical and uncorrelated systematic errors
+and dotted lines show the diﬀerent B meson production
+thresholds. The relative correlated systematic errors on
+Rb are summarized in Table I. The numerical results
+
+for each energy point, together with the estimated ISR
+cross section, can be found in Ref. [14]. It is important
+to stress that radiative corrections have not been applied
+since they would require an a-priori knowledge of the
+resonant region. The measured Rb therefore includes all
+ﬁnal- or initial- state radiation processes.
+The large statistics and the small energy steps of this
+scan make it possible to observe clear structures corresponding to the opening of new thresholds: dips cor∗
+responding to the B (∗) B ∗ and Bs Bs openings and a
+∗ ∗
+plateau close to the Bs Bs one. It is also evident that the
+Υ(10860) and Υ(11020) behave diﬀerently above and below the corresponding peaks. Finally, the plateau above
+the Υ(11020) is clearly visible.
+We ﬁt the following simple model to our data between 10.80 and 11.20 GeV: a ﬂat component representing bb-continuum states not interfering with resonance
+decays, added incoherently to a second ﬂat component
+interfering with two relativistic Breit Wigner resonances:
+σ = |Anr |2 + |Ar + A10860 eiφ10860 BW (M10860 , Γ10860 ) +
+A11020 eiφ11020 BW (M11020 , Γ11020 )|2 , with BW (M, Γ) =
+1/[(s − M 2 ) + iM Γ]. The results summarized in Table II
+and Fig. 1 diﬀer substantially from the PDG values. In
+∗
+∗ ∗
+particular the Bs Bs and Bs Bs thresholds have a very
+large impact on the determination of the Υ(10860) width.
+The number of states is, a priori, unknown as are their
+energy dependencies. Therefore, a proper coupled channel approach [15, 16] including the eﬀects of the various
+thresholds outlined earlier, would be likely to modify the
+results obtained from our simple ﬁt. As an illustration
+of the systematic uncertainties arising from the assumptions in our ﬁt, a simple modiﬁcation is to replace the ﬂat
+√
+nonresonant term by a threshold function at s = 2mB .
+This leads to a larger width (74 ± 4 MeV) and a lower
+mass (10869 ± 2 MeV) for the Υ(10860).
+
+7
+In summary, we have performed an accurate measurement of Rb in ﬁne grained center-of-mass energy steps
+and have shown that these measurements have the potential to yield information on the bottomonium spectrum
+and possible exotic extensions.
+We are grateful for the excellent luminosity and machine conditions provided by our PEP-II colleagues, and
+for the substantial dedicated eﬀort from the computing organizations that support BABAR. The collaborating institutions wish to thank SLAC for its support and
+kind hospitality. This work is supported by DOE and
+NSF (USA), NSERC (Canada), CEA and CNRS-IN2P3
+(France), BMBF and DFG (Germany), INFN (Italy),
+FOM (The Netherlands), NFR (Norway), MES (Russia),
+MEC (Spain), and STFC (United Kingdom). Individuals
+have received support from the Marie Curie EIF (European Union) and the A. P. Sloan Foundation.
+
+∗
+
+Deceased
+Now at Temple University, Philadelphia, Pennsylvania
+19122, USA
+‡
+Now at Tel Aviv University, Tel Aviv, 69978, Israel
+§
+Also with Universit` di Perugia, Dipartimento di Fisica,
+a
+Perugia, Italy
+¶
+Also with Universit` di Roma La Sapienza, I-00185
+a
+Roma, Italy
+∗∗
+Now at University of South Alabama, Mobile, Alabama
+36688, USA
+††
+Also with Universit` di Sassari, Sassari, Italy
+a
+[1] For a comprehensive review see for example E. J. Eichten,
+K. Lane and C. Quigg, Phys. Rev. D 73 (2006) 014014
+†
+
+[Erratum-ibid. D 73 (2006) 079903].
+[2] B. Aubert et al. [BABAR Collaboration], Phys. Rev.
+Lett. 95, 142001 (2005); B. Aubert et al. [BABAR
+Collaboration], Phys. Rev. Lett. 98 (2007) 212001;
+X. L. Wang et al. [Belle Collaboration], Phys. Rev. Lett.
+99 (2007) 142002; C. Z. Yuan et al. [Belle Collaboration],
+Phys. Rev. Lett. 99, 182004 (2007).
+[3] D. Besson, et al. [CLEO collaboration], Phys. Rev. Lett.
+54, 381 (1985).
+[4] D.M.Lovelock, et al. [CUSB collaboration], Phys. Rev.
+Lett. 54, 377 (1985).
+[5] PEP-II Conceptual Design Report, SLAC-0418 (1993).
+[6] B. Aubert et al. [BABAR Collaboration], Nucl. Instrum.
+and Methods Phys. Res., Sec. A 479, 1 (2002).
+[7] S. Agostinelli et al. [GEANT4 Collaboration], Nucl. Instrum. Meth. A 506 (2003) 250.
+[8] G.C. Fox and S. Wolfram, Phys. Rev. Lett. 41, 1581
+(1978).
+[9] S. Jadach, B. F. L. Ward and Z. Was, Comput. Phys.
+Commun. 130 (2000) 260.
+[10] D. J. Lange, Nucl. Instrum. Meth. A 462 (2001) 152.
+[11] M. Benayoun, S. I. Eidelman, V. N. Ivanchenko and
+Z. K. Silagadze, Mod. Phys. Lett. A 14 (1999) 2605.
+[12] T. Sjostrand, Comput. Phys. Commun. 39 (1986) 347.
+[13] A. S. Artamonov, et al. [MD1 Collaboration], Phys. Lett.
+B 474 (2000) 427.
+[14] While awaiting publication on EPAPS the full list of results is available as PUB-08/042 in
+https://oraweb.slac.stanford.edu/pls/slacquery/
+babar_documents.startup
+[15] E. Eichten et al., Phys. Rev. D 17 (1978) 3090; E. Eichten
+et al., Phys. Rev. D 21 (1980) 203.
+[16] N. A. Tornqvist, Phys. Rev. Lett. 53, 878 (1984).
+[17] W. M. Yao et al. [Particle Data Group], J. Phys. G 33
+(2006) 1.
+
+

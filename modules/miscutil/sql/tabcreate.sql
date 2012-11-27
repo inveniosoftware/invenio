@@ -4046,6 +4046,7 @@ CREATE TABLE IF NOT EXISTS `xtrJOB` (
   `id` tinyint(4) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
   `last_updated` datetime NOT NULL,
+  `last_recid` mediumint(8) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 
@@ -4204,5 +4205,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_history_fix',
 -- master upgrade recipes:
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_29_idxINDEX_new_indexer_column',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_04_circulation_and_linkback_updates',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_07_xtrjob_last_recid',NOW());
 
 -- end of file
