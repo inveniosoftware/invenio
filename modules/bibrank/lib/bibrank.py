@@ -94,6 +94,9 @@ from invenio.bibrank_word_indexer import word_similarity #@UnusedImport
 from invenio.bibrank_citerank_indexer import citerank #@UnusedImport
 from invenio.solrutils_bibrank_indexer import word_similarity_solr #@UnusedImport
 from invenio.xapianutils_bibrank_indexer import word_similarity_xapian #@UnusedImport
+from invenio.bibrank_selfcites_task import process_updates as selfcites
+# pylint: enable=W0611
+
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by

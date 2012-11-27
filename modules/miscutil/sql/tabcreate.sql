@@ -2678,6 +2678,28 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
   KEY extcitepubinfo (extcitepubinfo)
 ) ENGINE=MyISAM;
 
+-- tables for self-citations computation
+
+CREATE TABLE IF NOT EXISTS `rnkRECORDSCACHE` (
+  `id_bibrec` int(10) unsigned NOT NULL,
+  `authorid` bigint(10) NOT NULL,
+  PRIMARY KEY (`id_bibrec`,`authorid`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `rnkEXTENDEDAUTHORS` (
+  `id` int(10) unsigned NOT NULL,
+  `authorid` bigint(10) NOT NULL,
+  PRIMARY KEY (`id`,`authorid`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `rnkSELFCITES` (
+  `id_bibrec` int(10) unsigned NOT NULL,
+  `count` int(10) unsigned NOT NULL,
+  `references` text NOT NULL,
+  `last_updated` datetime NOT NULL,
+  PRIMARY KEY (`id_bibrec`)
+) ENGINE=MyISAM;
+
 -- tables for collections and collection tree:
 
 CREATE TABLE IF NOT EXISTS collection (
