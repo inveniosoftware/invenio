@@ -4228,5 +4228,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_history_fix',
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_29_idxINDEX_new_indexer_column',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_04_circulation_and_linkback_updates',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_07_xtrjob_last_recid',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_27_new_selfcite_tables',NOW());
 
 -- end of file
