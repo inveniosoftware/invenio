@@ -224,9 +224,8 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
     fd = process.stderr.fileno()
     fl = fcntl.fcntl(fd, fcntl.F_GETFL)
     fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-    poller = select.poll()
-    poller.register(process.stdout)
-    poller.register(process.stderr)
+    fd_to_poll = [process.stdout, process.stderr]
+    select_timeout = 0.5
     t1 = time.time()
     try:
         while process.poll() is None:
@@ -245,14 +244,14 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
                 except OSError:
                     pass
                 raise Timeout()
-            for fd, event in poller.poll(500):
-                if fd == process.stdout.fileno():
+            for fd in select.select(fd_to_poll, [], [], select_timeout)[0]:
+                if fd == process.stdout:
                     buf = process.stdout.read(65536)
                     if stdout is None:
                         tmp_stdout.write(buf)
                     else:
                         stdout.write(buf)
-                elif fd == process.stderr.fileno():
+                elif fd == process.stderr:
                     buf = process.stderr.read(65536)
                     if stderr is None:
                         tmp_stderr.write(buf)
@@ -263,13 +262,13 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
     finally:
         while True:
             ## Let's just read what is remaining to read.
-            for fd, event in poller.poll(500):
-                if fd == process.stdout.fileno():
+            for fd in select.select(fd_to_poll, [], [], select_timeout)[0]:
+                if fd == process.stdout:
                     buf = process.stdout.read(65536)
                     tmp_stdout.write(buf)
                     if stdout is not None:
                         stdout.write(buf)
-                elif fd == process.stderr.fileno():
+                elif fd == process.stderr:
                     buf = process.stderr.read(65536)
                     tmp_stderr.write(buf)
                     if stderr is not None:
