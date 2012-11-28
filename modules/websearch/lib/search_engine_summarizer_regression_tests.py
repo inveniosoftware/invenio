@@ -17,9 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Unit tests for the search engine summarizer."""
+"""Regression tests for the search engine summarizer."""
 
-# Note: citation summary tests were moved to BibRank as part of the
-# self-cite commit 1fcbed0ec34a9c31f8a727e21890c529d8222256.  Keeping
-# this file here in order to overwrite any previously installed file
-# (with tests that would now fail).
+import unittest
+
+from invenio.testutils import make_test_suite, run_test_suite
+from invenio.intbitset import intbitset
+
+
+class WebSearchSummarizerTests(unittest.TestCase):
+    """Test utility functions for search engine summarizer."""
+
+    def test_basic(self):
+        from invenio.search_engine_summarizer import summarize_records
+        summarize_records(intbitset(range(1, 100)), 'hcs', 'en')
+
+    def test_xml(self):
+        from invenio.search_engine_summarizer import summarize_records
+        summarize_records(intbitset(range(1, 100)), 'xcs', 'en')
+
+
+TEST_SUITE = make_test_suite(WebSearchSummarizerTests)
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)
