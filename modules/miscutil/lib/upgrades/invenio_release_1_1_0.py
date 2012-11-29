@@ -506,9 +506,10 @@ def pre_upgrade():
         # Run import here, since we are on 1.0-1.1 we know the import will work
         from invenio.textutils import wait_for_user
         try:
-            wait_for_user("\nUPGRADING TO 1.1.0 MAY LEAD TO DATA "
-                          "LOSS!!! Please thoroughly test the upgrade on "
-                          "non-production systems first.\n")
+            wait_for_user("\nUPGRADING TO 1.1.0 FROM A DEVELOPMENT VERSION"
+                          " WILL LEAD TO MANY WARNINGS! Please thoroughly"
+                          " test the upgrade on non-production systems first,"
+                          " and pay close attention to warnings.\n")
         except SystemExit:
             raise RuntimeError("Upgrade aborted by user.")
     else:
