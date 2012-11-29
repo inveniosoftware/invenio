@@ -18,4 +18,4 @@ highlight="no" contextual="no"/>
 
 <BFE_PUBLI_INFO prefix="<br /><small>Published in <strong>" suffix="</strong></small>" />
 
-<BFE_FULLTEXT prefix='<br /><small>' style="note" show_icons="yes" suffix="</small>" />
+<BFE_FULLTEXT prefix='<br /><small>' style="note" show_icons="yes" suffix="</small>" focus_on_main_file="yes" />
