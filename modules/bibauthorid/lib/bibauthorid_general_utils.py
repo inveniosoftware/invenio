@@ -76,7 +76,7 @@ wedge_print = __create_conditional_print(bconfig.DEBUG_WEDGE_OUTPUT)
 if bconfig.DEBUG_OUTPUT:
     import sys
 
-    status_len = 68
+    status_len = 20
     comment_len = 40
 
     def padd(stry, l):
@@ -91,6 +91,7 @@ if bconfig.DEBUG_OUTPUT:
         if print_ts or PRINT_TS_US:
             print  datetime.now(),
         print progress, comment, '\r',
+        sys.stdout.flush()
 
     def update_status_final(comment=""):
         update_status(1., comment, print_ts=PRINT_TS)

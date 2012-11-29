@@ -23,6 +23,7 @@ import os
 import cPickle
 
 from itertools import groupby, chain
+from invenio.bibauthorid_general_utils import update_status, update_status_final
 
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_marktables
 from invenio.bibauthorid_cluster_set import delayed_cluster_sets_from_personid
@@ -34,6 +35,7 @@ from invenio.bibauthorid_general_utils import bibauthor_print
 from invenio.bibauthorid_prob_matrix import prepare_matirx
 from invenio.bibauthorid_scheduler import schedule, matrix_coefs
 from invenio.bibauthorid_least_squares import to_function as create_approx_func
+from math import isnan
 
 import multiprocessing as mp
 
@@ -212,24 +214,31 @@ def tortoise_coefficient_statistics(statfile, parsed_output=None):
     user_clusters = set(x[1] for x in stats)
     assert total_tests == len(used_coeffs) * len(user_clusters)
 
+    update_status(0, 'Creating grouped stats...')
     grouped_stats = groupby(sorted(stats), lambda x: x[0])
+    update_status_final('Done creating grouped stats')
+    update_status(0, 'Creating cluster sizes per coefficient...')
     cluster_sizes_per_coeff = [ (g[0], [len(k[2]) for k in g[1]] ) for g in grouped_stats]
-
+    update_status_final('Done creating cluster sizes per coefficient')
     # average number of clusters per coefficient
+    update_status(0, 'Creating avg clusters per coeff...')
     avg_clusters_per_coeff = [ (k[0], sum(k[1])/len(k[1])) for k in cluster_sizes_per_coeff ]
-
+    update_status_final('Done creating avg clusters per coeff')
 
     edges_min_max_avg_per_coeff = []
+    maxlen = float(len(used_coeffs))
     grouped_stats = groupby(sorted(stats), lambda x: x[0])
-    for coeff in grouped_stats:
+    for i,coeff in enumerate(grouped_stats):
+        update_status(i/maxlen, 'Computing adv stats...')
         edgeslist =  [ [x[2] for x in cluster[2]] for cluster in coeff[1] ]
         minedges = [min(x) for x in edgeslist if x]
         maxedges = [max(x) for x in edgeslist if x]
-        avgs = [sum(x)/float(len(x)) for x in edgeslist if x]
+        avgs = [sum([p for p in x if not isnan(p)])/float(len(x))  for x in edgeslist if x]
 
         minedge = min(minedges)
         maxedge = max(maxedges)
-        avg = sum(avgs)/float(len(avgs))
+        av = float(len(avgs))
+        avg = sum(avg/av for avg in avgs)
 
         edges_min_max_avg_per_coeff.append((coeff[0],minedge,maxedge,avg))
 

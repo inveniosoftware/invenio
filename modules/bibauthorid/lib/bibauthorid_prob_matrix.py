@@ -114,7 +114,6 @@ class ProbabilityMatrix(object):
                             else:
                                 cur_calc += 1
                                 val = compare_bibrefrecs(bib1, bib2)
-
                             self._bib_matrix[bib1, bib2] = val
 
         clear_comparison_caches()

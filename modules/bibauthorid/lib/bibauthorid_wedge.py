@@ -232,6 +232,7 @@ def meld_edges(p1, p2):
     '''
     out_edges1, verts1 = p1
     out_edges2, verts2 = p2
+    assert verts1 > 0 and verts2 > 0, 'MELD_EDGES: verts problem %s %s ' % (str(verts1), str(verts2))
     vsum = verts1 + verts2
     invsum = 1. / vsum
 
