@@ -32,7 +32,7 @@ from invenio.search_engine import get_field_tags
 from invenio.bibtask import task_low_level_submission
 from invenio.textutils import encode_for_xml
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR, CFG_SITE_LANG
-
+from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import \
                                 CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
                                 CFG_BIBCIRCULATION_WORKING_DAYS, \
@@ -133,13 +133,9 @@ def search_user(column, string):
     return result
 
 def update_user_info_from_ldap(user_id):
-    from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
     ccid = db.get_borrower_ccid(user_id)
-    ldap_info = 'busy'
-    while ldap_info == 'busy':
-        time.sleep(1)
-        ldap_info = get_user_info_from_ldap(ccid=ccid)
-    if len(ldap_info) == 0:
+    ldap_info = get_user_info_from_ldap(ccid=ccid)
+    if not ldap_info:
         result = ()
     else:
         try:

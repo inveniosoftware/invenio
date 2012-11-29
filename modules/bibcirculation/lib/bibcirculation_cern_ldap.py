@@ -17,15 +17,18 @@
 
 """Invenio LDAP interface for BibCirculation at CERN. """
 
+from time import sleep
+from thread import get_ident
+
 from invenio.config import CFG_CERN_SITE
 try:
     import ldap
+    import ldap.filter
     #from invenio.external_authentication_cern_wrapper import _cern_nice_soap_auth
     CFG_BIBCIRCULATION_HAS_LDAP = CFG_CERN_SITE
 except (ImportError, IOError):
     CFG_BIBCIRCULATION_HAS_LDAP = False
 
-from thread import get_ident
 # from base64 import decodestring
 
 # This is the old configuration
@@ -51,6 +54,7 @@ def _cern_ldap_login():
     #connection.simple_bind(CFG_CERN_LDAP_BIND % user, password)
     return connection
 
+
 def get_user_info_from_ldap(nickname="", email="", ccid=""):
     """Query the CERN LDAP server for information about a user.
     Return a dictionary of information"""
@@ -61,27 +65,36 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
         connection = _ldap_connection_pool[get_ident()] = _cern_ldap_login()
 
     if nickname:
-        query = '(displayName=%s)' % nickname
+        query = '(displayName=%s)' % ldap.filter.escape_filter_chars(nickname)
     elif email:
-        query = '(mail=%s)' % email
+        query = '(mail=%s)' % ldap.filter.escape_filter_chars(email)
     elif ccid:
-        query = '(employeeID=%s)' % ccid
+        query = '(employeeID=%s)' % ldap.filter.escape_filter_chars(str(ccid))
     else:
         return {}
 
+    query_filter = "(& %s (| (employeetype=primary) (employeetype=external) (employeetype=ExCern) ) )" % query
     try:
+        results = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE,
+                                query_filter, timeout=5)
+    except ldap.LDAPError:
+        ## Mmh.. connection error? Let's reconnect at least once just in case
+        sleep(1)
+        connection = _ldap_connection_pool[get_ident()] = _cern_ldap_login()
+        results = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE,
+                                query_filter, timeout=5)
 
-        query_filter = "(& %s (| (employeetype=primary) (employeetype=external) ) )" % query
-        result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE,
-                                      query_filter, timeout=5)
-        if result and nickname:
-            return result[0][1]
-        else:
-            try:
-                return result[0][1]
-            except IndexError:
-                return {}
-    except:
-        return 'busy'
-
-    return {}
+    if len(results) > 1:
+        ## Maybe one ExCern and primary at the same time. In this case let's give precedence to ExCern
+        types = {}
+        for result in results:
+            types[result[1]['employeeType'][0]] = result[1]
+        if 'ExCern' in types and 'Primary' in types:
+            return types['ExCern']
+        if 'Primary' in types:
+            return types['Primary']
+        ## Ok otherwise we just pick up something :-)
+    if results:
+        return results[0][1]
+    else:
+        return {}

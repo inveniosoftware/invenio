@@ -367,7 +367,7 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
     user = collect_user_info(uid)
     borrower_id = db.get_borrower_id_by_email(user['email'])
 
-    if borrower_id == None:
+    if borrower_id is None:
         if CFG_CERN_SITE == 1:
             result = get_user_info_from_ldap(email=user['email'])
 
@@ -413,7 +413,7 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
                                                             ln=ln)
 
     address = db.get_borrower_address(user['email'])
-    if address == 0:
+    if not address:
         if CFG_CERN_SITE == 1:
             email = user['email']
             result = get_user_info_from_ldap(email)
