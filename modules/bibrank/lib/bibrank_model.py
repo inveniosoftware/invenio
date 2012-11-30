@@ -131,7 +131,7 @@ class RnkPAGEVIEWS(db.Model):
                 autoincrement=True)
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=True,
-            primary_key=True)
+                primary_key=True)
     id_user = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(User.id),
             server_default='0', primary_key=True)
@@ -167,6 +167,36 @@ class RnkWORD01R(db.Model):
     bibrec = db.relationship(Bibrec, backref='word01rs')
 
 
+class RnkEXTENDEDAUTHORS(db.Model):
+    """Represents a RnkEXTENDEDAUTHORS record."""
+    __tablename__ = 'rnkEXTENDEDAUTHORS'
+
+    id = db.Column(db.Integer(10, unsigned=True), primary_key=True, nullable=False)
+    authorid = db.Column(db.BigInteger(10), primary_key=True, nullable=False)
+
+
+class RnkRECORDSCACHE(db.Model):
+    """Represents a RnkRECORDSCACHE record."""
+    __tablename__ = 'rnkRECORDSCACHE'
+
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id), nullable=True,
+                primary_key=True)
+    authorid = db.Column(db.BigInteger(10), primary_key=True, nullable=False)
+
+
+class RnkSELFCITES(db.Model):
+    """Represents a RnkSELFCITES record."""
+    __tablename__ = 'rnkSELFCITES'
+
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id), nullable=True,
+                primary_key=True)
+    count = db.Column(db.Integer(10, unsigned=True), nullable=False)
+    references = db.Column(db.Text, nullable=False)
+    last_updated = db.Column(db.DateTime, nullable=False)
+
+
 
 __all__ = ['RnkMETHOD',
            'RnkMETHODDATA',
@@ -177,4 +207,7 @@ __all__ = ['RnkMETHOD',
            'RnkDOWNLOADS',
            'RnkPAGEVIEWS',
            'RnkWORD01F',
-           'RnkWORD01R']
+           'RnkWORD01R',
+           'RnkEXTENDEDAUTHORS',
+           'RnkRECORDSCACHE',
+           'RnkSELFCITES']
