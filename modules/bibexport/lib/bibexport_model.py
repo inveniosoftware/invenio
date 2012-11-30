@@ -127,25 +127,13 @@ class ExpQUERYRESULT(db.Model):
 #            secondary=expJOBRESULT_expQUERYRESULT,
 #            backref='queryresults')
 
-#class ExpJOBRESULTExpQUERYRESULT(db.Model):
-#    """Represents a ExpJOBRESULTExpQUERYRESULT record."""
-#    def __init__(self):
-#        pass
-#    __tablename__ = 'expJOBRESULT_expQUERYRESULT'
-#    id_expJOBRESULT = db.Column(db.Integer(15), db.ForeignKey('ExpJOBRESULT.id'),
-#            nullable=False, primary_key=True)
-#    id_expQUERYRESULT = db.Column(db.Integer(15), db.ForeignKey('ExpQUERYRESULT.id'),
-#            nullable=False, primary_key=True)
-#
-
-EXPJOBRESULT_EXPQUERYRESULT = db.Table('expJOBRESULT_expQUERYRESULT', db.metadata,
-    db.Column('id_expJOBRESULT', db.Integer(15),
-                db.ForeignKey(ExpJOBRESULT.id),
-                nullable=False, primary_key=True),
-    db.Column('id_expQUERYRESULT', db.Integer(15),
-                db.ForeignKey(ExpQUERYRESULT.id),
-                nullable=False, primary_key=True)
-)
+class ExpJOBRESULTExpQUERYRESULT(db.Model):
+    """Represents a ExpJOBRESULTExpQUERYRESULT record."""
+    __tablename__ = 'expJOBRESULT_expQUERYRESULT'
+    id_expJOBRESULT = db.Column(db.Integer(15), db.ForeignKey(ExpJOBRESULT.id),
+            nullable=False, primary_key=True)
+    id_expQUERYRESULT = db.Column(db.Integer(15), db.ForeignKey(ExpQUERYRESULT.id),
+            nullable=False, primary_key=True)
 
 
 
@@ -153,4 +141,5 @@ __all__ = ['ExpJOB',
            'UserExpJOB',
            'ExpJOBRESULT',
            'ExpQUERY',
-           'ExpQUERYRESULT']
+           'ExpQUERYRESULT',
+           'ExpJOBRESULTExpQUERYRESULT']
