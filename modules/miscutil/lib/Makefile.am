@@ -51,6 +51,7 @@ pylib_DATA = __init__.py \
              testutils.py \
              testutils_regression_tests.py \
              inveniocfg_upgrader.py \
+             inveniocfg_upgrader_model.py \
              inveniocfg_upgrader_unit_tests.py \
              invenio_connector.py \
              invenio_connector_regression_tests.py \
