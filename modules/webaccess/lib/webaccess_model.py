@@ -28,7 +28,6 @@ from invenio.sqlalchemyutils import db
 
 from invenio.websession_model import User
 
-db.Model.__table_args__ = {'useexisting':True}
 class AccACTION(db.Model):
     """Represents a AccACTION record."""
     __tablename__ = 'accACTION'
@@ -83,16 +82,23 @@ class AccROLE(db.Model):
 class AccAuthorization(db.Model):
     """Represents a AccAssociation record."""
     __tablename__ = 'accROLE_accACTION_accARGUMENT'
-    id_accROLE = db.Column(db.Integer(15), db.ForeignKey(AccROLE.id),
+    id_accROLE = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(AccROLE.id),
                 nullable=True,
+                autoincrement=False,
                 primary_key=True, index=True)
-    id_accACTION = db.Column(db.Integer(15), db.ForeignKey(AccACTION.id),
+    id_accACTION = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(AccACTION.id),
                 nullable=True,
+                autoincrement=False,
                 primary_key=True, index=True)
-    id_accARGUMENT = db.Column(db.Integer(15), db.ForeignKey(AccARGUMENT.id),
+    id_accARGUMENT = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(AccARGUMENT.id),
                 nullable=True, primary_key=True,
+                autoincrement=False,
                 index=True)
     argumentlistid = db.Column(db.MediumInteger(8), nullable=True,
+                autoincrement=False,
                 primary_key=True)
     role = db.relationship(AccROLE, backref='authorizations')
     action = db.relationship(AccACTION, backref='authorizations')

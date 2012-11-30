@@ -31,8 +31,8 @@ class LnkADMINURL(db.Model):
     __tablename__ = 'lnkADMINURL'
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    url = db.Column(db.String, nullable=False)
-    list = db.Column(db.String, nullable=False)
+    url = db.Column(db.String(100), nullable=False)
+    list = db.Column(db.String(30), nullable=False)
 
 
 class LnkADMINURLLOG(db.Model):
@@ -48,11 +48,11 @@ class LnkENTRY(db.Model):
     __tablename__ = 'lnkENTRY'
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    origin_url = db.Column(db.String, nullable=False)
-    id_bibrec = db.Column(db.Integer, nullable=False)
+    origin_url = db.Column(db.String(100), nullable=False)
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), nullable=False)
     additional_properties = db.Column(db.Binary)
-    type = db.Column(db.String, nullable=False)
-    status = db.Column(db.String, nullable=False)
+    type = db.Column(db.String(30), nullable=False)
+    status = db.Column(db.String(30), nullable=False)
     insert_time = db.Column(db.DateTime)
 
     @property
@@ -80,8 +80,8 @@ class LnkENTRYURLTITLE(db.Model):
     __tablename__ = 'lnkENTRYURLTITLE'
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    url = db.Column(db.String, nullable=False)
-    title = db.Column(db.String, nullable=False)
+    url = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(100), nullable=False)
     manual_set = db.Column(db.Integer, nullable=False)
     broken_count = db.Column(db.Integer)
     broken = db.Column(db.Integer, nullable=False)
@@ -93,7 +93,7 @@ class LnkLOG(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     id_user = db.Column(db.Integer)
-    action = db.Column(db.String, nullable=False)
+    action = db.Column(db.String(30), nullable=False)
     log_time = db.Column(db.DateTime)
 
 __all__ = [ 'LnkADMINURL',

@@ -155,8 +155,6 @@ external_collection_mapper = attribute_multi_dict_collection(
     val_attr=lambda obj: obj.externalcollection)
 
 
-db.Model.__table_args__ = {'extend_existing':True}
-
 class Collection(db.Model):
     """Represents a Collection record."""
 

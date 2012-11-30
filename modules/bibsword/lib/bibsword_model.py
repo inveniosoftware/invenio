@@ -35,8 +35,7 @@ class SwrREMOTESERVER(db.Model):
         pass
     __tablename__ = 'swrREMOTESERVER'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
+                primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), nullable=False)
     host = db.Column(db.String(50), nullable=False)
     username = db.Column(db.String(50), nullable=False)
@@ -46,7 +45,7 @@ class SwrREMOTESERVER(db.Model):
     url_base_record = db.Column(db.String(50), nullable=False)
     url_servicedocument = db.Column(db.String(80),
                 nullable=False)
-    xml_servicedocument = db.Column(db.iLargeBinary,
+    xml_servicedocument = db.Column(db.LargeBinary,
                 nullable=True)
     last_update = db.Column(db.Integer(15, unsigned=True),
                 nullable=False)
@@ -59,19 +58,22 @@ class SwrCLIENTDATA(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True,
                 autoincrement=True)
-    id_swrREMOTESERVER = db.Column(db.Integer(15), db.ForeignKey(SwrREMOTESERVER.id),
+    id_swrREMOTESERVER = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(SwrREMOTESERVER.id),
                 nullable=False)
-    id_record = db.Column(db.Integer(15), db.ForeignKey(Bibrec.id),
+    id_record = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
                 nullable=False)
     report_no = db.Column(db.String(50), nullable=False)
     id_remote = db.Column(db.String(50), nullable=False)
-    id_user = db.Column(db.Integer(15), db.ForeignKey(User.id),
+    id_user = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(User.id),
                 nullable=False)
     user_name = db.Column(db.String(100), nullable=False)
     user_email = db.Column(db.String(100), nullable=False)
-    xml_media_deposit = db.Column(db.iLargeBinary,
+    xml_media_deposit = db.Column(db.LargeBinary,
                 nullable=False)
-    xml_metadata_submit = db.Column(db.iLargeBinary,
+    xml_metadata_submit = db.Column(db.LargeBinary,
                 nullable=False)
     submission_date = db.Column(db.DateTime, nullable=False,
         server_default='0001-01-01 00:00:00')

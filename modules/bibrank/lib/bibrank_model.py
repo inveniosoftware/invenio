@@ -79,16 +79,14 @@ class RnkCITATIONDATA(db.Model):
 
 class RnkCITATIONDATAEXT(db.Model):
     """Represents a RnkCITATIONDATAEXT record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkCITATIONDATAEXT'
-    id_bibrec = db.Column(db.Integer(8, unsigned=True),
-                db.ForeignKey(Bibrec.id),
-            primary_key=True, nullable=False,
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id), autoincrement=False,
+                primary_key=True, nullable=False,
                 server_default='0')
     extcitepubinfo = db.Column(db.String(255), primary_key=True,
                 nullable=False,
-            index=True)
+                index=True)
 
 class RnkAUTHORDATA(db.Model):
     """Represents a RnkAUTHORDATA record."""
@@ -160,7 +158,7 @@ class RnkWORD01R(db.Model):
     def __init__(self):
         pass
     __tablename__ = 'rnkWORD01R'
-    id_bibrec = db.Column(db.MediumInteger(9, unsigned=True),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=False, primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
     type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),

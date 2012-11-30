@@ -55,7 +55,7 @@ class BskEXTREC(db.Model):
                 primary_key=True)
     external_id = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
-    collection_id = db.Column(db.Integer(15, unsigned=True),
+    collection_id = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Collection.id), nullable=False, server_default='0')
     original_url = db.Column(db.Text, nullable=True)
     creation_date = db.Column(db.DateTime, nullable=False,
@@ -86,12 +86,11 @@ class BskREC(db.Model):
         pass
     __tablename__ = 'bskREC'
     id_bibrec_or_bskEXTREC = db.Column(db.Integer(16), nullable=False,
-                server_default='0',
-            primary_key=True)
+                server_default='0', primary_key=True)
     id_bskBASKET = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(BskBASKET.id), nullable=False, server_default='0',
                 primary_key=True)
-    id_user_who_added_item = db.Column(db.Integer(15),
+    id_user_who_added_item = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(User.id),
                 nullable=False, server_default='0')
     score = db.Column(db.Integer(15), nullable=False,
@@ -107,8 +106,7 @@ class BskRECORDCOMMENT(db.Model):
         pass
     __tablename__ = 'bskRECORDCOMMENT'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True,
-            autoincrement=True)
+                primary_key=True, autoincrement=True)
     id_bibrec_or_bskEXTREC = db.Column(db.Integer(16), nullable=False,
                 server_default='0')
     id_bskBASKET = db.Column(db.Integer(15, unsigned=True),

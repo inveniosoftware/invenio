@@ -110,13 +110,13 @@ class AsBINARY(FunctionElement):
 def compile(element, compiler, **kw):
     return "BINARY %s" % compiler.process(element.clauses)
 
-@compiles(sqlalchemy.types.LargeBinary, "postgresql")
-def compile_binary_postgresql(type_, compiler, **kw):
-    return "BYTEA"
+#@compiles(sqlalchemy.types.LargeBinary, "postgresql")
+#def compile_binary_postgresql(type_, compiler, **kw):
+#    return "BYTEA"
 
-@compiles(sqlalchemy.types.LargeBinary, "mysql")
-def compile_binary_postgresql(type_, compiler, **kw):
-    return "BYTEA"
+#@compiles(sqlalchemy.types.LargeBinary, "mysql")
+#def compile_binary_postgresql(type_, compiler, **kw):
+#    return "BYTEA"
 
 def _include_sqlalchemy(obj, engine=None):
     if engine is None:
@@ -127,11 +127,22 @@ def _include_sqlalchemy(obj, engine=None):
     #            setattr(obj, key,
     #                    getattr(module, key))
 
-    setattr(obj, 'Char', sqlalchemy.types.CHAR)
+    #if engine == 'mysql':
+    #    from sqlalchemy.dialects import mysql as engine_types
+    #else:
+    #    from sqlalchemy import types as engine_types
+
+    from sqlalchemy.dialects import mysql as engine_types
+
+    setattr(obj, 'Char', engine_types.CHAR)
     setattr(obj, 'hybrid_property', hybrid_property)
-    setattr(obj, 'Double', sqlalchemy.types.Float)
-    setattr(obj, 'MediumInteger', sqlalchemy.types.Integer)
-    setattr(obj, 'TinyInteger', sqlalchemy.types.Integer)
+    setattr(obj, 'Double', engine_types.DOUBLE)
+    setattr(obj, 'Integer', engine_types.INTEGER)
+    setattr(obj, 'SmallInteger', engine_types.SMALLINT)
+    setattr(obj, 'MediumInteger', engine_types.MEDIUMINT)
+    setattr(obj, 'BigInteger', engine_types.BIGINT)
+    setattr(obj, 'TinyInteger', engine_types.TINYINT)
+    setattr(obj, 'Binary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iLargeBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iMediumBinary', sqlalchemy.types.LargeBinary)
@@ -145,7 +156,7 @@ def _include_sqlalchemy(obj, engine=None):
 
     def default_enum(f):
         def decorated(*args, **kwargs):
-            kwargs['native_enum']=False
+            kwargs['native_enum'] = engine == 'mysql' #False
             return f(*args, **kwargs)
         return decorated
 
@@ -210,11 +221,12 @@ class InvenioDB(SQLAlchemy):
         self.Model.todict = todict
         self.Model.fromdict = fromdict
         self.Model.__iter__ = iterfunc
-        #self.Model.__table_args__ = {
-        #        'extend_existing':True,
-        #        'mysql_engine':'MyISAM',
-        #        'mysql_charset':'utf8'
-        #        }
+        #if engine == 'mysql':
+        self.Model.__table_args__ = {
+            'extend_existing':  True,
+            'mysql_engine':     'MyISAM',
+            'mysql_charset':    'utf8'
+            }
 
         _include_sqlalchemy(self, engine=engine)
 

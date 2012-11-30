@@ -56,12 +56,13 @@ class UserExpJOB(db.Model):
     def __init__(self):
         pass
     __tablename__ = 'user_expJOB'
-    id_user = db.Column(db.Integer(15), db.ForeignKey(User.id),
+    id_user = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(User.id),
                 nullable=False,
-                     primary_key=True)
+                primary_key=True)
     id_expJOB = db.Column(db.Integer(15), db.ForeignKey(ExpJOB.id),
                 nullable=False,
-                       primary_key=True)
+                primary_key=True)
 
 class ExpJOBRESULT(db.Model):
     """Represents a ExpJOBRESULT record."""
@@ -80,23 +81,6 @@ class ExpJOBRESULT(db.Model):
     status_message = db.Column(db.Text, nullable=False)
     job = db.relationship(ExpJOB, backref='jobresults')
 
-#class ExpJOBExpQUERY(db.Model):
-#    """Represents a ExpJOBExpQUERY record."""
-#    def __init__(self):
-#        pass
-#    __tablename__ = 'expJOB_expQUERY'
-#    id_expJOB = db.Column(db.Integer(15), db.ForeignKey('ExpJOB.id'), nullable=False,
-#                       primary_key=True)
-#    id_expQUERY = db.Column(db.Integer(15), db.ForeignKey('ExpQUERY.id'),
-#                         nullable=False, primary_key=True)
-
-EXPJOB_EXPQUERY = db.Table('expJOB_expQUERY', db.metadata,
-    db.Column('id_expJOB', db.Integer(15), db.ForeignKey(ExpJOB.id),
-                nullable=False, primary_key=True),
-    db.Column('id_expQUERY', db.Integer(15), db.ForeignKey('expQUERY.id'),
-                nullable=False, primary_key=True)
-)
-
 class ExpQUERY(db.Model):
     """Represents a ExpQUERY record."""
     def __init__(self):
@@ -110,8 +94,19 @@ class ExpQUERY(db.Model):
     notes = db.Column(db.Text, nullable=True)
     deleted = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
-    jobs = db.relationship(ExpJOB, secondary=EXPJOB_EXPQUERY,
-            backref='queries')
+
+class ExpJOBExpQUERY(db.Model):
+    """Represents a ExpJOBExpQUERY record."""
+    __tablename__ = 'expJOB_expQUERY'
+    id_expJOB = db.Column(db.Integer(15, unsigned=True),
+                    db.ForeignKey(ExpJOB.id), nullable=False,
+                    primary_key=True)
+    id_expQUERY = db.Column(db.Integer(15, unsigned=True),
+                    db.ForeignKey(ExpQUERY.id), nullable=False,
+                    primary_key=True)
+
+    query = db.relationship(ExpQUERY, backref='jobs')
+    job = db.relationship(ExpJOB, backref='queries')
 
 class ExpQUERYRESULT(db.Model):
     """Represents a ExpQUERYRESULT record."""

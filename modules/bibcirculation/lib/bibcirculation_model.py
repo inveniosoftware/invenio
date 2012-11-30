@@ -76,7 +76,7 @@ class CrcITEM(db.Model):
     barcode = db.Column(db.String(30), nullable=False,
                 server_default='',
                      primary_key=True)
-    id_bibrec = db.Column(db.Integer(15, unsigned=True),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 nullable=False,
                        server_default='0')
     id_crcLIBRARY = db.Column(db.Integer(15, unsigned=True),
@@ -156,7 +156,8 @@ class CrcLOAN(db.Model):
                 autoincrement=True)
     id_crcBORROWER = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(CrcBORROWER.id), nullable=False, server_default='0')
-    id_bibrec = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(Bibrec.id),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
                 nullable=False, server_default='0')
     barcode = db.Column(db.String(30), db.ForeignKey(CrcITEM.barcode), nullable=False,
                 server_default='')
@@ -192,7 +193,8 @@ class CrcLOANREQUEST(db.Model):
                 autoincrement=True)
     id_crcBORROWER = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(CrcBORROWER.id), nullable=False, server_default='0')
-    id_bibrec = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(Bibrec.id),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
                 nullable=False, server_default='0')
     barcode = db.Column(db.String(30), db.ForeignKey(CrcITEM.barcode), nullable=False,
                 server_default='')
@@ -237,7 +239,8 @@ class CrcPURCHASE(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True,
                 autoincrement=True)
-    id_bibrec = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(Bibrec.id),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
                 nullable=False, server_default='0')
     id_crcVENDOR = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(CrcVENDOR.id), nullable=False, server_default='0')

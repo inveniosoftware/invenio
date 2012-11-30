@@ -34,7 +34,7 @@ class CmtRECORDCOMMENT(db.Model):
     __tablename__ = 'cmtRECORDCOMMENT'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True, autoincrement=True)
-    id_bibrec = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(Bibrec.id),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), db.ForeignKey(Bibrec.id),
                 nullable=False, server_default='0') # CmtRECORDCINNENT
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
                 nullable=False, server_default='0')
@@ -77,7 +77,7 @@ class CmtACTIONHISTORY(db.Model):
                 db.ForeignKey(CmtRECORDCOMMENT.id),
                 nullable=True,
                 primary_key=True)
-    id_bibrec = db.Column(db.Integer(15, unsigned=True),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id),
                 nullable=True, primary_key=True)
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
@@ -114,12 +114,14 @@ class CmtCOLLAPSED(db.Model):
 
     __tablename__ = 'cmtCOLLAPSED'
 
-    id_bibrec = db.Column(db.Integer, db.ForeignKey(Bibrec.id),
-                          primary_key=True, nullable=False)
-    id_cmtRECORDCOMMENT = db.Column(db.Integer, db.ForeignKey(CmtRECORDCOMMENT.id),
-                                    primary_key=True, nullable=False)
-    id_user = db.Column(db.Integer, db.ForeignKey(User.id),
-                        primary_key=True, nullable=False)
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id),
+                primary_key=True, nullable=False)
+    id_cmtRECORDCOMMENT = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(CmtRECORDCOMMENT.id),
+                primary_key=True, nullable=False)
+    id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
+                primary_key=True, nullable=False)
 
 
 __all__ = ['CmtRECORDCOMMENT',

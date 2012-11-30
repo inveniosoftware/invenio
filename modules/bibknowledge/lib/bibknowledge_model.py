@@ -45,11 +45,10 @@ class KnwKBDDEF(db.Model):
     def __init__(self):
         pass
     __tablename__ = 'knwKBDDEF'
-    id_knwKB = db.Column(db.MediumInteger(8, unsigned=True), db.ForeignKey(KnwKB.id),
-                nullable=False,
-            primary_key=True)
-    id_collection = db.Column(db.MediumInteger(9), db.ForeignKey(Collection.id),
-                nullable=True)
+    id_knwKB = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(KnwKB.id), nullable=False, primary_key=True)
+    id_collection = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(Collection.id), nullable=True)
     output_tag = db.Column(db.Text, nullable=True)
     search_expression = db.Column(db.Text, nullable=True)
     kb = db.relationship(KnwKB, backref='kbdefs')

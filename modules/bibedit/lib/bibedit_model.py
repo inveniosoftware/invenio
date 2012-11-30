@@ -46,14 +46,11 @@ class Bibfmt(db.Model):
     def __init__(self):
         pass
     __tablename__ = 'bibfmt'
-    id = db.Column(db.MediumInteger(8, unsigned=True), primary_key=True,
-                nullable=False,
-                autoincrement=True)
-    id_bibrec = db.Column(db.Integer(8, unsigned=True), db.ForeignKey(Bibrec.id),
-                nullable=False,
-            server_default='0')
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), db.ForeignKey(Bibrec.id),
+                nullable=False, server_default='0', primary_key=True,
+                autoincrement=False)
     format = db.Column(db.String(10), nullable=False,
-                server_default='')
+                server_default='', primary_key=True)
     last_updated = db.Column(db.DateTime, nullable=False,
                 server_default='0001-01-01 00:00:00')
     value = db.Column(db.iLargeBinary)
@@ -118,7 +115,7 @@ class BibrecBibdoc(db.Model):
     def __init__(self):
         pass
     __tablename__ = 'bibrec_bibdoc'
-    id_bibrec = db.Column(db.MediumInteger(9, unsigned=True),
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=False,
                 server_default='0', primary_key=True)
     id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
