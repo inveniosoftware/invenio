@@ -399,3 +399,21 @@ def guess_datetime(datetime_string):
             except ValueError:
                 pass
     raise ValueError("It is not possible to guess the datetime format of %s" % datetime_string)
+
+def get_time_estimator(total):
+    """
+    Given a total amount of items to compute, return a function that,
+    if called every time an item is computed (or every step items are computed)
+    will give a time estimation for how long it will take to compute the whole
+    set of itmes. The function will return two values: the first is the
+    number of seconds that are still needed to compute the whole set, the second
+    value is the time in the future when the operation is expected to end.
+    """
+    t1 = time.time()
+    count = [0]
+    def estimate_needed_time(step=1):
+        count[0] += step
+        t2 = time.time()
+        t3 = 1.0 * (t2 - t1) / count[0] * (total - count[0])
+        return t3, t3 + t1
+    return estimate_needed_time
