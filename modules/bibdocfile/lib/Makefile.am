@@ -22,6 +22,7 @@ pylib_DATA = bibdocfile_config.py file.py \
              bibdocfile_templates.py \
              bibdocfile_managedocfiles.py \
              bibdocfile.py \
+             bibdocfile_model.py \
              bibdocfilecli.py \
              bibdocfile_regression_tests.py
 
