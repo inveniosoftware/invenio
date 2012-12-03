@@ -94,6 +94,7 @@ pylib_DATA = __init__.py \
              jsonutils_unit_tests.py \
              sequtils_cnum.py \
              sequtils.py \
+             sequtils_model.py \
              sequtils_regression_tests.py \
 	     flaskshell.py \
 	     wtforms_utils.py
