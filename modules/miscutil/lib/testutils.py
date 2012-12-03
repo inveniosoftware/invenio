@@ -222,6 +222,31 @@ def test_web_page_existence(url):
         raise
     return True
 
+def get_authenticated_mechanize_browser(username="guest", password=""):
+    """
+    Return an instance of a mechanize browser already authenticated
+    to Invenio
+    """
+    try:
+        import mechanize
+    except ImportError:
+        raise InvenioTestUtilsBrowserException('ERROR: Cannot import mechanize.')
+    browser = mechanize.Browser()
+    browser.set_handle_robots(False) # ignore robots.txt, since we test gently
+    if username == "guest":
+        return browser
+    browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
+    browser.select_form(nr=0)
+    browser['p_un'] = username
+    browser['p_pw'] = password
+    browser.submit()
+    username_account_page_body = browser.response().read()
+    try:
+        username_account_page_body.index("You are logged in as %s." % username)
+    except ValueError:
+        raise InvenioTestUtilsBrowserException('ERROR: Cannot login as %s.' % username)
+    return browser
+
 def test_web_page_content(url,
                           username="guest",
                           password="",
@@ -249,36 +274,17 @@ def test_web_page_content(url,
        messages that may have been encountered during processing of
        page.
     """
-
+    try:
+        import mechanize
+    except ImportError:
+        raise InvenioTestUtilsBrowserException('ERROR: Cannot import mechanize.')
     if '--w3c-validate' in sys.argv:
         require_validate_p = True
         sys.stderr.write('Required validation\n')
 
     error_messages = []
     try:
-        import mechanize
-    except ImportError:
-        return ['ERROR: Cannot import mechanize.']
-    browser = mechanize.Browser()
-    browser.set_handle_robots(False) # ignore robots.txt, since we test gently
-    try:
-        # firstly login:
-        if username == "guest":
-            pass
-        else:
-            browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
-            browser.select_form(nr=0)
-            browser['p_un'] = username
-            browser['p_pw'] = password
-            browser.submit()
-            username_account_page_body = browser.response().read()
-            try:
-                username_account_page_body.index("You are logged in as %s." % username)
-            except ValueError:
-                raise InvenioTestUtilsBrowserException, \
-                      'ERROR: Cannot login as %s.' % username
-
-        # secondly read page body:
+        browser = get_authenticated_mechanize_browser(username, password)
         browser.open(url)
         url_body = browser.response().read()
 
@@ -361,10 +367,13 @@ def test_web_page_content(url,
         error_messages.append('ERROR: Page %s (login %s) led to an error: %s.' % \
                               (url, username, msg))
 
-    # logout after tests:
-    browser.open(CFG_SITE_SECURE_URL + "/youraccount/logout")
-    browser.response().read()
-    browser.close()
+    try:
+        # logout after tests:
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/logout")
+        browser.response().read()
+        browser.close()
+    except UnboundLocalError:
+        pass
 
     if CFG_TESTUTILS_VERBOSE >= 9:
         print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \

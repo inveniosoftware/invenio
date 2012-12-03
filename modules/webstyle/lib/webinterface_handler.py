@@ -364,109 +364,90 @@ def create_handler(root):
 
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
-        try:
-            allowed_methods = ("GET", "POST", "HEAD", "OPTIONS", "PUT")
-            #req.allow_methods(allowed_methods, 1)
-            #if req.method not in allowed_methods:
-            #    raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
+        allowed_methods = ("GET", "POST", "HEAD", "OPTIONS", "PUT")
+        #req.allow_methods(allowed_methods, 1)
+        #if req.method not in allowed_methods:
+        #    raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
-            if req.method == 'OPTIONS':
-                ## OPTIONS is used to now which method are allowed
-                req.headers_out['Allow'] = ', '.join(allowed_methods)
-                raise apache.SERVER_RETURN, apache.OK
+        if req.method == 'OPTIONS':
+            ## OPTIONS is used to now which method are allowed
+            req.headers_out['Allow'] = ', '.join(allowed_methods)
+            raise apache.SERVER_RETURN, apache.OK
 
-            # Set user agent for fckeditor.py, which needs it here
-            os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
+        # Set user agent for fckeditor.py, which needs it here
+        os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
 
-            # Check if REST authentication can be performed
-            if req.args:
-                args = cgi.parse_qs(req.args)
-                if 'apikey' in args and req.is_https():
-                    uid = web_api_key.acc_get_uid_from_request(req.uri, req.args)
-                    if uid < 0:
-                        raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
-                    else:
-                        setUid(req=req, uid=uid)
+        # Check if REST authentication can be performed
+        if req.args:
+            args = cgi.parse_qs(req.args)
+            if 'apikey' in args and req.is_https():
+                uid = web_api_key.acc_get_uid_from_request(req.uri, req.args)
+                if uid < 0:
+                    raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
+                else:
+                    setUid(req=req, uid=uid)
 
-            guest_p = isGuestUser(getUid(req), run_on_slave=False)
+        guest_p = isGuestUser(getUid(req), run_on_slave=False)
 
-            uri = req.uri
-            if uri == '/':
-                path = ['']
+        uri = req.uri
+        if uri == '/':
+            path = ['']
+        else:
+            ## Let's collapse multiple slashes into a single /
+            uri = RE_SLASHES.sub('/', uri)
+            path = uri[1:].split('/')
+
+        if CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
+            ## If the site is under maintainance mode let's return
+            ## 503 to casual crawler to avoid having the site being
+            ## indexed
+            req.status = 503
+
+        g = _RE_BAD_MSIE.search(req.headers_in.get('User-Agent', "MSIE 6.0"))
+        bad_msie = g and float(g.group(1)) < 9.0
+        if uri.startswith('/yours') or not guest_p:
+            ## Private/personalized request should not be cached
+            if bad_msie and req.is_https():
+                req.headers_out['Cache-Control'] = 'private, max-age=0, must-revalidate'
             else:
-                ## Let's collapse multiple slashes into a single /
-                uri = RE_SLASHES.sub('/', uri)
-                path = uri[1:].split('/')
+                req.headers_out['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
+                req.headers_out['Pragma'] = 'no-cache'
+                req.headers_out['Vary'] = '*'
+        elif not (bad_msie and req.is_https()):
+            req.headers_out['Cache-Control'] = 'public, max-age=3600'
+            req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
 
-            if CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
-                ## If the site is under maintainance mode let's return
-                ## 503 to casual crawler to avoid having the site being
-                ## indexed
-                req.status = 503
-
-            g = _RE_BAD_MSIE.search(req.headers_in.get('User-Agent', "MSIE 6.0"))
-            bad_msie = g and float(g.group(1)) < 9.0
-            if uri.startswith('/yours') or not guest_p:
-                ## Private/personalized request should not be cached
-                if bad_msie and req.is_https():
-                    req.headers_out['Cache-Control'] = 'private, max-age=0, must-revalidate'
-                else:
-                    req.headers_out['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
-                    req.headers_out['Pragma'] = 'no-cache'
-                    req.headers_out['Vary'] = '*'
-            elif not (bad_msie and req.is_https()):
-                req.headers_out['Cache-Control'] = 'public, max-age=3600'
-                req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
-
-            try:
-                if req.method == 'HEAD' and not RE_SPECIAL_URI.match(req.uri):
-                    return root._traverse(req, path, True, guest_p)
-                else:
-                    ## bibdocfile have a special treatment for HEAD
-                    return root._traverse(req, path, False, guest_p)
-            except TraversalError:
-                raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
-            except apache.SERVER_RETURN:
-                ## This is one of mod_python way of communicating
-                raise
-            except IOError, exc:
-                if 'Write failed, client closed connection' not in "%s" % exc:
-                    ## Workaround for considering as false positive exceptions
-                    ## rised by mod_python when the user close the connection
-                    ## or in some other rare and not well identified cases.
-                    register_exception(req=req, alert_admin=True)
-                raise
-            except Exception:
-                # send the error message, much more convenient than log hunting
-                if remote_debugger:
-                    args = {}
-                    if req.args:
-                        args = cgi.parse_qs(req.args)
-                        if 'debug' in args:
-                            remote_debugger.error_msg(args['debug'])
-                register_exception(req=req, alert_admin=True)
-                raise
-
-            # Serve an error by default.
+        try:
+            if req.header_only and not RE_SPECIAL_URI.match(req.uri):
+                return root._traverse(req, path, True, guest_p)
+            else:
+                ## bibdocfile have a special treatment for HEAD
+                return root._traverse(req, path, False, guest_p)
+        except TraversalError:
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
-        finally:
-            if hasattr(req, '_session'):
-                ## The session handler saves for caching a request_wrapper
-                ## in req.
-                ## This saves req as an attribute, creating a circular
-                ## reference.
-                ## Since we have have reached the end of the request handler
-                ## we can safely drop the request_wrapper so to avoid
-                ## memory leaks.
-                delattr(req, '_session')
-            if hasattr(req, '_user_info'):
-                ## For the same reason we can delete the user_info.
-                delattr(req, '_user_info')
+        except apache.SERVER_RETURN:
+            ## This is one of mod_python way of communicating
+            raise
+        except IOError, exc:
+            if 'Write failed, client closed connection' not in "%s" % exc:
+                ## Workaround for considering as false positive exceptions
+                ## rised by mod_python when the user close the connection
+                ## or in some other rare and not well identified cases.
+                register_exception(req=req, alert_admin=True)
+            raise
+        except Exception:
+            # send the error message, much more convenient than log hunting
+            if remote_debugger:
+                args = {}
+                if req.args:
+                    args = cgi.parse_qs(req.args)
+                    if 'debug' in args:
+                        remote_debugger.error_msg(args['debug'])
+            register_exception(req=req, alert_admin=True)
+            raise
 
-            ## as suggested in
-            ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
-            del gc.garbage[:]
-
+        # Serve an error by default.
+        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
     return _profiler
 
 

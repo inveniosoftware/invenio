@@ -35,7 +35,8 @@ from invenio.access_control_firerole import compile_role_definition, \
     serialize, deserialize
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_DEVEL_SITE
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+                              test_web_page_content, merge_error_messages, \
+                              get_authenticated_mechanize_browser
 from invenio.dbquery import run_sql
 
 class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
@@ -46,7 +47,7 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
 
         baseurl = CFG_SITE_URL + '/admin/webaccess/webaccessadmin.py/'
 
-        _exports = ['', 'delegate_startarea', 'manageaccounts']
+        _exports = ['', 'delegate_startarea', 'manageaccounts', 'rolearea', 'actionarea', 'userarea', 'managerobotlogin', 'listgroups', 'resetarea', '']
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
@@ -71,6 +72,16 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
+
+    def test_webaccess_becomeuser(self):
+        """webaccess - becomeuser functionality"""
+        browser = get_authenticated_mechanize_browser("admin")
+        browser.open(CFG_SITE_SECURE_URL + '/admin/webaccess/webaccessadmin.py/manageaccounts?mtype=perform_modifyaccounts')
+        browser.select_form(nr=0)
+        browser['email_user_pattern'] = 'romeo'
+        browser.submit()
+        browser.open(browser.find_link(text="Become user").absolute_url)
+        self.failUnless('romeo' in browser.response().read())
 
 class WebAccessFireRoleTest(unittest.TestCase):
     """Check WebAccess behaviour WRT FireRole."""
