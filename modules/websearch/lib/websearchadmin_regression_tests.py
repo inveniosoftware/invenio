@@ -41,7 +41,8 @@ class WebSearchAdminWebPagesAvailabilityTest(InvenioTestCase):
                     '?mtype=perform_addcollectiontotree',
                     '?mtype=perform_modifycollectiontree',
                     '?mtype=perform_checkwebcollstatus',
-                    '?mtype=perform_checkcollectionstatus',]
+                    '?mtype=perform_checkcollectionstatus',
+                    '?mtype=perform_checksearchservices']
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
@@ -63,6 +64,22 @@ class WebSearchAdminWebPagesAvailabilityTest(InvenioTestCase):
         url = CFG_SITE_URL + '/help/admin/websearch-admin-guide'
         error_messages = test_web_page_content(url,
                                                expected_text="WebSearch Admin Guide")
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+        return
+
+    def test_websearch_search_services_report(self):
+        """websearchadmin - availability of WebSearch "Search Services" Admin pages"""
+
+        url = CFG_SITE_URL + '/admin/websearch/websearchadmin.py?colID=1&mtype=perform_checksearchservices&ln=en'
+        error_messages = test_web_page_content(url,
+                                               username='admin',
+                                               password='',
+                                               expected_text=['CollectionNameSearchService',
+                                                              'collections of interest',
+                                                              'OK',
+                                                              'SubmissionNameSearchService',
+                                                              'submissions of interest'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return

@@ -68,7 +68,8 @@
 <strong>7. <a href="#7">Check External Collections</a></strong><br />
 <strong>8. <a href="#8">Edit Search Engine Parameters</a></strong><br />
 <strong>9. <a href="#9">Search Engine Cache</a></strong><br />
-<strong>10. <a href="#10">Additional Information</a></strong><br />
+<strong>10. <a href="#10">Search Services</a></strong><br />
+<strong>11. <a href="#11">Additional Information</a></strong><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -733,6 +734,39 @@ option to fix any potential inconsistencies.
 
 <a name="9"></a><h2>9. Search Engine Cache</h2>
 
-<a name="10"></a><h2>10. Additional Information</h2>
+<a name="10"></a><h2>10. Search Services</h2>
+
+<p>Search services are meant to display information contextual to a
+search query in very specialized way, in the sense that they can
+search/retrieve/display data beyond the traditional concept of
+records.  Typical search services could for example include:
+
+<ul>
+	<li>Spell-check user queries by calling an external spellchecking library, and offering "<em>Did you mean ...?</em>" options.</li>
+	<li>Parse user input and display an author profile when searching for a well-defined author.</li>
+	<li>Search for submission names matching the user input.</li>
+	<li>Retrieve phone number from the institutional LDAP.</li>
+	<li>Etc.</li>
+</ul>
+ </p>
+
+<p> Search services are displayed (in addition) just before the
+results returned by the standard Invenio search engine. They can be
+enabled by dropping a plug-in file
+at <code>/opt/invenio/lib/python/invenio/search_services/</code>. A
+few sample search services are included by default in Invenio. You can
+see which are installed in the WebSearch Admin
+interface <a href="/admin/websearch/websearchadmin.py?colID=1&amp;mtype=perform_checksearchservices">8. Search
+services</a> page. Additionnal plug-ins (not installed by default)
+might be available in the Invenio package
+at <code>/modules/websearch/lib/search_services/</code>.</p>
+
+<p>More information about search services might be found in each
+plug-in file. An
+advanced <a href="/help/hacking/search-services">Search Services hacking guide</a>
+is also available.</p>
+
+
+<a name="11"></a><h2>11. Additional Information</h2>
 
 <a href="<CFG_SITE_URL>/help/hacking/search-engine-internals">WebSearch Internals</a>

@@ -64,8 +64,9 @@ from invenio.config import \
      CFG_WEBSEARCH_SHOW_REVIEW_COUNT, \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
-
 from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
+from invenio.websearch_services import \
+     CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT
 
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
@@ -3099,6 +3100,54 @@ class Template:
             return out
         else:
             return ""
+
+    def tmpl_print_service_list_links(self, label, labels_and_urls, ln=CFG_SITE_URL):
+        """
+        Prints service results as list
+
+        @param label: the label to display before the list of links
+        @type label: string
+        @param labels_and_urls: list of tuples (label, url), already translated, not escaped
+        @type labels_and_urls: list(string, string)
+        @param ln: language
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+
+        out = '''
+        <span class="searchservicelabel">%s</span> ''' % cgi.escape(label)
+
+        out += """<script type="text/javascript">
+            $(document).ready(function() {
+                $('a.moreserviceitemslink').click(function() {
+                    $('.moreserviceitemslist', $(this).parent()).show();
+                    $(this).hide();
+                    $('.lessserviceitemslink', $(this).parent()).show();
+                    return false;
+                });
+                $('a.lessserviceitemslink').click(function() {
+                    $('.moreserviceitemslist', $(this).parent()).hide();
+                    $(this).hide();
+                    $('.moreserviceitemslink', $(this).parent()).show();
+                    return false;
+                });
+            });
+            </script>"""
+        count = 0
+        for link_label, link_url in labels_and_urls:
+            count += 1
+            out += """<span %(itemclass)s>%(separator)s <a class="searchserviceitem" href="%(url)s">%(link_label)s</a></span>""" % \
+                   {'itemclass' : count > CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT and 'class="moreserviceitemslist" style="display:none"' or '',
+                    'separator': count > 1 and ', ' or '',
+                    'url' : link_url,
+                    'link_label' : cgi.escape(link_label)}
+
+        if count > CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT:
+            out += """ <a class="lessserviceitemslink" style="display:none;" href="#">%s</a>""" % _("Less suggestions")
+            out += """ <a class="moreserviceitemslink" style="" href="#">%s</a>""" % _("More suggestions")
+
+        return out
 
     def tmpl_print_searchresultbox(self, header, body):
         """print a nicely formatted box for search results """

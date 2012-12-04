@@ -26,6 +26,8 @@ import random
 import time
 import sys
 from invenio.dateutils import strftime
+import os
+import traceback
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -2009,10 +2011,11 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     </tr><tr>
     <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkcollectionstatus">Collection Status</a></small></td>
     <td>6.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkexternalcollections">Check external collections</a></small></td>
-    <td>7.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
+    <td>7.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checksearchservices">Search services</a></small></td>
+    <td>8.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
+    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
 
     if mtype == "":
         fin_output += """<br /><br /><b><span class="info">To manage the collections, select an item from the menu.</span><b><br />"""
@@ -2049,6 +2052,11 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
         fin_output += content
     elif mtype == "perform_checkexternalcollections" or mtype == "perform_showall":
         fin_output += perform_checkexternalcollections(colID, ln, callback='')
+
+    if mtype == "perform_checksearchservices" and content:
+        fin_output += content
+    elif mtype == "perform_checksearchservices" or mtype == "perform_showall":
+        fin_output += perform_checksearchservices(colID, ln, callback='')
 
     body = [fin_output]
     body = [fin_output]
@@ -2685,6 +2693,53 @@ def perform_checkexternalcollections(colID, ln, icl=None, update="", confirm=0, 
 
     if callback:
         return perform_index(colID, ln, "perform_checkexternalcollections", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_checksearchservices(colID, ln, icl=None, update="", confirm=0, callback='yes'):
+    """Check the enabled search services, and possible errors"""
+    from invenio.pluginutils import PluginContainer
+    from invenio.websearch_services import CFG_SEARCH_SERVICES_PATH, \
+         __required_plugin_API_version__, \
+         SearchService
+
+    subtitle = """<a name="10"></a>Check search services &nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#10">?</a>]""" % CFG_SITE_URL
+    output  = ""
+
+    output += "<p>You can enable a search service by dropping the corresonpding plugin at <code>%s</code>.</p>" % \
+              cgi.escape(CFG_SEARCH_SERVICES_PATH)
+
+    search_service_plugins = PluginContainer(os.path.join(CFG_SEARCH_SERVICES_PATH, '*Service.py'),
+                                             api_version=__required_plugin_API_version__,
+                                             plugin_signature=SearchService)
+
+    output += "<br /><b>Enabled search services:</b><br />"
+    header = ['Service', 'Description', 'Status']
+    actions = []
+    for name, plugin in search_service_plugins.get_enabled_plugins().iteritems():
+        description = plugin().get_description()
+        actions.append((name, description, '<span style="color:#080">OK</a>'))
+
+    if actions:
+        output += tupletotable(header=header, tuple=actions)
+    else:
+        output += '<em style="color:#f80;font-size:small">No search service enabled</em>'
+
+    output += "<br /><b>Search services with errors:</b><br />"
+    header = ['Service', 'Error']
+    actions = []
+    for name, error in search_service_plugins.get_broken_plugins().iteritems():
+        actions.append((name, '<pre style="color:#800">' + cgi.escape(repr(error[0]) + " " + repr(error[1]) + "\n" + "\n".join(traceback.format_tb(error[2]))) + '</pre>'))
+
+    if actions:
+        output += tupletotable(header=header, tuple=actions)
+    else:
+        output += '<em style="color:#080;font-size:small">No error found</em>'
+
+    body = [output]
+
+    if callback:
+        return perform_index(colID, ln, "perform_checksearchservices", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 

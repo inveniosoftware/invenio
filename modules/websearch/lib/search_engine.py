@@ -141,7 +141,12 @@ from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
 from invenio import webinterface_handler_config as apache
 from invenio.solrutils_bibindex_searcher import solr_get_bitset
 from invenio.xapianutils_bibindex_searcher import xapian_get_bitset
-
+from invenio.websearch_services import \
+     get_search_services, \
+     CFG_WEBSEARCH_SERVICE_MAX_SERVICE_ANSWER_RELEVANCE, \
+     CFG_WEBSEARCH_SERVICE_MAX_NB_SERVICE_DISPLAY, \
+     CFG_WEBSEARCH_SERVICE_MIN_RELEVANCE_TO_DISPLAY, \
+     CFG_WEBSEARCH_SERVICE_MAX_RELEVANCE_DIFFERENCE
 
 try:
     import invenio.template
@@ -196,7 +201,8 @@ EM_REPOSITORY={"body" : "B",
                "np_portalbox" : "Pnp",
                "ne_portalbox" : "Pne",
                "lt_portalbox" : "Plt",
-               "rt_portalbox" : "Prt"};
+               "rt_portalbox" : "Prt",
+               "search_services": "SER"};
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -6196,6 +6202,10 @@ def prs_log_query(kwargs=None, req=None, uid=None, of=None, ln=None, p=None, f=N
         pass
     log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
 
+try:
+    loaded_websearch_services is not None
+except Exception:
+    loaded_websearch_services = get_search_services()
 
 def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None, _=None, p=None,
                     p1=None, p2=None, p3=None, colls_to_display=None, f=None, rg=None, sf=None,
@@ -6219,6 +6229,54 @@ def prs_search_common(kwargs=None, req=None, of=None, cc=None, ln=None, uid=None
                                     p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action,
                                     em
                                     ))
+
+        # WebSearch services
+        if jrec <= 1 and \
+               (em == "" and True or (EM_REPOSITORY["search_services"] in em)):
+            user_info = collect_user_info(req)
+            # display only on first search page, and only if wanted
+            # when 'em' param set.
+            if p:
+                search_units = create_basic_search_units(req, p, f)
+            else:
+                search_units = []
+            search_service_answers = [search_service.answer(req, user_info, of, cc, colls_to_search, p, f, search_units, ln) \
+                                      for search_service in loaded_websearch_services]
+            search_service_answers.sort(reverse=True)
+            nb_answers = 0
+            best_relevance = None
+
+            for answer_relevance, answer_html in search_service_answers:
+                nb_answers += 1
+                if best_relevance is None:
+                    best_relevance = answer_relevance
+                if best_relevance <= CFG_WEBSEARCH_SERVICE_MIN_RELEVANCE_TO_DISPLAY:
+                    # The answer is not relevant enough
+                    if verbose > 8:
+                        write_warning("Service relevance too low (%i). Answer would be: %s" % (answer_relevance, answer_html), req=req)
+                    break
+                if nb_answers > CFG_WEBSEARCH_SERVICE_MAX_NB_SERVICE_DISPLAY:
+                    # We have reached the max number of service to display
+                    if verbose > 8:
+                        write_warning("Max number of services (%i) reached." % CFG_WEBSEARCH_SERVICE_MAX_NB_SERVICE_DISPLAY, req=req)
+                    break
+                if best_relevance - answer_relevance > CFG_WEBSEARCH_SERVICE_MAX_RELEVANCE_DIFFERENCE:
+                    # The service gave an answer that is way less good than previous ones.
+                    if verbose > 8:
+                        write_warning("Service relevance too low (%i) compared to best one (%i). Answer would be: %s" % (answer_relevance, best_relevance, answer_html), req=req)
+                    break
+                req.write('<div class="searchservicebox">')
+                req.write(answer_html)
+                if verbose > 8:
+                    write_warning("Service relevance: %i" % answer_relevance, req=req)
+
+                req.write('</div>')
+                if answer_relevance == CFG_WEBSEARCH_SERVICE_MAX_SERVICE_ANSWER_RELEVANCE:
+                    # The service assumes it has given the definitive answer
+                    if verbose > 8:
+                        write_warning("There cannot be a better answer. Leaving", req=req)
+                    break
+
     t1 = os.times()[4]
     results_in_any_collection = intbitset()
     if aas == 1 or (p1 or p2 or p3):
@@ -6296,7 +6354,6 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
 
     # split result set into collections
     (results_final_nb, results_final_nb_total, results_final_for_all_selected_colls) = prs_split_into_collections(kwargs=kwargs, **kwargs)
-
 
     # we continue past this point only if there is a hosted collection that has timed out and might offer potential results
     if results_final_nb_total == 0 and not kwargs['hosted_colls_potential_results_p']:

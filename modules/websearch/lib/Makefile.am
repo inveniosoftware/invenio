@@ -15,6 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+SUBDIRS = services
+
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
@@ -41,7 +43,9 @@ pylib_DATA = \
 	websearch_external_collections_searcher.py \
 	websearch_external_collections_templates.py \
 	websearch_external_collections_unit_tests.py \
-	websearch_external_collections_utils.py
+	websearch_external_collections_utils.py \
+	websearch_services.py \
+	websearch_services_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

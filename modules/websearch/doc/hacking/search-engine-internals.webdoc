@@ -33,5 +33,8 @@ happens after user hits the SEARCH button.
 <dt><a href="search-engine-api">Search Engine API</a> <dd>Explains how to call
 search engine from your Python programs, should a need arize.
 
+<dt><a href="search-services">Search Services</a> <dd>Explains how to
+manage and implement new search services.
+
 </dl>
 </blockquote>

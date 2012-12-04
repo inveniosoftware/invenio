@@ -2131,6 +2131,7 @@ INSERT INTO knwKB VALUES ('5','INDEX-SYNONYM-TITLE','Knowledge base of title wor
 INSERT INTO knwKB VALUES ('6','DBCOLLID2OPENGRAPHTYPE','Maps collection 980 field to an Open Graph Type', NULL);
 INSERT INTO knwKB VALUES ('7','LICENSE2URL','Map a license name to its URL', NULL);
 INSERT INTO knwKB VALUES ('8','DBCOLLID2TWITTERCARDTYPE','Maps collection 980 field to a Twitter Card type', NULL);
+INSERT INTO knwKB VALUES ('9','FAQ','Map (whitespace-separated) keywords to an answer (label|url), to be used in FAQ search service', NULL);
 
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('ARTICLE','Published Article', '1');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PREPRINT','Preprint', '1');
@@ -2488,6 +2489,7 @@ INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-SA-3.0','http:/
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-ND-3.0','http://creativecommons.org/licenses/by-nc-nd/3.0/', '7');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('VIDEO','player', '8');
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('PICTURE','photo', '8');
+INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('search syntax find looking help','Search tips|/help/search-tips', '9');
 
 -- crcLIBRARY demo data:
 INSERT INTO crcLIBRARY (name, address, email, phone, type, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', 'main', '');
