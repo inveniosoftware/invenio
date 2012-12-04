@@ -282,6 +282,21 @@ def bibsched_send_signal(proc, task_id, sig):
     return False
 
 
+def is_monotask(task_id, proc, runtime, status, priority, host, sequenceid):
+    procname = proc.split(':')[0]
+    return procname in CFG_BIBTASK_MONOTASKS
+
+
+def stop_task(other_task_id, other_proc, other_priority, other_status, other_sequenceid):
+    Log("Send STOP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
+    bibsched_set_status(other_task_id, 'ABOUT TO STOP', other_status)
+
+
+def sleep_task(other_task_id, other_proc, other_priority, other_status, other_sequenceid):
+    Log("Send SLEEP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
+    bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
+
+
 class Manager(object):
     def __init__(self, old_stdout):
         import curses
@@ -967,7 +982,7 @@ class BibSched(object):
         self.node_relevant_active_tasks = ()
         ## All tasks of all nodes
         self.active_tasks_all_nodes = ()
-
+        self.mono_tasks_all_nodes = ()
         self.allowed_task_types = CFG_BIBSCHED_NODE_TASKS.get(self.hostname, CFG_BIBTASK_VALID_TASKS)
         os.environ['BIBSCHED_MODE'] = 'automatic'
 
@@ -1072,7 +1087,16 @@ class BibSched(object):
             Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s, host: %s, sequenceid: %s" %
                 (task_id, proc, runtime, status, priority, host, sequenceid))
 
-        if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
+        if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_active_tasks:
+            # For multi-node
+            # check if we need to sleep ourselves for monotasks to be able to run
+            for other_task_id, other_proc, other_runtime, other_status, other_priority, other_host, other_sequenceid in self.mono_tasks_all_nodes:
+                if priority < other_priority:
+                    # Sleep ourselves
+                    sleep_task(task_id, proc, runtime, status, priority, host, sequenceid)
+                    return True
+
+        elif (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
             if debug:
                 Log("Trying to run %s" % task_id)
 
@@ -1143,12 +1167,16 @@ class BibSched(object):
 
             ## No higher priority task have issue with the given task.
             if proc not in CFG_BIBTASK_FIXEDTIMETASKS and len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
-                ### !!! THIS HAS TO BE ADAPTED FOR MULTINODE
-                ### !!! Basically, the number of concurrent tasks should count per node
-                ## Not enough resources.
                 if debug:
                     Log("Cannot run because all resources (%s) are used (%s), higher: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
                 return False
+
+            ## Check for monotasks wanting to run
+            for other_task_id, other_proc, other_runtime, other_status, other_priority, other_host, other_sequenceid in self.mono_tasks_all_nodes:
+                if priority < other_priority:
+                    if debug:
+                        Log("Cannot run because there is a monotask with higher priority: %s %s" % (other_task_id, other_proc))
+                    return False
 
             ## We check if it is necessary to stop/put to sleep some lower priority
             ## task.
@@ -1166,7 +1194,7 @@ class BibSched(object):
 
             procname = proc.split(':')[0]
             if not tasks_to_stop and (not tasks_to_sleep or (proc not in CFG_BIBTASK_MONOTASKS and len(self.node_relevant_active_tasks) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS)):
-                if proc in CFG_BIBTASK_MONOTASKS and self.node_relevant_active_tasks:
+                if proc in CFG_BIBTASK_MONOTASKS and self.active_tasks_all_nodes:
                     if debug:
                         Log("Cannot run because this is a monotask and there are other tasks running: %s" % (self.node_relevant_active_tasks, ))
                     return False
@@ -1220,14 +1248,13 @@ class BibSched(object):
                     raise StandardError("%s is not in the allowed modules" % procname)
             else:
                 ## It's not still safe to run the task.
-                ## We first need to stop task that should be stopped
-                ## and to put to sleep task that should be put to sleep
-                for (other_task_id, other_proc, other_priority, other_status, other_sequenceid) in tasks_to_stop:
-                    Log("Send STOP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
-                    bibsched_set_status(other_task_id, 'ABOUT TO STOP', other_status)
-                for (other_task_id, other_proc, other_priority, other_status, other_sequenceid) in tasks_to_sleep:
-                    Log("Send SLEEP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
-                    bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
+                ## We first need to stop tasks that should be stopped
+                ## and to put to sleep tasks that should be put to sleep
+                for t in tasks_to_stop:
+                    stop_task(*t)
+                for t in tasks_to_sleep:
+                    sleep_task(*t)
+
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
                 return True
 
@@ -1292,11 +1319,12 @@ class BibSched(object):
                FROM schTASK WHERE status = 'SLEEPING'
                ORDER BY priority DESC, runtime ASC, id ASC""")
         self.node_relevant_active_tasks = run_sql(
-            """SELECT id, proc, runtime, status, priority, host,sequenceid
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
                FROM schTASK WHERE status IN ('RUNNING', 'CONTINUING',
                                              'SCHEDULED', 'ABOUT TO STOP',
                                              'ABOUT TO SLEEP')""")
         self.active_tasks_all_nodes = tuple(self.node_relevant_active_tasks)
+        self.mono_tasks_all_nodes = tuple(t for t in self.node_relevant_waiting_tasks if is_monotask(*t))
         ## Remove tasks that can not be executed on this host
         self.filter_for_allowed_tasks()
 
