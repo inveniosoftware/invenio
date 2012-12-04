@@ -232,7 +232,7 @@ class SelfCitesTaskTests(unittest.TestCase):
                                                    store_last_updated, \
                                                    get_bibrankmethod_lastupdate
         name = 'selfcites'
-        old_date = datetime(year=1900, month=1, day=1)
+        old_date = datetime(year=1900, month=1, day=1).strftime("%Y-%m-%d %H:%M:%S")
         try:
             original_date = get_bibrankmethod_lastupdate(name)
         except IndexError:

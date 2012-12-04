@@ -218,14 +218,12 @@ def process_chunk(recids, config, cites_weight, cites, refs, selfcites,
 def get_bibrankmethod_lastupdate(rank_method_code):
     """return the last excution date of bibrank method
     """
-    query = "SELECT last_updated FROM rnkMETHOD WHERE name = %s"
+    query = """SELECT DATE_FORMAT(last_updated, '%%Y-%%m-%%d %%H:%%i:%%s')
+               FROM rnkMETHOD WHERE name =%s"""
     last_update_time = run_sql(query, [rank_method_code])
     try:
         r = last_update_time[0][0]
     except IndexError:
-        r = None
-
-    if r is None:
         r = "0000-00-00 00:00:00"
 
     return r
