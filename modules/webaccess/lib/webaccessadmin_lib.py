@@ -24,7 +24,6 @@ __lastupdated__ = """$Date$"""
 ## fill config variables:
 
 import re
-import random
 import getopt
 import sys
 import time
@@ -1417,10 +1416,10 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
                 users.append(['', id, email, (note=="1" and '<strong class="info">Active</strong>' or '<strong class="important">Inactive</strong>')])
                 for col in [(((note=="1" and 'Inactivate' or 'Activate'), 'modifyaccountstatus'), ((note == "0" and 'Reject' or 'Delete'), 'rejectaccount'), ),
                             (('Edit account', 'editaccount'), ),]:
-                    users[-1].append('<a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % (col[0][1], id, email_user_pattern, limit_to, maxpage, page, random.randint(0, 1000), col[0][0]))
+                    users[-1].append('<a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s">%s</a>' % (col[0][1], id, email_user_pattern, limit_to, maxpage, page, col[0][0]))
                     for (str, function) in col[1:]:
-                        users[-1][-1] += ' / <a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % (function, id, email_user_pattern, limit_to, maxpage, page, random.randint(0, 1000), str)
-                users[-1].append('<a href=%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % ('becomeuser', id, email_user_pattern, limit_to, maxpage, page, random.randint(0, 1000), 'Become user'))
+                        users[-1][-1] += ' / <a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s">%s</a>' % (function, id, email_user_pattern, limit_to, maxpage, page, str)
+                users[-1].append('<a href=%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s">%s</a>' % ('becomeuser', id, email_user_pattern, limit_to, maxpage, page, 'Become user'))
 
             last = ""
             next = ""
