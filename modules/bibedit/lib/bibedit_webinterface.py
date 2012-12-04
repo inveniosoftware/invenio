@@ -75,7 +75,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                         language    = argd['ln'],
                         navtrail    = navtrail,
                         lastupdated = __lastupdated__,
-                        req         = req)
+                        req         = req,
+                        body_css_classes = ['bibedit'])
 
         # If it is an Ajax request, extract any JSON data.
         ajax_request, recid = False, None
@@ -134,7 +135,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                         language    = argd['ln'],
                         navtrail    = navtrail,
                         lastupdated = __lastupdated__,
-                        req         = req)
+                        req         = req,
+                        body_css_classes = ['bibedit'])
         else:
             # Handle AJAX request.
             json_response.update(perform_request_ajax(req, recid, uid,
@@ -174,7 +176,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                     language = ln,
                     navtrail    = navtrail,
                     lastupdated = __lastupdated__,
-                    req         = req)
+                    req         = req,
+                    body_css_classes = ['bibedit'])
 
     def new_ticket(self, req, form):
         """handle a edit/new_ticket request"""
@@ -197,7 +200,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                             language    = ln,
                             navtrail    = navtrail,
                             lastupdated = __lastupdated__,
-                            req         = req)
+                            req         = req,
+                            body_css_classes = ['bibedit'])
             else:
                 #redirect..
                 redirect_to_url(req, url)
@@ -220,7 +224,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                         language    = argd['ln'],
                         navtrail    = navtrail_bibedit,
                         lastupdated = __lastupdated__,
-                        req         = req)
+                        req         = req,
+                        body_css_classes = ['bibedit'])
 
         # If it is an Ajax request, extract any JSON data.
         ajax_request = False
@@ -261,7 +266,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                         language    = argd['ln'],
                         navtrail    = navtrail_bibedit,
                         lastupdated = __lastupdated__,
-                        req         = req)
+                        req         = req,
+                        body_css_classes = ['bibedit'])
         else:
             # Handle AJAX request.
             json_response.update(perform_request_ajax_template_interface(json_data))

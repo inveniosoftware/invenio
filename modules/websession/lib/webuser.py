@@ -860,8 +860,7 @@ def create_userinfobox_body(req, uid, language="en"):
     """Create user info box body for user UID in language LANGUAGE."""
 
     if req:
-        if req.subprocess_env.has_key('HTTPS') \
-           and req.subprocess_env['HTTPS'] == 'on':
+        if req.is_https():
             url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
         else:
             url_referer = CFG_SITE_URL + req.unparsed_uri
@@ -905,8 +904,7 @@ def create_useractivities_menu(req, uid, navmenuid, ln="en"):
     """
 
     if req:
-        if req.subprocess_env.has_key('HTTPS') \
-           and req.subprocess_env['HTTPS'] == 'on':
+        if req.is_https():
             url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
         else:
             url_referer = CFG_SITE_URL + req.unparsed_uri
@@ -958,8 +956,7 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
     """
     _ = gettext_set_language(ln)
     if req:
-        if req.subprocess_env.has_key('HTTPS') \
-           and req.subprocess_env['HTTPS'] == 'on':
+        if req.is_https():
             url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
         else:
             url_referer = CFG_SITE_URL + req.unparsed_uri
