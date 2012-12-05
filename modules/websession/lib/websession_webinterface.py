@@ -240,10 +240,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         grps = user_info['precached_usegroups'] and webgroup.account_group(uid, ln=args['ln']) or ''
         appr = user_info['precached_useapprove']
         sbms = user_info['precached_viewsubmissions']
+        comments = user_info['precached_sendcomments']
         loan = ''
         admn = webaccount.perform_youradminactivities(user_info, args['ln'])
         return page(title=_("Your Account"),
-                    body=webaccount.perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, args['ln']),
+                    body=webaccount.perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, args['ln'], comments),
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,

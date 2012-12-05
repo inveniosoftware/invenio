@@ -247,7 +247,8 @@ def make_canonical_urlargd(urlargd, default_urlargd):
 
 
 def create_html_link(urlbase, urlargd, link_label, linkattrd=None,
-                     escape_urlargd=True, escape_linkattrd=True):
+                     escape_urlargd=True, escape_linkattrd=True,
+                     urlhash=None):
     """Creates a W3C compliant link.
     @param urlbase: base url (e.g. invenio.config.CFG_SITE_URL/search)
     @param urlargd: dictionary of parameters. (e.g. p={'recid':3, 'of'='hb'})
@@ -257,10 +258,11 @@ def create_html_link(urlbase, urlargd, link_label, linkattrd=None,
                            arguments (e.g. < becomes &lt; or " becomes &quot;)
     @param escape_linkattrd: boolean indicating if the function should escape
                            attributes (e.g. < becomes &lt; or " becomes &quot;)
+    @param urlhash: hash string to add at the end of the link
     """
     attributes_separator = ' '
     output = '<a href="' + \
-             create_url(urlbase, urlargd, escape_urlargd) + '"'
+             create_url(urlbase, urlargd, escape_urlargd, urlhash) + '"'
     if linkattrd:
         output += ' '
         if escape_linkattrd:
@@ -410,13 +412,14 @@ def string_to_numeric_char_reference(string):
     return out
 
 
-def create_url(urlbase, urlargd, escape_urlargd=True):
+def create_url(urlbase, urlargd, escape_urlargd=True, urlhash=None):
     """Creates a W3C compliant URL. Output will look like this:
     'urlbase?param1=value1&amp;param2=value2'
     @param urlbase: base url (e.g. invenio.config.CFG_SITE_URL/search)
     @param urlargd: dictionary of parameters. (e.g. p={'recid':3, 'of'='hb'}
     @param escape_urlargd: boolean indicating if the function should escape
                            arguments (e.g. < becomes &lt; or " becomes &quot;)
+    @param urlhash: hash string to add at the end of the link
     """
     separator = '&amp;'
     output = urlbase
@@ -430,6 +433,8 @@ def create_url(urlbase, urlargd, escape_urlargd=True):
             arguments = [str(key) + '=' + str(urlargd[key])
                             for key in urlargd.keys()]
         output += separator.join(arguments)
+    if urlhash:
+        output += "#" + escape(quote(str(urlhash)))
     return output
 
 

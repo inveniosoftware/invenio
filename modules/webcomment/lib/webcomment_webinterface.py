@@ -40,7 +40,8 @@ from invenio.webcomment import check_recID_is_in_range, \
                                query_get_comment, \
                                toggle_comment_visibility, \
                                check_comment_belongs_to_record, \
-                               is_comment_deleted
+                               is_comment_deleted, \
+                               perform_display_your_comments
 
 from invenio.config import \
      CFG_TMPDIR, \
@@ -48,12 +49,15 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_PREFIX, \
+     CFG_SITE_NAME, \
+     CFG_SITE_NAME_INTL, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS, \
      CFG_SITE_RECORD, \
      CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
-     CFG_WEBCOMMENT_MAX_ATTACHED_FILES
+     CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -859,3 +863,68 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
                     body=_('The requested file could not be found'),
                     req=req,
                     language=argd['ln'])
+
+class WebInterfaceYourCommentsPages(WebInterfaceDirectory):
+    """Defines the set of /yourcomments pages."""
+
+    _exports = ['', ]
+
+    def index(self, req, form):
+        """Index page."""
+
+        argd = wash_urlargd(form, {'page': (int, 1),
+                                   'format': (str, "rc"),
+                                   'order_by': (str, "lcf"),
+                                   'per_page': (str, "all"),
+                                   })
+        # TODO: support also "reviews", by adding  new option to show/hide them if needed
+        uid = getUid(req)
+
+        # load the right language
+        _ = gettext_set_language(argd['ln'])
+
+        # Is site ready to accept comments?
+        if not CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/yourcomments" % \
+                                             (CFG_SITE_SECURE_URL,),
+                                       text="Comments are currently disabled on this site",
+                                       navmenuid="yourcomments")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/yourcomments%s" % (
+                        CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_sendcomments']:
+            # Maybe we should still authorize if user submitted
+            # comments in the past?
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use comments."))
+
+        return page(title=_("Your Comments"),
+                    body=perform_display_your_comments(user_info,
+                                                       page_number=argd['page'],
+                                                       selected_order_by_option=argd['order_by'],
+                                                       selected_display_number_option=argd['per_page'],
+                                                       selected_display_format_option=argd['format'],
+                                                       ln=argd['ln']),
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                 'ln': argd['ln'],
+                                 'account' : _("Your Account"),
+                              },
+                    description=_("%s View your previously submitted comments") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    uid=uid,
+                    language=argd['ln'],
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='youralerts',
+                    secure_page_p=1)
+
+    # Return the same page wether we ask for /CFG_SITE_RECORD/123 or /CFG_SITE_RECORD/123/
+    __call__ = index

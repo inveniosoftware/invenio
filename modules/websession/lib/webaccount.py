@@ -102,7 +102,7 @@ def perform_youradminactivities(user_info, ln):
              activities = your_admin_activities,
            )
 
-def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, ln):
+def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, ln, comments):
     """Display a dynamic page that shows the user's account."""
 
     # load the right message language
@@ -118,7 +118,7 @@ def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, s
             {'x_url_open': '<a href="' + login + '">',
              'x_url_close': '</a>'}
         accBody += "<br /><br />"
-        bask=aler=msgs= _("The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%(x_url_close)s first") %\
+        bask=aler=msgs=comments= _("The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%(x_url_close)s first") %\
             {'x_fmt_open': '<strong class="headline">',
              'x_fmt_close': '</strong>',
              'x_url_open': '<a href="' + login + '">',
@@ -158,7 +158,8 @@ def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, s
              submissions = sbms,
              approvals = appr,
              tickets = tickets,
-             administrative = admn
+             administrative = admn,
+             comments = comments,
            )
 
 def superuser_account_warnings():

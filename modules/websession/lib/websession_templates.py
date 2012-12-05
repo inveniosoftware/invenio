@@ -559,6 +559,14 @@ class Template:
         'your_baskets' : _("Your Baskets"),
         'basket_explain' : _("With baskets you can define specific collections of items, store interesting records you want to access later or share with others."),
         }
+        if not guest:
+            out += """
+            <dt><a href="../yourcomments/?ln=%(ln)s">%(your_comments)s</a></dt>
+            <dd>%(comments_explain)s""" % {
+            'ln' : ln,
+            'your_comments' : _("Your Comments"),
+            'comments_explain' : _("Display all the comments you have submitted so far."),
+            }
         if guest and CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
             out += self.tmpl_warning_guest_user(ln = ln, type = "baskets")
         out += """</dd>
@@ -661,7 +669,7 @@ class Template:
                           </table>""" % (url, title, body)
         return out
 
-    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, submissions, approvals, tickets, administrative):
+    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, submissions, approvals, tickets, administrative, comments):
         """
         Displays the your account page
 
@@ -686,6 +694,9 @@ class Template:
           - 'approvals' *string* - The body of the approvals block
 
           - 'administrative' *string* - The body of the administrative block
+
+          - 'comments' *string* - The body of the comments block
+
         """
 
         # load the right message language
@@ -706,6 +717,11 @@ class Template:
         if baskets:
             out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
 
+        if comments:
+            comments_description = _("You can consult the list of %(x_url_open)syour comments%(x_url_close)s submitted so far.")
+            comments_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourcomments/?ln=' + ln + '">',
+                                     'x_url_close': '</a>'}
+            out += self.tmpl_account_template(_("Your Comments"), comments_description, ln, '/yourcomments/?ln=%s' % ln)
         if alerts:
             out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
 
@@ -1293,7 +1309,7 @@ class Template:
                 }
         return out
 
-    def tmpl_create_useractivities_menu(self, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
+    def tmpl_create_useractivities_menu(self, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats, usecomments):
         """
         Returns the main navigation menu with actions based on user's
         priviledges
@@ -1326,6 +1342,8 @@ class Template:
         @type useloans:     boolean
         @param usestats:    If stats are enabled for the user
         @type usestats:     boolean
+        @param usecomments: If comments are enabled for the user
+        @type usecomments:  boolean
         @return: html menu of the user activities
         @rtype: string
         """
@@ -1364,6 +1382,12 @@ class Template:
                 'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
                 'ln' : ln,
                 'baskets' : _('Your baskets')
+                }
+        if usecomments:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yourcomments?ln=%(ln)s">%(comments)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'comments' : _('Your comments')
                 }
         if usegroups:
             out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yourgroups/display?ln=%(ln)s">%(groups)s</a></li>'  % {

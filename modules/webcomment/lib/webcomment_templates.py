@@ -2,7 +2,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,10 +44,11 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_RECORD, \
                            CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
                            CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE
-from invenio.htmlutils import get_html_text_editor
+from invenio.htmlutils import get_html_text_editor, create_html_select
 from invenio.messages import gettext_set_language
 from invenio.bibformat import format_record
 from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_admin import acc_get_user_roles_from_user_info, acc_get_role_id
 from invenio.search_engine_utils import get_fieldvalues
 
 class Template:
@@ -2293,5 +2294,243 @@ class Template:
         //]]></script>
         ''' % {'message': _('Your comment will be lost.').replace('"', '\\"'),
                'name': 'msg'}
+
+        return out
+
+    def tmpl_your_comments(self, user_info, comments, page_number=1, selected_order_by_option="lcf", selected_display_number_option="all", selected_display_format_option="rc", nb_total_results=0, nb_total_pages=0, ln=CFG_SITE_LANG):
+        """
+        Display all submitted comments by the user
+
+        @param user_info: standard user info object.
+        @param comments: ordered list of tuples (id_bibrec, comid, date_creation, body, status, in_reply_to_id_cmtRECORDCOMMENT)
+        @param page_number: page on which the user is.
+        @type page_number: integer
+        @param selected_order_by_option: seleccted ordering option. Can be one of:
+              - ocf: Oldest comment first
+              - lcf: Latest comment first
+              - grof: Group by record, oldest commented first
+              - grlf: Group by record, latest commented first
+        @type selected_order_by_option: string
+        @param selected_display_number_option: number of results to show per page. Can be a string-digit or 'all'.
+        @type selected_display_number_option: string
+        @param selected_display_format_option: how to show records. Can be one of:
+              - rc: Records and comments
+              - ro: Records only
+              - co: Comments only
+        @type selected_display_format_option: string
+        @param nb_total_results: total number of items to display.
+        @type nb_total_results: integer
+        @param nb_total_pages: total number of pages.
+        @type nb_total_pages: integer
+        @ln: language
+        @type ln: string
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        your_comments_order_by_options = (('ocf', _("Oldest comment first")),
+                                          ('lcf', _("Latest comment first")),
+                                          ('grof', _("Group by record, oldest commented first")),
+                                          ('grlf', _("Group by record, latest commented first")),
+                                          )
+        your_comments_display_format_options = (('rc', _("Records and comments")),
+                                                ('ro', _('Records only')),
+                                                ('co', _('Comments only')),
+                                                )
+        your_comments_display_number_options = (('20', _("%s items") % 20),
+                                                ('50', _("%s items") % 50),
+                                                ('100', _("%s items") % 100),
+                                                ('500',_("%s items") % 500),
+                                                ('all', _('All items')),
+                                                )
+        out = ""
+        out += _("Below is the list of the comments you have submitted so far.") + "<br/>"
+
+        if CFG_CERN_SITE:
+            if nb_total_results == 0:
+                out =  _('You have not yet submitted any comment in the document "discussion" tab.') + "<br/>"
+            user_roles = acc_get_user_roles_from_user_info(user_info)
+            if acc_get_role_id('ATLASDraftPublication') in user_roles:
+                out += _('You might find other comments here: ')
+                out += create_html_link(urlbase=CFG_SITE_URL + '/search',
+                                        urlargd={'ln': ln,
+                                                 'cc': 'ATLAS Publication Drafts Comments',
+                                                 'p': user_info['email'],
+                                                 'f': '859__f'},
+                                        link_label='ATLAS Publication Drafts Comments')
+            elif acc_get_role_id('cmsphysicsmembers') in user_roles:
+                out += _('You might find other comments here: ')
+                out += create_html_link(urlbase=CFG_SITE_URL + '/search',
+                                        urlargd={'ln': ln,
+                                                 'cc': '',
+                                                 'p': user_info['email'],
+                                                 'f': '859__f'},
+                                        link_label='CMS Publication Drafts Comments')
+            elif acc_get_role_id('LHCbDraftPublication') in user_roles:
+                out += _('You might find other comments here: ')
+                out += create_html_link(urlbase=CFG_SITE_URL + '/search',
+                                        urlargd={'ln': ln,
+                                                 'cc': '',
+                                                 'p': user_info['email'],
+                                                 'f': '859__f'},
+                                        link_label='LHCb Publication Drafts Comments')
+            out += '<br/>'
+            if nb_total_results == 0:
+                return out
+        else:
+            if nb_total_results == 0:
+                return _("You have not yet submitted any comment. Browse documents from the search interface and take part to discussions!")
+
+
+
+        # Show controls
+        format_selection = create_html_select(your_comments_display_format_options,
+                                              name="format", selected=selected_display_format_option,
+                                              attrs={'id': 'format',
+                                                     'onchange': 'this.form.submit();'})
+        order_by_selection = create_html_select(your_comments_order_by_options,
+                                                name="order_by", selected=selected_order_by_option,
+                                                attrs={'id': 'order_by',
+                                                       'onchange': 'this.form.submit();'})
+        nb_per_page_selection = create_html_select(your_comments_display_number_options,
+                                                   name="per_page", selected=selected_display_number_option,
+                                                   attrs={'id': 'per_page',
+                                                          'onchange': 'this.form.submit();'})
+
+        out += '''
+        <form method="get" class="yourcommentsdisplayoptionsform">
+        <fieldset id="yourcommentsdisplayoptions">
+        <legend>%(display_option_label)s:</legend>
+        <label for="format">%(format_selection_label)s :</label> %(format_selection)s
+        <label for="order_by">%(order_selection_label)s :</label> %(order_by_selection)s
+        <label for="per_page">%(per_page_selection_label)s :</label> %(nb_per_page_selection)s
+        <noscript><input type="submit" value="%(refresh_label)s" class="formbutton"/></noscript>
+        </fieldset>
+        </form>
+        ''' % {'format_selection_label': _("Display"),
+               'order_selection_label': _("Order by"),
+               'per_page_selection_label': _("Per page"),
+               'format_selection': format_selection,
+               'order_by_selection': order_by_selection,
+               'nb_per_page_selection': nb_per_page_selection,
+               'display_option_label': _("Display options"),
+               'refresh_label': _("Refresh"),
+               }
+
+        # Show comments
+        last_id_bibrec = None
+        nb_record_groups = 0
+        out += '<div id="yourcommentsmaincontent">'
+        for id_bibrec, comid, date_creation, body, status, in_reply_to_id_cmtRECORDCOMMENT in comments:
+            if last_id_bibrec != id_bibrec and selected_display_format_option in ('rc', 'ro'):
+                # We moved to another record. Show some info about
+                # current record.
+                if last_id_bibrec:
+                    # Close previous group
+                    out += "</div></div>"
+                    nb_record_groups += 1
+                #You might want to hide this information if user does
+                #not have access, though it would make sense that he
+                #can at least know on which page is comment appears..
+                out += '''<div class="yourcommentsrecordgroup" id="yourcomments-record-group-%(recid)s">
+                <div class="yourcommentsrecordgroup%(recid)sheader">&#149; ''' % {'recid': id_bibrec} + \
+                       format_record(id_bibrec, of="HS") + '</div><div style="padding-left: 20px;">'
+            if selected_display_format_option != 'ro':
+
+                final_body = email_quoted_txt2html(body)
+                title = '<a name="C%s" id="C%s"></a>' % (comid, comid)
+                if status == "dm":
+                    final_body = '<div class="webcomment_deleted_comment_message">%s</div>' % _("Comment deleted by the moderator")
+                elif status == "da":
+                    final_body = ('<div class="webcomment_deleted_comment_message">%s<br /><br />' % _("You have deleted this comment: it is not visible by other users")) +\
+                                 final_body + '</div>'
+                links = []
+                if in_reply_to_id_cmtRECORDCOMMENT:
+                    links.append(create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
+                                                  str(id_bibrec) + '/comments/',
+                                                  urlargd={'ln': ln},
+                                                  link_label=_('(in reply to a comment)'),
+                                                  urlhash=str(in_reply_to_id_cmtRECORDCOMMENT)))
+                links.append(create_html_link(urlbase=CFG_SITE_URL + '/'+ CFG_SITE_RECORD +'/' + \
+                                              str(id_bibrec) + '/comments/',
+                                              urlargd={'ln': ln},
+                                              link_label=_('See comment on discussion page'),
+                                              urlhash='C' + str(comid)))
+                out += '''
+        <div class="webcomment_comment_box">
+            <div class="webcomment_comment_avatar"><img class="webcomment_comment_avatar_default" src="%(site_url)s/img/user-icon-1-24x24.gif" alt="avatar" /></div>
+            <div class="webcomment_comment_content">
+                <div class="webcomment_comment_title">
+                    %(title)s
+                    <div class="webcomment_comment_date">%(date)s</div>
+                    <a class="webcomment_permalink" title="Permalink to this comment" href="#C%(comid)i">¶</a>
+                </div>
+                <div class="collapsible_content">
+                    <blockquote>
+                %(body)s
+                    </blockquote>
+                <div class="webcomment_comment_options">%(links)s</div>
+                </div>
+                <div class="clearer"></div>
+            </div>
+            <div class="clearer"></div>
+        </div>''' % \
+                        {'title'     : title,
+                         'body'      : final_body,
+                         'links'     : " ".join(links),
+                         'date'      : date_creation,
+                         'site_url'  : CFG_SITE_URL,
+                         'comid'     : comid,
+                         }
+
+            last_id_bibrec = id_bibrec
+
+        out += '</div>' # end 'yourcommentsmaincontent'
+
+        # Show page navigation
+        page_links = ''
+        if selected_display_format_option == 'ro' and \
+               selected_order_by_option in ('ocf', 'lcf'):
+            # We just have an approximation here (we count by
+            # comments, not record...)
+            page_links += (_("%i comments found in total (not shown on this page)") % nb_total_results) + '&nbsp;'
+        else:
+            page_links += (_("%i items found in total") % nb_total_results) + '&nbsp;'
+        if selected_display_number_option != 'all':
+            # Previous
+            if page_number != 1:
+                page_links += create_html_link(CFG_SITE_URL + '/yourcomments/',
+                                               {'page': page_number - 1,
+                                                'order_by': selected_order_by_option,
+                                                'per_page': selected_display_number_option,
+                                                'format': selected_display_format_option,
+                                                'ln': ln},
+                                               _("Previous"))
+            # Page Numbers
+            for i in range(1, nb_total_pages + 1):
+                if i != page_number:
+                    page_links += '&nbsp;&nbsp;' + \
+                                  create_html_link(CFG_SITE_URL + '/yourcomments/',
+                                                   {'page': i,
+                                                    'order_by': selected_order_by_option,
+                                                    'per_page': selected_display_number_option,
+                                                    'format': selected_display_format_option,
+                                                    'ln': ln},
+                                                   str(i)) + \
+                                                   '&nbsp;&nbsp;'
+
+                elif nb_total_pages > 1:
+                    page_links += '''&nbsp;&nbsp;<b>%s</b>&nbsp;&nbsp;''' % i
+            # Next
+            if page_number != nb_total_pages:
+                page_links += create_html_link(CFG_SITE_URL + '/yourcomments/',
+                                               {'page': page_number + 1,
+                                                'order_by': selected_order_by_option,
+                                                'per_page': selected_display_number_option,
+                                                'format': selected_display_format_option,
+                                                'ln': ln},
+                                               _("Next"))
+
+        out += '<br/><div id="yourcommentsnavigationlinks">' + page_links + '</div>'
 
         return out
