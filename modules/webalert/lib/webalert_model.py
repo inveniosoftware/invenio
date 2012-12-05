@@ -26,24 +26,23 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from websession_model import User
-from webbasket_model import BskBASKET
-from websearch_model import WebQuery
+from invenio.websession_model import User
+from invenio.webbasket_model import BskBASKET
+from invenio.websearch_model import WebQuery
+
 
 class UserQueryBasket(db.Model):
     """Represents a UserQueryBasket record."""
-    def __init__(self):
-        pass
     __tablename__ = 'user_query_basket'
-    id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
-                nullable=False, 
-            server_default='0', primary_key=True)
-    id_query = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(WebQuery.id),
-                nullable=False, 
-            server_default='0', primary_key=True,
+    id_user = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(User.id), nullable=False,
+                server_default='0', primary_key=True)
+    id_query = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(WebQuery.id), nullable=False,
+                server_default='0', primary_key=True,
                 index=True)
     id_basket = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(BskBASKET.id),
-                nullable=False, 
+                nullable=False,
             server_default='0', primary_key=True,
                 index=True)
     frequency = db.Column(db.String(5), nullable=False, server_default='',
@@ -52,12 +51,14 @@ class UserQueryBasket(db.Model):
     date_lastrun = db.Column(db.Date, nullable=True,
                 server_default='0001-01-01')
     alert_name = db.Column(db.String(30), nullable=False,
-                server_default='',
-            index=True)
+                server_default='', index=True)
+    alert_desc = db.Column(db.Text)
+    alert_recipient = db.Column(db.Text)
     notification = db.Column(db.Char(1), nullable=False,
                 server_default='y')
     user = db.relationship(User, backref='query_baskets')
     webquery = db.relationship(WebQuery, backref='user_baskets')
     basket = db.relationship(BskBASKET, backref='user_queries')
+
 
 __all__ = ['UserQueryBasket']

@@ -33,15 +33,15 @@ class Bibdocfsinfo(db.Model):
 
     id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
                     db.ForeignKey(Bibdoc.id), primary_key=True,
-                    nullable=False)
+                    nullable=False, autoincrement=False)
     version = db.Column(db.TinyInteger(4, unsigned=True), primary_key=True,
-                    nullable=False)
+                    nullable=False, autoincrement=False)
     format = db.Column(db.String(50), primary_key=True, nullable=False,
                     index=True)
     last_version = db.Column(db.Boolean, nullable=False, index=True)
     cd = db.Column(db.DateTime, nullable=False, index=True)
     md = db.Column(db.DateTime, nullable=False, index=True)
-    checksum = db.Column(db.String(32), nullable=False)
+    checksum = db.Column(db.Char(32), nullable=False)
     filesize = db.Column(db.BigInteger(15, unsigned=True), nullable=False,
                     index=True)
     mime = db.Column(db.String(100), nullable=False, index=True)

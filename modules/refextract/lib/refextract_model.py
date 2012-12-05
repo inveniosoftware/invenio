@@ -33,7 +33,7 @@ class XtrJOB(db.Model):
 
     __tablename__ = 'xtrJOB'
 
-    id = db.Column(db.Integer(4), primary_key=True, nullable=False)
+    id = db.Column(db.TinyInteger(4), primary_key=True, nullable=False)
     name = db.Column(db.String(30), nullable=False)
     last_updated = db.Column(db.DateTime, nullable=False)
 

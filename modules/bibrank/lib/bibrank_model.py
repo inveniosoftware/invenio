@@ -26,8 +26,8 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from websession_model import User
-from bibedit_model import Bibrec, Bibdoc
+from invenio.websession_model import User
+from invenio.bibedit_model import Bibrec, Bibdoc
 
 class RnkMETHOD(db.Model):
     """Represents a RnkMETHOD record."""
@@ -142,37 +142,34 @@ class RnkPAGEVIEWS(db.Model):
     bibrec = db.relationship(Bibrec, backref='pageviews')
     user = db.relationship(User, backref='pageviews')
 
+
 class RnkWORD01F(db.Model):
     """Represents a RnkWORD01F record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkWORD01F'
     id = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
-    term = db.Column(db.String(50), nullable=True)
+                primary_key=True, autoincrement=True)
+    term = db.Column(db.String(50), nullable=True, unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
+
 
 class RnkWORD01R(db.Model):
     """Represents a RnkWORD01R record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkWORD01R'
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=False, primary_key=True)
     termlist = db.Column(db.iLargeBinary, nullable=True)
     type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
-                nullable=False,
-            server_default='CURRENT', primary_key=True)
+                nullable=False, server_default='CURRENT', primary_key=True)
     bibrec = db.relationship(Bibrec, backref='word01rs')
 
 
 class RnkEXTENDEDAUTHORS(db.Model):
     """Represents a RnkEXTENDEDAUTHORS record."""
     __tablename__ = 'rnkEXTENDEDAUTHORS'
-
-    id = db.Column(db.Integer(10, unsigned=True), primary_key=True, nullable=False)
-    authorid = db.Column(db.BigInteger(10), primary_key=True, nullable=False)
+    id = db.Column(db.Integer(10, unsigned=True), primary_key=True,
+                nullable=False, autoincrement=False)
+    authorid = db.Column(db.BigInteger(10), primary_key=True, nullable=False,
+                autoincrement=False)
 
 
 class RnkRECORDSCACHE(db.Model):

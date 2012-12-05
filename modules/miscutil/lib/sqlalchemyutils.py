@@ -127,14 +127,13 @@ def _include_sqlalchemy(obj, engine=None):
     #            setattr(obj, key,
     #                    getattr(module, key))
 
-    #if engine == 'mysql':
-    #    from sqlalchemy.dialects import mysql as engine_types
-    #else:
-    #    from sqlalchemy import types as engine_types
-
-    from sqlalchemy.dialects import mysql as engine_types
+    if engine == 'mysql':
+        from sqlalchemy.dialects import mysql as engine_types
+    else:
+        from sqlalchemy import types as engine_types
 
     setattr(obj, 'Char', engine_types.CHAR)
+    setattr(obj, 'TinyText', engine_types.TINYTEXT)
     setattr(obj, 'hybrid_property', hybrid_property)
     setattr(obj, 'Double', engine_types.DOUBLE)
     setattr(obj, 'Integer', engine_types.INTEGER)
@@ -147,8 +146,8 @@ def _include_sqlalchemy(obj, engine=None):
     setattr(obj, 'iLargeBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iMediumBinary', sqlalchemy.types.LargeBinary)
 
-    #if engine == 'mysql':
-    #    import invenio.sqlalchemyutils_mysql
+    if engine == 'mysql':
+        import invenio.sqlalchemyutils_mysql
     #    module = invenio.sqlalchemyutils_mysql
     #    for key in module.__dict__:
     #        setattr(obj, key,
@@ -223,7 +222,8 @@ class InvenioDB(SQLAlchemy):
         self.Model.__iter__ = iterfunc
         #if engine == 'mysql':
         self.Model.__table_args__ = {
-            'extend_existing':  True,
+            'keep_existing':    True,
+            'extend_existing':  False,
             'mysql_engine':     'MyISAM',
             'mysql_charset':    'utf8'
             }

@@ -46,13 +46,13 @@ class Bibfmt(db.Model):
     def __init__(self):
         pass
     __tablename__ = 'bibfmt'
-    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), db.ForeignKey(Bibrec.id),
-                nullable=False, server_default='0', primary_key=True,
-                autoincrement=False)
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id), nullable=False, server_default='0',
+                primary_key=True, autoincrement=False)
     format = db.Column(db.String(10), nullable=False,
-                server_default='', primary_key=True)
+                server_default='', primary_key=True, index=True)
     last_updated = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00', index=True)
     value = db.Column(db.iLargeBinary)
     bibrec = db.relationship(Bibrec, backref='bibfmt')
 
@@ -64,7 +64,7 @@ class BibHOLDINGPEN(db.Model):
     changeset_id = db.Column(db.Integer(11), primary_key=True,
                 autoincrement=True)
     changeset_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00', index=True)
     changeset_xml = db.Column(db.Text, nullable=False)
     oai_id = db.Column(db.String(40), nullable=False,
                 server_default='')
@@ -131,24 +131,24 @@ class HstDOCUMENT(db.Model):
         pass
     __tablename__ = 'hstDOCUMENT'
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
-                nullable=False,
-                autoincrement=True)
-    id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
-                primary_key=True)
-    docname = db.Column(db.String(250), nullable=False)
-    docformat = db.Column(db.String(50), nullable=False)
+                nullable=False, autoincrement=True)
+    id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(Bibdoc.id), primary_key=True, nullable=False,
+                autoincrement=False)
+    docname = db.Column(db.String(250), nullable=False, index=True)
+    docformat = db.Column(db.String(50), nullable=False, index=True)
     docversion = db.Column(db.TinyInteger(4, unsigned=True),
                 nullable=False)
     docsize = db.Column(db.BigInteger(15, unsigned=True),
                 nullable=False)
     docchecksum = db.Column(db.Char(32), nullable=False)
-    doctimestamp = db.Column(db.DateTime, nullable=False)
-    action = db.Column(db.String(50), nullable=False)
+    doctimestamp = db.Column(db.DateTime, nullable=False, index=True)
+    action = db.Column(db.String(50), nullable=False, index=True)
     job_id = db.Column(db.MediumInteger(15, unsigned=True),
-                nullable=True)
-    job_name = db.Column(db.String(255), nullable=True)
-    job_person = db.Column(db.String(255), nullable=True)
-    job_date = db.Column(db.DateTime, nullable=True)
+                nullable=True, index=True)
+    job_name = db.Column(db.String(255), nullable=True, index=True)
+    job_person = db.Column(db.String(255), nullable=True, index=True)
+    job_date = db.Column(db.DateTime, nullable=True, index=True)
     job_details = db.Column(db.iBinary, nullable=True)
 
 class HstRECORD(db.Model):
@@ -157,16 +157,16 @@ class HstRECORD(db.Model):
         pass
     __tablename__ = 'hstRECORD'
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
-                nullable=False,
-                autoincrement=True)
-    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), nullable=False,
-                primary_key=True)
+                nullable=False, autoincrement=True)
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id), autoincrement=False,
+                nullable=False, primary_key=True)
     marcxml = db.Column(db.iBinary, nullable=False)
     job_id = db.Column(db.MediumInteger(15, unsigned=True),
-                nullable=False)
-    job_name = db.Column(db.String(255), nullable=False)
-    job_person = db.Column(db.String(255), nullable=False)
-    job_date = db.Column(db.DateTime, nullable=False)
+                nullable=False, index=True)
+    job_name = db.Column(db.String(255), nullable=False, index=True)
+    job_person = db.Column(db.String(255), nullable=False, index=True)
+    job_date = db.Column(db.DateTime, nullable=False, index=True)
     job_details = db.Column(db.iBinary, nullable=False)
 
 

@@ -36,7 +36,7 @@ class SwrREMOTESERVER(db.Model):
     __tablename__ = 'swrREMOTESERVER'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
     host = db.Column(db.String(50), nullable=False)
     username = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)

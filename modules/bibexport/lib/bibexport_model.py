@@ -26,56 +26,48 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from websession_model import User
+from invenio.websession_model import User
 
 class ExpJOB(db.Model):
     """Represents a ExpJOB record."""
-    def __init__(self):
-        pass
     __tablename__ = 'expJOB'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
+                primary_key=True, autoincrement=True)
     jobname = db.Column(db.String(50), nullable=False,
-                server_default='')
+                server_default='', unique=True)
     jobfreq = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     output_format = db.Column(db.MediumInteger(12),
-                nullable=False,
-                           server_default='0')
+                nullable=False, server_default='0')
     deleted = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     lastrun = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     output_directory = db.Column(db.Text, nullable=True)
     #users = db.relationship(User, secondary=UserExpJOB.__table__,
     #            backref='jobs')
 
 class UserExpJOB(db.Model):
     """Represents a UserExpJOB record."""
-    def __init__(self):
-        pass
     __tablename__ = 'user_expJOB'
     id_user = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(User.id),
-                nullable=False,
-                primary_key=True)
-    id_expJOB = db.Column(db.Integer(15), db.ForeignKey(ExpJOB.id),
-                nullable=False,
-                primary_key=True)
+                nullable=False, primary_key=True)
+    id_expJOB = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(ExpJOB.id),
+                nullable=False, primary_key=True)
 
 class ExpJOBRESULT(db.Model):
     """Represents a ExpJOBRESULT record."""
-    def __init__(self):
-        pass
     __tablename__ = 'expJOBRESULT'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True,
                 autoincrement=True)
-    id_expJOB = db.Column(db.Integer(15), db.ForeignKey(ExpJOB.id),
+    id_expJOB = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(ExpJOB.id),
                 nullable=False)
     execution_time = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     status = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     status_message = db.Column(db.Text, nullable=False)
@@ -83,8 +75,6 @@ class ExpJOBRESULT(db.Model):
 
 class ExpQUERY(db.Model):
     """Represents a ExpQUERY record."""
-    def __init__(self):
-        pass
     __tablename__ = 'expQUERY'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True, autoincrement=True)
@@ -110,13 +100,12 @@ class ExpJOBExpQUERY(db.Model):
 
 class ExpQUERYRESULT(db.Model):
     """Represents a ExpQUERYRESULT record."""
-    def __init__(self):
-        pass
     __tablename__ = 'expQUERYRESULT'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True,
                 autoincrement=True)
-    id_expQUERY = db.Column(db.Integer(15), db.ForeignKey(ExpQUERY.id),
+    id_expQUERY = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(ExpQUERY.id),
                 nullable=False)
     result = db.Column(db.Text, nullable=False)
     status = db.Column(db.MediumInteger(12), nullable=False,
@@ -130,9 +119,11 @@ class ExpQUERYRESULT(db.Model):
 class ExpJOBRESULTExpQUERYRESULT(db.Model):
     """Represents a ExpJOBRESULTExpQUERYRESULT record."""
     __tablename__ = 'expJOBRESULT_expQUERYRESULT'
-    id_expJOBRESULT = db.Column(db.Integer(15), db.ForeignKey(ExpJOBRESULT.id),
+    id_expJOBRESULT = db.Column(db.Integer(15, unsigned=True),
+            db.ForeignKey(ExpJOBRESULT.id),
             nullable=False, primary_key=True)
-    id_expQUERYRESULT = db.Column(db.Integer(15), db.ForeignKey(ExpQUERYRESULT.id),
+    id_expQUERYRESULT = db.Column(db.Integer(15, unsigned=True),
+            db.ForeignKey(ExpQUERYRESULT.id),
             nullable=False, primary_key=True)
 
 

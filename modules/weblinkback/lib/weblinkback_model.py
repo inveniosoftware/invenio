@@ -25,35 +25,33 @@ WebLinkBack database models.
 from invenio.sqlalchemyutils import db
 
 # Create your models here.
+from invenio.bibedit_model import Bibrec
+from invenio.websession_model import User
 
 class LnkADMINURL(db.Model):
     """Represents a LnkADMINURL record."""
     __tablename__ = 'lnkADMINURL'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    url = db.Column(db.String(100), nullable=False)
-    list = db.Column(db.String(30), nullable=False)
-
-
-class LnkADMINURLLOG(db.Model):
-    """Represents a LnkADMINURLLOG record."""
-    __tablename__ = 'lnkADMINURLLOG'
-
-    id_lnkADMINURL = db.Column(db.Integer, nullable=False, primary_key=True)
-    id_lnkLOG = db.Column(db.Integer, nullable=False, primary_key=True)
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                nullable=False)
+    url = db.Column(db.String(100), nullable=False, unique=True)
+    list = db.Column(db.String(30), nullable=False, index=True)
 
 
 class LnkENTRY(db.Model):
     """Represents a LnkENTRY record."""
     __tablename__ = 'lnkENTRY'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True, nullable=False)
     origin_url = db.Column(db.String(100), nullable=False)
-    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), nullable=False)
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id), nullable=False)
     additional_properties = db.Column(db.Binary)
-    type = db.Column(db.String(30), nullable=False)
-    status = db.Column(db.String(30), nullable=False)
-    insert_time = db.Column(db.DateTime)
+    type = db.Column(db.String(30), nullable=False, index=True)
+    status = db.Column(db.String(30), nullable=False, server_default='PENDING',
+                index=True)
+    insert_time = db.Column(db.DateTime, server_default='0001-01-01 00:00:00',
+                index=True)
 
     @property
     def title(self):
@@ -67,34 +65,50 @@ class LnkENTRY(db.Model):
             return self.origin_url
 
 
-class LnkENTRYLOG(db.Model):
-    """Represents a LnkENTRYLOG record."""
-    __tablename__ = 'lnkENTRYLOG'
-
-    id_lnkENTRY = db.Column(db.Integer, nullable=False, primary_key=True)
-    id_lnkLOG = db.Column(db.Integer, nullable=False, primary_key=True)
-
-
 class LnkENTRYURLTITLE(db.Model):
     """Represents a LnkENTRYURLTITLE record."""
     __tablename__ = 'lnkENTRYURLTITLE'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    url = db.Column(db.String(100), nullable=False)
-    title = db.Column(db.String(100), nullable=False)
-    manual_set = db.Column(db.Integer, nullable=False)
-    broken_count = db.Column(db.Integer)
-    broken = db.Column(db.Integer, nullable=False)
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                nullable=False)
+    url = db.Column(db.String(100), nullable=False, unique=True)
+    title = db.Column(db.String(100), nullable=False, index=True)
+    manual_set = db.Column(db.TinyInteger(1), nullable=False,
+                server_default='0')
+    broken_count = db.Column(db.Integer(5), server_default='0')
+    broken = db.Column(db.TinyInteger(1), nullable=False, server_default='0')
 
 
 class LnkLOG(db.Model):
     """Represents a LnkLOG record."""
     __tablename__ = 'lnkLOG'
 
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    id_user = db.Column(db.Integer)
-    action = db.Column(db.String(30), nullable=False)
-    log_time = db.Column(db.DateTime)
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True, nullable=False)
+    id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id))
+    action = db.Column(db.String(30), nullable=False, index=True)
+    log_time = db.Column(db.DateTime, server_default='0001-01-01 00:00:00',
+                index=True)
+
+
+class LnkENTRYLOG(db.Model):
+    """Represents a LnkENTRYLOG record."""
+    __tablename__ = 'lnkENTRYLOG'
+
+    id_lnkENTRY = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(LnkENTRY.id), nullable=False, primary_key=True)
+    id_lnkLOG = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(LnkLOG.id), nullable=False, primary_key=True)
+
+
+class LnkADMINURLLOG(db.Model):
+    """Represents a LnkADMINURLLOG record."""
+    __tablename__ = 'lnkADMINURLLOG'
+
+    id_lnkADMINURL = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(LnkADMINURL.id), primary_key=True, nullable=False)
+    id_lnkLOG = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(LnkLOG.id), primary_key=True, nullable=False)
+
 
 __all__ = [ 'LnkADMINURL',
             'LnkADMINURLLOG',

@@ -26,22 +26,19 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from bibsched_model import SchTASK
+from invenio.bibsched_model import SchTASK
 
 class HstBATCHUPLOAD(db.Model):
     """Represents a HstBATCHUPLOAD record."""
-    def __init__(self):
-        pass
     __tablename__ = 'hstBATCHUPLOAD'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
-    user = db.Column(db.String(50), nullable=False)
+                primary_key=True, autoincrement=True)
+    user = db.Column(db.String(50), nullable=False, index=True)
     submitdate = db.Column(db.DateTime, nullable=False)
     filename = db.Column(db.String(255), nullable=False)
     execdate = db.Column(db.DateTime, nullable=False)
-    id_schTASK = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(SchTASK.id),
-                nullable=False)
+    id_schTASK = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(SchTASK.id), nullable=False)
     batch_mode = db.Column(db.String(15), nullable=False)
     task = db.relationship(SchTASK, backref='batchuploads')
 

@@ -49,7 +49,8 @@ class AccARGUMENT(db.Model):
                 autoincrement=True)
     keyword = db.Column(db.String(32), nullable=True)
     value = db.Column(db.String(255), nullable=True)
-    #FIX __table_args__ = (db.Index('KEYVAL', keyword, value), {})
+    __table_args__ = (db.Index('KEYVAL', keyword, value),
+                      db.Model.__table_args__)
 
 class AccMAILCOOKIE(db.Model):
     """Represents a AccMAILCOOKIE record."""
@@ -59,7 +60,7 @@ class AccMAILCOOKIE(db.Model):
                 autoincrement=True)
     data = db.Column(db.iBinary, nullable=False)
     expiration = db.Column(db.DateTime, nullable=False,
-            server_default='9999-12-31 23:59:59',
+                server_default='9999-12-31 23:59:59',
                 index=True)
     kind = db.Column(db.String(32), nullable=False)
     onetime = db.Column(db.TinyInteger(1), nullable=False,

@@ -37,9 +37,12 @@ from sqlalchemy.orm.collections import mapped_collection, \
 from sqlalchemy.orm.collections import collection
 from invenio.intbitset import intbitset
 from sqlalchemy.ext.orderinglist import ordering_list
+
 # Create your models here.
 
 from invenio.websession_model import User
+from invenio.bibclassify_model import ClsMETHOD
+from invenio.bibrank_model import RnkMETHOD
 
 
 class IntbitsetPickle(object):
@@ -376,7 +379,7 @@ class Collectionname(db.Model):
             nullable=False, primary_key=True)
     ln = db.Column(db.Char(5), nullable=False, primary_key=True,
                 server_default='')
-    type = db.Column(db.Char(5), nullable=False, primary_key=True,
+    type = db.Column(db.Char(3), nullable=False, primary_key=True,
                 server_default='sn')
     value = db.Column(db.String(255), nullable=False)
 
@@ -561,11 +564,13 @@ class Format(db.Model):
                 primary_key=True,
                 autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
-    code = db.Column(db.String(6), nullable=False)
+    code = db.Column(db.String(6), nullable=False, unique=True)
     description = db.Column(db.String(255), server_default='')
     content_type = db.Column(db.String(255), server_default='')
     visibility = db.Column(db.TinyInteger(4), nullable=False,
                 server_default='1')
+    last_updated = db.Column(db.DateTime, nullable=False,
+                server_default='0001-01-01 00:00:00')
 
 class CollectionFormat(db.Model):
     """Represents a CollectionFormat record."""
@@ -606,9 +611,9 @@ class Field(db.Model):
     __tablename__ = 'field'
     id = db.Column(db.MediumInteger(9, unsigned=True),
                 primary_key=True)
-    name = db.Column(db.String(255), unique=True,
+    name = db.Column(db.String(255), nullable=False)
+    code = db.Column(db.String(255), unique=True,
                 nullable=False)
-    code = db.Column(db.String(255), nullable=False)
     #tags = db.relationship('FieldTag',
     #        collection_class=attribute_mapped_collection('score'),
     #        cascade="all, delete-orphan"
@@ -704,7 +709,7 @@ class WebQuery(db.Model):
                 autoincrement=True)
     type = db.Column(db.Char(1), nullable=False,
                 server_default='r')
-    urlargs = db.Column(db.Text, nullable=False)
+    urlargs = db.Column(db.Text(100), nullable=False, index=True)
 
 class UserQuery(db.Model):
     """Represents a UserQuery record."""
@@ -750,8 +755,6 @@ class CollectionFieldFieldvalue(db.Model):
     fieldvalue = db.relationship(Fieldvalue, backref='collection_fields')
 
 
-from bibclassify_model import ClsMETHOD
-
 class CollectionClsMETHOD(db.Model):
     """Represents a Collection_clsMETHOD record."""
     def __init__(self):
@@ -766,7 +769,6 @@ class CollectionClsMETHOD(db.Model):
     collection = db.relationship(Collection, backref='clsMETHODs')
     clsMETHOD = db.relationship(ClsMETHOD, backref='collections')
 
-from bibrank_model import RnkMETHOD
 
 class CollectionRnkMETHOD(db.Model):
     """Represents a CollectionRnkMETHOD record."""

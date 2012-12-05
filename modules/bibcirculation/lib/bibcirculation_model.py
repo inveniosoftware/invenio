@@ -26,7 +26,7 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from bibedit_model import Bibrec
+from invenio.bibedit_model import Bibrec
 
 class CrcBORROWER(db.Model):
     """Represents a CrcBORROWER record."""
@@ -36,10 +36,12 @@ class CrcBORROWER(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True,
                 autoincrement=True)
+    ccid = db.Column(db.Integer(15, unsigned=True), nullable=False,
+                unique=True)
     name = db.Column(db.String(255), nullable=False,
-                server_default='')
+                server_default='', index=True)
     email = db.Column(db.String(255), nullable=False,
-                server_default='')
+                server_default='', index=True)
     phone = db.Column(db.String(60), nullable=True)
     address = db.Column(db.String(60), nullable=True)
     mailbox = db.Column(db.String(30), nullable=True)
@@ -77,11 +79,11 @@ class CrcITEM(db.Model):
                 server_default='',
                      primary_key=True)
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
-                nullable=False,
-                       server_default='0')
+                db.ForeignKey(Bibrec.id), nullable=False,
+                server_default='0')
     id_crcLIBRARY = db.Column(db.Integer(15, unsigned=True),
-                nullable=False,
-                           server_default='0')
+                db.ForeignKey(CrcLIBRARY.id), nullable=False,
+                server_default='0')
     collection = db.Column(db.String(60), nullable=True)
     location = db.Column(db.String(60), nullable=True)
     description = db.Column(db.String(60), nullable=True)
@@ -89,13 +91,15 @@ class CrcITEM(db.Model):
                 server_default='')
     status = db.Column(db.String(20), nullable=False,
                 server_default='')
+    expected_arrival_date = db.Column(db.String(60), nullable=False,
+                server_default='')
     creation_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     modification_date = db.Column(db.DateTime, nullable=False,
-            server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     number_of_requests = db.Column(db.Integer(3, unsigned=True),
-                nullable=False,
-                                server_default='0')
+                nullable=False,server_default='0')
+
 
 class CrcILLREQUEST(db.Model):
     """Represents a CrcILLREQUEST record."""
@@ -106,34 +110,36 @@ class CrcILLREQUEST(db.Model):
                 primary_key=True,
                 autoincrement=True)
     id_crcBORROWER = db.Column(db.Integer(15, unsigned=True),
-                            db.ForeignKey(CrcBORROWER.id),
+                db.ForeignKey(CrcBORROWER.id),
                 nullable=False,
-                            server_default='0')
+                server_default='0')
     barcode = db.Column(db.String(30), db.ForeignKey(CrcITEM.barcode),
-                 nullable=False,
-                     server_default='')
+                nullable=False,
+                server_default='')
     period_of_interest_from = db.Column(db.DateTime,
                 nullable=False,
-            server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     period_of_interest_to = db.Column(db.DateTime,
                 nullable=False,
-            server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     id_crcLIBRARY = db.Column(db.Integer(15, unsigned=True),
-            db.ForeignKey(CrcLIBRARY.id), nullable=False,
+                db.ForeignKey(CrcLIBRARY.id), nullable=False,
                 server_default='0')
     request_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     expected_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     arrival_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     due_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     return_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     status = db.Column(db.String(20), nullable=False,
                 server_default='')
     cost = db.Column(db.String(30), nullable=False,
+                server_default='')
+    budget_code = db.Column(db.String(60), nullable=False,
                 server_default='')
     item_info = db.Column(db.Text, nullable=True)
     request_type = db.Column(db.Text, nullable=True)

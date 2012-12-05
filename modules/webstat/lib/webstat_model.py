@@ -33,13 +33,12 @@ class StaEVENT(db.Model):
     __tablename__ = 'staEVENT'
     id = db.Column(db.String(255), nullable=False,
                 primary_key=True)
-    number = db.Column(db.SmallInteger(2, unsigned=True,
-                zerofill=True),
-            nullable=False, autoincrement=True, index=True,
+    number = db.Column(db.SmallInteger(2, unsigned=True, zerofill=True),
+                nullable=False, autoincrement=True, primary_key=True,
                 unique=True)
     name = db.Column(db.String(255), nullable=True)
     creation_time = db.Column(db.TIMESTAMP, nullable=False,
-            server_default=db.func.current_timestamp())
+                server_default=db.func.current_timestamp())
     cols = db.Column(db.String(255), nullable=True)
 
 __all__ = ['StaEVENT']

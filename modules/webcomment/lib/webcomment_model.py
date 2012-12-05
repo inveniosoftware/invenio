@@ -51,7 +51,7 @@ class CmtRECORDCOMMENT(db.Model):
                 server_default='0')
     nb_abuse_reports = db.Column(db.Integer(10), nullable=False,
                 server_default='0')
-    status = db.Column(db.Char(2), nullable=False,
+    status = db.Column(db.Char(2), nullable=False, index=True,
                 server_default='ok')
     round_name = db.Column(db.String(255), nullable=False,
                 server_default='')
@@ -59,13 +59,16 @@ class CmtRECORDCOMMENT(db.Model):
                 server_default='')
     in_reply_to_id_cmtRECORDCOMMENT = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(id), nullable=False, server_default='0')
-    reply_order_cached_data = db.Column(db.iBinary,
-                nullable=True)
+    reply_order_cached_data = db.Column(db.Binary, nullable=True)
     bibrec = db.relationship(Bibrec, backref='recordcomments')
     user = db.relationship(User, backref='recordcomments')
     replies = db.relationship('CmtRECORDCOMMENT',
-                                  backref=db.backref('in_reply_to', remote_side=[id])
-                                  )
+                backref=db.backref('in_reply_to', remote_side=[id]))
+
+    __table_args__ = (db.Index('cmtRECORDCOMMENT_reply_order_cached_data',
+                               reply_order_cached_data, mysql_length=[40]),
+                      db.Model.__table_args__)
+
 
 class CmtACTIONHISTORY(db.Model):
     """Represents a CmtACTIONHISTORY record."""
@@ -86,7 +89,7 @@ class CmtACTIONHISTORY(db.Model):
                 nullable=True)
     action_time = db.Column(db.DateTime, nullable=False,
                 server_default='0001-01-01 00:00:00')
-    action_code = db.Column(db.Char(1), nullable=False)
+    action_code = db.Column(db.Char(1), nullable=False, index=True)
     recordcomment = db.relationship(CmtRECORDCOMMENT,
                 backref='actionhistory')
     bibrec = db.relationship(Bibrec)

@@ -28,8 +28,6 @@ from invenio.sqlalchemyutils import db
 
 class SbmACTION(db.Model):
     """Represents a SbmACTION record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmACTION'
     lactname = db.Column(db.Text, nullable=True)
     sactname = db.Column(db.Char(3), nullable=False, server_default='',
@@ -42,8 +40,6 @@ class SbmACTION(db.Model):
 
 class SbmALLFUNCDESCR(db.Model):
     """Represents a SbmALLFUNCDESCR record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmALLFUNCDESCR'
     #FIX ME pk
     function = db.Column(db.String(40), nullable=False, server_default='',
@@ -52,8 +48,6 @@ class SbmALLFUNCDESCR(db.Model):
 
 class SbmAPPROVAL(db.Model):
     """Represents a SbmAPPROVAL record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmAPPROVAL'
     doctype = db.Column(db.String(10), nullable=False,
                 server_default='')
@@ -75,13 +69,11 @@ class SbmAPPROVAL(db.Model):
 
 class SbmCATEGORIES(db.Model):
     """Represents a SbmCATEGORIES record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmCATEGORIES'
     doctype = db.Column(db.String(10), nullable=False, server_default='',
-                primary_key=True)
+                primary_key=True, index=True)
     sname = db.Column(db.String(75), nullable=False, server_default='',
-                primary_key=True)
+                primary_key=True, index=True)
     lname = db.Column(db.String(75), nullable=False,
                 server_default='')
     score = db.Column(db.TinyInteger(3, unsigned=True), nullable=False,
@@ -89,8 +81,6 @@ class SbmCATEGORIES(db.Model):
 
 class SbmCHECKS(db.Model):
     """Represents a SbmCHECKS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmCHECKS'
     chname = db.Column(db.String(15), nullable=False, server_default='',
                 primary_key=True)
@@ -102,8 +92,6 @@ class SbmCHECKS(db.Model):
 
 class SbmCOLLECTION(db.Model):
     """Represents a SbmCOLLECTION record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmCOLLECTION'
     id = db.Column(db.Integer(11), nullable=False,
                 primary_key=True,
@@ -113,8 +101,6 @@ class SbmCOLLECTION(db.Model):
 
 class SbmCOLLECTIONSbmCOLLECTION(db.Model):
     """Represents a SbmCOLLECTIONSbmCOLLECTION record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmCOLLECTION_sbmCOLLECTION'
     id_father = db.Column(db.Integer(11), db.ForeignKey(SbmCOLLECTION.id),
                 nullable=False, server_default='0', primary_key=True)
@@ -125,8 +111,6 @@ class SbmCOLLECTIONSbmCOLLECTION(db.Model):
 
 class SbmDOCTYPE(db.Model):
     """Represents a SbmDOCTYPE record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmDOCTYPE'
     ldocname = db.Column(db.Text, nullable=True)
     sdocname = db.Column(db.String(10), nullable=True,
@@ -138,8 +122,6 @@ class SbmDOCTYPE(db.Model):
 
 class SbmCOLLECTIONSbmDOCTYPE(db.Model):
     """Represents a SbmCOLLECTIONSbmDOCTYPE record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmCOLLECTION_sbmDOCTYPE'
     id_father = db.Column(db.Integer(11), db.ForeignKey(SbmCOLLECTION.id),
                 nullable=False, server_default='0', primary_key=True)
@@ -150,20 +132,15 @@ class SbmCOLLECTIONSbmDOCTYPE(db.Model):
 
 class SbmCOOKIES(db.Model):
     """Represents a SbmCOOKIES record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmCOOKIES'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
+                primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False)
     value = db.Column(db.Text, nullable=True)
     uid = db.Column(db.Integer(15), nullable=False)
 
 class SbmCPLXAPPROVAL(db.Model):
     """Represents a SbmCPLXAPPROVAL record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmCPLXAPPROVAL'
     doctype = db.Column(db.String(10), nullable=False,
                 server_default='')
@@ -181,33 +158,30 @@ class SbmCPLXAPPROVAL(db.Model):
     id_EdBoardGroup = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 server_default='0')
     dFirstReq = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dLastReq = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dEdBoardSel = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dRefereeSel = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dRefereeRecom = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dEdBoardRecom = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dPubComRecom = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
-    dProjectLeaderAction = db.Column(db.DateTime,
-                nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
+    dProjectLeaderAction = db.Column(db.DateTime, nullable=False,
+                server_default='0001-01-01 00:00:00')
 
 
 class SbmFIELD(db.Model):
     """Represents a SbmFIELD record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmFIELD'
     subname = db.Column(db.String(13), nullable=True,
                 primary_key=True)
     pagenb = db.Column(db.Integer(11), nullable=True,
-                primary_key=True)
+                primary_key=True, autoincrement=False)
     fieldnb = db.Column(db.Integer(11), nullable=True)
     fidesc = db.Column(db.String(15), nullable=True,
                 primary_key=True)
@@ -223,15 +197,11 @@ class SbmFIELD(db.Model):
 
 class SbmFIELDDESC(db.Model):
     """Represents a SbmFIELDDESC record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmFIELDDESC'
-    name = db.Column(db.String(15), db.ForeignKey(SbmFIELD.fidesc), nullable=False,
-                server_default='',
-            primary_key=True)
+    name = db.Column(db.String(15), db.ForeignKey(SbmFIELD.fidesc),
+                nullable=False, server_default='', primary_key=True)
     alephcode = db.Column(db.String(50), nullable=True)
-    marccode = db.Column(db.String(50), nullable=False,
-                server_default='')
+    marccode = db.Column(db.String(50), nullable=False, server_default='')
     type = db.Column(db.Char(1), nullable=True)
     size = db.Column(db.Integer(11), nullable=True)
     rows = db.Column(db.Integer(11), nullable=True)
@@ -244,14 +214,12 @@ class SbmFIELDDESC(db.Model):
     modifytext = db.Column(db.Text, nullable=True)
     fddfi2 = db.Column(db.Text, nullable=True)
     cookie = db.Column(db.Integer(11), nullable=True,
-                default='0')
+                server_default='0')
     field = db.relationship(SbmFIELD, backref='fielddescs')
 
 
 class SbmFORMATEXTENSION(db.Model):
     """Represents a SbmFORMATEXTENSION record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmFORMATEXTENSION'
     FILE_FORMAT = db.Column(db.Text(50), nullable=False,
                 primary_key=True)
@@ -261,40 +229,27 @@ class SbmFORMATEXTENSION(db.Model):
 
 class SbmFUNCTIONS(db.Model):
     """Represents a SbmFUNCTIONS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmFUNCTIONS'
     action = db.Column(db.String(10), nullable=False,
-                server_default='',
-            primary_key=True)
+                server_default='', primary_key=True)
     doctype = db.Column(db.String(10), nullable=False,
-                server_default='',
-            primary_key=True)
+                server_default='', primary_key=True)
     function = db.Column(db.String(40), nullable=False,
-                server_default='',
-            primary_key=True)
+                server_default='', primary_key=True)
     score = db.Column(db.Integer(11), nullable=False,
-                server_default='0',
-            primary_key=True)
+                server_default='0', primary_key=True)
     step = db.Column(db.TinyInteger(4), nullable=False,
-                server_default='1',
-            primary_key=True)
+                server_default='1', primary_key=True)
 
 class SbmFUNDESC(db.Model):
     """Represents a SbmFUNDESC record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmFUNDESC'
     function = db.Column(db.String(40), nullable=False,
-                server_default='',
-            primary_key=True)
-    param = db.Column(db.String(40), nullable=True,
-                primary_key=True)
+                server_default='', primary_key=True)
+    param = db.Column(db.String(40), primary_key=True)
 
 class SbmGFILERESULT(db.Model):
     """Represents a SbmGFILERESULT record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmGFILERESULT'
     FORMAT = db.Column(db.Text(50), nullable=False,
                 primary_key=True)
@@ -303,143 +258,100 @@ class SbmGFILERESULT(db.Model):
 
 class SbmIMPLEMENT(db.Model):
     """Represents a SbmIMPLEMENT record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmIMPLEMENT'
     docname = db.Column(db.String(10), nullable=True)
     actname = db.Column(db.Char(3), nullable=True)
     displayed = db.Column(db.Char(1), nullable=True)
-    subname = db.Column(db.String(13), nullable=True,
-                primary_key=True)
-    nbpg = db.Column(db.Integer(11), nullable=True,
-                primary_key=True)
+    subname = db.Column(db.String(13), nullable=True, primary_key=True)
+    nbpg = db.Column(db.Integer(11), nullable=True, primary_key=True,
+                autoincrement=False)
     cd = db.Column(db.Date, nullable=True)
     md = db.Column(db.Date, nullable=True)
     buttonorder = db.Column(db.Integer(11), nullable=True)
     statustext = db.Column(db.Text, nullable=True)
-    level = db.Column(db.Char(1), nullable=False,
-                server_default='')
-    score = db.Column(db.Integer(11), nullable=False,
-                server_default='0')
-    stpage = db.Column(db.Integer(11), nullable=False,
-                server_default='0')
-    endtxt = db.Column(db.String(100), nullable=False,
-                server_default='')
+    level = db.Column(db.Char(1), nullable=False, server_default='')
+    score = db.Column(db.Integer(11), nullable=False, server_default='0')
+    stpage = db.Column(db.Integer(11), nullable=False, server_default='0')
+    endtxt = db.Column(db.String(100), nullable=False, server_default='')
 
 class SbmPARAMETERS(db.Model):
     """Represents a SbmPARAMETERS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmPARAMETERS'
     doctype = db.Column(db.String(10), nullable=False,
-                server_default='',
-            primary_key=True)
+                server_default='', primary_key=True)
     name = db.Column(db.String(40), nullable=False,
-                server_default='',
-            primary_key=True)
+                server_default='', primary_key=True)
     value = db.Column(db.Text, nullable=False)
 
 class SbmPUBLICATION(db.Model):
     """Represents a SbmPUBLICATION record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmPUBLICATION'
     doctype = db.Column(db.String(10), nullable=False,
-                server_default='',
-            primary_key=True)
+                server_default='', primary_key=True)
     categ = db.Column(db.String(50), nullable=False,
-                server_default='',
-            primary_key=True)
+                server_default='', primary_key=True)
     rn = db.Column(db.String(50), nullable=False, server_default='',
                 primary_key=True)
-    status = db.Column(db.String(10), nullable=False,
-                server_default='')
+    status = db.Column(db.String(10), nullable=False, server_default='')
     dFirstReq = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dLastReq = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dAction = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
-    accessref = db.Column(db.String(20), nullable=False,
-                server_default='')
-    accessedi = db.Column(db.String(20), nullable=False,
-                server_default='')
-    access = db.Column(db.String(20), nullable=False,
-                server_default='')
-    referees = db.Column(db.String(50), nullable=False,
-                server_default='')
+                server_default='0001-01-01 00:00:00')
+    accessref = db.Column(db.String(20), nullable=False, server_default='')
+    accessedi = db.Column(db.String(20), nullable=False, server_default='')
+    access = db.Column(db.String(20), nullable=False, server_default='')
+    referees = db.Column(db.String(50), nullable=False, server_default='')
     authoremail = db.Column(db.String(50), nullable=False,
                 server_default='')
     dRefSelection = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dRefRec = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     dEdiRec = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
-    accessspo = db.Column(db.String(20), nullable=False,
-                server_default='')
+                server_default='0001-01-01 00:00:00')
+    accessspo = db.Column(db.String(20), nullable=False, server_default='')
     journal = db.Column(db.String(100), nullable=True)
 
 
 class SbmPUBLICATIONCOMM(db.Model):
     """Represents a SbmPUBLICATIONCOMM record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmPUBLICATIONCOMM'
     id = db.Column(db.Integer(11), nullable=False,
-                primary_key=True,
-                autoincrement=True)
-    id_parent = db.Column(db.Integer(11), nullable=True)
-    rn = db.Column(db.String(100), nullable=False,
-                server_default='')
+                primary_key=True, autoincrement=True)
+    id_parent = db.Column(db.Integer(11), server_default='0', nullable=True)
+    rn = db.Column(db.String(100), nullable=False, server_default='')
     firstname = db.Column(db.String(100), nullable=True)
     secondname = db.Column(db.String(100), nullable=True)
     email = db.Column(db.String(100), nullable=True)
-    date = db.Column(db.String(40), nullable=False,
-                server_default='')
-    synopsis = db.Column(db.String(255), nullable=False,
-                server_default='')
+    date = db.Column(db.String(40), nullable=False, server_default='')
+    synopsis = db.Column(db.String(255), nullable=False, server_default='')
     commentfulltext = db.Column(db.Text, nullable=True)
 
 
 class SbmPUBLICATIONDATA(db.Model):
     """Represents a SbmPUBLICATIONDATA record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmPUBLICATIONDATA'
     doctype = db.Column(db.String(10), nullable=False,
-                server_default='',
-            primary_key=True)
-    editoboard = db.Column(db.String(250), nullable=False,
-                server_default='')
-    base = db.Column(db.String(10), nullable=False,
-                server_default='')
-    logicalbase = db.Column(db.String(10), nullable=False,
-                server_default='')
-    spokesperson = db.Column(db.String(50), nullable=False,
-                server_default='')
+                server_default='', primary_key=True)
+    editoboard = db.Column(db.String(250), nullable=False, server_default='')
+    base = db.Column(db.String(10), nullable=False, server_default='')
+    logicalbase = db.Column(db.String(10), nullable=False, server_default='')
+    spokesperson = db.Column(db.String(50), nullable=False, server_default='')
 
 class SbmREFEREES(db.Model):
     """Represents a SbmREFEREES record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmREFEREES'
-    doctype = db.Column(db.String(10), nullable=False,
-                server_default='')
-    categ = db.Column(db.String(10), nullable=False,
-                server_default='')
-    name = db.Column(db.String(50), nullable=False,
-                server_default='')
-    address = db.Column(db.String(50), nullable=False,
-                server_default='')
-    rid = db.Column(db.Integer(11), nullable=False,
-                primary_key=True,
-            autoincrement=True)
+    doctype = db.Column(db.String(10), nullable=False, server_default='')
+    categ = db.Column(db.String(10), nullable=False, server_default='')
+    name = db.Column(db.String(50), nullable=False, server_default='')
+    address = db.Column(db.String(50), nullable=False, server_default='')
+    rid = db.Column(db.Integer(11), nullable=False, primary_key=True,
+                autoincrement=True)
 
 class SbmSUBMISSIONS(db.Model):
     """Represents a SbmSUBMISSIONS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'sbmSUBMISSIONS'
     email = db.Column(db.String(50), nullable=False,
                 server_default='')
@@ -454,9 +366,9 @@ class SbmSUBMISSIONS(db.Model):
     reference = db.Column(db.String(40), nullable=False,
                 server_default='')
     cd = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     md = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     log_id = db.Column(db.Integer(11), nullable=False,
                 primary_key=True,
                 autoincrement=True)

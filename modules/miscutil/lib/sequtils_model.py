@@ -29,12 +29,13 @@ from invenio.sqlalchemyutils import db
 class SeqSTORE(db.Model):
     """Represents a SeqSTORE record."""
     __tablename__ = 'seqSTORE'
-    __table_args__ = (db.UniqueConstraint('seq_name', 'seq_value'),
-                      db.Model.__table_args__)
 
-    id = db.Column(db.Integer(15), primary_key=True, nullable=False)
+    id = db.Column(db.Integer(8), primary_key=True, nullable=False)
     seq_name = db.Column(db.String(15))
     seq_value = db.Column(db.String(20))
 
+    __table_args__ = (db.Index('seq_name_value', seq_name, seq_value,
+                               unique=True),
+                      db.Model.__table_args__)
 
 __all__ = ['SeqSTORE']

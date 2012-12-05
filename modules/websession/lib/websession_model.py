@@ -23,6 +23,7 @@ WebSession database models.
 
 # General imports.
 from invenio.sqlalchemyutils import db
+from sqlalchemy.orm import column_property
 from sqlalchemy.ext.hybrid import hybrid_property
 from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
 # Create your models here.
@@ -71,8 +72,9 @@ class User(db.Model):
                 primary_key=True,
                 autoincrement=True)
     email = db.Column(db.String(255), nullable=False,
-                server_default='')
-    _password = db.Column(db.LargeBinary, name="password", nullable=False)
+                server_default='', index=True)
+    _password = db.Column(db.LargeBinary, name="password",
+                nullable=False)
     note = db.Column(db.String(255), nullable=True)
     settings = db.Column(
                 db.PickleType(
@@ -82,7 +84,7 @@ class User(db.Model):
                         default=get_default_user_preferences())),
                 nullable=True)
     nickname = db.Column(db.String(255), nullable=False,
-                server_default='')
+                server_default='', index=True)
     last_login = db.Column(db.DateTime, nullable=False,
         server_default='0001-01-01 00:00:00')
 
@@ -127,11 +129,12 @@ class Usergroup(db.Model):
     def __str__(self):
         return "%s <%s>" % (self.name, self.description)
     __tablename__ = 'usergroup'
+    #FIXME Unique(login_method(70), name)
     id = db.Column(db.Integer(15, unsigned=True),
                 nullable=False,
                 primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False,
-                server_default='')
+                server_default='', index=True)
     description = db.Column(db.Text, nullable=True)
     join_policy = db.Column(db.CHAR(2), nullable=False,
                 server_default='')
@@ -139,6 +142,10 @@ class Usergroup(db.Model):
                 server_default='INTERNAL')
     #all_users = db.relationship(User, secondary=lambda: UserUsergroup.__table__,
     #                       collection_class=set)
+
+    __table_args__ = (db.Index('login_method_name', login_method, name,
+                               mysql_length=[60, None]),
+                      db.Model.__table_args__)
 
 class UserUsergroup(db.Model):
     """Represents a UserUsergroup record."""
@@ -160,22 +167,33 @@ class UserUsergroup(db.Model):
     user = db.relationship(User, backref='usergroups')
     usergroup = db.relationship(Usergroup, backref='users')
 
+
 class Session(db.Model):
     """Represents a Session record."""
-    def __init__(self):
-        pass
     __tablename__ = 'session'
     session_key = db.Column(db.String(32), nullable=False,
                 server_default='', primary_key=True)
     session_expiry = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
-    # Use standard binary column.
+                server_default='0001-01-01 00:00:00', index=True)
     session_object = db.Column(db.LargeBinary, nullable=True)
     uid = db.Column(db.Integer(15, unsigned=True),
-                nullable=False)
+                nullable=False, index=True)
 
+
+class UserEXT(db.Model):
+    """Represents a UserEXT record."""
+    __tablename__ = 'userEXT'
+
+    id = db.Column(db.VARBINARY(255), primary_key=True, nullable=False)
+    method = db.Column(db.String(50), primary_key=True, nullable=False)
+    id_user = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(User.id), nullable=False)
+
+    __table_args__ = (db.Index('id_user', id_user, method, unique=True),
+                      db.Model.__table_args__)
 
 __all__ = ['User',
            'Usergroup',
            'UserUsergroup',
+           'UserEXT',
            'Session']

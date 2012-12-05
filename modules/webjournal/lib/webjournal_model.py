@@ -28,32 +28,25 @@ from invenio.sqlalchemyutils import db
 
 class JrnJOURNAL(db.Model):
     """Represents a JrnJOURNAL record."""
-    def __init__(self):
-        pass
     __tablename__ = 'jrnJOURNAL'
     id = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
-    name = db.Column(db.String(50), nullable=False,
+                primary_key=True, autoincrement=True)
+    name = db.Column(db.String(50), nullable=False, unique=True,
                 server_default='')
 
 class JrnISSUE(db.Model):
     """Represents a JrnISSUE record."""
-    def __init__(self):
-        pass
     __tablename__ = 'jrnISSUE'
     id_jrnJOURNAL = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(JrnJOURNAL.id), nullable=False, 
-            primary_key=True)
-    issue_number = db.Column(db.String(50), nullable=False,
-                server_default='',
-            primary_key=True)
-    issue_display = db.Column(db.String(50), nullable=False,
-                server_default='')
+                db.ForeignKey(JrnJOURNAL.id), nullable=False,
+                primary_key=True)
+    issue_number = db.Column(db.String(50), nullable=False, server_default='',
+                primary_key=True)
+    issue_display = db.Column(db.String(50), nullable=False, server_default='')
     date_released = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     date_announced = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     journal = db.relationship(JrnJOURNAL, backref='issues')
 
 

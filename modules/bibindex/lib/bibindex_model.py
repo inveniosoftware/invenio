@@ -26,7 +26,9 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from bibedit_model import Bibrec
+from invenio.bibedit_model import Bibrec
+from invenio.websearch_model import Field
+
 
 class IdxINDEX(db.Model):
     """Represents a IdxINDEX record."""
@@ -43,6 +45,8 @@ class IdxINDEX(db.Model):
                 server_default='0001-01-01 00:00:00')
     stemming_language = db.Column(db.String(10), nullable=False,
                 server_default='')
+    indexer = db.Column(db.String(10), nullable=False, server_default='native')
+
 
 class IdxINDEXNAME(db.Model):
     """Represents a IdxINDEXNAME record."""
@@ -58,7 +62,6 @@ class IdxINDEXNAME(db.Model):
     value = db.Column(db.String(255), nullable=False)
     idxINDEX = db.relationship(IdxINDEX, backref='names')
 
-from websearch_model import Field
 
 class IdxINDEXField(db.Model):
     """Represents a IdxINDEXField record."""
@@ -89,7 +92,7 @@ class IdxPAIR01F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR01R(db.Model):
@@ -115,7 +118,7 @@ class IdxPAIR02F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR02R(db.Model):
@@ -141,7 +144,7 @@ class IdxPAIR03F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR03R(db.Model):
@@ -167,7 +170,7 @@ class IdxPAIR04F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR04R(db.Model):
@@ -193,7 +196,7 @@ class IdxPAIR05F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR05R(db.Model):
@@ -219,7 +222,7 @@ class IdxPAIR06F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR06R(db.Model):
@@ -245,7 +248,7 @@ class IdxPAIR07F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR07R(db.Model):
@@ -271,7 +274,7 @@ class IdxPAIR08F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR08R(db.Model):
@@ -297,7 +300,7 @@ class IdxPAIR09F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR09R(db.Model):
@@ -323,7 +326,7 @@ class IdxPAIR10F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR10R(db.Model):
@@ -349,7 +352,7 @@ class IdxPAIR11F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR11R(db.Model):
@@ -375,7 +378,7 @@ class IdxPAIR12F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR12R(db.Model):
@@ -401,7 +404,7 @@ class IdxPAIR13F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR13R(db.Model):
@@ -427,7 +430,7 @@ class IdxPAIR14F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR14R(db.Model):
@@ -453,7 +456,7 @@ class IdxPAIR15F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR15R(db.Model):
@@ -479,7 +482,7 @@ class IdxPAIR16F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR16R(db.Model):
@@ -505,7 +508,7 @@ class IdxPAIR17F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR17R(db.Model):
@@ -531,7 +534,7 @@ class IdxPAIR18F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPAIR18R(db.Model):
@@ -558,7 +561,7 @@ class IdxPHRASE01F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE01R(db.Model):
@@ -584,7 +587,7 @@ class IdxPHRASE02F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE02R(db.Model):
@@ -610,7 +613,7 @@ class IdxPHRASE03F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE03R(db.Model):
@@ -636,7 +639,7 @@ class IdxPHRASE04F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE04R(db.Model):
@@ -662,7 +665,7 @@ class IdxPHRASE05F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE05R(db.Model):
@@ -688,7 +691,7 @@ class IdxPHRASE06F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE06R(db.Model):
@@ -714,7 +717,7 @@ class IdxPHRASE07F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE07R(db.Model):
@@ -740,7 +743,7 @@ class IdxPHRASE08F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE08R(db.Model):
@@ -766,7 +769,7 @@ class IdxPHRASE09F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE09R(db.Model):
@@ -792,7 +795,7 @@ class IdxPHRASE10F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE10R(db.Model):
@@ -818,7 +821,7 @@ class IdxPHRASE11F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE11R(db.Model):
@@ -844,7 +847,7 @@ class IdxPHRASE12F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE12R(db.Model):
@@ -870,7 +873,7 @@ class IdxPHRASE13F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE13R(db.Model):
@@ -896,7 +899,7 @@ class IdxPHRASE14F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE14R(db.Model):
@@ -922,7 +925,7 @@ class IdxPHRASE15F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE15R(db.Model):
@@ -948,7 +951,7 @@ class IdxPHRASE16F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE16R(db.Model):
@@ -974,7 +977,7 @@ class IdxPHRASE17F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE17R(db.Model):
@@ -1000,7 +1003,7 @@ class IdxPHRASE18F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(100), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxPHRASE18R(db.Model):
@@ -1026,7 +1029,7 @@ class IdxWORD01F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD01R(db.Model):
@@ -1052,7 +1055,7 @@ class IdxWORD02F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD02R(db.Model):
@@ -1078,7 +1081,7 @@ class IdxWORD03F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD03R(db.Model):
@@ -1104,7 +1107,7 @@ class IdxWORD04F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD04R(db.Model):
@@ -1130,7 +1133,7 @@ class IdxWORD05F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD05R(db.Model):
@@ -1156,7 +1159,7 @@ class IdxWORD06F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD06R(db.Model):
@@ -1182,7 +1185,7 @@ class IdxWORD07F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD07R(db.Model):
@@ -1208,7 +1211,7 @@ class IdxWORD08F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD08R(db.Model):
@@ -1234,7 +1237,7 @@ class IdxWORD09F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD09R(db.Model):
@@ -1260,7 +1263,7 @@ class IdxWORD10F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD10R(db.Model):
@@ -1286,7 +1289,7 @@ class IdxWORD11F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD11R(db.Model):
@@ -1312,7 +1315,7 @@ class IdxWORD12F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD12R(db.Model):
@@ -1338,7 +1341,7 @@ class IdxWORD13F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD13R(db.Model):
@@ -1364,7 +1367,7 @@ class IdxWORD14F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD14R(db.Model):
@@ -1390,7 +1393,7 @@ class IdxWORD15F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD15R(db.Model):
@@ -1416,7 +1419,7 @@ class IdxWORD16F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD16R(db.Model):
@@ -1442,7 +1445,7 @@ class IdxWORD17F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD17R(db.Model):
@@ -1468,7 +1471,7 @@ class IdxWORD18F(db.Model):
                 primary_key=True,
                 autoincrement=True)
     term = db.Column(db.String(50), nullable=True,
-                index=True)
+                unique=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
 
 class IdxWORD18R(db.Model):

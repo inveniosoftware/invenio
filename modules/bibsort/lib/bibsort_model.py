@@ -57,9 +57,10 @@ class BsrMETHODDATABUCKET(db.Model):
     __tablename__ = 'bsrMETHODDATABUCKET'
 
     id_bsrMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
-                    db.ForeignKey(BsrMETHOD.id),
+                    db.ForeignKey(BsrMETHOD.id), autoincrement=False,
                     primary_key=True, nullable=False)
-    bucket_no = db.Column(db.TinyInteger(2), primary_key=True, nullable=False)
+    bucket_no = db.Column(db.TinyInteger(2), primary_key=True, nullable=False,
+                    autoincrement=False)
     bucket_data = db.Column(db.LargeBinary)
     bucket_last_value = db.Column(db.String(255))
     last_updated = db.Column(db.DateTime)

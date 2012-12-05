@@ -25,26 +25,25 @@ bibsched database models.
 from invenio.sqlalchemyutils import db
 
 # Create your models here.
+from invenio.sequtils_model import SeqSTORE
 
 class HstTASK(db.Model):
     """Represents a HstTASK record."""
-    def __init__(self):
-        pass
     __tablename__ = 'hstTASK'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True) #,
-            #autoincrement=True)
-    proc = db.Column(db.String(20), nullable=False)
+                primary_key=True, autoincrement=False)
+    proc = db.Column(db.String(255), nullable=False)
     host = db.Column(db.String(255), nullable=False,
                 server_default='')
     user = db.Column(db.String(50), nullable=False)
-    e = db.Column(db.DateTime, nullable=False)
+    runtime = db.Column(db.DateTime, nullable=False, index=True)
     sleeptime = db.Column(db.String(20), nullable=True)
     arguments = db.Column(db.iMediumBinary, nullable=True)
-    status = db.Column(db.String(50), nullable=True)
+    status = db.Column(db.String(50), nullable=True, index=True)
     progress = db.Column(db.String(255), nullable=True)
     priority = db.Column(db.TinyInteger(4), nullable=False,
-                server_default='0')
+                server_default='0', index=True)
+    sequenceid = db.Column(db.Integer(8), db.ForeignKey(SeqSTORE.id))
 
 class SchTASK(db.Model):
     """Represents a SchTASK record."""
@@ -52,19 +51,19 @@ class SchTASK(db.Model):
         pass
     __tablename__ = 'schTASK'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True, 
-            autoincrement=True)
-    proc = db.Column(db.String(20), nullable=False)
+                primary_key=True, autoincrement=True)
+    proc = db.Column(db.String(255), nullable=False)
     host = db.Column(db.String(255), nullable=False,
                 server_default='')
     user = db.Column(db.String(50), nullable=False)
-    runtime = db.Column(db.DateTime, nullable=False)
+    runtime = db.Column(db.DateTime, nullable=False, index=True)
     sleeptime = db.Column(db.String(20), nullable=True)
     arguments = db.Column(db.iMediumBinary, nullable=True)
-    status = db.Column(db.String(50), nullable=True)
+    status = db.Column(db.String(50), nullable=True, index=True)
     progress = db.Column(db.String(255), nullable=True)
     priority = db.Column(db.TinyInteger(4), nullable=False,
-                server_default='0')
+                server_default='0', index=True)
+    sequenceid = db.Column(db.Integer(8), db.ForeignKey(SeqSTORE.id))
 
 
 __all__ = ['HstTASK',

@@ -28,24 +28,23 @@ from invenio.sqlalchemyutils import db
 
 class HstEXCEPTION(db.Model):
     """Represents a HstEXCEPTION record."""
-    def __init__(self):
-        pass
     __tablename__ = 'hstEXCEPTION'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                primary_key=True,
-            autoincrement=True)
+                primary_key=True, autoincrement=True)
     name = db.Column(db.String(50), nullable=False)
     filename = db.Column(db.String(255), nullable=True)
     line = db.Column(db.Integer(9), nullable=True)
     last_seen = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
-    last_notified = db.Column(db.DateTime, nullable=False, 
-            server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00', index=True)
+    last_notified = db.Column(db.DateTime, nullable=False,
+                server_default='0001-01-01 00:00:00', index=True)
     counter = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
     total = db.Column(db.Integer(15), nullable=False,
-                server_default='0')
+                server_default='0', index=True)
 
+    __table_args__ = (db.Index('name', name, filename, line, unique=True),
+                      db.Model.__table_args__)
 
 
 __all__ = ['HstEXCEPTION']

@@ -26,7 +26,7 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
-from websearch_model import Collection
+from invenio.websearch_model import Collection
 
 class KnwKB(db.Model):
     """Represents a KnwKB record."""
@@ -34,9 +34,8 @@ class KnwKB(db.Model):
         pass
     __tablename__ = 'knwKB'
     id = db.Column(db.MediumInteger(8, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
-    name = db.Column(db.String(255), server_default='')
+                primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), server_default='', unique=True)
     description = db.Column(db.Text, nullable=True)
     kbtype = db.Column(db.Char(1), nullable=True)
 

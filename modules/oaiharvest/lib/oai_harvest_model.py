@@ -27,25 +27,20 @@ from invenio.sqlalchemyutils import db
 # Create your models here.
 
 #from websearch_model import Collection
-from bibedit_model import Bibrec
-from bibsched_model import SchTASK
+from invenio.bibedit_model import Bibrec
+from invenio.bibsched_model import SchTASK
 
 class OaiHARVEST(db.Model):
     """Represents a OaiHARVEST record."""
-    def __init__(self):
-        pass
     __tablename__ = 'oaiHARVEST'
     id = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
-    baseurl = db.Column(db.String(255), nullable=False,
-                server_default='')
+                primary_key=True, autoincrement=True)
+    baseurl = db.Column(db.String(255), nullable=False, server_default='')
     metadataprefix = db.Column(db.String(255), nullable=False,
                 server_default='oai_dc')
     arguments = db.Column(db.Text, nullable=True)
     comment = db.Column(db.Text, nullable=True)
-    bibconvertcfgfile = db.Column(db.String(255),
-                nullable=True)
+    bibconvertcfgfile = db.Column(db.String(255), nullable=True)
     name = db.Column(db.String(255), nullable=False)
     lastrun = db.Column(db.DateTime, nullable=True)
     frequency = db.Column(db.MediumInteger(12), nullable=False,
@@ -59,12 +54,9 @@ class OaiHARVEST(db.Model):
 
 class OaiREPOSITORY(db.Model):
     """Represents a OaiREPOSITORY record."""
-    def __init__(self):
-        pass
     __tablename__ = 'oaiREPOSITORY'
     id = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
-                primary_key=True,
-                autoincrement=True)
+                primary_key=True, autoincrement=True)
     setName = db.Column(db.String(255), nullable=False,
                 server_default='')
     setSpec = db.Column(db.String(255), nullable=False,
@@ -87,8 +79,6 @@ class OaiREPOSITORY(db.Model):
 
 class OaiHARVESTLOG(db.Model):
     """Represents a OaiHARVESTLOG record."""
-    def __init__(self):
-        pass
     __tablename__ = 'oaiHARVESTLOG'
     id_oaiHARVEST = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(OaiHARVEST.id), nullable=False)
