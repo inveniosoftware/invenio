@@ -5393,7 +5393,7 @@ def prs_search(kwargs=None, recid=0, req=None, cc=None, p=None, p1=None, p2=None
 
     # External searches
     if of.startswith("h"):
-        if not of in ['hcs']:
+        if not of in ['hcs', 'hcs2']:
             perform_external_collection_search_with_em(req, cc, [p, p1, p2, p3], f, ec, verbose,
                                                        ln, selected_external_collections_infos, em=em)
     return page_end(req, of, ln, em)
@@ -5886,7 +5886,7 @@ def prs_split_into_collections(kwargs=None, results_final=None, colls_to_search=
 
 def prs_summarize_records(kwargs=None, req=None, p=None, f=None, aas=None,
                        p1=None, p2=None, p3=None, f1=None, f2=None, f3=None, op1=None, op2=None,
-                       ln=None, results_final_for_all_selected_colls=None, **dummy):
+                       ln=None, results_final_for_all_selected_colls=None, of='hcs', **dummy):
     # feed the current search to be summarized:
     from invenio.search_engine_summarizer import summarize_records
     search_p = p
@@ -5906,7 +5906,7 @@ def prs_summarize_records(kwargs=None, req=None, p=None, f=None, aas=None,
                 fi = fi + ':'
             search_p += fi + pi + op_d[oi]
         search_f = ''
-    summarize_records(results_final_for_all_selected_colls, 'hcs', ln, search_p, search_f, req)
+    summarize_records(results_final_for_all_selected_colls, of, ln, search_p, search_f, req)
 
 
 def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=None, pl_in_url=None,
@@ -6065,7 +6065,7 @@ def prs_log_query(kwargs=None, req=None, uid=None, of=None, ln=None, p=None, f=N
             uid)
         #id_query = log_query(req.remote_host, req.args, uid)
         if of.startswith("h") and id_query and (em == '' or EM_REPOSITORY["alert"] in em):
-            if not of in ['hcs']:
+            if not of in ['hcs', 'hcs2']:
                 # display alert/RSS teaser for non-summary formats:
                 user_info = collect_user_info(req)
                 display_email_alert_part = True
@@ -6216,7 +6216,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             return recIDs
 
         elif of.startswith("h"):
-            if of not in ['hcs']:
+            if of not in ['hcs', 'hcs2']:
                 # added the hosted_colls_potential_results_p parameter to help print out the overview more accurately
                 req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time,
                             ln, ec, hosted_colls_potential_results_p=kwargs['hosted_colls_potential_results_p'], em=em))
@@ -6226,7 +6226,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
         if of.startswith("x"):
             req.write("<!-- Search-Engine-Total-Number-Of-Results: %s -->\n" % kwargs['results_final_nb_total'])
         # print records:
-        if of in ['hcs']:
+        if of in ['hcs', 'hcs2']:
             prs_summarize_records(kwargs=kwargs, **kwargs)
         else:
             prs_print_records(kwargs=kwargs, **kwargs)

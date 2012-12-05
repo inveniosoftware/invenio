@@ -23,6 +23,7 @@
 import os
 import sys
 import time
+import traceback
 import ConfigParser
 
 from invenio.config import \
@@ -88,20 +89,19 @@ def single_tag_rank_method_repair_exec():
 def citation_exec(rank_method_code, name, config):
     """Rank method for citation analysis"""
     #first check if this is a specific task
-    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if task_get_option("cmd") == "print-missing":
         num = task_get_option("num")
         print_missing(num)
     else:
-        dict = get_citation_weight(rank_method_code, config)
-        if dict:
+        dic, index_update_time = get_citation_weight(rank_method_code, config)
+        if dic:
             if task_get_option("id") or task_get_option("collection") or \
                task_get_option("modified"):
                 # user have asked to citation-index specific records
                 # only, so we should not update citation indexer's
                 # last run time stamp information
-                begin_date = None
-            intoDB(dict, begin_date, rank_method_code)
+                index_update_time = None
+            intoDB(dic, index_update_time, rank_method_code)
         else:
             write_message("No need to update the indexes for citations.")
 
@@ -393,6 +393,7 @@ def bibrank_engine(run):
                 raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
+        write_message(traceback.format_exc()[:-1])
         register_exception()
         raise StandardError
 

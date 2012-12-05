@@ -198,8 +198,8 @@ def fetch_records(start_date, end_date):
     sql = """SELECT `id` FROM `bibrec`
              WHERE `modification_date` <= %s
              AND `modification_date` > %s"""
-    records = run_sql(sql, (end_date.strftime("%Y-%m-%d %H:%M:%S"),
-                            start_date.strftime("%Y-%m-%d %H:%M:%S")))
+    records = run_sql(sql, (end_date,
+                            start_date))
     return [r[0] for r in records]
 
 
@@ -210,8 +210,7 @@ def fetch_concerned_records(name):
 
 
 def store_last_updated(name, date):
-    run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", \
-                                    (date.strftime("%Y-%m-%d %H:%M:%S"), name))
+    run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, name))
 
 
 def read_configuration(rank_method_code):
@@ -236,7 +235,7 @@ def process_updates(rank_method_code):
         'algorithm': selfcites_config.get(rank_method_code, "algorithm"),
         'friends_threshold': selfcites_config.get(rank_method_code, "friends_threshold")
     }
-    begin_date = datetime.now()
+    begin_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     quick = task_get_option("quick") != "no"
     if not quick:
         return rebuild_tables(config)
