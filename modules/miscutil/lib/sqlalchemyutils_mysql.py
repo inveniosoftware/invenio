@@ -57,18 +57,33 @@ def visit_create_index(element, compiler, **kw):
         INDEX ix_tableA_description ON (description(40))
     """
     index = element.element
-    #preparer = compiler.dialect.preparer
-    preparer = MySQLIdentifierPreparer_mysqldb
-    text = "CREATE "
+    preparer = compiler.preparer
+    table = preparer.format_table(index.table)
+    name = preparer.quote(index.name, index.quote)
+
+    text = "ALTER TABLE %s ADD " % (table, )
     if index.unique:
         text += "UNIQUE "
-    text += "INDEX `%s` ON `%s` (%s)" \
-        % (index.name, #(preparer.quote(compiler._index_identifier(index.name), index.quote),
-        index.table, #preparer.format_table(index.table),
-        ', '.join('`' + c.name + '`' + #preparer.quote(c.name, c.quote) +
-            ((str(c.type).startswith('TEXT') and (c.type.length != None))
-                and '(%d)' % c.type.length or '')
-            for c in index.columns))
+    text += "INDEX %s" % (name, )
+
+    lst = index.kwargs.get('mysql_length', None)
+
+    columns = []
+    for i,c in enumerate(index.columns):
+        cname = preparer.quote(c.name, c.quote)
+        suffix = ''
+        if isinstance(lst, (list, tuple)) and len(lst)>i \
+            and lst[i] is not None:
+            suffix = '(%d)' % lst[i]
+        elif str(c.type).startswith('TEXT') and (c.type.length != None):
+            suffix = '(%d)' % c.type.length
+        columns.append(cname+suffix)
+
+    text += '(' + ', '.join(columns) + ')'
+
+    if 'mysql_using' in index.kwargs:
+        using = index.kwargs['mysql_using']
+        text += " USING %s" % (preparer.quote(using, index.quote))
 
     return text
 
