@@ -81,12 +81,11 @@ def format_element(bfo, name, tag_name='', tag='', kb='', kb_default_output='', 
         if isinstance(value, list):
             for val in value:
                 if isinstance(val, dict):
-                    out += val.values()
+                    out.extend(val.values())
                 else:
                     out.append(val)
-            out += [isinstance(val, dict) and val.values() or val for val in value]
         elif isinstance(value, dict):
-            out += value.values()
+            out.extend(value.values())
         else:
             out.append(value)
     out = dict(zip(out, len(out)*[''])).keys() # Remove duplicates
