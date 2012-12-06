@@ -76,12 +76,13 @@ class User(db.Model):
     _password = db.Column(db.LargeBinary, name="password",
                 nullable=False)
     note = db.Column(db.String(255), nullable=True)
-    settings = db.Column(
+    _settings = db.Column(
                 db.PickleType(
                     mutable=True,
                     pickler=MarshalPickle(
                         set_empty=True,
                         default=get_default_user_preferences())),
+                name='settings',
                 nullable=True)
     nickname = db.Column(db.String(255), nullable=False,
                 server_default='', index=True)
@@ -91,6 +92,15 @@ class User(db.Model):
     #TODO re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
     _password_comparator = db.PasswordComparator(_password)
+
+    @hybrid_property
+    def settings(self):
+        return self._settings if self._settings is not None else \
+               get_default_user_preferences()
+
+    @settings.setter
+    def settings(self, settings):
+        self._settings = settings
 
     @hybrid_property
     def password(self):

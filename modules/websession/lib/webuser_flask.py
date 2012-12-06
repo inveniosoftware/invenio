@@ -159,7 +159,7 @@ class UserInfo(CombinedMultiDict):
         return data
 
     def _create_guest(self):
-        data = {}
+        data = {'settings': {}}
 
         if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
             from invenio.sqlalchemyutils import db
