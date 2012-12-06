@@ -161,7 +161,9 @@ body {
 (function($) {
 
   var popupTimer // global popup timer
-    , hotkeys = Hotkeys({})
+  {% if current_user.settings.get('websearch_hotkeys', '1') == '1' -%}
+    , hotkeys = Hotkeys({}) // enable hotkeys
+  {%- endif %}
 
   // side facet list
   $('#facet_list').affix({

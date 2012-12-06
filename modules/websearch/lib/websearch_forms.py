@@ -33,7 +33,7 @@ from invenio.wtforms_utils import InvenioBaseForm, FilterForm, \
                     DateTimePickerWidget, FilterTextField, AutocompleteField, \
                     MultiWidget, RowWidget
 from wtforms import DateTimeField, BooleanField, TextField, TextAreaField, \
-                    PasswordField, HiddenField, validators
+                    PasswordField, RadioField, HiddenField, validators
 from wtforms import FormField, SelectField
 from wtforms import Form as WTFormDefault
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -64,5 +64,6 @@ class EasySearchForm(InvenioBaseForm):
 
 class WebSearchUserSettingsForm(InvenioBaseForm):
     of = SelectField(_('Results per page'),
-                    choices=[('10', '10'), (u'25', '25'), ('50', '50'), ('100', '100')])
-
+                    choices=[('10', '10'), ('25', '25'), ('50', '50'), ('100', '100')])
+    websearch_hotkeys = SelectField(_('Hotkeys'), choices=[('0', _('Disable')),
+                                                          ('1', _('Enable'))])
