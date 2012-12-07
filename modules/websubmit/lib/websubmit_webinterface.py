@@ -185,7 +185,16 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 for doc in bibarchive.list_bibdocs():
                     if docname == doc.get_docname():
                         try:
-                            docfile = doc.get_file(format, version)
+                            try:
+                                docfile = doc.get_file(format, version)
+                            except InvenioWebSubmitFileError, msg:
+                                req.status = apache.HTTP_NOT_FOUND
+                                if req.headers_in.get('referer'):
+                                    ## There must be a broken link somewhere.
+                                    ## Maybe it's good to alert the admin
+                                    register_exception(req=req, alert_admin=True)
+                                warn += print_warning(_("The format %s does not exist for the given version: %s") % (cgi.escape(format), cgi.escape(str(msg))))
+                                break
                             (auth_code, auth_message) = docfile.is_restricted(user_info)
                             if auth_code != 0:
                                 if CFG_WEBSUBMIT_ICON_SUBFORMAT_RE.match(get_subformat_from_format(format)):
