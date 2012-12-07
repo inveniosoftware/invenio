@@ -54,7 +54,7 @@ def format_element(bfo):
         mp4_urls = [url.replace('http://mediaarchive.cern.ch', 'https://mediastream.cern.ch') \
                     for url in bfo.fields('8567_u') if url.endswith('.mp4')]
         img_urls = [url.replace('http://mediaarchive.cern.ch', 'https://mediastream.cern.ch') \
-                    for url in bfo.fields('8567_u') if url.endswith('.jpg')]
+                    for url in bfo.fields('8567_u') if url.endswith('.jpg') or url.endswith('.png')]
 
         if mp4_urls:
             mp4_url = mp4_urls[0]
@@ -78,7 +78,7 @@ def format_element(bfo):
                        'CFG_STREAMER_URL': "rtmp://wowza.cern.ch:1935/vod",
                        'width': width,
                        'height': height,
-                       'image_url': img_urls[0],
+                       'image_url': img_urls and img_urls[0] or '',
                        'mp4_url': mp4_url.replace('http://mediaarchive.cern.ch', 'https://mediastream.cern.ch'),
                        'mp4_url_relative': '/' + '/'.join(mp4_url.split('/')[4:])}
 
