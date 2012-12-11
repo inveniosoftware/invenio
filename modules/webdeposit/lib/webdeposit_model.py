@@ -5,9 +5,9 @@ WebDeposit database models.
 from invenio.sqlalchemyutils import db
 
 
-class WebSubmitDraft(db.Model):
+class WebDepositDraft(db.Model):
     """Represents a submit draft."""
-    __tablename__ = 'submit_drafts'
+    __tablename__ = 'deposition_drafts'
     uuid = db.Column(db.String(36),
                      primary_key=True,
                      unique=True,
@@ -18,7 +18,7 @@ class WebSubmitDraft(db.Model):
     user_id = db.Column(db.Integer(15,
                         unsigned=True),
                         nullable=False)
-    doc_type = db.Column(db.String(45),
+    dep_type = db.Column(db.String(45),
                          nullable=False)
     form_type = db.Column(db.String(45),
                           nullable=False)
@@ -26,4 +26,4 @@ class WebSubmitDraft(db.Model):
                             nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
-__all__ = ['WebSubmitDraft']
+__all__ = ['WebDepositDraft']

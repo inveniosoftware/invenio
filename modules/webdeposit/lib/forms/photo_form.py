@@ -1,22 +1,27 @@
 import os
 from wtforms import Form, \
                     TextField, \
-                    DateField, \
                     FileField, \
+                    FormField, \
                     SubmitField
 
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_load_fields import fields
+from invenio.webdeposit_load_fields import TitleField
 
-globals().update(fields)
 __all__ = ['PhotoForm']
+
+
+class Dimensions(Form):
+    height = TextField('Height')
+    width = TextField('Width')
 
 
 class PhotoForm(Form):
 
     title = TitleField(_('Photo Title'))
+    dimensions = FormField(Dimensions)
     file = FileField(_('File'))
-    submit = SubmitField()
+    submit = SubmitField(_('Submit Photo'), widget=bootstrap_submit)
 
     #configuration variables
     _title = _("Submit a Photo")

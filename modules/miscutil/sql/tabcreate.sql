@@ -3592,11 +3592,11 @@ CREATE TABLE IF NOT EXISTS sbmCOOKIES (
   PRIMARY KEY  (id)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS submit_drafts (
+CREATE TABLE IF NOT EXISTS deposition_drafts_drafts (
   uuid VARCHAR(36) NOT NULL,
   draft_id INTEGER,
   user_id INTEGER NOT NULL,
-  doc_type VARCHAR(45) NOT NULL,
+  dep_type VARCHAR(45) NOT NULL,
   form_type VARCHAR(45) NOT NULL,
   form_values VARCHAR(2048) NOT NULL,
   timestamp DATETIME NOT NULL,

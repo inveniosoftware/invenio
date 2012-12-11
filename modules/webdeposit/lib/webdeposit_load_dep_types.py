@@ -21,16 +21,16 @@ CFG_FORMS = PluginContainer(os.path.join(CFG_PYLIBDIR, \
 """
 TODO: Create more doc types and load dynamically
 """
-doc_types = {"First Group": \
-                 [{"name": "Article", "type": "Article"}, \
-                  {"name": "Thesis", "type": "Thesis"}, \
-                  {"name": "Nice Poem", "type": "Poetry"}, \
+dep_types = {"First Group": \
+                 [{"name": "Article", "dep_type": "Article"}, \
+                  {"name": "Thesis", "dep_type": "Thesis"}, \
+                  {"name": "Nice Poem", "dep_type": "Poetry"}, \
                  ], \
              "Media": \
-                 [{"name": "Photo", "type": "Photo"}, \
-                  {"name": "Audio", "type": "Audio"}, \
-                  {"name": "Video", "type": "Video"}, \
+                 [{"name": "Photo", "dep_type": "Photo"}, \
+                  {"name": "Audio", "dep_type": "Audio"}, \
+                  {"name": "Video", "dep_type": "Video"}, \
                  ], \
              "Third Group": []}
 
-globals().update(doc_types)
+globals().update(dep_types)

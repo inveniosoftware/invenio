@@ -11,12 +11,12 @@ def plugin_builder(plugin_name, plugin_code):
 
 CFG_DOC_METADATA = PluginContainer(os.path.join(CFG_PYLIBDIR, \
                                                 'invenio', \
-                                                'webdeposit_doc_types', \
+                                                'webdeposit_dep_types', \
                                                 '*metadata.py'),
                                    plugin_builder=plugin_builder)
 
-""" Create a dict with a doc_type => form_to_be_loaded relation """
-doc_metadata = {}
+""" Create a dict with a dep_type => form_to_be_loaded relation """
+dep_metadata = {}
 for meta in CFG_DOC_METADATA.itervalues():
     if meta is not None:
-        doc_metadata[meta['doc_type']] = meta['form']
+        dep_metadata[meta['dep_type']] = meta['form']

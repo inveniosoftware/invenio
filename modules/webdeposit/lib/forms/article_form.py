@@ -2,10 +2,20 @@ from wtforms import Form, \
                     SubmitField
 
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_load_fields import fields
-from invenio.webdeposit_field_widgets import date_widget, plupload_widget
+from invenio.webdeposit_field_widgets import date_widget, plupload_widget, bootstrap_submit
 
-globals().update(fields)
+from invenio.webdeposit_load_fields import PublisherField, \
+                                           JournalField, \
+                                           ISSNField, \
+                                           TitleField, \
+                                           AuthorField, \
+                                           AbstractField, \
+                                           PagesNumberField, \
+                                           LanguageField, \
+                                           Date, \
+                                           KeywordsField, \
+                                           NotesField, \
+                                           FileUploadField
 __all__ = ['ArticleForm']
 
 
@@ -40,7 +50,7 @@ class ArticleForm(Form):
     notes = NotesField(_('Additional Notes or Comments'))
     file = FileUploadField(_('File'))
     plupload_file = FileUploadField(_('File'), widget=plupload_widget)
-    submit = SubmitField()
+    submit = SubmitField(_('Submit Article'), widget=bootstrap_submit)
 
     """ Form Configuration variables """
     _title = _("Submit an Article")

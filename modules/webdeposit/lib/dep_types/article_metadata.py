@@ -3,12 +3,12 @@ globals().update(forms)
 
 __all__ = ['Article']
 
-doc_type = "Article"
+dep_type = "Article"
 form = ArticleForm
 # form = get_metadata_creation_form_from_doctype(doc_type)  # # This will use BibField to create a simple form which is the concatenation of all the fields neeeded for doc_type "Article"
 
 Article = {"form": form, \
-           "doc_type": doc_type}
+           "dep_type": dep_type}
 
 """
 Workflow definition sample

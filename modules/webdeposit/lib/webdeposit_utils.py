@@ -1,7 +1,8 @@
 from sqlalchemy import func, desc
+from wtforms import FormField
 #from werkzeug.contrib.cache import RedisCache
 from invenio.sqlalchemyutils import db
-from webdeposit_model import WebSubmitDraft
+from webdeposit_model import WebDepositDraft
 
 import datetime
 import json
@@ -12,35 +13,35 @@ import uuid as new_uuid
 """ Document Type Functions """
 
 
-def create_doc_type(user_id, doc_type):
-    """Creates a doc_type (initiates workflow)
+def create_dep_type(user_id, dep_type):
+    """Creates a deposition object (initiates workflow)
     and returns the uuid and the form to be rendered
-    TODO: check if doc type exists
+    TODO: check if dep type exists
     """
 
-    from invenio.webdeposit_load_doc_metadata import doc_metadata
+    from invenio.webdeposit_load_dep_metadata import dep_metadata
 
     try:
-        form = doc_metadata[doc_type]()
+        form = dep_metadata[dep_type]()
     except KeyError:
-        # doc_type not found
+        # dep_type not found
         return None, None
     form_type = form.__class__.__name__
     uuid = new_uuid.uuid1()
-    websubmit_draft = WebSubmitDraft(uuid=uuid, \
+    webdeposit_draft = WebDepositDraft(uuid=uuid, \
                                      user_id=user_id, \
-                                     doc_type=doc_type, \
+                                     dep_type=dep_type, \
                                      form_type=form_type, \
                                      form_values='{}', \
                                      timestamp=func.current_timestamp())
-    db.session.add(websubmit_draft)
+    db.session.add(webdeposit_draft)
     db.session.commit()
 
-    return websubmit_draft.uuid, form
+    return webdeposit_draft.uuid, form
 
 
-def get_current_form(user_id, doc_type=None, uuid=None):
-    """Returns the latest draft(wtform object) of the doc_type
+def get_current_form(user_id, dep_type=None, uuid=None):
+    """Returns the latest draft(wtform object) of the dep_type
     or the form with the specific uuid.
     if it doesn't exist, creates a new one
     """
@@ -53,37 +54,47 @@ def get_current_form(user_id, doc_type=None, uuid=None):
 
     try:
         if uuid is not None:
-            websubmit_draft = db.session.query(WebSubmitDraft).filter(\
-                            WebSubmitDraft.user_id == user_id, \
-                            WebSubmitDraft.uuid == uuid)[0]
-        elif doc_type is not None:
-            websubmit_draft = db.session.query(WebSubmitDraft).filter(\
-                            WebSubmitDraft.user_id == user_id, \
-                            WebSubmitDraft.doc_type == doc_type, \
-                            WebSubmitDraft.timestamp == func.max(\
-                                WebSubmitDraft.timestamp).select())[0]
+            webdeposit_draft = db.session.query(WebDepositDraft).filter(\
+                            WebDepositDraft.user_id == user_id, \
+                            WebDepositDraft.uuid == uuid)[0]
+        elif dep_type is not None:
+            webdeposit_draft = db.session.query(WebDepositDraft).filter(\
+                            WebDepositDraft.user_id == user_id, \
+                            WebDepositDraft.dep_type == dep_type, \
+                            WebDepositDraft.timestamp == func.max(\
+                                WebDepositDraft.timestamp).select())[0]
         else:
-            websubmit_draft = db.session.query(WebSubmitDraft).filter(\
-                            WebSubmitDraft.user_id == user_id, \
-                            WebSubmitDraft.timestamp == func.max(\
-                                WebSubmitDraft.timestamp).select())[0]
+            webdeposit_draft = db.session.query(WebDepositDraft).filter(\
+                            WebDepositDraft.user_id == user_id, \
+                            WebDepositDraft.timestamp == func.max(\
+                                WebDepositDraft.timestamp).select())[0]
     except IndexError:
         if uuid is None:
             """ if a specific form was not requested
             create a new one
             """
-            uuid, form = create_doc_type(user_id, doc_type)
+            uuid, form = create_dep_type(user_id, dep_type)
             return uuid, form
         else:
             return None, None
 
-    form = globals()[websubmit_draft.form_type]()
-    draft_data = json.loads(websubmit_draft.form_values)
+    form = globals()[webdeposit_draft.form_type]()
+    draft_data = json.loads(webdeposit_draft.form_values)
 
     for field_name, field_data in form.data.iteritems():
-        if field_name in draft_data:
+        if isinstance(form.__dict__['_fields'][field_name], FormField) \
+                and field_name in draft_data:
+            subfield_names = form.__dict__['_fields'][field_name].form.__dict__['_fields'].keys()
+            #upperfield_name, subfield_name = field_name.split('-')
+            for subfield_name in subfield_names:
+                if subfield_name in draft_data[field_name]:
+                    form.__dict__["_fields"][field_name].\
+                        form.__dict__["_fields"][subfield_name].\
+                            process_data(draft_data[field_name][subfield_name])
+        elif field_name in draft_data:
             form[field_name].process_data(draft_data[field_name])
-    return websubmit_draft.uuid, form
+
+    return webdeposit_draft.uuid, form
 
 
 """ Draft Functions (or instances of forms)
@@ -92,16 +103,18 @@ old implementation with redis cache of the functions is provided in comments
 """
 
 
-def draft_field_get(user_id, uuid, field_name):
+def draft_field_get(user_id, uuid, field_name, subfield_name=None):
     """Returns the value of a field
     or, in case of error, None
     """
 
-    draft = db.session.query(WebSubmitDraft).filter_by(uuid=uuid, \
+    draft = db.session.query(WebDepositDraft).filter_by(uuid=uuid, \
                                                        user_id=user_id)[0]
     values = json.loads(draft.form_values)
 
     try:
+        if subfield_name is not None:
+             return values[field_name][subfield_name]
         return values[field_name]
     except KeyError:
         return None
@@ -112,15 +125,22 @@ def draft_field_get(user_id, uuid, field_name):
     """
 
 
-def draft_field_set(user_id, uuid, field_name, value):
+def draft_field_set(user_id, uuid, field_name, value, subfield_name=None):
     """
     Alters the value of a field
     """
 
-    draft = db.session.query(WebSubmitDraft).filter_by(uuid=uuid, \
+    draft = db.session.query(WebDepositDraft).filter_by(uuid=uuid, \
                                                        user_id=user_id)[0]
     values = json.loads(draft.form_values)  #get dict
-    values[field_name] = value  #change value
+    if subfield_name is not None:
+        try:
+            values[field_name][subfield_name] = value
+        except (KeyError, TypeError) as e:
+            values[field_name] = dict()
+            values[field_name][subfield_name] = value
+    else:
+        values[field_name] = value  #change value
     values = json.dumps(values)  #encode back to json
     draft.form_values = values
     draft.timestamp = datetime.datetime.now() #update draft's timestamp
@@ -133,7 +153,7 @@ def draft_field_set(user_id, uuid, field_name, value):
     """
 
 
-def draft_field_list_add(user_id, uuid, field_name, value):
+def draft_field_list_add(user_id, uuid, field_name, value, subfield=None):
     """Adds value to field
     Used for fields that contain multiple values
     e.g.1: { field_name : value1 } OR
@@ -143,15 +163,22 @@ def draft_field_list_add(user_id, uuid, field_name, value):
     e.g.2  { }
            -->
            { field_name : [value] }
+    e.g.3  { }
+           -->
+           { field_name : {key : value} }
     """
 
-    draft = db.session.query(WebSubmitDraft).filter_by(uuid=uuid, \
+    draft = db.session.query(WebDepositDraft).filter_by(uuid=uuid, \
                                                        user_id=user_id)[0]
     values = json.loads(draft.form_values)  #get dict
 
     try:
         if isinstance(values[field_name], list):
             values[field_name].append(value)
+        elif key is not None:
+            if not isinstance(values[field_name], dict):
+                values[field_name] = dict()
+            values[field_name][subfield] = value
         else:
             new_values_list = [values[field_name]]
             new_values_list.append(value)
@@ -164,17 +191,17 @@ def draft_field_list_add(user_id, uuid, field_name, value):
     db.session.commit()
 
 
-def new_draft(user_id, doc_type, form_type):
+def new_draft(user_id, dep_type, form_type):
     """Creates new draft
     gets new uuid
     """
 
-    websubmit_draft = WebSubmitDraft(user_id=user_id, \
+    webdeposit_draft = WebDepositDraft(user_id=user_id, \
                                      form_type=form_type, \
                                      form_values='{}')
-    db.session.add(websubmit_draft)
+    db.session.add(webdeposit_draft)
     db.session.commit()
-    return websubmit_draft.uuid
+    return webdeposit_draft.uuid
 
     """
     userID = str(userID)
@@ -196,7 +223,7 @@ def get_draft(user_id, uuid, field_name=None):
     """Returns draft values in a field_name => field_value dictionary
     or if field_name is defined, returns the associated value
     """
-    draft = db.session.query(WebSubmitDraft).filter_by(\
+    draft = db.session.query(WebDepositDraft).filter_by(\
                              uuid=uuid, \
                              user_id=user_id)[0]
     form_values = json.loads(draft.form_values)
@@ -249,22 +276,22 @@ def get_draft(user_id, uuid, field_name=None):
     """
 
 
-def delete_draft(user_id, doc_type, uuid):
+def delete_draft(user_id, dep_type, uuid):
     """ Deletes the draft with uuid=uuid
     and returns the most recently used draft
     if there is no draft left, returns None
     """
 
-    db.session.query(WebSubmitDraft).filter_by(\
+    db.session.query(WebDepositDraft).filter_by(\
                                      uuid=uuid, \
                                      user_id=user_id).delete()
     db.session.commit()
 
-    latest_draft = db.session.query(WebSubmitDraft).filter_by(\
+    latest_draft = db.session.query(WebDepositDraft).filter_by(\
                                     user_id=user_id, \
-                                    doc_type=doc_type).\
+                                    dep_type=dep_type).\
                                     order_by(\
-                                        desc(WebSubmitDraft.timestamp)).\
+                                        desc(WebDepositDraft.timestamp)).\
                                     first()
     if latest_draft is None: # There is no draft left
         return None
@@ -295,18 +322,18 @@ def delete_draft(user_id, doc_type, uuid):
     """
 
 
-def draft_field_get_all(user_id, doc_type, field_names):
+def draft_field_get_all(user_id, dep_type, field_names):
     all_drafts = []
 
     if not isinstance(field_names, list):
         field_names = [field_names]
 
-    for draft in db.session.query(WebSubmitDraft).filter_by(user_id=user_id, \
-                                                            doc_type=doc_type):
+    for draft in db.session.query(WebDepositDraft).filter_by(user_id=user_id, \
+                                                            dep_type=dep_type):
         draft_values = json.loads(draft.form_values)
 
         tmp_draft = {"draft_id": draft.uuid, \
-                     "doc_type": draft.doc_type, \
+                     "dep_type": draft.dep_type, \
                      "timestamp": draft.timestamp}
         for field_name in field_names:
             try:
@@ -334,7 +361,7 @@ def draft_field_get_all(user_id, doc_type, field_names):
 
 
 def set_current_draft(user_id, uuid):
-    draft = db.session.query(WebSubmitDraft).filter_by(\
+    draft = db.session.query(WebDepositDraft).filter_by(\
                                              user_id=user_id, \
                                              uuid=uuid)[0]
     draft.timestamp = datetime.datetime.now()
@@ -346,14 +373,14 @@ def set_current_draft(user_id, uuid):
     """
 
 
-def get_current_draft(user_id, doc_type):
-    websubmit_draft = db.session.query(WebSubmitDraft). \
+def get_current_draft(user_id, dep_type):
+    webdeposit_draft = db.session.query(WebDepositDraft). \
                                 filter_by(\
                                     user_id=user_id, \
-                                    doc_type=doc_type).\
-                                order_by(desc(WebSubmitDraft.timestamp)). \
+                                    dep_type=dep_type).\
+                                order_by(desc(WebDepositDraft.timestamp)). \
                                 first()
-    return websubmit_draft
+    return webdeposit_draft
     """
     return rediscache.get(str(userID) + ":current_draft")
     """

@@ -379,7 +379,7 @@ $(function() {
 	
         <div class="accordion" id="accordion2">
 
-        {% for doc_group, doc_types in docs.items() %}
+        {% for doc_group, dep_types in docs.items() %}
         
           <div class="accordion-group">
                 <div class="accordion-heading">
@@ -389,8 +389,8 @@ $(function() {
                 </div>
                 <div id="collapse{{ loop.index }}" class="accordion-body collapse">
                       <div class="accordion-inner">
-                      {% for doc_type in doc_types %}
-                            <a href="{{ doc_type.type }}">{{ doc_type.name }}<br>
+                      {% for dep in dep_types %}
+                            <a href="{{ dep.dep_type }}">{{ dep.name }}<br>
                        {% endfor %}
                       </div>
                 </div>
