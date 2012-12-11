@@ -36,6 +36,7 @@ if __name__ != "__main__":
     ## dependecies do this! (e.g. 4Suite)
     sys.stdout = sys.stderr
 
+from invenio.urlutils import redirect_to_url
 from invenio.session import get_session
 from invenio.webinterface_handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
 from invenio.webinterface_layout import invenio_handler
@@ -62,7 +63,11 @@ _RE_HTTPS_REPLACES = re.compile(r"\b((?:src\s*=|url\s*\()\s*[\"']?)http\://", re
 ## Regexp to verify that the IP starts with a number (filter cases where 'unknown')
 ## It is faster to verify only the start (585 ns) compared with verifying
 ## the whole ip address - re.compile('^\d+\.\d+\.\d+\.\d+$') (1.01 µs)
-_RE_IPADDRESS_START = re.compile("^\d+\.")
+_RE_IPADDRESS_START = re.compile(r"^\d+\.")
+
+## Regexp to match IE User-Agent
+_RE_BAD_MSIE = re.compile(r"MSIE\s+(\d+\.\d+)")
+
 
 def _http_replace_func(match):
     ## src external_site -> CFG_SITE_SECURE_URL/sslredirect/external_site
@@ -115,6 +120,7 @@ class SimulatedModPythonRequest(object):
         self.__replace_https = False
         self.track_writings = False
         self.__what_was_written = ""
+        self.__cookies_out = {}
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
                 self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value
@@ -122,6 +128,22 @@ class SimulatedModPythonRequest(object):
             self.__headers_in['content-length'] = environ['CONTENT_LENGTH']
         if environ.get('CONTENT_TYPE'):
             self.__headers_in['content-type'] = environ['CONTENT_TYPE']
+
+    def set_cookie(self, cookie):
+        """
+        This function is used to cumulate identical cookies.
+        """
+        self.__cookies_out[cookie.name] = cookie
+
+    def _write_cookies(self):
+        if self.__cookies_out:
+            if not self.headers_out.has_key("Set-Cookie"):
+                g = _RE_BAD_MSIE.search(self.headers_in.get('User-Agent', "MSIE 6.0"))
+                bad_msie = g and float(g.group(1)) < 9.0
+                if not (bad_msie and self.is_https()):
+                    self.headers_out.add("Cache-Control", 'no-cache="set-cookie"')
+            for cookie in self.__cookies_out.values():
+                self.headers_out.add("Set-Cookie", str(cookie))
 
     def get_wsgi_environ(self):
         return self.__environ
@@ -206,6 +228,7 @@ class SimulatedModPythonRequest(object):
 
     def send_http_header(self):
         if not self.__response_sent_p:
+            self._write_cookies()
             self.__tainted = True
             if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
                 self.__headers['Allow'] = ', '.join(self.__allowed_methods)
@@ -449,6 +472,26 @@ def application(environ, start_response):
     #print 'Starting mod_python simulation'
     try:
         try:
+            if (CFG_FULL_HTTPS or (CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https)) and not req.is_https():
+                # We need to isolate the part of the URI that is after
+                # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
+                original_parts = urlparse(req.unparsed_uri)
+                plain_prefix_parts = urlparse(CFG_SITE_URL)
+                secure_prefix_parts = urlparse(CFG_SITE_SECURE_URL)
+
+                # Compute the new path
+                plain_path = original_parts[2]
+                plain_path = secure_prefix_parts[2] + \
+                            plain_path[len(plain_prefix_parts[2]):]
+
+                # ...and recompose the complete URL
+                final_parts = list(secure_prefix_parts)
+                final_parts[2] = plain_path
+                final_parts[-3:] = original_parts[-3:]
+
+                target = urlunparse(final_parts)
+                redirect_to_url(req, target)
+
             possible_module, possible_handler = is_mp_legacy_publisher_path(environ['PATH_INFO'])
             if possible_module is not None:
                 mp_legacy_publisher(req, possible_module, possible_handler)
@@ -490,8 +533,22 @@ def application(environ, start_response):
             else:
                 return generate_error_page(req, page_already_started=True)
     finally:
-        for (callback, data) in req.get_cleanups():
-            callback(data)
+        try:
+            ## Let's save the session.
+            session = get_session(req)
+            try:
+                if req.is_https() or not session.need_https:
+                    ## We save the session only if it's safe to do it, i.e.
+                    ## if we well had a valid session.
+                    session.dirty = True
+                    session.save()
+                if 'user_info' in req._session:
+                    del req._session['user_info']
+            finally:
+                del session
+        except Exception:
+            ## What could have gone wrong?
+            register_exception(req=req, alert_admin=True)
         if hasattr(req, '_session'):
             ## The session handler saves for caching a request_wrapper
             ## in req.
@@ -505,8 +562,13 @@ def application(environ, start_response):
             ## For the same reason we can delete the user_info.
             delattr(req, '_user_info')
 
+        for (callback, data) in req.get_cleanups():
+            callback(data)
+
         ## as suggested in
         ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
+        gc.enable()
+        gc.collect()
         del gc.garbage[:]
     return []
 

@@ -244,6 +244,7 @@ def setUid(req, uid, remember_me=False):
         user_info = collect_user_info(req, login_time=True)
         session['user_info'] = user_info
         req._user_info = user_info
+        session.save()
     else:
         del session['user_info']
     return uid
@@ -745,6 +746,7 @@ def logoutUser(req):
         uid = createGuestUser()
         session['uid'] = uid
         session.set_remember_me(False)
+        session.save()
     else:
         uid = 0
         session.invalidate()

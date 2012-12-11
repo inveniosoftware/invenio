@@ -24,7 +24,7 @@ Just use L{get_session} to obtain a session object (with a dictionary
 interface, which will let you store permanent information).
 """
 
-from invenio.webinterface_handler_wsgi_utils import add_cookies, Cookie, get_cookie
+from invenio.webinterface_handler_wsgi_utils import Cookie, get_cookie
 
 import cPickle
 import time
@@ -44,8 +44,7 @@ from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
     CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS, \
     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
-    CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
-    CFG_WEBSESSION_ENABLE_LOCKING
+    CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE
 
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
@@ -100,12 +99,10 @@ class InvenioSession(dict):
     def __init__(self, req, sid=None):
         self._remember_me = False
         self._req, self._sid, self._secret = req, sid, None
-        self._lock = CFG_WEBSESSION_ENABLE_LOCKING
         self._new = 1
         self._created = 0
         self._accessed = 0
         self._timeout = 0
-        self._locked = 0
         self._invalid = 0
         self._dirty = False
         self._http_ip = None
@@ -138,16 +135,12 @@ class InvenioSession(dict):
 
         if self._sid:
             # attempt to load ourselves
-            self.lock()
             if self.load():
                 self._new = 0
 
         if self._new:
             # make a new session
-            if self._sid:
-                self.unlock() # unlock old sid
             self._sid = _new_sid(self._req)
-            self.lock()                 # lock new sid
             remote_ip = self._req.remote_ip
             if self._req.is_https():
                 self._https_ip = remote_ip
@@ -162,6 +155,13 @@ class InvenioSession(dict):
         # need cleanup?
         if random.randint(1, CFG_WEBSESSION_CLEANUP_CHANCE) == 1:
             self.cleanup()
+
+        if self._new and (not self.__need_https or self._req.is_https()):
+            ## We want to issue cookies only in case this is a new session
+            ## and there is not already a session cookie that is available
+            ## only over HTTPS
+            for cookie in self.make_cookies():
+                self._req.set_cookie(cookie)
 
     def get_dirty(self):
         """
@@ -203,7 +203,8 @@ class InvenioSession(dict):
         else:
             self.set_timeout(CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT *
                 CFG_WEBSESSION_ONE_DAY)
-        add_cookies(self._req, self.make_cookies())
+        for cookie in self.make_cookies():
+            self._req.set_cookie(cookie)
 
     def load(self):
         """
@@ -279,7 +280,7 @@ class InvenioSession(dict):
         Save the session to the database.
         """
         uid = self.get('uid', -1)
-        if not self._invalid and self._sid and self._dirty and (uid > 0 or self.is_useful()):
+        if (not self.__need_https or self._req.is_https()) and not self._invalid and self._sid and self._dirty and (uid > 0 or self.is_useful()):
             ## We store something only for real users or useful sessions.
             session_dict = {"_data" : self.copy(),
                     "_created" : self._created,
@@ -310,7 +311,8 @@ class InvenioSession(dict):
                     uid=%s
             """, (session_key, session_expiry, session_object, uid,
                 session_expiry, session_object, uid))
-            add_cookies(self._req, self.make_cookies())
+            for cookie in self.make_cookies():
+                self._req.set_cookie(cookie)
         ## No more dirty :-)
         self._dirty = False
 
@@ -328,7 +330,7 @@ class InvenioSession(dict):
         cookies = self.make_cookies()
         for cookie in cookies:
             cookie.expires = 0
-        add_cookies(self._req, cookies)
+            self._req.set_cookie(cookie)
         self.delete()
         self._invalid = 1
         if hasattr(self._req, '_session'):
@@ -381,20 +383,6 @@ class InvenioSession(dict):
             HTTP requests.
         """
         return self._https_ip
-
-    def lock(self):
-        """
-        Lock the session.
-        """
-        if self._lock:
-            self._locked = 1
-
-    def unlock(self):
-        """
-        Unlock the session.
-        """
-        if self._lock and self._locked:
-            self._locked = 0
 
     def is_new(self):
         """
@@ -458,9 +446,12 @@ class InvenioSession(dict):
         self._req.register_cleanup(session_cleanup)
         self._req.log_error("InvenioSession: registered database cleanup.")
 
-    def __del__(self):
-        self.save()
-        self.unlock()
+    ## NOTE: Let's disable __del__ to avoid garbage collection not to
+    ## be able to delete circular references involving the session
+    ## We can .save() anyway in good points, such as at the end of
+    ## of the application request
+    #def __del__(self):
+        #self.save()
 
     def get_need_https(self):
         return self.__need_https
@@ -475,12 +466,6 @@ class InvenioSession(dict):
     ## to an HTTPS connection if she really wants to access authenticated
     ## resources.
     need_https = property(get_need_https)
-
-def _unlock_session_cleanup(session):
-    """
-    Auxliary function to unlock a session.
-    """
-    session.unlock()
 
 def _init_rnd():
     """
