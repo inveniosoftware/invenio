@@ -66,12 +66,21 @@ else:
 ## should know DB credentials but this file.
 ## FIXME: this is more of a blast-from-the-past that should be fixed
 ## both here and in inveniocfg when the time permits.
-CFG_DATABASE_HOST = 'localhost'
-CFG_DATABASE_PORT = '3306'
-CFG_DATABASE_NAME = 'invenio'
-CFG_DATABASE_USER = 'invenio'
-CFG_DATABASE_PASS = 'my123p$ss'
-CFG_DATABASE_SLAVE = ''
+try:
+    from invenio.dbquery_config import CFG_DATABASE_HOST, \
+                                       CFG_DATABASE_PORT, \
+                                       CFG_DATABASE_NAME, \
+                                       CFG_DATABASE_USER, \
+                                       CFG_DATABASE_PASS, \
+                                       CFG_DATABASE_SLAVE
+except ImportError:
+    CFG_DATABASE_HOST = 'localhost'
+    CFG_DATABASE_PORT = '3306'
+    CFG_DATABASE_NAME = 'invenio'
+    CFG_DATABASE_USER = 'invenio'
+    CFG_DATABASE_PASS = 'my123p$ss'
+    CFG_DATABASE_SLAVE = ''
+
 
 _DB_CONN = {}
 _DB_CONN[CFG_DATABASE_HOST] = {}

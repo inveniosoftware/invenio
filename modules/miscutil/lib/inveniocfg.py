@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -313,7 +313,7 @@ def cli_cmd_update_config_py(conf):
         options = conf.options(section)
         options.sort()
         for option in options:
-            if not option.startswith('CFG_DATABASE_'):
+            if not option.upper().startswith('CFG_DATABASE_'):
                 # put all options except for db credentials into config.py
                 line_out = convert_conf_option(option, conf.get(section, option))
                 if line_out:
@@ -339,24 +339,21 @@ def cli_cmd_update_dbquery_py(conf):
     """
     print ">>> Going to update dbquery.py..."
     ## location where dbquery.py is:
-    dbquerypyfile = conf.get("Invenio", "CFG_PYLIBDIR") + \
-                    os.sep + 'invenio' + os.sep + 'dbquery.py'
+    dbqueryconfigpyfile = conf.get("Invenio", "CFG_PYLIBDIR") + \
+                    os.sep + 'invenio' + os.sep + 'dbquery_config.py'
     ## backup current dbquery.py file:
-    if os.path.exists(dbquerypyfile):
-        shutil.copy(dbquerypyfile, dbquerypyfile + '.OLD')
-    ## replace db parameters:
-    out = ''
-    for line in open(dbquerypyfile, 'r').readlines():
-        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS|SLAVE)(\s*=\s*)\'.*\'$', line)
-        if match:
-            dbparam = 'CFG_DATABASE_' + match.group(1)
-            out += "%s%s'%s'\n" % (dbparam, match.group(2),
-                                   conf.get('Invenio', dbparam))
-        else:
-            out += line
-    fdesc = open(dbquerypyfile, 'w')
-    fdesc.write(out)
+    if os.path.exists(dbqueryconfigpyfile + 'c'):
+        shutil.copy(dbqueryconfigpyfile + 'c', dbqueryconfigpyfile + 'c.OLD')
+
+    out = ["%s = '%s'\n" % (item.upper(), value) \
+                        for item, value in conf.items('Invenio') \
+                        if item.upper().startswith('CFG_DATABASE_')]
+
+    fdesc = open(dbqueryconfigpyfile, 'w')
+    fdesc.write("# -*- coding: utf-8 -*-\n")
+    fdesc.writelines(out)
     fdesc.close()
+
     print "You may want to restart Apache now."
     print ">>> dbquery.py updated successfully."
 
