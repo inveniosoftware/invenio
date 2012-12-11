@@ -83,7 +83,8 @@ from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
      InvenioWebSearchWildcardLimitError, \
      CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
-     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
+     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
+     CFG_SEARCH_RESULTS_CACHE_PREFIX
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
@@ -6308,9 +6309,9 @@ def perform_request_cache(req, action="show"):
     out += "<br />- reclist cache timestamp: %s" % collection_reclist_cache.timestamp
     out += "<br />- reclist cache contents:"
     out += "<blockquote>"
-    for coll in collection_reclist_cache.get_many(
-            CFG_SEARCH_RESULTS_CACHE_PREFIX+'*'):
-        out += "%s<br />" % (coll,)
+    for coll in collection_reclist_cache.cache.keys():
+        if collection_reclist_cache.cache[coll]:
+            out += "%s (%d)<br />" % (coll, len(collection_reclist_cache.cache[coll]))
     out += "</blockquote>"
     req.write(out)
     # show field i18nname cache:
