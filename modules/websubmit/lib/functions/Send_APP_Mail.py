@@ -41,9 +41,10 @@ from invenio.config import CFG_SITE_NAME, \
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.search_engine import print_record
+from invenio.mailutils import scheduled_send_email
+from invenio.bibtask import bibtask_allocate_sequenceid
 
 
 ## The field in which to search for the record submitter/owner's email address:
@@ -81,8 +82,9 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
        * edsrn: Name of the file containing the reference of the
                 approved document.
     """
-    global titlevalue,authorvalue,sysno,rn
+    global titlevalue,authorvalue, emailvalue,sysno,rn
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
+    sequence_id = bibtask_allocate_sequenceid(curdir)
     doctype = form['doctype']
     titlevalue = titlevalue.replace("\n"," ")
     authorvalue = authorvalue.replace("\n","; ")
@@ -245,7 +247,13 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
         record_owners_list = [email.lower().strip() \
                               for email in record_owners_list]
     else:
-        record_owners_list = []
+        #if the record owner can not be retrieved from the metadata
+        #(in case the record has not been inserted yet), 
+        #try to use the global variable emailvalue
+        try:
+            record_owners_list = [emailvalue]
+        except NameError:
+            record_owners_list = []
     record_owners = ",".join([owner for owner in record_owners_list])
     if record_owners != "":
         addresses += ",%s" % record_owners
@@ -264,5 +272,7 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
         mailbody += "Comments from the referee:\n%s\n" % comment
     # Send mail to referee if any recipients or copy to admin
     if addresses or CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
-        send_email(FROMADDR,addresses,mailtitle,mailbody, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+        scheduled_send_email(FROMADDR, addresses, mailtitle, mailbody,
+                             copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN,
+                             other_bibtasklet_arguments=['-I', str(sequence_id)])
     return ""
