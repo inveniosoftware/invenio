@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -80,7 +80,7 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
        * edsrn: Name of the file containing the reference of the
                 approved document.
     """
-    global titlevalue,authorvalue,sysno,rn
+    global titlevalue,authorvalue, emailvalue,sysno,rn
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     doctype = form['doctype']
     titlevalue = titlevalue.replace("\n"," ")
@@ -244,7 +244,13 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
         record_owners_list = [email.lower().strip() \
                               for email in record_owners_list]
     else:
-        record_owners_list = []
+        #if the record owner can not be retrieved from the metadata
+        #(in case the record has not been inserted yet),
+        #try to use the global variable emailvalue
+        try:
+            record_owners_list = [emailvalue]
+        except NameError:
+            record_owners_list = []
     record_owners = ",".join([owner for owner in record_owners_list])
     if record_owners != "":
         addresses += ",%s" % record_owners
