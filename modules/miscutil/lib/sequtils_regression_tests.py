@@ -30,6 +30,9 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.dbquery import run_sql
 
 from invenio.sequtils import SequenceGenerator
+from invenio.sequtils_texkey import TexkeySeq, TexkeyNoAuthorError, \
+                                    task_run_core
+
 
 def get_bibrecord_mock(_):
     return {'001': [([], ' ', ' ', '1086086', 1)],
@@ -46,6 +49,72 @@ def get_bibrecord_mock(_):
             '856': [([('u', 'http://dummy.com/')], '4', ' ', '', 6)],
             '970': [([('a', 'CONF-XXXXXX')], ' ', ' ', '', 2)],
             '980': [([('a', 'CONFERENCES')], ' ', ' ', '', 7)]}
+
+
+def get_sample_texkey(num_test=0):
+    sample_records = []
+    xml = """
+    <record>
+        <datafield tag="100" ind1=" " ind2=" ">
+            <subfield code="a">Boyle, P.A.</subfield>
+        </datafield>
+        <datafield tag="700" ind1=" " ind2=" ">
+            <subfield code="a">Christ, N.H.</subfield>
+        </datafield>
+        <datafield tag="269" ind1=" " ind2=" ">
+            <subfield code="c">2012-12-06</subfield>
+        </datafield>
+    </record>
+    """
+    sample_records.append(xml)
+
+    xml = """
+    <record>
+        <datafield tag="100" ind1=" " ind2=" ">
+            <subfield code="a">Broekhoven-Fiene, Hannah</subfield>
+        </datafield>
+        <datafield tag="700" ind1=" " ind2=" ">
+            <subfield code="a">Matthews, Brenda C.</subfield>
+        </datafield>
+            <datafield tag="269" ind1=" " ind2=" ">
+        <subfield code="c">2012-12-06</subfield>
+        </datafield>
+    </record>
+    """
+    sample_records.append(xml)
+
+    xml = """
+    <record>
+        <datafield tag="269" ind1=" " ind2=" ">
+            <subfield code="b">CERN</subfield>
+            <subfield code="a">Geneva</subfield>
+            <subfield code="c">2012-11-06</subfield>
+        </datafield>
+        <datafield tag="300" ind1=" " ind2=" ">
+            <subfield code="a">16</subfield>
+        </datafield>
+        <datafield tag="710" ind1=" " ind2=" ">
+            <subfield code="g">ATLAS Collaboration</subfield>
+        </datafield>
+    </record>
+    """
+    sample_records.append(xml)
+
+    xml = """
+    <record>
+        <datafield tag="269" ind1=" " ind2=" ">
+            <subfield code="b">CERN</subfield>
+            <subfield code="a">Geneva</subfield>
+            <subfield code="c">2012-11-06</subfield>
+        </datafield>
+        <datafield tag="300" ind1=" " ind2=" ">
+            <subfield code="a">16</subfield>
+        </datafield>
+    </record>
+    """
+    sample_records.append(xml)
+
+    return sample_records[num_test]
 
 
 class IntSeq(SequenceGenerator):
@@ -92,8 +161,60 @@ class TestCnumSequenceGeneratorClass(InvenioTestCase):
                         AND seq_value IN ("C50-09-14", "C50-09-14.1") """)
 
 
+class TestTexkeySequenceGeneratorClass(unittest.TestCase):
+
+    def setUp(self):
+        self.texkey1 = ""
+        self.texkey2 = ""
+        self.texkey3 = ""
+
+    def test_get_next_texkey1(self):
+        """ Generate the first texkey """
+
+        texkey_seq = TexkeySeq()
+        self.texkey1 = texkey_seq.next_value(xml_record=get_sample_texkey(0))
+        self.assertEqual(self.texkey1[:-3], 'Boyle:2012')
+
+    def test_get_next_texkey2(self):
+        """ Generate the second texkey """
+
+        texkey_seq = TexkeySeq()
+        self.texkey2 = texkey_seq.next_value(xml_record=get_sample_texkey(1))
+        self.assertEqual(self.texkey2[:-3], 'Broekhoven-Fiene:2012')
+
+    def test_get_next_texkey3(self):
+        """ Generate the third texkey """
+
+        texkey_seq = TexkeySeq()
+        self.texkey3 = texkey_seq.next_value(xml_record=get_sample_texkey(2))
+        self.assertEqual(self.texkey3[:-3], 'ATLAS:2012')
+
+    def test_get_next_texkey_error(self):
+        """ Generate an error while getting a texkey """
+
+        texkey_seq = TexkeySeq()
+        self.assertRaises(TexkeyNoAuthorError,
+            texkey_seq.next_value, xml_record=get_sample_texkey(3))
+
+    def tearDown(self):
+        # Clean DB entries
+        run_sql(""" DELETE FROM seqSTORE
+                    WHERE seq_name="texkey"
+                    AND seq_value IN ("%s", "%s", "%s") """ % (self.texkey1,
+                                                               self.texkey2,
+                                                               self.texkey3))
+
+
+class TestTexkeydaemonClass(unittest.TestCase):
+    def test_task_run_core(self):
+        """ Basic task_run_core check """
+        task_run_core()
+
+
 TEST_SUITE = make_test_suite(TestIntSequenceGeneratorClass,
-                             TestCnumSequenceGeneratorClass)
+                             TestCnumSequenceGeneratorClass,
+                             TestTexkeySequenceGeneratorClass,
+                             TestTexkeydaemonClass)
 
 
 if __name__ == "__main__":

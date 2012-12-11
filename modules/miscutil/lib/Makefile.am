@@ -95,6 +95,7 @@ pylib_DATA = __init__.py \
              memoiseutils_unit_tests.py \
              crossrefutils.py \
              containerutils.py \
+             sequtils_texkey.py \
              hepdatautils.py \
              hepdatadisplayutils.py \
              hepdatautils_unit_tests.py \
