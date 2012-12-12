@@ -620,7 +620,7 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element="page source")
 
-    def login(self, username="guest", password="", force_ln='en'):
+    def login(self, username="guest", password="", force_ln='en', go_to_login_page=True):
         """ Login function
         @param username: the username (nickname or email)
         @type username: string
@@ -629,14 +629,19 @@ class InvenioWebTestCase(unittest.TestCase):
         @param force_ln: if the arrival page doesn't use the corresponding
             language, then the browser will redirect to it.
         @type force_ln: string
+        @param go_to_login_page: if True, look for login link on the
+                                 page. Otherwise expect to be already
+                                 on a page with the login form
+        @type go_to_login_page: bool
         """
-        if not "You can use your nickname or your email address to login." in self.browser.page_source:
-            if "You are no longer recognized by our system" in self.browser.page_source:
-                self.find_element_by_link_text_with_timeout("login here")
-                self.browser.find_element_by_link_text("login here").click()
-            else:
-                self.find_element_by_link_text_with_timeout("login")
-                self.browser.find_element_by_link_text("login").click()
+        if go_to_login_page:
+            if not "You can use your nickname or your email address to login." in self.browser.page_source:
+                if "You are no longer recognized by our system" in self.browser.page_source:
+                    self.find_element_by_link_text_with_timeout("login here")
+                    self.browser.find_element_by_link_text("login here").click()
+                else:
+                    self.find_element_by_link_text_with_timeout("login")
+                    self.browser.find_element_by_link_text("login").click()
 
         self.find_element_by_name_with_timeout("p_un")
         self.browser.find_element_by_name("p_un").clear()

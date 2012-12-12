@@ -2216,22 +2216,6 @@ class WebSearchSummarizerTest(unittest.TestCase):
                                                expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9',
                                                expected_link_label='1'))
 
-    def test_compute_self_citations(self):
-        """websearch - computing self-citations"""
-        tags = search_engine_summarizer.get_authors_tags()
-        recids = [row[0] for row in run_sql('select id from bibrec limit 300')]
-        citers = search_engine_summarizer.get_cited_by_list(recids)
-        authors_cache = {}
-        total_citations = sum(len(lciters) for recid,lciters in citers)
-        total_citations_minus_self_citations = 0
-        for recid, lciters in citers:
-            total_citations_minus_self_citations += \
-                search_engine_summarizer.compute_self_citations(recid,
-                                                                lciters,
-                                                                authors_cache,
-                                                                tags)
-        self.assert_(total_citations_minus_self_citations < total_citations)
-
 
 class WebSearchRecordCollectionGuessTest(unittest.TestCase):
     """Primary collection guessing tests."""

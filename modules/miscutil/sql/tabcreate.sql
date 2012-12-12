@@ -2700,6 +2700,13 @@ CREATE TABLE IF NOT EXISTS `rnkSELFCITES` (
   PRIMARY KEY (`id_bibrec`)
 ) ENGINE=MyISAM;
 
+-- a table for storing invalid or ambiguous references encountered
+CREATE TABLE IF NOT EXISTS rnkCITATIONDATAERR (
+  `type` ENUM('multiple-matches', 'not-well-formed'),
+  citinfo varchar(255) NOT NULL default '',
+  PRIMARY KEY (`type`, citinfo)
+) ENGINE=MyISAM;
+
 -- tables for collections and collection tree:
 
 CREATE TABLE IF NOT EXISTS collection (

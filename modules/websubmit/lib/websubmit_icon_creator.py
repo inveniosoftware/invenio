@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -407,6 +407,8 @@ def create_icon(options):
     else:
         ## Get the file type of the input file:
         tmp_file_extension = options["input-file"].split(".")[-1]
+        ## allow also Invenio files that use the format: filename.ext;format;subformat;version
+        tmp_file_extension = tmp_file_extension.split(';')[0]
         if tmp_file_extension.lower() not in CFG_ALLOWED_FILE_EXTENSIONS:
             ## Ilegal input file type.
             msg = "Error: icons can be only be created from %s files, " \

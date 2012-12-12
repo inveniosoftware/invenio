@@ -24,6 +24,7 @@ import ConfigParser
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.config import CFG_ETCDIR
+from invenio.dbquery import run_sql
 
 
 def load_config():
@@ -128,7 +129,28 @@ class TestCitationIndexer(unittest.TestCase):
         compare_dicts(self, dicts)
 
 
-TEST_SUITE = make_test_suite(TestCitationIndexer,)
+class TestCitationIndexerWarnings(unittest.TestCase):
+    def cleanup(self):
+        run_sql("""DELETE FROM rnkCITATIONDATAERR
+                   WHERE citinfo LIKE 'Test Ref %'""")
+
+    def count(self):
+        return run_sql("SELECT COUNT(*) FROM rnkCITATIONDATAERR")[0][0]
+
+    def test_insert(self):
+        from invenio.bibrank_citation_indexer import store_citation_warning
+        self.cleanup()
+        before = self.count()
+        store_citation_warning('multiple-matches', 'Test Ref 1')
+        store_citation_warning('not-well-formed', 'Test Ref 2')
+        after = self.count()
+        self.assertEqual(after - before, 2)
+        store_citation_warning('not-well-formed', 'Test Ref 2')
+        after2 = self.count()
+        self.assertEqual(after2 - before, 2)
+        self.cleanup()
+
+TEST_SUITE = make_test_suite(TestCitationIndexer, TestCitationIndexerWarnings)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

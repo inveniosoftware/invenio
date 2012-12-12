@@ -2018,7 +2018,8 @@ class BibDoc:
             docfiles = self.list_version_files(version, list_hidden=display_hidden)
         else:
             docfiles = self.list_latest_files(list_hidden=display_hidden)
-        icon = self.get_icon(display_hidden=display_hidden)
+        # retrieve an icon that can be displayed (it can not be hidded)
+        icon = self.get_icon(display_hidden=False)
         if icon:
             imageurl = icon.get_url()
         else:
