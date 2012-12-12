@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02D111-1307, USA.
 
 """
-bibrank database models.
+BibRank database models.
 """
 
 # General imports.
@@ -29,10 +29,9 @@ from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec, Bibdoc
 
+
 class RnkMETHOD(db.Model):
     """Represents a RnkMETHOD record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkMETHOD'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
                 nullable=False)
@@ -41,66 +40,64 @@ class RnkMETHOD(db.Model):
     last_updated = db.Column(db.DateTime, nullable=False,
                 server_default='0001-01-01 00:00:00')
 
+
 class RnkMETHODDATA(db.Model):
     """Represents a RnkMETHODDATA record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkMETHODDATA'
     id_rnkMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(RnkMETHOD.id), nullable=False, primary_key=True)
     relevance_data = db.Column(db.iLargeBinary, nullable=True)
 
+
 class RnkMETHODNAME(db.Model):
     """Represents a RnkMETHODNAME record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkMETHODNAME'
     id_rnkMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(RnkMETHOD.id), primary_key=True)
-    ln = db.Column(db.Char(5), primary_key=True,
-                server_default='')
-    type = db.Column(db.Char(3), primary_key=True,
-                server_default='sn')
+    ln = db.Column(db.Char(5), primary_key=True, server_default='')
+    type = db.Column(db.Char(3), primary_key=True, server_default='sn')
     value = db.Column(db.String(255), nullable=False)
     method = db.relationship(RnkMETHOD, backref='names')
 
+
 class RnkCITATIONDATA(db.Model):
     """Represents a RnkCITATIONDATA record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkCITATIONDATA'
     id = db.Column(db.MediumInteger(8, unsigned=True), primary_key=True,
                 nullable=False)
-    object_name = db.Column(db.String(20), unique=True,
-                nullable=False)
+    object_name = db.Column(db.String(20), unique=True, nullable=False)
     object_value = db.Column(db.iLargeBinary, nullable=True)
     last_updated = db.Column(db.DateTime, nullable=False,
                 server_default='0001-01-01 00:00:00')
+
+
+class RnkCITATIONDATAERR(object):
+    """Represents a  RnkCITATIONDATAERR record."""
+    type = db.Column(db.Enum('multiple-matches', 'not-well-formed'),
+                primary_key=True)
+    citinfo = db.Column(db.String(255), nullable=False, server_default='',
+                primary_key=True)
+
 
 class RnkCITATIONDATAEXT(db.Model):
     """Represents a RnkCITATIONDATAEXT record."""
     __tablename__ = 'rnkCITATIONDATAEXT'
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), autoincrement=False,
-                primary_key=True, nullable=False,
-                server_default='0')
+                primary_key=True, nullable=False, server_default='0')
     extcitepubinfo = db.Column(db.String(255), primary_key=True,
-                nullable=False,
-                index=True)
+                nullable=False, index=True)
+
 
 class RnkAUTHORDATA(db.Model):
     """Represents a RnkAUTHORDATA record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkAUTHORDATA'
-    aterm = db.Column(db.String(50), primary_key=True,
-                nullable=True)
+    aterm = db.Column(db.String(50), primary_key=True, nullable=True)
     hitlist = db.Column(db.iLargeBinary, nullable=True)
+
 
 class RnkDOWNLOADS(db.Model):
     """Represents a RnkDOWNLOADS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkDOWNLOADS'
     id = db.Column(db.Integer, primary_key=True, nullable=False,
                 autoincrement=True)
@@ -108,37 +105,30 @@ class RnkDOWNLOADS(db.Model):
                 db.ForeignKey(Bibrec.id), nullable=True)
     download_time = db.Column(db.DateTime, nullable=True,
                 server_default='0001-01-01 00:00:00')
-    client_host = db.Column(db.Integer(10, unsigned=True),
-                nullable=True)
+    client_host = db.Column(db.Integer(10, unsigned=True), nullable=True)
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
                 nullable=True)
     id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Bibdoc.id), nullable=True)
-    file_version = db.Column(db.SmallInteger(2, unsigned=True),
-                nullable=True)
+    file_version = db.Column(db.SmallInteger(2, unsigned=True), nullable=True)
     file_format = db.Column(db.String(10), nullable=True)
     bibrec = db.relationship(Bibrec, backref='downloads')
     bibdoc = db.relationship(Bibdoc, backref='downloads')
     user = db.relationship(User, backref='downloads')
 
+
 class RnkPAGEVIEWS(db.Model):
     """Represents a RnkPAGEVIEWS record."""
-    def __init__(self):
-        pass
     __tablename__ = 'rnkPAGEVIEWS'
-    id = db.Column(db.MediumInteger, primary_key=True,
-                nullable=False,
+    id = db.Column(db.MediumInteger, primary_key=True, nullable=False,
                 autoincrement=True)
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
-                db.ForeignKey(Bibrec.id), nullable=True,
-                primary_key=True)
-    id_user = db.Column(db.Integer(15, unsigned=True),
-                db.ForeignKey(User.id),
-            server_default='0', primary_key=True)
-    client_host = db.Column(db.Integer(10, unsigned=True),
-                nullable=True)
+                db.ForeignKey(Bibrec.id), nullable=True, primary_key=True)
+    id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
+                server_default='0', primary_key=True)
+    client_host = db.Column(db.Integer(10, unsigned=True), nullable=True)
     view_time = db.Column(db.DateTime, primary_key=True,
-            server_default='0001-01-01 00:00:00')
+                server_default='0001-01-01 00:00:00')
     bibrec = db.relationship(Bibrec, backref='pageviews')
     user = db.relationship(User, backref='pageviews')
 
@@ -157,7 +147,7 @@ class RnkWORD01R(db.Model):
     __tablename__ = 'rnkWORD01R'
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=False, primary_key=True)
-    termlist = db.Column(db.iLargeBinary, nullable=True)
+    termlist = db.Column(db.LargeBinary, nullable=True)
     type = db.Column(db.Enum('CURRENT', 'FUTURE', 'TEMPORARY'),
                 nullable=False, server_default='CURRENT', primary_key=True)
     bibrec = db.relationship(Bibrec, backref='word01rs')
@@ -175,30 +165,26 @@ class RnkEXTENDEDAUTHORS(db.Model):
 class RnkRECORDSCACHE(db.Model):
     """Represents a RnkRECORDSCACHE record."""
     __tablename__ = 'rnkRECORDSCACHE'
-
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
-                db.ForeignKey(Bibrec.id), nullable=True,
-                primary_key=True)
+                db.ForeignKey(Bibrec.id), nullable=True, primary_key=True)
     authorid = db.Column(db.BigInteger(10), primary_key=True, nullable=False)
 
 
 class RnkSELFCITES(db.Model):
     """Represents a RnkSELFCITES record."""
     __tablename__ = 'rnkSELFCITES'
-
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
-                db.ForeignKey(Bibrec.id), nullable=True,
-                primary_key=True)
+                db.ForeignKey(Bibrec.id), nullable=True, primary_key=True)
     count = db.Column(db.Integer(10, unsigned=True), nullable=False)
     references = db.Column(db.Text, nullable=False)
     last_updated = db.Column(db.DateTime, nullable=False)
-
 
 
 __all__ = ['RnkMETHOD',
            'RnkMETHODDATA',
            'RnkMETHODNAME',
            'RnkCITATIONDATA',
+           'RnkCITATIONDATAERR',
            'RnkCITATIONDATAEXT',
            'RnkAUTHORDATA',
            'RnkDOWNLOADS',
