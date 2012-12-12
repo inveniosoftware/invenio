@@ -160,7 +160,8 @@ def get_query(alert_id):
 
 def email_notify(alert, records, argstr):
     """Send the notification e-mail for a specific alert."""
-
+    if CFG_WEBALERT_DEBUG_LEVEL > 2:
+        print "+" * 80 + '\n'
     uid = alert[0]
     user_info = collect_user_info(uid)
     frequency = alert[3]
