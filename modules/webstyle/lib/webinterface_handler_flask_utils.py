@@ -31,10 +31,12 @@ from invenio.cache import cache
 from sqlalchemy.sql import operators
 
 ## Placemark for the i18n function
-_ = lambda x:x
+_ = lambda x: x
+
 
 def register_template_context_processor(f):
     g._template_context_processor.append(f)
+
 
 class InvenioBlueprint(Blueprint):
 
@@ -52,7 +54,7 @@ class InvenioBlueprint(Blueprint):
                 return decorated_func
             return decorator
 
-    def invenio_memoize(self, *cargs, **kwargs):
+    def invenio_memoize(self, *cargs, **ckwargs):
         try:
             return cache.memoize(*cargs, **ckwargs)
         except:
@@ -93,7 +95,7 @@ class InvenioBlueprint(Blueprint):
             return f
         return decorator
 
-    def invenio_add_menuitem(self, *args):
+    def invenio_add_menuitem(self, name=None, *args):
         def decorator(f):
             endpoint = '.'.join([self.name, name or f.__name__])
             self.menubuilder_map[endpoint] = args

@@ -21,17 +21,16 @@ Invenio -> Flask adapter
 """
 
 import os
-import hashlib
-from os.path import join, exists, getmtime, splitext
+from os.path import join
 from pprint import pformat
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
-from flask import Blueprint, Flask, logging, session, request, g, \
-                url_for, current_app, Response, render_template, \
+from flask import Flask, session, request, g, \
+                url_for, current_app, render_template, \
                 redirect, flash
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
-from werkzeug.routing import BuildError, NotFound, RequestRedirect
+from werkzeug.routing import BuildError
 
 from invenio.sqlalchemyutils import db
 from invenio import config
@@ -43,10 +42,12 @@ from invenio.config import CFG_PYLIBDIR, \
     CFG_ETCDIR, CFG_DEVEL_SITE, \
     CFG_FLASK_CACHE_TYPE, \
     CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, CFG_WEBSESSION_ONE_DAY
+from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
+    CFG_WEBSESSION_ONE_DAY
 
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
+
 
 def create_invenio_flask_app():
     """
@@ -55,7 +56,7 @@ def create_invenio_flask_app():
 
     ## The Flask application instance
     _app = Flask(__name__,
-        static_url_path='/', ## We assume anything under '/' which is static to be handled directly by Apache
+        static_url_path='/',  # We assume anything under '/' which is static to be handled directly by Apache
         static_folder=CFG_WEBDIR)
 
     ## Let's initialize database.
@@ -64,16 +65,20 @@ def create_invenio_flask_app():
     # Register Flask application in flask-sqlalchemy extension
     db.init_app(_app)
 
-    from invenio.pluginutils import PluginContainer, create_enhanced_plugin_builder
+    ## First check that you have all rights to logs
+    from invenio.bibtask import check_running_process_user
+    check_running_process_user()
+
+    from invenio.pluginutils import PluginContainer
     from invenio.session_flask import InvenioSessionInterface
-#from flaskext.login import LoginManager
+    #from flaskext.login import LoginManager
     from invenio.webuser_flask import InvenioLoginManager, current_user
-    from invenio.messages import wash_language, gettext_set_language, language_list_long, is_language_rtl
+    from invenio.messages import wash_language, gettext_set_language, \
+                                 language_list_long, is_language_rtl
     from invenio.dateutils import convert_datetext_to_dategui, \
                                   convert_datestruct_to_dategui
     from invenio.urlutils import create_url
     from invenio.cache import cache
-#from invenio.webuser import collect_user_info
     from invenio.jinja2utils import CollectionExtension, DynCacheExtension
     from invenio.webmessage_mailutils import email_quoted_txt2html
     from flask.ext.assets import Environment, Bundle
@@ -95,14 +100,14 @@ def create_invenio_flask_app():
                 """Extends criteria when to stay on HTTP site."""
                 _force_https = False
                 if request.blueprint in current_app.blueprints:
-                    _force_https = current_app.blueprints[request.blueprint]._force_https
+                    _force_https = current_app.blueprints[request.blueprint].\
+                                   _force_https
 
                 view_func = current_app.view_functions.get(request.endpoint)
                 if view_func is not None and hasattr(view_func, '_force_https'):
                     _force_https = view_func._force_https
 
                 return not (_force_https or session.need_https())
-
 
     class LegacyAppMiddleware(object):
         def __init__(self, app):
@@ -127,7 +132,7 @@ def create_invenio_flask_app():
             if not isinstance(response, BaseResponse):
                 response = current_app.make_response(str(response))
             return response
-        except HTTPException, e:
+        except HTTPException:
             return render_template("404.html"), 404
 
     @_app.errorhandler(401)
@@ -146,12 +151,15 @@ def create_invenio_flask_app():
                                 cache, prefix="jinja::",
                                 timeout=3600))
 
-
     ## Let's customize the template loader to first look into
-    ## /opt/invenio/etc-local/templates and then into /opt/invenio/etc/templates
-    _app.jinja_loader = FileSystemLoader([join(CFG_ETCDIR + '-local', 'templates'), join(CFG_ETCDIR, 'templates')])
+    ## /opt/invenio/etc-local/templates and then into
+    ## /opt/invenio/etc/templates
+    _app.jinja_loader = FileSystemLoader([join(CFG_ETCDIR + '-local',
+                                               'templates'),
+                                          join(CFG_ETCDIR, 'templates')])
 
-    ## Let's attach our session handling (which is bridging with the native Invenio session handling
+    ## Let's attach our session handling (which is bridging with the native
+    ## Invenio session handling
     _app.session_interface = InvenioSessionInterface()
 
     ## Let's load the whole invenio.config into Flask :-) ...
@@ -160,16 +168,18 @@ def create_invenio_flask_app():
     ## ... and map certain common parameters
     _app.config["SECRET_KEY"] = 'Inv3n10'
     _app.config['SESSION_COOKIE_NAME'] = CFG_WEBSESSION_COOKIE_NAME
-    _app.config['PERMANENT_SESSION_LIFETIME'] = CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER * CFG_WEBSESSION_ONE_DAY
+    _app.config['PERMANENT_SESSION_LIFETIME'] = \
+        CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER * CFG_WEBSESSION_ONE_DAY
     _app.config['USE_X_SENDFILE'] = CFG_BIBDOCFILE_USE_XSENDFILE
     _app.config['DEBUG'] = CFG_DEVEL_SITE > 0
     _app.debug = CFG_DEVEL_SITE > 0
-    _app.config['CFG_LANGUAGE_LIST_LONG'] = [(lang, longname.decode('utf-8')) for (lang, longname) in language_list_long()]
-
+    _app.config['CFG_LANGUAGE_LIST_LONG'] = [(lang, longname.decode('utf-8'))
+        for (lang, longname) in language_list_long()]
 
     if CFG_DEVEL_SITE > 8:
         from flask_debugtoolbar import DebugToolbarExtension
         _toolbar = DebugToolbarExtension(_app)
+        del _toolbar
 
     ## Invenio is all using str objects. Let's change them to unicode
     _app.config.update(unicodifier(dict(_app.config)))
@@ -182,15 +192,17 @@ def create_invenio_flask_app():
             def decorator(*args, **kwargs):
                 try:
                     return f(*args, **kwargs)
-                except Exception, e:
+                except Exception:
                     register_exception(alert_admin=True)
                     pass
             return decorator
 
         ## When the redis is down, we would like to keep the site running.
-        cache.cache._client.execute_command = with_try_except_block(cache.cache._client.execute_command)
+        cache.cache._client.execute_command = with_try_except_block(
+            cache.cache._client.execute_command)
 
-    _flask_log_handler = RotatingFileHandler(os.path.join(CFG_LOGDIR, 'flask.log'))
+    _flask_log_handler = RotatingFileHandler(os.path.join(CFG_LOGDIR,
+                                                          'flask.log'))
     _flask_log_handler.setFormatter(Formatter(
         '%(asctime)s %(levelname)s: %(message)s '
         '[in %(pathname)s:%(lineno)d]'
@@ -205,7 +217,7 @@ def create_invenio_flask_app():
     # Let's create main menu.
     class Menu(object):
         def __init__(self, id='', title='', url='', order=None, children=None,
-                     display=lambda:True):
+                     display=lambda: True):
             self.id = id
             self.title = title
             self.url = url
@@ -215,7 +227,7 @@ def create_invenio_flask_app():
 
     # Let's create assets environment.
     _assets = Environment(_app)
-    _assets.debug = True #config.CFG_DEVEL_SITE == 1
+    _assets.debug = config.CFG_DEVEL_SITE >= 1
     _assets.directory = config.CFG_WEBDIR
 
     _app.jinja_env.extend(new_bundle=lambda tag, collection: \
@@ -233,6 +245,7 @@ def create_invenio_flask_app():
                     default='retro',
                     force_default=False,
                     force_lower=False)
+    del _gravatar
 
     @_login_manager.user_loader
     def _load_user(uid):
@@ -309,11 +322,12 @@ def create_invenio_flask_app():
     @_app.template_filter('invenio_format_date')
     def _format_date(date):
         """
-        This is a special Jinja2 filter that will call convert_datetext_to_dategui
-        to print a human friendly date.
+        This is a special Jinja2 filter that will call
+        convert_datetext_to_dategui to print a human friendly date.
         """
         if isinstance(date, datetime):
-            return convert_datestruct_to_dategui(date.timetuple(), g.ln).decode('utf-8')
+            return convert_datestruct_to_dategui(date.timetuple(),
+                                                 g.ln).decode('utf-8')
         return convert_datetext_to_dategui(date, g.ln).decode('utf-8')
 
     @_app.template_filter('invenio_url_args')
@@ -359,18 +373,6 @@ def create_invenio_flask_app():
         menubuilder = filter(lambda x: x.display(), current_app.config['menubuilder_map']['main'].\
                         children.itervalues())
 
-        def get_css_bundle():
-            collection = get_css_collection()
-            #TODO add settings for CSS filters
-            return Bundle(output='css/invenio-%s.css' % \
-                          hash('|'.join(collection)), *collection)
-
-        def get_js_bundle():
-            collection = get_js_collection()
-            #TODO add settings for JS minifiers
-            return Bundle(output='js/invenio-%s.js' % \
-                          hash('|'.join(collection)), *collection)
-
         user = current_user._get_current_object()
         return dict(_=g._,
                     current_user=user,
@@ -392,7 +394,6 @@ def create_invenio_flask_app():
                 return candidate
         raise ValueError('%s is not a valid blueprint plugin' % plugin_name)
 
-
 ## Let's load all the blueprints that are composing this Invenio instance
     _BLUEPRINTS = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_blueprint.py'),
@@ -411,9 +412,9 @@ def create_invenio_flask_app():
         _app.register_blueprint(plugin)
         if plugin.config:
             ## Let's include the configuration parameters of the config file.
-            ## E.g. if the blueprint specify the config string 'invenio.webmessage_config'
-            ## any uppercase variable defined in the module invenio.webmessage_config
-            ## is loaded into the system.
+            ## E.g. if the blueprint specify the config string
+            ## 'invenio.webmessage_config' any uppercase variable defined in
+            ## the module invenio.webmessage_config is loaded into the system.
             _app.config.from_object(plugin.config)
         if plugin.breadcrumbs:
             _app.config['breadcrumbs_map'][plugin.name] = plugin.breadcrumbs
@@ -421,7 +422,8 @@ def create_invenio_flask_app():
 
         ## Let's build global menu. Each blueprint can plug its own menu items.
         if plugin.menubuilder:
-            _app.config['menubuilder_map'].update((m[0],Menu(*m)) for m in plugin.menubuilder)
+            _app.config['menubuilder_map'].update((m[0],
+                Menu(*m)) for m in plugin.menubuilder)
         _app.config['menubuilder_map'].update(plugin.menubuilder_map)
 
     _app.config['menubuilder_map'].update({
@@ -431,7 +433,7 @@ def create_invenio_flask_app():
             'main.help': Menu('main.help', _('Help'), 'help', 9999)})
 
     menu = {'main': Menu('main', '', '')}
-    for key,item in _app.config['menubuilder_map'].iteritems():
+    for key, item in _app.config['menubuilder_map'].iteritems():
         start = menu
 
         if '.' not in key:

@@ -19,20 +19,14 @@
 
 """WebSearch Flask Blueprint"""
 
-import pprint
 import json
-from string import rfind, strip
-from datetime import datetime
-from hashlib import md5
 from math import ceil
 from itertools import groupby
+from flask import make_response, g, render_template, request, flash, jsonify, \
+                    redirect, url_for, current_app, abort
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app,\
-                  abort
-from sqlalchemy.sql import operators
-
-from invenio.config import CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT
+from invenio.config import CFG_PYLIBDIR, CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, \
+                           CFG_SITE_LANG
 from invenio.cache import cache
 from invenio.websearch_cache import search_results_cache, \
                                     get_search_query_id, \
@@ -42,16 +36,14 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.sqlalchemyutils import db
 from invenio.websearch_forms import EasySearchForm
-from invenio.websearch_model import Collection, CollectionCollection, Format
+from invenio.websearch_model import Collection, Format
 from invenio.websearch_webinterface import wash_search_urlargd
-from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
                                   register_template_context_processor
 from invenio.webuser_flask import current_user
 from invenio import bibindex_model as BibIndex
 from invenio.bibindex_engine import get_index_id_from_index_name
-from invenio.search_engine import search_pattern_parenthesised,\
-                                  get_creation_date,\
+from invenio.search_engine import get_creation_date,\
                                   perform_request_search,\
                                   search_pattern, \
                                   print_record, \
@@ -59,17 +51,14 @@ from invenio.search_engine import search_pattern_parenthesised,\
                                   get_most_popular_field_values, \
                                   get_records_that_can_be_displayed, \
                                   create_nearest_terms_box
-from invenio.bibformat import format_records
 
-#FIXME use caches for internationalization of collection names (get_coll_i18nname)
 
-#FIXME move to websearch.py
-@cache.memoize(3600)
 def cached_format_record(recIDs, of, ln='', verbose=0,
                          search_pattern=None, xml_records=None, user_info=None,
                          record_prefix=None, record_separator=None,
-                         record_suffix=None, prologue="", epilogue="", req=None,
-                         on_the_fly=False):
+                         record_suffix=None, prologue="", epilogue="",
+                         req=None, on_the_fly=False):
+    #FIXME move to websearch.py
     return print_record(recIDs, of, ln=ln, verbose=verbose,
                         brief_links=False).decode('utf8')
 
@@ -80,6 +69,7 @@ blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              menubuilder=[('main.search', _('Search'),
                                            'search.index', 1)])
 
+
 @cache.memoize()
 def get_export_formats():
     return Format.query.filter(db.and_(
@@ -87,24 +77,27 @@ def get_export_formats():
                     Format.visibility == 1
                     )).order_by(Format.name).all()
 
+
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.invenio_templated('websearch_index.html')
 def index():
     """ Renders homepage. """
     collection = Collection.query.get_or_404(1)
     # inject functions to the template
+
     @register_template_context_processor
     def index_context():
         return dict(
-            easy_search_form = EasySearchForm(csrf_enabled=False),
+            easy_search_form=EasySearchForm(csrf_enabled=False),
             format_record=cached_format_record,
             get_creation_date=get_creation_date
         )
     return dict(collection=collection)
 
 
-@blueprint.invenio_memoize(3600)
-def get_collection_breadcrumbs(collection, breadcrumbs=None, builder=None):
+#@blueprint.invenio_memoize(3600)
+def get_collection_breadcrumbs(collection, breadcrumbs=None, builder=None,
+                               ln=CFG_SITE_LANG):
     if breadcrumbs is None:
         breadcrumbs = []
     if collection is not None:
@@ -116,7 +109,8 @@ def get_collection_breadcrumbs(collection, breadcrumbs=None, builder=None):
         if builder is not None:
             crumb = builder(collection)
         else:
-            crumb = (collection.name_ln, 'search.collection',
+            crumb = (unicode(collection.name_ln.decode('utf-8')),
+                    'search.collection',
                      dict(name=collection.name))
         breadcrumbs.append(crumb)
     return breadcrumbs
@@ -125,15 +119,16 @@ def get_collection_breadcrumbs(collection, breadcrumbs=None, builder=None):
 @blueprint.route('/collection/<name>', methods=['GET', 'POST'])
 @blueprint.invenio_templated('websearch_index.html')
 def collection(name):
-    collection = Collection.query.filter(Collection.name==name).first_or_404()
+    collection = Collection.query.filter(Collection.name == name).first_or_404()
     #FIXME cache per language
-    b = get_collection_breadcrumbs(collection, [(_('Home'),'')])
+    b = get_collection_breadcrumbs(collection, [(_('Home'), '')], ln=g.ln)
     current_app.config['breadcrumbs_map'][request.endpoint] = b
+
     @register_template_context_processor
     def index_context():
         return dict(
             format_record=cached_format_record,
-            easy_search_form = EasySearchForm(csrf_enabled=False),
+            easy_search_form=EasySearchForm(csrf_enabled=False),
             get_creation_date=get_creation_date)
     return dict(collection=collection)
 
@@ -177,7 +172,8 @@ class SearchUrlargs(object):
         'p': {'title': 'Search', 'store': None},
         'cc': {'title': 'Collection', 'store': None},
         'c': {'title': 'Collection', 'store': None},
-        'rg': {'title': 'Records in Groups', 'store': 'websearch_group_records'},
+        'rg': {'title': 'Records in Groups',
+               'store': 'websearch_group_records'},
         'sf': {'title': 'Sort Field', 'store': None},
         'so': {'title': 'Sort Option', 'store': 'websearch_sort_option'},
         'rm': {'title': 'Rank Method', 'store': 'websearch_rank_method'}
@@ -196,13 +192,13 @@ class SearchUrlargs(object):
 
     @property
     def user_storable_args(self):
-        return dict(map(lambda (k,v): (v['store'], k),
-                    filter(lambda (k,v): v['store'],
+        return dict(map(lambda (k, v): (v['store'], k),
+                    filter(lambda (k, v): v['store'],
                     self.DEFAULT_URLARGS.iteritems())))
 
     @property
     def url_args(self):
-        return filter(lambda (k,v): k in self.DEFAULT_URLARGS.keys(),
+        return filter(lambda (k, v): k in self.DEFAULT_URLARGS.keys(),
                       self._url_args.iteritems())
 
     @property
@@ -214,14 +210,15 @@ class SearchUrlargs(object):
         args_keys = user_storable_args.keys()
         if self.user.settings is None:
             self.user.settings = dict()
-        return dict(map(lambda (k,v): (user_storable_args[k], v),
-                    filter(lambda (k,v): k in args_keys,
+        return dict(map(lambda (k, v): (user_storable_args[k], v),
+                    filter(lambda (k, v): k in args_keys,
                     self.user.settings.iteritems())))
 
 
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrank_citation_searcher import get_cited_by_count
 from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+
 
 class RecordInfo(object):
 
@@ -232,25 +229,25 @@ class RecordInfo(object):
         return "%s(%s)" % (self.__class__.__name__, self.recid)
 
     def get_nb_reviews(self, count_deleted=False):
-        @cache.cached(key_prefix='record_info::get_nb_reviews::'+str(self.recid)+'::'+str(count_deleted))
+        @cache.cached(key_prefix='record_info::get_nb_reviews::' + \
+                      str(self.recid) + '::' + str(count_deleted))
         def cached():
             return get_nb_reviews(self.recid, count_deleted)
         return cached()
 
     def get_nb_comments(self, count_deleted=False):
-        @cache.cached(key_prefix='record_info::get_nb_comments::'+str(self.recid)+'::'+str(count_deleted))
+        @cache.cached(key_prefix='record_info::get_nb_comments::' + \
+                      str(self.recid) + '::' + str(count_deleted))
         def cached():
             return get_nb_comments(self.recid, count_deleted)
         return cached()
 
     def get_cited_by_count(self):
-        @cache.cached(key_prefix='record_info::get_cided_by_count::'+str(self.recid))
-        def cached():
-            return get_cited_by_count(self.recid)
-        return cached()
+        return get_cited_by_count(self.recid)
 
     def get_fieldvalues(self, fieldname):
-        @cache.cached(key_prefix='record_info::get_fieldvalues::'+str(self.recid)+'::'+str(fieldname))
+        @cache.cached(key_prefix='record_info::get_fieldvalues::' + \
+                      str(self.recid) + '::' + str(fieldname))
         def cached():
             return get_fieldvalues(self.recid, fieldname)
         return cached()
@@ -259,25 +256,55 @@ class RecordInfo(object):
 def _create_neareset_term_box(argd_orig):
     try:
         return create_nearest_terms_box(argd_orig,
-            p.encode('ascii', 'ignore'),
+            request.args.get('p', '').encode('ascii', 'ignore'),
             '', ln=g.ln).decode('utf8')
     except:
         return '<!-- not found -->'
 
 
+import os
+from invenio.pluginutils import PluginContainer
+from invenio.websearch_facet_builders import \
+    get_current_user_records_that_can_be_displayed
+
+
+def _invenio_facet_plugin_builder(plugin_name, plugin_code):
+    """
+    Handy function to bridge pluginutils with (Invenio) facets.
+    """
+    from invenio.websearch_facet_builders import FacetBuilder
+    if 'facet' in dir(plugin_code):
+        candidate = getattr(plugin_code, 'facet')
+        if isinstance(candidate, FacetBuilder):
+            return candidate
+    raise ValueError('%s is not a valid facet plugin' % plugin_name)
+
+
+## Let's load all facets.
+_FACETS = PluginContainer(
+    os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_facets', 'facet_*.py'),
+    plugin_builder=_invenio_facet_plugin_builder)
+
+FACET_DICTS = dict((f.name, f) for f in _FACETS.values())
+FACET_SORTED_LIST = sorted(FACET_DICTS.values(), key=lambda x: x.order)
+
+
 @blueprint.route('/search', methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_('Search results'))
-@blueprint.invenio_templated('websearch_search.html') #, stream=True)
+@blueprint.invenio_templated('websearch_search.html')
 def search():
-    """ Renders search pages. """
+    """
+    Renders search pages.
+
+    @FIXME: add parameter stream=True
+    """
 
     uid = current_user.get_id()
-    user = User.query.get(uid) if not current_user.is_guest else None
-    url_args = SearchUrlargs(user=user, session=session, **request.args)
+    #url_args = SearchUrlargs(user=user, session=session, **request.args)
 
     name = request.args.get('cc')
     if name:
-        collection = Collection.query.filter(Collection.name==name).first_or_404()
+        collection = Collection.query.filter(Collection.name == name).first_or_404()
     else:
         collection = Collection.query.get_or_404(1)
 
@@ -296,6 +323,7 @@ def search():
 
     #FIXME
     b = []
+
     def _crumb_builder(collection):
         qargs = request.args.to_dict()
         qargs['cc'] = collection.name
@@ -305,14 +333,10 @@ def search():
         qargs = request.args.to_dict()
         qargs['cc'] = Collection.query.get_or_404(1).name
         b = get_collection_breadcrumbs(collection, [
-                (_('Home'),'search.search', qargs)],
+                (_('Home'), 'search.search', qargs)],
                 builder=_crumb_builder)
     current_app.config['breadcrumbs_map'][request.endpoint] = b
 
-    p = request.args.get('p')
-    f = request.args.get('f')
-    colls_to_search = request.args.get('cc')
-    wl = request.args.get('wl')
     rg = request.args.get('rg', 10, type=int)
     page = request.args.get('jrec', 1, type=int)
     qid = get_search_query_id(**argd)
@@ -321,51 +345,24 @@ def search():
     if (request.args.get('so') or request.args.get('rm')):
         recids.reverse()
 
-    def get_facet_title(facet):
-        if facet == 'collection' and collection.id > 1:
-            return collection.name_ln
-        return g._('Any '+f.capitalize())
-
-    facets = [{'title': get_facet_title(f),
-               'url': url_for('.facet', name=f, qid=qid),
-               'facet': f}  for f in ['collection', 'author', 'year']]
+    facets = map(lambda x: x.get_conf(collection=collection, qid=qid),
+                 FACET_SORTED_LIST)
 
     @register_template_context_processor
     def index_context():
         return dict(
-                collection = collection,
-                facets = facets,
-                RecordInfo = RecordInfo,
-                create_nearest_terms_box = lambda: _create_neareset_term_box(argd_orig),
-                pagination = Pagination(int(ceil(page/float(rg))), rg, len(recids)),
-                rg = rg,
-                qid = qid,
-                easy_search_form = EasySearchForm(csrf_enabled=False),
+                collection=collection,
+                facets=facets,
+                RecordInfo=RecordInfo,
+                create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
+                pagination=Pagination(int(ceil(page / float(rg))), rg, len(recids)),
+                rg=rg,
+                qid=qid,
+                easy_search_form=EasySearchForm(csrf_enabled=False),
                 format_record=cached_format_record,
                 #FIXME: move to DB layer
                 export_formats=get_export_formats())
-    return dict(recids = recids)
-
-
-def get_current_user_records_that_can_be_displayed(qid):
-    """
-    Returns records that current user can display.
-
-    @param qid: query identifier
-
-    @return: records in intbitset
-    """
-    @search_results_cache.memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT)
-    def get_records_for_user(qid, uid):
-        key = get_search_results_cache_key_from_qid(qid)
-        data = search_results_cache.get(key)
-        if data is None:
-            abort(406)
-        cc = search_results_cache.get(key+'::cc')
-        return get_records_that_can_be_displayed(current_user,
-                                                 HitSet().fastload(data), cc)
-    # Simplifies API
-    return get_records_for_user(qid, current_user.get_id())
+    return dict(recids=recids)
 
 
 @blueprint.route('/facet/<name>/<qid>', methods=['GET', 'POST'])
@@ -378,56 +375,33 @@ def facet(name, qid):
 
     @return: jsonified facet list sorted by number of records
     """
-    if name not in ['collection', 'author', 'year']:
+    if name not in FACET_DICTS:
         abort(406)
 
-    try:
-        recIDsHitSet = get_current_user_records_that_can_be_displayed(qid)
-        recIDs = recIDsHitSet.tolist()
-    except:
-        recIDs = []
-
-    cc = search_results_cache.get(get_search_results_cache_key_from_qid(qid)+'::cc')
-    limit = 50
-
-
-
-    if name == 'collection':
-        parent = request.args.get('parent', None)
-        if parent is not None:
-            collection = Collection.query.filter(Collection.name==parent).first_or_404()
-        else:
-            collection = Collection.query.filter(Collection.name==cc).first_or_404()
-        facet = []
-        for c in collection.collection_children_r:
-            num_records = len(c.reclist.intersection(recIDsHitSet))
-            if num_records:
-                facet.append((c.name, num_records, c.name_ln))
-        return jsonify(facet=sorted(facet, key=lambda x:x[1], reverse=True)[0:limit])
-
-    facet=get_most_popular_field_values(
-                            recIDs,
-                            get_field_tags(name))
+    facet = FACET_DICTS[name]
+    out = facet.get_facets_for_query(qid, limit=request.args.get('limit', 20))
 
     if request.is_xhr:
-        return jsonify(facet=facet[0:limit])
+        return jsonify(facet=out)
     else:
         response = make_response('<html><body>%s</body></html>' % \
-            str(facet[0:limit]))
+            str(out))
         response.mimetype = 'text/html'
         return response
 
 
-@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT/2)
+@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT / 2)
 def get_value_recids(value, facet):
-    p = '"'+str(value)+'"'
+    p = '"' + str(value) + '"'
     return search_pattern(p=p, f=facet)
 
-@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT/4)
+
+@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT / 4)
 def get_facet_recids(facet, values):
-    return reduce(lambda x,y: x.union(y),
+    return reduce(lambda x, y: x.union(y),
                   [get_value_recids(v, facet) for v in values],
                   HitSet())
+
 
 @blueprint.route('/results/<qid>', methods=['GET', 'POST'])
 def results(qid):
@@ -438,63 +412,43 @@ def results(qid):
     """
     try:
         recIDsHitSet = get_current_user_records_that_can_be_displayed(qid)
-        recIDs = recIDsHitSet.tolist()
     except KeyError:
         return 'KeyError'
     except:
         return _('Please reload the page')
 
     cc = search_results_cache.get(
-            get_search_results_cache_key_from_qid(qid)+'::cc')
+            get_search_results_cache_key_from_qid(qid) + '::cc')
 
     try:
         filter = json.loads(request.values.get('filter', '[]'))
     except:
         return _('Invalid filter data')
-    collection = Collection.query.filter(Collection.name==cc).first_or_404()
+    collection = Collection.query.filter(Collection.name == cc).first_or_404()
 
-    sortkeytype= lambda v:v[0]
-    sortfacet= lambda v:v[1]
+    sortkeytype = lambda v: v[0]
+    sortfacet = lambda v: v[1]
     data = sorted(filter, key=sortkeytype)
     out = {}
-    for t,vs in groupby(data, key=sortkeytype):
+    for t, vs in groupby(data, key=sortkeytype):
         out[t] = {}
-        for v,k in groupby(sorted(vs, key=sortfacet), key=sortfacet):
-            out[t][v] = map(lambda i:i[2], k)
+        for v, k in groupby(sorted(vs, key=sortfacet), key=sortfacet):
+            out[t][v] = map(lambda i: i[2], k)
 
     filter = out
     output = recIDsHitSet
 
     if '+' in filter:
         values = filter['+']
-        for facet in ['collection', 'author', 'year']:
-            if facet in values:
-                output.intersection_update(get_facet_recids(facet, values[facet]))
-
-    if '+' in filter and 'collectionname' in filter['+'] and len(filter['+']['collectionname']):
-        limitTo = reduce(lambda x,y: x.union(y),
-            [c.reclist for c in Collection.query.filter(
-                Collection.name.in_(filter['+']['collectionname'])
-            )],
-            HitSet())
-        output.intersection_update(limitTo)
-
+        for key, facet in FACET_DICTS.iteritems():
+            if key in values:
+                output.intersection_update(facet.get_facet_recids(values[key]))
 
     if '-' in filter:
         values = filter['-']
-        for facet in ['collection', 'author', 'year']:
-            if facet in values:
-                output.difference_update(get_facet_recids(facet, values[facet]))
-
-    if '-' in filter and 'collectionname' in filter['-'] and len(filter['-']['collectionname']):
-        exclude = reduce(lambda x,y: x.union(y),
-            [c.reclist for c in Collection.query.filter(
-                Collection.name.in_(filter['-']['collectionname'])
-            )],
-            HitSet())
-        current_app.logger.info(output)
-        current_app.logger.info(exclude)
-        output.difference_update(exclude)
+        for key, facet in FACET_DICTS.iteritems():
+            if key in values:
+                output.difference_update(facet.get_facet_recids(values[key]))
 
     #TODO sort
     if request.values.get('so'):
@@ -514,14 +468,15 @@ def results(qid):
 
     rg = request.values.get('rg', 10, type=int)
     page = request.values.get('jrec', 1, type=int)
+
     @register_template_context_processor
     def index_context():
         return dict(
-                collection = collection,
-                RecordInfo = RecordInfo,
-                create_nearest_terms_box = _create_neareset_term_box,
-                pagination = Pagination(int(ceil(page/float(rg))), rg, len(recids)),
-                rg = rg,
+                collection=collection,
+                RecordInfo=RecordInfo,
+                create_nearest_terms_box=_create_neareset_term_box,
+                pagination=Pagination(int(ceil(page / float(rg))), rg, len(recids)),
+                rg=rg,
                 format_record=cached_format_record)
 
     if len(recids):
@@ -557,15 +512,16 @@ def list(field):
         abort(406)
 
     q = request.args.get('q', '')
-    if len(q)<3:
+    if len(q) < 3:
         abort(406)
 
-    IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' % get_index_id_from_index_name(field))
+    IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' % \
+                                          get_index_id_from_index_name(field))
 
     results = IdxPHRASE.query.filter(IdxPHRASE.term.contains(q)).all()
     results = map(lambda r: r.term, results)
 
-    return jsonify(results = results)
+    return jsonify(results=results)
 
 
 @blueprint.route('/search/dispatch', methods=['GET', 'POST'])
@@ -581,6 +537,7 @@ def dispatch():
     flash("Not implemented action " + action, 'error')
     return redirect(request.referrer)
 
+
 @blueprint.route('/export', methods=['GET', 'POST'])
 def export():
     """
@@ -595,26 +552,24 @@ def export():
     recids = request.values.getlist('recid', type=int)
     rg = request.args.get('rg', len(recids), type=int)
     page = request.args.get('jrec', 1, type=int)
-    content_type = Format.query.filter(Format.code==of).one()
+    content_type = Format.query.filter(Format.code == of).one()
     name = request.args.get('cc')
     if name:
-        collection = Collection.query.filter(Collection.name==name).first_or_404()
+        collection = Collection.query.filter(Collection.name == name).\
+                                      first_or_404()
     else:
         collection = Collection.query.get_or_404(1)
 
     @register_template_context_processor
     def index_context():
         return dict(
-                collection = collection,
-                RecordInfo = RecordInfo,
-                rg = rg,
-                pagination = Pagination(int(ceil(page/float(rg))),
-                                        rg,
-                                        len(recids)))
+                collection=collection,
+                RecordInfo=RecordInfo,
+                rg=rg,
+                pagination=Pagination(int(ceil(page / float(rg))), rg,
+                                      len(recids)))
 
     from invenio.bibformat import print_records
     response = make_response(print_records(recids, of=of, ln=g.ln))
-    response.content_type=content_type
+    response.content_type = content_type
     return response
-
-

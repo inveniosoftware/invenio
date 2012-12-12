@@ -530,8 +530,6 @@
  #}
 <script>
   var box = {{ search_box(collection)|tojson|safe }};
-  //var box = {{ _search_simple_box(collection)|tojson|safe }};
-  //var box = {{ _search_advanced_box(collection)|tojson|safe }};
   document.write(box);
 </script>
 

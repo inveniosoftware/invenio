@@ -15,12 +15,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+SUBDIRS = facets
+
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
 	websearchadminlib.py \
 	websearch_blueprint.py \
 	websearch_cache.py \
+	websearch_facet_builders.py \
 	websearch_forms.py \
 	websearch_flask_tests.py \
 	websearch_fixtures.py \

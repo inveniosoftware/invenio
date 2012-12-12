@@ -39,10 +39,7 @@
   {{ portalboxes.te }}
 {% endblock %}
 
-{% block body %}
-
-{% dyncache 24*60*60, collection.name %}
-
+{% macro collection_records(collection) %}
 <style>
 .websearch .nav > li > ul > li {
   float: left;
@@ -161,6 +158,16 @@
 })(jQuery);
 </script>
 
-{% endcache %}
+{% endmacro %}
+
+{% block body %}
+
+{% if collection.is_restricted %}
+  {{ collection_records(collection) }}
+{% else %}
+  {% dyncache 24*60*60, collection.name %}
+    {{ collection_records(collection) }}
+  {% endcache %}
+{% endif %}
 
 {% endblock %}
