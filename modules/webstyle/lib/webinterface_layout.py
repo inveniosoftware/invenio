@@ -187,21 +187,21 @@ try:
     from invenio.bibknowledge_webinterface import WebInterfaceBibKnowledgePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBibKnowedgePages = WebInterfaceDumbPages
+    WebInterfaceBibKnowledgePages = WebInterfaceDumbPages
 
 try:
     from invenio.batchuploader_webinterface import \
          WebInterfaceBatchUploaderPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceDocumentationPages = WebInterfaceDumbPages
+    WebInterfaceBatchUploaderPages = WebInterfaceDumbPages
 
 try:
     from invenio.bibsword_webinterface import \
          WebInterfaceSword
 except:
     register_exception(alert_admin=True, subject='EMERGENCE')
-    WebInterfaceDocumentationPage = WebInterfaceDumbPages
+    WebInterfaceSword = WebInterfaceDumbPages
 
 try:
     from invenio.ping_webinterface import \
@@ -226,30 +226,30 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     the other modules."""
 
     _exports = WebInterfaceSearchInterfacePages._exports + \
-        WebInterfaceAuthorPages._exports + [
-        'youraccount',
-        'youralerts',
-        'yourbaskets',
-        'yourmessages',
-        'yourloans',
-        'yourgroups',
-        'yourtickets',
-        'comments',
-        'error',
-        'oai2d', ('oai2d.py', 'oai2d'),
-        ('getfile.py', 'getfile'),
-        'submit',
-        'rss',
-        'stats',
-        'journal',
-        'help',
-        'unapi',
-        'exporter',
-        'kb',
-        'batchuploader',
-        'bibsword',
-        'ping'
-        ] + test_exports
+               WebInterfaceAuthorPages._exports + [
+                   'youraccount',
+                   'youralerts',
+                   'yourbaskets',
+                   'yourmessages',
+                   'yourloans',
+                   'yourgroups',
+                   'yourtickets',
+                   'comments',
+                   'error',
+                   'oai2d', ('oai2d.py', 'oai2d'),
+                   ('getfile.py', 'getfile'),
+                   'submit',
+                   'rss',
+                   'stats',
+                   'journal',
+                   'help',
+                   'unapi',
+                   'exporter',
+                   'kb',
+                   'batchuploader',
+                   'bibsword',
+                   'ping'
+               ] + test_exports
 
     def __init__(self):
         self.getfile = websubmit_legacy_getfile
