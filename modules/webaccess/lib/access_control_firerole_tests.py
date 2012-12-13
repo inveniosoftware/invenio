@@ -30,6 +30,7 @@ from invenio.access_control_firerole import compile_role_definition, \
 from invenio.access_control_config import InvenioWebAccessFireroleError, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.webuser import collect_user_info
 
 class AccessControlFireRoleTest(unittest.TestCase):
     """Test functions related to the firewall like role definitions."""
@@ -38,6 +39,8 @@ class AccessControlFireRoleTest(unittest.TestCase):
         """setting up helper variables for tests"""
         self.user_info = {'email' : 'foo.bar@cern.ch',
             'group' : ['patata', 'cetriolo'], 'remote_ip' : '127.0.0.1'}
+        self.guest = collect_user_info(None)
+
 
     def test_compile_role_definition_empty(self):
         """firerole - compiling empty role definitions"""
@@ -120,6 +123,9 @@ class AccessControlFireRoleTest(unittest.TestCase):
     def test_firerole_ip_mask(self):
         """firerole - firerole core testing ip mask matching"""
         self.failUnless(acc_firerole_check_user(self.user_info,
+            compile_role_definition("allow remote_ip '127.0.0.0/24'"
+                "\ndeny any")))
+        self.failIf(acc_firerole_check_user(self.guest,
             compile_role_definition("allow remote_ip '127.0.0.0/24'"
                 "\ndeny any")))
 

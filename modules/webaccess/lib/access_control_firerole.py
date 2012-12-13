@@ -35,6 +35,7 @@ from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
 import re
 import cPickle
 from zlib import compress, decompress
+from invenio.errorlib import register_exception
 
 
 # INTERFACE
@@ -205,6 +206,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
             if not_p and not next_rule_p: # Nothing has matched and we got not
                 return allow_p # Then the whole rule matched!
     except Exception, msg:
+        register_exception(alert_admin=True)
         raise InvenioWebAccessFireroleError, msg
     return default_allow_p # By default we allow ;-) it'an OpenSource project
 
@@ -235,11 +237,12 @@ _any_rule_re = re.compile(r'(?P<command>allow|deny)[\s]+(any|all)[\s]*', re.I)
 # Sub expression finder
 _expressions_re = re.compile(r'(?<!\\)\'.+?(?<!\\)\'|(?<!\\)\".+?(?<!\\)\"|(?<!\\)\/.+?(?<!\\)\/')
 
-def _mkip (ip):
+def _mkip(ip):
     """ Compute a numerical value for a dotted IP """
     num = 0L
-    for i in map (int, ip.split ('.')):
-        num = (num << 8) + i
+    if '.' in ip:
+        for i in map(int, ip.split('.')):
+            num = (num << 8) + i
     return num
 
 _full = 2L ** 32 - 1
