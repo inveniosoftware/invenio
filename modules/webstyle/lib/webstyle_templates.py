@@ -247,13 +247,13 @@ class Template:
   'title' : (title and show_title_p) and '<div class="headline_div"><h1 class="headline">' + cgi.escape(title) + '</h1></div>' or '',
   'titleepilogue' : titleepilogue,
 
-  'body' : body.decode('utf-8'),
+  'body' : body.encode('utf-8'),
 
   }
         if show_footer:
             out += self.tmpl_pagefooter(req, ln = ln,
                            lastupdated = lastupdated,
-                           pagefooteradd = pagefooteradd.decode('utf-8'))
+                           pagefooteradd = pagefooteradd).encode('utf-8')
         return out
 
     def tmpl_pageheader(self, req, ln=CFG_SITE_LANG, headertitle="",
@@ -350,49 +350,7 @@ template function generated it.
             pageheadertitle = headertitle + ' - ' + sitename
 
 
-        out = """\
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
-<head>
- <title>%(pageheadertitle)s</title>
- <link rev="made" href="mailto:%(sitesupportemail)s" />
- <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
- <!--[if lt IE 8]>
-    <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
- <![endif]-->
- <!--[if gt IE 8]>
-    <style type="text/css">div.restrictedflag {filter:none;}</style>
- <![endif]-->
- <link rel="stylesheet" href="%(siteurl)s/css/bootstrap.min.css" type="text/css" />
- <link rel="stylesheet" href="%(siteurl)s/css/bootstrap-responsive.min.css" type="text/css" />
- <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
- <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
- <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
- %(linkbackTrackbackLink)s
- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- <meta http-equiv="Content-Language" content="%(ln)s" />
- <meta name="description" content="%(description)s" />
- <meta name="keywords" content="%(keywords)s" />
- <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
- <script type="text/javascript" src="%(cssurl)s/js/bootstrap.js"></script>
- %(metaheaderadd)s
-</head>
-<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
-<div class="pageheader">
-%(inspect_templates_message)s
-<!-- replaced page header -->
-<table class="navtrailbox">
- <tr>
-  <td class="navtrailboxbody">
-   %(navtrailbox)s
-  </td>
- </tr>
-</table>
-<!-- end replaced page header -->
-%(pageheaderadd)s
-</div>
-        """ % {
+        data = {
           'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
           'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
@@ -435,6 +393,54 @@ template function generated it.
           'linkbackTrackbackLink': headerLinkbackTrackbackLink,
           'inspect_templates_message' : inspect_templates_message
         }
+
+        for k, v in data.iteritems():
+            if isinstance(v, unicode):
+                data[k] = v.encode('utf-8')
+
+        out = """\
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
+<head>
+ <title>%(pageheadertitle)s</title>
+ <link rev="made" href="mailto:%(sitesupportemail)s" />
+ <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
+ <!--[if lt IE 8]>
+    <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
+ <![endif]-->
+ <!--[if gt IE 8]>
+    <style type="text/css">div.restrictedflag {filter:none;}</style>
+ <![endif]-->
+ <link rel="stylesheet" href="%(siteurl)s/css/bootstrap.min.css" type="text/css" />
+ <link rel="stylesheet" href="%(siteurl)s/css/bootstrap-responsive.min.css" type="text/css" />
+ <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
+ <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
+ <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
+ %(linkbackTrackbackLink)s
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta http-equiv="Content-Language" content="%(ln)s" />
+ <meta name="description" content="%(description)s" />
+ <meta name="keywords" content="%(keywords)s" />
+ <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
+ <script type="text/javascript" src="%(cssurl)s/js/bootstrap.js"></script>
+ %(metaheaderadd)s
+</head>
+<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
+<div class="pageheader">
+%(inspect_templates_message)s
+<!-- replaced page header -->
+<table class="navtrailbox">
+ <tr>
+  <td class="navtrailboxbody">
+   %(navtrailbox)s
+  </td>
+ </tr>
+</table>
+<!-- end replaced page header -->
+%(pageheaderadd)s
+</div>
+        """ % data
 
         out += render_template('header.html').encode('utf-8')
         return out

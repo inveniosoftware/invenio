@@ -894,7 +894,7 @@ def createhiddenform(action="", text="", button="confirm", cnfrm='', **hidden):
 
     output  = '<form action="%s" method="post">\n' % (action, )
     output += '<table>\n<tr><td style="vertical-align: top">'
-    output += text
+    output += text.decode('utf-8')
     if cnfrm:
         output += ' <input type="checkbox" name="confirm" value="1"/>'
     for key in hidden.keys():
