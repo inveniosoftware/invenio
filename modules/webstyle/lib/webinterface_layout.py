@@ -203,6 +203,13 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCE')
     WebInterfaceDocumentationPage = WebInterfaceDumbPages
 
+try:
+    from invenio.ping_webinterface import \
+         WebInterfacePingPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCE')
+    WebInterfacePingPages = WebInterfaceDumbPages
+
 if CFG_DEVEL_SITE:
     try:
         from invenio.httptest_webinterface import WebInterfaceHTTPTestPages
@@ -240,7 +247,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'exporter',
         'kb',
         'batchuploader',
-        'bibsword'
+        'bibsword',
+        'ping'
         ] + test_exports
 
     def __init__(self):
@@ -269,6 +277,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     kb = WebInterfaceBibKnowledgePages()
     batchuploader = WebInterfaceBatchUploaderPages()
     bibsword = WebInterfaceSword()
+    ping = WebInterfacePingPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
