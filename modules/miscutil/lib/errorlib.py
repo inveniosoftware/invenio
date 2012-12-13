@@ -216,56 +216,60 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
         print >> tracestack_data_stream, \
                 "\n** Traceback details \n"
         traceback.print_exc(file=tracestack_data_stream)
-        stack = [frame[0] for frame in inspect.getouterframes(inspect.currentframe())][skip_frames:]
+        stack = [frame[0] for frame in inspect.trace()]
+        #stack = [frame[0] for frame in inspect.getouterframes(exc_info[2])][skip_frames:]
         try:
             stack.reverse()
             print >> tracestack_data_stream, \
                     "\n** Stack frame details"
             values_to_hide = set()
             for frame in stack:
-                print >> tracestack_data_stream
-                print >> tracestack_data_stream, \
-                        "Frame %s in %s at line %s" % (
-                            frame.f_code.co_name,
-                            frame.f_code.co_filename,
-                            frame.f_lineno)
-                ## Dereferencing f_locals
-                ## See: http://utcc.utoronto.ca/~cks/space/blog/python/FLocalsAndTraceFunctions
-                local_values = frame.f_locals
                 try:
-                    values_to_hide |= find_all_values_to_hide(local_values)
+                    print >> tracestack_data_stream
+                    print >> tracestack_data_stream, \
+                            "Frame %s in %s at line %s" % (
+                                frame.f_code.co_name,
+                                frame.f_code.co_filename,
+                                frame.f_lineno)
+                    ## Dereferencing f_locals
+                    ## See: http://utcc.utoronto.ca/~cks/space/blog/python/FLocalsAndTraceFunctions
+                    local_values = frame.f_locals
+                    try:
+                        values_to_hide |= find_all_values_to_hide(local_values)
 
-                    code = open(frame.f_code.co_filename).readlines()
-                    first_line = max(1, frame.f_lineno-3)
-                    last_line = min(len(code), frame.f_lineno+3)
-                    print >> tracestack_data_stream, "-" * 79
-                    for line in xrange(first_line, last_line+1):
-                        code_line = code[line-1].rstrip()
-                        if line == frame.f_lineno:
-                            print >> tracestack_data_stream, \
-                                "----> %4i %s" % (line, code_line)
-                        else:
-                            print >> tracestack_data_stream, \
-                                "      %4i %s" % (line, code_line)
-                    print >> tracestack_data_stream, "-" * 79
-                except:
-                    pass
-                for key, value in local_values.items():
-                    print >> tracestack_data_stream, "\t%20s = " % key,
-                    try:
-                        value = repr(value)
-                    except Exception, err:
-                        ## We shall gracefully accept errors when repr() of
-                        ## a value fails (e.g. when we are trying to repr() a
-                        ## variable that was not fully initialized as the
-                        ## exception was raised during its __init__ call).
-                        value = "ERROR: when representing the value: %s" % (err)
-                    try:
-                        print >> tracestack_data_stream, \
-                            _truncate_dynamic_string(value)
+                        code = open(frame.f_code.co_filename).readlines()
+                        first_line = max(1, frame.f_lineno-3)
+                        last_line = min(len(code), frame.f_lineno+3)
+                        print >> tracestack_data_stream, "-" * 79
+                        for line in xrange(first_line, last_line+1):
+                            code_line = code[line-1].rstrip()
+                            if line == frame.f_lineno:
+                                print >> tracestack_data_stream, \
+                                    "----> %4i %s" % (line, code_line)
+                            else:
+                                print >> tracestack_data_stream, \
+                                    "      %4i %s" % (line, code_line)
+                        print >> tracestack_data_stream, "-" * 79
                     except:
-                        print >> tracestack_data_stream, \
-                            "<ERROR WHILE PRINTING VALUE>"
+                        pass
+                    for key, value in local_values.items():
+                        print >> tracestack_data_stream, "\t%20s = " % key,
+                        try:
+                            value = repr(value)
+                        except Exception, err:
+                            ## We shall gracefully accept errors when repr() of
+                            ## a value fails (e.g. when we are trying to repr() a
+                            ## variable that was not fully initialized as the
+                            ## exception was raised during its __init__ call).
+                            value = "ERROR: when representing the value: %s" % (err)
+                        try:
+                            print >> tracestack_data_stream, \
+                                _truncate_dynamic_string(value)
+                        except:
+                            print >> tracestack_data_stream, \
+                                "<ERROR WHILE PRINTING VALUE>"
+                finally:
+                    del frame
         finally:
             del stack
         tracestack_data = tracestack_data_stream.getvalue()
@@ -382,7 +386,7 @@ def register_exception(stream='error',
 
             ## If a prefix was requested let's print it
             if prefix:
-                prefix = _truncate_dynamic_string(prefix)
+                #prefix = _truncate_dynamic_string(prefix)
                 print >> log_stream, prefix + '\n'
                 print >> email_stream, prefix + '\n'
 
@@ -391,7 +395,7 @@ def register_exception(stream='error',
 
             ## If a suffix was requested let's print it
             if suffix:
-                suffix = _truncate_dynamic_string(suffix)
+                #suffix = _truncate_dynamic_string(suffix)
                 print >> log_stream, suffix
                 print >> email_stream, suffix
 
