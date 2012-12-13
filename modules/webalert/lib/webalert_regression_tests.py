@@ -25,6 +25,7 @@ import unittest
 from cStringIO import StringIO
 import sys
 import datetime
+import time
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_ADMIN_EMAIL, \
@@ -102,8 +103,8 @@ class WebAlertFilteringRestrictedRecords(unittest.TestCase):
         # Run the alert for a date when we expect some result, and
         # record output for later analysis.
         # First get creation date of demo records:
-        alert_date = datetime.datetime.strptime(get_creation_date(41, fmt="%Y-%m-%d"),
-                                       '%Y-%m-%d').date() + datetime.timedelta(days=1)
+        alert_date = datetime.datetime(*(time.strptime(get_creation_date(41, fmt="%Y-%m-%d"),
+                                                       '%Y-%m-%d')[:6])).date() + datetime.timedelta(days=1)
         # Prevent emails to be sent, raise verbosity:
         previous_cfg_webalert_debug_level = alert_engine.CFG_WEBALERT_DEBUG_LEVEL
         alert_engine.CFG_WEBALERT_DEBUG_LEVEL = 3
