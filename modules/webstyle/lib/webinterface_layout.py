@@ -207,6 +207,13 @@ except:
     WebInterfaceSword = WebInterfaceDumbPages
 
 try:
+    from invenio.ping_webinterface import \
+         WebInterfacePingPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCE')
+    WebInterfacePingPages = WebInterfaceDumbPages
+
+try:
     from invenio.bibauthorid_webinterface import WebInterfaceBibAuthorIDPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -279,36 +286,37 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     the other modules."""
 
     _exports = WebInterfaceSearchInterfacePages._exports + \
-        [
-        'youraccount',
-        'youralerts',
-        'yourbaskets',
-        'yourmessages',
-        'yourloans',
-        'yourcomments',
-        'ill',
-        'yourgroups',
-        'yourtickets',
-        'comments',
-        'error',
-        'oai2d', ('oai2d.py', 'oai2d'),
-        ('getfile.py', 'getfile'),
-        'submit',
-        'rss',
-        'stats',
-        'journal',
-        'help',
-        'unapi',
-        'exporter',
-        'kb',
-        'batchuploader',
-        'bibsword',
-        'person',
-        'admin2',
-        'linkbacks',
-        'author',
-        'textmining',
-        ] + test_exports + openaire_exports
+               [
+                   'youraccount',
+                   'youralerts',
+                   'yourbaskets',
+                   'yourmessages',
+                   'yourloans',
+                   'yourcomments',
+                   'ill',
+                   'yourgroups',
+                   'yourtickets',
+                   'comments',
+                   'error',
+                   'oai2d', ('oai2d.py', 'oai2d'),
+                   ('getfile.py', 'getfile'),
+                   'submit',
+                   'rss',
+                   'stats',
+                   'journal',
+                   'help',
+                   'unapi',
+                   'exporter',
+                   'kb',
+                   'batchuploader',
+                   'bibsword',
+                   'ping',
+                   'person',
+                   'admin2',
+                   'linkbacks',
+                   'author',
+                   'textmining',
+               ] + test_exports + openaire_exports
 
     def __init__(self):
         self.getfile = bibdocfile_legacy_getfile
@@ -339,6 +347,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     admin2 = WebInterfaceAdminPages()
     batchuploader = WebInterfaceBatchUploaderPages()
     bibsword = WebInterfaceSword()
+    ping = WebInterfacePingPages()
     person = WebInterfaceBibAuthorIDPages()
     linkbacks = WebInterfaceRecentLinkbacksPages()
     #redirects author to the new webauthor
