@@ -2089,3 +2089,92 @@ def is_comment_deleted(comid):
         return True
 
     return False
+
+def perform_display_your_comments(user_info,
+                                  page_number=1,
+                                  selected_order_by_option="lcf",
+                                  selected_display_number_option="all",
+                                  selected_display_format_option="rc",
+                                  ln=CFG_SITE_LANG):
+    """
+    Display all comments submitted by the user.
+
+    @TODO: support reviews too
+
+    @param user_info: standard user info object.
+    @param comments: ordered list of tuples (id_bibrec, comid, date_creation, body, status, in_reply_to_id_cmtRECORDCOMMENT)
+    @param page_number: page on which the user is.
+    @type page_number: integer
+    @param selected_order_by_option: seleccted ordering option. Can be one of:
+          - ocf: Oldest comment first
+          - lcf: Latest comment first
+          - grof: Group by record, oldest commented first
+          - grlf: Group by record, latest commented first
+    @type selected_order_by_option: string
+    @param selected_display_number_option: number of results to show per page. Can be a string-digit or 'all'.
+    @type selected_display_number_option: string
+    @param selected_display_format_option: how to show records. Can be one of:
+          - rc: Records and comments
+          - ro: Records only
+          - co: Comments only
+    @type selected_display_format_option: string
+    @ln: language
+    @type ln: string
+    """
+    query_params = ""
+    nb_total_pages = 0
+
+    if selected_display_format_option in ('rc', 'co'):
+        nb_total_results = run_sql("SELECT count(id) from cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0", \
+                                   (user_info['uid'], ))[0][0]
+    else:
+        if selected_order_by_option in ('grlf', 'grof'):
+            nb_total_results = run_sql("SELECT count(distinct(id_bibrec)) from cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0", \
+                                       (user_info['uid'], ))[0][0]
+        else:
+            nb_total_results = run_sql("SELECT count(id_bibrec) from cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0", \
+                                       (user_info['uid'], ))[0][0]
+    if page_number < 1:
+        page_number = 1
+
+    if selected_display_number_option != 'all' and \
+           not selected_display_number_option.isdigit():
+        # must be some garbage
+        selected_display_number_option = 'all'
+
+    query = ''
+    if selected_order_by_option == "lcf":
+        query_params += " ORDER BY date_creation DESC"
+    elif selected_order_by_option == "ocf":
+        query_params += " ORDER BY date_creation ASC"
+    elif selected_order_by_option == "grlf":
+        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT max(date_creation) as maxdatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.maxdatecreation DESC, cmt.date_creation DESC"
+    elif selected_order_by_option == "grof":
+        query = "SELECT cmt.id_bibrec, cmt.id, cmt.date_creation, cmt.body, cmt.status, cmt.in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT as cmt left join (SELECT min(date_creation) as mindatecreation, id_bibrec FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0 GROUP BY id_bibrec) as grp on cmt.id_bibrec = grp.id_bibrec WHERE id_user=%s AND star_score = 0 ORDER BY grp.mindatecreation ASC"
+
+    if selected_display_number_option.isdigit():
+        selected_display_number_option_as_int = int(selected_display_number_option)
+        if selected_display_number_option_as_int < 5:
+            selected_display_number_option_as_int = 5
+            selected_display_number_option = str(selected_display_number_option_as_int)
+        from_index = (page_number - 1) * int(selected_display_number_option)
+        query_params += ' LIMIT ' + \
+                        str(from_index) + \
+                        ',' + \
+                        str(int(selected_display_number_option))
+        nb_total_pages = int(math.ceil(float(nb_total_results) / selected_display_number_option_as_int))
+
+
+    if selected_order_by_option in ("grlf", "grof"):
+        res = run_sql(query + query_params, (user_info['uid'], user_info['uid']))
+    else:
+        res = run_sql("SELECT id_bibrec, id, date_creation, body, status, in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT WHERE id_user=%s AND star_score = 0" + query_params, (user_info['uid'], ))
+
+    return webcomment_templates.tmpl_your_comments(user_info, res,
+                                                   page_number=page_number,
+                                                   selected_order_by_option=selected_order_by_option,
+                                                   selected_display_number_option=selected_display_number_option,
+                                                   selected_display_format_option=selected_display_format_option,
+                                                   nb_total_results=nb_total_results,
+                                                   nb_total_pages=nb_total_pages,
+                                                   ln=ln)

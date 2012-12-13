@@ -3570,7 +3570,37 @@ div.bibcircbottom {
 .webcomment_review_first_introduction {
 
 }
-
+#yourcommentsmaincontent {
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto
+}
+.yourcommentsdisplayoptionsform {
+    text-align: center;
+}
+#yourcommentsdisplayoptions {
+    margin-bottom: 30px;
+    padding: 12px;
+    font-size: small;
+    display: inline-block;
+    border: 1px solid #bbb;
+}
+#yourcommentsdisplayoptions legend{
+    color: #555;
+}
+#yourcommentsdisplayoptions label{
+    font-weight: 700;
+    margin-left: 10px;
+}
+.yourcommentsrecordgroup {
+    margin-bottom: 20px;
+}
+#yourcommentsnavigationlinks {
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
 /* DEMOVID SUBMISSION */
 
 .websubmit_demovid_form table{

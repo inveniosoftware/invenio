@@ -936,7 +936,8 @@ def create_useractivities_menu(req, uid, navmenuid, ln="en"):
             usealerts=user_info['precached_usealerts'],
             usegroups=user_info['precached_usegroups'],
             useloans=user_info['precached_useloans'],
-            usestats=user_info['precached_usestats']
+            usestats=user_info['precached_usestats'],
+            usecomments=user_info['precached_sendcomments'],
             )
     except OperationalError:
         return ""
@@ -1188,6 +1189,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'precached_usepaperclaim' : False,
         'precached_usepaperattribution' : False,
         'precached_canseehiddenmarctags' : False,
+        'precached_sendcomments' : False,
     }
 
     try:
@@ -1331,6 +1333,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                 user_info['precached_useapprove'] = isUserReferee(user_info)
                 user_info['precached_useadmin'] = isUserAdmin(user_info)
                 user_info['precached_canseehiddenmarctags'] = acc_authorize_action(user_info, 'runbibedit')[0] == 0
+                user_info['precached_sendcomments'] = acc_authorize_action(user_info, 'sendcomment', '*')[0] == 0
                 usepaperclaim = False
                 usepaperattribution = False
                 viewclaimlink = False
