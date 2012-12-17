@@ -4657,207 +4657,20 @@
             <input class="formbutton" type="submit" name="action" value="_(Search)_" />
           </blockquote>
         </form>
-      </li>
-    </ol>
-  </en>
 
-  <fr>
-    <p>Il existe différentes méthodes de recherche d'un auteur. Chaque
-      méthode a ses avantages et ses inconvénients.</p>
-
-    <ol>
-      <li>Tout d'abord, notez que les recherches basées sur des termes
-        ne sont généralement pas adaptées. Si vous recherchez les mots
-        <code>Ellis J</code> dans le champ de l'auteur, deux requêtes
-        (pour les mots <code>Ellis</code> et <code>J</code>) sont
-        d'abord effectuées. Le booléen ET n'est utilisé que par la
-        suite:
-
-        <form action="<CFG_SITE_URL>/search" method="get">
-          <input type="hidden" name="ln" value="<lang:current />" />
-          <blockquote>
-            <input size="40" type="text" name="p" value="Ellis J" />
-            <select name="f">
-              <option value="">_(any field)_</option>
-              <option value="title">_(title)_</option>
-              <option value="author" selected="selected">_(author)_</option>
-            </select>
-            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-          </blockquote>
-        </form>
-
-        <p>Une telle requête inclut également les documents dont le
-          premier auteur est <em>Ellis, R</em> et le second <em>Finch,
-          A J</em>. Or il est possible qu'il ne s'agisse pas du
-          résultat que vous recherchez. La recherche est très rapide
-          et peut vous présenter un certain nombre de résultats
-          correspondant à l'auteur recherché. Il est néanmoins
-          également possible qu'une telle technique vous renvoie de
-          nombreuses réponses incorrectes, comme celle
-          susmentionnée. Dans un tel cas, il est plus adapté de
-          rechercher des phrases plutôt que des termes. Vous pouvez
-          ainsi affiner votre recherche.</p>
+	<p>This way of searching gives you the highest precision and no
+	  false positives.  (Assuming there are no other authors whose
+	  names are spelled <em>Ellis, J</em>, an assumption that is
+	  often false <a href="#author-full-names"><sup>*</sup></a>.)
+	  The search is very fast.</p>
       </li>
 
-      <li>Les noms d'auteurs sont généralement stockés sous une forme
-        contenant uniquement des initiales, telle que <em>Ellis,
-        J</em>. Pour obtenir la liste des publications d'un auteur
-        dont le nom est orthographié de cette manière, saisissez:
-
-        <form action="<CFG_SITE_URL>/search" method="get">
-          <input type="hidden" name="ln" value="<lang:current />" />
-          <blockquote>
-            <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
-            <select name="f">
-              <option value="">_(any field)_</option>
-              <option value="title">_(title)_</option>
-              <option value="author">_(author)_</option>
-            </select>
-            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-          </blockquote>
-        </form>
-      </li>
-    </ol>
-  </fr>
-
-  <es>
-    <p>La búsqueda por autor puede realizarse de diversas formas, cada una
-      de las cuales presenta sus ventajas y desventajas.</p>
-
-    <ol>
-      <li>En primer lugar, es necesario anotar que el modo de búsqueda
-        por palabras no es el que más adecuado en este tipo de búsqueda.
-        Si se selecciona la búsqueda por palabras <code>Ellis J</code>
-        dentro del índice de autores, ello se interpretará como dos
-        consultas (para las palabras <code>Ellis</code>
-        y <code>J</code>) que se efectuarán en primer lugar, y una
-        booleana Y que se realizará después.
-
-        <form action="<CFG_SITE_URL>/search" method="get">
-          <input type="hidden" name="ln" value="<lang:current />" />
-          <blockquote>
-            <input size="40" type="text" name="p" value="Ellis J" />
-            <select name="f">
-              <option value="">_(any field)_</option>
-              <option value="title">_(title)_</option>
-              <option value="author" selected="selected">_(author)_</option>
-            </select>
-            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-          </blockquote>
-        </form>
-
-        <p>La consulta realizada de este modo recuperará también un
-          documento que presenta como primer autor a <em> Ellis, R </em>
-          y como segundo autor <em>Finch, A J</em>, lo cual,
-          probablemente, no es lo deseado.  La búsqueda se ha realizado
-          muy rápidamente y se han recuperado registros sobre el autor
-          requerido, sin embargo, los resultados recuperados siguiendo
-          este método pueden no ser pertinentes, tal y como ocurre en el
-          ejemplo citado anteriormente. En lugar de buscar por palabras,
-          la técnica más conveniente que debe aplicarse en este caso es
-          la búsquda por frase, que permite conseguir mayor
-          precisión.</p>
-      </li>
-
-      <li>Es habitual encontrarse que los nombres de autores contengan
-        únicamente la inicial del nombre, como por ejemplo, <em>Ellis,
-        J</em>.  Para obtener un listado de las publicaciones de dicho
-        autor con el nombre escrito exactamente de ese modo, debemos
-        escribir:
-
-        <form action="<CFG_SITE_URL>/search" method="get">
-          <input type="hidden" name="ln" value="<lang:current />" />
-          <blockquote>
-            <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
-            <select name="f">
-              <option value="">_(any field)_</option>
-              <option value="title">_(title)_</option>
-              <option value="author">_(author)_</option>
-            </select>
-            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-          </blockquote>
-        </form>
-      </li>
-    </ol>
-  </es>
-
-  <ca>
-    <p>La cerca per autor es pot realitzar de diverses formes,
-      cadascuna de les quals presenta els seus avantatges i les seves
-      desavantatges.</p>
-
-    <ol>
-      <li>En primer lloc, cal notar que el mode de cerca per paraules
-        no és el més adient en aquests casos. Si es selecciona la
-        cerca per paraules <code>Ellis J</code> dins l'índex d'autors,
-        s'interpretarà como a dues consultes (per a les
-        paraules <code>Ellis</code> i <code>J</code>) que es
-        realitzaran en primer lloc, i una booleana I que es realitzarà
-        després.
-
-        <form action="<CFG_SITE_URL>/search" method="get">
-          <input type="hidden" name="ln" value="<lang:current />" />
-          <blockquote>
-            <input size="40" type="text" name="p" value="Ellis J" />
-            <select name="f">
-              <option value="">_(any field)_</option>
-              <option value="title">_(title)_</option>
-              <option value="author" selected="selected">_(author)_</option>
-            </select>
-            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-          </blockquote>
-        </form>
-
-        <p>La consulta realitzada d'aquesta forma recuperarà també un
-          document que tingui com a primer autor a <em>Ellis, R </em> i
-          com a segon autor a <em>Finch, A J</em>, fet que,
-          probablement, no es el desitjat.  La cerca s'ha realitzat amb
-          molta rapidesa i s'han recuperat registres sobre l'autor
-          requerit, ara bé, els resultats obtinguts seguint aquest
-          mètode poden no ser pertinents, tal i com passa a l'exemple
-          citat anteriorment.  En lloc de cercar per paraules, la
-          tècnica més convenient que s'ha d'aplicar en aquests casos és
-          la cerca per frase, que permet aconseguir major grau de
-          precisió.</p>
-      </li>
-
-      <li>Es habitual trobar-se que els noms d'autors continguin
-        únicament la inicial del nom, com per exemple, <em>Ellis,
-        J</em>.  Per obtenir un llistat de les publicacions de tal autor
-        amb el nom escrit exactament d'aquesta manera, cal escriure:
-
-        <form action="<CFG_SITE_URL>/search" method="get">
-          <input type="hidden" name="ln" value="<lang:current />" />
-          <blockquote>
-            <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
-            <select name="f">
-              <option value="">_(any field)_</option>
-              <option value="title">_(title)_</option>
-              <option value="author">_(author)_</option>
-            </select>
-            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
-          </blockquote>
-        </form>
-      </li>
-    </ol>
-  </ca>
-</lang>
-
-<lang>
-  <en>
-    <p>This way of searching gives you the highest precision and no
-      false positives.  (Assuming there are no other authors whose
-      names are spelled <em>Ellis, J</em>, an assumption that is often
-      false <a href="#author-full-names"><sup>*</sup></a>.)  The
-      search is very fast.</p>
-
-    <ol>
-      <li>Sometimes an author's first name may be spelled abbreviated on
-        some documents (such as <em>Ellis, J</em>) and sometimes full on
-        others (such as <em>Ellis, John</em>; eventually also with the
-        middle name: <em>Ellis, John Rolfe</em>).  To get the list of
-        publications for all these forms at the same time, you could use
-        a boolean OR query:
+      <li>Sometimes an author's first name may be spelled abbreviated
+        on some documents (such as <em>Ellis, J</em>) and sometimes
+        full on others (such as <em>Ellis, John</em>; eventually also
+        with the middle name: <em>Ellis, John Rolfe</em>).  To get the
+        list of publications for all these forms at the same time, you
+        could use a boolean OR query:
 
         <form action="<CFG_SITE_URL>/search" method="get">
           <input type="hidden" name="ln" value="<lang:current />" />
@@ -4975,12 +4788,68 @@
   </en>
 
   <fr>
-    <p>Cette méthode de recherche vous permet de procéder à une
-      recherche très précise et d'éviter les réponses incorrectes (si
-      l'on part du principe, souvent erroné, qu'aucun autre auteur
-      dont le nom est orthographié <em>Ellis, J</em> existe dans la
-      base de données). La recherche est très rapide.</p>
+    <p>Il existe différentes méthodes de recherche d'un auteur. Chaque
+      méthode a ses avantages et ses inconvénients.</p>
+
     <ol>
+      <li>Tout d'abord, notez que les recherches basées sur des termes
+	ne sont généralement pas adaptées. Si vous recherchez les mots
+	<code>Ellis J</code> dans le champ de l'auteur, deux requêtes
+	(pour les mots <code>Ellis</code> et <code>J</code>) sont
+	d'abord effectuées. Le booléen ET n'est utilisé que par la
+	suite:
+
+	<form action="<CFG_SITE_URL>/search" method="get">
+          <input type="hidden" name="ln" value="<lang:current />" />
+          <blockquote>
+            <input size="40" type="text" name="p" value="Ellis J" />
+            <select name="f">
+              <option value="">_(any field)_</option>
+              <option value="title">_(title)_</option>
+              <option value="author" selected="selected">_(author)_</option>
+            </select>
+            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+          </blockquote>
+	</form>
+
+	<p>Une telle requête inclut également les documents dont le
+          premier auteur est <em>Ellis, R</em> et le second <em>Finch,
+          A J</em>. Or il est possible qu'il ne s'agisse pas du
+          résultat que vous recherchez. La recherche est très rapide
+          et peut vous présenter un certain nombre de résultats
+          correspondant à l'auteur recherché. Il est néanmoins
+          également possible qu'une telle technique vous renvoie de
+          nombreuses réponses incorrectes, comme celle
+          susmentionnée. Dans un tel cas, il est plus adapté de
+          rechercher des phrases plutôt que des termes. Vous pouvez
+          ainsi affiner votre recherche.</p>
+      </li>
+
+      <li>Les noms d'auteurs sont généralement stockés sous une forme
+	contenant uniquement des initiales, telle que <em>Ellis,
+	J</em>. Pour obtenir la liste des publications d'un auteur
+	dont le nom est orthographié de cette manière, saisissez:
+
+	<form action="<CFG_SITE_URL>/search" method="get">
+          <input type="hidden" name="ln" value="<lang:current />" />
+          <blockquote>
+            <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
+            <select name="f">
+              <option value="">_(any field)_</option>
+              <option value="title">_(title)_</option>
+              <option value="author">_(author)_</option>
+            </select>
+            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+          </blockquote>
+	</form>
+
+	<p>Cette méthode de recherche vous permet de procéder à une
+	  recherche très précise et d'éviter les réponses incorrectes
+	  (si l'on <p></p>art du principe, souvent erroné, qu'aucun
+	  autre auteur dont le nom est orthographié <em>Ellis, J</em>
+	  existe dans la base de données). La recherche est très
+	  rapide.</p>
+      </li>
 
       <li>Il arrive que le prénom de l'auteur soit abrégé sur certains
         documents (<em>Ellis, J</em>) et complet sur d'autres
@@ -4988,7 +4857,7 @@
         prénom (<em>Ellis, John Rolfe</em>). Pour obtenir la liste de
         publications correspondant à l'ensemble de ces formes, vous
         pouvez utiliser une requête booléenne OU:
-
+	
         <form action="<CFG_SITE_URL>/search" method="get">
           <input type="hidden" name="ln" value="<lang:current />" />
           <blockquote>
@@ -5114,14 +4983,71 @@
   </fr>
 
   <es>
-    <p>Esta técnica de búsqueda confiere mayor precisión y evita
-      falsos positivos.  (La presunción de que no existen otros
-      autores cuyo nombre se escriba como <em>Ellis, J</em>, en
-      ocasiones puede no ser cierta
-      <a href="#author-full-names"><sup>*</sup></a>.)  La búsqueda se
-      realizará con mucha rapidez.</p>
+    <p>La búsqueda por autor puede realizarse de diversas formas, cada una
+      de las cuales presenta sus ventajas y desventajas.</p>
 
     <ol>
+      <li>En primer lugar, es necesario anotar que el modo de búsqueda
+        por palabras no es el que más adecuado en este tipo de búsqueda.
+        Si se selecciona la búsqueda por palabras <code>Ellis J</code>
+        dentro del índice de autores, ello se interpretará como dos
+        consultas (para las palabras <code>Ellis</code>
+        y <code>J</code>) que se efectuarán en primer lugar, y una
+        booleana Y que se realizará después.
+
+        <form action="<CFG_SITE_URL>/search" method="get">
+          <input type="hidden" name="ln" value="<lang:current />" />
+          <blockquote>
+            <input size="40" type="text" name="p" value="Ellis J" />
+            <select name="f">
+              <option value="">_(any field)_</option>
+              <option value="title">_(title)_</option>
+              <option value="author" selected="selected">_(author)_</option>
+            </select>
+            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+          </blockquote>
+        </form>
+
+        <p>La consulta realizada de este modo recuperará también un
+          documento que presenta como primer autor a <em> Ellis, R </em>
+          y como segundo autor <em>Finch, A J</em>, lo cual,
+          probablemente, no es lo deseado.  La búsqueda se ha realizado
+          muy rápidamente y se han recuperado registros sobre el autor
+          requerido, sin embargo, los resultados recuperados siguiendo
+          este método pueden no ser pertinentes, tal y como ocurre en el
+          ejemplo citado anteriormente. En lugar de buscar por palabras,
+          la técnica más conveniente que debe aplicarse en este caso es
+          la búsquda por frase, que permite conseguir mayor
+          precisión.</p>
+      </li>
+
+      <li>Es habitual encontrarse que los nombres de autores contengan
+        únicamente la inicial del nombre, como por ejemplo, <em>Ellis,
+        J</em>.  Para obtener un listado de las publicaciones de dicho
+        autor con el nombre escrito exactamente de ese modo, debemos
+        escribir:
+
+        <form action="<CFG_SITE_URL>/search" method="get">
+          <input type="hidden" name="ln" value="<lang:current />" />
+          <blockquote>
+            <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
+            <select name="f">
+              <option value="">_(any field)_</option>
+              <option value="title">_(title)_</option>
+              <option value="author">_(author)_</option>
+            </select>
+            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+          </blockquote>
+        </form>
+
+      <p>Esta técnica de búsqueda confiere mayor precisión y evita
+	falsos positivos.  (La presunción de que no existen otros
+	autores cuyo nombre se escriba como <em>Ellis, J</em>, en
+	ocasiones puede no ser cierta
+	<a href="#author-full-names"><sup>*</sup></a>.)  La búsqueda
+	se realizará con mucha rapidez.</p>
+      </li>
+
       <li>Algunas veces, en algunos documentos, el nombre propio de un
         autor se escribe de forma abreviada, (como <em>Ellis, J</em>)
         y otras de forma completa (como <em>Ellis, John</em>; y en
@@ -5255,15 +5181,72 @@
   </es>
 
   <ca>
-    <p>Aquesta tècnica de cerca confereix major grau de precisió i
-      evita falsos resultats aparentement positius.  (La presumpció de
-      que no existeixen altres autores els noms dels quals s'escrigui
-      com <em>Ellis, J</em>, en ocasions pot no ser
-      certa<a href="#author-full-names"><sup>*</sup></a>.)  La cerca
-      es realitzarà con amb molta rapidesa.</p>
+    <p>La cerca per autor es pot realitzar de diverses formes,
+      cadascuna de les quals presenta els seus avantatges i les seves
+      desavantatges.</p>
 
     <ol>
-      <li>Algunes vegadess, en alguns documents, el nom propi d'un
+      <li>En primer lloc, cal notar que el mode de cerca per paraules
+        no és el més adient en aquests casos. Si es selecciona la
+        cerca per paraules <code>Ellis J</code> dins l'índex d'autors,
+        s'interpretarà como a dues consultes (per a les
+        paraules <code>Ellis</code> i <code>J</code>) que es
+        realitzaran en primer lloc, i una booleana I que es realitzarà
+        després.
+
+        <form action="<CFG_SITE_URL>/search" method="get">
+          <input type="hidden" name="ln" value="<lang:current />" />
+          <blockquote>
+            <input size="40" type="text" name="p" value="Ellis J" />
+            <select name="f">
+              <option value="">_(any field)_</option>
+              <option value="title">_(title)_</option>
+              <option value="author" selected="selected">_(author)_</option>
+            </select>
+            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+          </blockquote>
+        </form>
+
+        <p>La consulta realitzada d'aquesta forma recuperarà també un
+          document que tingui com a primer autor a <em>Ellis, R </em> i
+          com a segon autor a <em>Finch, A J</em>, fet que,
+          probablement, no es el desitjat.  La cerca s'ha realitzat amb
+          molta rapidesa i s'han recuperat registres sobre l'autor
+          requerit, ara bé, els resultats obtinguts seguint aquest
+          mètode poden no ser pertinents, tal i com passa a l'exemple
+          citat anteriorment.  En lloc de cercar per paraules, la
+          tècnica més convenient que s'ha d'aplicar en aquests casos és
+          la cerca per frase, que permet aconseguir major grau de
+          precisió.</p>
+      </li>
+
+      <li>Es habitual trobar-se que els noms d'autors continguin
+        únicament la inicial del nom, com per exemple, <em>Ellis,
+        J</em>.  Per obtenir un llistat de les publicacions de tal autor
+        amb el nom escrit exactament d'aquesta manera, cal escriure:
+
+        <form action="<CFG_SITE_URL>/search" method="get">
+          <input type="hidden" name="ln" value="<lang:current />" />
+          <blockquote>
+            <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
+            <select name="f">
+              <option value="">_(any field)_</option>
+              <option value="title">_(title)_</option>
+              <option value="author">_(author)_</option>
+            </select>
+            <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+          </blockquote>
+        </form>
+
+	<p>Aquesta tècnica de cerca confereix major grau de precisió i
+	  evita falsos resultats aparentement positius.  (La presumpció de
+	  que no existeixen altres autores els noms dels quals s'escrigui
+	  com <em>Ellis, J</em>, en ocasions pot no ser
+	  certa<a href="#author-full-names"><sup>*</sup></a>.)  La cerca
+	  es realitzarà con amb molta rapidesa.</p>
+      </li>
+
+      <li>Algunes vegades, en alguns documents, el nom propi d'un
         autor s'escriu de forma abreujada, (com <em>Ellis, J</em>) i
         altres de forma completa (com <em>Ellis, John</em>; i en
         altres ocasions també amb el nom compost:<em>Ellis, John
