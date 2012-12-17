@@ -84,6 +84,7 @@ CFG_USER_DEFAULT_INFO = {
             'precached_usepaperclaim' : False,
             'precached_usepaperattribution' : False,
             'precached_canseehiddenmarctags' : False,
+            'precached_sendcomments' : False,
             }
 
 class UserInfo(CombinedMultiDict):
