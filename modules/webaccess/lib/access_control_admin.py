@@ -1175,6 +1175,7 @@ def acc_get_role_users(id_role):
 
 
 def acc_get_roles_emails(id_roles):
+    from invenio.websession_model import User
     return set(map(lambda u: u.email.lower().strip(),
         db.session.query(User.email).join(User.roles).filter(db.and_(
             UserAccROLE.expiration >= db.func.now(),

@@ -42,6 +42,7 @@ from invenio.urlutils import make_canonical_urlargd
 from invenio.cache import cache
 from invenio.webuser_flask import current_user
 
+
 #@cache.memoize(3600)
 def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **arguments):
     """
@@ -52,21 +53,16 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     authorization will be granted.
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
-    from flask import current_app
-    current_app.logger.info(req)
-    current_app.logger.info(type(req))
     if type(req) is dict:
         uid = req.get('uid', None)
         user_info = req
     elif type(req) not in [int, long]:
         uid = current_user.get_id()
-        user_info = collect_user_info(uid) #FIXME
+        user_info = collect_user_info(uid)  # FIXME
     else:
         user_info = collect_user_info(req)
 
     roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
-    current_app.logger.info(user_info)
-    current_app.logger.info(roles)
     roles.add(CFG_SUPERADMINROLE_ID)
 
     if acc_is_user_in_any_role(user_info, roles):
@@ -74,7 +70,7 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
         ## or User is SUPERADMIN
         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
-    if len(roles)<=1:
+    if len(roles) <= 1:
         ## No role is authorized for the given action/arguments
         if authorized_if_no_roles:
             ## User is authorized because no authorization exists for the given
@@ -87,6 +83,7 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     ## User is not authorized
     in_a_web_request_p = bool(user_info.get('uri', ''))
     return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info.get('uri', '')), CFG_WEBACCESS_MSGS[1]) or "")))
+
 
 def acc_get_authorized_emails(name_action, **arguments):
     """
