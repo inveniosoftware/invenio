@@ -199,7 +199,7 @@ function resize_content() {
   $("#bibEditContentTable").css('height', bibedit_table_height);
 }
 
-$(function(){
+function init_bibedit() {
   /*
    * Initialize all components.
    */
@@ -218,8 +218,7 @@ $(function(){
   // viewport
   resize_content();
   $(window).bind('resize', resize_content);
-});
-
+}
 
 function failInReadOnly(){
   /** Function checking if the current BibEdit mode is read-only. In sucha a case, a warning
