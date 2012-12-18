@@ -708,9 +708,11 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         _ = gettext_set_language(ln)
 
         uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "direct",
-                                           navmenuid='submit')
+                                       navmenuid='submit',
+                                       text=_("Submissions are not available"))
 
         myQuery = req.args
         if not sub:
@@ -723,8 +725,29 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             doctype = res[0][0]
             # get action name
             action = res[0][1]
+            # get category
+            categ = req.form.get('combo%s' % doctype, '*')
         # retrieve other parameter values
         params = dict(form)
+
+        # Check if user is authorized, based on doctype/action/categ,
+        # in order to give guest users a chance to log in if needed:
+        (auth_code, auth_message) = acc_authorize_action(req, 'submit',
+                                                         authorized_if_no_roles=not isGuestUser(uid),
+                                                         verbose=0,
+                                                         doctype=doctype,
+                                                         act=action,
+                                                         categ=categ)
+        if not auth_code == 0 and isGuestUser(uid):
+            # Propose to login
+            redirection_params = params
+            redirection_params['referer'] = CFG_SITE_SECURE_URL + req.unparsed_uri
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd(redirection_params, {})),
+                                   norobot=True)
+        # else: continue, and let main interface control the access
+
         # find existing access number
         if not access:
             # create 'unique' access number
