@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1820,12 +1820,13 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     if not f:
         return browse_in_bibwords(req, p, f)
 
+    coll_hitset = intbitset()
+    for coll_name in colls:
+        coll_hitset |= get_collection_reclist(coll_name)
+
     index_id = get_index_id_from_field(f)
     if index_id != 0:
-        coll = intbitset()
-        for coll_name in colls:
-            coll |= get_collection_reclist(coll_name)
-        browsed_phrases_in_colls = get_nearest_terms_in_idxphrase_with_collection(p, index_id, rg/2, rg/2, coll)
+        browsed_phrases_in_colls = get_nearest_terms_in_idxphrase_with_collection(p, index_id, rg/2, rg/2, coll_hitset)
     else:
         browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
         while not browsed_phrases:
@@ -1857,7 +1858,9 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
                 #Please try different term.<p>Displaying matches in any collection...""" % p_orig)
                 ## try to get nbhits for these phrases in any collection:
                 for phrase in browsed_phrases:
-                    browsed_phrases_in_colls.append([phrase, get_nbhits_in_bibxxx(phrase, f)])
+                    nbhits = get_nbhits_in_bibxxx(phrase, f, coll_hitset)
+                    if nbhits > 0:
+                        browsed_phrases_in_colls.append([phrase, nbhits])
 
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
@@ -3271,7 +3274,7 @@ def get_nbhits_in_idxphrases(word, f):
             out += len(intbitset(hitlist[0]))
     return out
 
-def get_nbhits_in_bibxxx(p, f):
+def get_nbhits_in_bibxxx(p, f, in_hitset=None):
     """Return number of hits for word 'word' inside words index for field 'f'."""
     ## determine browse field:
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
@@ -3307,7 +3310,12 @@ def get_nbhits_in_bibxxx(p, f):
                           (p, t))
         for row in res:
             recIDs[row[0]] = 1
-    return len(recIDs)
+
+    if in_hitset is None:
+        nbhits = len(recIDs)
+    else:
+        nbhits = len(intbitset(recIDs.keys()).intersection(in_hitset))
+    return nbhits
 
 def get_mysql_recid_from_aleph_sysno(sysno):
     """Returns DB's recID for ALEPH sysno passed in the argument (e.g. "002379334CER").

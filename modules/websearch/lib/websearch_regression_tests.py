@@ -571,6 +571,43 @@ class WebSearchTestBrowse(unittest.TestCase):
         # set is not equal
         self.failUnlessEqual(batch_1[-2][1]['p'], batch_2[0][1]['p'])
 
+    def test_browse_restricted_record_as_unauthorized_user(self):
+        """websearch - browse for a record that belongs to a restricted collection as an unauthorized user."""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?p=CERN-THESIS-99-074&f=088__a&action_browse=Browse&ln=en',
+                                               username = 'guest',
+                                               expected_text = ['Hits', '088__a'],
+                                               unexpected_text = ['>CERN-THESIS-99-074</a>'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_browse_restricted_record_as_unauthorized_user_in_restricted_collection(self):
+        """websearch - browse for a record that belongs to a restricted collection as an unauthorized user."""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?p=CERN-THESIS-99-074&f=088__a&action_browse=Browse&c=ALEPH+Theses&ln=en',
+                                               username='guest',
+                                               expected_text= ['This collection is restricted'],
+                                               unexpected_text= ['Hits', '>CERN-THESIS-99-074</a>'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_browse_restricted_record_as_authorized_user(self):
+        """websearch - browse for a record that belongs to a restricted collection as an authorized user."""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?p=CERN-THESIS-99-074&f=088__a&action_browse=Browse&ln=en',
+                                               username='admin',
+                                               password='',
+                                               expected_text= ['Hits', '088__a'],
+                                               unexpected_text = ['>CERN-THESIS-99-074</a>'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_browse_restricted_record_as_authorized_user_in_restricted_collection(self):
+        """websearch - browse for a record that belongs to a restricted collection as an authorized user."""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/search?p=CERN-THESIS-99-074&f=088__a&action_browse=Browse&c=ALEPH+Theses&ln=en',
+                                               username='admin',
+                                               password='',
+                                               expected_text= ['Hits', '>CERN-THESIS-99-074</a>'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
 class WebSearchTestOpenURL(unittest.TestCase):
 
     def test_isbn_01(self):
