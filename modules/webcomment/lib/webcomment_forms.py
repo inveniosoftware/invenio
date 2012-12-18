@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ from invenio.webinterface_handler_flask_utils import _
 from flask.ext.wtf import Form
 from invenio.wtforms_utils import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
 from wtforms import DateTimeField, BooleanField, TextField, TextAreaField, \
-                    PasswordField, HiddenField, validators
+                    PasswordField, HiddenField, SelectField, validators
 
 
 class AddCmtRECORDCOMMENTForm(InvenioBaseForm):
@@ -38,7 +38,14 @@ class AddCmtRECORDCOMMENTForm(InvenioBaseForm):
     body = TextAreaField(_('Message'), [
         validators.length(0, 10000,
         message = _("Your message is too long, please edit it. Maximum size allowed is %i characters.") % \
-                (10000,))])
+                (10000, ))])
 
     in_reply_to_id_cmtRECORDCOMMENT = HiddenField()
 
+
+class AddCmtRECORDCOMMENTFormReview(AddCmtRECORDCOMMENTForm):
+    star_score = SelectField(_('Stars'), choices=[('1', _('*')),
+                                                  ('2', _('**')),
+                                                  ('3', _('***')),
+                                                  ('4', _('****')),
+                                                  ('5', _('*****'))])

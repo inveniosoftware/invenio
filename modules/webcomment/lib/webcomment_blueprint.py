@@ -36,7 +36,8 @@ from invenio.webmessage_mailutils import email_quote_txt
 from invenio.websession_model import User
 from invenio.webcomment_model import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
                                      CmtACTIONHISTORY
-from invenio.webcomment_forms import AddCmtRECORDCOMMENTForm
+from invenio.webcomment_forms import AddCmtRECORDCOMMENTForm, \
+                                     AddCmtRECORDCOMMENTFormReview
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
                                      register_template_context_processor
 from invenio.webuser_flask import current_user
@@ -134,8 +135,8 @@ class CommentRights(object):
 #@blueprint.invenio_authentificated
 @blueprint.invenio_authorized('sendcomment',
                               authorized_if_no_roles=True,
-                              collection=lambda:g.collection.id)
-def add(recid):
+                              collection=lambda: g.collection.id)
+def add_comment(recid):
     uid = current_user.get_id()
     in_reply = request.args.get('in_reply', type=int)
     if in_reply is not None:
@@ -144,7 +145,7 @@ def add(recid):
             c = CmtRECORDCOMMENT()
             c.title = _('Re: ') + comment.title
             c.body = email_quote_txt(comment.body or '')
-            c.in_reply_to_id_cmtRECORDCOMMENT=in_reply
+            c.in_reply_to_id_cmtRECORDCOMMENT = in_reply
             form = AddCmtRECORDCOMMENTForm(request.form, obj=c)
             return render_template('webcomment_add.html', form=form)
 
@@ -155,6 +156,7 @@ def add(recid):
         c.id_bibrec = recid
         c.id_user = uid
         c.date_creation = datetime.now()
+        c.star_score = 0
         try:
             db.session.add(c)
             db.session.commit()
@@ -166,14 +168,40 @@ def add(recid):
     return render_template('webcomment_add.html', form=form)
 
 
+@blueprint.route('/<int:recid>/reviews/add', methods=['GET', 'POST'])
+@request_record
+#@blueprint.invenio_authentificated
+@blueprint.invenio_authorized('sendcomment',
+                              authorized_if_no_roles=True,
+                              collection=lambda: g.collection.id)
+def add_review(recid):
+    uid = current_user.get_id()
+    form = AddCmtRECORDCOMMENTFormReview(request.values)
+    if form.validate_on_submit():
+        c = CmtRECORDCOMMENT()
+        form.populate_obj(c)
+        c.id_bibrec = recid
+        c.id_user = uid
+        c.date_creation = datetime.now()
+        try:
+            db.session.add(c)
+            db.session.commit()
+            flash(_('Review was sent'), "info")
+            return redirect(url_for('webcomment.reviews', recid=recid))
+        except:
+            db.session.rollback()
+
+    return render_template('webcomment_add_review.html', form=form)
+
+
 @blueprint.route('/<int:recid>/comments', methods=['GET', 'POST'])
 @request_record
 def comments(recid):
     uid = current_user.get_id()
     comments = CmtRECORDCOMMENT.query.filter(db.and_(
         CmtRECORDCOMMENT.id_bibrec == recid,
-        CmtRECORDCOMMENT.title == '',
-        CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0
+        CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
+        CmtRECORDCOMMENT.star_score == 0
         )).all()
     return render_template('webcomment_comments.html', comments=comments)
 
@@ -185,8 +213,8 @@ def reviews(recid):
     uid = current_user.get_id()
     comments = CmtRECORDCOMMENT.query.filter(db.and_(
         CmtRECORDCOMMENT.id_bibrec == recid,
-        CmtRECORDCOMMENT.title != '',
-        CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0
+        CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
+        CmtRECORDCOMMENT.star_score > 0
         )).all()
     return render_template('webcomment_reviews.html', comments=comments)
 

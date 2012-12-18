@@ -90,13 +90,13 @@ def request_record(f):
         for k,v in get_detailed_page_tabs(collection.id, recid,
                                           g.ln).iteritems():
             b = 'record'
-            if k=='':
-                k='metadata'
-            if k=='comments':
-                b='webcomment'
-            if k=='linkbacks':
-                b='weblinkback'
-                k='index'
+            if k == '':
+                k = 'metadata'
+            if k == 'comments' or k == 'reviews':
+                b = 'webcomment'
+            if k == 'linkbacks':
+                b = 'weblinkback'
+                k = 'index'
 
             t = {'key':b+'.'+k}
             t.update(v)

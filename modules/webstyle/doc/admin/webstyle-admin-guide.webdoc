@@ -340,7 +340,7 @@ displayed when <em>Information</em> tab is selected).</p>
   |nav. breadcrumb                                |
   |                                               |
   |   .--------------------------------------.    |
-  | .-|Info.|Ref.|Discussion.|Stats.|Files |-.  |
+  | .-|Info.|Ref.|Comm.|Review.|Stats.|Files |-.  |
   | | '--------------------------------------' |  |
   | |                                          |  |
   | |                  content                 |  |
@@ -374,10 +374,14 @@ The following tabs are available:
     <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/references"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/references</a></td>
   </tr>
   <tr>
-    <td>Discussion</td>
-    <td>Displays the users' comments and reviews</td>
+    <td>Comments</td>
+    <td>Displays the users' comments</td>
     <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/comments"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/comments</a><br/>
-        <a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/reviews"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/reviews</a></td>
+  </tr>
+  <tr>
+    <td>Reviews</td>
+    <td>Displays the users' reviews</td>
+    <td><a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/10/reviews"><CFG_SITE_URL>/<CFG_SITE_RECORD>/10/reviews</a></td>
   </tr>
   <tr>
     <td>Usage Statistics</td>
@@ -440,10 +444,10 @@ configuration:</p>
   record pages. You can then build your own user interface on this
   almost blank page (See <a href="#det_page_cust_cont_tabs">Customizing content of tabs</a>).</li>
 
-  <li>Note that <em>Discussion</em> tab will not be shown if you have disabled
-  both the commenting and reviewing features in your installation
+  <li>Note that <em>Comments</em> and <em>Reviews</em> tabs will not be shown if you have disabled
+  commenting and reviewing features in your installation, respectively.
   (<code>CFG_WEBCOMMENT_ALLOW_COMMENTS</code> and
-  <code>CFG_WEBCOMMENT_ALLOW_REVIEWS</code> variable in your config file).</li>
+  <code>CFG_WEBCOMMENT_ALLOW_REVIEWS</code> variable in your config file)</li>
 </ul>
 
 <h4><a name="det_page_cust_cont_tabs">2.3 Customizing content of tabs</a></h4>
@@ -466,8 +470,8 @@ configuration:</p>
   is disabled (visible, but not clickable). It can therefore be
   collection-specific.</dd>
 
-<dt><strong><em>Discussion</em> tab</strong></dt>
-  <dd>The content of this tab is mainly defined by function
+<dt><strong><em>Comments</em> and <em>Reviews</em> tabs</strong></dt>
+  <dd>The content of these tabs is mainly defined by function
   <code>tmpl_get_comments(..)</code> in <code>webcomment_templates.py</code>. Other
   functions in this file are also involved in the display.</dd>
 

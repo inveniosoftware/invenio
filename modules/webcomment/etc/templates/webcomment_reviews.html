@@ -28,14 +28,11 @@
   <div class="page-header">
     <h4>
       {{ _("Reviews") }}
-      <small> /
-      <a href="{{ url_for('webcomment.comments', recid=recid) }}">
-        {{ _('Comments') }}
-      </a>
-      </small>
-      <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid) }}">
+      <small>
+      <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_review', recid=recid) }}">
         <i class="icon-pencil"></i> {{ _('write review') }}
       </a>
+      </small>
     </h4>
   </div>
 
@@ -58,16 +55,18 @@
       {{ c.body }}
       </p>
       <small>
-        <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
+
         {%- if c.user -%}
+        <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
         <a href="{{ url_for('yourmessages.add', sent_to_user_nicks=c.user.nickname) }}">
           {{ c.user.nickname }}
         </a>
         {%- else -%}
+        <img src="/img/user-icon-1-16x16.gif" alt="avatar"/>
           {{ _('Guest') }}
-        {%- endif -%}
+        {%- endif -%} &nbsp;
         - <i class="icon-time"></i> {{ c.date_creation }}
-        - <i class="icon-question-sign"></i> Was it helpfull?
+        - <i class="icon-question-sign"></i> Was it helpful?
           <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1,
             referer=request.url
           ) }}">
@@ -93,7 +92,17 @@
   </li>
   {%- endfor -%}
   </ul>
+
+  <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_review', recid=recid) }}">
+    <i class="icon-pencil"></i> {{ _('write review') }}
+  </a>
+  {%- else -%}
+  <div class="alert alert-info">
+    {{ _('There are no reviews. Be the first reviewing this record.') }}
+  </div>
   {%- endif -%}
+
+  <div style="clear:both"/></div>
 
 <script>
 $(document).ready(function() {
@@ -113,7 +122,5 @@ $('[data-toggle="modal"]').click(function(e) {
 
 });
 </script>
-
-
 
 {% endblock %}

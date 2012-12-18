@@ -29,11 +29,8 @@
   <div class="page-header">
     <h4>
       {{ _("Comments") }}
-      <small> /
-      <a href="{{ url_for('webcomment.reviews', recid=recid) }}">
-        {{ _('Reviews') }}
-      </a>
-      <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid) }}">
+      <small>
+      <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid) }}">
         <i class="icon-pencil"></i> {{ _('write comment') }}
       </a>
       </small>
@@ -57,16 +54,19 @@
           '</span>'))|safe }}
       </p>
       <small>
-        <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
+
         {%- if c.user -%}
+        <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
         <a href="{{ url_for('yourmessages.add', sent_to_user_nicks=c.user.nickname) }}">
           {{ c.user.nickname }}
         </a>
         {%- else -%}
+        <img src="/img/user-icon-1-16x16.gif" alt="avatar"/>
           {{ _('Guest') }}
-        {%- endif -%}
+        {%- endif -%} &nbsp;
+        - <i class="icon-time"></i> {{ c.date_creation }}
         - <i class="icon-pencil"></i>
-        <a data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid, in_reply=c.id) }}">
+        <a data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid, in_reply=c.id) }}">
           {{ _('reply') }}
         </a>
         - <i class="icon-heart"></i>
@@ -79,7 +79,6 @@
           {{_('dislike')}}
         </a>
         <span class="badge badge-important">{{ c.nb_votes_total-c.nb_votes_yes }}</span>
-        - <i class="icon-time"></i> {{ c.date_creation }}
         -
           <a href="{{ url_for('webcomment.report', recid=recid, id=c.id) }}">
             <i class="icon-exclamation-sign"></i>
@@ -96,11 +95,16 @@
   </li>
   {%- endfor -%}
   </ul>
-  {%- endif -%}
 
-  <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add', recid=recid) }}">
+  <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid) }}">
     <i class="icon-pencil"></i> {{ _('write comment') }}
   </a>
+
+  {%- else -%}
+  <div class="alert alert-info">
+    {{ _('There are no comments. Be the first commenting this record.') }}
+  </div>
+  {%- endif -%}
 
   <div style="clear:both"/></div>
   <hr/>

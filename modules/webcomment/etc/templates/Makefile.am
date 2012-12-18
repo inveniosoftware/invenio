@@ -19,6 +19,7 @@ templatesdir = $(sysconfdir)/templates
 templates_DATA = webcomment_comments.html \
 		 webcomment_reviews.html \
 		 webcomment_subscriptions.html \
+		 webcomment_add_review.html \
 		 webcomment_add.html
 
 EXTRA_DIST = $(templates_DATA)

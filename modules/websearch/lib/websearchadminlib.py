@@ -3394,12 +3394,13 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'references': {'label': _('References'),       'visible': False, 'enabled': True, 'order': 2},
             'citations' : {'label': _('Citations'),        'visible': False, 'enabled': True, 'order': 3},
             'keywords'  : {'label': _('Keywords'),         'visible': False, 'enabled': True, 'order': 4},
-            'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 5},
-            'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 6},
-            'files'     : {'label': _('Files'),            'visible': False, 'enabled': True, 'order': 7},
-            'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 8},
-            'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 9},
-            'linkbacks' : {'label': _('Linkbacks'),        'visible': False, 'enabled': True, 'order': 10},
+            'comments'  : {'label': _('Comments'),         'visible': False, 'enabled': True, 'order': 5},
+            'reviews'   : {'label': _('Reviews'),          'visible': False, 'enabled': True, 'order': 6},
+            'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 7},
+            'files'     : {'label': _('Files'),            'visible': False, 'enabled': True, 'order': 8},
+            'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 9},
+            'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 10},
+            'linkbacks' : {'label': _('Linkbacks'),        'visible': False, 'enabled': True, 'order': 11},
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
@@ -3418,10 +3419,13 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             tabs[key]['visible'] = True
 
 
-    if not CFG_WEBCOMMENT_ALLOW_COMMENTS and \
-           not CFG_WEBCOMMENT_ALLOW_REVIEWS:
+    if not CFG_WEBCOMMENT_ALLOW_COMMENTS:
         tabs['comments']['visible'] = False
         tabs['comments']['enabled'] = False
+
+    if not CFG_WEBCOMMENT_ALLOW_REVIEWS:
+        tabs['reviews']['visible'] = False
+        tabs['reviews']['enabled'] = False
 
     if recID is not None:
 
@@ -3492,14 +3496,16 @@ def get_detailed_page_tabs_counts(recID):
     @return: dictionary with following keys
                 'Citations': number of citations to be shown in the "Citations" tab
                 'References': number of references to be shown in the "References" tab
-                'Discussions': number of comments and reviews to be shown in the "Discussion" tab
+                'Comments': number of comments to be shown in the "Comments" tab
+                'Reviews': number of reviews to be shown in the "Reviews" tab
     """
 
     num_comments = 0 #num of comments
     num_reviews = 0 #num of reviews
     tabs_counts = {'Citations'   : 0,
                    'References'  : -1,
-                   'Discussions' : 0
+                   'Comments' : 0,
+                   'Reviews' : 0
                    }
     from invenio.search_engine import get_field_tags, get_record
     if CFG_BIBRANK_SHOW_CITATION_LINKS:
@@ -3518,7 +3524,9 @@ def get_detailed_page_tabs_counts(recID):
         num_comments = get_nb_comments(recID, count_deleted=False)
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:
         num_reviews = get_nb_reviews(recID, count_deleted=False)
-    if num_comments or num_reviews:
-        tabs_counts['Discussions'] = num_comments + num_reviews
+    if num_comments:
+        tabs_counts['Comments'] = num_comments
+    if num_reviews:
+        tabs_counts['Reviews'] = num_reviews
 
     return tabs_counts

@@ -19,7 +19,7 @@
 {% from "_formhelpers.html" import render_field with context %}
 {% macro add_comment() %}
 <form name="write_message"
-      action="{{ url_for('webcomment.add_comment', recid=recid) }}"
+      action="{{ url_for('webcomment.add_review', recid=recid) }}"
       style="{{ 'margin-bottom:0px;' if request.is_xhr }}"
       method="post" class="form-horizontal">
   <div class="{{ 'modal-body' if request.is_xhr }}">
@@ -27,6 +27,7 @@
     {{ render_field(form.in_reply_to_id_cmtRECORDCOMMENT) }}
     {{ render_field(form.title) }}
     {{ render_field(form.body) }}
+    {{ render_field(form.star_score) }}
   </div>
   <div class="{{ 'modal-footer ' if request.is_xhr else 'form-actions'}}">
         <input type="submit" name="send_button" value="{{ _("Send") }}" class="btn btn-primary"/>
