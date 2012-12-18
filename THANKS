@@ -36,7 +36,8 @@ contributed to the project:
 
   - Theodoropoulos Theodoros <theod@lib.auth.gr>
     Contributions to the Greek translation, Greek stopword list,
-    XML RefWorks output format.
+    XML RefWorks output format, Google Analytics documentation update,
+    BibConvert target/source CLI flag description fix.
 
   - Vasyl Ostrovskyi <vo@imath.kiev.ua>
     Contributions to the Ukrainian translation.

@@ -337,7 +337,10 @@ update-v0.99.4-tables:
 update-v0.99.5-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.5 and v0.99.6."
 
-update-v0.99.6-tables: # from v0.99.6 to v1.0.0-rc0
+update-v0.99.6-tables:
+	@echo "Nothing to do; table structure did not change between v0.99.6 and v0.99.7."
+
+update-v0.99.7-tables: # from v0.99.7 to v1.0.0-rc0
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	cat $(top_srcdir)/modules/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
 	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
