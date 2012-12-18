@@ -1,29 +1,27 @@
 --------------------------------------------------------------------
-CDS Invenio v0.99.6 is released
-October 18, 2012
+CDS Invenio v0.99.7 is released
+December 18, 2012
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-CDS Invenio v0.99.6 was released on October 18, 2012.
+CDS Invenio v0.99.7 was released on December 18, 2012.
 
-This is a minor bugfix release only.  It is recommended to all CDS
-Invenio sites using v0.99.5 or previous releases.
+This is a minor documentation update release only.  It is recommended
+to all CDS Invenio sites using v0.99.6 or previous releases.
 
 What's new:
 -----------
 
- *) improved XSS safety in external collection searching (WebSearch)
+ *) Google Analytics documentation update (WebStyle)
 
- *) verbose level in the search results pages is now available only to
-    admins, preventing potential restricted record ID disclosure even
-    though record content would remain restricted (WebSearch)
+ *) target/source CLI flag description fix (BibConvert)
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/cds-invenio-0.99.6.tar.gz>
-  <http://invenio-software.org/download/cds-invenio-0.99.6.tar.gz.md5>
-  <http://invenio-software.org/download/cds-invenio-0.99.6.tar.gz.sig>
+  <http://invenio-software.org/download/cds-invenio-0.99.7.tar.gz>
+  <http://invenio-software.org/download/cds-invenio-0.99.7.tar.gz.md5>
+  <http://invenio-software.org/download/cds-invenio-0.99.7.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -33,13 +31,13 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from CDS Invenio v0.99.5, then:
+If you are upgrading from CDS Invenio v0.99.6, then:
 
  - please stop your bibsched queue and your Apache server
 
  - install the update:
 
-     $ cd cds-invenio-0.99.6
+     $ cd cds-invenio-0.99.7
      $ cp -a /opt/cds-invenio/etc /opt/cds-invenio/etc.OLD
      $ sh /opt/cds-invenio/etc/build/config.nice
      $ make install
@@ -52,6 +50,6 @@ If you are upgrading from CDS Invenio v0.99.5, then:
 
 If you are upgrading from previous CDS Invenio releases (e.g. from
 v0.92.1), then please see a dedicated Invenio Upgrade wiki page at
-<https://twiki.cern.ch/twiki/bin/view/CDS/InvenioUpgrade>.
+<http://invenio-software.org/wiki/Installation/Upgrade>.
 
 - end of file -

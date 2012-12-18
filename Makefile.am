@@ -266,4 +266,7 @@ update-v0.99.4-tables:
 update-v0.99.5-tables:
 	@echo "Nothing to do; table structure did not change between v0.99.5 and v0.99.6."
 
+update-v0.99.6-tables:
+	@echo "Nothing to do; table structure did not change between v0.99.6 and v0.99.7."
+
 CLEANFILES = *~
