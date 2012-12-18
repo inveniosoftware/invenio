@@ -16,7 +16,7 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.6\n"
+"Project-Id-Version: CDS-Invenio 0.99.7\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2012-10-18 16:35+0200\n"
 "PO-Revision-Date: 2006-10-12 17:50+0200\n"
