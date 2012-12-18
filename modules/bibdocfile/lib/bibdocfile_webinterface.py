@@ -109,7 +109,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     pass
                 else:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-                    target = '/youraccount/login' + \
+                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                              make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
                                                      CFG_SITE_SECURE_URL + user_info['uri']}, {})
                     return redirect_to_url(req, target, norobot=True)
@@ -193,7 +193,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     return stream_restricted_icon(req)
                                 if user_info['email'] == 'guest':
                                     cookie = mail_cookie_create_authorize_action('viewrestrdoc', {'status' : docfile.get_status()})
-                                    target = '/youraccount/login' + \
+                                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
                                         CFG_SITE_SECURE_URL + user_info['uri']}, {})
                                     redirect_to_url(req, target)
@@ -349,7 +349,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
                                                      'runbibdocfile')
         if auth_code and user_info['email'] == 'guest':
             # Ask to login
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'ln' : argd['ln'],
                                              'referer' : CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
