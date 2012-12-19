@@ -1440,6 +1440,10 @@ class Template:
                 link += "#C%s" % success
         out += '<a href="%s">' % link
         out += _('Back to record') + '</a>'
+        out += '<br/><br/>' \
+               + _('You can also view all the comments you have submitted so far on "%(x_url_open)sYour Comments%(x_url_close)s" page.') % \
+               {'x_url_open': '<a target="_blank" href="%(CFG_SITE_URL)s/yourcomments?ln=%(ln)s">' %  {'CFG_SITE_URL': CFG_SITE_URL, 'ln': ln},
+                'x_url_close': '</a>'}
         return out
 
     def tmpl_create_multiple_actions_form(self,
