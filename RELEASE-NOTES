@@ -1,72 +1,50 @@
 --------------------------------------------------------------------
-Invenio v1.0.2 is released
-October 19, 2012
+Invenio v1.0.3 is released
+December 19, 2012
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.2 was released on October 19, 2012.
+Invenio v1.0.3 was released on December 19, 2012.
 
 This is a minor bugfix release only.  It is recommended to all Invenio
-sites using v1.0.1 or previous releases.
+sites using v1.0.2 or previous releases.
 
 What's new:
 -----------
 
- *) BibConvert: fix for static files in admin guide
+ *) BatchUploader: error reporting improvements
 
- *) BibEdit: regression test case fix
+ *) BibConvert: fix bug with SPLITW function; target/source CLI flag
+    description fix
 
- *) BibFormat: fix call to bfe_primary_report_number; revert fix for
-    format validation report
+ *) BibEdit: 'bibedit' CSS class addition to page body
 
- *) BibHarvest: OAI harvesting via HTTP proxy
+ *) BibFormat: fix for js_quicktags location
 
- *) BibRank: begin_date initialisation in del_recids(); INSERT DELAYED
-    INTO rnkPAGEVIEWS; user-friendlier message for similar docs
+ *) jQuery: tablesorter location standardisation
 
- *) BibUpload: clarify correct/replace mode help
+ *) WebComment: cleaner handling of non-reply comments
 
- *) WebJournal: catch ValueError when reading cache; use
-    CFG_TMPSHAREDDIR in admin UI
+ *) WebJournal: explicit RSS icon dimensions; fix for
+    CFG_TMPSHAREDDIR; fix for retrieval of deleted articles
 
- *) WebSearch: allow webcoll to query hidden tags; external collection
-    search fix; external search XSS vulnerability fix; fix for
-    parentheses inside quotes; get_collection_reclist() fix; more uses
-    of `rg` configurable default; 'verbose' mode available to admins
-    only; XSS and verbose improvements
+ *) WebSearch: external search pattern_list escape fix; respect output
+    format content-type; washing of 'as' argument
 
- *) WebSession: fix possibly undefined variables; prevent nickname
-    modification
+ *) WebStyle: dumb page loading fix; Google Analytics documentation
+    update; memory leak fix in session handling; new /ping handler;
+    removal of excess language box call; req.is_https() fix
 
- *) WebStyle: workaround IE bug with cache and HTTPS
+ *) WebSubmit: fix for Send_APP_Mail function
 
- *) WebSubmit: configurable Document File Manager; fix JS check for
-    mandatory fields; unoconv calling fix
-
- *) bibdocfile: guess_format_from_url() improvement;
-    guess_format_from_url() improvements; INSERT DELAYED INTO
-    rnkDOWNLOADS
-
- *) global: removal of psyco
-
- *) I18N: Spanish and Catalan updates to Search Tips; updates to
-    German translation
-
- *) installation: fix for jQuery UI custom; fix md5sum example
-    arguments; new index on session.session_expiry
-
- *) intbitset: fix memory leak
-
- *) inveniogc: tmp directory removal improvements
-
- *) urlutils: MS Office redirection workaround
+ *) WebUser: fix for referer URL protocol
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.2.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.2.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.2.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.3.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.3.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.3.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -76,23 +54,22 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from Invenio v1.0.1, then:
+If you are upgrading from Invenio v1.0.2, then:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.2.tar.gz
-     $ cd invenio-1.0.2
+     $ tar xvfz invenio-1.0.3.tar.gz
+     $ cd invenio-1.0.3
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
      $ make check-custom-templates
-     $ make update-v1.0.1-tables
+     $ make update-v1.0.2-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
-                  --exclude bibformat/format_templates/Default_HTML_brief.bft \
                   /opt/invenio/etc/
 
  c) Update your jQuery tablesorter library:

@@ -6,6 +6,36 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.3 -- released 2012-12-19
+-------------------------------------
+
+ *) BatchUploader: error reporting improvements
+
+ *) BibConvert: fix bug with SPLITW function; target/source CLI flag
+    description fix
+
+ *) BibEdit: 'bibedit' CSS class addition to page body
+
+ *) BibFormat: fix for js_quicktags location
+
+ *) jQuery: tablesorter location standardisation
+
+ *) WebComment: cleaner handling of non-reply comments
+
+ *) WebJournal: explicit RSS icon dimensions; fix for
+    CFG_TMPSHAREDDIR; fix for retrieval of deleted articles
+
+ *) WebSearch: external search pattern_list escape fix; respect output
+    format content-type; washing of 'as' argument
+
+ *) WebStyle: dumb page loading fix; Google Analytics documentation
+    update; memory leak fix in session handling; new /ping handler;
+    removal of excess language box call; req.is_https() fix
+
+ *) WebSubmit: fix for Send_APP_Mail function
+
+ *) WebUser: fix for referer URL protocol
+
 CDS Invenio v0.99.7 -- released 2012-12-18
 ------------------------------------------
 
