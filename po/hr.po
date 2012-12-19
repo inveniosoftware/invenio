@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.2\n"
+"Project-Id-Version: Invenio 1.0.3\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-10-19 05:34+0200\n"
+"POT-Creation-Date: 2012-12-19 15:02+0100\n"
 "PO-Revision-Date: 2008-02-29 15:34+0100\n"
 "Last-Translator: Alen Vodopijevec <alen@irb.hr>\n"
 "Language-Team: HR <info@invenio-software.org>\n"
@@ -38,7 +38,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:665
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:1111
+#: modules/websearch/lib/search_engine.py:1112
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
 msgstr "AND NOT"
@@ -81,7 +81,7 @@ msgstr "Administracija"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4501
+#: modules/websearch/lib/search_engine.py:4502
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -150,7 +150,7 @@ msgstr "cjeloviti tekst"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/websearch/lib/search_engine.py:1133
+#: modules/websearch/lib/search_engine.py:1134
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
 msgstr "Regularni izraz:"
@@ -167,7 +167,7 @@ msgstr "Regularni izraz:"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:1129
+#: modules/websearch/lib/search_engine.py:1130
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
 msgstr "Sve riječi:"
@@ -243,7 +243,7 @@ msgstr "predmetna odrednica"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/websearch/lib/search_engine.py:1132
+#: modules/websearch/lib/search_engine.py:1133
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "Partial phrase:"
 msgstr "Dio fraze:"
@@ -529,7 +529,7 @@ msgstr "eksperiment"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:777
 #: modules/websearch/doc/search-guide.webdoc:812
-#: modules/websearch/lib/search_engine.py:1130
+#: modules/websearch/lib/search_engine.py:1131
 #: modules/websearch/lib/websearch_templates.py:1113
 msgid "Any of the words:"
 msgstr "Bilo koja riječ:"
@@ -772,7 +772,7 @@ msgstr "odjel"
 #: modules/websearch/lib/websearch_templates.py:2110
 #: modules/websearch/lib/websearch_templates.py:2167
 #: modules/webstyle/lib/webstyle_templates.py:431
-#: modules/webstyle/lib/webstyle_templates.py:500
+#: modules/webstyle/lib/webstyle_templates.py:499
 #: modules/webstyle/lib/webdoc_tests.py:86
 #: modules/bibedit/lib/bibeditmulti_templates.py:296
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1819
@@ -1090,7 +1090,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:742
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/websearch/lib/search_engine.py:1131
+#: modules/websearch/lib/search_engine.py:1132
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "Exact phrase:"
 msgstr "Točna fraza:"
@@ -1109,8 +1109,8 @@ msgstr "Pomoć "
 #: modules/websearch/doc/search-guide.webdoc:664
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:955
-#: modules/websearch/lib/search_engine.py:1110
+#: modules/websearch/lib/search_engine.py:956
+#: modules/websearch/lib/search_engine.py:1111
 #: modules/websearch/lib/websearch_templates.py:1162
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "OR"
@@ -1124,7 +1124,7 @@ msgstr "OR"
 #: modules/websearch/doc/search-guide.webdoc:663
 #: modules/websearch/doc/search-guide.webdoc:766
 #: modules/websearch/doc/search-guide.webdoc:801
-#: modules/websearch/lib/search_engine.py:1109
+#: modules/websearch/lib/search_engine.py:1110
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
 msgstr "AND"
@@ -2109,7 +2109,7 @@ msgstr "Datum"
 #: modules/bibupload/lib/batchuploader_templates.py:172
 #: modules/bibupload/lib/batchuploader_templates.py:360
 #: modules/bibupload/lib/batchuploader_templates.py:426
-#: modules/webstyle/lib/webstyle_templates.py:669
+#: modules/webstyle/lib/webstyle_templates.py:668
 msgid "Time"
 msgstr "Vrijeme"
 
@@ -2292,7 +2292,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
 #: modules/websession/lib/webuser.py:303
-#: modules/webstyle/lib/webstyle_templates.py:578
+#: modules/webstyle/lib/webstyle_templates.py:577
 msgid "N/A"
 msgstr "N/A"
 
@@ -2375,7 +2375,7 @@ msgid "Apr"
 msgstr "Tra"
 
 #: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
 msgstr "Svi"
@@ -2409,67 +2409,67 @@ msgid "Dec"
 msgstr "Pro"
 
 #: modules/miscutil/lib/dateutils.py:215
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
 msgstr "Siječanj"
 
 #: modules/miscutil/lib/dateutils.py:216
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
 msgstr "Veljača"
 
 #: modules/miscutil/lib/dateutils.py:217
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
 msgstr "Ožujak"
 
 #: modules/miscutil/lib/dateutils.py:218
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
 msgstr "Travanj"
 
 #: modules/miscutil/lib/dateutils.py:220
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
 msgstr "Lipanj"
 
 #: modules/miscutil/lib/dateutils.py:221
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
 msgstr "Srpanj"
 
 #: modules/miscutil/lib/dateutils.py:222
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
 msgstr "Kolovoz"
 
 #: modules/miscutil/lib/dateutils.py:223
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
 msgstr "Rujan"
 
 #: modules/miscutil/lib/dateutils.py:224
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
 msgstr "Listopad"
 
 #: modules/miscutil/lib/dateutils.py:225
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
 msgstr "Studeni"
 
 #: modules/miscutil/lib/dateutils.py:226
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
 msgstr "Prosinac"
@@ -2602,8 +2602,8 @@ msgstr "Trebate pomoć? Kontaktirajte nas"
 
 #: modules/webaccess/lib/access_control_config.py:262
 #: modules/websession/lib/websession_templates.py:1087
-#: modules/websession/lib/webuser.py:887 modules/websession/lib/webuser.py:896
-#: modules/websession/lib/webuser.py:897
+#: modules/websession/lib/webuser.py:884 modules/websession/lib/webuser.py:893
+#: modules/websession/lib/webuser.py:894
 msgid "Run Record Editor"
 msgstr ""
 
@@ -2613,7 +2613,7 @@ msgid "Run Multi-Record Editor"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:264
-#: modules/websession/lib/webuser.py:888
+#: modules/websession/lib/webuser.py:885
 msgid "Run Document File Manager"
 msgstr ""
 
@@ -2697,60 +2697,60 @@ msgstr "Pokreni BibEdit"
 msgid "Run Batch Uploader"
 msgstr ""
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3706
+#: modules/webaccess/lib/webaccessadmin_lib.py:3705
 #, fuzzy, python-format
 msgid "Your account on '%s' has been activated"
 msgstr "Vaš korisnički račun je uspješno kreiran."
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3707
+#: modules/webaccess/lib/webaccessadmin_lib.py:3706
 #, fuzzy, python-format
 msgid "Your account earlier created on '%s' has been activated:"
 msgstr "Vaš korisnički račun je uspješno kreiran."
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3709
-#: modules/webaccess/lib/webaccessadmin_lib.py:3722
-#: modules/webaccess/lib/webaccessadmin_lib.py:3748
+#: modules/webaccess/lib/webaccessadmin_lib.py:3708
+#: modules/webaccess/lib/webaccessadmin_lib.py:3721
+#: modules/webaccess/lib/webaccessadmin_lib.py:3747
 #, fuzzy
 msgid "Username/Email:"
 msgstr "Korisničko ime"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3710
-#: modules/webaccess/lib/webaccessadmin_lib.py:3723
+#: modules/webaccess/lib/webaccessadmin_lib.py:3709
+#: modules/webaccess/lib/webaccessadmin_lib.py:3722
 #, fuzzy
 msgid "Password:"
 msgstr "Lozinka"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #, fuzzy, python-format
 msgid "Account created on '%s'"
 msgstr "Korisnički račun je kreiran"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3721
+#: modules/webaccess/lib/webaccessadmin_lib.py:3720
 #, fuzzy, python-format
 msgid "An account has been created for you on '%s':"
 msgstr "Vaš korisnički račun je uspješno kreiran."
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3733
+#: modules/webaccess/lib/webaccessadmin_lib.py:3732
 #, fuzzy, python-format
 msgid "Account rejected on '%s'"
 msgstr "Korisnički račun je kreiran"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3734
+#: modules/webaccess/lib/webaccessadmin_lib.py:3733
 #, fuzzy, python-format
 msgid "Your request for an account has been rejected on '%s':"
 msgstr "Vaš zahtjev za priključenjem grupi %s je odbijen."
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3736
+#: modules/webaccess/lib/webaccessadmin_lib.py:3735
 #, fuzzy, python-format
 msgid "Username/Email: %s"
 msgstr "Korisničko ime"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3746
+#: modules/webaccess/lib/webaccessadmin_lib.py:3745
 #, fuzzy, python-format
 msgid "Account deleted on '%s'"
 msgstr "Korisnički račun je kreiran"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3747
+#: modules/webaccess/lib/webaccessadmin_lib.py:3746
 #, fuzzy, python-format
 msgid "Your account on '%s' has been deleted:"
 msgstr "Grupa %s je obrisana"
@@ -2768,7 +2768,7 @@ msgstr "Detaljnije"
 #: modules/webalert/lib/htmlparser.py:187
 #: modules/websearch/lib/websearch_templates.py:1611
 #: modules/websearch/lib/websearch_templates.py:3346
-#: modules/webstyle/lib/webstyle_templates.py:830
+#: modules/webstyle/lib/webstyle_templates.py:829
 msgid "Similar records"
 msgstr "Slični zapisi"
 
@@ -3171,13 +3171,13 @@ msgstr "Personaliziraj"
 #: modules/webalert/lib/webalert_webinterface.py:364
 #: modules/webalert/lib/webalert_webinterface.py:441
 #: modules/webalert/lib/webalert_webinterface.py:515
-#: modules/webstyle/lib/webstyle_templates.py:582
-#: modules/webstyle/lib/webstyle_templates.py:619
-#: modules/webstyle/lib/webstyle_templates.py:621
+#: modules/webstyle/lib/webstyle_templates.py:581
+#: modules/webstyle/lib/webstyle_templates.py:618
+#: modules/webstyle/lib/webstyle_templates.py:620
 #: modules/websubmit/lib/websubmit_engine.py:1736
 #: modules/websubmit/lib/websubmit_webinterface.py:1103
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
-#: modules/bibedit/lib/bibedit_webinterface.py:205
+#: modules/bibedit/lib/bibedit_webinterface.py:208
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:496
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:280
@@ -4782,10 +4782,10 @@ msgstr "WebComment Admin"
 #: modules/webcomment/web/admin/webcommentadmin.py:199
 #: modules/webcomment/web/admin/webcommentadmin.py:235
 #: modules/webcomment/web/admin/webcommentadmin.py:273
-#: modules/websearch/lib/websearch_webinterface.py:962
+#: modules/websearch/lib/websearch_webinterface.py:969
 #: modules/websearch/web/admin/websearchadmin.py:1040
 #: modules/websession/lib/websession_webinterface.py:936
-#: modules/webstyle/lib/webstyle_templates.py:584
+#: modules/webstyle/lib/webstyle_templates.py:583
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:333
 msgid "Internal Error"
@@ -5041,89 +5041,89 @@ msgstr "Prikaži poruku"
 
 #: modules/websearch/lib/search_engine.py:746
 #: modules/websearch/lib/search_engine.py:773
-#: modules/websearch/lib/search_engine.py:4524
-#: modules/websearch/lib/search_engine.py:4577
+#: modules/websearch/lib/search_engine.py:4525
+#: modules/websearch/lib/search_engine.py:4578
 msgid "Search Results"
 msgstr "Pretraži rezultate"
 
-#: modules/websearch/lib/search_engine.py:875
+#: modules/websearch/lib/search_engine.py:876
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
 msgstr "bilo koji dan"
 
-#: modules/websearch/lib/search_engine.py:881
+#: modules/websearch/lib/search_engine.py:882
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
 msgstr "bilo koji mjesec"
 
-#: modules/websearch/lib/search_engine.py:889
+#: modules/websearch/lib/search_engine.py:890
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
 msgstr "bilo koja godina"
 
-#: modules/websearch/lib/search_engine.py:930
-#: modules/websearch/lib/search_engine.py:949
+#: modules/websearch/lib/search_engine.py:931
+#: modules/websearch/lib/search_engine.py:950
 #, fuzzy
 msgid "any public collection"
 msgstr "bilo koja kolekcija"
 
-#: modules/websearch/lib/search_engine.py:934
+#: modules/websearch/lib/search_engine.py:935
 #, fuzzy
 msgid "remove this collection"
 msgstr "Nema takvog korisnika"
 
-#: modules/websearch/lib/search_engine.py:945
+#: modules/websearch/lib/search_engine.py:946
 msgid "add another collection"
 msgstr "dodaj kolekciju"
 
-#: modules/websearch/lib/search_engine.py:955
+#: modules/websearch/lib/search_engine.py:956
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "rank by"
 msgstr "poredaj po"
 
-#: modules/websearch/lib/search_engine.py:975
+#: modules/websearch/lib/search_engine.py:976
 msgid "HTML brief"
 msgstr "sažeti HTML"
 
-#: modules/websearch/lib/search_engine.py:1088
+#: modules/websearch/lib/search_engine.py:1089
 #: modules/websearch/lib/websearch_webcoll.py:557
 msgid "latest first"
 msgstr "prvo najnovije"
 
-#: modules/websearch/lib/search_engine.py:1693
+#: modules/websearch/lib/search_engine.py:1694
 msgid "No values found."
 msgstr "Nema pronađenih vrijednosti"
 
-#: modules/websearch/lib/search_engine.py:1816
+#: modules/websearch/lib/search_engine.py:1817
 #, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1820
+#: modules/websearch/lib/search_engine.py:1821
 #, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1829
+#: modules/websearch/lib/search_engine.py:1830
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1869
+#: modules/websearch/lib/search_engine.py:1870
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Nema rezultata za %(x_query1)s, umjesto traženog koristi se %(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1879
-#: modules/websearch/lib/search_engine.py:1888
-#: modules/websearch/lib/search_engine.py:4496
-#: modules/websearch/lib/search_engine.py:4534
-#: modules/websearch/lib/search_engine.py:4585
+#: modules/websearch/lib/search_engine.py:1880
+#: modules/websearch/lib/search_engine.py:1889
+#: modules/websearch/lib/search_engine.py:4497
+#: modules/websearch/lib/search_engine.py:4535
+#: modules/websearch/lib/search_engine.py:4586
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
@@ -5131,13 +5131,13 @@ msgstr ""
 msgid "Requested record does not seem to exist."
 msgstr "Nažalost, zapis %s ne postoji."
 
-#: modules/websearch/lib/search_engine.py:2010
+#: modules/websearch/lib/search_engine.py:2011
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2332
+#: modules/websearch/lib/search_engine.py:2333
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5146,7 +5146,7 @@ msgstr ""
 "Nije pronađeno u kolekciji %(x_collection)s. Pretraživanje drugih javnih "
 "kolekcija dalo je %(x_url_open)s%(x_nb_hits)d rezultate%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2341
+#: modules/websearch/lib/search_engine.py:2342
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5154,27 +5154,27 @@ msgstr ""
 "Vaš upit nije pronađen niti u jednoj javnoj kolekciji. Ako ste tražili "
 "privatni dokument, molimo prvo odaberite željenu ograničenu kolekciju."
 
-#: modules/websearch/lib/search_engine.py:2458
+#: modules/websearch/lib/search_engine.py:2459
 #, fuzzy, python-format
 msgid "There are no records referring to %s."
 msgstr "%i košarica"
 
-#: modules/websearch/lib/search_engine.py:2460
+#: modules/websearch/lib/search_engine.py:2461
 #, fuzzy, python-format
 msgid "There are no records cited by %s."
 msgstr "%i košarica"
 
-#: modules/websearch/lib/search_engine.py:2465
+#: modules/websearch/lib/search_engine.py:2466
 #, fuzzy, python-format
 msgid "No word index is available for %s."
 msgstr "Indeks riječi nije dostupan za"
 
-#: modules/websearch/lib/search_engine.py:2476
+#: modules/websearch/lib/search_engine.py:2477
 #, fuzzy, python-format
 msgid "No phrase index is available for %s."
 msgstr "Indeks fraza nije dostupan za"
 
-#: modules/websearch/lib/search_engine.py:2521
+#: modules/websearch/lib/search_engine.py:2522
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -5183,14 +5183,14 @@ msgstr ""
 "Traženi pojam %(x_term)s u popisu %(x_index)s nije pronađen. Najsličniji "
 "pojmovi u svim kolekcijama su:"
 
-#: modules/websearch/lib/search_engine.py:2525
+#: modules/websearch/lib/search_engine.py:2526
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr ""
 "Traženi pojam %s nije pronađen. Najsličniji pojmovi u svim kolekcijama su:"
 
-#: modules/websearch/lib/search_engine.py:3281
+#: modules/websearch/lib/search_engine.py:3282
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -5199,7 +5199,7 @@ msgstr ""
 "Nažalost, sortiranje je dozvoljeno samo na skupovima od više od %d zapisa. "
 "Koristi se uobičajeno sortiranje."
 
-#: modules/websearch/lib/search_engine.py:3305
+#: modules/websearch/lib/search_engine.py:3306
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -5208,27 +5208,27 @@ msgstr ""
 "Nažalost, %s nije valjana opcija za sortiranje. Umjesto toga, izabrano je "
 "sortiranje prema naslovu."
 
-#: modules/websearch/lib/search_engine.py:3498
-#: modules/websearch/lib/search_engine.py:3827
-#: modules/websearch/lib/search_engine.py:4005
-#: modules/websearch/lib/search_engine.py:4028
-#: modules/websearch/lib/search_engine.py:4036
-#: modules/websearch/lib/search_engine.py:4044
-#: modules/websearch/lib/search_engine.py:4090
+#: modules/websearch/lib/search_engine.py:3499
+#: modules/websearch/lib/search_engine.py:3828
+#: modules/websearch/lib/search_engine.py:4006
+#: modules/websearch/lib/search_engine.py:4029
+#: modules/websearch/lib/search_engine.py:4037
+#: modules/websearch/lib/search_engine.py:4045
+#: modules/websearch/lib/search_engine.py:4091
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "Zapis je obrisan."
 
-#: modules/websearch/lib/search_engine.py:3726
+#: modules/websearch/lib/search_engine.py:3727
 msgid "Use different search terms."
 msgstr "Koristite druge pojmove za pretragu."
 
-#: modules/websearch/lib/search_engine.py:4806
+#: modules/websearch/lib/search_engine.py:4807
 #, fuzzy
 msgid "No match within your time limits, discarding this condition..."
 msgstr "Nema rezultata u traženim vremenskim okvirima, zahtjev je odbačen..."
 
-#: modules/websearch/lib/search_engine.py:4833
+#: modules/websearch/lib/search_engine.py:4834
 msgid "No match within your search limits, discarding this condition..."
 msgstr "Nema rezultata u traženim okvirima, zahtjev je odbačen..."
 
@@ -5572,19 +5572,19 @@ msgid "1 review"
 msgstr "izvješće"
 
 #: modules/websearch/lib/websearch_templates.py:3525
-#: modules/websearch/lib/websearch_webinterface.py:979
+#: modules/websearch/lib/websearch_webinterface.py:986
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "Kolekcija %s nije pronađena"
 
 #: modules/websearch/lib/websearch_templates.py:3537
-#: modules/websearch/lib/websearch_webinterface.py:975
+#: modules/websearch/lib/websearch_webinterface.py:982
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Nažalost, kolekcija %s ne postoji."
 
 #: modules/websearch/lib/websearch_templates.py:3539
-#: modules/websearch/lib/websearch_webinterface.py:976
+#: modules/websearch/lib/websearch_webinterface.py:983
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "Započni pregledavanje od %s. "
@@ -5689,12 +5689,12 @@ msgstr ""
 msgid "Additional Citation Metrics"
 msgstr "Uredi način prijave"
 
-#: modules/websearch/lib/websearch_webinterface.py:581
+#: modules/websearch/lib/websearch_webinterface.py:584
 #, fuzzy
 msgid "You are not authorized to view this area."
 msgstr "Vi niste vlasnik ove košarice."
 
-#: modules/websearch/lib/websearch_webinterface.py:981
+#: modules/websearch/lib/websearch_webinterface.py:988
 msgid "Not found"
 msgstr "Nije pronađeno"
 
@@ -6384,7 +6384,7 @@ msgstr "odjava"
 
 #: modules/websession/lib/websession_templates.py:1237
 #: modules/webstyle/lib/webstyle_templates.py:433
-#: modules/webstyle/lib/webstyle_templates.py:502
+#: modules/webstyle/lib/webstyle_templates.py:501
 msgid "Personalize"
 msgstr "Personaliziraj"
 
@@ -6785,7 +6785,7 @@ msgstr "Korisničko ime"
 msgid "You can approve or reject this account request at"
 msgstr ""
 
-#: modules/websession/lib/webuser.py:898 modules/websession/lib/webuser.py:899
+#: modules/websession/lib/webuser.py:895 modules/websession/lib/webuser.py:896
 msgid "Run File Manager"
 msgstr ""
 
@@ -7225,7 +7225,7 @@ msgid "Home"
 msgstr "Početna stranica"
 
 #: modules/webstyle/lib/webstyle_templates.py:432
-#: modules/webstyle/lib/webstyle_templates.py:501
+#: modules/webstyle/lib/webstyle_templates.py:500
 #: modules/websubmit/lib/websubmit_engine.py:690
 #: modules/websubmit/lib/websubmit_engine.py:1144
 #: modules/websubmit/lib/websubmit_engine.py:1190
@@ -7234,74 +7234,74 @@ msgid "Submit"
 msgstr "Prihvati"
 
 #: modules/webstyle/lib/webstyle_templates.py:434
-#: modules/webstyle/lib/webstyle_templates.py:503
+#: modules/webstyle/lib/webstyle_templates.py:502
 msgid "Help"
 msgstr "Pomoć"
 
-#: modules/webstyle/lib/webstyle_templates.py:467
+#: modules/webstyle/lib/webstyle_templates.py:466
 msgid "Last updated"
 msgstr "Ažurirano"
 
-#: modules/webstyle/lib/webstyle_templates.py:505
+#: modules/webstyle/lib/webstyle_templates.py:504
 msgid "Powered by"
 msgstr "Powered by"
 
-#: modules/webstyle/lib/webstyle_templates.py:506
+#: modules/webstyle/lib/webstyle_templates.py:505
 msgid "Maintained by"
 msgstr "Održava"
 
-#: modules/webstyle/lib/webstyle_templates.py:553
+#: modules/webstyle/lib/webstyle_templates.py:552
 msgid "This site is also available in the following languages:"
 msgstr "Sadržaj je dostupan i na slijedećim jezicima:"
 
-#: modules/webstyle/lib/webstyle_templates.py:586
+#: modules/webstyle/lib/webstyle_templates.py:585
 msgid "Browser"
 msgstr "Preglednik"
 
-#: modules/webstyle/lib/webstyle_templates.py:608
+#: modules/webstyle/lib/webstyle_templates.py:607
 msgid "System Error"
 msgstr "Sistemska greška"
 
-#: modules/webstyle/lib/webstyle_templates.py:623
+#: modules/webstyle/lib/webstyle_templates.py:622
 #, fuzzy
 msgid "Traceback"
 msgstr "Pogledaj unatrag"
 
-#: modules/webstyle/lib/webstyle_templates.py:670
+#: modules/webstyle/lib/webstyle_templates.py:669
 msgid "Client"
 msgstr "Klijent"
 
-#: modules/webstyle/lib/webstyle_templates.py:672
+#: modules/webstyle/lib/webstyle_templates.py:671
 #, fuzzy
 msgid "Please send an error report to the administrator."
 msgstr "Molimo pošaljite administratoru izvještaj o greški."
 
-#: modules/webstyle/lib/webstyle_templates.py:673
+#: modules/webstyle/lib/webstyle_templates.py:672
 msgid "Send error report"
 msgstr "Izvijesti o grešci"
 
-#: modules/webstyle/lib/webstyle_templates.py:677
+#: modules/webstyle/lib/webstyle_templates.py:676
 #, python-format
 msgid "Please contact %s quoting the following information:"
 msgstr "Molimo kontaktirajte %s navodeći slijedeće informacije:"
 
-#: modules/webstyle/lib/webstyle_templates.py:833
+#: modules/webstyle/lib/webstyle_templates.py:832
 #, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr ""
 "Zapis kreiran %(x_date_creation)s, zadnja izmjena %(x_date_modification)s"
 
-#: modules/webstyle/lib/webstyle_templates.py:904
+#: modules/webstyle/lib/webstyle_templates.py:903
 msgid "The server encountered an error while dealing with your request."
 msgstr ""
 
-#: modules/webstyle/lib/webstyle_templates.py:905
+#: modules/webstyle/lib/webstyle_templates.py:904
 #, fuzzy
 msgid "The system administrators have been alerted."
 msgstr "Zapis je obrisan."
 
-#: modules/webstyle/lib/webstyle_templates.py:906
+#: modules/webstyle/lib/webstyle_templates.py:905
 #, python-format
 msgid "In case of doubt, please contact %(x_admin_email)s."
 msgstr ""
@@ -8827,7 +8827,7 @@ msgstr "Član ste slijedećih grupa:"
 msgid "Send this article"
 msgstr "Ocijeni ovaj članak"
 
-#: modules/webjournal/lib/elements/bfe_webjournal_rss.py:136
+#: modules/webjournal/lib/elements/bfe_webjournal_rss.py:141
 #, fuzzy
 msgid "Subscribe by RSS"
 msgstr "Predbilježba (#)"
@@ -8869,11 +8869,11 @@ msgstr "Odaberi"
 msgid "Select Date:"
 msgstr "Odaberi"
 
-#: modules/bibedit/lib/bibedit_webinterface.py:181
+#: modules/bibedit/lib/bibedit_webinterface.py:183
 msgid "Comparing two record revisions"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_webinterface.py:204
+#: modules/bibedit/lib/bibedit_webinterface.py:207
 msgid "Failed to create a ticket"
 msgstr ""
 
@@ -11648,29 +11648,29 @@ msgstr ""
 msgid "Export with BibSword: Acknowledgement"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:199
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:199
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "No records match that file name"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:200
+#: modules/bibupload/lib/batchuploader_engine.py:204
 msgid "File already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:200
+#: modules/bibupload/lib/batchuploader_engine.py:204
 msgid "A file with the same name and format already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:201
+#: modules/bibupload/lib/batchuploader_engine.py:205
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:411
-#: modules/bibupload/lib/batchuploader_engine.py:424
+#: modules/bibupload/lib/batchuploader_engine.py:415
+#: modules/bibupload/lib/batchuploader_engine.py:428
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"

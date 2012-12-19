@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.2\n"
+"Project-Id-Version: Invenio 1.0.3\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-10-19 05:34+0200\n"
+"POT-Creation-Date: 2012-12-19 15:02+0100\n"
 "PO-Revision-Date: 2008-02-29 15:37+0100\n"
 "Last-Translator: Kam-ming Ku <kmku@hkusua.hku.hk>\n"
 "Language-Team: ZH_CN <info@invenio-software.org>\n"
@@ -36,7 +36,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:665
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:1111
+#: modules/websearch/lib/search_engine.py:1112
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
 msgstr "不包含"
@@ -79,7 +79,7 @@ msgstr "管理"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4501
+#: modules/websearch/lib/search_engine.py:4502
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -148,7 +148,7 @@ msgstr "全文"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/websearch/lib/search_engine.py:1133
+#: modules/websearch/lib/search_engine.py:1134
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
 msgstr "正则表达式:"
@@ -165,7 +165,7 @@ msgstr "正则表达式:"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:1129
+#: modules/websearch/lib/search_engine.py:1130
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
 msgstr "包含以下全部的字词:"
@@ -241,7 +241,7 @@ msgstr "主题"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/websearch/lib/search_engine.py:1132
+#: modules/websearch/lib/search_engine.py:1133
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "Partial phrase:"
 msgstr "包含以下的部分字句"
@@ -527,7 +527,7 @@ msgstr "实验"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:777
 #: modules/websearch/doc/search-guide.webdoc:812
-#: modules/websearch/lib/search_engine.py:1130
+#: modules/websearch/lib/search_engine.py:1131
 #: modules/websearch/lib/websearch_templates.py:1113
 msgid "Any of the words:"
 msgstr "包含以下任何一个字词:"
@@ -770,7 +770,7 @@ msgstr "分类"
 #: modules/websearch/lib/websearch_templates.py:2110
 #: modules/websearch/lib/websearch_templates.py:2167
 #: modules/webstyle/lib/webstyle_templates.py:431
-#: modules/webstyle/lib/webstyle_templates.py:500
+#: modules/webstyle/lib/webstyle_templates.py:499
 #: modules/webstyle/lib/webdoc_tests.py:86
 #: modules/bibedit/lib/bibeditmulti_templates.py:296
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1819
@@ -1088,7 +1088,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:742
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/websearch/lib/search_engine.py:1131
+#: modules/websearch/lib/search_engine.py:1132
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "Exact phrase:"
 msgstr "包含以下的完整字句:"
@@ -1107,8 +1107,8 @@ msgstr "提交帮助"
 #: modules/websearch/doc/search-guide.webdoc:664
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:955
-#: modules/websearch/lib/search_engine.py:1110
+#: modules/websearch/lib/search_engine.py:956
+#: modules/websearch/lib/search_engine.py:1111
 #: modules/websearch/lib/websearch_templates.py:1162
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "OR"
@@ -1122,7 +1122,7 @@ msgstr "或"
 #: modules/websearch/doc/search-guide.webdoc:663
 #: modules/websearch/doc/search-guide.webdoc:766
 #: modules/websearch/doc/search-guide.webdoc:801
-#: modules/websearch/lib/search_engine.py:1109
+#: modules/websearch/lib/search_engine.py:1110
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
 msgstr "和"
@@ -2107,7 +2107,7 @@ msgstr "日期"
 #: modules/bibupload/lib/batchuploader_templates.py:172
 #: modules/bibupload/lib/batchuploader_templates.py:360
 #: modules/bibupload/lib/batchuploader_templates.py:426
-#: modules/webstyle/lib/webstyle_templates.py:669
+#: modules/webstyle/lib/webstyle_templates.py:668
 msgid "Time"
 msgstr "时间"
 
@@ -2289,7 +2289,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
 #: modules/websession/lib/webuser.py:303
-#: modules/webstyle/lib/webstyle_templates.py:578
+#: modules/webstyle/lib/webstyle_templates.py:577
 msgid "N/A"
 msgstr "不适用"
 
@@ -2372,7 +2372,7 @@ msgid "Apr"
 msgstr "四月"
 
 #: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
 msgstr "五月"
@@ -2406,67 +2406,67 @@ msgid "Dec"
 msgstr "十二月"
 
 #: modules/miscutil/lib/dateutils.py:215
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
 msgstr "一月"
 
 #: modules/miscutil/lib/dateutils.py:216
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
 msgstr "二月"
 
 #: modules/miscutil/lib/dateutils.py:217
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
 msgstr "三月"
 
 #: modules/miscutil/lib/dateutils.py:218
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
 msgstr "四月"
 
 #: modules/miscutil/lib/dateutils.py:220
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
 msgstr "六月"
 
 #: modules/miscutil/lib/dateutils.py:221
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
 msgstr "七月"
 
 #: modules/miscutil/lib/dateutils.py:222
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
 msgstr "八月"
 
 #: modules/miscutil/lib/dateutils.py:223
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
 msgstr "九月"
 
 #: modules/miscutil/lib/dateutils.py:224
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
 msgstr "十月"
 
 #: modules/miscutil/lib/dateutils.py:225
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
 msgstr "十一月"
 
 #: modules/miscutil/lib/dateutils.py:226
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
 msgstr "十二月"
@@ -2597,8 +2597,8 @@ msgstr "需要协助？请联络"
 
 #: modules/webaccess/lib/access_control_config.py:262
 #: modules/websession/lib/websession_templates.py:1087
-#: modules/websession/lib/webuser.py:887 modules/websession/lib/webuser.py:896
-#: modules/websession/lib/webuser.py:897
+#: modules/websession/lib/webuser.py:884 modules/websession/lib/webuser.py:893
+#: modules/websession/lib/webuser.py:894
 msgid "Run Record Editor"
 msgstr ""
 
@@ -2608,7 +2608,7 @@ msgid "Run Multi-Record Editor"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:264
-#: modules/websession/lib/webuser.py:888
+#: modules/websession/lib/webuser.py:885
 msgid "Run Document File Manager"
 msgstr ""
 
@@ -2692,60 +2692,60 @@ msgstr "执行 BibEdit"
 msgid "Run Batch Uploader"
 msgstr ""
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3706
+#: modules/webaccess/lib/webaccessadmin_lib.py:3705
 #, fuzzy, python-format
 msgid "Your account on '%s' has been activated"
 msgstr "帐号已建立。"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3707
+#: modules/webaccess/lib/webaccessadmin_lib.py:3706
 #, fuzzy, python-format
 msgid "Your account earlier created on '%s' has been activated:"
 msgstr "帐号已建立。"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3709
-#: modules/webaccess/lib/webaccessadmin_lib.py:3722
-#: modules/webaccess/lib/webaccessadmin_lib.py:3748
+#: modules/webaccess/lib/webaccessadmin_lib.py:3708
+#: modules/webaccess/lib/webaccessadmin_lib.py:3721
+#: modules/webaccess/lib/webaccessadmin_lib.py:3747
 #, fuzzy
 msgid "Username/Email:"
 msgstr "帐号"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3710
-#: modules/webaccess/lib/webaccessadmin_lib.py:3723
+#: modules/webaccess/lib/webaccessadmin_lib.py:3709
+#: modules/webaccess/lib/webaccessadmin_lib.py:3722
 #, fuzzy
 msgid "Password:"
 msgstr "密码"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #, fuzzy, python-format
 msgid "Account created on '%s'"
 msgstr "帐号已建立"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3721
+#: modules/webaccess/lib/webaccessadmin_lib.py:3720
 #, fuzzy, python-format
 msgid "An account has been created for you on '%s':"
 msgstr "帐号已建立。"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3733
+#: modules/webaccess/lib/webaccessadmin_lib.py:3732
 #, fuzzy, python-format
 msgid "Account rejected on '%s'"
 msgstr "帐号已建立"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3734
+#: modules/webaccess/lib/webaccessadmin_lib.py:3733
 #, fuzzy, python-format
 msgid "Your request for an account has been rejected on '%s':"
 msgstr "您加入组别 %s的要求已被拒绝。"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3736
+#: modules/webaccess/lib/webaccessadmin_lib.py:3735
 #, fuzzy, python-format
 msgid "Username/Email: %s"
 msgstr "帐号"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3746
+#: modules/webaccess/lib/webaccessadmin_lib.py:3745
 #, fuzzy, python-format
 msgid "Account deleted on '%s'"
 msgstr "帐号已建立"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3747
+#: modules/webaccess/lib/webaccessadmin_lib.py:3746
 #, fuzzy, python-format
 msgid "Your account on '%s' has been deleted:"
 msgstr "组别 %s 已被删除"
@@ -2763,7 +2763,7 @@ msgstr "详细记录"
 #: modules/webalert/lib/htmlparser.py:187
 #: modules/websearch/lib/websearch_templates.py:1611
 #: modules/websearch/lib/websearch_templates.py:3346
-#: modules/webstyle/lib/webstyle_templates.py:830
+#: modules/webstyle/lib/webstyle_templates.py:829
 msgid "Similar records"
 msgstr "相似记录"
 
@@ -3158,13 +3158,13 @@ msgstr "个人化"
 #: modules/webalert/lib/webalert_webinterface.py:364
 #: modules/webalert/lib/webalert_webinterface.py:441
 #: modules/webalert/lib/webalert_webinterface.py:515
-#: modules/webstyle/lib/webstyle_templates.py:582
-#: modules/webstyle/lib/webstyle_templates.py:619
-#: modules/webstyle/lib/webstyle_templates.py:621
+#: modules/webstyle/lib/webstyle_templates.py:581
+#: modules/webstyle/lib/webstyle_templates.py:618
+#: modules/webstyle/lib/webstyle_templates.py:620
 #: modules/websubmit/lib/websubmit_engine.py:1736
 #: modules/websubmit/lib/websubmit_webinterface.py:1103
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
-#: modules/bibedit/lib/bibedit_webinterface.py:205
+#: modules/bibedit/lib/bibedit_webinterface.py:208
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:496
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:280
@@ -4752,10 +4752,10 @@ msgstr "WebComment 管理"
 #: modules/webcomment/web/admin/webcommentadmin.py:199
 #: modules/webcomment/web/admin/webcommentadmin.py:235
 #: modules/webcomment/web/admin/webcommentadmin.py:273
-#: modules/websearch/lib/websearch_webinterface.py:962
+#: modules/websearch/lib/websearch_webinterface.py:969
 #: modules/websearch/web/admin/websearchadmin.py:1040
 #: modules/websession/lib/websession_webinterface.py:936
-#: modules/webstyle/lib/webstyle_templates.py:584
+#: modules/webstyle/lib/webstyle_templates.py:583
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:333
 msgid "Internal Error"
@@ -5009,88 +5009,88 @@ msgstr "阅读讯息"
 
 #: modules/websearch/lib/search_engine.py:746
 #: modules/websearch/lib/search_engine.py:773
-#: modules/websearch/lib/search_engine.py:4524
-#: modules/websearch/lib/search_engine.py:4577
+#: modules/websearch/lib/search_engine.py:4525
+#: modules/websearch/lib/search_engine.py:4578
 msgid "Search Results"
 msgstr "检索结果"
 
-#: modules/websearch/lib/search_engine.py:875
+#: modules/websearch/lib/search_engine.py:876
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
 msgstr "任何日子"
 
-#: modules/websearch/lib/search_engine.py:881
+#: modules/websearch/lib/search_engine.py:882
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
 msgstr "任何月份"
 
-#: modules/websearch/lib/search_engine.py:889
+#: modules/websearch/lib/search_engine.py:890
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
 msgstr "任何年份"
 
-#: modules/websearch/lib/search_engine.py:930
-#: modules/websearch/lib/search_engine.py:949
+#: modules/websearch/lib/search_engine.py:931
+#: modules/websearch/lib/search_engine.py:950
 #, fuzzy
 msgid "any public collection"
 msgstr "任何专辑"
 
-#: modules/websearch/lib/search_engine.py:934
+#: modules/websearch/lib/search_engine.py:935
 #, fuzzy
 msgid "remove this collection"
 msgstr "找寻不到用户"
 
-#: modules/websearch/lib/search_engine.py:945
+#: modules/websearch/lib/search_engine.py:946
 msgid "add another collection"
 msgstr "新增专辑"
 
-#: modules/websearch/lib/search_engine.py:955
+#: modules/websearch/lib/search_engine.py:956
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "rank by"
 msgstr "排列"
 
-#: modules/websearch/lib/search_engine.py:975
+#: modules/websearch/lib/search_engine.py:976
 msgid "HTML brief"
 msgstr "简短的HTML"
 
-#: modules/websearch/lib/search_engine.py:1088
+#: modules/websearch/lib/search_engine.py:1089
 #: modules/websearch/lib/websearch_webcoll.py:557
 msgid "latest first"
 msgstr "时间"
 
-#: modules/websearch/lib/search_engine.py:1693
+#: modules/websearch/lib/search_engine.py:1694
 msgid "No values found."
 msgstr "没有找到。"
 
-#: modules/websearch/lib/search_engine.py:1816
+#: modules/websearch/lib/search_engine.py:1817
 #, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1820
+#: modules/websearch/lib/search_engine.py:1821
 #, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1829
+#: modules/websearch/lib/search_engine.py:1830
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1869
+#: modules/websearch/lib/search_engine.py:1870
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr "用 %(x_query1)s 没有确实匹配任何记录，现尝试用 %(x_query2)s 来查询… ，"
 
-#: modules/websearch/lib/search_engine.py:1879
-#: modules/websearch/lib/search_engine.py:1888
-#: modules/websearch/lib/search_engine.py:4496
-#: modules/websearch/lib/search_engine.py:4534
-#: modules/websearch/lib/search_engine.py:4585
+#: modules/websearch/lib/search_engine.py:1880
+#: modules/websearch/lib/search_engine.py:1889
+#: modules/websearch/lib/search_engine.py:4497
+#: modules/websearch/lib/search_engine.py:4535
+#: modules/websearch/lib/search_engine.py:4586
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
@@ -5098,13 +5098,13 @@ msgstr "用 %(x_query1)s 没有确实匹配任何记录，现尝试用 %(x_query
 msgid "Requested record does not seem to exist."
 msgstr "对不起，记录 %s 并不存在。"
 
-#: modules/websearch/lib/search_engine.py:2010
+#: modules/websearch/lib/search_engine.py:2011
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2332
+#: modules/websearch/lib/search_engine.py:2333
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5113,79 +5113,79 @@ msgstr ""
 "在专辑 %(x_collection)s 里没有匹配任何记录；但在其他的专辑里找"
 "到%(x_url_open)s%(x_nb_hits)d 笔记录%(x_url_close)s。"
 
-#: modules/websearch/lib/search_engine.py:2341
+#: modules/websearch/lib/search_engine.py:2342
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
 msgstr "没有在专辑里匹配任何记录。您可尝试在限制的专辑里找寻。"
 
-#: modules/websearch/lib/search_engine.py:2458
+#: modules/websearch/lib/search_engine.py:2459
 #, fuzzy, python-format
 msgid "There are no records referring to %s."
 msgstr "总共有 %i 个收藏篮"
 
-#: modules/websearch/lib/search_engine.py:2460
+#: modules/websearch/lib/search_engine.py:2461
 #, fuzzy, python-format
 msgid "There are no records cited by %s."
 msgstr "总共有 %i 个收藏篮"
 
-#: modules/websearch/lib/search_engine.py:2465
+#: modules/websearch/lib/search_engine.py:2466
 #, fuzzy, python-format
 msgid "No word index is available for %s."
 msgstr "没有可用的字索引给"
 
-#: modules/websearch/lib/search_engine.py:2476
+#: modules/websearch/lib/search_engine.py:2477
 #, fuzzy, python-format
 msgid "No phrase index is available for %s."
 msgstr "没有可用的短语索引给"
 
-#: modules/websearch/lib/search_engine.py:2521
+#: modules/websearch/lib/search_engine.py:2522
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
 "Nearest terms in any collection are:"
 msgstr "在索引 %(x_index)s 匹配不到关於 %(x_term)s 的任何记录。接近的短语是："
 
-#: modules/websearch/lib/search_engine.py:2525
+#: modules/websearch/lib/search_engine.py:2526
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr "匹配不到关於 %s 的任何记录。接近的短语是："
 
-#: modules/websearch/lib/search_engine.py:3281
+#: modules/websearch/lib/search_engine.py:3282
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
 "sort order."
 msgstr "对不起，这排序功能只被允许在最多 %d 纪录中使用。请用正常排序。"
 
-#: modules/websearch/lib/search_engine.py:3305
+#: modules/websearch/lib/search_engine.py:3306
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr "对不起，%s 不是一正确的排序选项，请选用标题排序。"
 
-#: modules/websearch/lib/search_engine.py:3498
-#: modules/websearch/lib/search_engine.py:3827
-#: modules/websearch/lib/search_engine.py:4005
-#: modules/websearch/lib/search_engine.py:4028
-#: modules/websearch/lib/search_engine.py:4036
-#: modules/websearch/lib/search_engine.py:4044
-#: modules/websearch/lib/search_engine.py:4090
+#: modules/websearch/lib/search_engine.py:3499
+#: modules/websearch/lib/search_engine.py:3828
+#: modules/websearch/lib/search_engine.py:4006
+#: modules/websearch/lib/search_engine.py:4029
+#: modules/websearch/lib/search_engine.py:4037
+#: modules/websearch/lib/search_engine.py:4045
+#: modules/websearch/lib/search_engine.py:4091
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "记录已被删除。"
 
-#: modules/websearch/lib/search_engine.py:3726
+#: modules/websearch/lib/search_engine.py:3727
 msgid "Use different search terms."
 msgstr "用其他关键词。"
 
-#: modules/websearch/lib/search_engine.py:4806
+#: modules/websearch/lib/search_engine.py:4807
 msgid "No match within your time limits, discarding this condition..."
 msgstr "没有在时限内匹配到记录, 放弃中..."
 
-#: modules/websearch/lib/search_engine.py:4833
+#: modules/websearch/lib/search_engine.py:4834
 msgid "No match within your search limits, discarding this condition..."
 msgstr "没有在找寻限制内匹配到记录, 放弃中..."
 
@@ -5527,19 +5527,19 @@ msgid "1 review"
 msgstr "评论"
 
 #: modules/websearch/lib/websearch_templates.py:3525
-#: modules/websearch/lib/websearch_webinterface.py:979
+#: modules/websearch/lib/websearch_webinterface.py:986
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "找不到 %s 专辑"
 
 #: modules/websearch/lib/websearch_templates.py:3537
-#: modules/websearch/lib/websearch_webinterface.py:975
+#: modules/websearch/lib/websearch_webinterface.py:982
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "对不起，%s 专辑并不存在。"
 
 #: modules/websearch/lib/websearch_templates.py:3539
-#: modules/websearch/lib/websearch_webinterface.py:976
+#: modules/websearch/lib/websearch_webinterface.py:983
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "您可以从 %s 开始浏览。"
@@ -5646,12 +5646,12 @@ msgstr ""
 msgid "Additional Citation Metrics"
 msgstr "编辑登入资料"
 
-#: modules/websearch/lib/websearch_webinterface.py:581
+#: modules/websearch/lib/websearch_webinterface.py:584
 #, fuzzy
 msgid "You are not authorized to view this area."
 msgstr "您并不是这收藏篮的拥有者。"
 
-#: modules/websearch/lib/websearch_webinterface.py:981
+#: modules/websearch/lib/websearch_webinterface.py:988
 msgid "Not found"
 msgstr "找寻不到"
 
@@ -6270,7 +6270,7 @@ msgstr "登出"
 
 #: modules/websession/lib/websession_templates.py:1237
 #: modules/webstyle/lib/webstyle_templates.py:433
-#: modules/webstyle/lib/webstyle_templates.py:502
+#: modules/webstyle/lib/webstyle_templates.py:501
 msgid "Personalize"
 msgstr "个人化"
 
@@ -6663,7 +6663,7 @@ msgstr "帐号"
 msgid "You can approve or reject this account request at"
 msgstr ""
 
-#: modules/websession/lib/webuser.py:898 modules/websession/lib/webuser.py:899
+#: modules/websession/lib/webuser.py:895 modules/websession/lib/webuser.py:896
 msgid "Run File Manager"
 msgstr ""
 
@@ -7091,7 +7091,7 @@ msgid "Home"
 msgstr "主页"
 
 #: modules/webstyle/lib/webstyle_templates.py:432
-#: modules/webstyle/lib/webstyle_templates.py:501
+#: modules/webstyle/lib/webstyle_templates.py:500
 #: modules/websubmit/lib/websubmit_engine.py:690
 #: modules/websubmit/lib/websubmit_engine.py:1144
 #: modules/websubmit/lib/websubmit_engine.py:1190
@@ -7100,72 +7100,72 @@ msgid "Submit"
 msgstr "提交"
 
 #: modules/webstyle/lib/webstyle_templates.py:434
-#: modules/webstyle/lib/webstyle_templates.py:503
+#: modules/webstyle/lib/webstyle_templates.py:502
 msgid "Help"
 msgstr "帮助"
 
-#: modules/webstyle/lib/webstyle_templates.py:467
+#: modules/webstyle/lib/webstyle_templates.py:466
 msgid "Last updated"
 msgstr "最後更新 "
 
-#: modules/webstyle/lib/webstyle_templates.py:505
+#: modules/webstyle/lib/webstyle_templates.py:504
 msgid "Powered by"
 msgstr "伺服器系统："
 
-#: modules/webstyle/lib/webstyle_templates.py:506
+#: modules/webstyle/lib/webstyle_templates.py:505
 msgid "Maintained by"
 msgstr "管理者："
 
-#: modules/webstyle/lib/webstyle_templates.py:553
+#: modules/webstyle/lib/webstyle_templates.py:552
 msgid "This site is also available in the following languages:"
 msgstr "本网站提供以下语言选择:"
 
-#: modules/webstyle/lib/webstyle_templates.py:586
+#: modules/webstyle/lib/webstyle_templates.py:585
 msgid "Browser"
 msgstr "浏览器"
 
-#: modules/webstyle/lib/webstyle_templates.py:608
+#: modules/webstyle/lib/webstyle_templates.py:607
 msgid "System Error"
 msgstr "系统错误"
 
-#: modules/webstyle/lib/webstyle_templates.py:623
+#: modules/webstyle/lib/webstyle_templates.py:622
 msgid "Traceback"
 msgstr "后退"
 
-#: modules/webstyle/lib/webstyle_templates.py:670
+#: modules/webstyle/lib/webstyle_templates.py:669
 msgid "Client"
 msgstr "客户"
 
-#: modules/webstyle/lib/webstyle_templates.py:672
+#: modules/webstyle/lib/webstyle_templates.py:671
 #, fuzzy
 msgid "Please send an error report to the administrator."
 msgstr "请给管理员发送错误报告。"
 
-#: modules/webstyle/lib/webstyle_templates.py:673
+#: modules/webstyle/lib/webstyle_templates.py:672
 msgid "Send error report"
 msgstr "发送错误报告"
 
-#: modules/webstyle/lib/webstyle_templates.py:677
+#: modules/webstyle/lib/webstyle_templates.py:676
 #, python-format
 msgid "Please contact %s quoting the following information:"
 msgstr "请联络 %s 并引用以下资料："
 
-#: modules/webstyle/lib/webstyle_templates.py:833
+#: modules/webstyle/lib/webstyle_templates.py:832
 #, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr "记录创建於%(x_date_creation)s，最後更新在%(x_date_modification)s"
 
-#: modules/webstyle/lib/webstyle_templates.py:904
+#: modules/webstyle/lib/webstyle_templates.py:903
 msgid "The server encountered an error while dealing with your request."
 msgstr ""
 
-#: modules/webstyle/lib/webstyle_templates.py:905
+#: modules/webstyle/lib/webstyle_templates.py:904
 #, fuzzy
 msgid "The system administrators have been alerted."
 msgstr "记录已被删除。"
 
-#: modules/webstyle/lib/webstyle_templates.py:906
+#: modules/webstyle/lib/webstyle_templates.py:905
 #, python-format
 msgid "In case of doubt, please contact %(x_admin_email)s."
 msgstr ""
@@ -8674,7 +8674,7 @@ msgstr "您是以下组别的成员："
 msgid "Send this article"
 msgstr "评价这文章"
 
-#: modules/webjournal/lib/elements/bfe_webjournal_rss.py:136
+#: modules/webjournal/lib/elements/bfe_webjournal_rss.py:141
 #, fuzzy
 msgid "Subscribe by RSS"
 msgstr "订阅"
@@ -8716,11 +8716,11 @@ msgstr "选择"
 msgid "Select Date:"
 msgstr "选择"
 
-#: modules/bibedit/lib/bibedit_webinterface.py:181
+#: modules/bibedit/lib/bibedit_webinterface.py:183
 msgid "Comparing two record revisions"
 msgstr ""
 
-#: modules/bibedit/lib/bibedit_webinterface.py:204
+#: modules/bibedit/lib/bibedit_webinterface.py:207
 msgid "Failed to create a ticket"
 msgstr ""
 
@@ -11495,29 +11495,29 @@ msgstr ""
 msgid "Export with BibSword: Acknowledgement"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:199
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:199
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "No records match that file name"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:200
+#: modules/bibupload/lib/batchuploader_engine.py:204
 msgid "File already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:200
+#: modules/bibupload/lib/batchuploader_engine.py:204
 msgid "A file with the same name and format already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:201
+#: modules/bibupload/lib/batchuploader_engine.py:205
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:411
-#: modules/bibupload/lib/batchuploader_engine.py:424
+#: modules/bibupload/lib/batchuploader_engine.py:415
+#: modules/bibupload/lib/batchuploader_engine.py:428
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"

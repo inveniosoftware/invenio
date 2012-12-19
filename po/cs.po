@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.2\n"
+"Project-Id-Version: Invenio 1.0.3\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-10-19 05:34+0200\n"
+"POT-Creation-Date: 2012-12-19 15:02+0100\n"
 "PO-Revision-Date: 2012-02-16 18:24+0100\n"
 "Last-Translator: Jiří Kunčar <jiri.kuncar@cern.ch>\n"
 "Language-Team: CS <info@invenio-software.org>\n"
@@ -39,7 +39,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:665
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:1111
+#: modules/websearch/lib/search_engine.py:1112
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
 msgstr "A NE"
@@ -82,7 +82,7 @@ msgstr "Areál administrátora"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4501
+#: modules/websearch/lib/search_engine.py:4502
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -151,7 +151,7 @@ msgstr "fulltext"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/websearch/lib/search_engine.py:1133
+#: modules/websearch/lib/search_engine.py:1134
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
 msgstr "Regulární výraz:"
@@ -168,7 +168,7 @@ msgstr "Regulární výraz:"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:1129
+#: modules/websearch/lib/search_engine.py:1130
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
 msgstr "Všechna tato slova:"
@@ -244,7 +244,7 @@ msgstr "předmět"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/websearch/lib/search_engine.py:1132
+#: modules/websearch/lib/search_engine.py:1133
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "Partial phrase:"
 msgstr "Částečná věta:"
@@ -529,7 +529,7 @@ msgstr "experiment"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:777
 #: modules/websearch/doc/search-guide.webdoc:812
-#: modules/websearch/lib/search_engine.py:1130
+#: modules/websearch/lib/search_engine.py:1131
 #: modules/websearch/lib/websearch_templates.py:1113
 msgid "Any of the words:"
 msgstr "Jedno ze slov:"
@@ -772,7 +772,7 @@ msgstr "oddělení"
 #: modules/websearch/lib/websearch_templates.py:2110
 #: modules/websearch/lib/websearch_templates.py:2167
 #: modules/webstyle/lib/webstyle_templates.py:431
-#: modules/webstyle/lib/webstyle_templates.py:500
+#: modules/webstyle/lib/webstyle_templates.py:499
 #: modules/webstyle/lib/webdoc_tests.py:86
 #: modules/bibedit/lib/bibeditmulti_templates.py:296
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1819
@@ -1088,7 +1088,7 @@ msgstr "WebSearch Průvodce pro správce"
 #: modules/websearch/doc/search-guide.webdoc:742
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/websearch/lib/search_engine.py:1131
+#: modules/websearch/lib/search_engine.py:1132
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "Exact phrase:"
 msgstr "Přesná věta:"
@@ -1106,8 +1106,8 @@ msgstr "Nápověda pro přidávání"
 #: modules/websearch/doc/search-guide.webdoc:664
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:955
-#: modules/websearch/lib/search_engine.py:1110
+#: modules/websearch/lib/search_engine.py:956
+#: modules/websearch/lib/search_engine.py:1111
 #: modules/websearch/lib/websearch_templates.py:1162
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "OR"
@@ -1121,7 +1121,7 @@ msgstr "NEBO"
 #: modules/websearch/doc/search-guide.webdoc:663
 #: modules/websearch/doc/search-guide.webdoc:766
 #: modules/websearch/doc/search-guide.webdoc:801
-#: modules/websearch/lib/search_engine.py:1109
+#: modules/websearch/lib/search_engine.py:1110
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
 msgstr "A"
@@ -2083,7 +2083,7 @@ msgstr "Datum"
 #: modules/bibupload/lib/batchuploader_templates.py:172
 #: modules/bibupload/lib/batchuploader_templates.py:360
 #: modules/bibupload/lib/batchuploader_templates.py:426
-#: modules/webstyle/lib/webstyle_templates.py:669
+#: modules/webstyle/lib/webstyle_templates.py:668
 msgid "Time"
 msgstr "Čas"
 
@@ -2267,7 +2267,7 @@ msgstr "Batch Přidal: Daemon monitor"
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
 #: modules/websession/lib/webuser.py:303
-#: modules/webstyle/lib/webstyle_templates.py:578
+#: modules/webstyle/lib/webstyle_templates.py:577
 #, fuzzy
 msgid "N/A"
 msgstr "N/A"
@@ -2351,7 +2351,7 @@ msgid "Apr"
 msgstr "duben"
 
 #: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
 msgstr "květen"
@@ -2385,67 +2385,67 @@ msgid "Dec"
 msgstr "Pro"
 
 #: modules/miscutil/lib/dateutils.py:215
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
 msgstr "leden"
 
 #: modules/miscutil/lib/dateutils.py:216
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
 msgstr "únor"
 
 #: modules/miscutil/lib/dateutils.py:217
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
 msgstr "březen"
 
 #: modules/miscutil/lib/dateutils.py:218
-#: modules/websearch/lib/search_engine.py:882
+#: modules/websearch/lib/search_engine.py:883
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
 msgstr "duben"
 
 #: modules/miscutil/lib/dateutils.py:220
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
 msgstr "červen"
 
 #: modules/miscutil/lib/dateutils.py:221
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
 msgstr "Červenec"
 
 #: modules/miscutil/lib/dateutils.py:222
-#: modules/websearch/lib/search_engine.py:883
+#: modules/websearch/lib/search_engine.py:884
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
 msgstr "srpen"
 
 #: modules/miscutil/lib/dateutils.py:223
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
 msgstr "září"
 
 #: modules/miscutil/lib/dateutils.py:224
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
 msgstr "říjen"
 
 #: modules/miscutil/lib/dateutils.py:225
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
 msgstr "listopad"
 
 #: modules/miscutil/lib/dateutils.py:226
-#: modules/websearch/lib/search_engine.py:884
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
 msgstr "prosinec"
@@ -2573,8 +2573,8 @@ msgstr "Potřebujete zásah člověka? Kontakt"
 
 #: modules/webaccess/lib/access_control_config.py:262
 #: modules/websession/lib/websession_templates.py:1087
-#: modules/websession/lib/webuser.py:887 modules/websession/lib/webuser.py:896
-#: modules/websession/lib/webuser.py:897
+#: modules/websession/lib/webuser.py:884 modules/websession/lib/webuser.py:893
+#: modules/websession/lib/webuser.py:894
 msgid "Run Record Editor"
 msgstr "Spustit editor záznamu"
 
@@ -2584,7 +2584,7 @@ msgid "Run Multi-Record Editor"
 msgstr "Spustit editor násobného záznamu"
 
 #: modules/webaccess/lib/access_control_config.py:264
-#: modules/websession/lib/webuser.py:888
+#: modules/websession/lib/webuser.py:885
 msgid "Run Document File Manager"
 msgstr "Spustit správce souboru dokumentu"
 
@@ -2662,58 +2662,58 @@ msgstr "Spustit BibCirculation"
 msgid "Run Batch Uploader"
 msgstr "Spustit dávkové nahrávání"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3706
+#: modules/webaccess/lib/webaccessadmin_lib.py:3705
 #, python-format
 msgid "Your account on '%s' has been activated"
 msgstr "Váš účet na '%s' byl aktivován"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3707
+#: modules/webaccess/lib/webaccessadmin_lib.py:3706
 #, python-format
 msgid "Your account earlier created on '%s' has been activated:"
 msgstr "Váš účet již dříve vytvořen na '%s' byl aktivován:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3709
-#: modules/webaccess/lib/webaccessadmin_lib.py:3722
-#: modules/webaccess/lib/webaccessadmin_lib.py:3748
+#: modules/webaccess/lib/webaccessadmin_lib.py:3708
+#: modules/webaccess/lib/webaccessadmin_lib.py:3721
+#: modules/webaccess/lib/webaccessadmin_lib.py:3747
 msgid "Username/Email:"
 msgstr "Uživatelské jméno/Email:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3710
-#: modules/webaccess/lib/webaccessadmin_lib.py:3723
+#: modules/webaccess/lib/webaccessadmin_lib.py:3709
+#: modules/webaccess/lib/webaccessadmin_lib.py:3722
 msgid "Password:"
 msgstr "Heslo:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #, python-format
 msgid "Account created on '%s'"
 msgstr "Účet vytvořen na '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3721
+#: modules/webaccess/lib/webaccessadmin_lib.py:3720
 #, python-format
 msgid "An account has been created for you on '%s':"
 msgstr "Účet byl vytvořen pro vás na '%s':"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3733
+#: modules/webaccess/lib/webaccessadmin_lib.py:3732
 #, python-format
 msgid "Account rejected on '%s'"
 msgstr "Účet zamítnut na '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3734
+#: modules/webaccess/lib/webaccessadmin_lib.py:3733
 #, python-format
 msgid "Your request for an account has been rejected on '%s':"
 msgstr "Vaše žádost o účet byla zamítnuta na '%s':"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3736
+#: modules/webaccess/lib/webaccessadmin_lib.py:3735
 #, python-format
 msgid "Username/Email: %s"
 msgstr "Uživatelské jméno/E-mail: %s"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3746
+#: modules/webaccess/lib/webaccessadmin_lib.py:3745
 #, python-format
 msgid "Account deleted on '%s'"
 msgstr "Účet smazán na '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3747
+#: modules/webaccess/lib/webaccessadmin_lib.py:3746
 #, python-format
 msgid "Your account on '%s' has been deleted:"
 msgstr "Váš účet na '%s' byl odstraněn:"
@@ -2731,7 +2731,7 @@ msgstr "Úplný záznam"
 #: modules/webalert/lib/htmlparser.py:187
 #: modules/websearch/lib/websearch_templates.py:1611
 #: modules/websearch/lib/websearch_templates.py:3346
-#: modules/webstyle/lib/webstyle_templates.py:830
+#: modules/webstyle/lib/webstyle_templates.py:829
 msgid "Similar records"
 msgstr "Podobné záznamy"
 
@@ -3127,13 +3127,13 @@ msgstr "%s, přizpůsobit"
 #: modules/webalert/lib/webalert_webinterface.py:364
 #: modules/webalert/lib/webalert_webinterface.py:441
 #: modules/webalert/lib/webalert_webinterface.py:515
-#: modules/webstyle/lib/webstyle_templates.py:582
-#: modules/webstyle/lib/webstyle_templates.py:619
-#: modules/webstyle/lib/webstyle_templates.py:621
+#: modules/webstyle/lib/webstyle_templates.py:581
+#: modules/webstyle/lib/webstyle_templates.py:618
+#: modules/webstyle/lib/webstyle_templates.py:620
 #: modules/websubmit/lib/websubmit_engine.py:1736
 #: modules/websubmit/lib/websubmit_webinterface.py:1103
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
-#: modules/bibedit/lib/bibedit_webinterface.py:205
+#: modules/bibedit/lib/bibedit_webinterface.py:208
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:496
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:280
@@ -4674,10 +4674,10 @@ msgstr "WebComment Administrátor"
 #: modules/webcomment/web/admin/webcommentadmin.py:199
 #: modules/webcomment/web/admin/webcommentadmin.py:235
 #: modules/webcomment/web/admin/webcommentadmin.py:273
-#: modules/websearch/lib/websearch_webinterface.py:962
+#: modules/websearch/lib/websearch_webinterface.py:969
 #: modules/websearch/web/admin/websearchadmin.py:1040
 #: modules/websession/lib/websession_webinterface.py:936
-#: modules/webstyle/lib/webstyle_templates.py:584
+#: modules/webstyle/lib/webstyle_templates.py:583
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:333
 msgid "Internal Error"
@@ -4930,58 +4930,58 @@ msgstr "Číst zprávu"
 
 #: modules/websearch/lib/search_engine.py:746
 #: modules/websearch/lib/search_engine.py:773
-#: modules/websearch/lib/search_engine.py:4524
-#: modules/websearch/lib/search_engine.py:4577
+#: modules/websearch/lib/search_engine.py:4525
+#: modules/websearch/lib/search_engine.py:4578
 msgid "Search Results"
 msgstr "Výsledky hledání"
 
-#: modules/websearch/lib/search_engine.py:875
+#: modules/websearch/lib/search_engine.py:876
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
 msgstr "jakýkoli den"
 
-#: modules/websearch/lib/search_engine.py:881
+#: modules/websearch/lib/search_engine.py:882
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
 msgstr "jakýkoli měsíc"
 
-#: modules/websearch/lib/search_engine.py:889
+#: modules/websearch/lib/search_engine.py:890
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
 msgstr "jakýkoli rok"
 
-#: modules/websearch/lib/search_engine.py:930
-#: modules/websearch/lib/search_engine.py:949
+#: modules/websearch/lib/search_engine.py:931
+#: modules/websearch/lib/search_engine.py:950
 msgid "any public collection"
 msgstr "jakákoli veřejná sbírka"
 
-#: modules/websearch/lib/search_engine.py:934
+#: modules/websearch/lib/search_engine.py:935
 msgid "remove this collection"
 msgstr "odstranit tuto kolekci"
 
-#: modules/websearch/lib/search_engine.py:945
+#: modules/websearch/lib/search_engine.py:946
 msgid "add another collection"
 msgstr "přidat kolekci"
 
-#: modules/websearch/lib/search_engine.py:955
+#: modules/websearch/lib/search_engine.py:956
 #: modules/websearch/lib/websearch_webcoll.py:587
 msgid "rank by"
 msgstr "seřadit podle"
 
-#: modules/websearch/lib/search_engine.py:975
+#: modules/websearch/lib/search_engine.py:976
 msgid "HTML brief"
 msgstr "stručný"
 
-#: modules/websearch/lib/search_engine.py:1088
+#: modules/websearch/lib/search_engine.py:1089
 #: modules/websearch/lib/websearch_webcoll.py:557
 msgid "latest first"
 msgstr "poslední záznam nejdříve"
 
-#: modules/websearch/lib/search_engine.py:1693
+#: modules/websearch/lib/search_engine.py:1694
 msgid "No values found."
 msgstr "Nebyly nalezeny žádné hodnoty."
 
-#: modules/websearch/lib/search_engine.py:1816
+#: modules/websearch/lib/search_engine.py:1817
 #, fuzzy, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
@@ -4990,7 +4990,7 @@ msgstr ""
 "Varování: full-textové vyhledávání je k dispozici pouze pro určitou "
 "podmnožinu příspěvků."
 
-#: modules/websearch/lib/search_engine.py:1820
+#: modules/websearch/lib/search_engine.py:1821
 #, fuzzy, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
@@ -4999,31 +4999,31 @@ msgstr ""
 "Varování: hodnota titulku hledání je k dispozici pouze pro určitou "
 "podmnožinu papírů."
 
-#: modules/websearch/lib/search_engine.py:1829
+#: modules/websearch/lib/search_engine.py:1830
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 "Index frází není k dispozici pro plné texty, zatím hledám slovní spojení ..."
 
-#: modules/websearch/lib/search_engine.py:1869
+#: modules/websearch/lib/search_engine.py:1870
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Žádný přesný výsledek pro %(x_query1)s nebyl nalezen, zkusme místo něj "
 "použít %(x_query2)s ..."
 
-#: modules/websearch/lib/search_engine.py:1879
-#: modules/websearch/lib/search_engine.py:1888
-#: modules/websearch/lib/search_engine.py:4496
-#: modules/websearch/lib/search_engine.py:4534
-#: modules/websearch/lib/search_engine.py:4585
+#: modules/websearch/lib/search_engine.py:1880
+#: modules/websearch/lib/search_engine.py:1889
+#: modules/websearch/lib/search_engine.py:4497
+#: modules/websearch/lib/search_engine.py:4535
+#: modules/websearch/lib/search_engine.py:4586
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
 msgid "Requested record does not seem to exist."
 msgstr "Požadovaný záznam asi neexistuje."
 
-#: modules/websearch/lib/search_engine.py:2010
+#: modules/websearch/lib/search_engine.py:2011
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
@@ -5031,7 +5031,7 @@ msgstr ""
 "Syntaxe dotazu nepochopena. Ignorování všech závorek v dotazu. Pokud je toto "
 "nepomůže, zkontrolujte Váš dotaz a zkuste to znova."
 
-#: modules/websearch/lib/search_engine.py:2332
+#: modules/websearch/lib/search_engine.py:2333
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5040,7 +5040,7 @@ msgstr ""
 "Žádný záznam nebyl nalezen v kolekci %(x_collection)s. Ostatní veřejně "
 "dostupné kolekce dali %(x_url_open)s%(x_nb_hits)d výsledků%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2341
+#: modules/websearch/lib/search_engine.py:2342
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5049,27 +5049,27 @@ msgstr ""
 "hledali dokumenty veřejně nepřístupné, zvolte prosím nejdříve příslušnou "
 "neveřejnou kolekci."
 
-#: modules/websearch/lib/search_engine.py:2458
+#: modules/websearch/lib/search_engine.py:2459
 #, python-format
 msgid "There are no records referring to %s."
 msgstr "Nejsou tam žádné záznamy vztahující se k %s."
 
-#: modules/websearch/lib/search_engine.py:2460
+#: modules/websearch/lib/search_engine.py:2461
 #, python-format
 msgid "There are no records cited by %s."
 msgstr "Nejsou tam žádné záznamy citované %s."
 
-#: modules/websearch/lib/search_engine.py:2465
+#: modules/websearch/lib/search_engine.py:2466
 #, python-format
 msgid "No word index is available for %s."
 msgstr "Index slov není k dispozici pro %s."
 
-#: modules/websearch/lib/search_engine.py:2476
+#: modules/websearch/lib/search_engine.py:2477
 #, python-format
 msgid "No phrase index is available for %s."
 msgstr "Index frází není k dispozici pro %s."
 
-#: modules/websearch/lib/search_engine.py:2521
+#: modules/websearch/lib/search_engine.py:2522
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -5078,7 +5078,7 @@ msgstr ""
 "Hledaný výraz %(x_term)s uvnitř indexu %(x_index)s neodpovídá žádnému "
 "záznamu. Nejbližší výrazy ve všech kolekcích jsou:"
 
-#: modules/websearch/lib/search_engine.py:2525
+#: modules/websearch/lib/search_engine.py:2526
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -5086,7 +5086,7 @@ msgstr ""
 "Hledaný výraz %s neodpovídá žádnému záznamu. Nejbližší termíny v každé "
 "kolekci jsou:"
 
-#: modules/websearch/lib/search_engine.py:3281
+#: modules/websearch/lib/search_engine.py:3282
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -5095,7 +5095,7 @@ msgstr ""
 "Omlouváme se, třídění je povoleno na soubory o velikosti pouze do %d "
 "záznamů. Použito výchozí řazení."
 
-#: modules/websearch/lib/search_engine.py:3305
+#: modules/websearch/lib/search_engine.py:3306
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -5104,28 +5104,28 @@ msgstr ""
 "Je mi líto, %s nevypadá jako platný druh volby řazení. Vybráno řazení podle "
 "názvu."
 
-#: modules/websearch/lib/search_engine.py:3498
-#: modules/websearch/lib/search_engine.py:3827
-#: modules/websearch/lib/search_engine.py:4005
-#: modules/websearch/lib/search_engine.py:4028
-#: modules/websearch/lib/search_engine.py:4036
-#: modules/websearch/lib/search_engine.py:4044
-#: modules/websearch/lib/search_engine.py:4090
+#: modules/websearch/lib/search_engine.py:3499
+#: modules/websearch/lib/search_engine.py:3828
+#: modules/websearch/lib/search_engine.py:4006
+#: modules/websearch/lib/search_engine.py:4029
+#: modules/websearch/lib/search_engine.py:4037
+#: modules/websearch/lib/search_engine.py:4045
+#: modules/websearch/lib/search_engine.py:4091
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "Záznam byl vymazán."
 
-#: modules/websearch/lib/search_engine.py:3726
+#: modules/websearch/lib/search_engine.py:3727
 msgid "Use different search terms."
 msgstr "Použíjte jiný termín pro hledání."
 
-#: modules/websearch/lib/search_engine.py:4806
+#: modules/websearch/lib/search_engine.py:4807
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Žádný výsledek nevyhovuje Vašim časovým kritériím, podmínka není vzata v "
 "úvahu..."
 
-#: modules/websearch/lib/search_engine.py:4833
+#: modules/websearch/lib/search_engine.py:4834
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Žádný výsledek nevyhovuje Vašim omezujícím kritériím, podmínky nejsou vzaty "
@@ -5460,19 +5460,19 @@ msgid "1 review"
 msgstr "1 recenze"
 
 #: modules/websearch/lib/websearch_templates.py:3525
-#: modules/websearch/lib/websearch_webinterface.py:979
+#: modules/websearch/lib/websearch_webinterface.py:986
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "Kolekce %s nebyla nalezena"
 
 #: modules/websearch/lib/websearch_templates.py:3537
-#: modules/websearch/lib/websearch_webinterface.py:975
+#: modules/websearch/lib/websearch_webinterface.py:982
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Je nám líto, ale kolekce %s asi neexistuje."
 
 #: modules/websearch/lib/websearch_templates.py:3539
-#: modules/websearch/lib/websearch_webinterface.py:976
+#: modules/websearch/lib/websearch_webinterface.py:983
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "Můžete začít prohledávat od %s."
@@ -5572,11 +5572,11 @@ msgstr "Rozdělení příspěvků podle citací:"
 msgid "Additional Citation Metrics"
 msgstr "Další citační metriky"
 
-#: modules/websearch/lib/websearch_webinterface.py:581
+#: modules/websearch/lib/websearch_webinterface.py:584
 msgid "You are not authorized to view this area."
 msgstr "Nemáte oprávnění k prohlížení této oblasti."
 
-#: modules/websearch/lib/websearch_webinterface.py:981
+#: modules/websearch/lib/websearch_webinterface.py:988
 msgid "Not found"
 msgstr "Nenalezeno"
 
@@ -6218,7 +6218,7 @@ msgstr "odhlásit"
 
 #: modules/websession/lib/websession_templates.py:1237
 #: modules/webstyle/lib/webstyle_templates.py:433
-#: modules/webstyle/lib/webstyle_templates.py:502
+#: modules/webstyle/lib/webstyle_templates.py:501
 msgid "Personalize"
 msgstr "Personalizace"
 
@@ -6602,7 +6602,7 @@ msgstr "   Uživatelské jméno/Email"
 msgid "You can approve or reject this account request at"
 msgstr "Můžete schválit nebo zamítnout žádost o účet na"
 
-#: modules/websession/lib/webuser.py:898 modules/websession/lib/webuser.py:899
+#: modules/websession/lib/webuser.py:895 modules/websession/lib/webuser.py:896
 msgid "Run File Manager"
 msgstr ""
 
@@ -7029,7 +7029,7 @@ msgid "Home"
 msgstr "Hlavní stránka"
 
 #: modules/webstyle/lib/webstyle_templates.py:432
-#: modules/webstyle/lib/webstyle_templates.py:501
+#: modules/webstyle/lib/webstyle_templates.py:500
 #: modules/websubmit/lib/websubmit_engine.py:690
 #: modules/websubmit/lib/websubmit_engine.py:1144
 #: modules/websubmit/lib/websubmit_engine.py:1190
@@ -7038,73 +7038,73 @@ msgid "Submit"
 msgstr "Přidej"
 
 #: modules/webstyle/lib/webstyle_templates.py:434
-#: modules/webstyle/lib/webstyle_templates.py:503
+#: modules/webstyle/lib/webstyle_templates.py:502
 msgid "Help"
 msgstr "Nápověda"
 
-#: modules/webstyle/lib/webstyle_templates.py:467
+#: modules/webstyle/lib/webstyle_templates.py:466
 msgid "Last updated"
 msgstr "Poslední aktualizace"
 
-#: modules/webstyle/lib/webstyle_templates.py:505
+#: modules/webstyle/lib/webstyle_templates.py:504
 msgid "Powered by"
 msgstr "Powered by"
 
-#: modules/webstyle/lib/webstyle_templates.py:506
+#: modules/webstyle/lib/webstyle_templates.py:505
 msgid "Maintained by"
 msgstr "Spravuje"
 
-#: modules/webstyle/lib/webstyle_templates.py:553
+#: modules/webstyle/lib/webstyle_templates.py:552
 msgid "This site is also available in the following languages:"
 msgstr "Tato stránka je také dostupná v následujících jazycích:"
 
-#: modules/webstyle/lib/webstyle_templates.py:586
+#: modules/webstyle/lib/webstyle_templates.py:585
 msgid "Browser"
 msgstr "Prohlížeč"
 
-#: modules/webstyle/lib/webstyle_templates.py:608
+#: modules/webstyle/lib/webstyle_templates.py:607
 msgid "System Error"
 msgstr "Chyba systému"
 
-#: modules/webstyle/lib/webstyle_templates.py:623
+#: modules/webstyle/lib/webstyle_templates.py:622
 #, fuzzy
 msgid "Traceback"
 msgstr "Traceback"
 
-#: modules/webstyle/lib/webstyle_templates.py:670
+#: modules/webstyle/lib/webstyle_templates.py:669
 msgid "Client"
 msgstr "Klient"
 
-#: modules/webstyle/lib/webstyle_templates.py:672
+#: modules/webstyle/lib/webstyle_templates.py:671
 msgid "Please send an error report to the administrator."
 msgstr "Prosím, odešlete zprávu o chybách správci."
 
-#: modules/webstyle/lib/webstyle_templates.py:673
+#: modules/webstyle/lib/webstyle_templates.py:672
 msgid "Send error report"
 msgstr "Odeslat zprávu o chybách"
 
-#: modules/webstyle/lib/webstyle_templates.py:677
+#: modules/webstyle/lib/webstyle_templates.py:676
 #, python-format
 msgid "Please contact %s quoting the following information:"
 msgstr "Prosíme kontaktujte %s a uveďte následující informace:"
 
-#: modules/webstyle/lib/webstyle_templates.py:833
+#: modules/webstyle/lib/webstyle_templates.py:832
 #, fuzzy, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr "Záznam vytvořen %s, modifikován %s"
 
-#: modules/webstyle/lib/webstyle_templates.py:904
+#: modules/webstyle/lib/webstyle_templates.py:903
 #, fuzzy
 msgid "The server encountered an error while dealing with your request."
 msgstr "Na serveru došlo k chybě při vyřizování vašeho požadavku."
 
-#: modules/webstyle/lib/webstyle_templates.py:905
+#: modules/webstyle/lib/webstyle_templates.py:904
 #, fuzzy
 msgid "The system administrators have been alerted."
 msgstr "Záznam byl vymazán."
 
-#: modules/webstyle/lib/webstyle_templates.py:906
+#: modules/webstyle/lib/webstyle_templates.py:905
 #, fuzzy, python-format
 msgid "In case of doubt, please contact %(x_admin_email)s."
 msgstr "V případě pochybností, kontaktujte%(x_admin_email) s."
@@ -8642,7 +8642,7 @@ msgstr ""
 msgid "Send this article"
 msgstr "Odeslat tento článek"
 
-#: modules/webjournal/lib/elements/bfe_webjournal_rss.py:136
+#: modules/webjournal/lib/elements/bfe_webjournal_rss.py:141
 msgid "Subscribe by RSS"
 msgstr "Odebírat RSS"
 
@@ -8680,12 +8680,12 @@ msgstr "košíky"
 msgid "Select Date:"
 msgstr "Vybrat datum:"
 
-#: modules/bibedit/lib/bibedit_webinterface.py:181
+#: modules/bibedit/lib/bibedit_webinterface.py:183
 #, fuzzy
 msgid "Comparing two record revisions"
 msgstr "Porovnání dvou rekordních revize"
 
-#: modules/bibedit/lib/bibedit_webinterface.py:204
+#: modules/bibedit/lib/bibedit_webinterface.py:207
 #, fuzzy
 msgid "Failed to create a ticket"
 msgstr "Nepodařilo se vytvořit si jízdenku"
@@ -11388,29 +11388,29 @@ msgstr "Export s BibSword: Krok 4/4"
 msgid "Export with BibSword: Acknowledgement"
 msgstr "Export s BibSword: Potvrzení"
 
-#: modules/bibupload/lib/batchuploader_engine.py:199
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr "Více než jeden možný recID, nejednoznačné chování"
 
-#: modules/bibupload/lib/batchuploader_engine.py:199
+#: modules/bibupload/lib/batchuploader_engine.py:203
 msgid "No records match that file name"
 msgstr "Žádné záznamy neodpovídají názvu souboru"
 
-#: modules/bibupload/lib/batchuploader_engine.py:200
+#: modules/bibupload/lib/batchuploader_engine.py:204
 msgid "File already exists"
 msgstr "Soubor již existuje"
 
-#: modules/bibupload/lib/batchuploader_engine.py:200
+#: modules/bibupload/lib/batchuploader_engine.py:204
 msgid "A file with the same name and format already exists"
 msgstr "Soubor se stejným názvem a formátem již existuje"
 
-#: modules/bibupload/lib/batchuploader_engine.py:201
+#: modules/bibupload/lib/batchuploader_engine.py:205
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr "Žádná práva k nahrání do kolekce '%s'"
 
-#: modules/bibupload/lib/batchuploader_engine.py:411
-#: modules/bibupload/lib/batchuploader_engine.py:424
+#: modules/bibupload/lib/batchuploader_engine.py:415
+#: modules/bibupload/lib/batchuploader_engine.py:428
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
