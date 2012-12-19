@@ -91,9 +91,9 @@
 }
 
 #bibEditColSubfieldAdd {
-  width: 16px;
-  min-width: 16px;
-  max-width: 16px;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
 }
 
 #bibEditTable .bibEditCellContent:hover,
@@ -139,6 +139,10 @@
 
 #bibEditTable img {
   cursor: pointer;
+}
+.bibEditCellAddSubfields img{
+  float: right;
+  margin: 1px;
 }
 
 #bibEditTable .bibEditBtnMoveSubfieldUp {

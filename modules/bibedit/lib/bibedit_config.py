@@ -187,15 +187,24 @@ CFG_BIBEDIT_FIELD_TEMPLATES_PATH = "%s%sbibedit%sfield_templates" % (CFG_ETCDIR,
 # CFG_BIBEDIT_AUTOSUGGEST_TAGS - for which tags the editor should try to autosuggest values
 # This is "safe" to have configured since it does not rely to a particular existing KB
 CFG_BIBEDIT_AUTOSUGGEST_TAGS = ['100__a']
+
 # CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS - a dictionary whose keys are tags and values kb names
 # This is better left empty when in doubt
 CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS = {} # { '65017a': 'SISC-65017a---65017a' }
+
 # CFG_BIBEDIT_KEYWORD_TAXONOMY - the name of the taxonomy DB that holds the taxonomy file used
 # for getting the keywords. Use only if you have a taxonomy KB.
 CFG_BIBEDIT_KEYWORD_TAXONOMY = "" #'HEP.RDF'
+
 #what tag is used for keywords
 CFG_BIBEDIT_KEYWORD_TAG = "" # '6531_a'
+
 #what label inside the RDF file contains the term
 CFG_BIBEDIT_KEYWORD_RDFLABEL = "" #'prefLabel'
+
 #where are BibEdit cache files stored
 CFG_BIBEDIT_CACHEDIR = CFG_TMPSHAREDDIR + '/bibedit-cache'
+
+# CFG_BIBEDIT_DOI_LOOKUP_FIELD - for which tag bibedit should add a link
+# to a DOI name resolver
+CFG_BIBEDIT_DOI_LOOKUP_FIELD = '0247_a'

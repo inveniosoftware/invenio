@@ -320,7 +320,7 @@ function initJeditable(){
     if (settings.cols) {
         textarea.attr('cols', settings.cols);
     } else if (settings.width != "none") {
-        textarea.width(settings.width);
+        textarea.width(settings.width - 6);
     }
     $(this).append(textarea);
 
@@ -335,6 +335,7 @@ function initJeditable(){
         addHandler_autocompleteAffiliations(textarea);
     }
     textarea.bind('keydown', 'return', function(event){ form.submit(); return false;});
+
     initInputHotkeys(textarea);
     return(textarea);
   };
@@ -2725,6 +2726,22 @@ function onAddSubfieldsClick(img){
    */
   var fieldID = img.id.slice(img.id.indexOf('_')+1);
   addSubfield(fieldID);
+}
+
+function onDOISearchClick(button){
+  /*
+   * Handle 'Search for DOI' button.
+   */
+  // gets the doi based from appropriate cell
+  var doi = $(button).parent().prev().text();
+  createReq({doi: doi, requestType: 'DOISearch'}, function(json)
+  {
+    if (json['doi_url'] !== undefined) {
+      window.open(json['doi_url']);
+    } else {
+      alert("DOI not found !");
+    }
+  }, false);
 }
 
 

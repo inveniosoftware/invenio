@@ -160,6 +160,7 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
         // Enable features for unprotected fields.
         if (!protectedSubfield) {
             cellContentClass = 'bibEditCellContent';
+            cellTabSwitch = ' tabSwitch';
             cellContentTitle = 'title="Click to edit" ';
             if (autosuggest || autokeyword) {
                 cellContentTitle = 'title="Click to edit (suggest values: ctrl-shift-a) " ';
@@ -201,6 +202,22 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
                                             onclick: 'onAddSubfieldsClick(this)'
                                             });
     }
+    var btnDOISearch = '';
+    if (typeof gDOILookupField !== 'undefined') {
+        // check if it's the DOI field
+        if (tag == gDOILookupField.substring(0,3) &&
+            ind1 == gDOILookupField.substring(3,4) &&
+            ind2 == gDOILookupField.substring(4,5)  &&
+            subfieldCode == gDOILookupField.substring(5,6)) {
+            btnDOISearch = img('/img/search.png',
+                'btnSearchDOI_' + fieldID,
+                '', {
+                    title: 'Search for DOI in dx.doi.org',
+                    onclick: "onDOISearchClick(this)"
+                });
+        }
+    }
+
     myelement = '' +
         '<tr id="row_' + subfieldID + '">' +
             '<td class="bibEditCellField">' + boxField + '</td>' + '<td ' +
@@ -214,12 +231,12 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
                 subfieldTagToPrint +
             '</td>' +
             '<td id="content_' + subfieldID + '" class="' + cellContentClass +
-                cellContentAdditionalClass + '" ' + cellContentTitle +
+                cellContentAdditionalClass + cellTabSwitch + '" ' + cellContentTitle +
                 autosuggestkeypress + cellContentOnClick + 'tabindex="0">' +
                 subfieldValue +
             '</td>' +
             '<td class="bibEditCellAddSubfields">' + btnAddSubfield +
-            '</td>' +
+            btnDOISearch + '</td>' +
         '</tr>'; /* add a place where the autosuggest box goes, if needed */
     if (autosuggest || autokeyword) {
         myelement = myelement +
