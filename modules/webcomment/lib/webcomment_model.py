@@ -22,20 +22,23 @@ WebComment database models.
 """
 
 # General imports.
+from sqlalchemy import event
 from invenio.sqlalchemyutils import db
+from invenio.webcomment import get_reply_order_cache_data
 
 # Create your models here.
 
 from invenio.bibedit_model import Bibrec
 from invenio.websession_model import User
 
+
 class CmtRECORDCOMMENT(db.Model):
     """Represents a CmtRECORDCOMMENT record."""
     __tablename__ = 'cmtRECORDCOMMENT'
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True, autoincrement=True)
-    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True), db.ForeignKey(Bibrec.id),
-                nullable=False, server_default='0') # CmtRECORDCINNENT
+    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
+                db.ForeignKey(Bibrec.id), nullable=False, server_default='0')
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
                 nullable=False, server_default='0')
     title = db.Column(db.String(255), nullable=False,
@@ -63,11 +66,53 @@ class CmtRECORDCOMMENT(db.Model):
     bibrec = db.relationship(Bibrec, backref='recordcomments')
     user = db.relationship(User, backref='recordcomments')
     replies = db.relationship('CmtRECORDCOMMENT',
-                backref=db.backref('in_reply_to', remote_side=[id]))
+                backref=db.backref('parent', remote_side=[id]))
+
+    def is_collapsed(self, id_user):
+        """Returns true if the comment is collapsed by user."""
+        return CmtCOLLAPSED.query.filter(db.and_(
+            CmtCOLLAPSED.id_bibrec == self.id_bibrec,
+            CmtCOLLAPSED.id_cmtRECORDCOMMENT == self.id,
+            CmtCOLLAPSED.id_user == id_user)).count() > 0
+
+    def collapse(self, id_user):
+        """Collapses comment beloging to user."""
+        c = CmtCOLLAPSED(id_bibrec=self.id_bibrec, id_cmtRECORDCOMMENT=self.id,
+                         id_user=id_user)
+        try:
+            db.session.add(c)
+            db.session.commit()
+        except:
+            db.session.rollback()
+
+    def expand(self, id_user):
+        """Expands comment beloging to user."""
+        CmtCOLLAPSED.query.filter(db.and_(
+            CmtCOLLAPSED.id_bibrec == self.id_bibrec,
+            CmtCOLLAPSED.id_cmtRECORDCOMMENT == self.id,
+            CmtCOLLAPSED.id_user == id_user)).delete(synchronize_session=False)
 
     __table_args__ = (db.Index('cmtRECORDCOMMENT_reply_order_cached_data',
                                reply_order_cached_data, mysql_length=[40]),
                       db.Model.__table_args__)
+
+
+def update_reply_order_cache_data(mapper, connection, target):
+    """Updates reply order cache data."""
+    if target.in_reply_to_id_cmtRECORDCOMMENT > 0:
+        parent = CmtRECORDCOMMENT.query.get(
+            target.in_reply_to_id_cmtRECORDCOMMENT)
+        if parent:
+            trans = connection.begin()
+            parent_reply_order = parent.reply_order_cached_data \
+                if parent.reply_order_cached_data else ''
+            parent_reply_order += get_reply_order_cache_data(target.id)
+            connection.execute(db.update(CmtRECORDCOMMENT.__table__).\
+                where(CmtRECORDCOMMENT.id == parent.id).\
+                values(reply_order_cached_data=parent_reply_order))
+            trans.commit()
+
+event.listen(CmtRECORDCOMMENT, 'after_insert', update_reply_order_cache_data)
 
 
 class CmtACTIONHISTORY(db.Model):
@@ -96,7 +141,6 @@ class CmtACTIONHISTORY(db.Model):
     user = db.relationship(User)
 
 
-from invenio.webuser_flask import current_user
 class CmtSUBSCRIPTION(db.Model):
     """Represents a CmtSUBSCRIPTION record."""
     __tablename__ = 'cmtSUBSCRIPTION'

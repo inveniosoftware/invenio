@@ -46,8 +46,16 @@
     {{ c.title }}
     <small>
        /
-      {{ ('<i class="icon-star"></i>'|safe) * (c.star_score%5) }}{{ ('<i class="icon-star-empty"></i>'|safe) * ((5-c.star_score)%5) }}
-      <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
+      {{ ('<i class="icon-star"></i>'|safe) * (c.star_score) }}{{ ('<i class="icon-star-empty"></i>'|safe) * ((5-c.star_score)) }} &nbsp;
+      {%- if c.nb_votes_total > 0 -%}
+        {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
+        {%- if votes > 0 -%}
+        / <span class="badge badge-success">+{{ votes }}</span>
+        {%- elif votes < 0 -%}
+        / <span class="badge badge-important">{{ votes }}</span>
+        {%- endif -%}
+      {%- endif -%}
+      <a class="pull-right" title="{{ _('Permalink to this review') }}" href="#{{ c.id }}">¶</a>
     </small>
     </h4>
     <blockquote>
@@ -66,7 +74,7 @@
           {{ _('Guest') }}
         {%- endif -%} &nbsp;
         - <i class="icon-time"></i> {{ c.date_creation }}
-        - <i class="icon-question-sign"></i> Was it helpful?
+        - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
           <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1,
             referer=request.url
           ) }}">

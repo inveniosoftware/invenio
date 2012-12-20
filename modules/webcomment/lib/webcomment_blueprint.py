@@ -19,12 +19,8 @@
 
 """WebSearch Flask Blueprint"""
 
-import datetime
-import pprint
-from functools import wraps
-from string import rfind, strip
 from datetime import datetime
-from hashlib import md5
+import socket
 
 from flask import Blueprint, session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app
@@ -65,7 +61,7 @@ from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
 from invenio.access_control_engine import acc_authorize_action
 
 blueprint = InvenioBlueprint('webcomment', __name__,
-                            url_prefix="/"+CFG_SITE_RECORD,
+                            url_prefix="/" + CFG_SITE_RECORD,
                             config='invenio.webcomment_config',
                             #breadcrumbs=[(_('Comments'),
                             #              'webcomment.subscribtions')],
@@ -75,16 +71,18 @@ blueprint = InvenioBlueprint('webcomment', __name__,
 
 from invenio.record_blueprint import request_record
 
+
 def log_comment_action(action_code, id, recid, uid=None):
     action = CmtACTIONHISTORY(
-        id_cmtRECORDCOMMENT = id,
-        id_bibrec = recid,
-        id_user = uid or current_user.get_id(),
-        client_host = socket.inet_aton(request.remote_addr),
-        action_time = datetime.now(),
-        action_code = action_code)
+        id_cmtRECORDCOMMENT=id,
+        id_bibrec=recid,
+        id_user=uid or current_user.get_id(),
+        client_host=socket.inet_aton(request.remote_addr),
+        action_time=datetime.now(),
+        action_code=action_code)
     db.session.add(action)
     db.session.commit()
+
 
 class CommentRights(object):
     def __init__(self, comment, uid = None):
@@ -170,7 +168,7 @@ def add_comment(recid):
 
 @blueprint.route('/<int:recid>/reviews/add', methods=['GET', 'POST'])
 @request_record
-#@blueprint.invenio_authentificated
+#@blueprint.invenio_authenticated
 @blueprint.invenio_authorized('sendcomment',
                               authorized_if_no_roles=True,
                               collection=lambda: g.collection.id)
@@ -218,14 +216,13 @@ def reviews(recid):
         )).all()
     return render_template('webcomment_reviews.html', comments=comments)
 
-import socket
 
 @blueprint.route('/<int:recid>/report/<int:id>', methods=['GET', 'POST'])
 @request_record
 def report(recid, id):
     if CommentRights(id).can_perform_action():
-        CmtRECORDCOMMENT.query.filter(CmtRECORDCOMMENT.id==id).update(dict(
-            nb_abuse_reports = CmtRECORDCOMMENT.nb_abuse_reports+1),
+        CmtRECORDCOMMENT.query.filter(CmtRECORDCOMMENT.id == id).update(dict(
+            nb_abuse_reports=CmtRECORDCOMMENT.nb_abuse_reports + 1),
             synchronize_session='fetch')
 
         log_comment_action(CFG_WEBCOMMENT_ACTION_CODE['REPORT_ABUSE'], id, recid)
@@ -243,9 +240,9 @@ def vote(recid, id, value):
     if CommentRights(id).can_perform_action():
         value = 1 if int(value) > 0 else 0
         CmtRECORDCOMMENT.query.filter(
-            CmtRECORDCOMMENT.id==id).update(dict(
-                nb_votes_total = CmtRECORDCOMMENT.nb_votes_total+1,
-                nb_votes_yes = CmtRECORDCOMMENT.nb_votes_yes + value),
+            CmtRECORDCOMMENT.id == id).update(dict(
+                nb_votes_total=CmtRECORDCOMMENT.nb_votes_total + 1,
+                nb_votes_yes=CmtRECORDCOMMENT.nb_votes_yes + value),
                 synchronize_session='fetch')
 
         log_comment_action(CFG_WEBCOMMENT_ACTION_CODE['VOTE'], id, recid)
@@ -254,6 +251,31 @@ def vote(recid, id, value):
         flash(_('You can not vote for this comment.'), 'error')
 
     return redirect(url_for('webcomment.comments', recid=recid))
+
+
+@blueprint.route('/<int:recid>/toggle/<int:id>',
+#                 methods=['GET', 'POST'])
+#@blueprint.route('/<int:recid>/toggle/<int:id>/<int:show>',
+                 methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+@request_record
+def toggle(recid, id, show=None):
+    uid = current_user.get_id()
+    comment = CmtRECORDCOMMENT.query.get_or_404(id)
+    assert(comment.id_bibrec == recid)
+
+    if show is None:
+        show = 1 if comment.is_collapsed(uid) else 0
+
+    if show:
+        comment.expand(uid)
+    else:
+        comment.collapse(uid)
+
+    if not request.is_xhr:
+        return redirect(url_for('webcomment.comments', recid=recid))
+    else:
+        return 'OK'
 
 
 @blueprint.route('/<recid>/comments/subscribe', methods=['GET', 'POST'])

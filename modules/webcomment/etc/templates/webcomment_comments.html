@@ -39,13 +39,42 @@
 
   {%- if comments -%}
 
-  <ul class="unstyled">
+  <style>
+  .comments .collapsed i.icon-chevron-down {
+    background-position: -456px -72px!important;
+  }
+
+  .comments hr { margin: 0px;}
+  </style>
+
+  <ul class="comments unstyled">
   {%- for c in comments recursive -%}
   <li name="{{ c.id }}">
-    <div >
-    <p>
+    <a class="collapse-comment pull-left{{ ' collapsed' if c.is_collapsed(current_user.get_id()) }}"
+       style="margin-right: 5px;"
+       data-toggle="collapse"
+       data-target="#collapse-{{ c.id }}"
+       href="{{ url_for('webcomment.toggle', recid=recid, id=c.id) }}">
+      <i class="icon-chevron-down"></i>
+    </a>
+
+    <h4>
+    {{ c.title }}
+    <small>
+      {%- if c.nb_votes_total > 0 -%}
+        {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
+        {%- if votes > 0 -%}
+        / <span class="badge badge-success">+{{ votes }}</span>
+        {%- elif votes < 0 -%}
+        / <span class="badge badge-important">{{ votes }}</span>
+        {%- endif -%}
+      {%- endif -%}
       <a class="pull-right" title="{{ _('Permalink to this comment') }}" href="#{{ c.id }}">¶</a>
-    </p>
+    </small>
+    </h4>
+    <div id="collapse-{{ c.id }}"
+         data-action="{{ url_for('webcomment.toggle', recid=recid, id=c.id) }}"
+         class="collapse{{ ' in' if not c.is_collapsed(current_user.get_id()) }}">
     <blockquote>
       <p style="font-size:90%;">
       {{ c.body|quoted_txt2html(
@@ -69,16 +98,19 @@
         <a data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid, in_reply=c.id) }}">
           {{ _('reply') }}
         </a>
-        - <i class="icon-heart"></i>
-        <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1) }}">
-          {{_('like')}}
-        </a>
-        <span class="badge badge-success">{{ c.nb_votes_yes }}</span>
-        /
-        <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=-1) }}">
-          {{_('dislike')}}
-        </a>
-        <span class="badge badge-important">{{ c.nb_votes_total-c.nb_votes_yes }}</span>
+        - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
+         <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1,
+            referer=request.url
+          ) }}">
+          <i class="icon-thumbs-up"></i>
+          {{ _('yes') }}
+          </a> /
+          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=-1,
+            referer=request.url
+          ) }}">
+          <i class="icon-thumbs-down"></i>
+          {{ _('no') }}
+          </a>
         -
           <a href="{{ url_for('webcomment.report', recid=recid, id=c.id) }}">
             <i class="icon-exclamation-sign"></i>
@@ -92,6 +124,10 @@
     </ul>
     {%- endif -%}
     </div>
+
+    {% if not loop.last %}
+      <hr/>
+    {% endif %}
   </li>
   {%- endfor -%}
   </ul>
@@ -124,6 +160,16 @@ $('[data-toggle="modal"]').click(function(e) {
     }).success(function() { $('input:text:visible:first').focus(); });
   }
 });
+
+$('.collapse').on('show', function() {
+  $.get($(this).attr('data-action'))
+})
+
+$('.collapse').on('hide', function() {
+  $.get($(this).attr('data-action'))
+})
+
+$('a.collapse-comment').on('click', function(e) { e.preventDefault() })
 
 });
 </script>
