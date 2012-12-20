@@ -160,7 +160,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
 
         if user_info['email'] == 'guest':
             # Ask to login
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
                                              CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)

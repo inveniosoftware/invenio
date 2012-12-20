@@ -202,7 +202,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             body=webaccount.perform_back(
                 _("The password was successfully set! "
                 "You can now proceed with the login."),
-                '/youraccount/login?ln=%s' % args['ln'], _('login'), args['ln']),
+                CFG_SITE_SECURE_URL + '/youraccount/login?ln=%s' % args['ln'], _('login'), args['ln']),
             req=req,
             language=args['ln'],
             lastupdated=__lastupdated__,
@@ -758,7 +758,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         args['remember_me'] = args['remember_me'] != ''
         locals().update(args)
         if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
-            return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'],
+            return webuser.page_not_authorized(req, CFG_SITE_SECURE_URL + "/youraccount/login?ln=%s" % args['ln'],
                                                navmenuid='youraccount')
         uid = webuser.getUid(req)
 
@@ -774,7 +774,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             uid2 = webuser.getUid(req)
             if uid2 == -1:
                 webuser.logoutUser(req)
-                return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid,
+                return webuser.page_not_authorized(req, CFG_SITE_SECURE_URL + "/youraccount/login?ln=%s" % args['ln'], uid=uid,
                                                     navmenuid='youraccount')
 
             # login successful!
@@ -790,7 +790,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if msgcode == 14:
                 if webuser.username_exists_p(args['p_un']):
                     mess = CFG_WEBACCESS_WARNING_MSGS[15] % cgi.escape(args['login_method'])
-            act = '/youraccount/login%s' % make_canonical_urlargd({'ln' : args['ln'], 'referer' : args['referer']}, {})
+            act = CFG_SITE_SECURE_URL + '/youraccount/login%s' % make_canonical_urlargd({'ln' : args['ln'], 'referer' : args['referer']}, {})
             return page(title=_("Login"),
                         body=webaccount.perform_back(mess, act, _("login"), args['ln']),
                         navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
@@ -830,7 +830,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         locals().update(args)
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
-            return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'],
+            return webuser.page_not_authorized(req, CFG_SITE_SECURE_URL + "/youraccount/login?ln=%s" % args['ln'],
                                                navmenuid='youraccount')
 
         uid = webuser.getUid(req)
@@ -868,7 +868,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             uid2 = webuser.getUid(req)
             if uid2 == -1:
                 webuser.logoutUser(req)
-                return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid,
+                return webuser.page_not_authorized(req, CFG_SITE_SECURE_URL + "/youraccount/login?ln=%s" % args['ln'], uid=uid,
                                                     navmenuid='youraccount')
 
             # login successful!
@@ -885,7 +885,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if msgcode == 14:
                 if webuser.username_exists_p(args['p_un']):
                     mess = CFG_WEBACCESS_WARNING_MSGS[15] % cgi.escape(args['login_method'])
-            act = '/youraccount/login%s' % make_canonical_urlargd({'ln' : args['ln'], 'referer' : args['referer']}, {})
+            act = CFG_SITE_SECURE_URL + '/youraccount/login%s' % make_canonical_urlargd({'ln' : args['ln'], 'referer' : args['referer']}, {})
             return page(title=_("Login"),
                         body=webaccount.perform_back(mess, act, _("login"), args['ln']),
                         navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",

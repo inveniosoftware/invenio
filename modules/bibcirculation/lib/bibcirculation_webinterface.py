@@ -348,7 +348,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -437,7 +437,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -514,7 +514,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
@@ -603,7 +603,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
@@ -702,7 +702,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
