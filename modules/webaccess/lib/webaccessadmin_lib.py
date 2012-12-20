@@ -83,7 +83,7 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG
             navtrail_previous_links += '&gt; <a class=navtrail ' \
             ' href=%s/admin/webaccess/webaccessadmin.py/delegate_startarea>' \
             'Delegate Rights</a> ' % (CFG_SITE_SECURE_URL, )
-        if adminarea >= 2 and adminarea < 7:
+        if adminarea >= 2 and adminarea < 9:
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py>' \
             'WebAccess Admin</a> ' % (CFG_SITE_SECURE_URL, )
@@ -884,7 +884,7 @@ def perform_manageaccounts(req, mtype='', content='', confirm=0):
                 title='Manage Accounts',
                 subtitle=subtitle,
                 body=[fin_output],
-                adminarea=0,
+                adminarea=7,
                 authorized=1)
 
 def perform_accesspolicy(req, callback='yes', confirm=0):
@@ -1912,9 +1912,8 @@ def actiondetails(id_action=0):
                 else:
                     authorization_details = 'no details to show'
 
-                roles.append([id, name,
-                            authorization_details,
-                            '<a href="showroleusers?id_role=%s">show connected users</a>' % (id, )])
+                roles.append([id, '<a href="showroledetails?id_role=%s">%s</a>' % (id, escape(name)),
+                            authorization_details])
             roletable = tupletotable(header=['id', 'name', 'authorization details', ''], tuple=roles)
 
             output += '<p>roles connected to %s:</p>\n' % (headerstrong(action=name_action, query=0), )
