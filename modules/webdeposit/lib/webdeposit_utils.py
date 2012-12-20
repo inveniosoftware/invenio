@@ -2,7 +2,9 @@ from sqlalchemy import func, desc
 from wtforms import FormField
 #from werkzeug.contrib.cache import RedisCache
 from invenio.sqlalchemyutils import db
-from webdeposit_model import WebDepositDraft
+from webdeposit_model import WebDepositDraft, \
+                             WebDepositWorkflow
+from invenio.webdeposit_workflow import WebDepositWorkflow
 
 import datetime
 import json
@@ -22,18 +24,20 @@ def create_dep_type(user_id, dep_type):
     from invenio.webdeposit_load_dep_metadata import dep_metadata
 
     try:
-        form = dep_metadata[dep_type]()
+        form = dep_metadata[dep_type]["form_sequence"][0]()
     except KeyError:
         # dep_type not found
         return None, None
     form_type = form.__class__.__name__
     uuid = new_uuid.uuid1()
+    status = 0 # not completed
     webdeposit_draft = WebDepositDraft(uuid=uuid, \
                                      user_id=user_id, \
                                      dep_type=dep_type, \
                                      form_type=form_type, \
                                      form_values='{}', \
-                                     timestamp=func.current_timestamp())
+                                     timestamp=func.current_timestamp(), \
+                                     status=status)
     db.session.add(webdeposit_draft)
     db.session.commit()
 
@@ -95,6 +99,10 @@ def get_current_form(user_id, dep_type=None, uuid=None):
             form[field_name].process_data(draft_data[field_name])
 
     return webdeposit_draft.uuid, form
+
+
+def get_next_form(user_id, dep_type=None, uuid=None):
+    from invenio.webdeposit_load_dep_metadata import dep_metadata
 
 
 """ Draft Functions (or instances of forms)

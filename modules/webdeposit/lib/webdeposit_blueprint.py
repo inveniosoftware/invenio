@@ -58,8 +58,10 @@ blueprint = InvenioBlueprint('webdeposit', __name__,
                               breadcrumbs=[(_('Deposit'), 'webdeposit')])
 
 
-@blueprint.route('/webdeposit/submitted', methods=['GET', 'POST'])
-def submit():
+@blueprint.route('/webdeposit/<dep_type>/<uuid>/submit', methods=['GET', 'POST'])
+def submit(dep_type, uuid):
+    from invenio.webuser_flask import current_user
+
     if request.method == 'POST':
         doctitle = request.form['doctitle']
         author = request.form['author']

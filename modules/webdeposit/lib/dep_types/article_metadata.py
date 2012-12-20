@@ -5,10 +5,18 @@ __all__ = ['Article']
 
 dep_type = "Article"
 form = ArticleForm
+form_sequence = [ArticleForm, PhotoForm]
+wf = [(set_status, [ArticleForm]), \
+      (wait_for_submission, [ArticleForm]), \
+      (set_status, [PhotoForm]),
+      (wait_for_submission, [PhotoForm])]
 # form = get_metadata_creation_form_from_doctype(doc_type)  # # This will use BibField to create a simple form which is the concatenation of all the fields neeeded for doc_type "Article"
 
 Article = {"form": form, \
-           "dep_type": dep_type}
+           "dep_type": dep_type, \
+           "form_sequence": form_sequence, \
+           "workflow": wf}
+
 
 """
 Workflow definition sample

@@ -19,4 +19,4 @@ CFG_DOC_METADATA = PluginContainer(os.path.join(CFG_PYLIBDIR, \
 dep_metadata = {}
 for meta in CFG_DOC_METADATA.itervalues():
     if meta is not None:
-        dep_metadata[meta['dep_type']] = meta['form']
+        dep_metadata[meta['dep_type']]["form"] = meta['form']
