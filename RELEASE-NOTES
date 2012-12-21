@@ -1,204 +1,93 @@
 --------------------------------------------------------------------
-Invenio v1.1.0 is released
-October 21, 2012
+Invenio v1.1.1 is released
+December 21, 2012
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.1.0 was released on October 21, 2012.
+Invenio v1.1.1 was released on December 21, 2012.
 
-This release introduces new Invenio release series v1.1.  Invenio v1.1
-brings over 1200 commits on top of Invenio v1.0, authored by over 20
-new co-authors and contributors.  Invenio v1.1 series contains many
-new features such as new automatic upgrader of Invenio installations,
-new media encoder library, new author disambiguator and paper claiming
-tool, new full-text snippet tool and support for Solr indexing, new
-in-memory record sorter, new user-signed web API key facility, new
-synonym support for searching and indexing, new micro format support
-for web crawlers, and more.  Invenio v1.1 is recommended to all
-Invenio sites using v1.0 or previous release series.
+This stable release contains a number of minor fixes and improvements.
+It is recommended to all Invenio sites using v1.1.0 or previous stable
+release series (v0.99, v1.0).
 
 What's new:
 -----------
 
- *) BatchUploader: RESTful interface, runtime checks, TextMARC input,
-    job priority selection
+ *) BatchUploader: error reporting improvements
 
- *) BibAuthorID: new automatic author disambiguation and paper
-    claiming facility
+ *) BibAuthorID: arXiv login upgrade; fix for small bug in claim
+    interface
 
- *) BibCatalog: storage of ticket requestor, default RT user
+ *) BibConvert: fix bug with SPLITW function; target/source CLI flag
+    description fix
 
- *) BibCirculation: security fixes
+ *) BibDocFile: better error report for unknown format; explicit
+    redirection to secure URL; fix for file upload in submissions
 
- *) BibClassify: UI improvements and refactoring
+ *) BibEdit: 'bibedit' CSS class addition to page body
 
- *) BibConvert: new BibTeX-to-MARCXML conversion, new oaidmf2marcxml
-    conversion, fixes for WORDS
+ *) BibFormat: clean Default_HTML_meta template; fix for js_quicktags
+    location; ISBN tag update for meta format; "ln" parameter in
+    bfe_record_url output; meta header output fix; relator code filter
+    in bfe_authors; fix for reformatting by record IDs
 
- *) BibDocFile: new filesystem cache for faster statistics, caseless
-    authorisation, disable HTTP range requests, improve file format
-    policies, and more
+ *) errorlib: register_exception improvements
 
- *) BibEdit: new options related to preview and printing, reference
-    curation, autocompletion, record and field template manager,
-    editing fields and subfields, per-collection authorisations, use
-    of knowledge bases, and more
+ *) global: login link using absolute URL redirection
 
- *) BibEditMulti: new actions with conditions on fields, partial
-    matching for subfields, faster preview generation, and more
+ *) installation: aidUSERINPUTLOG consistency upgrade; bigger
+    hstRECORD.marcxml size; fix for wrong name in tabcreate; inclusion
+    of JS quicktags in tarball; mark upgrade recipes as applied;
+    rephrase 1.1 upgrade recipe warning; safer upgrader bibsched
+    status parse; strip spaces in CFG list values
 
- *) BibEncode: new audio and video media file processing tool, new
-    Video demo collection
+ *) jQuery: tablesorter location standardisation
 
- *) BibFormat: new full-text snippet display facility, new
-    configuration for I18N caching, updates to EndNote, Excel, Dublin
-    Core and other formats, updates to formatting elements such as
-    DOI, author, updates to podcast output, updates to XSLT
-    processing, and more
+ *) mailutils: authentication and TLS support
 
- *) OAIHarvest: new configurable workflow with reference extraction,
-    new author list extraction post process, upload priority, OpenAIRE
-    compliance, better handling of timeouts, and more
+ *) OAIRepository: Edit OAI Set page bug fix; fix for OAI set editing;
+    print_record() fixes
 
- *) BibIndex: new full-text indexing via Solr, new support for author
-    ID indexing, better author tokeniser
+ *) plotextractor: washing of captions and context
 
- *) BibKnowledge: dynamic knowledge bases for record editor, support
-    for JSON format
+ *) pluginutils: fix for failing bibformat test case
 
- *) BibMatch: new matching of restricted collections
+ *) solrutils: addition of files into release tarball
 
- *) BibMerge: subfield order in slave record, confirmation pop up,
-    record selection bug fix
+ *) WebAccess: admin interface usability improvement; guest unit tests
+    for firerole
 
- *) BibRank: new index term count ranking method, new support for flot
-    graphs, updates to citation graphs
+ *) WebAlert: new regression tests for alerts
 
- *) BibRecord: new possibility to use lxml parser, sanity checks
+ *) WebComment: cleaner handling of non-reply comments
 
- *) BibSched: new motd-like facility for queue monitor, new
-    continuable error status for tasks, new tasklet framework, new
-    multi-node support, new monotask support, new support for task
-    sequences, improvements to scheduling algorithm
+ *) WebJournal: better language handling in widgets; CERN-specific
+    translation; explicit RSS icon dimensions; fix for
+    CFG_TMPSHAREDDIR; fix for retrieval of deleted articles; search
+    select form by name
 
- *) BibSort: new in-memory fast sorting tool using configurable
-    buckets
+ *) WebSearch: fix for webcoll grid layout markup;
+    get_all_field_values() typo; next-hit/previous-hit numbering fix;
+    respect output format content-type; washing of 'as' argument
 
- *) BibUpload: new automatic generation of MARC tag 005, new
-    `--callback-url' CLI parameter, fixes for appending existing
-    files, fixes for multiple 001 tags, and more
+ *) WebSession: fix for login-with-referer issue; fix for
+    merge_usera_into_userb()
 
- *) WebAccess: new external person ID support, performance
-    improvements, robot manager UI improvements, fixes for firerole
-    handling,
+ *) WebStyle: dumb page loading fix Google Analytics documentation
+    update; memory leak fix in session handling; new /ping handler;
+    removal of excess language box call; req.is_https() fix;
 
- *) WebAlert: new alert description facility, fixes for restricted
-    collections
+ *) WebSubmit: display login link on /submit page; fix for
+    Send_APP_Mail function; fix the approval URL for publiline
 
- *) WebApiKey: new user-signed Web API key facility
-
- *) WebAuthorProfile: new author pages with dynamic box layout
-
- *) WebBasket: add to basket interface improvements, better XML
-    export, fixes for external records and other improvements
-
- *) WebComment: new collapsible comment support, new permalink to
-    comments, loss prevention of unsubmitted comments, tidying up HTML
-    markup of comments, and more
-
- *) WebJournal: new Open Graph markup, more customisable newsletter,
-    redirect to latest release of specific category, refresh chosen
-    collections on release, remove unnecessary encoding/decoding,
-    update weather widget for new APIs, and more
-
- *) WebSearch: new index-time and search-time synonym support, new
-    Open Graph markup, new Google Scholar friendly metadata in page
-    header, new limit option for wildcard queries, new support for
-    access to merged records, new next/previous/back link support, new
-    `authorcount' indexing and searching, new relative date search
-    facility, clean OpenSearch support, improved speed, improvements
-    to SPIRES query syntax support, improvements to self-cite math,
-    primary collection guessing, other numerous fixes
-
- *) WebSession: new useful guest sessions, reintroduces configurable
-    IP checking, enforcement of nickname refresh, several other fixes
-
- *) WebStat: new login statistics, new custom query summary, error
-    analyser, custom event improvements
-
- *) WebStyle: new display restriction flag for restricted records, new
-    initial right-to-left language support, authenticated user and
-    HTTPS support, IP check for proxy configurations, layout updates
-    and fixes for MSIE, and more
-
- *) WebSubmit: new initial support for converting to PDF/X, new
-    embargo support, better LibreOffice compatibility, better async
-    file upload, enhancements for Link_Records, support for hiding
-    HIDDEN files in document manager, configurable initial value for
-    counter, make use of BibSched task sequences, and more
-
- *) installation: updates to jQuery, CKEditor, unoconv, and other
-    prerequisites
-
- *) dbdump: new compression support, reworked error handling
-
- *) dbquery: new possibility to query DB slave nodes, new dict-like
-    output, fix for MySQL 5.5.3 and higher versions
-
- *) errorlib: stack analysis improvements, outline style improvements
-    for invenio.err
-
- *) htmlutils: improvements to HTML markup removal, HTML tidying
-
- *) I18N: new Arabic and Lithuanian translations, updates to Catalan,
-    Czech, French, German, Greek, Italian, Russian, Slovak, Spanish
-    translations
-
- *) intbitset: new performance improvements, new get item support, new
-    pickle support, several memory leak fixes
-
- *) inveniocfg: new automated Invenio Upgrader tool
-
- *) InvenioConnector: new search with retries, improved search
-    parameters, improved local site check, use of Invenio user agent
-
- *) jsonutils: new JSON utility library
-
- *) mailutils: possibility to specify Reply-To header, fixes to
-    multipart
-
- *) plotextractor: better TeX detection, better PDF harvesting from
-    arXiv, configurable sleep timer
-
- *) pluginutils: new create_enhanced_plugin_builder API, external
-    plugin loading
-
- *) RefExtract: new daemon operation mode, new DOI recognition, better
-    author recognition, new author knowledge base
-
- *) remote debugger: new remote debuggng support
-
- *) sequtils: new sequence generator tool
-
- *) solrutils: new support for full-text query dispatching to Solr
-
- *) testutils: new Selenium web test framework
-
- *) textutils: updates to string-to-ascii functions, LaTeX symbols to
-    Unicode
-
- *) urlutils: fix for redirect_to_url
-
- *) xmlmarclint: fix for error report formatting
-
- *) ... and other numerous smaller fixes and improvements
+ *) WebUser: fix for referer URL protocol
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.1.0.tar.gz>
-  <http://invenio-software.org/download/invenio-1.1.0.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.1.0.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.1.1.tar.gz>
+  <http://invenio-software.org/download/invenio-1.1.1.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.1.1.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -208,29 +97,30 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from previous Invenio release series such as
-v0.99 or v1.0, then you can proceed as follows:
+Please proceed as follows:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.1.0.tar.gz
-     $ cd invenio-1.1.0
+     $ tar xvfz invenio-1.1.1.tar.gz
+     $ cd invenio-1.1.1
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
      $ make check-upgrade
      $ sudo -u www-data make install
+     $ sudo rsync -a /opt/invenio/etc.OLD/ \
+         --exclude invenio.conf \
+         --exclude bibformat/format_templates/Default_HTML_meta.bft \
+         /opt/invenio/etc/
+       # Note: if you are upgrading from previous stable release
+       # series (v0.99 or v1.0), please don't rsync but diff, in order
+       # to inspect changes and adapt your old configuration to the
+       # new v1.1 release series.
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
-     $ diff -r /opt/invenio/etc/ /opt/invenio/etc.OLD/
-       # inspect differences and adapt your local configuration files
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --upgrade
 
  c) Restart your Apache server and your bibsched queue.
-
- d) You may want to schedule new BibDocFile file system cache update:
-
-     $ bibdocfile --fix-bibdocfsinfo-cache
 
 - end of file -
