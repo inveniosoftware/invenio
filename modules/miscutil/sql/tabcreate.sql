@@ -4972,6 +4972,42 @@ CREATE TABLE IF NOT EXISTS `aulAUTHOR_IDENTIFIERS` (
   INDEX(`paper_id`)
 ) ENGINE=MyISAM;
 
+-- tables for webnews
+CREATE TABLE `nwsSTORY` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(256) NOT NULL,
+  `body` text NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE `nwsSTORY_nwsTAG` (
+  `id_story` int(11) NOT NULL,
+  `id_tag` int(11) NOT NULL,
+  PRIMARY KEY (`id_story`,`id_tag`),
+  KEY `id_story` (`id_story`),
+  KEY `id_tag` (`id_tag`),
+  CONSTRAINT `nwsSTORY_nwsTAG_ibfk_1` FOREIGN KEY (`id_story`) REFERENCES `nwsSTORY` (`id`),
+  CONSTRAINT `nwsSTORY_nwsTAG_ibfk_2` FOREIGN KEY (`id_tag`) REFERENCES `nwsTAG` (`id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE `nwsTAG` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tag` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE `nwsTOOLTIP` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_story` int(11) NOT NULL,
+  `body` varchar(512) NOT NULL,
+  `target_element` varchar(256) NOT NULL DEFAULT '',
+  `target_page` varchar(256) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `id_story` (`id_story`),
+  CONSTRAINT `nwsTOOLTIP_ibfk_1` FOREIGN KEY (`id_story`) REFERENCES `nwsSTORY` (`id`)
+) ENGINE=MyISAM;
+
 -- tables for invenio_upgrader
 CREATE TABLE IF NOT EXISTS upgrade (
   upgrade varchar(255) NOT NULL,
@@ -5039,5 +5075,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_24_seqSTORE_larg
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_01_22_queue_table_virtual_index',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_12_05_new_index_doi',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2014_03_13_new_index_filename',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_15_webnews_new_db_tables',NOW());
 
 -- end of file

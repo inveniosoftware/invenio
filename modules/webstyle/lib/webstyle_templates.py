@@ -42,6 +42,8 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_WEBLINKBACK_TRACKBACK_ENABLED
 
+from invenio.webnews_config import CFG_WEBNEWS_TOOLTIPS_DISPLAY
+
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link, \
                              get_canonical_and_alternates_urls
@@ -389,6 +391,10 @@ template function generated it.
  <meta name="keywords" content="%(keywords)s" />
  <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
  %(hepDataAdditions)s
+ <!-- WebNews CSS library -->
+ <link rel="stylesheet" href="%(cssurl)s/img/webnews.css" type="text/css" />
+ <!-- WebNews JS library -->
+ <script type="text/javascript" src="%(cssurl)s/js/webnews.js"></script>
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s>
@@ -546,6 +552,25 @@ template function generated it.
         else:
             msg_lastupdated = ""
 
+        if CFG_WEBNEWS_TOOLTIPS_DISPLAY:
+            tooltips_script = """
+<script>
+// WebNews tooltips
+$(document).ready(function() {
+    $.ajax({
+        url: "/news/tooltips",
+        success: function(data) {
+            create_tooltips(data);
+        },
+        dataType: "json",
+        cache: false
+    });
+});
+</script>
+"""
+        else:
+            tooltips_script = ""
+
         out = """
 <div class="pagefooter">
 %(pagefooteradd)s
@@ -564,6 +589,7 @@ template function generated it.
  </div>
 <!-- replaced page footer -->
 </div>
+%(tooltips_script)s
 </body>
 </html>
         """ % {
@@ -588,6 +614,8 @@ template function generated it.
           'version': CFG_VERSION,
 
           'pagefooteradd': pagefooteradd,
+
+          'tooltips_script' : tooltips_script,
         }
         return out
 

@@ -52,6 +52,7 @@ SUBDIRS = bibauthorid \
           webjournal \
           weblinkback \
           webmessage \
+          webnews \
           websearch \
           websession \
           webstat \

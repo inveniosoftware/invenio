@@ -873,6 +873,10 @@ AC_CONFIG_FILES([config.nice  \
      modules/webmessage/doc/hacking/Makefile \
      modules/webmessage/lib/Makefile \
      modules/webmessage/web/Makefile \
+     modules/webnews/Makefile \
+     modules/webnews/doc/Makefile \
+     modules/webnews/lib/Makefile \
+     modules/webnews/web/Makefile \
      modules/websearch/Makefile \
      modules/websearch/bin/Makefile \
      modules/websearch/bin/webcoll \

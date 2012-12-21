@@ -1,0 +1,162 @@
+/***************************************************************************
+* Assume that we want the arrow's size (i.e. side; height in case it's on  *
+* the left or right side; width otherwise) to be 16px. Then the border     *
+* width for the arrow and its border will be half that dimension, 8px. In  *
+* order for the arrow to be right on the tooltip, the arrow border's left  *
+* positioning has to be as much as it's size, therefore -16px. The arrow's *
+* left positioning has to be a couple of pixels to the right in order for  *
+* the border effect to be visible, therefore -14px. At the same time, in   *
+* order for the arrow's point to not overlap with the targeted item, the   *
+* tooltip's left margin has to be half the arrow's size (=the arrow's      *
+* border width), 8px. The tooltip's padding has to at least as much as the *
+* arrow's left positioning overhead, (-(-16px-(-14px))) 2px in this case.  *
+* The arrow's and the arrow border's top positioning can be as much as we  *
+* want, and it must be the same for both.                                  *
+*                                                                          *
+* Desired arrow's size ([height|width]): 16px                              *
+* Arrow's border-width: 8px (half the arrow's size)                        *
+* Tooltip's [left|right] margin: 8px (half the arrow's size)               *
+* Arrow's [left|right] positioning: -16px & -14px (arrow border and arrow) *
+* Arrow's [top|bottom] positioning: 8px                                    *
+*                                                                          *
+***************************************************************************/
+
+/* Arrow implementation using traditional elements */
+.ttn {
+    /* Display */
+    position: absolute;
+    display: none;
+    z-index: 9997;
+
+    /* Dimensions */
+    max-width: 250px;
+    min-width: 150px;
+
+    /* Contents */
+    background: #FFFFCC;
+    margin-left: 8px;
+    padding: 5px; /* padding has to be at least 2 */
+    font-size: small;
+
+    /* Border */
+    border: 1px solid #FFCC00;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+
+    /* Shadow */
+    -moz-box-shadow: 1px 1px 3px gray;
+    -webkit-box-shadow: 1px 1px 3px gray;
+    -o-box-shadow: 1px 1px 3px gray;
+    box-shadow: 1px 1px 3px gray;
+}
+
+.ttn_arrow {
+    /* Display */
+    position: absolute;
+    left: -14px;
+    top: 8px;
+    z-index: 9999;
+
+    /* Dimensions */
+    height: 0;
+    width: 0;
+
+    /* Border */
+    border-color: transparent #FFFFCC transparent transparent;
+    border-color: rgba(255,255,255,0) #FFFFCC rgba(255,255,255,0) rgba(255,255,255,0);
+    border-style: solid;
+    border-width: 8px;
+}
+
+.ttn_arrow_border {
+    /* Display */
+    position: absolute;
+    left: -16px;
+    top: 8px;
+    z-index: 9998;
+
+    /* Dimensions */
+    height: 0;
+    width: 0;
+
+    /* Border */
+    border-color: transparent #FFCC00 transparent transparent;
+    border-color: rgba(255,255,255,0) #FFCC00 rgba(255,255,255,0) rgba(255,255,255,0);
+    border-style: solid;
+    border-width: 8px;
+}
+
+/* Arrow implementation using the :before and :after pseudo elements */
+.ttn_alt_arrow_box {
+    /* Display */
+    position: absolute;
+    display: none;
+    z-index: 9997;
+
+    /* Dimensions */
+    max-width: 250px;
+    min-width: 150px;
+
+    /* Contents */
+    background: #FFFFCC;
+    margin-left: 6px;
+    padding: 3px;
+
+    /* Border */
+    border: 1px solid #FFCC00;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+
+    /* Shadow */
+    -moz-box-shadow: 1px 1px 3px gray;
+    -webkit-box-shadow: 1px 1px 3px gray;
+    -o-box-shadow: 1px 1px 3px gray;
+    box-shadow: 1px 1px 3px gray;
+}
+
+.ttn_alt_arrow_box:after, .ttn_alt_arrow_box:before {
+    right: 100%;
+    border: 1px solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+}
+
+.ttn_alt_arrow_box:after {
+    border-color: transparent;
+    border-right-color: #FFFFCC;
+    border-width: 6px;
+    top: 13px;
+}
+
+.ttn_alt_arrow_box:before {
+    border-color: transparent;
+    border-right-color: #FFCC00;
+    border-width: 8px;
+    top: 11px;
+}
+
+/* Style for the tooltip's contents */
+.ttn_text {
+    /* Contents */
+    vertical-align: top;
+    text-align: left;
+}
+
+.ttn_actions {
+    /* Contents */
+    vertical-align: bottom;
+    text-align: right;
+}
+
+.ttn_actions_read_more {
+}
+
+.ttn_actions_dismiss {
+}
