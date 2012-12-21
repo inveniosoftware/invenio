@@ -39,7 +39,7 @@ class Template:
             '          %(imgCompressMenuSection)sRecord\n' \
             '          %(imgNewRecord)s\n' \
             '          %(imgCloneRecord)s\n' \
-            '          &nbsp;&nbsp;%(imgTemplateRecord)s\n' \
+            '          %(imgTemplateRecord)s\n' \
             '        </div>\n' \
             '        <table>\n' \
             '          <col width="28px">\n' \

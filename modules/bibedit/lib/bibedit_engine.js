@@ -414,8 +414,7 @@ function initAjax(){
   );
 }
 
-
-function createReq(data, onSuccess, asynchronous) {
+function createReq(data, onSuccess, asynchronous, deferred){
   /*
    * Create Ajax request.
    */
@@ -437,14 +436,29 @@ function createReq(data, onSuccess, asynchronous) {
   $.ajax({data: {jsondata: JSON.stringify(data)},
            success: function(json){
                       onAjaxSuccess(json, onSuccess);
+                      if (deferred !== undefined) {
+                        deferred.resolve(json);
+                      }
                     },
-           async: asynchronous
+           async: asynchronous})
+  .done(function(){
+    createReqAjaxDone(data);
   });
 }
 // Transactions data.
 createReq.transactionID = 0;
 createReq.transactions = [];
 
+function createReqAjaxDone(data){
+/*
+ * This function is executed after the ajax request in createReq function was finished
+ * data: the data parameter that was send with ajax request
+ */
+  // If the request was from holding pen, trigger the event to apply holding pen changes
+  if (data['requestType'] == 'getHoldingPenUpdates') {
+    $.event.trigger('HoldingPenPageLoaded');
+  }
+}
 
 function createBulkReq(reqsData, onSuccess, optArgs){
   /* optArgs is a disctionary containning the optional arguments
@@ -548,8 +562,8 @@ function onAjaxSuccess(json, onSuccess){
         }
       }
       if (onSuccess) {
-          // No critical errors; call onSuccess function.
-          onSuccess(json);
+        // No critical errors; call onSuccess function.
+        onSuccess(json);
       }
     }
   }
@@ -646,7 +660,7 @@ function initStateFromHash(){
   // Find out which internal state the new hash leaves us with
   if (tmpState && tmpRecID){
     // We have both state and record ID.
-    if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord']) != -1)
+    if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord', 'hpapply']) != -1)
   gState = tmpState;
     else
       // Invalid state, fail...
@@ -700,27 +714,48 @@ function initStateFromHash(){
               getRecord(recID);
             }
         }
-      break;
-    case 'newRecord':
-      cleanUp(true, '', null, null, true);
-      displayNewRecordScreen();
-      bindNewRecordHandlers();
-      updateStatus('ready');
-      break;
-    case 'submit':
-      cleanUp(true, '', null, true);
-      displayMessage(4);
-      updateStatus('ready');
-      break;
-    case 'cancel':
-      cleanUp(true, '', null, true, true);
-      updateStatus('ready');
-      break;
-    case 'deleteRecord':
-      cleanUp(true, '', null, true);
-      displayMessage(10);
-      updateStatus('ready');
         break;
+      case 'hpapply':
+        var hpID = parseInt(gHashParsed.hpid, 10);
+        var recID = parseInt(tmpRecID, 10);
+        if (isNaN(recID) || isNaN(hpID)){
+          // Invalid record ID or HoldingPen ID.
+          cleanUp(true, tmpRecID, 'recID', true);
+          displayMessage(102);
+          updateStatus('error', gRESULT_CODES[102]);
+        }
+        else {
+          cleanUp(true, recID, 'recID');
+          gReadOnlyMode = tmpReadOnlyMode;
+          var hpButton = '#bibeditHPApplyChange' + hpID;
+          // after the record is created and all the data on the page is loaded
+          // trigger the click on holdingPen button
+          $(document).one('HoldingPenPageLoaded', function () {
+            $(hpButton).click();
+          });
+          getRecord(recID);
+        }
+        break;
+      case 'newRecord':
+        cleanUp(true, '', null, null, true);
+        displayNewRecordScreen();
+        bindNewRecordHandlers();
+        updateStatus('ready');
+        break;
+      case 'submit':
+        cleanUp(true, '', null, true);
+        displayMessage(4);
+        updateStatus('ready');
+        break;
+      case 'cancel':
+        cleanUp(true, '', null, true, true);
+        updateStatus('ready');
+        break;
+      case 'deleteRecord':
+        cleanUp(true, '', null, true);
+        displayMessage(10);
+        updateStatus('ready');
+          break;
     }
   }
   else
@@ -1277,6 +1312,8 @@ function getRecord(recID, recRev, onSuccess){
     recRev = 0;
   }
 
+  var getRecordPromise = new $.Deferred();
+
   if (onSuccess == undefined)
     onSuccess = onGetRecordSuccess;
   if (recRev != undefined && recRev != 0){
@@ -1301,12 +1338,16 @@ function getRecord(recID, recRev, onSuccess){
   }
 
   resetBibeditState();
-  createReq(reqData, onSuccess);
+  createReq(reqData, function(json) {
+      onSuccess(json);
+      // reloading the Holding Pen toolbar
+      onHoldingPenPanelRecordIdChanged(recID);
+  });
 
-  onHoldingPenPanelRecordIdChanged(recID); // reloading the Holding Pen toolbar
   getRecord.deleteRecordCache = false;
   getRecord.clonedRecord = false;
 }
+
 // Enable this flag to delete any existing cache before fetching next record.
 getRecord.deleteRecordCache = false;
 // Enable this flag to tell that we are fetching a record that has just been
@@ -1401,6 +1442,8 @@ function onGetRecordSuccess(json){
   adjustGeneralHPControlsVisibility();
 
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
+
+  onHoldingPenPanelRecordIdChanged(gRecID); // reloading the Holding Pen toolbar
 
   // Refresh top toolbar
   updateToolbar(false);

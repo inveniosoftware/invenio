@@ -69,8 +69,8 @@
 
 function onHoldingPenPanelRecordIdChanged(recordId){
   /** function that should be called when the edited record identifier changed
-   * the functionality consists of reloading the entries using the Ajax call
-   */
+  * the functionality consists of reloading the entries using the Ajax call
+  */
   holdingPenPanelRemoveEntries();
   createReq({recID: recordId, requestType: 'getHoldingPenUpdates'}, holdingPenPanelSetChanges);
 }
@@ -96,7 +96,7 @@ function holdingPenPanelAddEntry(entry){
 
 function holdingPenPanelSetChanges(data){
   /** Setting the Holding Pen panel content.
-   * 	This function cqn be utilised as a Javascript callback
+   * 	This function can be utilised as a Javascript callback
    *
    * 	Parameter:
    *  data - The dictionary containing a 'changes' key under which, a list
@@ -218,13 +218,13 @@ function onToggleDetailsVisibility(changesetNumber){
     // Making the DOM layers visible
 
     $(detailsSelector).removeClass(hidingClass);
-    $(togglingSelector).text('-');
+    $(togglingSelector + ' img').attr('src','/img/magnifying_minus.png');
 
   }
   else {
     // The changes preview was visible until now - time to hide it
     $(detailsSelector).addClass(hidingClass);
-    $(togglingSelector).text('+');
+    $(togglingSelector + ' img').attr('src','/img/magnifying_plus.png');
   }
 }
 

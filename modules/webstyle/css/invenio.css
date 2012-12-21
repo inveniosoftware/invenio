@@ -2233,7 +2233,8 @@ form input.hyperlinkformSubmitButton {
 
 .bibeditHPDetailsOpener{
     display: table-cell;
-    width: 20%;
+    width: 80%;
+    cursor: pointer;
 }
 .bibeditHPInformationsSection{
 
@@ -2257,6 +2258,7 @@ form input.hyperlinkformSubmitButton {
 
 .bibeditHPEntryCol1{
     display: table-cell;
+    vertical-align: middle;
 }
 
 .bibeditHPEntryCol2{

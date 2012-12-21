@@ -320,34 +320,29 @@ function removeAddFieldControl(changeNo) {
 
 /// generating the changes controls
 
-function getApplyChangeButton(functionName, changeNo) {
-    /*Returning the HTML code of the Apply change button
-     * functionName - the name of the function called when the button is clicked
-     *                The function has to take one argument being the number of
-     *                the change
-     * changeNo - the number of the change the button is associated with
-     */
+function getApplyChangeButton(functionName, changeNo){
+  /*Returning the HTML code of the Apply change button
+   * functionName - the name of the function called when the button is clicked
+   *                The function has to take one argument being the number of the
+   *                change
+   * changeNo - the number of the change the button is associated with
+   */
 
-    return "<button onClick=\"return " + functionName + "(" + changeNo +
-        ");\"><img src=\"/img/wsignout.gif\"></img></button>";
+  return "<button title='Apply' onClick=\"return " + functionName + "(" + changeNo + ");\"><img src=\"/img/wsignout.gif\"></img></button>";
 }
 
-function getRejectChangeButton(changeNo) { 
-    /* The button allowing to reject the change - and remove the control
-     * from the user interface
-     */
-    result = "<button onClick=\"onRejectChangeClicked(" + changeNo +
-        ");\"><img src=\"/img/iconcross2.gif\"></img></button>";
-    return result;
+function getRejectChangeButton(changeNo){
+  /*The button allowing to reject the change - and remove the control from the user interface*/
+  result = "<button title='Discard' onClick=\"onRejectChangeClicked(" +
+      changeNo + ");\"><img src=\"/img/iconcross2.gif\"></img></button>";
+  return result;
 }
 
-function getAddInsteadOfChangeButton(functionName, changeNo) {
-    /* The button allowing to reject the change - and remove the control
-     * from the user interface
-     */
-    result = "<button onClick=\"" + functionName + "(" + changeNo +
-        ");\"><img src=\"/img/plus_orange.png\"></img></button>";
-    return result;
+function getAddInsteadOfChangeButton(functionName, changeNo){
+  /*The button allowing to reject the change - and remove the control from the user interface*/
+  result = "<button title='Add changes as a new field' onClick=\"" + functionName + "(" +
+      changeNo + ");\"><img src=\"/img/plus_orange.png\"></img></button>";
+  return result;
 }
 
 function addSubfieldChangedControl(changeNo) {
@@ -362,8 +357,11 @@ function addSubfieldChangedControl(changeNo) {
     addButton = getAddInsteadOfChangeButton("applyFieldAdded", changeNo);
     /* adds a control allowing to change the subfield content */
 
-    newel = "<div class=\"bibeditHPCorrection\"><span> New value: " + content +
-        "</span>&nbsp;&nbsp;" + applyButton + rejectButton + addButton +
+    newel = "<div class=\"bibeditHPCorrection\"><span>" + content +
+        "</span>&nbsp;&nbsp;" +
+        applyButton +
+        rejectButton +
+        addButton +
         "</div>";
 
     $("#content_" + fieldId + "_" + fieldPos + "_" + sfPos).append(newel);
@@ -578,48 +576,57 @@ function createHoldingPenChangePreview(record) {
             changesetNumber + ");\">Hide preview</button>";
 }
 
-function createHoldingPenPanelEntry(changesetNumber, changesetDatetime) {
-    /*
-     * A function creating the panel entry describing one changeset
-     * Parameters:
-     *
-     *    changesetNumber - the internal changeset number ( from the Holding Pen )
-     *    changesetDatetime - the data of harvesting the changeset
-     *
-     * Returns: The HTML code of the control
-     */
+
+function createHoldingPenPanelEntry(changesetNumber, changesetDatetime){
+   /**
+   * A function creating the panel entry describing one changeset
+   * Parameters:
+   *
+   *    changesetNumber - the internal changeset number ( from the Holding Pen )
+   *    changesetDatetime - the data of harvesting the changeset
+   *
+   * Returns: The HTML code of the control
+   */
 
     manipulationControlsSection = //"<div class=\"bibeditHPEntryControlsPanel\">" +
-    button("<img src=\"/img/add.png\">", id = ("bibeditHPApplyChange" +
-        changesetNumber), _class = "bibeditHPControl", attrs = {
-        "onClick": ("return holdingPenPanelApplyChangeSet(" +
-        changesetNumber + ");")}) +
-    button("<img src=\"/img/delete.png\">", id = ("bibeditHPRemoveChange" +
-        changesetNumber), _class = "bibeditHPControl", attrs = {
-        "onClick": ("return holdingPenPanelRemoveChangeSet(" + changesetNumber +
-        ");")});
-    numberSection = "<div class=\"bibeditHPEntryNumber\">No" + changesetNumber +
-        "</div>";
+        button("<img src=\"/img/add.png\">",
+            id = ("bibeditHPApplyChange" + changesetNumber),
+            _class = "bibeditHPControl",
+            attrs = {
+              "onClick" :
+                ("return holdingPenPanelApplyChangeSet("+ changesetNumber + ");"),
+              "title" : "Apply Holding Pen changes"
+            }) +
+        button("<img src=\"/img/delete.png\">",
+            id = ("bibeditHPRemoveChange" + changesetNumber),
+            _class = "bibeditHPControl",
+            attrs = {
+              "onClick" :
+                ("return holdingPenPanelRemoveChangeSet("+ changesetNumber + ");"),
+                "title" : "Remove Holding Pen changes"
+            });
+        //"</div>";
 
-    datetimeSection = "<div class=\"bibeditHPEntryDateSection\">" +
-        changesetDatetime + "</div>";
+    numberSection = "<div class=\"bibeditHPEntryNumber\"></div>";
 
-    previewOpener = "<div id=\"holdingPenToggleDetailsVisibility_" +
-        changesetNumber + "\" onClick=\"onToggleDetailsVisibility(" +
-            changesetNumber + ");\" class=\"bibeditHPDetailsOpener\">+</div>";
+    datetimeSection = "<div class=\"bibeditHPEntryDateSection\">" + changesetDatetime + "</div>";
 
-    previewLayer = "<div class=\"bibeditHPContentPreviewBox bibeditHPHiddenElement\"  id=\"holdingPenPreview_" +
-        changesetNumber + "\">" + "Loading... <br>" +
-        "<br><button onClick=\"onToggleDetailsVisibility(" + changesetNumber +
-        ");\">Hide preview</button></div>"; // a toggle button ;
+    previewOpener = "<div id=\"holdingPenToggleDetailsVisibility_" + changesetNumber +
+                  "\" onClick=\"onToggleDetailsVisibility(" + changesetNumber +
+                  ");\" class=\"bibeditHPDetailsOpener\"><img src=\"/img/magnifying_plus.png\"></div>";
+
+    previewLayer = "<div class=\"bibeditHPContentPreviewBox bibeditHPHiddenElement\" id=\"holdingPenPreview_" + changesetNumber + "\">" +
+      "Loading... <br>"  +
+      "<br><button onClick=\"onToggleDetailsVisibility(" + changesetNumber + ");\">Hide preview</button></div>"; // a toggle button ;
+
     previewSection = previewOpener + previewLayer
 
-    result = "<div class=\"bibeditHPPanelEntry\" id=\"bibeditHoldingPenPanelEntry_" +
-        changesetNumber + "\">" + "<div class=\"bibeditHPEntryCol1\">" +
-        "<div class=\"bibeditHPEntryRow1\">" + numberSection + previewSection +
-        "</div>" + "<div class=\"bibeditHPEntryRow2\">" + datetimeSection +
-        "</div>" + "</div><div class=\"bibeditHPEntryCol2\">" +
-        manipulationControlsSection + "</div>" + "</div>";
+    result =   "<div class=\"bibeditHPPanelEntry\" id=\"bibeditHoldingPenPanelEntry_" + changesetNumber + "\">" +
+      "<div class=\"bibeditHPEntryCol1\">" +
+      "<div class=\"bibeditHPEntryRow1\">" + datetimeSection + "</div>" +
+          "<div class=\"bibeditHPEntryRow2\">" + previewSection + "</div>" +
+      "</div><div class=\"bibeditHPEntryCol2\">"+ manipulationControlsSection + "</div>" +
+          "</div>";
 
     return result;
 }
