@@ -3765,18 +3765,16 @@ class Template:
             return out
 
         # let's look for the recID's collection
-        record_found = 0
-        for coll in range(len(wlqh)):
-            if recID in wlqh[coll]:
-                record_found = 1
+        record_found = False
+        for coll in wlqh:
+            if recID in coll:
+                record_found = True
                 coll_recID = coll
                 break
 
         # let's calculate lenght of recID's collection
         if record_found:
-            if len(wlqh[coll_recID]) > 1:
-                wlqh[coll_recID].reverse()
-            recIDs = wlqh[coll_recID]
+            recIDs = coll_recID[::-1]
             totalrec = len(recIDs)
         # search for a specific record having not done any search before
         else:
