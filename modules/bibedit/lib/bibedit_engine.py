@@ -460,10 +460,7 @@ def perform_request_user(req, request_type, recid, data):
     """Handle user related requests."""
     response = {}
     if request_type == 'changeTagFormat':
-        try:
-            tagformat_settings = session_param_get(req, 'bibedit_tagformat')
-        except KeyError:
-            tagformat_settings = {}
+        tagformat_settings = session_param_get(req, 'bibedit_tagformat', {})
         tagformat_settings[recid] = data['tagFormat']
         session_param_set(req, 'bibedit_tagformat', tagformat_settings)
         response['resultCode'] = 2
@@ -699,11 +696,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             response['bibCirculationUrl'] = bibcirc_details_URL
             response['canRecordHavePhysicalCopies'] = can_have_copies
             # Set tag format from user's session settings.
-            try:
-                tagformat_settings = session_param_get(req, 'bibedit_tagformat')
-                tagformat = tagformat_settings[recid]
-            except KeyError:
-                tagformat = CFG_BIBEDIT_TAG_FORMAT
+            tagformat_settings = session_param_get(req, 'bibedit_tagformat')
+            tagformat = (tagformat_settings is not None) and tagformat_settings.get(recid, CFG_BIBEDIT_TAG_FORMAT) or CFG_BIBEDIT_TAG_FORMAT
             response['tagFormat'] = tagformat
             # KB information
             response['KBSubject'] = CFG_BIBEDIT_KB_SUBJECTS

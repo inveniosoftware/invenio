@@ -257,18 +257,18 @@ def session_param_del(req, key):
 
 def session_param_set(req, key, value):
     """
-    Associate a VALUE to the session param KEY for the current session.
+    Set a VALUE for the session param KEY for the current session.
     """
     session = get_session(req)
     session[key] = value
 
-def session_param_get(req, key):
+def session_param_get(req, key, default = None):
     """
     Return session parameter value associated with session parameter KEY for the current session.
-    If the key doesn't exists raise KeyError.
+    If the key doesn't exists return the provided default.
     """
     session = get_session(req)
-    return session[key]
+    return session.get(key, default)
 
 def session_param_list(req):
     """

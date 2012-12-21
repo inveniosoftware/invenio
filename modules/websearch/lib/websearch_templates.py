@@ -3745,20 +3745,13 @@ class Template:
             return ''
 
         # search for a specific record having not done any search before
-        try:
-            wlq = session_param_get(req, 'websearch-last-query')
-        except KeyError:
-            return ''
-
-        try:
-            wlqh = session_param_get(req, 'websearch-last-query-hits')
-        except KeyError:
-            return ''
+        wlq = session_param_get(req, 'websearch-last-query', '')
+        wlqh = session_param_get(req, 'websearch-last-query-hits')
 
         out = '''<br/><br/><div align="right">'''
         # excedeed limit CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT,
         # then will be displayed only the back to search link
-        if not wlqh:
+        if wlqh is None:
             out += '''<div style="padding-bottom:2px;padding-top:30px;"><span class="moreinfo" style="margin-right:10px;">
                         %(back)s </span></div></div>''' % \
                         {'back': create_html_link(wlq, {}, _("Back to search"), {'class': "moreinfo"})}
