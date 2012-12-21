@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.3\n"
+"Project-Id-Version: Invenio 1.0.4\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-12-19 15:02+0100\n"
+"POT-Creation-Date: 2012-12-21 10:37+0100\n"
 "PO-Revision-Date: 2008-03-26 15:56+0100\n"
 "Last-Translator: Joaquim Silvestre <joaquim.rodrigues.silvestre@cern.ch>\n"
 "Language-Team: PT <info@invenio-software.org>\n"
@@ -2761,59 +2761,59 @@ msgstr "Executar BibEdit"
 msgid "Run Batch Uploader"
 msgstr ""
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3705
+#: modules/webaccess/lib/webaccessadmin_lib.py:3704
 #, python-format
 msgid "Your account on '%s' has been activated"
 msgstr "A sua conta em '%s' foi activada"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3706
+#: modules/webaccess/lib/webaccessadmin_lib.py:3705
 #, fuzzy, python-format
 msgid "Your account earlier created on '%s' has been activated:"
 msgstr "A sua conta criada anteriormente em '%s' fia activada:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3708
-#: modules/webaccess/lib/webaccessadmin_lib.py:3721
-#: modules/webaccess/lib/webaccessadmin_lib.py:3747
+#: modules/webaccess/lib/webaccessadmin_lib.py:3707
+#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3746
 #, fuzzy
 msgid "Username/Email:"
 msgstr "Nome de utilizador/Email:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3709
-#: modules/webaccess/lib/webaccessadmin_lib.py:3722
+#: modules/webaccess/lib/webaccessadmin_lib.py:3708
+#: modules/webaccess/lib/webaccessadmin_lib.py:3721
 msgid "Password:"
 msgstr "Palavra-passe"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3719
+#: modules/webaccess/lib/webaccessadmin_lib.py:3718
 #, fuzzy, python-format
 msgid "Account created on '%s'"
 msgstr "Conta criada em '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #, fuzzy, python-format
 msgid "An account has been created for you on '%s':"
 msgstr "Uma conta foi criada para si em '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3732
+#: modules/webaccess/lib/webaccessadmin_lib.py:3731
 #, fuzzy, python-format
 msgid "Account rejected on '%s'"
 msgstr "Conta rejeitada em '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3733
+#: modules/webaccess/lib/webaccessadmin_lib.py:3732
 #, python-format
 msgid "Your request for an account has been rejected on '%s':"
 msgstr "O seu pedido para uma conta foi rejeitado '%s':"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3735
+#: modules/webaccess/lib/webaccessadmin_lib.py:3734
 #, fuzzy, python-format
 msgid "Username/Email: %s"
 msgstr "Nome de utilizador/Email: %s"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3745
+#: modules/webaccess/lib/webaccessadmin_lib.py:3744
 #, fuzzy, python-format
 msgid "Account deleted on '%s'"
 msgstr "Conta apagada em '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3746
+#: modules/webaccess/lib/webaccessadmin_lib.py:3745
 #, fuzzy, python-format
 msgid "Your account on '%s' has been deleted:"
 msgstr "A sua conta em '%s' foi apagada:"
@@ -3253,7 +3253,7 @@ msgstr "%s, personalizar"
 #: modules/webstyle/lib/webstyle_templates.py:618
 #: modules/webstyle/lib/webstyle_templates.py:620
 #: modules/websubmit/lib/websubmit_engine.py:1736
-#: modules/websubmit/lib/websubmit_webinterface.py:1103
+#: modules/websubmit/lib/websubmit_webinterface.py:1112
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
 #: modules/bibedit/lib/bibedit_webinterface.py:208
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:496
@@ -7672,7 +7672,7 @@ msgid "Upload"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:859
-#: modules/websubmit/lib/websubmit_webinterface.py:440
+#: modules/websubmit/lib/websubmit_webinterface.py:449
 #: modules/bibedit/lib/bibeditmulti_templates.py:305
 #, fuzzy
 msgid "Apply changes"
@@ -7835,7 +7835,7 @@ msgid "The chosen action is not supported by the document type."
 msgstr "A acção escolhida não é suportada por este tipo de documento."
 
 #: modules/websubmit/lib/websubmit_engine.py:1749
-#: modules/websubmit/lib/websubmit_webinterface.py:1119
+#: modules/websubmit/lib/websubmit_webinterface.py:1128
 #: modules/websubmit/web/approve.py:81
 msgid "Warning"
 msgstr "Aviso"
@@ -8513,94 +8513,99 @@ msgstr ""
 "O sistema encontrou um erro na recuperação da lista de ficheiros deste "
 "documento. "
 
-#: modules/websubmit/lib/websubmit_webinterface.py:201
+#: modules/websubmit/lib/websubmit_webinterface.py:196
+#, python-format
+msgid "The format %s does not exist for the given version: %s"
+msgstr ""
+
+#: modules/websubmit/lib/websubmit_webinterface.py:210
 #, fuzzy
 msgid "This file is restricted: "
 msgstr "O conteúdo desta coleção é restrito."
 
-#: modules/websubmit/lib/websubmit_webinterface.py:213
+#: modules/websubmit/lib/websubmit_webinterface.py:222
 msgid "An error has happened in trying to stream the request file."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_webinterface.py:216
+#: modules/websubmit/lib/websubmit_webinterface.py:225
 msgid "The requested file is hidden and can not be accessed."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_webinterface.py:223
+#: modules/websubmit/lib/websubmit_webinterface.py:232
 #, fuzzy
 msgid "Requested file does not seem to exist."
 msgstr "O registro foi apagado."
 
-#: modules/websubmit/lib/websubmit_webinterface.py:257
+#: modules/websubmit/lib/websubmit_webinterface.py:266
 msgid "Access to Fulltext"
 msgstr "Acesso a Fulltext"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:306
+#: modules/websubmit/lib/websubmit_webinterface.py:315
 msgid "An error has happened in trying to retrieve the requested file."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_webinterface.py:308
+#: modules/websubmit/lib/websubmit_webinterface.py:317
 #, fuzzy
 msgid "Not enough information to retrieve the document"
 msgstr "Seja o primeiro a fazer a analise critica deste documento."
 
-#: modules/websubmit/lib/websubmit_webinterface.py:316
+#: modules/websubmit/lib/websubmit_webinterface.py:325
 msgid "An error has happened in trying to retrieving the requested file."
 msgstr ""
 
 # msgstr "Formato de saída:"
-#: modules/websubmit/lib/websubmit_webinterface.py:367
+#: modules/websubmit/lib/websubmit_webinterface.py:376
 #, fuzzy
 msgid "Manage Document Files"
 msgstr "Gerir Formato dos Templates"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:385
+#: modules/websubmit/lib/websubmit_webinterface.py:394
 #, python-format
 msgid "Your modifications to record #%i have been submitted"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_webinterface.py:393
+#: modules/websubmit/lib/websubmit_webinterface.py:402
 #, python-format
 msgid "Your modifications to record #%i have been cancelled"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_webinterface.py:402
+#: modules/websubmit/lib/websubmit_webinterface.py:411
 msgid "Edit"
 msgstr "Editar"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:403
+#: modules/websubmit/lib/websubmit_webinterface.py:412
 #, fuzzy
 msgid "Edit record"
 msgstr "Editar outro registo"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:418
-#: modules/websubmit/lib/websubmit_webinterface.py:449
+#: modules/websubmit/lib/websubmit_webinterface.py:427
+#: modules/websubmit/lib/websubmit_webinterface.py:458
 #, fuzzy
 msgid "Document File Manager"
 msgstr "Gerir comentário"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:419
-#: modules/websubmit/lib/websubmit_webinterface.py:449
+#: modules/websubmit/lib/websubmit_webinterface.py:428
+#: modules/websubmit/lib/websubmit_webinterface.py:458
 #, fuzzy, python-format
 msgid "Record #%i"
 msgstr "A coleção %s não foi encontrada"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:441
+#: modules/websubmit/lib/websubmit_webinterface.py:450
 #, fuzzy
 msgid "Cancel all changes"
 msgstr "Guardar alterações"
 
 # msgstr "Ordenar por:"
-#: modules/websubmit/lib/websubmit_webinterface.py:913
+#: modules/websubmit/lib/websubmit_webinterface.py:922
 #, fuzzy
 msgid "Sorry, 'sub' parameter missing..."
 msgstr "Não pode enviar pedido de erro, falta o parâmetro %s"
 
-#: modules/websubmit/lib/websubmit_webinterface.py:916
+#: modules/websubmit/lib/websubmit_webinterface.py:925
 msgid "Sorry. Cannot analyse parameter"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_webinterface.py:977
+#: modules/websubmit/lib/websubmit_webinterface.py:986
 msgid "Sorry, invalid URL..."
 msgstr ""
 
