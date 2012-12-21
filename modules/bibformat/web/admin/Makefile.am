@@ -23,6 +23,6 @@ staticdir=$(localstatedir)/www/static/bibformat-admin-interface
 
 static_DATA = js_quicktags.js
 
-EXTRA_DIST =  $(webapp_DATA)
+EXTRA_DIST =  $(webapp_DATA) $(static_DATA)
 
 CLEANFILES = *~ *.tmp
