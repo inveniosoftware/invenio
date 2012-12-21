@@ -1,50 +1,31 @@
 --------------------------------------------------------------------
-Invenio v1.0.3 is released
-December 19, 2012
+Invenio v1.0.4 is released
+December 21, 2012
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.3 was released on December 19, 2012.
+Invenio v1.0.4 was released on December 21, 2012.
 
-This is a minor bugfix release only.  It is recommended to all Invenio
-sites using v1.0.2 or previous releases.
+This release fixes notably an installation problem in v1.0.3 that
+ommitted a file from the release tarball.  The release also introduces
+two minor improvements.  The release is recommended to all Invenio
+sites using v1.0.2 or previous versions.
 
 What's new:
 -----------
 
- *) BatchUploader: error reporting improvements
+ *) installation: inclusion of JS quicktags in tarball
 
- *) BibConvert: fix bug with SPLITW function; target/source CLI flag
-    description fix
+ *) bibdocfile: better error report for unknown format
 
- *) BibEdit: 'bibedit' CSS class addition to page body
-
- *) BibFormat: fix for js_quicktags location
-
- *) jQuery: tablesorter location standardisation
-
- *) WebComment: cleaner handling of non-reply comments
-
- *) WebJournal: explicit RSS icon dimensions; fix for
-    CFG_TMPSHAREDDIR; fix for retrieval of deleted articles
-
- *) WebSearch: external search pattern_list escape fix; respect output
-    format content-type; washing of 'as' argument
-
- *) WebStyle: dumb page loading fix; Google Analytics documentation
-    update; memory leak fix in session handling; new /ping handler;
-    removal of excess language box call; req.is_https() fix
-
- *) WebSubmit: fix for Send_APP_Mail function
-
- *) WebUser: fix for referer URL protocol
+ *) WebAccess: admin interface usability improvement
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.3.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.3.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.3.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.4.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.4.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.4.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -60,8 +41,8 @@ If you are upgrading from Invenio v1.0.2, then:
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.3.tar.gz
-     $ cd invenio-1.0.3
+     $ tar xvfz invenio-1.0.4.tar.gz
+     $ cd invenio-1.0.4
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make

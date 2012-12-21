@@ -6,6 +6,15 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.4 -- released 2012-12-21
+-------------------------------------
+
+ *) installation: inclusion of JS quicktags in tarball
+
+ *) bibdocfile: better error report for unknown format
+
+ *) WebAccess: admin interface usability improvement
+
 Invenio v1.0.3 -- released 2012-12-19
 -------------------------------------
 
