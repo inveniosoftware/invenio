@@ -93,7 +93,7 @@ from invenio.search_engine_utils import get_fieldvalues, \
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
-from invenio.bibformat import format_records
+from invenio.bibformat import format_records, record_get_xml
 from invenio.bibformat_engine import get_output_formats
 from invenio.websearch_webcoll import get_collection
 from invenio.intbitset import intbitset
@@ -108,6 +108,7 @@ from invenio.bibmerge_webinterface import WebInterfaceMergePages
 from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
 from invenio.bibfield import get_record
 from invenio.shellutils import mymkdir
+from invenio.logicutils import isnumber
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -1120,6 +1121,104 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                     else:
                         raise repr(v)
 
+    index = __call__
+
+
+class WebInterfaceSRUServicePages(WebInterfaceDirectory):
+    """ SRU protocol service pages."""
+
+    def __call__(self, req, form):
+        """SRU 1.2 service. parameters:
+        - operation -> (searchRetrieve, explain, scan, CQL)
+        - version -> only 1.2 is supported
+        - query (search query)
+        - startRecord (int)
+        - maximumRecords (int)
+        - recordPacking (xml is default, other is string)
+        - recordSchema -> http://www.loc.gov/standards/sru/resources/schemas.html
+        - resultSetTTL -> not supported
+        - stylesheet   -> Reference: http://www.loc.gov/standards/sru/specs/common.html#stylesheet
+        - extraRequestData -> not supported
+
+        scan and CQL are not supported yet
+
+        Keep only interesting parameters for the search
+        """
+        default_params = websearch_templates.sru_default_urlargd
+        argd = wash_urlargd(form, default_params)
+        user_info = collect_user_info(req)
+        req.content_type = "text/xml"
+        req.send_http_header()
+        operation = argd['operation']
+        xml_format = ''
+
+        if argd['version'] == None or argd['version'] == '':
+            params = {'details': 'Field missing', 'message': 'Please try adding: version=' + websearch_templates.sru_protocol_version}
+            out = websearch_templates.tmpl_sru_diagnostics_prologue(params)
+            out += websearch_templates.tmpl_sru_diagnostics_epilogue()
+            return out
+        elif argd['version'] != websearch_templates.sru_protocol_version:
+            params = {'details': 'Unsupported version', 'message': 'Unsupported version ' + argd['version']}
+            out = websearch_templates.tmpl_sru_diagnostics_prologue(params)
+            out += websearch_templates.tmpl_sru_diagnostics_epilogue()
+            return out
+
+        if argd['recordSchema'] == 'dc':
+            xml_format = 'xd'
+        elif argd['recordSchema'] == 'marcxml':
+            xml_format = 'marcxml_sru'
+        else:
+            xml_format = 'marcxml_sru'
+
+        if operation == "searchRetrieve":
+            req.argd = argd
+            recIDs   = perform_request_search(req, p=argd['query'])
+            fromRecord = 0
+            recCount = len(recIDs)
+            toRecord = recCount
+
+            if argd['query'] == None:
+                params = {'details': 'Field missing', 'message': 'Please try adding: query=yourqueryhere'}
+                out = websearch_templates.tmpl_sru_diagnostics_prologue(params)
+                out += websearch_templates.tmpl_sru_diagnostics_epilogue()
+                return out
+
+            if isnumber(argd['startRecord']):
+                if argd['startRecord'] >= 1 and argd['startRecord'] < recCount:
+                    fromRecord = argd['startRecord'] - 1
+            if isnumber(argd['maximumRecords']):
+                if fromRecord + argd['maximumRecords'] <= toRecord:
+                    toRecord = fromRecord + argd['maximumRecords']
+
+            params = {'number_of_records': len(range(fromRecord, toRecord)), 'stylesheet': argd['stylesheet']}
+            out    = websearch_templates.tmpl_sru_search_retrieve_prologue(params)
+
+            if params['number_of_records'] > 0:
+                out += "<zs:records>\n"
+
+                for i in range(fromRecord, toRecord):
+                    recID = recIDs[i]
+                    out += " <zs:record>\n"
+                    if xml_format == 'xd':
+                        out += "<zs:recordSchema>info:zs/schema/1/dc-v1.1</zs:recordSchema>"
+                    else:
+                        out += "<zs:recordSchema>info:zs/schema/1/marcxml-v1.1</zs:recordSchema>"
+                    out += "<zs:recordPacking>XML</zs:recordPacking>"
+                    out += "<zs:recordData>"
+                    out += record_get_xml(recID, format=xml_format)
+                    out += "</zs:recordData>"
+                    out += "</zs:record>"
+
+                out += "</zs:records>"
+            out += websearch_templates.tmpl_sru_search_retrieve_epilogue()
+            return out
+
+        elif operation == "scan":
+            req.write(websearch_templates.tmpl_sru_scan())
+
+        else:
+            # explain is the default SRU command
+            req.write(websearch_templates.tmpl_sru_explain())
     index = __call__
 
 

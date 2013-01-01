@@ -224,7 +224,10 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
         out += "   </header>\n"
         out += "   <metadata>\n"
 
-    if format.startswith("xm") or format == "marcxml":
+    if format == "marcxml_sru":
+        out += "  <record>\n"
+
+    if format.startswith("xm") or format == "marcxml" or format == "marcxml_sru":
         res = None
         if on_the_fly is False:
             # look for cached format existence:
@@ -238,7 +241,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
             # record 'recID' is not formatted in 'format' -- they are
             # not in "bibfmt" table; so fetch all the data from
             # "bibXXx" tables:
-            if format == "marcxml":
+            if format == "marcxml" or format == "marcxml_sru":
                 out += """    <record xmlns="http://www.loc.gov/MARC21/slim">\n"""
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)
             elif format.startswith("xm"):
@@ -355,6 +358,8 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
         out += "   </metadata>\n"
+        out += "  </record>\n"
+    elif format == "marcxml_sru":
         out += "  </record>\n"
 
     return out
