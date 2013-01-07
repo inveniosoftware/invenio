@@ -15,6 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import cgi
 import os
 import time
 import shutil
@@ -109,7 +110,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     pass
                 else:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-                    target = '/youraccount/login' + \
+                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                              make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
                                                      CFG_SITE_SECURE_URL + user_info['uri']}, {})
                     return redirect_to_url(req, target, norobot=True)
@@ -186,14 +187,23 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 for doc in bibarchive.list_bibdocs():
                     if docname == doc.get_docname():
                         try:
-                            docfile = doc.get_file(format, version)
+                            try:
+                                docfile = doc.get_file(format, version)
+                            except InvenioBibDocFileError, msg:
+                                req.status = apache.HTTP_NOT_FOUND
+                                if req.headers_in.get('referer'):
+                                    ## There must be a broken link somewhere.
+                                    ## Maybe it's good to alert the admin
+                                    register_exception(req=req, alert_admin=True)
+                                warn += write_warning(_("The format %s does not exist for the given version: %s") % (cgi.escape(format), cgi.escape(str(msg))))
+                                break
                             (auth_code, auth_message) = docfile.is_restricted(user_info)
                             if auth_code != 0 and not is_user_owner_of_record(user_info, self.recid):
                                 if CFG_BIBDOCFILE_ICON_SUBFORMAT_RE.match(get_subformat_from_format(format)):
                                     return stream_restricted_icon(req)
                                 if user_info['email'] == 'guest':
                                     cookie = mail_cookie_create_authorize_action('viewrestrdoc', {'status' : docfile.get_status()})
-                                    target = '/youraccount/login' + \
+                                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
                                         CFG_SITE_SECURE_URL + user_info['uri']}, {})
                                     redirect_to_url(req, target)
@@ -349,7 +359,7 @@ class WebInterfaceManageDocFilesPages(WebInterfaceDirectory):
                                                      'runbibdocfile')
         if auth_code and user_info['email'] == 'guest':
             # Ask to login
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'ln' : argd['ln'],
                                              'referer' : CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)

@@ -33,6 +33,7 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_LATEST_COUNT_DEFAULT, \
                                        CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio.config import CFG_SITE_URL, \
+                           CFG_SITE_SECURE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_RECORD
 from invenio.search_engine import guess_primary_collection_of_a_record, \
@@ -76,7 +77,7 @@ class WebInterfaceRecordLinkbacksPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_linkbacks(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             # Ask to login
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'ln': argd['ln'],
                                              'referer': CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
@@ -183,7 +184,7 @@ class WebInterfaceRecordLinkbacksPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(req, 'moderatelinkbacks', collection = guess_primary_collection_of_a_record(self.recid))
         if auth_code and user_info['email'] == 'guest':
             # Ask to login
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                      make_canonical_urlargd({'ln': argd['ln'],
                                              'referer': CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)

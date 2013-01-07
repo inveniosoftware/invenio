@@ -150,7 +150,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -331,7 +331,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                      'editor_type': argd['editor_type'],
                                                      'subscribe': argd['subscribe']},
                                                     onetime=True)
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri'] + '&cookie=' + msg_cookie}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -573,7 +573,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -650,7 +650,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if isGuestUser(uid):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -699,7 +699,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if isGuestUser(uid):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -723,7 +723,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         if isGuestUser(uid):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -808,7 +808,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -828,7 +828,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_comment(user_info, argd['comid'])
         if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_SECURE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)

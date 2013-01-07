@@ -962,10 +962,10 @@ class Template:
         else:
             out = "<p>%s</p>" % msg
 
-        out += """<form method="post" action="../youraccount/login">
+        out += """<form method="post" action="%(CFG_SITE_SECURE_URL)s/youraccount/login">
                   <table>
 
-               """
+               """ % {'CFG_SITE_SECURE_URL': CFG_SITE_SECURE_URL}
         if len(methods) > 1:
             # more than one method, must make a select
             login_select = """<select name="login_method" id="login_method">"""
@@ -1181,7 +1181,7 @@ class Template:
         # guest condition
         if guest:
             return _("You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first.") % \
-                        {'x_url_open': '<a href="../youraccount/login?ln=' + ln + '">',
+                        {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
                          'x_url_close': '<a/>'}
 
         # no rights condition

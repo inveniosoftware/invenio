@@ -2148,11 +2148,12 @@ class Template:
                      'warning' : _("WARNING! Upon confirmation, an email will be sent to the referee.")
                    }
             if auth_code == 0:
-                out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it") + ":<br />" +\
-                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onclick="window.location='approve.py?access=%(access)s&amp;ln=%(ln)s';return false;" />""" % {
+                out += "<br />" + _("As a referee for this document, you may approve or reject it from the submission interface") + ":<br />" +\
+                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onclick="window.location='%(siteurl)s/submit?doctype=%(doctype)s&amp;ln=%(ln)s';return false;" />""" % {
                          'approve' : _("Approve/Reject"),
-                         'access' : access,
-                         'ln' : ln
+                         'siteurl' : CFG_SITE_URL,
+                         'doctype' : doctype,
+                         'ln'      : ln
                        }
         if status == "approved":
             out += _("This document has been %(x_fmt_open)sapproved%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">', 'x_fmt_close': '</strong>'}
