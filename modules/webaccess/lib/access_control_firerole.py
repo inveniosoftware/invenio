@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,7 +41,7 @@ from invenio.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_CERN_SITE
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
-
+from invenio.errorlib import register_exception
 
 # INTERFACE
 
@@ -268,6 +268,7 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
             if not_p and not next_expr_p: # Nothing has matched and we got not
                 return allow_p # Then the whole rule matched!
     except Exception, msg:
+        register_exception(alert_admin=True)
         raise InvenioWebAccessFireroleError, msg
     return default_allow_p # By default we allow ;-) it'an OpenAccess project
 
@@ -300,11 +301,12 @@ _any_rule_re = re.compile(r'(?P<command>allow|deny)[\s]+(any|all)[\s]*', re.I)
 # Sub expression finder
 _expressions_re = re.compile(r'(?<!\\)\'.+?(?<!\\)\'|(?<!\\)\".+?(?<!\\)\"|(?<!\\)\/.+?(?<!\\)\/')
 
-def _mkip (ip):
+def _mkip(ip):
     """ Compute a numerical value for a dotted IP """
     num = 0L
-    for i in map (int, ip.split ('.')):
-        num = (num << 8) + i
+    if '.' in ip:
+        for i in map(int, ip.split('.')):
+            num = (num << 8) + i
     return num
 
 _full = 2L ** 32 - 1
@@ -333,4 +335,3 @@ def _ipmatch(ip, ip_matcher):
     @return: True if ip matches, False otherwise
     """
     return _mkip(ip) & ip_matcher[1] == ip_matcher[0]
-
