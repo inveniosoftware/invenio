@@ -612,7 +612,7 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
-    if kbtype == None or kbtype == 'w':
+    if not kbtype or kbtype == 'w':
         #get the kb and print it
         mappings = bibknowledge.get_kb_mappings(kbname, searchkey, \
                                                 searchvalue, searchtype)
