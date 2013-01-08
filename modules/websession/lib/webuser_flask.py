@@ -110,7 +110,7 @@ class UserInfo(CombinedMultiDict):
 
         self.info = CallbackDict(data, on_update)
         #FIXME remove req after everybody start using flask request.
-        CombinedMultiDict.__init__(self, [self.info, acc, self.req, dict(CFG_USER_DEFAULT_INFO)])
+        CombinedMultiDict.__init__(self, [self.req, self.info, acc, dict(CFG_USER_DEFAULT_INFO)])
         self.save()
 
 
@@ -142,8 +142,11 @@ class UserInfo(CombinedMultiDict):
         data = self._login(self.uid, force=True)
         acc = self._precache(data, force=True)
         self.info.update(data)
-        CombinedMultiDict.__init__(self, [self.info, acc, self.req, dict(CFG_USER_DEFAULT_INFO)])
+        CombinedMultiDict.__init__(self, [self.req, self.info, acc, dict(CFG_USER_DEFAULT_INFO)])
         self.save()
+
+    def update_request_info(self):
+        self.req = self._get_request_info()
 
     def _get_request_info(self):
         """

@@ -247,7 +247,7 @@ class Template:
   'title' : (title and show_title_p) and '<div class="headline_div"><h1 class="headline">' + cgi.escape(title) + '</h1></div>' or '',
   'titleepilogue' : titleepilogue,
 
-  'body' : body.encode('utf-8'),
+  'body' : body,
 
   }
         if show_footer:

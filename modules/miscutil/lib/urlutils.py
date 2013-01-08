@@ -133,13 +133,10 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
     if redirection_type is None:
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
 
-    from werkzeug.exceptions import HTTPException
-    from flask import redirect, current_app, abort
-    current_app.logger.info(" REDIRECTION ")
-    current_app.logger.info(url)
+    from flask import redirect
     r = redirect(url, code=redirection_type)
-    current_app.logger.info(r)
     raise apache.SERVER_RETURN, r
+    #FIXME enable code bellow
 
     del req.headers_out["Cache-Control"]
     req.headers_out["Cache-Control"] = "no-cache, private, no-store, " \
