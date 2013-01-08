@@ -114,10 +114,9 @@ def create_invenio_flask_app():
                 try:
                     response = self.app.full_dispatch_request()
                 except Exception, e:
-                    response = self.app.make_response(self.app.handle_exception(e))
-                    #raise
-                    #register_exception(alert_admin=True)
+                    response = self.app.handle_exception(e)
                 return response(environ, start_response)
+
 
     _app.wsgi_app = LegacyAppMiddleware(_app)
 
@@ -126,7 +125,7 @@ def create_invenio_flask_app():
         try:
             response = legacy_application(request.environ, g.start_response)
             if not isinstance(response, BaseResponse):
-                response = str(response) #current_app.make_response(response)
+                response = current_app.make_response(str(response))
             return response
         except HTTPException, e:
             return render_template("404.html"), 404

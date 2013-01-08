@@ -161,7 +161,8 @@ class SimulatedModPythonRequest(object):
                     if self.__replace_https:
                         self.__write(https_replace(self.__buffer))
                     else:
-                        self.__write(self.__buffer)
+                        if self.__buffer:
+                            self.__write(self.__buffer)
                     if self.track_writings:
                         if self.__replace_https:
                             self.__what_was_written += https_replace(self.__buffer)
@@ -178,13 +179,13 @@ class SimulatedModPythonRequest(object):
             self.__buffer = ''
 
     def set_content_type(self, content_type):
-        request.__mimetype = content_type
+        self.__mimetype = content_type
         if self.__is_https:
             if content_type.startswith("text/html") or content_type.startswith("application/rss+xml"):
                 self.__replace_https = True
 
     def get_content_type(self):
-        return request.__mimetype
+        return self.__mimetype
 
     def send_http_header(self):
         if not self.__response_sent_p:
@@ -194,7 +195,7 @@ class SimulatedModPythonRequest(object):
 
             ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
             #print self.__low_level_headers
-            self.__low_level_headers = [('Content-Type', request.__mimetype)]
+            self.__low_level_headers = [('Content-Type', self.__mimetype)]
             self.__write = self.__start_response(self.__status, self.__low_level_headers)
             self.__response_sent_p = True
             #print "Response sent: %s" % self.__headers
