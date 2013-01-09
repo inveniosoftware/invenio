@@ -281,4 +281,4 @@ def get_trackback_url(recid):
 
 def get_trackback_auto_discovery_tag(recid):
     return '<link rel="trackback" type="application/x-www-form-urlencoded" href="%s" />' \
-                % cgi.escape(get_trackback_url(recid))
+                % cgi.escape(get_trackback_url(recid), True)

@@ -34,8 +34,8 @@ import inspect
 import urllib
 import urllib2
 from urllib import urlencode, quote_plus, quote, FancyURLopener
-from urlparse import urlparse
-from cgi import parse_qs, escape
+from urlparse import urlparse, urlunparse
+from cgi import parse_qs, parse_qsl, escape
 
 try:
     import BeautifulSoup
@@ -54,7 +54,7 @@ from invenio import webinterface_handler_config as apache
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE, \
-     CFG_WEBDIR, CFG_SITE_NAME,  CFG_VERSION
+     CFG_WEBDIR, CFG_SITE_NAME,  CFG_VERSION, CFG_SITE_LANGS
 
 def wash_url_argument(var, new_type):
     """
@@ -411,6 +411,29 @@ def string_to_numeric_char_reference(string):
         out += "&#" + str(ord(char)) + ";"
     return out
 
+def get_canonical_and_alternates_urls(url, drop_ln=True, washed_argd=None):
+    """
+    Given an Invenio URL returns a tuple with two elements. The first is the
+    canonical URL, that is the original URL with CFG_SITE_URL prefix, and
+    where the ln= argument stripped. The second element element is mapping,
+    language code -> alternate URL
+    """
+    dummy_scheme, dummy_netloc, path, dummy_params, query, fragment = urlparse(url)
+    canonical_scheme, canonical_netloc = urlparse(CFG_SITE_URL)[0:2]
+    parsed_query = washed_argd or parse_qsl(query)
+    no_ln_parsed_query = [(key, value) for (key, value) in parsed_query if key != 'ln']
+    if drop_ln:
+        canonical_parsed_query = no_ln_parsed_query
+    else:
+        canonical_parsed_query = parsed_query
+    canonical_query = urlencode(canonical_parsed_query)
+    canonical_url = urlunparse((canonical_scheme, canonical_netloc, path, dummy_params, canonical_query, fragment))
+    alternate_urls = {}
+    for ln in CFG_SITE_LANGS:
+        alternate_query = urlencode(no_ln_parsed_query + [('ln', ln)])
+        alternate_url = urlunparse((canonical_scheme, canonical_netloc, path, dummy_params, alternate_query, fragment))
+        alternate_urls[ln] = alternate_url
+    return canonical_url, alternate_urls
 
 def create_url(urlbase, urlargd, escape_urlargd=True, urlhash=None):
     """Creates a W3C compliant URL. Output will look like this:

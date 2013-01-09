@@ -101,6 +101,22 @@ $ batchuploader --metadata -s20m
 </blockquote>
 </p>
 
+<p>Additionally you might want to automatically generate <tt>sitemap.xml</tt>
+files for your installation. For this just schedule:
+<blockquote>
+<pre>
+$ bibexport -w sitemap -s1d
+</pre>
+</blockquote>
+You will then need to add a line such as:
+<blockquote>
+<pre>
+Sitemap: <CFG_SITE_URL>/sitemap-index.xml.gz
+</pre>
+</blockquote>
+to your <tt>robots.txt</tt> file.</p>
+
+
 <p>If you are using the WebLinkback module, you should run the following tasklets:
 <blockquote>
 <pre>

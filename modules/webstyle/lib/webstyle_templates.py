@@ -41,7 +41,8 @@ from invenio.config import \
      CFG_INSPIRE_SITE
 
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
-from invenio.urlutils import make_canonical_urlargd, create_html_link
+from invenio.urlutils import make_canonical_urlargd, create_html_link, \
+                             get_canonical_and_alternates_urls
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
@@ -363,6 +364,7 @@ template function generated it.
  <!--[if gt IE 8]>
     <style type="text/css">div.restrictedflag {filter:none;}</style>
  <![endif]-->
+ %(canonical_and_alternate_urls)s
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
@@ -439,6 +441,7 @@ template function generated it.
           'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
           'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
+          'canonical_and_alternate_urls' : self.tmpl_canonical_and_alternate_urls(uri),
           'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
           'cssskin' : CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or '',
           'rssurl': rssurl,
@@ -478,6 +481,18 @@ template function generated it.
           'linkbackTrackbackLink': headerLinkbackTrackbackLink,
           'inspect_templates_message' : inspect_templates_message
         }
+        return out
+
+    def tmpl_canonical_and_alternate_urls(self, url):
+        """
+        Return the snippet of HTML to be put within the HTML HEAD tag in order
+        to declare the canonical and language alternate URLs of a page.
+        """
+        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url)
+        out = """  <link rel="canonical" href="%s" />\n""" % cgi.escape(canonical_url, True)
+        for ln, alternate_url in alternate_urls.iteritems():
+            ln = ln.replace('_', '-') ## zh_CN -> zh-CN
+            out += """  <link rel="alternate" hreflang="%s" href="%s" />\n""" % (ln, cgi.escape(alternate_url, True))
         return out
 
     def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
