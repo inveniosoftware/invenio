@@ -306,6 +306,8 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             url = CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/%s?ln=%s'
             url %= (str(merged_recid), argd['ln'])
             redirect_to_url(req, url)
+        elif record_status == -1:
+            req.status = apache.HTTP_GONE ## The record is gone!
 
         # mod_python does not like to return [] in case when of=id:
         out = perform_request_search(req, **argd)
