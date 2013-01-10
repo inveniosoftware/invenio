@@ -43,7 +43,7 @@ Contents
 	by running:
 
           $ sudo pip install -r requirements.txt
-          $ sudo pip install -r requirements-extra.txt
+          $ sudo pip install -r requirements-extras.txt
           $ sudo pip install -r requirements-flask.txt
           $ sudo pip install -r requirements-flask-ext.txt
 
