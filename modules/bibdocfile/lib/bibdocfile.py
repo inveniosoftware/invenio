@@ -1436,7 +1436,7 @@ class BibDoc:
         if docname:
             docname = normalize_docname(docname)
         self.docfiles = []
-        self.md5s = None
+        self.__md5s = None
         self.human_readable = human_readable
         if docid:
             if not recid:
@@ -1555,6 +1555,17 @@ class BibDoc:
         for docfile in self.docfiles:
             out += str(docfile)
         return out
+
+    def get_md5s(self):
+        """
+        @return: an instance of the Md5Folder class to access MD5 information
+            of the current BibDoc
+        @rtype: Md5Folder
+        """
+        if self.__md5s is None:
+            self.__md5s = Md5Folder(self.basedir)
+        return self.__md5s
+    md5s = property(get_md5s)
 
     def format_already_exists_p(self, format):
         """
@@ -1840,7 +1851,7 @@ class BibDoc:
         @note: an expunged BibDoc object shouldn't be used anymore or the
         result might be unpredicted.
         """
-        del self.md5s
+        del self.__md5s
         del self.more_info
         os.system('rm -rf %s' % escape_shell_arg(self.basedir))
         run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
@@ -2512,7 +2523,6 @@ class BibDoc:
                     self.more_info, human_readable=self.human_readable, cd=cd, md=md, size=size))
         else:
             if os.path.exists(self.basedir):
-                self.md5s = Md5Folder(self.basedir)
                 files = os.listdir(self.basedir)
                 files.sort()
                 for afile in files:

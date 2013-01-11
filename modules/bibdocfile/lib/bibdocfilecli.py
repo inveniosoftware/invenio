@@ -1041,6 +1041,8 @@ def cli_update_md5(options):
                     print_info(bibdoc.get_recid(), docid, '%s failing checksum!' % afile.get_full_path())
             wait_for_user('Updating the md5s of this document can hide real problems.')
             bibdoc.md5s.update(only_new=False)
+            bibdoc._sync_to_db()
+
 
 def cli_hide(options):
     """Hide the matched versions of documents."""
