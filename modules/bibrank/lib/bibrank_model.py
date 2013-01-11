@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -71,12 +71,12 @@ class RnkCITATIONDATA(db.Model):
                 server_default='0001-01-01 00:00:00')
 
 
-class RnkCITATIONDATAERR(object):
-    """Represents a  RnkCITATIONDATAERR record."""
+class RnkCITATIONDATAERR(db.Model):
+    """Represents a RnkCITATIONDATAERR record."""
+    __tablename__ = 'rnkCITATIONDATAERR'
     type = db.Column(db.Enum('multiple-matches', 'not-well-formed'),
                 primary_key=True)
-    citinfo = db.Column(db.String(255), nullable=False, server_default='',
-                primary_key=True)
+    citinfo = db.Column(db.String(255), primary_key=True, server_default='')
 
 
 class RnkCITATIONDATAEXT(db.Model):
