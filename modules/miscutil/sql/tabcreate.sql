@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+-- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -4218,6 +4218,19 @@ CREATE TABLE IF NOT EXISTS `wapCACHE` (
   INDEX `status-b` (`object_status`)
 ) ENGINE=MyISAM;
 
+-- tables for goto:
+CREATE TABLE IF NOT EXISTS goto (
+  label varchar(150) NOT NULL,
+  plugin varchar(150) NOT NULL,
+  parameters text NOT NULL,
+  creation_date datetime NOT NULL,
+  modification_date datetime NOT NULL,
+  PRIMARY KEY (label),
+  KEY (creation_date),
+  KEY (modification_date)
+) ENGINE=MyISAM;
+
+-- tables for invenio_upgrader
 CREATE TABLE IF NOT EXISTS upgrade (
   upgrade varchar(255) NOT NULL,
   applied DATETIME NOT NULL,

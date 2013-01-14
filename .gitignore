@@ -79,6 +79,7 @@ modules/websearch/bin/webcoll
 modules/websession/bin/inveniogc
 modules/webstat/bin/webstat
 modules/webstat/bin/webstatadmin
+modules/webstyle/bin/gotoadmin
 modules/webstyle/bin/webdoc
 modules/websubmit/bin/bibdocfile
 modules/websubmit/bin/inveniounoconv

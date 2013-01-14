@@ -1188,14 +1188,14 @@ class Template:
                  <td>%s</td>
                  <td algin='center'>
                  <input type="button" value='%s' style="background: url(/img/dialog-cancel.png)
-                 no-repeat; width: 75px; text-align: right;"
+                 no-repeat #8DBDD8; width: 75px; text-align: right;"
                  onClick="confirmation(%s)"
                  onmouseover="this.className='bibcircbuttonover'"
                  onmouseout="this.className='bibcircbutton'"
                  class="bibcircbutton">
 
                  <input type="button" value='%s' class="bibcircbutton"
-                        style="background: url(/img/dialog-yes.png) no-repeat;
+                        style="background: url(/img/dialog-yes.png) no-repeat #8DBDD8;
                         width: 150px; text-align: right;"
     onmouseover="this.className='bibcircbuttonover'"
     onmouseout="this.className='bibcircbutton'"
@@ -1384,12 +1384,12 @@ class Template:
                  <td>%s</td>
                  <td align="center">
                  <input type="button" value='%s' style="background: url(/img/dialog-cancel.png)
-                 no-repeat; width: 75px; text-align: right;"
+                 no-repeat #8DBDD8; width: 75px; text-align: right;"
                  onClick="confirmation(%s)"
                  class="bibcircbutton">
 
                  <input type=button
-                        style="background: url(/img/dialog-yes.png) no-repeat;
+                        style="background: url(/img/dialog-yes.png) no-repeat #8DBDD8;
                                width: 150px; text-align: right;"
 onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request_id=%s&recid=%s&borrower_id=%s'"
                  value='%s' class="bibcircbutton">
@@ -1819,7 +1819,7 @@ onClick="location.href='%s/admin2/bibcirculation/associate_barcode?ln=%s&request
                   <td>
 
                  <input type=button onClick="location.href='%s/admin2/bibcirculation/make_new_loan_from_request?ln=%s&check_id=%s&barcode=%s'"
-                 value='%s' class="bibcircbutton" style="background: url(/img/dialog-yes.png) no-repeat; width: 125px; text-align: right;"></td>
+                 value='%s' class="bibcircbutton" style="background: url(/img/dialog-yes.png) no-repeat #8DBDD8; width: 125px; text-align: right;"></td>
                  </td>
                  </tr>
                  """ % (
@@ -4676,7 +4676,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                  <td>%s</td>
                  <td align="center">
                  <input type="button" value='%s' style="background: url(/img/dialog-cancel.png)
-                 no-repeat; width: 75px; text-align: right;"
+                 no-repeat #8DBDD8; width: 75px; text-align: right;"
     onClick="location.href='%s/admin2/bibcirculation/get_pending_requests?ln=%s&request_id=%s'"
                  onmouseover="this.className='bibcircbuttonover'"
                  onmouseout="this.className='bibcircbutton'"
@@ -15880,11 +15880,11 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                   <td>%s</td>
                   <td algin='center'>
                     <input type="button" value='%s' style="background: url(/img/dialog-cancel.png)
-                        no-repeat; width: 75px; text-align: right;"
+                        no-repeat #8DBDD8; width: 75px; text-align: right;"
                         onClick="confirmation(%s)"
                         onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                         class="bibcircbutton">
-                    <input type=button style="background: url(/img/dialog-yes.png) no-repeat; width: 150px; text-align: right;"
+                    <input type=button style="background: url(/img/dialog-yes.png) no-repeat #8DBDD8; width: 150px; text-align: right;"
                         onClick="location.href='%s/admin2/bibcirculation/associate_barcode?request_id=%s&recid=%s&borrower_id=%s&ln=%s'"
                         onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                         value='%s' class="bibcircbutton">
@@ -15931,7 +15931,7 @@ onClick="location.href='%s/admin2/bibcirculation/bor_ill_historical_overview?ln=
                   <table class="bibcirctable">
                     <tr>
                       <td>
-                        <input type=button style="background: url(/img/document-print.png) no-repeat; width: 135px; text-align: right;"
+                        <input type=button style="background: url(/img/document-print.png) no-repeat #8DBDD8; width: 135px; text-align: right;"
                         onClick="location.href='%s/admin2/bibcirculation/get_pending_requests?print_data=true&ln=%s'"
                         onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                         value='%s' class="bibcircbutton">

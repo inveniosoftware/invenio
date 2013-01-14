@@ -888,6 +888,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/webstat/lib/Makefile \
      modules/webstyle/Makefile \
      modules/webstyle/bin/Makefile \
+     modules/webstyle/bin/gotoadmin \
      modules/webstyle/bin/webdoc \
      modules/webstyle/css/Makefile \
      modules/webstyle/doc/Makefile \
@@ -897,6 +898,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/webstyle/etc/templates/Makefile \
      modules/webstyle/img/Makefile \
      modules/webstyle/lib/Makefile \
+     modules/webstyle/lib/goto_plugins/Makefile \
      modules/websubmit/Makefile \
      modules/websubmit/bin/Makefile \
      modules/websubmit/bin/inveniounoconv \
