@@ -139,6 +139,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 return warning_page(msg, req, ln)
 
             if bibarchive.deleted_p():
+                req.status = apache.HTTP_GONE
                 return warning_page(_("Requested record does not seem to exist."), req, ln)
 
             docname = ''

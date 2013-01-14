@@ -1164,7 +1164,7 @@ class BibSched(object):
                 return False
 
             procname = proc.split(':')[0]
-            if not tasks_to_stop and (not tasks_to_sleep or len(self.node_relevant_active_tasks) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS):
+            if not tasks_to_stop and (not tasks_to_sleep or (proc not in CFG_BIBTASK_MONOTASKS and len(self.node_relevant_active_tasks) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS)):
                 if proc in CFG_BIBTASK_MONOTASKS and self.node_relevant_active_tasks:
                     if debug:
                         Log("Cannot run because this is a monotask and there are other tasks running: %s" % (self.node_relevant_active_tasks, ))
