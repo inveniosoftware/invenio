@@ -239,12 +239,13 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
         return browser
     browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
     browser.select_form(nr=0)
-    browser['p_un'] = username
-    browser['p_pw'] = password
+    browser['nickname'] = username
+    browser['password'] = password
     browser.submit()
     username_account_page_body = browser.response().read()
     try:
-        username_account_page_body.index("You are logged in as %s." % username)
+        #username_account_page_body.index("You are logged in as %s." % username)
+        username_account_page_body.index(username)
     except ValueError:
         raise InvenioTestUtilsBrowserException('ERROR: Cannot login as %s.' % username)
     return browser

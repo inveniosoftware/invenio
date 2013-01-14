@@ -157,7 +157,7 @@ class CollectionExtension(Extension):
 
 def render_template_to_string(input, _from_string=False, **context):
     """Renders a template from the template folder with the given
-    context and return the.
+    context and return the string.
 
     :param input: the string template, or name of the template to be
                   rendered, or an iterable with template names

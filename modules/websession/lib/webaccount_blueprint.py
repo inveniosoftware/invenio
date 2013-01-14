@@ -20,22 +20,15 @@
 """WebAccount Flask Blueprint"""
 
 from werkzeug.urls import url_unquote
-from flask import Blueprint, session, make_response, g, render_template, \
+from flask import session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app
 from invenio.sqlalchemyutils import db
-from invenio.websession_model import User, Usergroup, UserUsergroup
+from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webinterface_handler import wash_urlargd
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.access_control_config import \
      CFG_EXTERNAL_AUTH_USING_SSO, \
      CFG_EXTERNAL_AUTH_LOGOUT_SSO
-
-from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
-      CFG_WEBSESSION_USERGROUP_STATUS, \
-      CFG_WEBSESSION_GROUP_JOIN_POLICY, \
-      InvenioWebSessionError, \
-      InvenioWebSessionWarning
 
 from invenio.webaccount_forms import LoginForm
 from invenio.webuser_flask import login_user, logout_user, current_user
@@ -43,7 +36,8 @@ from invenio.webuser_flask import login_user, logout_user, current_user
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
-blueprint = InvenioBlueprint('youraccount', __name__, url_prefix="/youraccount",
+blueprint = InvenioBlueprint('youraccount', __name__,
+                url_prefix="/youraccount",
                 breadcrumbs=[(_("Your Account"), 'youraccount.index')],
                 menubuilder=[('main.personalize', _('Personalize'),
                               'youraccount.display', 3)])
@@ -58,12 +52,13 @@ def login():
         try:
             #TODO add login_methods
             user = User.query.filter(db.and_(
-                User.nickname==form.nickname.data,
-                User.password==form.password.data)).one()
+                User.nickname == form.nickname.data,
+                User.password == form.password.data)).one()
             login_user(user.get_id(), remember_me=form.remember.data)
-            flash(_("You have been logged in."), "info")
+            flash(_("You are logged in as %s.") % user.nickname, "info")
             # Change HTTP method to https if needed.
-            referer = url_unquote(request.form.get("referer", url_for(".login")))
+            referer = url_unquote(request.form.get("referer",
+                                                   url_for(".login")))
             if CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and \
                 request.url.startswith('https://') and \
                 referer.startswith('http://'):
@@ -81,8 +76,9 @@ def login():
 def logout():
     logout_user()
     return render_template('webaccount_logout.html',
-                            using_sso = CFG_EXTERNAL_AUTH_USING_SSO,
-                            logout_sso = CFG_EXTERNAL_AUTH_LOGOUT_SSO)
+                            using_sso=CFG_EXTERNAL_AUTH_USING_SSO,
+                            logout_sso=CFG_EXTERNAL_AUTH_LOGOUT_SSO)
+
 
 def _invenio_settings_plugin_builder(plugin_name, plugin_code):
     """
@@ -91,7 +87,8 @@ def _invenio_settings_plugin_builder(plugin_name, plugin_code):
     from invenio.settings import Settings
     if 'settings' in dir(plugin_code):
         candidate = getattr(plugin_code, 'settings')
-        return candidate
+        if issubclass(candidate, Settings):
+            return candidate
     raise ValueError('%s is not a valid settings plugin' % plugin_name)
 
 
@@ -107,15 +104,15 @@ _USER_SETTINGS = PluginContainer(
 @blueprint.invenio_authenticated
 def index():
     # load plugins
-    plugins = [a for a in [s() for (k,s) in _USER_SETTINGS.items()] if a.is_authorized]
+    plugins = [a for a in [s() for (k, s) in _USER_SETTINGS.items()] \
+               if a.is_authorized]
 
     dashboard_settings = current_user.get('dashboard_settings', {})
     order = dashboard_settings.get('order', [])
     plugins = sorted(plugins, key=lambda w: order.index(w.__class__.__name__) \
-                                  if w.__class__.__name__ in order else len(order))
+                            if w.__class__.__name__ in order else len(order))
 
-    return render_template('webaccount_display.html',
-                           plugins = plugins)
+    return render_template('webaccount_display.html', plugins=plugins)
 
 
 @blueprint.route('/edit/<name>', methods=['GET', 'POST'])
@@ -146,7 +143,5 @@ def edit(name):
         from werkzeug.datastructures import MultiDict
         form = plugin.form_builder(MultiDict(plugin.load()))
 
-    return render_template(getattr(plugin, 'edit_template', '') or 'webaccount_edit.html',
-            plugin = plugin,
-            form = form)
-
+    return render_template(getattr(plugin, 'edit_template', '') or \
+                           'webaccount_edit.html', plugin=plugin, form=form)

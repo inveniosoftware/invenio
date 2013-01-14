@@ -153,6 +153,7 @@ class SimulatedModPythonRequest(object):
             self.flush()
 
     def flush(self):
+        return
         self.send_http_header()
         if self.__buffer:
             self.__bytes_sent += len(self.__buffer)
@@ -188,6 +189,7 @@ class SimulatedModPythonRequest(object):
         return self.__mimetype
 
     def send_http_header(self):
+        return
         if not self.__response_sent_p:
             self.__tainted = True
             if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
@@ -448,6 +450,7 @@ def application(environ, start_response, flask_app=None):
             else:
                 ret = invenio_handler(req)
             req.flush()
+            return req.get_buffer()
         except SERVER_RETURN, status:
             redirection, = status.args
             from werkzeug.wrappers import BaseResponse
@@ -484,20 +487,20 @@ def application(environ, start_response, flask_app=None):
             else:
                 return generate_error_page(req, page_already_started=True)
     finally:
-        #for (callback, data) in req.get_cleanups():
-        #    callback(data)
-        if hasattr(req, '_session'):
-            ## The session handler saves for caching a request_wrapper
-            ## in req.
-            ## This saves req as an attribute, creating a circular
-            ## reference.
-            ## Since we have have reached the end of the request handler
-            ## we can safely drop the request_wrapper so to avoid
-            ## memory leaks.
-            delattr(req, '_session')
-        if hasattr(req, '_user_info'):
-            ## For the same reason we can delete the user_info.
-            delattr(req, '_user_info')
+        ##for (callback, data) in req.get_cleanups():
+        ##    callback(data)
+        #if hasattr(req, '_session'):
+        #    ## The session handler saves for caching a request_wrapper
+        #    ## in req.
+        #    ## This saves req as an attribute, creating a circular
+        #    ## reference.
+        #    ## Since we have have reached the end of the request handler
+        #    ## we can safely drop the request_wrapper so to avoid
+        #    ## memory leaks.
+        #    delattr(req, '_session')
+        #if hasattr(req, '_user_info'):
+        #    ## For the same reason we can delete the user_info.
+        #    delattr(req, '_user_info')
 
         ## as suggested in
         ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>

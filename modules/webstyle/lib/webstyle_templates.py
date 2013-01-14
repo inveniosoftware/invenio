@@ -27,7 +27,8 @@ import urllib
 import sys
 import string
 
-from flask import render_template, g, current_app
+from flask import g, current_app
+from invenio.jinja2utils import render_template_to_string
 from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_SITE_LANG, \
@@ -253,7 +254,7 @@ class Template:
         if show_footer:
             out += self.tmpl_pagefooter(req, ln = ln,
                            lastupdated = lastupdated,
-                           pagefooteradd = pagefooteradd).encode('utf-8')
+                           pagefooteradd = pagefooteradd)
         return out
 
     def tmpl_pageheader(self, req, ln=CFG_SITE_LANG, headertitle="",
@@ -442,7 +443,7 @@ template function generated it.
 </div>
         """ % data
 
-        out += render_template('header.html').encode('utf-8')
+        out += render_template_to_string('header.html').encode('utf-8')
         return out
 
     def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
@@ -483,7 +484,8 @@ template function generated it.
         except:
             lastupdated = None
 
-        out += render_template('footer.html', lastupdated=lastupdated)
+        out += render_template_to_string('footer.html',
+                                      lastupdated=lastupdated).encode('utf-8')
         out += """
 </body>
 </html>
