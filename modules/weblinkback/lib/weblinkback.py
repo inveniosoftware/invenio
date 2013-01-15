@@ -280,6 +280,18 @@ def perform_sendtrackback(req, recid, url, title, excerpt, blog_name, blog_id, s
     req.write(xml_response)
 
 
+def perform_sendtrackback_disabled(req):
+    status = 404
+    xml_response = """<response>
+                      <error>1</error>
+                      <message>Trackback facility disabled</message>
+                      </response>"""
+    req.set_content_type("text/xml; charset=utf-8")
+    req.set_status(status)
+    req.send_http_header()
+    req.write(xml_response)
+
+
 def update_linkbacks(mode):
     """
     Update titles of pages that link to the instance

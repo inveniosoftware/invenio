@@ -23,7 +23,8 @@ import unittest
 
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_RECORD, \
-                           CFG_DATABASE_NAME
+                           CFG_DATABASE_NAME, \
+                           CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.testutils import make_test_suite, \
                                    run_test_suite, \
                                    test_web_page_content, \
@@ -899,10 +900,12 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
             self.assertEqual(1, url_titles[3][5])
             p.stop()
 
-
-TEST_SUITE = make_test_suite(WebLinkbackWebPagesAvailabilityTest,
-                             WebLinkbackDatabaseTest,
-                             WebLinkbackUpdaterTest)
+if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+    TEST_SUITE = make_test_suite(WebLinkbackWebPagesAvailabilityTest,
+                                 WebLinkbackDatabaseTest,
+                                 WebLinkbackUpdaterTest)
+else:
+    TEST_SUITE = make_test_suite()
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

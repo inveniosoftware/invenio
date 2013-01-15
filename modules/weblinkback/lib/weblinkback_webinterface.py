@@ -26,7 +26,8 @@ from invenio.webuser import getUid, collect_user_info, page_not_authorized
 from invenio.weblinkback import check_user_can_view_linkbacks, \
                                 perform_sendtrackback, \
                                 perform_request_display_record_linbacks, \
-                                perform_request_display_approved_latest_added_linkbacks_to_accessible_records
+                                perform_request_display_approved_latest_added_linkbacks_to_accessible_records, \
+                                perform_sendtrackback_disabled
 from invenio.weblinkback_dblayer import approve_linkback, \
                                         reject_linkback
 from invenio.weblinkback_config import CFG_WEBLINKBACK_LATEST_COUNT_DEFAULT, \
@@ -35,7 +36,8 @@ from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_SITE_LANG, \
-                           CFG_SITE_RECORD
+                           CFG_SITE_RECORD, \
+                           CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.search_engine import guess_primary_collection_of_a_record, \
                                   create_navtrail_links, \
                                   get_colID
@@ -199,15 +201,18 @@ class WebInterfaceRecordLinkbacksPages(WebInterfaceDirectory):
         """
         Send a new trackback
         """
-        argd = wash_urlargd(form, {'url': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
-                                   'title': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
-                                   'excerpt': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
-                                   'blog_name': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
-                                   'id': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
-                                   'source': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
-                                   })
+        if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+            argd = wash_urlargd(form, {'url': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
+                                       'title': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
+                                       'excerpt': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
+                                       'blog_name': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
+                                       'id': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
+                                       'source': (str, CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME),
+                                       })
 
-        perform_sendtrackback(req, self.recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], argd['ln'])
+            perform_sendtrackback(req, self.recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], argd['ln'])
+        else:
+            perform_sendtrackback_disabled(req)
 
 
 class WebInterfaceRecentLinkbacksPages(WebInterfaceDirectory):
