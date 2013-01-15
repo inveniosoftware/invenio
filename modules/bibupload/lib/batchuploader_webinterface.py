@@ -29,7 +29,7 @@ from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
 from invenio.webinterface_handler_wsgi_utils import handle_file_post
-from invenio.webuser import getUid, page_not_authorized
+from invenio.webuser import getUid, page_not_authorized, get_email
 from invenio.webpage import page
 
 from invenio.batchuploader_engine import metadata_upload, cli_upload, \
@@ -84,17 +84,20 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                     'filetype': (str, ""),
                                     'mode': (str, ""),
                                     'submit_date': (str, "yyyy-mm-dd"),
-                                    'submit_time': (str, "hh:mm:ss")})
+                                    'submit_time': (str, "hh:mm:ss"),
+                                    'email_logs_to': (str, None)})
         _ = gettext_set_language(argd['ln'])
 
         not_authorized = user_authorization(req, argd['ln'])
         if not_authorized:
             return not_authorized
         uid = getUid(req)
+        if argd['email_logs_to'] is None:
+            argd['email_logs_to'] = get_email(uid)
         body = batchuploader_templates.tmpl_display_menu(argd['ln'], ref="metadata")
         body += batchuploader_templates.tmpl_display_web_metaupload_form(argd['ln'],
                 argd['error'], argd['filetype'], argd['mode'], argd['submit_date'],
-                argd['submit_time'])
+                argd['submit_time'], argd['email_logs_to'])
 
         title = _("Metadata batch upload")
         return page(title = title,
@@ -116,8 +119,9 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         if not_authorized:
             return not_authorized
         uid = getUid(req)
+        email_logs_to = get_email(uid)
         body = batchuploader_templates.tmpl_display_menu(argd['ln'], ref="documents")
-        body += batchuploader_templates.tmpl_display_web_docupload_form(argd['ln'])
+        body += batchuploader_templates.tmpl_display_web_docupload_form(argd['ln'], email_logs_to=email_logs_to)
 
         title = _("Document batch upload")
         return page(title = title,
@@ -138,7 +142,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                    'mode': (str, ""),
                                    'submit_date': (str, ""),
                                    'submit_time': (str, ""),
-                                   'priority': (str, "")})
+                                   'priority': (str, ""),
+                                   'email_logs_to': (str, "")})
         _ = gettext_set_language(argd['ln'])
 
         not_authorized = user_authorization(req, argd['ln'])
@@ -169,7 +174,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                             % (CFG_SITE_SECURE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_time']))
 
         errors, info = document_upload(req, argd['docfolder'], argd['matching'],
-                                       argd['mode'], date, time, argd['ln'], argd['priority'])
+                                       argd['mode'], date, time, argd['ln'], argd['priority'], argd['email_logs_to'])
 
         body = batchuploader_templates.tmpl_display_menu(argd['ln'])
         uid = getUid(req)
@@ -204,7 +209,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                    'submit_date': (str, None),
                                    'submit_time': (str, None),
                                    'filename': (str, None),
-                                   'priority': (str, None)})
+                                   'priority': (str, None),
+                                   'email_logs_to': (str, None)})
         _ = gettext_set_language(argd['ln'])
 
         not_authorized = user_authorization(req, argd['ln'])
@@ -243,7 +249,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         auth_code, auth_message = metadata_upload(req,
                                   form.get('metafile', None), argd['filetype'], argd['mode'].split()[0],
                                   date, time, argd['filename'], argd['ln'],
-                                  argd['priority'])
+                                  argd['priority'], argd['email_logs_to'])
 
         if auth_code == 1: # not authorized
             referer = '/batchuploader/'

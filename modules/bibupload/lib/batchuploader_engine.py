@@ -169,7 +169,7 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
 
 def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None,
                     exec_time=None, metafilename=None, ln=CFG_SITE_LANG,
-                    priority="1"):
+                    priority="1", email_logs_to=None):
     """
     Metadata web upload service. Get upload parameters and exec bibupload for the given file.
     Finally, write upload history.
@@ -212,13 +212,16 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
             msg = "[ERROR] MARCXML is not valid."
             return (error_codes['invalid_marc'], msg)
     # run upload command:
+    task_arguments = ('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority)
     if exec_date:
         date = exec_date
         if exec_time:
             date += ' ' + exec_time
-        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, "-t", date, filename)
-    else:
-        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, filename)
+        task_arguments += ("-t", date)
+    if email_logs_to:
+        task_arguments += ('--email-logs-to', email_logs_to)
+    task_arguments += (filename, )
+    jobid = task_low_level_submission(*task_arguments)
 
     # write batch upload history
     run_sql("""INSERT INTO hstBATCHUPLOAD (user, submitdate,
@@ -229,7 +232,7 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
             or time.strftime("%Y-%m-%d %H:%M:%S"), str(jobid), ))
     return (0, "Task %s queued" % str(jobid))
 
-def document_upload(req=None, folder="", matching="", mode="", exec_date="", exec_time="", ln=CFG_SITE_LANG, priority="1"):
+def document_upload(req=None, folder="", matching="", mode="", exec_date="", exec_time="", ln=CFG_SITE_LANG, priority="1", email_logs_to=None):
     """ Take files from the given directory and upload them with the appropiate mode.
     @parameters:
         + folder: Folder where the files to upload are stored
@@ -337,11 +340,17 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             if not user:
                 user = "batchupload"
             # Execute bibupload with the appropiate mode
+
+            task_arguments = ('bibupload', user, "--" + mode, "--name=" + docfile, "--priority=" + priority)
+
             if exec_date:
                 date = '--runtime=' + "\'" + exec_date + ' ' + exec_time + "\'"
-                jobid = task_low_level_submission('bibupload', user, "--" + mode, "--name=" + docfile, "--priority=" + priority, date, filename)
-            else:
-                jobid = task_low_level_submission('bibupload', user, "--" + mode, "--name=" + docfile, "--priority=" + priority, filename)
+                task_arguments += (date, )
+            if email_logs_to:
+                task_arguments += ("--email-logs-to", email_logs_to)
+            task_arguments += (filename, )
+
+            jobid = task_low_level_submission(*task_arguments)
 
             # write batch upload history
             run_sql("""INSERT INTO hstBATCHUPLOAD (user, submitdate,
