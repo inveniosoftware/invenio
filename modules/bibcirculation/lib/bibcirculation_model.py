@@ -36,8 +36,8 @@ class CrcBORROWER(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), nullable=False,
                 primary_key=True,
                 autoincrement=True)
-    ccid = db.Column(db.Integer(15, unsigned=True), nullable=False,
-                unique=True)
+    ccid = db.Column(db.Integer(15, unsigned=True), nullable=True,
+                unique=True, server_default=None)
     name = db.Column(db.String(255), nullable=False,
                 server_default='', index=True)
     email = db.Column(db.String(255), nullable=False,
