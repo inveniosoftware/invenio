@@ -34,7 +34,10 @@ import os
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email import Encoders
 from email.MIMEImage import MIMEImage
+from email.Utils import formatdate
 from cStringIO import StringIO
 from formatter import DumbWriter, AbstractFormatter
 
@@ -144,6 +147,7 @@ def send_email(fromaddr,
                ln=CFG_SITE_LANG,
                charset=None,
                replytoaddr="",
+               attachments=None
                ):
     """Send a forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
@@ -168,6 +172,8 @@ def send_email(fromaddr,
     @param replytoaddr: [string or list-of-strings] to be used for the
                         reply-to header of the email (if string, then
                         receivers are separated by ',')
+    @param attachments: list of paths of files to be attached. Alternatively,
+        every element of the list could be a tuple: (filename, mimetype)
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -198,7 +204,7 @@ This message would have been sent to the following recipients:
         usebcc = False
     body = forge_email(fromaddr, toaddr, subject, content, html_content,
                        html_images, usebcc, header, footer, html_header,
-                       html_footer, ln, charset, replytoaddr)
+                       html_footer, ln, charset, replytoaddr, attachments)
 
     _ = gettext_set_language(CFG_SITE_LANG)
 
@@ -318,7 +324,7 @@ def email_html_footer(ln=CFG_SITE_LANG):
 def forge_email(fromaddr, toaddr, subject, content, html_content='',
                 html_images=None, usebcc=False, header=None, footer=None,
                 html_header=None, html_footer=None, ln=CFG_SITE_LANG,
-                charset=None, replytoaddr=""):
+                charset=None, replytoaddr="", attachments=None):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
     @param toaddr: [string or list-of-strings] list of receivers (if string, then
@@ -336,8 +342,9 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     @param replytoaddr: [string or list-of-strings] to be used for the
                         reply-to header of the email (if string, then
                         receivers are separated by ',')
+    @param attachments: list of paths of files to be attached. Alternatively,
+        every element of the list could be a tuple: (filename, mimetype)
     @return: forged email as a string"""
-
     if html_images is None:
         html_images = {}
 
@@ -395,15 +402,6 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
             html_content_charset = charset
 
         msg_root = MIMEMultipart('alternative')
-        msg_root['Subject'] = subject
-        msg_root['From'] = fromaddr
-        if replytoaddr:
-            msg_root['Reply-To'] = replytoaddr
-        if usebcc:
-            msg_root['Bcc'] = toaddr
-            msg_root['To'] = 'Undisclosed.Recipients:'
-        else:
-            msg_root['To'] = toaddr
         msg_root.preamble = 'This is a multi-part message in MIME format.'
 
         msg_text = MIMEText(content, _charset=content_charset)
@@ -426,15 +424,42 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
             msg_root.attach(msg_related)
     else:
         msg_root = MIMEText(content, _charset=content_charset)
-        msg_root['From'] = fromaddr
-        if replytoaddr:
-            msg_root['Reply-To'] = replytoaddr
-        if usebcc:
-            msg_root['Bcc'] = toaddr
-            msg_root['To'] = 'Undisclosed.Recipients:'
-        else:
-            msg_root['To'] = toaddr
-        msg_root['Subject'] = subject
+
+    if attachments:
+        from invenio.bibdocfile import _mimes, guess_format_from_url
+        old_msg_root = msg_root
+        msg_root = MIMEMultipart()
+        msg_root.attach(old_msg_root)
+        for attachment in attachments:
+            try:
+                if type(attachment) in (list, tuple):
+                    attachment, mime = attachment
+                if mime is None:
+                    ## Automatic guessing of mimetype
+                    mime = _mimes.guess_type(attachment)[0]
+                if mime is None:
+                    ext = guess_format_from_url(attachment)
+                    mime = _mimes.guess_type("foo" + ext)[0]
+                if not mime:
+                    mime = 'application/octet-stream'
+                part = MIMEBase(*mime.split('/', 1))
+                part.set_payload(open(attachment, 'rb').read())
+                Encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(attachment))
+                msg_root.attach(part)
+            except:
+                register_exception(alert_admin=True, prefix="Can't attach %s" % attachment)
+
+    msg_root['From'] = fromaddr
+    if replytoaddr:
+        msg_root['Reply-To'] = replytoaddr
+    if usebcc:
+        msg_root['Bcc'] = toaddr
+        msg_root['To'] = 'Undisclosed.Recipients:'
+    else:
+        msg_root['To'] = toaddr
+    msg_root['Date'] = formatdate(localtime=True)
+    msg_root['Subject'] = subject
     msg_root['User-Agent'] = 'Invenio %s at %s' % (CFG_VERSION, CFG_SITE_URL)
     return msg_root.as_string()
 
