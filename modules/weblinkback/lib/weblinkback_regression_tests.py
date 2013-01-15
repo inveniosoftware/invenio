@@ -76,7 +76,7 @@ def remove_test_data():
 class WebLinkbackWebPagesAvailabilityTest(unittest.TestCase):
     """Test WebLinkback web pages whether they are up or not"""
 
-    def test_your_baskets_pages_availability(self):
+    def test_linkback_pages_availability(self):
         """weblinkback - availability of /linkbacks pages"""
 
         error_messages = []
