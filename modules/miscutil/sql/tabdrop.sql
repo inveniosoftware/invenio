@@ -1,7 +1,7 @@
 -- $Id$
 
 -- This file is part of Invenio.
--- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+-- Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -481,4 +481,5 @@ DROP TABLE IF EXISTS webapikey;
 DROP TABLE IF EXISTS wapCACHE;
 DROP TABLE IF EXISTS seqSTORE;
 DROP TABLE IF EXISTS upgrade;
+DROP TABLE IF EXISTS goto;
 -- end of file
