@@ -168,6 +168,10 @@ var gDisplayBibCircPanel = false;
 var gKBSubject = null;
 var gKBInstitution = null;
 
+// Does the record have a PDF attached?
+var gRecordHasPDF = false;
+
+
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -1221,6 +1225,7 @@ function onGetRecordSuccess(json){
   gPhysCopiesNum = json['numberOfCopies'];
   gBibCircUrl = json['bibCirculationUrl'];
   gDisplayBibCircPanel = json['canRecordHavePhysicalCopies'];
+  gRecordHasPDF = json['record_has_pdf']
 
   // Get KB information
   gKBSubject = json['KBSubject'];
@@ -1610,19 +1615,6 @@ function onOpenPDFClick() {
         preview_window.document.close(); // needed for chrome and safari
        });
 
-}
-
-
-function record_has_pdf() {
-  /*
-   * Request server if the record has a pdf attached
-   */
-   var record_has_pdf;
-   createReq({recID: gRecID, requestType: 'record_has_pdf'
-       }, function(json){
-            record_has_pdf = json['record_has_pdf'];
-       }, false);
-   return record_has_pdf;
 }
 
 

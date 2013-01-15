@@ -704,7 +704,7 @@ function updateToolbar(enable) {
         var sel = '#' + contents[0];
         var requires_pdf = contents[3];
         var fn = contents[4];
-        if (enable && requires_pdf && !record_has_pdf()) { /* Skip iteration */
+        if (enable && requires_pdf && !gRecordHasPDF) { /* Skip iteration */
             return true;
         }
         $(sel).removeClass(before).addClass(after);
