@@ -138,6 +138,13 @@ sudo -u www-data /opt/invenio/bin/bibtasklet \
      -T bst_weblinkback_updater \
      -a "mode=5" \
      -u admin -s7d -L 'Sunday 01:00-05:00'
+
+# Send notification email for all pending linkbacks
+sudo -u www-data /opt/invenio/bin/bibtasklet \
+     -N weblinkbacknotifications \
+     -T bst_weblinkback_updater \
+     -a "mode=6" \
+     -u admin -s1d
 </pre>
 </blockquote>
 </p>

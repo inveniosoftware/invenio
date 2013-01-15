@@ -18,8 +18,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.bibtask import write_message
+from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE
 from invenio.weblinkback import update_linkbacks, \
-                                delete_linkbacks_on_blacklist
+                                delete_linkbacks_on_blacklist, \
+                                send_pending_linkbacks_notification
 
 
 def bst_weblinkback_updater(mode):
@@ -30,6 +32,7 @@ def bst_weblinkback_updater(mode):
                  3 update page titles of old linkbacks
                  4 update manually set page titles
                  5 detect and disable broken linkbacks
+                 6 send notification email for all pending linkbacks
     @type mode: int
     """
     mode = int(mode)
@@ -53,3 +56,7 @@ def bst_weblinkback_updater(mode):
         write_message("Starting to detect and disable broken linkbacks")
         update_linkbacks(4)
         write_message("Completed to detect and disable broken linkbacks")
+    elif mode == 6:
+        write_message("Starting to send notification email")
+        send_pending_linkbacks_notification(CFG_WEBLINKBACK_TYPE['TRACKBACK'])
+        write_message("Completed to send notification email")

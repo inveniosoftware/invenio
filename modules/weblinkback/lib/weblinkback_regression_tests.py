@@ -583,6 +583,37 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         run_sql("INSERT INTO lnkENTRYURLTITLE ( url, title) VALUES ('URL2', %s)", (url,))
         self.assertEqual('This \xe2\x80\x9cis\xe2\x80\x9d \xc2\xa0\xe2\x80\x9c\xe2\x80\x9dtest\xe2\x80\x9d"', get_url_title(url))
 
+    def test_get_pending_trackbacks(self):
+        """weblinkback - get all pending trackbacks"""
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(9, len(pending_trackbacks))
+        for pending_trackback in pending_trackbacks:
+            approve_linkback(pending_trackback[0], self.user_info)
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(0, len(pending_trackbacks))
+
+        recid = 42
+        argd = {'url': 'URL',
+                'title': 'My title',
+                'excerpt': CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME,
+                'blog_name': 'Test Blog',
+                'id': CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME,
+                'source': CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME,
+                }
+        linkbackid1 = create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
+        create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
+
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(2, len(pending_trackbacks))
+        approve_linkback(linkbackid1, self.user_info)
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(1, len(pending_trackbacks))
+
+        create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
+        run_sql("INSERT INTO lnkENTRY (origin_url, id_bibrec, additional_properties, type, status, insert_time) VALUES ('URLN', 41, NULL, %s, %s, NOW())", (CFG_WEBLINKBACK_TYPE['PINGBACK'], CFG_WEBLINKBACK_STATUS['PENDING']))
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(2, len(pending_trackbacks))
+
 
 def get_title_of_page_mock1(url=""): # pylint: disable=W0613
     return "MOCK_TITLE1"

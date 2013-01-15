@@ -21,7 +21,8 @@
 
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_RECORD, \
-                           CFG_SITE_ADMIN_EMAIL
+                           CFG_SITE_ADMIN_EMAIL, \
+                           CFG_SITE_LANG
 from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, \
                                        CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME, \
                                        CFG_WEBLINKBACK_STATUS, \
@@ -47,7 +48,6 @@ from invenio.access_control_engine import acc_authorize_action, \
                                           acc_get_authorized_emails
 from invenio.webuser import collect_user_info
 from invenio.mailutils import send_email
-from invenio.bibformat import format_record
 from invenio.urlutils import get_title_of_page
 
 
@@ -66,7 +66,7 @@ def check_user_can_view_linkbacks(user_info, recid):
     return acc_authorize_action(user_info, 'viewlinkbacks', authorized_if_no_roles=True, collection=record_primary_collection)
 
 
-def generate_redirect_url(recid, ln, action = None):
+def generate_redirect_url(recid, ln=CFG_SITE_LANG, action = None):
     """
     Get redirect URL for an action
     @param action: the action, must be defined in weblinkback_webinterface.py
@@ -151,27 +151,26 @@ def create_trackback(recid, url, title, excerpt, blog_name, blog_id, source, use
     return create_linkback(url, recid, additional_properties, CFG_WEBLINKBACK_TYPE['TRACKBACK'], user_info)
 
 
-def send_request_notification_to_all_linkback_moderators(recid, origin_url, linkback_type, ln):
+def send_pending_linkbacks_notification(linkback_type):
     """
-    Send notification emails to all linkback moderators for linkback request
-    @param recid
-    @param origin_url: URL of the requestor
+    Send notification emails to all linkback moderators for all pending linkbacks
     @param linkback_type: of CFG_WEBLINKBACK_LIST_TYPE
     """
-    content = """There is a new %(linkback_type)s request for %(recordURL)s from %(origin_url)s which you should approve or reject.
-              """ % {'linkback_type': linkback_type,
-                     'recordURL': generate_redirect_url(recid, ln),
-                     'origin_url': origin_url}
+    pending_linkbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
 
-    html_content = """There is a new %(linkback_type)s request for %(record)s (<a href="%(recordURL)s">%(recordURL)s</a>) from <a href="%(origin_url)s">%(title)s</a> (<a href="%(origin_url)s">%(origin_url)s</a>) which you should approve or reject.
-                   """ % {'linkback_type': linkback_type,
-                          'record': format_record(recID=recid, of='hs', ln=ln),
-                          'recordURL': generate_redirect_url(recid, ln),
-                          'origin_url': origin_url,
-                          'title': origin_url}
+    if pending_linkbacks:
+        content = """There are %(count)s new %(linkback_type)s requests which you should approve or reject:
+                  """ % {'count': len(pending_linkbacks),
+                         'linkback_type': linkback_type}
 
-    for email in acc_get_authorized_emails('moderatelinkbacks', collection = guess_primary_collection_of_a_record(recid)):
-        send_email(CFG_SITE_ADMIN_EMAIL, email, 'New ' + linkback_type + ' request', content, html_content)
+        for pending_linkback in pending_linkbacks:
+            content += """
+                       For %(recordURL)s from %(origin_url)s.
+                       """ % {'recordURL': generate_redirect_url(pending_linkback[2]),
+                              'origin_url': pending_linkback[1]}
+
+        for email in acc_get_authorized_emails('moderatelinkbacks'):
+            send_email(CFG_SITE_ADMIN_EMAIL, email, 'Pending ' + linkback_type + ' requests', content)
 
 
 def infix_exists_for_url_in_list(url, list_type):
@@ -267,9 +266,6 @@ def perform_sendtrackback(req, recid, url, title, excerpt, blog_name, blog_id, s
         # approve request automatically from url in whitelist
         if  whitelist_match:
             approve_linkback(linkback_id, collect_user_info(req))
-        # send request notification email to moderators
-        else:
-            send_request_notification_to_all_linkback_moderators(recid, url, CFG_WEBLINKBACK_TYPE['TRACKBACK'], ln)
 
     xml_response += '</response>'
 

@@ -27,12 +27,13 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
 from invenio.textutils import xml_entities_to_utf8
 
 
-def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME["ASC"]):
+def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME["ASC"], linkback_type=None):
     """
     Get all linkbacks
     @param recid: of one record, of all if None
     @param status: with a certain status, of all if None
     @param order: order by insertion time either "ASC" or "DESC"
+    @param linkback_type: of a certain type, of all if None
     @return [(linkback_id,
               origin_url,
               recid,
@@ -51,22 +52,24 @@ def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_IN
                             status,
                             insert_time
                      FROM lnkENTRY"""
-    middle_sql = ""
+    conditions = []
     order_sql = "ORDER by id %s" % order
 
-    params = ()
+    params = []
 
-    if not recid:
-        middle_sql = " WHERE status=%s "
-        params = (status, )
-    if not status:
-        middle_sql = " WHERE id_bibrec=%s "
-        params = (recid, )
-    if recid and status:
-        middle_sql = " WHERE id_bibrec=%s AND status=%s "
-        params = (recid, status, )
+    def add_condition(column, value):
+        if value:
+            if not conditions:
+                conditions.append('WHERE %s=%%s' % column)
+            else:
+                conditions.append('AND %s=%%s' % column)
+            params.append(value)
 
-    return run_sql(header_sql + middle_sql + order_sql, params)
+    add_condition('id_bibrec', recid)
+    add_condition('status', status)
+    add_condition('type', linkback_type)
+
+    return run_sql(header_sql + ' ' + ' '.join(conditions) + ' ' + order_sql, tuple(params))
 
 
 def approve_linkback(linkbackid, user_info):
