@@ -101,33 +101,38 @@ $ batchuploader --metadata -s20m
 </blockquote>
 </p>
 
-<p>If you are using the WebLinkback module, you should run the following tasklets:
+<p>If you are using the WebLinkback module, you may want to run some of the following tasklets:
 <blockquote>
 <pre>
+# Delete rejected, broken and pending linkbacks whose URLs is on blacklist
 sudo -u www-data /opt/invenio/bin/bibtasklet \
      -N weblinkbackupdaterdeleteurlsonblacklist \
      -T bst_weblinkback_updater \
      -a "mode=1" \
      -u admin -s1d -L '22:00-05:00'
 
+# Update page titles of new linkbacks
 sudo -u www-data /opt/invenio/bin/bibtasklet \
      -N weblinkbackupdaternewpages \
      -T bst_weblinkback_updater \
      -a "mode=2" \
      -u admin -s1d -L '22:00-05:00'
 
+# Update page titles of old linkbacks
 sudo -u www-data /opt/invenio/bin/bibtasklet \
      -N weblinkbackupdateroldpages \
      -T bst_weblinkback_updater \
      -a "mode=3" \
      -u admin -s7d -L '22:00-05:00'
 
+# Update manually set page titles
 sudo -u www-data /opt/invenio/bin/bibtasklet \
      -N weblinkbackupdatermanuallysettitles \
      -T bst_weblinkback_updater \
      -a "mode=4" \
      -u admin -s7d -L '22:00-05:00'
 
+# Detect and disable broken linkbacks
 sudo -u www-data /opt/invenio/bin/bibtasklet \
      -N weblinkbackupdaterdetectbrokenlinkbacks \
      -T bst_weblinkback_updater \
