@@ -26,5 +26,5 @@ __revision__ = "$Id$"
 CFG_BIBUPLOAD_CONTROLFIELD_TAGS = ['001', '002', '003', '004',
                                    '005', '006', '007', '008']
 
-CFG_BIBUPLOAD_SPECIAL_TAGS = ['FMT', 'FFT']
+CFG_BIBUPLOAD_SPECIAL_TAGS = ['FMT', 'FFT', 'BDR', 'BDM']
 

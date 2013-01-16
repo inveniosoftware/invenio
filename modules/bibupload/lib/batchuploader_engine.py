@@ -297,7 +297,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                         if attached_file.checksum == file_md5:
                             errors.append((docfile, err_desc[3]))
                             break
-                        elif attached_file.fullname == docfile:
+                        elif attached_file.get_full_name() == docfile:
                             errors.append((docfile, err_desc[4]))
                             break
                 if len(errors) > num_errors:

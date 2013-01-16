@@ -39,7 +39,7 @@ def Move_Files_Archive(parameters, curdir, form, user_info=None):
             bibarchive = BibRecDocs(sysno)
             existingBibdocs = bibarchive.list_bibdocs(type)
             for existingBibdoc in existingBibdocs:
-                if not formats.has_key(existingBibdoc.get_docname()):
+                if not formats.has_key(bibarchive.get_docname(existingBibdoc.id)):
                     existingBibdoc.delete()
             # then create/update the new ones
             for key in formats.keys():

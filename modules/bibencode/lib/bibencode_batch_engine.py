@@ -501,7 +501,7 @@ def process_batch_job(batch_job_file):
                     version=1,
                     description=getval(batch_job, 'bibdoc_master_description'),
                     comment=getval(batch_job, 'bibdoc_master_comment'),
-                    format=master_format
+                    docformat=master_format
                     )
 
     #-----------#
@@ -663,7 +663,7 @@ def process_batch_job(batch_job_file):
                                     version=1,
                                     description=getval(job, 'bibdoc_description'),
                                     comment=getval(job, 'bibdoc_comment'),
-                                    format=bibdoc_frame_format)
+                                    docformat=bibdoc_frame_format)
             ## Remove the temporary folders
             _task_write_message("Removing temporary directory")
             shutil.rmtree(tmpdir)

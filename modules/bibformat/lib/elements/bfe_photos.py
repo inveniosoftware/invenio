@@ -23,8 +23,9 @@ import cgi
 from invenio.bibdocfile import BibRecDocs
 from invenio.urlutils import create_html_link
 
-def format_element(bfo, separator=" ", style='', img_style='', text_style='font-size:small', print_links='yes', max_photos='',
-           show_comment='yes', img_max_width='250px', display_all_version_links='yes'):
+def format_element(bfo, separator=" ", style='', img_style='', text_style='font-size:small',
+                   print_links='yes', max_photos='', show_comment='yes',
+                   img_max_width='250px', display_all_version_links='yes'):
     """
     Lists the photos of a record. Display the icon version, linked to
     its original version.
@@ -63,7 +64,7 @@ def format_element(bfo, separator=" ", style='', img_style='', text_style='font-
 
         if found_icons:
             additional_links = ''
-            name = doc.get_docname()
+            name = bibarchive.get_docname(doc.id)
             comment = doc.list_latest_files()[0].get_comment()
 
             preview_url = None

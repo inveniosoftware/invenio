@@ -23,6 +23,30 @@ from invenio.config import CFG_SITE_URL, \
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datestruct_to_dategui
 from invenio.urlutils import create_html_link
+from invenio.textutils import nice_size
+
+def list_types_from_array(bibdocs):
+    """Retrieves the list of types from the given bibdoc list."""
+    types = []
+    for bibdoc in bibdocs:
+        if not bibdoc.get_type() in types:
+            types.append(bibdoc.get_type())
+    types.sort()
+    if 'Main' in types:
+        ## Move 'Main' at the beginning
+        types.remove('Main')
+        types.insert(0, 'Main')
+    return types
+
+def list_versions_from_array(docfiles):
+    """Retrieve the list of existing versions from the given docfiles list."""
+    versions = []
+    for docfile in docfiles:
+        if not docfile.get_version() in versions:
+            versions.append(docfile.get_version())
+    versions.sort()
+    versions.reverse()
+    return versions
 
 class Template:
 
@@ -35,8 +59,68 @@ class Template:
         'subformat': (str, ""), # the subformat
         'download': (int, 0), # download as attachment
         }
+    def tmpl_display_bibrecdocs(self, bibrecdocs, docname="", version="", doctype="", ln=CFG_SITE_LANG, verbose=0, display_hidden=True):
+        """
+        Returns an HTML representation of the the attached documents.
 
-    def tmpl_filelist(self, ln, filelist='', recid='', docname='', version=''):
+        @param docname: if set, include only the requested document.
+        @type docname: string
+        @param version: if not set, only the last version will be displayed. If
+            'all', all versions will be displayed.
+        @type version: string (integer or 'all')
+        @param doctype: is set, include only documents of the requested type.
+        @type doctype: string
+        @param ln: the language code.
+        @type ln: string
+        @param verbose: if greater than 0, includes debug information.
+        @type verbose: integer
+        @param display_hidden: whether to include hidden files as well.
+        @type display_hidden: bool
+        @return: the formatted representation.
+        @rtype: HTML string
+        """
+        t = ""
+        if docname:
+            try:
+                bibdocs = [bibrecdocs.get_bibdoc(docname)]
+            except Exception, dummy:
+                bibdocs = bibrecdocs.list_bibdocs(doctype)
+        else:
+            bibdocs = bibrecdocs.list_bibdocs(doctype)
+        if bibdocs:
+            types = list_types_from_array(bibdocs)
+            fulltypes = []
+            for mytype in types:
+                if mytype in ('Plot', 'PlotMisc'):
+                    # FIXME: quick hack to ignore plot-like doctypes
+                    # on Files tab
+                    continue
+                fulltype = {
+                            'name' : mytype,
+                            'content' : [],
+                           }
+                for bibdoc in bibdocs:
+                    if mytype == bibdoc.get_type():
+                        fulltype['content'].append(
+                            self.tmpl_display_bibdoc(bibdoc, version,
+                                                     ln=ln, display_hidden=display_hidden,
+                                                     recid=bibrecdocs.id, docname=bibrecdocs.get_docname(bibdoc.id),
+                                                     status=bibdoc.status))
+                fulltypes.append(fulltype)
+
+            if verbose >= 9:
+                verbose_files = str(bibrecdocs)
+            else:
+                verbose_files = ''
+
+            t = self.tmpl_bibrecdoc_filelist(
+                  ln=ln,
+                  types = fulltypes,
+                  verbose_files=verbose_files
+                )
+        return t
+
+    def tmpl_filelist(self, ln, filelist=''):
         """
         Displays the file list for a record.
 
@@ -56,11 +140,11 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = _("record") + ' #' + '<a href="%s/%s/%s">%s</a>' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, recid)
-        if docname != "":
-            title += ' ' + _("document") + ' #' + str(docname)
-        if version != "":
-            title += ' ' + _("version") + ' #' + str(version)
+        #title = _("record") + ' #' + '<a href="%s/%s/%s">%s</a>' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, recid)
+        #if docname != "":
+        #    title += ' ' + _("document") + ' #' + str(docname)
+        #if version != "":
+        #    title += ' ' + _("version") + ' #' + str(version)
 
         out = """<div style="width:90%%;margin:auto;min-height:100px;margin-top:10px">
                 <!--start file list-->
@@ -103,6 +187,76 @@ class Template:
             if verbose_files:
                 out += "<pre>%s</pre>" % verbose_files
         return out
+
+    def tmpl_display_bibdocfile(self, bibdocfile, ln = CFG_SITE_LANG):
+        """Returns a formatted representation of this docfile."""
+        return self.tmpl_bibdocfile_filelist(
+                 ln = ln,
+                 recid = bibdocfile.get_recid(),
+                 version = bibdocfile.version,
+                 md = bibdocfile.md,
+                 name = bibdocfile.name,
+                 superformat = bibdocfile.get_superformat(),
+                 subformat = bibdocfile.subformat,
+                 nice_size_f = nice_size(bibdocfile.get_size()),
+                 description = bibdocfile.description or ''
+               )
+
+    def tmpl_display_bibdoc(self, bibdoc, version="", ln=CFG_SITE_LANG,
+                            display_hidden=True, recid=0, docname="", status=""):
+        """
+        Returns an HTML representation of the this document.
+
+        @param version: if not set, only the last version will be displayed. If
+            'all', all versions will be displayed.
+        @type version: string (integer or 'all')
+        @param ln: the language code.
+        @type ln: string
+        @param display_hidden: whether to include hidden files as well.
+        @type display_hidden: bool
+        @return: the formatted representation.
+        @rtype: HTML string
+        """
+        if version == "all":
+            docfiles = bibdoc.list_all_files(list_hidden=display_hidden)
+        elif version != "":
+            version = int(version)
+            docfiles = bibdoc.list_version_files(version, list_hidden=display_hidden)
+        else:
+            docfiles = bibdoc.list_latest_files(list_hidden=display_hidden)
+        icon = bibdoc.get_icon(display_hidden=display_hidden)
+        if icon:
+            imageurl = icon.get_url()
+        else:
+            imageurl = "%s/img/smallfiles.gif" % CFG_SITE_URL
+
+        versions = []
+        for version in list_versions_from_array(docfiles):
+            currversion = {
+                            'version' : version,
+                            'previous' : 0,
+                            'content' : []
+                          }
+            if version == bibdoc.get_latest_version() and version != 1:
+                currversion['previous'] = 1
+            for docfile in docfiles:
+                if docfile.get_version() == version:
+                    currversion['content'].append(self.tmpl_display_bibdocfile(docfile, ln = ln))
+            versions.append(currversion)
+
+        if versions:
+            return self.tmpl_bibdoc_filelist(
+                ln = ln,
+                versions = versions,
+                imageurl = imageurl,
+                docname = docname,
+                recid = recid,
+                status = status
+                )
+        else:
+            return ""
+
+
 
     def tmpl_bibdoc_filelist(self, ln, versions=None, imageurl='', recid='', docname='', status=''):
         """
@@ -175,7 +329,7 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, md, superformat, subformat, nice_size, description):
+    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, md, superformat, subformat, nice_size_f, description):
         """
         Displays a file in the file list.
 
@@ -195,7 +349,7 @@ class Template:
 
           - 'subformat' *string* - The display subformat
 
-          - 'nice_size' *string* - The nice_size of the file
+          - 'nice_size_f' *string* - The nice_size of the file
 
           - 'description' *string* - The description that might have been associated
           to the particular file
@@ -231,8 +385,7 @@ class Template:
                     <td valign="top"><em>%(description)s</em></td>
                     </tr>""" % {
                       'link' : link,
-                      'nice_size' : nice_size,
+                      'nice_size' : nice_size_f,
                       'md' : convert_datestruct_to_dategui(md.timetuple(), ln),
                       'description' : cgi.escape(description),
                     }
-

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -65,6 +65,8 @@ from invenio.bibdocfile_managedocfiles import \
      get_upload_file_interface_javascript, \
      get_upload_file_interface_css, \
      move_uploaded_files_to_storage
+
+bibdocfile_templates = invenio.template.load('bibdocfile')
 
 
 class WebInterfaceFilesPages(WebInterfaceDirectory):
@@ -143,7 +145,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 return warning_page(_("Requested record does not seem to exist."), req, ln)
 
             docname = ''
-            format = ''
+            docformat = ''
             version = ''
             warn = ''
 
@@ -153,18 +155,18 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 ## TODO: Change the extension system according to ext.py from setlink
                 ##       and have a uniform extension mechanism...
                 docname = file_strip_ext(filename)
-                format = filename[len(docname):]
-                if format and format[0] != '.':
-                    format = '.' + format
+                docformat = filename[len(docname):]
+                if docformat and docformat[0] != '.':
+                    docformat = '.' + docformat
                 if args['subformat']:
-                    format += ';%s' % args['subformat']
+                    docformat += ';%s' % args['subformat']
             else:
                 docname = args['docname']
 
-            if not format:
-                format = args['format']
+            if not docformat:
+                docformat = args['format']
                 if args['subformat']:
-                    format += ';%s' % args['subformat']
+                    docformat += ';%s' % args['subformat']
 
             if not version:
                 version = args['version']
@@ -186,21 +188,21 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             if version != 'all':
                 # search this filename in the complete list of files
                 for doc in bibarchive.list_bibdocs():
-                    if docname == doc.get_docname():
+                    if docname == bibarchive.get_docname(doc.id):
                         try:
                             try:
-                                docfile = doc.get_file(format, version)
+                                docfile = doc.get_file(docformat, version)
                             except InvenioBibDocFileError, msg:
                                 req.status = apache.HTTP_NOT_FOUND
                                 if req.headers_in.get('referer'):
                                     ## There must be a broken link somewhere.
                                     ## Maybe it's good to alert the admin
                                     register_exception(req=req, alert_admin=True)
-                                warn += write_warning(_("The format %s does not exist for the given version: %s") % (cgi.escape(format), cgi.escape(str(msg))))
+                                warn += write_warning(_("The format %s does not exist for the given version: %s") % (cgi.escape(docformat), cgi.escape(str(msg))))
                                 break
                             (auth_code, auth_message) = docfile.is_restricted(user_info)
                             if auth_code != 0 and not is_user_owner_of_record(user_info, self.recid):
-                                if CFG_BIBDOCFILE_ICON_SUBFORMAT_RE.match(get_subformat_from_format(format)):
+                                if CFG_BIBDOCFILE_ICON_SUBFORMAT_RE.match(get_subformat_from_format(docformat)):
                                     return stream_restricted_icon(req)
                                 if user_info['email'] == 'guest':
                                     cookie = mail_cookie_create_authorize_action('viewrestrdoc', {'status' : docfile.get_status()})
@@ -216,7 +218,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             if not docfile.hidden_p():
                                 if not readonly:
                                     ip = str(req.remote_ip)
-                                    doc.register_download(ip, version, format, uid)
+                                    doc.register_download(ip, version, docformat, uid)
                                 try:
                                     return docfile.stream(req, download=is_download)
                                 except InvenioBibDocFileError, msg:
@@ -230,16 +232,14 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         except InvenioBibDocFileError, msg:
                             register_exception(req=req, alert_admin=True)
 
-            if docname and format and not warn:
+            if docname and docformat and not warn:
                 req.status = apache.HTTP_NOT_FOUND
                 warn += write_warning(_("Requested file does not seem to exist."))
-            filelist = bibarchive.display("", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
+#            filelist = bibarchive.display("", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
+            filelist = bibdocfile_templates.tmpl_display_bibrecdocs(bibarchive, "", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
 
             t = warn + bibdocfile_templates.tmpl_filelist(
                 ln=ln,
-                recid=self.recid,
-                docname=args['docname'],
-                version=version,
                 filelist=filelist)
 
             cc = guess_primary_collection_of_a_record(self.recid)
@@ -307,29 +307,29 @@ def bibdocfile_legacy_getfile(req, form):
 
     _ = gettext_set_language(args['ln'])
 
-    def _getfile_py(req, recid=0, docid=0, version="", name="", format="", ln=CFG_SITE_LANG):
+    def _getfile_py(req, recid=0, docid=0, version="", name="", docformat="", ln=CFG_SITE_LANG):
         if not recid:
             ## Let's obtain the recid from the docid
             if docid:
                 try:
                     bibdoc = BibDoc(docid=docid)
-                    recid = bibdoc.get_recid()
+                    recid = bibdoc.bibrec_links[0]["recid"]
                 except InvenioBibDocFileError:
                     return warning_page(_("An error has happened in trying to retrieve the requested file."), req, ln)
             else:
                 return warning_page(_('Not enough information to retrieve the document'), req, ln)
         else:
+            brd = BibRecDocs(recid)
             if not name and docid:
                 ## Let's obtain the name from the docid
                 try:
-                    bibdoc = BibDoc(docid)
-                    name = bibdoc.get_docname()
+                    name = brd.get_docname(docid)
                 except InvenioBibDocFileError:
                     return warning_page(_("An error has happened in trying to retrieving the requested file."), req, ln)
 
-        format = normalize_format(format)
+        docformat = normalize_format(docformat)
 
-        redirect_to_url(req, '%s/%s/%s/files/%s%s?ln=%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, name, format, ln, version and 'version=%s' % version or ''), apache.HTTP_MOVED_PERMANENTLY)
+        redirect_to_url(req, '%s/%s/%s/files/%s%s?ln=%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, name, docformat, ln, version and 'version=%s' % version or ''), apache.HTTP_MOVED_PERMANENTLY)
 
     return _getfile_py(req, **args)
 

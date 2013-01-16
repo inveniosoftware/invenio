@@ -283,7 +283,7 @@ def clean_documents():
     write_message("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')" % CFG_DELETED_BIBDOC_MAXLIFE, verbose=9)
     records = run_sql("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')", (CFG_DELETED_BIBDOC_MAXLIFE,))
     for record in records:
-        bibdoc = BibDoc(record[0])
+        bibdoc = BibDoc.create_instance(record[0])
         bibdoc.expunge()
         write_message("DELETE FROM bibdoc WHERE id=%i" % int(record[0]), verbose=9)
         run_sql("DELETE FROM bibdoc WHERE id=%s", (record[0],))

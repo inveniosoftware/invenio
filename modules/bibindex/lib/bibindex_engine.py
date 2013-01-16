@@ -49,8 +49,9 @@ from invenio.bibindex_engine_tokenizer import \
      BibIndexPhraseTokenizer
 from invenio.bibindexadminlib import get_idx_indexer
 from invenio.bibdocfile import bibdocfile_url_p, \
-     bibdocfile_url_to_bibdoc, \
-     download_url, BibRecDocs
+     bibdocfile_url_to_bibdoc, normalize_format, \
+     download_url, guess_format_from_url, BibRecDocs, \
+     decompose_bibdocfile_url
 from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
 from invenio.search_engine import perform_request_search, \
      get_index_stemming_language, \
@@ -287,7 +288,6 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
         if bibdocfile_url_p(url_direct_or_indirect):
             write_message("... %s is an internal document" % url_direct_or_indirect, verbose=2)
             bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
-
             indexer = get_idx_indexer('fulltext')
             if indexer != 'native':
                 recid = bibdoc.recid
@@ -306,7 +306,10 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 # return nothing here:
                 return []
             else:
-                return get_words_from_phrase(bibdoc.get_text(), stemming_language)
+                text = ""
+                if hasattr(bibdoc, "get_text"):
+                    text = bibdoc.get_text()
+                return get_words_from_phrase(text, stemming_language)
         else:
             if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY:
                 write_message("... %s is external URL but indexing only local files" % url_direct_or_indirect, verbose=2)

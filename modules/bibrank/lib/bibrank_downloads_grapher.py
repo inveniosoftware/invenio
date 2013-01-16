@@ -161,7 +161,7 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
         for i in range(len(id_bibdoc_list)):
             datas = create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition="and id_bibdoc=%s" % id_bibdoc_list[i])
             coordinates_list.append(datas)
-            docname = run_sql("select docname from bibdoc where id=%s;" % id_bibdoc_list[i])
+            docname = run_sql("select docname from bibrec_bibdoc where id_bibdoc=%s and id_bibrec=%s;" % (id_bibdoc_list[i], id_bibrec))
             docfile_name_list.append(docname[0][0])
         #In case of multiple id_bibdocs datas_max will be used to draw a line which is the total of the others lines
         if not (len(intervals)==1 or len(id_bibdoc_list)==1):

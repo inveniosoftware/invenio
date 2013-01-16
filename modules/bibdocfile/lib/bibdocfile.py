@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -58,26 +58,20 @@ import base64
 import binascii
 import cgi
 import sys
-from warnings import warn
 
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:
-    from hashlib import md5
+    from hashlib import md5 # pylint: disable=E0611
 
 try:
     import magic
-    if not hasattr(magic, "open"):
-        raise ImportError
-    CFG_HAS_MAGIC = True
+    if hasattr(magic, "open"):
+        CFG_HAS_MAGIC = 1
+    elif hasattr(magic, "Magic"):
+        CFG_HAS_MAGIC = 2
 except ImportError:
-    CFG_HAS_MAGIC = False
-
-## The above flag controls whether HTTP range requests are supported or not
-## when serving static files via Python. This is disabled by default as
-## it currently breaks support for opening PDF files on Windows platforms
-## using Acrobat reader brower plugin.
-CFG_ENABLE_HTTP_RANGE_REQUESTS = False
+    CFG_HAS_MAGIC = 0
 
 from datetime import datetime
 from mimetypes import MimeTypes
@@ -94,7 +88,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.shellutils import escape_shell_arg
-from invenio.dbquery import run_sql, DatabaseError, blob_to_string
+from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
@@ -102,11 +96,10 @@ from invenio.bibrecord import record_get_field_instances, \
 from invenio.urlutils import create_url, make_user_agent_string
 from invenio.textutils import nice_size
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webuser import collect_user_info
 from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
 from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
+from invenio.config import CFG_SITE_URL, \
     CFG_WEBDIR, CFG_BIBDOCFILE_FILEDIR,\
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
     CFG_BIBDOCFILE_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
@@ -115,16 +108,24 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBSUBMIT_STORAGEDIR, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
     CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY, \
-    CFG_SITE_RECORD, \
+    CFG_SITE_RECORD, CFG_PYLIBDIR, \
     CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
     CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES
-from invenio.bibtask import write_message
 
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
+from invenio.pluginutils import PluginContainer
+
 import invenio.template
+
 bibdocfile_templates = invenio.template.load('bibdocfile')
+## The above flag controls whether HTTP range requests are supported or not
+## when serving static files via Python. This is disabled by default as
+## it currently breaks support for opening PDF files on Windows platforms
+## using Acrobat reader brower plugin.
+
+CFG_ENABLE_HTTP_RANGE_REQUESTS = False
 
 #: block size when performing I/O.
 CFG_BIBDOCFILE_BLOCK_SIZE = 1024 * 8
@@ -149,6 +150,8 @@ CFG_BIBDOCFILE_AVAILABLE_FLAGS = (
     'OCRED'
 )
 
+DBG_LOG_QUERIES = False
+
 #: constant used if FFT correct with the obvious meaning.
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
 
@@ -160,24 +163,34 @@ _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
 _mimes.encodings_map.update({'.bz2' : 'bzip2'})
 
 _magic_cookies = {}
-def _get_magic_cookies():
-    """
-    @return: a tuple of magic object.
-    @rtype: (MAGIC_NONE, MAGIC_COMPRESS, MAGIC_MIME, MAGIC_COMPRESS + MAGIC_MIME)
-    @note: ... not real magic. Just see: man file(1)
-    """
-    thread_id = get_ident()
-    if thread_id not in _magic_cookies:
-        _magic_cookies[thread_id] = {
-            magic.MAGIC_NONE: magic.open(magic.MAGIC_NONE),
-            magic.MAGIC_COMPRESS: magic.open(magic.MAGIC_COMPRESS),
-            magic.MAGIC_MIME: magic.open(magic.MAGIC_MIME),
-            magic.MAGIC_COMPRESS + magic.MAGIC_MIME: magic.open(magic.MAGIC_COMPRESS + magic.MAGIC_MIME),
-            magic.MAGIC_MIME_TYPE: magic.open(magic.MAGIC_MIME_TYPE),
-        }
-        for key in _magic_cookies[thread_id].keys():
-            _magic_cookies[thread_id][key].load()
-    return _magic_cookies[thread_id]
+
+if CFG_HAS_MAGIC == 1:
+    def _get_magic_cookies():
+        """
+        @return: a tuple of magic object.
+        @rtype: (MAGIC_NONE, MAGIC_COMPRESS, MAGIC_MIME, MAGIC_COMPRESS + MAGIC_MIME)
+        @note: ... not real magic. Just see: man file(1)
+        """
+        thread_id = get_ident()
+        if thread_id not in _magic_cookies:
+            _magic_cookies[thread_id] = {
+                magic.MAGIC_NONE: magic.open(magic.MAGIC_NONE),
+                magic.MAGIC_COMPRESS: magic.open(magic.MAGIC_COMPRESS),
+                magic.MAGIC_MIME: magic.open(magic.MAGIC_MIME),
+                magic.MAGIC_COMPRESS + magic.MAGIC_MIME: magic.open(magic.MAGIC_COMPRESS + magic.MAGIC_MIME),
+                magic.MAGIC_MIME_TYPE: magic.open(magic.MAGIC_MIME_TYPE),
+            }
+            for key in _magic_cookies[thread_id].keys():
+                _magic_cookies[thread_id][key].load()
+        return _magic_cookies[thread_id]
+elif CFG_HAS_MAGIC == 2:
+    def _magic_wrapper(local_path, mime=True, mime_encoding=False):
+        thread_id = get_ident()
+        if (thread_id, mime, mime_encoding) not in _magic_cookies:
+            magic_object = _magic_cookies[thread_id, mime, mime_encoding] = magic.Magic(mime=mime, mime_encoding=mime_encoding)
+        else:
+            magic_object = _magic_cookies[thread_id, mime, mime_encoding]
+        return magic_object.from_file(local_path) # pylint: disable=E1103
 
 def _generate_extensions():
     """
@@ -212,18 +225,78 @@ class InvenioBibDocFileError(Exception):
     """
     pass
 
-class InvenioWebSubmitFileError(InvenioBibDocFileError):
+class InvenioBibdocfileUnauthorizedURL(InvenioBibDocFileError):
     """
     Exception raised in case of errors related to fulltext files.
     """
     ## NOTE: this is a legacy Exception
     pass
 
-class InvenioBibdocfileUnauthorizedURL(Exception):
+def _val_or_null(val, eq_name = None, q_str = None, q_args = None):
     """
-    Exception raised in case it is not possible to access a certain URL
+    Auxiliary function helpful while building WHERE clauses of SQL queries
+    that should contain field=val or field is val
+
+    If optional parameters q_str and q_args are provided, lists are updated
+    if val == None, a statement of the form "eq_name is Null" is returned
+    otherwise, otherwise the function returns a parametrised comparison
+    "eq_name=%s" with val as an argument added to the query args list.
+
+    Using parametrised queries diminishes the likelihood of having
+    SQL injection.
+
+    @param val Value to compare with
+    @type val
+    @param eq_name The name of the database column
+    @type eq_name string
+    @param q_str Query string builder - list of clauses
+                 that should be connected by AND operator
+    @type q_str list
+
+    @param q_args Query arguments list. This list will be applied as
+                  a second argument of run_sql command
+    @type q_args list
+
+    @result string of a single part of WHERE clause
+    @rtype string
+
     """
-    pass
+    res = ""
+    if eq_name != None:
+        res += eq_name
+    if val == None:
+        if eq_name != None:
+            res += " is "
+        res += "NULL"
+        if q_str != None:
+            q_str.append(res)
+        return res
+    else:
+        if eq_name != None:
+            res += "="
+        res += "%s"
+        if q_str != None:
+            q_str.append(res)
+        if q_args != None:
+            q_args.append(str(val))
+        return res
+
+def _sql_generate_conjunctive_where(to_process):
+    """Generating WHERE clause of a SQL statement, consisting of conjunction
+       of declared terms. Terms are defined by the to_process argument.
+       the method creates appropriate entries different in the case, value
+       should be NULL (None in the list) and in the case of not-none arguments.
+       In the second case, parametrised query is generated decreasing the
+       chance of an SQL-injection.
+
+       @param to_process List of tuples (value, database_column)
+       @type to_process list"""
+    q_str = []
+    q_args = []
+    for entry in to_process:
+        q_str.append(_val_or_null(entry[0], eq_name = entry[1], q_args = q_args))
+    return (" AND ".join(q_str), q_args)
+
 def file_strip_ext(afile, skip_version=False, only_known_extensions=False, allow_subformat=True):
     """
     Strip in the best way the extension from a filename.
@@ -267,7 +340,7 @@ def file_strip_ext(afile, skip_version=False, only_known_extensions=False, allow
         nextfile = _extensions.sub('', afile)
     return nextfile
 
-def normalize_format(format, allow_subformat=True):
+def normalize_format(docformat, allow_subformat=True):
     """
     Normalize the format, e.g. by adding a dot in front.
 
@@ -280,21 +353,21 @@ def normalize_format(format, allow_subformat=True):
     @rtype; string
     """
     if allow_subformat:
-        subformat = format[format.rfind(';'):]
-        format = format[:format.rfind(';')]
+        subformat = docformat[docformat.rfind(';'):]
+        docformat = docformat[:docformat.rfind(';')]
     else:
         subformat = ''
-    if format and format[0] != '.':
-        format = '.' + format
+    if docformat and docformat[0] != '.':
+        docformat = '.' + docformat
     if CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION:
-        if format not in ('.Z', '.H', '.C', '.CC'):
-            format = format.lower()
-        format = {
+        if docformat not in ('.Z', '.H', '.C', '.CC'):
+            docformat = docformat.lower()
+        docformat = {
             '.jpg' : '.jpeg',
             '.htm' : '.html',
             '.tif' : '.tiff'
-        }.get(format, format)
-    return format + subformat
+        }.get(docformat, docformat)
+    return docformat + subformat
 
 def guess_format_from_url(url):
     """
@@ -310,17 +383,20 @@ def guess_format_from_url(url):
     @rtype: string
     """
     def guess_via_magic(local_path):
-        if CFG_HAS_MAGIC:
-            try:
+        try:
+            if CFG_HAS_MAGIC == 1:
                 magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME_TYPE]
                 mimetype = magic_cookie.file(local_path)
+            elif CFG_HAS_MAGIC == 2:
+                mimetype = _magic_wrapper(local_path, mime=True, mime_encoding=False)
+            if CFG_HAS_MAGIC:
                 ext = _mimes.guess_extension(mimetype)
                 if ext:
                     ## Normalize some common magic mis-interpreation
                     ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
                     return normalize_format(ext)
-            except Exception:
-                pass
+        except Exception:
+            pass
 
     ## Let's try to guess the extension by considering the URL as a filename
     ext = decompose_file(url, skip_version=True, only_known_extensions=True)[2]
@@ -354,7 +430,7 @@ def guess_format_from_url(url):
             filename = ""
             try:
                 try:
-                    filename = download_url(url, format='')
+                    filename = download_url(url, docformat='')
                     ext = guess_via_magic(filename)
                     if ext:
                         return ext
@@ -402,9 +478,16 @@ def normalize_version(version):
             return ''
     return str(version)
 
-def compose_file(dirname, docname, extension, subformat=None, version=None):
+def compose_file(dirname, extension, subformat=None, version=None, storagename=None):
     """
     Construct back a fullpath given the separate components.
+
+    @param
+    @param storagename Name under which the file should be stored in the filesystem
+    @type storagename string
+
+    @return a fullpath to the file
+    @rtype string
     """
     if version:
         version = ";%i" % int(version)
@@ -417,7 +500,10 @@ def compose_file(dirname, docname, extension, subformat=None, version=None):
         subformat = ""
     if extension and not extension.startswith("."):
         extension = ".%s" % extension
-    return os.path.join(dirname, docname + extension + subformat + version)
+
+    if not storagename:
+        storagename = "content"
+    return os.path.join(dirname, storagename + extension + subformat + version)
 
 def compose_format(extension, subformat=None):
     """
@@ -454,8 +540,8 @@ def decompose_file(afile, skip_version=False, only_known_extensions=False,
     @param allow_subformat: whether to consider also subformats as part of
         the extension.
     @type allow_subformat: bool
-    @return: a tuple with the directory name, the docname and extension.
-    @rtype: (dirname, docname, extension)
+    @return: a tuple with the directory name, the basename and extension.
+    @rtype: (dirname, basename, extension)
 
     @note: if a URL is provided, the scheme will be part of the dirname.
     @see: L{file_strip_ext} for the algorithm used to retrieve the extension.
@@ -487,9 +573,9 @@ def decompose_file_with_version(afile):
 
     @param afile: the path/name of a file.
     @type afile: string
-    @return: a tuple with the directory name, the docname, extension and
+    @return: a tuple with the directory name, the basename, extension and
         version.
-    @rtype: (dirname, docname, extension, version)
+    @rtype: (dirname, basename, extension, version)
 
     @raise ValueError: in case version does not exist it will.
     @note: if a URL is provided, the scheme will be part of the dirname.
@@ -505,21 +591,21 @@ def decompose_file_with_version(afile):
         extension = '.' + extension
     return (dirname, base, extension, version)
 
-def get_subformat_from_format(format):
+def get_subformat_from_format(docformat):
     """
     @return the subformat if any.
     @rtype: string
-    >>> get_superformat_from_format('foo;bar')
+    >>> get_subformat_from_format('foo;bar')
     'bar'
-    >>> get_superformat_from_format('foo')
+    >>> get_subformat_from_format('foo')
     ''
     """
     try:
-        return format[format.rindex(';') + 1:]
+        return docformat[docformat.rindex(';') + 1:]
     except ValueError:
         return ''
 
-def get_superformat_from_format(format):
+def get_superformat_from_format(docformat):
     """
     @return the superformat if any.
     @rtype: string
@@ -530,9 +616,9 @@ def get_superformat_from_format(format):
     'foo'
     """
     try:
-        return format[:format.rindex(';')]
+        return docformat[:docformat.rindex(';')]
     except ValueError:
-        return format
+        return docformat
 
 def propose_next_docname(docname):
     """
@@ -562,7 +648,7 @@ def propose_next_docname(docname):
         docname += '_1'
     return docname
 
-class BibRecDocs:
+class BibRecDocs(object):
     """
     This class represents all the files attached to one record.
 
@@ -589,7 +675,8 @@ class BibRecDocs:
             raise ValueError("BibRecDocs: recid is %s but must be an integer." % repr(recid))
         self.human_readable = human_readable
         self.deleted_too = deleted_too
-        self.bibdocs = []
+        self.bibdocs = {}
+        self.attachment_types = {} # dictionary docname->attachment type
         self.build_bibdoc_list()
 
     def __repr__(self):
@@ -611,8 +698,8 @@ class BibRecDocs:
         out = '%i::::total bibdocs attached=%i\n' % (self.id, len(self.bibdocs))
         out += '%i::::total size latest version=%s\n' % (self.id, nice_size(self.get_total_size_latest_version()))
         out += '%i::::total size all files=%s\n' % (self.id, nice_size(self.get_total_size()))
-        for bibdoc in self.bibdocs:
-            out += str(bibdoc)
+        for (docname, (bibdoc, dummy)) in self.bibdocs.items():
+            out += str(docname) + ":" + str(bibdoc)
         return out
 
     def empty_p(self):
@@ -624,7 +711,7 @@ class BibRecDocs:
 
     def deleted_p(self):
         """
-        @return: True if the corresponding record has been deleted.
+        @return: True if the correxsponding record has been deleted.
         @rtype: bool
         """
         from invenio.search_engine import record_exists
@@ -674,7 +761,7 @@ class BibRecDocs:
         @rtype: integer
         """
         size = 0
-        for bibdoc in self.bibdocs:
+        for (bibdoc, _) in self.bibdocs.values():
             size += bibdoc.get_total_size_latest_version()
         return size
 
@@ -688,7 +775,7 @@ class BibRecDocs:
         @rtype: integer
         """
         size = 0
-        for bibdoc in self.bibdocs:
+        for (bibdoc, _) in self.bibdocs.values():
             size += bibdoc.get_total_size()
         return size
 
@@ -697,20 +784,44 @@ class BibRecDocs:
         This method must be called everytime a I{bibdoc} is added, removed or
         modified.
         """
-        self.bibdocs = []
+        self.bibdocs = {}
         if self.deleted_too:
-            res = run_sql("""SELECT id_bibdoc, type FROM bibrec_bibdoc JOIN
-                         bibdoc ON id=id_bibdoc WHERE id_bibrec=%s
-                         ORDER BY docname ASC""", (self.id,))
-        else:
-            res = run_sql("""SELECT id_bibdoc, type FROM bibrec_bibdoc JOIN
-                         bibdoc ON id=id_bibdoc WHERE id_bibrec=%s AND
-                         status<>'DELETED' ORDER BY docname ASC""", (self.id,))
-        for row in res:
-            cur_doc = BibDoc(docid=row[0], recid=self.id, doctype=row[1], human_readable=self.human_readable)
-            self.bibdocs.append(cur_doc)
+            res = run_sql("""SELECT brbd.id_bibdoc, brbd.docname, brbd.type FROM bibrec_bibdoc as brbd JOIN
+                         bibdoc as bd ON bd.id=brbd.id_bibdoc WHERE brbd.id_bibrec=%s
+                         ORDER BY brbd.docname ASC""", (self.id,))
 
-    def list_bibdocs(self, doctype=''):
+        else:
+            res = run_sql("""SELECT brbd.id_bibdoc, brbd.docname, brbd.type FROM bibrec_bibdoc as brbd JOIN
+                         bibdoc as bd ON bd.id=brbd.id_bibdoc WHERE brbd.id_bibrec=%s AND
+                         bd.status<>'DELETED' ORDER BY brbd.docname ASC""", (self.id,))
+        for row in res:
+            cur_doc = BibDoc.create_instance(docid=row[0], recid=self.id,
+                                             human_readable=self.human_readable)
+            self.bibdocs[row[1]] = (cur_doc, row[2])
+
+    def list_bibdocs_by_names(self, doctype=None):
+        """
+        Returns the dictionary of all bibdocs object belonging to a recid.
+        Keys in the dictionary are names of documetns and values are BibDoc objects.
+        If C{doctype} is set, it returns just the bibdocs of that doctype.
+
+        @param doctype: the optional doctype.
+        @type doctype: string
+        @return: the dictionary of bibdocs.
+        @rtype: dictionary of Dcname -> BibDoc
+        """
+
+        if not doctype:
+            return dict((k,v) for (k,(v,_)) in self.bibdocs.iteritems())
+
+
+        res = {}
+        for (docname, (doc, attachmenttype)) in self.bibdocs.iteritems():
+            if attachmenttype == doctype:
+                res[docname] = doc
+        return res
+
+    def list_bibdocs(self, doctype=None):
         """
         Returns the list all bibdocs object belonging to a recid.
         If C{doctype} is set, it returns just the bibdocs of that doctype.
@@ -721,13 +832,14 @@ class BibRecDocs:
         @rtype: list of BibDoc
         """
         if not doctype:
-            return self.bibdocs
+            return [d for (d,_) in self.bibdocs.values()]
         else:
-            return [bibdoc for bibdoc in self.bibdocs if doctype == bibdoc.doctype]
+            return [bibdoc for (bibdoc, attype) in self.bibdocs.values() if doctype == attype]
 
-    def get_bibdoc_names(self, doctype=''):
+
+    def get_bibdoc_names(self, doctype=None):
         """
-        Returns all the names of the documents associated with the bibdoc.
+        Returns all the names of the documents associated with the bibrec.
         If C{doctype} is set, restrict the result to all the matching doctype.
 
         @param doctype: the optional doctype.
@@ -735,8 +847,45 @@ class BibRecDocs:
         @return: the list of document names.
         @rtype: list of string
         """
-        return [bibdoc.docname for bibdoc in self.list_bibdocs(doctype)]
+        return [docname for (docname, dummy) in self.list_bibdocs_by_names(doctype).items()]
 
+    def check_file_exists(self, path, f_format):
+        """
+        Check if a file with the same content of the file pointed in C{path}
+        is already attached to this record.
+
+        @param path: the file to be checked against.
+        @type path: string
+        @return: True if a file with the requested content is already attached
+        to the record.
+        @rtype: bool
+        """
+        size = os.path.getsize(path)
+
+        # Let's consider all the latest files
+        files = self.list_latest_files()
+
+        # Let's consider all the latest files with same size
+        potential = [afile for afile in files if afile.get_size() == size and afile.format == f_format]
+
+        if potential:
+            checksum = calculate_md5(path)
+
+            # Let's consider all the latest files with the same size and the
+            # same checksum
+            potential = [afile for afile in potential if afile.get_checksum() == checksum]
+
+            if potential:
+                potential = [afile for afile in potential if \
+                                 filecmp.cmp(afile.get_full_path(), path)]
+
+                if potential:
+                    return True
+                else:
+                    # Gosh! How unlucky, same size, same checksum but not same
+                    # content!
+                    pass
+        return False
 
     def propose_unique_docname(self, docname):
         """
@@ -777,9 +926,9 @@ class BibRecDocs:
 
         ## Check for possibility
         for bibdocfile in bibdoc2.list_latest_files():
-            format = bibdocfile.get_format()
-            if bibdoc1.format_already_exists_p(format):
-                raise InvenioBibDocFileError('Format %s already exists in bibdoc %s of record %s. It\'s impossible to merge bibdoc %s into it.' % (format, docname1, self.id, docname2))
+            docformat = bibdocfile.get_format()
+            if bibdoc1.format_already_exists_p(docformat):
+                raise InvenioBibDocFileError('Format %s already exists in bibdoc %s of record %s. It\'s impossible to merge bibdoc %s into it.' % (docformat, docname1, self.id, docname2))
 
         ## Importing restriction if needed.
         restriction1 = bibdoc1.get_status()
@@ -789,10 +938,12 @@ class BibRecDocs:
 
         ## Importing formats
         for bibdocfile in bibdoc2.list_latest_files():
-            format = bibdocfile.get_format()
+            docformat = bibdocfile.get_format()
             comment = bibdocfile.get_comment()
             description = bibdocfile.get_description()
-            bibdoc1.add_file_new_format(bibdocfile.get_full_path(), description=description, comment=comment, format=format)
+            bibdoc1.add_file_new_format(bibdocfile.get_full_path(),
+                                        description=description,
+                                        comment=comment, docformat=docformat)
 
         ## Finally deleting old bibdoc2
         bibdoc2.delete()
@@ -807,9 +958,8 @@ class BibRecDocs:
         @raise InvenioBibDocFileError: if the C{docname} does not
             corresponds to a document attached to this record.
         """
-        for bibdoc in self.bibdocs:
-            if bibdoc.docname == docname:
-                return bibdoc.id
+        if docname in self.bibdocs:
+            return self.bibdocs[docname][0].id
         raise InvenioBibDocFileError, "Recid '%s' is not connected with a " \
             "docname '%s'" % (self.id, docname)
 
@@ -823,11 +973,47 @@ class BibRecDocs:
         @raise InvenioBibDocFileError: if the C{docid} does not
             corresponds to a document attached to this record.
         """
-        for bibdoc in self.bibdocs:
+        for (docname, (bibdoc, _)) in self.bibdocs.items():
             if bibdoc.id == docid:
-                return bibdoc.docname
+                return docname
         raise InvenioBibDocFileError, "Recid '%s' is not connected with a " \
             "docid '%s'" % (self.id, docid)
+
+    def change_name(self, newname, oldname=None, docid=None):
+        """
+        Renames document of a given name.
+
+        @param newname: the new name.
+        @type newname: string
+        @raise InvenioBibDocFileError: if the new name corresponds to
+            a document already attached to the record owning this document.
+        """
+        if not oldname and not docid:
+            raise StandardError("Trying to rename unspecified document")
+
+        if not oldname:
+            oldname = self.get_docname(docid)
+        if not docid:
+            docid = self.get_docid(oldname)
+
+        doc, atttype = self.bibdocs[oldname]
+
+        try:
+            newname = normalize_docname(newname)
+
+            res = run_sql("SELECT id_bibdoc FROM bibrec_bibdoc WHERE id_bibrec=%s AND docname=%s", (self.id, newname))
+            if res:
+                raise InvenioBibDocFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.id)
+
+            run_sql("update bibrec_bibdoc set docname=%s where id_bibdoc=%s and id_bibrec=%s", (newname, docid, self.id))
+        finally:
+            # updating the document
+            for a in doc.bibrec_links:
+                if a["recid"] == self.id:
+                    a["docname"] = newname
+            # updating the record structure
+            del self.bibdocs[oldname]
+            self.bibdocs[newname] = (doc, atttype)
 
     def has_docname_p(self, docname):
         """
@@ -837,18 +1023,14 @@ class BibRecDocs:
             record.
         @rtype: bool
         """
-        for bibdoc in self.bibdocs:
-            if bibdoc.docname == docname:
-                return True
-        return False
+        return docname in self.bibdocs.keys()
 
     def get_bibdoc(self, docname):
         """
         @return: the bibdoc with a particular docname associated with
         this recid"""
-        for bibdoc in self.bibdocs:
-            if bibdoc.docname == docname:
-                return bibdoc
+        if docname in self.bibdocs:
+            return self.bibdocs[docname][0]
         raise InvenioBibDocFileError, "Recid '%s' is not connected with " \
             " docname '%s'" % (self.id, docname)
 
@@ -859,9 +1041,8 @@ class BibRecDocs:
         @param docname: the document name.
         @type docname: string
         """
-        for bibdoc in self.bibdocs:
-            if bibdoc.docname == docname:
-                bibdoc.delete()
+        if docname in self.bibdocs:
+            self.bibdocs[docname][0].delete()
         self.build_bibdoc_list()
 
     def add_bibdoc(self, doctype="Main", docname='file', never_fail=False):
@@ -887,16 +1068,21 @@ class BibRecDocs:
             if never_fail:
                 docname = self.propose_unique_docname(docname)
             if docname in self.get_bibdoc_names():
-                raise InvenioBibDocFileError, "%s has already a bibdoc with docname %s" % (self.id, docname)
+                raise InvenioBibDocFileError, \
+                    "%s has already a bibdoc with docname %s" % (self.id, docname)
             else:
-                bibdoc = BibDoc(recid=self.id, doctype=doctype, docname=docname, human_readable=self.human_readable)
+                bibdoc = BibDoc.create_instance(recid=self.id, doctype=doctype,
+                                                docname=docname,
+                                                human_readable=self.human_readable)
                 self.build_bibdoc_list()
                 return bibdoc
         except Exception, e:
             register_exception()
             raise InvenioBibDocFileError(str(e))
 
-    def add_new_file(self, fullpath, doctype="Main", docname=None, never_fail=False, description=None, comment=None, format=None, flags=None, modification_date=None):
+    def add_new_file(self, fullpath, doctype="Main", docname=None,
+                     never_fail=False, description=None, comment=None,
+                     docformat=None, flags=None, modification_date=None):
         """
         Directly add a new file to this record.
 
@@ -939,31 +1125,32 @@ class BibRecDocs:
         """
         if docname is None:
             docname = decompose_file(fullpath)[1]
-        if format is None:
-            format = decompose_file(fullpath)[2]
+
+        if docformat is None:
+            docformat = decompose_file(fullpath)[2]
         docname = normalize_docname(docname)
         try:
             bibdoc = self.get_bibdoc(docname)
         except InvenioBibDocFileError:
             # bibdoc doesn't already exists!
             bibdoc = self.add_bibdoc(doctype, docname, False)
-            bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
+            bibdoc.add_file_new_version(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
             self.build_bibdoc_list()
         else:
             try:
-                bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
+                bibdoc.add_file_new_format(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
                 self.build_bibdoc_list()
-            except InvenioBibDocFileError, e:
+            except InvenioBibDocFileError, dummy:
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
-                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
+                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
                     self.build_bibdoc_list()
                 else:
                     raise
         return bibdoc
 
-    def add_new_version(self, fullpath, docname=None, description=None, comment=None, format=None, flags=None):
+    def add_new_version(self, fullpath, docname=None, description=None, comment=None, docformat=None, flags=None):
         """
         Adds a new file to an already existent document object as a new
         version.
@@ -991,18 +1178,18 @@ class BibRecDocs:
         """
         if docname is None:
             docname = decompose_file(fullpath)[1]
-        if format is None:
-            format = decompose_file(fullpath)[2]
+        if docformat is None:
+            docformat = decompose_file(fullpath)[2]
         if flags is None:
             flags = []
-        if 'pdfa' in get_subformat_from_format(format).split(';') and not 'PDF/A' in flags:
+        if 'pdfa' in get_subformat_from_format(docformat).split(';') and not 'PDF/A' in flags:
             flags.append('PDF/A')
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags)
+        bibdoc.add_file_new_version(fullpath, description=description, comment=comment, docformat=docformat, flags=flags)
         self.build_bibdoc_list()
         return bibdoc
 
-    def add_new_format(self, fullpath, docname=None, description=None, comment=None, format=None, flags=None, modification_date=None):
+    def add_new_format(self, fullpath, docname=None, description=None, comment=None, docformat=None, flags=None, modification_date=None):
         """
         Adds a new file to an already existent document object as a new
         format.
@@ -1029,14 +1216,14 @@ class BibRecDocs:
         """
         if docname is None:
             docname = decompose_file(fullpath)[1]
-        if format is None:
-            format = decompose_file(fullpath)[2]
+        if docformat is None:
+            docformat = decompose_file(fullpath)[2]
         if flags is None:
             flags = []
-        if 'pdfa' in get_subformat_from_format(format).split(';') and not 'PDF/A' in flags:
+        if 'pdfa' in get_subformat_from_format(docformat).split(';') and not 'PDF/A' in flags:
             flags.append('PDF/A')
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format, flags=flags, modification_date=modification_date)
+        bibdoc.add_file_new_format(fullpath, description=description, comment=comment, docformat=docformat, flags=flags, modification_date=modification_date)
         self.build_bibdoc_list()
         return bibdoc
 
@@ -1056,64 +1243,6 @@ class BibRecDocs:
         for bibdoc in self.list_bibdocs(doctype):
             docfiles += bibdoc.list_latest_files(list_hidden=list_hidden)
         return docfiles
-
-    def display(self, docname="", version="", doctype="", ln=CFG_SITE_LANG, verbose=0, display_hidden=True):
-        """
-        Returns an HTML representation of the the attached documents.
-
-        @param docname: if set, include only the requested document.
-        @type docname: string
-        @param version: if not set, only the last version will be displayed. If
-            'all', all versions will be displayed.
-        @type version: string (integer or 'all')
-        @param doctype: is set, include only documents of the requested type.
-        @type doctype: string
-        @param ln: the language code.
-        @type ln: string
-        @param verbose: if greater than 0, includes debug information.
-        @type verbose: integer
-        @param display_hidden: whether to include hidden files as well.
-        @type display_hidden: bool
-        @return: the formatted representation.
-        @rtype: HTML string
-        """
-        t = ""
-        if docname:
-            try:
-                bibdocs = [self.get_bibdoc(docname)]
-            except InvenioBibDocFileError:
-                bibdocs = self.list_bibdocs(doctype)
-        else:
-            bibdocs = self.list_bibdocs(doctype)
-        if bibdocs:
-            types = list_types_from_array(bibdocs)
-            fulltypes = []
-            for mytype in types:
-                if mytype in ('Plot', 'PlotMisc'):
-                    # FIXME: quick hack to ignore plot-like doctypes
-                    # on Files tab
-                    continue
-                fulltype = {
-                            'name' : mytype,
-                            'content' : [],
-                           }
-                for bibdoc in bibdocs:
-                    if mytype == bibdoc.get_type():
-                        fulltype['content'].append(bibdoc.display(version,
-                            ln=ln, display_hidden=display_hidden))
-                fulltypes.append(fulltype)
-
-            if verbose >= 9:
-                verbose_files = str(self)
-            else:
-                verbose_files = ''
-
-            t = bibdocfile_templates.tmpl_bibrecdoc_filelist(
-                  ln=ln,
-                  types = fulltypes,
-                  verbose_files=verbose_files
-                )
-        return t
 
     def fix(self, docname):
         """
@@ -1150,8 +1279,8 @@ class BibRecDocs:
                         raise InvenioBibDocFileError, "A file called %s exists under %s. This is not a valid name. After the ';' there must be an integer representing the file version. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
                     if version == 0:
                         zero_version_bug = True
-                    format = name[len(file_strip_ext(name)):]
-                    format = normalize_format(format)
+                    docformat = name[len(file_strip_ext(name)):]
+                    docformat = normalize_format(docformat)
                     if not versions.has_key(version):
                         versions[version] = {}
                     new_name = 'FIXING-%s-%s' % (str(counter), name)
@@ -1160,10 +1289,10 @@ class BibRecDocs:
                     except Exception, e:
                         register_exception()
                         raise InvenioBibDocFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name), e)
-                    if versions[version].has_key(format):
+                    if versions[version].has_key(docformat):
                         new_bibdocs.append((new_name, version))
                     else:
-                        versions[version][format] = new_name
+                        versions[version][docformat] = new_name
                     counter += 1
                 elif filename[0] != '.':
                     # Strange name
@@ -1194,8 +1323,8 @@ class BibRecDocs:
             for version, formats in versions.iteritems():
                 if zero_version_bug:
                     version += 1
-                for format, filename in formats.iteritems():
-                    destination = '%s%s;%i' % (docname, format, version)
+                for docformat, filename in formats.iteritems():
+                    destination = '%s%s;%i' % (docname, docformat, version)
                     try:
                         shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination))
                     except Exception, e:
@@ -1233,8 +1362,8 @@ class BibRecDocs:
         bibdoc._build_file_list()
         self.build_bibdoc_list()
 
-        for bibdoc in self.bibdocs:
-            if not run_sql('SELECT more_info FROM bibdoc WHERE id=%s', (bibdoc.id,)):
+        for (bibdoc, dummyatttype) in self.bibdocs.values():
+            if not run_sql('SELECT data_value FROM bibdocmoreinfo WHERE bibdocid=%s', (bibdoc.id,)):
                 ## Import from MARC only if the bibdoc has never had
                 ## its more_info initialized.
                 try:
@@ -1267,10 +1396,10 @@ class BibRecDocs:
         for filename in os.listdir(bibdoc.basedir):
             if not filename.startswith('.'):
                 try:
-                    dummy, dummy, format, version = decompose_file_with_version(filename)
+                    dummy, dummy, docformat, version = decompose_file_with_version(filename)
                 except Exception:
                     raise InvenioBibDocFileError('Incorrect filename "%s" for docname %s for recid %i' % (filename, docname, self.id))
-                if '%s%s;%i' % (correct_docname, format, version) != filename:
+                if '%s%s;%i' % (correct_docname, docformat, version) != filename:
                     return False
         return True
 
@@ -1301,11 +1430,11 @@ class BibRecDocs:
         for filename in os.listdir(bibdoc.basedir):
             if not filename.startswith('.'):
                 try:
-                    dummy, dummy, format, version = decompose_file_with_version(filename)
+                    dummy, dummy, docformat, version = decompose_file_with_version(filename)
                 except ValueError:
                     register_exception(alert_admin=True, prefix= "Strange file '%s' is stored in %s" % (filename, bibdoc.basedir))
                 else:
-                    os.rename(os.path.join(bibdoc.basedir, filename), os.path.join(bibdoc.basedir, '%s%s;%i' % (docname, format, version)))
+                    os.rename(os.path.join(bibdoc.basedir, filename), os.path.join(bibdoc.basedir, '%s%s;%i' % (docname, docformat, version)))
         Md5Folder(bibdoc.basedir).update()
         bibdoc.touch()
         bibdoc._build_file_list('rename')
@@ -1328,8 +1457,10 @@ class BibRecDocs:
             if self.check_format(docname):
                 return True
         bibdoc = self.get_bibdoc(docname)
+
         correct_docname = decompose_file(docname + '.pdf')[1]
         need_merge = False
+
         if correct_docname != docname:
             need_merge = self.has_docname_p(correct_docname)
             if need_merge:
@@ -1366,29 +1497,12 @@ class BibRecDocs:
                 return
         docnames = set()
         for bibdoc in self.list_bibdocs():
-            docname = bibdoc.docname
+            docname = self.get_docname(bibdoc.id)
             if docname in docnames:
-                new_docname = self.propose_unique_docname(bibdoc.docname)
-                bibdoc.change_name(new_docname)
+                new_docname = self.propose_unique_docname(self.get_docname(bibdoc.id))
+                self.change_name(docid=bibdoc.id, newname=new_docname)
                 self.merge_bibdocs(docname, new_docname)
             docnames.add(docname)
-
-    def check_file_exists(self, path, format):
-        """
-        Check if a file with the same content of the file pointed in C{path}
-        is already attached to this record.
-
-        @param path: the file to be checked against.
-        @type path: string
-        @return: True if a file with the requested content is already attached
-        to the record.
-        @rtype: bool
-        """
-        # Let's consider all the latest files
-        for bibdoc in self.list_bibdocs():
-            if bibdoc.check_file_exists(path, format):
-                return True
-        return False
 
     def get_text(self, extract_text_if_necessary=True):
         """
@@ -1399,6 +1513,7 @@ class BibRecDocs:
             if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
                 re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
                 perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
+                from invenio.bibtask import write_message
                 write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
                 bibdoc.extract_text(perform_ocr=perform_ocr)
             texts.append(bibdoc.get_text())
@@ -1406,7 +1521,7 @@ class BibRecDocs:
         return " ".join(texts)
 
 
-class BibDoc:
+class BibDoc(object):
     """
     This class represents one document (i.e. a set of files with different
     formats and with versioning information that consitutes a piece of
@@ -1432,108 +1547,229 @@ class BibDoc:
     @raise InvenioBibDocFileError: in case of error.
     """
 
-    def __init__ (self, docid=None, recid=None, docname=None, doctype='Main', human_readable=False):
+    @staticmethod
+    def create_new_document(doc_type = "Main", rec_links = []):
+        status = ''
+        doc_id = run_sql("INSERT INTO bibdoc (status, creation_date, modification_date, doctype) "
+                          "values(%s,NOW(),NOW(), %s)", (status, doc_type))
+
+        if not doc_id:
+            raise InvenioBibDocFileError, "New docid cannot be created"
+
+        # creating the representation on disk ... preparing the directory
+        try:
+            BibDoc.prepare_basedir(doc_id)
+
+        except Exception, e:
+            run_sql('DELETE FROM bibdoc WHERE id=%s', (doc_id, ))
+#            run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (doc_id, ))
+
+            register_exception(alert_admin=True)
+            raise InvenioBibDocFileError, e
+
+        # the object has been created: linking to bibliographical records
+        doc = BibDoc(doc_id)
+        for link in rec_links:
+            if "rec_id" in link and link["rec_id"]:
+                rec_id = link["rec_id"]
+                doc_name = normalize_docname(link["doc_name"])
+                a_type = link["a_type"]
+                doc.attach_to_record(rec_id, str(a_type), str(doc_name))
+        return doc_id
+
+
+    def __init__(self, docid, human_readable=False, initial_data=None):
         """Constructor of a bibdoc. At least the docid or the recid/docname
-        pair is needed."""
+        pair is needed.
+        specifying recid, docname and doctype without specifying docid results in
+        attaching newly created document to a record
+        """
         # docid is known, the document already exists
-        if docname:
-            docname = normalize_docname(docname)
+        res2 = run_sql("SELECT id_bibrec, type, docname FROM bibrec_bibdoc WHERE id_bibdoc=%s", (docid,))
+        self.bibrec_types = [(r[0], r[1], r[2]) for r in res2 ] # just in case the result was behaving like tuples but was something else
+        if not res2:
+            # fake attachment
+            self.bibrec_types = [0, None, "fake_name_for_unattached_document"]
+
+        if initial_data is None:
+            initial_data = BibDoc._retrieve_data(docid)
+
         self.docfiles = []
         self.md5s = None
         self.human_readable = human_readable
-        if docid:
-            if not recid:
-                res = run_sql("SELECT id_bibrec,type FROM bibrec_bibdoc WHERE id_bibdoc=%s LIMIT 1", (docid,), 1)
-                if res:
-                    recid = res[0][0]
-                    doctype = res[0][1]
-                else:
-                    warn("Docid %s is orphan" % docid)
-            else:
-                res = run_sql("SELECT type FROM bibrec_bibdoc WHERE id_bibrec=%s AND id_bibdoc=%s LIMIT 1", (recid, docid,), 1)
-                if res:
-                    doctype = res[0][0]
-                else:
-                    #this bibdoc isn't associated with the corresponding bibrec.
-                    raise InvenioBibDocFileError, "Docid %s is not associated with the recid %s" % (docid, recid)
-            # gather the other information
-            res = run_sql("SELECT id,status,docname,creation_date,modification_date,text_extraction_date,more_info FROM bibdoc WHERE id=%s LIMIT 1", (docid,), 1)
-            if res:
-                self.cd = res[0][3]
-                self.md = res[0][4]
-                self.td = res[0][5]
-                self.recid = recid
-                self.docname = res[0][2]
-                self.id = docid
-                self.status = res[0][1]
-                self.more_info = BibDocMoreInfo(docid, blob_to_string(res[0][6]))
-                self.basedir = _make_base_dir(self.id)
-                self.doctype = doctype
-            else:
-                # this bibdoc doesn't exist
-                raise InvenioBibDocFileError, "The docid %s does not exist." % docid
-        # else it is a new document
-        else:
-            if not docname:
-                raise InvenioBibDocFileError, "You should specify the docname when creating a new bibdoc"
-            else:
-                self.recid = recid
-                self.doctype = doctype
-                self.docname = docname
-                self.status = ''
-                if recid:
-                    res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s LIMIT 1", (recid, docname), 1)
-                    if res:
-                        raise InvenioBibDocFileError("A bibdoc called %s already exists for recid %s" % (docname, recid))
-                self.id = run_sql("INSERT INTO bibdoc (status,docname,creation_date,modification_date) "
-                    "values(%s,%s,NOW(),NOW())", (self.status, docname))
-                if self.id:
-                    # we link the document to the record if a recid was
-                    # specified
-                    self.more_info = BibDocMoreInfo(self.id)
-                    res = run_sql("SELECT creation_date, modification_date, text_extraction_date FROM bibdoc WHERE id=%s", (self.id,))
-                    self.cd = res[0][0]
-                    self.md = res[0][1]
-                    self.td = res[0][2]
-                else:
-                    raise InvenioBibDocFileError, "New docid cannot be created"
-                try:
-                    self.basedir = _make_base_dir(self.id)
-                    # we create the corresponding storage directory
-                    if not os.path.exists(self.basedir):
-                        old_umask = os.umask(022)
-                        os.makedirs(self.basedir)
-                        # and save the father record id if it exists
-                        try:
-                            if self.recid:
-                                recid_fd = open("%s/.recid" % self.basedir, "w")
-                                recid_fd.write(str(self.recid))
-                                recid_fd.close()
-                            if self.doctype:
-                                type_fd = open("%s/.type" % self.basedir, "w")
-                                type_fd.write(str(self.doctype))
-                                type_fd.close()
-                        except Exception, e:
-                            register_exception(alert_admin=True)
-                            raise InvenioBibDocFileError, e
-                        os.umask(old_umask)
-                    if self.recid:
-                        run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type) VALUES (%s,%s,%s)",
-                            (recid, self.id, self.doctype,))
-                except Exception, e:
-                    run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
-                    run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
-                    register_exception(alert_admin=True)
-                    raise InvenioBibDocFileError, e
-        # build list of attached files
+        self.cd = initial_data["cd"] # creation date
+        self.md = initial_data["md"] # modification date
+        self.td = initial_data["td"] # text extraction date # should be moved from here !!!!
+        self.bibrec_links = initial_data["bibrec_links"]
+
+        self.id = initial_data["id"]
+        self.status = initial_data["status"]
+        self.basedir = initial_data["basedir"]
+        self.doctype = initial_data["doctype"]
+        self.storagename = initial_data["storagename"] # the old docname -> now used as a storage name for old records
+
+        self.more_info = BibDocMoreInfo(self.id)
         self._build_file_list('init')
+
+        # link with related_files
+        self._build_related_file_list()
+
+    @staticmethod
+    def prepare_basedir(doc_id):
+        """Prepares the directory serving as root of a BibDoc"""
+        basedir = _make_base_dir(doc_id)
+        # we create the corresponding storage directory
+        if not os.path.exists(basedir):
+            old_umask = os.umask(022)
+            os.makedirs(basedir)
+            os.umask(old_umask)
+
+    def _update_additional_info_files_p(self):
+        """Update the hidden file in the document directory ... the file contains all links to records"""
+        try:
+            reclinks_fd = open("%s/.reclinks" % (self.basedir, ), "w")
+            reclinks_fd.write("RECID DOCNAME TYPE\n")
+            for link in self.bibrec_links:
+                reclinks_fd.write("%(recid)s %(docname)s %(doctype)s\n" % link)
+            reclinks_fd.close()
+        except Exception, e:
+            register_exception(alert_admin=True)
+            raise InvenioBibDocFileError, e
+
+
+    @staticmethod
+    def _retrieve_data(docid = None):
+        """
+           Filling information about a document from the database entry
+        """
+        container = {}
+        container["bibrec_links"] = []
+        container["id"] = docid
+        container["basedir"] = _make_base_dir(container["id"])
+
+        # retrieving links betwen records and documents
+
+        res = run_sql("SELECT id_bibrec, type, docname FROM bibrec_bibdoc WHERE id_bibdoc=%s", (str(docid),), 1)
+        if res:
+            for r in res:
+                container["bibrec_links"].append({"recid": r[0], "doctype": r[1], "docname": r[2]})
+
+        # gather the other information
+        res = run_sql("SELECT status, creation_date, modification_date, text_extraction_date, doctype, docname FROM bibdoc WHERE id=%s LIMIT 1", (docid,), 1)
+
+        if res:
+            container["status"] = res[0][0]
+            container["cd"] = res[0][1]
+            container["md"] = res[0][2]
+            container["td"] = res[0][3]
+            container["doctype"] = res[0][4]
+            container["storagename"] = res[0][5]
+        else:
+            # this bibdoc doesn't exist
+            raise InvenioBibDocFileError, "The docid %s does not exist." % docid
+
+        # retreiving all available formats
+        fprefix = container["storagename"] or "content"
+        container["extensions"] = [fname[len(fprefix):] for fname in filter(lambda x: x.startswith(fprefix),os.listdir(container["basedir"]))]
+        return container
+
+    @staticmethod
+    def create_instance(docid=None, recid=None, docname=None,
+                        doctype='Fulltext', a_type = 'Main', human_readable=False):
+        """
+        Parameters of an attachement to the record:
+        a_type, recid, docname
+        @param a_type Type of the attachment to the record (by default Main)
+        @type a_type String
+
+        @param doctype Type of the document itself (by default Fulltext)
+        @type doctype String
+        """
+
+        # first try to retrieve existing record based on obtained data
+        data = None
+        extensions = []
+        if docid != None:
+            data = BibDoc._retrieve_data(docid)
+            doctype = data["doctype"]
+            extensions = data["extensions"]
+
+        # now check if the doctypype is supported by any particular plugin
+        def plugin_bldr(dummy, plugin_code):
+            """Preparing the plugin dictionary structure"""
+            ret = {}
+            ret['create_instance'] = getattr(plugin_code, "create_instance", None)
+            ret['supports'] = getattr(plugin_code, "supports", None)
+            return ret
+
+
+        bibdoc_plugins = PluginContainer(
+            os.path.join(CFG_PYLIBDIR,
+                     'invenio', 'bibdocfile_plugins', 'bom_*.py'),
+            plugin_builder=plugin_bldr)
+
+
+        # Loading an appropriate plugin (by default a generic BibDoc)
+        used_plugin = None
+
+        for dummy, plugin in bibdoc_plugins.iteritems():
+            if plugin['supports'](doctype, extensions):
+                used_plugin = plugin
+
+        if not docid:
+            rec_links = []
+            if recid:
+                rec_links.append({"rec_id": recid, "doc_name" : docname, "a_type": a_type})
+
+            if used_plugin and 'create_new' in used_plugin:
+                docid = used_plugin['create_new'](doctype, rec_links)
+            else:
+                docid = BibDoc.create_new_document(doctype, rec_links)
+
+        if used_plugin:
+            return used_plugin['create_instance'](docid=docid,
+                                                  human_readable=human_readable,
+                                                  initial_data=data)
+        return BibDoc(docid=docid,
+                      human_readable=human_readable,
+                      initial_data=data)
+
+    # parameters  can not be passed any more
+    @staticmethod
+    def _attach_to_record_p(doc_id, rec_id, a_type, docname):
+        """Private core of a method attaching document of a given ID to a record
+           @param a_type Attachment type (a function in which the document appears in the document)
+           @type a_type String
+
+        """
+        run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type, docname) VALUES (%s,%s,%s,%s)",
+                (str(rec_id), str(doc_id), a_type, docname))
+
+    def attach_to_record(self, recid, a_type, docname):
+        """ Attaches given document to a record given by its identifier.
+            @param recid The identifier of the record
+            @type recid Integer
+            @param a_type Function of a document in the record
+            @type a_type String
+            @param docname Name of a document inside of a record
+            @type docname String
+        """
+        run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type, docname) VALUES (%s,%s,%s,%s)",
+                (str(recid), str(self.id), a_type, docname))
+        self._update_additional_info_files_p()
 
     def __repr__(self):
         """
         @return: the canonical string representation of the C{BibDoc}.
         @rtype: string
         """
-        return 'BibDoc(%s, %s, %s, %s, %s)' % (repr(self.id), repr(self.recid), repr(self.docname), repr(self.doctype), repr(self.human_readable))
+        return 'BibDoc(%s, %s, %s)' % (repr(self.id), repr(self.doctype), repr(self.human_readable))
+
+    def format_recids(self):
+        """Returns a string representation of related record ids"""
+        if len(self.bibrec_links) == 1:
+            return self.bibrec_links[0]["recid"]
+        return "[" + ",".join([str(el["recid"]) for el in self.bibrec_links]) + "]"
 
     def __str__(self):
         """
@@ -1541,25 +1777,25 @@ class BibDoc:
             whole C{BibDoc} content.
         @rtype: string
         """
-        out = '%s:%i:::docname=%s\n' % (self.recid or '', self.id, self.docname)
-        out += '%s:%i:::doctype=%s\n' % (self.recid or '', self.id, self.doctype)
-        out += '%s:%i:::status=%s\n' % (self.recid or '', self.id, self.status)
-        out += '%s:%i:::basedir=%s\n' % (self.recid or '', self.id, self.basedir)
-        out += '%s:%i:::creation date=%s\n' % (self.recid or '', self.id, self.cd)
-        out += '%s:%i:::modification date=%s\n' % (self.recid or '', self.id, self.md)
-        out += '%s:%i:::text extraction date=%s\n' % (self.recid or '', self.id, self.td)
-        out += '%s:%i:::total file attached=%s\n' % (self.recid or '', self.id, len(self.docfiles))
+        recids = self.format_recids()
+        out = '%s:%i:::doctype=%s\n' % (recids, self.id, self.doctype)
+        out += '%s:%i:::status=%s\n' % (recids, self.id, self.status)
+        out += '%s:%i:::basedir=%s\n' % (recids, self.id, self.basedir)
+        out += '%s:%i:::creation date=%s\n' % (recids, self.id, self.cd)
+        out += '%s:%i:::modification date=%s\n' % (recids, self.id, self.md)
+        out += '%s:%i:::text extraction date=%s\n' % (recids, self.id, self.td)
+        out += '%s:%i:::total file attached=%s\n' % (recids, self.id, len(self.docfiles))
         if self.human_readable:
-            out += '%s:%i:::total size latest version=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size_latest_version()))
-            out += '%s:%i:::total size all files=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size()))
+            out += '%s:%i:::total size latest version=%s\n' % (recids, self.id, nice_size(self.get_total_size_latest_version()))
+            out += '%s:%i:::total size all files=%s\n' % (recids, self.id, nice_size(self.get_total_size()))
         else:
-            out += '%s:%i:::total size latest version=%s\n' % (self.recid or '', self.id, self.get_total_size_latest_version())
-            out += '%s:%i:::total size all files=%s\n' % (self.recid or '', self.id, self.get_total_size())
+            out += '%s:%i:::total size latest version=%s\n' % (recids, self.id, self.get_total_size_latest_version())
+            out += '%s:%i:::total size all files=%s\n' % (recids, self.id, self.get_total_size())
         for docfile in self.docfiles:
             out += str(docfile)
         return out
 
-    def format_already_exists_p(self, format):
+    def format_already_exists_p(self, docformat):
         """
         @param format: a format to be checked.
         @type format: string
@@ -1567,9 +1803,9 @@ class BibDoc:
             latest files.
         @rtype: bool
         """
-        format = normalize_format(format)
+        docformat = normalize_format(docformat)
         for afile in self.list_latest_files():
-            if format == afile.get_format():
+            if docformat == afile.get_format():
                 return True
         return False
 
@@ -1580,77 +1816,40 @@ class BibDoc:
         """
         return self.status
 
-    def get_text(self, version=None):
-        """
-        @param version: the requested version. If not set, the latest version
-            will be used.
-        @type version: integer
-        @return: the textual content corresponding to the specified version
-            of the document.
-        @rtype: string
-        """
-        if version is None:
-            version = self.get_latest_version()
-        if self.has_text(version):
-            return open(os.path.join(self.basedir, '.text;%i' % version)).read()
-        else:
-            return ""
+    @staticmethod
+    def get_fileprefix(basedir, storagename=None):
+        fname = "%s" % (storagename or "content", )
+        return os.path.join(basedir, fname )
 
-    def get_text_path(self, version=None):
+    def get_filepath(self, docformat, version):
+        """ Generaters the path inside of the filesystem where the document should be stored.
+        @param format The format of the document
+        @type format string
+        @param version version to be stored in the file
+        @type version string
+        TODO: this should be completely replaced. File storage (and so, also path building)
+        should be abstracted from BibDoc and be using loadable extensions
+        @param format Format of the document to be stored
+        @type format string
+        @param version Version of the document to be stored
+        @type version String
+        @return Full path to the file encoding a particular version and format of the document
+        @trype string
         """
-        @param version: the requested version. If not set, the latest version
-            will be used.
-        @type version: int
-        @return: the full path to the textual content corresponding to the specified version
-            of the document.
-        @rtype: string
-        """
-        if version is None:
-            version = self.get_latest_version()
-        if self.has_text(version):
-            return os.path.join(self.basedir, '.text;%i' % version)
-        else:
-            return ""
 
-    def extract_text(self, version=None, perform_ocr=False, ln='en'):
-        """
-        Try what is necessary to extract the textual information of a document.
+        return  "%s%s;%i" % (BibDoc.get_fileprefix(self.basedir, self.storagename),  docformat, version)
 
-        @param version: the version of the document for which text is required.
-            If not specified the text will be retrieved from the last version.
-        @type version: integer
-        @param perform_ocr: whether to perform OCR.
-        @type perform_ocr: bool
-        @param ln: a two letter language code to give as a hint to the OCR
-            procedure.
-        @type ln: string
-        @raise InvenioBibDocFileError: in case of error.
-        @note: the text is extracted and cached for later use. Use L{get_text}
-            to retrieve it.
-        """
-        from invenio.websubmit_file_converter import get_best_format_to_extract_text_from, convert_file, InvenioWebSubmitFileConverterError
-        if version is None:
-            version = self.get_latest_version()
-        docfiles = self.list_version_files(version)
-        ## We try to extract text only from original or OCRed documents.
-        filenames = [docfile.get_full_path() for docfile in docfiles if 'CONVERTED' not in docfile.flags or 'OCRED' in docfile.flags]
-        try:
-            filename = get_best_format_to_extract_text_from(filenames)
-        except InvenioWebSubmitFileConverterError:
-            ## We fall back on considering all the documents
-            filenames = [docfile.get_full_path() for docfile in docfiles]
-            try:
-                filename = get_best_format_to_extract_text_from(filenames)
-            except InvenioWebSubmitFileConverterError:
-                open(os.path.join(self.basedir, '.text;%i' % version), 'w').write('')
-                return
-        try:
-            convert_file(filename, os.path.join(self.basedir, '.text;%i' % version), '.txt', perform_ocr=perform_ocr, ln=ln)
-            if version == self.get_latest_version():
-                run_sql("UPDATE bibdoc SET text_extraction_date=NOW() WHERE id=%s", (self.id, ))
-        except InvenioWebSubmitFileConverterError, e:
-            register_exception(alert_admin=True, prefix="Error in extracting text from bibdoc %i, version %i" % (self.id, version))
-            raise InvenioBibDocFileError, str(e)
+    def get_docname(self):
+        """Obsolete !! (will return empty String for new format documents"""
+        return self.storagename
+    def get_doctype(self, recid):
+        """Retrieves the type of this document in the scope of a given recid"""
+        link_types = [attachement["doctype"] for attachement in \
+                          filter(lambda x: str(x["recid"]) == str(recid), \
+                                 self.bibrec_links)]
+        if link_types:
+            return link_types[0]
+        return ""
 
     def touch(self):
         """
@@ -1682,7 +1881,7 @@ class BibDoc:
             self.touch()
             self._build_file_list()
 
-    def add_file_new_version(self, filename, description=None, comment=None, format=None, flags=None, modification_date=None):
+    def add_file_new_version(self, filename, description=None, comment=None, docformat=None, flags=None, modification_date=None):
         """
         Add a new version of a file. If no physical file is already attached
         to the document a the given file will have version 1. Otherwise the
@@ -1711,13 +1910,14 @@ class BibDoc:
             if os.path.exists(filename):
                 if not os.path.getsize(filename) > 0:
                     raise InvenioBibDocFileError, "%s seems to be empty" % filename
-                if format is None:
-                    format = decompose_file(filename)[2]
+                if docformat is None:
+                    docformat = decompose_file(filename)[2]
                 else:
-                    format = normalize_format(format)
-                destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
-                if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, myversion, format)):
-                    raise InvenioBibDocFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
+                    docformat = normalize_format(docformat)
+
+                destination = self.get_filepath(docformat, myversion)
+                if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, myversion, docformat)):
+                    raise InvenioBibDocFileError("According to the database a file of format %s is already attached to the docid %s" % (docformat, self.id))
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
@@ -1726,32 +1926,32 @@ class BibDoc:
                 except Exception, e:
                     register_exception()
                     raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
-                self.more_info.set_description(description, format, myversion)
-                self.more_info.set_comment(comment, format, myversion)
+                self.more_info.set_description(description, docformat, myversion)
+                self.more_info.set_comment(comment, docformat, myversion)
                 if flags is None:
                     flags = []
-                if 'pdfa' in get_subformat_from_format(format).split(';') and not 'PDF/A' in flags:
+                if 'pdfa' in get_subformat_from_format(docformat).split(';') and not 'PDF/A' in flags:
                     flags.append('PDF/A')
                 for flag in flags:
                     if flag == 'PERFORM_HIDE_PREVIOUS':
                         for afile in self.list_all_files():
-                            format = afile.get_format()
+                            docformat = afile.get_format()
                             version = afile.get_version()
                             if version < myversion:
-                                self.more_info.set_flag('HIDDEN', format, myversion)
+                                self.more_info.set_flag('HIDDEN', docformat, myversion)
                     else:
-                        self.more_info.set_flag(flag, format, myversion)
+                        self.more_info.set_flag(flag, docformat, myversion)
             else:
                 raise InvenioBibDocFileError, "'%s' does not exists!" % filename
         finally:
             self.touch()
             Md5Folder(self.basedir).update()
             self._build_file_list()
-        just_added_file = self.get_file(format, myversion)
-        run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, myversion, format, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
+        just_added_file = self.get_file(docformat, myversion)
+        run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, myversion, docformat, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
         run_sql("UPDATE bibdocfsinfo SET last_version=false WHERE id_bibdoc=%s AND version<%s", (self.id, myversion))
 
-    def add_file_new_format(self, filename, version=None, description=None, comment=None, format=None, flags=None, modification_date=None):
+    def add_file_new_format(self, filename, version=None, description=None, comment=None, docformat=None, flags=None, modification_date=None):
         """
         Add a file as a new format.
 
@@ -1780,15 +1980,16 @@ class BibDoc:
             if os.path.exists(filename):
                 if not os.path.getsize(filename) > 0:
                     raise InvenioBibDocFileError, "%s seems to be empty" % filename
-                if format is None:
-                    format = decompose_file(filename)[2]
+                if docformat is None:
+                    docformat = decompose_file(filename)[2]
                 else:
-                    format = normalize_format(format)
-                if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, version, format)):
-                    raise InvenioBibDocFileError("According to the database a file of format %s is already attached to the docid %s" % (format, self.id))
-                destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
+                    docformat = normalize_format(docformat)
+
+                if run_sql("SELECT id_bibdoc FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=%s AND format=%s", (self.id, version, docformat)):
+                    raise InvenioBibDocFileError("According to the database a file of format %s is already attached to the docid %s" % (docformat, self.id))
+                destination = self.get_filepath(docformat, version)
                 if os.path.exists(destination):
-                    raise InvenioBibDocFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
+                    raise InvenioBibDocFileError, "A file for docid '%s' already exists for the format '%s'" % (str(self.id), docformat)
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
@@ -1797,23 +1998,23 @@ class BibDoc:
                 except Exception, e:
                     register_exception()
                     raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
-                self.more_info.set_comment(comment, format, version)
-                self.more_info.set_description(description, format, version)
+                self.more_info.set_comment(comment, docformat, version)
+                self.more_info.set_description(description, docformat, version)
                 if flags is None:
                     flags = []
-                if 'pdfa' in get_subformat_from_format(format).split(';') and not 'PDF/A' in flags:
+                if 'pdfa' in get_subformat_from_format(docformat).split(';') and not 'PDF/A' in flags:
                     flags.append('PDF/A')
                 for flag in flags:
                     if flag != 'PERFORM_HIDE_PREVIOUS':
-                        self.more_info.set_flag(flag, format, version)
+                        self.more_info.set_flag(flag, docformat, version)
             else:
                 raise InvenioBibDocFileError, "'%s' does not exists!" % filename
         finally:
             Md5Folder(self.basedir).update()
             self.touch()
             self._build_file_list()
-        just_added_file = self.get_file(format, version)
-        run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, version, format, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
+        just_added_file = self.get_file(docformat, version)
+        run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, version, docformat, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
 
     def purge(self):
         """
@@ -1830,7 +2031,7 @@ class BibDoc:
                         self.more_info.unset_flag(flag, afile.get_format(), afile.get_version())
                     try:
                         os.remove(afile.get_full_path())
-                    except Exception, e:
+                    except Exception, dummy:
                         register_exception()
             Md5Folder(self.basedir).update()
             self.touch()
@@ -1844,23 +2045,22 @@ class BibDoc:
         result might be unpredicted.
         """
         del self.md5s
+        self.more_info.delete()
         del self.more_info
         os.system('rm -rf %s' % escape_shell_arg(self.basedir))
         run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
         run_sql('DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s OR id_bibdoc2=%s', (self.id, self.id))
         run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
-        run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, doctimestamp) VALUES("EXPUNGE", %s, %s, NOW())', (self.id, self.docname))
+        run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, doctimestamp) VALUES("EXPUNGE", %s, NOW())', (self.id, ))
         run_sql('DELETE FROM bibdocfsinfo WHERE id_bibdoc=%s', (self.id, ))
-
         del self.docfiles
         del self.id
         del self.cd
         del self.md
         del self.td
         del self.basedir
-        del self.recid
         del self.doctype
-        del self.docname
+        del self.bibrec_links
 
     def revert(self, version):
         """
@@ -1874,9 +2074,9 @@ class BibDoc:
         version = int(version)
         docfiles = self.list_version_files(version)
         if docfiles:
-            self.add_file_new_version(docfiles[0].get_full_path(), description=docfiles[0].get_description(), comment=docfiles[0].get_comment(), format=docfiles[0].get_format(), flags=docfiles[0].flags)
+            self.add_file_new_version(docfiles[0].get_full_path(), description=docfiles[0].get_description(), comment=docfiles[0].get_comment(), docformat=docfiles[0].get_format(), flags=docfiles[0].flags)
         for docfile in docfiles[1:]:
-            self.add_file_new_format(docfile.filename, description=docfile.get_description(), comment=docfile.get_comment(), format=docfile.get_format(), flags=docfile.flags)
+            self.add_file_new_format(docfile.filename, description=docfile.get_description(), comment=docfile.get_comment(), docformat=docfile.get_format(), flags=docfile.flags)
 
     def import_descriptions_and_comments_from_marc(self, record=None):
         """
@@ -1891,6 +2091,7 @@ class BibDoc:
         from invenio.search_engine import get_record
         if record is None:
             record = get_record(self.id)
+
         fields = record_get_field_instances(record, '856', '4', ' ')
 
         global_comment = None
@@ -1903,7 +2104,7 @@ class BibDoc:
             if url:
                 ## Given a url
                 url = url[0]
-                if url == '%s/%s/%s/files/' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid):
+                if re.match('%s/%s/[0-9]+/files/' % (CFG_SITE_URL, CFG_SITE_RECORD), url):
                     ## If it is a traditional /CFG_SITE_RECORD/1/files/ one
                     ## We have global description/comment for all the formats
                     description = field_get_subfield_values(field, 'y')
@@ -1914,27 +2115,28 @@ class BibDoc:
                         global_comment = comment[0]
                 elif bibdocfile_url_p(url):
                     ## Otherwise we have description/comment per format
-                    dummy, docname, format = decompose_bibdocfile_url(url)
-                    if docname == self.docname:
+                    dummy, docname, docformat = decompose_bibdocfile_url(url)
+                    brd = BibRecDocs(self.id)
+                    if docname == brd.get_docname(self.id):
                         description = field_get_subfield_values(field, 'y')
                         if description:
-                            local_description[format] = description[0]
+                            local_description[docformat] = description[0]
                         comment = field_get_subfield_values(field, 'z')
                         if comment:
-                            local_comment[format] = comment[0]
+                            local_comment[docformat] = comment[0]
 
         ## Let's update the tables
         version = self.get_latest_version()
         for docfile in self.list_latest_files():
-            format = docfile.get_format()
-            if format in local_comment:
-                self.set_comment(local_comment[format], format, version)
+            docformat = docfile.get_format()
+            if docformat in local_comment:
+                self.set_comment(local_comment[docformat], docformat, version)
             else:
-                self.set_comment(global_comment, format, version)
-            if format in local_description:
-                self.set_description(local_description[format], format, version)
+                self.set_comment(global_comment, docformat, version)
+            if docformat in local_description:
+                self.set_description(local_description[docformat], docformat, version)
             else:
-                self.set_description(global_description, format, version)
+                self.set_description(global_description, docformat, version)
         self._build_file_list('init')
 
     def get_icon(self, subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, display_hidden=True):
@@ -1957,7 +2159,7 @@ class BibDoc:
                 return docfile
         return None
 
-    def add_icon(self, filename, format=None, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT, modification_date=None):
+    def add_icon(self, filename, docformat=None, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT, modification_date=None):
         """
         Attaches icon to this document.
 
@@ -1975,12 +2177,12 @@ class BibDoc:
         @raise InvenioBibDocFileError: in case of errors.
         """
         #first check if an icon already exists
-        if not format:
-            format = decompose_file(filename)[2]
+        if not docformat:
+            docformat = decompose_file(filename)[2]
         if subformat:
-            format += ";%s" % subformat
+            docformat += ";%s" % subformat
 
-        self.add_file_new_format(filename, format=format, modification_date=modification_date)
+        self.add_file_new_format(filename, docformat=docformat, modification_date=modification_date)
 
     def delete_icon(self, subformat_re=CFG_BIBDOCFILE_ICON_SUBFORMAT_RE):
         """
@@ -1996,64 +2198,9 @@ class BibDoc:
             if subformat_re.match(docfile.get_subformat()):
                 self.delete_file(docfile.get_format(), docfile.get_version())
 
-    def display(self, version="", ln=CFG_SITE_LANG, display_hidden=True):
+    def change_name(self, recid, newname):
         """
-        Returns an HTML representation of the this document.
-
-        @param version: if not set, only the last version will be displayed. If
-            'all', all versions will be displayed.
-        @type version: string (integer or 'all')
-        @param ln: the language code.
-        @type ln: string
-        @param display_hidden: whether to include hidden files as well.
-        @type display_hidden: bool
-        @return: the formatted representation.
-        @rtype: HTML string
-        """
-        t = ""
-        if version == "all":
-            docfiles = self.list_all_files(list_hidden=display_hidden)
-        elif version != "":
-            version = int(version)
-            docfiles = self.list_version_files(version, list_hidden=display_hidden)
-        else:
-            docfiles = self.list_latest_files(list_hidden=display_hidden)
-        # retrieve an icon that can be displayed (it can not be hidded)
-        icon = self.get_icon(display_hidden=False)
-        if icon:
-            imageurl = icon.get_url()
-        else:
-            imageurl = "%s/img/smallfiles.gif" % CFG_SITE_URL
-
-        versions = []
-        for version in list_versions_from_array(docfiles):
-            currversion = {
-                            'version' : version,
-                            'previous' : 0,
-                            'content' : []
-                          }
-            if version == self.get_latest_version() and version != 1:
-                currversion['previous'] = 1
-            for docfile in docfiles:
-                if docfile.get_version() == version:
-                    currversion['content'].append(docfile.display(ln = ln))
-            versions.append(currversion)
-
-        if versions:
-            return bibdocfile_templates.tmpl_bibdoc_filelist(
-                ln = ln,
-                versions = versions,
-                imageurl = imageurl,
-                docname = self.docname,
-                recid = self.recid,
-                status = self.status
-                )
-        else:
-            return ""
-
-    def change_name(self, newname):
-        """
-        Renames this document name.
+        Renames this document in connection with a given record.
 
         @param newname: the new name.
         @type newname: string
@@ -2062,29 +2209,16 @@ class BibDoc:
         """
         try:
             newname = normalize_docname(newname)
-            res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, newname))
-            if res:
-                raise InvenioBibDocFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
-            try:
-                for f in os.listdir(self.basedir):
-                    if not f.startswith('.'):
-                        try:
-                            (dummy, base, extension, version) = decompose_file_with_version(f)
-                        except ValueError:
-                            register_exception(alert_admin=True, prefix="Strange file '%s' is stored in %s" % (f, self.basedir))
-                        else:
-                            shutil.move(os.path.join(self.basedir, f), os.path.join(self.basedir, '%s%s;%i' % (newname, extension, version)))
-            except Exception, e:
-                register_exception()
-                raise InvenioBibDocFileError("Error in renaming the bibdoc %s to %s for recid %s: %s" % (self.docname, newname, self.recid, e))
-            run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
-            self.docname = newname
-        finally:
-            Md5Folder(self.basedir).update()
-            self.touch()
-            self._build_file_list('rename')
 
-    def set_comment(self, comment, format, version=None):
+            res = run_sql("SELECT id_bibdoc FROM bibrec_bibdoc WHERE id_bibrec=%s AND docname=%s", (recid, newname))
+            if res:
+                raise InvenioBibDocFileError, "A bibdoc called %s already exists for recid %s" % (newname, recid)
+
+            run_sql("update bibrec_bibdoc set docname=%s where id_bibdoc=%s and id_bibrec=%s", (newname, self.id, recid))
+        finally:
+            self.touch()
+
+    def set_comment(self, comment, docformat, version=None):
         """
         Updates the comment of a specific format/version of the document.
 
@@ -2099,12 +2233,12 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        format = normalize_format(format)
-        self.more_info.set_comment(comment, format, version)
+        docformat = normalize_format(docformat)
+        self.more_info.set_comment(comment, docformat, version)
         self.touch()
         self._build_file_list('init')
 
-    def set_description(self, description, format, version=None):
+    def set_description(self, description, docformat, version=None):
         """
         Updates the description of a specific format/version of the document.
 
@@ -2119,12 +2253,12 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        format = normalize_format(format)
-        self.more_info.set_description(description, format, version)
+        docformat = normalize_format(docformat)
+        self.more_info.set_description(description, docformat, version)
         self.touch()
         self._build_file_list('init')
 
-    def set_flag(self, flagname, format, version=None):
+    def set_flag(self, flagname, docformat, version=None):
         """
         Sets a flag for a specific format/version of the document.
 
@@ -2139,12 +2273,12 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        format = normalize_format(format)
-        self.more_info.set_flag(flagname, format, version)
+        docformat = normalize_format(docformat)
+        self.more_info.set_flag(flagname, docformat, version)
         self.touch()
         self._build_file_list('init')
 
-    def has_flag(self, flagname, format, version=None):
+    def has_flag(self, flagname, docformat, version=None):
         """
         Checks if a particular flag for a format/version is set.
 
@@ -2161,10 +2295,10 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        format = normalize_format(format)
-        return self.more_info.has_flag(flagname, format, version)
+        docformat = normalize_format(docformat)
+        return self.more_info.has_flag(flagname, docformat, version)
 
-    def unset_flag(self, flagname, format, version=None):
+    def unset_flag(self, flagname, docformat, version=None):
         """
         Unsets a flag for a specific format/version of the document.
 
@@ -2179,12 +2313,12 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        format = normalize_format(format)
-        self.more_info.unset_flag(flagname, format, version)
+        docformat = normalize_format(docformat)
+        self.more_info.unset_flag(flagname, docformat, version)
         self.touch()
         self._build_file_list('init')
 
-    def get_comment(self, format, version=None):
+    def get_comment(self, docformat, version=None):
         """
         Retrieve the comment of a specific format/version of the document.
 
@@ -2199,10 +2333,10 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        format = normalize_format(format)
-        return self.more_info.get_comment(format, version)
+        docformat = normalize_format(docformat)
+        return self.more_info.get_comment(docformat, version)
 
-    def get_description(self, format, version=None):
+    def get_description(self, docformat, version=None):
         """
         Retrieve the description of a specific format/version of the document.
 
@@ -2217,10 +2351,10 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        format = normalize_format(format)
-        return self.more_info.get_description(format, version)
+        docformat = normalize_format(docformat)
+        return self.more_info.get_description(docformat, version)
 
-    def hidden_p(self, format, version=None):
+    def hidden_p(self, docformat, version=None):
         """
         Returns True if the file specified by the given format/version is
         hidden.
@@ -2236,14 +2370,7 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        return self.more_info.has_flag('HIDDEN', format, version)
-
-    def get_docname(self):
-        """
-        @return: the name of this document.
-        @rtype: string
-        """
-        return self.docname
+        return self.more_info.has_flag('HIDDEN', docformat, version)
 
     def get_base_dir(self):
         """
@@ -2259,13 +2386,6 @@ class BibDoc:
         @rtype: string"""
         return self.doctype
 
-    def get_recid(self):
-        """
-        @return: the record id of the record to which this document is
-            attached.
-        @rtype: integer
-        """
-        return self.recid
 
     def get_id(self):
         """
@@ -2274,40 +2394,8 @@ class BibDoc:
         """
         return self.id
 
-    def pdf_a_p(self):
-        """
-        @return: True if this document contains a PDF in PDF/A format.
-        @rtype: bool"""
-        return self.has_flag('PDF/A', 'pdf')
 
-    def has_text(self, require_up_to_date=False, version=None):
-        """
-        Return True if the text of this document has already been extracted.
-
-        @param require_up_to_date: if True check the text was actually
-            extracted after the most recent format of the given version.
-        @type require_up_to_date: bool
-        @param version: a version for which the text should have been
-            extracted. If not specified the latest version is considered.
-        @type version: integer
-        @return: True if the text has already been extracted.
-        @rtype: bool
-        """
-        if version is None:
-            version = self.get_latest_version()
-        if os.path.exists(os.path.join(self.basedir, '.text;%i' % version)):
-            if not require_up_to_date:
-                return True
-            else:
-                docfiles = self.list_version_files(version)
-                text_md = datetime.fromtimestamp(os.path.getmtime(os.path.join(self.basedir, '.text;%i' % version)))
-                for docfile in docfiles:
-                    if text_md <= docfile.md:
-                        return False
-                return True
-        return False
-
-    def get_file(self, format, version=""):
+    def get_file(self, docformat, version=""):
         """
         Returns a L{BibDocFile} instance of this document corresponding to the
         specific format and version.
@@ -2326,19 +2414,19 @@ class BibDoc:
             version = int(version)
             docfiles = self.list_version_files(version)
 
-        format = normalize_format(format)
+        docformat = normalize_format(docformat)
 
         for docfile in docfiles:
-            if (docfile.get_format()==format or not format):
+            if (docfile.get_format() == docformat or not docformat):
                 return docfile
 
         ## Let's skip the subformat specification and consider just the
         ## superformat
-        superformat = get_superformat_from_format(format)
+        superformat = get_superformat_from_format(docformat)
         for docfile in docfiles:
             if get_superformat_from_format(docfile.get_format()) == superformat:
                 return docfile
-        raise InvenioBibDocFileError, "No file called '%s' of format '%s', version '%s'" % (self.docname, format, version)
+        raise InvenioBibDocFileError, "No file for doc %i of format '%s', version '%s'" % (self.id, docformat, version)
 
     def list_versions(self):
         """
@@ -2352,7 +2440,7 @@ class BibDoc:
         versions.sort()
         return versions
 
-    def delete(self):
+    def delete(self, recid = None):
         """
         Delete this document.
         @see: L{undelete} for how to undelete the document.
@@ -2360,7 +2448,18 @@ class BibDoc:
         """
         try:
             today = datetime.today()
-            self.change_name('DELETED-%s%s-%s' % (today.strftime('%Y%m%d%H%M%S'), today.microsecond, self.docname))
+            recids = []
+            if recid:
+                recids = [recid]
+            else:
+                recids = [link["recid"] for link in self.bibrec_links]
+
+            for rid in recids:
+                brd = BibRecDocs(rid)
+                docname = brd.get_docname(self.id)
+                # if the document is attached to some records
+                brd.change_name(docid=self.id, newname = 'DELETED-%s%s-%s' % (today.strftime('%Y%m%d%H%M%S'), today.microsecond, docname))
+
             run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
             self.status = 'DELETED'
         except Exception, e:
@@ -2382,7 +2481,7 @@ class BibDoc:
         """
         return len(self.docfiles) == 0
 
-    def undelete(self, previous_status=''):
+    def undelete(self, previous_status='', recid=None):
         """
         Undelete a deleted file (only if it was actually deleted via L{delete}).
         The previous C{status}, i.e. the restriction key can be provided.
@@ -2391,23 +2490,27 @@ class BibDoc:
         @type previous_status: string
         @raise InvenioBibDocFileError: in case of any error.
         """
-        bibrecdocs = BibRecDocs(self.recid)
+
         try:
             run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (previous_status, self.id))
         except Exception, e:
             raise InvenioBibDocFileError, "It's impossible to undelete bibdoc %s: %s" % (self.id, e)
-        if self.docname.startswith('DELETED-'):
-            try:
-                # Let's remove DELETED-20080214144322- in front of the docname
-                original_name = '-'.join(self.docname.split('-')[2:])
-                original_name = bibrecdocs.propose_unique_docname(original_name)
-                self.change_name(original_name)
-            except Exception, e:
-                raise InvenioBibDocFileError, "It's impossible to restore the previous docname %s. %s kept as docname because: %s" % (original_name, self.docname, e)
-        else:
-            raise InvenioBibDocFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % self.docname
 
-    def delete_file(self, format, version):
+        if recid:
+            bibrecdocs = BibRecDocs(recid)
+            docname = bibrecdocs.get_docname(self.id)
+            if docname.startswith('DELETED-'):
+                try:
+                    # Let's remove DELETED-20080214144322- in front of the docname
+                    original_name = '-'.join(docname.split('-')[2:])
+                    original_name = bibrecdocs.propose_unique_docname(original_name)
+                    bibrecdocs.change_name(docid=self.id, newname=original_name)
+                except Exception, e:
+                    raise InvenioBibDocFileError, "It's impossible to restore the previous docname %s. %s kept as docname because: %s" % (original_name, docname, e)
+            else:
+                raise InvenioBibDocFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % docname
+
+    def delete_file(self, docformat, version):
         """
         Delete a specific format/version of this document on the filesystem.
         @param format: the particular format to be deleted.
@@ -2416,7 +2519,7 @@ class BibDoc:
         @type version: integer
         @note: this operation is not reversible!"""
         try:
-            afile = self.get_file(format, version)
+            afile = self.get_file(docformat, version)
         except InvenioBibDocFileError:
             return
         try:
@@ -2461,13 +2564,13 @@ class BibDoc:
         renamef and every new file as renamet.
         """
 
-        def log_action(action, docid, docname, format, version, size, checksum, timestamp=''):
+        def log_action(action, docid, docname, docformat, version, size, checksum, timestamp=''):
             """Log an action into the bibdoclog table."""
             try:
                 if timestamp:
-                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)', (action, docid, docname, format, version, size, checksum, timestamp))
+                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)', (action, docid, docname, docformat, version, size, checksum, timestamp))
                 else:
-                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, format, version, size, checksum))
+                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, docformat, version, size, checksum))
             except DatabaseError:
                 register_exception()
 
@@ -2498,22 +2601,26 @@ class BibDoc:
 
         if context != ('init', 'init_from_disk'):
             previous_file_list = list(self.docfiles)
-        res = run_sql("SELECT status,docname,creation_date,"
-            "modification_date,more_info FROM bibdoc WHERE id=%s", (self.id,))
-        self.cd = res[0][2]
-        self.md = res[0][3]
-        self.docname = res[0][1]
+        res = run_sql("SELECT status, creation_date,"
+            "modification_date FROM bibdoc WHERE id=%s", (self.id,))
+
+        self.cd = res[0][1]
+        self.md = res[0][2]
         self.status = res[0][0]
-        self.more_info = BibDocMoreInfo(self.id, blob_to_string(res[0][4]))
+
+        self.more_info = BibDocMoreInfo(self.id)
         self.docfiles = []
+
+
         if CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE and context == 'init':
             ## In normal init context we read from DB
             res = run_sql("SELECT version, format, cd, md, checksum, filesize FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.id, ))
-            for version, format, cd, md, checksum, size in res:
+            for version, docformat, cd, md, checksum, size in res:
+                filepath = self.get_filepath(docformat, version)
                 self.docfiles.append(BibDocFile(
-                    os.path.join(self.basedir, self.docname + format + ";%s" % version), self.doctype,
-                    version, self.docname, format, self.recid, self.id, self.status, checksum,
-                    self.more_info, human_readable=self.human_readable, cd=cd, md=md, size=size))
+                    filepath, self.bibrec_types,
+                    version, docformat,  self.id, self.status, checksum,
+                    self.more_info, human_readable=self.human_readable, cd=cd, md=md, size=size, bibdoc=self))
         else:
             if os.path.exists(self.basedir):
                 self.md5s = Md5Folder(self.basedir)
@@ -2523,14 +2630,13 @@ class BibDoc:
                     if not afile.startswith('.'):
                         try:
                             filepath = os.path.join(self.basedir, afile)
-                            dirname, basename, format, fileversion = decompose_file_with_version(filepath)
+                            dummy, dummy, docformat, fileversion = decompose_file_with_version(filepath)
                             checksum = self.md5s.get_checksum(afile)
-                            # we can append file:
-                            self.docfiles.append(BibDocFile(filepath, self.doctype,
-                                fileversion, basename, format,
-                                self.recid, self.id, self.status, checksum,
-                                self.more_info, human_readable=self.human_readable))
-                        except Exception, e:
+                            self.docfiles.append(BibDocFile(filepath, self.bibrec_types,
+                                    fileversion, docformat,
+                                    self.id, self.status, checksum,
+                                    self.more_info, human_readable=self.human_readable, bibdoc=self))
+                        except Exception, dummy:
                             register_exception()
         if context in ('init', 'init_from_disk'):
             return
@@ -2541,14 +2647,14 @@ class BibDoc:
             if context == 'rename':
                 deletedstr = "RENAMEDFROM"
                 addedstr = "RENAMEDTO"
-            for (docname, format, version), (size, checksum, md) in added_files.iteritems():
+            for (docname, docformat, version), (size, checksum, md) in added_files.iteritems():
                 if context == 'rename':
                     md = '' # No modification time
-                log_action(addedstr, self.id, docname, format, version, size, checksum, md)
-            for (docname, format, version), (size, checksum, md) in deleted_files.iteritems():
+                log_action(addedstr, self.id, docname, docformat, version, size, checksum, md)
+            for (docname, docformat, version), (size, checksum, md) in deleted_files.iteritems():
                 if context == 'rename':
                     md = '' # No modification time
-                log_action(deletedstr, self.id, docname, format, version, size, checksum, md)
+                log_action(deletedstr, self.id, docname, docformat, version, size, checksum, md)
 
     def _sync_to_db(self):
         """
@@ -2559,6 +2665,24 @@ class BibDoc:
         for afile in self.docfiles:
             run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, false, %s, %s, %s, %s, %s)", (self.id, afile.get_version(), afile.get_format(), afile.cd, afile.md, afile.get_checksum(), afile.get_size(), afile.mime))
             run_sql("UPDATE bibdocfsinfo SET last_version=true WHERE id_bibdoc=%s AND version=%s", (self.id, self.get_latest_version()))
+
+    def _build_related_file_list(self):
+        """Lists all files attached to the bibdoc. This function should be
+        called everytime the bibdoc is modified within e.g. its icon.
+        @deprecated: use subformats instead.
+        """
+        self.related_files = {}
+        res = run_sql("SELECT ln.id_bibdoc2,ln.rel_type,bibdoc.status FROM "
+            "bibdoc_bibdoc AS ln,bibdoc WHERE bibdoc.id=ln.id_bibdoc2 AND "
+            "ln.id_bibdoc1=%s", (str(self.id),))
+        for row in res:
+            docid = row[0]
+            doctype = row[1]
+            if row[2] != 'DELETED':
+                if not self.related_files.has_key(doctype):
+                    self.related_files[doctype] = []
+                cur_doc = BibDoc.create_instance(docid=docid, human_readable=self.human_readable)
+                self.related_files[doctype].append(cur_doc)
 
     def get_total_size_latest_version(self):
         """Return the total size used on disk of all the files belonging
@@ -2592,23 +2716,6 @@ class BibDoc:
         version = int(version)
         return [docfile for docfile in self.docfiles if docfile.get_version() == version and (list_hidden or not docfile.hidden_p())]
 
-    def check_file_exists(self, path, format):
-        """
-        Check if a file with the same content of the file pointed in C{path}
-        is already attached to this record.
-
-        @param path: the file to be checked against.
-        @type path: string
-        @return: True if a file with the requested content is already attached
-        to the record.
-        @rtype: bool
-        """
-        # Let's consider all the latest files
-        for afile in self.list_latest_files():
-            if afile.is_identical_to(path, format):
-                return True
-        return False
-
     def get_latest_version(self):
         """ Returns the latest existing version number for the given bibdoc.
         If no file is associated to this bibdoc, returns '0'.
@@ -2623,18 +2730,54 @@ class BibDoc:
         """Return the total number of files."""
         return len(self.docfiles)
 
-    def register_download(self, ip_address, version, format, userid=0):
+    def register_download(self, ip_address, version, docformat, userid=0, recid=0):
         """Register the information about a download of a particular file."""
-        format = normalize_format(format)
-        if format[:1] == '.':
-            format = format[1:]
-        format = format.upper()
+
+        docformat = normalize_format(docformat)
+        if docformat[:1] == '.':
+            docformat = docformat[1:]
+        docformat = docformat.upper()
         return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "
             "(id_bibrec,id_bibdoc,file_version,file_format,"
             "id_user,client_host,download_time) VALUES "
             "(%s,%s,%s,%s,%s,INET_ATON(%s),NOW())",
-            (self.recid, self.id, version, format,
+            (recid, self.id, version, docformat,
             userid, ip_address,))
+
+    def get_incoming_relations(self, rel_type=None):
+        """Return all relations in which this BibDoc appears on target position
+        @param rel_type: Type of the relation, to which we want to limit our search. None = any type
+        @type rel_type: string
+
+        @return: List of BibRelation instances
+        @rtype: list
+        """
+        return BibRelation.get_relations(rel_type = rel_type,
+                                         bibdoc2_id = self.id)
+
+
+    def get_outgoing_relations(self, rel_type=None):
+        """Return all relations in which this BibDoc appears on target position
+        @param rel_type: Type of the relation, to which we want to limit our search. None = any type
+        @type rel_type: string
+
+        @return: List of BibRelation instances
+        @rtype: list
+        """
+        return BibRelation.get_relations(rel_type = rel_type,
+                                         bibdoc1_id = self.id)
+    def create_outgoing_relation(self, bibdoc2, rel_type):
+        """
+        Create an outgoing relation between current BibDoc and a different one
+        """
+        return BibRelation.create(bibdoc1_id = self.id, bibdoc2_id = bibdoc2.id, rel_type = rel_type)
+
+    def create_incoming_relation(self, bibdoc1, rel_type):
+        """
+        Create an outgoing relation between a particular version of
+        current BibDoc and a particular version of a different BibDoc
+        """
+        return BibRelation.create(bibdoc1_id = bibdoc1.id, bibdoc2_id = self.id, rel_type = rel_type)
 
 def generic_path2bidocfile(fullpath):
     """
@@ -2646,52 +2789,56 @@ def generic_path2bidocfile(fullpath):
     """
     fullpath = os.path.abspath(fullpath)
     try:
-        path, name, format, version = decompose_file_with_version(fullpath)
+        path, name, docformat, version = decompose_file_with_version(fullpath)
     except ValueError:
         ## There is no version
         version = 0
-        path, name, format = decompose_file(fullpath)
+        path, name, docformat = decompose_file(fullpath)
     md5folder = Md5Folder(path)
     checksum = md5folder.get_checksum(os.path.basename(fullpath))
     return BibDocFile(fullpath=fullpath,
         doctype=None,
+        recid_doctypes = [(0, None, name)],
         version=version,
-        name=name,
-        format=format,
-        recid=0,
+        docformat=docformat,
         docid=0,
         status=None,
         checksum=checksum,
         more_info=None)
 
-class BibDocFile:
+class BibDocFile(object):
     """This class represents a physical file in the Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, more_info=None, human_readable=False, cd=None, md=None, size=None):
+    def __init__(self, fullpath, recid_doctypes, version, docformat, docid, status, checksum, more_info=None, human_readable=False, cd=None, md=None, size=None, bibdoc = None):
         self.fullpath = os.path.abspath(fullpath)
-        self.doctype = doctype
+
         self.docid = docid
-        self.recid = recid
+
+        self.recids_doctypes = recid_doctypes
+
         self.version = version
         self.status = status
         self.checksum = checksum
         self.human_readable = human_readable
+        self.name = recid_doctypes[0][2]
+        self.bibdoc = bibdoc
+
         if more_info:
-            self.description = more_info.get_description(format, version)
-            self.comment = more_info.get_comment(format, version)
-            self.flags = more_info.get_flags(format, version)
+            self.description = more_info.get_description(docformat, version)
+            self.comment = more_info.get_comment(docformat, version)
+            self.flags = more_info.get_flags(docformat, version)
         else:
             self.description = None
             self.comment = None
             self.flags = []
-        self.format = normalize_format(format)
+        self.format = normalize_format(docformat)
         self.superformat = get_superformat_from_format(self.format)
         self.subformat = get_subformat_from_format(self.format)
-        self.fullname = name
-        if format:
-            self.fullname += self.superformat
-        self.mime, self.encoding = _mimes.guess_type(self.fullname)
+        if docformat:
+            self.recids_doctypes = [(a,b,c+self.superformat) for (a,b,c) in self.recids_doctypes]
+
+        self.mime, self.encoding = _mimes.guess_type(self.recids_doctypes[0][2])
         if self.mime is None:
             self.mime = "application/octet-stream"
         self.more_info = more_info
@@ -2702,71 +2849,49 @@ class BibDocFile:
             self.cd = cd or datetime.fromtimestamp(os.path.getctime(fullpath))
         except OSError:
             self.cd = self.md
-        self.name = name
+
         self.dir = os.path.dirname(fullpath)
         if self.subformat:
-            self.url = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, urllib.quote(self.name), urllib.quote(self.superformat)), {'subformat' : self.subformat})
-            self.fullurl = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, urllib.quote(self.name), urllib.quote(self.superformat)), {'subformat' : self.subformat, 'version' : self.version})
+            self.url = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recids_doctypes[0][0], self.name, self.superformat), {'subformat' : self.subformat})
+            self.fullurl = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recids_doctypes[0][0], self.name, self.superformat), {'subformat' : self.subformat, 'version' : self.version})
         else:
-            self.url = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, urllib.quote(self.name), urllib.quote(self.superformat)), {})
-            self.fullurl = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recid, urllib.quote(self.name), urllib.quote(self.superformat)), {'version' : self.version})
+            self.url = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recids_doctypes[0][0], self.name, self.superformat), {})
+            self.fullurl = create_url('%s/%s/%s/files/%s%s' % (CFG_SITE_URL, CFG_SITE_RECORD, self.recids_doctypes[0][0], self.name, self.superformat), {'version' : self.version})
         self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         self.magic = None
 
     def __repr__(self):
-        return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.more_info), repr(self.human_readable)))
+        return ('BibDocFile(%s,  %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), self.version, repr(self.name), repr(self.format), self.recids_doctypes[0][0], self.docid, repr(self.status), repr(self.checksum), repr(self.more_info), repr(self.human_readable)))
 
+    def format_recids(self):
+        if self.bibdoc:
+            return self.bibdoc.format_recids()
+        return "0"
     def __str__(self):
-        out = '%s:%s:%s:%s:fullpath=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullpath)
-        out += '%s:%s:%s:%s:fullname=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullname)
-        out += '%s:%s:%s:%s:name=%s\n' % (self.recid, self.docid, self.version, self.format, self.name)
-        out += '%s:%s:%s:%s:subformat=%s\n' % (self.recid, self.docid, self.version, self.format, get_subformat_from_format(self.format))
-        out += '%s:%s:%s:%s:status=%s\n' % (self.recid, self.docid, self.version, self.format, self.status)
-        out += '%s:%s:%s:%s:checksum=%s\n' % (self.recid, self.docid, self.version, self.format, self.checksum)
+        recids = self.format_recids()
+        out = '%s:%s:%s:%s:fullpath=%s\n' % (recids, self.docid, self.version, self.format, self.fullpath)
+        out += '%s:%s:%s:%s:name=%s\n' % (recids,  self.docid, self.version, self.format, self.name)
+        out += '%s:%s:%s:%s:subformat=%s\n' % (recids,  self.docid, self.version, self.format, get_subformat_from_format(self.format))
+        out += '%s:%s:%s:%s:status=%s\n' % (recids,  self.docid, self.version, self.format, self.status)
+        out += '%s:%s:%s:%s:checksum=%s\n' % (recids,  self.docid, self.version, self.format, self.checksum)
         if self.human_readable:
-            out += '%s:%s:%s:%s:size=%s\n' % (self.recid, self.docid, self.version, self.format, nice_size(self.size))
+            out += '%s:%s:%s:%s:size=%s\n' % (recids,  self.docid, self.version, self.format, nice_size(self.size))
         else:
-            out += '%s:%s:%s:%s:size=%s\n' % (self.recid, self.docid, self.version, self.format, self.size)
-        out += '%s:%s:%s:%s:creation time=%s\n' % (self.recid, self.docid, self.version, self.format, self.cd)
-        out += '%s:%s:%s:%s:modification time=%s\n' % (self.recid, self.docid, self.version, self.format, self.md)
-        out += '%s:%s:%s:%s:magic=%s\n' % (self.recid, self.docid, self.version, self.format, self.get_magic())
-        out += '%s:%s:%s:%s:mime=%s\n' % (self.recid, self.docid, self.version, self.format, self.mime)
-        out += '%s:%s:%s:%s:encoding=%s\n' % (self.recid, self.docid, self.version, self.format, self.encoding)
-        out += '%s:%s:%s:%s:url=%s\n' % (self.recid, self.docid, self.version, self.format, self.url)
-        out += '%s:%s:%s:%s:fullurl=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullurl)
-        out += '%s:%s:%s:%s:description=%s\n' % (self.recid, self.docid, self.version, self.format, self.description)
-        out += '%s:%s:%s:%s:comment=%s\n' % (self.recid, self.docid, self.version, self.format, self.comment)
-        out += '%s:%s:%s:%s:hidden=%s\n' % (self.recid, self.docid, self.version, self.format, self.hidden)
-        out += '%s:%s:%s:%s:flags=%s\n' % (self.recid, self.docid, self.version, self.format, self.flags)
-        out += '%s:%s:%s:%s:etag=%s\n' % (self.recid, self.docid, self.version, self.format, self.etag)
+            out += '%s:%s:%s:%s:size=%s\n' % (recids,  self.docid, self.version, self.format, self.size)
+        out += '%s:%s:%s:%s:creation time=%s\n' % (recids,  self.docid, self.version, self.format, self.cd)
+        out += '%s:%s:%s:%s:modification time=%s\n' % (recids,  self.docid, self.version, self.format, self.md)
+        out += '%s:%s:%s:%s:magic=%s\n' % (recids, self.docid, self.version, self.format, self.get_magic())
+        out += '%s:%s:%s:%s:mime=%s\n' % (recids, self.docid, self.version, self.format, self.mime)
+        out += '%s:%s:%s:%s:encoding=%s\n' % (recids, self.docid, self.version, self.format, self.encoding)
+        out += '%s:%s:%s:%s:url=%s\n' % (recids, self.docid, self.version, self.format, self.url)
+        out += '%s:%s:%s:%s:fullurl=%s\n' % (recids, self.docid, self.version, self.format, self.fullurl)
+        out += '%s:%s:%s:%s:description=%s\n' % (recids, self.docid, self.version, self.format, self.description)
+        out += '%s:%s:%s:%s:comment=%s\n' % (recids, self.docid, self.version, self.format, self.comment)
+        out += '%s:%s:%s:%s:hidden=%s\n' % (recids, self.docid, self.version, self.format, self.hidden)
+        out += '%s:%s:%s:%s:flags=%s\n' % (recids, self.docid, self.version, self.format, self.flags)
+        out += '%s:%s:%s:%s:etag=%s\n' % (recids, self.docid, self.version, self.format, self.etag)
         return out
 
-    def display(self, ln = CFG_SITE_LANG):
-        """Returns a formatted representation of this docfile."""
-        return bibdocfile_templates.tmpl_bibdocfile_filelist(
-                 ln = ln,
-                 recid = self.recid,
-                 version = self.version,
-                 md = self.md,
-                 name = self.name,
-                 superformat = self.superformat,
-                 subformat = self.subformat,
-                 nice_size = nice_size(self.size),
-                 description = self.description or ''
-               )
-
-    def is_identical_to(self, path, format):
-        """
-        @path: the path of another file on disk.
-        @return: True if L{path} is contains bitwise the same content.
-        """
-        if self.format != format:
-            return False
-        if os.path.getsize(path) != self.size:
-            return False
-        if calculate_md5(path) != self.checksum:
-            return False
-        return filecmp.cmp(self.get_full_path(), path)
 
     def is_restricted(self, user_info):
         """Returns restriction state. (see acc_authorize_action return values)"""
@@ -2797,7 +2922,8 @@ class BibDocFile:
         return self.url
 
     def get_type(self):
-        return self.doctype
+        """Returns the first type connected with the bibdoc of this file."""
+        return self.recids_doctypes[0][1]
 
     def get_path(self):
         return self.fullpath
@@ -2809,7 +2935,8 @@ class BibDocFile:
         return self.name
 
     def get_full_name(self):
-        return self.fullname
+        """Returns the first name connected with the bibdoc of this file."""
+        return self.recids_doctypes[0][2]
 
     def get_full_path(self):
         return self.fullpath
@@ -2846,8 +2973,8 @@ class BibDocFile:
         return content
 
     def get_recid(self):
-        """Returns the recid connected with the bibdoc of this file."""
-        return self.recid
+        """Returns the first recid connected with the bibdoc of this file."""
+        return self.recids_doctypes[0][0]
 
     def get_status(self):
         """Returns the status of the file, i.e. either '', 'DELETED' or a
@@ -2857,12 +2984,20 @@ class BibDocFile:
     def get_magic(self):
         """Return all the possible guesses from the magic library about
         the content of the file."""
-        if self.magic is None and CFG_HAS_MAGIC:
-            magic_cookies = _get_magic_cookies()
-            magic_result = []
-            for key in magic_cookies.keys():
-                magic_result.append(magic_cookies[key].file(self.fullpath))
-            self.magic = tuple(magic_result)
+        if self.magic is None:
+            if CFG_HAS_MAGIC == 1:
+                magic_cookies = _get_magic_cookies()
+                magic_result = []
+                for key in magic_cookies.keys():
+                    magic_result.append(magic_cookies[key].file(self.fullpath))
+                self.magic = tuple(magic_result)
+            elif CFG_HAS_MAGIC == 2:
+                magic_result = []
+                for key in ({'mime': False, 'mime_encoding': False},
+                        {'mime': True, 'mime_encoding': False},
+                        {'mime': False, 'mime_encoding': True}):
+                    magic_result.append(_magic_wrapper(self.fullpath, **key))
+                self.magic = tuple(magic_result)
         return self.magic
 
     def check(self):
@@ -2875,7 +3010,7 @@ class BibDocFile:
         inside websubmit_webinterface.py."""
         if os.path.exists(self.fullpath):
             if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
-                raise InvenioBibDocFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
+                raise InvenioBibDocFileError, "File %s, version %i, is corrupted!" % (self.recids_doctypes[0][2], self.version)
             stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl, download=download)
             raise apache.SERVER_RETURN, apache.DONE
         else:
@@ -2950,11 +3085,11 @@ def check_bibdoc_authorization(user_info, status):
     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
 _RE_BAD_MSIE = re.compile("MSIE\s+(\d+\.\d+)")
-def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None, download=False):
+def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5str=None, location=None, download=False):
     """This is a generic function to stream a file to the user.
     If fullname, mime, encoding, and location are not provided they will be
     guessed based on req and fullpath.
-    md5 should be passed as an hexadecimal string.
+    md5str should be passed as an hexadecimal string.
     """
     def normal_streaming(size):
         req.set_content_length(size)
@@ -3082,7 +3217,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                     ret.append(arange)
         return ret
 
-    def get_normalized_headers(headers):
+    def get_normalized_headers():
         """Strip and lowerize all the keys of the headers dictionary plus
         strip, lowerize and transform known headers value into their value."""
         ret = {
@@ -3108,7 +3243,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 ret[key] = value
         return ret
 
-    headers = get_normalized_headers(req.headers_in)
+    headers = get_normalized_headers()
     g = _RE_BAD_MSIE.search(headers.get('user-agent', "MSIE 6.0"))
     bad_msie = g and float(g.group(1)) < 9.0
 
@@ -3127,7 +3262,6 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
             req.headers_out["X-Sendfile"] = fullpath
             if mime is None:
-                format = decompose_file(fullpath)[2]
                 (mime, encoding) = _mimes.guess_type(fullpath)
                 if mime is None:
                     mime = "application/octet-stream"
@@ -3165,8 +3299,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.headers_out["Content-Location"] = location
         if etag is not None:
             req.headers_out["ETag"] = etag
-        if md5 is not None:
-            req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
+        if md5str is not None:
+            req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5str.upper()))[:-1]
         if bad_msie:
             ## IE is confused by quotes
             req.headers_out["Content-Disposition"] = 'attachment; filename=%s' % fullname.replace('"', '\\"')
@@ -3213,35 +3347,23 @@ def stream_restricted_icon(req):
     stream_file(req, '%s/img/restricted.gif' % CFG_WEBDIR)
     raise apache.SERVER_RETURN, apache.DONE
 
-def list_types_from_array(bibdocs):
-    """Retrieves the list of types from the given bibdoc list."""
-    types = []
-    for bibdoc in bibdocs:
-        if not bibdoc.get_type() in types:
-            types.append(bibdoc.get_type())
-    types.sort()
-    if 'Main' in types:
-        ## Move 'Main' at the beginning
-        types.remove('Main')
-        types.insert(0, 'Main')
-    return types
 
-def list_versions_from_array(docfiles):
-    """Retrieve the list of existing versions from the given docfiles list."""
-    versions = []
-    for docfile in docfiles:
-        if not docfile.get_version() in versions:
-            versions.append(docfile.get_version())
-    versions.sort()
-    versions.reverse()
-    return versions
+#def list_versions_from_array(docfiles):
+#    """Retrieve the list of existing versions from the given docfiles list."""
+#    versions = []
+#    for docfile in docfiles:
+#        if not docfile.get_version() in versions:
+#            versions.append(docfile.get_version())
+#    versions.sort()
+#    versions.reverse()
+#    return versions
 
 def _make_base_dir(docid):
     """Given a docid it returns the complete path that should host its files."""
     group = "g" + str(int(int(docid) / CFG_BIBDOCFILE_FILESYSTEM_BIBDOC_GROUP_LIMIT))
     return os.path.join(CFG_BIBDOCFILE_FILEDIR, group, str(docid))
 
-class Md5Folder:
+class Md5Folder(object):
     """Manage all the Md5 checksum about a folder"""
     def __init__(self, folder):
         """Initialize the class from the md5 checksum of a given path"""
@@ -3368,15 +3490,14 @@ def bibdocfile_url_to_bibrecdocs(url):
 def bibdocfile_url_to_bibdoc(url):
     """Given an URL in the form CFG_SITE_[SECURE_]URL/CFG_SITE_RECORD/xxx/files/... it returns
     a BibDoc object for the corresponding recid/docname."""
-
     docname = decompose_bibdocfile_url(url)[1]
     return bibdocfile_url_to_bibrecdocs(url).get_bibdoc(docname)
 
 def bibdocfile_url_to_bibdocfile(url):
     """Given an URL in the form CFG_SITE_[SECURE_]URL/CFG_SITE_RECORD/xxx/files/... it returns
     a BibDocFile object for the corresponding recid/docname/format."""
-    dummy, dummy, format = decompose_bibdocfile_url(url)
-    return bibdocfile_url_to_bibdoc(url).get_file(format)
+    docformat = decompose_bibdocfile_url(url)[2]
+    return bibdocfile_url_to_bibdoc(url).get_file(docformat)
 
 def bibdocfile_url_to_fullpath(url):
     """Given an URL in the form CFG_SITE_[SECURE_]URL/CFG_SITE_RECORD/xxx/files/... it returns
@@ -3399,7 +3520,7 @@ def get_docid_from_bibdocfile_fullpath(fullpath):
     returns the docid (e.g. 123)."""
     if not fullpath.startswith(os.path.join(CFG_BIBDOCFILE_FILEDIR, 'g')):
         raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
-    dirname, base, extension, version = decompose_file_with_version(fullpath)
+    dirname = decompose_file_with_version(fullpath)[0]
     try:
         return int(dirname.split('/')[-1])
     except:
@@ -3410,13 +3531,10 @@ def decompose_bibdocfile_fullpath(fullpath):
     returns a quadruple (recid, docname, format, version)."""
     if not fullpath.startswith(os.path.join(CFG_BIBDOCFILE_FILEDIR, 'g')):
         raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
-    dirname, base, extension, version = decompose_file_with_version(fullpath)
+    dirname, dummy, extension, version = decompose_file_with_version(fullpath)
     try:
         docid = int(dirname.split('/')[-1])
-        bibdoc = BibDoc(docid)
-        recid = bibdoc.get_recid()
-        docname = bibdoc.get_docname()
-        return recid, docname, extension, version
+        return {"doc_id" : docid, "extension": extension, "version": version}
     except:
         raise InvenioBibDocFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
 
@@ -3424,6 +3542,7 @@ def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
     if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
         return decompose_bibdocfile_very_old_url(url)
+
     if url.startswith('%s/%s/' % (CFG_SITE_URL, CFG_SITE_RECORD)):
         recid_file = url[len('%s/%s/' % (CFG_SITE_URL, CFG_SITE_RECORD)):]
     elif url.startswith('%s/%s/' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)):
@@ -3431,11 +3550,14 @@ def decompose_bibdocfile_url(url):
     else:
         raise InvenioBibDocFileError, "Url %s doesn't correspond to a valid record inside the system." % url
     recid_file = recid_file.replace('/files/', '/')
-    recid, docname, format = decompose_file(urllib.unquote(recid_file))
+
+    recid, docname, docformat = decompose_file(urllib.unquote(recid_file)) # this will work in the case of URL... not file !
     if not recid and docname.isdigit():
         ## If the URL was something similar to CFG_SITE_URL/CFG_SITE_RECORD/123
         return (int(docname), '', '')
-    return (int(recid), docname, format)
+
+    return (int(recid), docname, docformat)
+
 
 re_bibdocfile_old_url = re.compile(r'/%s/(\d*)/files/' % CFG_SITE_RECORD)
 def decompose_bibdocfile_old_url(url):
@@ -3455,9 +3577,13 @@ def decompose_bibdocfile_very_old_url(url):
                 params = cgi.parse_qs(params)
                 if 'docid' in params:
                     docid = int(params['docid'][0])
-                    bibdoc = BibDoc(docid)
-                    recid = bibdoc.get_recid()
-                    docname = bibdoc.get_docname()
+                    bibdoc = BibDoc.create_instance(docid)
+                    if bibdoc.bibrec_links:
+
+                        recid = bibdoc.bibrec_links[0]["rec_id"]
+                        docname = bibdoc.bibrec_links[0]["doc_name"]
+                    else:
+                        raise InvenioBibDocFileError("Old style URL pointing to an unattached document")
                 elif 'recid' in params:
                     recid = int(params['recid'][0])
                     if 'name' in params:
@@ -3466,8 +3592,9 @@ def decompose_bibdocfile_very_old_url(url):
                         docname = ''
                 else:
                     raise InvenioBibDocFileError('%s has not enough params to correspond to a bibdocfile.' % url)
-                format = normalize_format(params.get('format', [''])[0])
-                return (recid, docname, format)
+                docformat = normalize_format(params.get('format', [''])[0])
+
+                return (recid, docname, docformat)
             except Exception, e:
                 raise InvenioBibDocFileError('Problem with %s: %s' % (url, e))
         else:
@@ -3544,7 +3671,7 @@ def safe_mkstemp(suffix, prefix='bibdocfile_'):
         os.close(tmpfd)
     return tmppath
 
-def download_local_file(filename, format=None):
+def download_local_file(filename, docformat=None):
     """
     Copies a local file to Invenio's temporary directory.
 
@@ -3558,10 +3685,10 @@ def download_local_file(filename, format=None):
     @raise StandardError: if something went wrong
     """
     # Make sure the format is OK.
-    if format is None:
-        format = guess_format_from_url(filename)
+    if docformat is None:
+        docformat = guess_format_from_url(filename)
     else:
-        format = normalize_format(format)
+        docformat = normalize_format(docformat)
 
     tmppath = ''
 
@@ -3574,7 +3701,7 @@ def download_local_file(filename, format=None):
         for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR,
                 CFG_WEBSUBMIT_STORAGEDIR]:
             if path.startswith(allowed_path):
-                tmppath = safe_mkstemp(format)
+                tmppath = safe_mkstemp(docformat)
                 shutil.copy(path, tmppath)
                 if os.path.getsize(tmppath) == 0:
                     os.remove(tmppath)
@@ -3588,7 +3715,7 @@ def download_local_file(filename, format=None):
 
     return tmppath
 
-def download_external_url(url, format=None):
+def download_external_url(url, docformat=None):
     """
     Download a url (if it corresponds to a remote file) and return a
     local url to it.
@@ -3604,16 +3731,16 @@ def download_external_url(url, format=None):
     tmppath = None
 
     # Make sure the format is OK.
-    if format is None:
+    if docformat is None:
         # First try to find a known extension to the URL
-        format = decompose_file(url, skip_version=True,
+        docformat = decompose_file(url, skip_version=True,
                 only_known_extensions=True)[2]
-        if not format:
+        if not docformat:
             # No correct format could be found. Will try to get it from the
             # HTTP message headers.
-            format = ''
+            docformat = ''
     else:
-        format = normalize_format(format)
+        docformat = normalize_format(docformat)
 
     from_file, to_file, tmppath = None, None, ''
 
@@ -3624,13 +3751,13 @@ def download_external_url(url, format=None):
     except urllib2.URLError, e:
         raise StandardError, 'URL could not be opened: %s' % str(e)
 
-    if not format:
+    if not docformat:
         # We could not determine the format from the URL, so let's try
         # to read it from the HTTP headers.
-        format = get_format_from_http_response(from_file)
+        docformat = get_format_from_http_response(from_file)
 
     try:
-        tmppath = safe_mkstemp(format)
+        tmppath = safe_mkstemp(docformat)
 
         to_file = open(tmppath, 'w')
         while True:
@@ -3679,15 +3806,15 @@ def get_format_from_http_response(response):
 
     info = response.info()
 
-    format = ''
+    docformat = ''
 
     content_disposition = info.getheader('Content-Disposition')
     if content_disposition:
         filename = parse_content_disposition(content_disposition)
         if filename:
-            format = decompose_file(filename, only_known_extensions=False)[2]
-            if format:
-                return format
+            docformat = decompose_file(filename, only_known_extensions=False)[2]
+            if docformat:
+                return docformat
 
     content_type = info.getheader('Content-Type')
     if content_type:
@@ -3700,11 +3827,11 @@ def get_format_from_http_response(response):
             if ext:
                 ## Normalize some common magic mis-interpreation
                 ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
-                format = normalize_format(ext)
+                docformat = normalize_format(ext)
 
-    return format
+    return docformat
 
-def download_url(url, format=None):
+def download_url(url, docformat=None):
     """
     Download a url (if it corresponds to a remote file) and return a
     local url to it.
@@ -3713,15 +3840,332 @@ def download_url(url, format=None):
 
     try:
         if is_url_a_local_file(url):
-            tmppath = download_local_file(url, format=format)
+            tmppath = download_local_file(url, docformat = docformat)
         else:
-            tmppath = download_external_url(url, format=format)
+            tmppath = download_external_url(url, docformat = docformat)
     except StandardError:
         raise
 
     return tmppath
 
-class BibDocMoreInfo:
+class MoreInfo(object):
+    """This class represents a genering MoreInfo dictionary.
+       MoreInfo object can be attached to bibdoc, bibversion, format or BibRelation.
+       The entity where a particular MoreInfo object is attached has to be specified using the
+       constructor parametes.
+
+       This class is a thin wrapper around the database table.
+       """
+
+    def __init__(self, docid = None, version = None, docformat = None,
+                 relation = None, cache_only = False, cache_reads = True, initial_data = None):
+        """
+        @param cache_only Determines if MoreInfo object should be created in
+                          memory only or reflected in the database
+        @type cache_only boolean
+
+        @param cache_reads Determines if reads should be executed on the
+                           in-memory cache or should be redirected to the
+                           database. If this is true, cache can be entirely
+                           regenerated from the database only upon an explicit
+                           request. If the value is not present in the cache,
+                           the database is queried
+        @type cache_reads boolean
+
+        @param initial_data Allows to specify initial content of the cache.
+                             This parameter is useful when we create an in-memory
+                             instance from serialised value
+        @type initial_data string
+
+        """
+        self.docid = docid
+        self.version = version
+        self.format = docformat
+        self.relation = relation
+        self.cache_only = cache_only
+
+
+        if initial_data != None:
+            self.cache = initial_data
+            self.dirty = initial_data
+            if not self.cache_only:
+                self._flush_cache() #inserts new entries
+        else:
+            self.cache = {}
+            self.dirty = {}
+
+        self.cache_reads = cache_reads
+
+        if not self.cache_only:
+            self.populate_from_database()
+
+    @staticmethod
+    def create_from_serialised(ser_str, docid = None, version = None, docformat = None,
+                 relation = None, cache_only = False, cache_reads = True):
+        """Creates an instance of MoreInfo
+           using serialised data as the cache content"""
+        data = cPickle.loads(base64.b64decode(ser_str))
+        return MoreInfo(docid = docid, version = version, docformat = docformat,
+                        relation = relation, cache_only = cache_only,
+                        cache_reads = cache_reads, initial_data = data);
+
+    def serialise_cache(self):
+        """Returns a serialised representation of the cache"""
+        return base64.b64encode(cPickle.dumps(self.get_cache()))
+
+    def populate_from_database(self):
+        """Retrieves all values of MoreInfo and places them in the cache"""
+        where_str, where_args = self._generate_where_query_args()
+        query_str = "SELECT namespace, data_key, data_value FROM bibdocmoreinfo WHERE %s" % (where_str, )
+        res = run_sql(query_str, where_args)
+        if res:
+            for row in res:
+                namespace, data_key, data_value_ser = row
+                data_value = cPickle.loads(data_value_ser)
+                if not namespace in self.cache:
+                    self.cache[namespace] = {}
+                self.cache[namespace][data_key] = data_value
+
+    def _mark_dirty(self, namespace, data_key):
+        """Marks a data key dirty - that should be saved into the database"""
+        if not namespace in self.dirty:
+            self.dirty[namespace] = {}
+        self.dirty[namespace][data_key] = True
+
+    def _database_get_distinct_string_list(self, column, namespace = None):
+        """A private method reading an unique list of strings from the
+        moreinfo database table"""
+        where_str, where_args = self._generate_where_query_args(
+            namespace = namespace)
+        query_str = "SELECT DISTINCT %s FROM bibdocmoreinfo WHERE %s" % \
+            ( column, where_str, )
+
+        if DBG_LOG_QUERIES:
+            from invenio.bibtask import write_message
+            write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
+            print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
+
+        res = run_sql(query_str, where_args)
+
+        return (res and [x[0] for x in res]) or [] # after migrating to python 2.6, can be rewritten using x if y else z    syntax: return [x[0] for x in res] if res else []
+
+    def _database_get_namespaces(self):
+        """Read the database to discover namespaces declared in a given MoreInfo"""
+        return self._database_get_distinct_string_list("namespace")
+
+    def _database_get_keys(self, namespace):
+        """Returns all keys assigned in a given namespace of a MoreInfo instance"""
+        return self._database_get_distinct_string_list("data_key", namespace=namespace)
+
+    def _database_contains_key(self, namespace, key):
+        return self._database_read_value(namespace, key) != None
+
+    def _database_save_value(self, namespace, key, value):
+        """Write changes into the database"""
+        #TODO: this should happen within one transaction
+        serialised_val = cPickle.dumps(value)
+        # on duplicate key will not work here as miltiple null values are permitted by the index
+        if not self._database_contains_key(namespace, key):
+            #insert new value
+            query_parts = []
+            query_args = []
+
+            to_process = [(self.docid, "id_bibdoc"), (self.version, "version"),
+                          (self.format, "format"), (self.relation, "id_rel"),
+                          (str(namespace), "namespace"), (str(key), "data_key"),
+                          (str(serialised_val), "data_value")]
+
+            for entry in to_process:
+                _val_or_null(entry[0], q_str = query_parts, q_args = query_args)
+
+            columns_str = ", ".join(map(lambda x: x[1], to_process))
+            values_str = ", ".join(query_parts)
+
+            query_str = "INSERT INTO bibdocmoreinfo (%s) VALUES(%s)" % \
+                          (columns_str, values_str)
+
+            if DBG_LOG_QUERIES:
+                from invenio.bibtask import write_message
+                write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
+                print "Executing query: " + query_str + " ARGS: " + repr(query_args)
+
+            run_sql(query_str, query_args)
+        else:
+            #Update existing value
+            where_str, where_args = self._generate_where_query_args(namespace, key)
+            query_str = "UPDATE bibdocmoreinfo SET data_value=%s WHERE " + where_str
+            query_args =  [str(serialised_val)] + where_args
+
+            if DBG_LOG_QUERIES:
+                from invenio.bibtask import write_message
+                write_message("Executing query: " + query_str + " ARGS: " + repr(query_args))
+                print "Executing query: " + query_str + " ARGS: " + repr(query_args)
+
+            run_sql(query_str, query_args )
+
+    def _database_read_value(self, namespace, key):
+        """Reads a value directly from the database
+        @param namespace - namespace of the data to be read
+        @param key - key of the data to be read
+        """
+        where_str, where_args = self._generate_where_query_args(namespace = namespace, data_key = key)
+        query_str = "SELECT data_value FROM bibdocmoreinfo WHERE " + where_str
+
+        res = run_sql(query_str, where_args)
+
+        if DBG_LOG_QUERIES:
+            from invenio.bibtask import write_message
+            write_message("Executing query: " + query_str  + "  ARGS: " + repr(where_args) + "WITH THE RESULT: " + str(res))
+            s_ = ""
+            if res:
+                s_ = cPickle.loads(res[0][0])
+            print "Executing query: " + query_str + "  ARGS: " + repr(where_args) + " WITH THE RESULT: " + str(s_)
+
+        if res and res[0][0]:
+            try:
+                return cPickle.loads(res[0][0])
+            except:
+                raise Exception("Error when deserialising value for %s key=%s retrieved value=%s" % (repr(self), str(key), str(res[0][0])))
+        return None
+
+    def _database_remove_value(self, namespace, key):
+        """Removes an entry directly in the database"""
+        where_str, where_args = self._generate_where_query_args(namespace = namespace, data_key = key)
+        query_str = "DELETE FROM bibdocmoreinfo WHERE " + where_str
+        if DBG_LOG_QUERIES:
+            from invenio.bibtask import write_message
+            write_message("Executing query: " + query_str + "   ARGS: " + repr(where_args))
+            print "Executing query: " + query_str + "   ARGS: " + repr(where_args)
+        run_sql(query_str, where_args)
+
+        return None
+
+    def _flush_cache(self):
+        """Writes all the dirty cache entries into the database"""
+        for namespace in self.dirty:
+            for data_key in self.dirty[namespace]:
+                if namespace in self.cache and data_key in self.cache[namespace]\
+                        and not self.cache[namespace][data_key] is None:
+                    self._database_save_value(namespace, data_key, self.cache[namespace][data_key])
+                else:
+                    # This might happen if a value has been removed from the cache
+                    self._database_remove_value(namespace, data_key)
+        self.dirty = {}
+
+    def _generate_where_query_args(self, namespace = None, data_key = None):
+        """Private method generating WHERE clause of SQL statements"""
+        ns = []
+        if namespace != None:
+            ns = [(namespace, "namespace")]
+        dk = []
+        if data_key != None:
+            dk = [(data_key, "data_key")]
+        to_process = [(self.docid, "id_bibdoc"), (self.version, "version"),
+                      (self.format, "format"), (self.relation, "id_rel")] + \
+                      ns + dk
+
+        return _sql_generate_conjunctive_where(to_process)
+
+    def set_data(self, namespace, key, value):
+        """setting data directly in the database dictionary"""
+        if not namespace in self.cache:
+            self.cache[namespace] = {}
+        self.cache[namespace][key] = value
+        self._mark_dirty(namespace, key)
+        if not self.cache_only:
+            self._flush_cache()
+
+    def get_data(self, namespace, key):
+        """retrieving data from the database"""
+        if self.cache_reads or self.cache_only:
+            if namespace in self.cache and key in self.cache[namespace]:
+                return self.cache[namespace][key]
+
+        if not self.cache_only:
+            # we have a permission to read from the database
+            value = self._database_read_value(namespace, key)
+            if value:
+                if not namespace in self.cache:
+                    self.cache[namespace] = {}
+                self.cache[namespace][key] = value
+            return value
+        return None
+
+    def del_key(self, namespace, key):
+        """retrieving data from the database"""
+        if not namespace in self.cache:
+            return None
+
+        del self.cache[namespace][key]
+        self._mark_dirty(namespace, key)
+        if not self.cache_only:
+            self._flush_cache()
+
+    def contains_key(self, namespace, key):
+        return self.get_data(namespace, key) != None
+
+    # the dictionary interface -> updating the default namespace
+    def __setitem__(self, key, value):
+        self.set_data("", key, value) #the default value
+
+    def __getitem__(self, key):
+        return self.get_data("", key)
+
+    def __delitem__(self, key):
+        self.del_key("", key)
+
+    def __contains__(self, key):
+        return self.contains_key("", key)
+
+    def __repr__(self):
+        return "MoreInfo(docid=%s, version=%s, docformat=%s, relation=%s)" % \
+            (self.docid, self.version, self.format, self.relation)
+
+    def delete(self):
+        """Remove all entries associated with this MoreInfo"""
+        self.cache = {}
+        if not self.cache_only:
+            where_str, query_args = self._generate_where_query_args()
+            query_str = "DELETE FROM bibdocmoreinfo WHERE %s" % (where_str, )
+
+            if DBG_LOG_QUERIES:
+                from invenio.bibtask import write_message
+                write_message("Executing query: " + query_str + "   ARGS: " + repr(query_args))
+                print "Executing query: " + query_str + "   ARGS: " + repr(query_args)
+            run_sql(query_str, query_args)
+
+    def get_cache(self):
+        """Returns the content of the cache
+        @return The content of the MoreInfo cache
+        @rtype dictionary {namespace: {key1: value1, ... }, namespace2: {}}
+        """
+        return self.cache
+
+    def get_namespaces(self):
+        """Returns a list of namespaces present in the MoreInfo structure.
+           If the object is permitted access to the database, the data should
+           be always read from there. Unlike when reading a particular value,
+           we can not check if value is missing in the cache
+        """
+        if self.cache_only and self.cache_reads:
+            return self.cache.keys()
+        return self._database_get_namespaces()
+
+    def get_keys(self, namespace):
+        """Returns a list of keys present in a given namespace"""
+        if self.cache_only and self.cache_reads:
+            res = []
+            if namespace in self.cache:
+                res = self.cache[namespace].keys()
+            return res
+        else:
+            return self._database_get_keys(namespace)
+
+    def flush(self):
+        """Flush the content into the database"""
+        self._flush_cache()
+
+class BibDocMoreInfo(MoreInfo):
     """
     This class wraps contextual information of the documents, such as the
         - comments
@@ -3747,39 +4191,30 @@ class BibDocMoreInfo:
     @note: this class will be extended in the future to hold all the new auxiliary
     information about a document.
     """
-    def __init__(self, docid, more_info=None):
+    def __init__(self, docid, cache_only = False, initial_data = None):
         if not (type(docid) in (long, int) and docid > 0):
             raise ValueError("docid is not a positive integer, but %s." % docid)
-        self.docid = docid
-        if more_info is None:
-            res = run_sql('SELECT more_info FROM bibdoc WHERE id=%s', (docid, ))
-            if res and res[0][0]:
-                self.more_info = cPickle.loads(blob_to_string(res[0][0]))
-            else:
-                self.more_info = {}
-        else:
-            self.more_info = cPickle.loads(more_info)
-        if 'descriptions' not in self.more_info:
-            self.more_info['descriptions'] = {}
-        if 'comments' not in self.more_info:
-            self.more_info['comments'] = {}
-        if 'flags' not in self.more_info:
-            self.more_info['flags'] = {}
+        MoreInfo.__init__(self, docid, cache_only = cache_only, initial_data = initial_data)
+
+        if 'descriptions' not in self:
+            self['descriptions'] = {}
+        if 'comments' not in self:
+            self['comments'] = {}
+        if 'flags' not in self:
+            self['flags'] = {}
+        if DBG_LOG_QUERIES:
+            from invenio.bibtask import write_message
+            write_message("Creating BibDocMoreInfo :" + repr(self["comments"]))
+            print "Creating BibdocMoreInfo :" + repr(self["comments"])
 
     def __repr__(self):
         """
         @return: the canonical string representation of the C{BibDocMoreInfo}.
         @rtype: string
         """
-        return 'BibDocMoreInfo(%i, %s)' % (self.docid, repr(cPickle.dumps(self.more_info)))
+        return 'BibDocMoreInfo(%i, %s)' % (self.docid, repr(cPickle.dumps(self)))
 
-    def flush(self):
-        """
-        Flush this object to the database.
-        """
-        run_sql('UPDATE bibdoc SET more_info=%s WHERE id=%s', (cPickle.dumps(self.more_info), self.docid))
-
-    def set_flag(self, flagname, format, version):
+    def set_flag(self, flagname, docformat, version):
         """
         Sets a flag.
 
@@ -3794,18 +4229,21 @@ class BibDocMoreInfo:
             L{CFG_BIBDOCFILE_AVAILABLE_FLAGS}
         """
         if flagname in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
-            if not flagname in self.more_info['flags']:
-                self.more_info['flags'][flagname] = {}
-            if not version in self.more_info['flags'][flagname]:
-                self.more_info['flags'][flagname][version] = {}
-            if not format in self.more_info['flags'][flagname][version]:
-                self.more_info['flags'][flagname][version][format] = {}
-            self.more_info['flags'][flagname][version][format] = True
-            self.flush()
-        else:
-            raise ValueError, "%s is not in %s" % (flagname, CFG_BIBDOCFILE_AVAILABLE_FLAGS)
+            flags = self['flags']
 
-    def get_comment(self, format, version):
+            if not flagname in flags:
+                flags[flagname] = {}
+            if not version in flags[flagname]:
+                flags[flagname][version] = {}
+            if not docformat in flags[flagname][version]:
+                flags[flagname][version][docformat] = {}
+            flags[flagname][version][docformat] = True
+            self['flags'] = flags
+        else:
+            raise ValueError, "%s is not in %s" % \
+                (flagname, CFG_BIBDOCFILE_AVAILABLE_FLAGS)
+
+    def get_comment(self, docformat, version):
         """
         Returns the specified comment.
 
@@ -3820,13 +4258,13 @@ class BibDocMoreInfo:
         """
         try:
             assert(type(version) is int)
-            format = normalize_format(format)
-            return self.more_info['comments'].get(version, {}).get(format)
+            docformat = normalize_format(docformat)
+            return self['comments'].get(version, {}).get(docformat)
         except:
             register_exception()
             raise
 
-    def get_description(self, format, version):
+    def get_description(self, docformat, version):
         """
         Returns the specified description.
 
@@ -3841,13 +4279,13 @@ class BibDocMoreInfo:
         """
         try:
             assert(type(version) is int)
-            format = normalize_format(format)
-            return self.more_info['descriptions'].get(version, {}).get(format)
+            docformat = normalize_format(docformat)
+            return self['descriptions'].get(version, {}).get(docformat)
         except:
             register_exception()
             raise
 
-    def has_flag(self, flagname, format, version):
+    def has_flag(self, flagname, docformat, version):
         """
         Return True if the corresponding has been set.
 
@@ -3864,11 +4302,11 @@ class BibDocMoreInfo:
             L{CFG_BIBDOCFILE_AVAILABLE_FLAGS}
         """
         if flagname in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
-            return self.more_info['flags'].get(flagname, {}).get(version, {}).get(format, False)
+            return self['flags'].get(flagname, {}).get(version, {}).get(docformat, False)
         else:
             raise ValueError, "%s is not in %s" % (flagname, CFG_BIBDOCFILE_AVAILABLE_FLAGS)
 
-    def get_flags(self, format, version):
+    def get_flags(self, docformat, version):
         """
         Return the list of all the enabled flags.
 
@@ -3880,9 +4318,9 @@ class BibDocMoreInfo:
             L{CFG_BIBDOCFILE_AVAILABLE_FLAGS}).
         @rtype: list of string
         """
-        return [flag for flag in self.more_info['flags'] if format in self.more_info['flags'][flag].get(version, {})]
+        return [flag for flag in self['flags'] if docformat in self['flags'][flag].get(version, {})]
 
-    def set_comment(self, comment, format, version):
+    def set_comment(self, comment, docformat, version):
         """
         Set a comment.
 
@@ -3895,22 +4333,24 @@ class BibDocMoreInfo:
         """
         try:
             assert(type(version) is int and version > 0)
-            format = normalize_format(format)
+            docformat = normalize_format(docformat)
             if comment == KEEP_OLD_VALUE:
-                comment = self.get_comment(format, version) or self.get_comment(format, version - 1)
+                comment = self.get_comment(docformat, version) or self.get_comment(docformat, version - 1)
             if not comment:
-                self.unset_comment(format, version)
-                self.flush()
+                self.unset_comment(docformat, version)
                 return
-            if not version in self.more_info['comments']:
-                self.more_info['comments'][version] = {}
-            self.more_info['comments'][version][format] = comment
-            self.flush()
+            if not version in self['comments']:
+                comments = self['comments']
+                comments[version] = {}
+                self['comments'] = comments
+            comments = self['comments']
+            comments[version][docformat] = comment
+            self['comments'] = comments
         except:
             register_exception()
             raise
 
-    def set_description(self, description, format, version):
+    def set_description(self, description, docformat, version):
         """
         Set a description.
 
@@ -3923,22 +4363,24 @@ class BibDocMoreInfo:
         """
         try:
             assert(type(version) is int and version > 0)
-            format = normalize_format(format)
+            docformat = normalize_format(docformat)
             if description == KEEP_OLD_VALUE:
-                description = self.get_description(format, version) or self.get_description(format, version - 1)
+                description = self.get_description(docformat, version) or self.get_description(docformat, version - 1)
             if not description:
-                self.unset_description(format, version)
-                self.flush()
+                self.unset_description(docformat, version)
                 return
-            if not version in self.more_info['descriptions']:
-                self.more_info['descriptions'][version] = {}
-            self.more_info['descriptions'][version][format] = description
-            self.flush()
+
+            descriptions = self['descriptions']
+            if not version in descriptions:
+                descriptions[version] = {}
+
+            descriptions[version][docformat] = description
+            self.set_data("", 'descriptions', descriptions)
         except:
             register_exception()
             raise
 
-    def unset_comment(self, format, version):
+    def unset_comment(self, docformat, version):
         """
         Unset a comment.
 
@@ -3949,15 +4391,16 @@ class BibDocMoreInfo:
         """
         try:
             assert(type(version) is int and version > 0)
-            del self.more_info['comments'][version][format]
-            self.flush()
+            comments = self['comments']
+            del comments[version][docformat]
+            self['comments'] = comments
         except KeyError:
             pass
         except:
             register_exception()
             raise
 
-    def unset_description(self, format, version):
+    def unset_description(self, docformat, version):
         """
         Unset a description.
 
@@ -3968,15 +4411,16 @@ class BibDocMoreInfo:
         """
         try:
             assert(type(version) is int and version > 0)
-            del self.more_info['descriptions'][version][format]
-            self.flush()
+            descriptions = self['descriptions']
+            del descriptions[version][docformat]
+            self['descriptions'] = descriptions
         except KeyError:
             pass
         except:
             register_exception()
             raise
 
-    def unset_flag(self, flagname, format, version):
+    def unset_flag(self, flagname, docformat, version):
         """
         Unset a flag.
 
@@ -3992,19 +4436,243 @@ class BibDocMoreInfo:
         """
         if flagname in CFG_BIBDOCFILE_AVAILABLE_FLAGS:
             try:
-                del self.more_info['flags'][flagname][version][format]
-                self.flush()
+                flags = self['flags']
+                del flags[flagname][version][docformat]
+                self['flags'] = flags
             except KeyError:
                 pass
         else:
             raise ValueError, "%s is not in %s" % (flagname, CFG_BIBDOCFILE_AVAILABLE_FLAGS)
 
-    def serialize(self):
+
+_bib_relation__any_value = -1
+class BibRelation(object):
+    """
+    A representation of a relation between documents or their particular versions
+    """
+    def __init__(self, rel_type = None,
+                 bibdoc1_id = None, bibdoc2_id = None,
+                 bibdoc1_ver = None, bibdoc2_ver = None,
+                 bibdoc1_fmt = None, bibdoc2_fmt = None,
+                 rel_id = None):
         """
-        @return: the serialized version of this object.
-        @rtype: string
+        The constructor of the class representing a relation between two
+        documents.
+
+        If the more_info parameter is specified, no data is retrieved from
+        the database and the internal dictionary is initialised with
+        the passed value. If the more_info is not provided, the value is
+        read from the database. In the case of non-existing record, an
+        empty dictionary is assigned.
+
+        If a version of whichever record is not specified, the resulting
+        object desctibes a relation of all version of a given BibDoc.
+
+        @param bibdoc1
+        @type bibdoc1 BibDoc
+        @param bibdoc1_ver
+        @type version1_ver int
+        @param bibdoc2
+        @type bibdoc2 BibDco
+        @param bibdoc2_ver
+        @type bibdoc2_ver int
+
+        @param bibdoc1_fmt format of the first document
+        @type bibdoc1_fmt string
+        @param bibdoc2_fmt format of the second document
+        @type bibdoc2_fmt string
+
+        @param rel_type
+        @type rel_type string
+        @param more_info The serialised representation of the more_info
+        @type more_info string
+
+        @param rel_id allows to specify the identifier of the newly created relation
+        @type rel_ide unsigned int
+
         """
-        return cPickle.dumps(self.more_info)
+
+        self.id = rel_id
+        self.bibdoc1_id = bibdoc1_id
+        self.bibdoc2_id = bibdoc2_id
+        self.bibdoc1_ver = bibdoc1_ver
+        self.bibdoc2_ver = bibdoc2_ver
+        self.bibdoc1_fmt = bibdoc1_fmt
+        self.bibdoc2_fmt = bibdoc2_fmt
+        self.rel_type = rel_type
+
+
+        if rel_id == None:
+            self._fill_id_from_data()
+        else:
+            self._fill_data_from_id()
+
+        self.more_info = MoreInfo(relation = self.id)
+
+    def _fill_data_from_id(self):
+        """Fill all the relation data from the relation identifier
+        """
+        query = "SELECT id_bibdoc1, version1, format1, id_bibdoc2, version2, format2, rel_type FROM bibdoc_bibdoc WHERE id=%s"
+        res = run_sql(query, (str(self.id), ))
+        if res != None and res[0] != None:
+            self.bibdoc1_id = res[0][0]
+            self.bibdoc1_ver = res[0][1]
+            self.bibdoc1_fmt = res[0][2]
+            self.bibdoc2_id = res[0][3]
+            self.bibdoc2_ver = res[0][4]
+            self.bibdoc2_fmt = res[0][5]
+            self.rel_type = res[0][6]
+
+    def _fill_id_from_data(self):
+        """Fill the relation identifier based on the data provided"""
+        where_str, where_args = self._get_where_clauses()
+        query = "SELECT id FROM bibdoc_bibdoc WHERE %s" % (where_str, )
+
+        res = run_sql(query, where_args)
+        if res and res[0][0]:
+            self.id = int(res[0][0])
+
+    def _get_value_column_mapping(self):
+        """
+        Returns a list of tuples each tuple consists of a value and a name
+        of a database column where this value should fit
+        """
+        return [(self.rel_type, "rel_type"), (self.bibdoc1_id, "id_bibdoc1"),
+               (self.bibdoc1_ver, "version1"),
+                (self.bibdoc1_fmt, "format1"),
+               (self.bibdoc2_id, "id_bibdoc2"),
+                (self.bibdoc2_ver, "version2"),
+               (self.bibdoc2_fmt, "format2")]
+
+    def _get_where_clauses(self):
+        """Private function returning part of the SQL statement identifying
+          current relation
+
+        @return
+        @rtype tuple
+        """
+        return _sql_generate_conjunctive_where(self._get_value_column_mapping())
+
+    @staticmethod
+    def create(bibdoc1_id = None, bibdoc1_ver = None,
+               bibdoc1_fmt = None, bibdoc2_id = None,
+               bibdoc2_ver = None, bibdoc2_fmt = None,
+               rel_type = ""):
+        """
+        Create a relation and return instance.
+        Ommiting an argument means that a particular relation concerns any value of the parameter
+        """
+        # check if there is already entry corresponding to parameters
+        existing = BibRelation.get_relations(rel_type = rel_type,
+                                  bibdoc1_id = bibdoc1_id,
+                                  bibdoc2_id = bibdoc2_id,
+                                  bibdoc1_ver = bibdoc1_ver,
+                                  bibdoc2_ver = bibdoc2_ver,
+                                  bibdoc1_fmt = bibdoc1_fmt,
+                                  bibdoc2_fmt = bibdoc2_fmt)
+        if len(existing) > 0:
+            return existing[0]
+
+        # build the insert query and execute it
+        to_process = [(rel_type, "rel_type"), (bibdoc1_id, "id_bibdoc1"),
+                      (bibdoc1_ver, "version1"), (bibdoc1_fmt, "format1"),
+                      (bibdoc2_id, "id_bibdoc2"), (bibdoc2_ver, "version2"),
+                      (bibdoc2_fmt, "format2")]
+
+        values_list = []
+        args_list = []
+        columns_list = []
+
+        for entry in to_process:
+            columns_list.append(entry[1])
+            if entry[0] == None:
+                values_list.append("NULL")
+            else:
+                values_list.append("%s")
+                args_list.append(entry[0])
+
+        query = "INSERT INTO bibdoc_bibdoc (%s) VALUES (%s)" % (", ".join(columns_list), ", ".join(values_list))
+#        print "Query: %s Args: %s" % (query, str(args_list))
+        rel_id = run_sql(query, args_list)
+        return BibRelation(rel_id = rel_id)
+
+    def delete(self):
+        """ Removes a relation between objects from the database.
+            executing the flush function on the same object will restore
+            the relation
+        """
+        where_str, where_args = self._get_where_clauses()
+        run_sql("DELETE FROM bibdoc_bibdoc WHERE %s" % (where_str,), where_args) # kwalitee: disable=sql
+        # removing associated MoreInfo
+        self.more_info.delete()
+
+    def get_more_info(self):
+        return self.more_info
+
+    @staticmethod
+    def get_relations(rel_type = _bib_relation__any_value,
+                       bibdoc1_id = _bib_relation__any_value,
+                       bibdoc2_id = _bib_relation__any_value,
+                       bibdoc1_ver = _bib_relation__any_value,
+                       bibdoc2_ver = _bib_relation__any_value,
+                       bibdoc1_fmt = _bib_relation__any_value,
+                       bibdoc2_fmt = _bib_relation__any_value):
+
+        """Retrieves list of relations satisfying condtions.
+          If a parameter is specified, its value has to match exactly.
+          If a parameter is ommited, any of its values will be accepted"""
+
+        to_process = [(rel_type, "rel_type"), (bibdoc1_id, "id_bibdoc1"),
+                      (bibdoc1_ver, "version1"), (bibdoc1_fmt, "format1"),
+                      (bibdoc2_id, "id_bibdoc2"), (bibdoc2_ver, "version2"),
+                      (bibdoc2_fmt, "format2")]
+
+        where_str, where_args = _sql_generate_conjunctive_where(
+            filter(lambda x: x[0] != _bib_relation__any_value, to_process))
+
+        if where_str:
+            where_str = "WHERE " + where_str # in case of nonempty where, we need a where clause
+
+        query_str = "SELECT id FROM bibdoc_bibdoc %s" % (where_str, )
+        #     print "running query : %s with arguments %s on the object %s" % (query_str, str(where_args), repr(self))
+        try:
+            res = run_sql(query_str, where_args)
+        except:
+            raise Exception(query_str + " " + str(where_args))
+
+        results = []
+        if res != None:
+            for res_row in res:
+                results.append(BibRelation(rel_id=res_row[0]))
+        return results
+
+    # Access to MoreInfo
+    def set_data(self, category, key, value):
+        """assign additional information to this relation"""
+        self.more_info.set_data(category, key, value)
+
+    def get_data(self, category, key):
+        """read additional information assigned to this relation"""
+        return self.more_info.get_data(category, key)
+
+
+
+    #the dictionary interface allowing to set data bypassing the namespaces
+
+    def __setitem__(self, key, value):
+        self.more_info[key] = value
+
+    def __getitem__(self, key):
+        return self.more_info[key]
+
+    def __contains__(self, key):
+        return self.more_info.__contains__(key)
+
+    def __repr__(self):
+        return "BibRelation(id_bibdoc1 = %s, version1 = %s, format1 = %s, id_bibdoc2 = %s, version2 = %s, format2 = %s, rel_type = %s)" % \
+            (self.bibdoc1_id, self.bibdoc1_ver, self.bibdoc1_fmt,
+             self.bibdoc2_id, self.bibdoc2_ver, self.bibdoc2_fmt,
+             self.rel_type)
 
 def readfile(filename):
     """
@@ -4022,6 +4690,7 @@ def readfile(filename):
         return open(filename).read()
     except Exception:
         return ''
+
 
 class HeadRequest(urllib2.Request):
     """

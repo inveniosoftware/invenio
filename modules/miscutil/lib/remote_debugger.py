@@ -163,7 +163,7 @@ def get_debugger(arg):
 
 def parse_args(arg):
     """Parses arguments supplied through url param debug=xcxv
-    @return: tuple of debugger_no, additional_params
+    @return: tuple of debuggper_no, additional_params
     """
     debug_no = ''
     params = {}
