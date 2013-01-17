@@ -45,7 +45,8 @@ except ImportError:
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV
+    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
+    CFG_BIBEDIT_CACHEDIR
 from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
@@ -58,7 +59,7 @@ from invenio.bibrecord import create_record, create_records, \
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
-    CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPSHAREDDIR, \
+    CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
     CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, CFG_INSPIRE_SITE
 from invenio.dateutils import convert_datetext_to_dategui
@@ -83,7 +84,7 @@ from invenio.bibauthorid_name_utils import split_name_parts, \
 from invenio.bibknowledge import get_kbr_values
 
 # Precompile regexp:
-re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
+re_file_option = re.compile(r'^%s' % CFG_BIBEDIT_CACHEDIR)
 re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
 re_revid_split = re.compile('^(\d+)\.(\d{14})$')
 re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
@@ -371,7 +372,7 @@ def get_record_locked_since(recid, uid):
     locked_since  = ""
     try:
         locked_since = time.ctime(os.path.getmtime('%s%s%s' % (
-                        CFG_TMPSHAREDDIR, os.sep, filename)))
+                        CFG_BIBEDIT_CACHEDIR, os.sep, filename)))
     except OSError:
         pass
     return locked_since
@@ -618,10 +619,10 @@ def _get_file_path(recid, uid, filename=''):
 
     """
     if not filename:
-        return '%s%s%s_%s_%s' % (CFG_TMPSHAREDDIR, os.sep, CFG_BIBEDIT_FILENAME,
+        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, CFG_BIBEDIT_FILENAME,
                                  recid, uid)
     else:
-        return '%s%s%s_%s_%s' % (CFG_TMPSHAREDDIR, os.sep, filename, recid, uid)
+        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, filename, recid, uid)
 
 def _uids_with_active_caches(recid):
     """Return list of uids with active caches for record RECID. Active caches
@@ -631,14 +632,14 @@ def _uids_with_active_caches(recid):
     """
     re_tmpfilename = re.compile('%s_%s_(\d+)\.tmp' % (CFG_BIBEDIT_FILENAME,
                                                       recid))
-    tmpfiles = fnmatch.filter(os.listdir(CFG_TMPSHAREDDIR), '%s*.tmp' %
+    tmpfiles = fnmatch.filter(os.listdir(CFG_BIBEDIT_CACHEDIR), '%s*.tmp' %
                               CFG_BIBEDIT_FILENAME)
     expire_time = int(time.time()) - CFG_BIBEDIT_TIMEOUT
     active_uids = []
     for tmpfile in tmpfiles:
         mo = re_tmpfilename.match(tmpfile)
         if mo and int(os.path.getmtime('%s%s%s' % (
-                    CFG_TMPSHAREDDIR, os.sep, tmpfile))) > expire_time:
+                    CFG_BIBEDIT_CACHEDIR, os.sep, tmpfile))) > expire_time:
             active_uids.append(int(mo.group(1)))
     return active_uids
 

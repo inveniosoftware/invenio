@@ -75,7 +75,7 @@ etags:
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
 
 install-data-local:
-	for d in / /cache /cache/RTdata /log /tmp /tmp-shared /data /run /tmp-shared/bibencode/jobs/done ; do	\
+	for d in / /cache /cache/RTdata /log /tmp /tmp-shared /data /run /tmp-shared/bibencode/jobs/done /tmp-shared/bibedit-cache; do	\
 		mkdir -p $(localstatedir)$$d ;		\
 	done
 	@echo "************************************************************"
