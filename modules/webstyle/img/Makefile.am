@@ -145,6 +145,7 @@ img_DATA = add-small.png \
            move_to.gif \
            noway.gif \
            okay.gif \
+           orcid_icon_24.png \
            out.gif \
            paper-texture-128x128.gif \
            paper_clip-72x72.gif \

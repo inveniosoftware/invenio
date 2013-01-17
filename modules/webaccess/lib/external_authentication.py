@@ -104,3 +104,10 @@ class ExternalAuth:
         """
         return False
     robot_login_method_p = staticmethod(robot_login_method_p)
+
+    @staticmethod
+    def get_msg(req):
+        """
+        Return a given authentication message (needed e.g. when using OpenID/OAUTH1/OAUTH2)
+        """
+        raise NotImplementedError()

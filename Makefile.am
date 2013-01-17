@@ -323,36 +323,6 @@ install-solrutils:
 	cd $(solrdir)/contrib/ && \
 	jar -cf invenio-solr.jar org/invenio_software/solr/*class
 
-install-openid-package:
-	@echo "***********************************************************"
-	@echo "** Installing python OpenID packgace, please wait...     **"
-	@echo "***********************************************************"
-	wget --no-check-certificate https://github.com/openid/python-openid/tarball/master
-	tar -xzf master
-	cd openid-python-openid-*; sudo python setup.py install;
-	sudo rm -r openid-python-openid-*;
-	rm master
-	@echo "***********************************************************"
-	@echo "** python OpenID package is installed                    **"
-	@echo "** Don't forget to set CFG_OPENID_AUTHENTICATION         **"
-	@echo "***********************************************************"
-
-install-oauth-package:
-	@echo "***********************************************************"
-	@echo "** Installing python OpenID packgace, please wait...     **"
-	@echo "***********************************************************"
-	sudo apt-get install python-setuptools
-	wget --no-check-certificate https://github.com/litl/rauth/tarball/master
-	tar -xzf master
-	cd litl-rauth-*; sudo python setup.py install;
-	sudo rm -r litl-rauth-*;
-	rm master
-	@echo "***********************************************************"
-	@echo "** python oauth package is installed                     **"
-	@echo "** Don't forget to set CFG_OAUTH1_AUTHENTICATION or      **"
-	@echo "** CFG_OAUTH2_AUTHENTICATION                             **"
-	@echo "***********************************************************"
-
 update-v0.99.0-tables:
 	cat $(top_srcdir)/modules/miscutil/sql/tabcreate.sql | grep -v 'INSERT INTO upgrade' | ${prefix}/bin/dbexec
 	echo "DROP TABLE IF EXISTS oaiREPOSITORY;" | ${prefix}/bin/dbexec

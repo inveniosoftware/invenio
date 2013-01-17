@@ -33,14 +33,13 @@ from invenio.config import \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_SITE_RECORD, \
-     CFG_OPENID_AUTHENTICATION, \
-     CFG_OAUTH2_AUTHENTICATION, \
-     CFG_OAUTH1_AUTHENTICATION
+     CFG_SITE_RECORD
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO, CFG_WEB_API_KEY_STATUS, \
         CFG_OPENID_PROVIDERS, CFG_OAUTH2_PROVIDERS, \
-        CFG_OAUTH1_PROVIDERS
+        CFG_OAUTH1_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
+        CFG_OAUTH2_AUTHENTICATION, CFG_OAUTH1_AUTHENTICATION
+
 from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
 from invenio.htmlutils import escape_html, nmtoken_from_string
 from invenio.messages import gettext_set_language, language_list_long

@@ -22,11 +22,11 @@ __revision__ = \
 
 # pylint: disable=C0301
 
+from invenio import config
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE, \
      CFG_OPENAIRE_SITE, CFG_SITE_RECORD, CFG_INSPIRE_SITE, \
-     CFG_OPENID_AUTHENTICATION, CFG_OAUTH2_AUTHENTICATION, \
-     CFG_OAUTH1_AUTHENTICATION, CFG_SITE_ADMIN_EMAIL
+     CFG_SITE_ADMIN_EMAIL
 from invenio.messages import gettext_set_language
 
 class InvenioWebAccessFireroleError(Exception):
@@ -130,21 +130,6 @@ else:
     "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
     }
 
-# If OpenID authentication is enabled, add 'openid' to login methods
-if CFG_OPENID_AUTHENTICATION:
-    from invenio.external_authentication_openid import ExternalOpenID
-    CFG_EXTERNAL_AUTHENTICATION['openid'] = ExternalOpenID(enforce_external_nicknames=True)
-
-# If OAuth2 authentication is enabled, add 'oauth2' to login methods.
-if CFG_OAUTH2_AUTHENTICATION:
-    from invenio.external_authentication_oauth2 import ExternalOAuth2
-    CFG_EXTERNAL_AUTHENTICATION['oauth2'] = ExternalOAuth2(enforce_external_nicknames=True)
-
-# If OAuth1 authentication is enabled, add 'oauth1' to login methods.
-if CFG_OAUTH1_AUTHENTICATION:
-    from invenio.external_authentication_oauth1 import ExternalOAuth1
-    CFG_EXTERNAL_AUTHENTICATION['oauth1'] = ExternalOAuth1(enforce_external_nicknames=True)
-
 # CFG_TEMP_EMAIL_ADDRESS
 # Temporary email address for logging in with an OpenID/OAuth provider which
 # doesn't supply email address
@@ -184,7 +169,8 @@ CFG_OAUTH2_PROVIDERS = [
     'yammer',
     'foursquare',
     'googleoauth2',
-    'instagram'
+    'instagram',
+    'orcid'
 ]
 
 # CFG_OPENID_CONFIGURATIONS
@@ -363,8 +349,8 @@ CFG_OAUTH1_CONFIGURATIONS = {
 #	for finding where the id, email or nickname is.
 CFG_OAUTH2_CONFIGURATIONS =  {
     'facebook': {
-        'consumer_key': '',
-        'consumer_secret': '',
+        'consumer_key': '118319526393',
+        'consumer_secret': '8d675eb0ef89f2f8fbbe4ee56ab473c6',
         'access_token_url': 'https://graph.facebook.com/oauth/access_token',
         'authorize_url': 'https://www.facebook.com/dialog/oauth',
         'authorize_parameters': {
@@ -417,7 +403,62 @@ CFG_OAUTH2_CONFIGURATIONS =  {
         'id': ['user', 'id'],
         'nickname': ['user', 'username']
     },
+    'orcid': {
+        'consumer_key': '',
+        'consumer_secret': '',
+        'authorize_url': 'http://sandbox-1.orcid.org/oauth/authorize',
+        'access_token_url': 'http://api.sandbox-1.orcid.org/oauth/token',
+        'request_url': 'http://api.sandbox-1.orcid.org/{id}/orcid-profile',
+        'authorize_parameters': {
+            'scope': '/orcid-profile/read-limited',
+            'response_type': 'code',
+            'access_type': 'offline',
+        },
+        'id': ['orcid'],
+    }
 }
+
+## Let's override OpenID/OAuth1/OAuth2 configuration from invenio(-local).conf
+CFG_OPENID_PROVIDERS = config.CFG_OPENID_PROVIDERS
+CFG_OAUTH1_PROVIDERS = config.CFG_OAUTH1_PROVIDERS
+CFG_OAUTH2_PROVIDERS = config.CFG_OAUTH2_PROVIDERS
+if config.CFG_OPENID_CONFIGURATIONS:
+    for provider, configuration in config.CFG_OPENID_CONFIGURATIONS.items():
+        if provider in CFG_OPENID_CONFIGURATIONS:
+            CFG_OPENID_CONFIGURATIONS[provider].update(configuration)
+        else:
+            CFG_OPENID_CONFIGURATIONS[provider] = configuration
+if config.CFG_OAUTH1_CONFIGURATIONS:
+    for provider, configuration in config.CFG_OAUTH1_CONFIGURATIONS.items():
+        if provider in CFG_OAUTH1_CONFIGURATIONS:
+            CFG_OAUTH1_CONFIGURATIONS[provider].update(configuration)
+        else:
+            CFG_OAUTH1_CONFIGURATIONS[provider] = configuration
+if config.CFG_OAUTH2_CONFIGURATIONS:
+    for provider, configuration in config.CFG_OAUTH2_CONFIGURATIONS.items():
+        if provider in CFG_OAUTH2_CONFIGURATIONS:
+            CFG_OAUTH2_CONFIGURATIONS[provider].update(configuration)
+        else:
+            CFG_OAUTH2_CONFIGURATIONS[provider] = configuration
+
+# If OpenID authentication is enabled, add 'openid' to login methods
+CFG_OPENID_AUTHENTICATION = bool(CFG_OPENID_PROVIDERS)
+if CFG_OPENID_AUTHENTICATION:
+    from invenio.external_authentication_openid import ExternalOpenID
+    CFG_EXTERNAL_AUTHENTICATION['openid'] = ExternalOpenID(enforce_external_nicknames=True)
+
+# If OAuth1 authentication is enabled, add 'oauth1' to login methods.
+CFG_OAUTH1_AUTHENTICATION = bool(CFG_OAUTH1_PROVIDERS)
+if CFG_OAUTH1_PROVIDERS:
+    from invenio.external_authentication_oauth1 import ExternalOAuth1
+    CFG_EXTERNAL_AUTHENTICATION['oauth1'] = ExternalOAuth1(enforce_external_nicknames=True)
+
+# If OAuth2 authentication is enabled, add 'oauth2' to login methods.
+CFG_OAUTH2_AUTHENTICATION = bool(CFG_OAUTH2_PROVIDERS)
+if CFG_OAUTH2_AUTHENTICATION:
+    from invenio.external_authentication_oauth2 import ExternalOAuth2
+    CFG_EXTERNAL_AUTHENTICATION['oauth2'] = ExternalOAuth2(enforce_external_nicknames=True)
+
 
 ## If using SSO, this is the number of seconds after which the keep-alive
 ## SSO handler is pinged again to provide fresh SSO information.

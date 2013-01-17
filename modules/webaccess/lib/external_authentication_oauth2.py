@@ -25,27 +25,28 @@ providers.
 __revision__ = \
     "$Id$"
 
+import requests
+from urllib import urlencode
+
+from invenio.jsonutils import json_unicode_to_utf8
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.external_authentication import ExternalAuth
-from invenio.containerutils import treasure_hunter
+from invenio.containerutils import get_substructure
 
 class ExternalOAuth2(ExternalAuth):
     """
     Contains methods for authenticate with an OAuth2 provider.
     """
 
-    def __init__(self, enforce_external_nicknames = False):
-        """Initialization"""
-        ExternalAuth.__init__(self, enforce_external_nicknames)
+    @staticmethod
+    def __init_req(req):
+        req.g['oauth2_provider_name'] = ''
+        req.g['oauth2_debug'] = 0
+        req.g['oauth2_msg'] = ''
+        req.g['oauth2_debug_msg'] = ''
+        req.g['oauth2_response'] = None
 
-        self.provider_name = None
-        self.response = None
-        self.msg = 0
-        self.debug = 0
-        self.debug_msg = ""
-
-
-    def auth_user(self, username, password, req = None):
+    def auth_user(self, username, password, req=None):
         """
         Tries to find email and identity of the user from OAuth2 provider. If it
         doesn't find any of them, returns (None, None)
@@ -66,16 +67,18 @@ class ExternalOAuth2(ExternalAuth):
         from rauth.service import OAuth2Service
         from invenio.access_control_config import CFG_OAUTH2_PROVIDERS
 
+        self.__init_req(req)
+
         args = wash_urlargd(req.form, {
                             'code': (str, ''),
                             'provider': (str, '')
                             })
 
-        self.provider_name = args['provider']
+        req.g['oauth2_provider_name'] = args['provider']
 
-        if not self.provider_name:
+        if not req.g['oauth2_provider_name']:
             # If provider name isn't given
-            self.msg = 21
+            req.g['oauth2_msg'] = 21
             return None, None
 
         # Some providers doesn't construct return uri properly.
@@ -85,85 +88,90 @@ class ExternalOAuth2(ExternalAuth):
         # /youraccount/login?login_method=oauth2&provider=something?code=#
         # instead of
         # /youraccount/login?login_method=oauth2&provider=something&code=#
-        if '?' in self.provider_name:
-            (self.provider_name, args['code']) = \
+        if '?' in req.g['oauth2_provider_name']:
+            (req.g['oauth2_provider_name'], args['code']) = \
         (
-         self.provider_name[:self.provider_name.index('?')],
-         self.provider_name[self.provider_name.index('?') + 1 + len("code="):]
+         req.g['oauth2_provider_name'][:req.g['oauth2_provider_name'].index('?')],
+         req.g['oauth2_provider_name'][req.g['oauth2_provider_name'].index('?') + 1 + len("code="):]
          )
 
-        if not self.provider_name in CFG_OAUTH2_PROVIDERS:
-            self.msg = 22
+        if not req.g['oauth2_provider_name'] in CFG_OAUTH2_PROVIDERS:
+            req.g['oauth2_msg'] = 22
             return None, None
 
         # Load the configurations to construct OAuth2 service
-        config = CFG_OAUTH2_CONFIGURATIONS[self.provider_name]
+        config = CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]
 
-        self.debug = config.get('debug', 0)
+        req.g['oauth2_debug'] = config.get('debug', 0)
 
         provider = OAuth2Service(
-                                 name = self.provider_name,
+                                 name = req.g['oauth2_provider_name'],
                                  consumer_key = config['consumer_key'],
                                  consumer_secret = config['consumer_secret'],
                                  access_token_url = config['access_token_url'],
-                                 authorize_url = config['authorize_url'])
+                                 authorize_url = config['authorize_url'],
+                                 header_auth=True)
 
-        data = dict(
-                    code = args['code'],
+        data = dict(code = args['code'],
                     client_id = config['consumer_key'],
                     client_secret = config['consumer_secret'],
                     # Construct redirect uri without having '/' character at the
                     # left most of SITE_SECURE_URL
-                    redirect_uri = (CFG_SITE_SECURE_URL[:-1]
-                                    if
-                                    CFG_SITE_SECURE_URL[-1] == '/'
-                                    else CFG_SITE_SECURE_URL) + \
-                        '/youraccount/login?login_method=oauth2&provider=' + \
-                        self.provider_name
-                    )
+                    redirect_uri =  CFG_SITE_SECURE_URL + '/youraccount/login?' +
+                        urlencode({'login_method': 'oauth2', 'provider': req.g['oauth2_provider_name']}))
 
         # Get the access token
-        token = provider.get_access_token('POST', data = data)
+        token = provider.get_access_token('POST', data=data)
+
+        ## This is to ease exception frame analysis
+        token_content = token.content
 
         if token.content.has_key('error') or not \
-                                        token.content.has_key('access_token'):
-            if token.content['error'] == 'access_denied':
-                self.msg = 21
+                                        token_content.has_key('access_token'):
+            if token_content.get('error') == 'access_denied':
+                req.g['oauth2_msg'] = 21
                 return None, None
             else:
-                self.msg = 22
+                req.g['oauth2_msg'] = 22
                 return None, None
 
-        if self.debug:
-            self.debug_msg = str(token.content) + "<br/>"
-            
-        # Some providers send the user information and access token together.
-        email, identity = self._get_user_email_and_id(token.content)
+        req.g['oauth2_access_token'] = token_content['access_token']
+
+        if req.g['oauth2_debug']:
+            req.g['oauth2_debug_msg'] = str(token_content) + "<br/>"
+
+        if req.g['oauth2_provider_name'] == 'orcid':
+            req.g['oauth2_orcid'] = token_content['orcid']
+            email, identity = self._get_user_email_and_id_from_orcid(req)
+        else:
+            # Some providers send the user information and access token together.
+            email, identity = self._get_user_email_and_id(token_content, req)
 
         if not identity:
             profile = provider.request('GET', config['request_url'].format(
-                                    access_token=token.content['access_token']
-                                    ))
-            if self.debug:
-                self.debug_msg += str(profile.content)
+            access_token = token_content['access_token'], id=identity))
+            req.g['oauth2_access_token'] = token_content['access_token']
 
-            email, identity = self._get_user_email_and_id(profile.content)
+            if req.g['oauth2_debug']:
+                req.g['oauth2_debug_msg'] += str(profile.content)
+
+            email, identity = self._get_user_email_and_id(profile.content, req)
 
         if identity:
             # If identity is found, add the name of the provider at the
             # beginning of the identity because different providers may have
             # different users with same id.
-            identity = "%s:%s" % (self.provider_name, identity)
+            identity = "%s:%s" % (req.g['oauth2_provider_name'], identity)
         else:
-            self.msg = 23
+            req.g['oauth2_msg'] = 23
 
-        if self.debug:
-            self.msg = "<code>%s</code>" % self.debug_msg.replace("\n", "<br/>")
+        if req.g['oauth2_debug']:
+            req.g['oauth2_msg'] = "<code>%s</code>" % req.g['oauth2_debug_msg'].replace("\n", "<br/>")
             return None, None
-            
+
         return email, identity
 
-    def fetch_user_nickname(self, username, password = None, req = None):
+    def fetch_user_nickname(self, username, password=None, req=None):
         """
         Fetches the OAuth2 provider for nickname of the user. If it doesn't
             find any, returns None.
@@ -184,53 +192,20 @@ class ExternalOAuth2(ExternalAuth):
         """
         from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
 
-        if self.provider_name and self.response:
+        if req.g['oauth2_provider_name'] and req.g['oauth2_response']:
             path = None
-            if CFG_OAUTH2_CONFIGURATIONS[self.provider_name].has_key(
+            if CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']].has_key(
                                                                      'nickname'
                                                                      ):
-                path = CFG_OAUTH2_CONFIGURATIONS[self.provider_name]['nickname']
+                path = CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]['nickname']
 
             if path:
-                return treasure_hunter(self.response, path)
+                return get_substructure(req.g['oauth2_response'], path)
         else:
             return None
 
-    def user_exists(self, email, req = None):
-        """
-        This function cannot be implemented for OAuth2 authentication.
-        """
-        raise NotImplementedError()
-
-
-    def fetch_user_groups_membership(self, username, password = None,
-                                     req = None):
-        """
-        This function cannot be implemented for OAuth2 authentication.
-        """
-        return {}
-
-    def fetch_user_preferences(self, username, password = None, req = None):
-        """
-        This function cannot be implemented for OAuth2 authentication.
-        """
-        raise NotImplementedError()
-        #return {}
-
-    def fetch_all_users_groups_membership(self, req = None):
-        """
-        This function cannot be implemented for OAuth2 authentication.
-        """
-        raise NotImplementedError()
-
-    def robot_login_method_p():
-        """Return True if this method is dedicated to robots and should
-        not therefore be available as a choice to regular users upon login.
-        """
-        return False
-    robot_login_method_p = staticmethod(robot_login_method_p)
-
-    def _get_user_email_and_id(self, container):
+    @staticmethod
+    def _get_user_email_and_id(container, req):
         """
         Returns external identity and email address together. Since identity is
         essential for OAuth2 authentication, if it doesn't find external
@@ -246,16 +221,53 @@ class ExternalOAuth2(ExternalAuth):
         identity = None
         email = None
 
-        if CFG_OAUTH2_CONFIGURATIONS[self.provider_name].has_key('id'):
-            path = CFG_OAUTH2_CONFIGURATIONS[self.provider_name]['id']
-            identity = treasure_hunter(container, path)
+        #if req.g['oauth2_provider_name'] == 'orcid':
+
+
+        if CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']].has_key('id'):
+            path = CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]['id']
+            identity = get_substructure(container, path)
 
         if identity:
-            if CFG_OAUTH2_CONFIGURATIONS[self.provider_name].has_key('email'):
-                path = CFG_OAUTH2_CONFIGURATIONS[self.provider_name]\
+            if CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']].has_key('email'):
+                path = CFG_OAUTH2_CONFIGURATIONS[req.g['oauth2_provider_name']]\
                     ['email']
-                email = treasure_hunter(container, path)
+                email = get_substructure(container, path)
 
-            self.response = container
+            req.g['oauth2_response'] = container
 
         return email, identity
+
+    @staticmethod
+    def _get_user_email_and_id_from_orcid(req):
+        """
+        Since we are dealing with orcid we can fetch tons of information
+        from the user profile.
+        """
+        from invenio.access_control_config import CFG_OAUTH2_CONFIGURATIONS
+
+        profile = requests.get(CFG_OAUTH2_CONFIGURATIONS['orcid']['request_url'].format(id=req.g['oauth2_orcid']), headers={'Accept': 'application/orcid+json', 'Authorization': 'Bearer %s' % req.g['oauth2_access_token']})
+        orcid_record = req.g['orcid_record'] = json_unicode_to_utf8(profile.json)['orcid-profile']
+        id = orcid_record['orcid']['value']
+        emails = orcid_record['orcid-bio'].get('contact-details', {}).get('email', [])
+        if emails:
+            return emails[0], id
+        else:
+            return None, id
+
+    @staticmethod
+    def get_msg(req):
+        return req.g['oauth2_msg']
+
+    def fetch_user_preferences(self, username, password=None, req=None):
+        """Fetch user preferences/settings from the SSO account.
+        the external key will be '1' if the account is external to SSO,
+        otherwise 0
+        @return: a dictionary.
+        Note: for SSO the parameter are discarded and overloaded by Shibboleth
+        variables
+        """
+        if req and req.g['oauth2_provider_name'] == 'orcid':
+            return req.g.get('orcid_record', {})
+        else:
+            raise NotImplementedError()

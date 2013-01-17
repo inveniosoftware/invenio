@@ -33,20 +33,15 @@ class ExternalOpenID(ExternalAuth):
     Contains methods for authenticate with an OpenID provider.
     """
 
-    def __init__(self, enforce_external_nicknames = False):
-        """Initialization"""
-        ExternalAuth.__init__(self, enforce_external_nicknames)
+    @staticmethod
+    def __init_req(req):
+        req.g['openid_provider_name'] = ''
+        req.g['openid_debug'] = 0
+        req.g['openid_msg'] = ''
+        req.g['openid_debug_msg'] = ''
+        req.g['openid_response'] = None
 
-        # Response returned from OpenID provider.
-        self.response = None
-
-        # Error message code
-        self.msg = 0
-
-        # Name of the provider
-        self.provider_name = ""
-
-    def auth_user(self, username, password, req = None):
+    def auth_user(self, username, password, req=None):
         """
         Tries to find email and OpenID identity of the user. If it
         doesn't find any of them, returns (None, None)
@@ -63,41 +58,32 @@ class ExternalOpenID(ExternalAuth):
         @rtype: str|NoneType, str|NoneType
         """
         from openid.consumer import consumer
-        self.get_response(req)
+        self._get_response(req)
+        response = req.g['openid_response']
 
         identity = None
         email = None
 
-        if self.response.status == consumer.SUCCESS:
+        if response.status == consumer.SUCCESS:
             # In the first login of the user, fetches his/her email
             # from OpenID provider.
-            email = self.get_email_from_success_response()
-            identity = self.response.getDisplayIdentifier()
+            email = self._get_email_from_success_response(req)
+            identity = response.getDisplayIdentifier()
 
-        elif self.response.status == consumer.CANCEL:
+        elif response.status == consumer.CANCEL:
             # If user cancels the verification, set corresponding message.
-            self.msg = 21
-        elif self.response.status == consumer.FAILURE:
+            req.openid_msg = 21
+        elif response.status == consumer.FAILURE:
             # If verification fails, set corresponding message.
-            self.msg = 22
+            req.openid_msg.msg = 22
 
         return email, identity
 
-    def user_exists(self, email, req = None):
-        """
-        This function cannot be implemented for OpenID authentication.
-        """
-        raise NotImplementedError()
+    @staticmethod
+    def get_msg(req):
+        return req.g['openid_msg']
 
-
-    def fetch_user_groups_membership(self, username, password = None,
-                                     req = None):
-        """
-        This function cannot be implemented for OpenID authentication.
-        """
-        raise NotImplementedError()
-
-    def fetch_user_nickname(self, username, password = None, req = None):
+    def fetch_user_nickname(self, username, password=None, req=None):
         """
         Fetches the OpenID provider for nickname of the user. If it doesn't
             find any, returns None.
@@ -126,12 +112,14 @@ class ExternalOpenID(ExternalAuth):
         sreg_resp = None
         ax_resp = None
 
-        sreg_resp = sreg.SRegResponse.fromSuccessResponse(self.response)
+        response = req.g['openid_response']
+
+        sreg_resp = sreg.SRegResponse.fromSuccessResponse(response)
         if sreg_resp:
             if sreg_resp.getExtensionArgs().has_key('nickname'):
                 nickname = sreg_resp.getExtensionArgs()['nickname']
 
-        ax_resp = ax.FetchResponse.fromSuccessResponse(self.response)
+        ax_resp = ax.FetchResponse.fromSuccessResponse(response)
         if ax_resp and not nickname:
             extensions = ax_resp.getExtensionArgs()
 
@@ -148,27 +136,8 @@ class ExternalOpenID(ExternalAuth):
                     nickname = extensions['value.ext1.1']
         return nickname
 
-    def fetch_user_preferences(self, username, password = None, req = None):
-        """
-        This function cannot be implemented for OpenID authentication.
-        """
-        raise NotImplementedError()
-        #return {}
-
-    def fetch_all_users_groups_membership(self, req = None):
-        """
-        This function cannot be implemented for OpenID authentication.
-        """
-        raise NotImplementedError()
-
-    def robot_login_method_p():
-        """Return True if this method is dedicated to robots and should
-        not therefore be available as a choice to regular users upon login.
-        """
-        return False
-    robot_login_method_p = staticmethod(robot_login_method_p)
-
-    def get_email_from_success_response(self):
+    @staticmethod
+    def _get_email_from_success_response(req):
         """
         Fetches the email from consumer.SuccessResponse. If it doesn't find any
             returns None.
@@ -177,7 +146,8 @@ class ExternalOpenID(ExternalAuth):
         """
         from openid.extensions import ax
         email = None
-        ax_resp = ax.FetchResponse.fromSuccessResponse(self.response)
+        response = req.g['openid_response']
+        ax_resp = ax.FetchResponse.fromSuccessResponse(response)
 
         if ax_resp:
             extensions = ax_resp.getExtensionArgs()
@@ -194,7 +164,8 @@ class ExternalOpenID(ExternalAuth):
                     email = extensions['value.ext1.1']
         return email
 
-    def get_response(self, req):
+    @staticmethod
+    def _get_response(req):
         """
         Constructs the response returned from the OpenID provider
 
@@ -219,5 +190,5 @@ class ExternalOpenID(ExternalAuth):
 
         oidconsumer = consumer.Consumer({"id": get_session(req)}, None)
         url = CFG_SITE_SECURE_URL + "/youraccount/login"
-        self.response = oidconsumer.complete(args, url)
-        self.provider_name = args['provider']
+        req.g['openid_provider_name'] = args['provider']
+        req.g['openid_response'] = oidconsumer.complete(args, url)

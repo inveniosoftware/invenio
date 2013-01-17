@@ -582,10 +582,10 @@ def loginUser(req, p_un, p_pw, login_method):
                 if not p_extid:
                     p_extid = p_email
             elif not p_extid:
-                if hasattr(CFG_EXTERNAL_AUTHENTICATION[login_method], 'msg'):
+                try:
                     # OpenID and OAuth authentications have own error messages
-                    return (None, p_email, p_pw, CFG_EXTERNAL_AUTHENTICATION[login_method].msg)
-                else:
+                    return (None, p_email, p_pw, CFG_EXTERNAL_AUTHENTICATION[login_method].get_msg(req))
+                except NotImplementedError:
                     return(None, p_email, p_pw, 15)
             else:
                 # External login is successfull but couldn't fetch the email

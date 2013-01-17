@@ -19,34 +19,34 @@
 This module contains functions for basic containers (dict, list, str)
 """
 
-def treasure_hunter(island, route):
+def get_substructure(data, path):
     """
-    Tries to find the treasure in the island. If it cannot find, returns home
-    with just None.
+    Tries to retrieve a sub-structure within some data. If the path does not
+    match any sub-structure, returns None.
 
-    >>> island = {'a': 5, 'b': {'c': [1, 2, [{'f': [57]}], 4], 'd': 'test'}}
-    >>> treasure_hunter(island, "bc")
+    >>> data = {'a': 5, 'b': {'c': [1, 2, [{'f': [57]}], 4], 'd': 'test'}}
+    >>> get_substructure(island, "bc")
     [1, 2, [{'f': [57]}], 4]
-    >>> treasure_hunter(island, ['b', 'c'])
+    >>> get_substructure(island, ['b', 'c'])
     [1, 2, [{'f': [57]}], 4]
-    >>> treasure_hunter(island, ['b', 'c', 2, 0, 'f', 0])
+    >>> get_substructure(island, ['b', 'c', 2, 0, 'f', 0])
     57
-    >>> treasure_hunter(island, ['b', 'c', 2, 0, 'f', 'd'])
+    >>> get_substructure(island, ['b', 'c', 2, 0, 'f', 'd'])
     None
 
-    @param island: a container
-    @type island: str|dict|list|(an indexable container)
+    @param data: a container
+    @type data: str|dict|list|(an indexable container)
 
-    @param route: location of the data
-    @type route: list|str
+    @param path: location of the data
+    @type path: list|str
 
     @rtype: *
     """
 
-    if not len(route):
-        return island
+    if not len(path):
+        return data
 
     try:
-        return treasure_hunter(island[route[0]], route[1:])
+        return get_substructure(data[path[0]], path[1:])
     except (TypeError, IndexError, KeyError):
         return None

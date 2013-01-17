@@ -245,6 +245,46 @@ except ImportError, msg:
     )
 
 try:
+    import rauth
+except ImportError, msg:
+    warning_messages.append(
+    """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that python-rauth is not really required   **
+    ** but we recommend it in order to enable oauth    **
+    ** based authentication.                           **
+    **                                                 **
+    ** You can safely continue installing Invenio      **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your Invenio installation is put     **
+    ** into production.)                               **
+    *****************************************************
+    """ % msg
+    )
+
+try:
+    import openid
+except ImportError, msg:
+    warning_messages.append(
+    """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that python-openid is not really required  **
+    ** but we recommend it in order to enable OpenID   **
+    ** based authentication.                           **
+    **                                                 **
+    ** You can safely continue installing Invenio      **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your Invenio installation is put     **
+    ** into production.)                               **
+    *****************************************************
+    """ % msg
+    )
+
+try:
     import magic
     if not hasattr(magic, "open"):
         raise StandardError
@@ -386,7 +426,7 @@ except StandardError, msg:
     """ % (msg)
     )
 
-## Check if ffmpeg is installed and if so, with the minimum configuration for bibencode
+## 6) Check if ffmpeg is installed and if so, with the minimum configuration for bibencode
 try:
     try:
         process = subprocess.Popen('ffprobe', stderr=subprocess.PIPE, stdout=subprocess.PIPE)
