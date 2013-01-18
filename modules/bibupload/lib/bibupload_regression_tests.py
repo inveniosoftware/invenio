@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -2511,6 +2511,492 @@ class BibUploadRecordsWithOAIIDTest(GenericBibUploadTest):
         recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
         dummyerr2, recid2, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
         self.assertEqual(-1, recid2)
+
+class BibUploadRecordsWithDOITest(GenericBibUploadTest):
+    """Testing uploading of records with DOI."""
+
+    def tearDown(self):
+        GenericBibUploadTest.tearDown(self)
+
+    def setUp(self):
+        """Initialize the MARCXML test records."""
+        GenericBibUploadTest.setUp(self)
+        self.xm_testrec1 = """
+        <record>
+         <controlfield tag="001">123456789</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789</subfield>
+         </datafield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">nondoi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789-0</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 1</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.hm_testrec1 = """
+        001__ 123456789
+        003__ SzGeCERN
+        %(doitag)s%(doiind1)s%(doiind2)s $$%(doisubfieldcodesource)sdoi$$%(doisubfieldcodevalue)s10.5170/123-456-789
+        %(doitag)s%(doiind1)s%(doiind2)s $$%(doisubfieldcodesource)snondoi$$%(doisubfieldcodevalue)s10.5170/123-456-789-0
+        100__ $$aBar, Baz$$uFoo
+        245__ $$aOn the quux and huux 1
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': '_',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.xm_testrec1_to_update = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789</subfield>
+         </datafield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">nondoi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789-0</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 1 Updated</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.xm_testrec1_updated = """
+        <record>
+         <controlfield tag="001">123456789</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789</subfield>
+         </datafield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">nondoi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789-0</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 1 Updated</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.hm_testrec1_updated = """
+        001__ 123456789
+        003__ SzGeCERN
+        %(doitag)s%(doiind1)s%(doiind2)s $$%(doisubfieldcodesource)sdoi$$%(doisubfieldcodevalue)s10.5170/123-456-789
+        %(doitag)s%(doiind1)s%(doiind2)s $$%(doisubfieldcodesource)snondoi$$%(doisubfieldcodevalue)s10.5170/123-456-789-0
+        100__ $$aBar, Baz$$uFoo
+        245__ $$aOn the quux and huux 1 Updated
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': '_',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.xm_testrec2 = """
+        <record>
+         <controlfield tag="001">987654321</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/987-654-321</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 2</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.hm_testrec2 = """
+        001__ 987654321
+        003__ SzGeCERN
+        %(doitag)s%(doiind1)s%(doiind2)s $$%(doisubfieldcodesource)sdoi$$%(doisubfieldcodevalue)s10.5170/987-654-321
+        100__ $$aBar, Baz$$uFoo
+        245__ $$aOn the quux and huux 2
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': '_',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.xm_testrec2_to_update = """
+        <record>
+         <controlfield tag="001">987654321</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.xm_testrec3 = """
+        <record>
+         <controlfield tag="001">192837645</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789-0</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 4</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.hm_testrec3 = """
+        001__ 192837645
+        003__ SzGeCERN
+        %(doitag)s%(doiind1)s%(doiind2)s $$%(doisubfieldcodesource)sdoi$$%(doisubfieldcodevalue)s10.5170/123-456-789-0
+        100__ $$aBar, Baz$$uFoo
+        245__ $$aOn the quux and huux 4
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': '_',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.xm_testrec4 = """
+        <record>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789-non-existing</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 5</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+        self.xm_testrec5 = """
+        <record>
+         <controlfield tag="001">123456789</controlfield>
+         <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/123-456-789</subfield>
+         </datafield>
+         <datafield tag="%(doitag)s" ind1="%(doiind1)s" ind2="%(doiind2)s">
+          <subfield code="%(doisubfieldcodesource)s">doi</subfield>
+          <subfield code="%(doisubfieldcodevalue)s">10.5170/987-654-321</subfield>
+         </datafield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Bar, Baz</subfield>
+          <subfield code="u">Foo</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">On the quux and huux 6</subfield>
+         </datafield>
+        </record>
+        """ % {'doitag': '024',
+               'doiind1': '7',
+               'doiind2': ' ',
+               'doisubfieldcodevalue': 'a',
+               'doisubfieldcodesource': '2'
+               }
+
+    def test_insert_the_same_doi_matching_on_doi(self):
+        """bibupload - DOI tag, refuse to "insert" twice same DOI (matching on DOI)"""
+        # insert record 1 first time:
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1, msg1 = bibupload.bibupload(recs[0], opt_mode='insert')
+        inserted_xm = print_record(recid1, 'xm')
+        inserted_hm = print_record(recid1, 'hm')
+        # use real recID when comparing whether it worked:
+        self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
+        self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
+        # insert record 2 first time:
+        testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err2, recid2, msg2 = bibupload.bibupload(recs[0], opt_mode='insert')
+        inserted_xm = print_record(recid2, 'xm')
+        inserted_hm = print_record(recid2, 'hm')
+        # use real recID when comparing whether it worked:
+        self.xm_testrec2 = self.xm_testrec2.replace('987654321', str(recid2))
+        self.hm_testrec2 = self.hm_testrec2.replace('987654321', str(recid2))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec2), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec2), '')
+
+        # try to insert again record 1 (without recid, matching on DOI)
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1_updated, recid1_updated, msg1_updated = bibupload.bibupload(recs[0], opt_mode='insert')
+        self.assertEqual(-1, recid1_updated)
+
+        # if we try to update, append or correct, the same record is matched
+        recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
+        err1_updated, recid1_updated, msg1_updated = bibupload.bibupload(recs[0], opt_mode='correct')
+        self.assertEqual(recid1, recid1_updated)
+
+        err1_updated, recid1_updated, msg1_updated = bibupload.bibupload(recs[0], opt_mode='append')
+        self.assertEqual(recid1, recid1_updated)
+
+        err1_updated, recid1_updated, msg1_updated = bibupload.bibupload(recs[0], opt_mode='replace')
+        self.assertEqual(recid1, recid1_updated)
+
+    def test_insert_the_same_doi_matching_on_recid(self):
+        """bibupload - DOI tag, refuse to "insert" twice same DOI (matching on recid)"""
+        # First upload 2 test records
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1, msg1 = bibupload.bibupload(recs[0], opt_mode='insert')
+
+        testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err2, recid2, msg2 = bibupload.bibupload(recs[0], opt_mode='insert')
+
+        # try to update record 2 with DOI already in record 1. It must fail:
+        testrec_to_update = self.xm_testrec2_to_update.replace('<controlfield tag="001">987654321</controlfield>',
+                                                               '<controlfield tag="001">%s</controlfield>' % recid2)
+        recs = bibupload.xml_marc_to_records(testrec_to_update)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='replace')
+        self.assertEqual(1, err)
+
+        # Ditto in correct and append mode
+        recs = bibupload.xml_marc_to_records(testrec_to_update)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='correct')
+        self.assertEqual(1, err)
+
+        recs = bibupload.xml_marc_to_records(testrec_to_update)
+        err, recid, msg = bibupload.bibupload(recs[0], opt_mode='append')
+        self.assertEqual(1, err)
+
+    def test_insert_or_replace_the_same_doi_record(self):
+        """bibupload - DOI tag, allow to insert or replace matching on DOI"""
+        # insert/replace record 1 first time:
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1, msg1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
+        inserted_xm = print_record(recid1, 'xm')
+        inserted_hm = print_record(recid1, 'hm')
+        # use real recID in test buffers when comparing whether it worked:
+        self.xm_testrec1 = self.xm_testrec1.replace('123456789', str(recid1))
+        self.hm_testrec1 = self.hm_testrec1.replace('123456789', str(recid1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
+        # try to insert/replace updated record 1, it should be okay:
+        recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
+        err1_updated, recid1_updated, msg1_updated = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
+        inserted_xm = print_record(recid1_updated, 'xm')
+        inserted_hm = print_record(recid1_updated, 'hm')
+        self.assertEqual(recid1, recid1_updated)
+        # use real recID in test buffers when comparing whether it worked:
+        self.xm_testrec1_updated = self.xm_testrec1_updated.replace('123456789', str(recid1))
+        self.hm_testrec1_updated = self.hm_testrec1_updated.replace('123456789', str(recid1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          self.xm_testrec1_updated), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1_updated), '')
+
+    def test_correct_the_same_doi_record(self):
+        """bibupload - DOI tag, allow to correct matching on DOI"""
+        # insert/replace record 1 first time:
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1, msg1 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
+        inserted_xm = print_record(recid1, 'xm')
+        inserted_hm = print_record(recid1, 'hm')
+        # use real recID in test buffers when comparing whether it worked:
+        self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
+        self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
+        # try to correct updated record 1, it should be okay:
+        recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
+        err1_updated, recid1_updated, msg1_updated = bibupload.bibupload(recs[0], opt_mode='correct')
+        inserted_xm = print_record(recid1_updated, 'xm')
+        inserted_hm = print_record(recid1_updated, 'hm')
+        self.assertEqual(recid1, recid1_updated)
+        # use real recID in test buffers when comparing whether it worked:
+        self.xm_testrec1_updated = self.xm_testrec1_updated.replace('123456789', str(recid1))
+        self.hm_testrec1_updated = self.hm_testrec1_updated.replace('123456789', str(recid1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          self.xm_testrec1_updated), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1_updated), '')
+
+    def test_replace_nonexisting_doi_record(self):
+        """bibupload - DOI tag, refuse to replace non-existing DOI record (matching on DOI)"""
+        testrec_to_insert_first = self.xm_testrec4
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err4, recid4, msg4 = bibupload.bibupload(recs[0], opt_mode='replace')
+        self.assertEqual(-1, recid4)
+
+    def test_matching_on_doi_source_field(self):
+        """bibupload - DOI tag, test matching records using DOI value AND source field ($2)"""
+        # insert test record 1, with a "fake" doi (not "doi" in source field):
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1, msg1 = bibupload.bibupload(recs[0], opt_mode='insert')
+        inserted_xm = print_record(recid1, 'xm')
+        inserted_hm = print_record(recid1, 'hm')
+        # use real recID when comparing whether it worked:
+        self.xm_testrec1 = self.xm_testrec1.replace('123456789', str(recid1))
+        self.hm_testrec1 = self.hm_testrec1.replace('123456789', str(recid1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
+
+        # insert record 3, which matches record 1 "fake" doi, so it
+        # should work.
+        testrec_to_insert_first = self.xm_testrec3.replace('<controlfield tag="001">192837645</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err3, recid3, msg3 = bibupload.bibupload(recs[0], opt_mode='insert')
+        inserted_xm = print_record(recid3, 'xm')
+        inserted_hm = print_record(recid3, 'hm')
+        # use real recID when comparing whether it worked:
+        self.xm_testrec3 = self.xm_testrec3.replace('192837645', str(recid3))
+        self.hm_testrec3 = self.hm_testrec3.replace('192837645', str(recid3))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec3), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec3), '')
+
+    def test_replace_or_update_record__with_ambiguous_doi(self):
+        """bibupload - DOI tag, refuse to replace/correct/append on the basis of ambiguous DOI"""
+        # First upload 2 test records with two different DOIs:
+        testrec_to_insert_first = self.xm_testrec1.replace('<controlfield tag="001">123456789</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err1, recid1, msg1 = bibupload.bibupload(recs[0], opt_mode='insert')
+        self.assertEqual(0, err1)
+
+        testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
+                                                           '')
+        recs = bibupload.xml_marc_to_records(testrec_to_insert_first)
+        err2, recid2, msg2 = bibupload.bibupload(recs[0], opt_mode='insert')
+        self.assertEqual(0, err2)
+
+        # Now try to insert record with DOIs matching the records
+        # previously uploaded.  It must fail.
+        testrec = self.xm_testrec5.replace('<controlfield tag="001">123456789</controlfield>',
+                                           '')
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='insert')
+        self.assertEqual(1, err5)
+
+        # Ditto for other modes:
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
+        self.assertEqual(1, err5)
+
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='replace')
+        self.assertEqual(1, err5)
+
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='correct')
+        self.assertEqual(1, err5)
+
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='append')
+        self.assertEqual(1, err5)
+
+        # The same is true if a recid exists in the input MARCXML (as
+        # long as DOIs are ambiguous):
+        testrec = self.xm_testrec5.replace('<controlfield tag="001">123456789</controlfield>',
+                                           '<controlfield tag="001">%s</controlfield>' % recid1)
+
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
+        self.assertEqual(1, err5)
+
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='replace')
+        self.assertEqual(1, err5)
+
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='correct')
+        self.assertEqual(1, err5)
+
+        recs = bibupload.xml_marc_to_records(testrec)
+        err5, recid5, msg5 = bibupload.bibupload(recs[0], opt_mode='append')
+        self.assertEqual(1, err5)
 
 class BibUploadIndicatorsTest(GenericBibUploadTest):
     """
@@ -5038,7 +5524,8 @@ TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,
                              BibUploadPretendTest,
                              BibUploadCallbackURLTest,
                              BibUploadMoreInfoTest,
-                             BibUploadBibRelationsTest
+                             BibUploadBibRelationsTest,
+                             BibUploadRecordsWithDOITest,
                              )
 
 
