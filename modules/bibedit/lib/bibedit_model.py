@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -74,41 +74,38 @@ class BibHOLDINGPEN(db.Model):
 
 class Bibdoc(db.Model):
     """Represents a Bibdoc record."""
-    def __init__(self):
-        pass
     __tablename__ = 'bibdoc'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
-                nullable=False,
-                autoincrement=True)
+                nullable=False, autoincrement=True)
     status = db.Column(db.Text, nullable=False)
-    docname = db.Column(db.String(250), nullable=False,
-                server_default='file',
-                index=True)
+    docname = db.Column(db.String(250, collation='utf8_bin'), nullable=True,
+                server_default='file', index=True)
     creation_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00',
-                index=True)
+                server_default='0001-01-01 00:00:00', index=True)
     modification_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00',
-                index=True)
-    text_extraction_date = db.Column(db.DateTime,
-                nullable=False,
+                server_default='0001-01-01 00:00:00', index=True)
+    text_extraction_date = db.Column(db.DateTime, nullable=False,
                 server_default='0001-01-01 00:00:00')
-    more_info = db.Column(db.iMediumBinary, nullable=True)
+    doctype = db.Column(db.String(255))
 
 class BibdocBibdoc(db.Model):
     """Represents a BibdocBibdoc record."""
-    def __init__(self):
-        pass
     __tablename__ = 'bibdoc_bibdoc'
+    id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
+                nullable=False, autoincrement=True)
     id_bibdoc1 = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Bibdoc.id), nullable=False, primary_key=True)
+                db.ForeignKey(Bibdoc.id), nullable=True)
+    version1 = db.Column(db.TinyInt(4, unsigned=True))
+    format1 = db.Column(db.String(50))
     id_bibdoc2 = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Bibdoc.id), nullable=False, primary_key=True)
-    type = db.Column(db.String(255), nullable=True)
+                db.ForeignKey(Bibdoc.id), nullable=True)
+    version2 = db.Column(db.TinyInt(4, unsigned=True))
+    format2 = db.Column(db.String(50))
+    rel_type = db.Column(db.String(255), nullable=True)
     bibdoc1 = db.relationship(Bibdoc, backref='bibdoc2s',
-                primaryjoin=Bibdoc.id==id_bibdoc1)
+                primaryjoin=Bibdoc.id == id_bibdoc1)
     bibdoc2 = db.relationship(Bibdoc, backref='bibdoc1s',
-                primaryjoin=Bibdoc.id==id_bibdoc2)
+                primaryjoin=Bibdoc.id == id_bibdoc2)
 
 class BibrecBibdoc(db.Model):
     """Represents a BibrecBibdoc record."""
@@ -121,6 +118,8 @@ class BibrecBibdoc(db.Model):
     id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Bibdoc.id), nullable=False,
                 server_default='0', primary_key=True)
+    docname = db.Column(db.String(250, collation='utf8_bin'), nullable=False,
+                server_default='file', index=True)
     type = db.Column(db.String(255), nullable=True)
     bibrec = db.relationship(Bibrec, backref='bibdocs')
     bibdoc = db.relationship(Bibdoc, backref='bibrecs')
