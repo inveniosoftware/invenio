@@ -6,7 +6,9 @@ from wtforms import Form, \
                     SubmitField
 
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_load_fields import TitleField
+# Import custom fields
+from invenio.webdeposit_load_fields import fields
+from invenio.webdeposit_field_widgets import bootstrap_submit
 
 __all__ = ['PhotoForm']
 
@@ -18,7 +20,7 @@ class Dimensions(Form):
 
 class PhotoForm(Form):
 
-    title = TitleField(_('Photo Title'))
+    title = fields.TitleField(label=_('Photo Title'))
     dimensions = FormField(Dimensions)
     file = FileField(_('File'))
     submit = SubmitField(_('Submit Photo'), widget=bootstrap_submit)

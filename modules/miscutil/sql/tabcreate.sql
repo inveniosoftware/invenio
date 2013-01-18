@@ -3601,8 +3601,7 @@ CREATE TABLE IF NOT EXISTS deposition_drafts (
   form_type VARCHAR(45) NOT NULL,
   form_values VARCHAR(2048) NOT NULL,
   timestamp DATETIME NOT NULL,
-  PRIMARY KEY (uuid),
-  UNIQUE (uuid)
+  PRIMARY KEY (uuid, step)
 )
 
 CREATE TABLE IF NOT EXISTS deposition_workflows (
@@ -3610,6 +3609,7 @@ CREATE TABLE IF NOT EXISTS deposition_workflows (
   dep_type VARCHAR(45) NOT NULL,
   current_step INTEGER,
   status BINARY NOT NULL,
+  PRIMARY KEY (uuid)
   UNIQUE (uuid)
 )
 

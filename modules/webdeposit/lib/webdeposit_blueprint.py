@@ -35,16 +35,16 @@ from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.webdeposit_utils import create_dep_type, \
                                      get_current_form, \
+                                     get_current_step, \
                                      draft_field_set, \
                                      draft_field_list_add, \
                                      delete_draft, \
                                      draft_field_get_all, \
-                                     pretty_date
-
-from webdeposit_load_forms import forms
-
-globals().update(forms)
-
+                                     pretty_date, \
+                                     create_workflow, \
+                                     get_latest_or_new_workflow, \
+                                     get_workflow
+from invenio.webdeposit_workflow import DepositionWorkflow
 
 # from invenio.webuser_flask import current_user
 
@@ -61,6 +61,18 @@ blueprint = InvenioBlueprint('webdeposit', __name__,
 @blueprint.route('/webdeposit/<dep_type>/<uuid>/submit', methods=['GET', 'POST'])
 def submit(dep_type, uuid):
     from invenio.webuser_flask import current_user
+
+    webdep_workflow = get_workflow(dep_type, uuid)
+    webdep_workflow.jump_forward()
+    webdep_workflow.run()
+    status = webdep_workflow.get_status()
+
+    if status == 0:
+        return webdep_workflow.get_output()
+    else:
+        return 'Error form %d' % status
+
+    return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
 
     if request.method == 'POST':
         doctitle = request.form['doctitle']
@@ -241,8 +253,15 @@ def delete(dep_type, uuid=None):
 def create_new(dep_type):
     from invenio.webuser_flask import current_user
 
-    draft_id = create_dep_type(current_user.get_id(), dep_type)[0]
-    return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=draft_id))
+    workflow = create_workflow(current_user.get_id(), dep_type)
+    uuid = workflow.get_uuid()
+    workflow.run()
+    status = workflow.get_status()
+    if status == 0:
+        return workflow.get_output()
+    else:
+        return 'Error form %d' % status
+    return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
 
 
 @blueprint.route('/webdeposit')
@@ -253,16 +272,33 @@ def add(dep_type=None, uuid=None):
     from invenio.webuser_flask import current_user
 
     if dep_type is None:
+        # choose deposition type
         return render_dep_types()
-    elif uuid is not None:
-        #draft_id is the same
-        #it returns a new one if it doesn't exist
-        draft_id, form = get_current_form(current_user.get_id(), uuid=uuid)
+    elif uuid is None:
+        # get the latest one. if there is no workflow created
+        # lets create a new workflow with given deposition type
+        workflow = get_latest_or_new_workflow(dep_type)
+        ##draft_id, form = get_current_form(current_user.get_id(), dep_type)
     else:
-        draft_id, form = get_current_form(current_user.get_id(), dep_type)
-        return redirect(url_for("webdeposit.add", \
-                                dep_type=dep_type, \
-                                uuid=draft_id))
+        # get workflow with specific uuid
+        workflow = get_workflow(dep_type, uuid)
+        ##draft_id, form = get_current_form(current_user.get_id(), uuid=uuid)
+
+    workflow.run()
+    status = workflow.get_status()
+
+    if status == 0:
+        return workflow.get_output()
+    else:
+        return 'Error form %d' % status
+
+    #FIXME remove below vvvvvvvvvvvvvvvvvv
+
+
+#    else:
+ #       return redirect(url_for("webdeposit.add", \
+#                                dep_type=dep_type, \
+#                                uuid=draft_id))
 
     drafts = draft_field_get_all(current_user.get_id(), \
                                  dep_type, \

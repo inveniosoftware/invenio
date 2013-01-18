@@ -17,9 +17,7 @@ CFG_FORMS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'webdeposit_fo
 
 """ Change the names of the forms
     from the file names to the class names """
-forms = []
+forms = {}
 for form in CFG_FORMS.itervalues():
     if form is not None:
-        forms.append((form.__name__, form))
-
-globals().update(forms)
+        forms[form.__name__] = form

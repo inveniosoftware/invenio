@@ -18,9 +18,10 @@ CFG_FIELDS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'webdeposit_f
 
 """ Change the names of the fields
     from the file names to the class names """
-fields = []
+class Fields(object):
+    pass
+fields = Fields()
+
 for field in CFG_FIELDS.itervalues():
     if field is not None:
-        fields.append((field.__name__, field))
-
-globals().update(fields)
+        fields.__setattr__ (field.__name__, field)

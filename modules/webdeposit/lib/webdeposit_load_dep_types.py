@@ -32,5 +32,3 @@ dep_types = {"First Group": \
                   {"name": "Video", "dep_type": "Video"}, \
                  ], \
              "Third Group": []}
-
-globals().update(dep_types)

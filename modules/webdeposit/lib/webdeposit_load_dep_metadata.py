@@ -15,8 +15,9 @@ CFG_DOC_METADATA = PluginContainer(os.path.join(CFG_PYLIBDIR, \
                                                 '*metadata.py'),
                                    plugin_builder=plugin_builder)
 
-""" Create a dict with a dep_type => form_to_be_loaded relation """
+""" Create a dict with a dep_type => workflow relation """
 dep_metadata = {}
 for meta in CFG_DOC_METADATA.itervalues():
     if meta is not None:
-        dep_metadata[meta['dep_type']]["form"] = meta['form']
+        dep_metadata[meta['dep_type']] = dict()
+        dep_metadata[meta['dep_type']]["workflow"] = meta['workflow']

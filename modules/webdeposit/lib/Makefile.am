@@ -29,6 +29,7 @@ pylib_DATA = __init__.py \
              webdeposit_field_widgets.py \
              webdeposit_model.py \
              webdeposit_workflow.py \
+             webdeposit_workflow_utils.py \
              sherpa_romeo.py \
              orcid.py \
              xmlDict.py

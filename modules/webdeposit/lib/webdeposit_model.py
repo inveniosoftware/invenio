@@ -9,12 +9,14 @@ class WebDepositDraft(db.Model):
     """Represents a deposition draft."""
     __tablename__ = 'deposition_drafts'
     uuid = db.Column(db.String(36),
-                     primary_key=True,
-                     unique=True,
+                     nullable=False,
+                     primary_key=True)
+    dep_type = db.Column(db.String(45),
                      nullable=False)
     step = db.Column(db.Integer(15,
-                         unsigned=True),
-                         nullable=False)
+                     unsigned=True),
+                     nullable=False,
+                     primary_key=True)
     user_id = db.Column(db.Integer(15,
                         unsigned=True),
                         nullable=False)
@@ -32,10 +34,13 @@ class WebDepositWorkflow(db.Model):
                      unique=True,
                      nullable=False)
     dep_type = db.Column(db.String(45),
-                     nullable=False)
+                         nullable=False)
+    obj_json = db.Column(db.String(2048),
+                         nullable=False)
     current_step = db.Column(db.Integer(15,
-                        unsigned=True),
-                        nullable=False)
-    status = db.Column(db.Binary, nullable=False)
+                             unsigned=True),
+                             nullable=False)
+    status = db.Column(db.Integer(10, unsigned=True),
+                       nullable=False)
 
-__all__ = ['WebDepositDraft']
+__all__ = ['WebDepositDraft', 'WebDepositWorkflow']

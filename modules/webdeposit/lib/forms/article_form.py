@@ -4,30 +4,20 @@ from wtforms import Form, \
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, bootstrap_submit
 
-from invenio.webdeposit_load_fields import PublisherField, \
-                                           JournalField, \
-                                           ISSNField, \
-                                           TitleField, \
-                                           AuthorField, \
-                                           AbstractField, \
-                                           PagesNumberField, \
-                                           LanguageField, \
-                                           Date, \
-                                           KeywordsField, \
-                                           NotesField, \
-                                           FileUploadField
+# Import custom fields
+from invenio.webdeposit_load_fields import fields
 __all__ = ['ArticleForm']
 
 
 class ArticleForm(Form):
 
-    publisher = PublisherField(_('Publisher'))
-    journal = JournalField(_('Journal Title'))
-    issn = ISSNField('ISSN')
-    title = TitleField(_('Document Title'))
-    author = AuthorField(_('Author of the Document'))
-    abstract = AbstractField(_('Abstract'))
-    pagesnum = PagesNumberField(_('Number of Pages'))
+    publisher = fields.PublisherField(label=_('Publisher'), validators=[Required()])
+    journal = fields.JournalField(label=_('Journal Title'), validators=[Required()])
+    issn = fields.ISSNField(label='ISSN')
+    title = fields.TitleField(label=_('Document Title'))
+    author = fields.AuthorField(label=_('Author of the Document'))
+    abstract = fields.AbstractField(label=_('Abstract'))
+    pagesnum = fields.PagesNumberField(label=_('Number of Pages'))
     languages = [("en", _("English")), \
                 ("fre", _("French")), \
                 ("ger", _("German")), \
@@ -44,13 +34,13 @@ class ArticleForm(Form):
                 ("swe", _("Swedish")), \
                 ("fin", _("Finnish")), \
                 ("rus", _("Russian"))]
-    language = LanguageField(label="Language", choices=languages)
-    date = Date(_('Date of Document'), widget=date_widget)
-    keywords = KeywordsField(_('Keywords'))
-    notes = NotesField(_('Additional Notes or Comments'))
-    file = FileUploadField(_('File'))
-    plupload_file = FileUploadField(_('File'), widget=plupload_widget)
-    submit = SubmitField(_('Submit Article'), widget=bootstrap_submit)
+    language = fields.LanguageField(label=_("Language"), choices=languages)
+    date = fields.Date(label=_('Date of Document'), widget=date_widget)
+    keywords = fields.KeywordsField(label=_('Keywords'))
+    notes = fields.NotesField(label=_('Additional Notes or Comments'))
+    file = fields.FileUploadField(label=_('File'))
+    plupload_file = fields.FileUploadField(label=_('File'), widget=plupload_widget)
+    submit = SubmitField(label=_('Submit Article'), widget=bootstrap_submit)
 
     """ Form Configuration variables """
     _title = _("Submit an Article")

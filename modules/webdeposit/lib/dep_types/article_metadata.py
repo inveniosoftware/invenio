@@ -1,20 +1,24 @@
 from invenio.webdeposit_load_forms import forms
-globals().update(forms)
+from invenio.webdeposit_workflow_utils import authorize_user, \
+                                              render_form, \
+                                              wait_for_submission
 
 __all__ = ['Article']
 
+
+ArticleForm = forms['ArticleForm']
+PhotoForm = forms['PhotoForm']
+
 dep_type = "Article"
-form = ArticleForm
-form_sequence = [ArticleForm, PhotoForm]
-wf = [(set_status, [ArticleForm]), \
-      (wait_for_submission, [ArticleForm]), \
-      (set_status, [PhotoForm]),
-      (wait_for_submission, [PhotoForm])]
+wf = [authorize_user(), \
+      render_form(ArticleForm),
+      wait_for_submission(),
+      render_form(PhotoForm),
+      wait_for_submission()]
+
 # form = get_metadata_creation_form_from_doctype(doc_type)  # # This will use BibField to create a simple form which is the concatenation of all the fields neeeded for doc_type "Article"
 
-Article = {"form": form, \
-           "dep_type": dep_type, \
-           "form_sequence": form_sequence, \
+Article = {"dep_type": dep_type, \
            "workflow": wf}
 
 
