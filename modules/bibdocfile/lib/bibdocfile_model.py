@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -47,3 +47,23 @@ class Bibdocfsinfo(db.Model):
     mime = db.Column(db.String(100), nullable=False, index=True)
     master_format = db.Column(db.String(50))
 
+
+class Bibdocmoreinfo(db.Model):
+    """Represents a Bibdocmoreinfo record."""
+    __tablename__ = 'bibdocmoreinfo'
+
+    id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
+                    db.ForeignKey(Bibdoc.id), primary_key=True,
+                    autoincrement=False)
+    version = db.Column(db.TinyInteger(4, unsigned=True), primary_key=True,
+                    autoincrement=False)
+    format = db.Column(db.String(50), primary_key=True, nullable=False)
+    id_rel = db.Column(db.MediumInteger(9, unsigned=True),
+                    primary_key=True, autoincrement=False)
+    namespace = db.Column(db.Char(25), primary_key=True)
+    data_key = db.Column(db.Char(25), primary_key=True)
+    data_value = db.Column(db.MediumBlob)
+
+
+__all__ = ['Bibdocfsinfo',
+           'Bibdocfsinfo']
