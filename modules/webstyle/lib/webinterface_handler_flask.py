@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from flask import Flask, session, request, g, \
                 url_for, current_app, render_template, \
-                redirect, flash
+                redirect, flash, send_file
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError
 
@@ -56,7 +56,14 @@ def create_invenio_flask_app():
 
     ## The Flask application instance
     _app = Flask(__name__,
-        static_url_path='/',  # We assume anything under '/' which is static to be handled directly by Apache
+        ## Static files are usually handled directly by the webserver (e.g. Apache)
+        ## However in case WSGI is required to handle static files too (such
+        ## as when running simple server), then this flag can be
+        ## turned on (it is done automatically by wsgi_handler_test).
+        ## We assume anything under '/' which is static to be server directly
+        ## by the webserver from CFG_WEBDIR. In order to generate independent
+        ## url for static files use func:`url_for('static', filename='test')`.
+        static_url_path='',
         static_folder=CFG_WEBDIR)
 
     ## Let's initialize database.
@@ -87,8 +94,7 @@ def create_invenio_flask_app():
     from werkzeug.wrappers import BaseResponse
     from werkzeug.exceptions import HTTPException
     from invenio.flask_sslify import SSLify
-    from invenio.webinterface_handler_wsgi import \
-                application as legacy_application
+    from invenio.webinterface_handler_wsgi import application as legacy_application
 
     if CFG_HAS_HTTPS_SUPPORT:
         # Makes request always run over HTTPS.
@@ -118,16 +124,37 @@ def create_invenio_flask_app():
                 g.start_response = start_response
                 try:
                     response = self.app.full_dispatch_request()
-                except Exception, e:
+                except Exception as e:
                     response = self.app.handle_exception(e)
-                return response(environ, start_response)
 
+## FIXME register exception and send email on production site
+#      except Exception:
+#         register_exception(req=req, alert_admin=True)
+#         if not req.response_sent_p:
+#             req.status = HTTP_INTERNAL_SERVER_ERROR
+#             req.headers_out['content-type'] = 'text/html'
+#             start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+#             if CFG_DEVEL_SITE:
+#                 return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
+#                 from cgitb import html
+#                 return [html(sys.exc_info())]
+#             return generate_error_page(req)
+#         else:
+#             return generate_error_page(req, page_already_started=True)
+
+                return response(environ, start_response)
 
     _app.wsgi_app = LegacyAppMiddleware(_app)
 
     @_app.errorhandler(404)
     def page_not_found(error):
         try:
+            #if wsgi_serve_static_files:
+            #    ## let's serve static files
+            #    possible_static_path = is_static_path(request.environ['PATH_INFO'])
+            #    if possible_static_path is not None:
+            #        return send_file(possible_static_path)
+
             response = legacy_application(request.environ, g.start_response)
             if not isinstance(response, BaseResponse):
                 response = current_app.make_response(str(response))

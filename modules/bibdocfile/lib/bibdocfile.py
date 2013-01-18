@@ -3085,6 +3085,11 @@ def check_bibdoc_authorization(user_info, status):
         raise ValueError, 'Unexpected authorization type %s for %s' % (repr(auth_type), repr(auth_value))
     return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
+## TODO for future reimplementation of stream_file
+#class StreamFileException(Exception):
+#    def __init__(self, value):
+#        self.value = value
+
 _RE_BAD_MSIE = re.compile("MSIE\s+(\d+\.\d+)")
 def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5str=None, location=None, download=False):
     """This is a generic function to stream a file to the user.
@@ -3092,6 +3097,19 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
     guessed based on req and fullpath.
     md5str should be passed as an hexadecimal string.
     """
+
+    ## TODO for future reimplementation of stream_file
+    # from flask import send_file
+    # if fullname is None:
+    #     fullname = fullpath.split('/')[-1]
+    # response = send_file(fullpath,
+    #                      attachment_filename=fullname.replace('"', '\\"'),
+    #                      as_attachment=False)
+    # if not download:
+    #     response.headers['Content-Disposition'] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+    #
+    # raise StreamFileException(response)
+
     def normal_streaming(size):
         req.set_content_length(size)
         req.send_http_header()
@@ -3342,6 +3360,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             return normal_streaming(size)
     else:
         raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+
 
 def stream_restricted_icon(req):
     """Return the content of the "Restricted Icon" file."""

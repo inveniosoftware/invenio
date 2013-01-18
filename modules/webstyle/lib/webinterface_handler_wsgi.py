@@ -27,7 +27,6 @@ import inspect
 from fnmatch import fnmatch
 from urlparse import urlparse, urlunparse
 
-from wsgiref.validate import validator
 from wsgiref.util import FileWrapper
 
 if __name__ != "__main__":
@@ -36,24 +35,17 @@ if __name__ != "__main__":
     ## dependecies do this! (e.g. 4Suite)
     sys.stdout = sys.stderr
 
-from invenio.session import get_session
-from invenio.webinterface_handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
-from invenio.webinterface_layout import invenio_handler
-from invenio.webinterface_handler_wsgi_utils import table, FieldStorage
+from invenio.webinterface_handler_wsgi_utils import table
 from invenio.webinterface_handler_config import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
-from invenio.errorlib import register_exception, get_pretty_traceback
-from flask import request, current_app, after_this_request
-
-## Static files are usually handled directly by the webserver (e.g. Apache)
-## However in case WSGI is required to handle static files too (such
-## as when running wsgiref simple server), then this flag can be
-## turned on (it is done automatically by wsgi_handler_test).
-CFG_WSGI_SERVE_STATIC_FILES = False
+from invenio.errorlib import register_exception
+## TODO for future reimplementation of stream_file
+#from invenio.bibdocfile import StreamFileException
+from flask import request, after_this_request
 
 
 ## Magic regexp to search for usage of CFG_SITE_URL within src/href or
@@ -84,6 +76,18 @@ class InputProcessed(object):
         raise EOFError('The wsgi.input stream has already been consumed')
     readline = readlines = __iter__ = read
 
+
+from werkzeug import BaseResponse, ResponseStreamMixin, \
+                     CommonResponseDescriptorsMixin
+
+
+class Response(BaseResponse, ResponseStreamMixin,
+               CommonResponseDescriptorsMixin):
+    """
+    Full featured response object implementing :class:`ResponseStreamMixin`
+    to add support for the `stream` property.
+    """
+
 class SimulatedModPythonRequest(object):
     """
     mod_python like request object.
@@ -91,10 +95,10 @@ class SimulatedModPythonRequest(object):
     easy.
     @see: <http://www.modpython.org/live/current/doc-html/pyapi-mprequest.html>
     """
-    def __init__(self, environ, start_response, flask_app=None):
+    def __init__(self, environ, start_response):
+        self.response = Response()
         self.__environ = environ
         self.__start_response = start_response
-        self.__flask_app = flask_app
         self.__response_sent_p = False
         self.__buffer = ''
         self.__low_level_headers = []
@@ -108,7 +112,7 @@ class SimulatedModPythonRequest(object):
         self.__cleanups = []
         self.__mimetype = request.mimetype
         self.headers_out = { 'Cache-Control': None }
-        self.headers_out.update(dict(request.headers))
+        #self.headers_out.update(dict(request.headers))
         ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
         self.__write = None
         self.__write_error = False
@@ -149,11 +153,11 @@ class SimulatedModPythonRequest(object):
             self.__buffer += string.encode('utf8')
         else:
             self.__buffer += string
+
         if flush:
             self.flush()
 
     def flush(self):
-        return
         self.send_http_header()
         if self.__buffer:
             self.__bytes_sent += len(self.__buffer)
@@ -180,15 +184,23 @@ class SimulatedModPythonRequest(object):
             self.__buffer = ''
 
     def set_content_type(self, content_type):
-        self.__mimetype = content_type
+        self.response.content_type = content_type
         if self.__is_https:
             if content_type.startswith("text/html") or content_type.startswith("application/rss+xml"):
                 self.__replace_https = True
 
     def get_content_type(self):
-        return self.__mimetype
+        return self.response.content_type
 
     def send_http_header(self):
+        print self.__low_level_headers, self.headers_out
+        for (k, v) in self.__low_level_headers:
+            self.response.headers[k] = v
+        for k, v in self.headers_out.iteritems():
+            self.response.headers[k] = v
+
+        self.response.headers['Content-Type'] = self.__mimetype
+        self.__write = self.response.stream.write
         return
         if not self.__response_sent_p:
             self.__tainted = True
@@ -314,9 +326,9 @@ class SimulatedModPythonRequest(object):
 
     def set_encoding(self, encoding):
         if encoding:
-            self.__headers['content-encoding'] = str(encoding)
+            self.response.headers['content-encoding'] = str(encoding)
         else:
-            del self.__headers['content-encoding']
+            del self.response.headers['content-encoding']
 
     def get_bytes_sent(self):
         return self.__bytes_sent
@@ -428,64 +440,47 @@ def alert_admin_for_server_status_p(status, referer):
             return True
     return False
 
-def application(environ, start_response, flask_app=None):
+def application(environ, start_response):
     """
     Entry point for wsgi.
     """
     ## Needed for mod_wsgi, see: <http://code.google.com/p/modwsgi/wiki/ApplicationIssues>
-    req = SimulatedModPythonRequest(environ, start_response, flask_app)
+    req = SimulatedModPythonRequest(environ, start_response)
     #print 'Starting mod_python simulation'
+
     try:
-        try:
-            possible_module, possible_handler = is_mp_legacy_publisher_path(environ['PATH_INFO'])
-            if possible_module is not None:
-                mp_legacy_publisher(req, possible_module, possible_handler)
-            elif CFG_WSGI_SERVE_STATIC_FILES:
-                possible_static_path = is_static_path(environ['PATH_INFO'])
-                if possible_static_path is not None:
-                    from invenio.bibdocfile import stream_file
-                    stream_file(req, possible_static_path)
-                else:
-                    ret = invenio_handler(req)
-            else:
-                ret = invenio_handler(req)
-            req.flush()
-            return req.get_buffer()
-        except SERVER_RETURN, status:
-            redirection, = status.args
-            from werkzeug.wrappers import BaseResponse
-            if isinstance(redirection, BaseResponse):
-                return redirection
-            status = int(str(status))
-            if status == 404:
-                from werkzeug.exceptions import NotFound
-                raise NotFound()
-            if status not in (OK, DONE):
-                req.status = status
-                req.headers_out['content-type'] = 'text/html'
-                admin_to_be_alerted = alert_admin_for_server_status_p(status,
-                                                  req.headers_in.get('referer'))
-                if admin_to_be_alerted:
-                    register_exception(req=req, alert_admin=True)
-                if not req.response_sent_p:
-                    start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-                return generate_error_page(req, admin_to_be_alerted)
-            else:
-                req.flush()
-        except Exception, e:
-            register_exception(req=req, alert_admin=True)
-            raise
+        possible_module, possible_handler = is_mp_legacy_publisher_path(environ['PATH_INFO'])
+        if possible_module is not None:
+            mp_legacy_publisher(req, possible_module, possible_handler)
+        else:
+            from invenio.webinterface_layout import invenio_handler
+            ret = invenio_handler(req)
+        req.flush()
+    ## TODO for future reimplementation of stream_file
+    #except StreamFileException as e:
+    #    return e.value
+    except SERVER_RETURN, status:
+        redirection, = status.args
+        from werkzeug.wrappers import BaseResponse
+        if isinstance(redirection, BaseResponse):
+            return redirection
+        status = int(str(status))
+        if status == 404:
+            from werkzeug.exceptions import NotFound
+            raise NotFound()
+        if status not in (OK, DONE):
+            req.status = status
+            req.headers_out['content-type'] = 'text/html'
+            admin_to_be_alerted = alert_admin_for_server_status_p(status,
+                                              req.headers_in.get('referer'))
+            if admin_to_be_alerted:
+                register_exception(req=req, alert_admin=True)
             if not req.response_sent_p:
-                req.status = HTTP_INTERNAL_SERVER_ERROR
-                req.headers_out['content-type'] = 'text/html'
                 start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-                if CFG_DEVEL_SITE:
-                    return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
-                    from cgitb import html
-                    return [html(sys.exc_info())]
-                return generate_error_page(req)
-            else:
-                return generate_error_page(req, page_already_started=True)
+            return generate_error_page(req, admin_to_be_alerted)
+        else:
+            req.flush()
+
     finally:
         ##for (callback, data) in req.get_cleanups():
         ##    callback(data)
@@ -505,7 +500,8 @@ def application(environ, start_response, flask_app=None):
         ## as suggested in
         ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
         del gc.garbage[:]
-    return []
+    return req.response
+
 
 def generate_error_page(req, admin_was_alerted=True, page_already_started=False):
     """
@@ -559,6 +555,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     """
     mod_python legacy publisher minimum implementation.
     """
+    from invenio.session import get_session
+    from invenio.webinterface_handler import CFG_HAS_HTTPS_SUPPORT, CFG_FULL_HTTPS
     the_module = open(possible_module).read()
     module_globals = {}
     exec(the_module, module_globals)
@@ -655,14 +653,10 @@ def wsgi_handler_test(port=80):
     """
     Simple WSGI testing environment based on wsgiref.
     """
-    from wsgiref.simple_server import make_server
-    global CFG_WSGI_SERVE_STATIC_FILES
-    CFG_WSGI_SERVE_STATIC_FILES = True
     check_wsgiref_testing_feasability()
-    validator_app = validator(application)
-    httpd = make_server('', port, validator_app)
-    print "Serving on port %s..." % port
-    httpd.serve_forever()
+    from invenio.webinterface_handler_flask import create_invenio_flask_app
+    app = create_invenio_flask_app(wsgi_serve_static_files=True)
+    app.run(debug=True, port=port)
 
 def main():
     from optparse import OptionParser

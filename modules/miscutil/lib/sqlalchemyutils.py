@@ -19,15 +19,10 @@
 
 import sqlalchemy
 import sqlalchemy.orm
-from sqlalchemy import create_engine
-from sqlalchemy.types import TypeDecorator
-from sqlalchemy.orm import scoped_session, sessionmaker, class_mapper, \
-        properties
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.ext.serializer import loads, dumps
+import base64
+from sqlalchemy.orm import class_mapper, \
+                           properties
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm.collections import column_mapped_collection, \
-        attribute_mapped_collection, mapped_collection
 from invenio.intbitset import intbitset
 
 
@@ -51,11 +46,14 @@ def getRelationships(self):
 
     return retval
 
+
 def todict(self):
     def convert_datetime(value):
-        return value.strftime("%Y-%m-%d %H:%M:%S")
+        try:
+            return value.strftime("%Y-%m-%d %H:%M:%S")
+        except:
+            return ''
 
-    d = {}
     for c in self.__table__.columns:
         #NOTE   This hack is not needed if you redefine types.TypeDecorator for
         #       desired classes (Binary, LargeBinary, ...)
