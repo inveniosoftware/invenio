@@ -1510,13 +1510,14 @@ class BibRecDocs(object):
         """
         texts = []
         for bibdoc in self.list_bibdocs():
-            if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
-                re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
-                perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
-                from invenio.bibtask import write_message
-                write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
-                bibdoc.extract_text(perform_ocr=perform_ocr)
-            texts.append(bibdoc.get_text())
+            if hasattr(bibdoc, 'has_text'):
+                if extract_text_if_necessary and not bibdoc.has_text(require_up_to_date=True):
+                    re_perform_ocr = re.compile(CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES)
+                    perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
+                    from invenio.bibtask import write_message
+                    write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
+                    bibdoc.extract_text(perform_ocr=perform_ocr)
+                texts.append(bibdoc.get_text())
 
         return " ".join(texts)
 
