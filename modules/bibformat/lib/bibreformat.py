@@ -37,6 +37,7 @@ try:
     from invenio.bibrank_citation_searcher import get_cited_by
     from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
     from invenio.bibformat import format_record
+    from invenio.bibformat_dblayer import save_preformatted_record
     from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
     from invenio.shellutils import split_cli_ids_arg
     from invenio.bibtask import task_init, write_message, task_set_option, \
@@ -280,10 +281,12 @@ def iterate_over_new(list, fmt):
     count = 0
     for recID in list:
         t1 = os.times()[4]
-        start_date = time.strftime('%Y-%m-%d %H:%M:%S')
-        formatted_record = zlib.compress(format_record(recID, fmt, on_the_fly=True))
-        run_sql('REPLACE LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)',
-                (recID, fmt, start_date, formatted_record))
+        formatted_record = format_record(recID, fmt,
+                                         on_the_fly=True, save_missing=False)
+        save_preformatted_record(recID=recID,
+                                 of=fmt,
+                                 res=formatted_record,
+                                 low_priority=True)
         t2 = os.times()[4]
         tbibformat += (t2 - t1)
         count += 1
@@ -544,6 +547,7 @@ Reformatting options:
   -f,  --field          \t Force reformatting records by field
   -p,  --pattern        \t Force reformatting records by pattern
   -i,  --id             \t Force reformatting records by record id(s)
+  --missing             \t Force reformatting records without format
 Pattern options:
   -m,  --matching       \t Specify if pattern is exact (e), regular expression (r),
                         \t partial (p), any of the words (o) or all of the words (a)
@@ -557,7 +561,8 @@ Pattern options:
                  "pattern=",
                  "format=",
                  "noprocess",
-                 "id="]),
+                 "id=",
+                 "missing"]),
             task_submit_check_options_fnc=task_submit_check_options,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -568,7 +573,6 @@ def task_submit_check_options():
     if not (task_has_option('all') or task_has_option('collection') \
             or task_has_option('field') or task_has_option('pattern') \
             or task_has_option('matching') or task_has_option('recids')):
-        task_set_option('without', 1)
         task_set_option('last', 1)
     return True
 
@@ -583,6 +587,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """
     if key in ("-a", "--all"):
         task_set_option("all", 1)
+        task_set_option("without", 1)
+    elif key in ("--missing", ):
         task_set_option("without", 1)
     elif key in ("-c", "--collection"):
         task_set_option("collection", value)

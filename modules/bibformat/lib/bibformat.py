@@ -48,7 +48,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
      CFG_SITE_RECORD, \
-     CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS
+     CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS, \
+     CFG_BIBFORMAT_CACHED_FORMATS
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.access_control_engine import acc_authorize_action
@@ -59,7 +60,8 @@ import sys
 ##
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
-                  xml_record=None, user_info=None, on_the_fly=False):
+                  xml_record=None, user_info=None, on_the_fly=False,
+                  save_missing=True):
     """
     Format a record in given output format.
 
@@ -173,6 +175,13 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                                               user_info=user_info)
         if of.lower() == 'xm':
             out = filter_hidden_fields(out, user_info)
+
+        # We have spent time computing this format
+        # We want to save this effort if the format is cached
+        if save_missing and recID \
+           and of.lower() in CFG_BIBFORMAT_CACHED_FORMATS and verbose == 0:
+            bibformat_dblayer.save_preformatted_record(recID, of, out)
+
         return out
     except Exception, e:
         register_exception(prefix="An error occured while formatting record %i in %s" % \

@@ -497,6 +497,25 @@ def get_preformatted_record_date(recID, of):
     else:
         return None
 
+def save_preformatted_record(recID, of, res,
+                             low_priority=False, compress=zlib.compress):
+    start_date = time.strftime('%Y-%m-%d %H:%M:%S')
+    formatted_record = compress(res)
+    if low_priority:
+        sql_str = " LOW_PRIORITY"
+    else:
+        sql_str = " DELAYED"
+    run_sql("""INSERT%s INTO bibfmt
+               (id_bibrec, format, last_updated, value)
+               VALUES (%%s, %%s, %%s, %%s)
+               ON DUPLICATE KEY UPDATE
+                    last_updated = VALUES(last_updated),
+                    value = VALUES(value)
+               """ % sql_str,
+            (recID, of, start_date, formatted_record))
+
+
+
 ## def keep_formats_in_db(output_formats):
 ##     """
 ##     Remove from db formats that are not in the list
