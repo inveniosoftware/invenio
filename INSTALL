@@ -295,8 +295,10 @@ Contents
       $ ./configure
       $ make
       $ make install
+      $ make install-bootstrap
       $ make install-mathjax-plugin    ## optional
       $ make install-jquery-plugins    ## optional
+      $ make install-jquery-tokeninput ## optional
       $ make install-ckeditor-plugin   ## optional
       $ make install-pdfa-helper-files ## optional
       $ make install-mediaelement      ## optional
@@ -485,6 +487,11 @@ Contents
           hinted as to the exact command to use based on the
           parameters you have used in the configure command.
 
+      $ make install-bootstrap
+
+          This will automatically download and install Twitter
+          Bootstrap prerequisite.
+
       $ make install-mathjax-plugin  ## optional
 
           This will automatically download and install in the proper
@@ -504,6 +511,11 @@ Contents
           applications such as the record editor.
 
           Note that `unzip' is needed when installing jquery plugins.
+
+      $ make install-jquery-tokeninput  ## optional
+
+          This will automatically download and install jQuery
+          Tokeninput pre-requisite.
 
       $ make install-ckeditor-plugin  ## optional
 
