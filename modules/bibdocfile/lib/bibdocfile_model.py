@@ -27,6 +27,7 @@ from invenio.sqlalchemyutils import db
 # Create your models here.
 from invenio.bibedit_model import Bibdoc
 
+
 class Bibdocfsinfo(db.Model):
     """Represents a Bibdocfsinfo record."""
     __tablename__ = 'bibdocfsinfo'
@@ -52,18 +53,19 @@ class Bibdocmoreinfo(db.Model):
     """Represents a Bibdocmoreinfo record."""
     __tablename__ = 'bibdocmoreinfo'
 
+    id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True)
     id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
-                    db.ForeignKey(Bibdoc.id), primary_key=True,
-                    autoincrement=False)
-    version = db.Column(db.TinyInteger(4, unsigned=True), primary_key=True,
-                    autoincrement=False)
-    format = db.Column(db.String(50), primary_key=True, nullable=False)
-    id_rel = db.Column(db.MediumInteger(9, unsigned=True),
-                    primary_key=True, autoincrement=False)
-    namespace = db.Column(db.Char(25), primary_key=True)
-    data_key = db.Column(db.Char(25), primary_key=True)
-    data_value = db.Column(db.MediumBlob)
+                    db.ForeignKey(Bibdoc.id), nullable=True)
+    version = db.Column(db.TinyInteger(4, unsigned=True), nullable=True)
+    format = db.Column(db.String(50), nullable=True)
+    id_rel = db.Column(db.MediumInteger(9, unsigned=True), nullable=True)
+    namespace = db.Column(db.Char(25), nullable=True)
+    data_key = db.Column(db.Char(25))
+    data_value = db.Column(db.LargeBinary)
 
+    __table_args__ = (db.Index('bibdocmoreinfo_key', id_bibdoc, version,
+                               format, id_rel, namespace, data_key),
+                      db.Model.__table_args__)
 
 __all__ = ['Bibdocfsinfo',
-           'Bibdocfsinfo']
+           'Bibdocmoreinfo']
