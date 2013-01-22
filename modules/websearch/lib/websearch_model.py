@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,26 +18,24 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02D111-1307, USA.
 
 """
-websearch database models.
+WebSearch database models.
 """
 
 # General imports.
 import re
 from operator import itemgetter
 from flask import g
-from sqlalchemy.ext.mutable import Mutable
 from invenio.intbitset import intbitset
-from invenio.cache import cache
 from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
 from invenio.search_engine import collection_restricted_p
 from invenio.sqlalchemyutils import db
 from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm.collections import mapped_collection, \
-                                       attribute_mapped_collection
+from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
-from invenio.intbitset import intbitset
 from sqlalchemy.ext.orderinglist import ordering_list
+from invenio.websearch_external_collections_searcher import \
+    external_collections_dictionary
 
 # Create your models here.
 
@@ -534,8 +532,6 @@ class CollectionPortalbox(db.Model):
                 order_by=score)
 
 
-from invenio.websearch_external_collections_searcher import external_collections_dictionary
-
 class Externalcollection(db.Model):
     """Represents a Externalcollection record."""
     __tablename__ = 'externalcollection'
@@ -548,6 +544,7 @@ class Externalcollection(db.Model):
     def engine(self):
         if external_collections_dictionary.has_key(self.name):
             return external_collections_dictionary[self.name]
+
 
 class CollectionExternalcollection(db.Model):
     """Represents a CollectionExternalcollection record."""
@@ -567,10 +564,10 @@ class CollectionExternalcollection(db.Model):
 
     def _collection_type(type):
         return db.relationship(Collection,
-            primaryjoin=lambda:db.and_(
-                CollectionExternalcollection.id_collection==Collection.id,
-                CollectionExternalcollection.type==type),
-            backref='_externalcollections_'+str(type))
+            primaryjoin=lambda: db.and_(
+                CollectionExternalcollection.id_collection == Collection.id,
+                CollectionExternalcollection.type == type),
+            backref='_externalcollections_' + str(type))
     collection_0 = _collection_type(0)
     collection_1 = _collection_type(1)
     collection_2 = _collection_type(2)
@@ -580,43 +577,35 @@ class CollectionExternalcollection(db.Model):
 
 class Format(db.Model):
     """Represents a Format record."""
-    def __init__(self):
-        pass
     __tablename__ = 'format'
     id = db.Column(db.MediumInteger(9, unsigned=True),
-                primary_key=True,
-                autoincrement=True)
+                primary_key=True, autoincrement=True)
     name = db.Column(db.String(255), nullable=False)
     code = db.Column(db.String(6), nullable=False, unique=True)
     description = db.Column(db.String(255), server_default='')
     content_type = db.Column(db.String(255), server_default='')
     visibility = db.Column(db.TinyInteger(4), nullable=False,
                 server_default='1')
-    last_updated = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+    last_updated = db.Column(db.DateTime, nullable=True)
+
 
 class CollectionFormat(db.Model):
     """Represents a CollectionFormat record."""
-    def __init__(self):
-        pass
     __tablename__ = 'collection_format'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Collection.id), primary_key=True)
     id_format = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Format.id), primary_key=True)
     score = db.Column(db.TinyInteger(4, unsigned=True),
-                nullable=False,
-                server_default='0')
+                nullable=False, server_default='0')
     collection = db.relationship(Collection, backref='formats',
                 order_by=db.desc(score))
-    format = db.relationship(Format,
-                backref='collections',
+    format = db.relationship(Format, backref='collections',
                 order_by=db.desc(score))
+
 
 class Formatname(db.Model):
     """Represents a Formatname record."""
-    def __init__(self):
-        pass
     __tablename__ = 'formatname'
     id_format = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Format.id), primary_key=True)
@@ -626,6 +615,7 @@ class Formatname(db.Model):
                 server_default='sn')
     value = db.Column(db.String(255), nullable=False)
     format = db.relationship(Format, backref='names')
+
 
 class Field(db.Model):
     """Represents a Field record."""
@@ -668,20 +658,17 @@ class Fieldvalue(db.Model):
     name = db.Column(db.String(255), nullable=False)
     value = db.Column(db.Text, nullable=False)
 
+
 class Fieldname(db.Model):
     """Represents a Fieldname record."""
-    def __init__(self):
-        pass
     __tablename__ = 'fieldname'
-    id_field = db.Column(db.MediumInteger(9, unsigned=True), db.ForeignKey(Field.id),
-                primary_key=True)
-    ln = db.Column(db.Char(5), primary_key=True,
-                server_default='')
-    type = db.Column(db.Char(3), primary_key=True,
-                server_default='sn')
+    id_field = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(Field.id), primary_key=True)
+    ln = db.Column(db.Char(5), primary_key=True, server_default='')
+    type = db.Column(db.Char(3), primary_key=True, server_default='sn')
     value = db.Column(db.String(255), nullable=False)
-
     field = db.relationship(Field, backref='names')
+
 
 class Tag(db.Model):
     """Represents a Tag record."""
@@ -699,23 +686,18 @@ class Tag(db.Model):
         """Returns tupple with name and value."""
         return self.name, self.value
 
+
 class FieldTag(db.Model):
     """Represents a FieldTag record."""
     __tablename__ = 'field_tag'
     id_field = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey('field.id'),
-            nullable=False, primary_key=True)
+                db.ForeignKey('field.id'), nullable=False, primary_key=True)
     id_tag = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey("tag.id"),
-            nullable=False, primary_key=True)
-    score = db.Column(db.TinyInteger(4, unsigned=True),
-                nullable=False,
-            server_default='0')
-
-    tag = db.relationship(Tag, backref='fields',
-                order_by=score)
-    field = db.relationship(Field, backref='tags',
-                order_by=score)
+                db.ForeignKey('tag.id'), nullable=False, primary_key=True)
+    score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
+                server_default='0')
+    tag = db.relationship(Tag, backref='fields', order_by=score)
+    field = db.relationship(Field, backref='tags', order_by=score)
 
     def __init__(self, score, tup):
         self.score = score
@@ -741,8 +723,9 @@ class UserQuery(db.Model):
     __tablename__ = 'user_query'
     id_user = db.Column(db.Integer(15, unsigned=True),
                 db.ForeignKey(User.id), primary_key=True, server_default='0')
-    id_query = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(WebQuery.id),
-                primary_key=True, index=True, server_default='0')
+    id_query = db.Column(db.Integer(15, unsigned=True),
+                db.ForeignKey(WebQuery.id), primary_key=True, index=True,
+                server_default='0')
     hostname = db.Column(db.String(50), nullable=True,
                 server_default='unknown host')
     date = db.Column(db.DateTime, nullable=True)
@@ -752,19 +735,17 @@ class CollectionFieldFieldvalue(db.Model):
     """Represents a CollectionFieldFieldvalue record."""
     __tablename__ = 'collection_field_fieldvalue'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Collection.id), primary_key=True,
-                nullable=False)
-    id_field = db.Column(db.MediumInteger(9, unsigned=True), db.ForeignKey(Field.id),
-                primary_key=True, nullable=False)
+                db.ForeignKey(Collection.id), primary_key=True, nullable=False)
+    id_field = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(Field.id), primary_key=True, nullable=False)
     id_fieldvalue = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Fieldvalue.id), primary_key=True,
-                nullable=True)
+                db.ForeignKey(Fieldvalue.id), primary_key=True, nullable=True)
     type = db.Column(db.Char(3), nullable=False,
                 server_default='src')
     score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
                 server_default='0')
-    score_fieldvalue = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
-                server_default='0')
+    score_fieldvalue = db.Column(db.TinyInteger(4, unsigned=True),
+                nullable=False, server_default='0')
 
     collection = db.relationship(Collection, backref='field_fieldvalues',
                 order_by=score)
@@ -776,36 +757,26 @@ class CollectionFieldFieldvalue(db.Model):
 
 class CollectionClsMETHOD(db.Model):
     """Represents a Collection_clsMETHOD record."""
-    def __init__(self):
-        pass
     __tablename__ = 'collection_clsMETHOD'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Collection.id), primary_key=True,
-            nullable=False)
+                db.ForeignKey(Collection.id), primary_key=True, nullable=False)
     id_clsMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(ClsMETHOD.id), primary_key=True,
-            nullable=False)
+                db.ForeignKey(ClsMETHOD.id), primary_key=True, nullable=False)
     collection = db.relationship(Collection, backref='clsMETHODs')
     clsMETHOD = db.relationship(ClsMETHOD, backref='collections')
 
 
 class CollectionRnkMETHOD(db.Model):
     """Represents a CollectionRnkMETHOD record."""
-    def __init__(self):
-        pass
     __tablename__ = 'collection_rnkMETHOD'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Collection.id), primary_key=True,
-            nullable=False)
+                db.ForeignKey(Collection.id), primary_key=True, nullable=False)
     id_rnkMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(RnkMETHOD.id), primary_key=True,
-            nullable=False)
-    score = db.Column(db.TinyInteger(4, unsigned=True),
-                nullable=False,
-            server_default='0')
+                db.ForeignKey(RnkMETHOD.id), primary_key=True, nullable=False)
+    score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
+                server_default='0')
     collection = db.relationship(Collection, backref='rnkMETHODs')
     rnkMETHOD = db.relationship(RnkMETHOD, backref='collections')
-
 
 
 __all__ = ['Collection',
