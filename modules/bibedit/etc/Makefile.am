@@ -15,10 +15,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-rectmpldir = $(sysconfdir)/bibedit/record_templates/
+etcdir = $(sysconfdir)/bibedit/
+
+rectmpldir = $(etcdir)/record_templates/
 rectmpl_DATA = record_poem.xml
 
-fldtmpldir = $(sysconfdir)/bibedit/field_templates/
+fldtmpldir = $(etcdir)/field_templates/
 fldtmpl_DATA = field_firstauthor.xml \
                field_reference.xml \
                field_FFT.xml

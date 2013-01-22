@@ -160,7 +160,7 @@ class Record:
         keys.sort()
         for field_tag in keys:
             for field_instance in self.field[field_tag]:
-                if field_tag[0] >= '0' and field_tag[0] <= '9': # are we using numbers for field tag name?
+                if field_tag == "FFT__" or (field_tag[0] >= '0' and field_tag[0] <= '9'): # are we using numbers for field tag name?
                     tag = field_tag[0:3] # yes, so the first three chars constitute MARC-21 tag name
                     i1 = field_tag[3:4]  # next char is 1st indicator
                     if i1 == "_" or i1 == " ":
@@ -329,7 +329,7 @@ def transform_record(rec, errors):
         elif tag == "980":
             for field_instance in rec.field[tag]:
                 original_collids.append(field_instance)
-        elif tag!="FMT" and tag!="LDR" and tag!="008" and tag!="OWN" and tag!="0248" and tag!="---" and tag[0] in string.digits and tag[1] in string.digits and tag[2] in string.digits:
+        elif tag=="FFT__" or (tag!="FMT" and tag!="LDR" and tag!="008" and tag!="OWN" and tag!="0248" and tag!="---" and tag[0] in string.digits and tag[1] in string.digits and tag[2] in string.digits):
             for field_instance in rec.field[tag]:
                 out.add(tag, field_instance)
 
@@ -341,9 +341,27 @@ def transform_record(rec, errors):
 
     return out
 
+class ParseError(Exception):
+    """
+    Contains info about a parsing error occurred while parsing textmarc
+    """
+    def __init__(self, lineno=-1, linecontent="", message=""):
+        self.lineno = lineno
+        self.linecontent = linecontent
+        self.message = message
+        fileinput.close()
+
+    def __str__(self):
+        return repr(self.message)
 
 def transform_file(filename):
     "Reads ALEPH 500 sequential data file and transforms them into XML format."
+
+    re_field_tag = re.compile("^\d\d\d[\s\w]{2}$")
+    # This regexp is good enough for the moment, could be further improved if
+    # needed
+    re_content = re.compile('^(\$\$[a-z0-9].+)+$')
+    allowed_fields = ["FFT__"]
 
     record_no = 0
     filehandle = ""
@@ -353,7 +371,7 @@ def transform_file(filename):
     record_current = Record() # will hold current bibliographic record as we read through input file
     sysno_old, field_old, value_old = None, None, None # will hold values from previous line
 
-    ## go trough all the input file
+    ## go through all the input file
     for line in fileinput.input(filename):
         if line.startswith(BOM_UTF8):
             ## When files are created with notepad, or in general on Windows,
@@ -363,6 +381,12 @@ def transform_file(filename):
         if re.sub("\s","",line) != "":
             # parse the input line with MARC sequential format
             sysno, field, value = line[0:9], line[10:15], line[16:]
+            if not re_field_tag.match(field) and not field in allowed_fields:
+                raise ParseError(fileinput.lineno(), line,
+                    "Field tag \"%s\" does not match format \d\d\d[\s\w]{2}" % field)
+            elif not re_content.match(value):
+                raise ParseError(fileinput.lineno(), line,
+                    "Content of field \"%s\" is not well formed" % value)
             if field[0] == " " or field[1] == " " or field[2] == " ":
                 text = "\nRecord %s: Error in field definition %s\n" % (sysno,field)
                 if field[0] == " ":
@@ -393,6 +417,7 @@ def transform_file(filename):
     ## after all the input lines have been read, display last record
     record_current.add(field_old, Field(value_old))
     record_tmp = transform_record(record_current, errors)
+
     if record_tmp.sysno != "0":
         record_tmp.display(filehandle)
     ## display eventual errors

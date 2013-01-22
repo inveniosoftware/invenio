@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -817,4 +817,9 @@ def auto_version_url(file_path):
         @param file_path: path to the file, e.g js/foo.js
         @return: file_path with modification time appended to URL
     """
-    return file_path + "?%s" % md5(open(CFG_WEBDIR + os.sep + file_path).read()).hexdigest()
+    file_md5 = ""
+    try:
+        file_md5 = md5(open(CFG_WEBDIR + os.sep + file_path).read()).hexdigest()
+    except IOError:
+        pass
+    return file_path + "?%s" % file_md5

@@ -135,6 +135,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
         page_to_display = json_data["pageToDisplay"]
         collection = json_data["collection"]
         compute_modifications = json_data["compute_modifications"]
+        checked_records = json_data["checked_records"]
 
         json_response = {}
         if action_type == self._action_types.test_search:
@@ -145,7 +146,8 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
                                                     page_to_display,
                                                     language,
                                                     output_tags,
-                                                    collection))
+                                                    collection,
+                                                    checked_records))
             json_response['display_info_box'] = 1
             json_response['info_html'] = ""
             return json.dumps(json_response)
@@ -170,7 +172,8 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
                                                     output_tags,
                                                     collection,
                                                     compute_modifications,
-                                                    upload_mode))
+                                                    upload_mode,
+                                                    checked_records))
             return json.dumps(json_response)
 
         elif action_type == self._action_types.display_detailed_result:
@@ -184,7 +187,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
 
         elif action_type == self._action_types.submit_changes:
             commands_list, upload_mode, tag_list = self._create_commands_list(commands)
-            json_response.update(multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language, upload_mode, tag_list, collection, req))
+            json_response.update(multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language, upload_mode, tag_list, collection, req, checked_records))
             return json.dumps(json_response)
 
         # In case we obtain wrong action type we return empty page.
@@ -206,6 +209,10 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             action = current_subfield["action"]
             subfield_code = current_subfield["subfieldCode"]
             value = current_subfield["value"]
+            if "additionalValues" in current_subfield:
+                additional_values = current_subfield["additionalValues"]
+            else:
+                additional_values = []
             new_value = current_subfield["newValue"]
             condition = current_subfield["condition"]
             condition_exact_match = False
@@ -224,7 +231,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             elif action == self._subfield_action_types.replace_content:
                 subfield_command = multi_edit_engine.ReplaceSubfieldContentCommand(subfield_code, value, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.replace_text:
-                subfield_command = multi_edit_engine.ReplaceTextInSubfieldCommand(subfield_code, value, new_value, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield)
+                subfield_command = multi_edit_engine.ReplaceTextInSubfieldCommand(subfield_code, value, new_value, condition=condition, condition_exact_match=condition_exact_match, condition_does_not_exist=condition_does_not_exist, condition_subfield=condition_subfield, additional_values=additional_values)
             else:
                 subfield_command = multi_edit_engine.BaseFieldCommand(subfield_code, value, new_value)
 

@@ -57,6 +57,17 @@ function initHotkeys() {
    * initInputHotkeys)
    */
   // New record.
+
+  $(document).bind('keydown', 'ctrl+c', function(event) {
+      onPerformCopy();
+      event.preventDefault();
+  });
+
+  $(document).bind('keydown', 'ctrl+v', function(event) {
+      onPerformPaste();
+      event.preventDefault();
+  });
+
   $(document).bind('keydown', 'shift+n', function(event) {
       $('#imgNewRecord').trigger('click');
       event.preventDefault();
