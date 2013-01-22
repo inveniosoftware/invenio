@@ -78,7 +78,7 @@ class Bibdoc(db.Model):
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
                 nullable=False, autoincrement=True)
     status = db.Column(db.Text, nullable=False)
-    docname = db.Column(db.String(250, collation='utf8_bin'), nullable=True,
+    docname = db.Column(db.String(250), nullable=True,  # collation='utf8_bin'
                 server_default='file', index=True)
     creation_date = db.Column(db.DateTime, nullable=False,
                 server_default='0001-01-01 00:00:00', index=True)
@@ -95,11 +95,11 @@ class BibdocBibdoc(db.Model):
                 nullable=False, autoincrement=True)
     id_bibdoc1 = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Bibdoc.id), nullable=True)
-    version1 = db.Column(db.TinyInt(4, unsigned=True))
+    version1 = db.Column(db.TinyInteger(4, unsigned=True))
     format1 = db.Column(db.String(50))
     id_bibdoc2 = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Bibdoc.id), nullable=True)
-    version2 = db.Column(db.TinyInt(4, unsigned=True))
+    version2 = db.Column(db.TinyInteger(4, unsigned=True))
     format2 = db.Column(db.String(50))
     rel_type = db.Column(db.String(255), nullable=True)
     bibdoc1 = db.relationship(Bibdoc, backref='bibdoc2s',
@@ -118,7 +118,7 @@ class BibrecBibdoc(db.Model):
     id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Bibdoc.id), nullable=False,
                 server_default='0', primary_key=True)
-    docname = db.Column(db.String(250, collation='utf8_bin'), nullable=False,
+    docname = db.Column(db.String(250), nullable=False,  # collation='utf8_bin'
                 server_default='file', index=True)
     type = db.Column(db.String(255), nullable=True)
     bibrec = db.relationship(Bibrec, backref='bibdocs')
@@ -198,7 +198,7 @@ class BibrecBib00x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib00xs')
     bibxxx = db.relationship(Bib00x, backref='bibrecs')
 
@@ -229,7 +229,7 @@ class BibrecBib01x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib01xs')
     bibxxx = db.relationship(Bib01x, backref='bibrecs')
 
@@ -260,7 +260,7 @@ class BibrecBib02x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib02xs')
     bibxxx = db.relationship(Bib02x, backref='bibrecs')
 
@@ -291,7 +291,7 @@ class BibrecBib03x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib03xs')
     bibxxx = db.relationship(Bib03x, backref='bibrecs')
 
@@ -322,7 +322,7 @@ class BibrecBib04x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib04xs')
     bibxxx = db.relationship(Bib04x, backref='bibrecs')
 
@@ -353,7 +353,7 @@ class BibrecBib05x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib05xs')
     bibxxx = db.relationship(Bib05x, backref='bibrecs')
 
@@ -384,7 +384,7 @@ class BibrecBib06x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib06xs')
     bibxxx = db.relationship(Bib06x, backref='bibrecs')
 
@@ -415,7 +415,7 @@ class BibrecBib07x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib07xs')
     bibxxx = db.relationship(Bib07x, backref='bibrecs')
 
@@ -446,7 +446,7 @@ class BibrecBib08x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib08xs')
     bibxxx = db.relationship(Bib08x, backref='bibrecs')
 
@@ -477,7 +477,7 @@ class BibrecBib09x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib09xs')
     bibxxx = db.relationship(Bib09x, backref='bibrecs')
 
@@ -508,7 +508,7 @@ class BibrecBib10x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib10xs')
     bibxxx = db.relationship(Bib10x, backref='bibrecs')
 
@@ -539,7 +539,7 @@ class BibrecBib11x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib11xs')
     bibxxx = db.relationship(Bib11x, backref='bibrecs')
 
@@ -570,7 +570,7 @@ class BibrecBib12x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib12xs')
     bibxxx = db.relationship(Bib12x, backref='bibrecs')
 
@@ -601,7 +601,7 @@ class BibrecBib13x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib13xs')
     bibxxx = db.relationship(Bib13x, backref='bibrecs')
 
@@ -632,7 +632,7 @@ class BibrecBib14x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib14xs')
     bibxxx = db.relationship(Bib14x, backref='bibrecs')
 
@@ -663,7 +663,7 @@ class BibrecBib15x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib15xs')
     bibxxx = db.relationship(Bib15x, backref='bibrecs')
 
@@ -694,7 +694,7 @@ class BibrecBib16x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib16xs')
     bibxxx = db.relationship(Bib16x, backref='bibrecs')
 
@@ -725,7 +725,7 @@ class BibrecBib17x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib17xs')
     bibxxx = db.relationship(Bib17x, backref='bibrecs')
 
@@ -756,7 +756,7 @@ class BibrecBib18x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib18xs')
     bibxxx = db.relationship(Bib18x, backref='bibrecs')
 
@@ -787,7 +787,7 @@ class BibrecBib19x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib19xs')
     bibxxx = db.relationship(Bib19x, backref='bibrecs')
 
@@ -818,7 +818,7 @@ class BibrecBib20x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib20xs')
     bibxxx = db.relationship(Bib20x, backref='bibrecs')
 
@@ -849,7 +849,7 @@ class BibrecBib21x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib21xs')
     bibxxx = db.relationship(Bib21x, backref='bibrecs')
 
@@ -880,7 +880,7 @@ class BibrecBib22x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib22xs')
     bibxxx = db.relationship(Bib22x, backref='bibrecs')
 
@@ -911,7 +911,7 @@ class BibrecBib23x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib23xs')
     bibxxx = db.relationship(Bib23x, backref='bibrecs')
 
@@ -942,7 +942,7 @@ class BibrecBib24x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib24xs')
     bibxxx = db.relationship(Bib24x, backref='bibrecs')
 
@@ -973,7 +973,7 @@ class BibrecBib25x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib25xs')
     bibxxx = db.relationship(Bib25x, backref='bibrecs')
 
@@ -1004,7 +1004,7 @@ class BibrecBib26x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib26xs')
     bibxxx = db.relationship(Bib26x, backref='bibrecs')
 
@@ -1035,7 +1035,7 @@ class BibrecBib27x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib27xs')
     bibxxx = db.relationship(Bib27x, backref='bibrecs')
 
@@ -1066,7 +1066,7 @@ class BibrecBib28x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib28xs')
     bibxxx = db.relationship(Bib28x, backref='bibrecs')
 
@@ -1097,7 +1097,7 @@ class BibrecBib29x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib29xs')
     bibxxx = db.relationship(Bib29x, backref='bibrecs')
 
@@ -1128,7 +1128,7 @@ class BibrecBib30x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib30xs')
     bibxxx = db.relationship(Bib30x, backref='bibrecs')
 
@@ -1159,7 +1159,7 @@ class BibrecBib31x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib31xs')
     bibxxx = db.relationship(Bib31x, backref='bibrecs')
 
@@ -1190,7 +1190,7 @@ class BibrecBib32x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib32xs')
     bibxxx = db.relationship(Bib32x, backref='bibrecs')
 
@@ -1221,7 +1221,7 @@ class BibrecBib33x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib33xs')
     bibxxx = db.relationship(Bib33x, backref='bibrecs')
 
@@ -1252,7 +1252,7 @@ class BibrecBib34x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib34xs')
     bibxxx = db.relationship(Bib34x, backref='bibrecs')
 
@@ -1283,7 +1283,7 @@ class BibrecBib35x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib35xs')
     bibxxx = db.relationship(Bib35x, backref='bibrecs')
 
@@ -1314,7 +1314,7 @@ class BibrecBib36x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib36xs')
     bibxxx = db.relationship(Bib36x, backref='bibrecs')
 
@@ -1345,7 +1345,7 @@ class BibrecBib37x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib37xs')
     bibxxx = db.relationship(Bib37x, backref='bibrecs')
 
@@ -1376,7 +1376,7 @@ class BibrecBib38x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib38xs')
     bibxxx = db.relationship(Bib38x, backref='bibrecs')
 
@@ -1407,7 +1407,7 @@ class BibrecBib39x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib39xs')
     bibxxx = db.relationship(Bib39x, backref='bibrecs')
 
@@ -1438,7 +1438,7 @@ class BibrecBib40x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib40xs')
     bibxxx = db.relationship(Bib40x, backref='bibrecs')
 
@@ -1469,7 +1469,7 @@ class BibrecBib41x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib41xs')
     bibxxx = db.relationship(Bib41x, backref='bibrecs')
 
@@ -1500,7 +1500,7 @@ class BibrecBib42x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib42xs')
     bibxxx = db.relationship(Bib42x, backref='bibrecs')
 
@@ -1531,7 +1531,7 @@ class BibrecBib43x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib43xs')
     bibxxx = db.relationship(Bib43x, backref='bibrecs')
 
@@ -1562,7 +1562,7 @@ class BibrecBib44x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib44xs')
     bibxxx = db.relationship(Bib44x, backref='bibrecs')
 
@@ -1593,7 +1593,7 @@ class BibrecBib45x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib45xs')
     bibxxx = db.relationship(Bib45x, backref='bibrecs')
 
@@ -1624,7 +1624,7 @@ class BibrecBib46x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib46xs')
     bibxxx = db.relationship(Bib46x, backref='bibrecs')
 
@@ -1655,7 +1655,7 @@ class BibrecBib47x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib47xs')
     bibxxx = db.relationship(Bib47x, backref='bibrecs')
 
@@ -1686,7 +1686,7 @@ class BibrecBib48x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib48xs')
     bibxxx = db.relationship(Bib48x, backref='bibrecs')
 
@@ -1717,7 +1717,7 @@ class BibrecBib49x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib49xs')
     bibxxx = db.relationship(Bib49x, backref='bibrecs')
 
@@ -1748,7 +1748,7 @@ class BibrecBib50x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib50xs')
     bibxxx = db.relationship(Bib50x, backref='bibrecs')
 
@@ -1779,7 +1779,7 @@ class BibrecBib51x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib51xs')
     bibxxx = db.relationship(Bib51x, backref='bibrecs')
 
@@ -1810,7 +1810,7 @@ class BibrecBib52x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib52xs')
     bibxxx = db.relationship(Bib52x, backref='bibrecs')
 
@@ -1841,7 +1841,7 @@ class BibrecBib53x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib53xs')
     bibxxx = db.relationship(Bib53x, backref='bibrecs')
 
@@ -1872,7 +1872,7 @@ class BibrecBib54x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib54xs')
     bibxxx = db.relationship(Bib54x, backref='bibrecs')
 
@@ -1903,7 +1903,7 @@ class BibrecBib55x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib55xs')
     bibxxx = db.relationship(Bib55x, backref='bibrecs')
 
@@ -1934,7 +1934,7 @@ class BibrecBib56x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib56xs')
     bibxxx = db.relationship(Bib56x, backref='bibrecs')
 
@@ -1965,7 +1965,7 @@ class BibrecBib57x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib57xs')
     bibxxx = db.relationship(Bib57x, backref='bibrecs')
 
@@ -1996,7 +1996,7 @@ class BibrecBib58x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib58xs')
     bibxxx = db.relationship(Bib58x, backref='bibrecs')
 
@@ -2027,7 +2027,7 @@ class BibrecBib59x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib59xs')
     bibxxx = db.relationship(Bib59x, backref='bibrecs')
 
@@ -2058,7 +2058,7 @@ class BibrecBib60x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib60xs')
     bibxxx = db.relationship(Bib60x, backref='bibrecs')
 
@@ -2089,7 +2089,7 @@ class BibrecBib61x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib61xs')
     bibxxx = db.relationship(Bib61x, backref='bibrecs')
 
@@ -2120,7 +2120,7 @@ class BibrecBib62x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib62xs')
     bibxxx = db.relationship(Bib62x, backref='bibrecs')
 
@@ -2151,7 +2151,7 @@ class BibrecBib63x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib63xs')
     bibxxx = db.relationship(Bib63x, backref='bibrecs')
 
@@ -2182,7 +2182,7 @@ class BibrecBib64x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib64xs')
     bibxxx = db.relationship(Bib64x, backref='bibrecs')
 
@@ -2213,7 +2213,7 @@ class BibrecBib65x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib65xs')
     bibxxx = db.relationship(Bib65x, backref='bibrecs')
 
@@ -2244,7 +2244,7 @@ class BibrecBib66x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib66xs')
     bibxxx = db.relationship(Bib66x, backref='bibrecs')
 
@@ -2275,7 +2275,7 @@ class BibrecBib67x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib67xs')
     bibxxx = db.relationship(Bib67x, backref='bibrecs')
 
@@ -2306,7 +2306,7 @@ class BibrecBib68x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib68xs')
     bibxxx = db.relationship(Bib68x, backref='bibrecs')
 
@@ -2337,7 +2337,7 @@ class BibrecBib69x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib69xs')
     bibxxx = db.relationship(Bib69x, backref='bibrecs')
 
@@ -2368,7 +2368,7 @@ class BibrecBib70x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib70xs')
     bibxxx = db.relationship(Bib70x, backref='bibrecs')
 
@@ -2399,7 +2399,7 @@ class BibrecBib71x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib71xs')
     bibxxx = db.relationship(Bib71x, backref='bibrecs')
 
@@ -2430,7 +2430,7 @@ class BibrecBib72x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib72xs')
     bibxxx = db.relationship(Bib72x, backref='bibrecs')
 
@@ -2461,7 +2461,7 @@ class BibrecBib73x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib73xs')
     bibxxx = db.relationship(Bib73x, backref='bibrecs')
 
@@ -2492,7 +2492,7 @@ class BibrecBib74x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib74xs')
     bibxxx = db.relationship(Bib74x, backref='bibrecs')
 
@@ -2523,7 +2523,7 @@ class BibrecBib75x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib75xs')
     bibxxx = db.relationship(Bib75x, backref='bibrecs')
 
@@ -2554,7 +2554,7 @@ class BibrecBib76x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib76xs')
     bibxxx = db.relationship(Bib76x, backref='bibrecs')
 
@@ -2585,7 +2585,7 @@ class BibrecBib77x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib77xs')
     bibxxx = db.relationship(Bib77x, backref='bibrecs')
 
@@ -2616,7 +2616,7 @@ class BibrecBib78x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib78xs')
     bibxxx = db.relationship(Bib78x, backref='bibrecs')
 
@@ -2647,7 +2647,7 @@ class BibrecBib79x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib79xs')
     bibxxx = db.relationship(Bib79x, backref='bibrecs')
 
@@ -2678,7 +2678,7 @@ class BibrecBib80x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib80xs')
     bibxxx = db.relationship(Bib80x, backref='bibrecs')
 
@@ -2709,7 +2709,7 @@ class BibrecBib81x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib81xs')
     bibxxx = db.relationship(Bib81x, backref='bibrecs')
 
@@ -2740,7 +2740,7 @@ class BibrecBib82x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib82xs')
     bibxxx = db.relationship(Bib82x, backref='bibrecs')
 
@@ -2771,7 +2771,7 @@ class BibrecBib83x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib83xs')
     bibxxx = db.relationship(Bib83x, backref='bibrecs')
 
@@ -2802,7 +2802,7 @@ class BibrecBib84x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib84xs')
     bibxxx = db.relationship(Bib84x, backref='bibrecs')
 
@@ -2833,7 +2833,7 @@ class BibrecBib85x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib85xs')
     bibxxx = db.relationship(Bib85x, backref='bibrecs')
 
@@ -2864,7 +2864,7 @@ class BibrecBib86x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib86xs')
     bibxxx = db.relationship(Bib86x, backref='bibrecs')
 
@@ -2895,7 +2895,7 @@ class BibrecBib87x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib87xs')
     bibxxx = db.relationship(Bib87x, backref='bibrecs')
 
@@ -2926,7 +2926,7 @@ class BibrecBib88x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib88xs')
     bibxxx = db.relationship(Bib88x, backref='bibrecs')
 
@@ -2957,7 +2957,7 @@ class BibrecBib89x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib89xs')
     bibxxx = db.relationship(Bib89x, backref='bibrecs')
 
@@ -2988,7 +2988,7 @@ class BibrecBib90x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib90xs')
     bibxxx = db.relationship(Bib90x, backref='bibrecs')
 
@@ -3019,7 +3019,7 @@ class BibrecBib91x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib91xs')
     bibxxx = db.relationship(Bib91x, backref='bibrecs')
 
@@ -3050,7 +3050,7 @@ class BibrecBib92x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib92xs')
     bibxxx = db.relationship(Bib92x, backref='bibrecs')
 
@@ -3081,7 +3081,7 @@ class BibrecBib93x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib93xs')
     bibxxx = db.relationship(Bib93x, backref='bibrecs')
 
@@ -3112,7 +3112,7 @@ class BibrecBib94x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib94xs')
     bibxxx = db.relationship(Bib94x, backref='bibrecs')
 
@@ -3143,7 +3143,7 @@ class BibrecBib95x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib95xs')
     bibxxx = db.relationship(Bib95x, backref='bibrecs')
 
@@ -3174,7 +3174,7 @@ class BibrecBib96x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib96xs')
     bibxxx = db.relationship(Bib96x, backref='bibrecs')
 
@@ -3205,7 +3205,7 @@ class BibrecBib97x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib97xs')
     bibxxx = db.relationship(Bib97x, backref='bibrecs')
 
@@ -3236,7 +3236,7 @@ class BibrecBib98x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib98xs')
     bibxxx = db.relationship(Bib98x, backref='bibrecs')
 
@@ -3267,7 +3267,7 @@ class BibrecBib99x(db.Model):
         nullable=False, primary_key=True, index=True,
                 server_default='0')
     field_number = db.Column(db.SmallInteger(5, unsigned=True),
-                nullable=True)
+                primary_key=True)
     bibrec = db.relationship(Bibrec, backref='bib99xs')
     bibxxx = db.relationship(Bib99x, backref='bibrecs')
 
