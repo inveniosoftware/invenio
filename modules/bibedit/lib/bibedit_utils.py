@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,11 +34,18 @@ import os
 import re
 import time
 import zlib
+import tempfile
+import sys
 from datetime import datetime
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH
+    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV
 from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
@@ -47,13 +54,13 @@ from invenio.bibrecord import create_record, create_records, \
     record_order_subfields, record_get_field_instances, \
     record_add_field, field_get_subfield_codes, field_add_subfield, \
     field_get_subfield_values, record_delete_fields, record_add_fields, \
-    record_get_field_values
+    record_get_field_values, print_rec, record_modify_subfield
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPSHAREDDIR, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
-    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
+    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, CFG_INSPIRE_SITE
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.textutils import wash_for_xml
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
@@ -63,10 +70,17 @@ from invenio.search_engine import print_record, record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.webuser import get_user_info, getUid
+from invenio.webuser import get_user_info, getUid, get_email
 from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_engine import acc_authorize_action
+from invenio.refextract_api import extract_references_from_record_xml, \
+                                   extract_references_from_string_xml, \
+                                   extract_references_from_url_xml
+from invenio.textmarc2xmlmarc import transform_file, ParseError
+from invenio.bibauthorid_name_utils import split_name_parts, \
+                                        create_normalized_name
+from invenio.bibknowledge import get_kbr_values
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
@@ -226,7 +240,7 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
         record_revision = datetime.now().timetuple()
 
     cache_file = open(file_path, 'w')
-    assert_undo_redo_lists_correctness(undo_list, redo_list);
+    assert_undo_redo_lists_correctness(undo_list, redo_list)
     cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
     cache_file.close()
     return record_revision, record
@@ -250,7 +264,7 @@ def get_cache_file_contents(recid, uid):
     if cache_file:
         cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list = cPickle.load(cache_file)
         cache_file.close()
-        assert_undo_redo_lists_correctness(undo_list, redo_list);
+        assert_undo_redo_lists_correctness(undo_list, redo_list)
 
         return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list
 
@@ -261,14 +275,18 @@ def update_cache_file_contents(recid, uid, record_revision, record, pending_chan
     """
     cache_file = _get_cache_file(recid, uid, 'w')
     if cache_file:
-        assert_undo_redo_lists_correctness(undo_list, redo_list);
+        assert_undo_redo_lists_correctness(undo_list, redo_list)
         cPickle.dump([True, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
         cache_file.close()
         return get_cache_mtime(recid, uid)
 
 def delete_cache_file(recid, uid):
     """Delete a BibEdit cache file."""
-    os.remove('%s.tmp' % _get_file_path(recid, uid))
+    try:
+        os.remove('%s.tmp' % _get_file_path(recid, uid))
+    except OSError:
+        # File was probably already removed
+        pass
 
 
 def delete_disabled_changes(used_changes):
@@ -291,7 +309,6 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
         if cache:
             record = cache[2]
             used_changes = cache[4]
-#            record_strip_empty_fields(record) # now performed for every record after removing unfilled volatile fields
             xml_record = record_xml_output(record)
             delete_cache_file(recid, uid)
             delete_disabled_changes(used_changes)
@@ -343,6 +360,45 @@ def record_locked_by_other_user(recid, uid):
     except ValueError:
         pass
     return bool(active_uids)
+
+
+def get_record_locked_since(recid, uid):
+    """ Get modification time for the given recid and uid
+    """
+    filename = "%s_%s_%s.tmp" % (CFG_BIBEDIT_FILENAME,
+                                recid,
+                                uid)
+    locked_since  = ""
+    try:
+        locked_since = time.ctime(os.path.getmtime('%s%s%s' % (
+                        CFG_TMPSHAREDDIR, os.sep, filename)))
+    except OSError:
+        pass
+    return locked_since
+
+
+def record_locked_by_user_details(recid, uid):
+    """ Get the details about the user that has locked a record and the
+    time the record has been locked.
+    @return: user details and time when record was locked
+    @rtype: tuple
+    """
+    active_uids = _uids_with_active_caches(recid)
+    try:
+        active_uids.remove(uid)
+    except ValueError:
+        pass
+
+    record_blocked_by_nickname = record_blocked_by_email = locked_since = ""
+
+    if active_uids:
+        record_blocked_by_uid = active_uids[0]
+        record_blocked_by_nickname = get_user_info(record_blocked_by_uid)[1]
+        record_blocked_by_email = get_email(record_blocked_by_uid)
+        locked_since = get_record_locked_since(recid, record_blocked_by_uid)
+
+    return record_blocked_by_nickname, record_blocked_by_email, locked_since
+
 
 def record_locked_by_queue(recid):
     """Check if record should be locked for editing because of the current state
@@ -719,3 +775,222 @@ def merge_record_with_template(rec, template_name):
                                                field_get_subfield_values(template_field_instance,
                                                code)[0])
     return rec
+
+#################### Reference extraction ####################
+
+def replace_references(recid, uid=None, txt=None, url=None):
+    """Replace references for a record
+
+    The record itself is not updated, the marc xml of the document with updated
+    references is returned
+
+    Parameters:
+    * recid: the id of the record
+    * txt: references in text mode
+    * inspire: format of ther references
+    """
+    # Parse references
+    if txt is not None:
+        references_xml = extract_references_from_string_xml(txt, is_only_references=True)
+    elif url is not None:
+        references_xml = extract_references_from_url_xml(url)
+    else:
+        references_xml = extract_references_from_record_xml(recid)
+    references = create_record(references_xml.encode('utf-8'))
+
+    dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+    out_xml = None
+
+    references_to_add = record_get_field_instances(references[0],
+                                                   tag='999',
+                                                   ind1='C',
+                                                   ind2='5')
+    refextract_status = record_get_field_instances(references[0],
+                                                   tag='999',
+                                                   ind1='C',
+                                                   ind2='6')
+
+    if references_to_add:
+        # Replace 999 fields
+        record_delete_fields(record, '999')
+        record_add_fields(record, '999', references_to_add)
+        record_add_fields(record, '999', refextract_status)
+        # Update record references
+        out_xml = record_xml_output(record)
+
+    return out_xml
+
+#################### cnum generation ####################
+
+def record_is_conference(record):
+    """
+    Determine if the record is a new conference based on the value present
+    on field 980
+
+    @param record: record to be checked
+    @type record: bibrecord object
+
+    @return: True if record is a conference, False otherwise
+    @rtype: boolean
+    """
+    # Get collection field content (tag 980)
+    tag_980_content = record_get_field_values(record, "980", " ", " ", "a")
+    if "CONFERENCES" in tag_980_content:
+        return True
+    return False
+
+
+def add_record_cnum(recid, uid):
+    """
+    Check if the record has already a cnum. If not generate a new one
+    and return the result
+
+    @param recid: recid of the record under check. Used to retrieve cache file
+    @type recid: int
+
+    @param uid: id of the user. Used to retrieve cache file
+    @type uid: int
+
+    @return: None if cnum already present, new cnum otherwise
+    @rtype: None or string
+    """
+    # Import placed here to avoid circular dependency
+    from invenio.sequtils_cnum import CnumSeq, ConferenceNoStartDateError
+
+    record_revision, record, pending_changes, deactivated_hp_changes, \
+    undo_list, redo_list = get_cache_file_contents(recid, uid)[1:]
+
+    record_strip_empty_volatile_subfields(record)
+
+    # Check if record already has a cnum
+    tag_111__g_content = record_get_field_value(record, "111", " ", " ", "g")
+    if tag_111__g_content:
+        return
+    else:
+        cnum_seq = CnumSeq()
+        try:
+            new_cnum = cnum_seq.next_value(xml_record=wash_for_xml(print_rec(record)))
+        except ConferenceNoStartDateError:
+            return None
+        field_add_subfield(record['111'][0], 'g', new_cnum)
+        update_cache_file_contents(recid, uid, record_revision,
+                                   record, \
+                                   pending_changes, \
+                                   deactivated_hp_changes, \
+                                   undo_list, redo_list)
+        return new_cnum
+
+
+def get_xml_from_textmarc(recid, textmarc_record):
+    """
+    Convert textmarc to marcxml and return the result of the conversion
+
+    @param recid: id of the record that is being converted
+    @type: int
+
+    @param textmarc_record: record content in textmarc format
+    @type: string
+
+    @return: dictionary with the following keys:
+            * resultMsg: message describing conversion status
+            * resultXML: xml resulting from conversion
+            * parse_error: in case of error, a description of it
+    @rtype: dict
+    """
+    response = {}
+    # Let's remove empty lines
+    textmarc_record = os.linesep.join([s for s in textmarc_record.splitlines() if s])
+
+    # Create temp file with textmarc to be converted by textmarc2xmlmarc
+    (file_descriptor, file_name) = tempfile.mkstemp()
+    f = os.fdopen(file_descriptor, "w")
+
+    # Write content appending sysno at beginning
+    for line in textmarc_record.splitlines():
+        f.write("%09d %s\n" % (recid, re.sub("\s+", " ", line.strip())))
+    f.close()
+
+    old_stdout = sys.stdout
+    try:
+        # Redirect output, transform, restore old references
+        new_stdout = StringIO()
+        sys.stdout = new_stdout
+        try:
+            transform_file(file_name)
+            response['resultMsg'] = 'textmarc_parsing_success'
+            response['resultXML'] = new_stdout.getvalue()
+        except ParseError, e:
+            # Something went wrong, notify user
+            response['resultXML'] = ""
+            response['resultMsg'] = 'textmarc_parsing_error'
+            response['parse_error'] = [e.lineno, " ".join(e.linecontent.split()[1:]), e.message]
+    finally:
+        sys.stdout = old_stdout
+        return response
+
+
+#################### crossref utils ####################
+
+def crossref_process_template(template, change=False):
+    """
+    Creates record from template based on xml template
+    @param change: if set to True, makes changes to the record (translating the
+        title, unifying autroh names etc.), if not - returns record without
+        any changes
+    @return: record
+    """
+    record = create_record(template)[0]
+    if change:
+        crossref_translate_title(record)
+        crossref_normalize_name(record)
+    return record
+
+
+def crossref_translate_title(record):
+    """
+    Convert the record's title to the Inspire specific abbreviation
+    of the title (using JOURNALS knowledge base)
+    @return: changed record
+    """
+    # probably there is only one 773 field
+    # but just in case let's treat it as a list
+    for field in record_get_field_instances(record, '773'):
+        title = field[0][0][1]
+        new_title = get_kbr_values("JOURNALS", title, searchtype='e')
+        if new_title:
+            # returned value is a list, and we need only the first value
+            new_title = new_title[0][0]
+            position = field[4]
+            record_modify_subfield(rec=record, tag='773', subfield_code='p', \
+            value=new_title, subfield_position=0, field_position_global=position)
+
+
+def crossref_normalize_name(record):
+    """
+    Changes the format of author's name (often with initials) to the proper,
+    unified one, using bibauthor_name_utils tools
+    @return: changed record
+    """
+    # pattern for removing the spaces between two initials
+    pattern_initials = '([A-Z]\\.)\\s([A-Z]\\.)'
+    # first, change the main author
+    for field in record_get_field_instances(record, '100'):
+        main_author = field[0][0][1]
+        new_author = create_normalized_name(split_name_parts(main_author))
+        # remove spaces between initials
+        # two iterations are required
+        for _ in range(2):
+            new_author = re.sub(pattern_initials, '\g<1>\g<2>', new_author)
+        position = field[4]
+        record_modify_subfield(rec=record, tag='100', subfield_code='a', \
+        value=new_author, subfield_position=0, field_position_global=position)
+
+    # then, change additional authors
+    for field in record_get_field_instances(record, '700'):
+        author = field[0][0][1]
+        new_author = create_normalized_name(split_name_parts(author))
+        for _ in range(2):
+            new_author = re.sub(pattern_initials, '\g<1>\g<2>',new_author)
+        position = field[4]
+        record_modify_subfield(rec=record, tag='700', subfield_code='a', \
+            value=new_author, subfield_position=0, field_position_global=position)

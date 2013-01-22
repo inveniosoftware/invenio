@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,7 +29,6 @@ import time
 import tempfile
 import cgi
 import re
-import calendar
 
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -169,7 +168,7 @@ def cli_upload(req, file_content=None, mode=None, callback_url=None, nonce=None,
 
 def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None,
                     exec_time=None, metafilename=None, ln=CFG_SITE_LANG,
-                    priority="1"):
+                    priority="1", email_logs_to=None):
     """
     Metadata web upload service. Get upload parameters and exec bibupload for the given file.
     Finally, write upload history.
@@ -181,12 +180,10 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
     req.content_type = "text/html"
     req.send_http_header()
 
-    error_codes = {'not_authorized': 1, 'invalid_marc': 2}
+    error_codes = {'not_authorized': 1}
     # write temporary file:
-    if filetype == 'marcxml':
-        metafile = metafile.value
-    else:
-        metafile = _transform_input_to_marcxml(file_input=metafile.value)
+    if filetype != 'marcxml':
+        metafile = _transform_input_to_marcxml(file_input=metafile)
 
     user_info = collect_user_info(req)
     tempfile.tempdir = CFG_TMPSHAREDDIR
@@ -203,22 +200,17 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
         if allow[0] != 0:
             return (error_codes['not_authorized'], allow[1])
 
-    # check MARCXML validity
-    if filetype == 'marcxml':
-        # check validity of marcxml
-        xmlmarclint_path = CFG_BINDIR + '/xmlmarclint'
-        xmlmarclint_output, dummy1, dummy2 = run_shell_command('%s %s' % (xmlmarclint_path, filename))
-        if xmlmarclint_output != 0:
-            msg = "[ERROR] MARCXML is not valid."
-            return (error_codes['invalid_marc'], msg)
     # run upload command:
+    task_arguments = ('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority)
     if exec_date:
         date = exec_date
         if exec_time:
             date += ' ' + exec_time
-        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, "-t", date, filename)
-    else:
-        jobid = task_low_level_submission('bibupload', user_info['nickname'], mode, "--name=" + metafilename, "--priority=" + priority, filename)
+        task_arguments += ("-t", date)
+    if email_logs_to:
+        task_arguments += ('--email-logs-to', email_logs_to)
+    task_arguments += (filename, )
+    jobid = task_low_level_submission(*task_arguments)
 
     # write batch upload history
     run_sql("""INSERT INTO hstBATCHUPLOAD (user, submitdate,
@@ -229,7 +221,7 @@ def metadata_upload(req, metafile=None, filetype=None, mode=None, exec_date=None
             or time.strftime("%Y-%m-%d %H:%M:%S"), str(jobid), ))
     return (0, "Task %s queued" % str(jobid))
 
-def document_upload(req=None, folder="", matching="", mode="", exec_date="", exec_time="", ln=CFG_SITE_LANG, priority="1"):
+def document_upload(req=None, folder="", matching="", mode="", exec_date="", exec_time="", ln=CFG_SITE_LANG, priority="1", email_logs_to=None):
     """ Take files from the given directory and upload them with the appropiate mode.
     @parameters:
         + folder: Folder where the files to upload are stored
@@ -337,11 +329,17 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             if not user:
                 user = "batchupload"
             # Execute bibupload with the appropiate mode
+
+            task_arguments = ('bibupload', user, "--" + mode, "--name=" + docfile, "--priority=" + priority)
+
             if exec_date:
                 date = '--runtime=' + "\'" + exec_date + ' ' + exec_time + "\'"
-                jobid = task_low_level_submission('bibupload', user, "--" + mode, "--name=" + docfile, "--priority=" + priority, date, filename)
-            else:
-                jobid = task_low_level_submission('bibupload', user, "--" + mode, "--name=" + docfile, "--priority=" + priority, filename)
+                task_arguments += (date, )
+            if email_logs_to:
+                task_arguments += ("--email-logs-to", email_logs_to)
+            task_arguments += (filename, )
+
+            jobid = task_low_level_submission(*task_arguments)
 
             # write batch upload history
             run_sql("""INSERT INTO hstBATCHUPLOAD (user, submitdate,
@@ -425,51 +423,11 @@ def get_daemon_meta_files():
             pass
     return files
 
-def check_date(date):
-    """ Check if date is correct
-        @return:
-            0 - Default or correct date
-            3 - Incorrect format
-            4 - Date does not exist
-    """
-    if not date or date == "yyyy-mm-dd":
-        return 0
-    correct_format = re.match("2[01]\d\d-[01]?\d-[0-3]?\d", date)
-    if not correct_format:
-        return 3
-    #separate year, month, day
-    date = correct_format.group(0).split("-")
-    try:
-        calendar.weekday(int(date[0]), int(date[1]), int(date[2]))
-    except ValueError:
-        return 4
-    return 0
-
-def check_time(time):
-    """ Check if time is correct
-        @return:
-            0 - Default or correct time
-            1 - Incorrect format
-    """
-    if not time or time == "hh:mm:ss":
-        return 0
-    correct_format = re.match("[0-2]\d:[0-5]\d:[0-5]\d", time)
-    if not correct_format:
-        return 1
-    return 0
-
 def user_authorization(req, ln):
     """ Check user authorization to visit page """
-    _ = gettext_set_language(ln)
-    user_info = collect_user_info(req)
     auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
     if auth_code != 0:
         referer = '/batchuploader/'
-        if user_info['email'] == 'guest':
-            error_msg = _("Guests are not authorized to run batchuploader")
-        else:
-            error_msg = _("The user '%s' is not authorized to run batchuploader" % \
-                          (cgi.escape(user_info['nickname'])))
         return page_not_authorized(req=req, referer=referer,
                                    text=auth_message, navmenuid="batchuploader")
     else:
@@ -562,8 +520,6 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
     Useful to make sure that the client does not override other records by
     mistake.
     """
-    from invenio.bibrecord import create_records
-
     _ = gettext_set_language(ln)
     recs = create_records(metafile, 0, 0)
     user_info = collect_user_info(req)

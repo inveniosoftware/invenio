@@ -29,15 +29,18 @@ from datetime import datetime
 from urllib import quote
 from ConfigParser import ConfigParser
 import os
+import gzip
+import time
 
 from invenio.search_engine import get_collection_reclist
 from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, CFG_SITE_LANGS
 from invenio.intbitset import intbitset
 from invenio.websearch_webcoll import Collection
-from invenio.messages import language_list_long
-from invenio.bibtask import write_message, task_update_progress
+from invenio.bibtask import write_message, task_update_progress, task_sleep_now_if_required
+from invenio.textutils import encode_for_xml
+from invenio.urlutils import get_canonical_and_alternates_urls
 
 
 DEFAULT_TIMEZONE = '+01:00'
@@ -111,7 +114,8 @@ def get_all_public_collections(base_collections):
     return output
 
 def filter_fulltexts(recids, fulltext_type=None):
-    """ returns list of records having a fulltext of type x"""
+    """ returns list of records having a fulltext of type fulltext_type.
+    If fulltext_type is empty, return all records having a fulltext"""
     recids = dict(recids)
     if fulltext_type:
         query = """SELECT id_bibrec, max(modification_date)
@@ -152,37 +156,38 @@ def filter_reviews(recids):
 
 
 
-SITEMAP_HEADER = \
-'<?xml version="1.0" encoding="UTF-8"?>\n' \
-'<urlset\n' \
-'  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n' \
-'  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9\n' \
-'  http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"\n' \
-'  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+SITEMAP_HEADER = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+  http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">"""
 
 SITEMAP_FOOTER = '\n</urlset>\n'
 
 class SitemapWriter(object):
     """ Writer for sitemaps"""
 
-    def __init__(self, name):
+    def __init__(self, sitemap_id):
         """ Constructor.
         name: path to the sitemap file to be created
         """
         self.header = SITEMAP_HEADER
         self.footer = SITEMAP_FOOTER
-        self.name = name
-        self.filedescriptor = open(self.name, 'w')
+        self.sitemap_id = sitemap_id
+        self.name = os.path.join(CFG_WEBDIR, 'sitemap-%02d.xml.gz' % sitemap_id)
+        self.filedescriptor = gzip.open(self.name + '.part', 'w')
         self.num_urls = 0
         self.file_size = 0
-        self.buffer = []
         self.filedescriptor.write(self.header)
         self.file_size += len(self.footer)
 
-    def add_url(self, url, lastmod=datetime(1900, 1, 1), changefreq="",
-            priority=""):
+    def add_url(self, url, lastmod=datetime(1900, 1, 1), changefreq="", priority="", alternate=False):
         """ create a new url node. Returns the number of url nodes in sitemap"""
         self.num_urls += 1
+        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url, drop_ln=not alternate)
         url_node = u"""
   <url>
     <loc>%s</loc>%s
@@ -198,13 +203,18 @@ class SitemapWriter(object):
         if priority:
             optional += u"""
     <priority>%s</priority>""" % priority
-        url_node %= (url, optional)
+        if alternate:
+            for ln, alternate_url in alternate_urls.iteritems():
+                ln = ln.replace('_', '-') ## zh_CN -> zh-CN
+                optional += u"""
+    <xhtml:link rel="alternate" hreflang="%s" href="%s" />""" % (ln, encode_for_xml(alternate_url, quote=True))
+        url_node %= (encode_for_xml(canonical_url), optional)
         self.file_size += len(url_node)
-        self.buffer.append(url_node)
+        self.filedescriptor.write(url_node)
         return self.num_urls
 
     def get_size(self):
-        """ File size. Should ot be > 10MB """
+        """ File size. Should not be > 10MB """
         return self.file_size + len(self.footer)
 
     def get_number_of_urls(self):
@@ -215,10 +225,15 @@ class SitemapWriter(object):
         """ Returns the filename """
         return self.name
 
-    def close(self):
+    def get_sitemap_url(self):
+        """ Returns the sitemap URL"""
+        return CFG_SITE_URL + '/' + os.path.basename(self.name)
+
+    def __del__(self):
         """ Writes the whole sitemap """
-        self.filedescriptor.write(''.join(self.buffer) + self.footer)
+        self.filedescriptor.write(self.footer)
         self.filedescriptor.close()
+        os.rename(self.name + '.part', self.name)
 
 SITEMAP_INDEX_HEADER = \
 '<?xml version="1.0" encoding="UTF-8"?>\n' \
@@ -230,7 +245,7 @@ SITEMAP_INDEX_HEADER = \
 
 SITEMAP_INDEX_FOOTER = '\n</sitemapindex>\n'
 
-class SitemapIndexWriter(SitemapWriter):
+class SitemapIndexWriter(object):
     """class for writing Sitemap Index files."""
 
     def __init__(self, name):
@@ -240,133 +255,123 @@ class SitemapIndexWriter(SitemapWriter):
         self.header = SITEMAP_INDEX_HEADER
         self.footer = SITEMAP_INDEX_FOOTER
         self.name = name
-        self.filedescriptor = open(self.name, 'w')
+        self.filedescriptor = gzip.open(self.name + '.part', 'w')
         self.num_urls = 0
         self.file_size = 0
-        self.buffer = []
         self.filedescriptor.write(self.header)
         self.file_size += len(self.footer)
 
-    def add_url(self, url, lastmod=datetime(1900, 1, 1)):
+    def add_url(self, url):
         """ create a new url node. Returns the number of url nodes in sitemap"""
         self.num_urls += 1
         url_node = u"""
   <sitemap>
     <loc>%s</loc>%s
   </sitemap>"""
-        optional = ''
-        if lastmod:
-            optional += u"""
-    <lastmod>%s</lastmod>""" % lastmod.strftime('%Y-%m-%dT%H:%M:%S' +\
-                                                DEFAULT_TIMEZONE)
+        optional = u"""
+    <lastmod>%s</lastmod>""" % time.strftime('%Y-%m-%dT%H:%M:%S' +\
+                                            DEFAULT_TIMEZONE)
         url_node %= (url, optional)
         self.file_size += len(url_node)
-        self.buffer.append(url_node)
+        self.filedescriptor.write(url_node)
         return self.num_urls
 
+    def __del__(self):
+        """ Writes the whole sitemap """
+        self.filedescriptor.write(self.footer)
+        self.filedescriptor.close()
+        os.rename(self.name + '.part', self.name)
 
-
-def generate_sitemaps(collection_names, fulltext_filter=''):
+def generate_sitemaps(sitemap_index_writer, collection_names, fulltext_filter=''):
     """
     Generate sitemaps themselves. Return list of generated sitemaps files
     """
     sitemap_id = 1
-    writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
-    sitemaps = [writer.get_name()]
+    writer = SitemapWriter(sitemap_id)
+    sitemap_index_writer.add_url(writer.get_sitemap_url())
     nb_urls = 0
-    for [lang, lang_name] in language_list_long():
+    for lang in CFG_SITE_LANGS:
         writer.add_url(CFG_SITE_URL + '/?ln=%s' % lang,
                        lastmod=datetime.today(),
                        changefreq=DEFAULT_CHANGEFREQ_HOME,
                        priority=DEFAULT_PRIORITY_HOME)
         nb_urls += 1
-
+    write_message("... Getting all public records...")
     recids = get_all_public_records(collection_names)
-    task_update_progress("Generating urls for %s records" % len(recids))
-    #task_sleep_now_if_required(can_stop_too=True)
-    for (recid, lastmod) in recids:
-        if nb_urls <= MAX_RECORDS and nb_urls % 100 == 0:
-            #print nb_urls
-            #print writer.get_size()
-            if writer.get_size() > MAX_SIZE or nb_urls == MAX_RECORDS:
-                writer.close()
-                sitemap_id += 1
-                writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
-                sitemaps.append(writer.get_name())
+    write_message("... Generating urls for %s records..." % len(recids))
+    task_sleep_now_if_required(can_stop_too=True)
+    for i, (recid, lastmod) in enumerate(recids):
+        if nb_urls % 100 == 0 and (writer.get_size() >= MAX_SIZE or nb_urls >= MAX_RECORDS):
+            sitemap_id += 1
+            writer = SitemapWriter(sitemap_id)
+            sitemap_index_writer.add_url(writer.get_sitemap_url())
         nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s' % (CFG_SITE_RECORD, recid),
-                                 lastmod = lastmod,
-                                 changefreq = DEFAULT_CHANGEFREQ_RECORDS,
-                                 priority = DEFAULT_PRIORITY_RECORDS)
-        #task_sleep_now_if_required(can_stop_too=False)
-    task_update_progress("Generating urls for collections")
-    for (collection, lastmod) in get_all_public_collections(collection_names):
-        for [lang, lang_name] in language_list_long():
-            if nb_urls <= MAX_RECORDS and nb_urls % 100 == 0:
-                #print nb_urls
-                #print writer.get_size()
-                if writer.get_size() > MAX_SIZE or nb_urls == MAX_RECORDS:
-                    writer.close()
-                    sitemap_id += 1
-                    writer = SitemapWriter('%s/sitemap-%s.xml' % (CFG_WEBDIR,
-                                                                  sitemap_id))
-                    sitemaps.append(writer.get_name())
-            nb_urls = writer.add_url(
-                       '%s/collection/%s?ln=%s' % (CFG_SITE_URL, quote(collection), lang),
-                       lastmod = lastmod,
-                       changefreq = DEFAULT_CHANGEFREQ_COLLECTIONS,
-                       priority = DEFAULT_PRIORITY_COLLECTIONS)
-            #task_sleep_now_if_required(can_stop_too=False)
-    task_update_progress("Generating urls for fulltexts")
-    for  (recid, lastmod) in filter_fulltexts(recids, fulltext_filter):
-        if nb_urls <= MAX_RECORDS and nb_urls % 100 == 0:
-            #print nb_urls
-            #print writer.get_size()
-            if writer.get_size() > MAX_SIZE or nb_urls == MAX_RECORDS:
-                writer.close()
+                                lastmod = lastmod,
+                                changefreq = DEFAULT_CHANGEFREQ_RECORDS,
+                                priority = DEFAULT_PRIORITY_RECORDS)
+        if i % 100 == 0:
+            task_update_progress("Sitemap for recid %s/%s" % (i + 1, len(recids)))
+            task_sleep_now_if_required(can_stop_too=True)
+    write_message("... Generating urls for collections...")
+    collections = get_all_public_collections(collection_names)
+    for i, (collection, lastmod) in enumerate(collections):
+        for lang in CFG_SITE_LANGS:
+            if nb_urls % 100 == 0 and (writer.get_size() >= MAX_SIZE or nb_urls >= MAX_RECORDS):
                 sitemap_id += 1
-                writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
-                sitemaps.append(writer.get_name())
+                writer = SitemapWriter(sitemap_id)
+                sitemap_index_writer.add_url(writer.get_sitemap_url())
+            nb_urls = writer.add_url('%s/collection/%s?ln=%s' % (CFG_SITE_URL, quote(collection), lang),
+                        lastmod = lastmod,
+                        changefreq = DEFAULT_CHANGEFREQ_COLLECTIONS,
+                        priority = DEFAULT_PRIORITY_COLLECTIONS,
+                        alternate=True)
+        if i % 100 == 0:
+            task_update_progress("Sitemap for collection %s/%s" % (i + 1, len(collections)))
+            task_sleep_now_if_required(can_stop_too=True)
+    write_message("... Generating urls for fulltexts...")
+    recids = filter_fulltexts(recids, fulltext_filter)
+    for i, (recid, lastmod) in enumerate(recids):
+        if nb_urls % 100 == 0 and (writer.get_size() >= MAX_SIZE or nb_urls >= MAX_RECORDS):
+            sitemap_id += 1
+            writer = SitemapWriter(sitemap_id)
+            sitemap_index_writer.add_url(writer.get_sitemap_url())
         nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/files' % (CFG_SITE_RECORD, recid),
                                  lastmod = lastmod,
                                  changefreq = DEFAULT_CHANGEFREQ_FULLTEXTS,
                                  priority = DEFAULT_PRIORITY_FULLTEXTS)
-        #task_sleep_now_if_required(can_stop_too=False)
+        if i % 100 == 0:
+            task_update_progress("Sitemap for files page %s/%s" % (i, len(recids)))
+            task_sleep_now_if_required(can_stop_too=True)
 
-    task_update_progress("Generating urls for comments")
-    for  (recid, lastmod) in filter_comments(recids):
-        if nb_urls <= MAX_RECORDS and nb_urls % 100 == 0:
-            #print nb_urls
-            #print writer.get_size()
-            if writer.get_size() > MAX_SIZE or nb_urls == MAX_RECORDS:
-                writer.close()
-                sitemap_id += 1
-                writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
-                sitemaps.append(writer.get_name())
+    write_message("... Generating urls for comments...")
+    recids = filter_comments(recids)
+    for i, (recid, lastmod) in enumerate(recids):
+        if nb_urls % 100 == 0 and (writer.get_size() >= MAX_SIZE or nb_urls >= MAX_RECORDS):
+            sitemap_id += 1
+            writer = SitemapWriter(sitemap_id)
+            sitemap_index_writer.add_url(writer.get_sitemap_url())
         nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/comments' % (CFG_SITE_RECORD, recid),
                                  lastmod = lastmod,
                                  changefreq = DEFAULT_CHANGEFREQ_COMMENTS,
                                  priority = DEFAULT_PRIORITY_COMMENTS)
-        #task_sleep_now_if_required(can_stop_too=False)
-    task_update_progress("Generating urls for reviews")
-    for  (recid, lastmod) in filter_reviews(recids):
-        if nb_urls <= MAX_RECORDS and nb_urls % 100 == 0:
-            #print nb_urls
-            #print writer.get_size()
-            if writer.get_size() > MAX_SIZE or nb_urls == MAX_RECORDS:
-                writer.close()
-                sitemap_id += 1
-                writer = SitemapWriter(CFG_WEBDIR + '/sitemap-%s.xml' % sitemap_id)
-                sitemaps.append(writer.get_name())
+        if i % 100 == 0:
+            task_update_progress("Sitemap for comments page %s/%s" % (i, len(recids)))
+            task_sleep_now_if_required(can_stop_too=True)
+    write_message("... Generating urls for reviews")
+    recids = filter_reviews(recids)
+    for i, (recid, lastmod) in enumerate(recids):
+        if nb_urls % 100 == 0 and (writer.get_size() >= MAX_SIZE or nb_urls >= MAX_RECORDS):
+            sitemap_id += 1
+            write_message("")
+            writer = SitemapWriter(sitemap_id)
+            sitemap_index_writer.add_url(writer.get_sitemap_url())
         nb_urls = writer.add_url(CFG_SITE_URL + '/%s/%s/reviews' % (CFG_SITE_RECORD, recid),
                                  lastmod = lastmod,
                                  changefreq = DEFAULT_CHANGEFREQ_REVIEWS,
                                  priority = DEFAULT_PRIORITY_REVIEWS)
-        #task_sleep_now_if_required(can_stop_too=False)
-    try:
-        writer.close()
-    except:
-        pass
-    return sitemaps
+        if i % 100 == 0:
+            task_update_progress("Sitemap for reviews page %s/%s" % (i, len(recids)))
+            task_sleep_now_if_required(can_stop_too=True)
 
 def generate_sitemaps_index(collection_list, fulltext_filter=None):
     """main function. Generates the sitemap index and the sitemaps
@@ -374,23 +379,17 @@ def generate_sitemaps_index(collection_list, fulltext_filter=None):
     fulltext_filter: if provided the parser will intergrate only give fulltext
                      types
     """
-    sitemaps = generate_sitemaps(collection_list, fulltext_filter)
-    writer = SitemapIndexWriter(CFG_WEBDIR + '/sitemap-index.xml')
+    write_message("Generating all sitemaps...")
+    sitemap_index_writer = SitemapIndexWriter(CFG_WEBDIR + '/sitemap-index.xml.gz')
+    generate_sitemaps(sitemap_index_writer, collection_list, fulltext_filter)
 
-    task_update_progress("Generating sitemap index for %s sitemap files" % \
-                        len(sitemaps))
-    #task_sleep_now_if_required(can_stop_too=False)
-    for sitemap in sitemaps:
-        writer.add_url(CFG_SITE_URL + '/%s' % sitemap.split('/')[-1],
-                       lastmod=datetime.today())
-    writer.close()
 
 def run_export_method(jobname):
     """Main function, reading params and running the task."""
     write_message("bibexport_sitemap: job %s started." % jobname)
 
-    collections = get_config_parameter(jobname = "sitemap", parameter_name = "collection", is_parameter_collection = True)
-    fulltext_type = get_config_parameter(jobname = "sitemap", parameter_name = "fulltext_status")
+    collections = get_config_parameter(jobname=jobname, parameter_name="collection", is_parameter_collection = True)
+    fulltext_type = get_config_parameter(jobname=jobname, parameter_name="fulltext_status")
 
     generate_sitemaps_index(collections, fulltext_type)
 
@@ -409,7 +408,7 @@ def get_config_parameter(jobname, parameter_name, is_parameter_collection = Fals
     jobconfig.read(jobconffile)
 
     if is_parameter_collection:
-        all_items = jobconfig.items(section = 'export_job')
+        all_items = jobconfig.items(section='export_job')
 
         parameters = []
 

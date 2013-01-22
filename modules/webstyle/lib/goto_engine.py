@@ -209,7 +209,7 @@ def main():
         for component, goto in CFG_GOTO_PLUGINS.items():
             print component + ' -> ' + get_callable_documentation(goto)
     elif options.action == 'list-broken-goto-plugins':
-        print "Broeken GOTO plugins found:"
+        print "Broken GOTO plugins found:"
         for component, error in CFG_GOTO_PLUGINS.get_broken_plugins().items():
             print component + '->' + str(error)
     elif options.register:

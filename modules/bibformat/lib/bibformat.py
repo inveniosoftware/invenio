@@ -360,7 +360,7 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     return prologue + formatted_records + epilogue
 
-def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
+def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_info=None):
     """
     Returns an Excel readable format containing the given recIDs.
     If 'req' is given, also prints the output in 'req' while individual
@@ -380,6 +380,7 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
     @param ln: language
     @param ot: a list of fields that should be included in the excel output as columns(see perform_request_search 'ot' param)
     @param ot_sep: a separator used to separate values for the same record, in the same columns, if any
+    @param user_info: the user_info dictionary
     @return: a string in Excel format
     """
     # Prepare the column headers to display in the Excel file
@@ -432,7 +433,8 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
                                              record_separator='\n',
                                              prologue = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
                                              epilogue = footer,
-                                             req=req)
+                                             req=req,
+                                             user_info=user_info)
 
     return excel_formatted_records
 

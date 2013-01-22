@@ -46,10 +46,6 @@ def format_element(bfo, separator=" ", highlight='no'):
             title += ": " + title_part
         titles.append( title )
 
-    title = bfo.field('0248_a')
-    if len(title) > 0:
-        titles.append( title )
-
     title = bfo.field('246__a')
     if len(title) > 0:
         titles.append( title )

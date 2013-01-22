@@ -290,15 +290,17 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
             indexer = get_idx_indexer('fulltext')
             if indexer != 'native':
-                recid = bibdoc.recid
-                # Adds fulltexts of all files once per records
-                if not recid in fulltext_added:
-                    bibrecdocs = BibRecDocs(recid)
-                    text = bibrecdocs.get_text()
-                    if indexer == 'SOLR' and CFG_SOLR_URL:
-                        solr_add_fulltext(recid, text)
-                    elif indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
-                        xapian_add(recid, 'fulltext', text)
+                # A document might belong to multiple records
+                for rec_link in bibdoc.bibrec_links:
+                    recid = rec_link["recid"]
+                    # Adds fulltexts of all files once per records
+                    if not recid in fulltext_added:
+                        bibrecdocs = BibRecDocs(recid)
+                        text = bibrecdocs.get_text()
+                        if indexer == 'SOLR' and CFG_SOLR_URL:
+                            solr_add_fulltext(recid, text)
+                        elif indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
+                            xapian_add(recid, 'fulltext', text)
 
                     fulltext_added.add(recid)
                 # we are relying on an external information retrieval system

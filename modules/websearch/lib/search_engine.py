@@ -4282,7 +4282,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                     req.write('\n')
         elif format == 'excel':
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-            create_excel(recIDs=recIDs_to_print, req=req, ln=ln, ot=ot)
+            create_excel(recIDs=recIDs_to_print, req=req, ln=ln, ot=ot, user_info=user_info)
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):

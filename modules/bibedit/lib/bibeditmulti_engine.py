@@ -37,6 +37,7 @@ base class.
 __revision__ = "$Id"
 
 import subprocess
+import re
 from invenio import search_engine
 from invenio import bibrecord
 from invenio import bibformat
@@ -61,10 +62,13 @@ multiedit_templates = template.load('bibeditmulti')
 # base command for subfields
 class BaseSubfieldCommand:
     """Base class for commands manipulating subfields"""
-    def __init__(self, subfield, value = "", new_value = "", condition = "", condition_exact_match=True , condition_does_not_exist=False, condition_subfield = ""):
+    def __init__(self, subfield, value = "", new_value = "", condition = "", condition_exact_match=True , condition_does_not_exist=False, condition_subfield = "", additional_values = None):
         """Initialization."""
+        if additional_values is None:
+            additional_values = []
         self._subfield = subfield
         self._value = value
+        self._additional_values = additional_values
         self._new_value = new_value
         self._condition = condition
         self._condition_subfield = condition_subfield
@@ -216,8 +220,11 @@ class ReplaceTextInSubfieldCommand(BaseSubfieldCommand):
                 if field[4] == field_number:
                     subfields = field[0]
                     (field_code, field_value) = subfields[subfield_index]
+            replace_string = re.escape(self._value)
+            for val in self._additional_values:
+                replace_string += "|" + re.escape(val)
             #replace text
-            new_value = field_value.replace(self._value, self._new_value)
+            new_value = re.sub(replace_string, self._new_value, field_value)
             #update the subfield if needed
             if new_value != field_value:
                 bibrecord.record_modify_subfield(record, tag,
@@ -388,7 +395,7 @@ def perform_request_detailed_record(record_id, update_commands, output_format, l
 
 def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display, 
                                 language, outputTags, collection="", compute_modifications=0,
-                                upload_mode='-c'):
+                                upload_mode='-c', checked_records=None):
     """Returns the results of a test search.
 
     @param search_criteria: search criteria used in the test search
@@ -413,6 +420,10 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     if collection == "Any collection":
         collection = ""
     record_IDs = search_engine.perform_request_search(p=search_criteria, c=collection)
+
+    # initializing checked_records if not initialized yet or empty
+    if checked_records is None or not checked_records:
+        checked_records = record_IDs
 
     number_of_records = len(record_IDs)
 
@@ -442,7 +453,9 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
         formated_record = _get_formated_record(record_id=record_id,
                              output_format=output_format,
                              update_commands=update_commands,
-                             language=language, outputTags=outputTags, run_diff=record_id in displayed_records)
+                             language=language, outputTags=outputTags,
+                             run_diff=record_id in displayed_records,
+                             checked=record_id in checked_records)
         new_modifications = [current_command._modifications for current_command in update_commands]
         if new_modifications > current_modifications:
             record_modifications += 1
@@ -463,20 +476,22 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
         records_content = records_content[first_record_to_display:last_record_to_display + 1]
 
     response['display_info_box'] = compute_modifications or locked_records
-    response['info_html'] = multiedit_templates.info_box(language = language,
-                                                total_modifications = total_modifications)
+    response['info_html'] = multiedit_templates.info_box(language=language,
+                                                total_modifications=total_modifications)
     if locked_records:
-        response['info_html'] += multiedit_templates.tmpl_locked_record_list(language = language,
-                                                locked_records = locked_records)
-    response['search_html'] = multiedit_templates.search_results(records = records_content,
-                                                number_of_records = number_of_records,
-                                                current_page = page_to_display,
-                                                records_per_page = RECORDS_PER_PAGE,
-                                                language = language,
-                                                output_format=output_format)
+        response['info_html'] += multiedit_templates.tmpl_locked_record_list(language=language,
+                                                locked_records=locked_records)
+    response['search_html'] = multiedit_templates.search_results(records=records_content,
+                                                number_of_records=number_of_records,
+                                                current_page=page_to_display,
+                                                records_per_page=RECORDS_PER_PAGE,
+                                                language=language,
+                                                output_format=output_format,
+                                                checked_records=checked_records)
+    response['checked_records'] = checked_records
     return response
 
-def perform_request_submit_changes(search_criteria, update_commands, language, upload_mode, tag_list, collection, req):
+def perform_request_submit_changes(search_criteria, update_commands, language, upload_mode, tag_list, collection, req, checked_records):
     """Submits changes for upload into database.
 
     @param search_criteria: search criteria used in the test search
@@ -485,9 +500,10 @@ def perform_request_submit_changes(search_criteria, update_commands, language, u
     """
 
     response = {}
-    status, file_path = _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection, req)
+    status, file_path = _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection, req, checked_records)
 
     response['search_html'] = multiedit_templates.changes_applied(status, file_path)
+    response['checked_records'] = checked_records
     return response
 
 def _get_record_diff(record_textmarc, updated_record_textmarc, outputTags, record_id):
@@ -529,7 +545,7 @@ def _get_record_diff(record_textmarc, updated_record_textmarc, outputTags, recor
     result.append("</pre>")
     return '\n'.join(result)
 
-def _get_formated_record(record_id, output_format, update_commands, language, outputTags="", run_diff=True):
+def _get_formated_record(record_id, output_format, update_commands, language, outputTags="", run_diff=True, checked=True):
     """Returns a record in a given format
 
     @param record_id: the ID of record to format
@@ -538,8 +554,8 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
     @param language: the language to use to format the record
     @param run_diff: determines if we want to run _get_recodr_diff function, which sometimes takes too much time
     """
-    if update_commands:
-        # Modify te bibrecord object with the appropriate actions
+    if update_commands and checked:
+        # Modify the bibrecord object with the appropriate actions
         updated_record = _get_updated_record(record_id, update_commands)
 
     textmarc_options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
@@ -549,7 +565,7 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
     old_record = search_engine.get_record(recid=record_id)
     old_record_textmarc = xmlmarc2textmarc.create_marc_record(old_record, sysno="", options=textmarc_options)
     if "hm" == output_format:
-        if update_commands and run_diff:
+        if update_commands and run_diff and checked:
             updated_record_textmarc = xmlmarc2textmarc.create_marc_record(updated_record, sysno="", options=textmarc_options)
             result = _get_record_diff(old_record_textmarc, updated_record_textmarc, outputTags, record_id)
         else:
@@ -561,7 +577,7 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
             result.append('</pre>')
             result = '\n'.join(result)
     else:
-        if update_commands:
+        if update_commands and checked:
             # No coloring of modifications in this case
             xml_record = bibrecord.record_xml_output(updated_record)
         else:
@@ -600,7 +616,7 @@ def _create_marc(records_xml):
 
     return aleph_marc_output
 
-def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection, req):
+def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection, req, checked_records):
     """This methods takes care of submitting the changes to the server
     through bibupload.
 
@@ -617,8 +633,10 @@ def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, 
     num_records = len(record_IDs)
 
     updated_records = []
+    # Intersection of record_IDs list and checked_records
+    id_and_checked = list(set(record_IDs) & set(checked_records))
 
-    for current_id in record_IDs:
+    for current_id in id_and_checked:
         current_updated_record = _get_updated_record(current_id, update_commands)
         updated_records.append(current_updated_record)
 

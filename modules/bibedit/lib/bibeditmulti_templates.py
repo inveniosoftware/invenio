@@ -88,8 +88,24 @@ div .pagebody td{
     width: 200px;
 }
 
+.pagebody td .beforeValueInput, span.beforeValueInput{
+    color: green;
+    font-size: 12px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
 .textBoxConditionSubfield {
     width: 14px;
+}
+
+.textBoxValue{
+    margin-right: 1px;
+    margin-bottom: 1px;
+}
+
+.additionalValueParametersTmp{
+    display: none;
 }
 
 .msg {
@@ -138,6 +154,14 @@ div .pagebody td{
 }
 
 .buttonNewSubfield{
+    cursor: pointer;
+}
+
+.buttonNewValue{
+    cursor: pointer;
+}
+
+.buttonDeleteValue{
     cursor: pointer;
 }
 
@@ -484,9 +508,13 @@ div .boxleft_2 {
         <span class="action colActionType">%(text_replace_text)s</span>&nbsp;
     </td>
     <td>
-        <input id="textBoxValueDisplay" class="txtValue textBoxValue valueParameters" type="text"/>&nbsp;
+        <input id="textBoxValueDisplay" class="txtValue textBoxValue valueParameters" type="text"/>
+        <span class="additionalValueParameters">
+            <span class="beforeValueInput"> %(text_or)s </span>
+            <input id="textBoxValueDisplay" class="txtValue textBoxValue valueParameters" type="text"/>
+        </span>
 
-        <span class="newValueParameters"><strong> %(text_with)s </strong></span>
+        <span class="newValueParameters"><span class="beforeValueInput"> %(text_with)s </span></span>
         <input id="textBoxNewValueDisplay" class="txtValue textBoxNewValue newValueParameters" type="text" value="%(text_new_value)s"/>
 
         <span class="conditionParameters"><strong> %(text_with_condition)s</strong></span>
@@ -518,12 +546,26 @@ div .boxleft_2 {
     </tr>
     <tr class="valueParameters">
         <td /><td /><td /><td />
-        <td colspan="3">
+        <td>
             <input id="textBoxValue" class="txtValue textBoxValue" type="text" placeholder="%(text_value)s"/>
+        </td>
+        <td class="buttonCell">
+            <img src="%(site_url)s/img/add.png" class="buttonNewValue" alt="Add new value"/>
+            <span class="buttonNewValue linkButton">%(text_add_value)s</span>
+        </td>
+    </tr>
+    <tr class="additionalValueParametersTmp">
+        <td /><td /><td /><td class="beforeValueInput">OR</td >
+        <td>
+            <input id="textBoxValue" class="txtValue textBoxValue" type="text" placeholder="%(text_value)s"/>
+        </td>
+        <td class="buttonCell">
+            <img src="%(site_url)s/img/delete.png" class="buttonDeleteValue" alt="Delete this condition value"/>
+            <span class="buttonDeleteValue linkButton">%(text_delete_value)s</span>
         </td>
     </tr>
     <tr class="newValueParameters">
-        <td /><td /><td /><td />
+        <td /><td /><td /><td class="beforeValueInput">WITH</td>
         <td colspan="3">
             <input id="textBoxNewValue" class="txtValue textBoxNewValue" type="text" placeholder="%(text_new_value)s"/>
         </td>
@@ -572,6 +614,8 @@ div .boxleft_2 {
               "text_define_changes_explanation" : _("Specify fields and their subfields that should be changed in every record matching the search criteria."),
               "text_define_field" : _("Define new field action"),
               "text_define_subfield" : _("Define new subfield action"),
+              "text_add_value" : _("Add new condition value"),
+              "text_delete_value" : _("Remove this condition value"),
               "text_field" : _("Field"),
               "text_select_action" : _("Select action"),
               "text_add_field" : _("Add field"),
@@ -583,6 +627,7 @@ div .boxleft_2 {
               "text_cancel" : _("Cancel"),
               "text_replace_text" : _("Replace substring"),
               "text_replace_content" : _("Replace full content"),
+              "text_or" : _("or"),
               "text_with" : _("with"),
               "text_with_condition": _("when subfield $$"),
               "text_new_value" : _("new value"),
@@ -750,7 +795,7 @@ div .boxleft_2 {
         return header
 
 
-    def search_results(self, records, number_of_records, current_page, records_per_page, language, output_format):
+    def search_results(self, records, number_of_records, current_page, records_per_page, language, output_format, checked_records):
         """Retrurns the content of search resutls.
 
         @param records: list records to be displayed in the results.
@@ -767,11 +812,20 @@ div .boxleft_2 {
         for (record_id, record) in records:
             result += """
             <span class="resultItem" id="recordid_%(record_id)s">
-            %(record)s
-            </span><br><hr>
-            """ % {"record_id" : record_id,
-                  "record" : record
+            <div class="divRecordCheckbox">
+            <input type="checkbox" name="recordCheckbox" class="recordCheckbox" value="%(record_id)s"
+            """ % {"record_id": record_id,
+                  "record": record
                   }
+            if record_id in checked_records:
+                result += ' checked="checked"'
+            result += """
+            /></div>
+            <div class="divRecordPreview">
+            %(record)s
+            </div>
+            </span><br><hr>
+            """ % {"record": record}
 
         result_header = self._search_results_header(number_of_records = number_of_records,
                                                     current_page = current_page,

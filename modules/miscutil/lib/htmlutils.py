@@ -317,9 +317,9 @@ def get_mathjax_header(https=False):
     """
     if CFG_MATHJAX_HOSTING.lower() == 'cdn':
         if https:
-            mathjax_path = "https://d3eoax9i5htok0.cloudfront.net/mathjax/1.1-latest"
+            mathjax_path = "https://d3eoax9i5htok0.cloudfront.net/mathjax/2.1-latest"
         else:
-            mathjax_path = "http://cdn.mathjax.org/mathjax/1.1-latest"
+            mathjax_path = "http://cdn.mathjax.org/mathjax/2.1-latest"
     else:
         mathjax_path = "/MathJax"
     return """<script type="text/x-mathjax-config">

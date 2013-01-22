@@ -26,8 +26,8 @@ EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
 
 # current MathJax version and packages
 # See also modules/miscutil/lib/htmlutils.py (get_mathjax_header)
-MJV = 1.1
-MATHJAX = https://github.com/mathjax/MathJax/zipball/v$(MJV)
+MJV = 2.1
+MATHJAX = http://invenio-software.org/download/mathjax/MathJax-v$(MJV).zip
 
 # current CKeditor version
 CKV = 3.6.6
@@ -96,9 +96,10 @@ install-mathjax-plugin:
 	@echo "***********************************************************"
 	rm -rf /tmp/invenio-mathjax-plugin
 	mkdir /tmp/invenio-mathjax-plugin
+	rm -fr ${prefix}/var/www/MathJax
 	mkdir -p ${prefix}/var/www/MathJax
 	(cd /tmp/invenio-mathjax-plugin && \
-	wget '$(MATHJAX)' -O mathjax.zip --no-check-certificate && \
+	wget '$(MATHJAX)' -O mathjax.zip && \
 	unzip -q mathjax.zip && cd mathjax-MathJax-* && cp -ur * \
 	${prefix}/var/www/MathJax)
 	rm -fr /tmp/invenio-mathjax-plugin

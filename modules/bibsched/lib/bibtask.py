@@ -61,7 +61,7 @@ import random
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
-    CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR
+    CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.errorlib import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
@@ -71,6 +71,7 @@ from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS, CFG_BIBTASK_FIXEDTIMETASKS
 from invenio.dateutils import parse_runtime_limit
 from invenio.shellutils import escape_shell_arg
+from invenio.mailutils import send_email
 
 # Global _TASK_PARAMS dictionary.
 _TASK_PARAMS = {
@@ -92,6 +93,7 @@ _TASK_PARAMS = {
         'sequence-id':None,
         'stop_queue_on_error': False,
         'fixed_time': False,
+        'email_logs_to': [],
         }
 
 # Global _OPTIONS dictionary.
@@ -430,61 +432,64 @@ def task_init(
         _task_submit(argv, authorization_action, authorization_msg)
     else:
         try:
-            if task_get_task_param('profile'):
-                try:
-                    from cStringIO import StringIO
-                    import pstats
-                    filename = os.path.join(CFG_TMPDIR, 'bibsched_task_%s.pyprof' % _TASK_PARAMS['task_id'])
-                    existing_sorts = pstats.Stats.sort_arg_dict_default.keys()
-                    required_sorts = []
-                    profile_dump = []
-                    for sort in task_get_task_param('profile'):
-                        if sort not in existing_sorts:
-                            sort = 'cumulative'
-                        if sort not in required_sorts:
-                            required_sorts.append(sort)
-                    if sys.hexversion < 0x02050000:
-                        import hotshot
-                        import hotshot.stats
-                        pr = hotshot.Profile(filename)
-                        ret = pr.runcall(_task_run, task_run_fnc)
-                        for sort_type in required_sorts:
-                            tmp_out = sys.stdout
-                            sys.stdout = StringIO()
-                            hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
-                            # pylint: disable=E1103
-                            # This is a hack. sys.stdout is a StringIO in this case.
-                            profile_dump.append(sys.stdout.getvalue())
-                            # pylint: enable=E1103
-                            sys.stdout = tmp_out
-                    else:
-                        import cProfile
-                        pr = cProfile.Profile()
-                        ret = pr.runcall(_task_run, task_run_fnc)
-                        pr.dump_stats(filename)
-                        for sort_type in required_sorts:
-                            strstream = StringIO()
-                            pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
-                            profile_dump.append(strstream.getvalue())
-                    profile_dump = '\n'.join(profile_dump)
-                    profile_dump += '\nYou can use profile=%s' % existing_sorts
-                    open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a').write("%s" % profile_dump)
-                    os.remove(filename)
-                except ImportError:
+            try:
+                if task_get_task_param('profile'):
+                    try:
+                        from cStringIO import StringIO
+                        import pstats
+                        filename = os.path.join(CFG_TMPDIR, 'bibsched_task_%s.pyprof' % _TASK_PARAMS['task_id'])
+                        existing_sorts = pstats.Stats.sort_arg_dict_default.keys()
+                        required_sorts = []
+                        profile_dump = []
+                        for sort in task_get_task_param('profile'):
+                            if sort not in existing_sorts:
+                                sort = 'cumulative'
+                            if sort not in required_sorts:
+                                required_sorts.append(sort)
+                        if sys.hexversion < 0x02050000:
+                            import hotshot
+                            import hotshot.stats
+                            pr = hotshot.Profile(filename)
+                            ret = pr.runcall(_task_run, task_run_fnc)
+                            for sort_type in required_sorts:
+                                tmp_out = sys.stdout
+                                sys.stdout = StringIO()
+                                hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
+                                # pylint: disable=E1103
+                                # This is a hack. sys.stdout is a StringIO in this case.
+                                profile_dump.append(sys.stdout.getvalue())
+                                # pylint: enable=E1103
+                                sys.stdout = tmp_out
+                        else:
+                            import cProfile
+                            pr = cProfile.Profile()
+                            ret = pr.runcall(_task_run, task_run_fnc)
+                            pr.dump_stats(filename)
+                            for sort_type in required_sorts:
+                                strstream = StringIO()
+                                pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
+                                profile_dump.append(strstream.getvalue())
+                        profile_dump = '\n'.join(profile_dump)
+                        profile_dump += '\nYou can use profile=%s' % existing_sorts
+                        open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a').write("%s" % profile_dump)
+                        os.remove(filename)
+                    except ImportError:
+                        ret = _task_run(task_run_fnc)
+                        write_message("ERROR: The Python Profiler is not installed!", stream=sys.stderr)
+                else:
                     ret = _task_run(task_run_fnc)
-                    write_message("ERROR: The Python Profiler is not installed!", stream=sys.stderr)
-            else:
-                ret = _task_run(task_run_fnc)
-            if not ret:
-                write_message("Error occurred.  Exiting.", sys.stderr)
-        except Exception, e:
-            register_exception(alert_admin=True)
-            write_message("Unexpected error occurred: %s." % e, sys.stderr)
-            write_message("Traceback is:", sys.stderr)
-            write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
-            write_message("Exiting.", sys.stderr)
-            task_update_status("ERROR")
-        logging.shutdown()
+                if not ret:
+                    write_message("Error occurred.  Exiting.", sys.stderr)
+            except Exception, e:
+                register_exception(alert_admin=True)
+                write_message("Unexpected error occurred: %s." % e, sys.stderr)
+                write_message("Traceback is:", sys.stderr)
+                write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
+                write_message("Exiting.", sys.stderr)
+                task_update_status("ERROR")
+        finally:
+            _task_email_logs()
+            logging.shutdown()
 
 def _task_build_params(
     task_name,
@@ -532,6 +537,7 @@ def _task_build_params(
                 "stop-on-error",
                 "continue-on-error",
                 "fixed-time",
+                "email-logs-to="
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
@@ -570,6 +576,8 @@ def _task_build_params(
                 _TASK_PARAMS["stop_queue_on_error"] = False
             elif opt[0] in ("--fixed-time", ):
                 _TASK_PARAMS["fixed_time"] = True
+            elif opt[0] in ("--email-logs-to"):
+                _TASK_PARAMS["email_logs_to"] = opt[1].split(',')
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -852,6 +860,35 @@ def _task_get_options(task_id, task_name):
     write_message('Options retrieved: %s' % (out, ), verbose=9)
     return out
 
+def _task_email_logs():
+    """
+    In case this was requested, emails the logs.
+    """
+    email_logs_to = task_get_task_param('email_logs_to')
+
+    if not email_logs_to:
+        return
+
+    status = task_read_status()
+    task_name = task_get_task_param('task_name')
+    task_specific_name = task_get_task_param('task_specific_name')
+    if task_specific_name:
+        task_name += ':' + task_specific_name
+    runtime = task_get_task_param('runtime')
+
+    title = "Execution of %s: %s" % (task_name, status)
+    body = """
+Attached you can find the stdout and stderr logs of the execution of
+name: %s
+id: %s
+runtime: %s
+options: %s
+status: %s
+""" % (task_name, _TASK_PARAMS['task_id'], runtime, _OPTIONS, status)
+    err_file = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id'])
+    log_file = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id'])
+    return send_email(CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body, attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')])
+
 def _task_run(task_run_fnc):
     """Runs the task by fetching arguments from the BibSched task queue.
     This is what BibSched will be invoking via daemon call.
@@ -1020,6 +1057,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  --continue-on-error\tIn case of unrecoverable error don't stop the bibsched queue.\n")
     sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified\n\t\t\tbibtasklet with the given parameters between square\n\t\t\tbrackets.\n")
     sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr=\n\t\t\t'foo@xxx.com', toaddr='bar@xxx.com', subject='hello',\n\t\t\tcontent='help']\"\n")
+    sys.stderr.write("  --email-logs-to=EMAILS Sends an email with the results of the execution\n\t\t\tof the task, and attached the logs (EMAILS could be a comma-\n\t\t\tseparated lists of email addresses)\n")
     if description:
         sys.stderr.write(description)
     sys.exit(exitcode)
