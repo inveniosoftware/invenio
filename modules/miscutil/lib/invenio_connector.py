@@ -22,7 +22,7 @@ Tools to connect to distant Invenio servers using Invenio APIs.
 Example of use:
 
 from InvenioConnector import *
-cds = InvenioConnector("http://cdsweb.cern.ch")
+cds = InvenioConnector("http://cds.cern.ch")
 
 results = cds.search("higgs")
 
@@ -74,7 +74,7 @@ except ImportError:
     CFG_CERN_SITE = 0
     CFG_USER_AGENT = "invenio_connector"
 
-CFG_CDS_URL = "http://cdsweb.cern.ch/"
+CFG_CDS_URL = "http://cds.cern.ch/"
 
 class InvenioConnectorAuthError(Exception):
     """
@@ -479,10 +479,13 @@ class _SGMLParserFactory(mechanize.DefaultFactory):
 class CDSInvenioConnector(InvenioConnector):
     def __init__(self, user="", password="", local_import_path="invenio"):
         """
-        This is a specialized InvenioConnector class suitable to connecte
-        to the CERN Document Server (CDS), which uses centralize SSO.
+        This is a specialized InvenioConnector class suitable to connect
+        to the CERN Document Server (CDS), which uses centralized SSO.
         """
-        super(CDSInvenioConnector, self).__init__(CFG_CDS_URL, user, password, local_import_path=local_import_path)
+        cds_url = CFG_CDS_URL
+        if user:
+            cds_url = cds_url.replace('http', 'https')
+        super(CDSInvenioConnector, self).__init__(cds_url, user, password, local_import_path=local_import_path)
 
     def _init_browser(self):
         """
@@ -491,10 +494,10 @@ class CDSInvenioConnector(InvenioConnector):
         self.browser = mechanize.Browser(factory=_SGMLParserFactory(i_want_broken_xhtml_support=True))
         self.browser.set_handle_robots(False)
         self.browser.open(self.server_url)
-        self.browser.follow_link(text_regex="login")
+        self.browser.follow_link(text_regex="Sign in")
         self.browser.select_form(nr=0)
-        self.browser.form['ctl00$ContentPlaceHolder1$txtFormsLogin'] = self.user
-        self.browser.form['ctl00$ContentPlaceHolder1$txtFormsPassword'] = self.password
+        self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsLogin'] = self.user
+        self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsPassword'] = self.password
         self.browser.submit()
         self.browser.select_form(nr=0)
         self.browser.submit()
