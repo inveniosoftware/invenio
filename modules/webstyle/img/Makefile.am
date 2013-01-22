@@ -272,6 +272,15 @@ tmpdir=$(localstatedir)/tmp
 
 tmp_DATA = plotextractor_dummy.png
 
-EXTRA_DIST = $(img_DATA) $(tmp_DATA)
+wwwdir=$(localstatedir)/www
+
+www_DATA = favicon.ico \
+           apple-touch-icon-57-precomposed.png \
+           apple-touch-icon-72-precomposed.png \
+           apple-touch-icon-114-precomposed.png \
+           apple-touch-icon-144-precomposed.png
+
+
+EXTRA_DIST = $(img_DATA) $(tmp_DATA) $(www_DATA)
 
 CLEANFILES = *~ *.tmp
