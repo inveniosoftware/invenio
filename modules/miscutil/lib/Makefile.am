@@ -72,6 +72,7 @@ pylib_DATA = __init__.py \
              solrutils_bibrank_indexer.py \
              solrutils_bibrank_searcher.py \
              solrutils_config.py \
+             solrutils_regression_tests.py \
              solrutils_unit_tests.py \
              xapianutils_bibindex_indexer.py \
              xapianutils_bibindex_searcher.py \
