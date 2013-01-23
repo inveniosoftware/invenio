@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,7 +24,6 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import dbquery
-from invenio.config import CFG_DATABASE_NAME
 from invenio.testutils import make_test_suite, run_test_suite
 
 class TableUpdateTimesTest(unittest.TestCase):
@@ -39,7 +38,7 @@ class TableUpdateTimesTest(unittest.TestCase):
             # MySQL-5 provides INFORMATION_SCHEMA:
             query = """SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES
                         WHERE table_name='%s' AND table_schema='%s'""" \
-                        % (tablename, CFG_DATABASE_NAME)
+                        % (tablename, dbquery.CFG_DATABASE_NAME)
             tablename_update_time = str(dbquery.run_sql(query)[0][0])
         elif mysql_server_version.startswith("4.1"):
             # MySQL-4.1 has it on 12th position:
