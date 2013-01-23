@@ -48,8 +48,11 @@ __revision__ = "$Id$"
 
 import os
 import sys
-from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_DATABASE_HOST, \
-     CFG_DATABASE_USER, CFG_DATABASE_PASS, CFG_DATABASE_NAME, CFG_PATH_GZIP
+from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_PATH_GZIP
+from invenio.dbquery import CFG_DATABASE_HOST, \
+                            CFG_DATABASE_USER, \
+                            CFG_DATABASE_PASS, \
+                            CFG_DATABASE_NAME
 from invenio.bibtask import task_init, write_message, task_set_option, \
                             task_get_option, task_update_progress, \
                             task_get_task_param

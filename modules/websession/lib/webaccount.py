@@ -21,6 +21,8 @@ import re
 import MySQLdb
 import urllib
 
+from invenio.dbquery import CFG_DATABASE_HOST, \
+                            CFG_DATABASE_NAME
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_CERN_SITE, \
@@ -29,8 +31,6 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
-     CFG_DATABASE_HOST, \
-     CFG_DATABASE_NAME, \
      CFG_SITE_RECORD
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
