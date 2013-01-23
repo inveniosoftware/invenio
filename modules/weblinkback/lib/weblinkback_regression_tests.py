@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,8 +22,8 @@
 import unittest
 
 from invenio.config import CFG_SITE_URL, \
-                           CFG_SITE_RECORD, \
-                           CFG_DATABASE_NAME
+                           CFG_SITE_RECORD
+from invenio.dbquery import CFG_DATABASE_NAME
 from invenio.testutils import make_test_suite, \
                                    run_test_suite, \
                                    test_web_page_content, \
