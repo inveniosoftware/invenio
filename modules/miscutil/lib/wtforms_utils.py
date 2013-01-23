@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,10 +32,10 @@ import time
 
 from wtforms.widgets import TextInput, HTMLString, html_params
 from wtforms.fields import Field, TextField, HiddenField
-from wtforms import validators
 from flask.ext.wtf import Form
 from wtforms.ext.csrf.session import SessionSecureForm
 from wtforms.compat import text_type
+
 
 class RowWidget(object):
     """
@@ -194,6 +194,14 @@ class FilterTextField(TextField):
         return u''
 
 from flask import session
+from wtforms import Form as WTForm
+
+
+class InvenioForm(WTForm):
+    @property
+    def required_field_names(self):
+        return [field.name for field in self if hasattr(field, 'required')]
+
 
 class InvenioBaseForm(Form, SessionSecureForm):
     SECRET_KEY = 'EPj00jpfj8Gx1SjnyLxwBBSQfnQ9DJYe0Ym'

@@ -1,7 +1,25 @@
-from wtforms import Form, \
-                    SubmitField, \
-                    TextField
+# -*- coding: utf-8 -*-
+# #
+# # This file is part of Invenio.
+# # Copyright (C) 2013 CERN.
+# #
+# # Invenio is free software; you can redistribute it and/or
+# # modify it under the terms of the GNU General Public License as
+# # published by the Free Software Foundation; either version 2 of the
+# # License, or (at your option) any later version.
+# #
+# # Invenio is distributed in the hope that it will be useful, but
+# # WITHOUT ANY WARRANTY; without even the implied warranty of
+# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# # General Public License for more details.
+# #
+# # You should have received a copy of the GNU General Public License
+# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+
+from wtforms import SubmitField
 from wtforms.validators import Required
+from invenio.wtforms_utils import InvenioForm as Form
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, bootstrap_submit
 
@@ -16,7 +34,7 @@ class ArticleForm(Form):
     journal = fields.JournalField(label=_('Journal Title'), validators=[Required()])
     issn = fields.ISSNField(label='ISSN')
     title = fields.TitleField(label=_('Document Title'))
-    author = fields.AuthorField(label=_('Author of the Document'))
+    author = fields.AuthorField(label=_('Author'))
     abstract = fields.AbstractField(label=_('Abstract'))
     pagesnum = fields.PagesNumberField(label=_('Number of Pages'))
     languages = [("en", _("English")), \
@@ -38,7 +56,7 @@ class ArticleForm(Form):
     language = fields.LanguageField(label=_("Language"), choices=languages)
     date = fields.Date(label=_('Date of Document'), widget=date_widget)
     keywords = fields.KeywordsField(label=_('Keywords'))
-    notes = fields.NotesField(label=_('Additional Notes or Comments'))
+    notes = fields.NotesField(label=_('Notes or Comments'))
     file = fields.FileUploadField(label=_('File'))
     plupload_file = fields.FileUploadField(label=_('File'), widget=plupload_widget)
     submit = SubmitField(label=_('Submit Article'), widget=bootstrap_submit)

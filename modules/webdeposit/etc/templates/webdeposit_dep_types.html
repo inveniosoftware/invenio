@@ -1,406 +1,46 @@
 {% extends "page.html" %}
-{% block header %}
-    {{ super() }}
-    {% js 'js/jquery-ui.min.js' %}
-    {% js 'js/plupload.full.js' %}
-    {% js 'js/jquery.plupload.queue.js' %}
-    {% css 'css/jquery.plupload.queue.css' %}
-    {% css 'img/jquery-ui-1.8.23.custom.css' %}
-    
-{% endblock %}
-
 {% block body %}
-<style>
-#link{
-    float: left;
-    position:absolute;
-    font-size: 15px;
-    /*color:#272727;*/
-    color:rgb(59, 89, 152);
-    font-weight:bold;
-}
 
-#link:hover {
-    text-decoration:underline;
-}
+<div class="page-header">
+  <h3>{{ _('Select a Document Type') }}</h3>
+</div>
 
-.l{
-    size: 10px;
-}
-
-div#editable{
-    border: none;
-    z-index:-1;
-    display:none;
-}
-
-div#conditions{
-    border: none;
-    z-index:-1;
-    display:none;
-}
-
-#container {
-  width:550px;
-/*  height: 690px;
-  padding-left: 30px;
-  margin-left: auto ;
-  margin-right: auto ;
-      padding: 20px;*/
-      clear:both;
-      margin-top:10px;
-}
-</style>
-
-<script type=text/javascript>
-  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-</script>
-
-<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
-
-<script type=text/javascript>
-
-    var ajaxRequest = $.ajax({});
-    $(function() {
-        /*$('#submitButton').attr('disabled', 'disabled');
-$('#submitButton').removeAttr('disabled');
-        */
-    });
-
-/* Error checking */
-
-var errors = 0
-var oldJournal;
-
-
-  $(function() {
-    $('input').change( function() {
-        name = this.name;
-        $.getJSON($SCRIPT_ROOT + '_errorCheck', {
-            name: this.name,
-            attribute: $('input[name="'+this.name+'"]').val()
-        }, function(data) {
-          if (data.error == 1) {
-              errorMsg = data.errorMessage; 
-              $('#submitButton').attr('disabled', 'disabled');
-              $('#error-'+name).html(errorMsg);
-              $('#error-'+name).show('slow');
-              errors++;
-          }
-          else {
-              $('#error-'+name).hide('slow');
-              if (errors > 0)
-                  errors--;
-              emptyForm = checkEmptyFields();
-              if (emptyForm[0] == 0){
-                  $('#empty-fields-error').hide('slow');
-              }
-              else {
-                  $('#empty-fields-error').html(emptyForm[1]);
-              }
-              if ( (errors == 0) && ($('#empty-fields-error').css('display') == "none") )
-                      $('#submitButton').removeAttr('disabled');
-          }
-        });
-      return false;
-    });
-  });
-
-  $(function() {
-    $('textarea').change( function() {
-        name = this.name;
-        $.getJSON($SCRIPT_ROOT + '_errorCheck', {
-            name: this.name,
-            attribute: $('textarea[name="'+this.name+'"]').val()
-        }, function(data) {
-          if (data.error == "1"){
-              errorMsg = data.errorMessage;
-              $('#submitButton').attr('disabled', 'disabled');
-              $('#error-'+name).html(errorMsg);
-              $('#error-'+name).show('slow');
-          }
-          else {
-              $('#error-'+name).hide('slow');
-              if (errors > 0)
-                  errors--;
-              emptyForm = checkEmptyFields();
-              if (emptyForm[0] == 0){
-                  $('#empty-fields-error').hide('slow');
-              }
-              else {
-                  $('#empty-fields-error').html(emptyForm[1]);
-                  /*$('#empty-fields-error').show('slow');*/
-              }
-              if ( (errors == 0) && ($('#empty-fields-error').css('display') == "none") )
-                      $('#submitButton').removeAttr('disabled');
-          }
-        });
-      return false;
-    });
-  });
-
-
-  $(function() {
-    $('select').change( function() {
-        name = this.name;
-        $.getJSON($SCRIPT_ROOT + '_errorCheck', {
-            name: this.name,
-            attribute: $('select[name="'+this.name+'"]').val()[0]
-        }, function(data) {
-          if (data.error == "1"){
-              errorMsg = data.errorMessage;
-              $('#submitButton').attr('disabled', 'disabled');
-              $('#error-'+name).html(errorMsg);
-              $('#error-'+name).show('slow');
-          }
-          else {
-              $('#error-'+name).hide('slow');
-              if (errors > 0)
-                  errors--;
-              emptyForm = checkEmptyFields();
-              if (emptyForm[0] == 0){
-                  $('#empty-fields-error').hide('slow');
-              }
-              else {
-                  $('#empty-fields-error').html(emptyForm[1]);
-                  /*$('#empty-fields-error').show('slow');*/
-              }
-              if ( (errors == 0) && ($('#empty-fields-error').css('display') == "none") )
-                      $('#submitButton').removeAttr('disabled');
-          }
-        });
-      return false;
-    });
-  });
-
-$(document).ready(function() {
-
-
-
-  $(function() {
-  
-          
-            $(".datepicker").datepicker();
-        
-  
-      $("#submitButton").click(function(e ) {
-          e.preventDefault();
-          emptyForm = checkEmptyFields();
-          if (emptyForm[0] == 0){
-              $('#submitButton').removeAttr('disabled');
-              $('#empty-fields-error').hide('slow');
-              /*$('#submitForm').trigger('action');*/
-              document.getElementById("submitForm").submit();
-          }
-          else {
-              $('#submitButton').attr('disabled', 'disabled');
-              $('#empty-fields-error').html("<a class='close' data-dismiss='alert' href='#'>×</a>" + emptyForm[1]);
-              $('#empty-fields-error').show('slow');
-          }
-      });
-  });
-});
-
-function checkEmptyFields(){
-    var emptyFields = "These fields are empty!</br>";
-    var empty = 0;
-    $(":text, :file, :checkbox, select, textarea").each(function() {
-        if( (($(this).val() === "") || ($(this).val() === null)) && (this.name != "keywords") ) {
-            if (this.name == "keywords2")
-                emptyFields += "- Keywords</br>";
-            else
-                emptyFields += "- "+$("label[for='"+this.name+"']").html() + "</br>";
-            empty = 1;
-        }
-    });
-    return [empty, emptyFields];
-}
-
-/* Sherpa Romeo auto completion "_autocomplete?type=journal" */
-
-function type(o){
-    return !!o && Object.prototype.toString.call(o).match(/(\w+)\]/)[1];
-}
-
-
-$(function() {
-    $("input#journal").autocomplete({
-        source: "_autocomplete?type=journal",
-        open: function(event, ui) {
-            $('div#wait-journal').hide('slow');
-        },
-        minLength: 5,
-        select: function(event, ui) {
-            $('div#wait-journal').hide();
-            $('#conditions').hide();
-            var selected = ui.item.value;
-            $('#conditions').html('<img src="{{ url_for('static', filename='img/loading.gif') }}"/>');
-            $('#conditions').show('slow');
-            
-            $.getJSON($SCRIPT_ROOT + '_errorCheck', {
-                name: 'journal',
-                attribute: selected
-            }, function(data) {});
-            
-            $.getJSON($SCRIPT_ROOT + '_ISSN', {
-                title: selected
-            }, function(data) {
-                  $("input#issn").val(data.issn);
-                  cond = "<strong>Policies</strong>";
-                  if (jQuery.isEmptyObject(data.conditions))
-                      cond += "<strong> not found</strong>";
-                  else {
-                    cond = "";
-                      if( type(data.conditions) === 'String' ) {
-                          cond += data.conditions;
-                      }
-                      else {
-                          cond += "<br><ul>";
-                          $.each(data.conditions, function(index, value) {
-                              cond += "<li>"+value+"</li>";
-                          });
-                          cond += "</ul>";
-                      }
-                  }
-                  $('#conditions').html(cond);
-                  $('#conditions').show('slow');
-            });
-        },
-    });
-
-    $("input#journal").keyup( function() {
-        if ($("input#journal").val().length >= 5){
-            var val = $("input#journal").val();
-            if (val !== oldJournal) {
-                oldJournal = val;
-                if ($("input#journal").val().length >= 5)
-                    $('div#wait-journal').show();
-            }
-            else
-                $('div#wait-journal').hide();
-        }
-    });
-
-
-/*
-    (function () {
-        var oldVal;
-        
-        $('input#journal').bind('DOMAttrModified textInput input change keypress paste focus', function () {
-            var val = this.value;
-            if (val !== oldVal) {
-                oldVal = val;
-                if ($("input#journal").val().length >= 5)
-                    $('div#wait-journal').show();
-            }
-            else
-                $('div#wait-journal').hide();
-        });
-    }());
-*/
-    
-
-    $("input#journal").change( function() {
-        $('#issn').val('');
-        $('#conditions').hide('slow');
-    });
-    
-    $("input#issn").change( function() {
-        $('#conditions').hide('slow');
-    });
-
-    $("input#publisher").autocomplete({
-        source: "_autocomplete?type=publisher",
-        minLength: 5,
-        select: function(event, ui) {
-            var selected = ui.item.value;
-            $.getJSON($SCRIPT_ROOT + '_errorCheck', {
-                name: 'publisher',
-                attribute: selected
-            }, function(data) {});
-        }
-    });
-    
-     $("input#author").autocomplete({
-        source: "_autocomplete?type=author",
-        minLength: 5,
-        select: function(event, ui) {
-            var selected = ui.item.value;
-            $.getJSON($SCRIPT_ROOT + '_errorCheck', {
-                name: 'author',
-                attribute: selected
-            }, function(data) {});
-        }
-    });
-});
-
-$(function() {
-    $("input#publisher").change(function(){
-        
-    });
-});
-
-//////////////////////////////
-
-  $(function() {
-    $('#keywords').keyup( function() {
-        keywords = $('#keywords').val();
-        if (keywords.indexOf(" ") == -1)
-            return;
-        keywordsArr = keywords.split(" ");
-        txt = "";
-        $.each(keywordsArr, function(index, value) {
-            if (value != "")
-                txt += "<div class='label label-info' id='"+value+"' style='margin-right:5px;margin-bottom:5px; display:inline-block;padding-right:2px;'><i class='icon-tag icon-white'></i><span style='margin-left:1px;margin-right:1px;'>"+ value +"</span><span id='delete_tag'><i class='icon-remove-sign icon-white' style='margin-left:5px;cursor:pointer;'></i></span></div>"
-        });
-        newtags = $('#editable').html() + txt;
-        $('#editable').html(newtags);
-        $('#keywords').val('');
-        $('#editable').show();
-
-        tempkeywords = $('#keywords2').val();
-        $('#keywords2').val(tempkeywords+" "+keywords);
-        
-    });
-  });
-
-  $('#editable').on("click", "#delete_tag", function(event) {
-        alert(this);
-        alert("click!!!!");
-  });
-
-</script>
-
-
-	    <h3>Select a Document Type</h3>
-	    
-	    
-    <div id="container">
-	
-        <div class="accordion" id="accordion2">
-
-        {% for doc_group, dep_types in docs.items() %}
-        
-          <div class="accordion-group">
-                <div class="accordion-heading">
-                      <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapse{{ loop.index }}">
-                        <i class="icon-list"></i> {{ doc_group }}
-                      </a>
-                </div>
-                <div id="collapse{{ loop.index }}" class="accordion-body collapse">
-                      <div class="accordion-inner">
-                      {% for dep in dep_types %}
-                            <a href="{{ dep.dep_type }}">{{ dep.name }}<br>
-                       {% endfor %}
-                      </div>
-                </div>
-          </div>
-          
+<div class="row">
+  <div id="webdeposit_types_accordion" class="offset3 span6 accordion">
+  {% for doc_group, dep_types in docs.iteritems() %}
+    <div class="accordion-group">
+      <div class="accordion-heading">
+        <h4>
+        <a class="accordion-toggle" data-toggle="collapse"
+           data-parent="#webdeposit_types_accordion"
+           href="#collapse{{ loop.index }}">
+          <i class="icon-list pull-right"></i> {{ doc_group }}
+        </a>
+        </h4>
+      </div>
+      <div id="collapse{{ loop.index }}" class="collapse">
+        <div class="accordion-inner" style="padding: 0px;">
+          <ul class="nav nav-pills nav-stacked" style="margin-bottom: 0px;">
+          {% for dep in dep_types|sort(attribute='name') %}
+            <li>
+              <a href="{{ dep.dep_type }}">
+                <i class="icon-chevron-right pull-right"></i>
+                {{ dep.name }}
+                {% if dep.name in drafts %}
+                &nbsp;
+                <span class="badge badge-important">
+                  {{ drafts[dep.name] }}
+                </span>
+                {% endif %}
+              </a>
+            </li>
           {% endfor %}
-        
+          </ul>
         </div>
-	</div>
-        <div class="alert alert-error" id="empty-fields-error" style="font-size:12px; display:none;"></div>
+      </div>
     </div>
+  {% endfor %}
+  </div>
+</div>
 
 {% endblock %}

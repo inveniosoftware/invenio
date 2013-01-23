@@ -1,10 +1,29 @@
-from sqlalchemy.orm.exc import NoResultFound
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from flask import render_template
 from invenio.webdeposit_model import WebDepositWorkflow
 from invenio.webdeposit_workflow_utils import create_deposition_document
 from invenio.sqlalchemyutils import db
-import uuid as new_uuid
+from uuid import uuid1 as new_uuid
 import json
+
 
 class DepositionWorkflow(object):
     """ class for running sequential workflows
@@ -49,10 +68,10 @@ class DepositionWorkflow(object):
             Allocates a row in the database
         """
         if uuid is None:
-            uuid = new_uuid.uuid1()
+            uuid = new_uuid()
             self.obj['uuid'] = uuid
             # Then the workflow was not created before
-            dep_create = create_deposition_document(self.obj['dep_type'])
+            dep_create = create_deposition_document(self.obj['deposition_type'])
             dep_create(self.obj, self.eng)
         else:
             self.obj['uuid'] = uuid
@@ -64,7 +83,7 @@ class DepositionWorkflow(object):
 
     def set_deposition_type(self, deposition_type=None):
         if deposition_type is not None:
-            self.obj['dep_type'] = deposition_type
+            self.obj['deposition_type'] = deposition_type
 
     def get_status(self):
         return 0
@@ -78,8 +97,8 @@ class DepositionWorkflow(object):
                                              pretty_date
         form = get_form(user_id, uuid)
 
-        dep_type = self.obj['dep_type']
-        drafts = draft_field_get_all(user_id, dep_type, "title")
+        deposition_type = self.obj['deposition_type']
+        drafts = draft_field_get_all(user_id, deposition_type, "title")
         drafts = sorted(drafts,
                         key=lambda draft: draft['timestamp'],
                         reverse=True)
@@ -87,13 +106,11 @@ class DepositionWorkflow(object):
             draft['timestamp'] = pretty_date(draft['timestamp'])
 
         return render_template('webdeposit.html', \
-                               dep_type=dep_type,
+                               workflow=self,
+                               deposition_type=deposition_type,
                                form=form, \
                                drafts=drafts, \
-                               draft_id=uuid)
-
-        from flask.helpers import make_response
-        return make_response("hello world!" + str(self.eng) + self.get_uuid()) #self.eng
+                               uuid=uuid)
 
     def run(self):
         while True:
@@ -140,7 +157,7 @@ class DepositionWorkflow(object):
         # These keys have separate columns
         obj.pop('uuid')
         obj.pop('step')
-        obj.pop('dep_type')
+        obj.pop('deposition_type')
         obj_to_json = json.dumps(obj)
         wf.obj_json = obj_to_json
         db.session.commit()
@@ -160,7 +177,7 @@ class DepositionWorkflow(object):
         # These keys have separate columns
         obj.pop('uuid')
         obj.pop('step')
-        obj.pop('dep_type')
+        obj.pop('deposition_type')
         obj_to_json = json.dumps(obj)
         wf.obj_json = obj_to_json
         db.session.commit()
@@ -172,7 +189,25 @@ class DepositionWorkflow(object):
 
         obj = json.loads(wf.obj_json)
         obj['uuid'] = wf.uuid
-        obj['dep_type'] = wf.dep_type
+        obj['deposition_type'] = wf.dep_type
         obj['step'] = wf.current_step
         self.current_step = wf.current_step
         self.obj = obj
+
+    def cook_json(self):
+        user_id = self.obj['user_id']
+        uuid = self.obj['uuid']
+
+        from invenio.webdeposit_utils import get_form
+
+        json_reader = {}
+        for step in range(self.steps_num):
+            try:
+                form = get_form(user_id, uuid, step)
+                for field in form:
+                    json_reader = field.cook_json(json_reader)
+            except:
+                # some steps don't have any form ...
+                pass
+
+        return json_reader

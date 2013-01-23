@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # #
 # # This file is part of Invenio.
-# # Copyright (C) 2012 CERN.
+# # Copyright (C) 2012, 2013 CERN.
 # #
 # # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
@@ -21,83 +21,42 @@
 import os
 import shutil
 import json
-#from werkzeug import *
 from glob import iglob
-from flask import render_template, \
+from flask import current_app, \
+                  render_template, \
                   request, \
                   jsonify, \
                   redirect, \
                   url_for, \
-                  send_from_directory
+                  flash
+from werkzeug.utils import secure_filename
 
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 
+from invenio.config import CFG_WEBDEPOSIT_UPLOAD_FOLDER
 from invenio.sherpa_romeo import SherpaRomeoSearch
-from invenio.webdeposit_utils import create_dep_type, \
-                                     get_current_form, \
-                                     get_current_step, \
+from invenio.webdeposit_utils import get_current_form, \
                                      draft_field_set, \
                                      draft_field_list_add, \
-                                     delete_draft, \
-                                     draft_field_get_all, \
-                                     pretty_date, \
+                                     delete_workflow, \
                                      create_workflow, \
                                      get_latest_or_new_workflow, \
                                      get_workflow
-from invenio.webdeposit_workflow import DepositionWorkflow
-
-# from invenio.webuser_flask import current_user
+from invenio.webuser_flask import current_user
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
+                              url_prefix='/deposit',
                               config='invenio.websubmit_config',
-                              #breadcrumbs=[(_('Comments'),
-                              #              'webcomment.subscribtions')],
                               menubuilder=[('main.webdeposit',
                                           _('Deposit'),
                                             'webdeposit.add', 2)],
                               breadcrumbs=[(_('Deposit'), 'webdeposit')])
 
-
-@blueprint.route('/webdeposit/<dep_type>/<uuid>/submit', methods=['GET', 'POST'])
-def submit(dep_type, uuid):
-    from invenio.webuser_flask import current_user
-
-    webdep_workflow = get_workflow(dep_type, uuid)
-    webdep_workflow.jump_forward()
-    webdep_workflow.run()
-    status = webdep_workflow.get_status()
-
-    if status == 0:
-        return webdep_workflow.get_output()
-    else:
-        return 'Error form %d' % status
-
-    return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
-
-    if request.method == 'POST':
-        doctitle = request.form['doctitle']
-        author = request.form['author']
-        abstract = request.form['abstract']
-        pagesnum = request.form['pagesnum']
-        language = request.form['language']
-        date = request.form['date']
-        keywords = request.form['keywords']
-        keywords2 = request.form['keywords2']
-        notes = request.form['notes']
-        uploaded_file = request.files['file']
-        filename = secure_filename(uploaded_file.filename)
-        uploaded_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-        return render_template('websubmit_submitted.html', \
-                                doctitle=doctitle, author=author , abstract=abstract , \
-                                pagesnum=pagesnum , language=language , date=date , \
-                                keywords=keywords, keywords2=keywords2, notes=notes , validated=True)
-    else:
-        return render_template('websubmit_submitted.html', validated=False)
-
-
-@blueprint.route('/webdeposit/<dep_type>/_upload', methods=['POST', 'GET'])
-def plupload(dep_type):
+@blueprint.route('/upload/<uuid>', methods=['POST', 'GET'])
+def plupload(uuid):
+    """ The file is splitted in chunks on the client-side
+        and it is merged again on the server-side 
+    """
     if request.method == 'POST':
         try:
             chunks = request.form['chunks']
@@ -106,24 +65,27 @@ def plupload(dep_type):
             chunks = None
             pass
         name = request.form['name']
-
-        upload_folder = '/opt/invenio/var/tmp/webdeposit_uploads'
         current_chunk = request.files['file']
 
         try:
             filename = name + "_" + chunk
         except Exception:
             filename = name
-        current_chunk.save(os.path.join(upload_folder, filename))
 
-        from invenio.webuser_flask import current_user
-        draft_id = get_current_form(current_user.get_id())[0]
+        # check if webdeposit folder exists
+        # FIXME: create filesystem with structure:
+        #        user_id/document/type/filename
+        if not os.path.exists(CFG_WEBDEPOSIT_UPLOAD_FOLDER):
+            os.makedirs(CFG_WEBDEPOSIT_UPLOAD_FOLDER)
 
-        if chunks is None: #file is a single chunk
-            file_path = os.path.join(upload_folder, name)
+        # save the chunk
+        current_chunk.save(os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, filename))
+
+        if chunks is None:  # file is a single chunk
+            file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, name)
 
             draft_field_list_add(current_user.get_id(), \
-                                 draft_id, \
+                                 uuid, \
                                  "files", \
                                  file_path)
         elif int(chunk) == int(chunks) - 1:
@@ -131,32 +93,33 @@ def plupload(dep_type):
                 start merging the chunks'''
 
             chunk_files = []
-            for filename in iglob(os.path.join(upload_folder, name + '_*')):
+            for filename in iglob(os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, name + '_*')):
                 chunk_files.append(filename)
 
             #Sort files in numerical order
             chunk_files.sort(key=lambda x: int(x.split("_")[-1]))
 
-            file_path = os.path.join(upload_folder, name)
+            file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, name)
             destination = open(file_path, 'wb')
             for filename in chunk_files:
                 shutil.copyfileobj(open(filename, 'rb'), destination)
             destination.close()
 
             draft_field_list_add(current_user.get_id(), \
-                                 draft_id, \
+                                 uuid, \
                                  "files", \
                                  file_path)
     return ""
 
 
-@blueprint.route('/webdeposit/<dep_type>/_autocomplete/<uuid>', \
+@blueprint.route('/<deposition_type>/_autocomplete/<uuid>',
                  methods=['GET', 'POST'])
-def autocomplete(dep_type, uuid):
-    from invenio.webuser_flask import current_user
-
-    query = request.args.get('term')
-    field_type = request.args.get('type')
+def autocomplete(deposition_type, uuid):
+    """ Returns a list with of suggestions for the field
+        based on the current value
+    """
+    query = request.args.get('term') # value
+    field_type = request.args.get('type') # field
 
     form = get_current_form(current_user.get_id(), uuid=uuid)[1]
     form.__dict__["_fields"][field_type].process_data(query)
@@ -168,10 +131,9 @@ def autocomplete(dep_type, uuid):
         return []
 
 
-@blueprint.route('/webdeposit/<dep_type>/_ISSN/<uuid>', methods=['GET', 'POST'])
+@blueprint.route('/<deposition_type>/_ISSN/<uuid>', methods=['GET', 'POST'])
 # @cache.cached(timeout=50, key_prefix='issn')
-def autocomplete_ISSN_Conditions(dep_type, uuid):
-    from invenio.webuser_flask import current_user
+def autocomplete_ISSN_Conditions(deposition_type, uuid):
     query = request.args.get('title')
 
     s = SherpaRomeoSearch()
@@ -196,37 +158,41 @@ def autocomplete_ISSN_Conditions(dep_type, uuid):
     return json.dumps(response)
 
 
-@blueprint.route('/webdeposit/<dep_type>/_errorCheck/<uuid>')
-def error_check(dep_type, uuid):
-    val = request.args.get('attribute')
+@blueprint.route('/<deposition_type>/_errorCheck/<uuid>')
+def error_check(deposition_type, uuid):
+    """ Used for field error checking
+    """
+    value = request.args.get('attribute')
     field_name = request.args.get('name')
 
-    from invenio.webuser_flask import current_user
-
-
-    # draft_id, form = get_current_form(user_id)
-    # form_type = form.__class__.__name__
+    if field_name == "":
+        return "{}"
 
     subfield_name = None
     if '-' in field_name:
         field_name, subfield_name = field_name.split('-')
 
-    draft_field_set(current_user.get_id(), uuid, field_name, val, subfield_name)
-    draft_id, form = get_current_form(current_user.get_id(), uuid=uuid)
+    draft_field_set(current_user.get_id(),
+                    uuid,
+                    field_name,
+                    value,
+                    subfield_name)
+    uuid, form = get_current_form(current_user.get_id(), uuid=uuid)
 
 
-    if field_name == "issn" or field_name == "journal":
-        draft_field_set(current_user.get_id(), draft_id, "conditions", None)
+    #if field_name == "issn" or field_name == "journal":
+    #    draft_field_set(current_user.get_id(), uuid, "conditions", None)
 
     try:
-        form.__dict__["_fields"][field_name].process_data(val)
-    except  (KeyError, AttributeError) as e:
-        # check for form_field
+        # insert value into the form
+        form.__dict__["_fields"][field_name].process_data(value)
+    except  (KeyError, AttributeError):
+        # check for subfield
         if subfield_name is not None:
 
             form = form.__dict__["_fields"][field_name].form
             field_name = subfield_name
-            form.__dict__["_fields"][field_name].process_data(val)
+            form.__dict__["_fields"][field_name].process_data(value)
         else:
             return jsonify({"error_message": "Couldn't perform error checking", \
                             "error": 0})
@@ -238,156 +204,98 @@ def error_check(dep_type, uuid):
     return json_response
 
 
-@blueprint.route('/webdeposit/<dep_type>/webdeposit_delete/<uuid>')
-def delete(dep_type, uuid=None):
-    from invenio.webuser_flask import current_user
-
-    latest_draft_id = delete_draft(current_user.get_id(), dep_type, uuid)
-
+@blueprint.route('/<deposition_type>/delete/<uuid>')
+def delete(deposition_type, uuid):
+    """ Deletes the whole deposition with uuid=uuid
+        (including form drafts)
+        redirects to load another workflow
+    """
+    delete_workflow(current_user.get_id(), deposition_type, uuid)
+    flash(_('Deposition %s deleted!') % (uuid,), 'error')
     return redirect(url_for("webdeposit.add", \
-                            dep_type=dep_type, \
-                            uuid=latest_draft_id))
+                            deposition_type=deposition_type))
 
 
-@blueprint.route('/webdeposit/<dep_type>/new/')
-def create_new(dep_type):
-    from invenio.webuser_flask import current_user
-
-    workflow = create_workflow(current_user.get_id(), dep_type)
+@blueprint.route('/<deposition_type>/new/')
+def create_new(deposition_type):
+    """ Creates new deposition
+    """
+    workflow = create_workflow(current_user.get_id(), deposition_type)
     uuid = workflow.get_uuid()
-    workflow.run()
-    status = workflow.get_status()
-    if status == 0:
-        return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
-        return workflow.get_output()
-    else:
-        return 'Error form %d' % status
-    return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
+    flash(_('Deposition %s created!') % (uuid,), 'info')
+    return redirect(url_for("webdeposit.add", deposition_type=deposition_type, uuid=uuid))
 
 
-@blueprint.route('/webdeposit')
-@blueprint.route('/webdeposit/')
-@blueprint.route('/webdeposit/<dep_type>')
-@blueprint.route('/webdeposit/<dep_type>/<uuid>')
-def add(dep_type=None, uuid=None):
-    from invenio.webuser_flask import current_user
+@blueprint.route('/')
+@blueprint.route('/<deposition_type>')
+@blueprint.route('/<deposition_type>/')
+@blueprint.route('/<deposition_type>/<uuid>', methods=['GET', 'POST'])
+def add(deposition_type=None, uuid=None):
+    """
+    FIXME: add documentation
+    """
 
-    if dep_type is None:
+    status = 0
+
+    if deposition_type is None:
         # choose deposition type
         return render_dep_types()
     elif uuid is None:
         # get the latest one. if there is no workflow created
         # lets create a new workflow with given deposition type
-        workflow = get_latest_or_new_workflow(dep_type)
-        workflow.run()
+        workflow = get_latest_or_new_workflow(deposition_type)
         uuid = workflow.get_uuid()
-        status = workflow.get_status()
-        if status == 0:
-            return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
-        ##draft_id, form = get_current_form(current_user.get_id(), dep_type)
+        #flash(_('Deposition %s') % (uuid,), 'info')
+        return redirect(url_for('.add', deposition_type=deposition_type, uuid=uuid))
     else:
         # get workflow with specific uuid
-        workflow = get_workflow(dep_type, uuid)
-        ##draft_id, form = get_current_form(current_user.get_id(), uuid=uuid)
+        workflow = get_workflow(deposition_type, uuid)
+
+    current_app.config['breadcrumbs_map'][request.endpoint] = [
+                    (_('Home'), '')] + blueprint.breadcrumbs + [(deposition_type, None)]
+
+    if request.method == 'POST':
+        # Save the file
+        try:
+            uploaded_file = request.files['file']
+            filename = secure_filename(uploaded_file.filename)
+        except KeyError: # there is no file
+            filename = ''
+
+        if filename != '': # if exists
+            file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, filename)
+            uploaded_file.save(file_path)
+            draft_field_list_add(current_user.get_id(), \
+                     uuid, \
+                     "files", \
+                     file_path)
+
+        # Submission, proceed to the next steps
+        workflow.jump_forward()
 
     workflow.run()
     status = workflow.get_status()
 
     if status == 0:
+        # render current step of the workflow
         return workflow.get_output()
     else:
         return 'Error form %d' % status
 
-    #FIXME remove below vvvvvvvvvvvvvvvvvv
 
-
-#    else:
- #       return redirect(url_for("webdeposit.add", \
-#                                dep_type=dep_type, \
-#                                uuid=draft_id))
-
-    drafts = draft_field_get_all(current_user.get_id(), \
-                                 dep_type, \
-                                 "title")
-    drafts = sorted(drafts, key=lambda draft: draft['timestamp'], reverse=True)
-    for draft in drafts:
-        draft['timestamp'] = pretty_date(draft['timestamp'])
-
-    #blueprint.breadcrumbs = [('Deposit', 'webdeposit'), (dep_type, 'webdeposit.add')]
-    blueprint.invenio_set_breadcrumb(dep_type)
-    return render_template('webdeposit.html', \
-                           dep_type=dep_type,
-                           form=form, \
-                           drafts=drafts, \
-                           draft_id=draft_id)
-
-    """
-    form = ArticleForm()
-    form_type = form.__class__.__name__
-
-    if current_user.get_id() == 0:
-        form._drafting = False
-    if not form._drafting: #if guest user or drafting is not enabled
-        return render_template('websubmit_add.html', form=form, drafts=[])
-
-    if draft_id is None: #get the latest draft
-
-        draft_id = get_current_draft(current_user.get_id()).draft_id
-
-        if draft_id is None:
-            draft_id = new_draft(current_user.get_id(), form_type)
-            return redirect(url_for("websubmit.add", draft_id=draft_id))
-
-        draft = get_draft(current_user.get_id(), draft_id, form_type)
-
-    elif draft_id == 0:
-        draft_id = new_draft(current_user.get_id(), form_type)
-        return redirect(url_for("websubmit.add", draft_id=draft_id))
-        draft = get_draft(current_user.get_id(), str(draft_id))
-    else:
-        draft = get_draft(current_user.get_id(), draft_id, form_type)
-        if draft is None:
-            draft_id = new_draft(current_user.get_id())
-            return redirect(url_for("websubmit.add", draft_id=draft_id))
-
-    set_current_draft(current_user.get_id(), draft_id)
-
-    for fieldName, fieldData in form.data.iteritems():
-        if fieldName in draft:
-            form[fieldName].process_data(draft[fieldName])
-
-    conditions = draft_field_get(current_user.get_id(), draft_id, form_type, "conditions")
-    drafts = draft_field_get_all(current_user.get_id(), form_type, "title")
-    if not isinstance(conditions, str) and conditions is not None :
-        conds = []
-        for condition in conditions:
-            conds.append(escape(condition))
-        conditions = conds
-        return render_template('websubmit_add.html', \
-                               form=form, \
-                               conditions=conditions, \
-                               drafts=drafts, \
-                               draft_id=draft_id)
-    elif conditions is not None:
-        conditions = [escape(conditions)]
-        return render_template('websubmit_add.html', \
-                               form=form, \
-                               conditions=conditions, \
-                               drafts=drafts, \
-                               draft_id=draft_id)
-    else:
-        return render_template('websubmit_add.html', \
-                               form=form, \
-                               drafts=drafts, \
-                               draft_id=draft_id)
-    """
-
+from invenio.sqlalchemyutils import db
+from invenio.webdeposit_model import WebDepositDraft
+from invenio.webdeposit_load_dep_types import dep_types
 
 def render_dep_types():
-    """
-    Renders the doc types(workflows) list
-    """
-    from webdeposit_load_dep_types import dep_types
+    """ Renders the deposition types (workflows) list """
+    current_app.config['breadcrumbs_map'][request.endpoint] = [
+                        (_('Home'), '')] + blueprint.breadcrumbs
+
+    drafts = dict(db.session.query(WebDepositDraft.dep_type,
+                    db.func.count(db.func.distinct(WebDepositDraft.uuid))).\
+                  filter(WebDepositDraft.user_id == current_user.get_id()).\
+                  group_by(WebDepositDraft.dep_type).all())
 
     return render_template('webdeposit_dep_types.html', \
-                           docs=dep_types)
+                           docs=dep_types, drafts=drafts)
