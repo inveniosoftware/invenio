@@ -258,6 +258,7 @@ def create_new(dep_type):
     workflow.run()
     status = workflow.get_status()
     if status == 0:
+        return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
         return workflow.get_output()
     else:
         return 'Error form %d' % status
@@ -278,6 +279,11 @@ def add(dep_type=None, uuid=None):
         # get the latest one. if there is no workflow created
         # lets create a new workflow with given deposition type
         workflow = get_latest_or_new_workflow(dep_type)
+        workflow.run()
+        uuid = workflow.get_uuid()
+        status = workflow.get_status()
+        if status == 0:
+            return redirect(url_for("webdeposit.add", dep_type=dep_type, uuid=uuid))
         ##draft_id, form = get_current_form(current_user.get_id(), dep_type)
     else:
         # get workflow with specific uuid

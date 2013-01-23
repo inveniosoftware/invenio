@@ -6,9 +6,9 @@ __all__ = ['AuthorField']
 
 class AuthorField(TextField):
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-user"></i>'
-        super(AuthorField, self).__init__(name, **kwargs)
+        super(AuthorField, self).__init__(**kwargs)
 
     def pre_validate(self):
         return dict(error=0, error_message='')

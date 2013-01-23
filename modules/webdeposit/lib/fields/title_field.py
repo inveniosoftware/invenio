@@ -5,9 +5,9 @@ __all__ = ['TitleField']
 
 class TitleField(TextField):
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-book"></i>'
-        super(TitleField, self).__init__(name, **kwargs)
+        super(TitleField, self).__init__(**kwargs)
 
     def pre_validate(self):
         value = self.data

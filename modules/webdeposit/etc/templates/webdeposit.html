@@ -85,9 +85,9 @@ $(function() {
 
     var ajaxRequest = $.ajax({});
     $(function() {
-        /*$('#submitButton').attr('disabled', 'disabled');
+        /* $('#submitButton').attr('disabled', 'disabled'); */
 $('#submitButton').removeAttr('disabled');
-        */
+        
     });
 
 /* Error checking */
@@ -105,7 +105,7 @@ var oldJournal;
         }, function(data) {
           if (data.error == 1) {
               errorMsg = data.error_message; 
-              $('#submitButton').attr('disabled', 'disabled');
+              /* $('#submitButton').attr('disabled', 'disabled'); */
               $('#error-'+name).html(errorMsg);
               $('#error-'+name).show('slow');
               errors++;
@@ -140,7 +140,7 @@ var oldJournal;
         }, function(data) {
           if (data.error == "1"){
               errorMsg = data.error_message;
-              $('#submitButton').attr('disabled', 'disabled');
+              /* $('#submitButton').attr('disabled', 'disabled'); */
               $('#error-'+name).html(errorMsg);
               $('#error-'+name).show('slow');
           }
@@ -174,7 +174,7 @@ var oldJournal;
         }, function(data) {
           if (data.error == "1"){
               errorMsg = data.error_message;
-              $('#submitButton').attr('disabled', 'disabled');
+              /* $('#submitButton').attr('disabled', 'disabled'); */
               $('#error-'+name).html(errorMsg);
               $('#error-'+name).show('slow');
           }
@@ -206,7 +206,7 @@ $(document).ready(function() {
 
       $(".datepicker").datepicker();
 
-      $("#submitButton").click(function(e ) {
+      $("input#submitButton").click(function(e ) {
           e.preventDefault();
           emptyForm = checkEmptyFields();
           if (emptyForm[0] == 0){
@@ -216,7 +216,7 @@ $(document).ready(function() {
               document.getElementById("submitForm").submit();
           }
           else {
-              $('#submitButton').attr('disabled', 'disabled');
+              /* $('#submitButton').attr('disabled', 'disabled'); */
               $('#empty-fields-error').html("<a class='close' data-dismiss='alert' href='#'>×</a>" + emptyForm[1]);
               $('#empty-fields-error').show('slow');
           }
@@ -224,19 +224,30 @@ $(document).ready(function() {
   });
 });
 
+
 function checkEmptyFields(){
-    var emptyFields = "These fields are empty!</br>";
+    var emptyFields = "These fields are required!</br>";
     var empty = 0;
     $(":text, :file, :checkbox, select, textarea").each(function() {
-        if( (($(this).val() === "") || ($(this).val() === null)) && (this.name != "keywords") ) {
-            if (this.name == "keywords2")
-                emptyFields += "- Keywords</br>";
-            else
-                emptyFields += "- "+$("label[for='"+this.name+"']").html() + "</br>";
-            empty = 1;
+    {# Run the checks only for fields that are required #}
+    if ( false {% for field in form %} {% if field.required %} || (this.name == "{{ field.name }}") {% endif %} {% endfor %} ) {
+            if( (($(this).val() === "") || ($(this).val() === null)) && (this.name != "keywords") ) {
+                if (this.name == "keywords2")
+                    emptyFields += "- Keywords</br>";
+                else
+                    emptyFields += "- "+$("label[for='"+this.name+"']").html() + "</br>";
+                $('#error-'+this.name).html(this.name + " field is required!");
+                $('#error-'+this.name).show('slow');
+                empty = 1;
+            }
+            else 
+                $('#error-'+this.name).hide('slow');
         }
     });
-    return [0, emptyFields];
+    if (empty == 1) 
+        return [1, emptyFields];
+    else
+        return [0, emptyFields];
 }
 
 /* Sherpa Romeo auto completion "_autocomplete?type=journal" */
@@ -475,7 +486,7 @@ $(function() {
                     </div>
             </td>
         </tr>
-        <tr style="display:none;">
+        <tr>
             <td colspan="2">
             <div class="alert alert-error" id="error-{{ field.name }}" style="font-size:12px; display:none;">error message</div>
             </td>

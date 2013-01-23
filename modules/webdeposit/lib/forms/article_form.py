@@ -1,6 +1,7 @@
 from wtforms import Form, \
-                    SubmitField
-
+                    SubmitField, \
+                    TextField
+from wtforms.validators import Required
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, bootstrap_submit
 

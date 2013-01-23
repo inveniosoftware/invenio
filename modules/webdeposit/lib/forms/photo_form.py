@@ -14,16 +14,16 @@ __all__ = ['PhotoForm']
 
 
 class Dimensions(Form):
-    height = TextField('Height')
-    width = TextField('Width')
+    height = TextField(label=_('Height'))
+    width = TextField(label=_('Width'))
 
 
 class PhotoForm(Form):
 
     title = fields.TitleField(label=_('Photo Title'))
     dimensions = FormField(Dimensions)
-    file = FileField(_('File'))
-    submit = SubmitField(_('Submit Photo'), widget=bootstrap_submit)
+    file = FileField(label=_('File'))
+    submit = SubmitField(label=_('Submit Photo'), widget=bootstrap_submit)
 
     #configuration variables
     _title = _("Submit a Photo")

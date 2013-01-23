@@ -5,9 +5,9 @@ __all__ = ['PagesNumberField']
 
 class PagesNumberField(TextField):
 
-    def __init__(self, name, **kwargs):
+    def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-th"></i>'
-        super(PagesNumberField, self).__init__(name, **kwargs)
+        super(PagesNumberField, self).__init__(**kwargs)
 
     def pre_validate(self):
         value = self.data
