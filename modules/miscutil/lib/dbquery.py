@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -73,6 +73,7 @@ try:
                                        CFG_DATABASE_NAME, \
                                        CFG_DATABASE_USER, \
                                        CFG_DATABASE_PASS, \
+                                       CFG_DATABASE_TYPE, \
                                        CFG_DATABASE_SLAVE
 except ImportError:
     CFG_DATABASE_HOST = 'localhost'
@@ -80,6 +81,7 @@ except ImportError:
     CFG_DATABASE_NAME = 'invenio'
     CFG_DATABASE_USER = 'invenio'
     CFG_DATABASE_PASS = 'my123p$ss'
+    CFG_DATABASE_TYPE = 'mysql'
     CFG_DATABASE_SLAVE = ''
 
 
