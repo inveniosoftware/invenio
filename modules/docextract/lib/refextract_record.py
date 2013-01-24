@@ -160,11 +160,6 @@ def build_reference_fields(citation_elements, line_marker, inspire_format=None):
 
     reference_fields = [current_field]
 
-    ## This will hold the ordering of tags which have been appended to the xml line
-    ## This list will be used to control the desisions involving the creation of new citation lines
-    ## (in the event of a new set of authors being recognised, or strange title ordering...)
-    line_elements = []
-
     for element in citation_elements:
         ## Before going onto checking 'what' the next element is, handle misc text and semi-colons
         ## Multiple misc text subfields will be compressed later
@@ -178,12 +173,10 @@ def build_reference_fields(citation_elements, line_marker, inspire_format=None):
         # JOURNAL
         if element['type'] == "JOURNAL":
             add_journal_subfield(current_field, element, inspire_format)
-            line_elements.append(element)
 
         # REPORT NUMBER
         elif element['type'] == "REPORTNUMBER":
             add_subfield(current_field, 'reportnumber', element['report_num'])
-            line_elements.append(element)
 
         # URL
         elif element['type'] == "URL":
@@ -194,12 +187,10 @@ def build_reference_fields(citation_elements, line_marker, inspire_format=None):
             else:
                 add_subfield(current_field, 'url', element['url_string'])
                 add_subfield(current_field, 'urldesc', element['url_desc'])
-            line_elements.append(element)
 
         # DOI
         elif element['type'] == "DOI":
             add_subfield(current_field, 'doi', element['doi_string'])
-            line_elements.append(element)
 
         # AUTHOR
         elif element['type'] == "AUTH":
@@ -208,37 +199,29 @@ def build_reference_fields(citation_elements, line_marker, inspire_format=None):
                 value = "(%s)" % value
 
             add_subfield(current_field, 'author', value)
-            line_elements.append(element)
 
         elif element['type'] == "QUOTED":
             add_subfield(current_field, 'title', element['title'])
-            line_elements.append(element)
 
         elif element['type'] == "ISBN":
             add_subfield(current_field, 'isbn', element['ISBN'])
-            line_elements.append(element)
 
         elif element['type'] == "BOOK":
             add_subfield(current_field, 'title', element['title'])
-            line_elements.append(element)
 
         elif element['type'] == "PUBLISHER":
             add_subfield(current_field, 'publisher', element['publisher'])
-            line_elements.append(element)
 
         elif element['type'] == "YEAR":
             add_subfield(current_field, 'year', element['year'])
-            line_elements.append(element)
 
         elif element['type'] == "COLLABORATION":
             add_subfield(current_field,
                          'collaboration',
                          element['collaboration'])
-            line_elements.append(element)
 
         elif element['type'] == "RECID":
             add_subfield(current_field, 'recid', str(element['recid']))
-            line_elements.append(element)
 
     for field in reference_fields:
         merge_misc(field)

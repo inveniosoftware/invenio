@@ -498,12 +498,6 @@ def add_tagged_report_number(reading_line,
     else:
         rebuilt_line += reading_line[startpos:true_replacement_index]
 
-    # check to see whether the REPORT-NUMBER was enclosed within brackets;
-    # drop them if so:
-    if reading_line[true_replacement_index - 1] not in (u"[", u"("):
-        # no braces enclosing the REPORT-NUMBER:
-        rebuilt_line += reading_line[true_replacement_index - 1]
-
     # Add the tagged REPORT-NUMBER into the rebuilt-line segment:
     rebuilt_line += u"<cds.REPORTNUMBER>%(reportnum)s</cds.REPORTNUMBER>" \
                         % {'reportnum' : reportnum}
@@ -871,20 +865,22 @@ def identify_and_tag_authors(line, authors_kb):
     """Given a reference, look for a group of author names,
        place tags around the author group, return the newly tagged line.
     """
-
     # Replace authors which do not convert well from utf-8
     for pattern, repl in authors_kb:
         line = line.replace(pattern, repl)
 
     output_line = line
 
-    line = strip_tags(unidecode(line))
-    if len(line) != len(output_line):
-        output_line = unidecode(output_line)
-        line = strip_tags(output_line)
+    # We matched authors here
+    line = strip_tags(output_line)
+    matched_authors = list(re_auth.finditer(line))
+    # We try to have better results by unidecoding
+    unidecoded_line = strip_tags(unidecode(output_line))
+    matched_authors_unidecode = list(re_auth.finditer(unidecoded_line))
 
-    # Find as many author groups (collections of author names) as possible from the 'title-hidden' line
-    matched_authors = re_auth.finditer(line)
+    if len(matched_authors_unidecode) > len(matched_authors):
+        output_line = unidecode(output_line)
+        matched_authors = matched_authors_unidecode
 
     # If there is at least one matched author group
     if matched_authors:
@@ -1237,6 +1233,7 @@ def identify_report_numbers(line, kb_reports):
             # (this will replace chars in the lower-cased line):
             line = line[0:repnum_match.start(1)] \
                    + "_"*len(repnum_match.group(1)) + line[repnum_match.end(1):]
+
             # record the information about the matched preprint report number:
             # total length in the line of the matched preprint report number:
             repnum_matches_matchlen[repnum_match.start(1)] = \

@@ -24,24 +24,31 @@ Sends references to parse through bibsched
 """
 
 import sys
+import os
 from datetime import datetime, timedelta
+from tempfile import mkstemp
 
 from invenio.bibtask import task_init, task_set_option, \
                             task_get_option, write_message
 from invenio.config import CFG_VERSION, \
                            CFG_SITE_SECURE_URL, \
                            CFG_BIBCATALOG_SYSTEM, \
-                           CFG_REFEXTRACT_TICKET_QUEUE
+                           CFG_REFEXTRACT_TICKET_QUEUE, \
+                           CFG_INSPIRE_SITE
 from invenio.dbquery import run_sql
 from invenio.search_engine import perform_request_search
 # Help message is the usage() print out of how to use Refextract
 from invenio.refextract_cli import HELP_MESSAGE, DESCRIPTION
-from invenio.refextract_api import update_references, \
+from invenio.refextract_api import extract_references_from_record, \
                                    FullTextNotAvailable, \
-                                   RecordHasReferences
+                                   check_record_for_refextract
+from invenio.refextract_config import CFG_REFEXTRACT_FILENAME
+from invenio.config import CFG_TMPSHAREDDIR
+from invenio.bibtask import task_low_level_submission
 from invenio.docextract_task import task_run_core_wrapper, \
                                     split_ids
 from invenio.docextract_utils import setup_loggers
+from invenio.docextract_record import print_records
 from invenio.bibcatalog_system_rt import BibCatalogSystemRT
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_instances, \
@@ -116,24 +123,34 @@ def cb_parse_option(key, value, opts, args):
 
 
 def create_ticket(recid, bibcatalog_system, queue=CFG_REFEXTRACT_TICKET_QUEUE):
-    write_message('bibcatalog_system %s' % bibcatalog_system, verbose=1)
-    write_message('queue %s' % queue, verbose=1)
+    write_message('ticket system: %s' % bibcatalog_system.__class__.__name__)
+    write_message('queue: %s' % queue)
     if bibcatalog_system and queue:
+        results = bibcatalog_system.ticket_search(None,
+                                                  recordid=recid,
+                                                  queue=queue)
+        if results:
+            write_message("Ticket #%s found" % results[0])
+        else:
+            _create_ticket(recid, bibcatalog_system, queue)
 
-        subject = "Refs for #%s" % recid
 
+def _create_ticket(recid, bibcatalog_system, queue):
+    subject = "Refs for #%s" % recid
+
+    if CFG_INSPIRE_SITE:
         # Add report number in the subjecet
         report_number = ""
         record = get_bibrecord(recid)
 
-        in_hep = False
+        in_core = False
         for collection_tag in record_get_field_instances(record, "980"):
             for collection in field_get_subfield_values(collection_tag, 'a'):
-                if collection == 'HEP':
-                    in_hep = True
+                if collection == 'CORE':
+                    in_core = True
 
         # Only create tickets for HEP
-        if not in_hep:
+        if not in_core:
             write_message("not in hep", verbose=1)
             return
 
@@ -154,15 +171,15 @@ def create_ticket(recid, bibcatalog_system, queue=CFG_REFEXTRACT_TICKET_QUEUE):
                 subject += " " + report_number
                 break
 
-        text = '%s/record/edit/#state=edit&recid=%s' % (CFG_SITE_SECURE_URL, \
-                                                        recid)
-        bibcatalog_system.ticket_submit(subject=subject,
-                                        queue=queue,
-                                        text=text,
-                                        recordid=recid)
+    text = '%s/record/edit/#state=edit&recid=%s' % (CFG_SITE_SECURE_URL,
+                                                    recid)
+    bibcatalog_system.ticket_submit(subject=subject,
+                                    queue=queue,
+                                    text=text,
+                                    recordid=recid)
 
 
-def task_run_core(recid, bibcatalog_system=None, _arxiv=False):
+def task_run_core(recid, records, bibcatalog_system=None, _arxiv=False):
     setup_loggers(None, use_bibtask=True)
 
     if _arxiv:
@@ -171,23 +188,39 @@ def task_run_core(recid, bibcatalog_system=None, _arxiv=False):
         overwrite = not task_get_option('no-overwrite')
 
     try:
-        update_references(recid,
-                          overwrite=overwrite)
+        record = extract_references_from_record(recid)
         msg = "Extracted references for %s" % recid
+        safe_to_extract = True
         if overwrite:
             write_message("%s (overwrite)" % msg)
         else:
             write_message(msg)
+            if not check_record_for_refextract(recid):
+                write_message('Record not safe for re-extraction, skipping')
+                safe_to_extract = False
 
-        # Create a RT ticket if necessary
-        if not _arxiv and task_get_option('new') \
-                                    or task_get_option('create-ticket'):
-            write_message("Checking if we should create a ticket", verbose=1)
-            create_ticket(recid, bibcatalog_system)
+        if safe_to_extract:
+            records.append(record)
+            # Create a RT ticket if necessary
+            if task_get_option('new') or task_get_option('create-ticket'):
+                create_ticket(recid, bibcatalog_system)
     except FullTextNotAvailable:
         write_message("No full text available for %s" % recid)
-    except RecordHasReferences:
-        write_message("Record %s has references, skipping" % recid)
+
+
+def submit_bibupload(bibcatalog_system=None, records=None):
+    if records:
+        references_xml = print_records(records)
+
+        # Save new record to file
+        temp_fd, temp_path = mkstemp(prefix=CFG_REFEXTRACT_FILENAME,
+                                     dir=CFG_TMPSHAREDDIR)
+        temp_file = os.fdopen(temp_fd, 'w')
+        temp_file.write(references_xml)
+        temp_file.close()
+
+        # Update record
+        task_low_level_submission('bibupload', 'refextract', '-c', temp_path)
 
 
 def main():
@@ -197,7 +230,7 @@ def main():
     else:
         bibcatalog_system = None
 
-    extra_vars = {'bibcatalog_system': bibcatalog_system}
+    extra_vars = {'bibcatalog_system': bibcatalog_system, 'records': []}
     # Build and submit the task
     task_init(authorization_action='runrefextract',
         authorization_msg="Refextract Task Submission",
@@ -248,4 +281,5 @@ def main():
         task_submit_check_options_fnc=check_options,
         task_run_fnc=task_run_core_wrapper('refextract',
                                            task_run_core,
-                                           extra_vars=extra_vars))
+                                           extra_vars=extra_vars,
+                                           post_process=submit_bibupload))

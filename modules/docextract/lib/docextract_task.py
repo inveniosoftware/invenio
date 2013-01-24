@@ -34,10 +34,12 @@ from invenio.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 
 
-def task_run_core_wrapper(name, core_func, extra_vars=None):
+def task_run_core_wrapper(name, core_func, extra_vars=None, post_process=None):
     def fun():
         try:
-            return task_run_core(name, core_func, extra_vars)
+            return task_run_core(name, core_func,
+                                 extra_vars=extra_vars,
+                                 post_process=post_process)
         except Exception:
             # Remove extra '\n'
             write_message(traceback.format_exc()[:-1])
@@ -158,7 +160,7 @@ def process_records(name, records, func, extra_vars):
         count += 1
 
 
-def task_run_core(name, func, extra_vars=None):
+def task_run_core(name, func, extra_vars=None, post_process=None):
     """Calls extract_references in refextract"""
     if task_get_option('task_specific_name'):
         name = "%s:%s" % (name, task_get_option('task_specific_name'))
@@ -175,6 +177,9 @@ def task_run_core(name, func, extra_vars=None):
         arxiv_name = "%s:arxiv" % name
         records = fetch_concerned_arxiv_records(arxiv_name)
         process_records(arxiv_name, records, func, extra_vars)
+
+    if post_process:
+        post_process(**extra_vars)
 
     write_message("Complete")
     return True

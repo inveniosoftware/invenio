@@ -44,6 +44,7 @@ modules/bibrecord/bin/xmlmarc2textmarc
 modules/bibrecord/bin/xmlmarclint
 modules/docextract/bin/refextract
 modules/docextract/bin/docextract
+modules/docextract/bin/convert_journals
 modules/bibencode/bin/bibencode
 modules/bibexport/bin/bibexport
 modules/bibformat/bin/bibreformat

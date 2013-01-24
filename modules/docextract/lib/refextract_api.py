@@ -150,7 +150,7 @@ def extract_references_from_string(source,
     return parse_references(reflines, recid=recid)
 
 
-def extract_references_from_record_xml(recid):
+def extract_references_from_record(recid):
     """Extract references from a record id
 
     The single parameter is the document
@@ -160,7 +160,16 @@ def extract_references_from_record_xml(recid):
     if not path:
         raise FullTextNotAvailable()
 
-    return extract_references_from_file_xml(path, recid=recid)
+    return extract_references_from_file(path, recid=recid)
+
+
+def extract_references_from_record_xml(recid):
+    """Extract references from a record id
+
+    The single parameter is the document
+    The result is given in marcxml.
+    """
+    return extract_references_from_record(recid).to_xml()
 
 
 def replace_references(recid):
@@ -297,3 +306,25 @@ def search_from_reference(text):
                 break
 
     return field, pattern.encode('utf-8')
+
+
+def check_record_for_refextract(recid):
+    if get_fieldvalues(recid, '999C6v'):
+        # References extracted by refextract
+        if get_fieldvalues(recid, '999C59'):
+            # They have been curated
+            # To put in the HP and create ticket in the future
+            needs_submitting = False
+        else:
+            # They haven't been curated, we safely extract from the new pdf
+            needs_submitting = True
+    elif not get_fieldvalues(recid, '999C5_'):
+        # No references in the record, we can safely extract
+        # new references
+        needs_submitting = True
+    else:
+        # Old record, with either no curated references or references
+        # curated by SLAC. We cannot distinguish, so we do nothing
+        needs_submitting = False
+
+    return needs_submitting

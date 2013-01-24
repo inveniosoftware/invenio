@@ -54,6 +54,13 @@ def get_author_affiliation_numeration_str(punct=None):
     return numeration_str
 
 
+letter_re = re.compile(ur'(\w)', re.U)
+letters = set(unichr(n) for n in xrange(1, 0x10000))
+letters -= set(u'%s' % n for n in xrange(0, 10))
+letters -= set(['_'])
+uppercase_letters = set(c.upper() for c in letters if letter_re.match(c))
+UPPERCASE_RE = ur'[%s]' % ''.join(uppercase_letters)
+
 def get_initial_surname_author_pattern(incl_numeration=False):
     """Match an author name of the form: 'initial(s) surname'
 
@@ -71,20 +78,20 @@ def get_initial_surname_author_pattern(incl_numeration=False):
 
     return ur"""
     (?:
-        (?:[A-Z]\w{2,20}\s+)?                                ## Optionally a first name before the initials
+        (?:%(uppercase_re)s\w{2,20}\s+)?                     ## Optionally a first name before the initials
 
         (?<!Volume\s)                                        ## Initials (1-5) (cannot follow 'Volume\s')
-        [A-Z](?:\s*[.'’\s-]{1,3}\s*[A-Z]){0,4}[.\s-]{1,2}\s* ## separated by .,-,',etc.
+        %(uppercase_re)s(?:\s*[.'’\s-]{1,3}\s*%(uppercase_re)s){0,4}[.\s-]{1,2}\s* ## separated by .,-,',etc.
 
-        (?:[A-Z]\w{2,20}\s+)?                                ## Optionally a first name after the initials
+        (?:%(uppercase_re)s\w{2,20}\s+)?                     ## Optionally a first name after the initials
 
         (?:
             (?!%(invalid_prefixes)s)                         ## Invalid prefixes to avoid
-            [A-Za-z]{1,3}(?<!and)(?:(?:[’'`´-]\s?)|\s)       ## The surname prefix: 1, 2 or 3
+            \w{1,3}(?<!and)(?:(?:[’'`´-]\s?)|\s)             ## The surname prefix: 1, 2 or 3
         )?                                                   ## character prefixes before the surname (e.g. 'van','de')
 
         (?!%(invalid_surnames)s)                             ## Invalid surnames to avoid
-        [A-Z]                                                ## The surname, which must start with an upper case character
+        %(uppercase_re)s                                     ## The surname, which must start with an upper case character
         (?:[rR]\.|\w{1,20})                                  ## handle Jr.
         (?:[\-’'`´][\w’']{1,20})?                            ## single hyphen allowed jan-el or Figueroa-O'Farrill
         [’']?                                                ## Eventually an ending '
@@ -96,6 +103,7 @@ def get_initial_surname_author_pattern(incl_numeration=False):
             %(ed)s
         )?
     )""" % {
+        'uppercase_re' : UPPERCASE_RE,
         'invalid_prefixes': '|'.join(invalid_prefixes),
         'invalid_surnames': '|'.join(invalid_surnames),
         'ed'              : re_ed_notation,
@@ -123,17 +131,17 @@ def get_surname_initial_author_pattern(incl_numeration=False):
     (?:
         (?:
             (?!%(invalid_prefixes)s)                             ## Invalid prefixes to avoid
-            [A-Za-z]{1,3}(?<!and)(?<!in)(?:(?:[’'`´-]\s?)|\s)
+            \w{1,3}(?<!and)(?<!in)(?:(?:[’'`´-]\s?)|\s)
         )?   ## The optional surname prefix:
                                                                  ## 1 or 2, 2-3 character prefixes before the surname (e.g. 'van','de')
 
         (?!%(invalid_surnames)s)                                 ## Invalid surnames to avoid
-        [A-Z]\w{2,20}(?:[\-’'`´]\w{2,20})?                       ## The surname, which must start with an upper case character (single hyphen allowed)
+        %(uppercase_re)s\w{2,20}(?:[\-’'`´]\w{2,20})?            ## The surname, which must start with an upper case character (single hyphen allowed)
 
         \s*[,.\s]\s*                                             ## The space between the surname and its initials
 
         (?<!Volume\s)                                            ## Initials
-        [A-Z](?:\s*[.'’\s-]{1,2}\s*[A-Z]){0,4}\.{0,2}            ##
+        %(uppercase_re)s(?:\s*[.'’\s-]{1,2}\s*%(uppercase_re)s){0,4}\.{0,2}
 
                                                                  ## Either a comma or an 'and' MUST be present ... OR an end of line marker
                                                                  ## (maybe some space's between authors)
@@ -143,6 +151,7 @@ def get_surname_initial_author_pattern(incl_numeration=False):
             %(ed)s
         )?
     )""" % {
+        'uppercase_re' : UPPERCASE_RE,
         'invalid_prefixes': '|'.join(invalid_prefixes),
         'invalid_surnames': '|'.join(invalid_surnames),
         'ed'              : re_ed_notation,
@@ -151,7 +160,8 @@ def get_surname_initial_author_pattern(incl_numeration=False):
 
 
 invalid_surnames = (
-    'Supergravity', 'Collaboration', 'Theoretical', 'Appendix', 'Phys', 'Paper'
+    'Supergravity', 'Collaboration', 'Theoretical', 'Appendix', 'Phys',
+    'Paper', 'Energy'
 )
 invalid_prefixes = (
     'at',

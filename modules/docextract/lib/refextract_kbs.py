@@ -20,7 +20,6 @@
 import re
 import sys
 import csv
-
 try:
     import hashlib
     md5 = hashlib.md5
@@ -38,6 +37,8 @@ from invenio.refextract_re import re_kb_line, \
                                   re_punctuation
 from invenio.docextract_utils import write_message
 from invenio.docextract_text import re_group_captured_multiple_space
+from invenio.search_engine import get_collection_reclist
+from invenio.search_engine_utils import get_fieldvalues
 
 
 def get_kbs(custom_kbs_files=None, cache=None):
@@ -94,8 +95,11 @@ def load_kb(path, builder):
     else:
         write_message("Loading kb from %s" % path, verbose=3)
         kb_start = 'kb:'
+        records_start = 'records:'
         if path.startswith(kb_start):
             return load_kb_from_db(path[len(kb_start):], builder)
+        elif path.startswith(records_start):
+            return load_kb_from_records(path[len(kb_start):], builder)
         else:
             return load_kb_from_file(path, builder)
 
@@ -160,15 +164,8 @@ def create_institute_numeration_group_regexp_pattern(patterns):
         patterns. E.g.:
            (?P<num>[12]\d{3} \d\d\d|\d\d \d\d\d|[A-Za-z] \d\d\d)
     """
-    grouped_numeration_pattern = u""
-    if len(patterns) > 0:
-        grouped_numeration_pattern = u"(?P<numn>"
-        for pattern in patterns:
-            grouped_numeration_pattern += \
-                  institute_num_pattern_to_regex(pattern[1]) + u"|"
-        grouped_numeration_pattern = \
-              grouped_numeration_pattern[0:len(grouped_numeration_pattern) - 1]
-        grouped_numeration_pattern += u")"
+    patterns_list = [institute_num_pattern_to_regex(p[1]) for p in patterns]
+    grouped_numeration_pattern = u"(?P<numn>%s)" % u'|'.join(patterns_list)
     return grouped_numeration_pattern
 
 
@@ -309,9 +306,9 @@ def build_reportnum_kb(fpath):
             # complete regex:
             # will be in the style "(categ)-(numatn1|numatn2|numatn3|...)"
             for classification in preprint_classifications:
-                search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])((?P<categ>' \
+                search_pattern_str = ur'(?:^|[^a-zA-Z0-9\/\.\-])([\[\(]?(?P<categ>' \
                                      + classification[0].strip() + u')' \
-                                     + numeration_regexp + u')'
+                                     + numeration_regexp + u'[\]\)]?)'
 
                 re_search_pattern = re.compile(search_pattern_str,
                                                  re.UNICODE)
@@ -663,6 +660,35 @@ def load_kb_from_db(kb_name, builder):
     return builder(lazy_parser(get_kbr_items(kb_name)))
 
 
+def load_kb_from_records(kb_name, builder):
+    def get_tag_values(recid, tags):
+        for tag in tags:
+            for value in get_fieldvalues(recid, tag):
+                yield value
+
+    def lazy_parser(collection, left_tags, right_tags):
+        for recid in get_collection_reclist(collection):
+            try:
+                # Key tag
+                # e.g. for journals database: 711__a
+                left_values = get_tag_values(recid, left_tags)
+            except IndexError:
+                pass
+            else:
+                # Value tags
+                # e.g. for journals database: 130__a, 730__a and 030__a
+                right_values = get_tag_values(recid, right_tags)
+
+                for left_value in set(left_values):
+                    for right_value in set(right_values):
+                        yield left_value, right_value
+
+    dummy, collection, left_str, right_str = kb_name.split(':')
+    left_tags = left_str.split(',')
+    right_tags = right_str.split(',')
+    return builder(lazy_parser(collection, left_tags, right_tags))
+
+
 def build_journals_kb(knowledgebase):
     """Given the path to a knowledge base file, read in the contents
        of that file into a dictionary of search->replace word phrases.
@@ -704,6 +730,10 @@ def build_journals_kb(knowledgebase):
 
     write_message('Processing journals kb', verbose=3)
     for seek_phrase, repl in knowledgebase:
+        # We match on a simplified line, thus dots are replaced
+        # with spaces
+        seek_phrase = seek_phrase.replace('.', ' ').upper()
+
         # good KB line
         # Add the 'replacement term' into the dictionary of
         # replacement terms:
