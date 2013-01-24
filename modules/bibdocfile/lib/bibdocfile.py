@@ -1596,7 +1596,7 @@ class BibDoc(object):
             initial_data = BibDoc._retrieve_data(docid)
 
         self.docfiles = []
-        self.__md5s = None
+        self.md5s = None
         self.human_readable = human_readable
         self.cd = initial_data["cd"] # creation date
         self.md = initial_data["md"] # modification date
@@ -1795,17 +1795,6 @@ class BibDoc(object):
         for docfile in self.docfiles:
             out += str(docfile)
         return out
-
-    def get_md5s(self):
-        """
-        @return: an instance of the Md5Folder class to access MD5 information
-            of the current BibDoc
-        @rtype: Md5Folder
-        """
-        if self.__md5s is None:
-            self.__md5s = Md5Folder(self.basedir)
-        return self.__md5s
-    md5s = property(get_md5s)
 
     def format_already_exists_p(self, docformat):
         """
