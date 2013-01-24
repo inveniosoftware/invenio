@@ -27,17 +27,21 @@ import re
 import ConfigParser
 import copy
 
+from operator import itemgetter
 
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR, \
-     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
+     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+     CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD
 from invenio.dbquery import run_sql, deserialize_via_marshal, wash_table_column_name
 from invenio.errorlib import register_exception
 from invenio.webpage import adderrorbox
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibrank_citation_searcher import get_cited_by, get_cited_by_weight
+from invenio.bibrank_citation_searcher import get_cited_by, \
+                                              get_cited_by_weight, \
+                                              get_citation_dict
 from invenio.intbitset import intbitset
 from invenio.bibrank_word_searcher import find_similar
 # Do not remove these lines, it is necessary for func_object = globals().get(function)
@@ -413,30 +417,33 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     global voutput
     voutput = ""
 
-    #If the recID is numeric, return only stuff that cites it. Otherwise return
-    #stuff that cites hitset
+    # If the recID is numeric, return only stuff that cites it.
+    # Otherwise return stuff that cites hitset
 
-    #try to convert to int
-    recisint = True
-    recidint = 0
+    # Try to convert to int
     try:
         recidint = int(recID)
-    except:
-        recisint = False
-    ret = []
-    if recisint:
-        myrecords = get_cited_by(recidint) #this is a simple list
-        ret = get_cited_by_weight(myrecords)
+    except (TypeError, ValueError):
+        recidint = None
+
+    if recidint:
+        myrecords = get_cited_by(recidint)
     else:
-        ret = get_cited_by_weight(hitset)
-    ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second member of the tuples
+        myrecords = hitset
+
+    if len(myrecords) > CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
+        cites_counts = get_citation_dict('citations_counts')
+        ret = [(recid, weight) for recid, weight in cites_counts \
+                                                        if recid in myrecords]
+    else:
+        ret = get_cited_by_weight(myrecords)
+        ret.sort(key=itemgetter(1))
 
     if verbose > 0:
-        voutput = voutput+"\nrecID "+str(recID)+" is int: "+str(recisint)+" hitset "+str(hitset)+"\n"+"find_citations retlist "+str(ret)
-
-    #voutput = voutput + str(ret)
+        voutput += "\nrecID %s is int %s hitset %s\nfind_citations ret %s" \
+                                   % (recID, recidint is not None, hitset, ret)
 
     if ret:
-        return (ret,"(", ")", "")
+        return (ret, "(", ")", "")
     else:
-        return ((),"", "", "")
+        return ((), "", "", "")
