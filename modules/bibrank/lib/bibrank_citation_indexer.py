@@ -24,15 +24,18 @@ import time
 import os
 import sys
 import ConfigParser
-from datetime import datetime
 from itertools import islice
+from datetime import datetime
 
+from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql, \
                             deserialize_via_marshal
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
-from invenio.search_engine import search_pattern, search_unit
+from invenio.search_engine import search_pattern, \
+                                  search_unit, \
+                                  get_collection_reclist
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat_utils import parse_tag
 from invenio.bibknowledge import get_kb_mappings
@@ -42,9 +45,8 @@ from invenio.bibtask import write_message, task_get_option, \
 from invenio.bibindex_engine_utils import get_field_tags
 from invenio.docextract_record import get_record
 
-INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')
-
-re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
+re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK \
+                   = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
 
 
 def compute_weights():
@@ -55,9 +57,29 @@ def compute_weights():
     return weights
 
 
-def get_recids_matching_query(p, f, m='e'):
+def recids_cache(collections, cache={}):
+    if 'valid_recids' not in cache:
+        cache['valid_recids'] = intbitset()
+        for coll in collections.split(','):
+            cache['valid_recids'] += get_collection_reclist(coll)
+    return cache['valid_recids']
+
+
+def deleted_recids_cache(cache={}):
+    if 'deleted_records' not in cache:
+        cache['deleted_records'] = search_unit(p='DELETED', f='980', m='a')
+    return cache['deleted_records']
+
+
+def get_recids_matching_query(p, f, config, m='e'):
     """Return set of recIDs matching query for pattern p in field f."""
-    return search_pattern(p=p, f=f, m=m) - INTBITSET_OF_DELETED_RECORDS
+    function = config.get("rank_method", "function")
+    collections = config.get(function, 'collections')
+    if collections:
+        ret = search_pattern(p=p, f=f, m=m) & recids_cache(collections)
+    else:
+        ret = search_pattern(p=p, f=f, m=m) - deleted_recids_cache()
+    return ret
 
 
 def get_citation_weight(rank_method_code, config, chunk_size=25000):
@@ -98,6 +120,11 @@ def get_citation_weight(rank_method_code, config, chunk_size=25000):
 
     if updated_recids:
         begin_time = time.time()
+        try:
+            function = config.get("rank_method", "function")
+            config.get(function, 'collections')
+        except ConfigParser.NoOptionError:
+            config.set(function, 'collections', None)
         # Process fully the updated records
         weights = process_and_store(updated_recids, config, chunk_size)
         end_time = time.time()
@@ -161,14 +188,15 @@ def process_chunk(recids, config):
     # call the procedure that does the hard work by reading fields of
     # citations and references in the updated_recid's (but nothing else)!
     write_message("Entering get_citation_informations", verbose=9)
-    citation_informations = get_citation_informations(recids, tags)
+    citation_informations = get_citation_informations(recids, tags, config)
 
     write_message("Entering ref_analyzer", verbose=9)
     # call the analyser that uses the citation_informations to really
     # search x-cites-y in the coll..
     return ref_analyzer(citation_informations,
                         recids,
-                        tags)
+                        tags,
+                        config)
 
 
 def get_bibrankmethod_lastupdate(rank_method_code):
@@ -395,7 +423,8 @@ def get_alt_volume(volume):
     return alt_volume
 
 
-def get_citation_informations(recid_list, tags, fetch_catchup_info=True):
+def get_citation_informations(recid_list, tags, config,
+                              fetch_catchup_info=True):
     """Scans the collections searching references (999C5x -fields) and
        citations for items in the recid_list
        returns a 4 list of dictionaries that contains the citation information
@@ -436,14 +465,21 @@ def get_citation_informations(recid_list, tags, fetch_catchup_info=True):
 
         done += 1
 
-        if recid in INTBITSET_OF_DELETED_RECORDS:
-            # do not treat this record since it was deleted; we
-            # skip it like this in case it was only soft-deleted
-            # e.g. via bibedit (i.e. when collection tag 980 is
-            # DELETED but other tags like report number or journal
-            # publication info remained the same, so the calls to
-            # get_fieldvalues() below would return old values)
-            continue
+        function = config.get("rank_method", "function")
+        if config.get(function, 'collections'):
+            if recid not in recids_cache(config.get(function, 'collections')):
+                # do not treat this record since it is not in the collections
+                # we want to process
+                continue
+        else:
+            if recid in deleted_recids_cache():
+                # do not treat this record since it was deleted; we
+                # skip it like this in case it was only soft-deleted
+                # e.g. via bibedit (i.e. when collection tag 980 is
+                # DELETED but other tags like report number or journal
+                # publication info remained the same, so the calls to
+                # get_fieldvalues() below would return old values)
+                continue
 
         if tags['refs_report_number']:
             references_info['report-numbers'][recid] \
@@ -543,7 +579,7 @@ def standardize_report_number(report_number):
     return report_number
 
 
-def ref_analyzer(citation_informations, updated_recids, tags):
+def ref_analyzer(citation_informations, updated_recids, tags, config):
     """Analyze the citation informations and calculate the citation weight
        and cited by list dictionary.
     """
@@ -604,7 +640,9 @@ def ref_analyzer(citation_informations, updated_recids, tags):
             field = 'reportnumber'
             refnumber = standardize_report_number(refnumber)
             # Search for "hep-th/5644654 or such" in existing records
-            recids = get_recids_matching_query(p=refnumber, f=field)
+            recids = get_recids_matching_query(p=refnumber,
+                                               f=field,
+                                               config=config)
             write_message("These match searching %s in %s: %s" %
                                    (refnumber, field, list(recids)), verbose=9)
 
@@ -650,7 +688,9 @@ def ref_analyzer(citation_informations, updated_recids, tags):
                 write_message(msg, stream=sys.stderr)
                 continue  # skip this ill-formed value
 
-            recids = search_unit(p, field) - INTBITSET_OF_DELETED_RECORDS
+            recids = get_recids_matching_query(p=p,
+                                               f=field,
+                                               config=config)
             write_message("These match searching %s in %s: %s"
                                  % (reference, field, list(recids)), verbose=9)
 
@@ -687,7 +727,9 @@ def ref_analyzer(citation_informations, updated_recids, tags):
             p = reference
             field = 'doi'
 
-            recids = get_recids_matching_query(p, field)
+            recids = get_recids_matching_query(p=p,
+                                               f=field,
+                                               config=config)
             write_message("These match searching %s in %s: %s"
                                  % (reference, field, list(recids)), verbose=9)
 
@@ -725,13 +767,14 @@ def ref_analyzer(citation_informations, updated_recids, tags):
                 std_reportcode = standardize_report_number(reportcode)
                 report_pattern = r'^%s( *\[[a-zA-Z.-]*\])?' % \
                                                 re.escape(std_reportcode)
-                recids = get_recids_matching_query(report_pattern,
-                                                   tags['refs_report_number'],
-                                                   'r')
+                recids = get_recids_matching_query(p=report_pattern,
+                                                   f=tags['refs_report_number'],
+                                                   m='r',
+                                                   config=config)
             else:
-                recids = get_recids_matching_query(reportcode,
-                                                   tags['refs_report_number'],
-                                                   'e')
+                recids = get_recids_matching_query(p=reportcode,
+                                                   f=tags['refs_report_number'],
+                                                   config=config)
             for recid in recids:
                 add_to_cites(recid, thisrecid)
 
@@ -752,8 +795,9 @@ def ref_analyzer(citation_informations, updated_recids, tags):
             journal = journal.replace("\"", "")
             # Search the publication string like
             # Phys. Lett., B 482 (2000) 417 in 999C5s
-            recids = search_unit(p=journal, f=tags['refs_journal'], m='a') \
-                                                - INTBITSET_OF_DELETED_RECORDS
+            recids = get_recids_matching_query(p=journal,
+                                               f=tags['refs_journal'],
+                                               config=config)
             write_message("These records match %s in %s: %s"
                     % (journal, tags['refs_journal'], list(recids)), verbose=9)
 
@@ -774,8 +818,9 @@ def ref_analyzer(citation_informations, updated_recids, tags):
         for doi in dois:
             # Search the publication string like
             # Phys. Lett., B 482 (2000) 417 in 999C5a
-            recids = search_unit(p=doi, f=tags['refs_doi'], m='a') \
-                                                - INTBITSET_OF_DELETED_RECORDS
+            recids = get_recids_matching_query(p=doi,
+                                               f=tags['refs_doi'],
+                                               config=config)
             write_message("These records match %s in %s: %s"
                             % (doi, tags['refs_doi'], list(recids)), verbose=9)
 

@@ -296,6 +296,18 @@ def check_method(rank_method_code):
         else:
             write_message("No records modified, update not necessary")
 
+
+def load_config(method):
+    filename = CFG_ETCDIR + "/bibrank/" + method + ".cfg"
+    config = ConfigParser.ConfigParser()
+    try:
+        config.readfp(open(filename))
+    except StandardError:
+        write_message("Cannot find configuration file: %s" % filename,
+                      sys.stderr)
+        raise
+    return config
+
 def bibrank_engine(run):
     """Run the indexing task.
     Return 1 in case of success and 0 in case of failure.
@@ -308,15 +320,7 @@ def bibrank_engine(run):
         task_sleep_now_if_required(can_stop_too=True)
         cfg_name = getName(rank_method_code)
         write_message("Running rank method: %s." % cfg_name)
-
-        file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
-        config = ConfigParser.ConfigParser()
-        try:
-            config.readfp(open(file))
-        except StandardError, e:
-            write_message("Cannot find configurationfile: %s" % file, sys.stderr)
-            raise StandardError
-
+        config = load_config(rank_method_code)
         cfg_short = rank_method_code
         cfg_function = config.get("rank_method", "function") + "_exec"
         cfg_repair_function = config.get("rank_method", "function") + "_repair_exec"
