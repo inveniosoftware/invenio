@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,5 +21,13 @@
 
 # Note: citation summary tests were moved to BibRank as part of the
 # self-cite commit 1fcbed0ec34a9c31f8a727e21890c529d8222256.  Keeping
-# this file here in order to overwrite any previously installed file
-# (with tests that would now fail).
+# this file here with empty test case set in order to overwrite any
+# previously installed file.  Also, keeping TEST_SUITE empty so that
+# `inveniocfg --run-unit-tests' would not complain.
+
+from invenio.testutils import make_test_suite, run_test_suite
+
+TEST_SUITE = make_test_suite()
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)
