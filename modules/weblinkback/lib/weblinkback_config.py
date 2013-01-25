@@ -60,3 +60,5 @@ CFG_WEBLINKBACK_TRACKBACK_SUBSCRIPTION_ERROR_MESSAGE= {'BAD_ARGUMENT': 'Refused:
                                                        'BLACKLIST': 'Refused: URL in blacklist'}
 
 CFG_WEBLINKBACK_DEFAULT_USER = 0
+
+CFG_WEBLINKBACK_LATEST_FACTOR = 3
