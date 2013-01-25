@@ -295,9 +295,9 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                                 descr = _('Fulltext')
                             if not parsed_urls['main_urls'].has_key(descr):
                                 parsed_urls['main_urls'][descr] = []
-                            params = parse_qs(params)
-                            if 'subformat' in params:
-                                url_format += ' (%s)' % params['subformat'][0]
+                            params_dict = parse_qs(params)
+                            if 'subformat' in params_dict:
+                                url_format += ' (%s)' % params_dict['subformat'][0]
                             parsed_urls['main_urls'][descr].append((url, name, url_format))
                 if not assigned: # Url is not a bibdoc :-S
                     if not descr:
