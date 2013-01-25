@@ -22,18 +22,20 @@ WebJournal Element - return trackback auto discovery tag
 import cgi
 from invenio.webjournal_utils import parse_url_string
 from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
+from invenio.config import CFG_WEBLINKBACK_TRACKBACK_ENABLED
 
 def format_element(bfo):
     """
     Return trackback auto discovery tag if recid != -1, will return "" for recid == -1 like index pages
     """
-    # Retrieve context (journal, issue and category) from URI
-    args = parse_url_string(bfo.user_info['uri'])
-    recid = args["recid"]
-
     html = ""
-    if recid != -1:
-        html = get_trackback_auto_discovery_tag(recid)
+    if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+        # Retrieve context (journal, issue and category) from URI
+        args = parse_url_string(bfo.user_info['uri'])
+        recid = args["recid"]
+
+        if recid != -1:
+            html = get_trackback_auto_discovery_tag(recid)
 
     return html
 

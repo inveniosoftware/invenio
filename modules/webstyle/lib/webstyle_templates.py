@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -38,7 +38,8 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN, \
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_WEBLINKBACK_TRACKBACK_ENABLED
 
 from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
 from invenio.urlutils import make_canonical_urlargd, create_html_link, \
@@ -263,17 +264,6 @@ class Template:
                         secure_page_p=0, navmenuid="admin", metaheaderadd="",
                         rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
 
-        from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
-        # Embed a link in the header to subscribe trackbacks
-        # TODO: This hack must be replaced with the introduction of the new web framework
-        uri = req.unparsed_uri
-        recordIndexInURI = uri.find('/' + CFG_SITE_RECORD + '/')
-        headerLinkbackTrackbackLink = ''
-        # substring found --> offer trackback link in header
-        if recordIndexInURI != -1:
-            recid = uri[recordIndexInURI:len(uri)].split('/')[2].split("?")[0] #recid might end with ? for journal records
-            headerLinkbackTrackbackLink = get_trackback_auto_discovery_tag(recid)
-
         """Creates a page header
 
            Parameters:
@@ -321,6 +311,18 @@ class Template:
         if body_css_classes is None:
             body_css_classes = []
         body_css_classes.append(navmenuid)
+
+        uri = req.unparsed_uri
+        headerLinkbackTrackbackLink = ''
+        if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+            from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
+            # Embed a link in the header to subscribe trackbacks
+            # TODO: This hack must be replaced with the introduction of the new web framework
+            recordIndexInURI = uri.find('/' + CFG_SITE_RECORD + '/')
+            # substring found --> offer trackback link in header
+            if recordIndexInURI != -1:
+                recid = uri[recordIndexInURI:len(uri)].split('/')[2].split("?")[0] #recid might end with ? for journal records
+                headerLinkbackTrackbackLink = get_trackback_auto_discovery_tag(recid)
 
         if CFG_WEBSTYLE_INSPECT_TEMPLATES:
             inspect_templates_message = '''

@@ -22,7 +22,8 @@
 import unittest
 
 from invenio.config import CFG_SITE_URL, \
-                           CFG_SITE_RECORD
+                           CFG_SITE_RECORD, \
+                           CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.dbquery import CFG_DATABASE_NAME
 from invenio.testutils import make_test_suite, \
                                    run_test_suite, \
@@ -75,7 +76,7 @@ def remove_test_data():
 class WebLinkbackWebPagesAvailabilityTest(unittest.TestCase):
     """Test WebLinkback web pages whether they are up or not"""
 
-    def test_your_baskets_pages_availability(self):
+    def test_linkback_pages_availability(self):
         """weblinkback - availability of /linkbacks pages"""
 
         error_messages = []
@@ -572,6 +573,47 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         self.assertEqual(9, len(self.get_all_from_table("lnkENTRYLOG")))
         self.assertEqual(12, len(self.get_all_from_table("lnkLOG")))
 
+    def test_url_xml_entity_removal(self):
+        """weblinkback - URL XML entity removal"""
+        url = 'This is a&nbsp;test'
+        run_sql("INSERT INTO lnkENTRYURLTITLE ( url, title) VALUES ('URL1', %s)", (url,))
+        self.assertEqual('This is a\xc2\xa0test', get_url_title(url))
+
+        url = 'This &#8220;is&#8221; &nbsp;&#8220;&#8221;test&#8221;"'
+        run_sql("INSERT INTO lnkENTRYURLTITLE ( url, title) VALUES ('URL2', %s)", (url,))
+        self.assertEqual('This \xe2\x80\x9cis\xe2\x80\x9d \xc2\xa0\xe2\x80\x9c\xe2\x80\x9dtest\xe2\x80\x9d"', get_url_title(url))
+
+    def test_get_pending_trackbacks(self):
+        """weblinkback - get all pending trackbacks"""
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(9, len(pending_trackbacks))
+        for pending_trackback in pending_trackbacks:
+            approve_linkback(pending_trackback[0], self.user_info)
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(0, len(pending_trackbacks))
+
+        recid = 42
+        argd = {'url': 'URL',
+                'title': 'My title',
+                'excerpt': CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME,
+                'blog_name': 'Test Blog',
+                'id': CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME,
+                'source': CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME,
+                }
+        linkbackid1 = create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
+        create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
+
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(2, len(pending_trackbacks))
+        approve_linkback(linkbackid1, self.user_info)
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(1, len(pending_trackbacks))
+
+        create_trackback(recid, argd['url'], argd['title'], argd['excerpt'], argd['blog_name'], argd['id'], argd['source'], self.user_info)
+        run_sql("INSERT INTO lnkENTRY (origin_url, id_bibrec, additional_properties, type, status, insert_time) VALUES ('URLN', 41, NULL, %s, %s, NOW())", (CFG_WEBLINKBACK_TYPE['PINGBACK'], CFG_WEBLINKBACK_STATUS['PENDING']))
+        pending_trackbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+        self.assertEqual(2, len(pending_trackbacks))
+
 
 def get_title_of_page_mock1(url=""): # pylint: disable=W0613
     return "MOCK_TITLE1"
@@ -889,10 +931,12 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
             self.assertEqual(1, url_titles[3][5])
             p.stop()
 
-
-TEST_SUITE = make_test_suite(WebLinkbackWebPagesAvailabilityTest,
-                             WebLinkbackDatabaseTest,
-                             WebLinkbackUpdaterTest)
+if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+    TEST_SUITE = make_test_suite(WebLinkbackWebPagesAvailabilityTest,
+                                 WebLinkbackDatabaseTest,
+                                 WebLinkbackUpdaterTest)
+else:
+    TEST_SUITE = make_test_suite()
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
