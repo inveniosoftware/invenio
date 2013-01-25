@@ -6177,7 +6177,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             if rm: # do we have to rank?
                 results_final_for_all_colls_rank_records_output = rank_records(req, rm, 0, results_final_for_all_selected_colls,
                                                                                string.split(p) + string.split(p1) +
-                                                                               string.split(p2) + string.split(p3), verbose, so, of, ln, field=kwargs['f'])
+                                                                               string.split(p2) + string.split(p3), verbose, so, of, ln, kwargs['rg'], kwargs['jrec'], kwargs['f'])
                 if results_final_for_all_colls_rank_records_output[0]:
                     recIDs = results_final_for_all_colls_rank_records_output[0]
             elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
