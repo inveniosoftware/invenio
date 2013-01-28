@@ -342,7 +342,7 @@ def search():
     qid = get_search_query_id(**argd)
 
     recids = perform_request_search(req=request, **argd)
-    if (request.args.get('so') or request.args.get('rm')):
+    if (argd_orig.get('so') or argd_orig.get('rm')):
         recids.reverse()
 
     facets = map(lambda x: x.get_conf(collection=collection, qid=qid),
