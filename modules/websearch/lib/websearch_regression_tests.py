@@ -921,6 +921,13 @@ class WebSearchBooleanQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis+muon+letter',
                                                expected_text="Boolean query returned no hits. Please combine your search terms differently."))
 
+    def test_unsuccessful_boolean_query_in_advanced_search_where_all_individual_terms_match(self):
+        """ websearch - unsuccessful boolean query in advanced search where all individual terms match """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?m1=a&p1=ellis&op1=a&m2=a&p2=muon&op2=a&p3=letter',
+                                               expected_text="Boolean query returned no hits. Please combine your search terms differently."))
+
+
 class WebSearchAuthorQueryTest(unittest.TestCase):
     """Check various author-related queries."""
 

@@ -4809,6 +4809,14 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
         pass
     return
 
+def clean_dictionary(dictionary, list_of_items):
+    """Returns a copy of the dictionary with all the items 
+       in the list_of_items as empty strings"""
+    out_dictionary = dictionary.copy()
+    out_dictionary.update((item, '') for item in list_of_items)
+    return out_dictionary
+
+
 ### CALLABLES
 
 def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
@@ -5294,9 +5302,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
         results_in_any_collection = intbitset()
         if aas == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
+            len_results_p1 = 0
+            len_results_p2 = 0
+            len_results_p3 = 0
             try:
                 results_in_any_collection = search_pattern_parenthesised(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
-                if len(results_in_any_collection) == 0:
+                len_results_p1 = len(results_in_any_collection)
+                if len_results_p1 == 0:
                     if of.startswith("h"):
                         perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                     elif of.startswith("x"):
@@ -5306,6 +5318,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     return page_end(req, of, ln)
                 if p2:
                     results_tmp = search_pattern_parenthesised(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
+                    len_results_p2 = len(results_tmp)
                     if op1 == "a": # add
                         results_in_any_collection.intersection_update(results_tmp)
                     elif op1 == "o": # or
@@ -5317,6 +5330,14 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                             write_warning("Invalid set operation %s." % cgi.escape(op1), "Error", req=req)
                     if len(results_in_any_collection) == 0:
                         if of.startswith("h"):
+                            if len_results_p2:
+                                #each individual query returned results, but the boolean operation did not
+                                nearestterms = []
+                                nearest_search_args = req.argd.copy()
+                                if p1:
+                                    nearestterms.append((p1, len_results_p1, clean_dictionary(nearest_search_args, ['p2', 'f2', 'm2', 'p3', 'f3', 'm3'])))
+                                nearestterms.append((p2, len_results_p2, clean_dictionary(nearest_search_args, ['p1', 'f1', 'm1', 'p3', 'f3', 'm3'])))
+                                write_warning(websearch_templates.tmpl_search_no_boolean_hits(ln=ln, nearestterms=nearestterms), req=req)
                             perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                         elif of.startswith("x"):
                             # Print empty, but valid XML
@@ -5325,6 +5346,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                         return page_end(req, of, ln)
                 if p3:
                     results_tmp = search_pattern_parenthesised(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln, wl=wl)
+                    len_results_p3 = len(results_tmp)
                     if op2 == "a": # add
                         results_in_any_collection.intersection_update(results_tmp)
                     elif op2 == "o": # or
@@ -5334,6 +5356,16 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                     else:
                         if of.startswith("h"):
                             write_warning("Invalid set operation %s." % cgi.escape(op2), "Error", req=req)
+                    if len(results_in_any_collection) == 0 and len_results_p3 and of.startswith("h"):
+                        #each individual query returned results but the boolean operation did not
+                        nearestterms = []
+                        nearest_search_args = req.argd.copy()
+                        if p1:
+                            nearestterms.append((p1, len_results_p1, clean_dictionary(nearest_search_args, ['p2', 'f2', 'm2', 'p3', 'f3', 'm3'])))
+                        if p2:
+                            nearestterms.append((p2, len_results_p2, clean_dictionary(nearest_search_args, ['p1', 'f1', 'm1', 'p3', 'f3', 'm3'])))
+                        nearestterms.append((p3, len_results_p3, clean_dictionary(nearest_search_args, ['p1', 'f1', 'm1', 'p2', 'f2', 'm2'])))
+                        write_warning(websearch_templates.tmpl_search_no_boolean_hits(ln=ln,  nearestterms=nearestterms), req=req)
             except:
                 register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
