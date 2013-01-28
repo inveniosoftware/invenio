@@ -27,7 +27,6 @@ import difflib
 import zlib
 import copy
 
-from invenio import bibrecord
 from invenio import bibformat
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
@@ -46,7 +45,8 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_MSG
+    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
+    CFG_BIBEDIT_DOI_LOOKUP_FIELD
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -227,6 +227,7 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gAUTOSUGGEST_TAGS' : CFG_BIBEDIT_AUTOSUGGEST_TAGS,
             'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
             'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"',
+            'gREQUESTS_UNTIL_SAVE' : CFG_BIBEDIT_REQUESTS_UNTIL_SAVE,
             'gAVAILABLE_KBS': get_available_kbs(),
             'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
             }
@@ -442,7 +443,7 @@ def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
             # save the handler on the server side !
             data['undoRedo'] = undoRedo
             isFirst = False
-        lastResult = perform_request_ajax(req, recid, uid, data, True)
+        lastResult = perform_request_ajax(req, recid, uid, data, isBulk=True)
         # now we have to update the cacheMtime in next request !
 #        if lastResult.has_key('cacheMTime'):
         try:

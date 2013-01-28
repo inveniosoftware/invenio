@@ -86,6 +86,10 @@ CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION = 2000
 ## time to finish (recommended: >2000).
 CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY = 5000
 
+## CFG_BIBEDIT_REQUESTS_UNTIL_SAVE - number of requests until changes in the
+## editor will be saved
+CFG_BIBEDIT_REQUESTS_UNTIL_SAVE = 3
+
 ## CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
 ## by the Ajax engine.
 

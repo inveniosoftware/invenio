@@ -35,6 +35,8 @@
  *   - createReq
  *   - onAjaxError
  *   - onAjaxSuccess
+ *   - queue_request
+ *   - save_changes
  *
  * 4. Hash management
  *   - initStateFromHash
@@ -171,6 +173,12 @@ var gKBInstitution = null;
 // Does the record have a PDF attached?
 var gRecordHasPDF = false;
 
+// queue with all requests to be sent to server
+var gReqQueue = [];
+
+// count number of requests since last save
+var gReqCounter = 0;
+
 
 /*
  * **************************** 2. Initialization ******************************
@@ -224,7 +232,8 @@ function init_bibedit() {
   // viewport
   resize_content();
   $(window).bind('resize', resize_content);
-}
+});
+
 
 function failInReadOnly(){
   /** Function checking if the current BibEdit mode is read-only. In sucha a case, a warning
@@ -497,6 +506,49 @@ function onAjaxSuccess(json, onSuccess){
       }
     }
   }
+}
+
+function queue_request(data) {
+  /* Adds the request data to the global request queue for later
+  execution */
+
+  if ($('#btnSubmit').is(":disabled")) {
+    activateSubmitButton();
+  }
+  /* Create a deep copy of the data to avoid being manipulated
+  by other requests */
+  gReqQueue.push(jQuery.extend(true, {}, data));
+
+  /* Update counter of requests to save */
+  gReqCounter++;
+  if (gReqCounter === gREQUESTS_UNTIL_SAVE) {
+    save_changes();
+    gReqCounter = 0;
+  }
+}
+
+function save_changes() {
+  /* Sends all pending requests in bulk to the server
+  Returns deferred object to be able to notify when saving is done
+  */
+  var optArgs = {};
+  var saveChangesPromise = new $.Deferred();
+
+  if (gReqQueue.length > 0) {
+    updateStatus('saving');
+    createBulkReq(gReqQueue, function(json){
+      updateStatus('report', gRESULT_CODES[json['resultCode']]);
+      updateStatus('ready');
+      saveChangesPromise.resolve();
+    }, optArgs);
+
+    gReqQueue = [];
+  }
+  else {
+    saveChangesPromise.resolve();
+  }
+
+  return saveChangesPromise;
 }
 
 
@@ -1318,6 +1370,7 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
    * dialog: object containing the different parts of the modal dialog
    * html_preview: a formatted preview of the record content
   */
+  updateStatus('ready');
   addContentToDialog(dialogPreview, html_preview, "Do you want to submit the record?");
   dialogPreview.dialogDiv.dialog({
         title: "Confirm submit",
@@ -1432,16 +1485,17 @@ function onSubmitClick() {
   /*
    * Handle 'Submit' button (submit record).
    */
-  updateStatus('updating');
+  save_changes().done(function() {
+    updateStatus('updating');
+    /* Save all opened fields before submitting */
+    var savingOpenedFields = saveOpenedFields(savingOpenedFields);
 
-  /* Save all opened fields before submitting */
-  var savingOpenedFields = saveOpenedFields(savingOpenedFields);
+    savingOpenedFields.done(function() {
+      var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
 
-  savingOpenedFields.done(function() {
-    var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
-
-    // Get preview of the record and let the user confirm submit
-    getPreview(dialogPreview, onSubmitPreviewSuccess);
+      // Get preview of the record and let the user confirm submit
+      getPreview(dialogPreview, onSubmitPreviewSuccess);
+    });
   });
 }
 
@@ -1465,8 +1519,9 @@ function onPreviewClick() {
     reqData.textmarc = $("#textmarc_textbox").val();
   }
 
-  var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
-  createReq(reqData, function(json) {
+  save_changes().done(function() {
+    var dialogPreview = createDialog("Loading...", "Retrieving preview...", 750, 700, true);
+    createReq(reqData, function(json) {
       // Preview was successful.
       $(dialogPreview.dialogDiv).remove();
       var resCode = json['resultCode'];
@@ -1480,7 +1535,8 @@ function onPreviewClick() {
       var preview_window = openCenteredPopup('', 'Record preview', 768, 768);
       preview_window.document.write(html_preview);
       preview_window.document.close(); // needed for chrome and safari
-     });
+    });
+  });
 }
 
 
@@ -1515,58 +1571,62 @@ function onTextMarcClick() {
   /* Save the content in all textareas that are currently opened before changing
   view mode
   */
-  $(".edit_area textarea").trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));
 
-  createReq({recID: gRecID, requestType: 'getTextMarc'
-       }, function(json) {
-        // Request was successful.
-        $("#bibEditMessage").empty();
+  save_changes().done(function() {
+    $(".edit_area textarea").trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));
 
-        var textmarc_box = $('<textarea>');
-        textmarc_box.attr('id', 'textmarc_textbox');
-        textmarc_box.addClass("bibedit_input");
-        textmarc_box.html(json['textmarc']);
-        $('#bibEditTable').remove();
-        $('#bibEditContentTable').append(textmarc_box);
+    createReq({recID: gRecID, requestType: 'getTextMarc'
+         }, function(json) {
+          // Request was successful.
+          $("#bibEditMessage").empty();
 
-        // Avoids having two different scrollbars
-        $('#bibEditContentTable').css('overflow', 'visible');
+          var textmarc_box = $('<textarea>');
+          textmarc_box.attr('id', 'textmarc_textbox');
+          textmarc_box.addClass("bibedit_input");
+          textmarc_box.html(json['textmarc']);
+          $('#bibEditTable').remove();
+          $('#bibEditContentTable').append(textmarc_box);
 
-        // Create an extra div to store the textarea content whenever printing
-        var print_helper = $('<div>');
-        print_helper.attr('id', 'print_helper');
-        $('#bibEditContentTable').append(print_helper);
+          // Avoids having two different scrollbars
+          $('#bibEditContentTable').css('overflow', 'visible');
 
-        // Bind keyup event to textarea to detect when changes have been
-        // introduced
-        textmarc_box.on("keyup", onTextMarcBoxKeyUp);
+          // Create an extra div to store the textarea content whenever printing
+          var print_helper = $('<div>');
+          print_helper.attr('id', 'print_helper');
+          $('#bibEditContentTable').append(print_helper);
 
-        // Disable menu buttons
-        deactivateRecordMenu();
-        if (gRecordDirty) {
-          activateSubmitButton();
-        }
+          // Bind keyup event to textarea to detect when changes have been
+          // introduced
+          textmarc_box.on("keyup", onTextMarcBoxKeyUp);
 
-        // Disable reference extraction in textmarc mode
-        $('#img_run_refextract, #img_extract_free_text').off('click').removeClass(
-        'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
+          // Disable menu buttons
+          deactivateRecordMenu();
+          if (gRecordDirty) {
+            activateSubmitButton();
+          }
 
-        // Empty undo/redo handlers
-        var gUndoList = []; // list of possible undo operations
-        var gRedoList = []; // list of possible redo operations
-        updateUrView();
+          // Disable reference extraction in textmarc mode
+          $('#img_run_refextract, #img_extract_free_text').off('click').removeClass(
+          'bibEditImgCtrlEnabled').addClass('bibEditImgCtrlDisabled');
 
-        // Disable read/only mode button
-        $("#btnSwitchReadOnly").prop('disabled', true);
+          // Empty undo/redo handlers
+          gUndoList = []; // list of possible undo operations
+          gRedoList = []; // list of possible redo operations
+          updateUrView();
 
-        // Activate textmarc flag
-        gSubmitMode = 'textmarc';
+          // Disable read/only mode button
+          $("#btnSwitchReadOnly").prop('disabled', true);
 
-        // Change icon to table view
-        $("#img_textmarc").attr('src', '/img/bibedit_tableview.png');
-        $("#img_textmarc").attr('id', 'img_tableview');
-        $("#img_tableview").off("click").on("click", onTableViewClick);
-       });
+          // Activate textmarc flag
+          gSubmitMode = 'textmarc';
+
+          // Change icon to table view
+          $("#img_textmarc").attr('src', '/img/bibedit_tableview.png');
+          $("#img_textmarc").attr('id', 'img_tableview');
+          $("#img_tableview").off("click").on("click", onTableViewClick);
+         });
+
+  });
 }
 
 
@@ -2484,8 +2544,6 @@ function addFieldSave(fieldTmpNo)
   /*
    * Handle 'Save' button in add field form.
    */
-  updateStatus('updating');
-
   var jQRowGroupID = "#rowGroupAddField_" + fieldTmpNo;
   var controlfield = $(jQRowGroupID).data('isControlfield');
   var tag = $('#txtAddFieldTag_' + fieldTmpNo).val();
@@ -2631,9 +2689,8 @@ function addFieldSave(fieldTmpNo)
     value: value,
     undoRedo: undoHandler
   };
-  createReq(data, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  }, false);
+
+  queue_request(data);
 
   // Continue local updating.
   var fields = gRecord[tag];
@@ -2742,8 +2799,6 @@ function onAddSubfieldsSave(event, tag, fieldPosition) {
   /*
    * Handle 'Save' button in add subfields form.
    */
-  updateStatus('updating');
-
   var field = gRecord[tag][fieldPosition];
   var fieldID = tag + '_' + fieldPosition;
   var tag_ind = tag + field[1] + field[2];
@@ -2830,9 +2885,8 @@ function onAddSubfieldsSave(event, tag, fieldPosition) {
         subfields: subfields,
         undoRedo: urHandler
       };
-      createReq(data, function(json){
-        updateStatus('report', gRESULT_CODES[json['resultCode']]);
-      }, false);
+
+      queue_request(data);
 
       // Continue local updating
       field[0] = field[0].concat(subfields);
@@ -3028,7 +3082,6 @@ function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
 function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, 
                             value, consumedChange, undoDescriptor,
                             modifySubfieldCode){
-  updateStatus('updating');
   // Create Ajax request for simple updating the subfield value
   if (consumedChange == undefined || consumedChange == null){
     consumedChange = -1;
@@ -3043,11 +3096,8 @@ function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
                                                undoDescriptor,
                                                modifySubfieldCode);
 
-  createReq(data, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  }, false);
+  queue_request(data);
 }
-
 
 function getBulkUpdateSubfieldContentRequestData(tag, fieldPosition,
                                                  subfieldIndex, subfieldCode,
@@ -3108,7 +3158,6 @@ function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCo
      *          object:subfieldsToAdd - array containing subfields to add)
      *
      */
-    updateStatus('updating');
     if (consumedChange == undefined || consumedChange == null){
         consumedChange = -1;
     }
@@ -3122,11 +3171,13 @@ function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCo
                                                undoDescriptor,
                                                subfieldsToAdd,
                                                subfields_offset);
-    var optArgs = {
-      undoRedo: undoDescriptor
-    };
-    createBulkReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']])}, optArgs);
+
+    var bulk_data = {'requestType' : 'applyBulkUpdates',
+                     'requestsData' : data,
+                     'recID' : gRecID};
+    bulk_data.undoRedo = undoDescriptor;
+
+    queue_request(bulk_data);
 
     redrawFieldPosition(tag, fieldPosition);
     reColorFields();
@@ -3135,7 +3186,6 @@ function bulkUpdateSubfieldContent(tag, fieldPosition, subfieldIndex, subfieldCo
 
 function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosition,
                         consumedChange, undoDescriptor){
-  updateStatus('updating');
   // Create Ajax request for simple updating the subfield value
   if (consumedChange == undefined || consumedChange == null){
       consumedChange = -1;
@@ -3150,9 +3200,7 @@ function updateFieldTag(oldTag, newTag, oldInd1, oldInd2, ind1, ind2, fieldPosit
                                           consumedChange,
                                           undoDescriptor);
 
-  createReq(data, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  }, false);
+  queue_request(data);
 }
 
 
@@ -3480,6 +3528,7 @@ function onContentChange(value, th) {
         /* If editing reference field, add $$9 subfield */
         else if (tag_ind == '999C5' && !is_reference_manually_curated(field_instance)) {
             bulkOperation = true;
+            oldValue = subfield_instance[1];
             subfield_instance[1] = value;
             subfieldsToAdd.push.apply(subfieldsToAdd, field_instance[0]);
             subfieldsToAdd.push(["9", "CURATOR"]);
@@ -3608,7 +3657,6 @@ function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
   if (failInReadOnly()){
     return;
   }
-  updateStatus('updating');
 
   // Check if moving is possible
   if (type == 'up') {
@@ -3628,10 +3676,8 @@ function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
   addUndoOperation(undoHandler);
 
   var ajaxData = performMoveSubfield(tag, fieldPosition, subfieldIndex, type, undoHandler);
-  createReq(ajaxData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  }, false);
 
+  queue_request(ajaxData);
 }
 
 
@@ -3642,8 +3688,6 @@ function onDeleteClick(event){
   if (failInReadOnly()){
     return;
   }
-  updateStatus('updating');
-
   var toDelete = getSelectedFields();
   // Assert that no protected fields are scheduled for deletion.
   var protectedField = containsProtectedField(toDelete);
@@ -3657,9 +3701,7 @@ function onDeleteClick(event){
   addUndoOperation(urHandler);
   var ajaxData = deleteFields(toDelete, urHandler);
 
-  createReq(ajaxData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  }, false);
+  queue_request(ajaxData);
 }
 
 
@@ -3676,9 +3718,7 @@ function onMoveFieldUp(tag, fieldPosition) {
       var undoHandler = prepareUndoHandlerMoveField(tag, fieldPosition, "up");
       addUndoOperation(undoHandler);
       var ajaxData = performMoveField(tag, fieldPosition, "up", undoHandler);
-      createReq(ajaxData, function(json){
-        updateStatus('report', gRESULT_CODES[json['resultCode']]);
-      }, false);
+      queue_request(ajaxData);
     }
   }
 }
@@ -3697,9 +3737,7 @@ function onMoveFieldDown(tag, fieldPosition) {
       var undoHandler = prepareUndoHandlerMoveField(tag, fieldPosition, "down");
       addUndoOperation(undoHandler);
       var ajaxData = performMoveField(tag, fieldPosition, "down", undoHandler);
-      createReq(ajaxData, function(json){
-        updateStatus('report', gRESULT_CODES[json['resultCode']]);
-      }, false);
+      queue_request(ajaxData);
     }
   }
 }
@@ -4609,9 +4647,11 @@ function performRedoOperations(operations){
 //      undoRedo: "redo"
   };
 
-  createBulkReq(ajaxRequestsData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  }, optArgs);
+  var bulk_data = {'requestType' : 'applyBulkUpdates',
+                 'requestsData' : ajaxRequestsData,
+                 'recID' : gRecID};
+
+  queue_request(bulk_data);
 }
 
 
@@ -5055,9 +5095,11 @@ function performUndoOperations(operations){
 //    undoRedo: "undo"
   };
 
-  createBulkReq(ajaxRequestsData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  }, optArgs);
+  var bulk_data = {'requestType' : 'applyBulkUpdates',
+               'requestsData' : ajaxRequestsData,
+               'recID' : gRecID};
+
+  queue_request(bulk_data);
 }
 
 
