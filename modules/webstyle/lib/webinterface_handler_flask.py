@@ -95,6 +95,9 @@ def create_invenio_flask_app():
     from werkzeug.exceptions import HTTPException
     from invenio.flask_sslify import SSLify
     from invenio.webinterface_handler_wsgi import application as legacy_application
+    from invenio.webinterface_handler_wsgi import is_mp_legacy_publisher_path, \
+                                                  SimulatedModPythonRequest, \
+                                                  mp_legacy_publisher
 
     if CFG_HAS_HTTPS_SUPPORT:
         # Makes request always run over HTTPS.
@@ -125,22 +128,8 @@ def create_invenio_flask_app():
                 try:
                     response = self.app.full_dispatch_request()
                 except Exception as e:
+                    register_exception(req=request, alert_admin=True)
                     response = self.app.handle_exception(e)
-
-## FIXME register exception and send email on production site
-#      except Exception:
-#         register_exception(req=req, alert_admin=True)
-#         if not req.response_sent_p:
-#             req.status = HTTP_INTERNAL_SERVER_ERROR
-#             req.headers_out['content-type'] = 'text/html'
-#             start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-#             if CFG_DEVEL_SITE:
-#                 return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
-#                 from cgitb import html
-#                 return [html(sys.exc_info())]
-#             return generate_error_page(req)
-#         else:
-#             return generate_error_page(req, page_already_started=True)
 
                 return response(environ, start_response)
 
@@ -169,6 +158,22 @@ def create_invenio_flask_app():
             return 'You need to be authorised', 401
         flash(_('You need to be authorised.'), 'error')
         return redirect(url_for('youraccount.login', referer=request.referer))
+
+    @_app.endpoint('static')
+    def static_handler_with_legacy_publisher(*args, **kwargs):
+        """
+        Adds support for legacy publisher.
+
+        NOTE: It changes order of url page lookup. First, the invenio_handler
+        will be called and on 404 error the mp_legacy_publisher is called.
+        """
+        possible_module, possible_handler = is_mp_legacy_publisher_path(
+                                                request.environ['PATH_INFO'])
+        if possible_module is not None:
+            req = SimulatedModPythonRequest(request.environ, g.start_response)
+            mp_legacy_publisher(req, possible_module, possible_handler)
+            return req.response
+        return _app.send_static_file(*args, **kwargs)
 
     if CFG_FLASK_CACHE_TYPE not in [None, 'null']:
         _app.jinja_options = dict(_app.jinja_options,

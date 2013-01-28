@@ -449,12 +449,8 @@ def application(environ, start_response):
     #print 'Starting mod_python simulation'
 
     try:
-        possible_module, possible_handler = is_mp_legacy_publisher_path(environ['PATH_INFO'])
-        if possible_module is not None:
-            mp_legacy_publisher(req, possible_module, possible_handler)
-        else:
-            from invenio.webinterface_layout import invenio_handler
-            ret = invenio_handler(req)
+        from invenio.webinterface_layout import invenio_handler
+        invenio_handler(req)
         req.flush()
     ## TODO for future reimplementation of stream_file
     #except StreamFileException as e:
