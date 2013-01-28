@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -74,7 +74,8 @@ from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
-     CFG_BIBSORT_BUCKETS
+     CFG_BIBSORT_BUCKETS, \
+     CFG_BIBINDEX_CHARS_PUNCTUATION
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
@@ -165,6 +166,7 @@ re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
 re_pattern_space = re.compile("__SPACE__")
 re_pattern_today = re.compile("\$TODAY\$")
 re_pattern_parens = re.compile(r'\([^\)]+\s+[^\)]+\)')
+re_punctuation_followed_by_space = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + '\s')
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -663,8 +665,13 @@ def get_index_id_from_field(field):
     return out
 
 def get_words_from_pattern(pattern):
-    "Returns list of whitespace-separated words from pattern."
+    """
+    Returns list of whitespace-separated words from pattern, removing any
+    trailing punctuation-like signs from words in pattern.
+    """
     words = {}
+    # clean trailing punctuation signs inside pattern
+    pattern = re_punctuation_followed_by_space.sub(' ', pattern)
     for word in string.split(pattern):
         if not words.has_key(word):
             words[word] = 1
@@ -4810,7 +4817,7 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
     return
 
 def clean_dictionary(dictionary, list_of_items):
-    """Returns a copy of the dictionary with all the items 
+    """Returns a copy of the dictionary with all the items
        in the list_of_items as empty strings"""
     out_dictionary = dictionary.copy()
     out_dictionary.update((item, '') for item in list_of_items)
