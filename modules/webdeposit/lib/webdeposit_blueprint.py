@@ -285,17 +285,18 @@ def add(deposition_type=None, uuid=None):
 
 from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft
-from invenio.webdeposit_load_dep_types import dep_types
+from invenio.webdeposit_load_dep_types import deposition_types
 
 def render_dep_types():
     """ Renders the deposition types (workflows) list """
     current_app.config['breadcrumbs_map'][request.endpoint] = [
                         (_('Home'), '')] + blueprint.breadcrumbs
 
-    drafts = dict(db.session.query(WebDepositDraft.dep_type,
+    drafts = dict(db.session.query(WebDepositDraft.deposition_type,
                     db.func.count(db.func.distinct(WebDepositDraft.uuid))).\
                   filter(WebDepositDraft.user_id == current_user.get_id()).\
-                  group_by(WebDepositDraft.dep_type).all())
+                  group_by(WebDepositDraft.deposition_type).all())
 
     return render_template('webdeposit_dep_types.html', \
-                           docs=dep_types, drafts=drafts)
+                           deposition_types=deposition_types,
+                           drafts=drafts)

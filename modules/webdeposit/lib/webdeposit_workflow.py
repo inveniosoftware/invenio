@@ -189,7 +189,7 @@ class DepositionWorkflow(object):
 
         obj = json.loads(wf.obj_json)
         obj['uuid'] = wf.uuid
-        obj['deposition_type'] = wf.dep_type
+        obj['deposition_type'] = wf.deposition_type
         obj['step'] = wf.current_step
         self.current_step = wf.current_step
         self.obj = obj

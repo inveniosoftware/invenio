@@ -26,12 +26,11 @@ from invenio.sqlalchemyutils import db
 
 class WebDepositDraft(db.Model):
     """Represents a deposition draft."""
-    __tablename__ = 'deposition_drafts'
+    __tablename__ = 'depDRAFT'
     uuid = db.Column(db.String(36),
                      nullable=False,
                      primary_key=True)
-    ## FIXME change database column name
-    dep_type = db.Column(db.String(45),
+    deposition_type = db.Column(db.String(45),
                      nullable=False)
     step = db.Column(db.Integer(15,
                      unsigned=True),
@@ -48,12 +47,12 @@ class WebDepositDraft(db.Model):
 
 class WebDepositWorkflow(db.Model):
     """Represents a deposition workflow."""
-    __tablename__ = 'deposition_workflows'
+    __tablename__ = 'depWORKFLOW'
     uuid = db.Column(db.String(36),
                      primary_key=True,
                      unique=True,
                      nullable=False)
-    dep_type = db.Column(db.String(45),
+    deposition_type = db.Column(db.String(45),
                          nullable=False)
     obj_json = db.Column(db.String(2048),
                          nullable=False)

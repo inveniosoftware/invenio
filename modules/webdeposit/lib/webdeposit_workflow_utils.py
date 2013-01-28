@@ -52,7 +52,7 @@ def create_deposition_document(deposition_type):
         temp_obj.pop('deposition_type')
         obj_json = json.dumps(temp_obj)
         webdeposit_workflow = WebDepositWorkflow(uuid=uuid,
-                                                 dep_type=deposition_type,
+                                                 deposition_type=deposition_type,
                                                  obj_json=obj_json,
                                                  current_step=0,
                                                  status=0)
@@ -84,8 +84,7 @@ def render_form(form):
         form_type = form.__name__
         webdeposit_draft = WebDepositDraft(uuid=uuid,
                                   user_id=user_id,
-                                  ## FIXME change column name
-                                  dep_type=deposition_type,
+                                  deposition_type=deposition_type,
                                   form_type=form_type,
                                   form_values='{}',
                                   step=step,

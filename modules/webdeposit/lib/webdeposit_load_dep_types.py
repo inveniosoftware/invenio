@@ -41,7 +41,7 @@ CFG_FORMS = PluginContainer(os.path.join(CFG_PYLIBDIR, \
 TODO: Create more doc types and load dynamically
 """
 
-dep_types = {"First Group": \
+deposition_types = {"First Group": \
                  [{"name": "Article", "dep_type": "Article"}, \
                   {"name": "Thesis", "dep_type": "Thesis"}, \
                   {"name": "Nice Poem", "dep_type": "Poetry"}, \

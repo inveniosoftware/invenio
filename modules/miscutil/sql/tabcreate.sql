@@ -3594,19 +3594,20 @@ CREATE TABLE IF NOT EXISTS sbmCOOKIES (
 
 -- WebDeposit tables
 
-CREATE TABLE IF NOT EXISTS deposition_drafts (
+CREATE TABLE IF NOT EXISTS depDRAFT (
   uuid VARCHAR(36) NOT NULL,
   step INTEGER,
   user_id INTEGER NOT NULL,
+  deposition_type VARCHAR(45) NOT NULL,
   form_type VARCHAR(45) NOT NULL,
   form_values VARCHAR(2048) NOT NULL,
   timestamp DATETIME NOT NULL,
   PRIMARY KEY (uuid, step)
 )
 
-CREATE TABLE IF NOT EXISTS deposition_workflows (
+CREATE TABLE IF NOT EXISTS depWORKFLOW (
   uuid VARCHAR(36) NOT NULL,
-  dep_type VARCHAR(45) NOT NULL,
+  deposition_type VARCHAR(45) NOT NULL,
   current_step INTEGER,
   status BINARY NOT NULL,
   PRIMARY KEY (uuid)

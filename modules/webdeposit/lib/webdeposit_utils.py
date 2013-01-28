@@ -53,7 +53,7 @@ def get_latest_or_new_workflow(deposition_type):
         # get latest draft in order to get workflow's uuid
         webdeposit_draft = db.session.query(WebDepositDraft).filter(\
                 WebDepositDraft.user_id == user_id, \
-                WebDepositDraft.dep_type == deposition_type, \
+                WebDepositDraft.deposition_type == deposition_type, \
                 WebDepositDraft.timestamp == func.max(\
                     WebDepositDraft.timestamp).select()).one()
     except NoResultFound:
@@ -150,7 +150,7 @@ def get_current_form(user_id, deposition_type=None, uuid=None):
         elif deposition_type is not None:
             webdeposit_draft = db.session.query(WebDepositDraft).filter(\
                             WebDepositDraft.user_id == user_id, \
-                            WebDepositDraft.dep_type == deposition_type, \
+                            WebDepositDraft.deposition_type == deposition_type, \
                             WebDepositDraft.timestamp == func.max(\
                                 WebDepositDraft.timestamp).select())[0]
         else:
@@ -436,7 +436,7 @@ def delete_draft(user_id, deposition_type, uuid):
 
     latest_draft = db.session.query(WebDepositDraft).filter_by(\
                                     user_id=user_id, \
-                                    dep_type=deposition_type).\
+                                    deposition_type=deposition_type).\
                                     order_by(\
                                         desc(WebDepositDraft.timestamp)).\
                                     first()
@@ -472,25 +472,27 @@ def delete_draft(user_id, deposition_type, uuid):
 def draft_field_get_all(user_id, deposition_type, field_names):
     """ Returns a list with values of the field_names specified
         containing all the latest drafts
-        of deposition of type=dep_type
+        of deposition of type=deposition_type
     """
     all_drafts = []
 
     if not isinstance(field_names, list):
         field_names = [field_names]
 
-    """
-    FIXME: the query isn't correct
-           it must select drafts with max steps from each uuid
-    """
-    for draft in db.session.query(WebDepositDraft).filter_by(user_id=user_id, \
-                                                            dep_type=deposition_type).\
-                                                   group_by(WebDepositDraft.uuid).\
-                                                   having(func.max(WebDepositDraft.step)):
+    """ Select drafts with max step from each uuid """
+    drafts = []
+    query = db.session.query(WebDepositDraft).filter_by(user_id=user_id, \
+                                                        deposition_type=deposition_type)
+    for draft1 in query:
+        # where the draft has max step in each uuid group
+        if draft1 == max(query.filter_by(uuid=draft1.uuid), key=lambda d: d.step):
+            drafts.append(draft1)
+
+    for draft in drafts:
         draft_values = json.loads(draft.form_values)
 
         tmp_draft = {"draft_id": draft.uuid, \
-                     "deposition_type": draft.dep_type, \
+                     "deposition_type": draft.deposition_type, \
                      "timestamp": draft.timestamp}
         for field_name in field_names:
             try:
@@ -533,11 +535,11 @@ def set_current_draft(user_id, uuid):
     """
 
 
-def get_current_draft(user_id, dep_type):
+def get_current_draft(user_id, deposition_type):
     webdeposit_draft = db.session.query(WebDepositDraft). \
                                 filter_by(\
                                     user_id=user_id, \
-                                    dep_type=dep_type).\
+                                    deposition_type=deposition_type).\
                                 order_by(desc(WebDepositDraft.timestamp)). \
                                 first()
     return webdeposit_draft
