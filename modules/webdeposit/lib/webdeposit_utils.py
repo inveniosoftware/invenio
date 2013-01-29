@@ -259,9 +259,10 @@ def draft_field_set(user_id, uuid, field_name, value, subfield_name=None):
             values[field_name][subfield_name] = value
     else:
         values[field_name] = value  # change value
-    draft.form_values = values
-    draft.timestamp = datetime.now()  # update draft's timestamp
-    db.session.commit()
+    #draft.form_values = values
+    #draft.timestamp = datetime.now()  # update draft's timestamp
+    webdeposit_draft_query.update({"form_values": values,
+                                   "timestamp": datetime.now()})
 
 
 def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=None):
@@ -300,8 +301,8 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
     except KeyError:
         values[field_name] = [value]
 
-    draft.form_values = values
-    db.session.commit()
+    webdeposit_draft_query.update({"form_values": values,
+                                   "timestamp": datetime.now()})
 
 
 def new_draft(user_id, deposition_type, form_type):

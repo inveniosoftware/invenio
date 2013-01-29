@@ -26,10 +26,10 @@
               <a href="{{ url_for('webdeposit.add', deposition_type=dep.dep_type) }}">
                 <i class="icon-chevron-right pull-right"></i>
                 {{ dep.name }}
-                {% if dep.name in drafts %}
+                {% if dep.dep_type in drafts %}
                 &nbsp;
                 <span class="badge badge-important">
-                  {{ drafts[dep.name] }}
+                  {{ drafts[dep.dep_type] }}
                 </span>
                 {% endif %}
               </a>

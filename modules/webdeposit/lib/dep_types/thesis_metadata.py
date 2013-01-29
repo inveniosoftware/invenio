@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -8,21 +10,27 @@
 ##
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio/webdeposit_dep_types
+from invenio.webdeposit_load_forms import forms
+from invenio.webdeposit_workflow_utils import authorize_user, \
+                                              render_form, \
+                                              wait_for_submission
 
-pylib_DATA = __init__.py \
-             article.py \
-             article_metadata.py \
-             photo.py \
-             photo_metadata.py \
-             preprint_metadata.py \
-             thesis_metadata.py
+__all__ = ['Thesis']
 
-CLEANFILES = *~ *.tmp *.pyc
+
+ThesisForm = forms['ThesisForm']
+
+dep_type = "Thesis"
+wf = [authorize_user(), \
+      render_form(ThesisForm),
+      wait_for_submission()]
+
+Thesis = {"dep_type": dep_type, \
+            "workflow": wf}

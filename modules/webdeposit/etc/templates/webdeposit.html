@@ -15,6 +15,13 @@
 
 .ui-autocomplete-loading { background: white url('{{ url_for('static', filename='img/loading.gif') }}') right center no-repeat; }
 
+.ui-autocomplete {
+    max-height: 250px;
+    overflow-y: auto;
+    /* prevent horizontal scrollbar */
+    overflow-x: hidden;
+}
+
 #link{
     float: left;
     position:absolute;
@@ -102,13 +109,13 @@ div#conditions{
 
   {% for field in form %}
     <div class="control-group">
-      <div class="control-label">
+
       {% if field._icon_html %}
-        <span class="pull-left" style="margin-right: 5px;">
+        <span class="pull-left" style="margin-right: 5px; margin-top: 5px;">
           {{ field._icon_html|safe }}
         </span>
       {% endif %}
-
+      <div class="control-label">
       {% if "submit" not in field.__html__() %}
         {% set label_class = 'pull-left' + (' required' if field.required else '') %}
         {{ field.label(class_=label_class) }}
