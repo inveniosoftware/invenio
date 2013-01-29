@@ -22,8 +22,6 @@ from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft, \
                                      WebDepositWorkflow
 
-import json
-
 
 class JsonCookerMixin(object):
     def cook_json(self, json_reader):
@@ -50,10 +48,9 @@ def create_deposition_document(deposition_type):
         temp_obj.pop('uuid')
         temp_obj.pop('step')
         temp_obj.pop('deposition_type')
-        obj_json = json.dumps(temp_obj)
         webdeposit_workflow = WebDepositWorkflow(uuid=uuid,
                                                  deposition_type=deposition_type,
-                                                 obj_json=obj_json,
+                                                 obj_json=temp_obj,
                                                  current_step=0,
                                                  status=0)
         db.session.add(webdeposit_workflow)

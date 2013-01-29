@@ -44,6 +44,7 @@ from invenio.webdeposit_utils import get_current_form, \
                                      get_workflow
 from invenio.webuser_flask import current_user
 from invenio.webdeposit_load_dep_metadata import dep_metadata
+from invenio.webdeposit_workflow import CFG_WEBDEPOSIT_WORKFLOW_STATUS
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
                               url_prefix='/deposit',
@@ -284,6 +285,10 @@ def add(deposition_type=None, uuid=None):
     if status == 0:
         # render current step of the workflow
         return workflow.get_output()
+    elif status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['finished']:
+        flash(_('Deposition %s has been successfully finished.') % (uuid, ),
+              'success')
+        return render_dep_types()
     else:
         return 'Error form %d' % status
 

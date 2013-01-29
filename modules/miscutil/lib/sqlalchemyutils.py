@@ -20,10 +20,12 @@
 import sqlalchemy
 import sqlalchemy.orm
 import base64
+import json
 from sqlalchemy.orm import class_mapper, \
                            properties
 from sqlalchemy.ext.hybrid import hybrid_property
 from invenio.intbitset import intbitset
+from sqlalchemy.types import TypeDecorator, TEXT
 
 
 def getRelationships(self):
@@ -108,6 +110,26 @@ class AsBINARY(FunctionElement):
 def compile(element, compiler, **kw):
     return "BINARY %s" % compiler.process(element.clauses)
 
+
+class JSONEncodedTextDict(TypeDecorator):
+    """
+    Represents an immutable structure as a json-encoded string.
+
+    @see: http://docs.sqlalchemy.org/en/latest/core/types.html#marshal-json-strings
+    """
+
+    impl = TEXT
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
+
 #@compiles(sqlalchemy.types.LargeBinary, "postgresql")
 #def compile_binary_postgresql(type_, compiler, **kw):
 #    return "BYTEA"
@@ -130,6 +152,7 @@ def _include_sqlalchemy(obj, engine=None):
     else:
         from sqlalchemy import types as engine_types
 
+    setattr(obj, 'JSON', JSONEncodedTextDict)
     setattr(obj, 'Char', engine_types.CHAR)
     setattr(obj, 'TinyText', engine_types.TINYTEXT)
     setattr(obj, 'hybrid_property', hybrid_property)

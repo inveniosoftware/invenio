@@ -24,6 +24,12 @@ from invenio.sqlalchemyutils import db
 from uuid import uuid1 as new_uuid
 import json
 
+CFG_WEBDEPOSIT_WORKFLOW_STATUS = {
+    'running': 0,
+    'finished': 1,
+    'error': -1
+    }
+
 
 class DepositionWorkflow(object):
     """ class for running sequential workflows
@@ -86,7 +92,9 @@ class DepositionWorkflow(object):
             self.obj['deposition_type'] = deposition_type
 
     def get_status(self):
-        return 0
+        if self.current_step >= self.steps_num:
+            return CFG_WEBDEPOSIT_WORKFLOW_STATUS['finished']
+        return CFG_WEBDEPOSIT_WORKFLOW_STATUS['running']
 
     def get_output(self):
         user_id = self.obj['user_id']
@@ -120,7 +128,6 @@ class DepositionWorkflow(object):
                 break
 
     def run_next_step(self):
-        self.update_workflow_object()
         if self.current_step >= self.steps_num:
             self.obj['break'] = True
             return
@@ -130,73 +137,58 @@ class DepositionWorkflow(object):
         self.obj['step'] = self.current_step
         self.update_db()
 
-    def jump_forward(self):
+    def jump_forward(self, synchronize=False):
         self.current_step += 1
-        self.update_db_step()
+        if synchronize:
+            self.update_db()
 
-    def jump_backwards(self):
-        if self.current_step >= 2:
+    def jump_backwards(self, synchronize=False):
+        if self.current_step > 1:
             self.current_step -= 1
         else:
             self.current_step = 1
-        self.update_db_step()
+        if synchronize:
+            self.update_db()
 
-    def set_current_step(self, step):
+    def set_current_step(self, step, synchronize=False):
         self.current_step = step
-        self.update_db_step()
+        if synchronize:
+            self.update_db()
 
     def get_current_step(self):
         return self.current_step
 
-    def update_db(self):
-        uuid = self.obj['uuid']
+    def get_workflow_from_db(self):
+        uuid = self.get_uuid()
         wf = db.session.query(WebDepositWorkflow).filter(\
                                  WebDepositWorkflow.uuid == uuid).one()
-        wf.current_step = self.current_step
+        return wf
+
+    def update_db(self):
+        uuid = self.get_uuid()
         obj = dict(**self.obj)
         # These keys have separate columns
         obj.pop('uuid')
         obj.pop('step')
         obj.pop('deposition_type')
-        obj_to_json = json.dumps(obj)
-        wf.obj_json = obj_to_json
-        db.session.commit()
-
-    def update_db_step(self):
-        uuid = self.obj['uuid']
-        wf = db.session.query(WebDepositWorkflow).filter(\
-                                 WebDepositWorkflow.uuid == uuid).one()
-        wf.current_step = self.current_step
-        db.session.commit()
-
-    def update_db_object(self):
-        uuid = self.obj['uuid']
-        wf = db.session.query(WebDepositWorkflow).filter(\
-                                 WebDepositWorkflow.uuid == uuid).one()
-        obj = dict(self.obj)
-        # These keys have separate columns
-        obj.pop('uuid')
-        obj.pop('step')
-        obj.pop('deposition_type')
-        obj_to_json = json.dumps(obj)
-        wf.obj_json = obj_to_json
+        WebDepositWorkflow.query.filter(WebDepositWorkflow.uuid == uuid).\
+            update({
+                'current_step': self.current_step,
+                'obj_json': obj
+                })
         db.session.commit()
 
     def update_workflow_object(self):
-        uuid = self.obj['uuid']
-        wf = db.session.query(WebDepositWorkflow).filter(\
-                             WebDepositWorkflow.uuid == uuid).one()
-
-        obj = json.loads(wf.obj_json)
-        obj['uuid'] = wf.uuid
+        wf = self.get_workflow_from_db()
+        obj = dict(**wf.obj_json)
         obj['deposition_type'] = wf.deposition_type
         obj['step'] = wf.current_step
         self.current_step = wf.current_step
-        self.obj = obj
+        self.obj.update(obj)
 
     def cook_json(self):
         user_id = self.obj['user_id']
-        uuid = self.obj['uuid']
+        uuid = self.get_uuid()
 
         from invenio.webdeposit_utils import get_form
 
