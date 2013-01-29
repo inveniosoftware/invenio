@@ -3594,25 +3594,26 @@ CREATE TABLE IF NOT EXISTS sbmCOOKIES (
 
 -- WebDeposit tables
 
-CREATE TABLE IF NOT EXISTS depDRAFT (
-  uuid VARCHAR(36) NOT NULL,
-  step INTEGER,
-  user_id INTEGER NOT NULL,
-  deposition_type VARCHAR(45) NOT NULL,
-  form_type VARCHAR(45) NOT NULL,
-  form_values VARCHAR(2048) NOT NULL,
-  timestamp DATETIME NOT NULL,
-  PRIMARY KEY (uuid, step)
-)
-
 CREATE TABLE IF NOT EXISTS depWORKFLOW (
   uuid VARCHAR(36) NOT NULL,
   deposition_type VARCHAR(45) NOT NULL,
-  current_step INTEGER,
-  status BINARY NOT NULL,
+  obj_json TEXT NOT NULL,
+  current_step INTEGER(15) UNSIGNED NOT NULL,
+  status INTEGER(10) UNSIGNED NOT NULL,
   PRIMARY KEY (uuid)
-  UNIQUE (uuid)
-)
+)ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS depDRAFT (
+  uuid VARCHAR(36) NOT NULL,
+  deposition_type VARCHAR(45) NOT NULL,
+  step INTEGER(15) UNSIGNED NOT NULL,
+  user_id INTEGER(15) UNSIGNED NOT NULL,
+  form_type VARCHAR(45) NOT NULL,
+  form_values TEXT NOT NULL,
+  timestamp DATETIME NOT NULL,
+  PRIMARY KEY (uuid, step),
+  FOREIGN KEY(uuid) REFERENCES depWORKFLOW (uuid)
+) ENGINE=MyISAM;
 
 -- Scheduler tables
 

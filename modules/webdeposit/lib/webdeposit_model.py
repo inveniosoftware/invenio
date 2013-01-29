@@ -27,18 +27,6 @@ from invenio.sqlalchemyutils import db
 # Create your models here.
 
 
-class WebDepositDraft(db.Model):
-    """Represents a deposition draft."""
-    __tablename__ = 'depDRAFT'
-    uuid = db.Column(db.String(36), nullable=False, primary_key=True)
-    deposition_type = db.Column(db.String(45), nullable=False)
-    step = db.Column(db.Integer(15, unsigned=True), primary_key=True)
-    user_id = db.Column(db.Integer(15, unsigned=True), nullable=False)
-    form_type = db.Column(db.String(45), nullable=False)
-    form_values = db.Column(db.JSON, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False)
-
-
 class WebDepositWorkflow(db.Model):
     """Represents a deposition workflow."""
     __tablename__ = 'depWORKFLOW'
@@ -47,5 +35,21 @@ class WebDepositWorkflow(db.Model):
     obj_json = db.Column(db.JSON, nullable=False)
     current_step = db.Column(db.Integer(15, unsigned=True), nullable=False)
     status = db.Column(db.Integer(10, unsigned=True), nullable=False)
+
+
+class WebDepositDraft(db.Model):
+    """Represents a deposition draft."""
+    __tablename__ = 'depDRAFT'
+    uuid = db.Column(db.String(36), db.ForeignKey(WebDepositWorkflow.uuid),
+                primary_key=True)
+    deposition_type = db.Column(db.String(45), nullable=False)
+    step = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                autoincrement=False)
+    user_id = db.Column(db.Integer(15, unsigned=True), nullable=False)
+    form_type = db.Column(db.String(45), nullable=False)
+    form_values = db.Column(db.JSON, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    workflow = db.relationship(WebDepositWorkflow, backref='drafts')
+
 
 __all__ = ['WebDepositDraft', 'WebDepositWorkflow']

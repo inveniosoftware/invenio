@@ -30,7 +30,9 @@ from flask import current_app, \
                   url_for, \
                   flash
 from werkzeug.utils import secure_filename
-
+from invenio.sqlalchemyutils import db
+from invenio.webdeposit_model import WebDepositDraft, WebDepositWorkflow
+from invenio.webdeposit_load_dep_types import deposition_types
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 
 from invenio.config import CFG_WEBDEPOSIT_UPLOAD_FOLDER
@@ -265,10 +267,10 @@ def add(deposition_type=None, uuid=None):
         try:
             uploaded_file = request.files['file']
             filename = secure_filename(uploaded_file.filename)
-        except KeyError: # there is no file
+        except KeyError:  # there is no file
             filename = ''
 
-        if filename != '': # if exists
+        if filename != '':  # if exists
             file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, filename)
             uploaded_file.save(file_path)
             draft_field_list_add(current_user.get_id(), \
@@ -293,18 +295,17 @@ def add(deposition_type=None, uuid=None):
         return 'Error form %d' % status
 
 
-from invenio.sqlalchemyutils import db
-from invenio.webdeposit_model import WebDepositDraft
-from invenio.webdeposit_load_dep_types import deposition_types
-
 def render_dep_types():
     """ Renders the deposition types (workflows) list """
     current_app.config['breadcrumbs_map'][request.endpoint] = [
                         (_('Home'), '')] + blueprint.breadcrumbs
-
     drafts = dict(db.session.query(WebDepositDraft.deposition_type,
                     db.func.count(db.func.distinct(WebDepositDraft.uuid))).\
-                  filter(WebDepositDraft.user_id == current_user.get_id()).\
+                  join(WebDepositDraft.workflow).\
+                  filter(db.and_(
+                    WebDepositDraft.user_id == current_user.get_id(),
+                    WebDepositWorkflow.status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['running']
+                  )).\
                   group_by(WebDepositDraft.deposition_type).all())
 
     return render_template('webdeposit_dep_types.html', \

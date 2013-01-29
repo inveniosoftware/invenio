@@ -83,7 +83,7 @@ def render_form(form):
                                   user_id=user_id,
                                   deposition_type=deposition_type,
                                   form_type=form_type,
-                                  form_values='{}',
+                                  form_values={},
                                   step=step,
                                   timestamp=func.current_timestamp())
         db.session.add(webdeposit_draft)

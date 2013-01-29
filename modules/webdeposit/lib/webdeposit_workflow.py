@@ -106,19 +106,15 @@ class DepositionWorkflow(object):
         form = get_form(user_id, uuid)
 
         deposition_type = self.obj['deposition_type']
-        drafts = draft_field_get_all(user_id, deposition_type, "title")
-        drafts = sorted(drafts,
-                        key=lambda draft: draft['timestamp'],
-                        reverse=True)
-        for draft in drafts:
-            draft['timestamp'] = pretty_date(draft['timestamp'])
+        drafts = draft_field_get_all(user_id, deposition_type)
 
-        return render_template('webdeposit.html', \
+        return render_template('webdeposit.html',
                                workflow=self,
                                deposition_type=deposition_type,
-                               form=form, \
-                               drafts=drafts, \
-                               uuid=uuid)
+                               form=form,
+                               drafts=drafts,
+                               uuid=uuid,
+                               pretty_date=pretty_date)
 
     def run(self):
         while True:
@@ -130,6 +126,7 @@ class DepositionWorkflow(object):
     def run_next_step(self):
         if self.current_step >= self.steps_num:
             self.obj['break'] = True
+            self.update_db()
             return
         function = self.workflow[self.current_step]
         function(self.obj, self)
@@ -173,6 +170,7 @@ class DepositionWorkflow(object):
         obj.pop('deposition_type')
         WebDepositWorkflow.query.filter(WebDepositWorkflow.uuid == uuid).\
             update({
+                'status': self.get_status(),
                 'current_step': self.current_step,
                 'obj_json': obj
                 })
