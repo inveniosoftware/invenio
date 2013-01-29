@@ -17,37 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import json
+from datetime import datetime
 from sqlalchemy import func, desc
 from wtforms import FormField
-#from werkzeug.contrib.cache import RedisCache
-from invenio.sqlalchemyutils import db
 from sqlalchemy.orm.exc import NoResultFound
-from webdeposit_model import WebDepositDraft, \
-                             WebDepositWorkflow
+from invenio.sqlalchemyutils import db
+from invenio.webdeposit_model import WebDepositDraft, \
+                                     WebDepositWorkflow
 from invenio.webdeposit_workflow import DepositionWorkflow
-from webdeposit_load_forms import forms
-
-import datetime
-import json
-
-#rediscache = RedisCache("localhost", default_timeout=9000)
+from invenio.webdeposit_load_forms import forms
+from invenio.webuser_flask import current_user
+from invenio.webdeposit_load_dep_metadata import dep_metadata
 
 """ Deposition Type Functions """
 
 
 def get_latest_or_new_workflow(deposition_type):
     """ Creates new workflow or returns a new one """
-    from invenio.webuser_flask import current_user
-    from invenio.webdeposit_load_dep_metadata import dep_metadata
 
     user_id = current_user.get_id()
-
-    try:
-        # get the workflow from the deposition's metadata
-        wf = dep_metadata[deposition_type]["workflow"]
-    except KeyError:
-        # deposition type not found
-        return None
+    wf = dep_metadata[deposition_type]["workflow"]
 
     try:
         # get latest draft in order to get workflow's uuid
@@ -71,7 +61,6 @@ def get_latest_or_new_workflow(deposition_type):
 
 def get_workflow(deposition_type, uuid):
     """ Returns a workflow instance with uuid=uuid or None """
-    from invenio.webdeposit_load_dep_metadata import dep_metadata
     try:
         wf = dep_metadata[deposition_type]["workflow"]
     except KeyError:
@@ -84,8 +73,6 @@ def get_workflow(deposition_type, uuid):
 
 def create_workflow(user_id, deposition_type):
     """ Creates a new workflow and returns it """
-    from invenio.webdeposit_load_dep_metadata import dep_metadata
-
     try:
         wf = dep_metadata[deposition_type]["workflow"]
     except KeyError:
@@ -115,9 +102,6 @@ def create_deposition_type(user_id, deposition_type):
     TODO: check if dep type exists
     (deprecated, use create_workflow instead)
     """
-
-    from invenio.webdeposit_load_dep_metadata import dep_metadata
-
     try:
         wf = dep_metadata[deposition_type]["workflow"]
     except KeyError:
@@ -253,11 +237,6 @@ def draft_field_get(user_id, uuid, field_name, subfield_name=None):
         return values[field_name]
     except KeyError:
         return None
-    """
-    userID = str(userID)
-    draftID = str(draftID)
-    return rediscache.get(userID + ":" + draftID + ":" + fieldName)
-    """
 
 
 def draft_field_set(user_id, uuid, field_name, value, subfield_name=None):
@@ -267,27 +246,21 @@ def draft_field_set(user_id, uuid, field_name, value, subfield_name=None):
                             WebDepositDraft.user_id == user_id, \
                             WebDepositDraft.uuid == uuid)
     # get the draft with the max step
-    draft = webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+    draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+    values = json.loads(draft.form_values)
 
-    values = json.loads(draft.form_values)  #get dict
     if subfield_name is not None:
         try:
             values[field_name][subfield_name] = value
-        except (KeyError, TypeError) as e:
+        except (KeyError, TypeError):
             values[field_name] = dict()
             values[field_name][subfield_name] = value
     else:
-        values[field_name] = value  #change value
-    values = json.dumps(values)  #encode back to json
+        values[field_name] = value  # change value
+    values = json.dumps(values)  # encode back to json
     draft.form_values = values
-    draft.timestamp = datetime.datetime.now() #update draft's timestamp
+    draft.timestamp = datetime.now()  # update draft's timestamp
     db.session.commit()
-
-    """
-    userID = str(userID)
-    draftID = str(draftID)
-    rediscache.set(userID + ":" + draftID + ":" + fieldName, value)
-    """
 
 
 def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=None):
@@ -309,9 +282,8 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
                             WebDepositDraft.user_id == user_id, \
                             WebDepositDraft.uuid == uuid)
     # get the draft with the max step
-    draft = webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
-
-    values = json.loads(draft.form_values)  #get dict
+    draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+    values = json.loads(draft.form_values)
 
     try:
         if isinstance(values[field_name], list):
@@ -327,7 +299,7 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
     except KeyError:
         values[field_name] = [value]
 
-    values = json.dumps(values)  #encode back to json
+    values = json.dumps(values)  # encode back to json
     draft.form_values = values
     db.session.commit()
 
@@ -345,21 +317,6 @@ def new_draft(user_id, deposition_type, form_type):
     db.session.commit()
     return webdeposit_draft.uuid
 
-    """
-    userID = str(userID)
-    draftID = get_new_draft_id(userID)
-    drafts = rediscache.get(userID + ":drafts")
-    if drafts is None:
-        rediscache.set(str(userID) + ":drafts", str(draftID))
-    else:
-        newdrafts = drafts + ":" + str(draftID)
-        rediscache.set(str(userID) + ":drafts", newdrafts)
-
-    return draftID
-    """
-
-#def get_new_draft_id(userID):
-#    return rediscache.inc(str(userID) + ":draftcounter", delta=1)
 
 def get_draft(user_id, uuid, field_name=None):
     """ Returns draft values in a field_name => field_value dictionary
@@ -379,47 +336,8 @@ def get_draft(user_id, uuid, field_name=None):
     else:
         try:
             return form_values[field_name]
-        except KeyError: # field_name doesn't exist
-            return form_values #return whole row
-    """
-    userID = str(userID)
-    if draftID is None:
-        return None
-    else:
-        drafts = rediscache.get(userID + ":drafts")
-        if drafts is None:
-            return None
-        elif str(draftID) not in drafts.split(":"):
-            return None
-        else:
-            draftID = str(draftID)
-            publisher, journal, issn, doctitle, author, \
-            abstract, pagesnum, language, date, notes, conditions \
- = rediscache.get_many(userID + ":" + draftID + ":publisher", \
-                                   userID + ":" + draftID + ":journal", \
-                                   userID + ":" + draftID + ":issn", \
-                                   userID + ":" + draftID + ":doctitle", \
-                                   userID + ":" + draftID + ":author", \
-                                   userID + ":" + draftID + ":abstract", \
-                                   userID + ":" + draftID + ":pagesnum", \
-                                   userID + ":" + draftID + ":language", \
-                                   userID + ":" + draftID + ":date", \
-                                   userID + ":" + draftID + ":notes", \
-                                   userID + ":" + draftID + ":conditions")
-            return { "id"        : draftID, \
-                     "publisher" : publisher, \
-                     "journal"   : journal, \
-                     "issn"      : issn, \
-                     "doctitle"  : doctitle, \
-                     "author"    : author, \
-                     "abstract"  : abstract, \
-                     "pagesnum"  : pagesnum, \
-                     "language"  : language, \
-                     "date"      : date, \
-                     "notes"     : notes, \
-                     "conditions": conditions
-                    }
-    """
+        except KeyError:  # field_name doesn't exist
+            return form_values  # return whole row
 
 
 def delete_draft(user_id, deposition_type, uuid):
@@ -440,33 +358,10 @@ def delete_draft(user_id, deposition_type, uuid):
                                     order_by(\
                                         desc(WebDepositDraft.timestamp)).\
                                     first()
-    if latest_draft is None: # There is no draft left
+    if latest_draft is None:  # There is no draft left
         return None
     else:
         return latest_draft.uuid
-
-
-    """
-    userID = str(userID)
-    draftID = str(draftID)
-    drafts = rediscache.get(userID + ":drafts")
-    newdrafts = ""
-    i = 0;
-    for did in drafts.split(":"):
-        if did != draftID:
-            print did + "not equal to" + draftID
-            if i is not 0:
-                newdrafts += ":" + did
-            else:
-                newdrafts += did
-            i += 1
-    rediscache.set(userID + ":drafts", newdrafts)
-    draftIDs = newdrafts.split(":")
-    i = len(draftIDs) - 1
-    set_current_draft(userID, draftIDs[i])
-    #return the last draft
-    return draftIDs[i]
-    """
 
 
 def draft_field_get_all(user_id, deposition_type, field_names):
@@ -501,22 +396,7 @@ def draft_field_get_all(user_id, deposition_type, field_names):
                 tmp_draft[field_name] = None
         all_drafts.append(tmp_draft)
 
-
     return all_drafts
-
-    """
-    userID = str(userID)
-    drafts = rediscache.get(userID + ":drafts")
-    if drafts is None:
-        drafts = ""
-    draftIDs = drafts.split(":")
-    allDrafts = []
-    for draftID in draftIDs:
-        tempDraft = get_draft(userID, draftID)
-        allDrafts.append(tempDraft)
-
-    return allDrafts
-    """
 
 
 def set_current_draft(user_id, uuid):
@@ -526,13 +406,8 @@ def set_current_draft(user_id, uuid):
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
 
-    draft.timestamp = datetime.datetime.now()
+    draft.timestamp = datetime.now()
     db.session.commit()
-
-    """
-    draftID = str(draftID)
-    rediscache.set(str(userID) + ":current_draft", draftID)
-    """
 
 
 def get_current_draft(user_id, deposition_type):
@@ -543,9 +418,7 @@ def get_current_draft(user_id, deposition_type):
                                 order_by(desc(WebDepositDraft.timestamp)). \
                                 first()
     return webdeposit_draft
-    """
-    return rediscache.get(str(userID) + ":current_draft")
-    """
+
 
 """ Misc functions """
 
@@ -555,7 +428,8 @@ def pretty_date(time=False):
     pretty string like 'an hour ago', 'Yesterday', '3 months ago',
     'just now', etc
     """
-    from datetime import datetime
+
+    #FIXME move to dateutils.py
 
     now = datetime.now()
     if type(time) is int:
@@ -576,7 +450,7 @@ def pretty_date(time=False):
         if second_diff < 60:
             return str(second_diff) + " seconds ago"
         if second_diff < 120:
-            return  "a minute ago"
+            return "a minute ago"
         if second_diff < 3600:
             return str(second_diff / 60) + " minutes ago"
         if second_diff < 7200:
@@ -601,17 +475,3 @@ def pretty_date(time=False):
         return "Last year"
     else:
         return str(day_diff / 365) + " years ago"
-
-
-def escape(s):
-    ambersands_escape_table = { \
-        "&amp;": "&", \
-        "&quot;": '"', \
-        "&apos;": "'", \
-        "&gt;": ">", \
-        "&lt;": "<", \
-        "&#34;": "\""}
-
-    for (a, h) in ambersands_escape_table.items():
-        s = s.replace(a, h)
-    return s

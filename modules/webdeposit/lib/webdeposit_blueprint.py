@@ -43,19 +43,20 @@ from invenio.webdeposit_utils import get_current_form, \
                                      get_latest_or_new_workflow, \
                                      get_workflow
 from invenio.webuser_flask import current_user
+from invenio.webdeposit_load_dep_metadata import dep_metadata
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
                               url_prefix='/deposit',
                               config='invenio.websubmit_config',
                               menubuilder=[('main.webdeposit',
                                           _('Deposit'),
-                                            'webdeposit.add', 2)],
-                              breadcrumbs=[(_('Deposit'), 'webdeposit')])
+                                            'webdeposit.index_deposition_types', 2)],
+                              breadcrumbs=[(_('Deposit'), 'webdeposit.index_deposition_types')])
 
 @blueprint.route('/upload/<uuid>', methods=['POST', 'GET'])
 def plupload(uuid):
     """ The file is splitted in chunks on the client-side
-        and it is merged again on the server-side 
+        and it is merged again on the server-side
     """
     if request.method == 'POST':
         try:
@@ -236,6 +237,10 @@ def add(deposition_type=None, uuid=None):
     """
 
     status = 0
+
+    if deposition_type is not None and deposition_type not in dep_metadata:
+        flash(_('Invalid deposition type.'), 'error')
+        return render_dep_types()
 
     if deposition_type is None:
         # choose deposition type
