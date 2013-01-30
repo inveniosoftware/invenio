@@ -83,7 +83,8 @@ def create_invenio_flask_app():
     from invenio.messages import wash_language, gettext_set_language, \
                                  language_list_long, is_language_rtl
     from invenio.dateutils import convert_datetext_to_dategui, \
-                                  convert_datestruct_to_dategui
+                                  convert_datestruct_to_dategui, \
+                                  pretty_date
     from invenio.urlutils import create_url
     from invenio.cache import cache
     from invenio.jinja2utils import CollectionExtension, DynCacheExtension
@@ -361,6 +362,16 @@ def create_invenio_flask_app():
             return convert_datestruct_to_dategui(date.timetuple(),
                                                  g.ln).decode('utf-8')
         return convert_datetext_to_dategui(date, g.ln).decode('utf-8')
+
+    @_app.template_filter('invenio_pretty_date')
+    def _pretty_date(date):
+        """
+        This is a special Jinja2 filter that will call
+        pretty_date to print a human friendly timestamp.
+        """
+        if isinstance(date, datetime):
+            return pretty_date(date, ln=g.ln)
+        return date
 
     @_app.template_filter('invenio_url_args')
     def _url_args(d, append=u'?', filter=[]):
