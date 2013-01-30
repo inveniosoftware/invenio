@@ -417,3 +417,60 @@ def get_time_estimator(total):
         t3 = 1.0 * (t2 - t1) / count[0] * (total - count[0])
         return t3, t3 + t1
     return estimate_needed_time
+
+
+def pretty_date(time=False, ln=CFG_SITE_LANG):
+    """
+    Get a datetime object or a int() Epoch timestamp and return a
+    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
+    'just now', etc.
+    """
+
+    #FIXME move to dateutils.py
+    _ = gettext_set_language(ln)
+
+    now = datetime.datetime.now()
+    if type(time) is int:
+        diff = now - datetime.datetime.fromtimestamp(time)
+    elif isinstance(time, datetime.datetime):
+        diff = now - time
+    elif not time:
+        diff = now - now
+    second_diff = diff.seconds
+    day_diff = diff.days
+
+    if day_diff < 0:
+        return ''
+
+    if day_diff == 0:
+        if second_diff < 10:
+            return _("just now")
+        if second_diff < 60:
+            return str(second_diff) + _(" seconds ago")
+        if second_diff < 120:
+            return _("a minute ago")
+        if second_diff < 3600:
+            return str(second_diff / 60) + _(" minutes ago")
+        if second_diff < 7200:
+            return _("an hour ago")
+        if second_diff < 86400:
+            return str(second_diff / 3600) + _(" hours ago")
+    if day_diff == 1:
+        return _("Yesterday")
+    if day_diff < 7:
+        return str(day_diff) + _(" days ago")
+    if day_diff < 31:
+        if day_diff / 7 == 7:
+            return _("Last week")
+        else:
+            return str(day_diff / 7) + _(" weeks ago")
+    if day_diff < 365:
+        if day_diff / 30 == 1:
+            return _("Last month")
+        else:
+            return str(day_diff / 30) + _(" months ago")
+    if day_diff / 365 == 1:
+        return _("Last year")
+    else:
+        return str(day_diff / 365) + _(" years ago")
+
