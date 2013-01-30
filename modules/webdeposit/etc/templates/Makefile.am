@@ -18,6 +18,7 @@
 templatesdir = $(sysconfdir)/templates
 templates_DATA = \
 		 webdeposit.html \
+		 webdeposit_index.html \
 		 websubmit_submitted.html \
 		 webdeposit_dep_types.html
 

@@ -23,7 +23,7 @@
           <ul class="nav nav-pills nav-stacked" style="margin-bottom: 0px;">
           {% for dep in dep_types|sort(attribute='name') %}
             <li>
-              <a href="{{ url_for('webdeposit.add', deposition_type=dep.dep_type) }}">
+              <a href="{{ url_for('webdeposit.index', deposition_type=dep.dep_type) }}">
                 <i class="icon-chevron-right pull-right"></i>
                 {{ dep.name }}
                 {% if dep.dep_type in drafts %}
