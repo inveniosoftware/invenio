@@ -260,13 +260,24 @@ def create_invenio_flask_app():
 
     # Let's create assets environment.
     _assets = Environment(_app)
-    _assets.debug = config.CFG_DEVEL_SITE >= 1
+    _assets.debug = config.CFG_DEVEL_SITE > 1
     _assets.directory = config.CFG_WEBDIR
 
-    _app.jinja_env.extend(new_bundle=lambda tag, collection: \
-        Bundle(output="%s/invenio-%s.%s" % \
-               (tag, hash('|'.join(collection)), tag),
-               *collection))
+    def _jinja2_new_bundle(tag, collection):
+        if not _assets.debug:
+            files = [f for f in collection if os.path.isfile(
+                    os.path.join(_assets.directory, f))]
+            if len(files) != len(collection):
+                ## Turn on debuging to generate 404 request on missing files.
+                _assets.debug = True
+                current_app.logger.error('Missing files: ' + ','.join(
+                    set(collection) - set(files)))
+
+        return Bundle(output="%s/invenio-%s.%s" % \
+           (tag, hash('|'.join(collection)), tag), *collection)
+
+    _app.jinja_env.extend(new_bundle=_jinja2_new_bundle)
+
     _app.jinja_env.add_extension(CollectionExtension)
     _app.jinja_env.add_extension(DynCacheExtension)
     _app.jinja_env.add_extension('jinja2.ext.do')
