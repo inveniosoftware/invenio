@@ -89,7 +89,7 @@ div#conditions{
                   {{ _('Untitled') }}
               {% endif %}
             {{ '</strong>'|safe if uuid == draft.uuid }}
-            <span style="font-size: 80%;" class="muted">{{ pretty_date(draft.timestamp)|safe }}</span>
+            <span style="font-size: 80%;" class="muted">{{ draft.timestamp|invenio_pretty_date }}</span>
            </a>
           </li>
         {% endfor %}

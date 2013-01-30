@@ -101,8 +101,7 @@ class DepositionWorkflow(object):
         uuid = self.obj['uuid']
 
         from invenio.webdeposit_utils import get_form, \
-                                             draft_field_get_all, \
-                                             pretty_date
+                                             draft_field_get_all
         form = get_form(user_id, uuid)
 
         deposition_type = self.obj['deposition_type']
@@ -113,8 +112,7 @@ class DepositionWorkflow(object):
                                deposition_type=deposition_type,
                                form=form,
                                drafts=drafts,
-                               uuid=uuid,
-                               pretty_date=pretty_date)
+                               uuid=uuid)
 
     def run(self):
         while True:

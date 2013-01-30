@@ -28,7 +28,7 @@
             {{ _('Untitled') }}
         {% endif %}
       {{ '</strong>'|safe if uuid == draft.uuid }}
-      <span style="font-size: 80%;" class="muted">{{ draft.timestamp }}</span>
+      <span style="font-size: 80%;" class="muted">{{ draft.timestamp|invenio_pretty_date }}</span>
      </a>
     </li>
   {% endfor %}
