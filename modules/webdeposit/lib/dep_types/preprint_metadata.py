@@ -28,9 +28,14 @@ __all__ = ['Preprint']
 PreprintForm = forms['PreprintForm']
 
 dep_type = "Preprint"
+plural = "Preprints"
+group = "Articles & Preprints"
 wf = [authorize_user(), \
       render_form(PreprintForm),
       wait_for_submission()]
 
 Preprint = {"dep_type": dep_type, \
-            "workflow": wf}
+            "workflow": wf, \
+            "plural": plural, \
+            "group": group, \
+            "enabled": True}

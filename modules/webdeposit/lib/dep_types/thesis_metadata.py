@@ -28,9 +28,14 @@ __all__ = ['Thesis']
 ThesisForm = forms['ThesisForm']
 
 dep_type = "Thesis"
+plural = "Theses"
+group = "Articles & Preprints"
 wf = [authorize_user(), \
       render_form(ThesisForm),
       wait_for_submission()]
 
 Thesis = {"dep_type": dep_type, \
-            "workflow": wf}
+          "workflow": wf, \
+          "plural": plural, \
+          "group": group, \
+          "enabled": True}

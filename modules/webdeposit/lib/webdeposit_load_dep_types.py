@@ -17,31 +17,38 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#import os
+import os
 #from wtforms import Form
-#from invenio.config import CFG_PYLIBDIR
-#from invenio.pluginutils import PluginContainer
+from invenio.config import CFG_PYLIBDIR
+from invenio.pluginutils import PluginContainer
 
-"""def plugin_builder(plugin_name, plugin_code):
+def plugin_builder(plugin_name, plugin_code):
     all = getattr(plugin_code, '__all__')
     for name in all:
-        candidate = getattr(plugin_code, name)
-        if issubclass(candidate, Form):
-            return candidate
+        return getattr(plugin_code, name)
 
-CFG_FORMS = PluginContainer(os.path.join(CFG_PYLIBDIR, \
-                                         'invenio', \
-                                         'webdeposit_forms', \
-                                         '*.py'), \
-                            plugin_builder=plugin_builder)
-"""
-
+CFG_DOC_METADATA = PluginContainer(os.path.join(CFG_PYLIBDIR, \
+                                                'invenio', \
+                                                'webdeposit_dep_types', \
+                                                '*_metadata.py'),
+                                   plugin_builder=plugin_builder)
 
 """
-TODO: Create more doc types and load dynamically
-"""
+Create a dict with groups, names and deposition types
+in order to render the deposition type chooser page
 
+e.g.
 deposition_types = {"Articles & Preprints": \
                     [{"name": "Articles", "dep_type": "Article"}, \
                      {"name": "Preprints", "dep_type": "Preprint"}, \
                      {"name": "Theses", "dep_type": "Thesis"}]}
+"""
+
+deposition_types = {}
+for dep in CFG_DOC_METADATA.itervalues():
+    if not deposition_types.has_key(dep['group']):
+        deposition_types[dep['group']] = []
+    if dep["enabled"]:
+        deposition_types[dep['group']].append({"name": dep['plural'], "dep_type": dep["dep_type"]})
+
+__all__ = ['deposition_types']

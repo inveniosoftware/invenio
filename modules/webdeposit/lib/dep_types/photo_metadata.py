@@ -27,9 +27,14 @@ __all__ = ['Photo']
 PhotoForm = forms['PhotoForm']
 
 dep_type = "Photo"
+plural = "Photos"
+group = "Articles & Preprints"
 wf = [authorize_user(), \
       render_form(PhotoForm),
       wait_for_submission()]
 
 Photo = {"dep_type": dep_type, \
-         "workflow": wf}
+         "workflow": wf, \
+         "plural": plural, \
+         "group": group, \
+         "enabled": False}
