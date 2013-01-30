@@ -33,8 +33,6 @@ plural = "Articles"
 group = "Articles & Preprints"
 wf = [authorize_user(), \
       render_form(ArticleForm),
-      wait_for_submission(),
-      render_form(PhotoForm),
       wait_for_submission()]
 
 # form = get_metadata_creation_form_from_doctype(doc_type)  # # This will use BibField to create a simple form which is the concatenation of all the fields neeeded for doc_type "Article"
