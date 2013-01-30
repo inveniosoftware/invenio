@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1422,7 +1422,7 @@ class BibDoc:
         if docname:
             docname = normalize_docname(docname)
         self.docfiles = []
-        self.__md5s = None
+        self.md5s = None
         self.human_readable = human_readable
         if docid:
             if not recid:
@@ -1541,17 +1541,6 @@ class BibDoc:
         for docfile in self.docfiles:
             out += str(docfile)
         return out
-
-    def get_md5s(self):
-        """
-        @return: an instance of the Md5Folder class to access MD5 information
-            of the current BibDoc
-        @rtype: Md5Folder
-        """
-        if self.__md5s is None:
-            self.__md5s = Md5Folder(self.basedir)
-        return self.__md5s
-    md5s = property(get_md5s)
 
     def format_already_exists_p(self, format):
         """
