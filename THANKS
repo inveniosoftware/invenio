@@ -205,4 +205,8 @@ specialchar plugin from Frederico Knabben.
 The oai2.xsl.v1.0 OAI to HTML XSLT Style Sheet was taken from EPrints.
 <http://www.eprints.org/software/xslt.php>
 
+The xmlDict.py code is authored by Duncan McGreggor and is licensed
+under PSF license.  It was taken from
+<http://code.activestate.com/recipes/410469/>.
+
 - end of file -
