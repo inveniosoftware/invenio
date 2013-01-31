@@ -28,7 +28,8 @@ from invenio.external_authentication import ExternalAuth
 
 
 # Tunable list of settings to be hidden
-CFG_EXTERNAL_AUTH_HIDDEN_SETTINGS = ('auth', 'respccid', 'personid')
+## e.g.: CFG_EXTERNAL_AUTH_HIDDEN_SETTINGS = ('auth', 'respccid', 'personid')
+CFG_EXTERNAL_AUTH_HIDDEN_SETTINGS = ()
 # Tunable list of groups to be hidden
 CFG_EXTERNAL_AUTH_HIDDEN_GROUPS = (
     'All Exchange People',
@@ -59,15 +60,15 @@ CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE = (
     )
 
 # Prefix name for Shibboleth variables
-CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME = 'ADFS_'
+CFG_EXTERNAL_AUTH_SSO_PREFIX_NAMES = ('ADFS_', 'Shib-')
 # Name of the variable containing groups
-CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'GROUP'
+CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAMES[0] + 'GROUP'
 # Name of the variable containing login name
-CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'LOGIN'
+CFG_EXTERNAL_AUTH_SSO_LOGIN_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAMES[0] + 'LOGIN'
 # Name of the variable containing email
-CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'EMAIL'
+CFG_EXTERNAL_AUTH_SSO_EMAIL_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAMES[0] + 'EMAIL'
 # Name of the variable containing groups
-CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'GROUP'
+CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAMES[0] + 'GROUP'
 # Separator character for group variable
 CFG_EXTERNAL_AUTH_SSO_GROUPS_SEPARATOR = ';'
 
@@ -176,7 +177,6 @@ class ExternalAuthSSO(ExternalAuth):
         return {}
 
 
-
     def fetch_user_preferences(self, username, password=None, req=None):
         """Fetch user preferences/settings from the SSO account.
         the external key will be '1' if the account is external to SSO,
@@ -190,8 +190,10 @@ class ExternalAuthSSO(ExternalAuth):
             ret = {}
             prefs = self._fetch_particular_preferences(req)
             for key, value in req.subprocess_env.items():
-                if key.startswith(CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME) and not key == CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE:
-                    prefs[key[len(CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME):].lower()] = value
+                for prefix in CFG_EXTERNAL_AUTH_SSO_PREFIX_NAMES:
+                    if key.startswith(prefix) and not key == CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE:
+                        prefs[key[len(prefix):].lower()] = value
+                        break
             for key, value in prefs.items():
                 if key in CFG_EXTERNAL_AUTH_HIDDEN_SETTINGS:
                     ret['HIDDEN_' + key] = value
@@ -199,4 +201,3 @@ class ExternalAuthSSO(ExternalAuth):
                     ret[key] = value
             return ret
         return {}
-
