@@ -246,7 +246,7 @@ class ExternalAuthRobot(ExternalAuth):
         ext_id = data.get(self.external_id_attribute_name, email)
         if email:
             if isinstance(email, str):
-                return email.strip().lower(), ext_id.strip()
+                return email.strip().lower(), str(ext_id).strip()
             else:
                 raise InvenioWebAccessExternalAuthError("The email provided in the assertion is invalid: %s" % (repr(email)))
         else:
