@@ -124,17 +124,18 @@ def autocomplete(deposition_type, uuid):
     """ Returns a list with of suggestions for the field
         based on the current value
     """
-    query = request.args.get('term') # value
-    field_type = request.args.get('type') # field
+    query = request.args.get('term')  # value
+    field_type = request.args.get('type')  # field
+    limit = request.args.get('limit', 50, type=int)
 
     form = get_current_form(current_user.get_id(), uuid=uuid)[1]
     form.__dict__["_fields"][field_type].process_data(query)
 
     #Check if field has an autocomplete function
     if hasattr(form.__dict__["_fields"][field_type], "autocomplete"):
-        return json.dumps(form.__dict__["_fields"][field_type].autocomplete())
+        return jsonify(results=form.__dict__["_fields"][field_type].autocomplete()[:limit])
     else:
-        return []
+        return jsonify(results=[])
 
 
 @blueprint.route('/<deposition_type>/_ISSN/<uuid>', methods=['GET', 'POST'])

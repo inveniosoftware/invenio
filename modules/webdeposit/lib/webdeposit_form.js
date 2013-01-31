@@ -111,18 +111,29 @@ function type(o){
 }
 
 function webdeposit_field_autocomplete(selector, url) {
-    $(selector).autocomplete({
-        source: url,
-        minLength: 5,
-        /*select: function(event, ui) {
-            var selected = ui.item.value;
-            $.getJSON($SCRIPT_ROOT + '_errorCheck/{{ uuid }}', {
-                name: '{{ field.name }}',
-                attribute: selected
-            }, function(data) {});
-        }*/
-    });
 
+    var source = function(query) {
+      $(selector).addClass('ui-autocomplete-loading');
+      var typeahead = this;
+      $.ajax({
+        type: 'GET',
+        url: url,
+        data: $.param({
+          term: query
+        })
+      }).done(function(data) {
+        typeahead.process(data.results);
+        $(selector).removeClass('ui-autocomplete-loading');
+      }).fail(function(data) {
+        typeahead.process([query]);
+        $(selector).removeClass('ui-autocomplete-loading');
+      });
+    };
+    $(selector).typeahead({
+      source: source,
+      minLength: 5,
+      items: 50
+    });
 }
 
 /*

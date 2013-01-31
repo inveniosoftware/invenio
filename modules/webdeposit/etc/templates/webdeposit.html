@@ -2,12 +2,10 @@
 {% block header %}
     {{ super() }}
     <script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
-    {% js 'js/jquery-ui.min.js' %}
     {% js 'js/plupload/plupload.full.js' %}
     {% js 'js/plupload/jquery.plupload.queue/jquery.plupload.queue.js' %}
     {% js 'js/webdeposit_form.js' %}
     {% css 'js/plupload/jquery.plupload.queue/css/jquery.plupload.queue.css' %}
-    {% css 'img/jquery-ui.css' %}
 {% endblock %}
 
 {% block body %}
@@ -15,7 +13,7 @@
 
 .ui-autocomplete-loading { background: white url('{{ url_for('static', filename='img/loading.gif') }}') right center no-repeat; }
 
-.ui-autocomplete {
+.typeahead {
     max-height: 250px;
     overflow-y: auto;
     /* prevent horizontal scrollbar */
