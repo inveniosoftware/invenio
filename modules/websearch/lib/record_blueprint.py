@@ -82,7 +82,7 @@ def request_record(f):
         if not current_user.is_guest:
             user = User.query.get(current_user.get_id())
         title = get_fieldvalues(recid, '245__a')
-        title = title[0] if len(title) > 0 else ''
+        title = title[0].decode('utf-8') if len(title) > 0 else ''
 
         b = get_collection_breadcrumbs(collection, [(_('Home'),'')])
         b += [(title, 'record.metadata', dict(recid=recid))]
