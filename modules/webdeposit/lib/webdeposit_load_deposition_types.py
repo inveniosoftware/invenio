@@ -18,18 +18,21 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
-#from wtforms import Form
-from invenio.config import CFG_PYLIBDIR
+from pprint import pformat
+from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.pluginutils import PluginContainer
 
+
 def plugin_builder(plugin_name, plugin_code):
+    if plugin_name == '__init__':
+        return
     all = getattr(plugin_code, '__all__')
     for name in all:
         return getattr(plugin_code, name)
 
-CFG_DOC_METADATA = PluginContainer(os.path.join(CFG_PYLIBDIR, \
-                                                'invenio', \
-                                                'webdeposit_dep_types', \
+CFG_DOC_METADATA = PluginContainer(os.path.join(CFG_PYLIBDIR,
+                                                'invenio',
+                                                'webdeposit_deposition_types',
                                                 '*_metadata.py'),
                                    plugin_builder=plugin_builder)
 
@@ -44,11 +47,22 @@ deposition_types = {"Articles & Preprints": \
                      {"name": "Theses", "dep_type": "Thesis"}]}
 """
 
+deposition_metadata = {}
 deposition_types = {}
+
 for dep in CFG_DOC_METADATA.itervalues():
-    if not deposition_types.has_key(dep['group']):
+    if dep is not None:
+        deposition_metadata[dep['dep_type']] = dict()
+        deposition_metadata[dep['dep_type']]["workflow"] = dep['workflow']
+
+    if dep['group'] not in deposition_types:
         deposition_types[dep['group']] = []
     if dep["enabled"]:
-        deposition_types[dep['group']].append({"name": dep['plural'], "dep_type": dep["dep_type"]})
+        deposition_types[dep['group']].append({"name": dep['plural'],
+                                               "dep_type": dep["dep_type"]})
 
-__all__ = ['deposition_types']
+## Let's report about broken plugins
+open(os.path.join(CFG_LOGDIR, 'broken-depositions.log'), 'w').write(
+    pformat(CFG_DOC_METADATA.get_broken_plugins()))
+
+__all__ = ['deposition_types', 'deposition_metadata']

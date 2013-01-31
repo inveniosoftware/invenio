@@ -100,7 +100,11 @@ pylib_DATA = __init__.py \
              sequtils_regression_tests.py \
              crossrefutils.py \
 	     flaskshell.py \
-	     wtforms_utils.py
+	     wtforms_utils.py \
+             sherpa_romeo.py \
+             sherpa_romeo_testing.py \
+             orcid.py \
+             xmlDict.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \

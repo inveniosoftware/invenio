@@ -32,7 +32,8 @@ from flask import current_app, \
 from werkzeug.utils import secure_filename
 from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft, WebDepositWorkflow
-from invenio.webdeposit_load_dep_types import deposition_types
+from invenio.webdeposit_load_deposition_types import deposition_types, \
+                                                     deposition_metadata
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 
 from invenio.config import CFG_WEBDEPOSIT_UPLOAD_FOLDER
@@ -46,7 +47,6 @@ from invenio.webdeposit_utils import get_current_form, \
                                      get_workflow, \
                                      draft_field_get_all
 from invenio.webuser_flask import current_user
-from invenio.webdeposit_load_dep_metadata import dep_metadata
 from invenio.webdeposit_workflow import CFG_WEBDEPOSIT_WORKFLOW_STATUS
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
@@ -235,7 +235,21 @@ def create_new(deposition_type):
 
 @blueprint.route('/')
 def index_deposition_types():
-    return render_dep_types()
+    """ Renders the deposition types (workflows) list """
+    current_app.config['breadcrumbs_map'][request.endpoint] = [
+                        (_('Home'), '')] + blueprint.breadcrumbs
+    drafts = dict(db.session.query(WebDepositDraft.deposition_type,
+                    db.func.count(db.func.distinct(WebDepositDraft.uuid))).\
+                  join(WebDepositDraft.workflow).\
+                  filter(db.and_(
+                    WebDepositDraft.user_id == current_user.get_id(),
+                    WebDepositWorkflow.status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['running']
+                  )).\
+                  group_by(WebDepositDraft.deposition_type).all())
+
+    return render_template('webdeposit_index_deposition_types.html', \
+                           deposition_types=deposition_types,
+                           drafts=drafts)
 
 
 @blueprint.route('/<deposition_type>/')
@@ -256,14 +270,14 @@ def index(deposition_type):
 
 
 @blueprint.route('/<deposition_type>/<uuid>', methods=['GET', 'POST'])
-def add(deposition_type, uuid):
+def add(deposition_type, uuid=None):
     """
     FIXME: add documentation
     """
 
     status = 0
 
-    if deposition_type not in dep_metadata:
+    if deposition_type not in deposition_metadata:
         flash(_('Invalid deposition type.'), 'error')
         return redirect(url_for('.index_deposition_types'))
 
@@ -309,28 +323,13 @@ def add(deposition_type, uuid):
 
     if status == 0:
         # render current step of the workflow
-        return workflow.get_output()
+        return render_template('webdeposit_add.html', **workflow.get_output())
     elif status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['finished']:
         flash(_('Deposition %s has been successfully finished.') % (uuid, ),
               'success')
         return redirect(url_for('.index_deposition_types'))
     else:
-        return 'Error form %d' % status
-
-
-def render_dep_types():
-    """ Renders the deposition types (workflows) list """
-    current_app.config['breadcrumbs_map'][request.endpoint] = [
-                        (_('Home'), '')] + blueprint.breadcrumbs
-    drafts = dict(db.session.query(WebDepositDraft.deposition_type,
-                    db.func.count(db.func.distinct(WebDepositDraft.uuid))).\
-                  join(WebDepositDraft.workflow).\
-                  filter(db.and_(
-                    WebDepositDraft.user_id == current_user.get_id(),
-                    WebDepositWorkflow.status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['running']
-                  )).\
-                  group_by(WebDepositDraft.deposition_type).all())
-
-    return render_template('webdeposit_dep_types.html', \
-                           deposition_types=deposition_types,
-                           drafts=drafts)
+        flash(_('Deposition %s has return error code %d.') % (uuid, status),
+              'error')
+        current_app.logger.error('Deposition: %s has return error code: %d' % (uuid, status))
+        return redirect(url_for('.index_deposition_types'))

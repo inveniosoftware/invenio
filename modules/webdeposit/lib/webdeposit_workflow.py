@@ -107,12 +107,11 @@ class DepositionWorkflow(object):
         deposition_type = self.obj['deposition_type']
         drafts = draft_field_get_all(user_id, deposition_type)
 
-        return render_template('webdeposit.html',
-                               workflow=self,
-                               deposition_type=deposition_type,
-                               form=form,
-                               drafts=drafts,
-                               uuid=uuid)
+        return dict(workflow=self,
+                    deposition_type=deposition_type,
+                    form=form,
+                    drafts=drafts,
+                    uuid=uuid)
 
     def run(self):
         while True:

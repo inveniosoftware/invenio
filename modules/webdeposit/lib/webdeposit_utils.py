@@ -28,7 +28,7 @@ from invenio.webdeposit_workflow import DepositionWorkflow, \
                                         CFG_WEBDEPOSIT_WORKFLOW_STATUS
 from invenio.webdeposit_load_forms import forms
 from invenio.webuser_flask import current_user
-from invenio.webdeposit_load_dep_metadata import dep_metadata
+from invenio.webdeposit_load_deposition_types import deposition_metadata
 
 """ Deposition Type Functions """
 
@@ -37,7 +37,7 @@ def get_latest_or_new_workflow(deposition_type):
     """ Creates new workflow or returns a new one """
 
     user_id = current_user.get_id()
-    wf = dep_metadata[deposition_type]["workflow"]
+    wf = deposition_metadata[deposition_type]["workflow"]
 
     # get latest draft in order to get workflow's uuid
     webdeposit_draft = db.session.query(WebDepositDraft).\
@@ -64,7 +64,7 @@ def get_latest_or_new_workflow(deposition_type):
 def get_workflow(deposition_type, uuid):
     """ Returns a workflow instance with uuid=uuid or None """
     try:
-        wf = dep_metadata[deposition_type]["workflow"]
+        wf = deposition_metadata[deposition_type]["workflow"]
     except KeyError:
         # deposition type not found
         return None
@@ -76,7 +76,7 @@ def get_workflow(deposition_type, uuid):
 def create_workflow(user_id, deposition_type):
     """ Creates a new workflow and returns it """
     try:
-        wf = dep_metadata[deposition_type]["workflow"]
+        wf = deposition_metadata[deposition_type]["workflow"]
     except KeyError:
         # deposition type not found
         return None
@@ -105,7 +105,7 @@ def create_deposition_type(user_id, deposition_type):
     (deprecated, use create_workflow instead)
     """
     try:
-        wf = dep_metadata[deposition_type]["workflow"]
+        wf = deposition_metadata[deposition_type]["workflow"]
     except KeyError:
         # deposition_type not found
         return None, None

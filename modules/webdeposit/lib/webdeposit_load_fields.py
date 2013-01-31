@@ -18,11 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
+from pprint import pformat
 from wtforms import Field
-from invenio.config import CFG_PYLIBDIR
+from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.pluginutils import PluginContainer
 
+
 def plugin_builder(plugin_name, plugin_code):
+    if plugin_name == '__init__':
+        return
     try:
         all = getattr(plugin_code, '__all__')
         for name in all:
@@ -32,16 +36,24 @@ def plugin_builder(plugin_name, plugin_code):
     except AttributeError:
         pass
 
-CFG_FIELDS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'webdeposit_fields', '*.py'), \
+CFG_FIELDS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
+                                          'webdeposit_deposition_fields',
+                                          '*_field.py'),
                              plugin_builder=plugin_builder)
 
-""" Change the names of the fields
-    from the file names to the class names """
 
 class Fields(object):
     pass
+
 fields = Fields()
 
 for field in CFG_FIELDS.itervalues():
+    ## Change the names of the fields from the file names to the class names.
     if field is not None:
-        fields.__setattr__ (field.__name__, field)
+        fields.__setattr__(field.__name__, field)
+
+## Let's report about broken plugins
+open(os.path.join(CFG_LOGDIR, 'broken-deposition-fields.log'), 'w').write(
+    pformat(CFG_FIELDS.get_broken_plugins()))
+
+__all__ = ['fields']

@@ -15,14 +15,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio/webdeposit_dep_types
+pylibdir = $(libdir)/python/invenio/webdeposit_deposition_forms
 
 pylib_DATA = __init__.py \
-             article.py \
-             article_metadata.py \
-             photo.py \
-             photo_metadata.py \
-             preprint_metadata.py \
-             thesis_metadata.py
+             article_form.py \
+             photo_form.py \
+             preprint_form.py \
+             thesis_form.py
 
 CLEANFILES = *~ *.tmp *.pyc
