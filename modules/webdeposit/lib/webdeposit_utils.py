@@ -137,12 +137,12 @@ def get_current_form(user_id, deposition_type=None, uuid=None):
             webdeposit_draft = db.session.query(WebDepositDraft).filter(\
                             WebDepositDraft.user_id == user_id, \
                             WebDepositDraft.deposition_type == deposition_type, \
-                            WebDepositDraft.timestamp == func.max(\
+                            WebDepositDraft.timestamp == db.func.max(\
                                 WebDepositDraft.timestamp).select())[0]
         else:
             webdeposit_draft = db.session.query(WebDepositDraft).filter(\
                             WebDepositDraft.user_id == user_id, \
-                            WebDepositDraft.timestamp == func.max(\
+                            WebDepositDraft.timestamp == db.func.max(\
                                 WebDepositDraft.timestamp).select())[0]
     except NoResultFound:
         # No Form draft was found
