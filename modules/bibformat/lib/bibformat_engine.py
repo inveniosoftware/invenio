@@ -53,7 +53,8 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_SITE_LANG
 from invenio.errorlib import \
-     register_exception
+     register_exception, \
+     get_tracestack
 from invenio.bibrecord import \
      create_record, \
      record_get_field_instances, \
@@ -68,7 +69,9 @@ from invenio.messages import \
      gettext_set_language
 from invenio import bibformat_dblayer
 from invenio.bibformat_config import \
+     CFG_BIBFORMAT_TEMPLATES_DIR, \
      CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
+     CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
      CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_ELEMENTS_PATH, \
@@ -84,6 +87,7 @@ from invenio.htmlutils import \
      CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
 from invenio.webuser import collect_user_info
 from invenio.bibknowledge import get_kbr_values
+from invenio.jinja2utils import render_template_to_string
 from HTMLParser import HTMLParseError
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
@@ -342,6 +346,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
+
     if verbose == 9 and template is not None:
         out += """\n<br/><span class="quicknote">
         Using %s template for record %i.
@@ -349,7 +354,9 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     path = "%s%s%s" % (CFG_BIBFORMAT_TEMPLATES_PATH, os.sep, template)
-    if template is None or not os.access(path, os.R_OK):
+    if template is None or not (
+      os.access(path, os.R_OK) or
+      template.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION)):
         # template not found in new BibFormat. Call old one
         if verbose == 9:
             if template is None:
@@ -459,11 +466,11 @@ def format_with_format_template(format_template_filename, bfo,
 
     if format_template_code is not None:
         format_content = str(format_template_code)
-    else:
+    elif not format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         format_content = get_format_template(format_template_filename)['code']
 
     if format_template_filename is None or \
-           format_template_filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
+            format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
         # .bft
         filtered_format = filter_languages(format_content, bfo.lang)
         localized_format = translation_pattern.sub(translate, filtered_format)
@@ -471,6 +478,15 @@ def format_with_format_template(format_template_filename, bfo,
         evaluated_format = eval_format_template_elements(localized_format,
                                                          bfo,
                                                          verbose)
+    elif format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
+        evaluated_format = '<!-- empty -->'
+        try:
+            evaluated_format = render_template_to_string(
+                CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
+                bfo=bfo).encode('utf-8')
+        except Exception:
+            register_exception()
+
     else:
         #.xsl
         if bfo.xml_record:

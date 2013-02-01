@@ -19,9 +19,11 @@
 
 """WebSearch Flask Blueprint"""
 
+import re
 import json
 from math import ceil
 from itertools import groupby
+from operator import itemgetter
 from flask import make_response, g, render_template, request, flash, jsonify, \
                     redirect, url_for, current_app, abort
 
@@ -36,7 +38,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.sqlalchemyutils import db
 from invenio.websearch_forms import EasySearchForm
-from invenio.websearch_model import Collection, Format
+from invenio.websearch_model import Collection, Format, Tag
 from invenio.websearch_webinterface import wash_search_urlargd
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
                                   register_template_context_processor
@@ -52,30 +54,83 @@ from invenio.search_engine import get_creation_date,\
                                   get_records_that_can_be_displayed, \
                                   create_nearest_terms_box
 
-
-def cached_format_record(recIDs, of, ln='', verbose=0,
-                         search_pattern=None, xml_records=None, user_info=None,
-                         record_prefix=None, record_separator=None,
-                         record_suffix=None, prologue="", epilogue="",
-                         req=None, on_the_fly=False):
-    #FIXME move to websearch.py
-    return print_record(recIDs, of, ln=ln, verbose=verbose,
-                        brief_links=False)
-
-
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              config='invenio.search_engine_config',
                              breadcrumbs=[],
                              menubuilder=[('main.search', _('Search'),
                                            'search.index', 1)])
 
+from invenio.bibformat_engine import get_format_element, eval_format_element
+
+import os
+from pprint import pformat
+from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
+from invenio.pluginutils import PluginContainer
+
+
+def insert(name):
+    def _bfe_element(bfo, **kwargs):
+        # convert to utf-8 for legacy app
+        kwargs = dict((k, v.encode('utf-8') if isinstance(v, unicode) else v)
+                      for k, v in kwargs.iteritems())
+        format_element = get_format_element(name)
+        (out, dummy) = eval_format_element(format_element,
+                                           bfo,
+                                           kwargs)
+        # returns unicode for jinja2
+        return out.decode('utf-8')
+    return _bfe_element
+
+
+def plugin_builder(plugin_name, plugin_code):
+    if plugin_name == '__init__':
+        return
+    format_element = getattr(plugin_code, 'format_element')
+    return format_element
+
+BFE_ELEMENTS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
+                                            'bibformat_elements',
+                                            'bfe_*.py'),
+                               plugin_builder=plugin_builder)
+
+## Let's report about broken plugins
+open(os.path.join(CFG_LOGDIR, 'broken-bibformat-elements.log'), 'w').write(
+    pformat(BFE_ELEMENTS.get_broken_plugins()))
+
+sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
+fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
+
+
+@blueprint.app_context_processor
+def add_bfe_functions():
+    # get functions from files
+    bfe_from_files = dict((name.lower(), insert(name.lower()))
+                          for name in BFE_ELEMENTS.keys())
+    # get functions from tag table
+    bfe_from_tags = dict(('bfe_'+fix_tag_name(name),
+                          insert(fix_tag_name(name)))
+                         for name in map(itemgetter(0),
+                                         db.session.query(Tag.name).all()))
+    # overwrite functions from tag table with functions from files
+    bfe_from_tags.update(bfe_from_files)
+    return bfe_from_tags
+
+
+def cached_format_record(recIDs, of, ln='', verbose=0,
+                         search_pattern=None, xml_records=None, user_info=None,
+                         record_prefix=None, record_separator=None,
+                         record_suffix=None, prologue="", epilogue="",
+                         req=None, on_the_fly=False):
+    return print_record(recIDs, of, ln=ln, verbose=verbose,
+                        brief_links=False)
+
 
 @cache.memoize()
 def get_export_formats():
     return Format.query.filter(db.and_(
-                    Format.content_type != 'text/html',
-                    Format.visibility == 1
-                    )).order_by(Format.name).all()
+        Format.content_type != 'text/html',
+        Format.visibility == 1)
+    ).order_by(Format.name).all()
 
 
 @blueprint.route('/', methods=['GET', 'POST'])

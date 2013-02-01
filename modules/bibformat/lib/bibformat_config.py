@@ -32,31 +32,52 @@ from invenio.config import CFG_ETCDIR, CFG_PYLIBDIR
 CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 
 # Paths to main formats directories
-CFG_BIBFORMAT_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (CFG_ETCDIR, os.sep, os.sep)
+CFG_BIBFORMAT_TEMPLATES_DIR = "format_templates"
+CFG_BIBFORMAT_TEMPLATES_PATH = os.path.join(CFG_ETCDIR, 'bibformat', CFG_BIBFORMAT_TEMPLATES_DIR)
+CFG_BIBFORMAT_JINJA_TEMPLATE_PATH = os.path.join(CFG_ETCDIR, 'templates', CFG_BIBFORMAT_TEMPLATES_DIR)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"
-CFG_BIBFORMAT_ELEMENTS_PATH = "%s%sinvenio%sbibformat_elements" % (CFG_PYLIBDIR, os.sep, os.sep)
-CFG_BIBFORMAT_OUTPUTS_PATH = "%s%sbibformat%soutput_formats" % (CFG_ETCDIR, os.sep, os.sep)
+CFG_BIBFORMAT_ELEMENTS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibformat_elements')
+CFG_BIBFORMAT_OUTPUTS_PATH = os.path.join(CFG_ETCDIR, 'bibformat', 'output_formats')
 
 # File extensions of formats
 CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION = "bft"
+CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION = "tpl"
 CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION = "bfo"
 
+assert CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION != CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
+    "CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION and CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION must be different"
+
+assert len(CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION) == 3, \
+    "CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION must be 3 characters long"
+
+assert len(CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION) == 3, \
+    "CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION must be 3 characters long"
+
+assert len(CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION) == 3, \
+    "CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION must be 3 characters long"
+
 # Exceptions: errors
+
+
 class InvenioBibFormatError(Exception):
     """A generic error for BibFormat."""
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)
 
 # Exceptions: warnings
+
+
 class InvenioBibFormatWarning(Exception):
     """A generic warning for BibFormat."""
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)

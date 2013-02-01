@@ -22,6 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = bibformat_config.py bibformat_templates.py \
              bibformatadminlib.py bibformat_engine.py bibformat_dblayer.py \
              bibformat_utils.py bibformat.py \
+             bibformat_manager.py \
              bibformatadmin_regression_tests.py bibformat_engine_unit_tests.py \
              bibformat_bfx_engine.py bibformat_bfx_engine_config.py \
              bibformat_regression_tests.py bibformat_xslt_engine.py bibreformat.py \
