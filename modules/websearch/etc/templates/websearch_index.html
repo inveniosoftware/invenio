@@ -169,7 +169,7 @@
 {% if collection.is_restricted %}
   {{ collection_records(collection) }}
 {% else %}
-  {% dyncache 24*60*60, collection.name %}
+  {% dyncache 24*60*60, collection.name, g.ln %}
     {{ collection_records(collection) }}
   {% endcache %}
 {% endif %}
