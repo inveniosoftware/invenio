@@ -313,7 +313,7 @@ def search():
                                         VIEWRESTRCOLL,
                                         collection=collection.name)
         if auth_code and current_user.is_guest:
-            return redirect(url_for('youraccount.login',
+            return redirect(url_for('webaccount.login',
                                     referer=request.url))
         elif auth_code:
             return abort(401)

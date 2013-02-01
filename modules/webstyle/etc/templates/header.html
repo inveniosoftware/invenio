@@ -55,11 +55,11 @@
         <ul class="nav pull-right">
           <li>
           {% if current_user.is_guest %}
-            <a href="{{ url_for('youraccount.login', referer=request.url) }}">
+            <a href="{{ url_for('webaccount.login', referer=request.url) }}">
               <i class="icon icon-white icon-user"></i> {{ _("guest") }}
             </a>
           {% else %}
-            <a href="{{ url_for('youraccount.display') }}">
+            <a href="{{ url_for('webaccount.display') }}">
               <i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }}
             </a>
           {% endif %}
@@ -67,14 +67,14 @@
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span>&nbsp;</a>
           <ul class="dropdown-menu">
-            <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
+            <li><a href="{{ url_for('webaccount.display') }}">{{ _("Personalize") }}</a></li>
             <li class="divider"></li>
             {% if current_user.is_guest %}
-            <li><a href="{{ url_for('youraccount.login', referer=request.url) }}">
+            <li><a href="{{ url_for('webaccount.login', referer=request.url) }}">
               <i class="icon icon-lock"></i> {{ _("Login") }}
             </a></li>
             {% else %}
-            <li><a href="{{ url_for('youraccount.logout') }}">
+            <li><a href="{{ url_for('webaccount.logout') }}">
               <i class="icon icon-off"></i> {{ _("Logout") }}
             </a></li>
             {% endif %}

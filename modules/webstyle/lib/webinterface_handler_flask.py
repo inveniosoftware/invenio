@@ -158,7 +158,7 @@ def create_invenio_flask_app():
         if request.is_xhr:
             return 'You need to be authorised', 401
         flash(_('You need to be authorised.'), 'error')
-        return redirect(url_for('youraccount.login', referer=request.referer))
+        return redirect(url_for('webaccount.login', referer=request.referer))
 
     @_app.endpoint('static')
     def static_handler_with_legacy_publisher(*args, **kwargs):
@@ -244,7 +244,7 @@ def create_invenio_flask_app():
 
     # Let's create login manager.
     _login_manager = InvenioLoginManager()
-    _login_manager.login_view = 'youraccount.login'
+    _login_manager.login_view = 'webaccount.login'
     _login_manager.setup_app(_app)
 
     # Let's create main menu.

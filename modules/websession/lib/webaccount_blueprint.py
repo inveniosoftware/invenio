@@ -36,11 +36,11 @@ from invenio.webuser_flask import login_user, logout_user, current_user
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
-blueprint = InvenioBlueprint('youraccount', __name__,
+blueprint = InvenioBlueprint('webaccount', __name__,
                 url_prefix="/youraccount",
-                breadcrumbs=[(_("Your Account"), 'youraccount.index')],
+                breadcrumbs=[(_("Your Account"), 'webaccount.index')],
                 menubuilder=[('main.personalize', _('Personalize'),
-                              'youraccount.display', 3)])
+                              'webaccount.display', 3)])
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])

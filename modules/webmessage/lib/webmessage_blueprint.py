@@ -86,7 +86,7 @@ blueprint = InvenioBlueprint('webmessage', __name__, url_prefix="/yourmessages",
                           'webmessage.index', 10),
                          ('main.messages', MessagesMenu(),
                           'webmessage.index', -3, [], not_guest)],
-            breadcrumbs=[(_("Your Account"), 'youraccount.display'),
+            breadcrumbs=[(_("Your Account"), 'webaccount.display'),
                          ('Your Messages', 'webmessage.display')])
 
 

@@ -125,7 +125,7 @@
       update: function(event, ui) {
         var newOrder = $(this).sortable('toArray');
         $.ajax({
-          url: '{{ url_for('youraccount.edit', name='dashboard_user_settings') }}'
+          url: '{{ url_for('webaccount.edit', name='dashboard_user_settings') }}'
         , type: 'POST'
         , data: $.param({
             order: newOrder

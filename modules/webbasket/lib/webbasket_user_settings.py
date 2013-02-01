@@ -41,8 +41,8 @@ class WebBasketSettings(Settings):
         super(WebBasketSettings, self).__init__()
         self.icon = 'shopping-cart'
         self.title = _('Baskets WIP')
-        #self.view = url_for('youraccount.index')
-        #self.edit = url_for('youraccount.edit', name=__name__.split('.')[-1])
+        #self.view = url_for('webaccount.index')
+        #self.edit = url_for('webaccount.edit', name=__name__.split('.')[-1])
 
     def widget(self):
         uid = current_user.get_id()
