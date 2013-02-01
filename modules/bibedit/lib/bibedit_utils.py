@@ -230,8 +230,6 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
     """
     if not record:
         record = get_bibrecord(recid)
-        # Order subfields alphabetically after loading the record
-        record_order_subfields(record)
         if not record:
             return
 
@@ -242,6 +240,10 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
 
     cache_file = open(file_path, 'w')
     assert_undo_redo_lists_correctness(undo_list, redo_list)
+
+    # Order subfields alphabetically after loading the record
+    record_order_subfields(record)
+
     cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
     cache_file.close()
     return record_revision, record
