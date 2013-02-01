@@ -47,7 +47,7 @@ class WebMessageSettings(Settings):
         super(WebMessageSettings, self).__init__()
         self.icon = 'envelope'
         self.title = _('Messages')
-        self.view = url_for('yourmessages.index')
+        self.view = url_for('webmessage.index')
         if True or CFG_WEBMESSAGE_EMAIL_ALERT:
             self.edit = url_for('youraccount.edit',
                                 name=__name__.split('.')[-1])

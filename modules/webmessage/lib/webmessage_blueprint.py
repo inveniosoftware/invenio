@@ -75,19 +75,19 @@ class MessagesMenu(object):
         $(menu_a).on('hover', message_update);
       });
     </script>
-        """ % {'url': url_for('yourmessages.menu')}
+        """ % {'url': url_for('webmessage.menu')}
         return out
 
 not_guest = lambda: not current_user.is_guest
 
-blueprint = InvenioBlueprint('yourmessages', __name__, url_prefix="/yourmessages",
+blueprint = InvenioBlueprint('webmessage', __name__, url_prefix="/yourmessages",
             config='invenio.webmessage_config',
             menubuilder=[('main.personalize.messages', _('Your messages'),
-                          'yourmessages.index', 10),
+                          'webmessage.index', 10),
                          ('main.messages', MessagesMenu(),
-                          'yourmessages.index', -3, [], not_guest)],
+                          'webmessage.index', -3, [], not_guest)],
             breadcrumbs=[(_("Your Account"), 'youraccount.display'),
-                         ('Your Messages', 'yourmessages.display')])
+                         ('Your Messages', 'webmessage.display')])
 
 
 @blueprint.route('/menu', methods=['GET'])

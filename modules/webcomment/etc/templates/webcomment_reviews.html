@@ -66,7 +66,7 @@
 
         {%- if c.user -%}
         <img src="{{ c.user.email|gravatar(size=14, default=url_for('static', filename='img/user-icon-1-16x16.gif', _external=True)) }}" alt="avatar"/>
-        <a href="{{ url_for('yourmessages.add', sent_to_user_nicks=c.user.nickname) }}">
+        <a href="{{ url_for('webmessage.add', sent_to_user_nicks=c.user.nickname) }}">
           {{ c.user.nickname }}
         </a>
         {%- else -%}

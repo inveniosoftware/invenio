@@ -19,7 +19,7 @@
 
 <ul class="dropdown-menu">
   <li class="nav-header">{{ _('Messages') }}
-    <a class="pull-right" href="{{ url_for('yourmessages.add') }}">
+    <a class="pull-right" href="{{ url_for('webmessage.add') }}">
       {{ _('Write message') }}
     </a>
   </li>
@@ -27,7 +27,7 @@
   {% for m, um in messages %}
   <li class="row">
     {% set a_class = "span5 alert-info" if um.status == 'N' else "span5" %}
-    <a style="margin-bottom: 1px;" class="{{ a_class }}" href="{{ url_for('yourmessages.view', msgid=m.id) }}">
+    <a style="margin-bottom: 1px;" class="{{ a_class }}" href="{{ url_for('webmessage.view', msgid=m.id) }}">
       <div style="width: 100%; float: left;">
         <div style="float:left; width: 30px; padding: 4px;">
           <img src="{{ m.user_from.email|gravatar(size=30, default=url_for('static', filename='img/user-icon-1-24x24.gif', _external=True)) }}" alt="avatar"/>
@@ -50,7 +50,7 @@
   {% endfor %}
   <li class="divider"></li>
   <li style="text-align: center;">
-    <a href="{{ url_for('yourmessages.index') }}">{{ _('See All Messages') }}</a>
+    <a href="{{ url_for('webmessage.index') }}">{{ _('See All Messages') }}</a>
   </li>
 </ul>
 
