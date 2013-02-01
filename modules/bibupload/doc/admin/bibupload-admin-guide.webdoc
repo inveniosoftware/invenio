@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -240,7 +240,7 @@ semantic:
 
 <pre>
     FFT $a  ...  location of the docfile to upload (a filesystem path or a URL)
-        $d  ...  docfile description (optional)
+        $d  ...  docfile description (optional) (will go in 8564_ $y)
         $f  ...  format (optional; if not set, deduced from $a)
         $m  ...  new desired docfile name (optional; used for renaming files)
         $n  ...  docfile name (optional; if not set, deduced from $a)
@@ -249,7 +249,7 @@ semantic:
         $t  ...  docfile type (e.g. Main, Additional)
         $v  ...  version (used only with REVERT and DELETE-FILE, see below)
         $x  ...  url/path for an icon (optional)
-        $z  ...  comment (optional)
+        $z  ...  comment (optional) (will go in 8564_ $z)
 </pre>
 </p>
 
@@ -264,6 +264,8 @@ associated to record ID 123:
             &lt;subfield code="t"&gt;Main&lt;/subfield&gt;
             &lt;subfield code="d"&gt;
               This is the fulltext version of my thesis in the PDF format.
+            &lt;/subfield&gt;
+            &lt;subfield code="z"&gt;
               Chapter 5 still needs some revision.
             &lt;/subfield&gt;
         &lt;/datafield&gt;
@@ -353,7 +355,7 @@ $n subfield the original docname that should be renamed and in $m the new name.
 <tr><td><tt>PURGE</tt></td><td>In order to purge previous file revisions (i.e. in order to keep only the latest file version), please use the correct mode with $n docname and $t PURGE as the special keyword.</td></tr>
 <tr><td><tt>DELETE</tt></td><td>In order to delete all existing versions of a file, making it effectively hidden, please use the correct mode with $n docname
 and $t DELETE as the special keyword.</td></tr>
-<tr><td>EXPUNGE</td><td>In order to expunge (i.e. remove completely, also from the
+<tr><td><tt>EXPUNGE</tt></td><td>In order to expunge (i.e. remove completely, also from the
 filesystem) all existing versions of a file, making it effectively disappear, please use the correct mode with $n docname and $t EXPUNGE as the special keyword.
 </td><tr>
 <tr><td><tt>FIX-MARC</tt></td><td>In order to synchronize MARC to the bibrec/bibdoc structure (e.g. after an update or a tweak in the database), please use the correct mode with $n docname and $t FIX-MARC as the special keyword.</td></tr>
@@ -428,6 +430,13 @@ pointing to locally stored files are recreated on the basis of the
 full-text files connected to the record.  Thus, if you whish to update
 some 8564 tag pointing to a locally managed file, the only way to
 perform this is through the FFT tag, not by editing 8564 directly.<p>
+
+<p>Note as well that:
+<ul><li>the description indicated in FFT $d is going to be stored in
+the corresponding 8564_ $y subfield (and by default used as anchor for the link
+to the fulltext);</li>
+<li>The comment indicated in FFT $z is going to be stored in the corresponding 8564_ $z.</li>
+</ul>
 
 <a name="4"></a><h2>4. Batch Uploader</h2>
 <a name="4.1"></a><h3>4.1 Web interface - Cataloguers</h3>
