@@ -36,8 +36,9 @@ from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       InvenioWebSessionError, \
       InvenioWebSessionWarning
 
-blueprint = InvenioBlueprint('yourgroups', __name__, url_prefix="/yourgroups",
-breadcrumbs=[(_("Your Groups"), 'yourgroups.index')])
+blueprint = InvenioBlueprint('webgroup', __name__, url_prefix="/yourgroups",
+                             breadcrumbs=[(_("Your Groups"),
+                                           'webgroup.index')])
 
 
 def filter_by_user_status(uid, user_status, login_method='INTERNAL'):

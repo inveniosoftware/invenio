@@ -47,7 +47,7 @@
             minLength: 3,
             source: function(request, response) {
                 $.ajax({
-                    url: "{{ url_for('yourgroups.search')|safe }}",
+                    url: "{{ url_for('webgroup.search')|safe }}",
                     data: {
                         query: "users",
                         term: extractLast(request.term)
@@ -64,7 +64,7 @@
             minLength: 3,
             source: function(request, response) {
                 $.ajax({
-                    url: "{{ url_for('yourgroups.search')|safe }}",
+                    url: "{{ url_for('webgroup.search')|safe }}",
                     data: {
                         query: "groups",
                         term: extractLast(request.term)
