@@ -193,7 +193,6 @@ class SimulatedModPythonRequest(object):
         return self.response.content_type
 
     def send_http_header(self):
-        print self.__low_level_headers, self.headers_out
         for (k, v) in self.__low_level_headers:
             self.response.headers[k] = v
         for k, v in self.headers_out.iteritems():
@@ -604,6 +603,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
             redirect_to_url(req, target)
 
         try:
+            #FIXME set correct mimetype?
+            req.response.mimetype = 'text/html'
             return _check_result(req, module_globals[possible_handler](req, **form))
         except TypeError, err:
             if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):

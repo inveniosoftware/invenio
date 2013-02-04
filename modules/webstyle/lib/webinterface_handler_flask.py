@@ -28,7 +28,7 @@ from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from flask import Flask, session, request, g, \
                 url_for, current_app, render_template, \
-                redirect, flash, send_file
+                redirect, flash, send_file, abort
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError
 
@@ -161,6 +161,7 @@ def create_invenio_flask_app():
         return redirect(url_for('webaccount.login', referer=request.referer))
 
     @_app.endpoint('static')
+    @_app.route(_app.static_url_path + '/<path:filename>', methods=['POST'])
     def static_handler_with_legacy_publisher(*args, **kwargs):
         """
         Adds support for legacy publisher.
@@ -174,6 +175,8 @@ def create_invenio_flask_app():
             req = SimulatedModPythonRequest(request.environ, g.start_response)
             mp_legacy_publisher(req, possible_module, possible_handler)
             return req.response
+        if request.method == 'POST':
+            abort(405)
         return _app.send_static_file(*args, **kwargs)
 
     if CFG_FLASK_CACHE_TYPE not in [None, 'null']:
