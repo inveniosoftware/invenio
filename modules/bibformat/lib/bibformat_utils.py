@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -64,7 +64,7 @@ def highlight_matches(text, compiled_pattern, \
     return compiled_pattern.sub(replace_highlight, text)
 
 def highlight(text, keywords=None, \
-              prefix_tag='<strong>', suffix_tag="</strong>"):
+              prefix_tag='<strong>', suffix_tag="</strong>", whole_word_matches=False):
     """
     Returns text with all words highlighted with given tags (this
     function places 'prefix_tag' and 'suffix_tag' before and after
@@ -76,6 +76,7 @@ def highlight(text, keywords=None, \
     @param keywords: a list of string
     @param prefix_tag: prefix to use before each matching parts
     @param suffix_tag: suffix to use after each matching parts
+    @param whole_word_matches: to use whole word matches
     @return: highlighted text
     """
 
@@ -86,7 +87,10 @@ def highlight(text, keywords=None, \
     for k in keywords:
         escaped_keywords.append(re.escape(k))
     #Build a pattern of the kind keyword1 | keyword2 | keyword3
-    pattern = '|'.join(escaped_keywords)
+    if whole_word_matches:
+        pattern = '|'.join(['\\b' + key + '\\b' for key in escaped_keywords])
+    else:
+        pattern = '|'.join(escaped_keywords)
     compiled_pattern = re.compile(pattern, re.IGNORECASE)
 
     #Replace and return keywords with prefix+keyword+suffix
@@ -677,9 +681,34 @@ def get_text_snippets(textfile_path, patterns, nb_chars, max_snippets):
         if snippet and count < max_snippets:
             if out:
                 out += "..."
-            out += highlight(snippet, patterns)
+            out += highlight(snippet, patterns, whole_word_matches=True)
 
     return out
+
+
+def words_start_with_patterns(words, patterns):
+    """
+    Check whether the first word's beginning matches any of the patterns.
+    The second argument is an array of patterns to match.
+    """
+
+    ret = False
+    for p in patterns:
+        # Phrase handling
+        if ' ' in p:
+            phrase = p
+            phrase_terms = p.split()
+            additional_term_count = len(phrase_terms) - 1
+            possible_match = ' '.join(words[:additional_term_count + 1])
+            if possible_match.lower() == phrase.lower():
+                return True, additional_term_count
+        else:
+            lower_case = words[0].lower()
+            if lower_case.startswith(str(p).lower()):
+                ret = True
+                break
+    return ret, 0
+
 
 def cut_out_snippet(text, patterns, nb_chars):
     """
@@ -692,55 +721,59 @@ def cut_out_snippet(text, patterns, nb_chars):
     """
     # TODO: cut at begin or end of sentence
 
-    def starts_with_any(word, patterns):
-        # Check whether the word's beginning matches any of the patterns.
-        # The second argument is an array of patterns to match.
+    words = text.split()
+    snippet, start, finish = cut_out_snippet_core_creation(words, patterns, nb_chars)
+    return cut_out_snippet_wrap(snippet, words, start, finish, nb_chars)
 
-        ret = False
-        lower_case = word.lower()
-        for p in patterns:
-            if lower_case.startswith(str(p).lower()):
-                ret = True
-                break
-        return ret
 
+def cut_out_snippet_core_creation(words, patterns, nb_chars):
+    """ Stage 1:
+        Creating the snipper core starts and finishes with a matched pattern
+        The idea is to find a pattern occurance, then go on creating a suffix until
+        the next pattern is found. Then the suffix is added to the snippet
+        unless the loop brakes before due to suffix being to long.
+    """
     snippet = ""
     suffix = ""
-    words = text.split()
-
-    # Stage 1:
-    # Creating the snipper core starts and finishes with a matched pattern
-    # The idea is to find a pattern occurance, then go on creating a suffix until
-    # the next pattern is found. Then the suffix is added to the snippet
-    # unless the loop brakes before due to suffix being to long.
     i = 0
     start = -1 # start is an index of the first matched pattern
     finish = -1 # is an index of the last matched pattern
     #in this loop, the snippet core always starts and finishes with a matched pattern
     while i < len(words) and len(snippet) + len(suffix) < nb_chars:
-        matched_word = starts_with_any(words[i], patterns)
+        word_matched_p, additional_term_count = words_start_with_patterns(words[i:], patterns)
         #if the first pattern was already found
         if len(snippet) == 0:
             #first occurance of pattern
-            if matched_word:
-                snippet = words[i]
+            if word_matched_p:
                 start = i
-                finish = i
                 suffix = ""
+                if not additional_term_count:
+                    snippet = words[i]
+                    finish = i
+                else:
+                    snippet = ' '.join(words[i:i + additional_term_count + 1])
+                    finish = i + additional_term_count
         else:
-            if matched_word:
-                # there is enough room for this pattern in the snippet because
-                # with previous word the snippet was shorter than nb_chars
-                snippet += suffix + " " + words[i] # suffix starts with a space
-                finish = i
+            if word_matched_p:
+                if not additional_term_count:
+                    # there is enough room for this pattern in the snippet because
+                    # with previous word the snippet was shorter than nb_chars
+                    snippet += suffix + " " + words[i] # suffix starts with a space
+                    finish = i
+                else:
+                    snippet += suffix + " " + ' '.join(words[i:i + additional_term_count + 1]) # suffix starts with a space
+                    finish = i + additional_term_count
                 suffix = ""
             else:
                 suffix += " " + words[i]
-        i += 1
+        i += 1 + additional_term_count
+    return snippet, start, finish
 
 
-    # Stage 2: Wrap the snippet core symetrically up to the nb_chars
-    # if snippet is non-empty, then start and finish will be set before
+def cut_out_snippet_wrap(snippet, words, start, finish, nb_chars):
+    """ Stage 2: Wrap the snippet core symetrically up to the nb_chars
+        if snippet is non-empty, then start and finish will be set before
+    """
     front = True
     while 0 < len(snippet) < nb_chars:
         if front and start == 0:
