@@ -38,6 +38,7 @@ pylib_DATA = bibrankadminlib.py \
              bibrank_regression_tests.py \
              bibrank.py \
              bibrank_bridge_config.py \
+             bibrank_bridge_utils.py \
              bibrankadmin_regression_tests.py \
              bibrankgkb.py \
              bibrank_citerank_indexer.py \

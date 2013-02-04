@@ -48,7 +48,12 @@ def get_collection_filter(hitset, cutoff_amount):
     if start_index < 0:
         start_index = 0
     it = itertools.islice(hitset, start_index, None)
-    return 'id:(' + ' '.join([str(recid) for recid in it]) + ')'
+    ids = ' '.join([str(recid) for recid in it])
+
+    if ids:
+        return 'id:(%s)' % ids
+    else:
+        return  ''
 
 
 def solr_get_ranked(query, hitset, params, ranked_result_amount):

@@ -73,14 +73,3 @@ def solr_get_bitset(index, query):
     data = u.read()
     bitset.fastload(data)
     return bitset
-
-
-def solr_get_bitset_via_solrpy(index, query):
-    """
-    Queries an index and returns the ids as intbitset.
-    """
-    bitset = intbitset.intbitset()
-    response = SOLR_CONNECTION.query('%s:%s' % (index, query))
-    for hit in response.results:
-        bitset.add(int(hit["id"]))
-    return bitset

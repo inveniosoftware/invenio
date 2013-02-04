@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,5 +16,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-# Syntax (lower, upper, replacement): replace char if in range(lower, upper + 1)
-CFG_SOLR_INVALID_CHAR_RANGES = ((0, 8, ' '), (11, 12, ' '), (14, 31, ' '), (55296, 57343, ''), (65534, 65535, ''))
+from invenio.config import CFG_ETCDIR
+
+
+def get_external_word_similarity_ranker():
+    for line in open('%s/bibrank/wrd.cfg' % CFG_ETCDIR):
+        for ranker in ('solr', 'xapian'):
+            if 'word_similarity_%s' % ranker in line:
+                return ranker
+    return False

@@ -28,14 +28,13 @@ from invenio.bibtask import write_message, task_get_option, task_update_progress
                             task_sleep_now_if_required
 from invenio.dbquery import run_sql
 from invenio.search_engine import get_fieldvalues, record_exists
-from invenio.textutils import remove_control_characters
 from invenio.bibdocfile import BibRecDocs
 from invenio.bibrank_bridge_config import CFG_MARC_ABSTRACT, \
                                           CFG_MARC_AUTHOR_NAME, \
                                           CFG_MARC_ADDITIONAL_AUTHOR_NAME, \
                                           CFG_MARC_TITLE, \
                                           CFG_MARC_KEYWORD
-from invenio.solrutils_bibindex_indexer import remove_invalid_solr_characters
+from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters
 from invenio.bibindex_engine import create_range_list
 from invenio.errorlib import register_exception
 
@@ -69,26 +68,26 @@ def solr_add_range(lower_recid, upper_recid):
     for recid in range(lower_recid, upper_recid + 1):
         if record_exists(recid):
             try:
-                abstract = unicode(remove_control_characters(get_fieldvalues(recid, CFG_MARC_ABSTRACT)[0]), 'utf-8')
+                abstract = unicode(get_fieldvalues(recid, CFG_MARC_ABSTRACT)[0], 'utf-8')
             except:
                 abstract = ""
             try:
-                first_author = remove_control_characters(get_fieldvalues(recid, CFG_MARC_AUTHOR_NAME)[0])
-                additional_authors = remove_control_characters(reduce(lambda x, y: x + " " + y, get_fieldvalues(recid, CFG_MARC_ADDITIONAL_AUTHOR_NAME), ''))
+                first_author = get_fieldvalues(recid, CFG_MARC_AUTHOR_NAME)[0]
+                additional_authors = reduce(lambda x, y: x + " " + y, get_fieldvalues(recid, CFG_MARC_ADDITIONAL_AUTHOR_NAME), '')
                 author = unicode(first_author + " " + additional_authors, 'utf-8')
             except:
                 author = ""
             try:
                 bibrecdocs = BibRecDocs(recid)
-                fulltext = unicode(remove_control_characters(bibrecdocs.get_text()), 'utf-8')
+                fulltext = unicode(bibrecdocs.get_text(), 'utf-8')
             except:
                 fulltext = ""
             try:
-                keyword = unicode(remove_control_characters(reduce(lambda x, y: x + " " + y, get_fieldvalues(recid, CFG_MARC_KEYWORD), '')), 'utf-8')
+                keyword = unicode(reduce(lambda x, y: x + " " + y, get_fieldvalues(recid, CFG_MARC_KEYWORD), ''), 'utf-8')
             except:
                 keyword = ""
             try:
-                title = unicode(remove_control_characters(get_fieldvalues(recid, CFG_MARC_TITLE)[0]), 'utf-8')
+                title = unicode(get_fieldvalues(recid, CFG_MARC_TITLE)[0], 'utf-8')
             except:
                 title = ""
             solr_add(recid, abstract, author, fulltext, keyword, title)
@@ -103,11 +102,11 @@ def solr_add(recid, abstract, author, fulltext, keyword, title):
     """
     try:
         SOLR_CONNECTION.add(id=recid,
-                            abstract=remove_invalid_solr_characters(abstract),
-                            author=remove_invalid_solr_characters(author),
-                            fulltext=remove_invalid_solr_characters(fulltext),
-                            keyword=remove_invalid_solr_characters(keyword),
-                            title=remove_invalid_solr_characters(title))
+                            abstract=replace_invalid_solr_characters(abstract),
+                            author=replace_invalid_solr_characters(author),
+                            fulltext=replace_invalid_solr_characters(fulltext),
+                            keyword=replace_invalid_solr_characters(keyword),
+                            title=replace_invalid_solr_characters(title))
     except:
         register_exception(alert_admin=True)
 

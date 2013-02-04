@@ -27,6 +27,7 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.dbquery import run_sql
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
+from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
 
 class BibRankWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibRank web pages whether they are up or not."""
@@ -165,11 +166,19 @@ class BibRankExtCitesTest(unittest.TestCase):
         self.assertEqual(self._detect_extcite_info(test_case_repno),
                          test_case_repno_cited_by)
 
-TEST_SUITE = make_test_suite(BibRankWebPagesAvailabilityTest,
-                             BibRankIntlMethodNames,
-                             BibRankWordSimilarityRankingTest,
-                             BibRankCitationRankingTest,
-                             BibRankExtCitesTest)
+
+TESTS = [BibRankWebPagesAvailabilityTest,
+         BibRankIntlMethodNames,
+         BibRankCitationRankingTest,
+         BibRankExtCitesTest]
+
+
+if not get_external_word_similarity_ranker():
+    TESTS.append(BibRankWordSimilarityRankingTest)
+
+
+TEST_SUITE = make_test_suite(*TESTS)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

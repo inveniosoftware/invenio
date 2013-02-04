@@ -43,8 +43,7 @@ from invenio.textutils import \
      decode_to_unicode, \
      translate_latex2unicode, \
      translate_to_ascii, \
-     strip_accents, \
-     remove_control_characters
+     strip_accents
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -458,13 +457,6 @@ class TestStripping(unittest.TestCase):
                          strip_accents('mémêmëmè'))
         self.assertEqual("MEMEMEME",
                          strip_accents('MÉMÊMËMÈ'))
-
-    def test_remove_control_characters(self):
-        """textutils - stripping of accented letters"""
-        self.assertEqual("foo\nbar\tfab\n\r",
-                         remove_control_characters('foo\nbar\tfab\n\r'))
-        self.assertEqual("abc de",
-                         remove_control_characters('abc\02de'))
 
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
                              WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,

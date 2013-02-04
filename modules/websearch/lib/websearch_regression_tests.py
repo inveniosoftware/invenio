@@ -55,6 +55,7 @@ from invenio import search_engine_summarizer
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.intbitset import intbitset
 from invenio.search_engine import intersect_results_with_collrecs
+from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
 
 if 'fr' in CFG_SITE_LANGS:
     lang_french_configured = True
@@ -2643,13 +2644,15 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
         # FIXME_TICKET_1174
         # self.run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
 
-        self.run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109])
+        if not get_external_word_similarity_ranker():
+            self.run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109])
 
         self.run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 2, 14, 9, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
 
         self.run_test('p=boson;rm=citation', [1, 47, 50, 107, 108, 77, 95])
 
-        self.run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
+        if not get_external_word_similarity_ranker():
+            self.run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
 
         self.run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [])
 
