@@ -237,7 +237,9 @@ def localtime_to_utc(date):
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_time)
 
 def get_modification_date(recid):
-    """Returns the date of last modification for the record 'recid'."""
+    """Returns the date of last modification for the record 'recid'.
+    Return empty string if no record or modification date in UTC.
+    """
     out = ""
     res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (recid,), 1)
     if res and res[0][0]:
@@ -245,7 +247,9 @@ def get_modification_date(recid):
     return out
 
 def get_earliest_datestamp():
-    """Get earliest datestamp in the database"""
+    """Get earliest datestamp in the database
+    Return empty string if no records or earliest datestamp in UTC.
+    """
     out = ""
     res = run_sql("SELECT DATE_FORMAT(MIN(creation_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
     if res:
@@ -253,7 +257,9 @@ def get_earliest_datestamp():
     return out
 
 def get_latest_datestamp():
-    """Get latest datestamp in the database"""
+    """Get latest datestamp in the database
+    Return empty string if no records or latest datestamp in UTC.
+    """
     out = ""
     res = run_sql("SELECT DATE_FORMAT(MAX(modification_date),'%Y-%m-%d %H:%i:%s') FROM bibrec", n=1)
     if res:
@@ -355,7 +361,7 @@ def get_record_rights(dummy):
             #elif code == CFG_OAI_LICENSE_URI_SUBFIELD:
                 #license_uri = value
 
-def print_record(recid, prefix='marcxml', verb='ListRecords', set_spec=None):
+def print_record(recid, prefix='marcxml', verb='ListRecords', set_spec=None, set_last_updated=None):
     """Prints record 'recid' formatted according to 'prefix'.
 
     - if record does not exist, return nothing.
@@ -367,9 +373,6 @@ def print_record(recid, prefix='marcxml', verb='ListRecords', set_spec=None):
     - if record has been deleted and CFG_OAI_DELETED_POLICY is 'no',
       then return nothing.
 
-    Optional parameter 'record_exists_result' has the value of the result
-    of the record_exists(recid) function (in order not to call that function
-    again if already done.)
     """
 
     record_exists_result = record_exists(recid) == 1
@@ -405,7 +408,10 @@ def print_record(recid, prefix='marcxml', verb='ListRecords', set_spec=None):
 
     header_body = EscapedXMLString('')
     header_body += X.identifier()(ident)
-    header_body += X.datestamp()(get_modification_date(recid))
+    if set_last_updated:
+        header_body += X.datestamp()(max(get_modification_date(recid), set_last_updated))
+    else:
+        header_body += X.datestamp()(get_modification_date(recid))
     for set_spec in get_field(recid, CFG_OAI_SET_FIELD):
         if set_spec and set_spec != CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC:
             # Print only if field not empty
@@ -488,9 +494,11 @@ def oai_list_records_or_identifiers(req, argd):
         if recid > last_recid:
             break
 
+    set_last_updated = get_set_last_update(argd.get('set', ""))
+
     req.write(oai_header(argd, verb))
     for recid in list(complete_list)[cursor:cursor+CFG_OAI_LOAD]:
-        req.write(print_record(recid, argd['metadataPrefix'], verb=verb, set_spec=argd.get('set')))
+        req.write(print_record(recid, argd['metadataPrefix'], verb=verb, set_spec=argd.get('set'), set_last_updated=set_last_updated))
 
     if list(complete_list)[cursor+CFG_OAI_LOAD:]:
         resumption_token = oai_generate_resumption_token(argd.get('set', ''))
@@ -583,7 +591,7 @@ def oai_identify(argd):
                 X.delimiter()(":") +
                 X.sampleIdentifier()(CFG_OAI_SAMPLE_IDENTIFIER) +
                 """</oai-identifier>""")
-    out += CFG_OAI_IDENTIFY_DESCRIPTION
+    out += CFG_OAI_IDENTIFY_DESCRIPTION % {'CFG_SITE_URL': EscapedXMLString(CFG_SITE_URL)}
     if CFG_OAI_FRIENDS:
         friends = """<friends xmlns="http://www.openarchives.org/OAI/2.0/friends/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -631,20 +639,41 @@ def oai_get_recid(identifier):
             recid = row[0]
     return recid
 
-def filter_out_based_on_date_range(recids, fromdate="", untildate=""):
+
+def get_set_last_update(set_spec=""):
+    """
+    Returns the last_update of a given set (or of all sets) in UTC
+    """
+    if set_spec:
+        last_update = run_sql("SELECT DATE_FORMAT(MAX(last_updated),'%%Y-%%m-%%d %%H:%%i:%%s') FROM oaiREPOSITORY WHERE setSpec=%s", (set_spec, ))[0][0]
+    else:
+        last_update = run_sql("SELECT DATE_FORMAT(MAX(last_updated),'%Y-%m-%d %H:%i:%s') FROM oaiREPOSITORY")[0][0]
+    if last_update:
+        return localtime_to_utc(last_update)
+    else:
+        return None
+
+
+def filter_out_based_on_date_range(recids, fromdate="", untildate="", set_spec=None):
     """ Filter out recids based on date range."""
-    if fromdate != "":
+    if fromdate:
         fromdate = normalize_date(fromdate, "T00:00:00Z")
     else:
         fromdate = get_earliest_datestamp()
     fromdate = utc_to_localtime(fromdate)
 
-    if untildate != "":
+    if untildate:
         untildate = normalize_date(untildate, "T23:59:59Z")
     else:
         untildate = get_latest_datestamp()
-
     untildate = utc_to_localtime(untildate)
+
+    if set_spec is not None: ## either it has a value or it empty, thus meaning all records
+        last_updated = get_set_last_update(set_spec)
+        if last_updated is not None:
+            last_updated = utc_to_localtime(last_updated)
+            if last_updated > fromdate:
+                fromdate = utc_to_localtime(get_earliest_datestamp())
 
     recids = intbitset(recids) ## Let's clone :-)
 
@@ -675,7 +704,7 @@ def oai_get_recid_list(set_spec="", fromdate="", untildate=""):
         ret -= search_unit_in_bibxxx(p='DELETED', f='980__%', type='e')
         if CFG_CERN_SITE:
             ret -= search_unit_in_bibxxx(p='DUMMY', f='980__%', type='e')
-    return filter_out_based_on_date_range(ret, fromdate, untildate)
+    return filter_out_based_on_date_range(ret, fromdate, untildate, set_spec)
 
 def oai_generate_resumption_token(set_spec):
     """Generates unique ID for resumption token management."""

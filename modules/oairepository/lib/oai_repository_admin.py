@@ -77,6 +77,10 @@ def perform_request_index(ln=CFG_SITE_LANG):
                        "admin/oairepository/oairepositoryadmin.py/editset?ln=" + \
                        ln + "&amp;oai_set_id=" + str(id) + '">edit</a>'
 
+        edit_request = '<a href="' + CFG_SITE_URL + "/" + \
+                       "admin/oairepository/oairepositoryadmin.py/touchset?ln=" + \
+                       ln + "&amp;oai_set_id=" + str(id) + '">touch</a>'
+
         sets.append([id, cgi.escape(setSpec), cgi.escape(setName),
                      cgi.escape(setCollection),
                      cgi.escape(p1), f1, m1, op1,
@@ -316,6 +320,57 @@ def perform_request_delset(oai_set_id=None, ln=CFG_SITE_LANG, func=0):
 
     return nice_box("", out)
 
+def perform_request_touchset(oai_set_id=None, ln=CFG_SITE_LANG, func=0):
+    """creates html form to touch an OAI set"""
+    _ = gettext_set_language(ln)
+    out = ""
+
+    if oai_set_id:
+        oai_set = get_oai_set(oai_set_id)
+        if not oai_set:
+            return "ERROR: oai_set_id %s seems invalid" % oai_set_id
+
+        oai_set = get_oai_set(oai_set_id)
+        oai_set_spec = oai_set[0][1]
+        oai_set_name = oai_set[0][2]
+        oai_set_collection = oai_set[0][3]
+        oai_set_p1 = oai_set[0][5]
+        oai_set_f1 = oai_set[0][6]
+        oai_set_m1 = oai_set[0][7]
+        oai_set_p2 = oai_set[0][8]
+        oai_set_f2 = oai_set[0][9]
+        oai_set_m2 = oai_set[0][10]
+        oai_set_p3 = oai_set[0][11]
+        oai_set_f3 = oai_set[0][12]
+        oai_set_m3 = oai_set[0][13]
+        oai_set_op1 = oai_set[0][14]
+        oai_set_op2 = oai_set[0][15]
+
+        if func in ["0", 0]:
+
+            if oai_set:
+                question = _("""Do you want to touch the OAI set %s? Note that this will force all clients to re-harvest the whole set.""") % cgi.escape(oai_set_spec)
+                text = oaiharvest_templates.tmpl_print_info(ln, question)
+                out += createform(action="touchset",
+                                    text=text,
+                                    button="Touch",
+                                    oai_set_id=oai_set_id,
+                                    func=1)
+            else:
+                return oaiharvest_templates.tmpl_print_info(ln, _("OAI set does not exist."))
+        elif func in ["1", 1]:
+            touch_oai_set(oai_set_spec)
+            out += oaiharvest_templates.tmpl_print_info(ln, _("OAI set %s touched.") % cgi.escape(oai_set_spec))
+    out += "<br />"
+    out += "<br /><br />"
+    out += create_html_link(urlbase=oai_rep_admin_url + \
+                "/index",
+                urlargd={'ln': ln},
+                link_label=_("Return to main selection"))
+
+    return nice_box("", out)
+
+
 def get_oai_set(id=''):
     """Returns a row parameters for a given id"""
     sets = []
@@ -348,6 +403,17 @@ def get_oai_set(id=''):
     except StandardError, e:
         register_exception(alert_admin=True)
         return str(e)
+
+def touch_oai_set(setSpec):
+    """
+    Updates the last_updated timestamp of an oai_set. This will cause
+    any record belonging to it to be actually re-exported. This is
+    useful in case e.g. the format template used to generate an
+    export has been amended.
+
+    Note: the last_updated time is in localtime to the server.
+    """
+    run_sql("UPDATE oaiREPOSITORY SET last_updated=NOW() WHERE setSpec=%s", (setSpec, ))
 
 def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec,
                    oai_set_collection, oai_set_description,
