@@ -78,7 +78,7 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields, record_get_field_instances, record_add_fields, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
-    record_strip_controlfields
+    record_strip_controlfields, record_order_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
@@ -507,6 +507,8 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         assert(changeId != None)
         hpContent = get_hp_update_xml(changeId)
         holdingPenRecord = create_record(hpContent[0], "xm")[0]
+        # order subfields alphabetically
+        record_order_subfields(holdingPenRecord)
 #        databaseRecord = get_record(hpContent[1])
         response['record'] = holdingPenRecord
         response['changeset_number'] = changeId

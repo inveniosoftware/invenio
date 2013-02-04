@@ -426,7 +426,7 @@ function holdingPenPanelApplyChangeSet(changesNum){
       onHoldingPenChangesetRetrieved);
   }else
   {
-    // we can apply the changes directly without wawiting for them to be retrieved
+    // we can apply the changes directly without waiting for them to be retrieved
     visualizeRetrievedChangeset(changesNum, gHoldingPenLoadedChanges[changesNum]);
   }
 }
