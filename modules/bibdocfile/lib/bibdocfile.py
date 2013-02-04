@@ -67,11 +67,12 @@ else:
 
 try:
     import magic
-    if not hasattr(magic, "open"):
-        raise ImportError
-    CFG_HAS_MAGIC = True
+    if hasattr(magic, "open"):
+        CFG_HAS_MAGIC = 1
+    elif hasattr(magic, "Magic"):
+        CFG_HAS_MAGIC = 2
 except ImportError:
-    CFG_HAS_MAGIC = False
+    CFG_HAS_MAGIC = 0
 
 ## The above flag controls whether HTTP range requests are supported or not
 ## when serving static files via Python. This is disabled by default as
@@ -158,24 +159,34 @@ _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
 _mimes.encodings_map.update({'.bz2' : 'bzip2'})
 
 _magic_cookies = {}
-def _get_magic_cookies():
-    """
-    @return: a tuple of magic object.
-    @rtype: (MAGIC_NONE, MAGIC_COMPRESS, MAGIC_MIME, MAGIC_COMPRESS + MAGIC_MIME)
-    @note: ... not real magic. Just see: man file(1)
-    """
-    thread_id = get_ident()
-    if thread_id not in _magic_cookies:
-        _magic_cookies[thread_id] = {
-            magic.MAGIC_NONE: magic.open(magic.MAGIC_NONE),
-            magic.MAGIC_COMPRESS: magic.open(magic.MAGIC_COMPRESS),
-            magic.MAGIC_MIME: magic.open(magic.MAGIC_MIME),
-            magic.MAGIC_COMPRESS + magic.MAGIC_MIME: magic.open(magic.MAGIC_COMPRESS + magic.MAGIC_MIME),
-            magic.MAGIC_MIME_TYPE: magic.open(magic.MAGIC_MIME_TYPE),
-        }
-        for key in _magic_cookies[thread_id].keys():
-            _magic_cookies[thread_id][key].load()
-    return _magic_cookies[thread_id]
+
+if CFG_HAS_MAGIC == 1:
+    def _get_magic_cookies():
+        """
+        @return: a tuple of magic object.
+        @rtype: (MAGIC_NONE, MAGIC_COMPRESS, MAGIC_MIME, MAGIC_COMPRESS + MAGIC_MIME)
+        @note: ... not real magic. Just see: man file(1)
+        """
+        thread_id = get_ident()
+        if thread_id not in _magic_cookies:
+            _magic_cookies[thread_id] = {
+                magic.MAGIC_NONE: magic.open(magic.MAGIC_NONE),
+                magic.MAGIC_COMPRESS: magic.open(magic.MAGIC_COMPRESS),
+                magic.MAGIC_MIME: magic.open(magic.MAGIC_MIME),
+                magic.MAGIC_COMPRESS + magic.MAGIC_MIME: magic.open(magic.MAGIC_COMPRESS + magic.MAGIC_MIME),
+                magic.MAGIC_MIME_TYPE: magic.open(magic.MAGIC_MIME_TYPE),
+            }
+            for key in _magic_cookies[thread_id].keys():
+                _magic_cookies[thread_id][key].load()
+        return _magic_cookies[thread_id]
+elif CFG_HAS_MAGIC == 2:
+    def _magic_wrapper(local_path, mime=True, mime_encoding=False):
+        thread_id = get_ident()
+        if (thread_id, mime, mime_encoding) not in _magic_cookies:
+            magic_object = _magic_cookies[thread_id, mime, mime_encoding] = magic.Magic(mime=mime, mime_encoding=mime_encoding)
+        else:
+            magic_object = _magic_cookies[thread_id, mime, mime_encoding]
+        return magic_object.from_file(local_path)
 
 def _generate_extensions():
     """
@@ -308,17 +319,20 @@ def guess_format_from_url(url):
     @rtype: string
     """
     def guess_via_magic(local_path):
-        if CFG_HAS_MAGIC:
-            try:
+        try:
+            if CFG_HAS_MAGIC == 1:
                 magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME_TYPE]
                 mimetype = magic_cookie.file(local_path)
+            elif CFG_HAS_MAGIC == 2:
+                mimetype = _magic_wrapper(local_path, mime=True, mime_encoding=False)
+            if CFG_HAS_MAGIC:
                 ext = _mimes.guess_extension(mimetype)
                 if ext:
                     ## Normalize some common magic mis-interpreation
                     ext = {'.asc': '.txt', '.obj': '.bin'}.get(ext, ext)
                     return normalize_format(ext)
-            except Exception:
-                pass
+        except Exception:
+            pass
 
     ## Let's try to guess the extension by considering the URL as a filename
     ext = decompose_file(url, skip_version=True, only_known_extensions=True)[2]
@@ -2839,12 +2853,20 @@ class BibDocFile:
     def get_magic(self):
         """Return all the possible guesses from the magic library about
         the content of the file."""
-        if self.magic is None and CFG_HAS_MAGIC:
-            magic_cookies = _get_magic_cookies()
-            magic_result = []
-            for key in magic_cookies.keys():
-                magic_result.append(magic_cookies[key].file(self.fullpath))
-            self.magic = tuple(magic_result)
+        if self.magic is None:
+            if CFG_HAS_MAGIC == 1:
+                magic_cookies = _get_magic_cookies()
+                magic_result = []
+                for key in magic_cookies.keys():
+                    magic_result.append(magic_cookies[key].file(self.fullpath))
+                self.magic = tuple(magic_result)
+            elif CFG_HAS_MAGIC == 2:
+                magic_result = []
+                for key in ({'mime': False, 'mime_encoding': False},
+                        {'mime': True, 'mime_encoding': False},
+                        {'mime': False, 'mime_encoding': True}):
+                    magic_result.append(_magic_wrapper(self.fullpath, **key))
+                self.magic = tuple(magic_result)
         return self.magic
 
     def check(self):
