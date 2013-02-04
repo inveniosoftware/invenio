@@ -29,5 +29,5 @@ class KeywordsField(TextField, JsonCookerMixinBuilder('keywords')):
         self._icon_html = '<i class="icon-tags"></i>'
         super(KeywordsField, self).__init__(**kwargs)
 
-    def pre_validate(self):
+    def pre_validate(self, form=None):
         return dict(error=0, error_message='')

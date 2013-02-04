@@ -28,5 +28,5 @@ class IntegerTextField(IntegerField, JsonCookerMixin):
     def __init__(self, **kwargs):
         super(IntegerTextField, self).__init__(**kwargs)
 
-    def pre_validate(self):
+    def pre_validate(self, form=None):
         return dict(error=0, error_message='')

@@ -29,7 +29,7 @@ class PagesNumberField(TextField, JsonCookerMixinBuilder('page_number')):
         self._icon_html = '<i class="icon-th"></i>'
         super(PagesNumberField, self).__init__(**kwargs)
 
-    def pre_validate(self):
+    def pre_validate(self, form=None):
         value = self.data
 
         def is_number(s):
@@ -39,6 +39,16 @@ class PagesNumberField(TextField, JsonCookerMixinBuilder('page_number')):
             except ValueError:
                 return False
 
-        if not is_number(value):
+        if value is '':
+            return dict(error=0, error_message='')
+        elif not is_number(value):
+            error_message = 'Pages number must be a number!'
+            try:
+                self.errors.append(error_message)
+            except AttributeError:
+                self.errors = list(self.process_errors)
+                self.errors.append(error_message)
             return dict(error=1, \
-                        error_message='Pages number must be a number! duh')
+                        error_message=error_message)
+        else:
+            return dict(error=0, error_message='')

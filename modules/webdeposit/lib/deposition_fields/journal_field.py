@@ -39,8 +39,16 @@ class JournalField(TextField, JsonCookerMixinBuilder('journal')):
 
         super(JournalField, self).__init__(**kwargs)
 
-    def pre_validate(self):
-        return dict(error=0, error_message='')
+    def pre_validate(self, form=None):
+        value = self.data
+        s = SherpaRomeoSearch()
+        s.search_journal(value)
+        issn = s.parser.get_issn()
+        if type(issn) is str:  # unique journal
+            return dict(error=0, error_message='',
+                        fields=dict(issn=issn))
+        else:
+            return dict(error=0, error_message='')
 
     def autocomplete(self):
         value = self.data

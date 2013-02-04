@@ -265,7 +265,26 @@ def draft_field_get(user_id, uuid, field_name, subfield_name=None):
         return None
 
 
-def draft_field_set(user_id, uuid, field_name, value, subfield_name=None):
+def draft_field_error_check(user_id, uuid, field_name, value):
+    """ Retrieves the form based on the uuid
+        and returns a json string evaluating the field's value
+    """
+
+    form = get_form(user_id, uuid=uuid)
+
+    subfield_name = None
+    subfield_name = None
+    if '-' in field_name:  # check if its subfield
+        field_name, subfield_name = field_name.split('-')
+
+        form = form.__dict__["_fields"][field_name].form
+        field_name = subfield_name
+
+    form.__dict__["_fields"][field_name].process_data(value)
+    return form.__dict__["_fields"][field_name].pre_validate(form)
+
+
+def draft_field_set(user_id, uuid, field_name, value):
     """ Alters the value of a field """
 
     webdeposit_draft_query = db.session.query(WebDepositDraft).\
@@ -276,6 +295,10 @@ def draft_field_set(user_id, uuid, field_name, value, subfield_name=None):
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
     values = draft.form_values
+
+    subfield_name = None
+    if '-' in field_name:  # check if its subfield
+        field_name, subfield_name = field_name.split('-')
 
     if subfield_name is not None:
         try:

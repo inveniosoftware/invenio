@@ -106,38 +106,115 @@ div#conditions{
   <fieldset>
 
   {% for field in form %}
-    <div class="control-group">
 
-      {% if field._icon_html %}
-        <span class="pull-left" style="margin-right: 5px; margin-top: 5px;">
-          {{ field._icon_html|safe }}
-        </span>
-      {% endif %}
-      <div class="control-label">
+    {% if field.form %}
+      <hr>
+    {% endif %}
+
+    <div class="control-group {{ "error" if field.errors }}" id="error-group-{{ field.name }}">
+
+      <div class="control-label {{ "error" if field.errors }}">
       {% if "submit" not in field.__html__() %}
-        {% set label_class = 'pull-left' + (' required' if field.required else '') %}
-        {{ field.label(class_=label_class) }}
+        {% set label_class = (' required' if field.required else '') %}
+        {% if field.form %}
+          <h5>
+            {{ field.label.text }}
+          </h5>
+        {% else %}
+            {{ field.label(class_=label_class) }}
+        {% endif %}
       {% endif %}
-      <div id="wait-{{ field.name }}"
-           style="height: 20px; width: 20px; margin-top: -17px; display:none;">
-        <img src="{{ url_for('static', filename='img/loading.gif') }}"/>
-      </div>
-    </div>
-    <div class="controls {% if show_error_list and field.errors %} error{% endif %}">
-      {{ field(class_=field.short_name) }}
-      {% if show_error_list and field.errors %}
-        {% for error in field.errors %}
-          <span class="help-inline">{{ error }}</span>
-        {% endfor %}
-      {% endif %}
-      <div class="alert alert-error help-inline" id="error-{{ field.name }}" style="display:none;">error message</div>
-      </div>
     </div>
 
-    {% if ("keywords" in field.__html__()) %}
-    <div class="control-group" style="display: none;">
-      <input name="keywords-{{ field.short_name}}" type="text" value="">
-    </div>
+    {% if field.form %}
+      </div>
+
+
+        {% for subfield in field.form %}
+
+          <div class="control-group {{ "error" if subfield.errors }}" id="error-group-{{ subfield.name }}">
+
+          <div class="control-label {{ "error" if subfield.errors }}">
+          {% if "submit" not in subfield.__html__() %}
+            {% set label_class = (' required' if subfield.required else '') %}
+            {{ subfield.label(class_=label_class) }}
+          {% endif %}
+          </div>
+
+        <div class="controls" id="field-{{ subfield.name }}">
+          {% if subfield._icon_html and "pluploader" not in subfield.__html__() %}
+                <div class="input-prepend">
+                    <span class="add-on">
+                    {{ subfield._icon_html|safe }}
+                    </span>
+              {% elif "pluploader" not in subfield.__html__() %}
+                <div style="margin-left: 27px;">
+              {% else %}
+                <div>
+              {% endif %}
+
+              {{ subfield(class_=field.short_name) }}
+
+              </div>
+
+          {% if subfield.errors %}
+            {% for error in subfield.errors %}
+              <div class="alert alert-error help-inline error-list-{{ subfield.name }}">{{ error }}</div>
+            {% endfor %}
+          {% endif %}
+          <div class="alert alert-error help-inline" id="error-{{ subfield.name }}" style="display:none;">error message</div>
+          <div class="alert alert-info help-inline" id="info-{{ subfield.name }}" style="display:none;">info message</div>
+          <div class="alert alert-success help-inline" id="success-{{ subfield.name }}" style="display:none;">success message</div>
+          </div>
+        </div>
+
+        {% if ("keywords" in field.__html__()) %}
+        <div class="control-group" style="display: none;">
+          <input name="keywords-{{ field.short_name}}" type="text" value="">
+        </div>
+
+        {% endif %}
+
+        {% endfor %}
+
+      <hr>
+
+
+    {% else %}
+
+    <div class="controls" id="field-{{ field.name }}">
+          {% if field._icon_html and "pluploader" not in field.__html__() %}
+                <div class="input-prepend">
+                    <span class="add-on">
+                    {{ field._icon_html|safe }}
+                    </span>
+              {% elif "pluploader" not in field.__html__() %}
+                <div style="margin-left: 27px;">
+              {% else %}
+                <div>
+              {% endif %}
+
+              {{ field(class_=field.short_name) }}
+
+              </div>
+
+          {% if field.errors %}
+            {% for error in field.errors %}
+              <div class="alert alert-error help-inline error-list-{{ field.name }}">{{ error }}</div>
+            {% endfor %}
+          {% endif %}
+          <div class="alert alert-error help-inline" id="error-{{ field.name }}" style="display:none;">error message</div>
+          <div class="alert alert-info help-inline" id="info-{{ field.name }}" style="display:none;">info message</div>
+          <div class="alert alert-success help-inline" id="success-{{ field.name }}" style="display:none;">success message</div>
+          </div>
+        </div>
+
+        {% if ("keywords" in field.__html__()) %}
+        <div class="control-group" style="display: none;">
+          <input name="keywords-{{ field.short_name}}" type="text" value="">
+        </div>
+        {% endif %}
+
     {% endif %}
 
   {% endfor %}
@@ -160,7 +237,10 @@ $(function() {
                                 '{{ url_for("webdeposit.autocomplete", deposition_type=deposition_type, uuid=uuid, type=field.name) }}')
   {% endif %}
 {% endfor %}
-  $(".datepicker").datepicker();
+  //$(".datepicker").datepicker();
+  // FIXME: datepicker css problem
+  //        check earlier version of jquery-ui
+  //        or check makefile
 
   $("input#submitButton").click(function(e ) {
           e.preventDefault();

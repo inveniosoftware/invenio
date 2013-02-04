@@ -61,3 +61,44 @@ def create_deposition_document(deposition_type, user_id):
         db.session.add(webdeposit_workflow)
         db.session.commit()
     return create_dep_doc
+
+
+def authorize_user(user_id=None):
+    def user_auth(obj, eng):
+        if user_id is not None:
+            obj['user_id'] = user_id
+        else:
+            from invenio.webuser_flask import current_user
+            obj['user_id'] = current_user.get_id()
+    return user_auth
+
+
+def render_form(form):
+    def render(obj, eng):
+        uuid = obj['uuid']
+        if 'user_id' in obj:
+            user_id = obj['user_id']
+        else:
+            from invenio.webuser_flask import current_user
+            user_id = current_user.get_id()
+        deposition_type = obj['deposition_type']
+        step = obj['step']
+        form_type = form.__name__
+        webdeposit_draft = WebDepositDraft(uuid=uuid,
+                                  user_id=user_id,
+                                  deposition_type=deposition_type,
+                                  form_type=form_type,
+                                  form_values={},
+                                  step=step,
+                                  timestamp=func.current_timestamp())
+        db.session.add(webdeposit_draft)
+        db.session.commit()
+    return render
+
+
+def wait_for_submission():
+    def wait(obj, eng):
+        obj['break'] = True
+        eng.current_step -= 1
+    return wait
+

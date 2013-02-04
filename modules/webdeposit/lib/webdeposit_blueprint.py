@@ -39,13 +39,15 @@ from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.config import CFG_WEBDEPOSIT_UPLOAD_FOLDER
 from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.webdeposit_utils import get_current_form, \
+                                     get_form, \
                                      draft_field_set, \
                                      draft_field_list_add, \
                                      delete_workflow, \
                                      create_workflow, \
                                      get_latest_or_new_workflow, \
                                      get_workflow, \
-                                     draft_field_get_all
+                                     draft_field_get_all, \
+                                     draft_field_error_check
 from invenio.webuser_flask import current_user
 from invenio.bibworkflow_engine import CFG_WORKFLOW_STATUS
 from invenio.bibworkflow_model import Workflow
@@ -176,38 +178,13 @@ def error_check(deposition_type, uuid):
     if field_name == "":
         return "{}"
 
-    subfield_name = None
-    if '-' in field_name:
-        field_name, subfield_name = field_name.split('-')
-
-    draft_field_set(current_user.get_id(),
-                    uuid,
-                    field_name,
-                    value,
-                    subfield_name)
-    uuid, form = get_current_form(current_user.get_id(), uuid=uuid)
-
-    #if field_name == "issn" or field_name == "journal":
-    #    draft_field_set(current_user.get_id(), uuid, "conditions", None)
+    draft_field_set(current_user.get_id(), uuid, field_name, value)
+    check_result = draft_field_error_check(current_user.get_id(), \
+                                       uuid, field_name, value)
     try:
-        # insert value into the form
-        form.__dict__["_fields"][field_name].process_data(value)
-    except (KeyError, AttributeError):
-        # check for subfield
-        if subfield_name is not None:
-
-            form = form.__dict__["_fields"][field_name].form
-            field_name = subfield_name
-            form.__dict__["_fields"][field_name].process_data(value)
-        else:
-            return jsonify({"error_message": "Couldn't perform error checking", \
-                            "error": 0})
-
-    try:
-        json_response = jsonify(form.__dict__["_fields"][field_name].pre_validate())
+        return jsonify(check_result)
     except TypeError:
-        json_response = jsonify({"error_message": "", "error": 0})
-    return json_response
+        return jsonify({"error_message": "", "error": 0})
 
 
 @blueprint.route('/<deposition_type>/delete/<uuid>')
@@ -299,20 +276,31 @@ def add(deposition_type, uuid=None):
                      {'deposition_type': deposition_type, 'uuid': uuid})]
 
     if request.method == 'POST':
-        # Save the file
-        try:
-            uploaded_file = request.files['file']
+        # Save the files
+        for (field, uploaded_file) in request.files.items():
             filename = secure_filename(uploaded_file.filename)
-        except KeyError:  # there is no file
-            filename = ''
-
-        if filename != '':  # if exists
+            if filename == "":
+                continue
             file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, filename)
             uploaded_file.save(file_path)
             draft_field_list_add(current_user.get_id(), \
                      uuid, \
                      "files", \
                      file_path)
+
+        # Save form values
+        for (field_name, value) in request.form.items():
+            if "submit" in field_name.lower():
+                continue
+            draft_field_set(current_user.get_id(),
+                            uuid, field_name,
+                            value, None)
+
+        form = get_form(current_user.get_id(), uuid)
+        # Validate form
+        if not form.validate():
+            # render the form with error messages
+            return render_template('webdeposit_add.html', **workflow.get_output(form_validation=True))
 
         # Submission, proceed to the next steps
         workflow.jump_forward()

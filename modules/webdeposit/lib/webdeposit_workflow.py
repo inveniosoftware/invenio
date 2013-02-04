@@ -50,8 +50,7 @@ class DepositionWorkflow(object):
         self.set_user_id(user_id)
         self.set_uuid(uuid)
 
-        if deposition_type is not None:
-            self.set_deposition_type(deposition_type)
+        self.deposition_type = deposition_type
 
         self.current_step = 0
         self.set_engine(engine)
@@ -65,17 +64,13 @@ class DepositionWorkflow(object):
         if uuid is None:
             uuid = new_uuid()
             self.uuid = uuid
-            # Then the workflow was not created before
-            #dep_create = create_deposition_document(self.get_deposition_type(),
-            #                                        self.get_user_id())
-            #dep_create(self.obj, self.eng)
         else:
             self.uuid = uuid
-            # synchronize the workflow object
-            #self.update_workflow_object()
 
     def get_uuid(self):
         return self.uuid
+
+    uuid = property(get_uuid, set_uuid)
 
     def set_engine(self, engine=None):
         if engine is None:
@@ -104,6 +99,8 @@ class DepositionWorkflow(object):
     def get_deposition_type(self):
         return self.obj['deposition_type']
 
+    deposition_type = property(get_deposition_type, set_deposition_type)
+
     def set_user_id(self, user_id=None):
         if user_id is not None:
             self.user_id = user_id
@@ -122,7 +119,7 @@ class DepositionWorkflow(object):
             return CFG_WORKFLOW_STATUS['finished']
         return CFG_WORKFLOW_STATUS['running']
 
-    def get_output(self):
+    def get_output(self, form_validation=None):
         user_id = self.user_id
         uuid = self.get_uuid()
 
@@ -132,6 +129,9 @@ class DepositionWorkflow(object):
 
         deposition_type = self.obj['deposition_type']
         drafts = draft_field_get_all(user_id, deposition_type)
+
+        if form_validation:
+            form.validate()
 
         return dict(workflow=self,
                     deposition_type=deposition_type,

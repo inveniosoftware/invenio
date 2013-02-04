@@ -30,7 +30,7 @@ class AuthorField(TextField, JsonCookerMixinBuilder('author')):
         self._icon_html = '<i class="icon-user"></i>'
         super(AuthorField, self).__init__(**kwargs)
 
-    def pre_validate(self):
+    def pre_validate(self, form=None):
         return dict(error=0, error_message='')
 
     def autocomplete(self):

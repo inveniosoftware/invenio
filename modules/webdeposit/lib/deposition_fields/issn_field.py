@@ -29,5 +29,5 @@ class ISSNField(TextField, JsonCookerMixinBuilder('issn')):
         self._icon_html = '<i class="icon-barcode"></i>'
         super(ISSNField, self).__init__(**kwargs)
 
-    def pre_validate(self):
+    def pre_validate(self, form=None):
         return dict(error=0, error_message='')

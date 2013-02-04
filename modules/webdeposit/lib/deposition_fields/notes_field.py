@@ -29,5 +29,5 @@ class NotesField(TextAreaField, JsonCookerMixinBuilder('notes')):
         self._icon_html = '<i class="icon-list"></i>'
         super(NotesField, self).__init__(**kwargs)
 
-    def pre_validate(self):
+    def pre_validate(self, form=None):
         return dict(error=0, error_message='')

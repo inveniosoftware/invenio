@@ -29,5 +29,5 @@ class LanguageField(SelectField, JsonCookerMixinBuilder('language')):
         self._icon_html = '<i class="icon-flag"></i>'
         super(LanguageField, self).__init__(**kwargs)
 
-    def pre_validate(self):
+    def pre_validate(self, form=None):
         return dict(error=0, error_message='')
