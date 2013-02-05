@@ -89,6 +89,10 @@ pylib_DATA = __init__.py \
              sequtils_regression_tests.py \
              crossrefutils.py
 
+jsdir=$(localstatedir)/www/js
+
+js_DATA = jquery.mathpreview.js
+
 noinst_DATA = testimport.py \
               kwalitee.py \
               pep8.py
@@ -99,6 +103,7 @@ tmp_DATA = intbitset_example.int
 
 EXTRA_DIST = $(pylib_DATA) \
              $(tmp_DATA) \
+             $(js_DATA) \
              testimport.py \
              kwalitee.py \
              pep8.py \

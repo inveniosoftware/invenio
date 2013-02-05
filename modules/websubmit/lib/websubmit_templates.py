@@ -27,7 +27,7 @@ from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.urlutils import create_html_link
 from invenio.webmessage_mailutils import email_quoted_txt2html
-from invenio.htmlutils import escape_html
+from invenio.htmlutils import escape_html, escape_javascript_string
 from invenio.websubmit_config import CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION
 
 class Template:
@@ -2865,6 +2865,36 @@ class Template:
         out += write_box
 
         return out
+
+    def tmpl_mathpreview_header(self, ln, https=False):
+        """
+        Metaheader to add to submit pages in order to preview equation
+        rendered via MathJax.
+
+        @param ln: language.
+        @param https: True on https pages, False otherwise.
+        """
+        # By default, add tooltip to any suspected 'title' and
+        # 'abstract' field, as well as those tagged with 'mathpreview'
+        # class.
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        return '''
+         <script src="%(siteurl)s/js/jquery.mathpreview.js" type="text/javascript"></script>
+         <script type="text/javascript">
+         <!--
+         $(document).ready(function() {
+         $('textarea[name$="TITLE"], input[type="text"][name$="TITLE"],textarea[name$="ABSTRACT"], input[type="text"][name$="ABSTRACT"], textarea[name$="TTL"], input[type="text"][name$="TTL"], textarea[name$="ABS"], input[type="text"][name$="ABS"], textarea[name$="ABSTR"], input[type="text"][name$="ABSTR"], .mathpreview textarea, .mathpreview input[type="text"], input[type="text"].mathpreview, textarea.mathpreview').mathpreview(
+         {'help-label': '%(help-label)s',
+          'help-url'  : '%(siteurl)s/help/submit-guide#math-markup'});
+         })
+         -->
+         </script>''' % {
+         'siteurl': https and CFG_SITE_SECURE_URL or CFG_SITE_URL,
+         'help-label': escape_javascript_string(_("Use '\\$' delimiters to write LaTeX markup. Eg: \\$e=mc^{2}\\$")),
+         }
 
 def displaycplxdoc_displayauthaction(action, linkText):
     return """ <strong class="headline">(<a href="" onclick="document.forms[0].action.value='%(action)s';document.forms[0].submit();return false;">%(linkText)s</a>)</strong>""" % {

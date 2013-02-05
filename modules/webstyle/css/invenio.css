@@ -3821,4 +3821,32 @@ div.bibcircbottom {
 
 }
 
+/* Math preview panel */
+
+#mathpreviewarea {
+    display: none;
+    float:left;
+    padding:0;
+    border: 1px solid #eec520;
+    color: #000;
+    background-color:#ffffea;
+    -webkit-box-shadow: 1px 2px 5px 1px rgba(0,0,0,0.5);
+    -moz-box-shadow: 1px 2px 5px 1px rgba(0,0,0,0.5);
+    box-shadow: 1px 2px 5px 1px rgba(0,0,0,0.5);}
+#mathpreviewareabar {
+    border-bottom:1px solid #eec520;
+    background-color:#eec970;
+    font-size:small;
+    color: #3B2324
+}
+#mathpreviewareacontent {
+    padding:5px;
+}
+#mathpreviewareaclose {
+    float: right;
+    clear: none;
+    margin-left: 10px;
+}
+#mathpreviewareabar span{float:left; clear:none}
+
 /* end of invenio.css */

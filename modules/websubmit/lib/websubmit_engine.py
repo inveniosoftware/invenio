@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,7 +39,9 @@ from invenio.config import \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_DEVEL_SITE, \
-     CFG_SITE_SECURE_URL
+     CFG_SITE_SECURE_URL, \
+     CFG_WEBSUBMIT_USE_MATHJAX
+
 from invenio.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, error_page, warning_page
@@ -53,6 +55,7 @@ from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
+from invenio.htmlutils import get_mathjax_header
 
 from invenio.websubmit_dblayer import \
      get_storage_directory_of_action, \
@@ -730,6 +733,14 @@ def interface(req,
                    'ln' : ln
                  }
 
+
+    ## add MathJax if wanted
+    if CFG_WEBSUBMIT_USE_MATHJAX:
+        metaheaderadd = get_mathjax_header(req.is_https())
+        metaheaderadd += websubmit_templates.tmpl_mathpreview_header(ln, req.is_https())
+    else:
+        metaheaderadd = ''
+
     return page(title= actname,
                 body = t,
                 navtrail = p_navtrail,
@@ -738,7 +749,8 @@ def interface(req,
                 uid = uid,
                 language = ln,
                 req = req,
-                navmenuid='submit')
+                navmenuid='submit',
+                metaheaderadd=metaheaderadd)
 
 
 def endaction(req,
@@ -1210,6 +1222,14 @@ def endaction(req,
                    'docname' : docname,
                    'ln' : ln,
                  }
+
+    ## add MathJax if wanted
+    if CFG_WEBSUBMIT_USE_MATHJAX:
+        metaheaderadd = get_mathjax_header(req.is_https())
+        metaheaderadd += websubmit_templates.tmpl_mathpreview_header(ln, req.is_https())
+    else:
+        metaheaderadd = ''
+
     return page(title= actname,
                 body = t,
                 navtrail = p_navtrail,
@@ -1218,7 +1238,8 @@ def endaction(req,
                 uid = uid,
                 language = ln,
                 req = req,
-                navmenuid='submit')
+                navmenuid='submit',
+                metaheaderadd=metaheaderadd)
 
 def home(req, catalogues_text, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     """This function generates the WebSubmit "home page".
