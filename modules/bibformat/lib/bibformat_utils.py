@@ -34,12 +34,14 @@ from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS, \
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR
 from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
 from invenio.textutils import encode_for_xml
 from invenio.shellutils import run_shell_command
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.solrutils_bibindex_searcher import solr_get_snippet
 
 def highlight_matches(text, compiled_pattern, \
                       prefix_tag='<strong>', suffix_tag="</strong>"):
@@ -618,12 +620,16 @@ def get_pdf_snippets(recID, patterns, user_info):
         max_snippets=CFG_WEBSEARCH_FULLTEXT_SNIPPETS[text_path_courtesy]
 
     if text_path and nb_chars and max_snippets:
-        out = get_text_snippets(text_path, patterns, nb_chars, max_snippets)
-        if not out:
-            # no hit, so check stemmed versions:
-            from invenio.bibindex_engine_stemmer import stem
-            stemmed_patterns = [stem(p, 'en') for p in patterns]
-            out = get_text_snippets(text_path, stemmed_patterns, nb_chars, max_snippets)
+        out = ''
+        if CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR == 'native':
+            out = get_text_snippets(text_path, patterns, nb_chars, max_snippets)
+            if not out:
+                # no hit, so check stemmed versions:
+                from invenio.bibindex_engine_stemmer import stem
+                stemmed_patterns = [stem(p, 'en') for p in patterns]
+                out = get_text_snippets(text_path, stemmed_patterns, nb_chars, max_snippets)
+        elif CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR == 'SOLR':
+            out = solr_get_snippet(patterns, recID, nb_chars, max_snippets)
 
         if out:
             out_courtesy = ""
