@@ -26,7 +26,8 @@ import unittest
 from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
      remove_html_markup, create_html_select, \
      CFG_TIDY_INSTALLED, \
-     CFG_BEAUTIFULSOUP_INSTALLED, tidy_html
+     CFG_BEAUTIFULSOUP_INSTALLED, tidy_html, \
+     escape_javascript_string
 from invenio.testutils import make_test_suite, run_test_suite
 
 class XSSEscapingTest(unittest.TestCase):
@@ -95,6 +96,97 @@ class CharactersEscapingTest(unittest.TestCase):
         nmtoken = nmtoken_from_string(ascii_str)
         for char in nmtoken:
             self.assert_(char in ['.', '-', '_', ':'] or char.isalnum())
+
+class JavascriptCharactersEscapingTest(unittest.TestCase):
+    """Test functions related to escaping Javascript characters for use in various context """
+
+    def test_newline(self):
+        """htmlutils - test if newlines are properly escaped for Javascript strings"""
+        test_str = "a string with a \n line break in it"
+        self.assertEqual(escape_javascript_string(test_str), "a string with a \\n line break in it")
+        test_str = "a string with a \r\n line break in it"
+        self.assertEqual(escape_javascript_string(test_str), "a string with a \\r\\n line break in it")
+        test_str = """a string with a \r\n line break and "quote" in it"""
+        self.assertEqual(escape_javascript_string(test_str), '''a string with a \\r\\n line break and \\"quote\\" in it''')
+
+    def test_newline_nojson(self):
+        """htmlutils - test if newlines are properly escaped for Javascript strings without JSON module. """
+        # Trick jsonutils into thinking json module is not available.
+        import invenio.htmlutils
+        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        self.test_newline()
+        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+
+    def test_escape_javascript_string_for_html(self):
+        """htmlutils - escaping strings for Javascript, for use in HTML"""
+        self.assertEqual(escape_javascript_string('''"Are you a Munchkin?" asked Dorothy.
+"No, but I am their friend"'''),
+                         '\\"Are you a Munchkin?\\" asked Dorothy.\\n\\"No, but I am their friend\\"')
+
+        input_string = '''/*<![CDATA[*/"Your <em>'Silver Shoes'</em> will carry you over the desert,"\r replied Glinda./*]]>*/'''
+        output_string = """/*&lt;![CDATA[*/\\"Your &lt;em&gt;\\'Silver Shoes\\'&lt;/em&gt; will carry you over the desert,\\"\\r replied Glinda./*]]&gt;*/"""
+        self.assertEqual(escape_javascript_string(input_string), output_string)
+
+
+    def test_escape_javascript_string_for_html_nojson(self):
+        """htmlutils - escaping strings for Javascript, for use in HTML, without JSON module."""
+        # Same output if we did not have JSON installed
+        import invenio.htmlutils
+        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        self.test_escape_javascript_string_for_html()
+        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+
+    def test_escape_javascript_string_for_html_in_cdata(self):
+        """htmlutils - escaping strings for Javascript, for use in HTML, in CDATA sections"""
+        input_string = '''/*<![CDATA[*/"Your <em>'Silver Shoes'</em> will carry you over the desert,"\r replied Glinda./*]]>*/'''
+        output_string = """/*<![CDATA[*/\\"Your <em>\\'Silver Shoes\\'</em> will carry you over the desert,\\"\\r replied Glinda./*]]]]><![CDATA[>*/"""
+        self.assertEqual(escape_javascript_string(input_string, escape_for_html=False, escape_CDATA=True),
+                         output_string)
+
+    def test_escape_javascript_string_for_html_in_cdata_nojson(self):
+        """htmlutils - escaping strings for Javascript, for use in HTML, in CDATA sections, without JSON module."""
+        import invenio.htmlutils
+        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        self.test_escape_javascript_string_for_html_in_cdata()
+        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+
+    def test_escape_javascript_string_for_javascript_or_json(self):
+        """htmlutils - escaping strings for Javascript, for use in "pure" Javscript or JSON output"""
+        input_string = '''/*<![CDATA[*/"Your <em>'Silver Shoes'</em> will carry you over the desert,"\r replied Glinda./*]]>*/'''
+        output_string = """/*<![CDATA[*/\\"Your <em>\\'Silver Shoes\\'</em> will carry you over the desert,\\"\\r replied Glinda./*]]>*/"""
+        self.assertEqual(escape_javascript_string(input_string, escape_for_html=False, escape_CDATA=False),
+                         output_string)
+
+    def test_escape_javascript_string_for_javascript_or_json_nojson(self):
+        """htmlutils - escaping strings for Javascript, for use in "pure" Javscript or JSON output, without JSON module."""
+        import invenio.htmlutils
+        invenio.htmlutils.CFG_JSON_AVAILABLE = False
+        self.test_escape_javascript_string_for_javascript_or_json()
+        invenio.htmlutils.CFG_JSON_AVAILABLE = True
+
+    def test_escape_closing_script_tag(self):
+        """htmlutils - escaping closing </script> tag"""
+        input_string = '''My string contain some<script>alert(foo)</script> that browser might not like'''
+        output_string = '''My string contain some<script>alert(foo)</scr'+'ipt> that browser might not like'''
+        self.assertEqual(escape_javascript_string(input_string,
+                                                  escape_for_html=False,
+                                                  escape_CDATA=False,
+                                                  escape_script_tag_with_quote="'"),
+                         output_string)
+
+        output_string = '''My string contain some<script>alert(foo)</scr"+"ipt> that browser might not like'''
+        self.assertEqual(escape_javascript_string(input_string,
+                                                  escape_for_html=False,
+                                                  escape_CDATA=False,
+                                                  escape_script_tag_with_quote='"'),
+                         output_string)
+
+    def test_escape_javascript_string_for_html_in_tag_attribute(self):
+        """htmlutils - escaping closing double quotes for use in HTML tag attribute"""
+        input_string = '''"Your <em>'Silver Shoes'</em> will carry you over the desert,"\r replied Glinda.'''
+        output_string = """&quot;Your <em>\\'Silver Shoes\\'</em> will carry you over the desert,&quot;\\r replied Glinda."""
+        self.assertEqual(escape_javascript_string(input_string, escape_for_html=False, escape_quote_for_html=True),
+                         output_string)
 
 class HTMLWashingTest(unittest.TestCase):
     """Test functions related to general washing of HTML source"""
@@ -267,7 +359,8 @@ TEST_SUITE = make_test_suite(XSSEscapingTest,
                              HTMLMarkupRemovalTest,
                              HTMLTidyingTest,
                              HTMLAutomaticLinksTransformation,
-                             HTMLCreation)
+                             HTMLCreation,
+                             JavascriptCharactersEscapingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
