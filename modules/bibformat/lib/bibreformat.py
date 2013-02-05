@@ -63,10 +63,9 @@ def fetch_last_updated(format):
     return last_date
 
 
-def store_last_updated(format, update_date):
+def store_last_updated(format, iso_date):
     sql = "UPDATE format SET last_updated = %s " \
            "WHERE code = %s AND (last_updated < %s or last_updated IS NULL)"
-    iso_date = update_date.strftime("%Y-%m-%d %H:%M:%S")
     run_sql(sql, (iso_date, format.lower(), iso_date))
 
 
@@ -90,7 +89,7 @@ def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, 
 
     t1 = os.times()[4]
 
-    start_date = datetime.now()
+    start_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 ### Query the database
 ###
