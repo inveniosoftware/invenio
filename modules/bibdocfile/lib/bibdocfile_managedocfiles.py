@@ -1,7 +1,7 @@
 ## $Id: Revise_Files.py,v 1.37 2009/03/26 15:11:05 jerome Exp $
 
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -96,9 +96,12 @@ from invenio.dbquery import run_sql
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.urlutils import create_html_mailto
+from invenio.htmlutils import escape_javascript_string
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 
 CFG_ALLOWED_ACTIONS = ['revise', 'delete', 'add', 'addFormat']
+
+params_id = 0
 
 def create_file_upload_interface(recid,
                                  form=None,
@@ -731,6 +734,12 @@ def create_file_upload_interface(recid,
                 body += '<script>alert("%s");</script>' % \
                        (_("A file named %s already exists. Please choose another name.") % \
                         file_rename).replace('"', '\\"')
+            elif file_rename != file_target and \
+                     ('.' in file_rename or '/' in file_rename or "\\" in file_rename):
+                    # We forbid usage of a few characters, for the good of
+                    # everybody...
+                body += '<script>alert("%s");</script>' % \
+                        _("You are not allowed to use dot '.', slash '/', or backslash '\\\\' in file names. Choose a different name and upload your file again. In particular, note that you should not include the extension in the renaming field.").replace('"', '\\"')
             else:
                 # Log
                 log_action(working_dir, file_action, file_target,
@@ -788,8 +797,8 @@ def create_file_upload_interface(recid,
     doctypes_list = ""
     if len(cleaned_doctypes) > 1:
         doctypes_list = '<select id="fileDoctype" name="fileDoctype" onchange="var idx=this.selectedIndex;var doctype=this.options[idx].value;updateForm(doctype,'+','.join([js_can_describe_doctypes, js_can_comment_doctypes, js_can_restrict_doctypes])+');">' + \
-                        '\n'.join(['<option value="' + doctype + '">' + \
-                                   description + '</option>' \
+                        '\n'.join(['<option value="' + cgi.escape(doctype, True) + '">' + \
+                                   cgi.escape(description) + '</option>' \
                                    for (doctype, description) \
                                    in doctypes_and_desc if \
                                    doctype in cleaned_doctypes]) + \
@@ -844,9 +853,11 @@ def create_file_upload_interface(recid,
                                     protect_hidden_files=protect_hidden_files)
     body += '</table>'
     if len(cleaned_doctypes) > 0:
-        body += '''<input type="button" onclick="%(display_revise_panel)s;updateForm('%(defaultSelectedDoctype)s', %(can_describe_doctypes)s, %(can_comment_doctypes)s, %(can_restrict_doctypes)s);return false;" value="%(add_new_file)s"/>''' % \
-               {'display_revise_panel':javascript_display_revise_panel(action='add', target='', show_doctypes=True, show_keep_previous_versions=False, show_rename=can_name_new_files, show_description=True, show_comment=True, bibdocname='', description='', comment='', show_restrictions=True, restriction=len(restrictions_and_desc) > 0 and restrictions_and_desc[0][0] or '', doctypes=doctypes_list),
-                'defaultSelectedDoctype': cleaned_doctypes[0],
+        (revise_panel, javascript_prefix) = javascript_display_revise_panel(action='add', target='', show_doctypes=True, show_keep_previous_versions=False, show_rename=can_name_new_files, show_description=True, show_comment=True, bibdocname='', description='', comment='', show_restrictions=True, restriction=len(restrictions_and_desc) > 0 and restrictions_and_desc[0][0] or '', doctypes=doctypes_list)
+        body += '''%(javascript_prefix)s<input type="button" onclick="%(display_revise_panel)s;updateForm('%(defaultSelectedDoctype)s', %(can_describe_doctypes)s, %(can_comment_doctypes)s, %(can_restrict_doctypes)s);return false;" value="%(add_new_file)s"/>''' % \
+               {'display_revise_panel': revise_panel,
+                'javascript_prefix': javascript_prefix,
+                'defaultSelectedDoctype': escape_javascript_string(cleaned_doctypes[0], escape_quote_for_html=True),
                 'add_new_file': _("Add new file"),
                 'can_describe_doctypes':js_can_describe_doctypes,
                 'can_comment_doctypes': repr({}.fromkeys(can_comment_doctypes, '')),
@@ -998,13 +1009,13 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     if not updated and show_links and not hidden_p:
         out += '<a target="_blank" href="' + main_bibdocfile.get_url() \
            + '">'
-    out += abstract_bibdoc['get_docname']
+    out += cgi.escape(abstract_bibdoc['get_docname'])
     if hidden_p:
         out += ' <span style="font-size:small;font-style:italic;color:#888">(hidden)</span>'
     if not updated and show_links and not hidden_p:
         out += '</a>'
     if main_bibdocfile_description:
-        out += ' (<em>' + main_bibdocfile_description + '</em>)'
+        out += ' (<em>' + cgi.escape(main_bibdocfile_description) + '</em>)'
     out += '</td>'
 
     (description, comment) = get_description_and_comment(abstract_bibdoc['list_latest_files'])
@@ -1014,8 +1025,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_revise_doctypes or \
            '*' in can_revise_doctypes and not (hidden_p and protect_hidden_files):
-        out += '[<a href="" onclick="%(display_revise_panel)s;return false;">%(revise)s</a>]' % \
-               {'display_revise_panel': javascript_display_revise_panel(
+        (revise_panel, javascript_prefix) = javascript_display_revise_panel(
             action='revise',
             target=abstract_bibdoc['get_docname'],
             show_doctypes=False,
@@ -1028,17 +1038,29 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
             comment=comment,
             show_restrictions=(main_bibdocfile.get_type() in can_restrict_doctypes) or '*' in can_restrict_doctypes,
             restriction=restriction,
-            doctypes=doctypes_list),
+            doctypes=doctypes_list)
+        out += '%(javascript_prefix)s[<a href="" onclick="%(display_revise_panel)s;return false;">%(revise)s</a>]' % \
+               {'display_revise_panel': revise_panel,
+                'javascript_prefix': javascript_prefix,
                 'revise': _("revise")
                 }
 
     # Delete link
     if main_bibdocfile.get_type() in can_delete_doctypes or \
            '*' in can_delete_doctypes and not (hidden_p and protect_hidden_files):
-        out += '''[<a href="" onclick="return askDelete('%(bibdocname)s', '%(form_url_params)s')">%(delete)s</a>]
-        ''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
+        global params_id
+        params_id += 1
+        out += '''
+        <script type="text/javascript">
+        /*<![CDATA[*/
+        var delete_panel_params_%(id)i = "%(bibdocname)s";
+        /*]]>*/
+        </script>
+        [<a href="" onclick="return askDelete(delete_panel_params_%(id)i, '%(form_url_params)s')">%(delete)s</a>]
+        ''' % {'bibdocname': escape_javascript_string(abstract_bibdoc['get_docname'], escape_for_html=False),
                'delete': _("delete"),
-               'form_url_params': form_url_params or ''}
+               'form_url_params': form_url_params or '',
+               'id': params_id}
     out += '''</td>'''
 
     # Format row
@@ -1058,8 +1080,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_add_format_to_doctypes or \
            '*' in can_add_format_to_doctypes and not (hidden_p and protect_hidden_files):
-        out += '[<a href="" onclick="%(display_revise_panel)s;return false;">%(add_format)s</a>]' % \
-        {'display_revise_panel':javascript_display_revise_panel(
+        (revise_panel, javascript_prefix) = javascript_display_revise_panel(
             action='addFormat',
             target=abstract_bibdoc['get_docname'],
             show_doctypes=False,
@@ -1072,7 +1093,10 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
             comment='',
             show_restrictions=False,
             restriction=restriction,
-            doctypes=doctypes_list),
+            doctypes=doctypes_list)
+        out += '%(javascript_prefix)s[<a href="" onclick="%(display_revise_panel)s;return false;">%(add_format)s</a>]' % \
+        {'display_revise_panel': revise_panel,
+         'javascript_prefix': javascript_prefix,
          'add_format':_("add format")}
 
     out += '</td></tr>'
@@ -1345,24 +1369,41 @@ def javascript_display_revise_panel(action, target, show_doctypes, show_keep_pre
     Returns a correctly encoded call to the javascript function to
     display the revision panel.
     """
-    def escape_js_string_param(input):
-        "Escape string parameter to be used in Javascript function"
-        return input.replace('\\', '\\\\').replace('\r', '\\r').replace('\n', '\\n').replace("'", "\\'").replace('"', '&quot;')
-
-    return '''display_revise_panel(this, '%(action)s', '%(target)s', %(showDoctypes)s, %(showKeepPreviousVersions)s, %(showRename)s, %(showDescription)s, %(showComment)s, '%(bibdocname)s', '%(description)s', '%(comment)s', %(showRestrictions)s, '%(restriction)s', '%(doctypes)s')''' % \
-           {'action': action,
-            'showDoctypes': show_doctypes and 'true' or 'false',
-            'target': escape_js_string_param(target),
-            'bibdocname': escape_js_string_param(bibdocname),
-            'showRename': show_rename and 'true' or 'false',
-            'showKeepPreviousVersions': show_keep_previous_versions and 'true' or 'false',
-            'showComment': show_comment and 'true' or 'false',
-            'showDescription': show_description and 'true' or 'false',
-            'description': description and escape_js_string_param(description) or '',
-            'comment': comment and escape_js_string_param(comment) or '',
-            'showRestrictions': show_restrictions and 'true' or 'false',
-            'restriction': escape_js_string_param(restriction),
-            'doctypes': escape_js_string_param(doctypes)}
+    global params_id
+    params_id += 1
+    javascript_prefix = '''
+    <script type="text/javascript">
+    /*<![CDATA[*/
+    var revise_panel_params_%(id)i = {"action": "%(action)s",
+                                      "target": "%(target)s",
+                                      "showDoctypes": %(showDoctypes)s,
+                                      "showKeepPreviousVersions": %(showKeepPreviousVersions)s,
+                                      "showRename": %(showRename)s,
+                                      "showDescription": %(showDescription)s,
+                                      "showComment": %(showComment)s,
+                                      "bibdocname": "%(bibdocname)s",
+                                      "description": "%(description)s",
+                                      "comment": "%(comment)s",
+                                      "showRestrictions": %(showRestrictions)s,
+                                      "restriction": "%(restriction)s",
+                                      "doctypes": "%(doctypes)s"}
+     /*]]>*/
+     </script>''' % {'id': params_id,
+                   'action': action,
+                   'showDoctypes': show_doctypes and 'true' or 'false',
+                   'target': escape_javascript_string(target, escape_for_html=False),
+                   'bibdocname': escape_javascript_string(bibdocname, escape_for_html=False),
+                   'showRename': show_rename and 'true' or 'false',
+                   'showKeepPreviousVersions': show_keep_previous_versions and 'true' or 'false',
+                   'showComment': show_comment and 'true' or 'false',
+                   'showDescription': show_description and 'true' or 'false',
+                   'description': description and escape_javascript_string(description, escape_for_html=False) or '',
+                   'comment': comment and escape_javascript_string(comment, escape_for_html=False) or '',
+                   'showRestrictions': show_restrictions and 'true' or 'false',
+                   'restriction': escape_javascript_string(restriction, escape_for_html=False),
+                   'doctypes': escape_javascript_string(doctypes, escape_for_html=False)}
+    return ('display_revise_panel(this, revise_panel_params_%(id)i)' % {'id': params_id},
+            javascript_prefix)
 
 def get_uploaded_files_for_docname(log_dir, docname):
     """
@@ -2349,7 +2390,22 @@ function showResponse(responseText, statusText)  {
  */
 var last_clicked_link = null;
 
-function display_revise_panel(link, action, target, showDoctypes, showKeepPreviousVersions, showRename, showDescription, showComment, bibdocname, description, comment, showRestrictions, restriction, doctypes){
+function display_revise_panel(link, params){
+
+        var action = params['action'];
+        var target = params['target'];
+        var showDoctypes = params['showDoctypes'];
+        var showKeepPreviousVersions = params['showKeepPreviousVersions'];
+        var showRename = params['showRename'];
+        var showDescription = params['showDescription'];
+        var showComment = params['showComment'];
+        var bibdocname = params['bibdocname'];
+        var description = params['description'];
+        var comment = params['comment'];
+        var showRestrictions = params['showRestrictions'];
+        var restriction = params['restriction'];
+        var doctypes = params['doctypes'];
+
         var balloon = document.getElementById("balloon");
         var file_input_block = document.getElementById("balloonReviseFileInputBlock");
         var doctype = document.getElementById("fileDoctypesRow");
