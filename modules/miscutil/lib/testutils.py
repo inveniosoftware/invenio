@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -49,6 +49,15 @@ from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
      CFG_TESTS_REQUIRE_HTML_VALIDATION
 from invenio.pluginutils import PluginContainer
 
+try:
+    from nose.tools import nottest
+except ImportError:
+    def nottest(f):
+        """Helper decorator to mark a function as not to be tested by nose."""
+        f.__test__ = False
+        return f
+
+@nottest
 def warn_user_about_tests(test_suite_type='regression'):
     """
     Display a standard warning about running tests that might modify
@@ -105,11 +114,13 @@ Please confirm by typing 'Yes, I know!': """ % test_suite_type)
 
     return
 
+@nottest
 def make_test_suite(*test_cases):
     """ Build up a test suite given separate test cases"""
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in test_cases])
 
+@nottest
 def run_test_suite(testsuite, warn_user=False):
     """
     Convenience function to embed in test suites.  Run given testsuite
@@ -146,6 +157,7 @@ class InvenioTestUtilsBrowserException(Exception):
     """Helper exception for the regression test suite browser."""
     pass
 
+@nottest
 def test_web_page_existence(url):
     """
     Test whether URL exists and is well accessible.
@@ -184,6 +196,7 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
         raise InvenioTestUtilsBrowserException('ERROR: Cannot login as %s.' % username)
     return browser
 
+@nottest
 def test_web_page_content(url,
                           username="guest",
                           password="",
@@ -330,6 +343,7 @@ def merge_error_messages(error_messages):
         out = "\n*** " + "\n*** ".join(error_messages)
     return out
 
+@nottest
 def build_and_run_unit_test_suite():
     """
     Detect all Invenio modules with names ending by '*_unit_tests.py', build
@@ -352,6 +366,7 @@ def build_and_run_unit_test_suite():
     res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
     return res.wasSuccessful()
 
+@nottest
 def build_and_run_regression_test_suite():
     """
     Detect all Invenio modules with names ending by
@@ -376,6 +391,7 @@ def build_and_run_regression_test_suite():
     res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
     return res.wasSuccessful()
 
+@nottest
 def build_and_run_web_test_suite():
     """
     Detect all Invenio modules with names ending by
@@ -598,6 +614,7 @@ class InvenioWebTestCase(unittest.TestCase):
         self.find_element_by_link_text_with_timeout("logout")
         self.browser.find_element_by_link_text("logout").click()
 
+    @nottest
     def element_value_test(self, element_name="", element_id="", \
                            expected_element_value="", unexpected_element_value="", in_form=True):
         """ Function to check if the value in the given
@@ -641,6 +658,7 @@ class InvenioWebTestCase(unittest.TestCase):
             except AssertionError, e:
                 self.errors.append(str(e))
 
+    @nottest
     def page_source_test(self, expected_text="", unexpected_text=""):
         """ Function to check if the current page contains
         the expected text (unexpected text) or not.

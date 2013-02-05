@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -158,7 +158,7 @@ class WebSubmitFileConverterTest(unittest.TestCase):
     """Test WebSubmit file converter tool"""
 
     def __init__(self, input_file, from_format, to_format):
-        super(WebSubmitFileConverterTest, self).__init__('runTest')
+        super(WebSubmitFileConverterTest, self).__init__('_run_test')
         self.from_format = from_format
         self.to_format = to_format
         self.input_file = input_file
@@ -177,7 +177,7 @@ class WebSubmitFileConverterTest(unittest.TestCase):
     def shortDescription(self):
         return """websubmit - test %s to %s conversion""" % (self.from_format, self.to_format)
 
-    def runTest(self):
+    def _run_test(self):
         from invenio.websubmit_file_converter import InvenioWebSubmitFileConverterError, convert_file
         try:
             tmpdir_snapshot1 = set(os.listdir(CFG_TMPDIR))

@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,7 +34,7 @@ except ImportError:
     print "Using installed refextract\n"
     import invenio.refextract
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, nottest
 
 
 # pylint: disable-msg=C0301
@@ -49,6 +49,7 @@ def setup_files(self):
     self.assert_( exists(self.test_pdfname) and getsize(self.test_pdfname) > 0)
 
 
+@nottest
 def set_test_cli_opts():
     refextract.cli_opts = { 'treat_as_raw_section'       : 0,
                             'output_raw'                 : 0,
@@ -73,6 +74,7 @@ class RefExtractPDFTest(unittest.TestCase):
         set_test_cli_opts()
 
 
+    @nottest
     def test_PDF_extraction(self):
         """ refextract test basic pdf extraction ---necessary for some remaining tests"""
         (docbody, extract_error) = refextract.get_plaintext_document_body(self.test_pdfname)
@@ -100,6 +102,7 @@ class RefExtractExtractSectionTest(unittest.TestCase):
         file.close()
 
 
+    @nottest
     def test_reference_finding(self):
         """ find a reference section """
         (references, extract_error, how_start) = refextract.extract_section_from_fulltext(self.textbody,'references')
@@ -108,6 +111,8 @@ class RefExtractExtractSectionTest(unittest.TestCase):
 #           print "found -> %s\n" % line
         self.assertEqual(len(references), 17)
 
+
+    @nottest
     def test_author_finding(self):
         """ find author section """
 
@@ -181,7 +186,7 @@ class RefExtractAuthorParsingTest(unittest.TestCase):
             """]
 
 
-
+    @nottest
     def test_reference_parsing(self):
         """Use a hardcoded set of authors to test the parsing"""
         (processed_authors, count_author, \
@@ -251,7 +256,7 @@ class RefExtractReferenceParsingTest(unittest.TestCase):
          self.standardised_preprint_reportnum_categs) = \
          refextract.build_reportnum_knowledge_base(refextract.CFG_REFEXTRACT_KB_REPORT_NUMBERS)
 
-
+    @nottest
     def test_reference_parsing(self):
         """Use a hardcoded set of refstrings to test the parsing"""
         (processed_references, count_misc, \
