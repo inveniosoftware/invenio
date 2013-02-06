@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -42,6 +42,7 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
     CFG_SITE_SECURE_URL, CFG_WEBSEARCH_SPIRES_SYNTAX
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
+                              nottest, \
                               make_url, make_surl, test_web_page_content, \
                               merge_error_messages
 from invenio.urlutils import same_urls_p
@@ -2103,6 +2104,7 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29+OR+SL%282%2CZ%29',
                                                expected_text="[57, 79, 80, 88]"))
 
+    @nottest
     def FIXME_TICKET_453_test_special_terms_u1_and_sl_or_parens(self):
         """websearch - query for special terms, (U(1) OR SL(2,Z))"""
         self.assertEqual([],
@@ -2585,7 +2587,7 @@ class WebSearchAuthorCountQueryTest(unittest.TestCase):
 class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
     """Tests the perform request search API after refactoring."""
 
-    def run_test(self, test_args, expected_results):
+    def _run_test(self, test_args, expected_results):
         params = {}
 
         params.update(map(lambda y: (y[0], ',' in y[1] and ', ' not in y[1] and y[1].split(',') or y[1]), map(lambda x: x.split('=', 1), test_args.split(';'))))
@@ -2615,70 +2617,70 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
     def test_queries(self):
         """websearch - testing p_r_s standard arguments and their combinations"""
 
-        self.run_test('p=ellis;f=author;action=Search', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p=ellis;f=author;action=Search', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
 
-        self.run_test('p=ellis;f=author;sf=title;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self.run_test('p=ellis;f=author;sf=title;wl=5;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self.run_test('p=ellis;f=author;sf=title;wl=5;so=a', [13, 47, 10, 12, 18, 17, 11, 9, 14, 16, 8])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;so=a', [13, 47, 10, 12, 18, 17, 11, 9, 14, 16, 8])
 
-        self.run_test('p=ellis;f=author;sf=title;wl=5;so=d', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;so=d', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self.run_test('p=ell*;sf=title;wl=5', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ell*;sf=title;wl=5', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self.run_test('p=ell*;sf=title;wl=1', [10])
+        self._run_test('p=ell*;sf=title;wl=1', [10])
 
-        self.run_test('p=ell*;sf=title;wl=100', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ell*;sf=title;wl=100', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self.run_test('p=muon OR kaon;f=author;sf=title;wl=5;action=Search', [])
+        self._run_test('p=muon OR kaon;f=author;sf=title;wl=5;action=Search', [])
 
-        self.run_test('p=muon OR kaon;sf=title;wl=5;action=Search', [67, 12])
+        self._run_test('p=muon OR kaon;sf=title;wl=5;action=Search', [67, 12])
 
-        self.run_test('p=muon OR kaon;sf=title;wl=5;c=Articles,Preprints', [67, 12])
+        self._run_test('p=muon OR kaon;sf=title;wl=5;c=Articles,Preprints', [67, 12])
 
-        self.run_test('p=muon OR kaon;sf=title;wl=5;c=Articles', [67])
+        self._run_test('p=muon OR kaon;sf=title;wl=5;c=Articles', [67])
 
-        self.run_test('p=muon OR kaon;sf=title;wl=5;c=Preprints', [12])
+        self._run_test('p=muon OR kaon;sf=title;wl=5;c=Preprints', [12])
 
         # FIXME_TICKET_1174
-        # self.run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
+        # self._run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
 
         if not get_external_word_similarity_ranker():
-            self.run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109])
+            self._run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109])
 
-        self.run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 2, 14, 9, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
+        self._run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 2, 14, 9, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
 
-        self.run_test('p=boson;rm=citation', [1, 47, 50, 107, 108, 77, 95])
+        self._run_test('p=boson;rm=citation', [1, 47, 50, 107, 108, 77, 95])
 
         if not get_external_word_similarity_ranker():
-            self.run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
+            self._run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
 
-        self.run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [])
 
-        self.run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [])
 
-        self.run_test('p1=ellis;f1=author;m1=e;op1=a;p2=john;f2=author;m2=e', [])
+        self._run_test('p1=ellis;f1=author;m1=e;op1=a;p2=john;f2=author;m2=e', [])
 
-        self.run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
 
-        self.run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
 
-        self.run_test('p1=ellis;f1=author;m1=e;op1=o;p2=john;f2=author;m2=e', [])
+        self._run_test('p1=ellis;f1=author;m1=e;op1=o;p2=john;f2=author;m2=e', [])
 
-        self.run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
 
-        self.run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
 
-        self.run_test('p1=ellis;f1=author;m1=e;op1=n;p2=john;f2=author;m2=e', [])
+        self._run_test('p1=ellis;f1=author;m1=e;op1=n;p2=john;f2=author;m2=e', [])
 
-        self.run_test('p=Ellis, J;ap=1', [9, 10, 11, 12, 14, 17, 18, 47])
+        self._run_test('p=Ellis, J;ap=1', [9, 10, 11, 12, 14, 17, 18, 47])
 
-        self.run_test('p=Ellis, J;ap=0', [9, 10, 11, 12, 14, 17, 18, 47])
+        self._run_test('p=Ellis, J;ap=0', [9, 10, 11, 12, 14, 17, 18, 47])
 
-        self.run_test('p=recid:148x', [])
+        self._run_test('p=recid:148x', [])
 
-        self.run_test('p=recid:148x;of=xm;rg=200', "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n\n</collection>")
+        self._run_test('p=recid:148x;of=xm;rg=200', "<collection xmlns=\"http://www.loc.gov/MARC21/slim\">\n\n</collection>")
 
 
 

@@ -22,7 +22,7 @@
 import unittest
 from invenio.config import CFG_SOLR_URL, CFG_SITE_NAME
 from invenio import intbitset
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters
 from invenio.solrutils_bibindex_searcher import solr_get_bitset
 from invenio.solrutils_bibrank_searcher import get_collection_filter, solr_get_ranked, solr_get_similar_ranked
@@ -110,6 +110,7 @@ class TestSolrSearch(unittest.TestCase):
     def _get_result(self, query, index='fulltext'):
         return solr_get_bitset(index, query)
 
+    @nottest
     def test_get_bitset(self):
         """solrutils - search results"""
         self.assertEqual(HITSETS['Willnotfind'], self._get_result('Willnotfind'))
@@ -157,6 +158,7 @@ class TestSolrRanking(unittest.TestCase):
             'cutoff_time_ms': cutoff_time
         }
 
+    @nottest
     def test_get_ranked(self):
         """solrutils - ranking results"""
         all_ranked = 0
@@ -166,6 +168,7 @@ class TestSolrRanking(unittest.TestCase):
         self.assertEqual(ranked_top['of'], self._get_ranked_result_sequence(query='of'))
         self.assertEqual(ranked_top['"higgs boson"'], self._get_ranked_result_sequence(query='"higgs boson"'))
 
+    @nottest
     def test_get_ranked_top(self):
         """solrutils - ranking top results"""
         top_n = 0
@@ -188,6 +191,7 @@ class TestSolrRanking(unittest.TestCase):
         self.assertEqual(ranked_top['of'], self._get_ranked_result_sequence(query='of', rows=top_n))
         self.assertEqual(ranked_top['"higgs boson"'], self._get_ranked_result_sequence(query='"higgs boson"', rows=top_n))
 
+    @nottest
     def test_get_ranked_smaller_hitset(self):
         """solrutils - ranking smaller hitset"""
         hitset = intbitset.intbitset([47, 56, 58, 68, 85, 89])
@@ -197,6 +201,7 @@ class TestSolrRanking(unittest.TestCase):
         self.assertEqual((50, 61, 74, 45, 94), self._get_ranked_result_sequence(query='of', hitset=hitset))
         self.assertEqual((74, 45, 94), self._get_ranked_result_sequence(query='of', hitset=hitset, rows=3))
 
+    @nottest
     def test_get_ranked_larger_hitset(self):
         """solrutils - ranking larger hitset"""
         hitset = intbitset.intbitset([47, 56, 58, 68, 85, 89])
@@ -256,6 +261,7 @@ class TestSolrSimilarToRecid(unittest.TestCase):
 
     _all_records = get_collection_reclist(CFG_SITE_NAME)
 
+    @nottest
     def test_get_similar_ranked(self):
         """solrutils - similar results"""
         all_ranked = 0
@@ -265,6 +271,7 @@ class TestSolrSimilarToRecid(unittest.TestCase):
         recid = 59
         self.assertEqual(similar_top[recid], self._get_similar_result_sequence(recid=recid))
 
+    @nottest
     def test_get_similar_ranked_top(self):
         """solrutils - similar top results"""
         top_n = 5

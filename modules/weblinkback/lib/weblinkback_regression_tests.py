@@ -26,9 +26,10 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.dbquery import CFG_DATABASE_NAME
 from invenio.testutils import make_test_suite, \
-                                   run_test_suite, \
-                                   test_web_page_content, \
-                                   merge_error_messages
+    run_test_suite, \
+    nottest, \
+    test_web_page_content, \
+    merge_error_messages
 
 from invenio.dbquery import run_sql
 try:
@@ -64,6 +65,7 @@ def get_max_auto_increment_id(table):
     return run_sql("SELECT Auto_increment FROM information_schema.tables WHERE table_name=%s AND table_schema=%s", (table, CFG_DATABASE_NAME))[0][0] - 1
 
 
+@nottest
 def remove_test_data():
     run_sql("DELETE FROM lnkENTRY")
     run_sql("DELETE FROM lnkENTRYURLTITLE")
@@ -185,6 +187,7 @@ class WebLinkbackDatabaseTest(unittest.TestCase):
         """Remove test data"""
         self.remove_test_data()
 
+    @nottest
     def remove_test_data(self):
         """Clean tables"""
         self._max_id_lnkENTRY = get_max_auto_increment_id('lnkENTRY')
@@ -639,6 +642,7 @@ class WebLinkbackUpdaterTest(unittest.TestCase):
         """Remove test data"""
         self.remove_test_data()
 
+    @nottest
     def remove_test_data(self):
         """Clean tables"""
         self._max_id_lnkENTRY = get_max_auto_increment_id('lnkENTRY')

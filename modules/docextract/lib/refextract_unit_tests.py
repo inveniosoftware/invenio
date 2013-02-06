@@ -223,7 +223,11 @@ class SearchTest(unittest.TestCase):
         self.assert_('B76' in pattern)
         self.assert_('477' in pattern)
 
-TEST_SUITE = make_test_suite(IbidTest, TagNumerationTest)
+TEST_SUITE = make_test_suite(ReTest,
+                             IbidTest,
+                             TagNumerationTest,
+                             FindSectionTest,
+                             SearchTest)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
