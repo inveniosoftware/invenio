@@ -43,7 +43,7 @@ from invenio.webcomment import check_recID_is_in_range, \
                                is_comment_deleted
 
 from invenio.config import \
-     CFG_TMPDIR, \
+     CFG_TMPSHAREDDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
@@ -377,9 +377,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             for formfield in formfields[:CFG_WEBCOMMENT_MAX_ATTACHED_FILES]:
                 if hasattr(formfield, "filename") and formfield.filename:
                     filename = formfield.filename
-                    dir_to_open = os.path.join(CFG_TMPDIR, 'webcomment', str(uid))
+                    dir_to_open = os.path.join(CFG_TMPSHAREDDIR, 'webcomment', str(uid))
                     try:
-                        assert(dir_to_open.startswith(CFG_TMPDIR))
+                        assert(dir_to_open.startswith(CFG_TMPSHAREDDIR))
                     except AssertionError:
                         register_exception(req=req,
                                            prefix='User #%s tried to upload file to forbidden location: %s' \
