@@ -197,7 +197,8 @@ def perform_request_init(uid, ln, req, lastupdated):
 
 
     body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
-    body += '<link rel="stylesheet" type="text/css" href="/img/bibedit.css" />'
+    body += '<link rel="stylesheet" type="text/css" href="%s/%s" />' % (CFG_SITE_URL,
+            auto_version_url("img/" + 'bibedit.css'))
 
     if CFG_CERN_SITE:
         cern_site = 'true'
