@@ -3110,6 +3110,14 @@ CREATE TABLE IF NOT EXISTS collection_collection (
   PRIMARY KEY (id_dad,id_son)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS collectionboxname (
+  id_collection mediumint(9) unsigned NOT NULL,
+  ln char(5) NOT NULL default '',
+  type char(1) NOT NULL default 'r',
+  value varchar(255) NOT NULL,
+  PRIMARY KEY  (id_collection,ln,type)
+) ENGINE=MyISAM;
+
 -- tables for OAI sets:
 
 CREATE TABLE IF NOT EXISTS oaiREPOSITORY (
@@ -4673,6 +4681,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_delete_recjso
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_hstRECORD_affected_fields',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_25_virtual_indexes',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_30_indexer_interface',NOW());
-INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_04_30_new_plotextractor_websubmit_function',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_04_30_new_plotextractor_websubmit_function',NOW()INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_06_new_collectionboxname_table',NOW());
 
 -- end of file

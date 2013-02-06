@@ -4734,6 +4734,40 @@ class WebSearchExactTitleIndexTest(InvenioTestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
+class WebSearchCustomCollectionBoxesName(InvenioTestCase):
+    """Test if the custom collection box labels are correctly displayed"""
+
+    def test_custom_latest_additions_box_name(self):
+        """websearch - test custom name for 'Latest additions' box in 'Videos' collection"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/Videos?ln=en',
+                                               expected_text='Latest videos:'))
+
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/Videos?ln=fr',
+                                               expected_text='Dernières vidéos:'))
+
+        # There is currently no translation for that box in Afrikaans:
+        # we must fall back to CFG_SITE_LANG
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/Videos?ln=af',
+                                               expected_text='Latest videos:'))
+
+    def test_custom_narrow_by_box_name(self):
+        """websearch - test custom name for 'Narrow by' box in 'CERN Divisions' collection"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/CERN%20Divisions?ln=en',
+                                               expected_text='Browse by division:'))
+
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/CERN%20Divisions?ln=fr',
+                                               expected_text='Naviguer par division:'))
+
+        # There is currently no translation for that box in Afrikaans:
+        # we must fall back to CFG_SITE_LANG
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/CERN%20Divisions?ln=af',
+                                               expected_text='Browse by division:'))
 
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
@@ -4782,7 +4816,9 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchGetRecordTests,
                              WebSearchExactTitleIndexTest,
                              WebSearchCJKTokenizedSearchTest,
-                             WebSearchItemCountQueryTest)
+                             WebSearchItemCountQueryTest,
+                             WebSearchCustomCollectionBoxesName)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

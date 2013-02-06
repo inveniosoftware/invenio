@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_SITE_URL
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, wash_table_column_name
 
 def getnavtrail(previous = ''):
     navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
@@ -972,49 +972,59 @@ def get_i8n_name(ID, ln, rtype, table):
     except StandardError, e:
         raise StandardError
 
-def get_name(ID, ln, rtype, table):
+def get_name(ID, ln, rtype, table, id_column=None):
     """Returns the value from the table name based on arguments
     ID - id
     ln - a language supported by Invenio
     type - the type of value wanted, like 'ln', 'sn'
-    table - tablename"""
+    table - tablename
+    id_column - name of the column with identifier. If None, expect column to be named 'id_%s' % table
+    """
 
     name = "name"
     if table[-1:].isupper():
         name = "NAME"
 
+    if id_column:
+        id_column = wash_table_column_name(id_column)
+
     try:
-        res = run_sql("SELECT value FROM %s%s WHERE type='%s' and ln='%s' and id_%s=%s" % (table, name, rtype, ln, table, ID))
+        res = run_sql("SELECT value FROM %s%s WHERE type='%s' and ln='%s' and %s=%s" % (table, name, rtype, ln, (id_column or 'id_%s' % wash_table_column_name(table)), ID))
         return res
     except StandardError, e:
         return ()
 
-def modify_translations(ID, langs, sel_type, trans, table):
+def modify_translations(ID, langs, sel_type, trans, table, id_column=None):
     """add or modify translations in tables given by table
     frmID - the id of the format from the format table
     sel_type - the name type
     langs - the languages
     trans - the translations, in same order as in langs
-    table - the table"""
+    table - the table
+    id_column - name of the column with identifier. If None, expect column to be named 'id_%s' % table
+    """
 
     name = "name"
     if table[-1:].isupper():
         name = "NAME"
 
+    id_column = id_column or 'id_%s' % table
+    if id_column:
+        id_column = wash_table_column_name(id_column)
     try:
         for nr in range(0,len(langs)):
-            res = run_sql("SELECT value FROM %s%s WHERE id_%s=%%s AND type=%%s AND ln=%%s" % (table, name, table),
+            res = run_sql("SELECT value FROM %s%s WHERE %s=%%s AND type=%%s AND ln=%%s" % (table, name, id_column),
                           (ID, sel_type, langs[nr][0]))
             if res:
                 if trans[nr]:
-                    res = run_sql("UPDATE %s%s SET value=%%s WHERE id_%s=%%s AND type=%%s AND ln=%%s" % (table, name, table),
+                    res = run_sql("UPDATE %s%s SET value=%%s WHERE %s=%%s AND type=%%s AND ln=%%s" % (table, name, id_column),
                                   (trans[nr], ID, sel_type, langs[nr][0]))
                 else:
-                    res = run_sql("DELETE FROM %s%s WHERE id_%s=%%s AND type=%%s AND ln=%%s" % (table, name, table),
+                    res = run_sql("DELETE FROM %s%s WHERE %s=%%s AND type=%%s AND ln=%%s" % (table, name, id_column),
                                   (ID, sel_type, langs[nr][0]))
             else:
                 if trans[nr]:
-                    res = run_sql("INSERT INTO %s%s (id_%s, type, ln, value) VALUES (%%s,%%s,%%s,%%s)" % (table, name, table),
+                    res = run_sql("INSERT INTO %s%s (%s, type, ln, value) VALUES (%%s,%%s,%%s,%%s)" % (table, name, id_column),
                                   (ID, sel_type, langs[nr][0], trans[nr]))
         return (1, "")
     except StandardError, e:

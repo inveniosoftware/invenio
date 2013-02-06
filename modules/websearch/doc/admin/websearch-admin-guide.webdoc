@@ -327,6 +327,10 @@ different in different contexts (e.g. long name, short name, etc), so
 that prior to modifying translations you will be asked to select which
 name type you want to change.
 
+<p>The interface also lets you customize the labelling (and
+translations) of the default collection boxes: "Focus on:", "Narrow
+by:" and "Latest addtions:".
+
 <p>The translations aren't mandatory to define.  If a translation does
 not exist in a language chosen by the end user, the end user will be
 shown the collection name in the default language of this

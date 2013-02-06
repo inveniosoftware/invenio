@@ -618,6 +618,12 @@ INSERT INTO collectionname VALUES (38,'en','ln','Subjects');
 INSERT INTO collectionname VALUES (38,'fr','ln','Sujets');
 INSERT INTO collectionname VALUES (38,'pl','ln','Tematy');
 
+INSERT INTO collectionboxname VALUES (33,'en','l','Latest videos:');
+INSERT INTO collectionboxname VALUES (33,'fr','l','Dernières vidéos:');
+INSERT INTO collectionboxname VALUES (9,'en','r','Browse by division:');
+INSERT INTO collectionboxname VALUES (9,'fr','r','Naviguer par division:');
+
+
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
 INSERT INTO collection_collection VALUES (1,17,'r',30);

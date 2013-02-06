@@ -1302,9 +1302,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = {'r': _("Narrow by collection:"),
-                 'v': _("Focus on:")}[type]
-
+        title = father.get_collectionbox_name(ln, type)
 
         if has_grandchildren:
             style_prolog = "<strong>"
@@ -1497,7 +1495,7 @@ class Template:
         return _("This collection does not contain any document yet.")
 
 
-    def tmpl_instant_browse(self, aas, ln, recids, more_link=None, grid_layout=False):
+    def tmpl_instant_browse(self, aas, ln, recids, more_link=None, grid_layout=False, father=None):
         """
           Formats a list of records (given in the recids list) from the database.
 
@@ -1511,6 +1509,7 @@ class Template:
 
           - 'more_link' *string* - the "More..." link for the record. If not given, will not be displayed
 
+          - 'father' *collection* - The current collection
         """
 
         # load the right message language
@@ -1561,7 +1560,7 @@ class Template:
             <td class="narrowsearchboxbody">%(body)s</td>
             </tr>
           </tbody>
-        </table>''' % {'header' : _("Latest additions:"),
+        </table>''' % {'header' : father.get_collectionbox_name(ln, 'l') ,
                        'body' : body,
                        }
 
