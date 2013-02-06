@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -40,7 +40,7 @@ import stat
 import shutil
 
 import bibclassify_config as bconfig
-from testutils import make_test_suite, run_test_suite
+from testutils import make_test_suite, run_test_suite, nottest
 import config
 import bibclassify_engine
 import bibclassify_cli
@@ -112,6 +112,7 @@ class BibClassifyTestCase(unittest.TestCase):
         return sin, serr
 
 
+    @nottest
     def get_test_file(self, recid, type='Main', format='pdf'):
 
         br = bibdocfile.BibRecDocs(recid)
