@@ -164,6 +164,11 @@ class IntBitSetTest(unittest.TestCase):
         self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset(trailing_bits=True))
         self._helper_test_via_fncs_list(fncs, intbitset(trailing_bits=True), intbitset([]))
 
+    def test_no_segmentation_fault(self):
+        """intbitset - test no segmentation fault with foreign data types"""
+        for intbitset_fnc, set_fnc, dummy, dummy in self.fncs_list:
+            self.assertRaises(TypeError, intbitset_fnc, (intbitset([1,2,3]), set([1,2,3])))
+            self.assertRaises(TypeError, set_fnc, (set([1,2,3]), intbitset([1,2,3])))
 
     def test_set_intersection(self):
         """intbitset - set intersection, normal set"""

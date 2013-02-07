@@ -133,7 +133,7 @@ cdef class intbitset:
     cdef IntBitSet *bitset
     cdef bint sanity_checks
 
-    def __cinit__(self, rhs=0, int preallocate=-1, int trailing_bits=0, bint sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):
+    def __cinit__(intbitset self, rhs=0, int preallocate=-1, int trailing_bits=0, bint sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):
         """
         Initialize intbitset.
         * rhs can be:
@@ -153,10 +153,9 @@ cdef class intbitset:
         * no_allocate is used internally and should never be set.
         after the biggest one added with rhs.
         """
-        cdef Py_ssize_t size
-        cdef void *buf
+        cdef Py_ssize_t size = 0
+        cdef void *buf = NULL
         cdef int elem
-        cdef int i
         cdef int last
         cdef int remelem
         cdef bint tuple_of_tuples
@@ -266,11 +265,11 @@ cdef class intbitset:
             intBitSetDestroy(self.bitset)
             raise
 
-    def __dealloc__(self):
+    def __dealloc__(intbitset self):
         #print >> sys.stderr, "intbitset.__dealloc__ is called"
         intBitSetDestroy(self.bitset)
 
-    def __contains__(self, int elem):
+    def __contains__(intbitset self, int elem):
         if self.sanity_checks:
             if elem < 0:
                 raise ValueError("Negative numbers, not allowed")
@@ -278,10 +277,10 @@ cdef class intbitset:
                 raise OverflowError("Element must be <= %s" % maxelem)
         return intBitSetIsInElem(self.bitset, elem) != 0
 
-    def __cmp__(self, intbitset rhs not None):
+    def __cmp__(intbitset self, intbitset rhs not None):
         raise TypeError("cannot compare intbitset using cmp()")
 
-    def __richcmp__(self, intbitset rhs not None, int op):
+    def __richcmp__(intbitset self, intbitset rhs not None, int op):
         cdef short unsigned int tmp
         tmp = intBitSetCmp((<intbitset>self).bitset, rhs.bitset)
         if op == 0: # <
@@ -297,16 +296,16 @@ cdef class intbitset:
         if op == 5: # >=
             return tmp in (0, 2)
 
-    def __len__(self):
+    def __len__(intbitset self):
         return intBitSetGetTot(self.bitset)
 
-    def __hash__(self):
+    def __hash__(intbitset self):
         return hash(PyString_FromStringAndSize(<char *>self.bitset.bitset, wordbytesize * (intBitSetGetTot(self.bitset) / wordbitsize + 1)))
 
-    def __nonzero__(self):
+    def __nonzero__(intbitset self):
         return not intBitSetEmpty(self.bitset)
 
-    def __iadd__(self, rhs):
+    def __iadd__(intbitset self, rhs):
         cdef int elem
         if isinstance(rhs, (int, long)):
             if self.sanity_checks:
@@ -334,7 +333,7 @@ cdef class intbitset:
                     intBitSetAddElem(self.bitset, elem)
         return self
 
-    def __isub__(self, rhs):
+    def __isub__(intbitset self, rhs):
         cdef int elem
         if isinstance(rhs, (int, long)):
             if self.sanity_checks:
@@ -358,10 +357,10 @@ cdef class intbitset:
                     intBitSetDelElem(self.bitset, elem)
         return self
 
-    def __deepcopy__(self, memo):
+    def __deepcopy__(intbitset self, memo):
         return intbitset(self)
 
-    def __del__(self, int elem):
+    def __del__(intbitset self, int elem):
         if self.sanity_checks:
             if elem < 0:
                 raise ValueError("Negative numbers, not allowed")
@@ -369,49 +368,46 @@ cdef class intbitset:
                 raise OverflowError("Element must be <= %s" % maxelem)
         intBitSetDelElem(self.bitset, elem)
 
-    def __and__(self, intbitset rhs not None):
+    def __and__(intbitset self, intbitset rhs not None):
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetIntersection((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __or__(self, intbitset rhs not None):
+    def __or__(intbitset self, intbitset rhs not None):
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetUnion((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __xor__(self, intbitset rhs not None):
+    def __xor__(intbitset self, intbitset rhs not None):
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetXor((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __sub__(self, intbitset rhs not None):
+    def __sub__(intbitset self, intbitset rhs not None):
         ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetSub((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __iand__(self, intbitset rhs not None):
+    def __iand__(intbitset self, intbitset rhs not None):
         intBitSetIIntersection(self.bitset, rhs.bitset)
         return self
 
-    def __ior__(self, intbitset rhs not None):
+    def __ior__(intbitset self, intbitset rhs not None):
         intBitSetIUnion(self.bitset, rhs.bitset)
         return self
 
-    def __ixor__(self, intbitset rhs not None):
+    def __ixor__(intbitset self, intbitset rhs not None):
         intBitSetIXor(self.bitset, rhs.bitset)
         return self
 
-    def __repr__(self):
-        cdef int last
-        cdef int maxelem
-        cdef int next_last
+    def __repr__(intbitset self):
         finite_list = self.extract_finite_list()
         if self.bitset.trailing_bits:
             return "intbitset(%s, trailing_bits=True)" % repr(finite_list)
         else:
             return "intbitset(%s)" % repr(finite_list)
 
-    def __str__(self):
+    def __str__(intbitset self):
         cdef int tot
         tot = intBitSetGetTot(self.bitset)
         if tot < 0:
@@ -437,37 +433,37 @@ cdef class intbitset:
             return self.__repr__()
 
     ## Buffer interface
-    #def __getreadbuffer__(self, int i, void **p):
+    #def __getreadbuffer__(intbitset self, int i, void **p):
         #if i != 0:
             #return -1
         #p[0] = (<intbitset >self).bitset
         #return (<intbitset >self).size * wordbytesize
 
-    #def __getwritebuffer__(self, int i, void **p):
+    #def __getwritebuffer__(intbitset self, int i, void **p):
         #if i != 0:
             #raise SystemError
         #p[0] = (<intbitset >self).bitset
         #return (<intbitset >self).size * wordbytesize
 
-    #def __getsegcount__(self, int *p):
+    #def __getsegcount__(intbitset self, int *p):
         #if p != NULL:
             #p[0] = (<intbitset >self).size * wordbytesize
         #return 1
 
-    #def __getcharbuffer__(self, int i, char **p):
+    #def __getcharbuffer__(intbitset self, int i, char **p):
         #if i != 0:
             #return -1
         #p[0] = <char *> (<intbitset >self).bitset
         #return (<intbitset >self).size * wordbytesize
 
     # Iterator interface
-    def __iter__(self):
+    def __iter__(intbitset self):
         if self.bitset.trailing_bits:
             raise OverflowError("It's impossible to iterate over an infinite set.")
         return intbitset_iterator(self)
 
     # Customized interface
-    def add(self, int elem):
+    def add(intbitset self, int elem):
         """Add an element to a set.
         This has no effect if the element is already present."""
         if self.sanity_checks:
@@ -477,7 +473,7 @@ cdef class intbitset:
                 raise OverflowError("Element must be <= %s" % maxelem)
         intBitSetAddElem(self.bitset, elem)
 
-    def clear(self):
+    def clear(intbitset self):
         intBitSetReset(self.bitset)
 
     def difference(intbitset self, rhs):
@@ -486,11 +482,11 @@ cdef class intbitset:
         """
         return self.__sub__(rhs)
 
-    def difference_update(self, rhs):
+    def difference_update(intbitset self, rhs):
         """Remove all elements of another set from this set."""
         self.__isub__(rhs)
 
-    def discard(self, int elem):
+    def discard(intbitset self, int elem):
         """Remove an element from a intbitset if it is a member.
         If the element is not a member, do nothing."""
         if self.sanity_checks:
@@ -500,47 +496,47 @@ cdef class intbitset:
                 raise OverflowError("Element must be <= %s" % maxelem)
         intBitSetDelElem(self.bitset, elem)
 
-    def intersection(self, rhs):
+    def intersection(intbitset self, rhs):
         """Return the intersection of two intbitsets as a new set.
         (i.e. all elements that are in both intbitsets.)
         """
         return self.__and__(rhs)
 
-    def intersection_update(self, rhs):
+    def intersection_update(intbitset self, rhs):
         """Update a intbitset with the intersection of itself and another."""
         self.__iand__(rhs)
 
-    def union(self, rhs):
+    def union(intbitset self, rhs):
         """Return the union of two intbitsets as a new set.
         (i.e. all elements that are in either intbitsets.)
         """
         return self.__or__(rhs)
 
-    def union_update(self, rhs):
+    def union_update(intbitset self, rhs):
         """Update a intbitset with the union of itself and another."""
         self.__ior__(rhs)
 
-    def issubset(self, rhs):
+    def issubset(intbitset self, rhs):
         """Report whether another set contains this set."""
         return self.__le__(rhs)
 
-    def issuperset(self, rhs):
+    def issuperset(intbitset self, rhs):
         """Report whether this set contains another set."""
         return self.__ge__(rhs)
 
-    def symmetric_difference(self, rhs):
+    def symmetric_difference(intbitset self, rhs):
         """Return the symmetric difference of two sets as a new set.
         (i.e. all elements that are in exactly one of the sets.)
         """
         return self.__xor__(rhs)
 
-    def symmetric_difference_update(self, rhs):
+    def symmetric_difference_update(intbitset self, rhs):
         """Update an intbitset with the symmetric difference of itself and another.
         """
         self.__ixor__(rhs)
 
     # Dumping & Loading
-    def fastdump(self):
+    def fastdump(intbitset self):
         """Return a compressed string representation suitable to be saved
         somewhere."""
         cdef Py_ssize_t size
@@ -548,7 +544,7 @@ cdef class intbitset:
         tmp = PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize)
         return zlib.compress(tmp)
 
-    def fastload(self, strdump):
+    def fastload(intbitset self, strdump):
         """Load a compressed string representation produced by a previous call
         to the fastdump method into the current intbitset. The previous content
         will be replaced."""
@@ -571,11 +567,11 @@ cdef class intbitset:
             raise ValueError("strdump is corrupted")
         return self
 
-    def copy(self):
+    def copy(intbitset self):
         """Return a shallow copy of a set."""
         return intbitset(self)
 
-    def pop(self):
+    def pop(intbitset self):
         """Remove and return an arbitrary set element."""
         cdef int ret
         ret = intBitSetGetNext(self.bitset, -1)
@@ -584,7 +580,7 @@ cdef class intbitset:
         intBitSetDelElem(self.bitset, ret)
         return ret
 
-    def remove(self, int elem):
+    def remove(intbitset self, int elem):
         """Remove an element from a set; it must be a member.
         If the element is not a member, raise a KeyError.
         """
@@ -598,7 +594,7 @@ cdef class intbitset:
         else:
             raise KeyError(elem)
 
-    def strbits(self):
+    def strbits(intbitset self):
         """Return a string of 0s and 1s representing the content in memory
         of the intbitset.
         """
@@ -613,7 +609,7 @@ cdef class intbitset:
             last = i+1
         return ''.join(ret)
 
-    def update_with_signs(self, rhs):
+    def update_with_signs(intbitset self, rhs):
         """Given a dictionary rhs whose keys are integers, remove all the integers
         whose value are less than 0 and add every integer whose value is 0 or more"""
         cdef int value
@@ -637,13 +633,13 @@ cdef class intbitset:
         except AttributeError:
             raise TypeError("rhs should be a valid dictionary with integers keys and integer values")
 
-    def get_size(self):
+    def get_size(intbitset self):
         return intBitSetGetSize(self.bitset)
 
-    def get_allocated(self):
+    def get_allocated(intbitset self):
         return intBitSetGetAllocated(self.bitset)
 
-    def get_sorted_element(self, int index):
+    def get_sorted_element(intbitset self, int index):
         """Return element at position index in the sorted representation of the
         set. Note that index must be less than len(self)"""
         cdef int l
@@ -664,7 +660,7 @@ cdef class intbitset:
             raise IndexError("intbitset index out of range")
         return last
 
-    def to_sorted_list(self, int i, int j):
+    def to_sorted_list(intbitset self, int i, int j):
         """Return a sublist of the sorted representation of the set.
         Note, negative indices are not supported."""
         cdef int l
@@ -694,12 +690,12 @@ cdef class intbitset:
             intBitSetAddElem((<intbitset> ret).bitset, last)
         return ret
 
-    def is_infinite(self):
+    def is_infinite(intbitset self):
         """Return True if the intbitset is infinite. (i.e. trailing_bits=True
         was used in the constructor.)"""
         return self.bitset.trailing_bits != 0
 
-    def extract_finite_list(self, int up_to=-1):
+    def extract_finite_list(intbitset self, int up_to=-1):
         """Return a finite list of elements sufficient to be passed to intbitset
         constructor toghether with the proper value of trailing_bits in order
         to reproduce this intbitset. At least up_to integer are looked for when
@@ -719,13 +715,13 @@ cdef class intbitset:
             ret.append(last)
         return ret
 
-    def get_wordbitsize(self):
+    def get_wordbitsize(intbitset self):
         return wordbitsize
 
-    def get_wordbytsize(self):
+    def get_wordbytsize(intbitset self):
         return wordbytesize
 
-    def tolist(self):
+    def tolist(intbitset self):
         """Legacy method to retrieve a list of all the elements inside an
         intbitset.
         """
@@ -740,7 +736,7 @@ cdef class intbitset_iterator:
     cdef IntBitSet *bitset
     cdef bint sanity_checks
 
-    def __cinit__(self, intbitset bitset not None):
+    def __cinit__(intbitset_iterator self, intbitset bitset not None):
         #print >> sys.stderr, "intbitset_iterator.__cinit__ is called"
         self.last = -1
         ## A copy should be performed, in case the original bitset disappears
@@ -748,11 +744,11 @@ cdef class intbitset_iterator:
         self.bitset = intBitSetClone(bitset.bitset)
         self.sanity_checks = CFG_INTBITSET_ENABLE_SANITY_CHECKS
 
-    def __dealloc__(self):
+    def __dealloc__(intbitset_iterator self):
         #print >> sys.stderr, "intbitset_iterator.__dealloc__ is called"
         intBitSetDestroy(self.bitset)
 
-    def __next__(self):
+    def __next__(intbitset_iterator self):
         if self.last == -2:
             raise StopIteration()
         self.last = intBitSetGetNext(self.bitset, self.last)
@@ -763,7 +759,7 @@ cdef class intbitset_iterator:
             raise StopIteration()
         return self.last
 
-    def __iter__(self):
+    def __iter__(intbitset_iterator self):
         return self
 
     cdef object __weakref__
