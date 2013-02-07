@@ -649,6 +649,19 @@ a.footer:hover {
    border-collapse: collapse;
    /*border-top: 1px solid #36c;*/
 }
+span.collection-father-has-grandchildren a{
+    font-weight:800;
+}
+ul.collection-second-level{
+    padding-left: 0;
+    margin: 0;
+}
+ul.collection-second-level li{
+    font-size:small;
+    list-style: none;
+    display: inline;
+    white-space: nowrap;
+}
 .searchalsosearchboxheader {
    color: #000;
    /*background: #ffeacc;*/

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1316,11 +1316,9 @@ class Template:
         title = father.get_collectionbox_name(ln, type)
 
         if has_grandchildren:
-            style_prolog = "<strong>"
-            style_epilog = "</strong>"
+            style_class = 'collection-first-level collection-father-has-grandchildren'
         else:
-            style_prolog = ""
-            style_epilog = ""
+            style_class = 'collection-first-level'
 
         out = """<table class="%(narrowsearchbox)s">
                    <thead>
@@ -1358,10 +1356,11 @@ class Template:
                     out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" /></td>""" % {'name' : cgi.escape(son.name) }
             else:
                 out += '</td>'
-            out += """<td valign="top">%(link)s%(recs)s """ % {
+            out += """<td valign="top"><span class="%(style_class)s">%(link)s%(recs)s</span> """ % {
                 'link': create_html_link(self.build_search_interface_url(c=son.name, ln=ln, aas=aas),
-                                         {}, style_prolog + cgi.escape(son.get_name(ln)) + style_epilog),
-                'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
+                                         {}, cgi.escape(son.get_name(ln))),
+                'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln),
+                'style_class': style_class}
 
             # the following prints the "external collection" arrow just after the name and
             # number of records of the hosted collection
@@ -1378,9 +1377,9 @@ class Template:
                 out += """ <small class="warning">[%(msg)s]</small> """ % { 'msg' : _("restricted") }
             if display_grandsons and len(grandsons[i]):
                 # iterate trough grandsons:
-                out += """<br />"""
+                out += """<ul class="collection-second-level">"""
                 for grandson in grandsons[i]:
-                    out += """ <small>%(link)s%(nbrec)s</small> """ % {
+                    out += """ <li>%(link)s%(nbrec)s</li> """ % {
                         'link': create_html_link(self.build_search_interface_url(c=grandson.name, ln=ln, aas=aas),
                                                  {},
                                                  cgi.escape(grandson.get_name(ln))),
@@ -1392,6 +1391,7 @@ class Template:
                         if str(grandson.dbquery).startswith("hostedcollection:"):
                             out += """<img src="%(siteurl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/>""" % \
                                     { 'siteurl' : CFG_BASE_URL, 'name' : cgi.escape(grandson.name), }
+                out += """</ul>"""
 
             out += """</td></tr>"""
             i += 1
