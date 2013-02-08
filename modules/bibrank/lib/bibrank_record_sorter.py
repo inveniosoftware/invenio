@@ -439,6 +439,7 @@ def find_citations(rank_method_code, recID, hitset, verbose):
         cites_counts = get_citation_dict('citations_counts')
         ret = [(recid, weight) for recid, weight in cites_counts
                                                         if recid in myrecords]
+        ret = reversed(ret)
     else:
         ret = get_cited_by_weight(myrecords)
         ret.sort(key=itemgetter(1))
