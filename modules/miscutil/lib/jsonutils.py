@@ -88,15 +88,15 @@ def json_remove_comments(text):
 
 def wash_for_js(text):
     """
-    Escapes a string so it can be used as a JavaScript string.
+    DEPRECATED: use htmlutils.escape_javascript_string() instead,
+    and take note that returned value is no longer enclosed into
+    quotes.
     """
+    from invenio.htmlutils import escape_javascript_string
     if isinstance(text, basestring):
-        if CFG_JSON_AVAILABLE:
-            return json.dumps(text)
-        else:
-            text = text.replace("\r\n","\\r\\n")
-            text = text.replace("\n","\\n")
-            text = text.replace('"','\\"')
-            return '''"%s"''' % text
+        return '"%s"' % escape_javascript_string(text,
+                                                 escape_for_html=False,
+                                                 escape_CDATA=False,
+                                                 escape_script_tag_with_quote=None)
     else:
         return text

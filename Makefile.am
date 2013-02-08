@@ -106,7 +106,8 @@ install-mathjax-plugin:
 	@echo "************************************************************"
 	@echo "** The MathJax plugin was successfully installed.         **"
 	@echo "** Please do not forget to properly set the option        **"
-	@echo "** CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS in invenio.conf. **"
+	@echo "** CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS and              **"
+	@echo "** CFG_WEBSUBMIT_USE_MATHJAX in invenio.conf.             **"
 	@echo "************************************************************"
 
 uninstall-mathjax-plugin:

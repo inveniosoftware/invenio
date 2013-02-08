@@ -153,3 +153,18 @@ details of them to
 <a href="mailto:<CFG_SITE_SUPPORT_EMAIL>"><CFG_SITE_SUPPORT_EMAIL></a>.</li>
 </ul>
 </p>
+
+<h3><a name="math-markup">
+Using LaTeX markup
+</a></h3>
+<p>
+Some fields might
+accept <a href="http://www.latex-project.org/">LaTeX</a> markup as
+input. Depending on the submission and site configuration, you should
+be able to submit LaTeX markup, as long as it is enclosed within
+'<code>$</code>' delimiters. For example: <code>$E=mc^{2}$</code>.
+Simply make sure that every opening '<code>$</code>' is followed by a
+closing one. Some fields might also offer a preview of the rendered
+output to let you check the validity of your markup (it might take a
+few seconds for the preview to be available).
+</p>

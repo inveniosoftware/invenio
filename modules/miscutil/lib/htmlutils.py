@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,12 +29,24 @@ from invenio.textutils import indent_text, encode_for_xml
 import re
 import cgi
 import os
-
+import sys
+if sys.hexversion < 0x2060000:
+    try:
+        import simplejson as json
+        CFG_JSON_AVAILABLE = True
+    except ImportError:
+        # Okay, no Ajax app will be possible, but continue anyway,
+        # since this package is only recommended, not mandatory.
+        CFG_JSON_AVAILABLE = False
+        json = None
+else:
+    import json
+    CFG_JSON_AVAILABLE = True
 try:
     from BeautifulSoup import BeautifulSoup
     CFG_BEAUTIFULSOUP_INSTALLED = True
 except ImportError:
-      CFG_BEAUTIFULSOUP_INSTALLED = False
+    CFG_BEAUTIFULSOUP_INSTALLED = False
 try:
     import tidy
     CFG_TIDY_INSTALLED = True
@@ -93,14 +105,123 @@ def escape_html(text, escape_quotes=False):
     @param text: text to be escaped from HTML tags
     @param escape_quotes: if True, escape any quote mark to its HTML entity:
                           " => &quot;
-                          ' => &#34;
+                          ' => &#39;
     """
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
     text = text.replace('>', '&gt;')
     if escape_quotes:
         text = text.replace('"', '&quot;')
-        text = text.replace("'", '&#34;')
+        text = text.replace("'", '&#39;')
+    return text
+
+
+CFG_JS_CHARS_MAPPINGS = {
+    '\\': '\\\\',
+    "'": "\\'",
+    '"': '\\"',
+    '\b': '\\b',
+    '\f': '\\f',
+    '\n': '\\n',
+    '\r': '\\r',
+    '\t': '\\t',
+    '\v': '\\v',
+    }
+for i in range(0x20):
+    CFG_JS_CHARS_MAPPINGS.setdefault(chr(i), '\\u%04x' % (i,))
+for i in (0x2028, 0x2029):
+    CFG_JS_CHARS_MAPPINGS.setdefault(unichr(i), '\\u%04x' % (i,))
+RE_ESCAPE_JS_CHARS = re.compile(u'''[\\x00-\\x1f\\\\"\\\\'\\b\\f\\n\\r\\t\\v\u2028\u2029]''')
+RE_CLOSING_SCRIPT_TAG = re.compile('</script>', re.IGNORECASE)
+def escape_javascript_string(text, escape_for_html=True, escape_quote_for_html=False, escape_CDATA=True, escape_script_tag_with_quote='"'):
+    """
+    Escape text in order to be used as Javascript string in various
+    context.
+
+    Examples::
+    >>> text = '''"Are you a Munchkin?" asked Dorothy.
+"No, but I am their friend"'''
+    >>> escape_javascript_string(text)
+    >>> \\"&quot;Are you a Munchkin?\\" asked Dorothy.\\n\\"No, but I am their friend\\"'
+
+    The returned string can be enclosed either in single or double
+    quotes delimiters.
+
+    THE FUNCTION ASSUME THAT YOU HAVE ALREDADY WASHED THE STRING FROM
+    UNSAFE CONTENT, according to the context you plan to use the
+    string. The function will just make sure that the string will not
+    break you Javascript/HTML code/markup.
+
+    If you plan to include the string inside the body of an HTML page,
+    you will probably want to set C{escape_for_html} to True, in order
+    to produce XHTML-valid pages when the input string contain
+    characters such as < , > and &.
+
+    Furthermore if you plan to include the string as part of a tag
+    attribute (for eg. <a href="#" onclick="foo&quot;bar"), you might
+    want to set C{escape_quote_for_html} to True.
+
+    If you plan to include the string inside the body of an HTML page,
+    enclosed by CDATA delimiters, then you would *not* need to escape
+    HTML tags. Using CDATA delimeters enables to include Javascript
+    strings meant to refer to HTML tags (eg. in case you would like to
+    manipulate the DOM tree to add new nodes to the page), which would
+    not be possible when escaping the HTML. For eg.:
+        /*<![CDATA[*/
+            document.getElementById('foo').innerHTML = '<p>bar</p>'
+        /*]]>*/
+    In this case you will probably want to set C{escape_CDATA} to True
+    in order to produce an XHTML-valid document, in case a closing
+    CDATA delimeter is in your input string. Parameter C{escape_CDATA}
+    is not considered when C{escape_for_html} is set to True.
+
+    Note that CDATA delimiters might be automatically added by the
+    browser, based on the content-type used to serve the page.
+
+    When C{escape_for_html} is set to False, whatever option is chosen
+    for C{escape_CDATA}, the string must not contain a '</script>' tag
+    (apparently...). The only option to keep this '</script>' tag (if
+    you need it) is to split it, which requires to know which quote
+    delimiter your plan to use. For eg:
+
+    Examples::
+    >>> text = '''foo</script>bar'''
+    >>> val = escape_javascript_string(text, escape_for_html=False, escape_script_tag_with_quote='"')
+    >>> 'foo</scr"+"ipt>bar'
+    >>> mycode = '''alert("%s")''' % val
+
+    C{escape_script_tag_with_quote} is not considered when
+    C{escape_for_html} is set to True.
+
+    If you are planning to return the string as part of a pure
+    Javascript document, then you should in principle set both
+    C{escape_for_html} and C{escape_CDATA} to False, and
+    C{escape_script_tag_with_quote} to None.
+
+    @param text: string to be escaped
+    @param escape_for_html: if True, also escape input for HTML
+    @param escape_CDATA: if True, escape closing CDATA tags (when C{escape_for_html} is False)
+    @escape_script_tag_with_quote: which quote will be used to delimit your string, in case you must wash, but keep, C{</script>} tag (when C{escape_for_html} is False)
+    """
+    if escape_quote_for_html:
+        text = text.replace('"', '&quot;')
+    if escape_for_html:
+        text = cgi.escape(text)
+    elif escape_CDATA:
+        text = text.replace(']]>', ']]]]><![CDATA[>')
+
+    if CFG_JSON_AVAILABLE:
+        text = json.dumps(text)[1:-1].replace("'", "\\'")
+    else:
+        # Try to emulate
+        def escape_chars(matchobj):
+            return CFG_JS_CHARS_MAPPINGS[matchobj.group(0)]
+
+        text = RE_ESCAPE_JS_CHARS.sub(escape_chars, text)
+
+    if not escape_for_html and escape_script_tag_with_quote:
+        text = RE_CLOSING_SCRIPT_TAG.sub('''</scr%(q)s+%(q)sipt>''' % {'q': escape_script_tag_with_quote}, text)
+
     return text
 
 class HTMLWasher(HTMLParser):
@@ -324,7 +445,8 @@ def get_mathjax_header(https=False):
         mathjax_path = "/MathJax"
     return """<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
-  tex2jax: {inlineMath: [['$','$']]},
+  tex2jax: {inlineMath: [['$','$']],
+            processEscapes: true},
   showProcessingMessages: false,
   messageStyle: "none"
 });
