@@ -1265,7 +1265,10 @@ def collect_user_info(req, login_time=False, refresh=False):
             user_info['group'] = [group[1] for group in get_groups(uid)]
             prefs = get_user_preferences(uid)
             login_method = prefs['login_method']
-            login_object = CFG_EXTERNAL_AUTHENTICATION[login_method]
+            ## NOTE: we fall back to default login_method if the login_method
+            ## specified in the user settings does not exist (e.g. after
+            ## a migration.)
+            login_object = CFG_EXTERNAL_AUTHENTICATION.get(login_method, CFG_EXTERNAL_AUTHENTICATION[CFG_EXTERNAL_AUTH_DEFAULT])
             if login_object and ((datetime.datetime.now() - get_last_login(uid)).seconds > 3600):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
