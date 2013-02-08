@@ -3875,4 +3875,16 @@ div.bibcircbottom {
 }
 #mathpreviewareabar span{float:left; clear:none}
 
+/* Classes used for diff between two records */
+
+.diff_field_deleted {
+   color: #ff0000;
+}
+
+.diff_field_added {
+   color: #00aa00;
+}
+
+/* end of Classes used for diff between two records */
+
 /* end of invenio.css */

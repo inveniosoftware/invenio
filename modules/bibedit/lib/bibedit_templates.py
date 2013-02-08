@@ -274,7 +274,8 @@ class Template:
     def history_comparebox(self, ln, revdate, revdate_cmp, comparison):
         """ Display the bibedit history comparison box. """
         _ = gettext_set_language(ln)
-        title = '<b>%(comp)s</b><br />%(rev)s %(revdate)s<br />%(rev)s %(revdate_cmp)s' % {
+        title = '<b>%(comp)s</b><br /><span class="diff_field_added">%(rev)s %(revdate)s</span>\
+        <br /><span class="diff_field_deleted">%(rev)s %(revdate_cmp)s</span>' % {
             'comp': _('Comparison of:'),
             'rev': _('Revision'),
             'revdate': revdate,

@@ -885,7 +885,7 @@ def record_get_field_values(rec, tag, ind1=" ", ind2=" ", code=""):
     # If tmp was not set, nothing was found
     return tmp
 
-def record_xml_output(rec, tags=None):
+def record_xml_output(rec, tags=None, order_fn=None):
     """Generates the XML for record 'rec' and returns it as a string
     @rec: record
     @tags: list of tags to be printed"""
@@ -906,7 +906,10 @@ def record_xml_output(rec, tags=None):
             if not tags or tag in tags:
                 for field in rec[tag]:
                     fields.append((tag, field))
-        record_order_fields(fields)
+        if order_fn is None:
+            record_order_fields(fields)
+        else:
+            record_order_fields(fields, order_fn)
         for field in fields:
             marcxml.append(field_xml_output(field[1], field[0]))
     marcxml.append('</record>')
@@ -1537,6 +1540,10 @@ def _subfield_xml_output(subfield):
 def _order_by_ord(field1, field2):
     """Function used to order the fields according to their ord value"""
     return cmp(field1[1][4], field2[1][4])
+
+def _order_by_tags(field1, field2):
+    """Function used to order the fields according to the tags"""
+    return cmp(field1[0], field2[0])
 
 def _get_children_by_tag_name(node, name):
     """Retrieves all children from node 'node' with name 'name' and
