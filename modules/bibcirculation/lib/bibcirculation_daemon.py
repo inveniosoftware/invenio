@@ -183,24 +183,21 @@ def task_run_core():
         list_of_borrowers = db.get_all_borrowers()
 
         total_borrowers = len(list_of_borrowers)
-        done  = 0
 
-        for borrower in list_of_borrowers:
+        for done, borrower in enumerate(list_of_borrowers):
             user_id = borrower[0]
             update_user_info_from_ldap(user_id)
-            done+=1
-            task_update_progress("Done %d out of %d." % (done, total_borrowers))
-            task_sleep_now_if_required(can_stop_too=True)
+            if done % 10 == 0:
+                task_update_progress("Borrower: updated %d out of %d." % (done, total_borrowers))
+                task_sleep_now_if_required(can_stop_too=True)
 
     if task_get_option("overdue-letters"):
         expired_loans = db.get_all_expired_loans()
 
         total_expired_loans = len(expired_loans)
-        done  = 0
-
-        for (borrower_id, _bor_name, recid, _barcode, _loaned_on,
+        for done, (borrower_id, _bor_name, recid, _barcode, _loaned_on,
              _due_date, _number_of_renewals, number_of_letters,
-             date_letters, _notes, loan_id) in expired_loans:
+             date_letters, _notes, loan_id) in enumerate(expired_loans):
 
             number_of_letters=int(number_of_letters)
 
@@ -221,12 +218,9 @@ def task_run_core():
                 update_expired_loan(loan_id)
                 send_overdue_letter(borrower_id, subject, content)
 
-            done+=1
-
-            task_update_progress("Done %d out of %d." % (done, total_expired_loans))
-
-            task_sleep_now_if_required(can_stop_too=True)
-            time.sleep(1)
+            if done % 10 == 0:
+                task_update_progress("Recall: sent %d out of %d." % (done, total_expired_loans))
+                task_sleep_now_if_required(can_stop_too=True)
 
     return 1
 

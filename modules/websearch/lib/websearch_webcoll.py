@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -130,6 +130,7 @@ class Collection:
         "Creates collection instance by querying the DB configuration database about 'name'."
         self.calculate_reclist_run_already = 0 # to speed things up without much refactoring
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
+        self.reclist_updated_since_start = 0 # to check if webpage cache need rebuilding
         self.reclist_with_nonpublic_subcolls = intbitset()
         # used to store the temporary result of the calculation of nbrecs of an external collection
         self.nbrecs_tmp = None
@@ -139,6 +140,8 @@ class Collection:
             self.dbquery = None
             self.nbrecs = None
             self.reclist = intbitset()
+            self.old_reclist = intbitset()
+            self.reclist_updated_since_start = 1
         else:
             self.name = name
             try:
@@ -153,11 +156,14 @@ class Collection:
                         self.reclist = intbitset(res[0][4])
                     except:
                         self.reclist = intbitset()
+                        self.reclist_updated_since_start = 1
                 else: # collection does not exist!
                     self.id = None
                     self.dbquery = None
                     self.nbrecs = None
                     self.reclist = intbitset()
+                    self.reclist_updated_since_start = 1
+                self.old_reclist = intbitset(self.reclist)
             except Error, e:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
@@ -807,9 +813,14 @@ class Collection:
         write_message("... updating reclist of %s (%s recs)" % (self.name, self.nbrecs), verbose=6)
         sys.stdout.flush()
         try:
+            ## In principle we could skip this update if old_reclist==reclist
+            ## however we just update it here in case of race-conditions.
             run_sql("UPDATE collection SET nbrecs=%s, reclist=%s WHERE id=%s",
                     (self.nbrecs, self.reclist.fastdump(), self.id))
-            self.reclist_updated_since_start = 1
+            if self.old_reclist != self.reclist:
+                self.reclist_updated_since_start = 1
+            else:
+                write_message("... no changes in reclist detected", verbose=6)
         except Error, e:
             print "Database Query Error %d: %s." % (e.args[0], e.args[1])
             sys.exit(1)
@@ -962,15 +973,19 @@ def main():
                      "collection only. [all]\n"
                     "  -r, --recursive\t Update cache for the given collection and all its\n"
                     "\t\t\t descendants (to be used in combination with -c). [no]\n"
+                    "  -q, --quick\t\t Skip webpage cache update for those collections whose\n"
+                    "\t\t\t reclist was not changed. Note: if you use this option, it is advised\n"
+                    "\t\t\t to schedule, e.g. a nightly 'webcoll --force'. [no]\n"
                     "  -f, --force\t\t Force update even if cache is up to date. [no]\n"
                     "  -p, --part\t\t Update only certain cache parts (1=reclist,"
                     " 2=webpage). [both]\n"
                     "  -l, --language\t Update pages in only certain language"
                     " (e.g. fr,it,...). [all]\n",
             version=__revision__,
-            specific_params=("c:rfp:l:", [
+            specific_params=("c:rqfp:l:", [
                     "collection=",
                     "recursive",
+                    "quick",
                     "force",
                     "part=",
                     "language="
@@ -996,6 +1011,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("recursive", 1)
     elif key in ("-f", "--force"):
         task_set_option("force", 1)
+    elif key in ("-q", "--quick"):
+        task_set_option("quick", 1)
     elif key in ("-p", "--part"):
         task_set_option("part", int(value))
     elif key in ("-l", "--language"):
@@ -1077,7 +1094,6 @@ def task_run_core():
                     coll.set_nbrecs_for_external_collection()
                 else:
                     coll.calculate_reclist()
-                task_sleep_now_if_required()
                 coll.update_reclist()
                 task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
                 task_sleep_now_if_required(can_stop_too=True)
@@ -1086,9 +1102,12 @@ def task_run_core():
             i = 0
             for coll in colls:
                 i += 1
-                write_message("%s / webpage cache update" % coll.name)
-                for lang in CFG_SITE_LANGS:
-                    coll.update_webpage_cache(lang)
+                if coll.reclist_updated_since_start or task_has_option("collection") or task_get_option("force") or not task_get_option("quick"):
+                    write_message("%s / webpage cache update" % coll.name)
+                    for lang in CFG_SITE_LANGS:
+                        coll.update_webpage_cache(lang)
+                else:
+                    write_message("%s / webpage cache seems not to need an update and --quick was used" % coll.name, verbose=2)
                 task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
                 task_sleep_now_if_required(can_stop_too=True)
 
