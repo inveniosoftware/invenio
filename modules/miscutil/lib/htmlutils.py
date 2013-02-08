@@ -93,14 +93,14 @@ def escape_html(text, escape_quotes=False):
     @param text: text to be escaped from HTML tags
     @param escape_quotes: if True, escape any quote mark to its HTML entity:
                           " => &quot;
-                          ' => &#34;
+                          ' => &#39;
     """
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
     text = text.replace('>', '&gt;')
     if escape_quotes:
         text = text.replace('"', '&quot;')
-        text = text.replace("'", '&#34;')
+        text = text.replace("'", '&#39;')
     return text
 
 class HTMLWasher(HTMLParser):
