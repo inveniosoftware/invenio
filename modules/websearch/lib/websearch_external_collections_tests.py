@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@ import unittest
 
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, nottest
 
 def download_and_parse():
     """Try to make a query that always return results on all search engines.
@@ -69,6 +69,7 @@ def download_and_parse():
 
     return errors
 
+@nottest
 def build_search_urls_test():
     """Build some classical urls from basic_search_units."""
     print "Testing external_search_engines build_search_url functions."
@@ -86,6 +87,7 @@ def build_search_urls_test():
 class ExtCollTests(unittest.TestCase):
     """Test cases for websearch_external_collections_*"""
 
+    @nottest
     def test_download_and_parse(self):
         """websearch_external_collections - download_and_parse (not reliable, see docstring)"""
         self.assertEqual([], download_and_parse())
@@ -96,4 +98,3 @@ TEST_SUITE = make_test_suite() #ExtCollTests,)
 if __name__ == "__main__":
     build_search_urls_test()
     run_test_suite(TEST_SUITE)
-

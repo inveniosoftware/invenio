@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,6 +39,7 @@ from mechanize import Browser, LinkNotFoundError
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
+                              nottest, \
                               make_url, test_web_page_content, \
                               merge_error_messages
 from invenio.urlutils import same_urls_p
@@ -1366,6 +1367,7 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29+OR+SL%282%2CZ%29',
                                                expected_text="[57, 79, 80, 88]"))
 
+    @nottest
     def FIXME_TICKET_453_test_special_terms_u1_and_sl_or_parens(self):
         """websearch - query for special terms, (U(1) OR SL(2,Z))"""
         self.assertEqual([],

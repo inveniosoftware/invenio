@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.config import CFG_CERN_SITE
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, nottest
 
 class ExternalAuthenticationCernTest(unittest.TestCase):
     """Test functions related to the CERN authentication."""
@@ -37,20 +37,24 @@ class ExternalAuthenticationCernTest(unittest.TestCase):
                 open('demopwd.cfg', 'r').readline().strip().split(':', 2)
         self.cern = cern.ExternalAuthCern()
 
+    @nottest
     def test_auth_user_ok(self):
         """external authentication CERN - authorizing user through CERN system: should pass"""
         self.assertEqual(self.cern.auth_user(self.username, self.userpwd), \
                 self.useremail)
 
+    @nottest
     def test_auth_user_fail(self):
         """external authentication CERN - authorizing user through CERN system: should fail"""
         self.assertEqual(self.cern.auth_user('patata', 'patata'), None)
 
+    @nottest
     def test_fetch_user_groups_membership(self):
         """external authentication CERN - fetching user group membership at CERN"""
         self.assertNotEqual(self.cern.fetch_user_groups_membership(self.useremail, self.userpwd), 0)
         self.assertEqual(self.cern.fetch_user_groups_membership('patata', 'patata'), {})
 
+    @nottest
     def test_fetch_user_preferences(self):
         """external authentication CERN - fetching user setting from CERN"""
         self.assertEqual(self.cern.fetch_user_preferences(self.username, self.userpwd)['email'], self.useremail)
@@ -63,5 +67,3 @@ else:
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
-
