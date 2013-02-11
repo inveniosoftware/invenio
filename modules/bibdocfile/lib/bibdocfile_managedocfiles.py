@@ -889,6 +889,8 @@ def create_file_upload_interface(recid,
             'previous_versions_label': _('Keep previous versions'),
             'cancel': _('Cancel'),
             'upload': _('Upload'),
+            'uploading_label': _('Uploading...'),
+            'postprocess_label': _('Please wait...'),
             'submit_or_button': form_url_params and 'button' or 'submit'}
         body += '''
         <input type="hidden" name="recid" value="%(recid)i"/>
@@ -2361,8 +2363,17 @@ def get_upload_file_interface_javascript(form_url_params):
         javascript += '''
 // prepare the form when the DOM is ready
 $(document).ready(function() {
+    var progress = $('.progress');
+    var rotatingprogress = $('.rotatingprogress');
+    var bar = $('.bar');
+    var percent = $('.percent');
     var options = {
         target: '#uploadFileInterface', // target element(s) to be updated with server response
+        uploadProgress: function(event, position, total, percentComplete) {
+                                    update_progress(progress, bar, percent, percentComplete, rotatingprogress);},
+        beforeSubmit: function(arr, $form, options) {
+                                    show_upload_progress();
+                                    return true;},
         success: showResponse, // post-submit callback
         url: '/%(CFG_SITE_RECORD)s/managedocfilesasync%(form_url_params)s' // override for form's 'action' attribute
     };
@@ -2378,6 +2389,7 @@ $(document).ready(function() {
 
 // post-submit callback
 function showResponse(responseText, statusText)  {
+    hide_upload_progress();
     hide_revise_panel();
 }
     '''  % {
@@ -2510,13 +2522,58 @@ function hide_revise_panel(){
 }
 
 
-/* Intercept ESC key in order to close revise panel */
+/* Intercept ESC key in order to close revise panel*/
 document.onkeyup = keycheck;
 function keycheck(e){
         var KeyID = (window.event) ? event.keyCode : e.keyCode;
+        var upload_in_progress_p = $('.progress').is(":visible") || $('.rotatingprogress').is(":visible")
         if(KeyID==27){
-            hide_revise_panel()
+            if (upload_in_progress_p) {
+                hide_upload_progress();
+            } else {
+                hide_revise_panel();
+            }
         }
+}
+
+/* Update progress bar, show if necessary (and then hide rotating progress indicator) */
+function update_progress(progress, bar, percent, percentComplete, rotatingprogress){
+    if (rotatingprogress.is(":visible")) {
+        $('.rotatingprogress').hide();
+        $('.progress').show();
+    }
+    var percentVal = percentComplete + '%%';
+    bar.width(percentVal)
+    percent.html(percentVal);
+
+    if (percentComplete == '100') {
+        // There might be some lengthy post-processing to do.
+        show_upload_progress(post_process_label=true);
+    }
+}
+
+/* Hide upload/cancel button, show rotating progress indicator */
+function show_upload_progress(post_process_label_p) {
+    if (!post_process_label_p) { post_process_label_p = false;}
+
+    if (post_process_label_p) {
+        /* Show post-process label */
+        $('.progress').hide();
+        $('.rotatingprogress').hide();
+        $('.rotatingpostprocess').show();
+    } else {
+        /* Show uploading label */
+        $('#canceluploadbuttongroup').hide();
+        $('.rotatingprogress').show();
+    }
+}
+/* show upload/cancel button, hide any progress indicator */
+function hide_upload_progress() {
+    $('.progress').hide();
+    $('.rotatingprogress').hide();
+    $('.rotatingpostprocess').hide();
+    $('#canceluploadbuttongroup').show();
+    $('.percent').html('0%%');
 }
 
 function findPosition( oElement ) {
@@ -2799,6 +2856,37 @@ margin-top:6px;
 #description, #comment, #rename {
 width:90%%;
 }
+.rotatingprogress, .rotatingpostprocess {
+position:relative;
+float:right;
+padding: 1px;
+font-style:italic;
+font-size:small;
+margin-right: 5px;
+display:none;
+}
+
+.progress {
+position:relative;
+width:100%%;
+float:left;
+border: 1px solid #ddd;
+padding: 1px;
+border-radius: 3px;
+display:none;
+}
+.bar {
+background-color: #dd9700;
+width:0%%; height:20px;
+border-radius: 3px; }
+.percent {
+position:absolute;
+display:inline-block;
+top:3px;
+left:45%%;
+font-size:small;
+color: #514100;
+}
 -->
 </style>
 ''' % {'CFG_SITE_URL': CFG_SITE_URL}
@@ -2827,10 +2915,11 @@ revise_balloon = '''
               <div id="renameBox" style=""><label for="rename">%(filename_label)s:</label><br/><input type="text" name="rename" id="rename" size="20" autocomplete="off"/></div>
               <div id="descriptionBox" style=""><label for="description">%(description_label)s:</label><br/><input type="text" name="description" id="description" size="20" autocomplete="off"/></div>
               <div id="commentBox" style=""><label for="comment">%(comment_label)s:</label><br/><textarea name="comment" id="comment" rows="3"/></textarea></div>
-              <div id="restrictionBox" style="display:none">%(restrictions)s</div>
+              <div id="restrictionBox" style="display:none;white-space:nowrap;">%(restrictions)s</div>
               <div id="keepPreviousVersions" style="display:none"><input type="checkbox" id="balloonReviseFileKeep" name="keepPreviousFiles" checked="checked" /><label for="balloonReviseFileKeep">%(previous_versions_label)s</label>&nbsp;<small>[<a href="" onclick="alert('%(previous_versions_help)s');return false;">?</a>]</small></div>
               <p id="warningFormats" style="display:none"><img src="%(CFG_SITE_URL)s/img/warning.png" alt="Warning"/> %(revise_format_warning)s&nbsp;[<a href="" onclick="alert('%(revise_format_help)s');return false;">?</a>]</p>
-              <div style="text-align:right;margin-top:5px"><input type="button" value="%(cancel)s" onclick="javascript:hide_revise_panel();"/> <input type="%(submit_or_button)s" id="bibdocfilemanagedocfileuploadbutton" value="%(upload)s"/></div>
+              <div class="progress"><div class="bar"></div ><div class="percent">0%%</div ></div>
+              <div class="rotatingprogress"><img src="/img/ui-anim_basic_16x16.gif" /> %(uploading_label)s</div><div class="rotatingpostprocess"><img src="/img/ui-anim_basic_16x16.gif" /> %(postprocess_label)s</div><div id="canceluploadbuttongroup" style="text-align:right;margin-top:5px"><input type="button" value="%(cancel)s" onclick="javascript:hide_revise_panel();"/> <input type="%(submit_or_button)s" id="bibdocfilemanagedocfileuploadbutton" onclick="show_upload_progress()" value="%(upload)s"/></div>
             </td>
           </tr>
         </table>
