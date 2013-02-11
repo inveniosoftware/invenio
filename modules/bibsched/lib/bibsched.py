@@ -349,7 +349,6 @@ class Manager(object):
                                            ord("p"), ord("P"), ord("o"), ord("O"),
                                            ord("l"), ord("L"), ord("e"), ord("E"))):
             self.display_in_footer("in automatic mode")
-            self.stdscr.refresh()
         else:
             status = self.currentrow and self.currentrow[5] or None
             if char == self.curses.KEY_UP:
@@ -413,16 +412,25 @@ class Manager(object):
                 self.display = 1
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
+                # We need to update the display to display done tasks
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("only done processes are displayed")
             elif char == ord("2"):
                 self.display = 2
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
+                # We need to update the display to display not done tasks
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("only not done processes are displayed")
             elif char == ord("3"):
                 self.display = 3
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
+                # We need to update the display to display archived tasks
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("only archived processes are displayed")
             elif char in (ord("q"), ord("Q")):
                 if self.curses.panel.top_panel() == self.panel:
@@ -446,7 +454,9 @@ class Manager(object):
                 print >> self.old_stdout, "\rPress ENTER to continue",
                 self.old_stdout.flush()
                 raw_input()
-                self.curses.panel.update_panels()
+                # We need to redraw the bibsched task list
+                # since we are displaying "Press ENTER to continue"
+                self.repaint()
             else:
                 self._display_message_box("No pager was found")
 
@@ -459,13 +469,16 @@ class Manager(object):
             previous = self.motd
             self.curses.endwin()
             os.system("%s %s" % (editor, motdpath))
-            self.curses.panel.update_panels()
             try:
                 self.motd = open(motdpath).read().strip()
             except IOError:
                 self.motd = ""
             if len(self.motd) > 0:
                 self.motd = "MOTD [%s] " % time.strftime("%m-%d-%Y %H:%M", time.localtime(os.path.getmtime(motdpath))) + self.motd
+
+            # We need to redraw the MOTD part
+            self.repaint()
+
             if previous[24:] != self.motd[24:]:
                 if len(previous) == 0:
                     Log('motd set to "%s"' % self.motd.replace("\n", "|"))
@@ -551,6 +564,12 @@ order to let this task run. The current priority is %s. New value:"
             return
         bibsched_set_priority(task_id, new_priority)
 
+        # We need to update the tasks list with our new priority
+        # to be able to display it
+        self.update_rows()
+        # We need to update the priority number next to the task
+        self.repaint()
+
     def wakeup(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
@@ -560,6 +579,8 @@ order to let this task run. The current priority is %s. New value:"
         if status == "SLEEPING":
             if not bibsched_send_signal(process, task_id, signal.SIGCONT):
                 bibsched_set_status(task_id, "ERROR", "SLEEPING")
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("process woken up")
         else:
             self.display_in_footer("process is not sleeping")
@@ -620,6 +641,7 @@ order to let this task run. The current priority is %s. New value:"
         self.curses.echo()
         ret = self.win.getstr()
         self.curses.noecho()
+        self.panel = None
         return ret
 
     def _display_message_box(self, msg):
@@ -644,6 +666,7 @@ order to let this task run. The current priority is %s. New value:"
         self.win.move(height - 2, 2)
         self.win.getkey()
         self.curses.noecho()
+        self.panel = None
 
     def purge_done(self):
         """Garbage collector."""
@@ -657,6 +680,9 @@ order to let this task run. The current priority is %s. New value:"
                 ', '.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE),
                 CFG_BIBSCHED_GC_TASKS_OLDER_THAN)):
             gc_tasks()
+            # We removed some tasks from our list
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("DONE processes purged")
 
     def run(self):
@@ -673,6 +699,9 @@ order to let this task run. The current priority is %s. New value:"
                     command = "%s %s" % (program, str(task_id))
                     spawn_task(command)
                     Log("manually running task #%d (%s)" % (task_id, process))
+                    # We changed the status of one of our tasks
+                    self.update_rows()
+                    self.repaint()
                 else:
                     ## Process already running (typing too quickly on the keyboard?)
                     pass
@@ -686,6 +715,8 @@ order to let this task run. The current priority is %s. New value:"
         status = self.currentrow[5]
         if status in ('ERROR', 'DONE WITH ERRORS', 'ERRORS REPORTED'):
             bibsched_set_status(task_id, 'ACK ' + status, status)
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("Acknowledged error")
 
     def sleep(self):
@@ -693,6 +724,8 @@ order to let this task run. The current priority is %s. New value:"
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING'):
             bibsched_set_status(task_id, 'ABOUT TO SLEEP', status)
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("SLEEP signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot put to sleep non-running processes")
@@ -705,6 +738,8 @@ order to let this task run. The current priority is %s. New value:"
             if self._display_YN_box("Are you sure you want to kill the %s process %s?" % (process, task_id)):
                 bibsched_send_signal(process, task_id, signal.SIGKILL)
                 bibsched_set_status(task_id, 'KILLED')
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("KILL signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot kill non-running processes")
@@ -721,12 +756,16 @@ order to let this task run. The current priority is %s. New value:"
                 while bibsched_get_status(task_id) == 'NOW STOP':
                     if count <= 0:
                         bibsched_set_status(task_id, 'ERROR', 'NOW STOP')
+                        self.update_rows()
+                        self.repaint()
                         self.display_in_footer("It seems impossible to wakeup this task.")
                         return
                     time.sleep(CFG_BIBSCHED_REFRESHTIME)
                     count -= 1
             else:
                 bibsched_set_status(task_id, 'ABOUT TO STOP', status)
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("STOP signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot stop non-running processes")
@@ -749,6 +788,8 @@ order to let this task run. The current priority is %s. New value:"
             bibsched_set_status(task_id, "WAITING")
             bibsched_set_progress(task_id, "")
             bibsched_set_host(task_id, "")
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("process initialised")
         else:
             self.display_in_footer("Cannot initialise running processes")
@@ -762,7 +803,8 @@ order to let this task run. The current priority is %s. New value:"
         os.system(COMMAND)
 
         self.auto_mode = not self.auto_mode
-        self.stdscr.refresh()
+        # We need to refresh the color of the header and footer
+        self.repaint()
 
     def put_line(self, row, header=False, motd=False):
         ## ROW: (id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host)
