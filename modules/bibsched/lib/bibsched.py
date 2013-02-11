@@ -343,7 +343,7 @@ class Manager(object):
                                            self.curses.KEY_DOWN,
                                            self.curses.KEY_PPAGE,
                                            self.curses.KEY_NPAGE,
-                                           ord("g"), ord("G"),
+                                           ord("g"), ord("G"), ord("n"),
                                            ord("q"), ord("Q"), ord("a"),
                                            ord("A"), ord("1"), ord("2"), ord("3"),
                                            ord("p"), ord("P"), ord("o"), ord("O"),
