@@ -30,7 +30,7 @@ from urllib2 import urlopen, HTTPError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_DEVEL_SITE
 from invenio.bibdocfile import calculate_md5
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio.goto_engine import CFG_GOTO_PLUGINS, register_redirection, drop_redirection, update_redirection
 
 def get_final_url(url):
@@ -110,12 +110,14 @@ class WebStyleGotoTests(unittest.TestCase):
         register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article'), CFG_SITE_URL + '/record/108')
 
-    def FIXME_test_latest_pdf_article_redirection(self):
+    @nottest
+    def FIXME_TICKET_1293_test_latest_pdf_article_redirection(self):
         """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
         register_redirection('latest_pdf_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles', 'format': '.pdf'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_pdf_article'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
 
-    def FIXME_test_URL_argument_in_redirection(self):
+    @nottest
+    def FIXME_TICKET_1293_test_URL_argument_in_redirection(self):
         """webstyle - test redirecting while passing arguments on the URL"""
         register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article?format=.pdf'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
