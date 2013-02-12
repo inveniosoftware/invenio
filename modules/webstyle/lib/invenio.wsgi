@@ -47,5 +47,10 @@ try:
 except:
     pass
 
+## You can't write to stdout in mod_wsgi, but some of our
+## dependecies do this! (e.g. 4Suite)
+import sys
+sys.stdout = sys.stderr
+
 from invenio.webinterface_handler_flask import create_invenio_flask_app
 application = create_invenio_flask_app()

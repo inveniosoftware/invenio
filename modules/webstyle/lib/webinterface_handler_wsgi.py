@@ -29,12 +29,6 @@ from urlparse import urlparse, urlunparse
 
 from wsgiref.util import FileWrapper
 
-if __name__ != "__main__":
-    # Chances are that we are inside mod_wsgi.
-    ## You can't write to stdout in mod_wsgi, but some of our
-    ## dependecies do this! (e.g. 4Suite)
-    sys.stdout = sys.stderr
-
 from invenio.webinterface_handler_wsgi_utils import table
 from invenio.webinterface_handler_config import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
