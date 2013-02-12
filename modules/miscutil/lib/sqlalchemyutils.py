@@ -258,7 +258,8 @@ class InvenioDB(SQLAlchemy):
             username = CFG_DATABASE_USER,
             password = CFG_DATABASE_PASS,
             host = CFG_DATABASE_HOST,
-            database = CFG_DATABASE_NAME
+            database = CFG_DATABASE_NAME,
+            port = CFG_DATABASE_PORT,
             )
 
     def __getattr__(self, name):
