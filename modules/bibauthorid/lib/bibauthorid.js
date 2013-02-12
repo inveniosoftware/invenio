@@ -105,10 +105,12 @@ $(document).ready(function() {
 	//});
 
     // Show Message
-    $("#aid_notification").fadeIn("slow");
-    $("#aid_notification a.aid_close-notify").click(function() {
-        $("#aid_notification").fadeOut("slow");
-        return false;
+    $(".ui-alert").fadeIn("slow");
+    $("a.aid_close-notify").each(function() {
+	$(this).click(function() {
+            $(this).parents(".ui-alert").fadeOut("slow");
+            return false;
+        } )
     });
 
     // Set Focus on last input field w/ class 'focus'

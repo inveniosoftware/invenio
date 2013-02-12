@@ -248,7 +248,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         req.send_http_header()
         metaheaderadd = '<script type="text/javascript" src="%s/js/webauthorprofile.js"> </script>' % (CFG_SITE_URL)
         metaheaderadd += """
-        <style> 
+        <style>
         .hidden {
             display: none;
         }

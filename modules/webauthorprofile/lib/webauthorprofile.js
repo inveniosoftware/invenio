@@ -36,7 +36,7 @@ $(document).ready(function() {
         });
     });
 });
-    
+
 function initAjax(){
   /*
    * Initialize Ajax.

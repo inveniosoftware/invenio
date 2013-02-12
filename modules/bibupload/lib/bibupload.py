@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -69,7 +69,8 @@ from invenio.bibrecord import create_records, \
                               record_delete_fields, \
                               record_add_subfield_into, \
                               record_find_field, \
-                              record_extract_oai_id
+                              record_extract_oai_id, \
+                              record_extract_dois
 from invenio.search_engine import get_record
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
@@ -180,7 +181,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         write_message(msg, verbose=1, stream=sys.stderr)
         return (1, -1, msg)
 
-    # Extraction of the Record Id from 001, SYSNO or OAIID tags:
+    # Extraction of the Record Id from 001, SYSNO or OAIID or DOI tags:
     rec_id = retrieve_rec_id(record, opt_mode, pretend=pretend)
     if rec_id == -1:
         msg = "    Failed: either the record already exists and insert was " \
@@ -190,8 +191,12 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         return (1, -1, msg)
     elif rec_id > 0:
         write_message("   -Retrieve record ID (found %s): DONE." % rec_id, verbose=2)
+        (unique_p, msg) = check_record_doi_is_unique(rec_id, record)
+        if not unique_p:
+            write_message(msg, verbose=1, stream=sys.stderr)
+            return (1, int(rec_id), msg)
         if not record.has_key('001'):
-            # Found record ID by means of SYSNO or OAIID, and the
+            # Found record ID by means of SYSNO or OAIID or DOI, and the
             # input MARCXML buffer does not have this 001 tag, so we
             # should add it now:
             error = record_add_field(record, '001', controlfield_value=rec_id)
@@ -741,6 +746,39 @@ def find_record_from_oaiid(oaiid):
     else:
         return None
 
+def find_record_from_doi(doi):
+    """
+    Try to find record in the database from the given DOI.
+    Return record ID if found, None otherwise.
+    """
+    recids = []
+    bibxxx = 'bib02x'
+    bibrec_bibxxx = 'bibrec_' + bibxxx
+    try:
+        res = run_sql("""SELECT bb.id_bibrec, bb.field_number
+            FROM %(bibrec_bibxxx)s AS bb, %(bibxxx)s AS b
+            WHERE b.tag=%%s AND b.value=%%s
+            AND bb.id_bibxxx=b.id""" % \
+                      {'bibxxx': bibxxx,
+                       'bibrec_bibxxx': bibrec_bibxxx},
+                      ('0247_a', doi,))
+
+        # For each of the result, make sure that it is really tagged as doi
+        for (id_bibrec, field_number) in res:
+            res = run_sql("""SELECT bb.id_bibrec
+            FROM %(bibrec_bibxxx)s AS bb, %(bibxxx)s AS b
+            WHERE b.tag=%%s AND b.value=%%s
+            AND bb.id_bibxxx=b.id and bb.field_number=%%s and bb.id_bibrec=%%s""" % \
+                      {'bibxxx': bibxxx,
+                       'bibrec_bibxxx': bibrec_bibxxx},
+                      ('0247_2', "doi", field_number, id_bibrec))
+            if res and res[0][0] == id_bibrec:
+                return res[0][0]
+    except Error, error:
+        write_message("   Error during find_record_from_doi(): %s " % error,
+                      verbose=1, stream=sys.stderr)
+    return None
+
 def extract_tag_from_record(record, tag_number):
     """ Extract the tag_number for record."""
     # first step verify if the record is not already in the database
@@ -749,7 +787,7 @@ def extract_tag_from_record(record, tag_number):
     return None
 
 def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
-    """Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID
+    """Retrieve the record Id from a record by using tag 001 or SYSNO or OAI ID or DOI
     tag. opt_mod is the desired mode.
 
     @param post_phase Tells if we are calling this method in the postprocessing phase. If true, we accept presence of 001 fields even in the insert mode
@@ -801,7 +839,7 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                     return -1
             else:
                 # The record doesn't exist yet. We shall have try to check
-                # the SYSNO or OAI id later.
+                # the SYSNO or OAI or DOI id later.
                 write_message("   -Tag 001 value not found in database.",
                               verbose=9)
                 rec_id = None
@@ -901,6 +939,41 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
             write_message("   -Tag SYSNO not found in the xml marc file.",
                 verbose=9)
 
+    if rec_id is None:
+        # 5th step we look for the DOI.
+        record_dois = record_extract_dois(record)
+        matching_recids = set()
+        if record_dois:
+            # try to find the corresponding rec id from the database
+            for record_doi in record_dois:
+                possible_recid = find_record_from_doi(record_doi)
+                if possible_recid:
+                    matching_recids.add(possible_recid)
+            if len(matching_recids) > 1:
+                # Oops, this record refers to DOI existing in multiple records.
+                # Dunno which one to choose.
+                write_message("   Failed : Multiple records found in the" \
+                          " database %s that match the DOI(s) in the input" \
+                          " MARCXML %s" % (repr(matching_recids), repr(record_dois)),
+                          verbose=1, stream=sys.stderr)
+                return -1
+            elif len(matching_recids) == 1:
+                rec_id = matching_recids.pop()
+                if opt_mode == 'insert':
+                    write_message("   Failed: DOI tag matching record #%s found in the xml" \
+                          " submitted, you should use the option replace," \
+                          " correct or append to replace an existing" \
+                          " record. (-h for help)" % rec_id,
+                          verbose=1, stream=sys.stderr)
+                    return -1
+            else:
+                write_message("   - Tag DOI value not found in database.",
+                                  verbose=9)
+                rec_id = None
+        else:
+            write_message("   -Tag DOI not found in the xml marc file.",
+                verbose=9)
+
     # Now we should have detected rec_id from SYSNO or OAIID
     # tags.  (None otherwise.)
     if rec_id:
@@ -920,6 +993,37 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
             return -1
 
     return rec_id and int(rec_id) or None
+
+def check_record_doi_is_unique(rec_id, record):
+    """
+    Check that DOI found in 'record' does not exist in any other
+    record than 'recid'.
+
+    Return (boolean, msg) where 'boolean' would be True if the DOI is
+    unique.
+    """
+    record_dois = record_extract_dois(record)
+    if record_dois:
+        matching_recids = set()
+        for record_doi in record_dois:
+            possible_recid = find_record_from_doi(record_doi)
+            if possible_recid:
+                matching_recids.add(possible_recid)
+        if len(matching_recids) > 1:
+            # Oops, this record refers to DOI existing in multiple records.
+            msg = "   Failed : Multiple records found in the" \
+                      " database %s that match the DOI(s) in the input" \
+                      " MARCXML %s" % (repr(matching_recids), repr(record_dois))
+            return (False, msg)
+        elif len(matching_recids) == 1:
+            matching_recid = matching_recids.pop()
+            if str(matching_recid) != str(rec_id):
+                # Oops, this record refers to DOI existing in a different record.
+                msg = "   Failed : DOI(s) %s found in this record (#%s)" \
+                      " already exist(s) in another other record (#%s)" % \
+                      (repr(record_dois), rec_id, matching_recid)
+                return (False, msg)
+    return (True, "")
 
 ### Insert functions
 

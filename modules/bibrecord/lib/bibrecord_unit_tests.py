@@ -23,7 +23,8 @@ The BibRecord test suite.
 
 import unittest
 
-from invenio.config import CFG_TMPDIR
+from invenio.config import CFG_TMPDIR, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio import bibrecord, bibrecord_config
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -1544,6 +1545,55 @@ class BibRecordNumCharRefTest(unittest.TestCase):
                                            correct=1, parser='lxml')[0][0]
             self.assertEqual(rec, self.rec_expected)
 
+class BibRecordExtractIdentifiersTest(unittest.TestCase):
+    """ bibrecord - testing for getting identifiers from record """
+
+    def setUp(self):
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">1</controlfield>
+        <datafield tag="100" ind1="C" ind2="5">
+        <subfield code="a">val1</subfield>
+        </datafield>
+        <datafield tag="024" ind1="7" ind2=" ">
+        <subfield code="2">doi</subfield>
+        <subfield code="a">5555/TEST1</subfield>
+        </datafield>
+        <datafield tag="024" ind1="7" ind2=" ">
+        <subfield code="2">DOI</subfield>
+        <subfield code="a">5555/TEST2</subfield>
+        </datafield>
+        <datafield tag="024" ind1="7" ind2=" ">
+        <subfield code="2">nondoi</subfield>
+        <subfield code="a">5555/TEST3</subfield>
+        </datafield>
+        <datafield tag="024" ind1="8" ind2=" ">
+        <subfield code="2">doi</subfield>
+        <subfield code="a">5555/TEST4</subfield>
+        </datafield>
+        <datafield tag="%(oai_tag)s" ind1="%(oai_ind1)s" ind2="%(oai_ind2)s">
+        <subfield code="%(oai_subcode)s">oai:atlantis:1</subfield>
+        </datafield>
+        </record>
+        """ % {'oai_tag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'oai_ind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3],
+               'oai_ind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4],
+               'oai_subcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5],
+               }
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
+
+    def test_extract_doi(self):
+        """bibrecord - getting DOI identifier(s) from record"""
+        self.assertEqual(bibrecord.record_extract_dois(self.rec),
+                         ['5555/TEST1', '5555/TEST2'])
+
+    def test_extract_oai_id(self):
+        """bibrecord - getting OAI identifier(s) from record"""
+        self.assertEqual(bibrecord.record_extract_oai_id(self.rec),
+                         'oai:atlantis:1')
+
+
 TEST_SUITE = make_test_suite(
     BibRecordSuccessTest,
     BibRecordParsersTest,
@@ -1566,7 +1616,8 @@ TEST_SUITE = make_test_suite(
     BibRecordFindFieldTest,
     BibRecordDeleteSubfieldTest,
     BibRecordSingletonTest,
-    BibRecordNumCharRefTest
+    BibRecordNumCharRefTest,
+    BibRecordExtractIdentifiersTest,
     )
 
 if __name__ == '__main__':

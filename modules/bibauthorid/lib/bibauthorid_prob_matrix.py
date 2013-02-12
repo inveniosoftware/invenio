@@ -89,9 +89,12 @@ class ProbabilityMatrix(object):
         if expected == 0:
             expected = 1
 
-        cur_calc, opti = 0, 0
+        cur_calc, opti, prints_counter = 0, 0, 0
         for cl1 in cluster_set.clusters:
-            update_status((float(opti) + cur_calc) / expected, "Prob matrix: calc %d, opti %d." % (cur_calc, opti))
+
+            if cur_calc+opti - prints_counter > 100000:
+                update_status((float(opti) + cur_calc) / expected, "Prob matrix: calc %d, opti %d." % (cur_calc, opti))
+                prints_counter = cur_calc+opti
 
             #clean caches
             if cur_calc - last_cleaned > 2000000:
@@ -114,7 +117,6 @@ class ProbabilityMatrix(object):
                             else:
                                 cur_calc += 1
                                 val = compare_bibrefrecs(bib1, bib2)
-
                             self._bib_matrix[bib1, bib2] = val
 
         clear_comparison_caches()

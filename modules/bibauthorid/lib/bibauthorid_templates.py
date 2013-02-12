@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,6 +32,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.bibformat import format_record
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibauthorid_config import EXTERNAL_SYSTEMS_LIST
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id, get_person_names_from_id
 from invenio.bibauthorid_webapi import get_personiID_external_ids
 from invenio.bibauthorid_frontinterface import get_uid_from_personid
@@ -39,6 +40,7 @@ from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
 from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
 from invenio.messages import gettext_set_language, wash_language
 from invenio.webuser import get_email
+from invenio.htmlutils import escape_html
 #from invenio.textutils import encode_for_xml
 from flask import session
 
@@ -71,26 +73,103 @@ class Template:
         return "\n".join(html)
 
 
-    def tmpl_notification_box(self, message, teaser="Notice:", show_close_btn=True):
+    def tmpl_transaction_box(self, teaser_key, messages, show_close_btn=True):
         '''
         Creates a notification box based on the jQuery UI style
 
-        @param message: message to display in the box
-        @type message: string
-        @param teaser: Teaser text in bold next to icon
-        @type teaser: string
+        @param teaser_key: key to a dict which returns the teaser
+        @type teaser_key: string
+        @param messages: list of keys to a dict which return the message to display in the box
+        @type messages: list of strings
         @param show_close_btn: display close button [x]
         @type show_close_btn: boolean
 
         @return: HTML code
         @rtype: string
         '''
+        transaction_teaser_dict = { 'success': 'Success!',
+                                    'failure': 'Failure!' }
+        transaction_message_dict = { 'confirm_success': '%s transaction%s successfully executed.',
+                                     'confirm_failure': '%s transaction%s failed. The system may have been updating during your operation. Please try again or contact %s to obtain help.',
+                                     'reject_success': '%s transaction%s successfully executed.',
+                                     'reject_failure': '%s transaction%s failed. The system may have been updating during your operation. Please try again or contact %s to obtain help.',
+                                     'reset_success': '%s transaction%s successfully executed.',
+                                     'reset_failure': '%s transaction%s failed. The system may have been updating during your operation. Please try again or contact %s to obtain help.' }
+
+        teaser = self._(transaction_teaser_dict[teaser_key])
+
         html = []
         h = html.append
-        h('<div id="aid_notification" class="ui-widget">')
+        for key in transaction_message_dict.keys():
+            same_kind = [mes for mes in messages if mes == key]
+            trans_no = len(same_kind)
+            if trans_no == 0:
+                continue
+            elif trans_no == 1:
+                args = [trans_no, '']
+            else:
+                args = [trans_no, 's']
+
+            color = ''
+            if teaser_key == 'failure':
+                color = 'background: #FC2626;'
+                args.append(CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL)
+
+            message = self._(transaction_message_dict[key] % tuple(args))
+
+            h('<div id="aid_notification_' + key + '" class="ui-widget ui-alert">')
+            h('  <div style="%s margin-top: 20px; padding: 0pt 0.7em;" class="ui-state-highlight ui-corner-all">' % (color))
+            h('    <p><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>')
+            h('    <strong>%s</strong> %s' % (teaser, message))
+
+            if show_close_btn:
+                h('    <span style="float:right; margin-right: 0.3em;"><a rel="nofollow" href="#" class="aid_close-notify" style="border-style: none;">X</a></span></p>')
+
+            h(' </div>')
+            h('</div>')
+
+        return "\n".join(html)
+
+    def tmpl_notification_box(self, teaser_key, message_key, bibrefs, show_close_btn=True):
+        '''
+        Creates a notification box based on the jQuery UI style
+
+        @param teaser_key: key to a dict which returns the teaser
+        @type teaser_key: string
+        @param message_key: key to a dict which returns the message to display in the box
+        @type message_key: string
+        @param bibrefs: bibrefs which are about to be assigned
+        @type bibrefs: list of strings
+        @param show_close_btn: display close button [x]
+        @type show_close_btn: boolean
+
+        @return: HTML code
+        @rtype: string
+        '''
+        notification_teaser_dict = {'info': 'Info!' }
+        notification_message_dict = {'attribute_papers': 'You are about to attribute the following paper%s:' }
+
+        teaser = self._(notification_teaser_dict[teaser_key])
+        arg = ''
+        if len(bibrefs) > 1:
+            arg = 's'
+        message = self._(notification_message_dict[message_key] % (arg) )
+
+        html = []
+        h = html.append
+
+        h('<div id="aid_notification_' + teaser_key + '" class="ui-widget ui-alert">')
         h('  <div style="margin-top: 20px; padding: 0pt 0.7em;" class="ui-state-highlight ui-corner-all">')
         h('    <p><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>')
         h('    <strong>%s</strong> %s' % (teaser, message))
+        h("<ul>")
+        for paper in bibrefs:
+            if ',' in paper:
+                pbibrec = paper.split(',')[1]
+            else:
+                pbibrec = paper
+            h("<li>%s</li>" % (format_record(int(pbibrec), "ha")))
+        h("</ul>")
 
         if show_close_btn:
             h('    <span style="float:right; margin-right: 0.3em;"><a rel="nofollow" href="#" class="aid_close-notify">X</a></span></p>')
@@ -101,24 +180,33 @@ class Template:
         return "\n".join(html)
 
 
-    def tmpl_error_box(self, message, teaser="Alert:", show_close_btn=True):
+    def tmpl_error_box(self, teaser_key, message_key, show_close_btn=True):
         '''
         Creates an error box based on the jQuery UI style
 
-        @param message: message to display in the box
-        @type message: string
-        @param teaser: Teaser text in bold next to icon
-        @type teaser: string
+        @param teaser_key: key to a dict which returns the teaser
+        @type teaser_key: string
+        @param message_key: key to a dict which returns the message to display in the box
+        @type message_key: string
         @param show_close_btn: display close button [x]
         @type show_close_btn: boolean
 
         @return: HTML code
         @rtype: string
         '''
+        error_teaser_dict = {'sorry': 'Sorry.',
+                             'error': 'Error:' }
+        error_message_dict = {'check_entries': 'Please check your entries.',
+                              'provide_transaction': 'Please provide at least one transaction.' }
+
+        teaser = self._(error_teaser_dict[teaser_key])
+        message = self._(error_message_dict[message_key])
+
         html = []
         h = html.append
-        h('<div id="aid_notification" class="ui-widget">')
-        h('  <div style="margin-top: 20px; padding: 0pt 0.7em;" class="ui-state-error ui-corner-all">')
+
+        h('<div id="aid_notification_' + teaser_key + '" class="ui-widget ui-alert">')
+        h('  <div style="background: #FC2626; margin-top: 20px; padding: 0pt 0.7em;" class="ui-state-error ui-corner-all">')
         h('    <p><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert"></span>')
         h('    <strong>%s</strong> %s' % (teaser, message))
 
@@ -131,26 +219,38 @@ class Template:
         return "\n".join(html)
 
 
-    def tmpl_ticket_box(self, teaser, message, show_close_btn=True):
+    def tmpl_ticket_box(self, teaser_key, message_key, trans_no, show_close_btn=True):
         '''
         Creates a semi-permanent box informing about ticket
         status notifications
 
-        @param message: message to display in the box
-        @type message: string
-        @param teaser: Teaser text in bold next to icon
-        @type teaser: strinfrom flask import sessiong
-        @param ticket: The ticket object from the session
-        @param ticket: list of dict
+        @param teaser_key: key to a dict which returns the teaser
+        @type teaser_key: string
+        @param message_key: key to a dict which returns the message to display in the box
+        @type message_key: string
+        @param trans_no: number of transactions in progress
+        @type trans_no: integer
         @param show_close_btn: display close button [x]
         @type show_close_btn: boolean
 
         @return: HTML code
         @rtype: string
         '''
+        ticket_teaser_dict = {'in_process': 'Claim in process!' }
+        ticket_message_dict = {'transaction': 'There %s %s transaction%s in progress.' }
+
+        teaser = self._(ticket_teaser_dict[teaser_key])
+
+        if trans_no == 1:
+            args = ['is', trans_no, '']
+        else:
+            args = ['are', trans_no, 's']
+
+        message = self._(ticket_message_dict[message_key] % tuple(args))
+
         html = []
         h = html.append
-        h('<div id="aid_notification" class="ui-widget">')
+        h('<div id="aid_notification_' + teaser_key + '" class="ui-widget ui-alert">')
         h('  <div style="margin-top: 20px; padding: 0pt 0.7em;" class="ui-state-highlight ui-corner-all">')
         h('    <p><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>')
         h('    <strong>%s</strong> %s ' % (teaser, message))
@@ -165,40 +265,48 @@ class Template:
 
         return "\n".join(html)
 
-    def tmpl_search_ticket_box(self, teaser, message, search_ticket, show_close_btn=False):
+    def tmpl_search_ticket_box(self, teaser_key, message_key, bibrefs, show_close_btn=False):
         '''
         Creates a box informing about a claim in progress for
         the search.
 
-        @param message: message to display in the box
-        @type message: string
-        @param teaser: Teaser text in bold next to icon
-        @type teaser: string
-        @param search_ticket: The search ticket object from the session
-        @param search_ticket: list of dict
+        @param teaser_key: key to a dict which returns the teaser
+        @type teaser_key: string
+        @param message_key: key to a dict which returns the message to display in the box
+        @type message_key: string
+        @param bibrefs: bibrefs which are about to be assigned
+        @type bibrefs: list of strings
         @param show_close_btn: display close button [x]
         @type show_close_btn: boolean
 
         @return: HTML code
         @rtype: string
         '''
+        error_teaser_dict = {'person_search': 'Person search for assignment in progress!' }
+        error_message_dict = {'assign_papers': 'You are searching for a person to assign the following paper%s:' }
+
+        teaser = self._(error_teaser_dict[teaser_key])
+        arg = ''
+        if len(bibrefs) > 1:
+            arg = 's'
+        message = self._(error_message_dict[message_key] % (arg) )
+
         html = []
         h = html.append
-        h('<div id="aid_notification" class="ui-widget">')
+        h('<div id="aid_notification_' + teaser_key + '" class="ui-widget ui-alert">')
         h('  <div style="margin-top: 20px; padding: 0pt 0.7em;" class="ui-state-highlight ui-corner-all">')
         h('    <p><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>')
         h('    <strong>%s</strong> %s ' % (teaser, message))
         h("<ul>")
-        for paper in search_ticket['bibrefs']:
+        for paper in bibrefs:
             if ',' in paper:
                 pbibrec = paper.split(',')[1]
             else:
                 pbibrec = paper
             h("<li>%s</li>"
-                   % (format_record(pbibrec, "ha")))
+                   % (format_record(int(pbibrec), "ha")))
         h("</ul>")
         h('<a rel="nofollow" id="checkout" href="action?cancel_search_ticket=True">' + self._('Quit searching.') + '</a>')
-#        h('DBGticket - ' + str(search_ticket))
 
         if show_close_btn:
             h('    <span style="float:right; margin-right: 0.3em;"><a rel="nofollow" href="#" class="aid_close-notify">X</a></span></p>')
@@ -314,8 +422,7 @@ class Template:
                                                                        'repeal_text':'Repeal this record assignment.',
                                                                        'to_other_text':'Assign to another person',
                                                                        'alt_to_other':'To other person!'
-                                                                       },
-                             show_reset_button=True):
+                                                                       } ):
         '''
         Generate play per-paper links for the table for the
         status "repealed"
@@ -329,13 +436,7 @@ class Template:
         '''
         stri = ('<!---2!--><span id="aid_status_details"> '
                 '<img src="%(url)s/img/aid_reject.png" alt="%(alt_repeal)s" />'
-                '%(repeal_text)s <br>')
-        if show_reset_button:
-            stri = stri + (
-                '<a rel="nofollow" id="aid_reset" class="aid_grey" href="%(url)s/person/action?reset=True&selection=%(ref)s&pid=%(pid)s">'
-                '<img src="%(url)s/img/aid_reset_gray.png" alt="%(alt_forget)s" style="margin-left: 22px;" />'
-                '%(forget_text)s</a><br>')
-        stri = stri + (
+                '%(repeal_text)s <br>'
                 '<a rel="nofollow" id="aid_confirm" class="aid_grey" href="%(url)s/person/action?confirm=True&selection=%(ref)s&pid=%(pid)s">'
                 '<img src="%(url)s/img/aid_check_gray.png" alt="%(alt_confirm)s" style="margin-left: 22px;" />'
                 '%(confirm_text)s</a><br>'
@@ -409,44 +510,29 @@ class Template:
         '''
         t_html = []
         h = t_html.append
-        h(self._('You are about to attribute the following paper'))
-        if len(bibrefs) > 1:
-            h('s: <br>')
-        else:
-            h(': <br>')
-        h("<ul>")
+
+        h(self.tmpl_notification_box('info', 'attribute_papers', bibrefs, show_close_btn=False))
+        h('<p> ' + self._('Your options') + ': </p>')
+
         bibs = ''
         for paper in bibrefs:
             if bibs:
                 bibs = bibs + '&'
             bibs = bibs + 'selection=' + str(paper)
-            if ',' in paper:
-                pbibrec = paper.split(',')[1]
-            else:
-                pbibrec = paper
-            h("<li>%s</li>"
-                       % (format_record(pbibrec, "ha")))
-            h("</ul>")
-
-        pp_html = []
-        h = pp_html.append
-        h(self.tmpl_notification_box("\n".join(t_html),
-                                     self._("Info"), False))
-        h('<p> Your options: </p>')
 
         if pid > -1:
-            h(('<a rel="nofollow" id="clam_for_myself" href="%s/person/action?confirm=True&%s&pid=%s"> Claim for yourself </a> <br>')
-              % (CFG_SITE_URL, bibs, str(pid)))
+            h('<a rel="nofollow" id="clam_for_myself" href="%s/person/action?confirm=True&%s&pid=%s"> ' % (CFG_SITE_URL, bibs, str(pid)) )
+            h(self._('Claim for yourself') + ' </a> <br>')
 
         if last_viewed_pid:
-            h(('<a rel="nofollow" id="clam_for_last_viewed" href="%s/person/action?confirm=True&%s&pid=%s"> Attribute to %s </a> <br>')
-              % (CFG_SITE_URL, bibs, str(last_viewed_pid[0]), last_viewed_pid[1]))
+            h('<a rel="nofollow" id="clam_for_last_viewed" href="%s/person/action?confirm=True&%s&pid=%s"> ' % (CFG_SITE_URL, bibs, str(last_viewed_pid[0])) )
+            h(self._('Attribute to') + ' %s </a> <br>' % (last_viewed_pid[1]) )
 
         if search_enabled:
-            h(('<a rel="nofollow" id="claim_search" href="%s/person/action?to_other_person=True&%s">' + self._(' Search for a person to attribute the paper to') + ' </a> <br>')
-                  % (CFG_SITE_URL, bibs))
+            h('<a rel="nofollow" id="claim_search" href="%s/person/action?to_other_person=True&%s"> ' % (CFG_SITE_URL, bibs))
+            h(self._('Search for a person to attribute the paper to') + ' </a> <br>')
 
-        return "\n".join(pp_html)
+        return "\n".join(t_html)
 
 
     def __tmpl_admin_records_table(self, form_id, person_id, bibrecids, verbiage_dict={'no_doc_string':'Sorry, there are currently no documents to be found in this category.',
@@ -491,7 +577,7 @@ class Template:
         @type buttons_verbiage_dict: dict
         '''
         no_papers_html = ['<div style="text-align:left;margin-top:1em;"><strong>']
-        no_papers_html.append('%s' % verbiage_dict['no_doc_string'])
+        no_papers_html.append('%s' % self._(verbiage_dict['no_doc_string']) )
         no_papers_html.append('</strong></div>')
 
         if not bibrecids or not person_id:
@@ -515,11 +601,11 @@ class Template:
         h(('<img src="%s/img/aid_90low_right.png" alt="∟" />')
           % (CFG_SITE_URL))
         h('<input type="hidden" name="pid" value="%s" />' % (person_id))
-        h('<input type="submit" name="confirm" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_confirm'])
-        h('<input type="submit" name="repeal" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_repeal'])
-        h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_to_others'])
-        if show_reset_button:
-            h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
+        h('<input type="submit" name="confirm" value="%s" class="aid_btn_blue" />' % self._(verbiage_dict['b_confirm']) )
+        h('<input type="submit" name="repeal" value="%s" class="aid_btn_blue" />' % self._(verbiage_dict['b_repeal']) )
+        h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % self._(verbiage_dict['b_to_others']) )
+        #if show_reset_button:
+        #    h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
         h("  </div>")
 
 
@@ -527,15 +613,15 @@ class Template:
         h("<thead>")
         h("  <tr>")
         h('    <th>&nbsp;</th>')
-        h('    <th>Paper Short Info</th>')
-        h("    <th>Author Name</th>")
-        h("    <th>Affiliation</th>")
-        h("    <th>Date</th>")
-        h("    <th>Experiment</th>")
-        h("    <th>Actions</th>")
-        h("  </tr>")
-        h("</thead>")
-        h("<tbody>")
+        h('    <th>' + self._('Paper Short Info') + '</th>')
+        h('    <th>' + self._('Author Name') + '</th>')
+        h('    <th>' + self._('Affiliation') + '</th>')
+        h('    <th>' + self._('Date') + '</th>')
+        h('    <th>' + self._('Experiment') + '</th>')
+        h('    <th>' + self._('Actions') + '</th>')
+        h('  </tr>')
+        h('</thead>')
+        h('<tbody>')
 
 
         for idx, paper in enumerate(bibrecids):
@@ -543,7 +629,7 @@ class Template:
 
             h('    <td><input type="checkbox" name="selection" '
                            'value="%s" /> </td>' % (paper['bibref']))
-            rec_info = format_record(paper['recid'], "ha")
+            rec_info = format_record(int(paper['recid']), "ha")
             rec_info = str(idx + 1) + '.  ' + rec_info
             h("    <td>%s</td>" % (rec_info))
             h("    <td>%s</td>" % (paper['authorname']))
@@ -552,7 +638,7 @@ class Template:
             if paper['authoraffiliation']:
                 aff = paper['authoraffiliation']
             else:
-                aff = "Not assigned"
+                aff = self._("Not assigned")
 
             h("    <td>%s</td>" % (aff))
 
@@ -576,8 +662,7 @@ class Template:
                                             show_reset_button=show_reset_button)
             elif paper['flag'] == -2:
                 paper_status = self.tmpl_author_repealed(paper['bibref'], person_id,
-                                            verbiage_dict=buttons_verbiage_dict['record_repealed'],
-                                            show_reset_button=show_reset_button)
+                                            verbiage_dict=buttons_verbiage_dict['record_repealed'])
             else:
                 paper_status = self.tmpl_author_undecided(paper['bibref'], person_id,
                                             verbiage_dict=buttons_verbiage_dict['record_undecided'],
@@ -613,8 +698,8 @@ class Template:
         h('<input type="submit" name="confirm" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_confirm'])
         h('<input type="submit" name="repeal" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_repeal'])
         h('<input type="submit" name="to_other_person" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_to_others'])
-        if show_reset_button:
-            h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
+        #if show_reset_button:
+        #    h('<input type="submit" name="reset" value="%s" class="aid_btn_blue" />' % verbiage_dict['b_forget'])
         h("  </div>")
         h("</form>")
         return "\n".join(pp_html)
@@ -644,20 +729,20 @@ class Template:
         h = pp_html.append
         h('<form id="review" action="/person/batchprocess" method="post">')
         h('<table  class="reviewstable" cellpadding="3" width="100%">')
-        h("  <thead>")
-        h("    <tr>")
+        h('  <thead>')
+        h('    <tr>')
         h('      <th>&nbsp;</th>')
-        h('      <th>Paper Short Info</th>')
-        h("      <th>Actions</th>")
-        h("    </tr>")
-        h("  </thead>")
-        h("  <tbody>")
+        h('      <th>' + self._('Paper Short Info') + '</th>')
+        h('      <th>' + self._('Actions') + '</th>')
+        h('    </tr>')
+        h('  </thead>')
+        h('  <tbody>')
 
         for paper in bibrecids:
             h('  <tr>')
             h('    <td><input type="checkbox" name="selected_bibrecs" '
                        'value="%s" /> </td>' % (paper))
-            rec_info = format_record(paper[0], "ha")
+            rec_info = format_record(int(paper[0]), "ha")
 
             if not admin:
                 rec_info = rec_info.replace("person/search?q=", "author/")
@@ -670,14 +755,14 @@ class Template:
         h("  </tbody>")
         h("</table>")
 
-        h('<div style="text-align:left;">' + self._(' On all pages: '))
+        h('<div style="text-align:left;"> ' + self._('On all pages') + ': ')
         h('<a rel="nofollow" rel="group_1" href="#select_all">' + self._('Select All') + '</a> | ')
         h('<a rel="nofollow" rel="group_1" href="#select_none">' + self._('Select None') + '</a> | ')
         h('<a rel="nofollow" rel="group_1" href="#invert_selection">' + self._('Invert Selection') + '</a>')
         h('</div>')
 
         h('<div style="vertical-align:middle;">')
-        h('∟ With selected do: ')
+        h('∟ ' + self._('With selected do') + ': ')
         h('<input type="hidden" name="pid" value="%s" />' % (person_id))
         h('<input type="hidden" name="mfind_bibref" value="claim" />')
         h('<input type="submit" name="submit" value="Review selected transactions" />')
@@ -706,7 +791,7 @@ class Template:
 
         #class="ui-tabs ui-widget ui-widget-content ui-corner-all">
         h('<div id="aid_person_names"')
-        h('<p><strong>' + self._('Names variants:') + '</strong></p>')
+        h('<p><strong>' + self._('Names variants') + ':</strong></p>')
         h("<p>")
         h('<!--<span class="aid_lowlight_text">Person ID: <span id="pid%s">%s</span></span><br />!-->'
                       % (person_id, person_id))
@@ -905,7 +990,8 @@ class Template:
                     try:
                         title = get_fieldvalues(int(bibrec), "245__a")[0]
                     except IndexError:
-                        title = "No title available"
+                        title = self._("No title available")
+                    title = escape_html(title)
 
                     if 'commit_entry' in ticket_links:
                         h('<a rel="nofollow" id="action" href="%(url)s/person/action?%(action)s=True&pid=%(pid)s&selection=%(bib)s&rt_id=%(rt)s">%(action)s - %(name)s on %(title)s </a>'
@@ -934,8 +1020,9 @@ class Template:
             canonical_name = str(get_canonical_id_from_person_id(person_id))
             if '.' in str(canonical_name) and not isinstance(canonical_name, int):
                 canonical_name = canonical_name[0:canonical_name.rindex('.')]
-            h('<div><div> <strong> Canonical name setup </strong>')
-            h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action">' % (canonical_name, CFG_SITE_URL))
+            h('<div><div> <strong> Person id </strong> <br> %s <br>' % person_id)
+            h('<strong> <br> Canonical name setup </strong>')
+            h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action" rel="nofollow">' % (canonical_name, CFG_SITE_URL))
             h('<input type="hidden" name="set_canonical_name" value="True" />')
             h('<input name="canonical_name" id="canonical_name" type="text" style="border:1px solid #333; width:500px;" value="%s" /> ' % canonical_name)
             h('<input type="hidden" name="pid" value="%s" />' % person_id)
@@ -952,19 +1039,55 @@ class Template:
                 h('UserID: INSPIRE user %s is associated with this profile with email: %s' % (str(userid), str(email)))
             else:
                 h('UserID: There is no INSPIRE user associated to this profile!')
-            h('<br></div><br>')
+            h('<br></div>')
 
             external_ids = get_personiID_external_ids(person_id)
-            h('<div>')
-            h('<strong> External IDs </strong><br>')
-            for idx in external_ids:
-                for k in external_ids[id]:
-                    h('  %s : %s <br>' % (idx, k))
-            h('</div>')
+            h('<div> <br>')
+            h('<strong> External IDs </strong> <br>')
 
-            h("  </div>")
+            h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
+            h('<input type="hidden" name="add_missing_external_ids" value="True">')
+            h('<input type="hidden" name="pid" value="%s">' % person_id)
+            h('<br> <input type="submit" value="add missing ids" class="aid_btn_blue"> </form>')
 
-        h("</div>")
+            h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
+            h('<input type="hidden" name="rewrite_all_external_ids" value="True">')
+            h('<input type="hidden" name="pid" value="%s">' % person_id)
+            h('<br> <input type="submit" value="rewrite all ids" class="aid_btn_blue"> </form> <br>')
+
+            if external_ids:
+                h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
+                h('   <input type="hidden" name="delete_external_ids" value="True">')
+                h('   <input type="hidden" name="pid" value="%s">' % person_id)
+                for idx in external_ids:
+                    try:
+                        sys = [s for s in EXTERNAL_SYSTEMS_LIST if EXTERNAL_SYSTEMS_LIST[s] == idx][0]
+                    except (IndexError):
+                        sys = ''
+                    for k in external_ids[idx]:
+                        h('<br> <input type="checkbox" name="existing_ext_ids" value="%s||%s"> <strong> %s: </strong> %s' % (idx, k, sys, k))
+                h('        <br> <br> <input type="submit" value="delete selected ids" class="aid_btn_blue"> <br> </form>')
+            else:
+                h('UserID: There are no external users associated to this profile!')
+
+
+
+            h('<br> <br>')
+            h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
+            h('   <input type="hidden" name="add_external_id" value="True">')
+            h('   <input type="hidden" name="pid" value="%s">' % person_id)
+            h('   <select name="ext_system">')
+            h('      <option value="" selected>-- ' + self._('Choose system') + ' --</option>')
+            for el in EXTERNAL_SYSTEMS_LIST:
+                h('  <option value="%s"> %s </option>' % (EXTERNAL_SYSTEMS_LIST[el], el))
+            h('   </select>')
+            h('   <input type="text" name="ext_id" id="ext_id" style="border:1px solid #333; width:350px;">')
+            h('   <input type="submit" value="add external id" class="aid_btn_blue">')
+            # h('<br>NOTE: please note that if you add an external id it will replace the previous one (if any).')
+            h('<br> </form> </div>')
+
+            h('</div> </div>')
+        h('</div>')
 
         return "\n".join(html)
 
@@ -992,7 +1115,13 @@ class Template:
             if not "bibrecs" in bibrefs_to_confirm[person]:
                 continue
 
-            h((self._("Select name for") + " %s") % bibrefs_to_confirm[person]["person_name"])
+            person_name = bibrefs_to_confirm[person]["person_name"]
+            if person_name.isspace():
+                h((self._('Claim for person with id') + ': %s. ') % person)
+                h(self._('This seems to be an empty profile without names associated to it yet'))
+                h(self._('(the names will be automatically gathered when the first paper is claimed to this profile).'))
+            else:
+                h((self._("Select name for") + " %s") % (person_name))
             pid = person
 
             for recid in bibrefs_to_confirm[person]["bibrecs"]:
@@ -1002,6 +1131,7 @@ class Template:
                     fv = get_fieldvalues(int(recid), "245__a")[0]
                 except (ValueError, IndexError, TypeError):
                     fv = self._('Error retrieving record title')
+                fv = escape_html(fv)
 
                 h(self._("Paper title: ") + fv)
                 h('<select name="bibrecgroup%s">' % (recid))
@@ -1028,10 +1158,10 @@ class Template:
                         fv = get_fieldvalues(int(recid), "245__a")[0]
                     except (ValueError, IndexError, TypeError):
                         fv = self._('Error retrieving record title')
+                    fv = escape_html(fv)
 
                     h('<div id="aid_moreinfo">')
-                    h(('%s' + self._(' --  With name: '))
-                      % (fv))
+                    h(('%s' + self._(' --  With name: ')) % (fv) )
                     #, bibrefs_auto_assigned[person]["bibrecs"][recid][0][1]))
                     # asbibref = "%s||%s" % (person, bibrefs_auto_assigned[person]["bibrecs"][recid][0][0])
                     pbibref = bibrefs_auto_assigned[person]["bibrecs"][recid][0][0]
@@ -1172,6 +1302,7 @@ class Template:
                 rectitle = get_fieldvalues(int(recid), "245__a")[0]
             except (ValueError, IndexError, TypeError):
                 rectitle = self._('Error retrieving record title')
+            rectitle = escape_html(rectitle)
 
             if "authorname_rec" in ticket:
                 recauthor = ticket['authorname_rec']
@@ -1224,12 +1355,12 @@ class Template:
 #        h(html_icon_legend())
 
         if "checkout_faulty_fields" in pinfo and pinfo["checkout_faulty_fields"]:
-            h(self.tmpl_error_box(self._("Please Check your entries"), self._("Sorry.")))
+            h(self.tmpl_error_box('sorry', 'check_entries'))
 
         if ("checkout_faulty_fields" in pinfo
             and pinfo["checkout_faulty_fields"]
             and "tickets" in pinfo["checkout_faulty_fields"]):
-            h(self.tmpl_error_box(self._("Please provide at least one transaction."), self._("Error:")))
+            h(self.tmpl_error_box('error', 'provide_transaction'))
 
 #        h('<div id="aid_checkout_teaser">' +
 #          self._('Almost done! Please use the button "Confirm these changes" '
@@ -1448,12 +1579,10 @@ class Template:
                                  "<a rel='nofollow' href=\"mailto:%s\">%s</a>.</strong>") % (query, authemail, authemail))
             h('</div>')
             if new_person_link:
+                link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
                 if search_ticket:
-                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
                     for r in search_ticket['bibrefs']:
                         link = link + '&selection=%s' % str(r)
-                else:
-                    link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
                 h('<div>')
                 h('<a rel="nofollow" href="%s">' % (link))
                 h(self._("Create a new Person for your search"))
@@ -1544,7 +1673,7 @@ class Template:
 
                 for paper in papers:
                     h("<li>%s</li>"
-                           % (format_record(paper[0], "ha")))
+                           % (format_record(int(paper[0]), "ha")))
 
                 h("</ul>")
             elif not papers:
@@ -1562,12 +1691,10 @@ class Template:
             h('</div>')
 
         if new_person_link:
+            link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
             if search_ticket:
-                link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
                 for r in search_ticket['bibrefs']:
                     link = link + '&selection=%s' % str(r)
-            else:
-                link = "%s/person/action?confirm=True&pid=%s" % (CFG_SITE_URL, '-3')
             h('<div>')
             h('<a rel="nofollow" href="%s">' % (link))
             h(self._("Create a new Person for your search"))
@@ -1809,4 +1936,3 @@ class Template:
         return "\n".join(html)
 
 # pylint: enable=C0301
-

@@ -23,8 +23,40 @@ bibauthorid_general_utils
 
 import bibauthorid_config as bconfig
 from datetime import datetime
+import sys
+
 PRINT_TS = bconfig.DEBUG_TIMESTAMPS
 PRINT_TS_US = bconfig.DEBUG_TIMESTAMPS_UPDATE_STATUS and PRINT_TS
+NEWLINE = bconfig.DEBUG_UPDATE_STATUS_THREAD_SAFE
+
+FO = bconfig.DEBUG_LOG_TO_PIDFILE
+
+TERMINATOR = '\r'
+if NEWLINE or FO:
+    TERMINATOR = '\n'
+
+import os
+PID = os.getpid
+
+pidfiles = dict()
+
+
+def override_stdout_config(fileout=False, stdout=True):
+    global FO
+    assert fileout^stdout
+    if fileout:
+        FO = True
+    if stdout:
+        FO = False
+
+def set_stdout():
+    if FO:
+        try:
+            sys.stdout = pidfiles[PID()]
+        except KeyError:
+            pidfiles[PID()]  =    open('/tmp/bibauthorid_log_pid_'+str(PID()),'w')
+            sys.stdout = pidfiles[PID()]
+            print 'REDIRECTING TO PIDFILE '
 
 
 #python2.4 compatibility layer.
@@ -52,11 +84,13 @@ bai_all = all
 
 
 def __print_func(*args):
+    set_stdout()
     if PRINT_TS:
         print datetime.now(),
     for arg in args:
         print arg,
     print ""
+    sys.stdout.flush()
 
 def __dummy_print(*args):
     pass
@@ -74,25 +108,28 @@ wedge_print = __create_conditional_print(bconfig.DEBUG_WEDGE_OUTPUT)
 
 
 if bconfig.DEBUG_OUTPUT:
-    import sys
 
-    status_len = 68
+    status_len = 20
     comment_len = 40
 
     def padd(stry, l):
         return stry[:l].ljust(l)
 
     def update_status(percent, comment="", print_ts=False):
-        filled = int(percent * 50)
-        bar = "[%s%s] " % ("#" * filled, "-" * (50 - filled))
-        percent = ("%.2f%% done" % (percent * 100)).rjust(12)
+        set_stdout()
+        filled = int(percent * status_len-2)
+        bar = "[%s%s] " % ("#" * filled, "-" * (status_len-2 - filled))
+        percent = ("%.2f%% done" % (percent * 100))
         progress = padd(bar + percent, status_len)
         comment = padd(comment, comment_len)
         if print_ts or PRINT_TS_US:
             print  datetime.now(),
-        print progress, comment, '\r',
+        print 'pid:',PID(),
+        print progress, comment, TERMINATOR,
+        sys.stdout.flush()
 
     def update_status_final(comment=""):
+        set_stdout()
         update_status(1., comment, print_ts=PRINT_TS)
         print ""
         sys.stdout.flush()

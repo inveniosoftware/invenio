@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,15 +27,35 @@ from bibauthorid_general_utils import update_status \
                                     , wedge_print
 from bibauthorid_prob_matrix import ProbabilityMatrix
 import numpy
+#mport cPickle as SER
+import msgpack as SER
 
 import gc
 
-eps = 0.001
+SP_NUMBERS = Bib_matrix.special_numbers
+SP_SYMBOLS = Bib_matrix.special_symbols
+SP_CONFIRM = Bib_matrix.special_symbols['+']
+SP_QUARREL = Bib_matrix.special_symbols['-']
 
-# The lower bound of the edges being processed by the wedge algorithm.
-edge_cut_prob = bconfig.WEDGE_THRESHOLD / 2
+eps = 0.01
+edge_cut_prob = ''
+wedge_thrsh = ''
 
-def wedge(cluster_set):
+import os
+PID = lambda : str(os.getpid())
+
+def wedge(cluster_set, report_cluster_status=False, force_wedge_thrsh=False):
+    # The lower bound of the edges being processed by the wedge algorithm.
+    global edge_cut_prob
+    global wedge_thrsh
+
+    if not force_wedge_thrsh:
+        edge_cut_prob = bconfig.WEDGE_THRESHOLD / 3.
+        wedge_thrsh = bconfig.WEDGE_THRESHOLD
+    else:
+        edge_cut_prob = force_wedge_thrsh / 3.
+        wedge_thrsh = force_wedge_thrsh
+
     matr = ProbabilityMatrix()
     matr.load(cluster_set.last_name)
 
@@ -44,12 +64,97 @@ def wedge(cluster_set):
 
     do_wedge(cluster_set)
 
+    report = []
+    if bconfig.DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES or report_cluster_status:
+        msg = []
+        for cl1 in cluster_set.clusters:
+            for cl2 in cluster_set.clusters:
+                if cl2 > cl1:
+                    id1 = cluster_set.clusters.index(cl1)
+                    id2 = cluster_set.clusters.index(cl2)
+                    c12 = _compare_to(cl1,cl2)
+                    c21 = _compare_to(cl2,cl1)
+                    report.append((id1,id2,c12+c21))
+                    msg.append( ' %s vs %s : %s + %s = %s -- %s' %  (id1, id2, c12, c21, c12+c21, cl1.hates(cl2)))
+        msg = 'Wedge final clusters for %s: \n' % str(wedge_thrsh) + '\n'.join(msg)
+        if not bconfig.DEBUG_WEDGE_OUTPUT and bconfig.DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES:
+            print
+            print msg
+            print
+        wedge_print(msg)
+
+
     restore_cluster_set(cluster_set)
 
     if bconfig.DEBUG_CHECKS:
         assert cluster_set._debug_test_hate_relation()
         assert cluster_set._debug_duplicated_recs()
 
+    if report_cluster_status:
+        destfile = '/tmp/baistats/cluster_status_report_pid_%s_lastname_%s_thrsh_%s' % (str(PID()),str(cluster_set.last_name),str(wedge_thrsh))
+        f = open(destfile, 'w')
+        SER.dump([wedge_thrsh,cluster_set.last_name,report,cluster_set.num_all_bibs],f)
+        f.close()
+    gc.collect()
+
+def _decide(cl1, cl2):
+    score1 = _compare_to(cl1, cl2)
+    score2 = _compare_to(cl2, cl1)
+    s = score1 + score2
+    wedge_print("Wedge: _decide (%f+%f) = %f cmp to %f" % (score1,score2,s,wedge_thrsh))
+    return s > wedge_thrsh, s
+
+def _compare_to(cl1, cl2):
+    pointers = [cl1.out_edges[v] for v in cl2.bibs]
+
+    assert pointers, PID()+"Wedge: no edges between clusters!"
+    vals, probs = zip(*pointers)
+
+    wedge_print("Wedge: _compare_to: vals = %s, probs = %s" % (str(vals), str(probs)))
+
+    if SP_QUARREL in vals:
+        ret = 0.
+        wedge_print('Wedge: _compare_to: - edge present, returning 0')
+
+    elif SP_CONFIRM in vals:
+        ret = 0.5
+        wedge_print('Wedge: _compare_to: + edge present, returning 0.5')
+
+    else:
+
+        avg = sum(vals) / len(vals)
+        if avg > eps:
+            nvals = [(val / avg) ** prob for val, prob in pointers]
+        else:
+            wedge_print("Wedge: _compare_to: vals too low to compare, skipping")
+            return 0
+
+        coeff = _gini(nvals)
+
+        weight = sum(starmap(mul, pointers)) / sum(probs)
+
+        ret = (coeff * weight) / 2.
+
+        assert ret <= 0.5, PID()+'COMPARE_TO big value returned ret %s coeff %s weight %s nvals %s vals %s prob %s' % (ret, coeff, weight, nvals, vals, probs)
+
+        wedge_print("Wedge: _compare_to: coeff = %f, weight = %f, retval = %f" % (coeff, weight, ret))
+
+    return ret
+
+def _gini(arr):
+    arr = sorted(arr, reverse=True)
+    dividend = sum(starmap(mul, izip(arr, xrange(1, 2 * len(arr), 2))))
+    divisor = len(arr) * sum(arr)
+    return float(dividend) / divisor
+
+def _compare_to_final_bounds(score1, score2):
+    return score1 + score2 > bconfig.WEDGE_THRESHOLD
+
+def _edge_sorting(edge):
+    '''
+    probability + certainty / 10
+    '''
+    return edge[2][0] + edge[2][1] / 10.
 
 def do_wedge(cluster_set, deep_debug=False):
     '''
@@ -58,54 +163,14 @@ def do_wedge(cluster_set, deep_debug=False):
     than 20 bibs in the cluster set.
     '''
 
-    def decide(cl1, cl2):
-        score1 = compare_to(cl1, cl2)
-        score2 = compare_to(cl2, cl1)
-
-        return compare_to_final_bounds(score1, score2)
-
-    def compare_to(cl1, cl2):
-        pointers = [cl1.out_edges[v] for v in cl2.bibs]
-
-        assert pointers, "Wedge: no edges between clusters!"
-        vals, probs = zip(*pointers)
-
-        avg = sum(vals) / len(vals)
-        if avg > eps:
-            nvals = ((val / avg) ** prob for val, prob in pointers)
-        else:
-            return 0
-
-        coeff = gini(nvals)
-
-        weight = sum(starmap(mul, pointers)) / sum(probs)
-
-        wedge_print("Wedge: Decide: vals = %s, probs = %s" % (str(vals), str(probs)))
-        wedge_print("Wedge: Decide: coeff = %f, weight = %f" % (coeff, weight))
-
-        return coeff * weight
-
-    def gini(arr):
-        arr = sorted(arr, reverse=True)
-        dividend = sum(starmap(mul, izip(arr, xrange(1, 2 * len(arr), 2))))
-        divisor = len(arr) * sum(arr)
-        return float(dividend) / divisor
-
-    def compare_to_final_bounds(score1, score2):
-        return score1 + score2 > bconfig.WEDGE_THRESHOLD
-
-    def edge_sorting(edge):
-        '''
-        probability + certainty / 10
-        '''
-        return edge[2][0] + edge[2][1] / 10.
-
     bib_map = create_bib_2_cluster_dict(cluster_set)
 
     plus_edges, minus_edges, edges = group_edges(cluster_set)
 
+    interval = 1000
     for i, (bib1, bib2) in enumerate(plus_edges):
-        update_status(float(i) / len(plus_edges), "Agglomerating obvious clusters...")
+        if (i % interval) == 0:
+            update_status(float(i) / len(plus_edges), "Agglomerating obvious clusters...")
         cl1 = bib_map[bib1]
         cl2 = bib_map[bib2]
         if cl1 != cl2 and not cl1.hates(cl2):
@@ -115,8 +180,10 @@ def do_wedge(cluster_set, deep_debug=False):
                 bib_map[v] = cl1
     update_status_final("Agglomerating obvious clusters done.")
 
+    interval = 1000
     for i, (bib1, bib2) in enumerate(minus_edges):
-        update_status(float(i) / len(minus_edges), "Dividing obvious clusters...")
+        if (i % interval) == 0:
+            update_status(float(i) / len(minus_edges), "Dividing obvious clusters...")
         cl1 = bib_map[bib1]
         cl2 = bib_map[bib2]
         if cl1 != cl2 and not cl1.hates(cl2):
@@ -124,35 +191,45 @@ def do_wedge(cluster_set, deep_debug=False):
     update_status_final("Dividing obvious clusters done.")
 
     bibauthor_print("Sorting the value edges.")
-    edges = sorted(edges, key=edge_sorting, reverse=True)
+    edges = sorted(edges, key=_edge_sorting, reverse=True)
 
-    interval = 1000
+    interval = 500000
     wedge_print("Wedge: New wedge, %d edges." % len(edges))
     for current, (v1, v2, unused) in enumerate(edges):
         if (current % interval) == 0:
             update_status(float(current) / len(edges), "Wedge...")
 
-        assert unused != '+' and unused != '-', "Signed edge after filter!"
-        wedge_print("Wedge: poped new edge: Verts = %s, %s Value = (%f, %f)" % (v1, v2, unused[0], unused[1]))
+        assert unused != '+' and unused != '-', PID()+"Signed edge after filter!"
         cl1 = bib_map[v1]
         cl2 = bib_map[v2]
+        idcl1 = cluster_set.clusters.index(cl1)
+        idcl2 = cluster_set.clusters.index(cl2)
+
+        #keep the ids low!
+        if idcl1 > idcl2:
+            idcl1, idcl2 = idcl2, idcl1
+            cl1, cl2 = cl2, cl1
+
+        wedge_print("Wedge: popped new edge: Verts = (%s,%s) from (%s, %s) Value = (%f, %f)" % (idcl1, idcl2, v1, v2, unused[0], unused[1]))
+
         if cl1 != cl2 and not cl1.hates(cl2):
             if deep_debug:
                 export_to_dot(cluster_set, "/tmp/%s%d.dot" % (cluster_set.last_name, current), bib_map, (v1, v2, unused))
 
-            if decide(cl1, cl2):
-                wedge_print("Wedge: Joined!")
+            decision, value = _decide(cl1, cl2)
+            if decision:
+                wedge_print("Wedge: Joined %s to %s with %s"% (idcl1, idcl2, value))
                 join(cl1, cl2)
                 cluster_set.clusters.remove(cl2)
                 for v in cl2.bibs:
                     bib_map[v] = cl1
             else:
-                wedge_print("Wedge: Quarreled!")
+                wedge_print("Wedge: Quarreled %s from %s with %s " %  (idcl1, idcl2, value))
                 cl1.quarrel(cl2)
         elif cl1 == cl2:
-            wedge_print("Wedge: Clusters already joined!")
+            wedge_print("Wedge: Clusters already joined! (%s,%s)" % (idcl1, idcl2))
         else:
-            wedge_print("Wedge: Clusters hate each other!")
+            wedge_print("Wedge: Clusters hate each other! (%s,%s)" % (idcl1, idcl2))
 
     update_status_final("Wedge done.")
     bibauthor_print("")
@@ -168,10 +245,11 @@ def meld_edges(p1, p2):
     '''
     out_edges1, verts1 = p1
     out_edges2, verts2 = p2
+    assert verts1 > 0 and verts2 > 0, PID()+'MELD_EDGES: verts problem %s %s ' % (str(verts1), str(verts2))
     vsum = verts1 + verts2
     invsum = 1. / vsum
 
-    #special_numbers = Bib_matrix.special_numbers #local reference optimization
+    special_numbers = Bib_matrix.special_numbers #local reference optimization
 
     def median(e1, e2):
 
@@ -179,8 +257,10 @@ def meld_edges(p1, p2):
     # if e1[0] in special_numbers: return e1
     # if e2[0] in special_numbers: return e2
         if e1[0] < 0:
+            assert e1[0] in special_numbers, "MELD_EDGES: wrong value for median? %s" % str(e1)
             return e1
         if e2[0] < 0:
+            assert e2[0] in special_numbers, "MELD_EDGES: wrong value for median? %s" % str(e2)
             return e2
 
         i1 = e1[1] * verts1
@@ -195,8 +275,10 @@ def meld_edges(p1, p2):
     result = numpy.ndarray(shape=(size, 2), dtype=float, order='C')
     for i in xrange(size):
         result[i] = median(out_edges1[i], out_edges2[i])
+        assert (result[i][0] >= 0 and result[i][0] <= 1) or result[i][0] in Bib_matrix.special_numbers, PID()+'MELD_EDGES: value %s' % result[i]
+        assert (result[i][1] >= 0 and result[i][1] <= 1) or result[i][1] in Bib_matrix.special_numbers, PID()+'MELD_EDGES: compat %s' % result[i]
 
-    return (result, verts1 + verts2)
+    return (result, vsum)
 
 def convert_cluster_set(cs, prob_matr):
     '''
@@ -218,8 +300,8 @@ def convert_cluster_set(cs, prob_matr):
         end = len(result_mapping)
         clus.bibs = range(start, end)
 
-    assert len(result_mapping) == len(set(result_mapping)), "Cluster set conversion failed"
-    assert len(result_mapping) == cs.num_all_bibs, "Cluster set conversion failed"
+    assert len(result_mapping) == len(set(result_mapping)), PID()+"Cluster set conversion failed"
+    assert len(result_mapping) == cs.num_all_bibs, PID()+"Cluster set conversion failed"
 
     cs.new2old = result_mapping
 
@@ -229,10 +311,12 @@ def convert_cluster_set(cs, prob_matr):
 
     special_symbols = Bib_matrix.special_symbols #locality optimization
 
+    interval = 10000
     for current, c1 in enumerate(cs.clusters):
-        update_status(float(current) / len(cs.clusters), "Converting the cluster set...")
+        if (current % interval) == 0:
+            update_status(float(current) / len(cs.clusters), "Converting the cluster set...")
 
-        assert len(c1.bibs) > 0, "Empty cluster send to wedge"
+        assert len(c1.bibs) > 0, PID()+"Empty cluster send to wedge"
         pointers = []
 
         for v1 in c1.bibs:
@@ -279,8 +363,10 @@ def group_edges(cs):
     minus = []
     pairs = []
     gc.disable()
+    interval = 1000
     for current, cl1 in enumerate(cs.clusters):
-        update_status(float(current) / len(cs.clusters), "Grouping all edges...")
+        if (current % interval) == 0:
+            update_status(float(current) / len(cs.clusters), "Grouping all edges...")
 
         bib1 = tuple(cl1.bibs)[0]
         pointers = cl1.out_edges
@@ -312,8 +398,8 @@ def join(cl1, cl2):
                                (cl2.out_edges, len(cl2.bibs)))[0]
     cl1.bibs += cl2.bibs
 
-    assert not cl1.hates(cl1), "Joining hateful clusters"
-    assert not cl2.hates(cl2), "Joining hateful clusters"
+    assert not cl1.hates(cl1), PID()+"Joining hateful clusters"
+    assert not cl2.hates(cl2), PID()+"Joining hateful clusters2"
 
     cl1.hate |= cl2.hate
     for cl in cl2.hate:

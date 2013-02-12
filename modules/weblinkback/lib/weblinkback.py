@@ -31,7 +31,8 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, \
                                        CFG_WEBLINKBACK_TRACKBACK_SUBSCRIPTION_ERROR_MESSAGE, \
                                        CFG_WEBLINKBACK_PAGE_TITLE_STATUS, \
                                        CFG_WEBLINKBACK_BROKEN_COUNT, \
-                                       CFG_WEBLINKBACK_LATEST_FACTOR
+                                       CFG_WEBLINKBACK_LATEST_FACTOR, \
+                                       CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL
 from invenio.weblinkback_dblayer import create_linkback, \
                                         get_url_list, \
                                         get_all_linkbacks, \
@@ -159,11 +160,17 @@ def send_pending_linkbacks_notification(linkback_type):
     pending_linkbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
 
     if pending_linkbacks:
-        content = """There are %(count)s new %(linkback_type)s requests which you should approve or reject:
-                  """ % {'count': len(pending_linkbacks),
-                         'linkback_type': linkback_type}
+        pending_count = len(pending_linkbacks)
+        cutoff_text = ''
+        if pending_count > CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL:
+            cutoff_text = ' (Printing only the first %s requests)' % CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL
 
-        for pending_linkback in pending_linkbacks:
+        content = """There are %(count)s new %(linkback_type)s requests which you should approve or reject%(cutoff)s:
+                  """ % {'count': pending_count,
+                         'linkback_type': linkback_type,
+                         'cutoff': cutoff_text}
+
+        for pending_linkback in pending_linkbacks[0:CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL]:
             content += """
                        For %(recordURL)s from %(origin_url)s.
                        """ % {'recordURL': generate_redirect_url(pending_linkback[2]),

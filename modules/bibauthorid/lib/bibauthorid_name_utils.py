@@ -27,6 +27,7 @@ import invenio.bibauthorid_config as bconfig
 from invenio.bibauthorid_string_utils import string_partition
 from copy import deepcopy
 
+from invenio.textutils import translate_to_ascii
 
 from invenio.bibauthorid_general_utils import name_comparison_print
 
@@ -119,15 +120,18 @@ def split_name_parts(name_string, delete_name_additions=True,
         if name_string.count(sep) >= 1:
             found_sep = sep
             surname, rest_of_name = string_partition(name_string, sep)[0::2]
-            surname = surname.strip().capitalize()
+            surname = surname.strip().title()
             break
 
     if not found_sep:
         if name_string.count(" ") > 0:
             rest_of_name, surname = string_partition(name_string, ' ', direc='r')[0::2]
-            surname = surname.strip().capitalize()
+            surname = surname.strip().title()
         else:
-            return [name_string.strip().capitalize(), [], [], []]
+            if not return_all_lower:
+                return [name_string.strip().capitalize(), [], [], []]
+            else:
+                return [name_string.strip().lower(), [], [], []]
 
     if rest_of_name.count(","):
         rest_of_name = string_partition(rest_of_name, ",")[0]
@@ -250,7 +254,9 @@ def clean_name_string(namestring, replacement=" ", keep_whitespace=True,
     whitespace_removal = re.compile("[\s]{2,100}")
     tmp = artifact_removal_re.sub(replacement, namestring)
 
-    return whitespace_removal.sub(" ", tmp).strip()
+    tmp = whitespace_removal.sub(" ", tmp).strip()
+
+    return tmp
 
 
 def soft_compare_names(origin_name, target_name):
@@ -273,6 +279,10 @@ def soft_compare_names(origin_name, target_name):
     score = 0.0
     oname = deepcopy(origin_name)
     tname = deepcopy(target_name)
+
+    oname = translate_to_ascii(oname)[0]
+    tname = translate_to_ascii(tname)[0]
+
     orig_name = split_name_parts(oname.lower())
     targ_name = split_name_parts(tname.lower())
     orig_name[0] = clean_name_string(orig_name[0],
@@ -590,6 +600,10 @@ def compare_names(origin_name, target_name, initials_penalty=False):
     name_comparison_print("\nComparing: " , origin_name, ' ', target_name)
     gendernames = GLOBAL_gendernames
     name_variations = GLOBAL_name_variations
+
+    origin_name = translate_to_ascii(origin_name)[0]
+    target_name = translate_to_ascii(target_name)[0]
+
     no = split_name_parts(origin_name, True, "", True)
     nt = split_name_parts(target_name, True, "", True)
 
@@ -657,8 +671,8 @@ def compare_names(origin_name, target_name, initials_penalty=False):
         initials_screwup = 0
         initials_distance = 0
 
-    score = score - (0.75 * initials_screwup + 0.10 * (1 - initials_c)\
-            + 0.15 * initials_distance) * (score)
+    score = min((score - (0.75 * initials_screwup + 0.10 * (1 - initials_c)\
+            + 0.15 * initials_distance) * (score)), 0.0)
     name_comparison_print("|- initials sets: ", no[1], " ", nt[1])
     name_comparison_print("|- initials distance: ", initials_distance)
     name_comparison_print("|- initials c: ", initials_c)
@@ -693,7 +707,7 @@ def compare_names(origin_name, target_name, initials_penalty=False):
         max_names_screwup = 0
         avg_names_screwup = 0
 
-    score = score - score * 0.75 * max_names_screwup - score * 0.25 * avg_names_screwup
+    score = min(score - score * ( 0.75 * max_names_screwup + 0.25 * avg_names_screwup), 0.0)
     name_comparison_print("|- max names screwup: ", max_names_screwup)
     name_comparison_print("|- avg screwup: ", avg_names_screwup)
     name_comparison_print("||- names score: ", score)
