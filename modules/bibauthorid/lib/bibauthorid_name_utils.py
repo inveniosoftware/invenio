@@ -128,7 +128,10 @@ def split_name_parts(name_string, delete_name_additions=True,
             rest_of_name, surname = string_partition(name_string, ' ', direc='r')[0::2]
             surname = surname.strip().title()
         else:
-            return [name_string.strip().capitalize(), [], [], []]
+            if not return_all_lower:
+                return [name_string.strip().capitalize(), [], [], []]
+            else:
+                return [name_string.strip().lower(), [], [], []]
 
     if rest_of_name.count(","):
         rest_of_name = string_partition(rest_of_name, ",")[0]
@@ -668,8 +671,8 @@ def compare_names(origin_name, target_name, initials_penalty=False):
         initials_screwup = 0
         initials_distance = 0
 
-    score = score - (0.75 * initials_screwup + 0.10 * (1 - initials_c)\
-            + 0.15 * initials_distance) * (score)
+    score = min((score - (0.75 * initials_screwup + 0.10 * (1 - initials_c)\
+            + 0.15 * initials_distance) * (score)), 0.0)
     name_comparison_print("|- initials sets: ", no[1], " ", nt[1])
     name_comparison_print("|- initials distance: ", initials_distance)
     name_comparison_print("|- initials c: ", initials_c)
@@ -704,7 +707,7 @@ def compare_names(origin_name, target_name, initials_penalty=False):
         max_names_screwup = 0
         avg_names_screwup = 0
 
-    score = score - score * 0.75 * max_names_screwup - score * 0.25 * avg_names_screwup
+    score = min(score - score * ( 0.75 * max_names_screwup + 0.25 * avg_names_screwup), 0.0)
     name_comparison_print("|- max names screwup: ", max_names_screwup)
     name_comparison_print("|- avg screwup: ", avg_names_screwup)
     name_comparison_print("||- names score: ", score)

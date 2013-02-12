@@ -158,12 +158,15 @@ DEBUG_TIMESTAMPS = True
 # Print timestamps even in update_status
 DEBUG_TIMESTAMPS_UPDATE_STATUS = True
 
+DEBUG_UPDATE_STATUS_THREAD_SAFE = True
+DEBUG_LOG_TO_PIDFILE = True
+
 # The following options trigger the output for parts of
 # bibauthorid which normally generate too much output
 DEBUG_NAME_COMPARISON_OUTPUT = False
 DEBUG_METADATA_COMPARISON_OUTPUT = False
 DEBUG_WEDGE_OUTPUT = False
-DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES = True
+DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES = False
 DEBUG_PROCESS_PEAK_MEMORY = True
 
 # Keep in mind that you might use an assert instead of this option.

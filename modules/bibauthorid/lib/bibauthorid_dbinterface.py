@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -87,7 +87,7 @@ def get_sql_time():
     return run_sql("select now()")[0][0]
 
 
-def set_personid_row(person_id, tag, value, opt1=0, opt2=0, opt3=""):
+def set_personid_row(person_id, tag, value, opt1=None, opt2=None, opt3=None):
     '''
     Inserts data and additional info into aidPERSONIDDATA
     @param person_id:
@@ -97,13 +97,12 @@ def set_personid_row(person_id, tag, value, opt1=0, opt2=0, opt3=""):
     @param value:
     @type value: string
     @param opt1:
-    @type opt1:
+    @type opt1: int
     @param opt2:
-    @type opt2:
+    @type opt2: int
     @param opt3:
-    @type opt3:
+    @type opt3: string
     '''
-
     run_sql("INSERT INTO aidPERSONIDDATA "
             "(`personid`, `tag`, `data`, `opt1`, `opt2`, `opt3`) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
@@ -1696,6 +1695,18 @@ def get_inspire_id(p):
     '''
     return get_grouped_records((str(p[0]), p[1], p[2]), str(p[0]) + '__i').values()[0]
 
+def get_claimed_papers_from_papers(papers):
+    '''
+    Given a set of papers it returns the subset of claimed papers
+    @param papers: set of papers
+    @type papers: frozenset
+    @return: tuple
+    '''
+    papers_s = list_2_SQL_str(papers)
+    claimed_papers = run_sql("select bibrec from aidPERSONIDPAPERS "
+                             "where bibrec in %s and flag = 1" % papers_s)
+    return claimed_papers
+
 def collect_personID_external_ids_from_papers(personid, limit_to_claimed_papers=False):
     gathered_ids = {}
 
@@ -1716,6 +1727,25 @@ def collect_personID_external_ids_from_papers(personid, limit_to_claimed_papers=
         inspireids = set((i[0] for i in inspireids))
 
         gathered_ids['INSPIREID'] = inspireids
+
+#    if COLLECT_ORCID:
+#        orcids = []
+#        for p in person_papers:
+#            extid = get_orcid(p)
+#            if extid:
+#                orcids.append(extid)
+#        orcids = set((i[0] for i in orcids))
+#        gathered_ids['ORCID'] = orcids
+
+#    if COLLECT_ARXIV_ID:
+#        arxivids = []
+#        for p in person_papers:
+#            extid = get_arxiv_id(p)
+#            if extid:
+#                arxivids.append(extid)
+#        arxivids = set((i[0] for i in arxivids))
+#        gathered_ids['ARXIVID'] = arxivids
+
     return gathered_ids
 
 def update_personID_external_ids(persons_list=None, overwrite=False,
@@ -2941,7 +2971,7 @@ def get_doi_from_rec(recid):
                     if doi_dict[el][0] == '0247_2' and doi_dict[el][1] == 'DOI':
                         found = True
                     elif doi_dict[el][0] == '0247_a':
-                            code = doi_dict[el][1]
+                        code = doi_dict[el][1]
                     if found and code:
                         return code
         return None
@@ -3031,5 +3061,3 @@ def export_person_to_foaf(person_id):
             raise Exception('WHAT THE HELL DID WE GET HERE? %s' % str(val) )
 
     return X['person'](body=export(infodict, indent=1))
-
-

@@ -55,6 +55,7 @@ from invenio.search_engine_utils import get_fieldvalues
 
 import invenio.bibauthorid_webapi as webapi
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+from invenio.bibauthorid_backinterface import update_personID_external_ids
 
 
 TEMPLATE = load('bibauthorid')
@@ -1652,6 +1653,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'selection': (list, []),
              'set_canonical_name': (str, None),
              'canonical_name': (str, None),
+             'add_missing_external_ids': (str, None),
+             'rewrite_all_external_ids': (str, None),
              'delete_external_ids': (str, None),
              'existing_ext_ids': (list, None),
              'add_external_id': (str, None),
@@ -1709,6 +1712,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             action = 'claim'
         elif 'set_canonical_name' in argd and argd['set_canonical_name']:
             action = 'set_canonical_name'
+        elif 'add_missing_external_ids' in argd and argd['add_missing_external_ids']:
+            action = 'add_missing_external_ids'
+        elif 'rewrite_all_external_ids' in argd and argd['rewrite_all_external_ids']:
+            action = 'rewrite_all_external_ids'
         elif 'delete_external_ids' in argd and argd['delete_external_ids']:
             action = 'delete_external_ids'
         elif 'add_external_id' in argd and argd['add_external_id']:
@@ -1946,7 +1953,27 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.update_person_canonical_name(pid, cname, userinfo)
 
-            return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+
+        elif action == 'add_missing_external_ids':
+            if 'pid' in argd and argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot recompute external ids for an unknown person")
+
+            update_personID_external_ids([pid], overwrite=False)
+
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+
+        elif action == 'rewrite_all_external_ids':
+            if 'pid' in argd and argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot recompute external ids for an unknown person")
+
+            update_personID_external_ids([pid], overwrite=True)
+
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
 
         elif action == 'delete_external_ids':
             if 'pid' in argd and argd['pid'] > -1:
@@ -1963,7 +1990,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.delete_person_external_ids(pid, existing_ext_ids, userinfo)
 
-            return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
 
         elif action == 'add_external_id':
             if 'pid' in argd and argd['pid'] > -1:
@@ -1985,7 +2012,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.add_person_external_id(pid, ext_sys, ext_id, userinfo)
 
-            return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
 
         else:
             return self._error_page(req, ln,

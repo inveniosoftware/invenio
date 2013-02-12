@@ -34,7 +34,17 @@ from cgi import escape
 from invenio.bibauthorid_dbinterface import * #pylint:  disable-msg=W0614
 
 
-def set_person_data(person_id, tag, value, user_level=0):
+def set_person_data(person_id, tag, value, user_level=None):
+    '''
+    @param person_id:
+    @type person_id: int
+    @param tag:
+    @type tag: string
+    @param value:
+    @type value: string
+    @param user_level:
+    @type user_level: int
+    '''
     old = dbinter.get_personid_row(person_id, tag)
     old_data = [tup[0] for tup in old]
     if value not in old_data:

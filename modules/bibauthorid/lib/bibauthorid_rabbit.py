@@ -56,7 +56,7 @@ USE_EXT_IDS = bconfig.RABBIT_USE_EXTERNAL_IDS
 USE_INSPIREID = bconfig.RABBIT_USE_EXTERNAL_ID_INSPIREID
 
 
-def rabbit(bibrecs, check_invalid_papers=False):
+def rabbit(bibrecs, check_invalid_papers=False, personids_to_update_extids=None):
     '''
     @param bibrecs: an iterable full of bibrecs
     @type bibrecs: an iterable of ints
@@ -179,6 +179,8 @@ def rabbit(bibrecs, check_invalid_papers=False):
 
     update_status_final()
 
+    if personids_to_update_extids:
+        updated_pids |= personids_to_update_extids
     if updated_pids: # an empty set will update all canonical_names
         update_personID_canonical_names(updated_pids)
         update_personID_external_ids(updated_pids, limit_to_claimed_papers=bconfig.LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS)

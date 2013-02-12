@@ -168,7 +168,7 @@ class Template:
                 pbibrec = paper.split(',')[1]
             else:
                 pbibrec = paper
-            h("<li>%s</li>" % (format_record(pbibrec, "ha")))
+            h("<li>%s</li>" % (format_record(int(pbibrec), "ha")))
         h("</ul>")
 
         if show_close_btn:
@@ -304,7 +304,7 @@ class Template:
             else:
                 pbibrec = paper
             h("<li>%s</li>"
-                   % (format_record(pbibrec, "ha")))
+                   % (format_record(int(pbibrec), "ha")))
         h("</ul>")
         h('<a rel="nofollow" id="checkout" href="action?cancel_search_ticket=True">' + self._('Quit searching.') + '</a>')
 
@@ -629,7 +629,7 @@ class Template:
 
             h('    <td><input type="checkbox" name="selection" '
                            'value="%s" /> </td>' % (paper['bibref']))
-            rec_info = format_record(paper['recid'], "ha")
+            rec_info = format_record(int(paper['recid']), "ha")
             rec_info = str(idx + 1) + '.  ' + rec_info
             h("    <td>%s</td>" % (rec_info))
             h("    <td>%s</td>" % (paper['authorname']))
@@ -742,7 +742,7 @@ class Template:
             h('  <tr>')
             h('    <td><input type="checkbox" name="selected_bibrecs" '
                        'value="%s" /> </td>' % (paper))
-            rec_info = format_record(paper[0], "ha")
+            rec_info = format_record(int(paper[0]), "ha")
 
             if not admin:
                 rec_info = rec_info.replace("person/search?q=", "author/")
@@ -1020,8 +1020,9 @@ class Template:
             canonical_name = str(get_canonical_id_from_person_id(person_id))
             if '.' in str(canonical_name) and not isinstance(canonical_name, int):
                 canonical_name = canonical_name[0:canonical_name.rindex('.')]
-            h('<div><div> <strong> Canonical name setup </strong>')
-            h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action">' % (canonical_name, CFG_SITE_URL))
+            h('<div><div> <strong> Person id </strong> <br> %s <br>' % person_id)
+            h('<strong> <br> Canonical name setup </strong>')
+            h('<div style="margin-top: 15px;"> Current canonical name: %s  <form method="GET" action="%s/person/action" rel="nofollow">' % (canonical_name, CFG_SITE_URL))
             h('<input type="hidden" name="set_canonical_name" value="True" />')
             h('<input name="canonical_name" id="canonical_name" type="text" style="border:1px solid #333; width:500px;" value="%s" /> ' % canonical_name)
             h('<input type="hidden" name="pid" value="%s" />' % person_id)
@@ -1044,8 +1045,18 @@ class Template:
             h('<div> <br>')
             h('<strong> External IDs </strong> <br>')
 
+            h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
+            h('<input type="hidden" name="add_missing_external_ids" value="True">')
+            h('<input type="hidden" name="pid" value="%s">' % person_id)
+            h('<br> <input type="submit" value="add missing ids" class="aid_btn_blue"> </form>')
+
+            h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
+            h('<input type="hidden" name="rewrite_all_external_ids" value="True">')
+            h('<input type="hidden" name="pid" value="%s">' % person_id)
+            h('<br> <input type="submit" value="rewrite all ids" class="aid_btn_blue"> </form> <br>')
+
             if external_ids:
-                h('<form method="GET" action="%s/person/action">' % (CFG_SITE_URL) )
+                h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
                 h('   <input type="hidden" name="delete_external_ids" value="True">')
                 h('   <input type="hidden" name="pid" value="%s">' % person_id)
                 for idx in external_ids:
@@ -1059,8 +1070,10 @@ class Template:
             else:
                 h('UserID: There are no external users associated to this profile!')
 
+
+
             h('<br> <br>')
-            h('<form method="GET" action="%s/person/action">' % (CFG_SITE_URL) )
+            h('<form method="GET" action="%s/person/action" rel="nofollow">' % (CFG_SITE_URL) )
             h('   <input type="hidden" name="add_external_id" value="True">')
             h('   <input type="hidden" name="pid" value="%s">' % person_id)
             h('   <select name="ext_system">')
@@ -1068,7 +1081,7 @@ class Template:
             for el in EXTERNAL_SYSTEMS_LIST:
                 h('  <option value="%s"> %s </option>' % (EXTERNAL_SYSTEMS_LIST[el], el))
             h('   </select>')
-            h('   <input type="text" name="ext_id" id="ext_id" style="border:1px solid #333; width:100px;">')
+            h('   <input type="text" name="ext_id" id="ext_id" style="border:1px solid #333; width:350px;">')
             h('   <input type="submit" value="add external id" class="aid_btn_blue">')
             # h('<br>NOTE: please note that if you add an external id it will replace the previous one (if any).')
             h('<br> </form> </div>')
@@ -1661,7 +1674,7 @@ class Template:
 
                 for paper in papers:
                     h("<li>%s</li>"
-                           % (format_record(paper[0], "ha")))
+                           % (format_record(int(paper[0]), "ha")))
 
                 h("</ul>")
             elif not papers:
