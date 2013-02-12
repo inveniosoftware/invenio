@@ -70,6 +70,53 @@ def update_person_canonical_name(person_id, canonical_name, userinfo=''):
     dbapi.update_personID_canonical_names([person_id], overwrite=True, suggested=canonical_name)
     dbapi.insert_user_log(userinfo, person_id, 'data_update', 'CMPUI_changecanonicalname', '', 'Canonical name manually updated.', userid=uid)
 
+def delete_person_external_ids(person_id, existing_ext_ids, userinfo=''):
+    '''
+    Deletes external ids of the person
+    @param person_id: person id
+    @type person_id: int
+    @param existing_ext_ids: external ids to delete
+    @type existing_ext_ids: list
+    '''
+    if userinfo.count('||'):
+        uid = userinfo.split('||')[0]
+    else:
+        uid = ''
+
+    deleted_ids = []
+    for el in existing_ext_ids:
+        if el.count('||'):
+            ext_sys = el.split('||')[0]
+            ext_id = el.split('||')[1]
+        else:
+            continue
+        tag = 'extid:%s' % ext_sys
+        dbapi.del_person_data(tag, person_id, ext_id)
+        deleted_ids.append((person_id, tag, ext_id))
+
+    dbapi.insert_user_log(userinfo, person_id, 'data_deletion', 'CMPUI_deleteextid', '', 'External ids manually deleted: ' + str(deleted_ids), userid=uid)
+
+def add_person_external_id(person_id, ext_sys, ext_id, userinfo=''):
+    '''
+    Adds an external id for the person
+    @param person_id: person id
+    @type person_id: int
+    @param ext_sys: external system
+    @type ext_sys: str
+    @param ext_id: external id
+    @type ext_id: str
+    '''
+    if userinfo.count('||'):
+        uid = userinfo.split('||')[0]
+    else:
+        uid = ''
+
+    tag = 'extid:%s' % ext_sys
+    dbapi.set_person_data(person_id, tag, ext_id)
+
+    log_value = '%s %s %s' % (person_id, tag, ext_id)
+    dbapi.insert_user_log(userinfo, person_id, 'data_insertion', 'CMPUI_addexternalid', log_value, 'External id manually added.', userid=uid)
+
 def get_canonical_id_from_person_id(person_id):
     '''
     Finds the person  canonical name from personid (e.g. 1)
@@ -1241,19 +1288,19 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
     @param uid: the internal user ID of the currently logged in user
     @type uid: int
 
-    @return: success of the process
-    @rtype: boolean
+    @return: list of a tuple: [(status, message), ] or None if something went wrong
+    @rtype: [(bool, str), ]
     '''
     pid = wash_integer_id(pid)
 
     if not action in ['confirm', 'assign', 'repeal', 'reset']:
-        return False
-    elif pid < 0:
-        return False
+        return None
     elif pid == -3:
         pid = dbapi.create_new_person(uid, uid_is_owner=False)
+    elif pid < 0:
+        return None
     elif not is_valid_bibref(bibref):
-        return False
+        return None
 
     if userinfo.count('||'):
         uid = userinfo.split('||')[0]
@@ -1262,23 +1309,22 @@ def execute_action(action, pid, bibref, uid, userinfo='', comment=''):
 
     user_level = _resolve_maximum_acces_rights(uid)[1]
 
+    res = None
     if action in ['confirm', 'assign']:
         dbapi.insert_user_log(userinfo, pid, 'assign', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
-        dbapi.confirm_papers_to_person(pid, [bibref], user_level)
+        res = dbapi.confirm_papers_to_person(pid, [bibref], user_level)
     elif action in ['repeal']:
         dbapi.insert_user_log(userinfo, pid, 'repeal', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
-        dbapi.reject_papers_from_person(pid, [bibref], user_level)
+        res = dbapi.reject_papers_from_person(pid, [bibref], user_level)
     elif action in ['reset']:
         dbapi.insert_user_log(userinfo, pid, 'reset', 'CMPUI_ticketcommit', bibref, comment, userid=uid)
-        dbapi.reset_papers_flag(pid, [bibref])
-    else:
-        return False
+        res = dbapi.reset_papers_flag(pid, [bibref])
 
     #This is the only point which modifies a person, so this can trigger the
     #deletion of a cached page
     webauthorapi.expire_all_cache_for_personid(pid)
 
-    return True
+    return res
 
 
 def sign_assertion(robotname, assertion):

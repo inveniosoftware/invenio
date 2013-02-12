@@ -124,7 +124,7 @@ if GLOBAL_CONFIG and CFG_BIBAUTHORID_MAX_PROCESSES:
 else:
     BIBAUTHORID_MAX_PROCESSES = 12
 
-WEDGE_THRESHOLD = 0.8
+WEDGE_THRESHOLD = 0.9
 
 
 #Rabbit use or ignore external ids
@@ -152,17 +152,21 @@ LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS = True
 
 # This flag triggers most of the output.
 DEBUG_OUTPUT = True
-# Print timestamps 
+# Print timestamps
 DEBUG_TIMESTAMPS = True
 
 # Print timestamps even in update_status
 DEBUG_TIMESTAMPS_UPDATE_STATUS = True
+
+DEBUG_UPDATE_STATUS_THREAD_SAFE = True
+DEBUG_LOG_TO_PIDFILE = True
 
 # The following options trigger the output for parts of
 # bibauthorid which normally generate too much output
 DEBUG_NAME_COMPARISON_OUTPUT = False
 DEBUG_METADATA_COMPARISON_OUTPUT = False
 DEBUG_WEDGE_OUTPUT = False
+DEBUG_WEDGE_PRINT_FINAL_CLUSTER_COMPATIBILITIES = False
 DEBUG_PROCESS_PEAK_MEMORY = True
 
 # Keep in mind that you might use an assert instead of this option.
@@ -194,3 +198,5 @@ TICKET_SENDING_FROM_USER_EMAIL = True
 NAMES_SEPARATOR_CHARACTER_LIST = ",;.=\-\(\)"
 SURNAMES_SEPARATOR_CHARACTER_LIST = ",;"
 
+# Dict which maps an external system with the name of the tag with which an external id is stored in the db
+EXTERNAL_SYSTEMS_LIST = {'Inspire': 'INSPIREID', 'Orcid': 'ORCID', 'arXiv': 'ARXIVID'}

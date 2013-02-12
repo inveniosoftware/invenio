@@ -17,7 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Bibauthorid Web Interface Logic and URL handler."""
+""" Bibauthorid Web Interface Logic and URL handler. """
+
 # pylint: disable=W0105
 # pylint: disable=C0301
 # pylint: disable=W0613
@@ -25,40 +26,36 @@
 from cgi import escape
 from copy import deepcopy
 from pprint import pformat
-
 from operator import itemgetter
+
 try:
     from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 except:
     CFG_JSON_AVAILABLE = False
     json = None
 
-from invenio.bibauthorid_config import CLAIMPAPER_ADMIN_ROLE
-from invenio.bibauthorid_config import CLAIMPAPER_USER_ROLE
-#from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
-from invenio.config import CFG_SITE_LANG
-from invenio.config import CFG_SITE_URL
-from invenio.config import CFG_SITE_NAME
-from invenio.config import CFG_INSPIRE_SITE
-#from invenio.config import CFG_SITE_SECURE_URL
+from invenio.bibauthorid_config import AID_ENABLED, CLAIMPAPER_ADMIN_ROLE, CLAIMPAPER_USER_ROLE, \
+                            PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
+                            BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS
+
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, CFG_INSPIRE_SITE #, CFG_SITE_SECURE_URL
+
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.messages import gettext_set_language #, wash_language
 from invenio.template import load
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.session import get_session
 from invenio.urlutils import redirect_to_url
-from invenio.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences
-from invenio.webuser import email_valid_p, emailUnique
-from invenio.webuser import get_email_from_username, get_uid_from_email, isUserSuperAdmin
-from invenio.access_control_admin import acc_find_user_role_actions
-from invenio.access_control_admin import acc_get_user_roles, acc_get_role_id
+from invenio.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences, \
+                            email_valid_p, emailUnique, get_email_from_username, get_uid_from_email, \
+                            isUserSuperAdmin
+from invenio.access_control_admin import acc_find_user_role_actions, acc_get_user_roles, acc_get_role_id
 from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
 
 import invenio.bibauthorid_webapi as webapi
-import invenio.bibauthorid_config as bconfig
-
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
+from invenio.bibauthorid_backinterface import update_personID_external_ids
 
 
 TEMPLATE = load('bibauthorid')
@@ -262,7 +259,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         is_authorized = True
         pids_to_check = []
 
-        if not bconfig.AID_ENABLED:
+        if not AID_ENABLED:
             return page_not_authorized(req, text=_("Fatal: Author ID capabilities are disabled on this system."))
 
         if req_level and 'ulevel' in pinfo and pinfo["ulevel"] != req_level:
@@ -537,34 +534,29 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         session = get_session(req)
         pinfo = session['personinfo']
         ticket = pinfo['ticket']
+        results = []
         pendingt = []
-        donet = []
         for t in ticket:
             if 'execution_result' in t:
-                if t['execution_result'] == True:
-                    donet.append(t)
+                if t['execution_result']:
+                    for res in t['execution_result']:
+                        results.append(res)
             else:
                 pendingt.append(t)
 
-        if len(pendingt) == 1:
-            message = 'There is ' + str(len(pendingt)) + ' transaction in progress.'
-        else:
-            message = 'There are ' + str(len(pendingt)) + ' transactions in progress.'
+        box = ''
+        if pendingt:
+            box = box + TEMPLATE.tmpl_ticket_box('in_process', 'transaction', len(pendingt))
 
-        teaser = 'Claim in process!'
-        if len(pendingt) == 0:
-            box = ""
-        else:
-            box = TEMPLATE.tmpl_ticket_box(teaser, message)
+        if results:
+            failed = [messages for status, messages in results if not status]
+            if failed:
+                box = box + TEMPLATE.tmpl_transaction_box('failure', failed)
 
-        if len(donet) > 0:
-            teaser = 'Success!'
-            if len(donet) == 1:
-                message = str(len(donet)) + ' transaction successfully executed.'
-            else:
-                message = str(len(donet)) + ' transactions successfully executed.'
+            successfull = [messages for status, messages in results if status]
+            if successfull:
+                box = box + TEMPLATE.tmpl_transaction_box('success', successfull)
 
-            box = box + TEMPLATE.tmpl_notification_box(message, teaser)
         return box
 
 
@@ -1405,7 +1397,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             webapi.send_user_commit_notification_email(userinfo, ok_tickets)
 
         for t in ticket:
-            t['execution_result'] = True
+            t['execution_result'] = [(True, ''),]
 
         ticket[:] = ok_tickets
         session.dirty = True
@@ -1437,7 +1429,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         webapi.create_request_ticket(userinfo, ticket)
 
         for t in ticket:
-            t['execution_result'] = True
+            t['execution_result'] = [(True, ''),]
 
         session.dirty = True
 
@@ -1660,7 +1652,14 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
              'rt_action': (str, None),
              'selection': (list, []),
              'set_canonical_name': (str, None),
-             'canonical_name': (str, None)})
+             'canonical_name': (str, None),
+             'add_missing_external_ids': (str, None),
+             'rewrite_all_external_ids': (str, None),
+             'delete_external_ids': (str, None),
+             'existing_ext_ids': (list, None),
+             'add_external_id': (str, None),
+             'ext_system': (str, None),
+             'ext_id': (str, None) })
 
         ln = argd['ln']
         # ln = wash_language(argd['ln'])
@@ -1713,6 +1712,14 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             action = 'claim'
         elif 'set_canonical_name' in argd and argd['set_canonical_name']:
             action = 'set_canonical_name'
+        elif 'add_missing_external_ids' in argd and argd['add_missing_external_ids']:
+            action = 'add_missing_external_ids'
+        elif 'rewrite_all_external_ids' in argd and argd['rewrite_all_external_ids']:
+            action = 'rewrite_all_external_ids'
+        elif 'delete_external_ids' in argd and argd['delete_external_ids']:
+            action = 'delete_external_ids'
+        elif 'add_external_id' in argd and argd['add_external_id']:
+            action = 'add_external_id'
 
         no_access = self._page_access_permission_wall(req, pid)
 
@@ -1871,7 +1878,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             #check if ticket targets (bibref for pid) are already in ticket
             for t in tempticket:
                 for e in list(ticket):
-                    if e['pid'] == t['pid'] and e['bibref'] == t['bibref']:
+                    if e['bibref'] == t['bibref']:
                         ticket.remove(e)
                 ticket.append(t)
             if 'search_ticket' in pinfo:
@@ -1946,7 +1953,66 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.update_person_canonical_name(pid, cname, userinfo)
 
-            return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+
+        elif action == 'add_missing_external_ids':
+            if 'pid' in argd and argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot recompute external ids for an unknown person")
+
+            update_personID_external_ids([pid], overwrite=False)
+
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+
+        elif action == 'rewrite_all_external_ids':
+            if 'pid' in argd and argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot recompute external ids for an unknown person")
+
+            update_personID_external_ids([pid], overwrite=True)
+
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+
+        elif action == 'delete_external_ids':
+            if 'pid' in argd and argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot delete external ids from an unknown person")
+
+            if 'existing_ext_ids' in argd and argd['existing_ext_ids']:
+                existing_ext_ids = argd['existing_ext_ids']
+            else:
+                return self._error_page(req, ln, "Fatal: you must select at least one external id in order to delete it!")
+
+            uid = getUid(req)
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.delete_person_external_ids(pid, existing_ext_ids, userinfo)
+
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+
+        elif action == 'add_external_id':
+            if 'pid' in argd and argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot add external id to unknown person")
+
+            if 'ext_system' in argd and argd['ext_system']:
+                ext_sys = argd['ext_system']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot add an external id without specifying the system")
+
+            if 'ext_id' in argd and argd['ext_id']:
+                ext_id = argd['ext_id']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot add a custom external id without a suggestion")
+
+            uid = getUid(req)
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.add_person_external_id(pid, ext_sys, ext_id, userinfo)
+
+            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
 
         else:
             return self._error_page(req, ln,
@@ -2188,9 +2254,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if not search_ticket:
             return ''
         else:
-            teaser = _('Person search for assignment in progress!')
-            message = _('You are searching for a person to assign the following papers:')
-            return TEMPLATE.tmpl_search_ticket_box(teaser, message, search_ticket)
+            return TEMPLATE.tmpl_search_ticket_box('person_search', 'assign_papers', search_ticket['bibrefs'])
 
 
     def search(self, req, form, is_fallback=False, fallback_query='', fallback_title='', fallback_message=''):
@@ -2279,7 +2343,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 #                authorpapers = webapi.get_papers_by_person_id(pid, -1)
 #                authorpapers = sorted(authorpapers, key=itemgetter(0),
 #                                      reverse=True)
-                if index < bconfig.PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
+                if index < PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
                     #We are no longer sorting by date because of the huge impact this have
                     #on the system.
                     #The sorting is now done per recordid
@@ -2347,7 +2411,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         except KeyError:
             pass
 
-        if bconfig.BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE:
+        if BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE:
             return redirect_to_url(req, '%s/person/%s?open_claim=True' % (CFG_SITE_URL, person))
 
         body = TEMPLATE.tmpl_claim_stub(person)
@@ -2547,7 +2611,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if not request:
             return "404__no_filter_selected"
 
-        if not request in bconfig.VALID_EXPORT_FILTERS:
+        if not request in VALID_EXPORT_FILTERS:
             return "500_filter_invalid"
 
         if request == "arxiv":

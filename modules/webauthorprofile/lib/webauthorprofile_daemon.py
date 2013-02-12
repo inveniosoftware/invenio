@@ -43,10 +43,10 @@ Examples:
 
   OPTIONS
     Options for update personid
-      (default)             Computes all caches for all persons with at least one expired cache 
+      (default)             Computes all caches for all persons with at least one expired cache
 
     --all                   Computes all caches for all persons
-    
+
     --mp        Enables multiprocessing computation
 
 """,

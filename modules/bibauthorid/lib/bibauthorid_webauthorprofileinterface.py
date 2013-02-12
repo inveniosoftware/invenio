@@ -23,7 +23,7 @@ from invenio.bibauthorid_config import CLAIMPAPER_USER_ROLE #emitting #pylint: d
 #import invenio.bibauthorid_webapi as webapi
 #import invenio.bibauthorid_config as bconfig
 
-from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string #emitting #pylint: disable-msg=W0611    
+from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string #emitting #pylint: disable-msg=W0611
 
 from invenio.bibauthorid_webapi import search_person_ids_by_name #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_webapi import get_papers_by_person_id #emitting #pylint: disable-msg=W0611

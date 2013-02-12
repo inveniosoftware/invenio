@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,6 +27,8 @@ import invenio.bibauthorid_config as bconfig
 import numpy
 import cPickle
 from cPickle import UnpicklingError
+from invenio.htmlutils import X
+
 import os
 import gc
 
@@ -38,7 +40,7 @@ from operator import itemgetter
 
 from invenio.search_engine import perform_request_search
 from invenio.access_control_engine import acc_authorize_action
-
+from invenio.config import CFG_SITE_URL
 
 from invenio.bibauthorid_name_utils import split_name_parts
 from invenio.bibauthorid_name_utils import create_canonical_name
@@ -80,12 +82,12 @@ COLLECT_INSPIRE_ID = bconfig.COLLECT_EXTERNAL_ID_INSPIREID
 
 def get_sql_time():
     '''
-    Returns the time acoarding to the database. The type is datetime.datetime.
+    Returns the time according to the database. The type is datetime.datetime.
     '''
     return run_sql("select now()")[0][0]
 
 
-def set_personid_row(person_id, tag, value, opt1=0, opt2=0, opt3=""):
+def set_personid_row(person_id, tag, value, opt1=None, opt2=None, opt3=None):
     '''
     Inserts data and additional info into aidPERSONIDDATA
     @param person_id:
@@ -95,13 +97,12 @@ def set_personid_row(person_id, tag, value, opt1=0, opt2=0, opt3=""):
     @param value:
     @type value: string
     @param opt1:
-    @type opt1:
+    @type opt1: int
     @param opt2:
-    @type opt2:
+    @type opt2: int
     @param opt3:
-    @type opt3:
+    @type opt3: string
     '''
-
     run_sql("INSERT INTO aidPERSONIDDATA "
             "(`personid`, `tag`, `data`, `opt1`, `opt2`, `opt3`) "
             "VALUES (%s, %s, %s, %s, %s, %s)",
@@ -309,7 +310,7 @@ def move_signature(sig, pid, force_claimed=False, unclaim=False):
     Moves a signature to a different person id
     @param sig: signature tuple
     @type sig: tuple
-    @param pid: personid 
+    @param pid: personid
     @type pid: int
     '''
     upd = "update aidPERSONIDPAPERS set personid=%s" % pid
@@ -386,7 +387,8 @@ def get_all_personids_by_name(regexpr):
     '''
     return run_sql("select personid, name "
                    "from aidPERSONIDPAPERS "
-                   "where name like %s",
+                   "where name like %s "
+                   "and flag > -2",
                    (regexpr,))
 
 def get_personids_by_canonical_name(target):
@@ -399,7 +401,7 @@ def get_personids_by_canonical_name(target):
                   "tag='canonical_name' and data like %s", (target,))
     if pid:
         return run_sql("select personid, name from aidPERSONIDPAPERS "
-                       "where personid=%s", (pid[0][0],))
+                       "where personid=%s and flag > -2", (pid[0][0],))
     else:
         return []
 
@@ -901,14 +903,14 @@ def confirm_papers_to_person(pid, papers, user_level=0):
     '''
     Confirms the relationship between pid and paper, as from user input.
     @param pid: id of the person
-    @type pid: ('2',)
+    @type pid: integer
     @param papers: list of papers to confirm
-    @type papers: (('100:7531,9024',),)
+    @type papers: ((str,),)   e.g. (('100:7531,9024',),)
+    @return: list of tuples: (status, message_key)
+    @rtype: [(bool, str), ]
     '''
-
-
     pids_to_update = set([pid])
-
+    res = []
 
     for p in papers:
         bibref, rec = p.split(",")
@@ -918,26 +920,45 @@ def confirm_papers_to_person(pid, papers, user_level=0):
         sig = (table, ref, rec)
 
         #Check the status of pid: the paper should be present, either assigned or rejected
-        paps = run_sql("select bibref_table, bibref_value, bibrec "
-                       "from aidPERSONIDPAPERS "
-                       "where personid=%s "
-                       "and bibrec=%s "
-                       "and flag > -2"
-                       , (pid, rec))
+        gen_papers = run_sql("select bibref_table, bibref_value, bibrec, personid, flag, name "
+                             "from aidPERSONIDPAPERS "
+                             "where bibrec=%s "
+                             "and flag >= -2"
+                       , (rec,))
 
-        other_paps = run_sql("select bibref_table, bibref_value, bibrec "
-                       "from aidPERSONIDPAPERS "
-                       "where personid <> %s "
-                       "and bibrec=%s "
-                       "and flag > -2"
-                       , (pid, rec))
+        paps = [el[0:3] for el in gen_papers if el[3] == pid and el[4] > -2]
+        #run_sql("select bibref_table, bibref_value, bibrec "
+        #               "from aidPERSONIDPAPERS "
+        #               "where personid=%s "
+        #               "and bibrec=%s "
+        #               "and flag > -2"
+        #               , (pid, rec))
 
-        rej_paps = run_sql("select bibref_table, bibref_value, bibrec "
-                       "from aidPERSONIDPAPERS "
-                       "where personid=%s "
-                       "and bibrec=%s "
-                       "and flag = -2"
-                       , (pid, rec))
+        other_paps = [el[0:3] for el in gen_papers if el[3] != pid and el[4] > -2]
+        #other_paps = run_sql("select bibref_table, bibref_value, bibrec "
+        #               "from aidPERSONIDPAPERS "
+        #               "where personid <> %s "
+        #               "and bibrec=%s "
+        #               "and flag > -2"
+        #               , (pid, rec))
+
+        rej_paps = [el[0:3] for el in gen_papers if el[3] == pid and el[4] == -2]
+        #rej_paps = run_sql("select bibref_table, bibref_value, bibrec "
+        #               "from aidPERSONIDPAPERS "
+        #               "where personid=%s "
+        #               "and bibrec=%s "
+        #               "and flag = -2"
+        #               , (pid, rec))
+
+        bibref_exists = [el[0:3] for el in gen_papers if el[0] == table and el[1] == ref and el[4] > -2]
+        #bibref_exists = run_sql("select * "
+        #                        "from aidPERSONIDPAPERS "
+        #                        "and bibref_table=%s "
+        #                        "and bibref_value=%s "
+        #                        "and bibrec=%s "
+        #                        "and flag > -2"
+        #                        , (table, ref, rec))
+
 
         # All papers that are being claimed should be present in aidPERSONIDPAPERS, thus:
         # assert paps or rej_paps or other_paps, 'There should be at least something regarding this bibrec!'
@@ -945,8 +966,10 @@ def confirm_papers_to_person(pid, papers, user_level=0):
         # BUT, it usually happens that claims get done out of the browser/session cache which is hours/days old,
         # hence it happens that papers are claimed which no longer exists in the system.
         # For the sake of mental sanity, instead of crashing from now on we just ignore such cases.
-        if not (paps or other_paps or rej_paps):
+        if not (paps or other_paps or rej_paps) or not bibref_exists:
+            res.append((False, 'confirm_failure'))
             continue
+        res.append((True, 'confirm_success'))
 
         # It should not happen that a paper is assigned more then once to the same person.
         # But sometimes it happens in rare unfortunate cases of bad concurrency circumstances,
@@ -972,6 +995,7 @@ def confirm_papers_to_person(pid, papers, user_level=0):
         run_sql("delete from aidPERSONIDPAPERS where bibref_table like %s and "
                 " bibref_value = %s and bibrec=%s"
                 , sig)
+
         add_signature(sig, None, pid)
         run_sql("update aidPERSONIDPAPERS "
                 "set personid = %s "
@@ -984,6 +1008,7 @@ def confirm_papers_to_person(pid, papers, user_level=0):
                    table, ref, rec))
 
     update_personID_canonical_names(pids_to_update)
+    return res
 
 
 def reject_papers_from_person(pid, papers, user_level=0):
@@ -992,11 +1017,14 @@ def reject_papers_from_person(pid, papers, user_level=0):
     @param pid: id of the person
     @type pid: integer
     @param papers: list of papers to confirm
-    @type papers: ('100:7531,9024',)
+    @type papers: ((str,),)   e.g. (('100:7531,9024',),)
+    @return: list of tuples: (status, message_key)
+    @rtype: [(bool, str), ]
     '''
 
     new_pid = get_new_personid()
     pids_to_update = set([pid])
+    res = []
 
     for p in papers:
         brr, rec = p.split(",")
@@ -1008,11 +1036,13 @@ def reject_papers_from_person(pid, papers, user_level=0):
         # For the sake of mental sanity (see commentis in confirm_papers_to_personid, just ignore in case this paper is no longer existent
         # assert(records)
         if not records:
+            res.append((False, 'reject_failure'))
             continue
+        res.append((True, 'reject_success'))
 
         fpid, name = records[0]
         # If the record is assigned to a different person already, the rejection is meaningless
-        # Otherwise, we assign the paper to someone else (not important who it will eventually 
+        # Otherwise, we assign the paper to someone else (not important who it will eventually
         # get moved by tortoise) and add the rejection to the current person
 
         if fpid == pid:
@@ -1025,40 +1055,70 @@ def reject_papers_from_person(pid, papers, user_level=0):
 
     update_personID_canonical_names(pids_to_update)
 
+    return res
+
 
 def reset_papers_flag(pid, papers):
     '''
     Resets the flag associated to the papers to '0'
+    @param pid: id of the person
+    @type pid: integer
     @param papers: list of papers to confirm
-    @type papers: (('100:7531,9024',),)
+    @type papers: ((str,),)   e.g. (('100:7531,9024',),)
+    @return: list of tuples: (status, message_key)
+    @rtype: [(bool, str), ]
     '''
+    res = []
     for p in papers:
         bibref, rec = p.split(",")
         table, ref = bibref.split(":")
+        ref = int(ref)
         sig = (table, ref, rec)
+        gen_papers = run_sql("select bibref_table, bibref_value, bibrec, flag "
+                       "from aidPERSONIDPAPERS "
+                       "where bibrec=%s "
+                       "and personid=%s"
+                       , (rec, pid))
 
-        paps = run_sql("select bibref_table, bibref_value, bibrec "
-                       "from aidPERSONIDPAPERS "
-                       "where personid=%s "
-                       "and bibrec=%s "
-                       , (pid, rec))
-        rej_paps = run_sql("select bibref_table, bibref_value, bibrec "
-                       "from aidPERSONIDPAPERS "
-                       "where personid=%s "
-                       "and bibrec=%s "
-                       "and flag = -2"
-                       , (pid, rec))
+        paps = [el[0:3] for el in gen_papers]
+        #run_sql("select bibref_table, bibref_value, bibrec "
+        #               "from aidPERSONIDPAPERS "
+        #               "where personid=%s "
+        #               "and bibrec=%s "
+        #               , (pid, rec))
+
+        rej_paps = [el[0:3] for el in gen_papers if el[3] == -2]
+        #rej_paps = run_sql("select bibref_table, bibref_value, bibrec "
+        #               "from aidPERSONIDPAPERS "
+        #               "where personid=%s "
+        #               "and bibrec=%s "
+        #               "and flag = -2"
+        #               , (pid, rec))
+
+        pid_bibref_exists = [el[0:3] for el in gen_papers if el[0] == table and el[1] == ref and el[3] > -2]
+        #bibref_exists = run_sql("select * "
+        #                        "from aidPERSONIDPAPERS "
+        #                        "and bibref_table=%s "
+        #                        "and bibref_value=%s "
+        #                        "and personid=%s "
+        #                        "and bibrec=%s "
+        #                        "and flag > -2"
+        #                        , (table, ref, pid, rec))
 
         # again, see confirm_papers_to_person for the sake of mental sanity
         # assert paps or rej_paps
-        if not paps or rej_paps:
+        if rej_paps or not pid_bibref_exists:
+            res.append((False, 'reset_failure'))
             continue
+        res.append((True, 'reset_success'))
         assert len(paps) < 2
 
         run_sql("delete from aidPERSONIDPAPERS where bibref_table like %s and "
                 "bibref_value = %s and bibrec = %s",
                 (sig))
         add_signature(sig, None, pid)
+
+    return res
 
 
 def user_can_modify_data(uid, pid):
@@ -1364,7 +1424,7 @@ def get_personiID_external_ids(personid):
     return extids
 
 #bibauthorid_maintenance personid update private methods
-def update_personID_canonical_names(persons_list=None, overwrite=False, suggested=''):
+def update_personID_canonical_names(persons_list=None, overwrite=False, suggested='', overwrite_not_claimed_only=False):
     '''
     Updates the personID table creating or updating canonical names for persons
     @param: persons_list: persons to consider for the update  (('1'),)
@@ -1382,6 +1442,10 @@ def update_personID_canonical_names(persons_list=None, overwrite=False, suggeste
 
     for idx, pid in enumerate(persons_list):
         update_status(float(idx) / float(len(persons_list)), "Updating canonical_names...")
+        if overwrite_not_claimed_only:
+            has_claims = run_sql("select personid from aidPERSONIDPAPERS where personid = %s and flag = 2", (pid,))
+            if has_claims:
+                continue
         current_canonical = run_sql("select data from aidPERSONIDDATA where "
                                     "personid=%s and tag=%s", (pid, 'canonical_name'))
 
@@ -1631,6 +1695,18 @@ def get_inspire_id(p):
     '''
     return get_grouped_records((str(p[0]), p[1], p[2]), str(p[0]) + '__i').values()[0]
 
+def get_claimed_papers_from_papers(papers):
+    '''
+    Given a set of papers it returns the subset of claimed papers
+    @param papers: set of papers
+    @type papers: frozenset
+    @return: tuple
+    '''
+    papers_s = list_2_SQL_str(papers)
+    claimed_papers = run_sql("select bibrec from aidPERSONIDPAPERS "
+                             "where bibrec in %s and flag = 1" % papers_s)
+    return claimed_papers
+
 def collect_personID_external_ids_from_papers(personid, limit_to_claimed_papers=False):
     gathered_ids = {}
 
@@ -1651,6 +1727,25 @@ def collect_personID_external_ids_from_papers(personid, limit_to_claimed_papers=
         inspireids = set((i[0] for i in inspireids))
 
         gathered_ids['INSPIREID'] = inspireids
+
+#    if COLLECT_ORCID:
+#        orcids = []
+#        for p in person_papers:
+#            extid = get_orcid(p)
+#            if extid:
+#                orcids.append(extid)
+#        orcids = set((i[0] for i in orcids))
+#        gathered_ids['ORCID'] = orcids
+
+#    if COLLECT_ARXIV_ID:
+#        arxivids = []
+#        for p in person_papers:
+#            extid = get_arxiv_id(p)
+#            if extid:
+#                arxivids.append(extid)
+#        arxivids = set((i[0] for i in arxivids))
+#        gathered_ids['ARXIVID'] = arxivids
+
     return gathered_ids
 
 def update_personID_external_ids(persons_list=None, overwrite=False,
@@ -2006,7 +2101,6 @@ def get_lastname_results(last_name):
                    "where personid like '" + last_name + ".%'")
 
 
-
 def get_full_personid_data(table_name="`aidPERSONIDDATA`"):
     '''
     Get all columns and rows from aidPERSONIDDATA
@@ -2014,6 +2108,50 @@ def get_full_personid_data(table_name="`aidPERSONIDDATA`"):
     '''
     return run_sql("select personid, tag, data, "
                    "opt1, opt2, opt3 from %s" % table_name)
+
+
+def get_specific_personid_full_data(pid):
+    '''
+    Get all columns and rows from aidPERSONIDDATA
+    '''
+    return run_sql("select personid, tag, data, "
+                   "opt1, opt2, opt3 from aidPERSONIDDATA where personid=%s "
+                   , (pid,))
+
+
+def get_canonical_names_by_pid(pid):
+    '''
+    Get all data that has as a tag canonical_name from aidPERSONIDDATA
+    '''
+    return run_sql("select data "
+                   "from aidPERSONIDDATA where personid=%s and tag=%s"
+                   , (pid, "canonical_name"))
+
+
+def get_orcids_by_pids(pid):
+    '''
+    Get all data that has as a tag extid:ORCID from aidPERSONIDDATA
+    '''
+    return run_sql("select data "
+                   "from aidPERSONIDDATA where personid=%s and tag=%s"
+                   , (pid, "extid:ORCID"))
+
+
+def get_inspire_ids_by_pids(pid):
+    '''
+    Get all data that has as a tag extid:INSPIREID from aidPERSONIDDATA
+    '''
+    return run_sql("select data "
+                   "from aidPERSONIDDATA where personid=%s and tag=%s"
+                   , (pid, "extid:INSPIREID"))
+
+def get_uids_by_pids(pid):
+    '''
+    Get all data that has as a tag uid from aidPERSONIDDATA
+    '''
+    return run_sql("select data "
+                   "from aidPERSONIDDATA where personid=%s and tag=%s"
+                   , (pid, "uid"))
 
 def get_name_string_to_pid_dictionary():
     '''
@@ -2516,7 +2654,7 @@ def get_all_bibrecs():
     '''
     Get all record ids present in aidPERSONIDPAPERS
     '''
-    return [x[0] for x in run_sql("select distinct bibrec from aidPERSONIDPAPERS")]
+    return set([x[0] for x in run_sql("select bibrec from aidPERSONIDPAPERS")])
 
 def get_bibrefrec_to_pid_flag_mapping():
     '''
@@ -2772,7 +2910,7 @@ def get_signatures_from_bibrefs(bibrefs):
     else:
         sig70x = ()
 
-    return ifilter(lambda x: x in valid_recs, chain(sig10x, sig70x))
+    return ifilter(lambda x: x[2] in valid_recs, chain(set(sig10x), set(sig70x)))
 
 
 def get_all_valid_bibrecs():
@@ -2811,3 +2949,115 @@ def get_coauthor_pids(pid, exclude_bibrecs=None):
     pids = sorted(pids, key=lambda x: x[1], reverse=True)
 
     return pids
+
+def get_doi_from_rec(recid):
+    """
+    Returns the doi of the paper like str if found.
+    Otherwise returns None.
+    0247 $2 DOI $a id
+    """
+    idx = run_sql("SELECT id_bibxxx, field_number FROM bibrec_bib02x WHERE id_bibrec = %s", (recid,))
+    if idx:
+        doi_id_s = list_2_SQL_str(idx, lambda x: x[0])
+        doi = run_sql("SELECT id, tag, value FROM bib02x WHERE id in %s " % doi_id_s)
+        if doi:
+            grouped = groupby(idx, lambda x: x[1])
+            doi_dict = dict((x[0],x[1:]) for x in doi)
+            for group in grouped:
+                elms = [x[0] for x in list(group[1])]
+                found = False
+                code = None
+                for el in elms:
+                    if doi_dict[el][0] == '0247_2' and doi_dict[el][1] == 'DOI':
+                        found = True
+                    elif doi_dict[el][0] == '0247_a':
+                        code = doi_dict[el][1]
+                    if found and code:
+                        return code
+        return None
+
+def export_person(person_id):
+    '''list of records table: personidpapers and personiddate check existing function for getting the records!!!
+       exports a structure of dictunaries of tuples of [...] if strings, like:
+
+       {'name':('namestring',),
+        'repeatable_field':({'field1':('val1',)},{'field1':'val2'})}
+    '''
+
+    person_info = defaultdict(defaultdict)
+
+    full_names = get_person_db_names_set(person_id)
+    if full_names:
+        splitted_names = [split_name_parts(n[0]) for n in full_names]
+        splitted_names = [x+[len(x[2])] for x in splitted_names]
+        max_first_names = max([x[4] for x in splitted_names])
+        full_name_candidates = filter(lambda x: x[4] == max_first_names, splitted_names)
+        full_name = create_normalized_name(full_name_candidates[0])
+
+
+        person_info['names']['full_name'] = (full_name,)
+        person_info['names']['surname'] = (full_name_candidates[0][0],)
+        if full_name_candidates[0][2]:
+            person_info['names']['first_names'] =  (' '.join(full_name_candidates[0][2]),)
+        person_info['names']['name_variants'] = ('; '.join([create_normalized_name(x) for x in splitted_names]),)
+
+    bibrecs = get_person_bibrecs(person_id)
+
+    recids_data = []
+    for recid in bibrecs:
+        recid_dict = defaultdict(defaultdict)
+        recid_dict['INSPIRE-record-id'] = (str(recid),)
+        recid_dict['INSPIRE-record-url'] = ('%s/record/%s' % (CFG_SITE_URL, str(recid)),)
+        rec_doi = get_doi_from_rec(recid)
+        if rec_doi:
+            recid_dict['DOI']= (str(rec_doi),)
+        recids_data.append(recid_dict)
+
+    person_info['records']['record'] = tuple(recids_data)
+
+
+    person_info['identifiers']['INSPIRE_person_ID'] = (str(person_id),)
+
+
+    canonical_names = get_canonical_names_by_pid(person_id)
+    if canonical_names:
+        person_info['identifiers']['INSPIRE_canonical_name'] = (str(canonical_names[0][0]),)
+        person_info['profile_page']['INSPIRE_profile_page']  = ('%s/author/%s' % (CFG_SITE_URL,canonical_names[0][0]),)
+    else:
+        person_info['profile_page']['INSPIRE_profile_page']  = ('%s/author/%s' % (CFG_SITE_URL,str(person_id)),)
+
+    orcids = get_orcids_by_pids(person_id)
+    if orcids:
+        person_info['identifiers']['ORCID'] = tuple(str(x[0]) for x in orcids)
+
+
+    inspire_ids = get_inspire_ids_by_pids(person_id)
+    if inspire_ids:
+        person_info['identifiers']['INSPIREID'] = tuple(str(x[0]) for x in inspire_ids)
+
+
+    return person_info
+
+
+def export_person_to_foaf(person_id):
+    '''
+    Exports to foaf xml a dictionary of dictionaries or tuples of strings as retured by export_person
+    '''
+
+    infodict = export_person(person_id)
+
+    def export(val, indent=0):
+        if isinstance(val, dict):
+            contents = list()
+            for k,v in val.iteritems():
+                if isinstance(v,tuple):
+                    contents.append( ''.join( [ X[str(k)](indent=indent, body=export(c)) for c in v] ))
+                else:
+                    contents.append( X[str(k)](indent=indent,body=export(v, indent=indent+1)) )
+            return ''.join(contents)
+        elif isinstance(val, str):
+            return str(X.escaper(val))
+        else:
+            raise Exception('WHAT THE HELL DID WE GET HERE? %s' % str(val) )
+
+    return X['person'](body=export(infodict, indent=1))

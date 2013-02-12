@@ -30,6 +30,10 @@ from bibauthorid_backinterface import get_recently_modified_record_ids
 from bibauthorid_backinterface import get_user_log
 from bibauthorid_backinterface import insert_user_log
 from bibauthorid_backinterface import get_sql_time
+from bibauthorid_backinterface import get_personids_from_bibrec
+from bibauthorid_backinterface import get_claimed_papers_from_papers
+from bibauthorid_backinterface import get_all_valid_bibrecs
+
 
 #python 2.4 compatibility
 from bibauthorid_general_utils import bai_any as any
@@ -221,12 +225,38 @@ def _task_submit_check_options():
 
     return True
 
+def _get_personids_to_update_extids(papers=None):
+    '''
+    It returns the set of personids of which we should recalculate
+    their external ids.
+    @param papers: papers
+    @type papers: set or None
+    @return: personids
+    @rtype: set
+    '''
+    last_log = get_user_log(userinfo='daemon', action='PID_UPDATE', only_most_recent=True)
+    if last_log:
+        daemon_last_time_run = last_log[0][2]
+        modified_bibrecs = get_recently_modified_record_ids(daemon_last_time_run)
+    else:
+        modified_bibrecs = get_all_valid_bibrecs()
+    if papers:
+        modified_bibrecs &= set(papers)
+    if not modified_bibrecs:
+        return None
+    if bconfig.LIMIT_EXTERNAL_IDS_COLLECTION_TO_CLAIMED_PAPERS:
+        modified_bibrecs = [rec[0] for rec in get_claimed_papers_from_papers(modified_bibrecs)]
+    personids_to_update_extids = set()
+    for bibrec in modified_bibrecs:
+        personids_to_update_extids |= set(get_personids_from_bibrec(bibrec))
+    return personids_to_update_extids
 
 def rabbit_with_log(papers, check_invalid_papers, log_comment, partial=False):
     from bibauthorid_rabbit import rabbit
 
+    personids_to_update_extids = _get_personids_to_update_extids(papers)
     starting_time = get_sql_time()
-    rabbit(papers, check_invalid_papers)
+    rabbit(papers, check_invalid_papers, personids_to_update_extids)
     if partial:
         action = 'PID_UPDATE_PARTIAL'
     else:
