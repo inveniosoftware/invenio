@@ -240,6 +240,12 @@ def get_refersto_hitset(ahitset):
             out = intbitset(rows)
     return out
 
+def get_one_cited_by_weight(recID):
+    """Returns a number_of_citing_records for one record
+    """
+    weight = get_citation_dict("citations_weights")
+
+    return weight.get(recID, 0)
 
 def get_cited_by_weight(recordlist):
     """Return a tuple of ([recid,number_of_citing_records],...) for all the
