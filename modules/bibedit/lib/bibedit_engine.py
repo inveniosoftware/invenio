@@ -83,7 +83,7 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
     CFG_INSPIRE_SITE
-from invenio.search_engine import record_exists, search_pattern
+from invenio.search_engine import record_exists, perform_request_search
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
@@ -368,7 +368,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
     # Call function based on request type.
     if request_type == 'searchForRecord':
         # Search request.
-        response.update(perform_request_search(data))
+        response.update(perform_request_bibedit_search(data, req))
     elif request_type in ['changeTagFormat']:
         # User related requests.
         response.update(perform_request_user(req, request_type, recid, data))
@@ -459,7 +459,7 @@ def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
     return lastResult
 
 
-def perform_request_search(data):
+def perform_request_bibedit_search(data, req):
     """Handle search requests."""
     response = {}
     searchType = data['searchType']
@@ -470,7 +470,7 @@ def perform_request_search(data):
         pattern = searchPattern
     else:
         pattern = searchType + ':' + searchPattern
-    result_set = list(search_pattern(p=pattern))
+    result_set = list(perform_request_search(req=req, p=pattern))
     response['resultCode'] = 1
     response['resultSet'] = result_set[0:CFG_BIBEDIT_MAX_SEARCH_RESULTS]
     return response
