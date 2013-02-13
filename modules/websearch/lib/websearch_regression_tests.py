@@ -4856,6 +4856,33 @@ class WebSearchCustomCollectionBoxesName(InvenioTestCase):
                          test_web_page_content(CFG_SITE_URL + '/collection/CERN%20Divisions?ln=af',
                                                expected_text='Browse by division:'))
 
+
+class WebSearchDetailedRecordTabsTest(InvenioTestCase):
+    def test_detailed_record(self):
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81',
+                                               expected_text='Decapitating Tadpoles'))
+
+    def test_detailed_record_references_tab(self):
+        expected_refs = [
+            'References (37)',
+            'W. Fischler and L. Susskind, "Dilaton Tadpoles, String Condensates And Scale In-variance,"',
+            'A. Adams, O. Aharony, J. McGreevy, E. Silverstein,..., work in progress',
+        ]
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81/references',
+                                               expected_text=expected_refs))
+
+    def test_detailed_record_citations_tab(self):
+        expected_cites = [
+            'Filtering Gravity: Modification at Large Distances?',
+        ]
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/81/citations',
+                                               expected_text=expected_cites,
+                                               unexpected_text='The server encountered an error'))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -4904,7 +4931,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchExactTitleIndexTest,
                              WebSearchCJKTokenizedSearchTest,
                              WebSearchItemCountQueryTest,
-                             WebSearchCustomCollectionBoxesName)
+                             WebSearchCustomCollectionBoxesName,
+                             WebSearchDetailedRecordTabsTest)
 
 
 if __name__ == "__main__":

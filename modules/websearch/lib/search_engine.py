@@ -97,7 +97,10 @@ from invenio.search_engine_utils import (get_fieldvalues,
                                          get_fieldvalues_alephseq_like,
                                          record_exists)
 from invenio.bibrecord import create_record, record_xml_output
-from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
+from invenio.bibrank_record_sorter import (get_bibrank_methods,
+                                           is_method_valid,
+                                           rank_records as rank_records_bibrank,
+                                           rank_by_citations)
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
@@ -4633,6 +4636,9 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                                  rm=rm))
                         # Self-cited
                         selfcited = get_self_cited_by(recid)
+                        selfcited = rank_by_citations(get_self_cited_by(recid), verbose=verbose)
+                        selfcited = reversed(selfcited[0])
+                        selfcited = [recid for recid, dummy in selfcited]
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))
                         # Co-cited
