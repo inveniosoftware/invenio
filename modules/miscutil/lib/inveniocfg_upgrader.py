@@ -829,6 +829,13 @@ def cmd_upgrade_check(dummy_conf, upgrader=None):
     logger = upgrader.get_logger()
 
     try:
+        from invenio.flaskshell import db
+    except ImportError:
+        logger.error("make check-upgrade is unfortunately not supported for "
+            "non-SQLAlchemy based Invenio installations")
+        sys.exit(1)
+
+    try:
         # Run upgrade pre-checks
         upgrades = upgrader.get_upgrades()
 
@@ -860,6 +867,7 @@ def cmd_upgrade(dummy_conf, upgrader=None):
     """ Command for applying upgrades """
     from invenio.config import CFG_LOGDIR
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
+    from invenio.flaskshell import db
 
     logfilename = os.path.join(CFG_LOGDIR, 'invenio_upgrader.log')
     if not upgrader:
@@ -921,6 +929,13 @@ def cmd_upgrade_show_pending(dummy_conf, upgrader=None):
     if not upgrader:
         upgrader = InvenioUpgrader()
     logger = upgrader.get_logger()
+
+    try:
+        from invenio.flaskshell import db
+    except ImportError:
+        logger.error("make check-upgrade is unfortunately not supported for "
+            "non-SQLAlchemy based Invenio installations")
+        sys.exit(1)
 
     try:
         upgrades = upgrader.get_upgrades()
