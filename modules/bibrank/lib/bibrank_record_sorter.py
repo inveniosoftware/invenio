@@ -252,11 +252,8 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose, methods)
         elif rank_method_code == "citation":
-            #we get rank_method_code correctly here. pattern[0] is the search word - not used by find_cit
-            p = ""
-            if pattern and pattern[0]:
-                p = pattern[0][6:]
-            result = find_citations(rank_method_code, p, hitset, verbose)
+            # we get rank_method_code correctly here. pattern[0] is the search word - not used by find_cit
+            result = find_citations(hitset, verbose)
 
         elif func_object:
             if function == "word_similarity":
@@ -295,7 +292,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         results_similar_recIDs = map(lambda x: x[0], result[0])
         results_similar_relevances = map(lambda x: x[1], result[0])
         result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], "%s" % configcreated + result[3])
-        aftermap = time.time() - starttime;
+        aftermap = time.time() - starttime
     else:
         result = (None, None, result[1], result[2], result[3])
 
@@ -306,7 +303,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     result = (result[0],result[1],result[2],result[3],tmp)
 
     #dbg = string.join(map(str,methods[rank_method_code].items()))
-    #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput);
+    #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput)
     return result
 
 def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance,verbose):
@@ -413,7 +410,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
-def find_citations(rank_method_code, recID, hitset, verbose):
+def find_citations(hitset, verbose):
     """Rank by the amount of citations."""
     #calculate the cited-by values for all the members of the hitset
     #returns: ((recordid,weight),prefix,postfix,message)
@@ -421,42 +418,26 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     global voutput
     voutput = ""
 
-    # If the recID is numeric, return only stuff that cites it.
-    # Otherwise return stuff that cites hitset
-
-    # Try to convert to int
-    try:
-        recidint = int(recID)
-    except (TypeError, ValueError):
-        recidint = None
-
-    if recidint:
-        myrecords = get_cited_by(recidint)
-    else:
-        myrecords = hitset
-
-    if len(myrecords) > CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
+    if len(hitset) > CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
         cites_counts = get_citation_dict('citations_counts')
         ret = [(recid, weight) for recid, weight in cites_counts
-                                                        if recid in myrecords]
+                                                        if recid in hitset]
         ret = reversed(ret)
     else:
-        ret = get_cited_by_weight(myrecords)
+        ret = get_cited_by_weight(hitset)
         ret.sort(key=itemgetter(1))
 
     if verbose > 0:
-        voutput += "\nrecID %s is int %s hitset %s\nfind_citations ret %s" \
-                                   % (recID, recidint is not None, hitset, ret)
+        voutput += "\nhitset %s\nfind_citations ret %s" % (hitset, ret)
 
     if ret:
         return (ret, "(", ")", "")
     else:
-        ret = get_cited_by_weight(myrecords)
+        ret = get_cited_by_weight(hitset)
         ret.sort(key=itemgetter(1))
 
     if verbose > 0:
-        voutput += "\nrecID %s is int %s hitset %s\nfind_citations ret %s" \
-                                   % (recID, recidint is not None, hitset, ret)
+        voutput += "\nhitset %s\nfind_citations ret %s" % (hitset, ret)
 
     if ret:
         return (ret, "(", ")", "")
