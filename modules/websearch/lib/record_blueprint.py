@@ -174,6 +174,7 @@ def keywords(recid):
 
 
 from invenio.bibrank_downloads_similarity import calculate_reading_similarity_list
+from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
 
 @blueprint.route('/<int:recid>/usage', methods=['GET', 'POST'])
 @request_record
@@ -181,10 +182,12 @@ def usage(recid):
     uid = current_user.get_id()
     viewsimilarity = calculate_reading_similarity_list(recid, "pageviews")
     downloadsimilarity = calculate_reading_similarity_list(recid, "downloads")
+    downloadgraph = create_download_history_graph_and_box(recid)
 
     return render_template('record_usage.html',
                             viewsimilarity = viewsimilarity,
-                            downloadsimilarity = downloadsimilarity)
+                            downloadsimilarity = downloadsimilarity,
+                            downloadgraph = downloadgraph)
 
 
 
