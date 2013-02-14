@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,14 +23,31 @@ The Refextract task tests suite for tasks
 It requires a fully functional invenio installation.
 """
 
-# Note: unit tests were moved to the regression test suite.  Keeping
-# this file here with empty test case set in order to overwrite any
-# previously installed file.  Also, keeping TEST_SUITE empty so that
-# `inveniocfg --run-unit-tests' would not complain.
+import unittest
 
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.refextract_api import update_references, \
+                                   RecordHasReferences, \
+                                   FullTextNotAvailable
 
-TEST_SUITE = make_test_suite()
 
-if __name__ == "__main__":
+class RefextractApiTest(unittest.TestCase):
+    def test_no_fulltext(self):
+        try:
+            update_references(1000000000000)
+            self.fail()
+        except FullTextNotAvailable:
+            # As expected
+            pass
+
+    def test_no_overwrite(self):
+        try:
+            update_references(92, overwrite=False)
+            self.fail()
+        except RecordHasReferences:
+            # As expected
+            pass
+
+TEST_SUITE = make_test_suite(RefextractApiTest)
+if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
