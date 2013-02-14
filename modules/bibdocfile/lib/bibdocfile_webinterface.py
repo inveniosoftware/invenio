@@ -216,7 +216,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             if not docfile.hidden_p():
                                 if not readonly:
                                     ip = str(req.remote_ip)
-                                    doc.register_download(ip, version, format, uid)
+                                    doc.register_download(ip, docfile.get_version(), format, uid)
                                 try:
                                     return docfile.stream(req, download=is_download)
                                 except InvenioBibDocFileError, msg:
