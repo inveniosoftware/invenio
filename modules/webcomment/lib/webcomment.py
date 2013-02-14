@@ -1856,12 +1856,17 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
                 return (1,"")
             else:
                 try:
-                    raise InvenioWebCommentWarning(_('Record ID %s does not exist in the database.') % recID)
+                    if success == -1:
+                        status = 'deleted'
+                        raise InvenioWebCommentWarning(_('The record has been deleted.'))
+                    else:
+                        status = 'inexistant'
+                        raise InvenioWebCommentWarning(_('Record ID %s does not exist in the database.') % recID)
                 except InvenioWebCommentWarning, exc:
                     register_exception(stream='warning')
                     warnings.append((exc.message, ''))
                 #warnings.append(('ERR_WEBCOMMENT_RECID_INEXISTANT', recID))
-                return (0, webcomment_templates.tmpl_record_not_found(status='inexistant', recID=recID, ln=ln))
+                return (0, webcomment_templates.tmpl_record_not_found(status=status, recID=recID, ln=ln))
         elif recID == 0:
             try:
                 raise InvenioWebCommentWarning(_('No record ID was given.'))
