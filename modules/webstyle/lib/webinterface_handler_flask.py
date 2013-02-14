@@ -87,7 +87,8 @@ def create_invenio_flask_app():
                                   pretty_date
     from invenio.urlutils import create_url
     from invenio.cache import cache
-    from invenio.jinja2utils import CollectionExtension, DynCacheExtension
+    from invenio.jinja2utils import CollectionExtension, DynCacheExtension, \
+                                    hack_jinja2_utf8decoding
     from invenio.webmessage_mailutils import email_quoted_txt2html
     from flask.ext.assets import Environment, Bundle
     from invenio.webinterface_handler_flask_utils import unicodifier
@@ -99,6 +100,10 @@ def create_invenio_flask_app():
     from invenio.webinterface_handler_wsgi import is_mp_legacy_publisher_path, \
                                                   SimulatedModPythonRequest, \
                                                   mp_legacy_publisher
+
+    # See note on Jinja2 string decoding using ASCII codec instead of UTF8 in
+    # function documentation
+    hack_jinja2_utf8decoding()
 
     if CFG_HAS_HTTPS_SUPPORT:
         # Makes request always run over HTTPS.

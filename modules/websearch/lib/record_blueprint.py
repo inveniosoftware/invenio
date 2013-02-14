@@ -30,7 +30,6 @@ from flask import Blueprint, session, make_response, g, render_template, \
 from invenio.cache import cache
 from invenio.config import CFG_SITE_RECORD
 from invenio.intbitset import intbitset as HitSet
-from invenio.webinterface_handler_flask_utils import unicodifier
 from invenio.sqlalchemyutils import db
 from invenio.websearch_model import Collection, CollectionCollection
 from invenio.websession_model import User
@@ -82,7 +81,7 @@ def request_record(f):
         if not current_user.is_guest:
             user = User.query.get(current_user.get_id())
         title = get_fieldvalues(recid, '245__a')
-        title = title[0].decode('utf-8') if len(title) > 0 else ''
+        title = title[0] if len(title) > 0 else ''
 
         b = get_collection_breadcrumbs(collection, [(_('Home'),'')])
         b += [(title, 'record.metadata', dict(recid=recid))]
@@ -102,7 +101,7 @@ def request_record(f):
 
             t = {'key':b+'.'+k}
             t.update(v)
-            tabs.append(unicodifier(t))
+            tabs.append(t)
             if v['visible']:
                 g.record_tab_keys.append(b+'.'+k)
 

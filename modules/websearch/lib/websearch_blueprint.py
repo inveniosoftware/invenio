@@ -60,7 +60,7 @@ def cached_format_record(recIDs, of, ln='', verbose=0,
                          req=None, on_the_fly=False):
     #FIXME move to websearch.py
     return print_record(recIDs, of, ln=ln, verbose=verbose,
-                        brief_links=False).decode('utf8')
+                        brief_links=False)
 
 
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
@@ -109,7 +109,7 @@ def get_collection_breadcrumbs(collection, breadcrumbs=None, builder=None,
         if builder is not None:
             crumb = builder(collection)
         else:
-            crumb = (unicode(collection.name_ln.decode('utf-8')),
+            crumb = (collection.name_ln,
                     'search.collection',
                      dict(name=collection.name))
         breadcrumbs.append(crumb)
