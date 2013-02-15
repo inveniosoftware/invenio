@@ -54,3 +54,8 @@ sys.stdout = sys.stderr
 
 from invenio.webinterface_handler_flask import create_invenio_flask_app
 application = create_invenio_flask_app()
+
+from invenio.config import CFG_DEVEL_SITE
+if CFG_DEVEL_SITE > 8:
+    from werkzeug.debug import DebuggedApplication
+    application = DebuggedApplication(application, evalex=True)
