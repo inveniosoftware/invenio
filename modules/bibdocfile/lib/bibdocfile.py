@@ -3247,13 +3247,9 @@ class Md5Folder:
     def __init__(self, folder):
         """Initialize the class from the md5 checksum of a given path"""
         self.folder = folder
-        try:
-            self.load()
-        except InvenioBibDocFileError:
-            self.md5s = {}
-            self.update()
+        self.load()
 
-    def update(self, only_new = True):
+    def update(self, only_new=True):
         """Update the .md5 file with the current files. If only_new
         is specified then only not already calculated file are calculated."""
         if not only_new:
@@ -3274,42 +3270,38 @@ class Md5Folder:
             md5file.close()
             os.umask(old_umask)
         except Exception, e:
-            register_exception()
-            raise InvenioBibDocFileError, "Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e)
+            register_exception(alert_admin=True)
+            raise InvenioBibDocFileError("Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e))
 
     def load(self):
         """Load .md5 into the md5 dictionary"""
         self.md5s = {}
-        try:
-            md5file = open(os.path.join(self.folder, ".md5"), "r")
-            for row in md5file:
+        md5_path = os.path.join(self.folder, ".md5")
+        if os.path.exists(md5_path):
+            for row in open(md5_path, "r"):
                 md5hash = row[:32]
                 filename = row[34:].strip()
                 self.md5s[filename] = md5hash
-            md5file.close()
-        except IOError:
+        else:
             self.update()
-        except Exception, e:
-            register_exception()
-            raise InvenioBibDocFileError, "Encountered an exception while loading .md5 for folder '%s': '%s'" % (self.folder, e)
 
-    def check(self, filename = ''):
+    def check(self, filename=''):
         """Check the specified file or all the files for which it exists a hash
         for being coherent with the stored hash."""
         if filename and filename in self.md5s.keys():
             try:
                 return self.md5s[filename] == calculate_md5(os.path.join(self.folder, filename))
             except Exception, e:
-                register_exception()
-                raise InvenioBibDocFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
+                register_exception(alert_admin=True)
+                raise InvenioBibDocFileError("Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e))
         else:
             for filename, md5hash in self.md5s.items():
                 try:
                     if calculate_md5(os.path.join(self.folder, filename)) != md5hash:
                         return False
                 except Exception, e:
-                    register_exception()
-                    raise InvenioBibDocFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
+                    register_exception(alert_admin=True)
+                    raise InvenioBibDocFileError("Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e))
             return True
 
     def get_checksum(self, filename):
@@ -3335,7 +3327,7 @@ def calculate_md5_external(filename):
         else:
             return ret
     except Exception, e:
-        raise InvenioBibDocFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+        raise InvenioBibDocFileError("Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e))
 
 def calculate_md5(filename, force_internal=False):
     """Calculate the md5 of a physical file. This is suitable for files smaller
@@ -3353,8 +3345,8 @@ def calculate_md5(filename, force_internal=False):
             to_be_read.close()
             return computed_md5.hexdigest()
         except Exception, e:
-            register_exception()
-            raise InvenioBibDocFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+            register_exception(alert_admin=True)
+            raise InvenioBibDocFileError("Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e))
     else:
         return calculate_md5_external(filename)
 
