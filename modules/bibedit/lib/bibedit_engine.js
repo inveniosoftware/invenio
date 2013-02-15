@@ -3904,6 +3904,9 @@ function onPerformPaste(){
 
      According to the default behaviour, the fields are appended as last of the same kind
    */
+   if (!gRecord) {
+    return;
+   }
 
   if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
     /*we do not want to perform this in case we are in an ordinary text area*/
@@ -3911,11 +3914,14 @@ function onPerformPaste(){
   }
 
   var clipboardContent = clipboardPasteValue();
+  if (!clipboardContent) {
+    return;
+  }
 
   var record = null;
-  try{
+  try {
     record = decodeMarcXMLRecord(clipboardContent);
-  } catch (err){
+  } catch (err) {
     alert("Error when parsing XML occured ... " + err.mesage);
   }
 
