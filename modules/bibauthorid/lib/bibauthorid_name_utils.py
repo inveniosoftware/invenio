@@ -671,8 +671,8 @@ def compare_names(origin_name, target_name, initials_penalty=False):
         initials_screwup = 0
         initials_distance = 0
 
-    score = min((score - (0.75 * initials_screwup + 0.10 * (1 - initials_c)\
-            + 0.15 * initials_distance) * (score)), 0.0)
+    score = max((score - ((0.75 * initials_screwup + 0.10 * (1. - initials_c)\
+            + 0.15 * initials_distance) * score)), 0.0)
     name_comparison_print("|- initials sets: ", no[1], " ", nt[1])
     name_comparison_print("|- initials distance: ", initials_distance)
     name_comparison_print("|- initials c: ", initials_c)
@@ -707,7 +707,7 @@ def compare_names(origin_name, target_name, initials_penalty=False):
         max_names_screwup = 0
         avg_names_screwup = 0
 
-    score = min(score - score * ( 0.75 * max_names_screwup + 0.25 * avg_names_screwup), 0.0)
+    score = max(score - score * ( 0.75 * max_names_screwup + 0.25 * avg_names_screwup), 0.0)
     name_comparison_print("|- max names screwup: ", max_names_screwup)
     name_comparison_print("|- avg screwup: ", avg_names_screwup)
     name_comparison_print("||- names score: ", score)
