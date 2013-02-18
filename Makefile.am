@@ -94,7 +94,7 @@ install-mathjax-plugin:
 	mkdir -p ${prefix}/var/www/MathJax
 	(cd /tmp/invenio-mathjax-plugin && \
 	wget '$(MATHJAX)' -O mathjax.zip && \
-	unzip -q mathjax.zip && cd mathjax-MathJax-* && cp -ur * \
+	unzip -q mathjax.zip && cd mathjax-MathJax-* && cp -r * \
 	${prefix}/var/www/MathJax)
 	rm -fr /tmp/invenio-mathjax-plugin
 	@echo "************************************************************"
