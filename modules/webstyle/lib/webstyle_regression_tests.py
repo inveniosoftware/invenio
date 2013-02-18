@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,8 +19,6 @@
 
 """WebStyle Regression Test Suite."""
 
-__revision__ = "$Id$"
-
 from invenio.testutils import InvenioTestCase
 import httplib
 import os
@@ -28,7 +26,7 @@ import urlparse
 import mechanize
 from urllib2 import urlopen, HTTPError
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_DEVEL_SITE
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_DEVEL_SITE, CFG_SITE_RECORD
 from invenio.bibdocfile import calculate_md5
 from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio.goto_engine import CFG_GOTO_PLUGINS, register_redirection, drop_redirection, update_redirection
@@ -76,7 +74,9 @@ class WebStyleGotoTests(InvenioTestCase):
         drop_redirection('first_record')
         drop_redirection('invalid_external')
         drop_redirection('latest_article')
+        drop_redirection('latest_picture')
         drop_redirection('latest_pdf_article')
+        drop_redirection('latest_jpeg_picture')
 
     def test_plugin_availability(self):
         """webstyle - test GOTO plugin availability"""
@@ -87,18 +87,18 @@ class WebStyleGotoTests(InvenioTestCase):
 
     def test_simple_relative_redirection(self):
         """webstyle - test simple relative redirection via goto_plugin_simple"""
-        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/1'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/1')
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/%s/1' % CFG_SITE_RECORD})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), '%s/%s/1' % (CFG_SITE_URL, CFG_SITE_RECORD))
 
     def test_simple_absolute_redirection(self):
         """webstyle - test simple absolute redirection via goto_plugin_simple"""
-        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': CFG_SITE_URL + '/record/1'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/1')
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '%s/%s/1' % (CFG_SITE_URL, CFG_SITE_RECORD)})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), '%s/%s/1' % (CFG_SITE_URL, CFG_SITE_RECORD))
 
     def test_simple_absolute_redirection_https(self):
         """webstyle - test simple absolute redirection to https via goto_plugin_simple"""
-        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': CFG_SITE_SECURE_URL + '/record/1'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_SECURE_URL + '/record/1')
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '%s/%s/1' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD)})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), '%s/%s/1' % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD))
 
     def test_invalid_external_redirection(self):
         """webstyle - test simple absolute redirection to https via goto_plugin_simple"""
@@ -108,25 +108,25 @@ class WebStyleGotoTests(InvenioTestCase):
     def test_latest_article_redirection(self):
         """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
         register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article'), CFG_SITE_URL + '/record/128')
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article'), '%s/%s/128' % (CFG_SITE_URL, CFG_SITE_RECORD))
 
-    @nottest
-    def FIXME_TICKET_1293_test_latest_pdf_article_redirection(self):
+    def test_latest_jpeg_picture_redirection(self):
         """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
-        register_redirection('latest_pdf_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles', 'format': '.pdf'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_pdf_article'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
+        register_redirection('latest_jpeg_picture', 'goto_plugin_latest_record', parameters={'cc': 'Pictures', 'format': '.jpeg'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_jpeg_picture'), '%s/%s/7/files/9806033.jpeg' % (CFG_SITE_URL, CFG_SITE_RECORD))
 
-    @nottest
-    def FIXME_TICKET_1293_test_URL_argument_in_redirection(self):
+    def test_URL_argument_in_redirection(self):
         """webstyle - test redirecting while passing arguments on the URL"""
         register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article?format=.pdf'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
+        register_redirection('latest_picture', 'goto_plugin_latest_record', parameters={'cc': 'Pictures'})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article?format=.pdf'), '%s/%s/128' % (CFG_SITE_URL, CFG_SITE_RECORD))
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_picture?format=.jpeg'), '%s/%s/7/files/9806033.jpeg' % (CFG_SITE_URL, CFG_SITE_RECORD))
 
     def test_updating_redirection(self):
         """webstyle - test updating redirection"""
-        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/1'})
-        update_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/2'})
-        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/2')
+        register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/%s/1' % CFG_SITE_RECORD})
+        update_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/%s/2' % CFG_SITE_RECORD})
+        self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/%s/2' % CFG_SITE_RECORD)
 
 
 TEST_SUITE = make_test_suite(WebStyleWSGIUtilsTests, WebStyleGotoTests)
