@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -72,9 +72,22 @@ class TextmarcToXMLTests(unittest.TestCase):
         260__ $$c1961
         300__ $$a15"""
         output = get_xml_from_textmarc(1, textmarc)
-        self.assertEqual(output['resultMsg'], 'textmarc_parsing_error')
-        expected_error = [1, "100__ $$a"]
-        self.assertEqual(output['parse_error'][:-1], expected_error)
+        # We expect success now, ignoring empty field, see ticket:1269.
+        # <http://invenio-software.org/ticket/1269>
+        self.assertEqual(output['resultMsg'], 'textmarc_parsing_success')
+        self.assertEqual(output['resultXML'], """<record>
+   <controlfield tag="001">1</controlfield>
+   <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Pion production by 24 GeV/c protons in hydrogen</subfield>
+   </datafield>
+   <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="c">1961</subfield>
+   </datafield>
+   <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">15</subfield>
+   </datafield>
+</record>
+""")
 
     def test_accept_fft_tags_in_textmarc(self):
         textmarc = """100__ $$aDoe, J.$$uCERN
