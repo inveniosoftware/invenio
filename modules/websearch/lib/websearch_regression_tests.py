@@ -3308,6 +3308,11 @@ class WebSearchRestrictedCollectionTest(InvenioTestCase):
                             test_web_page_content(CFG_SITE_URL + '/collection/Theses',
                                                   expected_text="Latest additions"))
 
+    def test_restricted_record_not_in_latest_addition(self):
+        """websearch - restricted record never appear in latest addition"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/collection/Preprints',
+                                                  unexpected_text="Notes on statistics for physicists"))
+
     def test_restricted_search_as_anonymous_guest(self):
         """websearch - restricted collection not searchable by anonymous guest"""
         browser = Browser()

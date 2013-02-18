@@ -327,17 +327,20 @@ class Collection:
         # close file:
         f.close()
 
-    def update_webpage_cache(self, lang):
+    def update_webpage_cache(self, lang, all_restricted_recids=None):
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and
            call write_cache_file() afterwards to update the collection webpage cache."""
+
+        if all_restricted_recids is None:
+            all_restricted_recids = intbitset()
 
         ## precalculate latest additions for non-aggregate
         ## collections (the info is ln and as independent)
         if self.dbquery:
             if CFG_WEBSEARCH_I18N_LATEST_ADDITIONS:
-                self.create_latest_additions_info(ln=lang)
+                self.create_latest_additions_info(ln=lang, all_restricted_recids=all_restricted_recids)
             else:
-                self.create_latest_additions_info()
+                self.create_latest_additions_info(all_restricted_recids=all_restricted_recids)
 
         # load the right message language
         _ = gettext_set_language(lang)
@@ -437,15 +440,20 @@ class Collection:
 
         return websearch_templates.tmpl_searchalso(ln, engines_list, self.id)
 
-    def create_latest_additions_info(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, ln=CFG_SITE_LANG):
+    def create_latest_additions_info(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, ln=CFG_SITE_LANG, all_restricted_recids=None):
         """
         Create info about latest additions that will be used for
         create_instant_browse() later.
+
+        Note: all_restricted_recids is passed along in order to subtract
+              potentially resstricted records.
         """
+        if all_restricted_recids is None:
+            all_restricted_recids = intbitset()
         self.latest_additions_info = []
         if self.nbrecs and self.reclist:
             # firstly, get last 'rg' records:
-            recIDs = list(self.reclist)
+            recIDs = list(self.reclist - all_restricted_recids)
             of = 'hb'
             # CERN hack begins: tweak latest additions for selected collections:
             if CFG_CERN_SITE:
@@ -1166,29 +1174,43 @@ def task_run_core():
                 colls.append(get_collection(row[0]))
         # secondly, update collection reclist cache:
         if task_get_option('part', 1) == 1:
-            i = 0
-            for coll in colls:
-                i += 1
+            for i, coll in enumerate(colls):
                 write_message("%s / reclist cache update" % coll.name)
                 if str(coll.dbquery).startswith("hostedcollection:"):
                     coll.set_nbrecs_for_external_collection()
                 else:
                     coll.calculate_reclist()
                 coll.update_reclist()
-                task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
+                task_update_progress("Part 1/2: done %d/%d" % (i + 1, len(colls)))
                 task_sleep_now_if_required(can_stop_too=True)
         # thirdly, update collection webpage cache:
         if task_get_option("part", 2) == 2:
-            i = 0
-            for coll in colls:
-                i += 1
+            ## Let's refresh the cache of restricted records, in order to
+            ## not disclose them in latest_addition.
+            from search_engine import restricted_collection_cache, get_all_restricted_recids
+            restricted_collection_cache.recreate_cache_if_needed()
+            all_restricted_recids = get_all_restricted_recids()
+
+            for i, coll in enumerate(colls):
                 if coll.reclist_updated_since_start or task_has_option("collection") or task_get_option("force") or not task_get_option("quick"):
                     write_message("%s / webpage cache update" % coll.name)
                     for lang in CFG_SITE_LANGS:
-                        coll.update_webpage_cache(lang)
+                        if coll.get_name() in restricted_collection_cache.cache:
+                            ## We don't strip away restricted records as the collection
+                            ## is anyway restricted and hence the user must be
+                            ## already authenticated to see records.
+                            ## Additionally, by default, since CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY
+                            ## is set to ANY, any record belonging to a restricted
+                            ## collection is entitled to be displayed in the
+                            ## latest additions.
+                            coll.update_webpage_cache(lang)
+                        else:
+                            ## We strip away restricted records to play safe against
+                            ## not authenticated users.
+                            coll.update_webpage_cache(lang, all_restricted_recids)
                 else:
                     write_message("%s / webpage cache seems not to need an update and --quick was used" % coll.name, verbose=2)
-                task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
+                task_update_progress("Part 2/2: done %d/%d" % (i + 1, len(colls)))
                 task_sleep_now_if_required(can_stop_too=True)
 
         # finally update the cache last updated timestamp:
