@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -888,7 +888,7 @@ class BibUploadFMTModeTest(GenericBibUploadTest):
                                           self.expected_xm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))), '')
         self.assertEqual(compare_hmbuffers(hm_after,
                                           self.expected_hm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))), '')
-        self.assertEqual(run_sql('SELECT last_updated from bibfmt WHERE id_bibrec=%s', (new_recid, ))[0][0], datetime.datetime(2008, 3, 14, 15, 14))
+        self.assertEqual(run_sql("SELECT last_updated from bibfmt WHERE format='HB' AND id_bibrec=%s", (new_recid, ))[0][0], datetime.datetime(2008, 3, 14, 15, 14))
         self.failUnless(hb_after.startswith("Test. Okay."))
 
     def test_updating_existing_record_formats_in_format_mode(self):
