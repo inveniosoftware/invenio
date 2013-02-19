@@ -2136,6 +2136,21 @@ class WebSearchAuthorCountQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=50%2B&f=authorcount&of=id',
                                                expected_text="[10, 17]"))
 
+class WebSearchGetRecordTests(unittest.TestCase):
+    def setUp(self):
+        self.recid = run_sql("INSERT INTO bibrec(creation_date, modification_date) VALUES(NOW(), NOW())")
+
+    def tearDown(self):
+        run_sql("DELETE FROM bibrec WHERE id=%s", (self.recid,))
+
+    def test_get_record(self):
+        """bibformat - test print_record and get_record of empty record"""
+        from invenio.search_engine import print_record, get_record
+        self.assertEqual(print_record(self.recid, 'xm'), '    <record>\n        <controlfield tag="001">%s</controlfield>\n    </record>\n\n    ' % self.recid)
+        self.assertEqual(get_record(self.recid), {'001': [([], ' ', ' ', str(self.recid), 1)]})
+
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -2175,7 +2190,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestWildcardLimit,
                              WebSearchSynonymQueryTest,
                              WebSearchWashCollectionsTest,
-                             WebSearchAuthorCountQueryTest)
+                             WebSearchAuthorCountQueryTest,
+                             WebSearchGetRecordTests)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
