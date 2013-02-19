@@ -114,7 +114,6 @@ class FormatElementTest(unittest.TestCase):
     def setUp(self):
         # pylint: disable=C0103
         """bibformat - setting python path to test elements"""
-        self.original_sys_path = sys.path
         sys.path.append('%s' % CFG_TMPDIR)
         self.old_elements_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
@@ -122,7 +121,7 @@ class FormatElementTest(unittest.TestCase):
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
 
     def tearDown(self):
-        sys.path = self.original_sys_path
+        sys.path.pop()
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = self.old_elements_path
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = self.old_import_path
 
@@ -621,6 +620,8 @@ class FormatTest(unittest.TestCase):
     def setUp(self):
         # pylint: disable=C0103
         """ bibformat - prepare BibRecord objects"""
+        sys.path.append('%s' % CFG_TMPDIR)
+
         self.xml_text_1 = '''
         <record>
         <controlfield tag="001">33</controlfield>
@@ -721,6 +722,7 @@ class FormatTest(unittest.TestCase):
         bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
 
     def tearDown(self):
+        sys.path.pop()
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = self.old_elements_path
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = self.old_import_path
