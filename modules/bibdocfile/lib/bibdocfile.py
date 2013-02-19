@@ -2024,6 +2024,32 @@ class BibDoc(object):
         just_added_file = self.get_file(docformat, version)
         run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, version, docformat, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
 
+    def change_docformat(self, oldformat, newformat):
+        """
+        Renames a format name on disk and in all BibDoc structures.
+        The change will touch only the last version files.
+        The change will take place only if the newformat doesn't already exist.
+        @param oldformat: the format that needs to be renamed
+        @type oldformat: string
+        @param newformat: the format new name
+        @type newformat: string
+        """
+        oldformat = normalize_format(oldformat)
+        newformat = normalize_format(newformat)
+        if self.format_already_exists_p(newformat):
+            # same format already exists in the latest files, abort
+            return
+        for bibdocfile in self.list_latest_files():
+            if bibdocfile.get_format() == oldformat:
+                # change format -> rename x.oldformat -> x.newformat
+                dirname, base, docformat, version = decompose_file_with_version(bibdocfile.get_full_path())
+                os.rename(bibdocfile.get_full_path(), os.path.join(dirname, '%s%s;%i' %(base, newformat, version)))
+                Md5Folder(self.basedir).update()
+                self.touch()
+                self._build_file_list('rename')
+                self._sync_to_db()
+                return
+
     def purge(self):
         """
         Physically removes all the previous version of the given bibdoc.

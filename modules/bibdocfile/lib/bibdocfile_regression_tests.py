@@ -293,10 +293,14 @@ class BibDocsTest(unittest.TestCase):
         #check modification time
         self.assertEqual(my_new_bibdoc.get_file('.jpg', version=1).md, timestamp1)
         self.assertEqual(my_new_bibdoc.get_file('.gif', version=1).md, timestamp4)
+        #change the format name
+        my_new_bibdoc.change_docformat('.gif', '.gif;icon-640')
+        self.assertEqual(my_new_bibdoc.format_already_exists_p('.gif'), False)
+        self.assertEqual(my_new_bibdoc.format_already_exists_p('.gif;icon-640'), True)
         #delete file
         my_new_bibdoc.delete_file('.jpg', 1)
         #delete file
-        my_new_bibdoc.delete_file('.gif', 1)
+        my_new_bibdoc.delete_file('.gif;icon-640', 1)
         #empty bibdoc
         self.assertEqual(my_new_bibdoc.empty_p(), True)
         #hidden?
