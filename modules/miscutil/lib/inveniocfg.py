@@ -221,7 +221,8 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_WEBSTYLE_REVERSE_PROXY_IPS',
                        'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS',
                        'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS',
-                       'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',]:
+                       'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',
+                       'CFG_FLASK_DISABLED_BLUEPRINTS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

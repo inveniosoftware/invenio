@@ -40,7 +40,7 @@ from invenio.config import CFG_PYLIBDIR, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
     CFG_LOGDIR, CFG_SITE_LANG, CFG_WEBDIR, \
     CFG_ETCDIR, CFG_DEVEL_SITE, \
-    CFG_FLASK_CACHE_TYPE, \
+    CFG_FLASK_CACHE_TYPE, CFG_FLASK_DISABLED_BLUEPRINTS, \
     CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY
@@ -449,6 +449,8 @@ def create_invenio_flask_app():
         """
         Handy function to bridge pluginutils with (Invenio) blueprints.
         """
+        if plugin_name in CFG_FLASK_DISABLED_BLUEPRINTS:
+            raise ValueError('%s is excluded by CFG_FLASK_DISABLED_BLUEPRINTS' % plugin_name)
         from invenio.webinterface_handler_flask_utils import InvenioBlueprint
         if 'blueprint' in dir(plugin_code):
             candidate = getattr(plugin_code, 'blueprint')
