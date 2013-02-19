@@ -1861,6 +1861,13 @@ class BibDoc(object):
         #if self.recid:
             #run_sql('UPDATE bibrec SET modification_date=NOW() WHERE id=%s', (self.recid, ))
 
+    def change_doctype(self, new_doctype):
+        """
+        Modify the doctype of a BibDoc
+        """
+        run_sql('UPDATE bibdoc SET doctype=%s WHERE id=%s', (new_doctype, self.id))
+        run_sql('UPDATE bibrec_bibdoc SET type=%s WHERE id_bibdoc=%s', (new_doctype, self.id))
+
     def set_status(self, new_status):
         """
         Set a new status. A document with a status information is a restricted

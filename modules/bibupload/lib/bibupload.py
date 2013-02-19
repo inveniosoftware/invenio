@@ -2021,6 +2021,9 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             if restriction != KEEP_OLD_VALUE:
                                 if not pretend:
                                     bibdoc.set_status(restriction)
+                            if doctype and doctype!= KEEP_OLD_VALUE:
+                                if not pretend:
+                                    bibdoc.change_doctype(doctype)
                             if urls:
                                 (first_url, first_format, first_description, first_comment, first_flags, first_timestamp) = urls[0]
                                 other_urls = urls[1:]
