@@ -2831,8 +2831,7 @@ def generic_path2bidocfile(fullpath):
     md5folder = Md5Folder(path)
     checksum = md5folder.get_checksum(os.path.basename(fullpath))
     return BibDocFile(fullpath=fullpath,
-        doctype=None,
-        recid_doctypes = [(0, None, name)],
+        recid_doctypes=[(0, None, name)],
         version=version,
         docformat=docformat,
         docid=0,
