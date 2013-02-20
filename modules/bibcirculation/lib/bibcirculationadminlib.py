@@ -400,7 +400,7 @@ def borrower_notification(req, borrower_id, borrower_email, template, message,
         show_template = load_template(template)
 
     elif send_message:
-        send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+        send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
                    toaddr   = email,
                    subject  = subject,
                    content  = message,
