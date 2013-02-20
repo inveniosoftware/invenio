@@ -47,10 +47,15 @@ CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "tests_bibformat_elements"
 class FormatTemplateTest(unittest.TestCase):
     """ bibformat - tests on format templates"""
 
+    def setUp(self):
+        self.old_templates_path = bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH
+        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
+
+    def tearDown(self):
+        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = self.old_templates_path
+
     def test_get_format_template(self):
         """bibformat - format template parsing and returned structure"""
-
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
 
         #Test correct parsing and structure
         template_1 = bibformat_engine.get_format_template("Test1.bft", with_attributes=True)
@@ -73,8 +78,6 @@ class FormatTemplateTest(unittest.TestCase):
 
     def test_get_format_templates(self):
         """ bibformat - loading multiple format templates"""
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
-
         templates = bibformat_engine.get_format_templates(with_attributes=True)
         #test correct loading
         self.assert_("Test1.bft" in templates.keys())
@@ -89,7 +92,6 @@ class FormatTemplateTest(unittest.TestCase):
 
     def test_get_format_template_attrs(self):
         """ bibformat - correct parsing of attributes in format template"""
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
         attrs = bibformat_engine.get_format_template_attrs("Test1.bft")
         self.assertEqual(attrs['name'], "name_test")
         self.assertEqual(attrs['description'], "desc_test")
@@ -97,7 +99,6 @@ class FormatTemplateTest(unittest.TestCase):
 
     def test_get_fresh_format_template_filename(self):
         """ bibformat - getting fresh filename for format template"""
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
         filename_and_name_1 = bibformat_engine.get_fresh_format_template_filename("Test")
         self.assert_(len(filename_and_name_1) >= 2)
         self.assertEqual(filename_and_name_1[0], "Test.bft")
@@ -113,12 +114,20 @@ class FormatElementTest(unittest.TestCase):
     def setUp(self):
         # pylint: disable=C0103
         """bibformat - setting python path to test elements"""
+        self.original_sys_path = sys.path
         sys.path.append('%s' % CFG_TMPDIR)
+        self.old_elements_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
+        self.old_import_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+
+    def tearDown(self):
+        sys.path = self.original_sys_path
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = self.old_elements_path
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = self.old_import_path
 
     def test_resolve_format_element_filename(self):
         """bibformat - resolving format elements filename """
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-
         #Test elements filename starting without bfe_, with underscore instead of space
         filenames = ["test 1", "test 1.py", "bfe_test 1", "bfe_test 1.py", "BFE_test 1",
                      "BFE_TEST 1", "BFE_TEST 1.py", "BFE_TeST 1.py", "BFE_TeST 1",
@@ -156,10 +165,6 @@ class FormatElementTest(unittest.TestCase):
 
     def test_get_format_element(self):
         """bibformat - format elements parsing and returned structure"""
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-
-
         #Test loading with different kind of names, for element with spaces in name, without bfe_
         element_1 = bibformat_engine.get_format_element("test 1", with_built_in_params=True)
         self.assert_(element_1 is not None)
@@ -217,8 +222,6 @@ class FormatElementTest(unittest.TestCase):
 
     def test_get_format_element_attrs_from_function(self):
         """ bibformat - correct parsing of attributes in 'format' docstring"""
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
         element_1 = bibformat_engine.get_format_element("test 1", with_built_in_params=True)
         function = element_1['code']
         attrs = bibformat_engine.get_format_element_attrs_from_function(function,
@@ -233,9 +236,6 @@ class FormatElementTest(unittest.TestCase):
 
     def test_get_format_elements(self):
         """bibformat - multiple format elements parsing and returned structure"""
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-
         elements = bibformat_engine.get_format_elements()
         self.assert_(isinstance(elements, dict))
         self.assertEqual(elements['TEST_1']['attrs']['name'], "TEST_1")
@@ -245,8 +245,8 @@ class FormatElementTest(unittest.TestCase):
 
     def test_get_tags_used_by_element(self):
         """bibformat - identification of tag usage inside element"""
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = bibformat_config.CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = bibformat_config.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = self.old_elements_path
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = self.old_import_path
         tags = bibformatadminlib.get_tags_used_by_element('bfe_abstract.py')
         self.failUnless(len(tags) == 4,
                         'Could not correctly identify tags used in bfe_abstract.py')
@@ -254,10 +254,15 @@ class FormatElementTest(unittest.TestCase):
 class OutputFormatTest(unittest.TestCase):
     """ bibformat - tests on output formats"""
 
-    def test_get_output_format(self):
-        """ bibformat - output format parsing and returned structure """
+    def setUp(self):
+        self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
 
+    def tearDown(self):
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
+
+    def test_get_output_format(self):
+        """ bibformat - output format parsing and returned structure """
         filename_1 = bibformat_engine.resolve_output_format_filename("test1")
         output_1 = bibformat_engine.get_output_format(filename_1, with_attributes=True)
 
@@ -299,7 +304,6 @@ class OutputFormatTest(unittest.TestCase):
 
     def test_get_output_formats(self):
         """ bibformat - loading multiple output formats """
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
         outputs = bibformat_engine.get_output_formats(with_attributes=True)
         self.assert_(isinstance(outputs, dict))
         self.assert_("TEST1.bfo" in outputs.keys())
@@ -316,8 +320,6 @@ class OutputFormatTest(unittest.TestCase):
 
     def test_get_output_format_attrs(self):
         """ bibformat - correct parsing of attributes in output format"""
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
-
         attrs= bibformat_engine.get_output_format_attrs("TEST1")
 
         self.assertEqual(attrs['names']['generic'], "")
@@ -328,8 +330,6 @@ class OutputFormatTest(unittest.TestCase):
 
     def test_resolve_output_format(self):
         """ bibformat - resolving output format filename"""
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
-
         filenames = ["test1", "test1.bfo", "TEST1", "TeST1", "TEST1.bfo", "<b>test1"]
         for i in range(len(filenames)-2):
             filename_1 = bibformat_engine.resolve_output_format_filename(filenames[i])
@@ -340,8 +340,6 @@ class OutputFormatTest(unittest.TestCase):
 
     def test_get_fresh_output_format_filename(self):
         """ bibformat - getting fresh filename for output format"""
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
-
         filename_and_name_1 = bibformat_engine.get_fresh_output_format_filename("test")
         self.assert_(len(filename_and_name_1) >= 2)
         self.assertEqual(filename_and_name_1[0], "TEST.bfo")
@@ -623,7 +621,6 @@ class FormatTest(unittest.TestCase):
     def setUp(self):
         # pylint: disable=C0103
         """ bibformat - prepare BibRecord objects"""
-
         self.xml_text_1 = '''
         <record>
         <controlfield tag="001">33</controlfield>
@@ -714,11 +711,23 @@ class FormatTest(unittest.TestCase):
         <record>
         <controlfield tag="001">555</controlfield>
         </record>'''
+        self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
+        self.old_elements_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
+        self.old_import_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
+        self.old_templates_path = bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH
+        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
+
+    def tearDown(self):
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = self.old_elements_path
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = self.old_import_path
+        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = self.old_templates_path
 
     def test_decide_format_template(self):
         """ bibformat - choice made by function decide_format_template"""
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
-
         result = bibformat_engine.decide_format_template(self.bfo_1, "test1")
         self.assertEqual(result, "Thesis_detailed.bft")
 
@@ -739,11 +748,6 @@ class FormatTest(unittest.TestCase):
 
     def test_format_record(self):
         """ bibformat - correct formatting"""
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
-
         #use output format that has no match TEST DISABLED DURING MIGRATION
         #result = bibformat_engine.format_record(recID=None, of="test2", xml_record=self.xml_text_2)
         #self.assertEqual(result.replace("\n", ""),"")
@@ -779,10 +783,7 @@ class FormatTest(unittest.TestCase):
 
     def test_format_with_format_template(self):
         """ bibformat - correct formatting with given template"""
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
-
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
         template = bibformat_engine.get_format_template("Test3.bft")
         result = bibformat_engine.format_with_format_template(format_template_filename = None,
                                                               bfo=self.bfo_1,
@@ -834,7 +835,6 @@ class MarcFilteringTest(unittest.TestCase):
         numhfields = newxml.count("595")
         self.assertEqual(numhfields, 1)
 
-
 TEST_SUITE = make_test_suite(FormatTemplateTest,
                              OutputFormatTest,
                              FormatElementTest,
@@ -846,4 +846,3 @@ TEST_SUITE = make_test_suite(FormatTemplateTest,
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
-
