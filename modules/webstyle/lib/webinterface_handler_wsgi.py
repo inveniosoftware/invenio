@@ -82,6 +82,7 @@ class Response(BaseResponse, ResponseStreamMixin,
     to add support for the `stream` property.
     """
 
+
 class SimulatedModPythonRequest(object):
     """
     mod_python like request object.
@@ -104,8 +105,7 @@ class SimulatedModPythonRequest(object):
         self.__bytes_sent = 0
         self.__allowed_methods = []
         self.__cleanups = []
-        self.__mimetype = request.mimetype
-        self.headers_out = { 'Cache-Control': None }
+        self.headers_out = {'Cache-Control': None}
         #self.headers_out.update(dict(request.headers))
         ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
         self.__write = None
@@ -192,20 +192,7 @@ class SimulatedModPythonRequest(object):
         for k, v in self.headers_out.iteritems():
             self.response.headers[k] = v
 
-        self.response.headers['Content-Type'] = self.__mimetype
         self.__write = self.response.stream.write
-        return
-        if not self.__response_sent_p:
-            self.__tainted = True
-            if self.__allowed_methods and self.__status.startswith('405 ') or self.__status.startswith('501 '):
-                self.__headers['Allow'] = ', '.join(self.__allowed_methods)
-
-            ## See: <http://www.python.org/dev/peps/pep-0333/#the-write-callable>
-            #print self.__low_level_headers
-            self.__low_level_headers = [('Content-Type', self.__mimetype)]
-            self.__write = self.__start_response(self.__status, self.__low_level_headers)
-            self.__response_sent_p = True
-            #print "Response sent: %s" % self.__headers
 
     def get_unparsed_uri(self):
         return '?'.join([self.__environ['PATH_INFO'], self.__environ['QUERY_STRING']])
@@ -214,7 +201,7 @@ class SimulatedModPythonRequest(object):
         return request.environ['PATH_INFO']
 
     def get_headers_in(self):
-        return request.headers #self.__headers_in
+        return request.headers
 
     def get_subprocess_env(self):
         return self.__environ
@@ -597,8 +584,6 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
             redirect_to_url(req, target)
 
         try:
-            #FIXME set correct mimetype?
-            req.response.mimetype = 'text/html'
             return _check_result(req, module_globals[possible_handler](req, **form))
         except TypeError, err:
             if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):
