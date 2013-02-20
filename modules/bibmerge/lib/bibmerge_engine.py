@@ -147,6 +147,8 @@ def perform_request_record(requestType, uid, data):
             record_add_field(record2, '980', ' ', ' ', '', [('c', 'DELETED')])
             # mark record2 as duplicate of record1
             record_add_field(record2, '970', ' ', ' ', '', [('d', str(recid1))])
+            # add recid of deleted record to master record
+            record_add_field(record1, '981', ' ', ' ', '', [('a', str(recid2))])
 
             # submit record2 to be deleted
             xml_record2 = record_xml_output(record2)
