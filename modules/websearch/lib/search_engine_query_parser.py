@@ -755,6 +755,7 @@ class SpiresToInvenioSyntaxConverter:
             #leading 'find' is present and SPIRES syntax is switched on
             return True
         if CFG_WEBSEARCH_SPIRES_SYNTAX > 1:
+            query = self._re_pattern_double_quotes.sub(query, '')
             for word in query.split(' '):
                 if self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.has_key(word):
                     return True
