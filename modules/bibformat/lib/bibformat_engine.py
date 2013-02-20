@@ -361,7 +361,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                 out += """\n<br/><span class="quicknote">
                 Template %s could not be read.
                 </span>""" % (template)
-        if CFG_PATH_PHP:
+        if CFG_PATH_PHP and os.path.isfile(os.path.join(CFG_BINDIR, 'bibformat')):
             if verbose == 9:
                 out += """\n<br/><span class="quicknote">
                 Using old BibFormat for record %s.
