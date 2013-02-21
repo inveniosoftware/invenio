@@ -32,7 +32,7 @@ class JournalField(TextField, JsonCookerMixinBuilder('journal')):
 
         # Create our own Required data member
         # for client-side use
-        if kwargs.has_key('validators'):
+        if 'validators' in kwargs:
             for v in kwargs.get("validators"):
                 if type(v) is Required:
                     self.required = True
@@ -41,14 +41,28 @@ class JournalField(TextField, JsonCookerMixinBuilder('journal')):
 
     def pre_validate(self, form=None):
         value = self.data
-        s = SherpaRomeoSearch()
-        s.search_journal(value)
-        issn = s.parser.get_issn()
-        if type(issn) is str:  # unique journal
-            return dict(error=0, error_message='',
-                        fields=dict(issn=issn))
-        else:
+        if value == "" or value.isspace():
             return dict(error=0, error_message='')
+
+        s = SherpaRomeoSearch()
+        s.search_journal(value, 'exact')
+        if s.error:
+            return dict(info=1, info_message=s.error_message)
+
+        if s.get_num_hits() == 1:
+            issn = s.parser.get_journals(attribute='issn')
+            if issn != [] and issn is not None:
+                issn = issn[0]
+                publisher = s.parser.get_publishers(journal=value)
+                if publisher is not None and publisher != []:
+                    return dict(error=0, error_message='',
+                               fields=dict(issn=issn, publisher=publisher['name']))
+                return dict(error=0, error_message='',
+                            info=1, info_message="Journal's Publisher not found",
+                            fields=dict(publisher="", issn=issn))
+            else:
+                return dict(info=1, info_message="Couldn't find ISSN")
+        return dict(error=0, error_message='')
 
     def autocomplete(self):
         value = self.data

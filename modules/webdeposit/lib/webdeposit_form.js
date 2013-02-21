@@ -48,6 +48,85 @@ function webdeposit_init_plupload(selector, url) {
 var errors = 0;
 var oldJournal;
 
+
+function webdeposit_handle_field_data(name, value, data, url, required_fields) {
+    // handles a response from the server for the field
+    if (data.error == 1) {
+        errorMsg = data.error_message;
+        $('#error-'+name).html(errorMsg);
+        $('.error-list-'+name).hide('slow');
+        $('#error-'+name).show('slow');
+        $("#error-group-" + name).addClass('error');
+        errors++;
+    } else {
+        $('#error-'+name).hide('slow');
+        $('.error-list-'+name).hide('slow');
+        $("#error-group-" + name).removeClass('error');
+        if (errors > 0)
+            errors--;
+        emptyForm = checkEmptyFields(false, name, required_fields);
+        if (emptyForm[0] == 0) {
+            $('#empty-fields-error').hide('slow');
+        }
+        else {
+            $('#empty-fields-error').html("These fields are required!</br>" + emptyForm[1]);
+            $('#empty-fields-error').show();
+        }
+    }
+
+    dismiss = '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+
+    if (data.success == 1) {
+        success = '<div class="alert alert-success help-inline" id="success-' + name + '" style="display:none;">'
+                  + dismiss + data.success_message +
+                  '</div>';
+        $('#success-' + name).remove();
+        $('#field-' + name).append(success);
+        $('#success-' + name).show('slow');
+    }
+    else {
+      $('#success-' + name).remove();
+    }
+
+    if (data.info == 1) {
+        info = '<div class="alert alert-info help-inline" id="info-' + name + '" style="display:none;">'
+               + dismiss + data.info_message +
+               '</div>';
+        $('#info-' + name).remove();
+        $('#field-' + name).append(info);
+        $('#info-' + name).css('margin-top', '10px');
+        $('#info-' + name).css('clear', 'both');
+        $('#info-' + name).css('float', 'left');
+        $('#info-' + name).show('slow');
+    }
+    else {
+      $('#info-' + name).remove();
+    }
+
+    if (data.fields) {
+        $.each(data.fields, function(name, value) {
+            $('#error-' + name).hide('slow');
+            errors--;
+            old_value = $('[name=' + name + ']').val();
+            if (old_value != value) {
+                $('[name=' + name + ']').val(value);
+                webdeposit_handle_new_value(name, value, url, required_fields);
+            }
+        });
+    }
+
+  }
+
+function webdeposit_handle_new_value(name, value, url, required_fields) {
+  // sends an ajax request with the data
+  $.getJSON(url, {
+      name: name,
+      attribute: value
+  }, function(data){
+        webdeposit_handle_field_data(name, value, data, url, required_fields);
+  });
+}
+
 function webdeposit_input_error_check(selector, url, required_fields) {
   $(selector).change( function() {
       name = this.name;
@@ -55,62 +134,8 @@ function webdeposit_input_error_check(selector, url, required_fields) {
       $.getJSON(url, {
           name: name,
           attribute: value
-      }, function(data) {
-        if (data.error == 1) {
-            errorMsg = data.error_message;
-            $('#error-'+name).html(errorMsg);
-            $('.error-list-'+name).hide('slow');
-            $('#error-'+name).show('slow');
-            $("#error-group-" + name).addClass('error');
-            errors++;
-        } else {
-            $('#error-'+name).hide('slow');
-            $('.error-list-'+name).hide('slow');
-            $("#error-group-" + name).removeClass('error');
-            if (errors > 0)
-                errors--;
-            emptyForm = checkEmptyFields(false, name, required_fields);
-            if (emptyForm[0] == 0) {
-                $('#empty-fields-error').hide('slow');
-            }
-            else {
-                $('#empty-fields-error').html("These fields are required!</br>" + emptyForm[1]);
-                $('#empty-fields-error').show();
-            }
-        }
-
-        dismiss = '<button type="button" class="close" data-dismiss="alert">&times;</button>';
-
-        if (data.success == 1) {
-            success = '<div class="alert alert-success help-inline" id="success-' + name + '" style="display:none;">'
-                      + dismiss + data.success_message +
-                      '</div>';
-            $('#success-' + name).remove();
-            $('#field-' + name).append(success);
-            $('#success-' + name).show('slow');
-        }
-        else {
-          $('#success-' + name).remove();
-        }
-
-        if (data.info == 1) {
-            info = '<div class="alert alert-info help-inline" id="info-' + name + '" style="display:none;">'
-                   + dismiss + data.info_message +
-                   '</div>';
-            $('#info-' + name).remove();
-            $('#field-' + name).append(info);
-            $('#info-' + name).show('slow');
-        }
-        else {
-          $('#info-' + name).remove();
-        }
-
-        if (data.fields) {
-            $.each(data.fields, function(name, value) {
-                $('[name=' + name + ']').val(value);
-            });
-        }
-
+      }, function(data){
+            webdeposit_handle_field_data(name, value, data, url, required_fields)
       });
     return false;
   });
