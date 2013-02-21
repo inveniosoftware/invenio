@@ -27,7 +27,8 @@ Command options:
   -n, --number=NUM      Keep up to NUM previous dump files. [default=5]
   --params=PARAMS       Specify your own mysqldump parameters. Optional.
   --compress            Compress dump directly into gzip.
-  --slave               Perform the dump from a slave, if any.
+  --slave=HOST          Perform the dump from a slave, if no host use CFG_DATABASE_SLAVE.
+  --ignore=TABLES       Specify the tables to ignore (comma seperated)
 
 Scheduling options:
   -u, --user=USER User name to submit the task as, password needed.
@@ -85,7 +86,8 @@ def _delete_old_dumps(dirname, filename, number_to_keep):
 
 def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
                   user=CFG_DATABASE_USER, passw=CFG_DATABASE_PASS, \
-                  name=CFG_DATABASE_NAME, params=None, compress=False):
+                  name=CFG_DATABASE_NAME, params=None, compress=False, \
+                  ignore=None):
     """
     Dump Invenio database into SQL file located at DUMP_PATH.
 
@@ -118,6 +120,9 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
 
     @param compress: should the dump be compressed through gzip?
     @type compress: bool
+
+    @param ignore: list of tables to ignore in the dump
+    @type ignore: string
     """
     write_message("... writing %s" % (dump_path,))
 
@@ -130,7 +135,10 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
         # No parameters set, lets use the default ones.
         params = " --skip-opt --add-drop-table --add-locks --create-options" \
                  " --quick --extended-insert --set-charset --disable-keys" \
-                 " --lock-tables=false"
+                 " --lock-tables=false "
+
+    if ignore:
+        params += " ".join(["--ignore-table=%s.%s" % (CFG_DATABASE_NAME, table) for table in ignore])
 
     dump_cmd = "%s %s " \
                " --host=%s --port=%s --user=%s --password=%s %s" % \
@@ -159,7 +167,7 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
     write_message("... completed writing %s" % (dump_path,))
 
 
-def dump_slave_database(dump_path, host, params=None):
+def dump_slave_database(dump_path, host, params=None, ignore=None):
     """
     Performs a dump of a defined slave database, making sure
     to halt slave replication until the dump has completed.
@@ -172,6 +180,9 @@ def dump_slave_database(dump_path, host, params=None):
 
     @param params: command line parameters to pass to mysqldump. Optional.
     @type params: string
+
+    @param ignore: list of tables to ignore in the dump
+    @type ignore: string
     """
     # We need to stop slave replication before performing the dump
     write_message("... stopping slave")
@@ -197,7 +208,8 @@ def dump_slave_database(dump_path, host, params=None):
 
     dump_database(dump_path, \
                   host=host, \
-                  params=params)
+                  params=params, \
+                  ignore=ignore)
 
     write_message("... starting slave.")
     admin_cmd += " start-slave " \
@@ -242,6 +254,8 @@ def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
             if not CFG_DATABASE_SLAVE:
                 raise StandardError("ERROR: No slave defined.")
             task_set_option('slave', CFG_DATABASE_SLAVE)
+    elif key in ('--ignore'):
+        task_set_option('ignore', value)
     else:
         return False
     return True
@@ -262,11 +276,15 @@ def _dbdump_run_task_core():
     params = task_get_option('params', None)
     compress = task_get_option('compress', False)
     slave = task_get_option('slave', False)
+    ignore = task_get_option('ignore', None)
 
     output_file_suffix = task_get_task_param('task_starting_time').replace(' ', '_') + '.sql'
     if compress:
         output_file_suffix = "%s.gz" % (output_file_suffix,)
     write_message("Reading parameters ended")
+
+    if ignore:
+        ignore = [table.strip() for table in ignore.split(',')]
 
     # make dump:
     task_update_progress("Dumping database")
@@ -276,12 +294,12 @@ def _dbdump_run_task_core():
         output_file_prefix = 'slave-%s-dbdump-' % (CFG_DATABASE_NAME,)
         output_file = output_file_prefix + output_file_suffix
         dump_path = output_dir + os.sep + output_file
-        dump_slave_database(dump_path, slave, params)
+        dump_slave_database(dump_path, slave, params, ignore)
     else:
         output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
         output_file = output_file_prefix + output_file_suffix
         dump_path = output_dir + os.sep + output_file
-        dump_database(dump_path, params=params)
+        dump_database(dump_path, params=params, ignore=ignore)
 
     write_message("Database dump ended")
     # prune old dump files:
@@ -304,10 +322,11 @@ def main():
   --params=PARAMS       Specify your own mysqldump parameters. Optional.
   --compress            Compress dump directly into gzip.
   --slave=HOST          Perform the dump from a slave, if no host use CFG_DATABASE_SLAVE.
+  --ignore=TABLES       Specify the tables to ignore (comma seperated)
 """ % CFG_LOGDIR,
               version=__revision__,
               specific_params=("n:o:p:",
-                               ["number=", "output=", "params=", "slave=", "compress"]),
+                               ["number=", "output=", "params=", "slave=", "compress", 'ignore=']),
               task_submit_elaborate_specific_parameter_fnc=_dbdump_elaborate_submit_param,
               task_run_fnc=_dbdump_run_task_core)
 
