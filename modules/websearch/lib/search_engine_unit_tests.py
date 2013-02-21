@@ -249,8 +249,8 @@ class TestQueryParser(unittest.TestCase):
     def test_parsing_colons_and_spaces_badly_struuctured(self):
         "search engine - parsing query with colons and spaces, badly structured"
         self._check("foo: bar", 'abstract', None,
-                    [['+', 'bar', 'abstract', 'w'],
-                     ['+', 'foo:', 'abstract', 'w']])
+                    [['+', 'foo', 'abstract', 'w'],
+                     ['+', 'bar', 'abstract', 'w']])
 
     def test_parsing_colons_and_spaces_for_phrase_query(self):
         "search engine - parsing query with colons and spaces, phrase query"
