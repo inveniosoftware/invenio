@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,11 +21,13 @@
 
 __revision__ = "$Id$"
 
+import shutil
 import os
 import unittest
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo, \
-	check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC
+    check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC, \
+    Md5Folder, calculate_md5, calculate_md5_external
 from invenio.dbquery import run_sql
 
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
@@ -35,7 +37,8 @@ from invenio.config import \
         CFG_BIBDOCFILE_FILEDIR, \
         CFG_SITE_RECORD, \
         CFG_WEBDIR, \
-        CFG_TMPDIR
+        CFG_TMPDIR, \
+        CFG_PATH_MD5SUM
 import invenio.template
 from datetime import datetime
 import time
@@ -293,10 +296,14 @@ class BibDocsTest(unittest.TestCase):
         #check modification time
         self.assertEqual(my_new_bibdoc.get_file('.jpg', version=1).md, timestamp1)
         self.assertEqual(my_new_bibdoc.get_file('.gif', version=1).md, timestamp4)
+        #change the format name
+        my_new_bibdoc.change_docformat('.gif', '.gif;icon-640')
+        self.assertEqual(my_new_bibdoc.format_already_exists_p('.gif'), False)
+        self.assertEqual(my_new_bibdoc.format_already_exists_p('.gif;icon-640'), True)
         #delete file
         my_new_bibdoc.delete_file('.jpg', 1)
         #delete file
-        my_new_bibdoc.delete_file('.gif', 1)
+        my_new_bibdoc.delete_file('.gif;icon-640', 1)
         #empty bibdoc
         self.assertEqual(my_new_bibdoc.empty_p(), True)
         #hidden?
@@ -474,9 +481,9 @@ class CheckBibDocAuthorizationTest(unittest.TestCase):
 class BibDocFileURLTest(unittest.TestCase):
     """Regression tests for bibdocfile_url_p function."""
     def test_bibdocfile_url_p(self):
+        """bibdocfile - check bibdocfile_url_p() functionality"""
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/98/files/9709037.pdf' % CFG_SITE_RECORD))
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/098/files/9709037.pdf' % CFG_SITE_RECORD))
-
 
 class MoreInfoTest(unittest.TestCase):
     """regression tests about BibDocFiles"""
@@ -543,7 +550,55 @@ class MoreInfoTest(unittest.TestCase):
         m2.delete()
 
 
-TEST_SUITE = make_test_suite(BibRecDocsTest,
+class BibDocFileMd5FolderTests(unittest.TestCase):
+    """Regression test class for the Md5Folder class"""
+    def setUp(self):
+        self.path = os.path.join(CFG_TMPDIR, 'md5_tests')
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
+
+    def tearDown(self):
+        shutil.rmtree(self.path)
+
+    def test_empty_md5folder(self):
+        """bibdocfile - empty Md5Folder"""
+        self.assertEqual(Md5Folder(self.path).md5s, {})
+
+
+    def test_one_file_md5folder(self):
+        """bibdocfile - one file in Md5Folder"""
+        open(os.path.join(self.path, 'test.txt'), "w").write("test")
+        md5s = Md5Folder(self.path)
+        self.assertEqual(md5s.md5s, {'test.txt': '098f6bcd4621d373cade4e832627b4f6'})
+
+    def test_adding_one_more_file_md5folder(self):
+        """bibdocfile - one more file in Md5Folder"""
+        open(os.path.join(self.path, 'test.txt'), "w").write("test")
+        md5s = Md5Folder(self.path)
+        self.assertEqual(md5s.md5s, {'test.txt': '098f6bcd4621d373cade4e832627b4f6'})
+        open(os.path.join(self.path, 'test2.txt'), "w").write("second test")
+        md5s.update()
+        self.assertEqual(md5s.md5s, {'test.txt': '098f6bcd4621d373cade4e832627b4f6', 'test2.txt': 'f5a6496b3ed4f2d6e5d602c7be8e6b42'})
+
+    def test_detect_corruption(self):
+        """bibdocfile - detect corruption in Md5Folder"""
+        open(os.path.join(self.path, 'test.txt'), "w").write("test")
+        md5s = Md5Folder(self.path)
+        open(os.path.join(self.path, 'test.txt'), "w").write("second test")
+        self.failIf(md5s.check('test.txt'))
+        md5s.update(only_new=False)
+        self.failUnless(md5s.check('test.txt'))
+        self.assertEqual(md5s.get_checksum('test.txt'), 'f5a6496b3ed4f2d6e5d602c7be8e6b42')
+
+    if CFG_PATH_MD5SUM:
+        def test_md5_algorithms(self):
+            """bibdocfile - compare md5 algorithms"""
+            filepath = os.path.join(self.path, 'test.txt')
+            open(filepath, "w").write("test")
+            self.assertEqual(calculate_md5(filepath, force_internal=True), calculate_md5_external(filepath))
+
+TEST_SUITE = make_test_suite(BibDocFileMd5FolderTests,
+                             BibRecDocsTest,
                              BibDocsTest,
                              BibDocFilesTest,
                              MoreInfoTest,

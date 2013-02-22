@@ -77,7 +77,8 @@ from invenio.config import \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_BIBSORT_BUCKETS, \
-     CFG_XAPIAN_ENABLED
+     CFG_XAPIAN_ENABLED, \
+     CFG_BIBINDEX_CHARS_PUNCTUATION
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
@@ -171,6 +172,7 @@ re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
 re_pattern_space = re.compile("__SPACE__")
 re_pattern_today = re.compile("\$TODAY\$")
 re_pattern_parens = re.compile(r'\([^\)]+\s+[^\)]+\)')
+re_punctuation_followed_by_space = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + '\s')
 
 ## em possible values
 EM_REPOSITORY={"body" : "B",
@@ -670,8 +672,13 @@ def get_index_id_from_field(field):
     return out
 
 def get_words_from_pattern(pattern):
-    "Returns list of whitespace-separated words from pattern."
+    """
+    Returns list of whitespace-separated words from pattern, removing any
+    trailing punctuation-like signs from words in pattern.
+    """
     words = {}
+    # clean trailing punctuation signs inside pattern
+    pattern = re_punctuation_followed_by_space.sub(' ', pattern)
     for word in string.split(pattern):
         if not words.has_key(word):
             words[word] = 1

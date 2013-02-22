@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,6 +30,7 @@ pylib_DATA = docextract_pdf.py \
              refextract_re.py \
              refextract_api.py \
              refextract_api_unit_tests.py \
+             refextract_api_regression_tests.py \
              refextract_text.py \
              refextract_xml.py \
              refextract_find.py \

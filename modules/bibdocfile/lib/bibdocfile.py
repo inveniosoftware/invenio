@@ -1861,6 +1861,13 @@ class BibDoc(object):
         #if self.recid:
             #run_sql('UPDATE bibrec SET modification_date=NOW() WHERE id=%s', (self.recid, ))
 
+    def change_doctype(self, new_doctype):
+        """
+        Modify the doctype of a BibDoc
+        """
+        run_sql('UPDATE bibdoc SET doctype=%s WHERE id=%s', (new_doctype, self.id))
+        run_sql('UPDATE bibrec_bibdoc SET type=%s WHERE id_bibdoc=%s', (new_doctype, self.id))
+
     def set_status(self, new_status):
         """
         Set a new status. A document with a status information is a restricted
@@ -2016,6 +2023,32 @@ class BibDoc(object):
             self._build_file_list()
         just_added_file = self.get_file(docformat, version)
         run_sql("INSERT INTO bibdocfsinfo(id_bibdoc, version, format, last_version, cd, md, checksum, filesize, mime) VALUES(%s, %s, %s, true, %s, %s, %s, %s, %s)", (self.id, version, docformat, just_added_file.cd, just_added_file.md, just_added_file.get_checksum(), just_added_file.get_size(), just_added_file.mime))
+
+    def change_docformat(self, oldformat, newformat):
+        """
+        Renames a format name on disk and in all BibDoc structures.
+        The change will touch only the last version files.
+        The change will take place only if the newformat doesn't already exist.
+        @param oldformat: the format that needs to be renamed
+        @type oldformat: string
+        @param newformat: the format new name
+        @type newformat: string
+        """
+        oldformat = normalize_format(oldformat)
+        newformat = normalize_format(newformat)
+        if self.format_already_exists_p(newformat):
+            # same format already exists in the latest files, abort
+            return
+        for bibdocfile in self.list_latest_files():
+            if bibdocfile.get_format() == oldformat:
+                # change format -> rename x.oldformat -> x.newformat
+                dirname, base, docformat, version = decompose_file_with_version(bibdocfile.get_full_path())
+                os.rename(bibdocfile.get_full_path(), os.path.join(dirname, '%s%s;%i' %(base, newformat, version)))
+                Md5Folder(self.basedir).update()
+                self.touch()
+                self._build_file_list('rename')
+                self._sync_to_db()
+                return
 
     def purge(self):
         """
@@ -2798,8 +2831,7 @@ def generic_path2bidocfile(fullpath):
     md5folder = Md5Folder(path)
     checksum = md5folder.get_checksum(os.path.basename(fullpath))
     return BibDocFile(fullpath=fullpath,
-        doctype=None,
-        recid_doctypes = [(0, None, name)],
+        recid_doctypes=[(0, None, name)],
         version=version,
         docformat=docformat,
         docid=0,
@@ -3388,13 +3420,9 @@ class Md5Folder(object):
     def __init__(self, folder):
         """Initialize the class from the md5 checksum of a given path"""
         self.folder = folder
-        try:
-            self.load()
-        except InvenioBibDocFileError:
-            self.md5s = {}
-            self.update()
+        self.load()
 
-    def update(self, only_new = True):
+    def update(self, only_new=True):
         """Update the .md5 file with the current files. If only_new
         is specified then only not already calculated file are calculated."""
         if not only_new:
@@ -3415,42 +3443,38 @@ class Md5Folder(object):
             md5file.close()
             os.umask(old_umask)
         except Exception, e:
-            register_exception()
-            raise InvenioBibDocFileError, "Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e)
+            register_exception(alert_admin=True)
+            raise InvenioBibDocFileError("Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e))
 
     def load(self):
         """Load .md5 into the md5 dictionary"""
         self.md5s = {}
-        try:
-            md5file = open(os.path.join(self.folder, ".md5"), "r")
-            for row in md5file:
+        md5_path = os.path.join(self.folder, ".md5")
+        if os.path.exists(md5_path):
+            for row in open(md5_path, "r"):
                 md5hash = row[:32]
                 filename = row[34:].strip()
                 self.md5s[filename] = md5hash
-            md5file.close()
-        except IOError:
+        else:
             self.update()
-        except Exception, e:
-            register_exception()
-            raise InvenioBibDocFileError, "Encountered an exception while loading .md5 for folder '%s': '%s'" % (self.folder, e)
 
-    def check(self, filename = ''):
+    def check(self, filename=''):
         """Check the specified file or all the files for which it exists a hash
         for being coherent with the stored hash."""
         if filename and filename in self.md5s.keys():
             try:
                 return self.md5s[filename] == calculate_md5(os.path.join(self.folder, filename))
             except Exception, e:
-                register_exception()
-                raise InvenioBibDocFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
+                register_exception(alert_admin=True)
+                raise InvenioBibDocFileError("Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e))
         else:
             for filename, md5hash in self.md5s.items():
                 try:
                     if calculate_md5(os.path.join(self.folder, filename)) != md5hash:
                         return False
                 except Exception, e:
-                    register_exception()
-                    raise InvenioBibDocFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
+                    register_exception(alert_admin=True)
+                    raise InvenioBibDocFileError("Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e))
             return True
 
     def get_checksum(self, filename):
@@ -3476,7 +3500,7 @@ def calculate_md5_external(filename):
         else:
             return ret
     except Exception, e:
-        raise InvenioBibDocFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+        raise InvenioBibDocFileError("Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e))
 
 def calculate_md5(filename, force_internal=False):
     """Calculate the md5 of a physical file. This is suitable for files smaller
@@ -3494,8 +3518,8 @@ def calculate_md5(filename, force_internal=False):
             to_be_read.close()
             return computed_md5.hexdigest()
         except Exception, e:
-            register_exception()
-            raise InvenioBibDocFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+            register_exception(alert_admin=True)
+            raise InvenioBibDocFileError("Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e))
     else:
         return calculate_md5_external(filename)
 

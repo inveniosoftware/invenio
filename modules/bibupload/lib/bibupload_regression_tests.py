@@ -4386,6 +4386,61 @@ allow any</subfield>
         self.failUnless(bibrecdocs.get_bibdoc('site_logo').list_versions(), [1])
         self.failUnless(bibrecdocs.get_bibdoc('line').list_versions(), [1, 2])
 
+    def test_fft_correct_modify_doctype(self):
+        """bibupload - FFT correct with different doctype"""
+        test_to_upload = """
+        <record>
+            <controlfield tag="003">SzGeCERN</controlfield>
+            <datafield tag="FFT" ind1=" " ind2=" ">
+                <subfield code="a">%(siteurl)s/img/site_logo.gif</subfield>
+                <subfield code="d">a description</subfield>
+                <subfield code="t">TEST1</subfield>
+            </datafield>
+        </record>
+        """ % {
+              'siteurl': CFG_SITE_URL
+              }
+
+        test_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="n">site_logo</subfield>
+          <subfield code="t">TEST2</subfield>
+         </datafield>
+        </record>
+        """
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
+          <subfield code="y">a description</subfield>
+         </datafield>
+        </record>
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        # insert test record:
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        _, recid, _ = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        bibrecdocs = BibRecDocs(recid)
+        self.failUnless(bibrecdocs.get_bibdoc('site_logo').doctype, 'TEST1')
+
+        # correct test record with new FFT:
+        recs = bibupload.xml_marc_to_records(test_to_correct)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+
+        bibrecdocs = BibRecDocs(recid)
+        self.failUnless(bibrecdocs.get_bibdoc('site_logo').doctype, 'TEST2')
+
     def test_fft_append_already_exists(self):
         """bibupload - FFT append with already identical existing file"""
         # define the test case:

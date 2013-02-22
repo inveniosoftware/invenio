@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -249,16 +249,16 @@ def session_param_del(req, key):
 
 def session_param_set(req, key, value):
     """
-    Associate a VALUE to the session param KEY for the current session.
+    Set a VALUE for the session param KEY for the current session.
     """
     session[key] = value
 
-def session_param_get(req, key):
+def session_param_get(req, key, default = None):
     """
     Return session parameter value associated with session parameter KEY for the current session.
-    If the key doesn't exists raise KeyError.
+    If the key doesn't exists return the provided default.
     """
-    return session[key]
+    return session.get(key, default)
 
 def session_param_list(req):
     """
