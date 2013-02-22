@@ -51,7 +51,24 @@ CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
 def create_invenio_flask_app():
     """
-    This prepare wsgi Invenio application based on Flask.
+    Prepare WSGI Invenio application based on Flask.
+
+    Invenio consists of a new Flask application with legacy support for
+    the old WSGI legacy application and the old Python legacy
+    scripts (URLs to *.py files).
+
+    An incoming request is processed in the following manner:
+
+     * The Flask application first routes request via its URL routing
+       system (see LegacyAppMiddleware.__call__()).
+
+     * One route in the Flask system, will match Python legacy
+       scripts (see static_handler_with_legacy_publisher()).
+
+     * If the Flask application aborts the request with a 404 error, the request
+       is passed on to the WSGI legacy application (see page_not_found()). E.g.
+       either the Flask application did not find a route, or a view aborted the
+       request with a 404 error.
     """
 
     ## The Flask application instance
@@ -78,7 +95,6 @@ def create_invenio_flask_app():
 
     from invenio.pluginutils import PluginContainer
     from invenio.session_flask import InvenioSessionInterface
-    #from flaskext.login import LoginManager
     from invenio.webuser_flask import InvenioLoginManager, current_user
     from invenio.messages import wash_language, gettext_set_language, \
                                  language_list_long, is_language_rtl
