@@ -28,7 +28,7 @@ from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from flask import Flask, session, request, g, \
                 url_for, current_app, render_template, \
-                redirect, flash, send_file, abort
+                redirect, flash, abort
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError
 
@@ -41,7 +41,7 @@ from invenio.config import CFG_PYLIBDIR, \
     CFG_LOGDIR, CFG_SITE_LANG, CFG_WEBDIR, \
     CFG_ETCDIR, CFG_DEVEL_SITE, \
     CFG_FLASK_CACHE_TYPE, CFG_FLASK_DISABLED_BLUEPRINTS, \
-    CFG_SITE_URL, CFG_SITE_SECURE_URL
+    CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_FLASK_SERVE_STATIC_FILES
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY
 
@@ -144,12 +144,6 @@ def create_invenio_flask_app():
     @_app.errorhandler(404)
     def page_not_found(error):
         try:
-            #if wsgi_serve_static_files:
-            #    ## let's serve static files
-            #    possible_static_path = is_static_path(request.environ['PATH_INFO'])
-            #    if possible_static_path is not None:
-            #        return send_file(possible_static_path)
-
             response = legacy_application(request.environ, g.start_response)
             if not isinstance(response, BaseResponse):
                 response = current_app.make_response(str(response))
@@ -180,9 +174,25 @@ def create_invenio_flask_app():
             req = SimulatedModPythonRequest(request.environ, g.start_response)
             mp_legacy_publisher(req, possible_module, possible_handler)
             return req.response
-        if request.method == 'POST':
-            abort(405)
-        return _app.send_static_file(*args, **kwargs)
+
+        # Static file serving for devserver
+        # ---------------------------------
+        # Apache normally serve all static files, but if we are using the
+        # devserver we need to serve static files here. Werkzeugs default
+        # behaviour is to return a '405 Method not allowed' for POST requests
+        # to static files. However, if we abort all POST requests with 405, the
+        # legacy_application (see page_not_found()) will not be given a chance
+        # to serve static files as it only get's invokved when we abort with a
+        # 404. Hence, on POST requests, we first check if the static file exists,
+        # and if it does we return we abort the request with a 405.
+        if not CFG_FLASK_SERVE_STATIC_FILES:
+            abort(404)
+        else:
+            static_file_response = _app.send_static_file(*args, **kwargs)
+            if request.method == 'POST':
+                abort(405)
+            else:
+                return static_file_response
 
     if CFG_FLASK_CACHE_TYPE not in [None, 'null']:
         _app.jinja_options = dict(_app.jinja_options,
