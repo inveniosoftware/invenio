@@ -23,9 +23,9 @@ import cPickle
 import os
 import re
 import time
-import datetime
 import tempfile
 import sys
+import datetime
 if sys.hexversion < 0x2050000:
     from glob import glob as iglob
 else:
@@ -65,6 +65,7 @@ from invenio.bibformat import format_record
 from invenio.bibrecord import record_get_field_instances
 from invenio.errorlib import register_exception
 from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
+from invenio.dateutils import localtime_to_utc, utc_to_localtime
 
 CFG_VERBS = {
     'GetRecord'          : ['identifier', 'metadataPrefix'],
@@ -162,79 +163,6 @@ def get_field(recid, field):
     query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag=%%s" % (wash_table_column_name(bibbx), wash_table_column_name(bibx))
 
     return [row[0] for row in run_sql(query, (recid, field))]
-
-def utc_to_localtime(date):
-    """
-    Convert UTC to localtime
-
-    Reference:
-     - (1) http://www.openarchives.org/OAI/openarchivesprotocol.html#Dates
-     - (2) http://www.w3.org/TR/NOTE-datetime
-
-    This function works only with dates complying with the
-    "Complete date plus hours, minutes and seconds" profile of
-    ISO 8601 defined by (2), and linked from (1).
-
-    Eg:    1994-11-05T13:15:30Z
-    """
-    ldate = date.split("T")[0]
-    ltime = date.split("T")[1]
-
-    lhour   = ltime.split(":")[0]
-    lminute = ltime.split(":")[1]
-    lsec    = ltime.split(":")[2]
-    lsec    = lsec[:-1] # Remove trailing "Z"
-
-    lyear   = ldate.split("-")[0]
-    lmonth  = ldate.split("-")[1]
-    lday    = ldate.split("-")[2]
-
-
-    # 1: Build a time as UTC. Since time.mktime() expect a local time :
-    ## 1a: build it without knownledge of dst
-    ## 1b: substract timezone to get a local time, with possibly wrong dst
-    utc_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))
-    local_time = utc_time - time.timezone
-
-    # 2: Fix dst for local_time
-    # Find out the offset for daily saving time of the local
-    # timezone at the time of the given 'date'
-    if time.localtime(local_time)[-1] == 1:
-        local_time = local_time + 3600
-
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(local_time))
-
-def localtime_to_utc(date):
-    """Convert localtime to UTC"""
-
-    ldate = date.split(" ")[0]
-    ltime = date.split(" ")[1]
-
-    lhour   = ltime.split(":")[0]
-    lminute = ltime.split(":")[1]
-    lsec    = ltime.split(":")[2]
-
-    lyear   = ldate.split("-")[0]
-    lmonth  = ldate.split("-")[1]
-    lday    = ldate.split("-")[2]
-
-    # Find out the offset for daily saving time of the local
-    # timezone at the time of the given 'date'
-    #
-    # 1: build time that correspond to local date, without knowledge of dst
-    # 2: determine if dst is locally enabled at this time
-    tmp_date = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))
-    if time.localtime(tmp_date)[-1] == 1:
-        dst = time.localtime(tmp_date)[-1]
-    else:
-        dst = 0
-
-    # 3: Build a new time with knowledge of the dst
-    local_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, dst))
-    # 4: Get the time as UTC
-    utc_time = time.gmtime(local_time)
-
-    return time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_time)
 
 def get_modification_date(recid):
     """Returns the date of last modification for the record 'recid'.

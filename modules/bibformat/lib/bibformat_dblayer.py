@@ -28,33 +28,8 @@ import zlib
 import time
 
 from invenio.dbquery import run_sql
+from invenio.dateutils import localtime_to_utc
 
-
-def localtime_to_utc(date, fmt="%Y-%m-%dT%H:%M:%SZ"):
-    """
-    Convert localtime to UTC
-
-    @param date: the date to convert to UTC
-    @type date: string
-    @param fmt: the output format for the returned date
-    @return: a UTC version of input X{date}
-    @rtype: string
-    """
-
-    ldate = date.split(" ")[0]
-    ltime = date.split(" ")[1]
-
-    lhour   = ltime.split(":")[0]
-    lminute = ltime.split(":")[1]
-    lsec    = ltime.split(":")[2]
-
-    lyear   = ldate.split("-")[0]
-    lmonth  = ldate.split("-")[1]
-    lday    = ldate.split("-")[2]
-
-    timetoconvert = time.strftime(fmt, time.gmtime(time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))))
-
-    return timetoconvert
 
 def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
@@ -65,7 +40,7 @@ def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
     @return: creation date of the record
     @rtype: string
     """
-    out   = ""
+    out = ""
     res = run_sql("SELECT DATE_FORMAT(creation_date, '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
     if res[0][0]:
         out = localtime_to_utc(res[0][0], fmt)

@@ -25,8 +25,9 @@ from invenio.testutils import InvenioTestCase
 import datetime
 import calendar
 import time
+import os
 
-from time import mktime, strptime
+from time import mktime, strptime, tzset
 from invenio import dateutils
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_LANGS
@@ -286,25 +287,23 @@ class STRFTimeTest(InvenioTestCase):
     def test_strftime_date_over_1900(self):
         test_date = "12.03.1908"
         expected = "Thu, 12 Mar 1908 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date,"%d.%m.%Y"))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date, "%d.%m.%Y"))
         self.assertEqual(expected, result)
 
     def test_strftime_date_under_1900(self):
         test_date = "3.1.1765"
         expected = "Thu, 03 Jan 1765 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date,"%d.%m.%Y"))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", strptime(test_date, "%d.%m.%Y"))
         self.assertEqual(expected, result)
 
     def test_strftime_date_over_1900_object(self):
-        test_date = "12.03.1908"
         expected = "Thu, 12 Mar 1908 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1908,3,12))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1908, 3, 12))
         self.assertEqual(expected, result)
 
     def test_strftime_date_under_1900_object(self):
-        test_date = "3.1.1765"
         expected = "Thu, 03 Jan 1765 00:00:00 +0000"
-        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1765,1,3))
+        result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1765, 1, 3))
         self.assertEqual(expected, result)
 
 class DateTest(InvenioTestCase):
@@ -327,27 +326,95 @@ class DateTimeTest(InvenioTestCase):
     Testing creation of date object
     """
     def test_datetime_creation_after_1900(self):
-        expected = datetime.datetime(1908,3,12,12,12,12)
-        result = dateutils.datetime(1908,3,12,12,12,12)
+        expected = datetime.datetime(1908, 3, 12, 12, 12, 12)
+        result = dateutils.datetime(1908, 3, 12, 12, 12, 12)
         self.assertEqual(expected, result)
 
     def test_datetime_creation_before_1900(self):
-        expected = datetime.datetime(1765,1,3,10,2,13)
-        result = dateutils.datetime(1765,1,3,10,2,13)
+        expected = datetime.datetime(1765, 1, 3, 10, 2, 13)
+        result = dateutils.datetime(1765, 1, 3, 10, 2, 13)
         self.assertEqual(expected, result)
 
     def test_datetime_strftime_before_1900(self):
-        new_datetime = dateutils.datetime(1765,1,3,10,2,13)
+        new_datetime = dateutils.datetime(1765, 1, 3, 10, 2, 13)
         expected = "Thu, 03 Jan 1765 10:02:13 +0000"
         result = new_datetime.strftime("%a, %d %b %Y %H:%M:%S +0000")
         self.assertEqual(expected, result)
+
+
+class LocaltimeToUTCTest(InvenioTestCase):
+    """
+    Testing transformation between localtime to utc time
+    """
+    def setUp(self):
+        if 'TZ' in os.environ:
+            self.old_timezone = os.environ['TZ']
+        else:
+            self.old_timezone = None
+
+    def tearDown(self):
+        if self.old_timezone is None:
+            del os.environ['TZ']
+        else:
+            os.environ['TZ'] = self.old_timezone
+        tzset()
+
+    def test_localtime_to_utc_cet(self):
+        os.environ['TZ'] = 'Europe/Oslo'
+        tzset()
+
+        expected = "2012-06-12T14:15:00Z"
+        result = dateutils.localtime_to_utc("2012-06-12 16:15:00")
+        self.assertEqual(expected, result)
+
+        expected = "2012-12-12T15:15:00Z"
+        result = dateutils.localtime_to_utc("2012-12-12 16:15:00")
+        self.assertEqual(expected, result)
+
+    def test_localtime_to_utc_uk(self):
+        os.environ['TZ'] = 'Europe/London'
+        tzset()
+
+        expected = "2012-06-12T15:15:00Z"
+        result = dateutils.localtime_to_utc("2012-06-12 16:15:00")
+        self.assertEqual(expected, result)
+
+        expected = "2012-12-12T16:15:00Z"
+        result = dateutils.localtime_to_utc("2012-12-12 16:15:00")
+        self.assertEqual(expected, result)
+
+    def test_utc_to_localtime_cet(self):
+        os.environ['TZ'] = 'Europe/Oslo'
+        tzset()
+
+        expected = "2012-06-12 16:15:00"
+        result = dateutils.utc_to_localtime("2012-06-12T14:15:00Z")
+        self.assertEqual(expected, result)
+
+        expected = "2012-12-12 16:15:00"
+        result = dateutils.utc_to_localtime("2012-12-12T15:15:00Z")
+        self.assertEqual(expected, result)
+
+    def test_utc_to_localtime_uk(self):
+        os.environ['TZ'] = 'Europe/London'
+        tzset()
+
+        expected = "2012-06-12 16:15:00"
+        result = dateutils.utc_to_localtime("2012-06-12T15:15:00Z")
+        self.assertEqual(expected, result)
+
+        expected = "2012-12-12 16:15:00"
+        result = dateutils.utc_to_localtime("2012-12-12T16:15:00Z")
+        self.assertEqual(expected, result)
+
 
 TEST_SUITE = make_test_suite(ConvertFromDateCVSTest,
                              ConvertIntoDateGUITest,
                              ParseRuntimeLimitTest,
                              STRFTimeTest,
                              DateTest,
-                             DateTimeTest
+                             DateTimeTest,
+                             LocaltimeToUTCTest,
                              )
 
 if __name__ == "__main__":

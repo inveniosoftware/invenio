@@ -60,9 +60,11 @@ datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
 
+
 class date(real_date):
     def strftime(self, fmt):
         return strftime(fmt, self)
+
 
 class datetime(real_datetime):
     def strftime(self, fmt):
@@ -74,6 +76,11 @@ class datetime(real_datetime):
 
     def date(self):
         return date(self.year, self.month, self.day)
+
+    @staticmethod
+    def strptime(date_string, format):
+        return datetime(*(time.strptime(date_string, format)[0:6]))
+
 
 def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG, secs=False):
     """
@@ -506,3 +513,41 @@ def strftime(fmt, dt):
 
 def strptime(date_string, fmt):
     return real_datetime(*(time.strptime(date_string, fmt)[:6]))
+
+
+def get_dst(date_obj):
+    """Determine if dst is locally enabled at this time"""
+    dst = 0
+    if date_obj.year >= 1900:
+        tmp_date = time.mktime(date_obj.timetuple())
+        # DST is 1 so reduce time with 1 hour.
+        dst = time.localtime(tmp_date)[-1]
+    return dst
+
+
+def utc_to_localtime(date_str, fmt="%Y-%m-%d %H:%M:%S", input_fmt="%Y-%m-%dT%H:%M:%SZ"):
+    """
+    Convert UTC to localtime
+
+    Reference:
+     - (1) http://www.openarchives.org/OAI/openarchivesprotocol.html#Dates
+     - (2) http://www.w3.org/TR/NOTE-datetime
+
+    This function works only with dates complying with the
+    "Complete date plus hours, minutes and seconds" profile of
+    ISO 8601 defined by (2), and linked from (1).
+
+    Eg:    1994-11-05T13:15:30Z
+    """
+    date_struct = datetime.strptime(date_str, input_fmt)
+    date_struct += timedelta(hours=get_dst(date_struct))
+    date_struct -= timedelta(seconds=time.timezone)
+    return strftime(fmt, date_struct)
+
+
+def localtime_to_utc(date_str, fmt="%Y-%m-%dT%H:%M:%SZ", input_fmt="%Y-%m-%d %H:%M:%S"):
+    """Convert localtime to UTC"""
+    date_struct = datetime.strptime(date_str, input_fmt)
+    date_struct -= timedelta(hours=get_dst(date_struct))
+    date_struct += timedelta(seconds=time.timezone)
+    return strftime(fmt, date_struct)
