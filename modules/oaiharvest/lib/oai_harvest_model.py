@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -66,6 +66,8 @@ class OaiREPOSITORY(db.Model):
     setDescription = db.Column(db.Text, nullable=False)
     setDefinition = db.Column(db.Text, nullable=False)
     setRecList = db.Column(db.iLargeBinary, nullable=True)
+    last_updated = db.Column(db.DateTime, nullable=False,
+                             server_default='1970-01-01 00:00:00')
     p1 = db.Column(db.Text, nullable=False)
     f1 = db.Column(db.Text, nullable=False)
     m1 = db.Column(db.Text, nullable=False)

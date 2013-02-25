@@ -2746,6 +2746,7 @@ CREATE TABLE IF NOT EXISTS oaiREPOSITORY (
   setDescription text NOT NULL default '',
   setDefinition text NOT NULL default '',
   setRecList longblob,
+  last_updated datetime NOT NULL default '1970-01-01',
   p1 text NOT NULL default '',
   f1 text NOT NULL default '',
   m1 text NOT NULL default '',

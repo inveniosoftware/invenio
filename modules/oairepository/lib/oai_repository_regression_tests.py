@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import unittest
 import time
+from datetime import datetime, timedelta
 import re
 
 from cStringIO import StringIO
@@ -31,10 +32,46 @@ from invenio.config import CFG_SITE_URL, \
      CFG_OAI_SLEEP, \
      CFG_OAI_LOAD, \
      CFG_OAI_ID_FIELD
+from invenio.dbquery import run_sql
 from invenio.intbitset import intbitset
 from invenio import oai_repository_server, search_engine
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
+
+class OAIRepositoryTouchSetTest(unittest.TestCase):
+    """Check OAI-PMH consistency when touching a set."""
+    def setUp(self):
+        """Backup the current configuration"""
+        self.timestamps = run_sql("SELECT id, last_updated FROM oaiREPOSITORY")
+
+    def tearDown(self):
+        """Restore timestamps"""
+        for id, last_updated in self.timestamps:
+            run_sql("UPDATE oaiREPOSITORY SET last_updated=%s WHERE id=%s", (last_updated, id))
+
+    def test_touching_set(self):
+        """oairepository - touch a set"""
+        req = StringIO()
+        oai_repository_server.oai_list_records_or_identifiers(req,  {'verb': 'ListIdentifiers', 'metadataPrefix': 'marcxml', 'set':'cern:experiment'})
+        response = req.getvalue()
+        current_timestamps = re.findall("<datestamp>(.*?)</datestamp>", response)
+        current_timestamps = [datetime(*time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')[:-3]) for timestamp in current_timestamps]
+        last_timestamp = max(current_timestamps)
+        future_timestamp = last_timestamp + timedelta(0, 5) ## 5 seconds in the future to the last record
+        future_timestamp = future_timestamp.strftime('%Y-%m-%dT%H:%M:%SZ')
+        req = StringIO()
+        oai_repository_server.oai_list_records_or_identifiers(req,  {'verb': 'ListIdentifiers', 'metadataPrefix': 'marcxml', 'set':'cern:experiment', 'from': future_timestamp})
+        response = req.getvalue()
+        self.failIf(re.findall("<datestamp>(.*?)</datestamp>", response))
+        from invenio.oai_repository_admin import touch_oai_set
+        touch_oai_set('cern:experiment')
+        req = StringIO()
+        oai_repository_server.oai_list_records_or_identifiers(req,  {'verb': 'ListIdentifiers', 'metadataPrefix': 'marcxml', 'set':'cern:experiment', 'from': future_timestamp})
+        response = req.getvalue()
+        new_timestamps = re.findall("<datestamp>(.*?)</datestamp>", response)
+        new_timestamps = [datetime(*time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')[:-3]) for timestamp in new_timestamps]
+        self.assertEqual(len(new_timestamps), len(current_timestamps), "new %s, old %s, from: %s" % (new_timestamps, current_timestamps, future_timestamp))
+        self.failUnless(new_timestamps > current_timestamps)
 
 class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
     """Check OAI Repository web pages whether they are up or not."""
@@ -101,8 +138,8 @@ class TestSelectiveHarvesting(unittest.TestCase):
         self.assertNotEqual([], datestamps)
 
         # We must be able to retrieve an id with the date we have just found
-        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(fromdate=sample_datestamp))
-        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(untildate=sample_datestamp))
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(fromdate=sample_datestamp), "%s not in %s (fromdate=%s)" % (sample_id, oai_repository_server.oai_get_recid_list(fromdate=sample_datestamp), sample_datestamp))
+        self.assert_(sample_id in oai_repository_server.oai_get_recid_list(untildate=sample_datestamp), "%s not in %s" % (sample_id, oai_repository_server.oai_get_recid_list(untildate=sample_datestamp)))
         self.assert_(sample_id in oai_repository_server.oai_get_recid_list(untildate=sample_datestamp, \
                                                                  fromdate=sample_datestamp))
 
@@ -178,7 +215,8 @@ Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_o
 Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_marcxml))
 
 
-TEST_SUITE = make_test_suite(OAIRepositoryWebPagesAvailabilityTest,
+TEST_SUITE = make_test_suite(OAIRepositoryTouchSetTest,
+                             OAIRepositoryWebPagesAvailabilityTest,
                              TestSelectiveHarvesting,
                              TestPerformance)
 

@@ -16,10 +16,10 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.0-rc0\n"
+"Project-Id-Version: Invenio 1.1.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:12+0100\n"
-"PO-Revision-Date: 2012-02-02 20:07+0100\n"
+"PO-Revision-Date: 2013-02-25 11:40+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <info@invenio-software.org>\n"
 "Language: \n"
@@ -7103,7 +7103,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2460
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
-msgstr "Us podeu baixar una versió més nova de Invenio.  Visiteu "
+msgstr "Puede bajarse una versión más reciente de Invenio.  Visite "
 
 #: modules/websession/lib/websession_templates.py:2467
 msgid ""
@@ -9182,7 +9182,7 @@ msgid ""
 "issue number or check with support."
 msgstr ""
 "Parece que la configuración del número actual está vacía.  Pruebe de escoger "
-"un número en concreto o póngase en contacte amb el suporte."
+"un número en concreto o póngase en contacte con soporte."
 
 #: modules/webjournal/lib/webjournal_config.py:298
 msgid "Issue number badly formed"
@@ -13458,11 +13458,31 @@ msgstr ""
 msgid "Correct my publication lists!"
 msgstr "Corrijan mi lista de publicaciones"
 
-#~ msgid "This book is sent to you ..."
-#~ msgstr "Se le ha enviado este libro..."
+#~ msgid "Make sure we match the right names!"
+#~ msgstr "¡Asegúrese que los nombres se correspondan!"
 
-#~ msgid "Id"
-#~ msgstr "Identificador"
+#~ msgid ""
+#~ "Please select an author on each of the records that will be assigned."
+#~ msgstr ""
+#~ "Seleccione un autor para cada uno de los los registros que se le asignen."
+
+#~ msgid "Papers without a name selected will be ignored in the process."
+#~ msgstr ""
+#~ "En el proceso, se ignoraran los documentos sin un nombre seleccionado."
+
+#~ msgid ""
+#~ "The result of this request will be visible immediately but we need your "
+#~ "confirmation to do so for this paper has been manually claimed before"
+#~ msgstr ""
+#~ "El resultado de esta petición será visible, imediatamente pero es "
+#~ "necesaria su confirmación, porque este document ya había sido "
+#~ "reivindicado manualmente"
+
+#~ msgid "Tickets you created about this person"
+#~ msgstr "Tareas que usted ha creado sobre esta persona"
+
+#~ msgid "Error: No BibCatalog system configured."
+#~ msgstr "Error: el sistema BibCatalog no está configurado"
 
 #~ msgid "0 borrower(s) found."
 #~ msgstr "No se ha encontrado ningún usuario."
@@ -13507,18 +13527,6 @@ msgstr "Corrijan mi lista de publicaciones"
 #~ msgid "Back borrower's loans"
 #~ msgstr "Volver a los préstamos"
 
-#~ msgid "period_of_interest_from"
-#~ msgstr "período_de_interés_desde"
-
-#~ msgid "jsCal3"
-#~ msgstr "jsCal3"
-
-#~ msgid "period_of_interest_to"
-#~ msgstr "período_de_interés_hasta"
-
-#~ msgid "jsCal4"
-#~ msgstr "jsCal4"
-
 #~ msgid "Borrower wants only this edition?"
 #~ msgstr "Quiere solamente esta edición, el lector?"
 
@@ -13527,12 +13535,6 @@ msgstr "Corrijan mi lista de publicaciones"
 #~ "time."
 #~ msgstr ""
 #~ "Acepto los %s del servicio, en particular devolver los libros a tiempo."
-
-#~ msgid "jsCal1"
-#~ msgstr "jsCal1"
-
-#~ msgid "jsCal2"
-#~ msgstr "jsCal2"
 
 #~ msgid "Volume, Issue, Page"
 #~ msgstr "Volumen, número, página"
@@ -13568,6 +13570,613 @@ msgstr "Corrijan mi lista de publicaciones"
 #~ "Este libro no existe en Invenio.  Rellene por favor el sigüente "
 #~ "formulario."
 
+#~ msgid "This book is sent to you ..."
+#~ msgstr "Se le ha enviado este libro..."
+
+#~ msgid "Id"
+#~ msgstr "Identificador"
+
+#~ msgid ""
+#~ "Automatically generated <span class=\"keyword single\">single</"
+#~ "span>,        <span class=\"keyword composite\">composite</span>, <span "
+#~ "class=\"keyword author-kw\">author</span>,        and <span class="
+#~ "\"keyword other-kw\">other keywords</span>."
+#~ msgstr ""
+#~ "Generado automáticamente <span class=\"keyword single\">sencillo</span>, "
+#~ "<span class=\"keyword composite\">compuesto</span>, <span class=\"keyword "
+#~ "author-kw\">autor</span>, i <span class=\"keyword other-kw\">otras "
+#~ "palabras clave</span>."
+
+#~ msgid "Automated keyword extraction wasn't run for this document yet."
+#~ msgstr ""
+#~ "Para este documento todavía no se han extraído automáticamente las "
+#~ "palabras clave."
+
+#~ msgid "Generate keywords"
+#~ msgstr "Generar palabras clave"
+
+#~ msgid "There are no suitable keywords for display in this record."
+#~ msgstr "No hay palabras clave relevantes para este registro."
+
+#~ msgid "Show more..."
+#~ msgstr "Mostrar más..."
+
+#~ msgid "Unweighted %s keywords:"
+#~ msgstr "Palabras clave no sospesades de tipo %s"
+
+#~ msgid "Weighted %s keywords:"
+#~ msgstr "Palabras clave sospesades de tipo %s"
+
+#~ msgid "tag cloud"
+#~ msgstr "nuve de etiquetas"
+
+#~ msgid "list"
+#~ msgstr "lista"
+
+#~ msgid "XML"
+#~ msgstr "XML"
+
+#~ msgid "Unknown type: %s"
+#~ msgstr "Tipo desconocido: %s"
+
+#~ msgid "The site settings do not allow automatic keyword extraction"
+#~ msgstr ""
+#~ "La configuración de este sitio no permite la extracción automática de "
+#~ "palabras clave"
+
+#~ msgid ""
+#~ "We have registered your request, the automatedkeyword extraction will run "
+#~ "after some time. Please return back in a while."
+#~ msgstr ""
+#~ "Su petición se ha registrado.  La extracción automática de palabras clave "
+#~ "se ejecutará pronto.  Vuelva dentro de un rato."
+
+#~ msgid ""
+#~ "Unfortunately, we don't have a PDF fulltext for this record in the "
+#~ "storage,                     keywords cannot be generated using an "
+#~ "automated process."
+#~ msgstr ""
+#~ "Por desgracia, no existe una copia local del texto completo en PDF. No es "
+#~ "posible generar automáticamente las palabras clave."
+
+#~ msgid "The format %s does not exist for the given version: %s"
+#~ msgstr "El formato %s no existe para la versión %s"
+
+#~ msgid "does not exist"
+#~ msgstr "no existe"
+
+#~ msgid ""
+#~ "WARNING: The following records are pending "
+#~ "execution                        in the task "
+#~ "queue.                        If you proceed with the changes, the "
+#~ "modifications made                        with other tool (e.g. BibEdit) "
+#~ "to these records will                        be lost"
+#~ msgstr ""
+#~ "ATENCIÓN: los siguientes registros están pendentes de actualizar en la "
+#~ "cola de taresa pendientes.  Si sigue con los cambios, se perderán las "
+#~ "modificaciones hechas con la otra herramienta (es decir, BibEdit) sobre "
+#~ "este registro."
+
+#~ msgid ""
+#~ "We are sorry, a problem has occured during the processing of your video "
+#~ "upload%(submission_title)s."
+#~ msgstr ""
+#~ "Por desgracia ha ocurrido un problema durante el proceso de carga de su "
+#~ "video upload%(submission_title)s."
+
+#~ msgid "The file you uploaded was %(input_filename)s."
+#~ msgstr "El fichero que ha subido es %(input_filename)s."
+
+#~ msgid "Your video might not be fully available until intervention."
+#~ msgstr "Su video no estará disponible hasta su verificación."
+
+#~ msgid "You can check the status of your video here: %(record_url)s."
+#~ msgstr "Puede comprobar el estado de su video aquí: %(record_url)s."
+
+#~ msgid ""
+#~ "You might want to take a look at  %(guidelines_url)s and modify or redo "
+#~ "your submission."
+#~ msgstr ""
+#~ "Puede echar un vistazo a %(guidelines_url)s y modificar o repetir su "
+#~ "envío."
+
+#~ msgid "the video guidelines"
+#~ msgstr "las guías para los videos"
+
+#~ msgid ""
+#~ "Your video submission%(submission_title)s was successfully processed."
+#~ msgstr ""
+#~ "Su video submission%(submission_title)s ha sido correctamente procesado."
+
+#~ msgid "Your video is now available here: %(record_url)s."
+#~ msgstr "Su video ahora está accesible en: %(record_url)s."
+
+#~ msgid ""
+#~ "If the videos quality is not as expected, you might want to take a look "
+#~ "at %(guidelines_url)s and modify or redo your submission."
+#~ msgstr ""
+#~ "Si la cualidad de los videos no es la que espera, puede echar un vistazo "
+#~ "a %(guidelines_url)s y modificar o repetir su envío."
+
+#~ msgid "More than one templates found in the document. No format found."
+#~ msgstr ""
+#~ "Se ha encontrado más de una plantilla en el documento.  No se ha "
+#~ "encontrado el formato."
+
+#~ msgid "Note for programmer: you have not implemented operator %s."
+#~ msgstr "Nota para el programador: no ha implementado el operador %s."
+
+#~ msgid "Name %s is not recognised as a valid operator name."
+#~ msgstr "El nombre %s no es un operador reconocido."
+
+#~ msgid "Duplicate name: %s."
+#~ msgstr "Nombre duplicado: %s."
+
+#~ msgid "No name defined for the template."
+#~ msgstr "No se ha definido ningún nombre para la plantilla."
+
+#~ msgid "No description entered for the template."
+#~ msgstr "No se ha entrado ninguna descripción para la plantilla."
+
+#~ msgid "No content type specified for the template. Using default: text/xml."
+#~ msgstr ""
+#~ "No se ha entrado el tipo de contenido para la plantilla.  Se usará el "
+#~ "valor per defecto: text/xml."
+
+#~ msgid "Missing attribute \"name\" in TEMPLATE_REF."
+#~ msgstr "Falta el atributo \"name\" en TEMPLATE_REF."
+
+#~ msgid "Missing attribute \"name\" in ELEMENT."
+#~ msgstr "Falta el atributo \"name\" en ELEMENT."
+
+#~ msgid "Missing attribute \"name\" in FIELD."
+#~ msgstr "Falta el atributo \"name\" en FIELD."
+
+#~ msgid "Field %s is not defined."
+#~ msgstr "El campo %s no está definido."
+
+#~ msgid "Missing attribute \"value\" in TEXT."
+#~ msgstr "Falta el atributo \"name\" en TEXT."
+
+#~ msgid "Missing attribute \"object\" in LOOP."
+#~ msgstr "Falta el atributo \"name\" en LOOP."
+
+#~ msgid "Missing attrbute \"name\" in IF."
+#~ msgstr "Falta el atributo \"name\" en IF."
+
+#~ msgid "Invalid regular expression: %s."
+#~ msgstr "Expresión regular no válida: %s"
+
+#~ msgid "Invalid syntax of IF statement."
+#~ msgstr "Sintaxis no válida para el condicional IF."
+
+#~ msgid "Invalid address: %s %s"
+#~ msgstr "Dirección no válida: %s %s"
+
+#~ msgid ""
+#~ "Invalid display type. Must be one of: value, tag, ind1, ind2, code; "
+#~ "received: %s."
+#~ msgstr ""
+#~ "Tipo de visualización no válida.  Ha de ser uno de: value, tag, ind1, "
+#~ "ind2, code; received: %s."
+
+#~ msgid "Repeating subfield codes in the same instance!"
+#~ msgstr "¡Códigos de subcampo repetidos en la misma instancia!"
+
+#~ msgid "No template could be found for output format %s."
+#~ msgstr "No se ha encontrado una plantilla para el formato de salida %s."
+
+#~ msgid "Could not find format element named %s."
+#~ msgstr "No se ha encontrado el elemento de formato %s"
+
+#~ msgid "Error when evaluating format element %s with parameters %s."
+#~ msgstr "Error al evaluar el elemento de formato %s con el parámetro %s."
+
+#~ msgid ""
+#~ "Escape mode for format element %s could not be retrieved. Using default "
+#~ "mode instead."
+#~ msgstr ""
+#~ "No se ha podido obtener el modo de escape para el elemento de formato %s. "
+#~ "Se usará el modo por defecto."
+
+#~ msgid "\"nbMax\" parameter for %s must be an \"int\"."
+#~ msgstr "El parámetro \"nbMax\" para %s ha de ser un \"int\"."
+
+#~ msgid "Could not read format template named %s. %s."
+#~ msgstr "No se ha podido leer la plantilla de formato %s. %s."
+
+#~ msgid "Format element %s could not be found."
+#~ msgstr "No se ha encontrado el elemento de formato %s."
+
+#~ msgid "Error in format element %s. %s."
+#~ msgstr "Error en el elemento de formato %s. %s."
+
+#~ msgid "Format element %s has no function named \"format\"."
+#~ msgstr ""
+#~ "El elemento de formato %s no tiene ninguna función llamada \"format\"."
+
+#~ msgid "Output format with code %s could not be found."
+#~ msgstr "No se ha encontrado el formato de salida con el código %s."
+
+#~ msgid "Output format %s cannot not be read. %s."
+#~ msgstr "No se ha podido leer el formato de salida %s. %s."
+
+#~ msgid "Could not find output format named %s."
+#~ msgstr "No se ha podido encontrar el formato de salida %s."
+
+#~ msgid "Could not find a fresh name for output format %s."
+#~ msgstr ""
+#~ "No ha sido posible encontrar un nuevo nombre para el formato de salida %s"
+
+#~ msgid "No Record Found for %s."
+#~ msgstr "No se ha encontrado ningún registro para %s."
+
+#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
+#~ msgstr ""
+#~ "La especificación para la etiqueta \"%s\" debe acabar en la columna \":"
+#~ "\", linea %s."
+
+#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
+#~ msgstr ""
+#~ "La especificación para la etiqueta \"%s\" debe comenzar con \"tag\", "
+#~ "linea %s."
+
+#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
+#~ msgstr "\"tag\" debe estar en minúscula en \"%s\", linea %s."
+
+#~ msgid "Should be \"tag field_number:\" at line %s."
+#~ msgstr "Debería ser \"tag field_number:\", linea %s."
+
+#~ msgid "Invalid tag \"%s\" at line %s."
+#~ msgstr "Etiqueta \"%s\" no válida, linea %s."
+
+#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
+#~ msgstr ""
+#~ "La condición \"%s\" ocurre fuera de una especificación de etiqueta, linea "
+#~ "%s."
+
+#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
+#~ msgstr "La condición \"%s\" solo puede tenir un solo carácter, linea %s."
+
+#~ msgid "Template \"%s\" does not exist at line %s."
+#~ msgstr "La plantilla \"%s\" no existe, linea %s."
+
+#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
+#~ msgstr "Falta la columna \":\" después de \"default\" en \"%s\", linea %s."
+
+#~ msgid ""
+#~ "Default template specification \"%s\" must start with \"default :\" at "
+#~ "line %s."
+#~ msgstr ""
+#~ "La especificación de la plantilla por defecto \"%s\" debe comenzar por "
+#~ "\"default :\", linea %s."
+
+#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
+#~ msgstr ""
+#~ "La palabra \"default\" debe estar en minúsculas en \"%s\", linea %s."
+
+#~ msgid "Line %s could not be understood at line %s."
+#~ msgstr "No se puede entender la linea %s, linea %s."
+
+#~ msgid "Output format %s cannot not be read. %s"
+#~ msgstr "No se ha podido leer el format de salida %s. %s"
+
+#~ msgid ""
+#~ "Could not find a name specified in tag \"<name>\" inside format template "
+#~ "%s."
+#~ msgstr ""
+#~ "No se ha podido encontrar el nombre especificado en la etiqueta \"<name>"
+#~ "\" en la plantilla de formato %s."
+
+#~ msgid ""
+#~ "Could not find a description specified in tag \"<description>\" inside "
+#~ "format template %s."
+#~ msgstr ""
+#~ "No se ha podido econtrar la descripción especificada en la etiqueta "
+#~ "\"<description>\" en la plantilla de formato %s."
+
+#~ msgid "Format template %s calls undefined element \"%s\"."
+#~ msgstr "La plantilla de formato %s llama al elemento no definido \"%s\"."
+
+#~ msgid ""
+#~ "Format template %s calls unreadable element \"%s\". Check element file "
+#~ "permissions."
+#~ msgstr ""
+#~ "La plantilla de formato %s llama al elemento ilegible \"%s\". Compruebe "
+#~ "los permisos de fichero del elemento."
+
+#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
+#~ msgstr ""
+#~ "No se ha podido cargar el elemento \"%s\" en la plantilla %s. Compruebe "
+#~ "el código del elemento."
+
+#~ msgid ""
+#~ "Format element %s uses unknown parameter \"%s\" in format template %s."
+#~ msgstr ""
+#~ "El elemento de formato %s usa el parámetro desconocido \"%s\" en la "
+#~ "plantilla de formato %s."
+
+#~ msgid "Could not read format template named %s. %s"
+#~ msgstr "No se ha podido leer la plantilla de formato %s. %s"
+
+#~ msgid "Format element %s cannot not be read. %s"
+#~ msgstr "No se ha podido leer el elemento de formato %s. %s"
+
+#~ msgid "Add this document to your ScienceWise.info bookmarks"
+#~ msgstr "Añadir este documento a sus favoritos en ScienceWise.info"
+
+#~ msgid "Add this article to your ScienceWise.info bookmarks"
+#~ msgstr "Añadir este artículo a sus favoritos en ScienceWise.info"
+
+#~ msgid ""
+#~ "Cannot write in etc/bibformat dir of your Invenio installation. Check "
+#~ "directory permission."
+#~ msgstr ""
+#~ "No se ha podido escribir en el directorio etc/bibformat de su instalación "
+#~ "de Invenio. Compruebe los permisos del directorio."
+
+#~ msgid "Format template %s cannot not be read. %s"
+#~ msgstr "No se ha podido leer la plantilla de formato %s. %s"
+
+#~ msgid "No format specified for validation. Please specify one."
+#~ msgstr ""
+#~ "No se ha especificado ningún formato para la validación.  Especifique uno."
+
+#~ msgid "BibSort Guide"
+#~ msgstr "Guía de Bibsort"
+
+#~ msgid "May "
+#~ msgstr "Mayo"
+
+#~ msgid ""
+#~ "The system is not attempting to send an email from %s, to %s, with body "
+#~ "%s."
+#~ msgstr ""
+#~ "El sistema no intenta enviar un mensaje de %s, a %s, amb el texto %s."
+
+#~ msgid ""
+#~ "Error in connecting to the SMPT server waiting %s seconds. Exception is "
+#~ "%s, while sending email from %s to %s with body %s."
+#~ msgstr ""
+#~ "Error en la conexión con el servidor SMPT esperando %s segundos. La "
+#~ "excepción es %s, al intentar enviar el mensaje de %s a %s con el texto %s."
+
+#~ msgid "Error in sending email from %s to %s with body %s."
+#~ msgstr "Error al enviar un mensaje de %s, a %s, con el texto %s."
+
+#~ msgid "Please enter a name for the source."
+#~ msgstr "Introduzca un nombre para la fuente."
+
+#~ msgid "Please enter a metadata prefix."
+#~ msgstr "Untroduzca el prefijo de metadatos."
+
+#~ msgid "Please enter a base url."
+#~ msgstr "Untroduzca la url base."
+
+#~ msgid "Please choose a frequency of harvesting"
+#~ msgstr "Escoja una frecuencia de recolecta"
+
+#~ msgid "You selected a postprocess mode which involves conversion."
+#~ msgstr "Ha seleccionado un modo de postproceso que involucra conversión."
+
+#~ msgid ""
+#~ "Please enter a valid name of or a full path to a BibConvert config file "
+#~ "or change postprocess mode."
+#~ msgstr ""
+#~ "Entre un nombre válido o la ruta completa a un fichero de configuración "
+#~ "BibConvert, o cambie el modo de postproceso."
+
+#~ msgid "You selected a postprocess mode which involves filtering."
+#~ msgstr "Ha seleccionado un modo de postproceso que involucra filtrage."
+
+#~ msgid ""
+#~ "Please enter a valid name of or a full path to a BibFilter script or "
+#~ "change postprocess mode."
+#~ msgstr ""
+#~ "Entre un nombre válido o la ruta completa a un script BibFilter, o cambie "
+#~ "el modo de postproceso."
+
+#~ msgid "Please choose the harvesting starting date"
+#~ msgstr "Escoja la fecha de inicio de la recolecta"
+
+#~ msgid "Record deleted from the holding pen"
+#~ msgstr "Registro eliminado de la lista de espera"
+
+#~ msgid "Configure BibSort"
+#~ msgstr "Configurar BibSort"
+
+#~ msgid "Papers written alone"
+#~ msgstr "Articles como autor individual"
+
+#~ msgid "No Collaborations"
+#~ msgstr "Sin colaboraciones"
+
+#~ msgid "Collaborations"
+#~ msgstr "Colaboraciones"
+
+#~ msgid "Frequent co-authors (excluding collaborations)"
+#~ msgstr "Coautores frecuentes (excluyendo colaboraciones)"
+
+#~ msgid "Citations%s:"
+#~ msgstr "Citaciones%s:"
+
+#~ msgid "Recompute Now!"
+#~ msgstr "¡Recalcular ahora!"
+
+#~ msgid "Untitled basket"
+#~ msgstr "Cesta sin título"
+
+#~ msgid "Untitled topic"
+#~ msgstr "Tema sin título"
+
+#~ msgid "%(x_search_for_term)s in %(x_collection_list)s"
+#~ msgstr "%(x_search_for_term)s en %(x_collection_list)s"
+
+#~ msgid "%i matching items"
+#~ msgstr "encontrados %i items"
+
+#~ msgid "This basket does not contain any records yet."
+#~ msgstr "Esta cesta no contiene aún ningún registro."
+
+#~ msgid "All your topics"
+#~ msgstr "Todos sus temas"
+
+#~ msgid "All your groups"
+#~ msgstr "Todos sus grupos"
+
+#~ msgid "All your public baskets"
+#~ msgstr "Todas sus las cestas públicas"
+
+#~ msgid "Please select a basket..."
+#~ msgstr "Seleccione una cesta..."
+
+#~ msgid "%(x_nb)i Comments for round \"%(x_name)s\""
+#~ msgstr "%(x_nb)i comentarios por la vuelta «%(x_name)s»"
+
+#~ msgid "%(x_nb)i Comments"
+#~ msgstr "%(x_nb)i comentarios"
+
+#~ msgid "Be the first to review this document.</div>"
+#~ msgstr "Sea el primero a escribir una reseña de este documento.</div>"
+
+#~ msgid "Close"
+#~ msgstr "Cerrar"
+
+#~ msgid "Open"
+#~ msgstr "Abrir"
+
+#~ msgid "Specified comment does not belong to this record"
+#~ msgstr "El comentario especificado no pertenece a este registro"
+
+#~ msgid "You do not have access to the specified comment"
+#~ msgstr "No tiene acceso al comentario especificado"
+
+#~ msgid "You cannot vote for a deleted comment"
+#~ msgstr "No puede votar a un comentario borrado"
+
+#~ msgid "You cannot report a deleted comment"
+#~ msgstr "No puede denunciar a un comentario borrado"
+
+#~ msgid "You cannot access files of a deleted comment"
+#~ msgstr "No puede acceder a los ficheros de un comentario borrado"
+
+#~ msgid "Regenerate Issue"
+#~ msgstr "Regenerar número"
+
+#~ msgid ""
+#~ "Warning: full-text search is only available for a subset of papers mostly "
+#~ "from %(x_range_from_year)s-%(x_range_to_year)s."
+#~ msgstr ""
+#~ "Atención: la búsqueda a texto completo sólo está disponible para un "
+#~ "subconjunto de documentos, mayoritariamente de entre "
+#~ "%(x_range_from_year)s-%(x_range_to_year)s."
+
+#~ msgid ""
+#~ "Warning: figure caption search is only available for a subset of papers "
+#~ "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
+#~ msgstr ""
+#~ "Atención: la búsqueda en los pies de imágenes sólo está disponible para "
+#~ "un subconjunto de documentos, mayoritariamente de entre "
+#~ "%(x_range_from_year)s-%(x_range_to_year)s."
+
+#~ msgid "Your search did not match any records.  Please try again."
+#~ msgstr "Su búsqueda no ha encontrado ningún registro. Vuelva a intentarlo."
+
+#~ msgid ""
+#~ "Sorry, %s does not seem to be a valid sort option. The records will not "
+#~ "be sorted."
+#~ msgstr "No es posible ordenar por %s.  No se ordenarán los registros."
+
+#~ msgid "The record %d replaces it."
+#~ msgstr "El registro %d lo reemplaza."
+
+#~ msgid "Total number of citations excluding self-citations"
+#~ msgstr "Número total de citaciones excluyendo las autocitas"
+
+#~ msgid "Average citations per paper excluding self-citations"
+#~ msgstr "Media de citas por artículo excluyendo las autocitas"
+
+#~ msgid "API keys"
+#~ msgstr "Llaves API"
+
+#~ msgid "These are your current API keys"
+#~ msgstr "Estas son sus llaves API"
+
+#~ msgid "Description: "
+#~ msgstr "Descripción: "
+
+#~ msgid "Status: "
+#~ msgstr "Estado: "
+
+#~ msgid "API key"
+#~ msgstr "Llave API"
+
+#~ msgid "Delete key"
+#~ msgstr "Suprimir la llave"
+
+#~ msgid ""
+#~ "If you want to create a new API key, please enter a description for it"
+#~ msgstr "Si desea crear una nueva llave API, escriba su descripción"
+
+#~ msgid "Description for the new API key"
+#~ msgstr "Descripción para la nueva llave API"
+
+#~ msgid ""
+#~ "The description should be something meaningful for you to recognize the "
+#~ "API key"
+#~ msgstr ""
+#~ "La descripción debería ser algo significativo para que pueda reconocer la "
+#~ "nueva llave API"
+
+#~ msgid "Create new key"
+#~ msgstr "Crear una llave nueva"
+
+#~ msgid "Your nickname has not been updated"
+#~ msgstr "Su alias no se ha actualitzado."
+
+#~ msgid "Login to display all document types you can access"
+#~ msgstr ""
+#~ "Identifíquese para visualizar todos los tipos de documento a los que "
+#~ "tiene acceso"
+
+#~ msgid ""
+#~ "As a referee for this document, you may approve or reject it from the "
+#~ "submission interface"
+#~ msgstr ""
+#~ "Como revisor de este documento, puede aprobarlo o rechazarlo des de la "
+#~ "interfaz de envíos"
+
+#~ msgid "Sorry, invalid arguments"
+#~ msgstr "Argumentos no válidos"
+
+#~ msgid "Note: the requested submission has already been completed"
+#~ msgstr "El envío ya se ha completado"
+
+#~ msgid ""
+#~ "Sorry, you don't seem to have initiated a submission with the provided "
+#~ "access number"
+#~ msgstr ""
+#~ "No parece que haya iniciado un envío con el número de acceso que ha\n"
+#~ "especificado"
+
+#~ msgid "period_of_interest_from"
+#~ msgstr "período_de_interés_desde"
+
+#~ msgid "jsCal3"
+#~ msgstr "jsCal3"
+
+#~ msgid "period_of_interest_to"
+#~ msgstr "período_de_interés_hasta"
+
+#~ msgid "jsCal4"
+#~ msgstr "jsCal4"
+
+#~ msgid "jsCal1"
+#~ msgstr "jsCal1"
+
+#~ msgid "jsCal2"
+#~ msgstr "jsCal2"
+
 #~ msgid "No fulltext"
 #~ msgstr "Sin texto completo"
 
@@ -13588,9 +14197,6 @@ msgstr "Corrijan mi lista de publicaciones"
 
 #~ msgid "ERROR"
 #~ msgstr "ERROR"
-
-#~ msgid "does not exist"
-#~ msgstr "no existe"
 
 #~ msgid "already exists."
 #~ msgstr "ya existe"

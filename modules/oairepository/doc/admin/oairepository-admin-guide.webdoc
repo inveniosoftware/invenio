@@ -56,6 +56,8 @@ The OAI Repository corresponds to a set of metadata exposed for periodical harve
 
 <p>If you want to export all the records in your repository, just leave all the query parameters blank. You can also omit the OAI setSpec and setName if you do not want to organize your repository into a hierarchy.</p>
 
+<p>If you want to force all the clients currently harvesting a given set you are exporting (e.g. because you have enriched a metadata export format) you can simply touch the corresponding set.</p>
+
 <p>Tip: since the exposed records are retrieved using the Invenio search engine, you can test your query definition in the <a href="<CFG_SITE_URL>/?as=1">advanced search interface</a> of your repostory.</p>
 
 <a name="2.2"></a><h3>2.2. Exposing metadata via OAI Repository Gateway</h3>
