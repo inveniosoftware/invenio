@@ -167,7 +167,7 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
     write_message("... completed writing %s" % (dump_path,))
 
 
-def dump_slave_database(dump_path, host, params=None, ignore=None):
+def dump_slave_database(dump_path, host, *args, **kwargs):
     """
     Performs a dump of a defined slave database, making sure
     to halt slave replication until the dump has completed.
@@ -205,12 +205,7 @@ def dump_slave_database(dump_path, host, params=None, ignore=None):
         raise StandardError("ERROR: Stopping slave failed: %s" % (stderr,))
 
     write_message("... slave stopped")
-
-    dump_database(dump_path, \
-                  host=host, \
-                  params=params, \
-                  ignore=ignore)
-
+    dump_database(dump_path, host=host, *args, **kwargs)
     write_message("... starting slave.")
     admin_cmd += " start-slave " \
                  " --host=%s --port=%s --user=%s --password=%s " % \
@@ -278,7 +273,8 @@ def _dbdump_run_task_core():
     slave = task_get_option('slave', False)
     ignore = task_get_option('ignore', None)
 
-    output_file_suffix = task_get_task_param('task_starting_time').replace(' ', '_') + '.sql'
+    output_file_suffix = task_get_task_param('task_starting_time')
+    output_file_suffix = output_file_suffix.replace(' ', '_') + '.sql'
     if compress:
         output_file_suffix = "%s.gz" % (output_file_suffix,)
     write_message("Reading parameters ended")
@@ -294,12 +290,19 @@ def _dbdump_run_task_core():
         output_file_prefix = 'slave-%s-dbdump-' % (CFG_DATABASE_NAME,)
         output_file = output_file_prefix + output_file_suffix
         dump_path = output_dir + os.sep + output_file
-        dump_slave_database(dump_path, slave, params, ignore)
+        dump_slave_database(dump_path, \
+                            host=slave, \
+                            params=params, \
+                            compress=compress, \
+                            ignore=ignore)
     else:
         output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
         output_file = output_file_prefix + output_file_suffix
         dump_path = output_dir + os.sep + output_file
-        dump_database(dump_path, params=params, ignore=ignore)
+        dump_database(dump_path, \
+                      params=params, \
+                      compress=compress, \
+                      ignore=ignore)
 
     write_message("Database dump ended")
     # prune old dump files:

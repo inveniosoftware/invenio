@@ -37,7 +37,7 @@ except:
     CFG_JSON_AVAILABLE = False
     json = None
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_BASE_URL
 from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
                             BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS, PERSONS_PER_PAGE, \
                             MAX_NUM_SHOW_PAPERS
@@ -66,6 +66,9 @@ from invenio.bibauthorid_backinterface import update_external_ids_of_authors, ge
             get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author
 from invenio.bibauthorid_dbinterface import defaultdict, remove_arxiv_papers_of_author
 from invenio.webauthorprofile_orcidutils import get_dois_from_orcid
+
+from invenio.bibauthorid_webauthorprofileinterface import is_valid_canonical_id, get_person_id_from_canonical_id, \
+    get_person_redirect_link, author_has_papers
 
 from invenio.bibauthorid_templates import WebProfileMenu, WebProfilePage
 
@@ -3631,7 +3634,6 @@ class WebInterfaceAuthor(WebInterfaceDirectory):
     from invenio.webauthorprofile_webinterface import WebAuthorPages
 
     claim = WebInterfaceBibAuthorIDClaimPages()
-    index = claim.search
     profile = WebAuthorPages()
     choose_profile = claim.choose_profile
     help = claim.help
@@ -3640,6 +3642,45 @@ class WebInterfaceAuthor(WebInterfaceDirectory):
     search = claim.search
     search_ajax = WebAuthorSearch()
     ticket = WebInterfaceAuthorTicketHandling()
+
+    def _lookup(self, component, path):
+        if component not in self._exports:
+            return WebInterfaceAuthor(component), path
+
+    def __init__(self, component=None):
+        self.path = component
+
+    def __call__(self, req, form):
+        if self.path is None or len(self.path) < 1:
+            redirect_to_url(req, "%s/author/search" % CFG_BASE_URL)
+
+        # Check if canonical id: e.g. "J.R.Ellis.1"
+        pid = get_person_id_from_canonical_id(self.path)
+        if pid >= 0:
+            url = "%s/author/profile/%s" % (CFG_BASE_URL, get_person_redirect_link(pid))
+            redirect_to_url(req, url, redirection_type=apache.HTTP_MOVED_PERMANENTLY)
+            return
+        else:
+            try:
+                pid = int(self.path)
+            except ValueError:
+                redirect_to_url(req, "%s/author/search?q=%s" % (CFG_BASE_URL, self.path))
+                return
+            else:
+                if author_has_papers(pid):
+                    cid = get_person_redirect_link(pid)
+                    if is_valid_canonical_id(cid):
+                        redirect_id = cid
+                    else:
+                        redirect_id = pid
+                    url = "%s/author/profile/%s" % (CFG_BASE_URL, redirect_id)
+                    redirect_to_url(req, url, redirection_type=apache.HTTP_MOVED_PERMANENTLY)
+                    return
+
+        redirect_to_url(req, "%s/author/search" % CFG_BASE_URL)
+        return
+
+    index = __call__
 
 
 class WebInterfacePerson(WebInterfaceDirectory):
