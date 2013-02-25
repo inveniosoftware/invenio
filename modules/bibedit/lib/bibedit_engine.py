@@ -28,6 +28,7 @@ import zlib
 import copy
 import urllib
 import urllib2
+import cookielib
 
 from invenio import bibformat
 
@@ -48,7 +49,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
     CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
-    CFG_BIBEDIT_DOI_LOOKUP_FIELD
+    CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -432,7 +433,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
     elif request_type == "getTableView":
         response.update(perform_request_get_tableview(recid, uid, data))
     elif request_type == "DOISearch":
-        response.update(perform_doi_search(data))
+        response.update(perform_doi_search(data['doi']))
 
     return response
 
@@ -1593,7 +1594,7 @@ def _get_formated_record(record, new_window):
 
 def perform_request_init_template_interface():
     """Handle a request to manage templates"""
-    errors   = []
+    errors = []
     warnings = []
     body = ''
 
@@ -1612,7 +1613,8 @@ def perform_request_init_template_interface():
 
     # Add scripts (the ordering is NOT irrelevant).
     scripts = ['jquery-ui.min.js',
-               'json2.js', 'bibedit_display.js', 'bibedit_template_interface.js']
+               'json2.js', 'bibedit_display.js',
+               'bibedit_template_interface.js']
 
     for script in scripts:
         body += '    <script type="text/javascript" src="%s/js/%s">' \
@@ -1642,25 +1644,28 @@ def perform_request_edit_template(data):
     template_filename = data['templateFilename']
     template = get_record_template(template_filename)
     if not template:
-        response['resultCode']  = 1
+        response['resultCode'] = 1
     else:
         response['templateMARCXML'] = template
 
     return response
 
-def perform_doi_search(data):
+
+def perform_doi_search(doi):
     """Search for DOI on the dx.doi.org page
     @return: the url returned by this page"""
     response = {}
     url = "http://dx.doi.org/"
-    val = {'hdl' : data['doi']}
+    val = {'hdl': doi}
     url_data = urllib.urlencode(val)
-    req = urllib2.Request(url, url_data)
+    cj = cookielib.CookieJar()
+    header = [('User-Agent', CFG_DOI_USER_AGENT)]
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener.addheaders = header
     try:
-        resp = urllib2.urlopen(req)
-    except urllib2.HTTPError:
+        resp = opener.open(url, url_data)
+    except:
         return response
     else:
-        response['doi_url'] = resp.url
-
+        response['doi_url'] = resp.geturl()
     return response

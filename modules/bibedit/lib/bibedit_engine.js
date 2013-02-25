@@ -232,7 +232,7 @@ function init_bibedit() {
   // viewport
   resize_content();
   $(window).bind('resize', resize_content);
-});
+};
 
 
 function failInReadOnly(){

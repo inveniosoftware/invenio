@@ -24,6 +24,7 @@ import re
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibedit_utils import get_xml_from_textmarc
+from invenio.bibedit_engine import perform_doi_search
 
 class TextmarcToXMLTests(unittest.TestCase):
     """ Test utility functions to convert textmarc to XML """
@@ -109,8 +110,25 @@ class TextmarcToXMLTests(unittest.TestCase):
         self.assertEqual(re.sub("\s+", " ", output['resultXML'].strip()),
             re.sub("\s+", " ", xml_expected_output.strip()))
 
+class TestPerformDoiSearch(unittest.TestCase):
+    """Test the perform_doi_search function, which resolves the doi using
+    dx.doi.org page and returns the url of the resource
+    """
 
-TEST_SUITE = make_test_suite(TextmarcToXMLTests)
+    def test_normal(self):
+        """Checks if some standard doi is working"""
+        doi = "10.1007/BF02724522"
+        wrong_output = {}
+        self.assertNotEqual(perform_doi_search(doi), wrong_output)
+
+    def test_no_headers(self):
+        """Checks if the doi that requires 'User-Agent' header is working"""
+        doi = "10.1016/0550-3213(89)90423-9"
+        wrong_output = {}
+        self.assertNotEqual(perform_doi_search(doi), wrong_output)
+
+TEST_SUITE = make_test_suite(TextmarcToXMLTests,
+                            TestPerformDoiSearch)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

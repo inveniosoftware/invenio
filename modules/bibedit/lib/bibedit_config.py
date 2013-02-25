@@ -208,3 +208,6 @@ CFG_BIBEDIT_CACHEDIR = CFG_TMPSHAREDDIR + '/bibedit-cache'
 # CFG_BIBEDIT_DOI_LOOKUP_FIELD - for which tag bibedit should add a link
 # to a DOI name resolver
 CFG_BIBEDIT_DOI_LOOKUP_FIELD = '0247_a'
+# Name of User-Agent header that is send to the DOI name resolver page
+# Without the User-Agent, dx.doi.org page returns 404 error
+CFG_DOI_USER_AGENT = "Invenio"
