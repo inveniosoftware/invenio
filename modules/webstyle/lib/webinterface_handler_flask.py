@@ -41,7 +41,8 @@ from invenio.config import CFG_PYLIBDIR, \
     CFG_LOGDIR, CFG_SITE_LANG, CFG_WEBDIR, \
     CFG_ETCDIR, CFG_DEVEL_SITE, \
     CFG_FLASK_CACHE_TYPE, CFG_FLASK_DISABLED_BLUEPRINTS, \
-    CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_FLASK_SERVE_STATIC_FILES
+    CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_FLASK_SERVE_STATIC_FILES, \
+    CFG_SITE_SECRET_KEY
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY
 
@@ -233,7 +234,7 @@ def create_invenio_flask_app():
     _app.config.from_object(config)
 
     ## ... and map certain common parameters
-    _app.config["SECRET_KEY"] = 'Inv3n10'
+    _app.config["SECRET_KEY"] = CFG_SITE_SECRET_KEY
     _app.config['SESSION_COOKIE_NAME'] = CFG_WEBSESSION_COOKIE_NAME
     _app.config['PERMANENT_SESSION_LIFETIME'] = \
         CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER * CFG_WEBSESSION_ONE_DAY
