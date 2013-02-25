@@ -1,7 +1,7 @@
 ## $Id: Revise_Files.py,v 1.37 2009/03/26 15:11:05 jerome Exp $
 
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -96,9 +96,12 @@ from invenio.dbquery import run_sql
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.urlutils import create_html_mailto
+from invenio.htmlutils import escape_javascript_string
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 
 CFG_ALLOWED_ACTIONS = ['revise', 'delete', 'add', 'addFormat']
+
+params_id = 0
 
 def create_file_upload_interface(recid,
                                  form=None,
@@ -731,6 +734,12 @@ def create_file_upload_interface(recid,
                 body += '<script>alert("%s");</script>' % \
                        (_("A file named %s already exists. Please choose another name.") % \
                         file_rename).replace('"', '\\"')
+            elif file_rename != file_target and \
+                     ('.' in file_rename or '/' in file_rename or "\\" in file_rename):
+                    # We forbid usage of a few characters, for the good of
+                    # everybody...
+                body += '<script>alert("%s");</script>' % \
+                        _("You are not allowed to use dot '.', slash '/', or backslash '\\\\' in file names. Choose a different name and upload your file again. In particular, note that you should not include the extension in the renaming field.").replace('"', '\\"')
             else:
                 # Log
                 log_action(working_dir, file_action, file_target,
@@ -788,8 +797,8 @@ def create_file_upload_interface(recid,
     doctypes_list = ""
     if len(cleaned_doctypes) > 1:
         doctypes_list = '<select id="fileDoctype" name="fileDoctype" onchange="var idx=this.selectedIndex;var doctype=this.options[idx].value;updateForm(doctype,'+','.join([js_can_describe_doctypes, js_can_comment_doctypes, js_can_restrict_doctypes])+');">' + \
-                        '\n'.join(['<option value="' + doctype + '">' + \
-                                   description + '</option>' \
+                        '\n'.join(['<option value="' + cgi.escape(doctype, True) + '">' + \
+                                   cgi.escape(description) + '</option>' \
                                    for (doctype, description) \
                                    in doctypes_and_desc if \
                                    doctype in cleaned_doctypes]) + \
@@ -844,9 +853,11 @@ def create_file_upload_interface(recid,
                                     protect_hidden_files=protect_hidden_files)
     body += '</table>'
     if len(cleaned_doctypes) > 0:
-        body += '''<input type="button" onclick="%(display_revise_panel)s;updateForm('%(defaultSelectedDoctype)s', %(can_describe_doctypes)s, %(can_comment_doctypes)s, %(can_restrict_doctypes)s);return false;" value="%(add_new_file)s"/>''' % \
-               {'display_revise_panel':javascript_display_revise_panel(action='add', target='', show_doctypes=True, show_keep_previous_versions=False, show_rename=can_name_new_files, show_description=True, show_comment=True, bibdocname='', description='', comment='', show_restrictions=True, restriction=len(restrictions_and_desc) > 0 and restrictions_and_desc[0][0] or '', doctypes=doctypes_list),
-                'defaultSelectedDoctype': cleaned_doctypes[0],
+        (revise_panel, javascript_prefix) = javascript_display_revise_panel(action='add', target='', show_doctypes=True, show_keep_previous_versions=False, show_rename=can_name_new_files, show_description=True, show_comment=True, bibdocname='', description='', comment='', show_restrictions=True, restriction=len(restrictions_and_desc) > 0 and restrictions_and_desc[0][0] or '', doctypes=doctypes_list)
+        body += '''%(javascript_prefix)s<input type="button" onclick="%(display_revise_panel)s;updateForm('%(defaultSelectedDoctype)s', %(can_describe_doctypes)s, %(can_comment_doctypes)s, %(can_restrict_doctypes)s);return false;" value="%(add_new_file)s"/>''' % \
+               {'display_revise_panel': revise_panel,
+                'javascript_prefix': javascript_prefix,
+                'defaultSelectedDoctype': escape_javascript_string(cleaned_doctypes[0], escape_quote_for_html=True),
                 'add_new_file': _("Add new file"),
                 'can_describe_doctypes':js_can_describe_doctypes,
                 'can_comment_doctypes': repr({}.fromkeys(can_comment_doctypes, '')),
@@ -878,6 +889,8 @@ def create_file_upload_interface(recid,
             'previous_versions_label': _('Keep previous versions'),
             'cancel': _('Cancel'),
             'upload': _('Upload'),
+            'uploading_label': _('Uploading...'),
+            'postprocess_label': _('Please wait...'),
             'submit_or_button': form_url_params and 'button' or 'submit'}
         body += '''
         <input type="hidden" name="recid" value="%(recid)i"/>
@@ -998,13 +1011,13 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     if not updated and show_links and not hidden_p:
         out += '<a target="_blank" href="' + main_bibdocfile.get_url() \
            + '">'
-    out += abstract_bibdoc['get_docname']
+    out += cgi.escape(abstract_bibdoc['get_docname'])
     if hidden_p:
         out += ' <span style="font-size:small;font-style:italic;color:#888">(hidden)</span>'
     if not updated and show_links and not hidden_p:
         out += '</a>'
     if main_bibdocfile_description:
-        out += ' (<em>' + main_bibdocfile_description + '</em>)'
+        out += ' (<em>' + cgi.escape(main_bibdocfile_description) + '</em>)'
     out += '</td>'
 
     (description, comment) = get_description_and_comment(abstract_bibdoc['list_latest_files'])
@@ -1014,8 +1027,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_revise_doctypes or \
            '*' in can_revise_doctypes and not (hidden_p and protect_hidden_files):
-        out += '[<a href="" onclick="%(display_revise_panel)s;return false;">%(revise)s</a>]' % \
-               {'display_revise_panel': javascript_display_revise_panel(
+        (revise_panel, javascript_prefix) = javascript_display_revise_panel(
             action='revise',
             target=abstract_bibdoc['get_docname'],
             show_doctypes=False,
@@ -1028,17 +1040,29 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
             comment=comment,
             show_restrictions=(main_bibdocfile.get_type() in can_restrict_doctypes) or '*' in can_restrict_doctypes,
             restriction=restriction,
-            doctypes=doctypes_list),
+            doctypes=doctypes_list)
+        out += '%(javascript_prefix)s[<a href="" onclick="%(display_revise_panel)s;return false;">%(revise)s</a>]' % \
+               {'display_revise_panel': revise_panel,
+                'javascript_prefix': javascript_prefix,
                 'revise': _("revise")
                 }
 
     # Delete link
     if main_bibdocfile.get_type() in can_delete_doctypes or \
            '*' in can_delete_doctypes and not (hidden_p and protect_hidden_files):
-        out += '''[<a href="" onclick="return askDelete('%(bibdocname)s', '%(form_url_params)s')">%(delete)s</a>]
-        ''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
+        global params_id
+        params_id += 1
+        out += '''
+        <script type="text/javascript">
+        /*<![CDATA[*/
+        var delete_panel_params_%(id)i = "%(bibdocname)s";
+        /*]]>*/
+        </script>
+        [<a href="" onclick="return askDelete(delete_panel_params_%(id)i, '%(form_url_params)s')">%(delete)s</a>]
+        ''' % {'bibdocname': escape_javascript_string(abstract_bibdoc['get_docname'], escape_for_html=False),
                'delete': _("delete"),
-               'form_url_params': form_url_params or ''}
+               'form_url_params': form_url_params or '',
+               'id': params_id}
     out += '''</td>'''
 
     # Format row
@@ -1058,8 +1082,7 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_add_format_to_doctypes or \
            '*' in can_add_format_to_doctypes and not (hidden_p and protect_hidden_files):
-        out += '[<a href="" onclick="%(display_revise_panel)s;return false;">%(add_format)s</a>]' % \
-        {'display_revise_panel':javascript_display_revise_panel(
+        (revise_panel, javascript_prefix) = javascript_display_revise_panel(
             action='addFormat',
             target=abstract_bibdoc['get_docname'],
             show_doctypes=False,
@@ -1072,7 +1095,10 @@ def create_file_row(abstract_bibdoc, can_delete_doctypes,
             comment='',
             show_restrictions=False,
             restriction=restriction,
-            doctypes=doctypes_list),
+            doctypes=doctypes_list)
+        out += '%(javascript_prefix)s[<a href="" onclick="%(display_revise_panel)s;return false;">%(add_format)s</a>]' % \
+        {'display_revise_panel': revise_panel,
+         'javascript_prefix': javascript_prefix,
          'add_format':_("add format")}
 
     out += '</td></tr>'
@@ -1344,24 +1370,41 @@ def javascript_display_revise_panel(action, target, show_doctypes, show_keep_pre
     Returns a correctly encoded call to the javascript function to
     display the revision panel.
     """
-    def escape_js_string_param(input):
-        "Escape string parameter to be used in Javascript function"
-        return input.replace('\\', '\\\\').replace('\r', '\\r').replace('\n', '\\n').replace("'", "\\'").replace('"', '&quot;')
-
-    return '''display_revise_panel(this, '%(action)s', '%(target)s', %(showDoctypes)s, %(showKeepPreviousVersions)s, %(showRename)s, %(showDescription)s, %(showComment)s, '%(bibdocname)s', '%(description)s', '%(comment)s', %(showRestrictions)s, '%(restriction)s', '%(doctypes)s')''' % \
-           {'action': action,
-            'showDoctypes': show_doctypes and 'true' or 'false',
-            'target': escape_js_string_param(target),
-            'bibdocname': escape_js_string_param(bibdocname),
-            'showRename': show_rename and 'true' or 'false',
-            'showKeepPreviousVersions': show_keep_previous_versions and 'true' or 'false',
-            'showComment': show_comment and 'true' or 'false',
-            'showDescription': show_description and 'true' or 'false',
-            'description': description and escape_js_string_param(description) or '',
-            'comment': comment and escape_js_string_param(comment) or '',
-            'showRestrictions': show_restrictions and 'true' or 'false',
-            'restriction': escape_js_string_param(restriction),
-            'doctypes': escape_js_string_param(doctypes)}
+    global params_id
+    params_id += 1
+    javascript_prefix = '''
+    <script type="text/javascript">
+    /*<![CDATA[*/
+    var revise_panel_params_%(id)i = {"action": "%(action)s",
+                                      "target": "%(target)s",
+                                      "showDoctypes": %(showDoctypes)s,
+                                      "showKeepPreviousVersions": %(showKeepPreviousVersions)s,
+                                      "showRename": %(showRename)s,
+                                      "showDescription": %(showDescription)s,
+                                      "showComment": %(showComment)s,
+                                      "bibdocname": "%(bibdocname)s",
+                                      "description": "%(description)s",
+                                      "comment": "%(comment)s",
+                                      "showRestrictions": %(showRestrictions)s,
+                                      "restriction": "%(restriction)s",
+                                      "doctypes": "%(doctypes)s"}
+     /*]]>*/
+     </script>''' % {'id': params_id,
+                   'action': action,
+                   'showDoctypes': show_doctypes and 'true' or 'false',
+                   'target': escape_javascript_string(target, escape_for_html=False),
+                   'bibdocname': escape_javascript_string(bibdocname, escape_for_html=False),
+                   'showRename': show_rename and 'true' or 'false',
+                   'showKeepPreviousVersions': show_keep_previous_versions and 'true' or 'false',
+                   'showComment': show_comment and 'true' or 'false',
+                   'showDescription': show_description and 'true' or 'false',
+                   'description': description and escape_javascript_string(description, escape_for_html=False) or '',
+                   'comment': comment and escape_javascript_string(comment, escape_for_html=False) or '',
+                   'showRestrictions': show_restrictions and 'true' or 'false',
+                   'restriction': escape_javascript_string(restriction, escape_for_html=False),
+                   'doctypes': escape_javascript_string(doctypes, escape_for_html=False)}
+    return ('display_revise_panel(this, revise_panel_params_%(id)i)' % {'id': params_id},
+            javascript_prefix)
 
 def get_uploaded_files_for_docname(log_dir, docname):
     """
@@ -2322,8 +2365,17 @@ def get_upload_file_interface_javascript(form_url_params):
         javascript += '''
 // prepare the form when the DOM is ready
 $(document).ready(function() {
+    var progress = $('.progress');
+    var rotatingprogress = $('.rotatingprogress');
+    var bar = $('.bar');
+    var percent = $('.percent');
     var options = {
         target: '#uploadFileInterface', // target element(s) to be updated with server response
+        uploadProgress: function(event, position, total, percentComplete) {
+                                    update_progress(progress, bar, percent, percentComplete, rotatingprogress);},
+        beforeSubmit: function(arr, $form, options) {
+                                    show_upload_progress();
+                                    return true;},
         success: showResponse, // post-submit callback
         url: '/%(CFG_SITE_RECORD)s/managedocfilesasync%(form_url_params)s' // override for form's 'action' attribute
     };
@@ -2339,6 +2391,7 @@ $(document).ready(function() {
 
 // post-submit callback
 function showResponse(responseText, statusText)  {
+    hide_upload_progress();
     hide_revise_panel();
 }
     '''  % {
@@ -2351,7 +2404,22 @@ function showResponse(responseText, statusText)  {
  */
 var last_clicked_link = null;
 
-function display_revise_panel(link, action, target, showDoctypes, showKeepPreviousVersions, showRename, showDescription, showComment, bibdocname, description, comment, showRestrictions, restriction, doctypes){
+function display_revise_panel(link, params){
+
+        var action = params['action'];
+        var target = params['target'];
+        var showDoctypes = params['showDoctypes'];
+        var showKeepPreviousVersions = params['showKeepPreviousVersions'];
+        var showRename = params['showRename'];
+        var showDescription = params['showDescription'];
+        var showComment = params['showComment'];
+        var bibdocname = params['bibdocname'];
+        var description = params['description'];
+        var comment = params['comment'];
+        var showRestrictions = params['showRestrictions'];
+        var restriction = params['restriction'];
+        var doctypes = params['doctypes'];
+
         var balloon = document.getElementById("balloon");
         var file_input_block = document.getElementById("balloonReviseFileInputBlock");
         var doctype = document.getElementById("fileDoctypesRow");
@@ -2456,13 +2524,58 @@ function hide_revise_panel(){
 }
 
 
-/* Intercept ESC key in order to close revise panel */
+/* Intercept ESC key in order to close revise panel*/
 document.onkeyup = keycheck;
 function keycheck(e){
         var KeyID = (window.event) ? event.keyCode : e.keyCode;
+        var upload_in_progress_p = $('.progress').is(":visible") || $('.rotatingprogress').is(":visible")
         if(KeyID==27){
-            hide_revise_panel()
+            if (upload_in_progress_p) {
+                hide_upload_progress();
+            } else {
+                hide_revise_panel();
+            }
         }
+}
+
+/* Update progress bar, show if necessary (and then hide rotating progress indicator) */
+function update_progress(progress, bar, percent, percentComplete, rotatingprogress){
+    if (rotatingprogress.is(":visible")) {
+        $('.rotatingprogress').hide();
+        $('.progress').show();
+    }
+    var percentVal = percentComplete + '%%';
+    bar.width(percentVal)
+    percent.html(percentVal);
+
+    if (percentComplete == '100') {
+        // There might be some lengthy post-processing to do.
+        show_upload_progress(post_process_label=true);
+    }
+}
+
+/* Hide upload/cancel button, show rotating progress indicator */
+function show_upload_progress(post_process_label_p) {
+    if (!post_process_label_p) { post_process_label_p = false;}
+
+    if (post_process_label_p) {
+        /* Show post-process label */
+        $('.progress').hide();
+        $('.rotatingprogress').hide();
+        $('.rotatingpostprocess').show();
+    } else {
+        /* Show uploading label */
+        $('#canceluploadbuttongroup').hide();
+        $('.rotatingprogress').show();
+    }
+}
+/* show upload/cancel button, hide any progress indicator */
+function hide_upload_progress() {
+    $('.progress').hide();
+    $('.rotatingprogress').hide();
+    $('.rotatingpostprocess').hide();
+    $('#canceluploadbuttongroup').show();
+    $('.percent').html('0%%');
 }
 
 function findPosition( oElement ) {
@@ -2745,6 +2858,37 @@ margin-top:6px;
 #description, #comment, #rename {
 width:90%%;
 }
+.rotatingprogress, .rotatingpostprocess {
+position:relative;
+float:right;
+padding: 1px;
+font-style:italic;
+font-size:small;
+margin-right: 5px;
+display:none;
+}
+
+.progress {
+position:relative;
+width:100%%;
+float:left;
+border: 1px solid #ddd;
+padding: 1px;
+border-radius: 3px;
+display:none;
+}
+.bar {
+background-color: #dd9700;
+width:0%%; height:20px;
+border-radius: 3px; }
+.percent {
+position:absolute;
+display:inline-block;
+top:3px;
+left:45%%;
+font-size:small;
+color: #514100;
+}
 -->
 </style>
 ''' % {'CFG_SITE_URL': CFG_SITE_URL}
@@ -2773,10 +2917,11 @@ revise_balloon = '''
               <div id="renameBox" style=""><label for="rename">%(filename_label)s:</label><br/><input type="text" name="rename" id="rename" size="20" autocomplete="off"/></div>
               <div id="descriptionBox" style=""><label for="description">%(description_label)s:</label><br/><input type="text" name="description" id="description" size="20" autocomplete="off"/></div>
               <div id="commentBox" style=""><label for="comment">%(comment_label)s:</label><br/><textarea name="comment" id="comment" rows="3"/></textarea></div>
-              <div id="restrictionBox" style="display:none">%(restrictions)s</div>
+              <div id="restrictionBox" style="display:none;white-space:nowrap;">%(restrictions)s</div>
               <div id="keepPreviousVersions" style="display:none"><input type="checkbox" id="balloonReviseFileKeep" name="keepPreviousFiles" checked="checked" /><label for="balloonReviseFileKeep">%(previous_versions_label)s</label>&nbsp;<small>[<a href="" onclick="alert('%(previous_versions_help)s');return false;">?</a>]</small></div>
               <p id="warningFormats" style="display:none"><img src="%(CFG_SITE_URL)s/img/warning.png" alt="Warning"/> %(revise_format_warning)s&nbsp;[<a href="" onclick="alert('%(revise_format_help)s');return false;">?</a>]</p>
-              <div style="text-align:right;margin-top:5px"><input type="button" value="%(cancel)s" onclick="javascript:hide_revise_panel();"/> <input type="%(submit_or_button)s" id="bibdocfilemanagedocfileuploadbutton" value="%(upload)s"/></div>
+              <div class="progress"><div class="bar"></div ><div class="percent">0%%</div ></div>
+              <div class="rotatingprogress"><img src="/img/ui-anim_basic_16x16.gif" /> %(uploading_label)s</div><div class="rotatingpostprocess"><img src="/img/ui-anim_basic_16x16.gif" /> %(postprocess_label)s</div><div id="canceluploadbuttongroup" style="text-align:right;margin-top:5px"><input type="button" value="%(cancel)s" onclick="javascript:hide_revise_panel();"/> <input type="%(submit_or_button)s" id="bibdocfilemanagedocfileuploadbutton" onclick="show_upload_progress()" value="%(upload)s"/></div>
             </td>
           </tr>
         </table>

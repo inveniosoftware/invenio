@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -142,7 +142,7 @@ class Template:
 
         #title = _("record") + ' #' + '<a href="%s/%s/%s">%s</a>' % (CFG_SITE_URL, CFG_SITE_RECORD, recid, recid)
         #if docname != "":
-        #    title += ' ' + _("document") + ' #' + str(docname)
+        #    title += ' ' + _("document") + ' #' + cgi.escape(str(docname))
         #if version != "":
         #    title += ' ' + _("version") + ' #' + str(version)
 
@@ -296,7 +296,7 @@ class Template:
                      </td>
                    </tr>""" % {
                      'imageurl' : imageurl,
-                     'docname' : docname,
+                     'docname' : cgi.escape(docname),
                      'restriction_label': status and ('<tr><td colspan="2" class="restrictedfilerowheader">%s</td></tr>' % _('Restricted')) or ''
                    }
         for version in versions:
@@ -305,7 +305,7 @@ class Template:
                                  'see' : _("see"),
                                  'siteurl' : CFG_SITE_URL,
                                  'CFG_SITE_RECORD': CFG_SITE_RECORD,
-                                 'docname' : urllib.quote(docname),
+                                 'docname' : cgi.escape(urllib.quote(docname), True),
                                  'recID': recid,
                                  'previous': _("previous"),
                                  'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or '',
@@ -362,7 +362,7 @@ class Template:
             CFG_SITE_URL,
             CFG_SITE_RECORD,
             recid,
-            '%s%s' % (name, superformat))
+            '%s%s' % (cgi.escape(name, True), superformat))
 
         urlargd = {'version' : version}
         if subformat:
