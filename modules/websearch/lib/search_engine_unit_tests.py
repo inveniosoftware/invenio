@@ -199,8 +199,8 @@ class TestQueryParser(unittest.TestCase):
 
     def test_parsing_structured_query_existing_field(self):
         "search engine - parsing structured query, existing field, but no word index"
-        self._check("division:IT", '', None,
-                    [['+', 'IT', 'division', 'a']])
+        self._check("experiment:LHC", '', None,
+                    [['+', 'LHC', 'experiment', 'a']])
 
     def test_parsing_structured_query_nonexisting(self):
         "search engine - parsing structured query, non-existing index"
@@ -239,18 +239,18 @@ class TestQueryParser(unittest.TestCase):
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w']])
 
-    def test_parsing_colons_and_spaces_well_struuctured(self):
+    def test_parsing_colons_and_spaces_well_structured(self):
         "search engine - parsing query with colons and spaces, well structured"
         self._check("title: muon author:ellis keyword:   kaon", 'abstract', None,
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w'],
                      ['+', 'kaon', 'keyword', 'w']])
 
-    def test_parsing_colons_and_spaces_badly_struuctured(self):
+    def test_parsing_colons_and_spaces_badly_structured(self):
         "search engine - parsing query with colons and spaces, badly structured"
-        self._check("foo: bar", 'abstract', None,
-                    [['+', 'foo', 'abstract', 'w'],
-                     ['+', 'bar', 'abstract', 'w']])
+        self._check("foo: bar", 'title', None,
+                    [['+', 'foo', 'title', 'w'],
+                     ['+', 'bar', 'title', 'w']])
 
     def test_parsing_colons_and_spaces_for_phrase_query(self):
         "search engine - parsing query with colons and spaces, phrase query"
