@@ -16,10 +16,10 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.0-rc0\n"
+"Project-Id-Version: Invenio 1.1.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2011-12-19 22:12+0100\n"
-"PO-Revision-Date: 2012-02-02 20:07+0100\n"
+"PO-Revision-Date: 2013-02-25 11:41+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Language: \n"
@@ -7115,7 +7115,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2460
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
-msgstr "Puede bajarse una versión más reciente de Invenio.  Visite "
+msgstr "Podeu baixar-vos una versió més nova d'Invenio.  Visiteu "
 
 #: modules/websession/lib/websession_templates.py:2467
 msgid ""
@@ -12716,24 +12716,24 @@ msgstr "Administració de BibSword"
 #: modules/bibsword/lib/bibsword_webinterface.py:301
 #: modules/bibsword/lib/bibsword_webinterface.py:330
 msgid "Export with BibSword: Step 2/4"
-msgstr "Exportar amb BibSword: paso 2/4"
+msgstr "Exportar amb BibSword: pas 2/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:222
 #: modules/bibsword/lib/bibsword_webinterface.py:233
 #: modules/bibsword/lib/bibsword_webinterface.py:291
 msgid "Export with BibSword: Step 1/4"
-msgstr "Exportar amb BibSword: paso 1/4"
+msgstr "Exportar amb BibSword: pas 1/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:315
 #: modules/bibsword/lib/bibsword_webinterface.py:343
 #: modules/bibsword/lib/bibsword_webinterface.py:374
 msgid "Export with BibSword: Step 3/4"
-msgstr "Exportar amb BibSword: paso 3/4"
+msgstr "Exportar amb BibSword: pas 3/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:358
 #: modules/bibsword/lib/bibsword_webinterface.py:389
 msgid "Export with BibSword: Step 4/4"
-msgstr "Exportar amb BibSword: paso 4/4"
+msgstr "Exportar amb BibSword: pas 4/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:434
 msgid "Export with BibSword: Acknowledgement"
@@ -13495,11 +13495,30 @@ msgstr ""
 msgid "Correct my publication lists!"
 msgstr "Corregiu la meva llista de publicacions"
 
-#~ msgid "This book is sent to you ..."
-#~ msgstr "S'us ha enviat aquest llibre..."
+#~ msgid "Make sure we match the right names!"
+#~ msgstr "Assegureu-vos que els noms es corresponguin!"
 
-#~ msgid "Id"
-#~ msgstr "Identificador"
+#~ msgid ""
+#~ "Please select an author on each of the records that will be assigned."
+#~ msgstr ""
+#~ "Seleccioneu un autor per a cadascun dels registres que se li assignin."
+
+#~ msgid "Papers without a name selected will be ignored in the process."
+#~ msgstr "En el procés, s'ignoraran els documents sense un nom seleccionat."
+
+#~ msgid ""
+#~ "The result of this request will be visible immediately but we need your "
+#~ "confirmation to do so for this paper has been manually claimed before"
+#~ msgstr ""
+#~ "El resultat d'aquesta petició serà visible immediatament, però ens cal la "
+#~ "vostra confirmació per fer-ho, perquè aquest document ja havia estat "
+#~ "reivindicat manualment"
+
+#~ msgid "Tickets you created about this person"
+#~ msgstr "Tasques que heu creat sobre aquesta persona"
+
+#~ msgid "Error: No BibCatalog system configured."
+#~ msgstr "Error: el sistema BibCatalog no està configurat"
 
 #~ msgid "0 borrower(s) found."
 #~ msgstr "No s'ha trobat cap usuari."
@@ -13544,18 +13563,6 @@ msgstr "Corregiu la meva llista de publicacions"
 #~ msgid "Back borrower's loans"
 #~ msgstr "Tornar als préstecs"
 
-#~ msgid "period_of_interest_from"
-#~ msgstr "període_d'interès_des_de"
-
-#~ msgid "jsCal3"
-#~ msgstr "jsCal3"
-
-#~ msgid "period_of_interest_to"
-#~ msgstr "període_d'interès_fins"
-
-#~ msgid "jsCal4"
-#~ msgstr "jsCal4"
-
 #~ msgid "Borrower wants only this edition?"
 #~ msgstr "Vol només aquesta edició, el lector?"
 
@@ -13564,12 +13571,6 @@ msgstr "Corregiu la meva llista de publicacions"
 #~ "time."
 #~ msgstr ""
 #~ "Acepto els %s del servicio, en particular retornar els llibres a temps."
-
-#~ msgid "jsCal1"
-#~ msgstr "jsCal1"
-
-#~ msgid "jsCal2"
-#~ msgstr "jsCal2"
 
 #~ msgid "Volume, Issue, Page"
 #~ msgstr "Volum, número, pàgina"
@@ -13605,6 +13606,609 @@ msgstr "Corregiu la meva llista de publicacions"
 #~ "Aquest llibre no existeix a Invenio.  Ompliu si us plau el següent "
 #~ "formulari."
 
+#~ msgid "This book is sent to you ..."
+#~ msgstr "S'us ha enviat aquest llibre..."
+
+#~ msgid "Id"
+#~ msgstr "Identificador"
+
+#~ msgid ""
+#~ "Automatically generated <span class=\"keyword single\">single</"
+#~ "span>,        <span class=\"keyword composite\">composite</span>, <span "
+#~ "class=\"keyword author-kw\">author</span>,        and <span class="
+#~ "\"keyword other-kw\">other keywords</span>."
+#~ msgstr ""
+#~ "Generat automàticament <span class=\"keyword single\">senzill</span>,"
+#~ "<span class=\"keyword composite\">compost</span>, <span class=\"keyword "
+#~ "author-kw\">autor</span>, i <span class=\"keyword other-kw\">altres "
+#~ "paraules clau</span>."
+
+#~ msgid "Automated keyword extraction wasn't run for this document yet."
+#~ msgstr ""
+#~ "Per a aquest document encara no s'han extret automàticament les paraules "
+#~ "clau."
+
+#~ msgid "Generate keywords"
+#~ msgstr "Generar paraules claus"
+
+#~ msgid "There are no suitable keywords for display in this record."
+#~ msgstr "No hi ha paraules clau rellevants per a aquest registre."
+
+#~ msgid "Show more..."
+#~ msgstr "Mostrar-ne más..."
+
+#~ msgid "Unweighted %s keywords:"
+#~ msgstr "Paraules clau no sospesades de tipus %s"
+
+#~ msgid "Weighted %s keywords:"
+#~ msgstr "Paraules clau sospesades de tipus %s"
+
+#~ msgid "tag cloud"
+#~ msgstr "núvol d'etiquetes"
+
+#~ msgid "list"
+#~ msgstr "llista"
+
+#~ msgid "XML"
+#~ msgstr "XML"
+
+#~ msgid "Unknown type: %s"
+#~ msgstr "Tipus desconegut: %s"
+
+#~ msgid "The site settings do not allow automatic keyword extraction"
+#~ msgstr ""
+#~ "La configuració d'aquest lloc no permet l'extracció automàtica de "
+#~ "paraules clau"
+
+#~ msgid ""
+#~ "We have registered your request, the automatedkeyword extraction will run "
+#~ "after some time. Please return back in a while."
+#~ msgstr ""
+#~ "La vostra petició s'ha registrat.  L'extracció automàtica de paraules "
+#~ "clau s'executarà aviat.  Torneu en una estona."
+
+#~ msgid ""
+#~ "Unfortunately, we don't have a PDF fulltext for this record in the "
+#~ "storage,                     keywords cannot be generated using an "
+#~ "automated process."
+#~ msgstr ""
+#~ "Per desgràcia, no existeix una còpia local del text complet en PDF. No és "
+#~ "posible generar automàticament les paraules clau."
+
+#~ msgid "The format %s does not exist for the given version: %s"
+#~ msgstr "El format %s no existeix per a la versió %s"
+
+#~ msgid "does not exist"
+#~ msgstr "no existeix"
+
+#~ msgid ""
+#~ "WARNING: The following records are pending "
+#~ "execution                        in the task "
+#~ "queue.                        If you proceed with the changes, the "
+#~ "modifications made                        with other tool (e.g. BibEdit) "
+#~ "to these records will                        be lost"
+#~ msgstr ""
+#~ "ATENCIÓ: els següents registres estan pendents d'actualitzar a la cua de "
+#~ "tasques pendents.  Si seguiu amb els canvis, es perderan les "
+#~ "modificacions fetes amb l'altre eina (és a dir, BibEdit) sobre aquest "
+#~ "registre."
+
+#~ msgid ""
+#~ "We are sorry, a problem has occured during the processing of your video "
+#~ "upload%(submission_title)s."
+#~ msgstr ""
+#~ "Per desgràcia hi ha hagut un problema durant el procés de càrrega del "
+#~ "vostre video upload%(submission_title)s."
+
+#~ msgid "The file you uploaded was %(input_filename)s."
+#~ msgstr "El fitxer que heu pujat ha estat el %(input_filename)s."
+
+#~ msgid "Your video might not be fully available until intervention."
+#~ msgstr "El vostre vídeo no estarà disponible fins la seva verificació."
+
+#~ msgid "You can check the status of your video here: %(record_url)s."
+#~ msgstr "Podeu comprovar l'estat del vostre vídeo aquí: %(record_url)s."
+
+#~ msgid ""
+#~ "You might want to take a look at  %(guidelines_url)s and modify or redo "
+#~ "your submission."
+#~ msgstr ""
+#~ "Podeu donar un cop d'ull a %(guidelines_url)s i modificar o repetir el "
+#~ "vostre lliurament."
+
+#~ msgid "the video guidelines"
+#~ msgstr "les guies per als vídeos"
+
+#~ msgid ""
+#~ "Your video submission%(submission_title)s was successfully processed."
+#~ msgstr ""
+#~ "El vostre vídeo submission%(submission_title)s ha estat processat "
+#~ "correctamente."
+
+#~ msgid "Your video is now available here: %(record_url)s."
+#~ msgstr "El vostre vídeo ara està accesible a: %(record_url)s."
+
+#~ msgid ""
+#~ "If the videos quality is not as expected, you might want to take a look "
+#~ "at %(guidelines_url)s and modify or redo your submission."
+#~ msgstr ""
+#~ "Si la qualitat dels vídeos no és la que espereu, podeu donar un cop d'ull "
+#~ "a %(guidelines_url)s i modificar o repetir el vostre lliurament."
+
+#~ msgid "More than one templates found in the document. No format found."
+#~ msgstr ""
+#~ "S'ha trobat més d'una plantilla en el document.  No s'ha trobat el format."
+
+#~ msgid "Note for programmer: you have not implemented operator %s."
+#~ msgstr "Nota per al programador: no heu implementat l'operador %s."
+
+#~ msgid "Name %s is not recognised as a valid operator name."
+#~ msgstr "El nom %s no és un operador reconegut."
+
+#~ msgid "Duplicate name: %s."
+#~ msgstr "Nom duplicat: %s."
+
+#~ msgid "No name defined for the template."
+#~ msgstr "No s'ha definit cap nom per a la plantilla."
+
+#~ msgid "No description entered for the template."
+#~ msgstr "No s'ha entrat cap descripció per a la plantilla."
+
+#~ msgid "No content type specified for the template. Using default: text/xml."
+#~ msgstr ""
+#~ "No s'ha entrat el tipus de contingut per a la plantilla.  S'usarà el "
+#~ "valor per defecte: text/xml."
+
+#~ msgid "Missing attribute \"name\" in TEMPLATE_REF."
+#~ msgstr "Falta l'atribut \"name\" a TEMPLATE_REF."
+
+#~ msgid "Missing attribute \"name\" in ELEMENT."
+#~ msgstr "Falta l'atribut \"name\" a ELEMENT."
+
+#~ msgid "Missing attribute \"name\" in FIELD."
+#~ msgstr "Falta l'atribut \"name\" a FIELD."
+
+#~ msgid "Field %s is not defined."
+#~ msgstr "El camp %s no està definit."
+
+#~ msgid "Missing attribute \"value\" in TEXT."
+#~ msgstr "Falta l'atribut \"name\" a TEXT."
+
+#~ msgid "Missing attribute \"object\" in LOOP."
+#~ msgstr "Falta l'atribut \"name\" a LOOP."
+
+#~ msgid "Missing attrbute \"name\" in IF."
+#~ msgstr "Falta l'atribut \"name\" a IF."
+
+#~ msgid "Invalid regular expression: %s."
+#~ msgstr "Expressió regular no vàlida: %s"
+
+#~ msgid "Invalid syntax of IF statement."
+#~ msgstr "Sintaxi no vàlida per al condicional IF."
+
+#~ msgid "Invalid address: %s %s"
+#~ msgstr "Adreça no vàlida: %s %s"
+
+#~ msgid ""
+#~ "Invalid display type. Must be one of: value, tag, ind1, ind2, code; "
+#~ "received: %s."
+#~ msgstr ""
+#~ "Tipus de visualització no vàlida.  Ha de ser un de: value, tag, ind1, "
+#~ "ind2, code; received: %s."
+
+#~ msgid "Repeating subfield codes in the same instance!"
+#~ msgstr "Codis de subcamp repetits a la mateixa instància!"
+
+#~ msgid "No template could be found for output format %s."
+#~ msgstr "No s'ha trobat una plantilla per al format de sortida %s."
+
+#~ msgid "Could not find format element named %s."
+#~ msgstr "No s'ha pogut trobar l'element de format %s"
+
+#~ msgid "Error when evaluating format element %s with parameters %s."
+#~ msgstr "Error a l'avaluar l'element de format %s amb el paràmetre %s."
+
+#~ msgid ""
+#~ "Escape mode for format element %s could not be retrieved. Using default "
+#~ "mode instead."
+#~ msgstr ""
+#~ "No s'ha pogut obtenir el modus d'escape per a l'element de format %s. "
+#~ "S'usarà el modo per defecte."
+
+#~ msgid "\"nbMax\" parameter for %s must be an \"int\"."
+#~ msgstr "El paràmetre \"nbMax\" per a %s ha de ser un \"int\"."
+
+#~ msgid "Could not read format template named %s. %s."
+#~ msgstr "No s'ha pogut llegir la plantilla de format %s. %s."
+
+#~ msgid "Format element %s could not be found."
+#~ msgstr "No s'ha trobat l'element de format %s."
+
+#~ msgid "Error in format element %s. %s."
+#~ msgstr "Error a l'element de format %s. %s."
+
+#~ msgid "Format element %s has no function named \"format\"."
+#~ msgstr "L'element de format %s no té cap funció que es digui \"format\"."
+
+#~ msgid "Output format with code %s could not be found."
+#~ msgstr "No s'ha trobat el format de sortida amb el codi %s."
+
+#~ msgid "Output format %s cannot not be read. %s."
+#~ msgstr "No s'ha pogut llegir el format de sortida %s. %s."
+
+#~ msgid "Could not find output format named %s."
+#~ msgstr "No s'ha pogut trobat el format de sortida %s."
+
+#~ msgid "Could not find a fresh name for output format %s."
+#~ msgstr "No ha estat possible trobar un nom nou per al format de sortida %s"
+
+#~ msgid "No Record Found for %s."
+#~ msgstr "No s'ha trobat cap registre per %s."
+
+#~ msgid "Tag specification \"%s\" must end with column \":\" at line %s."
+#~ msgstr ""
+#~ "L'especificació per a l'etiqueta \"%s\" ha d'acabar a la columna \":\", "
+#~ "línia %s."
+
+#~ msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
+#~ msgstr ""
+#~ "L'especificació per a l'etiqueta \"%s\" ha de començar amb \"tag\", línia "
+#~ "%s."
+
+#~ msgid "\"tag\" must be lowercase in \"%s\" at line %s."
+#~ msgstr "\"tag\" ha d'estar en minúscula a \"%s\", línia %s."
+
+#~ msgid "Should be \"tag field_number:\" at line %s."
+#~ msgstr "Hauria de ser \"tag field_number:\", línia %s."
+
+#~ msgid "Invalid tag \"%s\" at line %s."
+#~ msgstr "Etiqueta \"%s\" no vàlida, línia %s."
+
+#~ msgid "Condition \"%s\" is outside a tag specification at line %s."
+#~ msgstr ""
+#~ "La condició \"%s\" és fora d'una especificació d'etiqueta, línia %s."
+
+#~ msgid "Condition \"%s\" can only have a single separator --- at line %s."
+#~ msgstr "La condició \"%s\" només pot tenir un sol caràcter, línia %s."
+
+#~ msgid "Template \"%s\" does not exist at line %s."
+#~ msgstr "La plantilla \"%s\" no existeix, línia %s."
+
+#~ msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
+#~ msgstr "Falta la columna \":\" després de \"default\" a \"%s\", línia %s."
+
+#~ msgid ""
+#~ "Default template specification \"%s\" must start with \"default :\" at "
+#~ "line %s."
+#~ msgstr ""
+#~ "L'especificació de la plantilla per defecte \"%s\" ha de començar per "
+#~ "\"default :\", línia %s."
+
+#~ msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
+#~ msgstr "La paraula \"default\" ha de ser en minúscules a \"%s\", línia %s."
+
+#~ msgid "Line %s could not be understood at line %s."
+#~ msgstr "No es pot entendre la línia %s, línia %s."
+
+#~ msgid "Output format %s cannot not be read. %s"
+#~ msgstr "No s'ha pogut llegir el format de sortida %s. %s"
+
+#~ msgid ""
+#~ "Could not find a name specified in tag \"<name>\" inside format template "
+#~ "%s."
+#~ msgstr ""
+#~ "No s'ha pogut trobar el nom especificat a l'etiqueta \"<name>\" a la "
+#~ "plantilla de format %s."
+
+#~ msgid ""
+#~ "Could not find a description specified in tag \"<description>\" inside "
+#~ "format template %s."
+#~ msgstr ""
+#~ "No s'ha pogut trobar la descripció especificada a l'etiqueta "
+#~ "\"<description>\" a la plantilla de format %s."
+
+#~ msgid "Format template %s calls undefined element \"%s\"."
+#~ msgstr "La plantilla de format %s crida l'element no definit \"%s\"."
+
+#~ msgid ""
+#~ "Format template %s calls unreadable element \"%s\". Check element file "
+#~ "permissions."
+#~ msgstr ""
+#~ "La plantilla de format %s crida a l'element il·legible \"%s\". Comproveu "
+#~ "els permisos de fitxer de l'element."
+
+#~ msgid "Cannot load element \"%s\" in template %s. Check element code."
+#~ msgstr ""
+#~ "No s'ha pogut carregar l'element \"%s\" a la plantilla %s. Comproveu el "
+#~ "codi de l'element."
+
+#~ msgid ""
+#~ "Format element %s uses unknown parameter \"%s\" in format template %s."
+#~ msgstr ""
+#~ "L'element de format %s usa el paràmetre desconegut \"%s\" a la plantilla "
+#~ "de format %s."
+
+#~ msgid "Could not read format template named %s. %s"
+#~ msgstr "No s'ha pogut llegir la plantilla de format %s. %s"
+
+#~ msgid "Format element %s cannot not be read. %s"
+#~ msgstr "No s'ha pogut llegir l'element de format %s. %s"
+
+#~ msgid "Add this document to your ScienceWise.info bookmarks"
+#~ msgstr "Afegir aquest documento als vostres preferits a ScienceWise.info"
+
+#~ msgid "Add this article to your ScienceWise.info bookmarks"
+#~ msgstr "Afegir aquest article als vostres preferits a ScienceWise.info"
+
+#~ msgid ""
+#~ "Cannot write in etc/bibformat dir of your Invenio installation. Check "
+#~ "directory permission."
+#~ msgstr ""
+#~ "No s'ha pogut escriure al directori etc/bibformat de la vostra "
+#~ "instal·lació d'Invenio. Comproveu els permisos del directori."
+
+#~ msgid "Format template %s cannot not be read. %s"
+#~ msgstr "No s'ha pogut llegir la plantilla de format %s. %s"
+
+#~ msgid "No format specified for validation. Please specify one."
+#~ msgstr ""
+#~ "No heu especificat cap format per a la validació.  Especifiqueu-ne un."
+
+#~ msgid "BibSort Guide"
+#~ msgstr "Guia del BibSort"
+
+#~ msgid "May "
+#~ msgstr "Maig"
+
+#~ msgid ""
+#~ "The system is not attempting to send an email from %s, to %s, with body "
+#~ "%s."
+#~ msgstr ""
+#~ "El sistema no intenta enviar un missatge de %s, a %s, amb el text %s."
+
+#~ msgid ""
+#~ "Error in connecting to the SMPT server waiting %s seconds. Exception is "
+#~ "%s, while sending email from %s to %s with body %s."
+#~ msgstr ""
+#~ "Error en la conexió amb el servidor SMPT esperant %s segons. L'excepció "
+#~ "és %s, a l'intentar enviar el missatge de %s a %s con el text %s."
+
+#~ msgid "Error in sending email from %s to %s with body %s."
+#~ msgstr "Error a l'enviar un missatge de %s, a %s, amb el text %s."
+
+#~ msgid "Please enter a name for the source."
+#~ msgstr "Introduiu un nom per a la font."
+
+#~ msgid "Please enter a metadata prefix."
+#~ msgstr "Introduiu el prefixe de metadades."
+
+#~ msgid "Please enter a base url."
+#~ msgstr "Untroduiu la url base."
+
+#~ msgid "Please choose a frequency of harvesting"
+#~ msgstr "Escolliu una freqüència de recol·lecta"
+
+#~ msgid "You selected a postprocess mode which involves conversion."
+#~ msgstr "Heu seleccionat un modus de postprocés que involucra conversió."
+
+#~ msgid ""
+#~ "Please enter a valid name of or a full path to a BibConvert config file "
+#~ "or change postprocess mode."
+#~ msgstr ""
+#~ "Entreu un nom vàlid o la ruta completa a un fitxer de configuració "
+#~ "BibConvert, o canvieu el modus de postprocés."
+
+#~ msgid "You selected a postprocess mode which involves filtering."
+#~ msgstr "Heu seleccionat un modus de postprocés que involucra filtratge."
+
+#~ msgid ""
+#~ "Please enter a valid name of or a full path to a BibFilter script or "
+#~ "change postprocess mode."
+#~ msgstr ""
+#~ "Entreu un nom vàlid o la ruta completa a un script BibFilter, o canvieu "
+#~ "el modus de postprocés."
+
+#~ msgid "Please choose the harvesting starting date"
+#~ msgstr "Escolliu la data d'inici de la recolecta"
+
+#~ msgid "Record deleted from the holding pen"
+#~ msgstr "Registre esborrat de la llista d'espera"
+
+#~ msgid "Configure BibSort"
+#~ msgstr "Configurar BibSort"
+
+#~ msgid "Papers written alone"
+#~ msgstr "Articles com a autor individual"
+
+#~ msgid "No Collaborations"
+#~ msgstr "Sense col·laboracions"
+
+#~ msgid "Collaborations"
+#~ msgstr "Col·laboracions"
+
+#~ msgid "Frequent co-authors (excluding collaborations)"
+#~ msgstr "Coautors freqüentes (excloent-hi col·laboracions)"
+
+#~ msgid "Citations%s:"
+#~ msgstr "Citacions%s:"
+
+#~ msgid "Recompute Now!"
+#~ msgstr "Recalcula ara!"
+
+#~ msgid "Untitled basket"
+#~ msgstr "Cistell sense títol"
+
+#~ msgid "Untitled topic"
+#~ msgstr "Tema sense títol"
+
+#~ msgid "%(x_search_for_term)s in %(x_collection_list)s"
+#~ msgstr "%(x_search_for_term)s a %(x_collection_list)s"
+
+#~ msgid "%i matching items"
+#~ msgstr "trobats %i items"
+
+#~ msgid "This basket does not contain any records yet."
+#~ msgstr "Aquest cistell encara no conté cap registre."
+
+#~ msgid "All your topics"
+#~ msgstr "Tots els vostres temes"
+
+#~ msgid "All your groups"
+#~ msgstr "Tots els vostres grups"
+
+#~ msgid "All your public baskets"
+#~ msgstr "Tots els vostres cistells públics"
+
+#~ msgid "Please select a basket..."
+#~ msgstr "Seleccioneu un cistell..."
+
+#~ msgid "%(x_nb)i Comments for round \"%(x_name)s\""
+#~ msgstr "%(x_nb)i comentaris per la volta «%(x_name)s»"
+
+#~ msgid "%(x_nb)i Comments"
+#~ msgstr "%(x_nb)i comentaris"
+
+#~ msgid "Be the first to review this document.</div>"
+#~ msgstr "Sigueu el primer a escriure una ressenya d'aquest document.</div>"
+
+#~ msgid "Close"
+#~ msgstr "Tanca"
+
+#~ msgid "Open"
+#~ msgstr "Obre"
+
+#~ msgid "Specified comment does not belong to this record"
+#~ msgstr "El comentari especificat no pertany a aquest registre"
+
+#~ msgid "You do not have access to the specified comment"
+#~ msgstr "No teniu accés al comentari especificat"
+
+#~ msgid "You cannot vote for a deleted comment"
+#~ msgstr "No podeu votar un comentari esborrat"
+
+#~ msgid "You cannot report a deleted comment"
+#~ msgstr "No podeu denunciar un comentari esborrat"
+
+#~ msgid "You cannot access files of a deleted comment"
+#~ msgstr "No podeu accedir als fitxers d'un comentari esborrat"
+
+#~ msgid "Regenerate Issue"
+#~ msgstr "Regenera el número"
+
+#~ msgid ""
+#~ "Warning: full-text search is only available for a subset of papers mostly "
+#~ "from %(x_range_from_year)s-%(x_range_to_year)s."
+#~ msgstr ""
+#~ "Atenció: la cerca a text complet només està disponible per a un "
+#~ "subconjunt de documents, majoritàriament d'entre %(x_range_from_year)s-"
+#~ "%(x_range_to_year)s."
+
+#~ msgid ""
+#~ "Warning: figure caption search is only available for a subset of papers "
+#~ "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
+#~ msgstr ""
+#~ "Atenció: la cerca als peus d'imatges només està disponible per a un "
+#~ "subconjunt de documents, majoritàriament d'entre %(x_range_from_year)s-"
+#~ "%(x_range_to_year)s."
+
+#~ msgid "Your search did not match any records.  Please try again."
+#~ msgstr "La vostra cerca no ha trobat cap registre. Torneu-ho a provar."
+
+#~ msgid ""
+#~ "Sorry, %s does not seem to be a valid sort option. The records will not "
+#~ "be sorted."
+#~ msgstr "No és possible ordenar per %s.  No s'rodenaran els registres."
+
+#~ msgid "The record %d replaces it."
+#~ msgstr "El registre %d el reemplaça."
+
+#~ msgid "Total number of citations excluding self-citations"
+#~ msgstr "Nombre total de citacions excloent les autocites"
+
+#~ msgid "Average citations per paper excluding self-citations"
+#~ msgstr "Mitja de cites per article excloent les autocites"
+
+#~ msgid "API keys"
+#~ msgstr "Claus API"
+
+#~ msgid "These are your current API keys"
+#~ msgstr "Aqestes són les vostres claus API"
+
+#~ msgid "Description: "
+#~ msgstr "Descripció: "
+
+#~ msgid "Status: "
+#~ msgstr "Estat: "
+
+#~ msgid "API key"
+#~ msgstr "Clau API"
+
+#~ msgid "Delete key"
+#~ msgstr "Suprimeix la clau"
+
+#~ msgid ""
+#~ "If you want to create a new API key, please enter a description for it"
+#~ msgstr "Si voleu crear una nova clau API, escriviu-hi la seva descripció"
+
+#~ msgid "Description for the new API key"
+#~ msgstr "Descripció per a la nova clau API"
+
+#~ msgid ""
+#~ "The description should be something meaningful for you to recognize the "
+#~ "API key"
+#~ msgstr ""
+#~ "La descripció hauria de ser prou significativa perquè podeu reconèixer\n"
+#~ "la nova clau API"
+
+#~ msgid "Create new key"
+#~ msgstr "Crear una clau nova"
+
+#~ msgid "Your nickname has not been updated"
+#~ msgstr "El vostre alias no ha estat actualitzat."
+
+#~ msgid "Login to display all document types you can access"
+#~ msgstr ""
+#~ "Identifiqueu-vos per a visualitzar tots els tipus de document als que "
+#~ "teniu accés"
+
+#~ msgid ""
+#~ "As a referee for this document, you may approve or reject it from the "
+#~ "submission interface"
+#~ msgstr ""
+#~ "Com a revisor d'aquest document, podeu aprovar-lo o rebutjar-lo des de la "
+#~ "interfíci de lliuraments"
+
+#~ msgid "Sorry, invalid arguments"
+#~ msgstr "Arguments no vàlids"
+
+#~ msgid "Note: the requested submission has already been completed"
+#~ msgstr "El lliurament s'ha completat"
+
+#~ msgid ""
+#~ "Sorry, you don't seem to have initiated a submission with the provided "
+#~ "access number"
+#~ msgstr ""
+#~ "No sembla que hàgiu iniciat un lliurament amb el número d'accés que heu "
+#~ "especificat"
+
+#~ msgid "period_of_interest_from"
+#~ msgstr "període_d'interès_des_de"
+
+#~ msgid "jsCal3"
+#~ msgstr "jsCal3"
+
+#~ msgid "period_of_interest_to"
+#~ msgstr "període_d'interès_fins"
+
+#~ msgid "jsCal4"
+#~ msgstr "jsCal4"
+
+#~ msgid "jsCal1"
+#~ msgstr "jsCal1"
+
+#~ msgid "jsCal2"
+#~ msgstr "jsCal2"
+
 #~ msgid "No fulltext"
 #~ msgstr "Sense text complet"
 
@@ -13625,9 +14229,6 @@ msgstr "Corregiu la meva llista de publicacions"
 
 #~ msgid "ERROR"
 #~ msgstr "ERROR"
-
-#~ msgid "does not exist"
-#~ msgstr "no existeix"
 
 #~ msgid "already exists."
 #~ msgstr "ja existeix"
