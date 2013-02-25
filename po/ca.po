@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.1.1\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2012-12-21 13:27+0100\n"
-"PO-Revision-Date: 2012-02-02 20:07+0100\n"
+"PO-Revision-Date: 2013-02-25 11:41+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Language: \n"
@@ -1497,17 +1497,17 @@ msgstr " Donar per bona tota aquesta tasca"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:985
 msgid "Make sure we match the right names!"
-msgstr ""
+msgstr "Assegureu-vos que els noms es corresponguin!"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:987
-#, fuzzy
 msgid "Please select an author on each of the records that will be assigned."
-msgstr "Seleccioneu un autor per als registres en qüestió."
+msgstr ""
+"Seleccioneu un autor per a cadascun dels registres que se li "
+"assignin."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:988
-#, fuzzy
 msgid "Papers without a name selected will be ignored in the process."
-msgstr "Les caselles no seleccionades seran ignorades en el procés."
+msgstr "En el procés, s'ignoraran els documents sense un nom seleccionat."
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:995
 msgid "Select name for"
@@ -1580,14 +1580,13 @@ msgid "Confirmation needed to continue"
 msgstr "Cal la confirmació per a continuar"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1147
-#, fuzzy
 msgid ""
 "The result of this request will be visible immediately but we need your "
 "confirmation to do so for this paper has been manually claimed before"
 msgstr ""
-"El resultat d'aquesta petició serà visible immediatament però cal la vostra "
-"confirmació per fer-ho, ja que aquest document ja havia estat reivindicat "
-"manualment"
+"El resultat d'aquesta petició serà visible immediatament, però ens cal "
+"la vostra confirmació per fer-ho, perquè aquest document ja havia "
+"estat reivindicat manualment"
 
 #: modules/bibauthorid/lib/bibauthorid_templates.py:1152
 msgid "This will create a change request for the operators"
@@ -2069,7 +2068,6 @@ msgid "Papers"
 msgstr "Documents:"
 
 #: modules/bibauthorid/lib/bibauthorid_webinterface.py:768
-#, fuzzy
 msgid "Tickets you created about this person"
 msgstr "Tasques que heu creat sobre aquesta persona"
 
@@ -2129,7 +2127,7 @@ msgstr "Benvinguts!"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:35
 msgid "Error: No BibCatalog system configured."
-msgstr ""
+msgstr "Error: el sistema BibCatalog no està configurat"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:39
 #: modules/bibedit/lib/bibedit_webinterface.py:196
@@ -4538,33 +4536,38 @@ msgid ""
 "author-kw\">author</span>,        and <span class=\"keyword other-kw\">other "
 "keywords</span>."
 msgstr ""
+"Generat automàticament <span class=\"keyword single\">senzill</span>,"
+"<span class=\"keyword composite\">compost</span>, <span class=\"keyword "
+"author-kw\">autor</span>, i <span class=\"keyword other-kw\">altres "
+"paraules clau</span>."
 
 #: modules/bibclassify/lib/bibclassify_templates.py:232
 msgid "Automated keyword extraction wasn't run for this document yet."
 msgstr ""
+"Per a aquest document encara no s'han extret automàticament les "
+"paraules clau."
 
 #: modules/bibclassify/lib/bibclassify_templates.py:232
-#, fuzzy
 msgid "Generate keywords"
-msgstr "Paraules claus freqüents"
+msgstr "Generar paraules claus"
 
 #: modules/bibclassify/lib/bibclassify_templates.py:244
 msgid "There are no suitable keywords for display in this record."
-msgstr ""
+msgstr "No hi ha paraules clau rellevants per a aquest registre."
 
 #: modules/bibclassify/lib/bibclassify_templates.py:288
 msgid "Show more..."
-msgstr ""
+msgstr "Mostrar-ne más..."
 
 #: modules/bibclassify/lib/bibclassify_templates.py:319
-#, fuzzy, python-format
+#, python-format
 msgid "Unweighted %s keywords:"
-msgstr "Citat por: %s registres"
+msgstr "Paraules clau no sospesades de tipus %s"
 
 #: modules/bibclassify/lib/bibclassify_templates.py:325
-#, fuzzy, python-format
+#, python-format
 msgid "Weighted %s keywords:"
-msgstr "Citat por: %s registres"
+msgstr "Paraules clau sospesades de tipus %s"
 
 #: modules/bibclassify/lib/bibclassify_templates.py:364
 #: modules/websearch/lib/websearchadminlib.py:3396
@@ -4573,30 +4576,34 @@ msgstr "Paraules clau"
 
 #: modules/bibclassify/lib/bibclassify_templates.py:366
 msgid "tag cloud"
-msgstr ""
+msgstr "núvol d'etiquetes"
 
 #: modules/bibclassify/lib/bibclassify_templates.py:367
 msgid "list"
-msgstr ""
+msgstr "llista"
 
 #: modules/bibclassify/lib/bibclassify_templates.py:368
 msgid "XML"
-msgstr ""
+msgstr "XML"
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:141
-#, fuzzy, python-format
+#, python-format
 msgid "Unknown type: %s"
-msgstr "Tipus de document desconegut"
+msgstr "Tipus desconegut: %s"
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:236
 msgid "The site settings do not allow automatic keyword extraction"
 msgstr ""
+"La configuració d'aquest lloc no permet l'extracció automàtica de "
+"paraules clau"
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:258
 msgid ""
 "We have registered your request, the automatedkeyword extraction will run "
 "after some time. Please return back in a while."
 msgstr ""
+"La vostra petició s'ha registrat.  L'extracció automàtica de paraules "
+"clau s'executarà aviat.  Torneu en una estona."
 
 #: modules/bibclassify/lib/bibclassify_webinterface.py:263
 msgid ""
@@ -4604,6 +4611,8 @@ msgid ""
 "storage,                     keywords cannot be generated using an automated "
 "process."
 msgstr ""
+"Per desgràcia, no existeix una còpia local del text complet en PDF. "
+"No és posible generar automàticament les paraules clau."
 
 #: modules/bibdocfile/lib/bibdocfile_managedocfiles.py:385
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:443
@@ -4841,9 +4850,9 @@ msgstr ""
 "possible."
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:198
-#, fuzzy, python-format
+#, python-format
 msgid "The format %s does not exist for the given version: %s"
-msgstr "El fitxer %s no existeix"
+msgstr "El format %s no existeix per a la versió %s"
 
 #: modules/bibdocfile/lib/bibdocfile_webinterface.py:212
 msgid "This file is restricted: "
@@ -5049,9 +5058,8 @@ msgid "contains"
 msgstr "conté"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:591
-#, fuzzy
 msgid "does not exist"
-msgstr "L'usuari %s no existeix"
+msgstr "no existeix"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:592
 msgid "condition"
@@ -5084,6 +5092,10 @@ msgid ""
 "the modifications made                        with other tool (e.g. BibEdit) "
 "to these records will                        be lost"
 msgstr ""
+"ATENCIÓ: els següents registres estan pendents d'actualitzar a la cua "
+"de tasques pendents.  Si seguiu amb els canvis, es perderan les "
+"modificacions fetes amb l'altre eina (és a dir, BibEdit) sobre aquest "
+"registre."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:691
 #: modules/websearch/lib/websearch_templates.py:2489
@@ -5115,21 +5127,23 @@ msgid ""
 "We are sorry, a problem has occured during the processing of your video "
 "upload%(submission_title)s."
 msgstr ""
+"Per desgràcia hi ha hagut un problema durant el procés de càrrega del "
+"vostre video upload%(submission_title)s."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:119
 #: modules/bibencode/lib/bibencode_batch_engine.py:162
 #, python-format
 msgid "The file you uploaded was %(input_filename)s."
-msgstr ""
+msgstr "El fitxer que heu pujat ha estat el %(input_filename)s."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:121
 msgid "Your video might not be fully available until intervention."
-msgstr ""
+msgstr "El vostre vídeo no estarà disponible fins la seva verificació."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:123
 #, python-format
 msgid "You can check the status of your video here: %(record_url)s."
-msgstr ""
+msgstr "Podeu comprovar l'estat del vostre vídeo aquí: %(record_url)s."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:125
 #, python-format
@@ -5137,21 +5151,25 @@ msgid ""
 "You might want to take a look at  %(guidelines_url)s and modify or redo your "
 "submission."
 msgstr ""
+"Podeu donar un cop d'ull a %(guidelines_url)s i modificar o repetir el "
+"vostre lliurament."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:136
 #: modules/bibencode/lib/bibencode_batch_engine.py:177
 msgid "the video guidelines"
-msgstr ""
+msgstr "les guies per als vídeos"
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:160
 #, python-format
 msgid "Your video submission%(submission_title)s was successfully processed."
 msgstr ""
+"El vostre vídeo submission%(submission_title)s ha estat processat "
+"correctamente."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:164
-#, fuzzy, python-format
+#, python-format
 msgid "Your video is now available here: %(record_url)s."
-msgstr "No hi ha cap índex de paraules disponible per a %s."
+msgstr "El vostre vídeo ara està accesible a: %(record_url)s."
 
 #: modules/bibencode/lib/bibencode_batch_engine.py:166
 #, python-format
@@ -5159,6 +5177,9 @@ msgid ""
 "If the videos quality is not as expected, you might want to take a look at "
 "%(guidelines_url)s and modify or redo your submission."
 msgstr ""
+"Si la qualitat dels vídeos no és la que espereu, podeu donar un cop "
+"d'ull a %(guidelines_url)s i modificar o repetir el vostre "
+"lliurament."
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:500
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:515
@@ -5320,84 +5341,88 @@ msgstr "Resultat de la tasca d'exportació"
 #: modules/bibformat/lib/bibformat_bfx_engine.py:137
 msgid "More than one templates found in the document. No format found."
 msgstr ""
+"S'ha trobat més d'una plantilla en el document.  No s'ha trobat el "
+"format."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:233
 #, python-format
 msgid "Note for programmer: you have not implemented operator %s."
-msgstr ""
+msgstr "Nota per al programador: no heu implementat l'operador %s."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:240
 #, python-format
 msgid "Name %s is not recognised as a valid operator name."
-msgstr ""
+msgstr "El nom %s no és un operador reconegut."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:274
 #: modules/bibformat/lib/bibformat_bfx_engine.py:308
 #, python-format
 msgid "Duplicate name: %s."
-msgstr ""
+msgstr "Nom duplicat: %s."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:283
 #: modules/bibformat/lib/bibformat_bfx_engine.py:317
 msgid "No name defined for the template."
-msgstr ""
+msgstr "No s'ha definit cap nom per a la plantilla."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:328
 msgid "No description entered for the template."
-msgstr ""
+msgstr "No s'ha entrat cap descripció per a la plantilla."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:339
 msgid "No content type specified for the template. Using default: text/xml."
 msgstr ""
+"No s'ha entrat el tipus de contingut per a la plantilla.  S'usarà el "
+"valor per defecte: text/xml."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:361
 msgid "Missing attribute \"name\" in TEMPLATE_REF."
-msgstr ""
+msgstr "Falta l'atribut \"name\" a TEMPLATE_REF."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:393
 msgid "Missing attribute \"name\" in ELEMENT."
-msgstr ""
+msgstr "Falta l'atribut \"name\" a ELEMENT."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:419
 msgid "Missing attribute \"name\" in FIELD."
-msgstr ""
+msgstr "Falta l'atribut \"name\" a FIELD."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:430
 #: modules/bibformat/lib/bibformat_bfx_engine.py:486
 #: modules/bibformat/lib/bibformat_bfx_engine.py:537
 #: modules/bibformat/lib/bibformat_bfx_engine.py:733
-#, fuzzy, python-format
+#, python-format
 msgid "Field %s is not defined."
-msgstr "El fitxer %s no existeix"
+msgstr "El camp %s no està definit."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:452
 msgid "Missing attribute \"value\" in TEXT."
-msgstr ""
+msgstr "Falta l'atribut \"name\" a TEXT."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:478
 msgid "Missing attribute \"object\" in LOOP."
-msgstr ""
+msgstr "Falta l'atribut \"name\" a LOOP."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:528
 msgid "Missing attrbute \"name\" in IF."
-msgstr ""
+msgstr "Falta l'atribut \"name\" a IF."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:604
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid regular expression: %s."
-msgstr "Expressió regular:"
+msgstr "Expressió regular no vàlida: %s"
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:620
 #: modules/bibformat/lib/bibformat_bfx_engine.py:648
 #: modules/bibformat/lib/bibformat_bfx_engine.py:665
 #: modules/bibformat/lib/bibformat_bfx_engine.py:682
 msgid "Invalid syntax of IF statement."
-msgstr ""
+msgstr "Sintaxi no vàlida per al condicional IF."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:723
-#, fuzzy, python-format
+#, python-format
 msgid "Invalid address: %s %s"
-msgstr "Paràmetres no vàlids"
+msgstr "Adreça no vàlida: %s %s"
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:953
 #, python-format
@@ -5405,27 +5430,29 @@ msgid ""
 "Invalid display type. Must be one of: value, tag, ind1, ind2, code; "
 "received: %s."
 msgstr ""
+"Tipus de visualització no vàlida.  Ha de ser un de: value, tag, ind1, "
+"ind2, code; received: %s."
 
 #: modules/bibformat/lib/bibformat_bfx_engine.py:1009
 msgid "Repeating subfield codes in the same instance!"
-msgstr ""
+msgstr "Codis de subcamp repetits a la mateixa instància!"
 
 #: modules/bibformat/lib/bibformat_engine.py:373
 #, python-format
 msgid "No template could be found for output format %s."
-msgstr ""
+msgstr "No s'ha trobat una plantilla per al format de sortida %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:528
 #: modules/bibformat/lib/bibformat_engine.py:763
 #: modules/bibformat/lib/bibformatadminlib.py:1555
-#, fuzzy, python-format
+#, python-format
 msgid "Could not find format element named %s."
-msgstr "Valida de l'element de format %s"
+msgstr "No s'ha pogut trobar l'element de format %s"
 
 #: modules/bibformat/lib/bibformat_engine.py:622
 #, python-format
 msgid "Error when evaluating format element %s with parameters %s."
-msgstr ""
+msgstr "Error a l'avaluar l'element de format %s amb el paràmetre %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:660
 #, python-format
@@ -5433,53 +5460,55 @@ msgid ""
 "Escape mode for format element %s could not be retrieved. Using default mode "
 "instead."
 msgstr ""
+"No s'ha pogut obtenir el modus d'escape per a l'element de format "
+"%s. S'usarà el modo per defecte."
 
 #: modules/bibformat/lib/bibformat_engine.py:732
 #, python-format
 msgid "\"nbMax\" parameter for %s must be an \"int\"."
-msgstr ""
+msgstr "El paràmetre \"nbMax\" per a %s ha de ser un \"int\"."
 
 #: modules/bibformat/lib/bibformat_engine.py:881
 #: modules/bibformat/lib/bibformat_engine.py:960
 #, python-format
 msgid "Could not read format template named %s. %s."
-msgstr ""
+msgstr "No s'ha pogut llegir la plantilla de format %s. %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:1025
-#, fuzzy, python-format
+#, python-format
 msgid "Format element %s could not be found."
-msgstr "No s'ha trobat el comentari sol·licitat"
+msgstr "No s'ha trobat l'element de format %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:1059
 #: modules/bibformat/lib/bibformatadminlib.py:1541
-#, fuzzy, python-format
+#, python-format
 msgid "Error in format element %s. %s."
-msgstr "Valida de l'element de format %s"
+msgstr "Error a l'element de format %s. %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:1083
 #, python-format
 msgid "Format element %s has no function named \"format\"."
-msgstr ""
+msgstr "L'element de format %s no té cap funció que es digui \"format\"."
 
 #: modules/bibformat/lib/bibformat_engine.py:1414
-#, fuzzy, python-format
+#, python-format
 msgid "Output format with code %s could not be found."
-msgstr "No s'ha trobat el comentari sol·licitat"
+msgstr "No s'ha trobat el format de sortida amb el codi %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:1471
-#, fuzzy, python-format
+#, python-format
 msgid "Output format %s cannot not be read. %s."
-msgstr "Atributs del format de sortida %s"
+msgstr "No s'ha pogut llegir el format de sortida %s. %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:1631
-#, fuzzy, python-format
+#, python-format
 msgid "Could not find output format named %s."
-msgstr "Valida del format de sortida %s"
+msgstr "No s'ha pogut trobat el format de sortida %s."
 
 #: modules/bibformat/lib/bibformat_engine.py:1712
-#, fuzzy, python-format
+#, python-format
 msgid "Could not find a fresh name for output format %s."
-msgstr "No ha estat possible crear el format de sortida"
+msgstr "No ha estat possible trobar un nom nou per al format de sortida %s"
 
 #: modules/bibformat/lib/bibformat_templates.py:315
 #: modules/bibformat/lib/bibformat_templates.py:429
@@ -5686,56 +5715,60 @@ msgid "Enter a search query here."
 msgstr "Introduiu una cerca aquí."
 
 #: modules/bibformat/lib/bibformatadminlib.py:406
-#, fuzzy, python-format
+#, python-format
 msgid "No Record Found for %s."
-msgstr "No s'ha trobat el registre"
+msgstr "No s'ha trobat cap registre per %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1280
 #, python-format
 msgid "Tag specification \"%s\" must end with column \":\" at line %s."
 msgstr ""
+"L'especificació per a l'etiqueta \"%s\" ha d'acabar a la columna \":\", "
+"línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1287
 #, python-format
 msgid "Tag specification \"%s\" must start with \"tag\" at line %s."
 msgstr ""
+"L'especificació per a l'etiqueta \"%s\" ha de començar amb \"tag\", línia "
+"%s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1294
 #, python-format
 msgid "\"tag\" must be lowercase in \"%s\" at line %s."
-msgstr ""
+msgstr "\"tag\" ha d'estar en minúscula a \"%s\", línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1304
 #: modules/bibformat/lib/bibformatadminlib.py:1318
 #, python-format
 msgid "Should be \"tag field_number:\" at line %s."
-msgstr ""
+msgstr "Hauria de ser \"tag field_number:\", línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1312
 #, python-format
 msgid "Invalid tag \"%s\" at line %s."
-msgstr ""
+msgstr "Etiqueta \"%s\" no vàlida, línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1327
 #, python-format
 msgid "Condition \"%s\" is outside a tag specification at line %s."
-msgstr ""
+msgstr "La condició \"%s\" és fora d'una especificació d'etiqueta, línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1335
 #, python-format
 msgid "Condition \"%s\" can only have a single separator --- at line %s."
-msgstr ""
+msgstr "La condició \"%s\" només pot tenir un sol caràcter, línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1343
 #: modules/bibformat/lib/bibformatadminlib.py:1376
-#, fuzzy, python-format
+#, python-format
 msgid "Template \"%s\" does not exist at line %s."
-msgstr "El fitxer %s no existeix"
+msgstr "La plantilla \"%s\" no existeix, línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1354
 #, python-format
 msgid "Missing column \":\" after \"default\" in \"%s\" at line %s."
-msgstr ""
+msgstr "Falta la columna \":\" després de \"default\" a \"%s\", línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1361
 #, python-format
@@ -5743,31 +5776,35 @@ msgid ""
 "Default template specification \"%s\" must start with \"default :\" at line "
 "%s."
 msgstr ""
+"L'especificació de la plantilla per defecte \"%s\" ha de començar per "
+"\"default :\", línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1368
 #, python-format
 msgid "\"default\" keyword must be lowercase in \"%s\" at line %s."
-msgstr ""
+msgstr "La paraula \"default\" ha de ser en minúscules a \"%s\", línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1384
 #, python-format
 msgid "Line %s could not be understood at line %s."
-msgstr ""
+msgstr "No es pot entendre la línia %s, línia %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1390
 #: modules/bibformat/web/admin/bibformatadmin.py:186
 #: modules/bibformat/web/admin/bibformatadmin.py:257
 #: modules/bibformat/web/admin/bibformatadmin.py:307
 #: modules/bibformat/web/admin/bibformatadmin.py:1012
-#, fuzzy, python-format
+#, python-format
 msgid "Output format %s cannot not be read. %s"
-msgstr "Atributs del format de sortida %s"
+msgstr "No s'ha pogut llegir el format de sortida %s. %s"
 
 #: modules/bibformat/lib/bibformatadminlib.py:1419
 #, python-format
 msgid ""
 "Could not find a name specified in tag \"<name>\" inside format template %s."
 msgstr ""
+"No s'ha pogut trobar el nom especificat a l'etiqueta \"<name>\" a la "
+"plantilla de format %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1428
 #, python-format
@@ -5775,11 +5812,13 @@ msgid ""
 "Could not find a description specified in tag \"<description>\" inside "
 "format template %s."
 msgstr ""
+"No s'ha pogut trobar la descripció especificada a l'etiqueta "
+"\"<description>\" a la plantilla de format %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1443
-#, fuzzy, python-format
+#, python-format
 msgid "Format template %s calls undefined element \"%s\"."
-msgstr "Dependències de la plantilla de format %s"
+msgstr "La plantilla de format %s crida l'element no definit \"%s\"."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1452
 #, python-format
@@ -5787,27 +5826,33 @@ msgid ""
 "Format template %s calls unreadable element \"%s\". Check element file "
 "permissions."
 msgstr ""
+"La plantilla de format %s crida a l'element il·legible \"%s\". Comproveu "
+"els permisos de fitxer de l'element."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1458
 #, python-format
 msgid "Cannot load element \"%s\" in template %s. Check element code."
 msgstr ""
+"No s'ha pogut carregar l'element \"%s\" a la plantilla %s. Comproveu el "
+"codi de l'element."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1482
 #, python-format
 msgid "Format element %s uses unknown parameter \"%s\" in format template %s."
 msgstr ""
+"L'element de format %s usa el paràmetre desconegut \"%s\" a la plantilla "
+"de format %s."
 
 #: modules/bibformat/lib/bibformatadminlib.py:1499
 #, python-format
 msgid "Could not read format template named %s. %s"
-msgstr ""
+msgstr "No s'ha pogut llegir la plantilla de format %s. %s"
 
 #: modules/bibformat/lib/bibformatadminlib.py:1547
 #: modules/bibformat/web/admin/bibformatadmin.py:1054
-#, fuzzy, python-format
+#, python-format
 msgid "Format element %s cannot not be read. %s"
-msgstr "Dependències de l'element de format %s"
+msgstr "No s'ha pogut llegir l'element de format %s. %s"
 
 #: modules/bibformat/lib/elements/bfe_aid_authors.py:287
 #: modules/bibformat/lib/elements/bfe_authors.py:141
@@ -5873,17 +5918,19 @@ msgstr "Text complet"
 
 #: modules/bibformat/lib/elements/bfe_sciencewise.py:99
 msgid "Add this document to your ScienceWise.info bookmarks"
-msgstr ""
+msgstr "Afegir aquest documento als vostres preferits a ScienceWise.info"
 
 #: modules/bibformat/lib/elements/bfe_sciencewise.py:112
 msgid "Add this article to your ScienceWise.info bookmarks"
-msgstr ""
+msgstr "Afegir aquest article als vostres preferits a ScienceWise.info"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:56
 msgid ""
 "Cannot write in etc/bibformat dir of your Invenio installation. Check "
 "directory permission."
 msgstr ""
+"No s'ha pogut escriure al directori etc/bibformat de la vostra "
+"instal·lació d'Invenio. Comproveu els permisos del directori."
 
 #: modules/bibformat/web/admin/bibformatadmin.py:189
 #: modules/bibformat/web/admin/bibformatadmin.py:260
@@ -5924,9 +5971,9 @@ msgstr "No ha estat possible crear el format de sortida"
 #: modules/bibformat/web/admin/bibformatadmin.py:522
 #: modules/bibformat/web/admin/bibformatadmin.py:597
 #: modules/bibformat/web/admin/bibformatadmin.py:1034
-#, fuzzy, python-format
+#, python-format
 msgid "Format template %s cannot not be read. %s"
-msgstr "Atributs de la plantilla de format %s"
+msgstr "No s'ha pogut llegir la plantilla de format %s. %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:525
 #: modules/bibformat/web/admin/bibformatadmin.py:600
@@ -5985,6 +6032,8 @@ msgstr "Valida de l'element de format %s"
 #: modules/bibformat/web/admin/bibformatadmin.py:1068
 msgid "No format specified for validation. Please specify one."
 msgstr ""
+"No heu especificat cap format per a la validació.  Especifiqueu-ne "
+"un."
 
 #: modules/bibformat/web/admin/bibformatadmin.py:1071
 msgid "Format Validation"
@@ -6318,9 +6367,8 @@ msgid "Download user distribution:"
 msgstr "Distribució de les baixades:"
 
 #: modules/bibsort/lib/bibsortadminlib.py:367
-#, fuzzy
 msgid "BibSort Guide"
-msgstr "Ajuda per als lliuraments"
+msgstr "Guia del BibSort"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:157
 msgid "BibSword Admin Interface"
@@ -6331,24 +6379,24 @@ msgstr "Administració de BibSword"
 #: modules/bibsword/lib/bibsword_webinterface.py:301
 #: modules/bibsword/lib/bibsword_webinterface.py:330
 msgid "Export with BibSword: Step 2/4"
-msgstr "Exportar amb BibSword: paso 2/4"
+msgstr "Exportar amb BibSword: pas 2/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:222
 #: modules/bibsword/lib/bibsword_webinterface.py:233
 #: modules/bibsword/lib/bibsword_webinterface.py:291
 msgid "Export with BibSword: Step 1/4"
-msgstr "Exportar amb BibSword: paso 1/4"
+msgstr "Exportar amb BibSword: pas 1/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:315
 #: modules/bibsword/lib/bibsword_webinterface.py:343
 #: modules/bibsword/lib/bibsword_webinterface.py:374
 msgid "Export with BibSword: Step 3/4"
-msgstr "Exportar amb BibSword: paso 3/4"
+msgstr "Exportar amb BibSword: pas 3/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:358
 #: modules/bibsword/lib/bibsword_webinterface.py:389
 msgid "Export with BibSword: Step 4/4"
-msgstr "Exportar amb BibSword: paso 4/4"
+msgstr "Exportar amb BibSword: pas 4/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:434
 msgid "Export with BibSword: Acknowledgement"
@@ -6742,7 +6790,7 @@ msgstr "abril"
 #: modules/websearch/lib/search_engine.py:1004
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "May "
-msgstr ""
+msgstr "Maig"
 
 #: modules/miscutil/lib/dateutils.py:220
 #: modules/websearch/lib/search_engine.py:1004
@@ -6855,7 +6903,7 @@ msgstr "classificació per cites en el temps"
 #, python-format
 msgid ""
 "The system is not attempting to send an email from %s, to %s, with body %s."
-msgstr ""
+msgstr "El sistema no intenta enviar un missatge de %s, a %s, amb el text %s."
 
 #: modules/miscutil/lib/mailutils.py:233
 #, python-format
@@ -6863,11 +6911,14 @@ msgid ""
 "Error in connecting to the SMPT server waiting %s seconds. Exception is %s, "
 "while sending email from %s to %s with body %s."
 msgstr ""
+"Error en la conexió amb el servidor SMPT esperant %s "
+"segons. L'excepció és %s, a l'intentar enviar el missatge de %s a %s "
+"con el text %s."
 
 #: modules/miscutil/lib/mailutils.py:244
 #, python-format
 msgid "Error in sending email from %s to %s with body %s."
-msgstr ""
+msgstr "Error a l'enviar un missatge de %s, a %s, amb el text %s."
 
 #: modules/miscutil/lib/mailutils.py:259 modules/miscutil/lib/mailutils.py:272
 #: modules/webcomment/lib/webcomment_templates.py:2182
@@ -6951,31 +7002,27 @@ msgstr "No heu seleccionat cap identificador de servidor OAI"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:207
 #: modules/oaiharvest/lib/oai_harvest_admin.py:331
-#, fuzzy
 msgid "Please enter a name for the source."
-msgstr "Introduiu un nom d'usuari o de grup."
+msgstr "Introduiu un nom per a la font."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:209
 #: modules/oaiharvest/lib/oai_harvest_admin.py:333
-#, fuzzy
 msgid "Please enter a metadata prefix."
-msgstr "Introduiu un nom de grup vàlid."
+msgstr "Introduiu el prefixe de metadades."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:211
-#, fuzzy
 msgid "Please enter a base url."
-msgstr "Introduiu un nom de grup."
+msgstr "Untroduiu la url base."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:213
 #: modules/oaiharvest/lib/oai_harvest_admin.py:335
-#, fuzzy
 msgid "Please choose a frequency of harvesting"
-msgstr "Seleccioneu una categoria"
+msgstr "Escolliu una freqüència de recol·lecta"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:215
 #: modules/oaiharvest/lib/oai_harvest_admin.py:339
 msgid "You selected a postprocess mode which involves conversion."
-msgstr ""
+msgstr "Heu seleccionat un modus de postprocés que involucra conversió."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:216
 #: modules/oaiharvest/lib/oai_harvest_admin.py:340
@@ -6983,11 +7030,13 @@ msgid ""
 "Please enter a valid name of or a full path to a BibConvert config file or "
 "change postprocess mode."
 msgstr ""
+"Entreu un nom vàlid o la ruta completa a un fitxer de configuració "
+"BibConvert, o canvieu el modus de postprocés."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:218
 #: modules/oaiharvest/lib/oai_harvest_admin.py:342
 msgid "You selected a postprocess mode which involves filtering."
-msgstr ""
+msgstr "Heu seleccionat un modus de postprocés que involucra filtratge."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:219
 #: modules/oaiharvest/lib/oai_harvest_admin.py:343
@@ -6995,6 +7044,8 @@ msgid ""
 "Please enter a valid name of or a full path to a BibFilter script or change "
 "postprocess mode."
 msgstr ""
+"Entreu un nom vàlid o la ruta completa a un script BibFilter, o "
+"canvieu el modus de postprocés."
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:289
 #: modules/oaiharvest/lib/oai_harvest_admin.py:461
@@ -7007,7 +7058,7 @@ msgstr "Tornar a la llista dels servidors OAI"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:337
 msgid "Please choose the harvesting starting date"
-msgstr ""
+msgstr "Escolliu la data d'inici de la recolecta"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:447
 msgid "Try again with another url"
@@ -7068,9 +7119,8 @@ msgid "Accept Holding Pen version"
 msgstr "Acceptar la versió en espera de revisió"
 
 #: modules/oaiharvest/lib/oai_harvest_admin.py:1151
-#, fuzzy
 msgid "Record deleted from the holding pen"
-msgstr "Esborrar de la llista d'espera"
+msgstr "Registre esborrat de la llista d'espera"
 
 #: modules/oaiharvest/lib/oai_harvest_templates.py:53
 #: modules/oaiharvest/lib/oai_harvest_templates.py:70
@@ -7216,9 +7266,8 @@ msgstr "Configurar WebJournal"
 
 #: modules/webaccess/lib/access_control_config.py:322
 #: modules/websession/lib/websession_templates.py:1219
-#, fuzzy
 msgid "Configure BibSort"
-msgstr "Configurar BibFormat"
+msgstr "Configurar BibSort"
 
 #: modules/webaccess/lib/access_control_config.py:323
 #: modules/websession/lib/websession_templates.py:1188
@@ -7733,9 +7782,8 @@ msgid "No Papers"
 msgstr "Cap document"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:300
-#, fuzzy
 msgid "Papers written alone"
-msgstr "Títol del document: "
+msgstr "Articles com a autor individual"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:468
 #: modules/websearch/lib/websearch_templates.py:4254
@@ -7748,14 +7796,12 @@ msgid "Frequent keywords"
 msgstr "Paraules claus freqüents"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:530
-#, fuzzy
 msgid "No Collaborations"
-msgstr "Col·leccions"
+msgstr "Sense col·laboracions"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:533
-#, fuzzy
 msgid "Collaborations"
-msgstr "Col·leccions"
+msgstr "Col·laboracions"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:559
 #: modules/websearch/lib/websearch_templates.py:4229
@@ -7774,7 +7820,7 @@ msgstr "Afiliacions"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:588
 msgid "Frequent co-authors (excluding collaborations)"
-msgstr ""
+msgstr "Coautors freqüentes (excloent-hi col·laboracions)"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:611
 #: modules/websearch/lib/websearch_templates.py:4273
@@ -7782,9 +7828,9 @@ msgid "No Frequent Co-authors"
 msgstr "Co-autors poc freqüents"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:628
-#, fuzzy, python-format
+#, python-format
 msgid "Citations%s:"
-msgstr "Citacions:"
+msgstr "Citacions%s:"
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:632
 #: modules/websearch/lib/websearch_templates.py:4340
@@ -7798,7 +7844,7 @@ msgstr "Sóc jo mateix.  Verifiqueu la meva llista de publicacions."
 
 #: modules/webauthorprofile/lib/webauthorprofile_templates.py:743
 msgid "Recompute Now!"
-msgstr ""
+msgstr "Recalcula ara!"
 
 #: modules/webbasket/lib/webbasket.py:106
 #: modules/webbasket/lib/webbasket.py:2284
@@ -7925,14 +7971,12 @@ msgstr ""
 "vàlids."
 
 #: modules/webbasket/lib/webbasket.py:1955
-#, fuzzy
 msgid "Untitled basket"
-msgstr "Edita el cistell"
+msgstr "Cistell sense títol"
 
 #: modules/webbasket/lib/webbasket.py:1955
-#, fuzzy
 msgid "Untitled topic"
-msgstr "Edita el tema"
+msgstr "Tema sense títol"
 
 #: modules/webbasket/lib/webbasket.py:1957
 msgid ""
@@ -8089,9 +8133,9 @@ msgid "Search also in notes (where allowed)"
 msgstr "Cercar també a les notes (si pertoca)"
 
 #: modules/webbasket/lib/webbasket_templates.py:578
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_search_for_term)s in %(x_collection_list)s"
-msgstr "Cerca dins %(x_collection_name)s"
+msgstr "%(x_search_for_term)s a %(x_collection_list)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:615
 msgid "Results overview"
@@ -8102,9 +8146,9 @@ msgstr "Sumari dels resultats"
 #: modules/webbasket/lib/webbasket_templates.py:789
 #: modules/webbasket/lib/webbasket_templates.py:898
 #: modules/webbasket/lib/webbasket_templates.py:1002
-#, fuzzy, python-format
+#, python-format
 msgid "%i matching items"
-msgstr "No s'ha trobat cap usuari que coincideixi"
+msgstr "trobats %i items"
 
 #: modules/webbasket/lib/webbasket_templates.py:654
 #: modules/webbasket/lib/webbasket_templates.py:1000
@@ -8503,9 +8547,8 @@ msgid "This basket is publicly accessible at the following address:"
 msgstr "Aquest cistell és públicament accessible a aquesta adreça:"
 
 #: modules/webbasket/lib/webbasket_templates.py:2488
-#, fuzzy
 msgid "This basket does not contain any records yet."
-msgstr "Aquesta col·lecció encara no conté cap document."
+msgstr "Aquest cistell encara no conté cap registre."
 
 #: modules/webbasket/lib/webbasket_templates.py:2522
 msgid "You do not have sufficient rights to view this basket's content."
@@ -8656,9 +8699,8 @@ msgid "Your personal baskets"
 msgstr "Els vostres cistells personals"
 
 #: modules/webbasket/lib/webbasket_templates.py:4223
-#, fuzzy
 msgid "All your topics"
-msgstr "Tots els vostres cistells"
+msgstr "Tots els vostres temes"
 
 #: modules/webbasket/lib/webbasket_templates.py:4234
 #: modules/webbasket/lib/webbasket_templates.py:4334
@@ -8666,27 +8708,24 @@ msgid "Your group baskets"
 msgstr "Els vostres cistells de grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:4239
-#, fuzzy
 msgid "All your groups"
-msgstr "Els vostres grups"
+msgstr "Tots els vostres grups"
 
 #: modules/webbasket/lib/webbasket_templates.py:4250
 msgid "Your public baskets"
 msgstr "Els vostres cistells públics"
 
 #: modules/webbasket/lib/webbasket_templates.py:4254
-#, fuzzy
 msgid "All your public baskets"
-msgstr "Tots els cistells públics"
+msgstr "Tots els vostres cistells públics"
 
 #: modules/webbasket/lib/webbasket_templates.py:4259
 msgid "All the public baskets"
 msgstr "Tots els cistells públics"
 
 #: modules/webbasket/lib/webbasket_templates.py:4292
-#, fuzzy
 msgid "Please select a basket..."
-msgstr "Seleccioneu un número"
+msgstr "Seleccioneu un cistell..."
 
 #: modules/webbasket/lib/webbasket_webinterface.py:159
 #: modules/webbasket/lib/webbasket_webinterface.py:320
@@ -8879,14 +8918,14 @@ msgid "Write a comment"
 msgstr "Escriviu un comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:95
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i Comments for round \"%(x_name)s\""
 msgstr "%(x_nb)i comentaris per la volta «%(x_name)s»"
 
 #: modules/webcomment/lib/webcomment_templates.py:98
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i Comments"
-msgstr "%i comentaris"
+msgstr "%(x_nb)i comentaris"
 
 #: modules/webcomment/lib/webcomment_templates.py:126
 #, python-format
@@ -8968,16 +9007,14 @@ msgid "Rate this document"
 msgstr "Valoreu aquest document"
 
 #: modules/webcomment/lib/webcomment_templates.py:335
-#, fuzzy
 msgid "Be the first to review this document.</div>"
-msgstr "Sigueu el primer a escriure una ressenya d'aquest document."
+msgstr "Sigueu el primer a escriure una ressenya d'aquest document.</div>"
 
 #: modules/webcomment/lib/webcomment_templates.py:379
 #: modules/webcomment/lib/webcomment_templates.py:440
 #: modules/webcomment/lib/webcomment_templates.py:782
-#, fuzzy
 msgid "Close"
-msgstr "tancar"
+msgstr "Tanca"
 
 #: modules/webcomment/lib/webcomment_templates.py:386
 #: modules/webcomment/lib/webcomment_templates.py:837
@@ -9008,7 +9045,7 @@ msgstr "Fitxers adjunts"
 #: modules/webcomment/lib/webcomment_templates.py:440
 #: modules/webcomment/lib/webcomment_templates.py:781
 msgid "Open"
-msgstr ""
+msgstr "Obre"
 
 #: modules/webcomment/lib/webcomment_templates.py:509
 #, python-format
@@ -9500,14 +9537,13 @@ msgstr "No s'ha trobat el registre"
 #: modules/webcomment/lib/webcomment_webinterface.py:583
 #: modules/webcomment/lib/webcomment_webinterface.py:660
 msgid "Specified comment does not belong to this record"
-msgstr ""
+msgstr "El comentari especificat no pertany a aquest registre"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:352
 #: modules/webcomment/lib/webcomment_webinterface.py:589
 #: modules/webcomment/lib/webcomment_webinterface.py:666
-#, fuzzy
 msgid "You do not have access to the specified comment"
-msgstr "No teniu permisos per a rdnottst aquesta nota."
+msgstr "No teniu accés al comentari especificat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:423
 #, python-format
@@ -9526,11 +9562,11 @@ msgstr "Afegeix un comentari"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:594
 msgid "You cannot vote for a deleted comment"
-msgstr ""
+msgstr "No podeu votar un comentari esborrat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:671
 msgid "You cannot report a deleted comment"
-msgstr ""
+msgstr "No podeu denunciar un comentari esborrat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:818
 #: modules/webcomment/lib/webcomment_webinterface.py:858
@@ -9543,7 +9579,7 @@ msgstr "No s'ha trobat el comentari sol·licitat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:839
 msgid "You cannot access files of a deleted comment"
-msgstr ""
+msgstr "No podeu accedir als fitxers d'un comentari esborrat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:859
 msgid "The requested file could not be found"
@@ -9944,9 +9980,8 @@ msgid "Issue regenerated"
 msgstr "Número regenerat"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:275
-#, fuzzy
 msgid "Regenerate Issue"
-msgstr "Seleccioneu el número:"
+msgstr "Regenera el número"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:328
 msgid "Publishing Interface"
@@ -10234,22 +10269,24 @@ msgid "No values found."
 msgstr "No s'han trobat valors."
 
 #: modules/websearch/lib/search_engine.py:1887
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
-"Atenció: la cerca a text complet només està disponible per a un subconjunt "
-"de documents, majoritàriament d'entre 2006-2011."
+"Atenció: la cerca a text complet només està disponible per a un "
+"subconjunt de documents, majoritàriament d'entre "
+"%(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1891
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from %(x_range_from_year)s-%(x_range_to_year)s."
 msgstr ""
 "Atenció: la cerca als peus d'imatges només està disponible per a un "
-"subconjunt de documents, majoritàriament d'entre 2006-2011."
+"subconjunt de documents, majoritàriament d'entre "
+"%(x_range_from_year)s-%(x_range_to_year)s."
 
 #: modules/websearch/lib/search_engine.py:1899
 #, python-format
@@ -10308,11 +10345,8 @@ msgstr ""
 "documents no públics, escolliu primer la col·lecció restringida."
 
 #: modules/websearch/lib/search_engine.py:2792
-#, fuzzy
 msgid "Your search did not match any records.  Please try again."
-msgstr ""
-"No ha estat possible desar la vostra contribució.  Si us plau torneu-ho a "
-"provar."
+msgstr "La vostra cerca no ha trobat cap registre. Torneu-ho a provar."
 
 #: modules/websearch/lib/search_engine.py:2801
 msgid "No match found, please enter different search terms."
@@ -10357,11 +10391,11 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:3760
 #: modules/websearch/lib/search_engine.py:3880
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. The records will not be "
 "sorted."
-msgstr "No és possible ordenar per %s.  Ha quedat ordenat per títol."
+msgstr "No és possible ordenar per %s.  No s'rodenaran els registres."
 
 #: modules/websearch/lib/search_engine.py:3868
 #, python-format
@@ -10374,9 +10408,9 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:4110
 #: modules/websearch/lib/search_engine.py:4429
-#, fuzzy, python-format
+#, python-format
 msgid "The record %d replaces it."
-msgstr "El registre ha estat suprimit."
+msgstr "El registre %d el reemplaça."
 
 #: modules/websearch/lib/search_engine.py:4308
 msgid "Use different search terms."
@@ -10807,14 +10841,12 @@ msgid "Average citations per paper:"
 msgstr "Mitja de cites per article:"
 
 #: modules/websearch/lib/websearch_templates.py:4450
-#, fuzzy
 msgid "Total number of citations excluding self-citations"
-msgstr "Nombre total de citacions excloent les autocites:"
+msgstr "Nombre total de citacions excloent les autocites"
 
 #: modules/websearch/lib/websearch_templates.py:4461
-#, fuzzy
 msgid "Average citations per paper excluding self-citations"
-msgstr "Mitja de cites per article excloent les autocites:"
+msgstr "Mitja de cites per article excloent les autocites"
 
 #: modules/websearch/lib/websearch_templates.py:4475
 msgid "Breakdown of papers by citations:"
@@ -11006,38 +11038,35 @@ msgstr "Grups d'usuaris externs"
 
 #: modules/websession/lib/websession_templates.py:128
 msgid "API keys"
-msgstr ""
+msgstr "Claus API"
 
 #: modules/websession/lib/websession_templates.py:132
 msgid "These are your current API keys"
-msgstr ""
+msgstr "Aqestes són les vostres claus API"
 
 #: modules/websession/lib/websession_templates.py:155
-#, fuzzy
 msgid "Description: "
-msgstr "Descripció"
+msgstr "Descripció: "
 
 #: modules/websession/lib/websession_templates.py:156
-#, fuzzy
 msgid "Status: "
-msgstr "Estat"
+msgstr "Estat: "
 
 #: modules/websession/lib/websession_templates.py:159
 msgid "API key"
-msgstr ""
+msgstr "Clau API"
 
 #: modules/websession/lib/websession_templates.py:160
-#, fuzzy
 msgid "Delete key"
-msgstr "Suprimeix el cistell"
+msgstr "Suprimeix la clau"
 
 #: modules/websession/lib/websession_templates.py:186
 msgid "If you want to create a new API key, please enter a description for it"
-msgstr ""
+msgstr "Si voleu crear una nova clau API, escriviu-hi la seva descripció"
 
 #: modules/websession/lib/websession_templates.py:187
 msgid "Description for the new API key"
-msgstr ""
+msgstr "Descripció per a la nova clau API"
 
 #: modules/websession/lib/websession_templates.py:188
 #: modules/websession/lib/websession_templates.py:257
@@ -11051,11 +11080,12 @@ msgid ""
 "The description should be something meaningful for you to recognize the API "
 "key"
 msgstr ""
+"La descripció hauria de ser prou significativa perquè podeu reconèixer\n"
+"la nova clau API"
 
 #: modules/websession/lib/websession_templates.py:191
-#, fuzzy
 msgid "Create new key"
-msgstr "Crear un nou cistell"
+msgstr "Crear una clau nova"
 
 #: modules/websession/lib/websession_templates.py:250
 msgid ""
@@ -11990,7 +12020,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2556
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
-msgstr "Puede bajarse una versión más reciente de Invenio.  Visite "
+msgstr "Podeu baixar-vos una versió més nova d'Invenio.  Visiteu "
 
 #: modules/websession/lib/websession_templates.py:2563
 msgid ""
@@ -12166,9 +12196,8 @@ msgstr ""
 "la instal·lació."
 
 #: modules/websession/lib/websession_webinterface.py:428
-#, fuzzy
 msgid "Your nickname has not been updated"
-msgstr "Aquest ítem ha estat actualitzat."
+msgstr "El vostre alias no ha estat actualitzat."
 
 #: modules/websession/lib/websession_webinterface.py:442
 msgid "Settings successfully edited."
@@ -12743,6 +12772,8 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:67
 msgid "Login to display all document types you can access"
 msgstr ""
+"Identifiqueu-vos per a visualitzar tots els tipus de document als que "
+"teniu accés"
 
 #: modules/websubmit/lib/websubmit_templates.py:93
 msgid "Document types available for submission"
@@ -13109,13 +13140,12 @@ msgstr ""
 "ATENCIÓ! Un correu electònic serà enviat al vostre revisor si ho confirmeu."
 
 #: modules/websubmit/lib/websubmit_templates.py:2151
-#, fuzzy
 msgid ""
 "As a referee for this document, you may approve or reject it from the "
 "submission interface"
 msgstr ""
-"Com a revisor d'aquest document, podeu fer clic en aquest botó per a aprovar-"
-"lo o rebutjar-lo"
+"Com a revisor d'aquest document, podeu aprovar-lo o rebutjar-lo des de "
+"la interfíci de lliuraments"
 
 #: modules/websubmit/lib/websubmit_templates.py:2153
 msgid "Approve/Reject"
@@ -13331,20 +13361,20 @@ msgid "reject"
 msgstr "rebutjar"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:686
-#, fuzzy
 msgid "Sorry, invalid arguments"
-msgstr "URL no válido..."
+msgstr "Arguments no vàlids"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:693
-#, fuzzy
 msgid "Note: the requested submission has already been completed"
-msgstr "La petició d'ingressar al grup ja ha estat rebutjada."
+msgstr "El lliurament s'ha completat"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:697
 msgid ""
 "Sorry, you don't seem to have initiated a submission with the provided "
 "access number"
 msgstr ""
+"No sembla que hàgiu iniciat un lliurament amb el número d'accés que "
+"heu especificat"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:717
 msgid "Sorry, 'sub' parameter missing..."
