@@ -19,21 +19,12 @@
 
 """WebMessage Forms"""
 
-from string import strip
-from datetime import datetime
-
 from flask import url_for
-from invenio.sqlalchemyutils import db
-from invenio.websession_model import User, Usergroup
-from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
 from invenio.webinterface_handler_flask_utils import _
 from invenio.bibknowledge import get_kb_mappings
-from flask.ext.wtf import Form
-from invenio.wtforms_utils import InvenioBaseForm, FilterForm, \
-                    DateTimePickerWidget, FilterTextField, AutocompleteField, \
-                    MultiWidget, RowWidget
-from wtforms import DateTimeField, BooleanField, TextField, TextAreaField, \
-                    PasswordField, RadioField, HiddenField, validators
+from invenio.wtforms_utils import InvenioBaseForm, AutocompleteField, \
+                    RowWidget
+from wtforms import TextField
 from wtforms import FormField, SelectField
 from wtforms import Form as WTFormDefault
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -46,6 +37,7 @@ class JournalForm(WTFormDefault):
             query_factory=lambda: [{'key':'', 'value':_('Any journal')}] + get_kb_mappings('EJOURNALS'))
     vol = TextField(_('Vol'))
     page = TextField(_('Pg'))
+
 
 class EasySearchForm(InvenioBaseForm):
     """Defines form for easy seach popup."""
@@ -61,6 +53,7 @@ class EasySearchForm(InvenioBaseForm):
     k = AutocompleteField(_('Keywords'), data_provide="typeahead-url",
         data_source=lambda: url_for('search.list', field='keyword'))
     journal = FormField(JournalForm, widget=RowWidget())
+
 
 class WebSearchUserSettingsForm(InvenioBaseForm):
     of = SelectField(_('Results per page'),

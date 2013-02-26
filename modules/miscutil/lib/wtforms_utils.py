@@ -30,11 +30,14 @@ are taken from `flask-admin` extension.
 import datetime
 import time
 
+from flask import session
+from wtforms import Form as WTForm
 from wtforms.widgets import TextInput, HTMLString, html_params
-from wtforms.fields import Field, TextField, HiddenField
+from wtforms.fields import Field, TextField, HiddenField, FileField
 from flask.ext.wtf import Form
 from wtforms.ext.csrf.session import SessionSecureForm
 from wtforms.compat import text_type
+from invenio.config import CFG_SITE_SECRET_KEY
 
 
 class RowWidget(object):
@@ -141,29 +144,6 @@ class TypeheadWidget(object):
             kwargs['value'] = field._value()
         return HTMLString(u'<input %s />' % html_params(name=field.name, **kwargs))
 
-class MultiWidget(object):
-    """
-    Renders a list of fields in one div.
-    """
-    def __init__(self, *args, **kwargs):#html_tag='div', prefix_label=True):
-        #assert html_tag in ('div', 'span')
-        #self.html_tag = html_tag
-        #self.prefix_label = prefix_label
-        print args, kwargs
-        pass
-
-    def __call__(self, field, **kwargs):
-        kwargs.setdefault('id', field.id)
-        html = []
-        html.append('<%s %s>' % (self.html_tag, html_params(**kwargs)))
-        for i, subfield in enumerate(field):
-            if not self.prefix_label or i>0:
-                html.append('<div class="controll-group">%s %s</div>' % (subfield.label, subfield()))
-            else:
-                html.append(subfield())
-        html.append('</%s>' % self.html_tag)
-        return HTMLString(''.join(html))
-
 
 def has_file_field(form):
     """Test whether or not a form has a FileField in it. This is used
@@ -193,9 +173,6 @@ class FilterTextField(TextField):
             return self.raw_data.pop()
         return u''
 
-from flask import session
-from wtforms import Form as WTForm
-
 
 class InvenioForm(WTForm):
     @property
@@ -204,7 +181,7 @@ class InvenioForm(WTForm):
 
 
 class InvenioBaseForm(Form, SessionSecureForm):
-    SECRET_KEY = 'EPj00jpfj8Gx1SjnyLxwBBSQfnQ9DJYe0Ym'
+    SECRET_KEY = CFG_SITE_SECRET_KEY
     TIME_LIMIT = datetime.timedelta(minutes=20)
 
     def __init__(self, *args, **kwargs):
@@ -220,4 +197,3 @@ class FilterForm(InvenioBaseForm):
     """
     sort_by = HiddenField()
     order = HiddenField()
-
