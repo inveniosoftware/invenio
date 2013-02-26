@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,7 +44,9 @@ from invenio.webstat import perform_request_index, \
     perform_display_custom_summary, \
     perform_display_stats_per_coll, \
     perform_display_current_system_health, \
-    perform_display_coll_list
+    perform_display_yearly_report, \
+    perform_display_coll_list, \
+    perform_display_ingestion_status
 
 
 def detect_suitable_graph_format():
@@ -66,7 +68,7 @@ SUITABLE_GRAPH_FORMAT = detect_suitable_graph_format()
 class WebInterfaceStatsPages(WebInterfaceDirectory):
     """Defines the set of stats pages."""
 
-    _exports = ['', 'system_health',
+    _exports = ['', 'system_health', 'systemhealth', 'yearly_report', 'ingestion_health',
                  'collection_population', 'new_records', 'search_frequency', 'search_type_distribution',
                  'download_frequency', 'comments_frequency', 'number_of_loans', 'web_submissions',
                  'loans_stats', 'loans_lists', 'renewals_lists', 'returns_table', 'returns_graph',
@@ -93,8 +95,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
         return page(title="Statistics",
                     body=perform_request_index(ln=ln),
-                    description="CDS, Statistics",
-                    keywords="CDS, statistics",
+                    description="Invenio, Statistics",
+                    keywords="Invenio, statistics",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='stats',
@@ -117,11 +119,61 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_current_system_health(ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Current system health",
-                    keywords="CDS, statistics, current system health",
+                    description="Invenio, Statistics, Current system health",
+                    keywords="Invenio, statistics, current system health",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='current system health',
+                    language=ln)
+
+    def systemhealth(self, req, form):
+        """Redirect for the old URL. """
+        return redirect_to_url (req, "%s/stats/system_health" % (CFG_SITE_URL))
+
+    def yearly_report(self, req, form):
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        if auth_code:
+            return page_not_authorized(req,
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
+                text=auth_msg,
+                navmenuid='yearly report',
+                ln=ln)
+        return page(title="Yearly report",
+                    body=perform_display_yearly_report(ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
+                    description="Invenio, Statistics, Yearly report",
+                    keywords="Invenio, statistics, yearly report",
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='yearly report',
+                    language=ln)
+
+    def ingestion_health(self, req, form):
+        argd = wash_urlargd(form, { 'pattern': (str, None),
+                                    'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        req_ingestion = argd['pattern']
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        if auth_code:
+            return page_not_authorized(req,
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
+                text=auth_msg,
+                navmenuid='ingestion status',
+                ln=ln)
+        return page(title="Check ingestion health",
+                    body=perform_display_ingestion_status(req_ingestion, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
+                    description="Invenio, Statistics, Ingestion health",
+                    keywords="Invenio, statistics, Ingestion health",
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='ingestion health',
                     language=ln)
 
     # KEY EVENT SECTION
@@ -148,8 +200,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('collection population', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Collection population",
-                    keywords="CDS, statistics, collection population",
+                    description="Invenio, Statistics, Collection population",
+                    keywords="Invenio, statistics, collection population",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='collection population',
@@ -178,8 +230,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('new records', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, New records",
-                    keywords="CDS, statistics, new records",
+                    description="Invenio, Statistics, New records",
+                    keywords="Invenio, statistics, new records",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='new records',
@@ -208,8 +260,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('search frequency', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Search frequency",
-                    keywords="CDS, statistics, search frequency",
+                    description="Invenio, Statistics, Search frequency",
+                    keywords="Invenio, statistics, search frequency",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='search frequency',
@@ -238,8 +290,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('comments frequency', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Comments frequency",
-                    keywords="CDS, statistics, Comments frequency",
+                    description="Invenio, Statistics, Comments frequency",
+                    keywords="Invenio, statistics, Comments frequency",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='comments frequency',
@@ -267,8 +319,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('search type distribution', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Search type distribution",
-                    keywords="CDS, statistics, search type distribution",
+                    description="Invenio, Statistics, Search type distribution",
+                    keywords="Invenio, statistics, search type distribution",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='search type distribution',
@@ -297,8 +349,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('download frequency', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Download frequency",
-                    keywords="CDS, statistics, download frequency",
+                    description="Invenio, Statistics, Download frequency",
+                    keywords="Invenio, statistics, download frequency",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='download frequency',
@@ -326,8 +378,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('number of loans', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Number of circulation loans",
-                    keywords="CDS, statistics, Number of circulation loans",
+                    description="Invenio, Statistics, Number of circulation loans",
+                    keywords="Invenio, statistics, Number of circulation loans",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='number of circulation loans',
@@ -356,8 +408,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('web submissions', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Web submissions",
-                    keywords="CDS, statistics, websubmissions",
+                    description="Invenio, Statistics, Web submissions",
+                    keywords="Invenio, statistics, websubmissions",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='web submissions',
@@ -389,8 +441,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('loans statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation loans statistics",
-                    keywords="CDS, statistics, Circulation loans statistics",
+                    description="Invenio, Statistics, Circulation loans statistics",
+                    keywords="Invenio, statistics, Circulation loans statistics",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation loans statistics',
@@ -426,8 +478,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('loans lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation oans lists",
-                    keywords="CDS, statistics, Circulation loans lists",
+                    description="Invenio, Statistics, Circulation oans lists",
+                    keywords="Invenio, statistics, Circulation loans lists",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation loans lists',
@@ -457,8 +509,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('renewals', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation renewals lists",
-                    keywords="CDS, statistics, Circulation renewals lists",
+                    description="Invenio, Statistics, Circulation renewals lists",
+                    keywords="Invenio, statistics, Circulation renewals lists",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation renewals lists',
@@ -486,8 +538,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('number returns', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation returns table",
-                    keywords="CDS, statistics, Circulation returns table",
+                    description="Invenio, Statistics, Circulation returns table",
+                    keywords="Invenio, statistics, Circulation returns table",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation returns table',
@@ -515,8 +567,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('percentage returns', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation returns graph",
-                    keywords="CDS, statistics, Circulation returns graph",
+                    description="Invenio, Statistics, Circulation returns graph",
+                    keywords="Invenio, statistics, Circulation returns graph",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation returns graph',
@@ -547,8 +599,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('ill requests statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation ILL Requests statistics",
-                    keywords="CDS, statistics, Circulation ILL Requests statistics",
+                    description="Invenio, Statistics, Circulation ILL Requests statistics",
+                    keywords="Invenio, statistics, Circulation ILL Requests statistics",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation ill requests statistics',
@@ -578,8 +630,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('ill requests list', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation ILL Requests list",
-                    keywords="CDS, statistics, Circulation ILL Requests list",
+                    description="Invenio, Statistics, Circulation ILL Requests list",
+                    keywords="Invenio, statistics, Circulation ILL Requests list",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation ill requests list',
@@ -611,8 +663,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                                                   argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Percentage of circulation satisfied ILL requests",
-                    keywords="CDS, statistics, Percentage of circulation satisfied ILL requests",
+                    description="Invenio, Statistics, Percentage of circulation satisfied ILL requests",
+                    keywords="Invenio, statistics, Percentage of circulation satisfied ILL requests",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='percentage circulation satisfied ill requests',
@@ -642,8 +694,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('items stats', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation items statistics",
-                    keywords="CDS, statistics, Circulation items statistics",
+                    description="Invenio, Statistics, Circulation items statistics",
+                    keywords="Invenio, statistics, Circulation items statistics",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation items stats',
@@ -670,8 +722,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('items list', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation items list",
-                    keywords="CDS, statistics, Circulation items list",
+                    description="Invenio, Statistics, Circulation items list",
+                    keywords="Invenio, statistics, Circulation items list",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation items list',
@@ -700,8 +752,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('loan request statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation hold requests statistics",
-                    keywords="CDS, statistics, Circulation hold requests statistics",
+                    description="Invenio, Statistics, Circulation hold requests statistics",
+                    keywords="Invenio, statistics, Circulation hold requests statistics",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation loan request statistics',
@@ -730,8 +782,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('loan request lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation hold request lists",
-                    keywords="CDS, statistics, Circulation hold request lists",
+                    description="Invenio, Statistics, Circulation hold request lists",
+                    keywords="Invenio, statistics, Circulation hold request lists",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation hold request lists',
@@ -759,8 +811,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('user statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation users statistics",
-                    keywords="CDS, statistics, Circulation users statistics",
+                    description="Invenio, Statistics, Circulation users statistics",
+                    keywords="Invenio, statistics, Circulation users statistics",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation user statistics',
@@ -788,8 +840,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('user lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Circulation users lists",
-                    keywords="CDS, statistics, Circulation users lists",
+                    description="Invenio, Statistics, Circulation users lists",
+                    keywords="Invenio, statistics, Circulation users lists",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='circulation users lists',
@@ -827,8 +879,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=body,
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS Personalize, Statistics, Custom event",
-                    keywords="CDS, statistics, custom event",
+                    description="Invenio, Statistics, Custom event",
+                    keywords="Invenio, statistics, custom event",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='custom event',
@@ -851,8 +903,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_error_log_analyzer(ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Error log analyzer",
-                    keywords="CDS, statistics, Error log analyzer",
+                    description="Invenio, Statistics, Error log analyzer",
+                    keywords="Invenio, statistics, Error log analyzer",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='error log analyzer',
@@ -875,8 +927,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_customevent_help(ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS Personalize, Statistics, Custom event help",
-                    keywords="CDS, statistics, custom event help",
+                    description="Invenio, Statistics, Custom event help",
+                    keywords="Invenio, statistics, custom event help",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='custom event help',
@@ -916,8 +968,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_custom_summary(argd, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Custom Query Summary",
-                    keywords="CDS, statistics, custom query summary",
+                    description="Invenio, Statistics, Custom Query Summary",
+                    keywords="Invenio, statistics, custom query summary",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='custom query summary',
@@ -941,8 +993,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_coll_list(req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Collection statistics",
-                    keywords="CDS, statistics",
+                    description="Invenio, Statistics, Collection statistics",
+                    keywords="Invenio, statistics",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='collections list',
@@ -978,8 +1030,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_stats_per_coll(argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
-                    description="CDS, Statistics, Collection %s" % argd['collection'],
-                    keywords="CDS, statistics, %s" % argd['collection'],
+                    description="Invenio, Statistics, Collection %s" % argd['collection'],
+                    keywords="Invenio, statistics, %s" % argd['collection'],
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='collections',

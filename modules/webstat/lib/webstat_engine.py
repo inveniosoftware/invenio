@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -39,7 +39,8 @@ from invenio.bibindex_engine import CFG_JOURNAL_TAG
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search, \
     get_collection_reclist, \
-    get_most_popular_field_values
+    get_most_popular_field_values, \
+    search_pattern
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.dbquery import run_sql, \
     wash_table_column_name
@@ -48,6 +49,9 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
     book_information_from_MARC
 from invenio.bibcirculation_dblayer import get_id_bibrec, \
     get_borrower_data
+from invenio.websearch_webcoll import CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE
+from invenio.dateutils import convert_datetext_to_datestruct, convert_datestruct_to_dategui
+
 
 WEBSTAT_SESSION_LENGTH = 48 * 60 * 60 # seconds
 WEBSTAT_GRAPH_TOKENS = '-=#+@$%&XOSKEHBC'
@@ -1358,6 +1362,275 @@ WHERE returned_on!='0000-00-00 00:00:00' and loaned_on > %s", (datefrom, ))[0][0
                           (datefrom, ))[0][0]
     return (loans, renewals, returns, illrequests, holdrequest)
 
+
+def get_last_updates():
+    """
+    List date/time when the last updates where done (easy reading format).
+
+    @return: last indexing, last ranking, last sorting, last webcolling
+    @type: (datetime, datetime, datetime, datetime)
+    """
+    try:
+        last_index = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
+                    (str(run_sql('SELECT last_updated FROM idxINDEX WHERE \
+                    name="global"')[0][0])))
+        last_rank = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
+                    (str(run_sql('SELECT last_updated FROM rnkMETHOD ORDER BY \
+                            last_updated DESC LIMIT 1')[0][0])))
+        last_sort = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
+                    (str(run_sql('SELECT last_updated FROM bsrMETHODDATA ORDER BY \
+                            last_updated DESC LIMIT 1')[0][0])))
+        file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
+        last_coll = convert_datestruct_to_dategui(convert_datetext_to_datestruct \
+                    (str(file_coll_last_update.read())))
+        file_coll_last_update.close()
+    # database not filled
+    except IndexError:
+        return ("", "", "", "")
+    return (last_index, last_rank, last_sort, last_coll)
+
+def get_list_link(process, category=None):
+    """
+    Builds the link for the list of records not indexed, ranked, sorted or
+    collected.
+    @param process: kind of process the records are waiting for (index, rank,
+                    sort, collect)
+    @type process: str
+    @param category: specific sub-category of the process.
+                     Index: global, collection, abstract, author, keyword,
+                            reference, reportnumber, title, fulltext, year,
+                            journal, collaboration, affiliation, exactauthor,
+                            caption, firstauthor, exactfirstauthor, authorcount)
+                     Rank:  wrd, demo_jif, citation, citerank_citation_t,
+                            citerank_pagerank_c, citerank_pagerank_t
+                     Sort:  latest first, title, author, report number,
+                            most cited
+                     Collect: Empty / None
+    @type category: str
+
+    @return: link text
+    @type: string
+    """
+    if process == "index":
+        list_registers = run_sql('SELECT id FROM bibrec WHERE \
+                            modification_date > (SELECT last_updated FROM \
+                            idxINDEX WHERE name=%s)', (category,))
+    elif process == "rank":
+        list_registers = run_sql('SELECT id FROM bibrec WHERE \
+                            modification_date > (SELECT last_updated FROM \
+                            rnkMETHOD WHERE name=%s)', (category,))
+    elif process == "sort":
+        list_registers = run_sql('SELECT id FROM bibrec WHERE \
+                            modification_date > (SELECT last_updated FROM \
+                            bsrMETHODDATA WHERE id_bsrMETHOD=(SELECT id \
+                            FROM bsrMETHOD WHERE name=%s))', (category,))
+    elif process == "collect":
+        file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
+        coll_last_update = file_coll_last_update.read()
+        file_coll_last_update.close()
+        list_registers = run_sql('SELECT id FROM bibrec WHERE \
+                                modification_date > %s', (coll_last_update,))
+
+    # build the link
+    if list_registers == ():
+        return "Up to date"
+    link = '<a href="' + CFG_SITE_URL + '/search?p='
+    for register in list_registers:
+        link += 'recid%3A' + str(register[0]) + '+or+'
+    # delete the last '+or+'
+    link = link[:len(link)-4]
+    link += '">' + str(len(list_registers)) + '</a>'
+    return link
+
+def get_search_link(record_id):
+    """
+    Auxiliar, builds the direct link for a given record.
+    @param record_id: record's id number
+    @type record_id: int
+
+    @return: link text
+    @type: string
+    """
+    link = '<a href="' + CFG_SITE_URL + '/record/' + \
+            str(record_id) + '">Record [' + str(record_id) + ']</a>'
+    return link
+
+def get_ingestion_matching_records(request=None, limit=25):
+    """
+    Fetches all the records matching a given pattern, arranges them by last
+    modificaton date and returns a list.
+    @param request: requested pattern to match
+    @type request: str
+
+    @return: list of records matching a pattern,
+             (0,) if no request,
+             (-1,) if the request was invalid
+    @type: list
+    """
+    if request==None or request=="":
+        return (0,)
+    try:
+        records = list(search_pattern(p=request))
+    except:
+        return (-1,)
+    if records == []:
+        return records
+
+    # order by most recent modification date
+    query = 'SELECT id FROM bibrec WHERE '
+    for r in records:
+        query += 'id="' + str(r) + '" OR '
+    query = query[:len(query)-4]
+    query += ' ORDER BY modification_date DESC LIMIT %s'
+
+    list_records = run_sql(query, (limit,))
+    final_list = []
+    for lr in list_records:
+        final_list.append(lr[0])
+    return final_list
+
+def get_record_ingestion_status(record_id):
+    """
+    Returns the amount of ingestion methods not updated yet to a given record.
+    If 0, the record is up to date.
+    @param record_id: record id number
+    @type record_id: int
+
+    @return: number of methods not updated for the record
+    @type: int
+    """
+    counter = 0
+    counter += run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                        id=%s AND modification_date > (SELECT last_updated FROM \
+                        idxINDEX WHERE name="global")', (record_id, ))[0][0]
+
+    counter += run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                        id=%s AND modification_date > (SELECT last_updated FROM \
+                        rnkMETHOD ORDER BY last_updated DESC LIMIT 1)', \
+                        (record_id, ))[0][0]
+
+    counter = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                        id=%s AND modification_date > (SELECT last_updated FROM \
+                        bsrMETHODDATA ORDER BY last_updated DESC LIMIT 1)', \
+                        (record_id, ))[0][0]
+    file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
+    last_coll = file_coll_last_update.read()
+    file_coll_last_update.close()
+    counter += run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                        id=%s AND \
+                        modification_date >\
+                         %s', (record_id, last_coll,))[0][0]
+    return counter
+
+def get_specific_ingestion_status(record_id, process, method=None):
+    """
+    Returns whether a record is or not up to date for a given
+    process and method.
+
+    @param record_id: identification number of the record
+    @type record_id: int
+    @param process: kind of process the records may be waiting for (index,
+                    rank, sort, collect)
+    @type process: str
+    @param method: specific sub-method of the process.
+                     Index: global, collection, abstract, author, keyword,
+                            reference, reportnumber, title, fulltext, year,
+                            journal, collaboration, affiliation, exactauthor,
+                            caption, firstauthor, exactfirstauthor, authorcount
+                     Rank:  wrd, demo_jif, citation, citerank_citation_t,
+                            citerank_pagerank_c, citerank_pagerank_t
+                     Sort:  latest first, title, author, report number,
+                            most cited
+                     Collect: Empty / None
+    @type category: str
+
+    @return: text: None if the record is up to date
+                   Last time the method was updated if it is waiting
+    @type: date/time string
+    """
+    exist = run_sql('SELECT COUNT(*) FROM bibrec WHERE id=%s', (record_id, ))
+    if exist[0][0] == 0:
+        return "REG not in DB"
+
+    if process == "index":
+        list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                                id=%s AND modification_date > (SELECT \
+                                last_updated FROM idxINDEX WHERE name=%s)',
+                                (record_id, method,))
+        last_time = run_sql ('SELECT last_updated FROM idxINDEX WHERE \
+                            name=%s', (method,))[0][0]
+    elif process == "rank":
+        list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                                id=%s AND modification_date > (SELECT \
+                                last_updated FROM rnkMETHOD WHERE name=%s)',
+                                (record_id, method,))
+        last_time = run_sql ('SELECT last_updated FROM rnkMETHOD WHERE \
+                            name=%s', (method,))[0][0]
+    elif process == "sort":
+        list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                                id=%s AND modification_date > (SELECT \
+                                last_updated FROM bsrMETHODDATA WHERE \
+                                id_bsrMETHOD=(SELECT id FROM bsrMETHOD \
+                                WHERE name=%s))', (record_id, method,))
+        last_time = run_sql ('SELECT last_updated FROM bsrMETHODDATA WHERE \
+                            id_bsrMETHOD=(SELECT id FROM bsrMETHOD \
+                            WHERE name=%s)', (method,))[0][0]
+    elif process == "collect":
+        file_coll_last_update = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, 'r')
+        last_time = file_coll_last_update.read()
+        file_coll_last_update.close()
+        list_registers = run_sql('SELECT COUNT(*) FROM bibrec WHERE id=%s \
+                                AND modification_date > %s',
+                                (record_id, last_time,))
+    # no results means the register is up to date
+    if list_registers[0][0] == 0:
+        return None
+    else:
+        return convert_datestruct_to_dategui(convert_datetext_to_datestruct \
+                    (str(last_time)))
+
+def get_title_ingestion(record_id, last_modification):
+    """
+    Auxiliar, builds a direct link for a given record, with its last
+    modification date.
+    @param record_id: id number of the record
+    @type record_id: string
+    @param last_modification: date/time of the last modification
+    @type last_modification: string
+
+    @return: link text
+    @type: string
+    """
+    return '<h3><a href="%s/record/%s">Record [%s] last modification: %s</a></h3>' \
+            % (CFG_SITE_URL, record_id, record_id, last_modification)
+
+def get_record_last_modification (record_id):
+    """
+    Returns the date/time of the last modification made to a given record.
+    @param record_id: id number of the record
+    @type record_id: int
+
+    @return: date/time of the last modification
+    @type: string
+    """
+    return convert_datestruct_to_dategui(convert_datetext_to_datestruct \
+                    (str(run_sql('SELECT modification_date FROM bibrec \
+                    WHERE id=%s', (record_id,))[0][0])))
+
+def get_general_status():
+    """
+    Returns an aproximate amount of ingestions processes not aplied to new or
+    updated records, using the "global" category.
+
+    @return: number of processes not updated
+    @type: int
+    """
+    return run_sql('SELECT COUNT(*) FROM bibrec WHERE \
+                    modification_date > (SELECT last_updated FROM \
+                    idxINDEX WHERE name="global")')[0][0]
+
+
+
 # ERROR LOG STATS
 
 def update_error_log_analyzer():
@@ -2442,9 +2715,7 @@ def _get_datetime_iter(t_start, granularity='day',
         else:
             # Default just in case
             span = "days=1"
-
         tim += eval("datetime.timedelta(" + span + ")")
-
 
 def _to_datetime(dttime, dt_format='%Y-%m-%d %H:%M:%S'):
     """
