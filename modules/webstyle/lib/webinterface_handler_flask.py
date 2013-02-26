@@ -42,7 +42,7 @@ from invenio.config import CFG_PYLIBDIR, \
     CFG_ETCDIR, CFG_DEVEL_SITE, \
     CFG_FLASK_CACHE_TYPE, CFG_FLASK_DISABLED_BLUEPRINTS, \
     CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_FLASK_SERVE_STATIC_FILES, \
-    CFG_SITE_SECRET_KEY
+    CFG_SITE_SECRET_KEY, CFG_BINDIR
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY
 
@@ -234,6 +234,16 @@ def create_invenio_flask_app():
     _app.config.from_object(config)
 
     ## ... and map certain common parameters
+    if not CFG_SITE_SECRET_KEY or CFG_SITE_SECRET_KEY == '':
+        fill_secret_key = """
+    Set variable CFG_SITE_SECRET_KEY with random string in invenio-local.conf.
+
+    $ echo "CFG_SITE_SECRET_KEY = `python -c "import os;import re;print re.escape(os.urandom(24).__repr__()[1:-1])"`" >> %s
+    $ %s
+        """ % (CFG_ETCDIR + os.sep + 'invenio-local.conf',
+               CFG_BINDIR + os.sep + 'inveniocfg --update-conf')
+        raise Exception(fill_secret_key)
+
     _app.config["SECRET_KEY"] = CFG_SITE_SECRET_KEY
     _app.config['SESSION_COOKIE_NAME'] = CFG_WEBSESSION_COOKIE_NAME
     _app.config['PERMANENT_SESSION_LIFETIME'] = \
