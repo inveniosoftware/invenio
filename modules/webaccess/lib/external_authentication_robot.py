@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -410,4 +410,3 @@ def update_robot_key(login_method, robot, key=None):
         robot_keys[login_method][robot] = key
     mymkdir(os.path.join(CFG_ETCDIR, 'webaccess'))
     open(CFG_ROBOT_KEYS_PATH, 'w').write(compress(dumps(robot_keys, -1)))
-
