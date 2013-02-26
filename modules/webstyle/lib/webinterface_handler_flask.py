@@ -122,6 +122,25 @@ def create_invenio_flask_app():
     # function documentation
     hack_jinja2_utf8decoding()
 
+    # SECRET_KEY is needed by Flask Debug Toolbar
+    if not CFG_SITE_SECRET_KEY or CFG_SITE_SECRET_KEY == '':
+        fill_secret_key = """
+    Set variable CFG_SITE_SECRET_KEY with random string in invenio-local.conf.
+
+    $ echo "CFG_SITE_SECRET_KEY = `python -c "import os;import re;print re.escape(os.urandom(24).__repr__()[1:-1])"`" >> %s
+    $ %s
+        """ % (CFG_ETCDIR + os.sep + 'invenio-local.conf',
+               CFG_BINDIR + os.sep + 'inveniocfg --update-conf')
+        raise Exception(fill_secret_key)
+
+    _app.config["SECRET_KEY"] = CFG_SITE_SECRET_KEY
+
+    # Enable Flask Debug Toolbar early to also catch HTTPS redirects
+    if CFG_DEVEL_SITE > 8:
+        from flask_debugtoolbar import DebugToolbarExtension
+        _toolbar = DebugToolbarExtension(_app)
+        del _toolbar
+
     if CFG_HAS_HTTPS_SUPPORT:
         # Makes request always run over HTTPS.
         _sslify = SSLify(_app)
@@ -234,17 +253,6 @@ def create_invenio_flask_app():
     _app.config.from_object(config)
 
     ## ... and map certain common parameters
-    if not CFG_SITE_SECRET_KEY or CFG_SITE_SECRET_KEY == '':
-        fill_secret_key = """
-    Set variable CFG_SITE_SECRET_KEY with random string in invenio-local.conf.
-
-    $ echo "CFG_SITE_SECRET_KEY = `python -c "import os;import re;print re.escape(os.urandom(24).__repr__()[1:-1])"`" >> %s
-    $ %s
-        """ % (CFG_ETCDIR + os.sep + 'invenio-local.conf',
-               CFG_BINDIR + os.sep + 'inveniocfg --update-conf')
-        raise Exception(fill_secret_key)
-
-    _app.config["SECRET_KEY"] = CFG_SITE_SECRET_KEY
     _app.config['SESSION_COOKIE_NAME'] = CFG_WEBSESSION_COOKIE_NAME
     _app.config['PERMANENT_SESSION_LIFETIME'] = \
         CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER * CFG_WEBSESSION_ONE_DAY
@@ -253,11 +261,6 @@ def create_invenio_flask_app():
     _app.debug = CFG_DEVEL_SITE > 0
     _app.config['CFG_LANGUAGE_LIST_LONG'] = [(lang, longname.decode('utf-8'))
         for (lang, longname) in language_list_long()]
-
-    if CFG_DEVEL_SITE > 8:
-        from flask_debugtoolbar import DebugToolbarExtension
-        _toolbar = DebugToolbarExtension(_app)
-        del _toolbar
 
     ## Invenio is all using str objects. Let's change them to unicode
     _app.config.update(unicodifier(dict(_app.config)))
