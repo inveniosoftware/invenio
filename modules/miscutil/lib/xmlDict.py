@@ -40,6 +40,7 @@ class XmlDictConfig(dict):
     def __init__(self, parent_element):
         if parent_element.items():
             self.update(dict(parent_element.items()))
+
         for element in parent_element:
             if element:
                 # treat like dict - we assume that if the first two tags
@@ -62,8 +63,24 @@ class XmlDictConfig(dict):
             # good idea -- time will tell. It works for the way we are
             # currently doing XML configuration files...
             elif element.items():
-                self.update({element.tag: dict(element.items())})
+
+                # this assumes that if we got a single attribute
+                # with no children the attribute defines the type of the text
+                if len(element.items()) == 1 and not list(element):
+                    # check if its str or unicode and if the text is empty,
+                    # otherwise the tag has empty text, no need to add it
+                    if isinstance(element.text, basestring) and element.text.strip() != '':
+                        # we have an attribute in the tag that specifies
+                        # most probably the type of the text
+                        tag = element.items()[0][1]
+                        self.update({element.tag: dict({tag: element.text})})
+                else:
+                    self.update({element.tag: dict(element.items())})
+                    if not list(element) and isinstance(element.text, basestring)\
+                        and element.text.strip() != '':
+                        self[element.tag].update(dict({"text": element.text}))
             # finally, if there are no child tags and no attributes, extract
             # the text
             else:
                 self.update({element.tag: element.text})
+
