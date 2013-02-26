@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -80,6 +80,9 @@ if not HAS_SSL:
     from warnings import warn
     warn("Module ssl not installed. Please install with e.g. 'pip install ssl'. Required for HTTPS connections to DataCite.", RuntimeWarning)
 
+import urllib2
+import re
+from invenio.xmlDict import XmlDictConfig, ElementTree
 
 # Uncomment to enable debugging of HTTP connection and uncomment line in
 # DataCiteRequest.request()
@@ -535,3 +538,79 @@ class DataCite(object):
             return r.data
         else:
             raise DataCiteError.factory(r.code)
+
+class DataciteMetadata(object):
+
+    def __init__(self, doi):
+
+        self.url = "http://data.datacite.org/application/x-datacite+xml/"
+        self.error = False
+        try:
+            data = urllib2.urlopen(self.url + doi).read()
+        except urllib2.HTTPError:
+            self.error = True
+
+        if not self.error:
+            # Clean the xml for parsing
+            data = re.sub('<\?xml.*\?>', '', data, count=1)
+
+            # Remove the resource tags
+            data = re.sub('<resource .*xsd">', '', data)
+            self.data = '<?xml version="1.0"?><datacite>' + data[0:len(data) - 11] + '</datacite>'
+            self.root = ElementTree.XML(self.data)
+            self.xml = XmlDictConfig(self.root)
+
+    def get_creators(self, attribute='creatorName'):
+        if 'creators' in self.xml:
+            [c[attribute] for c in self.xml['creators']['creator']]
+        return None
+
+    def get_titles(self):
+        if 'titles' in self.xml:
+            return self.xml['titles']['title']
+        return None
+
+    def get_publisher(self):
+        if 'publisher' in self.xml:
+            return self.xml['publisher']
+        return None
+
+    def get_dates(self):
+        if 'dates' in self.xml:
+            return self.xml['dates']['date']
+        return None
+
+    def get_publication_year(self):
+        if 'publicationYear' in self.xml:
+            return self.xml['publicationYear']
+        return None
+
+    def get_language(self):
+        if 'language' in self.xml:
+            return self.xml['language']
+        return None
+
+    def get_related_identifiers(self):
+        pass
+
+    def get_description(self, description_type='Abstract'):
+        if 'descriptions' in self.xml:
+            if isinstance(self.xml['descriptions']['description'], list):
+                for description in self.xml['descriptions']['description']:
+                    if description_type in description:
+                        return description[description_type]
+            elif isinstance(self.xml['descriptions']['description'], dict):
+                description = self.xml['descriptions']['description']
+                if description_type in description:
+                    return description[description_type]
+                elif len(description) == 1:
+                    # return the only description
+                    return description.values()[0]
+
+        return None
+
+    def get_rights(self):
+        if 'titles' in self.xml:
+            return self.xml['rights']
+        return None
+
