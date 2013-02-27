@@ -15,21 +15,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = ticket_templates
+pylibdir=$(libdir)/python/invenio/bibcatalog_ticket_templates
 
-pylibdir = $(libdir)/python/invenio
-
-pylib_DATA = bibcatalog.py \
-             bibcatalog_templates.py \
-             bibcatalog_system.py \
-             bibcatalog_system_rt.py \
-             bibcatalog_system_rt_unit_tests.py \
-             bibcatalog_system_email.py \
-             bibcatalog_system_email_unit_tests.py \
-             bibcatalog_task.py \
-             bibcatalog_dblayer.py \
-             bibcatalog_utils.py \
-             bibcatalog_unit_tests.py
+pylib_DATA = *.py
 
 EXTRA_DIST = $(pylib_DATA)
 

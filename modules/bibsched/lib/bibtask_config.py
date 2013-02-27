@@ -32,10 +32,10 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "webstatadmin", "bibclassify", "bibexport",
-                           "dbdump", "batchuploader", "bibauthorid", 'bibencode',
+                           "dbdump", "batchuploader", "bibauthorid", "bibencode",
                            "bibtasklet", "refextract", "bibcircd", "bibsort",
                            "webauthorprofile", "selfcites", "hepdataharvest",
-                           "arxiv-pdf-checker")
+                           "arxiv-pdf-checker", "bibcatalog")
 
 # Tasks that should be run as standalone task
 if CFG_INSPIRE_SITE:

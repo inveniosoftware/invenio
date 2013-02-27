@@ -579,10 +579,13 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibauthority/lib/Makefile \
      modules/bibauthority/web/Makefile \
      modules/bibcatalog/Makefile \
+     modules/bibcatalog/bin/Makefile \
+     modules/bibcatalog/bin/bibcatalog \
      modules/bibcatalog/doc/Makefile \
      modules/bibcatalog/doc/admin/Makefile \
      modules/bibcatalog/doc/hacking/Makefile
      modules/bibcatalog/lib/Makefile \
+     modules/bibcatalog/lib/ticket_templates/Makefile \
      modules/bibcheck/Makefile \
      modules/bibcheck/doc/Makefile \
      modules/bibcheck/doc/admin/Makefile \
