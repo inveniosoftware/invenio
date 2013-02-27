@@ -27,6 +27,7 @@ General options:
    -V, --version            print version number
 
 Options to finish your installation:
+   --create-secret-key      generate random CFG_SITE_SECRET_KEY
    --create-apache-conf     create Apache configuration files
    --create-tables          create DB tables for Invenio
    --load-webstat-conf      load the WebStat configuration
@@ -699,6 +700,20 @@ before continuing.""" % err)
     finally:
         run_sql("DROP TABLE IF EXISTS test__invenio__utf8")
     print "ok"
+
+def cli_cmd_create_secret_key(conf):
+    """Generate and append CFG_SITE_SECRET_KEY to invenio-local.conf.
+    Useful for the installation process."""
+    print ">>> Going to generate random CFG_SITE_SECRET_KEY..."
+    from invenio.config import CFG_ETCDIR, CFG_SITE_SECRET_KEY
+    if CFG_SITE_SECRET_KEY is not None and len(CFG_SITE_SECRET_KEY) > 0:
+        print "ERROR: CFG_SITE_SECRET_KEY is already filled."
+        sys.exit(1)
+    invenio_local_path = CFG_ETCDIR + os.sep + 'invenio-local.conf'
+    secret_key = re.escape(os.urandom(24).__repr__()[1:-1])
+    with open(invenio_local_path, 'a') as f:
+        f.write('CFG_SITE_SECRET_KEY = %s' % (secret_key, ))
+    print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
 
 def cli_cmd_create_tables(conf):
     """Create and fill Invenio DB tables.  Useful for the installation process."""
@@ -1422,6 +1437,7 @@ def prepare_option_parser():
     parser.add_option("-V", "--version", action="store_true", help="print version number")
 
     finish_options = OptionGroup(parser, "Options to finish your installation")
+    finish_options.add_option("", "--create-secret-key", dest='actions', const='create-secret-key', action="append_const", help="generate random CFG_SITE_SECRET_KEY")
     finish_options.add_option("", "--create-apache-conf", dest='actions', const='create-apache-conf', action="append_const", help="create Apache configuration files")
     finish_options.add_option("", "--create-tables", dest='actions', const='create-tables', action="append_const", help="create DB tables for Invenio")
     finish_options.add_option("", "--load-webstat-conf", dest='actions', const='load-webstat-conf', action="append_const", help="load the WebStat configuration")
@@ -1540,6 +1556,8 @@ def main(*cmd_args):
                 cli_cmd_list(conf)
             elif action == 'detect-system-details':
                 cli_cmd_detect_system_details(conf)
+            elif action == 'create-secret-key':
+                cli_cmd_create_secret_key(conf)
             elif action == 'create-tables':
                 cli_cmd_create_tables(conf)
             elif action == 'load-webstat-conf':

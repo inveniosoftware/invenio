@@ -25,7 +25,7 @@ _inveniocfg()
     prev="${COMP_WORDS[COMP_CWORD-1]}"
 
     # Basic options
-    opts="-h --help -v --version --create-apache-conf --create-tables --load-webstat-conf --drop-tables --check-openoffice-dir --create-demo-site --load-demo-records --remove-demo-records --drop-demo-site --run-unit-tests --run-regression-tests --run-web-tests --run-flask-tests --update-all --update-config-py --update-dbquery-py --update-dbexec --update-bibconvert-tpl --update-web-tests --reset-all --reset-sitename --reset-siteadminemail --reset-fieldnames --reset-recstruct-cache --list --get --conf-dir --detect-system-details --upgrade --upgrade-check --upgrade-show-pending --upgrade-show-applied --upgrade-create-standard-recipe --upgrade-create-release-recipe"
+    opts="-h --help -v --version --create-apache-conf --create-tables --load-webstat-conf --drop-tables --check-openoffice-dir --create-secret-key --create-demo-site --load-demo-records --remove-demo-records --drop-demo-site --run-unit-tests --run-regression-tests --run-web-tests --run-flask-tests --update-all --update-config-py --update-dbquery-py --update-dbexec --update-bibconvert-tpl --update-web-tests --reset-all --reset-sitename --reset-siteadminemail --reset-fieldnames --reset-recstruct-cache --list --get --conf-dir --detect-system-details --upgrade --upgrade-check --upgrade-show-pending --upgrade-show-applied --upgrade-create-standard-recipe --upgrade-create-release-recipe"
 
     # Option arguments
     case "$prev" in

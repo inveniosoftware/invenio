@@ -127,11 +127,17 @@ def create_invenio_flask_app():
         fill_secret_key = """
     Set variable CFG_SITE_SECRET_KEY with random string in invenio-local.conf.
 
-    $ echo "CFG_SITE_SECRET_KEY = `python -c "import os;import re;print re.escape(os.urandom(24).__repr__()[1:-1])"`" >> %s
+    You can use following commands:
     $ %s
-        """ % (CFG_ETCDIR + os.sep + 'invenio-local.conf',
-               CFG_BINDIR + os.sep + 'inveniocfg --update-conf')
-        raise Exception(fill_secret_key)
+    $ %s
+        """ % (CFG_BINDIR + os.sep + 'inveniocfg --create-secret-key',
+               CFG_BINDIR + os.sep + 'inveniocfg --update-config-py')
+        try:
+            raise Exception(fill_secret_key)
+        except Exception:
+            register_exception(alert_admin=True,
+                               subject="Missing CFG_SITE_SECRET_KEY")
+            raise Exception(fill_secret_key)
 
     _app.config["SECRET_KEY"] = CFG_SITE_SECRET_KEY
 
