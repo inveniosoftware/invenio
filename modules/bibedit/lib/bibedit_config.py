@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_ETCDIR
+from invenio.config import CFG_ETCDIR, CFG_TMPSHAREDDIR
 
 import os
 
@@ -85,6 +85,10 @@ CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION = 2000
 ## WARNING: If set to low, the request for RT to generate the ticket won't have
 ## time to finish (recommended: >2000).
 CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY = 5000
+
+## CFG_BIBEDIT_REQUESTS_UNTIL_SAVE - number of requests until changes in the
+## editor will be saved
+CFG_BIBEDIT_REQUESTS_UNTIL_SAVE = 3
 
 ## CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
 ## by the Ajax engine.
@@ -183,13 +187,27 @@ CFG_BIBEDIT_FIELD_TEMPLATES_PATH = "%s%sbibedit%sfield_templates" % (CFG_ETCDIR,
 # CFG_BIBEDIT_AUTOSUGGEST_TAGS - for which tags the editor should try to autosuggest values
 # This is "safe" to have configured since it does not rely to a particular existing KB
 CFG_BIBEDIT_AUTOSUGGEST_TAGS = ['100__a']
+
 # CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS - a dictionary whose keys are tags and values kb names
 # This is better left empty when in doubt
 CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS = {} # { '65017a': 'SISC-65017a---65017a' }
+
 # CFG_BIBEDIT_KEYWORD_TAXONOMY - the name of the taxonomy DB that holds the taxonomy file used
 # for getting the keywords. Use only if you have a taxonomy KB.
 CFG_BIBEDIT_KEYWORD_TAXONOMY = "" #'HEP.RDF'
+
 #what tag is used for keywords
 CFG_BIBEDIT_KEYWORD_TAG = "" # '6531_a'
+
 #what label inside the RDF file contains the term
 CFG_BIBEDIT_KEYWORD_RDFLABEL = "" #'prefLabel'
+
+#where are BibEdit cache files stored
+CFG_BIBEDIT_CACHEDIR = CFG_TMPSHAREDDIR + '/bibedit-cache'
+
+# CFG_BIBEDIT_DOI_LOOKUP_FIELD - for which tag bibedit should add a link
+# to a DOI name resolver
+CFG_BIBEDIT_DOI_LOOKUP_FIELD = '0247_a'
+# Name of User-Agent header that is send to the DOI name resolver page
+# Without the User-Agent, dx.doi.org page returns 404 error
+CFG_DOI_USER_AGENT = "Invenio"

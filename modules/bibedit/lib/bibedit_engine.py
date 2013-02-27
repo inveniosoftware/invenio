@@ -26,8 +26,10 @@ import re
 import difflib
 import zlib
 import copy
+import urllib
+import urllib2
+import cookielib
 
-from invenio import bibrecord
 from invenio import bibformat
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
@@ -46,7 +48,8 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_MSG
+    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
+    CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -76,12 +79,12 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields, record_get_field_instances, record_add_fields, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
-    record_strip_controlfields
+    record_strip_controlfields, record_order_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
     CFG_INSPIRE_SITE
-from invenio.search_engine import record_exists, search_pattern
+from invenio.search_engine import record_exists, perform_request_search
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
@@ -195,7 +198,8 @@ def perform_request_init(uid, ln, req, lastupdated):
 
 
     body += '<link rel="stylesheet" type="text/css" href="/img/jquery-ui.css" />'
-    body += '<link rel="stylesheet" type="text/css" href="/img/bibedit.css" />'
+    body += '<link rel="stylesheet" type="text/css" href="%s/%s" />' % (CFG_SITE_URL,
+            auto_version_url("img/" + 'bibedit.css'))
 
     if CFG_CERN_SITE:
         cern_site = 'true'
@@ -227,8 +231,10 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gAUTOSUGGEST_TAGS' : CFG_BIBEDIT_AUTOSUGGEST_TAGS,
             'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
             'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"',
+            'gREQUESTS_UNTIL_SAVE' : CFG_BIBEDIT_REQUESTS_UNTIL_SAVE,
             'gAVAILABLE_KBS': get_available_kbs(),
-            'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS
+            'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS,
+            'gDOILookupField': '"' + CFG_BIBEDIT_DOI_LOOKUP_FIELD + '"'
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -276,12 +282,22 @@ def get_available_kbs():
     available_kbs = [kb for kb in kb_list if kb_exists(kb)]
     return available_kbs
 
+
+def record_has_pdf(recid):
+    """ Check if record has a pdf attached
+    """
+    rec_info = BibRecDocs(recid)
+    docs = rec_info.list_bibdocs()
+    return bool(docs)
+
+
 def get_xml_comparison(header1, header2, xml1, xml2):
     """
     Return diffs of two MARCXML records.
     """
     return "".join(difflib.unified_diff(xml1.splitlines(1),
         xml2.splitlines(1), header1, header2))
+
 
 def get_marcxml_of_revision_id(recid, revid):
     """
@@ -296,6 +312,7 @@ def get_marcxml_of_revision_id(recid, revid):
         for row in tmp_res:
             res += zlib.decompress(row[0]) + "\n"
     return res
+
 
 def perform_request_compare(ln, recid, rev1, rev2):
     """Handle a request for comparing two records"""
@@ -320,6 +337,7 @@ def perform_request_compare(ln, recid, rev1, rev2):
                                                  job_date2, comparison)
     return body, errors, warnings
 
+
 def perform_request_newticket(recid, uid):
     """create a new ticket with this record's number
     @param recid: record id
@@ -340,6 +358,7 @@ def perform_request_newticket(recid, uid):
         errmsg = "No ticket system configured"
     return (errmsg, t_url)
 
+
 def perform_request_ajax(req, recid, uid, data, isBulk = False):
     """Handle Ajax requests by redirecting to appropriate function."""
     response = {}
@@ -350,7 +369,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
     # Call function based on request type.
     if request_type == 'searchForRecord':
         # Search request.
-        response.update(perform_request_search(data))
+        response.update(perform_request_bibedit_search(data, req))
     elif request_type in ['changeTagFormat']:
         # User related requests.
         response.update(perform_request_user(req, request_type, recid, data))
@@ -402,8 +421,6 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         response.update(perform_request_preview_record(request_type, recid, uid, data))
     elif request_type in ('get_pdf_url', ):
         response.update(perform_request_get_pdf_url(recid))
-    elif request_type in ('record_has_pdf', ):
-        response.update(perform_request_record_has_pdf(recid))
     elif request_type in ('refextract', ):
         txt = None
         if data.has_key('txt'):
@@ -415,6 +432,8 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         response.update(perform_request_get_textmarc(recid, uid))
     elif request_type == "getTableView":
         response.update(perform_request_get_tableview(recid, uid, data))
+    elif request_type == "DOISearch":
+        response.update(perform_doi_search(data['doi']))
 
     return response
 
@@ -431,7 +450,7 @@ def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
             # save the handler on the server side !
             data['undoRedo'] = undoRedo
             isFirst = False
-        lastResult = perform_request_ajax(req, recid, uid, data, True)
+        lastResult = perform_request_ajax(req, recid, uid, data, isBulk=True)
         # now we have to update the cacheMtime in next request !
 #        if lastResult.has_key('cacheMTime'):
         try:
@@ -440,7 +459,8 @@ def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
             raise Exception(str(lastResult))
     return lastResult
 
-def perform_request_search(data):
+
+def perform_request_bibedit_search(data, req):
     """Handle search requests."""
     response = {}
     searchType = data['searchType']
@@ -451,10 +471,11 @@ def perform_request_search(data):
         pattern = searchPattern
     else:
         pattern = searchType + ':' + searchPattern
-    result_set = list(search_pattern(p=pattern))
+    result_set = list(perform_request_search(req=req, p=pattern))
     response['resultCode'] = 1
     response['resultSet'] = result_set[0:CFG_BIBEDIT_MAX_SEARCH_RESULTS]
     return response
+
 
 def perform_request_user(req, request_type, recid, data):
     """Handle user related requests."""
@@ -465,6 +486,7 @@ def perform_request_user(req, request_type, recid, data):
         session_param_set(req, 'bibedit_tagformat', tagformat_settings)
         response['resultCode'] = 2
     return response
+
 
 def perform_request_holdingpen(request_type, recId, changeId=None):
     """
@@ -487,6 +509,8 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         assert(changeId != None)
         hpContent = get_hp_update_xml(changeId)
         holdingPenRecord = create_record(hpContent[0], "xm")[0]
+        # order subfields alphabetically
+        record_order_subfields(holdingPenRecord)
 #        databaseRecord = get_record(hpContent[1])
         response['record'] = holdingPenRecord
         response['changeset_number'] = changeId
@@ -494,6 +518,7 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         assert(changeId != None)
         delete_hp_change(changeId)
     return response
+
 
 def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG):
     """Handle 'major' record related requests like fetching, submitting or
@@ -681,6 +706,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             if record_status == -1:
                 # The record was deleted
                 response['resultCode'] = 103
+
+            response['record_has_pdf'] = record_has_pdf(recid)
 
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
@@ -888,6 +915,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV["record_submitted"]
 
     return response
+
 
 def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                                   hpChanges, undoRedoOp, isBulk=False):
@@ -1151,6 +1179,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
 
     return response
 
+
 def perform_request_autocomplete(request_type, recid, uid, data):
     """
     Perfrom an AJAX request associated with the retrieval of autocomplete
@@ -1236,6 +1265,7 @@ def perform_request_autocomplete(request_type, recid, uid, data):
             response['autocomplete'] = new_vals
     response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['autosuggestion_scanned']
     return response
+
 
 def perform_request_bibcatalog(request_type, recid, uid):
     """Handle request to BibCatalog (RT).
@@ -1478,14 +1508,6 @@ def perform_request_get_pdf_url(recid):
     return response
 
 
-def perform_request_record_has_pdf(recid):
-    """ Check if record has a pdf attached
-    """
-    rec_info = BibRecDocs(recid)
-    docs = rec_info.list_bibdocs()
-    return {'record_has_pdf': bool(docs)}
-
-
 def perform_request_get_textmarc(recid, uid):
     """ Get record content from cache, convert it to textmarc and return it
     """
@@ -1572,7 +1594,7 @@ def _get_formated_record(record, new_window):
 
 def perform_request_init_template_interface():
     """Handle a request to manage templates"""
-    errors   = []
+    errors = []
     warnings = []
     body = ''
 
@@ -1591,7 +1613,8 @@ def perform_request_init_template_interface():
 
     # Add scripts (the ordering is NOT irrelevant).
     scripts = ['jquery-ui.min.js',
-               'json2.js', 'bibedit_display.js', 'bibedit_template_interface.js']
+               'json2.js', 'bibedit_display.js',
+               'bibedit_template_interface.js']
 
     for script in scripts:
         body += '    <script type="text/javascript" src="%s/js/%s">' \
@@ -1621,8 +1644,28 @@ def perform_request_edit_template(data):
     template_filename = data['templateFilename']
     template = get_record_template(template_filename)
     if not template:
-        response['resultCode']  = 1
+        response['resultCode'] = 1
     else:
         response['templateMARCXML'] = template
 
+    return response
+
+
+def perform_doi_search(doi):
+    """Search for DOI on the dx.doi.org page
+    @return: the url returned by this page"""
+    response = {}
+    url = "http://dx.doi.org/"
+    val = {'hdl': doi}
+    url_data = urllib.urlencode(val)
+    cj = cookielib.CookieJar()
+    header = [('User-Agent', CFG_DOI_USER_AGENT)]
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener.addheaders = header
+    try:
+        resp = opener.open(url, url_data)
+    except:
+        return response
+    else:
+        response['doi_url'] = resp.geturl()
     return response

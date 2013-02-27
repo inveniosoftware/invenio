@@ -335,6 +335,11 @@ function updateStatus(statusType, reporttext, enableToolbar){
       updateStatus.statusResetTimerID = setTimeout('updateStatus("ready")',
 				  gSTATUS_ERROR_TIME);
       break;
+    case 'saving':
+        image = img('/img/indicator.gif');
+        text = 'Saving changes...';
+        break;
+      // Generic report. Resets to 'Ready' after timeout.
     default:
       image = '';
       text = '';

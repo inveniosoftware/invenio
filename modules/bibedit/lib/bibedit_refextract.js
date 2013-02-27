@@ -128,12 +128,13 @@
 		* Handle click on refextract from PDF button
 		*
 		*/
+		save_changes().done(function() {
+			var loading_title = "Extracting references from PDF";
+			updateDialogLoading(loading_title);
 
-		var loading_title = "Extracting references from PDF";
-		updateDialogLoading(loading_title);
-
-		var extract_from_pdf_promise = request_extract_from_pdf();
-		extract_from_pdf_promise.done(updateDialogRefextractResult);
+			var extract_from_pdf_promise = request_extract_from_pdf();
+			extract_from_pdf_promise.done(updateDialogRefextractResult);
+		});
 	}
 
 	function onRefExtractURLClick() {
@@ -141,26 +142,28 @@
 		* Handle click on refextract from URL button
 		*
 		*/
-		var dialogContent = '<input type="text" id="input_extract_url" class="bibedit_input" placeholder="URL to extract references">';
-		dialogReferences = createDialog("Extract references from URL", dialogContent, 200, 500);
-		dialogReferences.contentParagraph.addClass('dialog-box-centered-no-margin');
-		dialogReferences.dialogDiv.dialog({
-			buttons: {
-				"Extract references": function() {
-					url = $("#input_extract_url").val();
-					if (url === "") {
-						return;
-					}
-					var loading_title = "Extracting references from URL";
-					updateDialogLoading(loading_title);
-					var extract_from_url_promise = request_extract_from_url(url);
-					extract_from_url_promise.done(updateDialogRefextractResult);
+		save_changes().done(function() {
+			var dialogContent = '<input type="text" id="input_extract_url" class="bibedit_input" placeholder="URL to extract references">';
+			dialogReferences = createDialog("Extract references from URL", dialogContent, 200, 500);
+			dialogReferences.contentParagraph.addClass('dialog-box-centered-no-margin');
+			dialogReferences.dialogDiv.dialog({
+				buttons: {
+					"Extract references": function() {
+						url = $("#input_extract_url").val();
+						if (url === "") {
+							return;
+						}
+						var loading_title = "Extracting references from URL";
+						updateDialogLoading(loading_title);
+						var extract_from_url_promise = request_extract_from_url(url);
+						extract_from_url_promise.done(updateDialogRefextractResult);
 
-				},
-				Cancel: function() {
-					$( this ).remove();
-				}
-		}});
+					},
+					Cancel: function() {
+						$( this ).remove();
+					}
+			}});
+		});
 	}
 
 	function onRefExtractFreeTextClick() {
@@ -168,26 +171,27 @@
 		* Handler for free text refextract button. Allows to paste references
 		* and process them using refextract on the server side.
 		*/
-
-		/* Create the modal dialog that will contain the references */
-		var dialogContent = "Paste your references:<br/><textarea id='reffreetext' class='bibedit_input'></textarea>"
-		dialogReferences = createDialog("Paste references", dialogContent, 750, 700);
-		dialogReferences.dialogDiv.dialog({
-			buttons: {
-				"Extract references": function() {
-					var textReferences = $('#reffreetext').val();
-					if (textReferences === "") {
-						return;
+		save_changes().done(function() {
+			/* Create the modal dialog that will contain the references */
+			var dialogContent = "Paste your references:<br/><textarea id='reffreetext' class='bibedit_input'></textarea>"
+			dialogReferences = createDialog("Paste references", dialogContent, 750, 700);
+			dialogReferences.dialogDiv.dialog({
+				buttons: {
+					"Extract references": function() {
+						var textReferences = $('#reffreetext').val();
+						if (textReferences === "") {
+							return;
+						}
+						var loading_title = "Extracting references from text";
+						updateDialogLoading(loading_title);
+						var extract_from_text_promise = request_extract_from_text(textReferences);
+						extract_from_text_promise.done(updateDialogRefextractResult);
+					},
+					Cancel: function() {
+						$( this ).remove();
 					}
-					var loading_title = "Extracting references from text";
-					updateDialogLoading(loading_title);
-					var extract_from_text_promise = request_extract_from_text(textReferences);
-					extract_from_text_promise.done(updateDialogRefextractResult);
-				},
-				Cancel: function() {
-					$( this ).remove();
 				}
-			}
+			});
 		});
 	}
 
