@@ -23,7 +23,7 @@ Invenio -> Flask adapter utilities
 from functools import wraps
 from flask import Blueprint, current_app, request, session, redirect, abort, g, \
                   render_template, jsonify, get_flashed_messages, flash, \
-                  Response, _request_ctx_stack, stream_with_context
+                  Response, _request_ctx_stack, stream_with_context, Request
 from invenio.webuser_flask import current_user, login_required
 from invenio.urlutils import create_url
 from invenio.sqlalchemyutils import db
@@ -36,6 +36,20 @@ _ = lambda x: x
 
 def register_template_context_processor(f):
     g._template_context_processor.append(f)
+
+
+class InvenioRequest(Request):
+    """
+    Flask Request wrapper which adds support for converting the request into
+    legacy request (SimulatedModPythonRequest). This is primarily useful
+    when Flaskifying modules, that still depends on old code.
+    """
+    def dummy_start_response(self, *args, **kwargs):
+        pass
+
+    def get_legacy_request(self):
+        from invenio.webinterface_handler_wsgi import SimulatedModPythonRequest
+        return SimulatedModPythonRequest(self.environ, self.dummy_start_response)
 
 
 class InvenioBlueprint(Blueprint):

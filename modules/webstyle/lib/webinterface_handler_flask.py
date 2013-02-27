@@ -127,7 +127,7 @@ def create_invenio_flask_app(**kwargs_config):
                                     LangExtension, hack_jinja2_utf8decoding
     from invenio.webmessage_mailutils import email_quoted_txt2html
     from flask.ext.assets import Environment, Bundle
-    from invenio.webinterface_handler_flask_utils import unicodifier
+    from invenio.webinterface_handler_flask_utils import unicodifier, InvenioRequest
     from flaskext.gravatar import Gravatar
     from werkzeug.wrappers import BaseResponse
     from werkzeug.exceptions import HTTPException
@@ -280,6 +280,9 @@ def create_invenio_flask_app(**kwargs_config):
     ## Invenio session handling
     _app.session_interface = InvenioSessionInterface()
 
+    ## Set custom request class
+    _app.request_class = InvenioRequest
+
     ## Let's load the whole invenio.config into Flask :-) ...
     _app.config.from_object(config)
 
@@ -292,6 +295,7 @@ def create_invenio_flask_app(**kwargs_config):
     _app.debug = CFG_DEVEL_SITE > 0
     _app.config['CFG_LANGUAGE_LIST_LONG'] = [(lang, longname.decode('utf-8'))
         for (lang, longname) in language_list_long()]
+
 
     ## Invenio is all using str objects. Let's change them to unicode
     _app.config.update(unicodifier(dict(_app.config)))
