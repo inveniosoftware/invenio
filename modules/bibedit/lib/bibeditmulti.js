@@ -731,12 +731,10 @@ function onButtonSaveNewSubfieldClick() {
 
     // update subfield appearence at the user interface
     var actionText = templateNewSubfield.find(".subfieldActionType").eq(0).find('option').filter(':selected').text();
-    var conditionExactText;
-    if (currentSubfield.conditionSubfieldExactMatch === "0") {
-        conditionExactText = "is equal to";
-    } else if (currentSubfield.conditionSubfieldExactMatch === "1") {
-        conditionExactText = "contains";
-    } else conditionExactText = "does not exist";
+    // remember the selected option from conditions list ("is equal to", "contains" or "does not exist")
+    var conditionSelectedOption = currentSubfield.conditionSubfieldExactMatch;
+    var conditionExactText = templateNewSubfield.find(".selectConditionExactMatch option[value='"
+        + conditionSelectedOption + "']").text();
 
     templateDisplaySubfield.attr("id", subfieldDisplayID);
     templateDisplaySubfield.find(".action").eq(0).text(actionText);
@@ -756,12 +754,15 @@ function onButtonSaveNewSubfieldClick() {
         templateDisplaySubfield.find(".textBoxConditionSubfield").eq(0).attr("value", currentSubfield.conditionSubfield);
     }
 
-    // show "when subfield $$..." does not exist without "condition" textBox
-    if (templateDisplaySubfield.find(".conditionExact").eq(0).text() == 'does not exist') {
+    // check if the subfield condition is "when subfield $$... does not exist" (hide "condition" textBox)
+    // 'does not exist' is option with value '2' on the select list
+    if (conditionSelectedOption == '2') {
         displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action, 'true');
         templateDisplaySubfield.find(".textBoxCondition").hide();
     }
-    else if (templateDisplaySubfield.find(".textBoxCondition").eq(0).val() != 'condition') {
+    // in case of 'when subfield is equal/contains "condition"'
+    // check if the "condition" is specified, if not just ignore the part "when ..."
+    else if (templateDisplaySubfield.find(".textBoxCondition").eq(0).val() != '') {
         displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action, 'true');
     }
     else {
@@ -843,14 +844,8 @@ function onButtonSaveNewFieldConditionClick() {
     gFields[fieldID].conditionSubfield = conditionSubfield;
     gFields[fieldID].condition = condition;
     gFields[fieldID].conditionSubfieldExactMatch = conditionSubfieldExactMatch;
-
-    if (conditionSubfieldExactMatch === "0") {
-        conditionExactText = "is equal to";
-    }
-    else if(conditionSubfieldExactMatch === "1") {
-        conditionExactText = "contains";
-    }
-    else conditionExactText = "does not exist";
+    var conditionExactText = templateDisplayField.find(".selectConditionExactMatch option[value='"
+        + conditionSubfieldExactMatch + "']").text();
 
     templateDisplayField.find(".conditionExact").eq(0).text(conditionExactText);
     templateDisplayField.find("#textBoxConditionFieldDisplay").eq(0).attr("value", condition);
