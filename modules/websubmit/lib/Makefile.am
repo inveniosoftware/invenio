@@ -38,7 +38,8 @@ pylib_DATA = websubmit_config.py websubmit_engine.py file.py \
              bibdocfilecli.py \
              bibdocfile_regression_tests.py \
              hocrlib.py \
-             websubmit_file_metadata.py
+             websubmit_file_metadata.py \
+             websubmitadmincli.py
 
 metadataplugindir = $(libdir)/python/invenio/websubmit_file_metadata_plugins
 metadataplugin_DATA = __init__.py \

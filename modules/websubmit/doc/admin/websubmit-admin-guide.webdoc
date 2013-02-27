@@ -119,6 +119,9 @@ descriptions, etc.)</b>
     <li>6.2&nbsp;&nbsp;<a href="#6.2">User-level</a></li>
   </ul>
 </li>
+<li><strong>7. <a href="#load_dump_cli">Load/dump Submissions</a></strong>
+</li>
+
 </ul>
 
 &nbsp;&nbsp;&nbsp;&nbsp;(Check out the <a href="#oldwebsubmitguide">old WebSubmit admin guide</a>)<br/>
@@ -1267,7 +1270,7 @@ function documentation</a>.</p>
 
 <p>File revisions and deletions comes for free with the
 functions. Simply allow deletion or revision of files when
-configuring <code>Create_Upload_Files_Interface<code>.</p>
+configuring <code>Create_Upload_Files_Interface</code>.</p>
 
 
 <a name="5.4"></a><h3>5.4 Upload_File element instance + Move_Uploaded_Files_To_Storage function</h3>
@@ -1309,7 +1312,7 @@ the <a href="#2.3">option 3</a>, step 5.</p>
 
 <p>File revisions and deletions comes for free with the
 this technique. Simply allow deletion or revision of files when
-configuring <code>Upload_Files<code> element of the MBI or SRV steps.</p>
+configuring <code>Upload_Files</code> element of the MBI or SRV steps.</p>
 
 <a name="5.5"></a><h3>5.5 FCKeditor element instance + Move_FCKeditor_Files_To_Storage function</h3>
 
@@ -1491,6 +1494,43 @@ workflow (for eg. just after the "Get_Recid" function). Check also
 the <a href="#2.4">Restricting the submission</a> how-to from this
 guide.</p>
 
+<a name="load_dump_cli"></a><h2>7. Load/dump Submissions</h2>
+
+<p>Use <code>websubmitadmin</code> to dump a given submission
+configuration from the database to a file. For example:
+<pre>
+$ /opt/invenio/bin/websubmitadmin --dump=DEMOART > DEMOART_db_dump.sql
+</pre>
+</p>
+
+<p>
+The submission dumper tool relies on the fact that submission-specific
+elements and functions are prefixed with the submission doctype (for
+example <code>DEMOART</code>), and will only dump those. Functions,
+elements, etc. without prefix are considered "shared", and not dumped by
+default, in order to eliminate duplicates). See also
+option <code>--method</code> to change that behaviour.
+</p>
+
+<p><code>websubmitadmin</code> can also help you "diff" between
+different submission versions (for eg. between a dump file and the
+database). This tool will optionally hide differences solely due to
+ordering of statements in the dump, or different modification
+dates. For example:
+<pre>
+$ /opt/invenio/bin/websubmitadmin --diff=DEMOART --ignore=d,o < DEMOART_db_dump.sql
+</pre>
+</p>
+
+<p>Run <code>/opt/invenio/bin/websubmitadmin --help</code> for more
+info and more examples.</p>
+
+<p>Use <code>dbexec</code> to load a submission dumped
+with <code>websubmitadmin</code>. For example:
+<pre>
+$ /opt/invenio/bin/dbexec < DEMOART_db_dump.sql
+</pre>
+</p>
 
 <a name="7"></a><h2>Terminology</h2>
 <a name="7.1"></a><h3>The document type of a file (<code>doctype</code>)</h3>
