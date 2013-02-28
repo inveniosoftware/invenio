@@ -93,7 +93,7 @@ class Template:
                              {'x_url_open': '<a href="%s/yourbaskets/create_basket?ln=%s">' % (CFG_SITE_URL, ln),
                               'x_url_close': '</a>'}}
 
-        ## Firstly, create the tabs area.
+        ## First, create the tabs area.
         if personal_info:
             ## If a specific topic is selected display the name of the topic
             ## and the options on it.
@@ -353,8 +353,22 @@ class Template:
                 content += """
                     </td>"""
             content += """
-                  </tr>
-                </table>"""
+                  </tr>"""
+            if not personal_baskets_info:
+                create_basket_link = """<a href="%(url)s/yourbaskets/create_basket?topic=%(topic)s&amp;ln=%(ln)s"><img src="%(url)s/img/%(img)s" />%(label)s</a>""" % \
+                                     {'url': CFG_SITE_URL,
+                                      'topic': urllib.quote(topic),
+                                      'ln': ln,
+                                      'img': 'wb-create-basket.png',
+                                      'label': _('Create basket')}
+                content += """
+                      <tr>
+                        <td class="bsk_directory_box_nav_extra_options" text-align: right;" colspan="%s">
+                        %s
+                        </td>
+                      </tr>""" % (str(nb_cells), create_basket_link)
+            content += """
+                    </table>"""
 
         elif group_info and category==CFG_WEBBASKET_CATEGORIES['GROUP']:
             content_list = []
@@ -2328,7 +2342,7 @@ class Template:
         add_ext_resource = ""
 
         if user_can_add_item:
-            add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i""" % (CFG_SITE_URL,selected_category,bskid,)
+            add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i&amp;wait=1""" % (CFG_SITE_URL,selected_category,bskid,)
             add_ext_resource_logo = """<img src="%s/img/wb-create-basket.png" />""" % (CFG_SITE_URL,)
             add_ext_resource = """<a href="%s">%s%s</a>""" % (add_ext_resource_url, add_ext_resource_logo, _("Add item"))
         
@@ -2410,7 +2424,7 @@ class Template:
         add_ext_resource = ""
 
         if user_can_add_item:
-            add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i""" % (CFG_SITE_URL,selected_category,bskid,)
+            add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i&amp;wait=1""" % (CFG_SITE_URL,selected_category,bskid,)
             add_ext_resource_logo = """<img src="%s/img/wb-create-basket.png" />""" % (CFG_SITE_URL,)
             add_ext_resource = """<a href="%s">%s%s</a>""" % (add_ext_resource_url, add_ext_resource_logo, _("Add item"))
 
