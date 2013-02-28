@@ -420,7 +420,7 @@ def alert_admin_for_server_status_p(status, referer):
             return True
     return False
 
-def application(environ, start_response):
+def application(environ, start_response, handler=None):
     """
     Entry point for wsgi.
     """
@@ -429,8 +429,11 @@ def application(environ, start_response):
     #print 'Starting mod_python simulation'
 
     try:
-        from invenio.webinterface_layout import invenio_handler
-        invenio_handler(req)
+        if handler is None:
+            from invenio.webinterface_layout import invenio_handler
+            invenio_handler(req)
+        else:
+            handler(req)
         req.flush()
     ## TODO for future reimplementation of stream_file
     #except StreamFileException as e:

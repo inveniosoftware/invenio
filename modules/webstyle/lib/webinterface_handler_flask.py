@@ -213,9 +213,10 @@ def create_invenio_flask_app():
         possible_module, possible_handler = is_mp_legacy_publisher_path(
                                                 request.environ['PATH_INFO'])
         if possible_module is not None:
-            req = SimulatedModPythonRequest(request.environ, g.start_response)
-            mp_legacy_publisher(req, possible_module, possible_handler)
-            return req.response
+            legacy_publisher = lambda req: \
+                mp_legacy_publisher(req, possible_module, possible_handler)
+            return legacy_application(request.environ, g.start_response,
+                                      handler=legacy_publisher)
 
         # Static file serving for devserver
         # ---------------------------------
