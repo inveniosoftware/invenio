@@ -66,13 +66,17 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
             json_data = json_unicode_to_utf8(json_data)
             ajax_request = True
             json_response = {}
-            if json_data.has_key('recID1'):
-                recid1 = int(json_data['recID1'])
-                json_data['recID1'] = recid1
-            if json_data.has_key('recID2'):
-                if json_data.get('record2Mode') == "recid":
-                    recid2 = int(json_data['recID2'])
-                    json_data['recID2'] = recid2
+            try:
+                if json_data.has_key('recID1'):
+                    recid1 = int(json_data['recID1'])
+                    json_data['recID1'] = recid1
+                if json_data.has_key('recID2'):
+                    if json_data.get('record2Mode') == "recid":
+                        recid2 = int(json_data['recID2'])
+                        json_data['recID2'] = recid2
+            except ValueError:
+                json_response.update({'resultCode': 1, 'resultText': 'Invalid record ID!'})
+                return json.dumps(json_response)
             if json_data.has_key("duplicate"):
                 if json_data.get('record2Mode') == "recid":
                     json_data["duplicate"] = int(json_data["duplicate"])

@@ -84,8 +84,6 @@ function getRecid2Mode(recid) {
     return 'revision';
   else if (recid=='tmp')
     return 'tmpfile';
-  else if (recid=='none')
-    return 'none';
   else
     return false;
 }
@@ -96,6 +94,8 @@ function initStateFromHash() {
   gHash = window.location.hash;
   if (gHash == '') {
     $('#bibMergeContent').html('Select two records to be compared from the side panel.');
+    // Disable "Submit" button
+    $('#bibMergeBtnSubmit').attr('disabled','disabled');
     return;
   }
   var parsedHash = deserializeHash(gHash);
@@ -106,6 +106,7 @@ function initStateFromHash() {
   }
   // if wrong parameters where given in the url:
   $('#bibMergeContent').html('INVALID URL PARAMETERS');
+  $('#bibMergeBtnSubmit').attr('disabled','disabled');
 }
 
 function deserializeHash(aHash) {
@@ -523,6 +524,7 @@ function initPanel() {
     if (event.keyCode == 13) //on press 'enter'
       compareRecords();
   });
+  $('#bibMergeCompare').on('click', compareRecords);
   $('#bibMergeSearchInput').keypress( function(event) {
     if (event.keyCode == 13) //on press 'enter'
       $('#bibMergeBtnSearch').click();
@@ -971,9 +973,10 @@ function onclickLinkToBibEdit2() {
 
 function panelDisabled(disabled) {
   if (disabled == true)
-    $('#bibMergePanel').find('button, input, optgroup, option, select, textarea').attr('disabled', true);
+    // Disable all elements except "Compare" button
+    $('#bibMergePanel').find('button, optgroup, option, select, textarea').not('#bibMergeCompare').attr('disabled', true);
   else
-    $('#bibMergePanel').find('button, input, optgroup, option, select, textarea').removeAttr('disabled');
+    $('#bibMergePanel').find('button, optgroup, option, select, textarea').not('#bibMergeCompare').removeAttr('disabled');
 }
 
 function displayAlert(msgType) {

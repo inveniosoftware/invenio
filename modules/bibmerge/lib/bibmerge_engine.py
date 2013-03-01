@@ -371,6 +371,7 @@ def _get_record(recid, uid, result, fresh_record=False):
             if not latest_record_revision(recid, record_revision):
                 result['cacheOutdated'] = True
         result['resultCode'], result['resultText'], result['cacheDirty'], result['cacheMTime'] = 0, 'Record OK', cache_dirty, mtime
+    record_order_subfields(record)
     return record
 
 def _get_record_slave(recid, result, mode=None, uid=None):
@@ -391,7 +392,6 @@ def _get_record_slave(recid, result, mode=None, uid=None):
             result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
         else:
             record = create_record( print_record(recid, 'xm') )[0]
-            record_order_subfields(record)
 
     elif mode == 'tmpfile':
         file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
@@ -418,6 +418,7 @@ def _get_record_slave(recid, result, mode=None, uid=None):
 
     else:
         result['resultCode'], result['resultText'] = 1, 'Invalid record mode for record2'
+    record_order_subfields(record)
     return record
 
 def _field_info(fieldIdCode):
