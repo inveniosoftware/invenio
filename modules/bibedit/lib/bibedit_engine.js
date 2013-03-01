@@ -1251,8 +1251,11 @@ function getRecord(recID, recRev, onSuccess){
    *             interface
    */
 
-  // Temporary store the record ID by attaching it to the onGetRecordSuccess
-  // function.
+  /* Make sure the record revision exists, otherwise default to current */
+  if ($.inArray(recRev, gRecRevisionHistory) === -1) {
+    recRev = 0;
+  }
+
   if (onSuccess == undefined)
     onSuccess = onGetRecordSuccess;
   if (recRev != undefined && recRev != 0){
@@ -1559,6 +1562,12 @@ function onPreviewClick() {
       }
       var html_preview = json['html_preview'];
       var preview_window = openCenteredPopup('', 'Record preview', 768, 768);
+      if ( preview_window === null ) {
+        var msg = "<strong> The preview window cannot be opened.</strong><br />\
+                  Your browser might be blocking popups. Check the options and\
+                  enable popups for this page.";
+        displayMessage(undefined, true, [msg]);
+      }
       preview_window.document.write(html_preview);
       preview_window.document.close(); // needed for chrome and safari
     });
@@ -1698,6 +1707,12 @@ function onOpenPDFClick() {
         // Preview was successful.
         var pdf_url = json['pdf_url'];
         var preview_window = openCenteredPopup(pdf_url);
+        if ( preview_window === null ) {
+        var msg = "<strong> The preview window cannot be opened.</strong><br />\
+                  Your browser might be blocking popups. Check the options and\
+                  enable popups for this page.";
+        displayMessage(undefined, true, [msg]);
+        }
         preview_window.document.close(); // needed for chrome and safari
        });
 
@@ -3470,6 +3485,9 @@ function onDeleteClick(event){
   addUndoOperation(urHandler);
   var ajaxData = deleteFields(toDelete, urHandler);
 
+  // Disable the delete button
+  $('#btnDeleteSelected').attr('disabled', 'disabled');
+
   queue_request(ajaxData);
 }
 
@@ -3600,14 +3618,15 @@ function onRevertClick(revisionId){
   if (displayAlert('confirmRevert')){
     createReq({recID: gRecID, revId: revisionId, requestType: 'revert',
          force: onSubmitClick.force}, function(json){
-    // Submission was successful.
+      // Submission was successful.
       changeAndSerializeHash({state: 'submit', recid: gRecID});
       var resCode = json['resultCode'];
       cleanUp(!gNavigatingRecordSet, '', null, true);
-      updateStatus('report', gRESULT_CODES[resCode]);
-      displayMessage(resCode);
       // clear the list of record revisions
-      resetBibeditState()
+      resetBibeditState();
+      displayMessage(resCode, false, [json['recID']]);
+      updateToolbar(false);
+      updateStatus('report', gRESULT_CODES[resCode]);
     });
     onSubmitClick.force = false;
   }
