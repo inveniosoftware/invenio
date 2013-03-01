@@ -19,19 +19,19 @@
 
 """WebSearch Flask Blueprint"""
 
-import pprint
 from functools import wraps
-from string import rfind, strip
-from datetime import datetime
-from hashlib import md5
+from invenio import webinterface_handler_config as apache
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
+from flask import session, make_response, g, render_template, \
+                  request, flash, jsonify, redirect, url_for, current_app, \
+                  abort
 from invenio.cache import cache
 from invenio.config import CFG_SITE_RECORD
-from invenio.intbitset import intbitset as HitSet
+from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.access_control_mailcookie import \
+    mail_cookie_create_authorize_action
 from invenio.sqlalchemyutils import db
-from invenio.websearch_model import Collection, CollectionCollection
+from invenio.websearch_model import Collection
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec
 from invenio.webcomment_model import CmtSUBSCRIPTION
@@ -39,14 +39,9 @@ from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
                                   register_template_context_processor
 from invenio.webuser_flask import current_user
 
-from invenio.search_engine import search_pattern_parenthesised,\
-                                  get_creation_date,\
-                                  perform_request_search,\
-                                  search_pattern,\
-                                  guess_primary_collection_of_a_record, \
-                                  print_record
+from invenio.search_engine import guess_primary_collection_of_a_record, \
+                                  check_user_can_view_record
 
-from sqlalchemy.sql import operators
 from invenio.webcomment import get_mini_reviews
 from invenio.websearchadminlib import get_detailed_page_tabs,\
                                       get_detailed_page_tabs_counts
@@ -61,6 +56,15 @@ blueprint = InvenioBlueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
                              #menubuilder=[('main.search', _('Search'),
                              #              'search.index', 1)])
 
+Bibrec.user_comment_subscritions = db.relationship(
+    CmtSUBSCRIPTION,
+    primaryjoin=lambda: db.and_(
+        CmtSUBSCRIPTION.id_bibrec==Bibrec.id,
+        CmtSUBSCRIPTION.id_user==current_user.get_id()
+    ),
+    viewonly=True)
+
+
 def request_record(f):
     @wraps(f)
     def decorated(recid, *args, **kwargs):
@@ -68,13 +72,31 @@ def request_record(f):
             Collection.name==guess_primary_collection_of_a_record(recid)).\
             one()
 
-        Bibrec.user_comment_subscritions = db.relationship(
-            CmtSUBSCRIPTION,
-            primaryjoin=lambda: db.and_(
-                CmtSUBSCRIPTION.id_bibrec==Bibrec.id,
-                CmtSUBSCRIPTION.id_user==current_user.get_id()
-            ),
-            viewonly=True)
+        (auth_code, auth_msg) = check_user_can_view_record(current_user, recid)
+
+        # only superadmins can use verbose parameter for obtaining debug information
+        if not current_user.is_super_admin and 'verbose' in kwargs:
+            kwargs['verbose'] = 0
+
+        if auth_code and current_user.is_guest:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
+                'collection' : guess_primary_collection_of_a_record(recid)})
+            url_args = {'action': cookie, 'ln' : g.ln, 'referer' : request.referrer}
+            return redirect(url_for('webaccount.login', **url_args))
+        elif auth_code:
+            flash(auth_msg, 'error')
+            abort(apache.HTTP_UNAUTHORIZED)
+
+        from invenio.search_engine import record_exists, get_merged_recid
+        # check if the current record has been deleted
+        # and has been merged, case in which the deleted record
+        # will be redirect to the new one
+        record_status = record_exists(recid)
+        merged_recid = get_merged_recid(recid)
+        if record_status == -1 and merged_recid:
+            return redirect(url_for('record.metadata', recid=merged_recid))
+        elif record_status == -1:
+            abort(apache.HTTP_GONE)  ## The record is gone!
 
         g.record = record = Bibrec.query.get(recid)
         user = None
@@ -121,25 +143,24 @@ def request_record(f):
         return f(recid, *args, **kwargs)
     return decorated
 
+
 @blueprint.route('/<int:recid>/metadata', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>/', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>', methods=['GET', 'POST'])
 @request_record
 def metadata(recid):
-    uid = current_user.get_id()
     return render_template('record_metadata.html')
+
 
 @blueprint.route('/<int:recid>/references', methods=['GET', 'POST'])
 @request_record
 def references(recid):
-    uid = current_user.get_id()
     return render_template('record_references.html')
 
 
 @blueprint.route('/<int:recid>/files', methods=['GET', 'POST'])
 @request_record
 def files(recid):
-    uid = current_user.get_id()
     return render_template('record_files.html')
 
 
@@ -150,7 +171,6 @@ from invenio.bibrank_citation_searcher import calculate_cited_by_list,\
 @blueprint.route('/<int:recid>/citations', methods=['GET', 'POST'])
 @request_record
 def citations(recid):
-    uid = current_user.get_id()
     citations = dict(
         citinglist = calculate_cited_by_list(recid),
         selfcited = get_self_cited_by(recid),
@@ -165,7 +185,6 @@ from bibclassify_webinterface import record_get_keywords
 @blueprint.route('/<int:recid>/keywords', methods=['GET', 'POST'])
 @request_record
 def keywords(recid):
-    uid = current_user.get_id()
     found, keywords, record = record_get_keywords(recid)
     return render_template('record_keywords.html',
                            found = found,
@@ -178,7 +197,6 @@ from invenio.bibrank_downloads_grapher import create_download_history_graph_and_
 @blueprint.route('/<int:recid>/usage', methods=['GET', 'POST'])
 @request_record
 def usage(recid):
-    uid = current_user.get_id()
     viewsimilarity = calculate_reading_similarity_list(recid, "pageviews")
     downloadsimilarity = calculate_reading_similarity_list(recid, "downloads")
     downloadgraph = create_download_history_graph_and_box(recid)

@@ -224,9 +224,11 @@ class UserInfo(CombinedMultiDict):
         user_info = info
         user_info.update(self.req)
 
-        from invenio.webuser import isUserSubmitter, isUserReferee, isUserAdmin
+        from invenio.webuser import isUserSubmitter, isUserReferee, \
+                                    isUserAdmin, isUserSuperAdmin
         from invenio.access_control_engine import acc_authorize_action
-        from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
+        from invenio.access_control_admin import acc_get_role_id, \
+                                                 acc_is_user_in_role
         from invenio.search_engine import get_permitted_restricted_collections
 
         data = {}
@@ -241,6 +243,7 @@ class UserInfo(CombinedMultiDict):
         data['precached_viewsubmissions'] = isUserSubmitter(user_info)
         data['precached_useapprove'] = isUserReferee(user_info)
         data['precached_useadmin'] = isUserAdmin(user_info)
+        data['precached_usesuperadmin'] = isUserSuperAdmin(user_info)
         data['precached_canseehiddenmarctags'] = acc_authorize_action(user_info, 'runbibedit')[0] == 0
         usepaperclaim = False
         usepaperattribution = False
@@ -296,6 +299,10 @@ class UserInfo(CombinedMultiDict):
     @property
     def is_admin(self):
         return self.get('precached_useadmin', False)
+
+    @property
+    def is_super_admin(self):
+        return self.get('precached_usesuperadmin', False)
 
     def get_id(self):
         return self.get('id', None)

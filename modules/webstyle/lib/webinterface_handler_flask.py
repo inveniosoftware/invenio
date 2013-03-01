@@ -199,7 +199,7 @@ def create_invenio_flask_app():
         if request.is_xhr:
             return 'You need to be authorised', 401
         flash(_('You need to be authorised.'), 'error')
-        return redirect(url_for('webaccount.login', referer=request.referer))
+        return redirect(url_for('webaccount.login', referer=request.referrer))
 
     @_app.endpoint('static')
     @_app.route(_app.static_url_path + '/<path:filename>', methods=['POST'])

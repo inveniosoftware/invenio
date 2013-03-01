@@ -134,7 +134,7 @@
     {% for category, msg in get_flashed_messages(with_categories=true) %}
       <div class="alert alert-{{ category }}">
         <a class="close" data-dismiss="alert" href="#">×</a>
-        {{ msg }}
+        {{ msg|safe }}
       </div>
     {% endfor %}
     {% endblock messages %}
