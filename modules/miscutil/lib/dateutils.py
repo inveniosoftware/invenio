@@ -476,7 +476,7 @@ def _findall(text, substr):
 
 def strftime(fmt, dt):
     if not isinstance(dt, real_date):
-        dt = datetime(dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec)
+        dt = datetime(dt[0], dt[1], dt[2], dt[3], dt[4], dt[5])
     if dt.year >= 1900:
         return time.strftime(fmt, dt.timetuple())
     illegal_formatting = _illegal_formatting.search(fmt)
