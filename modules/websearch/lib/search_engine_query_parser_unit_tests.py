@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,6 +31,7 @@ from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
 
 if search_engine_query_parser.GOT_DATEUTIL:
     import dateutil
+    from dateutil.relativedelta import relativedelta as du_delta
     DATEUTIL_AVAILABLE = True
 else:
     DATEUTIL_AVAILABLE = False
@@ -742,7 +743,7 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         def test_date_by_yr_mo_day_wholemonth_and_suffix(self):
             """SPIRES search syntax - searching by date 1976-04-01 and t dog"""
             spi_search = "find date 1976-04-01 and t dog"
-            inv_search = 'year:1976-04 and title:dog'
+            inv_search = 'year:1976-04-01 and title:dog'
             self._compare_searches(inv_search, spi_search)
 
         def test_date_by_yr_mo_day_and_suffix(self):
@@ -768,6 +769,20 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
             spi_search = "find date > 1978-10-21"
             inv_search = 'year:1978-10-21->9999'
             self._compare_searches(inv_search, spi_search)
+
+        if DATEUTIL_AVAILABLE:
+            def test_date_2_digits_year_month_day(self):
+                """SPIRES search syntax - searching by date > 78-10-21"""
+                spi_search = "find date 78-10-21"
+                inv_search = 'year:1978-10-21'
+                self._compare_searches(inv_search, spi_search)
+
+        if DATEUTIL_AVAILABLE:
+            def test_date_2_digits_year(self):
+                """SPIRES search syntax - searching by date 78"""
+                spi_search = "find date 78"
+                inv_search = 'year:1978'
+                self._compare_searches(inv_search, spi_search)
 
         def test_spires_syntax_trailing_colon(self):
             """SPIRES search syntax - test for blowup with trailing colon"""
@@ -817,21 +832,33 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
             def test_date_accept_this_week(self):
                 """SPIRES search syntax - searching by this week"""
                 spi_search = "find date this week"
-                inv_search = "year:" + datetime.datetime.strftime(datetime.datetime.today()\
-                             +dateutil.relativedelta.relativedelta(days=-(datetime.datetime.today().isoweekday()%7)), '%Y-%m-%d')
+                begin = datetime.datetime.today()
+                days_to_remove = datetime.datetime.today().isoweekday() % 7
+                begin += du_delta(days=-days_to_remove)
+                begin_str = datetime.datetime.strftime(begin, '%Y-%m-%d')
+                # Only 6 days cause the last day is included in the search
+                end = datetime.datetime.today()
+                end_str = datetime.datetime.strftime(end, '%Y-%m-%d')
+                inv_search = "year:%s->%s" % (begin_str, end_str)
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_accept_last_week(self):
                 """SPIRES search syntax - searching by last week"""
                 spi_search = "find date last week"
-                inv_search = "year:" + datetime.datetime.strftime(datetime.datetime.today()\
-                             +dateutil.relativedelta.relativedelta(days=-(7+(datetime.datetime.today().isoweekday()%7))), '%Y-%m-%d')
+                begin = datetime.datetime.today()
+                days_to_remove = 7 + datetime.datetime.today().isoweekday() % 7
+                begin += du_delta(days=-days_to_remove)
+                begin_str = datetime.datetime.strftime(begin, '%Y-%m-%d')
+                # Only 6 days cause the last day is included in the search
+                end = begin + du_delta(days=6)
+                end_str = datetime.datetime.strftime(end, '%Y-%m-%d')
+                inv_search = "year:%s->%s" % (begin_str, end_str)
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_accept_date_minus_days(self):
                 """SPIRES search syntax - searching by 2011-01-03 - 2"""
                 spi_search = "find date 2011-01-03 - 2"
-                inv_search = "year:2011-01"
+                inv_search = "year:2011-01-01"
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_accept_date_minus_days_with_month_wrap(self):
@@ -873,13 +900,13 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
             def test_date_accept_date_plus_days_with_year_wrap(self):
                 """SPIRES search syntax - searching by 2011-12-31 + 1"""
                 spi_search = "find date 2011-12-31 + 1"
-                inv_search = "year:2012-01"
+                inv_search = "year:2012-01-01"
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_accept_date_plus_days_with_leapyear_february(self):
                 """SPIRES search syntax - searching by 2008-02-29 + 2"""
                 spi_search = "find date 2008-02-28 + 2"
-                inv_search = "year:2008-03"
+                inv_search = "year:2008-03-01"
                 self._compare_searches(inv_search, spi_search)
 
             def test_date_accept_date_plus_many_days(self):

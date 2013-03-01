@@ -52,7 +52,7 @@ from invenio.search_engine import perform_request_search, \
     wash_colls, record_public_p
 from invenio import search_engine_summarizer
 from invenio.search_engine_utils import get_fieldvalues
-
+from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
 
 if 'fr' in CFG_SITE_LANGS:
     lang_french_configured = True
@@ -2036,6 +2036,7 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
                              test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
                                                    expected_text='[9, 12, 14, 47]'))
 
+    if DATEUTIL_AVAILABLE:
         def test_dadd_search(self):
             'websearch - find da > today - 3650'
             # XXX: assumes we've reinstalled our site in the last 10 years
