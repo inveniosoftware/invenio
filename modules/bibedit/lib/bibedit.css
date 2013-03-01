@@ -677,6 +677,27 @@ div.refextracted {
     background-color: red;
 }
 
+.list-plain {
+  list-style-type: none;
+  padding:0;
+  margin-top:5px;
+}
+
+#display_div {
+  float: left;
+  clear: left;
+  margin-top: 5px;
+  background-color: #EEEEEE;
+  border: 1px solid #C7C7C7;
+  width: 135px;
+  padding: 10px;
+  font-size: 0.8em;
+}
+
+label {
+  cursor: pointer;
+}
+
 /* Always display scrollbars in webkit based browsers */
 
 ::-webkit-scrollbar {

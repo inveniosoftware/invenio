@@ -49,7 +49,8 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
     CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
-    CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT
+    CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT, \
+    CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -234,7 +235,9 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gREQUESTS_UNTIL_SAVE' : CFG_BIBEDIT_REQUESTS_UNTIL_SAVE,
             'gAVAILABLE_KBS': get_available_kbs(),
             'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS,
-            'gDOILookupField': '"' + CFG_BIBEDIT_DOI_LOOKUP_FIELD + '"'
+            'gDOILookupField': '"' + CFG_BIBEDIT_DOI_LOOKUP_FIELD + '"',
+            'gDisplayReferenceTags': CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS,
+            'gDisplayAuthorTags': CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -264,6 +267,7 @@ def perform_request_init(uid, ln, req, lastupdated):
     #oaiId = record_extract_oai_id(rec)
 
     body += bibedit_templates.menu()
+    body += bibedit_templates.focuson()
     body += """<div id="bibEditContent">
                <div class="revisionLine"></div>
                <div id="Toptoolbar"></div>

@@ -228,6 +228,7 @@ function init_bibedit() {
   initHotkeys();
   initClipboardLibrary();
   initClipboard();
+  bindFocusHandlers();
   // Modify BibEdit content table height dinamically to avoid going over the
   // viewport
   resize_content();
@@ -5927,4 +5928,78 @@ function onEditableCellChange(value, th) {
     highlight_change(cell, value);
 
     return value;
+}
+
+
+/* Functions specific to display modes */
+
+function onfocusreference() {
+  if ($("#focuson_references").prop("checked") === true) {
+    $.each(gDisplayReferenceTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").show();
+    });
+  }
+  else {
+    $.each(gDisplayReferenceTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").hide();
+    });
+  }
+}
+
+
+function onfocusauthor() {
+  if ($("#focuson_authors").prop("checked") === true) {
+    $.each(gDisplayAuthorTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").show();
+    });
+  }
+  else {
+    $.each(gDisplayAuthorTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").hide();
+    });
+  }
+}
+
+
+function onfocusother() {
+  var tags = [];
+  tags = tags.concat(gDisplayReferenceTags, gDisplayAuthorTags);
+
+  var myselector = $();
+  $.each(tags, function() {
+    myselector = myselector.add("tbody[id^='rowGroup_" + this + "']");
+  });
+
+  if ($("#focuson_others").prop("checked") === true) {
+    $("tbody:[id^='rowGroup_']").not(myselector).show();
+  }
+  else {
+    $("tbody:[id^='rowGroup_']").not(myselector).hide();
+  }
+}
+
+
+function displayAllTags() {
+  $("#focuson_references").prop("checked", true);
+  $("#focuson_authors").prop("checked", true);
+  $("#focuson_others").prop("checked", true);
+}
+
+
+function getUnmarkedTags() {
+  return $("#focuson_list input:checkbox:not(:checked)");
+}
+
+
+function setUnmarkedTags(tags) {
+  $.each(tags, function() {
+    this.click();
+  })
+}
+
+
+function bindFocusHandlers() {
+  $("#focuson_references").on("click", onfocusreference);
+  $("#focuson_authors").on("click", onfocusauthor);
+  $("#focuson_others").on("click", onfocusother);
 }

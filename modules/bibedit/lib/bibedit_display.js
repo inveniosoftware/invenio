@@ -25,6 +25,11 @@ function displayRecord() {
     /*
      * Create the main content table.
      */
+
+    // Every time we display the table, mark all checkboxes to show/hide
+    // specific tags
+    displayAllTags();
+
     var table = '' + '<table id="bibEditTable">' +
         '<col span="1" class="bibEditColFieldBox"/>' +
         '<col span="1" id="bibEditColFieldTag"/>' +

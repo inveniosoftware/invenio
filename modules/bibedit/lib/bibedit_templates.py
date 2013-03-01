@@ -302,6 +302,28 @@ class Template:
 
         return value
 
+    def focuson(self):
+        html = """
+        <div id='display_div'>
+            <strong>Display</strong> <br />
+            <ul id='focuson_list' class='list-plain'>
+                <li>
+                    <input type="checkbox" name="references" id="focuson_references" value="references" checked/>
+                    <label for="focuson_references">References</label>
+                </li>
+                <li>
+                    <input type="checkbox" name="authors" id="focuson_authors" value="authors" checked/>
+                    <label for="focuson_authors">Authors</label>
+                </li>
+                <li>
+                    <input type="checkbox" name="others" id="focuson_others" value="others" checked/>
+                    <label for="focuson_others">Others</label>
+                </li>
+            </ul>
+        </div>
+        """
+        return html
+
 def img(src, _class='', **kargs):
     """Create an HTML <img> element."""
     src = 'src="%s" ' % src
