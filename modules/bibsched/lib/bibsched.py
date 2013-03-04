@@ -1274,20 +1274,29 @@ class BibSched(object):
                 return True
 
     def check_errors(self):
-        sql = "SELECT count(id) FROM schTASK WHERE status='ERROR'" \
-              " OR status='DONE WITH ERRORS' OR STATUS='CERROR'"
-        if run_sql(sql)[0][0] > 0:
-            errors = run_sql("""SELECT id,proc,status FROM schTASK
-                                WHERE status = 'ERROR'
-                                OR status = 'DONE WITH ERRORS'
-                                OR status = 'CERROR'""")
-            msg_errors = ["    #%s %s -> %s" % row for row in errors]
-            msg = 'BibTask with ERRORS:\n%s' % "\n".join(msg_errors)
-            err_types = set(e[2] for e in errors if e[2])
-            if 'ERROR' in err_types or 'DONE WITH ERRORS' in err_types:
-                raise StandardError(msg)
-            else:
-                raise RecoverableError(msg)
+        errors = run_sql("""SELECT id,proc,status FROM schTASK
+                            WHERE status = 'ERROR'
+                            OR status = 'DONE WITH ERRORS'
+                            OR status = 'CERROR'""")
+        if errors:
+            error_msgs = []
+            error_recoverable = True
+            for e_id, e_proc, e_status in errors:
+                if run_sql("""UPDATE schTASK
+                               SET status='ERRORS REPORTED'
+                               WHERE id = %s AND (status='CERROR'
+                               OR status='ERROR'
+                               OR status='DONE WITH ERRORS')""", [e_id]):
+                    msg = "    #%s %s -> %s" % (e_id, e_proc, e_status)
+                    error_msgs.append(msg)
+                    if e_status in ('ERROR', 'DONE WITH ERRORS'):
+                        error_recoverable = False
+            if error_msgs:
+                msg = "BibTask with ERRORS:\n%s" % '\n'.join(error_msgs)
+                if error_recoverable:
+                    raise RecoverableError(msg)
+                else:
+                    raise StandardError(msg)
 
     def calculate_rows(self):
         """Return all the node_relevant_active_tasks to work on."""
@@ -1295,7 +1304,6 @@ class BibSched(object):
             self.check_errors()
         except RecoverableError, msg:
             register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
-            run_sql("UPDATE schTASK SET status='ERRORS REPORTED' WHERE status='CERROR'")
 
         max_bibupload_priority, min_bibupload_priority = run_sql(
                     """SELECT MAX(priority), MIN(priority)
