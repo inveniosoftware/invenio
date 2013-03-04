@@ -99,7 +99,6 @@ class SimulatedModPythonRequest(object):
         self.__low_level_headers = []
         self.__headers = table(self.__low_level_headers)
         self.__headers.add = self.__headers.add_header
-        self.__status = "200 OK"
         self.__filename = None
         self.__disposition_type = None
         self.__bytes_sent = 0
@@ -243,13 +242,15 @@ class SimulatedModPythonRequest(object):
         return request.environ['REQUEST_METHOD'] == 'HEAD'
 
     def set_status(self, status):
-        self.__status = '%s %s' % (status, HTTP_STATUS_MAP.get(int(status), 'Explanation not available'))
+        self.response.status_code = status
 
     def get_status(self):
-        return int(self.__status.split(' ')[0])
+        return self.response.status_code
 
     def get_wsgi_status(self):
-        return self.__status
+        return '%s %s' % (self.response.status_code,
+                          HTTP_STATUS_MAP.get(int(self.response.status_code),
+                                              'Explanation not available'))
 
     def sendfile(self, path, offset=0, the_len=-1):
         try:
@@ -456,9 +457,9 @@ def application(environ, start_response, handler=None):
                 register_exception(req=req, alert_admin=True)
             if not req.response_sent_p:
                 start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-            return generate_error_page(req, admin_to_be_alerted)
-        else:
-            req.flush()
+            map(req.write, generate_error_page(req, admin_to_be_alerted))
+
+        req.flush()
 
     finally:
         ##for (callback, data) in req.get_cleanups():
