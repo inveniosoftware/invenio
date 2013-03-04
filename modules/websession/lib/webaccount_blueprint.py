@@ -72,7 +72,6 @@ def login():
 
 @blueprint.route('/logout', methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Logout"))
-@blueprint.invenio_cached()
 def logout():
     logout_user()
     return render_template('webaccount_logout.html',
