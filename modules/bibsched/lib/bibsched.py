@@ -1127,6 +1127,8 @@ class BibSched(object):
                     return False
 
             if sequenceid:
+                ## Let's normalize the prority of all tasks in a sequenceid to the
+                ## max priority of the group
                 max_priority = run_sql("""SELECT MAX(priority) FROM schTASK
                                           WHERE status='WAITING'
                                           AND sequenceid=%s""",
@@ -1137,7 +1139,10 @@ class BibSched(object):
                     Log("Raised all waiting tasks with sequenceid " \
                         "%s to the max priority %s" % (sequenceid, max_priority))
                     ## Some priorities where raised
-                    return False
+                    return True
+
+                ## Let's normalize the runtime of all tasks in a sequenceid to
+                ## the compatible runtime.
                 current_runtimes = run_sql("""SELECT id, runtime FROM schTASK WHERE sequenceid=%s AND status='WAITING' ORDER by id""", (sequenceid, ))
                 runtimes_adjusted = False
                 if current_runtimes:
@@ -1152,14 +1157,14 @@ class BibSched(object):
                         last_runtime = runtime
                 if runtimes_adjusted:
                     ## Some runtime have been adjusted
-                    return False
+                    return True
 
-            for other_task_id, other_proc, other_dummy, other_status, other_sequenceid in higher + lower:
-                if sequenceid is not None and \
-                    sequenceid == other_sequenceid and task_id > other_task_id:
-                    Log('Task %s need to run after task %s since they have the same sequence id: %s' % (task_id, other_task_id, sequenceid))
-                    ## If there is a task with same sequence number then do not run the current task
-                    return False
+            if sequenceid is not None:
+                for other_task_id, dummy_other_proc, dummy_other_runtime, dummy_other_status, dummy_other_priority, dummy_other_host, other_sequenceid in self.active_tasks_all_nodes:
+                    if sequenceid == other_sequenceid and task_id > other_task_id:
+                        Log('Task %s need to run after task %s since they have the same sequence id: %s' % (task_id, other_task_id, sequenceid))
+                        ## If there is a task with same sequence number then do not run the current task
+                        return False
 
             if proc in CFG_BIBTASK_MONOTASKS and higher:
                 ## This is a monotask
@@ -1216,6 +1221,14 @@ class BibSched(object):
                 if status in ("SLEEPING", "ABOUT TO SLEEP"):
                     if host == self.hostname:
                         ## We can only wake up tasks that are running on our own host
+                        for other_task_id, other_proc, dummy_other_runtime, other_status, dummy_other_priority, other_host, dummy_other_sequenceid in self.node_relevant_active_tasks:
+                            ## But only if there are not other tasks still going to sleep, otherwise
+                            ## we might end up stealing the slot for an higher priority  task.
+                            if other_task_id != task_id and other_status in ('ABOUT TO SLEEP', 'ABOUT TO STOP') and other_host == self.hostname:
+                                if debug:
+                                    Log("Not yet waking up task #%d since there are other tasks (%s #%d) going to sleep (higher priority task incoming?)" % (task_id, other_proc, other_task_id))
+                                return False
+
                         bibsched_set_status(task_id, "CONTINUING", status)
                         if not bibsched_send_signal(proc, task_id, signal.SIGCONT):
                             bibsched_set_status(task_id, "ERROR", "CONTINUING")
