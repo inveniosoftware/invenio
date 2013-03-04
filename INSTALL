@@ -311,6 +311,7 @@ Contents
 
       $ sudo chown -R www-data.www-data /opt/invenio
       $ sudo -u www-data emacs /opt/invenio/etc/invenio-local.conf
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-secret-key
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-tables
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-webstat-conf
@@ -659,6 +660,14 @@ Contents
                  hosts fulltext and media files associated to records
               /var/data/submit
                  hosts files created during submissions
+
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-secret-key
+
+          Please create secret key for the Flask application if you
+          have not done so yet during customisation of your
+          `invenio-local.conf'.  This command will check the contents
+          of this file and will update it with generated secret key
+          value.
 
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
 
