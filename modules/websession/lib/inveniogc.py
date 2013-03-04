@@ -73,7 +73,7 @@ CFG_MAX_ATIME_RM_BIBSWORD = 28
 # After how many days to remove temporary video uploads
 CFG_MAX_ATIME_WEBSUBMIT_TMP_VIDEO = 3
 # After how many days to remove obsolete refextract xml output files
-CFG_MAX_ATIME_RM_REFEXTRACT = 28
+CFG_MAX_ATIME_RM_REFEXTRACT = 7
 # After how many days to remove obsolete bibdocfiles temporary files
 CFG_MAX_ATIME_RM_BIBDOC = 4
 # After how many days to remove obsolete WebSubmit-created temporary
