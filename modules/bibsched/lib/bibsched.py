@@ -224,7 +224,9 @@ def spawn_task(command, wait=False):
     def preexec():  # Don't forward signals.
         os.setsid()
 
-    process = Popen(command, preexec_fn=preexec, shell=True)
+    devnull = open(os.devnull, "w")
+    process = Popen(command, preexec_fn=preexec, shell=True,
+                    stderr=devnull, stdout=devnull)
     if wait:
         process.wait()
 
@@ -668,7 +670,7 @@ order to let this task run. The current priority is %s. New value:" \
                               WHERE id=%s and status='WAITING'""",
                            (self.hostname, task_id)):
                     program = os.path.join(CFG_BINDIR, process)
-                    command = "%s %s > /dev/null 2> /dev/null" % (program, str(task_id))
+                    command = "%s %s" % (program, str(task_id))
                     spawn_task(command)
                     Log("manually running task #%d (%s)" % (task_id, process))
                 else:
@@ -1242,7 +1244,7 @@ class BibSched(object):
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s' % (task_id, proc, os.path.join(CFG_LOGDIR, 'bibsched.log'))
-                    command = "(%s %s > /dev/null 2> /dev/null %s)" % (program, str(task_id), exit_str)
+                    command = "%s %s %s" % (program, str(task_id), exit_str)
                     ### Set the task to scheduled and tie it to this host
                     if self.tie_task_to_host(task_id):
                         Log("Task #%d (%s) started" % (task_id, proc))
