@@ -28,7 +28,8 @@ pylib_DATA = __init__.py \
              webdeposit_field_widgets.py \
              webdeposit_model.py \
              webdeposit_workflow.py \
-             webdeposit_workflow_utils.py
+             webdeposit_workflow_utils.py \
+             webdeposit_field.py
 
 jsdir=$(localstatedir)/www/js
 

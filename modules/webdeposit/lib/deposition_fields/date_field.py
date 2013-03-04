@@ -18,12 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import DateField
+from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['Date']
 
 
-class Date(DateField, JsonCookerMixinBuilder('date')):
+class Date(DateField, WebDepositField, JsonCookerMixinBuilder('date')):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-calendar"></i>'

@@ -30,6 +30,7 @@ __all__ = ['ArticleForm']
 
 class ArticleForm(Form):
 
+    doi = fields.DOIField(label=_('DOI'))
     publisher = fields.PublisherField(label=_('Publisher'), validators=[Required()])
     journal = fields.JournalField(label=_('Journal Title'), validators=[Required()])
     issn = fields.ISSNField(label='ISSN')

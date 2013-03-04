@@ -18,12 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
+from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['PagesNumberField']
 
 
-class PagesNumberField(TextField, JsonCookerMixinBuilder('page_number')):
+class PagesNumberField(TextField, WebDepositField, JsonCookerMixinBuilder('page_number')):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-th"></i>'

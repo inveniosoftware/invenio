@@ -18,25 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from wtforms.validators import Required
+from invenio.webdeposit_field import WebDepositField
 from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['JournalField']
 
 
-class JournalField(TextField, JsonCookerMixinBuilder('journal')):
+class JournalField(TextField, WebDepositField, JsonCookerMixinBuilder('journal')):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-book"></i>'
-
-        # Create our own Required data member
-        # for client-side use
-        if 'validators' in kwargs:
-            for v in kwargs.get("validators"):
-                if type(v) is Required:
-                    self.required = True
-
         super(JournalField, self).__init__(**kwargs)
 
     def pre_validate(self, form=None):

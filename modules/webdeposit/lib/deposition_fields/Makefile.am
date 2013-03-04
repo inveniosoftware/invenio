@@ -30,6 +30,7 @@ pylib_DATA = __init__.py \
              keywords_field.py \
              language_field.py \
              notes_field.py \
-             pages_number_field.py
+             pages_number_field.py \
+             doi_field.py
 
 CLEANFILES = *~ *.tmp *.pyc

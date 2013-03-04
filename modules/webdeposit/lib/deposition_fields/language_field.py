@@ -18,12 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import SelectField
+from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['LanguageField']
 
 
-class LanguageField(SelectField, JsonCookerMixinBuilder('language')):
+class LanguageField(SelectField, WebDepositField, JsonCookerMixinBuilder('language')):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-flag"></i>'

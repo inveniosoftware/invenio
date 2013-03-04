@@ -18,12 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
+from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['TitleField']
 
 
-class TitleField(TextField, JsonCookerMixinBuilder('title')):
+class TitleField(TextField, WebDepositField, JsonCookerMixinBuilder('title')):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-book"></i>'

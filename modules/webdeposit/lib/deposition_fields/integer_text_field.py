@@ -18,12 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import IntegerField
+from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixin
 
 __all__ = ['IntegerTextField']
 
 
-class IntegerTextField(IntegerField, JsonCookerMixin):
+class IntegerTextField(IntegerField, WebDepositField, JsonCookerMixin):
 
     def __init__(self, **kwargs):
         super(IntegerTextField, self).__init__(**kwargs)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,35 +20,28 @@
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
-from invenio.sherpa_romeo import SherpaRomeoSearch
+from invenio.dataciteutils import DataciteMetadata
 
-__all__ = ['ISSNField']
+__all__ = ['DOIField']
 
 
-class ISSNField(TextField, JsonCookerMixinBuilder('issn')):
+class DOIField(TextField, WebDepositField, JsonCookerMixinBuilder('doi')):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-barcode"></i>'
-        super(ISSNField, self).__init__(**kwargs)
+        super(DOIField, self).__init__(**kwargs)
 
     def pre_validate(self, form=None):
         value = self.data
         if value == "" or value.isspace():
-            return dict(error=0, error_message='')
-        s = SherpaRomeoSearch()
-        s.search_issn(value)
-        if s.error:
-            return dict(error=1, error_message=s.error_message)
+            return dict()
+        datacite = DataciteMetadata(value)
+        if datacite.error:
+            return dict(info=1, info_message="Couldn't retrieve doi metadata")
 
-        if s.get_num_hits() == 1:
-            journal = s.parser.get_journals(attribute='jtitle')
-            journal = journal[0]
-            publisher = s.parser.get_publishers(journal=journal)
-            if publisher is not None and publisher != []:
-                return dict(error=0, error_message='',
-                            fields=dict(journal=journal, publisher=publisher['name']))
-            else:
-                return dict(error=0, error_message='',
-                            fields=dict(journal=journal))
-
-        return dict(info=1, info_message="Couldn't find Journal")
+        return dict(fields=dict(publisher=datacite.get_publisher(),
+                                title=datacite.get_titles(),
+                                date=datacite.get_dates(),
+                                abstract=datacite.get_description()),
+                    success=1,
+                    success_message='Datacite.org metadata imported successfully')
