@@ -310,6 +310,7 @@ def cli_cmd_update_config_py(conf):
     if not conf.get("Invenio", "CFG_SITE_SECURE_URL"):
         conf.set("Invenio", "CFG_SITE_SECURE_URL",
                  conf.get("Invenio", "CFG_SITE_URL"))
+
     ## process all the options normally:
     sections = conf.sections()
     sections.sort()
@@ -322,6 +323,17 @@ def cli_cmd_update_config_py(conf):
                 line_out = convert_conf_option(option, conf.get(section, option))
                 if line_out:
                     fdesc.write(line_out + "\n")
+
+    ## special treatment for CFG_SITE_SECRET_KEY that can not be empty
+    if not conf.get("Invenio", "CFG_SITE_SECRET_KEY"):
+        CFG_BINDIR = conf.get("Invenio", "CFG_BINDIR") + os.sep
+        print >> sys.stderr, """WARNING: CFG_SITE_SECRET_KEY can not be empty.
+You may want to customise your invenio-local.conf configuration accordingly.
+
+$ %sinveniocfg --create-secret-key
+$ %sinveniocfg --update-config-py
+""" % (CFG_BINDIR, CFG_BINDIR)
+
     ## FIXME: special treatment for experimental variables
     ## CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES and CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
     ## (not offering them in invenio.conf since they will be refactored)
