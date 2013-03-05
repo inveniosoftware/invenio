@@ -22,6 +22,7 @@
 import unittest
 import sys
 import StringIO
+import logging
 
 from invenio.inveniocfg import main
 from invenio.testutils import make_test_suite, run_test_suite
@@ -48,6 +49,13 @@ class InveniocfgTest(unittest.TestCase):
         """ Helper method to *stop* capture stdout and stderr """
         sys.stdout = self.default_stdout
         sys.stderr = self.default_stderr
+
+        # Inveniocfg sets up some loggers
+        # At shutdown, they try to close their stream so we close them here
+        # in order to not leave them which a closed stream they will fail to
+        # close
+        logging.shutdown()
+
         if self.output:
             self.output.close()
         if self.error:
