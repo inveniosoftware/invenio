@@ -35,6 +35,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_WEBSTAT_BIBCIRCULATION_START_YEAR
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
+from invenio.bibindex_engine import CFG_JOURNAL_TAG
 from invenio.search_engine import get_coll_i18nname, \
     wash_index_term
 from invenio.dbquery import run_sql, wash_table_column_name, ProgrammingError
@@ -1608,7 +1609,7 @@ def perform_display_custom_summary(args, ln=CFG_SITE_LANG):
     @type args: { str: str }
     """
     if args['tag'] == '':
-        args['tag'] = "773__p"
+        args['tag'] = CFG_JOURNAL_TAG.replace("%", "p")
     data = get_custom_summary_data(args['query'], args['tag'])
     tag_name = _get_tag_name(args['tag'])
     if tag_name == '':

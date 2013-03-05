@@ -303,7 +303,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid)
         command_out = self._run_rt_command(command, uid)
-        print command_out
+
         if command_out == None:
             return 0
 
