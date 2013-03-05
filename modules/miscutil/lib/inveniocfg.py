@@ -80,9 +80,11 @@ from ConfigParser import ConfigParser
 from optparse import OptionParser, OptionGroup, IndentedHelpFormatter, Option, \
     OptionError
 import os
+import random
 import re
 import shutil
 import socket
+import string
 import sys
 
 
@@ -731,7 +733,8 @@ def cli_cmd_create_secret_key(conf):
         print "You may want to run 'inveniocfg --update-all'' now."
         print ">>> No need to generate secret key."
     else:
-        secret_key = re.escape(os.urandom(24).__repr__()[1:-1])
+        secret_key = ''.join([random.choice(string.letters + string.digits) \
+                              for dummy in range(0,256)])
         with open(invenio_local_path, 'a') as f:
             f.write('CFG_SITE_SECRET_KEY = %s\n' % (secret_key, ))
         print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
