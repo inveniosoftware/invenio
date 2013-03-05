@@ -280,7 +280,8 @@ class Template:
 
          - 'docname' *string* - The name of the document
 
-         - 'status' *string* - The status of a document
+         - 'status' *string* - An non-empty string (ex. 'Restricted') if the file is restricted
+                               for the guest user, otherwise an empty string.
         """
         if versions is None:
             versions = []
