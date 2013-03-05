@@ -311,6 +311,7 @@ Contents
 
       $ sudo chown -R www-data.www-data /opt/invenio
       $ sudo -u www-data emacs /opt/invenio/etc/invenio-local.conf
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-secret-key
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-tables
@@ -661,19 +662,24 @@ Contents
               /var/data/submit
                  hosts files created during submissions
 
-      $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-secret-key
-
-          Please create secret key for the Flask application if you
-          have not done so yet during customisation of your
-          `invenio-local.conf'.  This command will check the contents
-          of this file and will update it with generated secret key
-          value.
-
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
 
           Make the rest of the Invenio system aware of your
           invenio-local.conf changes.  This step is mandatory each
           time you edit your conf files.
+
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-secret-key
+
+          You may need to create secret key for the Flask application
+          if you have not done so yet during customisation of your
+          `invenio-local.conf'.  This command will check the contents
+          of this file and will update it with randomly generated
+          secret key value.
+
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
+
+          Make the rest of the Invenio system aware of the secret key
+          change in invenio-local.conf.
 
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-tables
 

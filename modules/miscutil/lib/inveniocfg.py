@@ -717,15 +717,24 @@ def cli_cmd_create_secret_key(conf):
     """Generate and append CFG_SITE_SECRET_KEY to invenio-local.conf.
     Useful for the installation process."""
     print ">>> Going to generate random CFG_SITE_SECRET_KEY..."
-    from invenio.config import CFG_ETCDIR, CFG_SITE_SECRET_KEY
+    try:
+        from invenio.config import CFG_ETCDIR, CFG_SITE_SECRET_KEY
+    except ImportError:
+        print "ERROR: please run 'inveniocfg --update-config-py' first."
+        sys.exit(1)
     if CFG_SITE_SECRET_KEY is not None and len(CFG_SITE_SECRET_KEY) > 0:
         print "ERROR: CFG_SITE_SECRET_KEY is already filled."
         sys.exit(1)
     invenio_local_path = CFG_ETCDIR + os.sep + 'invenio-local.conf'
-    secret_key = re.escape(os.urandom(24).__repr__()[1:-1])
-    with open(invenio_local_path, 'a') as f:
-        f.write('CFG_SITE_SECRET_KEY = %s' % (secret_key, ))
-    print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
+    if _grep_version_from_executable(invenio_local_path, 'CFG_SITE_SECRET_KEY'):
+        print "WARNING: invenio-local.conf already contains CFG_SITE_SECRET_KEY."
+        print "You may want to run 'inveniocfg --update-all'' now."
+        print ">>> No need to generate secret key."
+    else:
+        secret_key = re.escape(os.urandom(24).__repr__()[1:-1])
+        with open(invenio_local_path, 'a') as f:
+            f.write('CFG_SITE_SECRET_KEY = %s\n' % (secret_key, ))
+        print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
 
 def cli_cmd_create_tables(conf):
     """Create and fill Invenio DB tables.  Useful for the installation process."""
