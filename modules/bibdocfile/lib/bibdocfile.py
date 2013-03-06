@@ -2239,16 +2239,26 @@ class BibDoc(object):
             Specifiy a different subformat if you need to use a different
             convention.
         @type subformat_re: compiled regular expression
-        @return: the bibdocfile corresponding to the icon of this document, or
-            None if any icon exists for this document.
+        @return: the bibdocfile corresponding to CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
+            or, if this does not exist, the smallest size icon of this
+            document, or None if no icon exists for this document.
         @rtype: BibDocFile
         @warning: before I{subformat} were introduced this method was
             returning a BibDoc, while now is returning a BibDocFile. Check
             if your client code is compatible with this.
         """
+        icons = []
         for docfile in self.list_latest_files(list_hidden=display_hidden):
-            if subformat_re.match(docfile.get_subformat()):
+            subformat = docfile.get_subformat()
+            if subformat.lower() == CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT.lower():
+                # If it's the default icon subformat, return it
                 return docfile
+            if subformat_re.match(subformat):
+                icons.append((docfile.get_size(), docfile))
+        if icons:
+            # Sort by size, retrieve the smallest one
+            icons.sort()
+            return icons[0][1]
         return None
 
     def add_icon(self, filename, docformat=None, subformat=CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT, modification_date=None):
