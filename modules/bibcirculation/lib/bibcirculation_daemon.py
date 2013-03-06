@@ -30,17 +30,20 @@ from invenio.bibtask import task_init, \
                             task_sleep_now_if_required, \
                             task_update_progress, \
                             task_set_option, \
-                            task_get_option
+                            task_get_option, \
+                            write_message
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
                                           CFG_BIBCIRCULATION_LOANS_EMAIL, \
-                                          CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,\
+                                          CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
                                           CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED
 
 from invenio.bibcirculation_utils import generate_email_body, \
                                          book_title_from_MARC, \
-                                         update_user_info_from_ldap
+                                         update_user_info_from_ldap, \
+                                         update_requests_statuses, \
+                                         looks_like_dictionary
 import datetime
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
@@ -48,63 +51,39 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         has elaborated the key.
         Possible keys:
     """
+    write_message(key)
     if key in ('-o', '--overdue-letters'):
         task_set_option('overdue-letters', True)
     elif key in ('-b', '--update-borrowers'):
         task_set_option('update-borrowers', True)
+    elif key in ('-r', '--update-requests'):
+        task_set_option('update-requests', True)
     else:
         return False
     return True
 
-def get_expired_loan():
+def update_expired_loan(loan_id, ill=0):
     """
-    @return all expired loans
-    """
-
-    res = run_sql("""select id_crcBORROWER, id, id_bibrec
-                       from crcLOAN
-                      where (status=%s and due_date<NOW())
-                         or (status=%s)
-                """, (CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN,
-                       CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED))
-    return res
-
-def update_expired_loan(loan_id):
-    """
-    Update status, number of overdue letter and date of overdue letter
+    Update status, number of overdue letters and the date of overdue letter
 
     @param loan_id: identify the loan. Primary key of crcLOAN.
     @type loan_id: int
     """
 
-    run_sql("""update crcLOAN
+    if ill:
+        run_sql("""update crcILLREQUEST
+                  set overdue_letter_number=overdue_letter_number+1,
+                       overdue_letter_date=NOW()
+                where id=%s
+               """, (loan_id,))
+    else:
+        run_sql("""update crcLOAN
                   set overdue_letter_number=overdue_letter_number+1,
                        status=%s,
                        overdue_letter_date=NOW()
                 where id=%s
                """, (CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED,
                      loan_id))
-
-def get_overdue_letters_info(loan_id):
-    """
-    Get the number of letters and the date of the last letter
-    sent for a given loan_id.
-
-    @param loan_id: identify the loan. Primary of crcLOAN.
-    @type loan_id: int
-
-    @return number_of_letters and date of the last letter
-    """
-
-    res = run_sql("""select overdue_letter_number,
-                            DATE_FORMAT(overdue_letter_date,'%%Y-%%m-%%d')
-                       from crcLOAN
-                      where id=%s""",
-                  (loan_id, ))
-
-    return res[0]
-
-
 
 def send_overdue_letter(borrower_id, subject, content):
     """
@@ -172,22 +151,14 @@ def must_send_third_recall(date_letters):
     except ValueError:
         return False
 
-def update_borrowers_information():
-    list_of_borrowers = db.get_all_borrowers()
-
-    for borrower in list_of_borrowers:
-        user_id = borrower[0]
-        update_user_info_from_ldap(user_id)
-
-
 def task_run_core():
     """
-    run daemon
+    Run daemon
     """
-
+    write_message("Starting...")
     if task_get_option("update-borrowers"):
+        write_message("Started update-borrowers")
         list_of_borrowers = db.get_all_borrowers()
-
         total_borrowers = len(list_of_borrowers)
 
         for done, borrower in enumerate(list_of_borrowers):
@@ -196,11 +167,28 @@ def task_run_core():
             if done % 10 == 0:
                 task_update_progress("Borrower: updated %d out of %d." % (done, total_borrowers))
                 task_sleep_now_if_required(can_stop_too=True)
+        task_update_progress("Borrower: updated %d out of %d." % (done+1, total_borrowers))
+        write_message("Updated %d out of %d total borrowers" % (done+1, total_borrowers))
+
+    if task_get_option("update-requests"):
+        write_message("Started update-requests")
+        list_of_reqs = db.get_loan_request_by_status(CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
+
+        for (_request_id, recid, bc, _name, borrower_id, _library, _location,
+             _date_from, _date_to, _request_date) in list_of_reqs:
+            description = db.get_item_description(bc)
+            list_of_barcodes = db.get_barcodes(recid, description)
+            for barcode in list_of_barcodes:
+                update_requests_statuses(barcode)
+                task_sleep_now_if_required(can_stop_too=True)
+        task_update_progress("Requests due updated from 'waiting' to 'pending'.")
+        write_message("Requests due updated from 'waiting' to 'pending'.")
 
     if task_get_option("overdue-letters"):
+        write_message("Started overdue-letters")
         expired_loans = db.get_all_expired_loans()
-
         total_expired_loans = len(expired_loans)
+
         for done, (borrower_id, _bor_name, recid, _barcode, _loaned_on,
              _due_date, _number_of_renewals, number_of_letters,
              date_letters, _notes, loan_id) in enumerate(expired_loans):
@@ -225,25 +213,59 @@ def task_run_core():
                 send_overdue_letter(borrower_id, subject, content)
 
             if done % 10 == 0:
-                task_update_progress("Recall: sent %d out of %d." % (done, total_expired_loans))
+                task_update_progress("Loan recall: sent %d out of %d." % (done, total_expired_loans))
                 task_sleep_now_if_required(can_stop_too=True)
+        task_update_progress("Loan recall: processed %d out of %d expires loans." % (done+1, total_expired_loans))
+        write_message("Processed %d out of %d expired loans." % (done+1, total_expired_loans))
+
+        # Recalls for expired ILLs
+        write_message("Started overdue-letters for Inter Library Loans")
+        expired_ills = db.get_all_expired_ills()
+        total_expired_ills = len(expired_ills)
+
+        for done, (ill_id, borrower_id, item_info, number_of_letters,
+             date_letters) in enumerate(expired_ills):
+
+            number_of_letters=int(number_of_letters)
+
+            content = ''
+            if number_of_letters == 0:
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['ILL_RECALL1'], ill_id, ill=1)
+            elif number_of_letters == 1 and must_send_second_recall(date_letters):
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['ILL_RECALL2'], ill_id, ill=1)
+            elif number_of_letters == 2 and must_send_third_recall(date_letters):
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['ILL_RECALL3'], ill_id, ill=1)
+            elif number_of_letters >= 3 and must_send_third_recall(date_letters):
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['ILL_RECALL3'], ill_id, ill=1)
+
+            if content != '' and looks_like_dictionary(item_info):
+                item_info = eval(item_info)
+                if item_info.has_key('title'):
+                    book_title = item_info['title']
+                    subject = "ILL RECALL: " + str(book_title)
+                    update_expired_loan(loan_id=ill_id, ill=1)
+                    send_overdue_letter(borrower_id, subject, content)
+            if done % 10 == 0:
+                task_update_progress("ILL recall: sent %d out of %d." % (done, total_expired_ills))
+                task_sleep_now_if_required(can_stop_too=True)
+        task_update_progress("ILL recall: processed %d out of %d expired ills." % (done+1, total_expired_ills))
+        write_message("Processed %d out of %d expired ills." % (done+1, total_expired_ills))
 
     return 1
 
 def main():
-    """
-    main()
-    """
+
     task_init(authorization_action='runbibcircd',
               authorization_msg="BibCirculation Task Submission",
-              help_specific_usage="""-o,  --overdue-letters\tCheck overdue loans and send recall emails if necessary.\n-b,  --update-borrowers\tUpdate borrowers information from ldap.\n""",
-              description="""Examples:
-              %s -u admin
-              """ % (sys.argv[0]),
-              specific_params=("ob", ["overdue-letters", "update-borrowers"]),
-                task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
-                version=__revision__,
-                task_run_fnc = task_run_core)
+              help_specific_usage="""-o,  --overdue-letters\tCheck overdue loans and send recall emails if necessary.\n
+-b,  --update-borrowers\tUpdate borrowers information from ldap.\n
+-r,  --update-requests\tUpdate pending requests of users\n\n""",
+              description="""Example: %s -u admin \n\n""" % (sys.argv[0]),
+              specific_params=("obr", ["overdue-letters", "update-borrowers", "update-requests"]),
+              task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
+              version=__revision__,
+              task_run_fnc = task_run_core
+              )
 
 if __name__ == '__main__':
     main()
