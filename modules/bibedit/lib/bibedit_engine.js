@@ -361,11 +361,32 @@ function initJeditable(){
         $('textarea', this).bind('click', function(e) {
             e.stopPropagation();
         });
-        $('textarea', this).bind('keydown', 'return', function(e) {
-            e.stopPropagation();
-            $(this).blur();
+
+        $('textarea', this).bind('keydown', function(e) {
+            var TABKEY = 9;
+            var RETURNKEY = 13;
+
+            switch (e.keyCode) {
+              case RETURNKEY:
+                // Just save field content
+                e.stopPropagation();
+                $(this).blur();
+                break;
+              case TABKEY:
+                // Move between fields
+                e.preventDefault();
+
+                $(this).blur();
+
+                var currentElementIndex = $(".tabSwitch").index($(original));
+                var step = e.shiftKey ? -1 : 1;
+                $(".tabSwitch").eq(currentElementIndex + step).click();
+                break;
+            }
         });
+
         $('textarea', this).keyup(function() {
+          // Keep the limit of max chars for fields/subfields
           var max = parseInt($(this).attr('maxlength'));
           if( $(this).val().length > max ) {
               $(this).val($(this).val().substr(0, $(this).attr('maxlength')));
