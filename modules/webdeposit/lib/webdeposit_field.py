@@ -36,3 +36,4 @@ class WebDepositField(object):
             for v in kwargs.get("validators"):
                 if type(v) is Required:
                     self.required = True
+        super(WebDepositField, self).__init__(**kwargs)

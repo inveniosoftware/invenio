@@ -24,11 +24,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['TitleField']
 
 
-class TitleField(TextField, WebDepositField, JsonCookerMixinBuilder('title')):
+class TitleField(WebDepositField, TextField, JsonCookerMixinBuilder('title')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-book"></i>'
         super(TitleField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-book"></i>'
 
     def pre_validate(self, form=None):
         value = self.data

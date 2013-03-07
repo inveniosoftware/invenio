@@ -24,11 +24,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['PagesNumberField']
 
 
-class PagesNumberField(TextField, WebDepositField, JsonCookerMixinBuilder('page_number')):
+class PagesNumberField(WebDepositField, TextField, JsonCookerMixinBuilder('page_number')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-th"></i>'
         super(PagesNumberField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-th"></i>'
 
     def pre_validate(self, form=None):
         value = self.data
@@ -40,7 +40,7 @@ class PagesNumberField(TextField, WebDepositField, JsonCookerMixinBuilder('page_
             except ValueError:
                 return False
 
-        if value is '':
+        if value.isspace():
             return dict(error=0, error_message='')
         elif not is_number(value):
             error_message = 'Pages number must be a number!'

@@ -24,11 +24,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['LanguageField']
 
 
-class LanguageField(SelectField, WebDepositField, JsonCookerMixinBuilder('language')):
+class LanguageField(WebDepositField, SelectField, JsonCookerMixinBuilder('language')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-flag"></i>'
         super(LanguageField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-flag"></i>'
 
     def pre_validate(self, form=None):
         return dict(error=0, error_message='')

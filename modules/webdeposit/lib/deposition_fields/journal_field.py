@@ -25,11 +25,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['JournalField']
 
 
-class JournalField(TextField, WebDepositField, JsonCookerMixinBuilder('journal')):
+class JournalField(WebDepositField, TextField, JsonCookerMixinBuilder('journal')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-book"></i>'
         super(JournalField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-book"></i>'
 
     def pre_validate(self, form=None):
         value = self.data
@@ -60,5 +60,7 @@ class JournalField(TextField, WebDepositField, JsonCookerMixinBuilder('journal')
         value = self.data
 
         s = SherpaRomeoSearch()
-        response = s.search_journal(value)
-        return response
+        journals = s.search_journal(value)
+        if journals is None:
+            return []
+        return journals

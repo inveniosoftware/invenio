@@ -24,11 +24,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['KeywordsField']
 
 
-class KeywordsField(TextField, WebDepositField, JsonCookerMixinBuilder('keywords')):
+class KeywordsField(WebDepositField, TextField, JsonCookerMixinBuilder('keywords')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-tags"></i>'
         super(KeywordsField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-tags"></i>'
 
     def pre_validate(self, form=None):
         return dict(error=0, error_message='')

@@ -25,11 +25,11 @@ from invenio.dataciteutils import DataciteMetadata
 __all__ = ['DOIField']
 
 
-class DOIField(TextField, WebDepositField, JsonCookerMixinBuilder('doi')):
+class DOIField(WebDepositField, TextField, JsonCookerMixinBuilder('doi')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-barcode"></i>'
         super(DOIField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-barcode"></i>'
 
     def pre_validate(self, form=None):
         value = self.data

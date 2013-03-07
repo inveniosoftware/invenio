@@ -1,3 +1,22 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
 {% extends "page.html" %}
 {% block header %}
     {{ super() }}
@@ -5,7 +24,10 @@
     {% js 'js/plupload/plupload.full.js' %}
     {% js 'js/plupload/jquery.plupload.queue/jquery.plupload.queue.js' %}
     {% js 'js/webdeposit_form.js' %}
+    {% js 'js/jquery-ui.min.js' %}
     {% css 'js/plupload/jquery.plupload.queue/css/jquery.plupload.queue.css' %}
+    {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css' %}
+    {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css' %}
 {% endblock %}
 
 {% block body %}
@@ -80,7 +102,7 @@ div#conditions{
         {% for draft in drafts %}
           <li> <a href="{{ url_for('webdeposit.add', deposition_type=draft.deposition_type, uuid=draft.uuid) }}">
             {{ '<strong>'|safe if uuid == draft.uuid }}
-              {{ draft.workflow.deposition_type }}:
+              {{ draft.workflow.name }}:
               {% if draft.form_values and draft.form_values.title %}
                   {{ draft.form_values.title }}
               {% else %}
@@ -237,10 +259,7 @@ $(function() {
                                 '{{ url_for("webdeposit.autocomplete", deposition_type=deposition_type, uuid=uuid, type=field.name) }}')
   {% endif %}
 {% endfor %}
-  //$(".datepicker").datepicker();
-  // FIXME: datepicker css problem
-  //        check earlier version of jquery-ui
-  //        or check makefile
+  $(".datepicker").datepicker();
 
   $("input#submitButton").click(function(e ) {
           e.preventDefault();

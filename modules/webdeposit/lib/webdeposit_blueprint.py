@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
-# #
-# # This file is part of Invenio.
-# # Copyright (C) 2012, 2013 CERN.
-# #
-# # Invenio is free software; you can redistribute it and/or
-# # modify it under the terms of the GNU General Public License as
-# # published by the Free Software Foundation; either version 2 of the
-# # License, or (at your option) any later version.
-# #
-# # Invenio is distributed in the hope that it will be useful, but
-# # WITHOUT ANY WARRANTY; without even the implied warranty of
-# # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# # General Public License for more details.
-# #
-# # You should have received a copy of the GNU General Public License
-# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+##
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """WebDeposit Flask Blueprint"""
+
 import os
 import shutil
 import json
@@ -31,7 +32,7 @@ from flask import current_app, \
                   flash
 from werkzeug.utils import secure_filename
 from invenio.sqlalchemyutils import db
-from invenio.webdeposit_model import WebDepositDraft, WebDepositWorkflow
+from invenio.webdeposit_model import WebDepositDraft
 from invenio.webdeposit_load_deposition_types import deposition_types, \
                                                      deposition_metadata
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
@@ -62,6 +63,7 @@ blueprint = InvenioBlueprint('webdeposit', __name__,
 
 
 @blueprint.route('/upload/<uuid>', methods=['POST', 'GET'])
+@blueprint.invenio_authenticated
 def plupload(uuid):
     """ The file is splitted in chunks on the client-side
         and it is merged again on the server-side
@@ -123,6 +125,7 @@ def plupload(uuid):
 
 @blueprint.route('/<deposition_type>/_autocomplete/<uuid>',
                  methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
 def autocomplete(deposition_type, uuid):
     """ Returns a list with of suggestions for the field
         based on the current value
@@ -169,6 +172,7 @@ def autocomplete_ISSN_Conditions(deposition_type, uuid):
 
 
 @blueprint.route('/<deposition_type>/_errorCheck/<uuid>')
+@blueprint.invenio_authenticated
 def error_check(deposition_type, uuid):
     """ Used for field error checking
     """
@@ -188,6 +192,7 @@ def error_check(deposition_type, uuid):
 
 
 @blueprint.route('/<deposition_type>/delete/<uuid>')
+@blueprint.invenio_authenticated
 def delete(deposition_type, uuid):
     """ Deletes the whole deposition with uuid=uuid
         (including form drafts)
@@ -200,6 +205,7 @@ def delete(deposition_type, uuid):
 
 
 @blueprint.route('/<deposition_type>/new/')
+@blueprint.invenio_authenticated
 def create_new(deposition_type):
     """ Creates new deposition
     """
@@ -229,6 +235,7 @@ def index_deposition_types():
 
 
 @blueprint.route('/<deposition_type>/')
+@blueprint.invenio_authenticated
 def index(deposition_type):
     current_app.config['breadcrumbs_map'][request.endpoint] = [
                     (_('Home'), '')] + blueprint.breadcrumbs + [(deposition_type, None)]
@@ -246,6 +253,7 @@ def index(deposition_type):
 
 
 @blueprint.route('/<deposition_type>/<uuid>', methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
 def add(deposition_type, uuid=None):
     """
     FIXME: add documentation
@@ -292,20 +300,19 @@ def add(deposition_type, uuid=None):
         for (field_name, value) in request.form.items():
             if "submit" in field_name.lower():
                 continue
-            draft_field_set(current_user.get_id(),
-                            uuid, field_name,
-                            value, None)
+            draft_field_set(current_user.get_id(), uuid, field_name, value)
 
         form = get_form(current_user.get_id(), uuid)
         # Validate form
         if not form.validate():
             # render the form with error messages
-            return render_template('webdeposit_add.html', **workflow.get_output(form_validation=True))
+            return render_template('webdeposit_add.html',
+                                  **workflow.get_output(form_validation=True))
 
         # Submission, proceed to the next steps
         workflow.jump_forward()
-
-    workflow.run()
+    else:
+        workflow.run()
     status = workflow.get_status()
 
     if status == 0:

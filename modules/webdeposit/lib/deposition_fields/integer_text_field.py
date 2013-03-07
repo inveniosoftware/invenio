@@ -24,7 +24,7 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixin
 __all__ = ['IntegerTextField']
 
 
-class IntegerTextField(IntegerField, WebDepositField, JsonCookerMixin):
+class IntegerTextField(WebDepositField, IntegerField, JsonCookerMixin):
 
     def __init__(self, **kwargs):
         super(IntegerTextField, self).__init__(**kwargs)

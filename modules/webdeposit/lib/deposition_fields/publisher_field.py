@@ -25,11 +25,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['PublisherField']
 
 
-class PublisherField(TextField, WebDepositField, JsonCookerMixinBuilder('publisher')):
+class PublisherField(WebDepositField, TextField, JsonCookerMixinBuilder('publisher')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-certificate"></i>'
         super(PublisherField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-certificate"></i>'
 
     def pre_validate(self, form=None):
         value = self.data
@@ -40,8 +40,12 @@ class PublisherField(TextField, WebDepositField, JsonCookerMixinBuilder('publish
         if s.error:
             return dict(info=1, info_message=s.error_message)
 
-        conditions = s.parser.get_publishers(attribute='conditions')[0]
-        if conditions is not []:
+        conditions = s.parser.get_publishers(attribute='conditions')
+        if conditions is not None:
+            conditions = conditions[0]
+        else:
+            conditions = []
+        if conditions != []:
             conditions_html = "<u>Conditions</u><br><ol>"
             if isinstance(conditions['condition'], str):
                 conditions_html += "<li>" + conditions['condition'] + "</li>"
@@ -95,4 +99,7 @@ class PublisherField(TextField, WebDepositField, JsonCookerMixinBuilder('publish
     def autocomplete(self):
         value = self.data
         sherpa_romeo = SherpaRomeoSearch()
-        return sherpa_romeo.search_publisher(value)
+        publishers = sherpa_romeo.search_publisher(value)
+        if publishers is None:
+            return []
+        return publishers

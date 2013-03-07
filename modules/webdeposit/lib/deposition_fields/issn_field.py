@@ -25,11 +25,11 @@ from invenio.sherpa_romeo import SherpaRomeoSearch
 __all__ = ['ISSNField']
 
 
-class ISSNField(TextField, JsonCookerMixinBuilder('issn')):
+class ISSNField(WebDepositField, TextField, JsonCookerMixinBuilder('issn')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-barcode"></i>'
         super(ISSNField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-barcode"></i>'
 
     def pre_validate(self, form=None):
         value = self.data

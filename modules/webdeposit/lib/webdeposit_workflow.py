@@ -18,29 +18,28 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.webdeposit_model import WebDepositWorkflow
-from invenio.webdeposit_workflow_utils import create_deposition_document
-from invenio.bibworkflow_engine import BibWorkflowEngine,\
-                                       CFG_WORKFLOW_STATUS
+from invenio.bibworkflow_engine import BibWorkflowEngine, CFG_WORKFLOW_STATUS
 from invenio.bibworkflow_object import BibWorkflowObject
 from invenio.bibworkflow_model import Workflow, WfeObject
-from invenio.bibworkflow_client import run_workflow, restart_workflow
+from invenio.bibworkflow_client import restart_workflow
 from invenio.sqlalchemyutils import db
 from uuid import uuid1 as new_uuid
 
 
 class DepositionWorkflow(object):
-    """ class for running sequential workflows
+    """ class for running webdeposit workflows using the BibWorkflow engine
 
-    Workflow always obtains a uuid,
-    either externally or creates a new one.
-    (That's because it must have allocated space for the object)
+        The user_id and workflow must always be defined
+        If the workflow has been initialized before the appropriate uuid
+        must be defined
+        otherwise a new workflow will be created
 
-    The workflow functions must have the following structure:
+        The workflow functions must have the following structure:
 
-    def function_name(arg1, arg2):
-        def fun_name2(obj, eng):
-            # do stuff
-        return fun_name2
+        def function_name(arg1, arg2):
+            def fun_name2(obj, eng):
+                # do stuff
+            return fun_name2
     """
 
     def __init__(self, engine=None, workflow=None,
@@ -58,9 +57,7 @@ class DepositionWorkflow(object):
         self.set_workflow(workflow)
 
     def set_uuid(self, uuid=None):
-        """ Sets the uuid or obtains a new one
-            Allocates a row in the database
-        """
+        """ Sets the uuid or obtains a new one """
         if uuid is None:
             uuid = new_uuid()
             self.uuid = uuid
@@ -70,12 +67,13 @@ class DepositionWorkflow(object):
     def get_uuid(self):
         return self.uuid
 
-    uuid = property(get_uuid, set_uuid)
-
     def set_engine(self, engine=None):
+        """ Initializes the BibWorkflow engine """
         if engine is None:
-            engine = BibWorkflowEngine(name=self.get_deposition_type(), uuid=self.get_uuid(), \
-                                       user_id=self.get_user_id(), module_name="webdeposit")
+            engine = BibWorkflowEngine(name=self.get_deposition_type(),
+                                       uuid=self.get_uuid(),
+                                       user_id=self.get_user_id(),
+                                       module_name="webdeposit")
         self.eng = engine
         self.eng.save()
 
@@ -87,7 +85,16 @@ class DepositionWorkflow(object):
         self.steps_num = len(workflow)
 
     def set_object(self):
-        self.bib_obj = BibWorkflowObject(data=self.obj, workflow_id=self.get_uuid(), user_id=self.get_user_id())
+        self.db_workflow_obj = WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid()).\
+                                      first()
+        if self.db_workflow_obj is None:
+            self.bib_obj = BibWorkflowObject(data=self.obj,
+                                         workflow_id=self.get_uuid(),
+                                         user_id=self.get_user_id())
+        else:
+            self.bib_obj = BibWorkflowObject(id=self.db_workflow_obj.id,
+                                             workflow_id=self.get_uuid(),
+                                             user_id=self.get_user_id())
 
     def get_object(self):
         return self.bib_obj
@@ -114,12 +121,20 @@ class DepositionWorkflow(object):
         return self.user_id
 
     def get_status(self):
-        return 0
-        if self.current_step >= self.steps_num:
+        """ Returns the status of the workflow
+            (check CFG_WORKFLOW_STATUS from bibworkflow_engine)
+        """
+        finished = Workflow.query.filter(Workflow.uuid == self.get_uuid()).one().\
+                        counter_finished >= 1
+
+        if finished:
             return CFG_WORKFLOW_STATUS['finished']
-        return CFG_WORKFLOW_STATUS['running']
+        return Workflow.query.filter(Workflow.uuid == self.get_uuid()).one().status
 
     def get_output(self, form_validation=None):
+        """ Returns a representation of the current state of the workflow
+            (a dict with the variables to fill the jinja template)
+        """
         user_id = self.user_id
         uuid = self.get_uuid()
 
@@ -140,12 +155,15 @@ class DepositionWorkflow(object):
                     uuid=uuid)
 
     def run(self):
-        starting_point = self.bib_obj.db_obj.task_counter
-        restart_workflow(self.eng, [self.bib_obj], starting_point)
-        #run_workflow(self.eng, [self.bib_obj])
-        #restart_workflow
-        #run(self.get_deposition_type(), [self.bib_obj])
-        #run_by_wid(self.get_uuid(), [self.obj])
+        """ Runs or resumes the workflow """
+        finished = self.eng.db_obj.counter_finished > 1
+        if finished:
+            # The workflow is finished, nothing to do
+            return
+        wfobjects = WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid())
+        wfobject = max(wfobjects.all(), key=lambda w: w.modified)
+        starting_point = wfobject.task_counter
+        restart_workflow(self.eng, [self.bib_obj], starting_point, stop_on_halt=True)
 
     def run_next_step(self):
         if self.current_step >= self.steps_num:
@@ -159,9 +177,7 @@ class DepositionWorkflow(object):
         self.update_db()
 
     def jump_forward(self, synchronize=False):
-        self.current_step += 1
-        if synchronize:
-            self.update_db()
+        restart_workflow(self.eng, [self.bib_obj], 'next')
 
     def jump_backwards(self, synchronize=False):
         if self.current_step > 1:

@@ -24,11 +24,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['Date']
 
 
-class Date(DateField, WebDepositField, JsonCookerMixinBuilder('date')):
+class Date(WebDepositField, DateField, JsonCookerMixinBuilder('date')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-calendar"></i>'
         super(Date, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-calendar"></i>'
 
     def pre_validate(self, form=None):
         return dict(error=0, error_message='')

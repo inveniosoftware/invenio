@@ -24,11 +24,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixin
 __all__ = ['FileUploadField']
 
 
-class FileUploadField(FileField, WebDepositField, JsonCookerMixin):
+class FileUploadField(WebDepositField, FileField, JsonCookerMixin):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-file"></i>'
         super(FileUploadField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-file"></i>'
 
     def pre_validate(self, form=None):
         return dict(error=0, error_message='')

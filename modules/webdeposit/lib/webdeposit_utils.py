@@ -44,7 +44,8 @@ def get_latest_or_new_workflow(deposition_type):
         join(WebDepositDraft.workflow).\
         filter(
             Workflow.user_id == user_id,
-            WebDepositDraft.deposition_type == deposition_type,
+            Workflow.name == deposition_type,
+            Workflow.module_name == 'webdeposit',
             Workflow.status == CFG_WORKFLOW_STATUS['running']).\
         order_by(db.desc(WebDepositDraft.timestamp)).\
         first()

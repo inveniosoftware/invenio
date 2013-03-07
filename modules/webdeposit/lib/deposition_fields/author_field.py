@@ -25,11 +25,11 @@ from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 __all__ = ['AuthorField']
 
 
-class AuthorField(TextField, WebDepositField, JsonCookerMixinBuilder('author')):
+class AuthorField(WebDepositField, TextField, JsonCookerMixinBuilder('author')):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-user"></i>'
         super(AuthorField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-user"></i>'
 
     def pre_validate(self, form=None):
         return dict(error=0, error_message='')
