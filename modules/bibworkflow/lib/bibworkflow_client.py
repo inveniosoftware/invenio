@@ -19,7 +19,7 @@ import traceback
 from workflow.engine import HaltProcessing
 
 
-def run_workflow(wfe, data):
+def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
     """
     Main function running the workflow.
     """
@@ -43,6 +43,8 @@ def run_workflow(wfe, data):
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
             wfe.save(0)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+            if stop_on_halt:
+                break
         except Exception as e:
             # Processing generated an exception. We print the stacktrace, save the object and continue
             wfe.log.info("Processing error!")
@@ -53,9 +55,17 @@ def run_workflow(wfe, data):
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
             wfe.save(0)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+            if stop_on_halt or stop_on_error:
+                raise e
 
 
-def restart_workflow(wfe, data, restart_point):
+def restart_workflow(wfe, data, restart_point, stop_on_halt=False, stop_on_error=False):
+    """
+    Restart a given workflow engine object (wfe), using given data at point "restart_point".
+
+    You can use stop_on_error to raise exception's and stop the processing.
+    Use stop_on_halt to stop processing the workflow if HaltProcessing is raised.
+    """
     wfe.log.info("bibw_client.restart_workflow::restart_point: " + str(restart_point))
     objects = []
     for o in data:
@@ -63,7 +73,16 @@ def restart_workflow(wfe, data, restart_point):
 
     if restart_point == "beginning":
         wfe.setPosition(wfe.db_obj.current_object, [0])
+        print "beginning: " + str(restart_point)
+    elif restart_point == "next":
+        current_task_id = wfe.getCurrTaskId()
+        current_task_id[-1] += 1
+        wfe.setPosition(wfe.db_obj.current_object, current_task_id)
+        print "current_task_id: " + str(current_task_id)
+    elif restart_point == "current":
+        pass
     else:
+        print "else: " + str(restart_point)
         wfe.setPosition(wfe.db_obj.current_object, restart_point)
     wfe._unpickled = True
 
@@ -82,12 +101,14 @@ def restart_workflow(wfe, data, restart_point):
                 wfe.restart('current', 'current')
                 # We processed the restarted workflow. We're done.
                 break
-        except HaltProcessing as e:
+        except HaltProcessing:
             # Processing was halted. Lets save current object and continue.
             wfe.log.info("Processing halted!")
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
             wfe.save(0)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+            if stop_on_halt:
+                break
         except Exception as e:
             # Processing generated an exception. We print the stacktrace, save the object and continue
             wfe.log.info("Processing error!")
@@ -98,3 +119,5 @@ def restart_workflow(wfe, data, restart_point):
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
             wfe.save(0)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+            if stop_on_halt or stop_on_error:
+                raise e
