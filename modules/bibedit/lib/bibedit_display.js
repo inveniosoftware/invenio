@@ -958,7 +958,12 @@ function displayMessage(msgCode, keepContent, args) {
             args[2] + '<br />';
         break;
     default:
-        msg = 'Result code: <b>' + msgCode + '</b>';
+        if ( args[0] ) {
+            msg = args[0];
+        }
+        else {
+            msg = 'Result code: <strong>' + msgCode + '</strong>';
+        }
     }
     if (!keepContent) {
         clearWarnings();

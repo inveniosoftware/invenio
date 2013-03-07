@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011, 2012 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -273,6 +273,14 @@ function initDialogs(){
 }
 
 
+/**
+ * Error handler when deleting cache of the record
+ */
+function onDeleteRecordCacheError(XHR, textStatus, errorThrown) {
+  console.log("Cannot delete record cache file");
+  updateStatus('ready');
+}
+
 function initMisc(){
   /*
    * Miscellaneous initialization operations.
@@ -294,7 +302,7 @@ function initMisc(){
     }
     else {
       createReq({recID: gRecID, requestType: 'deleteRecordCache'},
-        function() {}, false);
+        function() {}, false, undefined, onDeleteRecordCacheError);
     }
   };
 
@@ -414,12 +422,16 @@ function initAjax(){
   );
 }
 
-function createReq(data, onSuccess, asynchronous, deferred){
+function createReq(data, onSuccess, asynchronous, deferred, onError) {
   /*
    * Create Ajax request.
    */
   if (typeof asynchronous === "undefined") {
     asynchronous = true;
+  }
+
+  if (typeof onError === "undefined") {
+    asynchronous = onAjaxError;
   }
 
   // Include and increment transaction ID.
@@ -440,6 +452,7 @@ function createReq(data, onSuccess, asynchronous, deferred){
                         deferred.resolve(json);
                       }
                     },
+           error: onError,
            async: asynchronous})
   .done(function(){
     createReqAjaxDone(data);
@@ -460,6 +473,21 @@ function createReqAjaxDone(data){
   }
 }
 
+
+/**
+ * Error handler for AJAX bulk requests
+ * @param  {object} data - object describing all operations to be done
+ * @return {function}      function to be used as error handler
+ */
+function onBulkReqError(data) {
+  return function (XHR, textStatus, errorThrown) {
+            console.log("Error while processing:");
+            console.log(data);
+            updateStatus("ready");
+          }
+}
+
+
 function createBulkReq(reqsData, onSuccess, optArgs){
   /* optArgs is a disctionary containning the optional arguments
      possible keys include:
@@ -475,7 +503,9 @@ function createBulkReq(reqsData, onSuccess, optArgs){
         data.undoRedo = optArgs.undoRedo;
     }
 
-    createReq(data, onSuccess, optArgs.asynchronous);
+    var errorCallback = onBulkReqError(data);
+
+    createReq(data, onSuccess, optArgs.asynchronous, undefined, errorCallback);
 }
 
 
@@ -483,9 +513,10 @@ function onAjaxError(XHR, textStatus, errorThrown){
   /*
    * Handle Ajax request errors.
    */
-  alert('Request completed with status ' + textStatus +
+  console.log('Request completed with status ' + textStatus +
     '\nResult: ' + XHR.responseText +
     '\nError: ' + errorThrown);
+  updateStatus('ready');
 }
 
 
@@ -691,7 +722,8 @@ function initStateFromHash(){
     updateStatus('updating');
     if (gRecID && !gRecordDirty && !tmpReadOnlyMode)
       // If the record is unchanged, delete the cache.
-      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+                true, undefined, onDeleteRecordCacheError);
     switch (gState){
       case 'startPage':
         cleanUp(true, '', 'recID', true, true);
@@ -1277,7 +1309,8 @@ function onNewRecordClick(event){
   else
     // If the record is unchanged, erase the cache.
     if (gReadOnlyMode == false){
-      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+                true, undefined, onDeleteRecordCacheError);
   }
   changeAndSerializeHash({state: 'newRecord'});
   cleanUp(true, '');
@@ -1293,6 +1326,18 @@ function onTemplateRecordClick(event){
     /* Handle 'Template management' button */
     var template_window = window.open('/record/edit/templates', '', 'resizeable,scrollbars');
     template_window.document.close(); // needed for chrome and safari
+}
+
+
+/**
+ * Error handler when opening a record
+ */
+function onGetRecordError() {
+  var msg = "<em>Error</em>: record cannot be opened. <br /><br /> \
+            If the problem persists, contact the site admin."
+
+  displayMessage(undefined, false, [msg]);
+  updateStatus("ready");
 }
 
 
@@ -1342,7 +1387,7 @@ function getRecord(recID, recRev, onSuccess){
       onSuccess(json);
       // reloading the Holding Pen toolbar
       onHoldingPenPanelRecordIdChanged(recID);
-  });
+  }, true, undefined, onGetRecordError);
 
   getRecord.deleteRecordCache = false;
   getRecord.clonedRecord = false;
@@ -1864,7 +1909,8 @@ function onCloneRecordClick(){
   }
   else if (!gRecordDirty) {
     // If the record is unchanged, erase the cache.
-    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+              true, undefined, onDeleteRecordCacheError);
   }
   createReq({requestType: 'newRecord', newType: 'clone', recID: gRecID},
     function(json){
@@ -3617,7 +3663,8 @@ function switchToReadOnlyMode(){
     return false;
   }
   gReadOnlyMode = true;
-  createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+            true, undefined, onDeleteRecordCacheError);
   gCacheMTime = 0;
 
   updateInterfaceAccordingToMode();
