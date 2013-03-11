@@ -1160,6 +1160,26 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
              show_title = show_title and (em=="" or EM_REPOSITORY["body"] in em)
            )
 
+
+def create_exact_author_browse_help_link(p=None, p1=None, p2=None, p3=None, f=None, f1=None, f2=None, f3=None,
+                                  rm=None, cc=None, ln=None, jrec=None, rg=None, aas=0, action=""):
+    """Creates a link to help switch from author to exact author while browsing"""
+    if action == 'browse':
+        search_fields = (f, f1, f2, f3)
+        if ('author' in search_fields) or ('firstauthor' in search_fields):
+            def add_exact(field):
+                if field == 'author' or field == 'firstauthor':
+                    return 'exact' + field
+                return field
+            (fe, f1e, f2e, f3e) = map(add_exact, search_fields)
+            link_name = f or f1
+            link_name = (link_name == 'firstauthor' and 'exact first author') or 'exact author'
+            return websearch_templates.tmpl_exact_author_browse_help_link(p=p, p1=p1, p2=p2, p3=p3, f=fe, f1=f1e, f2=f2e, f3=f3e,
+                                                                   rm=rm, cc=cc, ln=ln, jrec=jrec, rg=rg, aas=aas, action=action,
+                                                                   link_name=link_name)
+    return ""
+
+
 def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, tab=''):
     """Creates navigation trail links, i.e. links to collection
     ancestors (except Home collection).  If aas==1, then links to
@@ -5506,6 +5526,9 @@ def prs_browse(kwargs=None, req=None, of=None, cc=None, aas=None, ln=None, uid=N
                                 p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action,
                                 em
                                 ))
+    write_warning(create_exact_author_browse_help_link(p, p1, p2, p3, f, f1, f2, f3,
+                                                rm, cc, ln, jrec, rg, aas, action),
+                                                req=req)
     try:
         if aas == 1 or (p1 or p2 or p3):
             browse_pattern(req, colls_to_search, p1, f1, rg, ln)
