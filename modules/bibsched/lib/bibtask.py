@@ -58,6 +58,8 @@ import logging
 import logging.handlers
 import random
 
+from socket import gethostname
+
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
@@ -72,6 +74,9 @@ from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
 from invenio.dateutils import parse_runtime_limit
 from invenio.shellutils import escape_shell_arg
 from invenio.mailutils import send_email
+from invenio.bibsched import bibsched_set_host, \
+                             bibsched_get_host
+
 
 # Global _TASK_PARAMS dictionary.
 _TASK_PARAMS = {
@@ -942,6 +947,17 @@ def _task_run(task_run_fnc):
             run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id'])) # kwalitee: disable=sql
             write_message("Task #%d postponed because outside of runtime limit" % _TASK_PARAMS['task_id'])
             return True
+
+    # Make sure the host field is updated
+    # It will not be updated properly when we run
+    # a task from the cli (without using the bibsched monitor)
+    host = bibsched_get_host(_TASK_PARAMS['task_id'])
+    if host and host != gethostname():
+        write_message("Error: The task #%d is bound to %s." %
+            (_TASK_PARAMS['task_id'], host), sys.stderr)
+        return False
+    else:
+        bibsched_set_host(_TASK_PARAMS['task_id'], gethostname())
 
     ## initialize signal handler:
     signal.signal(signal.SIGUSR2, signal.SIG_IGN)
