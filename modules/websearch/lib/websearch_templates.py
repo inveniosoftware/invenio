@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -569,6 +569,32 @@ class Template:
         description += '; '.join(get_fieldvalues(recid, "100__a") + get_fieldvalues(recid, "700__a"))
 
         return (title, description, keywords)
+
+
+    def tmpl_exact_author_browse_help_link(self, p, p1, p2, p3, f, f1, f2, f3, rm, cc, ln, jrec, rg, aas, action, link_name):
+        """
+        Creates the 'exact author' help link for browsing.
+
+        """
+        _ = gettext_set_language(ln)
+        url = create_html_link(self.build_search_url(p=p,
+                                                     p1=p1,
+                                                     p2=p2,
+                                                     p3=p3,
+                                                     f=f,
+                                                     f1=f1,
+                                                     f2=f2,
+                                                     f3=f3,
+                                                     rm=rm,
+                                                     cc=cc,
+                                                     ln=ln,
+                                                     jrec=jrec,
+                                                     rg=rg,
+                                                     aas=aas,
+                                                     action=action),
+                               {}, _(link_name), {'class': 'nearestterms'})
+        return "Did you mean to browse in %s index?" % url
+
 
     def tmpl_navtrail_links(self, aas, ln, dads):
         """
