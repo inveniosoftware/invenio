@@ -245,6 +245,25 @@ class DynCacheExtension(Extension):
         return rv
 
 
+from flask import g
+from invenio.bibformat_engine import filter_languages
+
+
+class LangExtension(Extension):
+    tags = set(['lang'])
+
+    def parse(self, parser):
+        lineno = parser.stream.next().lineno
+
+        body = parser.parse_statements(['name:endlang'], drop_needle=True)
+
+        return nodes.CallBlock(self.call_method('_lang'),
+                               [], [], body).set_lineno(lineno)
+
+    def _lang(self,  caller):
+        return filter_languages('<lang>' + caller() + '</lang>', g.ln)
+
+
 def hack_jinja2_utf8decoding():
     """
     Jinja2 requires all strings to be unicode objects. Invenio however operates

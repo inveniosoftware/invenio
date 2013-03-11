@@ -109,7 +109,7 @@ def create_invenio_flask_app():
     from invenio.urlutils import create_url, get_canonical_and_alternates_urls
     from invenio.cache import cache
     from invenio.jinja2utils import CollectionExtension, DynCacheExtension, \
-                                    hack_jinja2_utf8decoding
+                                    LangExtension, hack_jinja2_utf8decoding
     from invenio.webmessage_mailutils import email_quoted_txt2html
     from flask.ext.assets import Environment, Bundle
     from invenio.webinterface_handler_flask_utils import unicodifier
@@ -344,6 +344,7 @@ def create_invenio_flask_app():
 
     _app.jinja_env.add_extension(CollectionExtension)
     _app.jinja_env.add_extension(DynCacheExtension)
+    _app.jinja_env.add_extension(LangExtension)
     _app.jinja_env.add_extension('jinja2.ext.do')
 
     # Let's create Gravatar bridge.
