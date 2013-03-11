@@ -90,7 +90,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.shellutils import escape_shell_arg
+from invenio.shellutils import escape_shell_arg, run_shell_command
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.bibrecord import record_get_field_instances, \
@@ -1630,6 +1630,19 @@ class BibDoc(object):
         basedir = _make_base_dir(doc_id)
         # we create the corresponding storage directory
         if not os.path.exists(basedir):
+            from invenio.config import CFG_CERN_SITE, CFG_INSPIRE_SITE, CFG_BIBDOCFILE_AFS_VOLUME_PATTERN, CFG_BIBDOCFILE_AFS_VOLUME_QUOTA
+            if os.path.realpath(basedir).startswith('/afs') and (CFG_CERN_SITE or CFG_INSPIRE_SITE):
+                ## We are on AFS at CERN! Let's allocate directories the CERN/AFS way. E.g.
+                ## $ afs_admin create -q 1000000 /afs/cern.ch/project/cds/files/g40 p.cds.g40
+                ## NOTE: This might be extended to use low-level OpenAFS CLI tools
+                ## so that this technique could be extended to other AFS users outside CERN.
+                mount_point = os.path.dirname(os.path.realpath(basedir))
+                if not os.path.exists(mount_point):
+                    volume = CFG_BIBDOCFILE_AFS_VOLUME_PATTERN % os.path.basename(mount_point)
+                    quota = str(CFG_BIBDOCFILE_AFS_VOLUME_QUOTA)
+                    exit_code, stdout, stderr = run_shell_command("afs_admin create -q %s %s %s", (quota, mount_point, volume))
+                    if exit_code or stderr:
+                        raise IOError("Error in creating AFS mount point %s with quota %s and volume %s: exit_code=%s. Captured stdout:\n: %s\nCaptured stderr:\n: %s" % (mount_point, quota, volume, exit_code, stdout, stderr))
             old_umask = os.umask(022)
             os.makedirs(basedir)
             os.umask(old_umask)
