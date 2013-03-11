@@ -97,8 +97,6 @@ class SimulatedModPythonRequest(object):
         self.__response_sent_p = False
         self.__buffer = ''
         self.__low_level_headers = []
-        self.__headers = table(self.__low_level_headers)
-        self.__headers.add = self.__headers.add_header
         self.__filename = None
         self.__disposition_type = None
         self.__bytes_sent = 0
@@ -286,9 +284,9 @@ class SimulatedModPythonRequest(object):
 
     def set_content_length(self, content_length):
         if content_length is not None:
-            self.__headers['content-length'] = str(content_length)
+            self.response.headers['content-length'] = str(content_length)
         else:
-            del self.__headers['content-length']
+            del self.response.headers['content-length']
 
     def is_https(self):
         return self.__is_https
@@ -303,7 +301,7 @@ class SimulatedModPythonRequest(object):
         self.__filename = filename
         if self.__disposition_type is None:
             self.__disposition_type = 'inline'
-        self.__headers['content-disposition'] = '%s; filename=%s' % (self.__disposition_type, self.__filename)
+        self.response.headers['content-disposition'] = '%s; filename=%s' % (self.__disposition_type, self.__filename)
 
     def set_encoding(self, encoding):
         if encoding:
@@ -318,7 +316,7 @@ class SimulatedModPythonRequest(object):
         self.__errors.write(message.strip() + '\n')
 
     def get_content_type_set_p(self):
-        return bool(self.__headers['content-type'])
+        return bool(self.response.headers['content-type'])
 
     def allow_methods(self, methods, reset=0):
         if reset:
