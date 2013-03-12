@@ -1095,6 +1095,10 @@ WSGIRestrictStdout Off
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-144-precomposed.png
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-114-precomposed.png
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-72-precomposed.png
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-57-precomposed.png
         WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=3600 maximum-requests=10000
         WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
@@ -1172,6 +1176,10 @@ WSGIRestrictStdout Off
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-144-precomposed.png
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-114-precomposed.png
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-72-precomposed.png
+        Alias /favicon.ico %(webdir)s/apple-touch-icon-57-precomposed.png
         RedirectMatch /sslredirect/(.*) http://$1
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
