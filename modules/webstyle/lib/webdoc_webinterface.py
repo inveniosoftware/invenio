@@ -149,25 +149,27 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
         titles = {'admin': _("Admin Pages"),
                   'help': _("Help Pages"),
                   'hacking': _("Hacking Pages")}
-        navtrails = {'admin': '<a class="navtrail" href="%s/help/admin%s">%s</a>' % \
-                     (CFG_SITE_URL, ln_link, _("Admin Area")),
-                     'help': '<a class="navtrail" href="%s/help/%s">%s</a>' % \
-                     (CFG_SITE_URL, ln_link, _("Help Central")),
-                     'hacking': '<a class="navtrail" href="%s/help/hacking%s">%s</a>' % \
-                     (CFG_SITE_URL, ln_link, _("Hacking Invenio"))}
-        body = '''<div style="float:right;clear:none;font-size:small;color:#666;width:auto;margin-right:30px;padding:5px" class="mini-panel"><strong>''' + \
-               _("Latest modifications:") + '</strong>' + \
-               get_webdoc_topics(sort_by='date', sc=0, limit=5,
-                                 categ=[categ], ln=ln) + \
-               '</div>' + '<p>' +_('This is the table of contents of the %(x_category)s pages.') % {'x_category': categ}
+        navtrails = {'admin': '<a class="navtrail" href="/help/admin%s">%s</a>' % \
+                     (ln_link, _("Admin Area")),
+                     'help': '<a class="navtrail" href="/help/%s">%s</a>' % \
+                     (ln_link, _("Help Central")),
+                     'hacking': '<a class="navtrail" href="/help/hacking%s">%s</a>' % \
+                     (ln_link, _("Hacking Invenio"))}
+        body = '<div class="container" ><div class="row">' + \
+               '<div  class="span8"><h5>' + \
+              _('Table of contents of the %(x_category)s pages.') % {'x_category': categ}
         if categ != 'help':
-            body += ' ' + _('See also') + ' ' + \
+            body += ' <small>' + _('See also') + ' ' + \
                               ', '.join([ link for (category, link) in \
                                           see_also_links.iteritems() \
-                                          if category != categ]) + '.'
+                                          if category != categ]) + '.</small>'
 
-        body += '</p>' + get_webdoc_topics(sort_by='name', sc=1,
-                                           categ=[categ], ln=ln)
+        body += '</h5>' + get_webdoc_topics(sort_by='name', sc=1,
+                                          categ=[categ], ln=ln) + \
+                '</div><div  class="span4">' + \
+                '<h5>'+_("Latest modifications:") + '</h5>' + \
+                get_webdoc_topics(sort_by='date', sc=0, limit=5,
+                                  categ=[categ], ln=ln)+'</div></div></div>'
         page_parts = {'title': titles.get(categ, ''),
                       'body': body,
                       'navtrail': navtrails.get(categ, '')

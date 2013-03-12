@@ -551,16 +551,19 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
                    {'category': _(category).capitalize()} + '</strong>'
         if limit < 0:
             limit = len(topic)
-        out += '<ul><li>' + \
-               '</li><li>'.join(['%s <a href="%s%s">%s</a>' % \
-                                 ((sort_by == 'date' and time.strftime('%Y-%m-%d', topic_item[1])) or '', \
-                                  topic_item[2], \
-                                  ln_link, \
-                                  get_webdoc_parts(topic_item[0], \
-                                                   parts=['title'], \
-                                                   ln=ln).get('title', '')) \
-                                 for topic_item in topic[:limit]]) + \
-                                 '</li></ul>'
+        out += '<ul class="nav nav-tabs nav-stacked"><li>' + \
+               '</li><li>'.join(['<a href="%s%s">%s %s</a>' %
+                                 ((topic_item[2],
+                                   ln_link,
+                                   get_webdoc_parts(topic_item[0],
+                                                    parts=['title'],
+                                                    ln=ln).get('title') or topic_item[2].split('/')[-1],
+                                   '<span class="label pull-right">' +
+                                   time.strftime('%Y-%m-%d', topic_item[1]) +
+                                   '</span>' if sort_by == 'date' else
+                                   '<i class="icon-chevron-right pull-right"></i>'))
+                                for topic_item in topic[:limit]]) + \
+            '</li></ul>'
 
     return out
 
