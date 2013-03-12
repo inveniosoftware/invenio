@@ -95,6 +95,7 @@ class SimulatedModPythonRequest(object):
         self.__environ = environ
         self.__start_response = start_response
         self.__response_sent_p = False
+        self.__content_type_set_p = False
         self.__buffer = ''
         self.__low_level_headers = []
         self.__filename = None
@@ -175,6 +176,7 @@ class SimulatedModPythonRequest(object):
             self.__buffer = ''
 
     def set_content_type(self, content_type):
+        self.__content_type_set_p = True
         self.response.content_type = content_type
         if self.__is_https:
             if content_type.startswith("text/html") or content_type.startswith("application/rss+xml"):
@@ -316,7 +318,8 @@ class SimulatedModPythonRequest(object):
         self.__errors.write(message.strip() + '\n')
 
     def get_content_type_set_p(self):
-        return bool(self.response.headers['content-type'])
+        return self.__content_type_set_p and \
+            bool(self.response.headers['content-type'])
 
     def allow_methods(self, methods, reset=0):
         if reset:
