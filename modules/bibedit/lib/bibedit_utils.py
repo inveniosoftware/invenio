@@ -746,20 +746,42 @@ def can_record_have_physical_copies(recid):
 
     return collections["holdings"]["visible"] == True
 
+
+def get_record_collections(recid):
+    """ Returns all collections of a record, field 980
+    @param recid: record id to get collections from
+    @type: string
+
+    @return: list of collections
+    @rtype: list
+    """
+    recstruct = get_record(recid)
+    return [collection for collection in record_get_field_values(recstruct,
+                                                            tag="980",
+                                                            ind1=" ",
+                                                            ind2=" ",
+                                                            code="a")]
+
+
 def extend_record_with_template(recid):
     """ Determine if the record has to be extended with the content
     of a template as defined in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
     @return: template name to be applied to record or False if no template
     has to be applied
     """
-    rec_collection = guess_primary_collection_of_a_record(recid)
-    if rec_collection in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE:
-        return CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE[rec_collection]
+    rec_collections = get_record_collections(recid)
+
+    for collection in rec_collections:
+        if collection in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE:
+            return CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE[collection]
     return False
+
 
 def merge_record_with_template(rec, template_name):
     """ Extend the record rec with the contents of the template and return it"""
     template = get_record_template(template_name)
+    if not template:
+        return
     template_bibrec = create_record(template)[0]
 
     for field_tag in template_bibrec:

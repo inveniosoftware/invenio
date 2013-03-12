@@ -700,8 +700,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             # For some collections, merge template with record
             template_to_merge = extend_record_with_template(recid)
             if template_to_merge:
-                record = merge_record_with_template(record, template_to_merge)
-                create_cache_file(recid, uid, record, True)
+                merged_record = merge_record_with_template(record, template_to_merge)
+                if merged_record:
+                    record = merged_record
+                    create_cache_file(recid, uid, record, True)
 
             if record_status == -1:
                 # The record was deleted
