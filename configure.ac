@@ -775,6 +775,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/bin/dbdump \
      modules/miscutil/bin/dbexec \
      modules/miscutil/bin/inveniocfg \
+     modules/miscutil/bin/inveniomanage \
      modules/miscutil/bin/plotextractor \
      modules/miscutil/demo/Makefile \
      modules/miscutil/doc/Makefile \

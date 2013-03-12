@@ -1,0 +1,71 @@
+# -*- coding: utf-8 -*-
+##
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+
+import os
+from pprint import pformat
+from flask.ext.script import Manager
+from flask.ext.script.commands import ShowUrls, Clean
+from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
+from invenio.pluginutils import PluginContainer
+from invenio.sqlalchemyutils import db
+from invenio.webinterface_handler_flask import create_invenio_flask_app
+
+manager = Manager(create_invenio_flask_app)
+
+
+@manager.shell
+def make_shell_context():
+    """Extend shell context."""
+    from flask import current_app
+    return dict(current_app=current_app, db=db)
+
+
+def _invenio_manager_plugin_builder(plugin_name, plugin_code):
+    """
+    Handy function to bridge pluginutils with (Invenio) blueprints.
+    """
+    if 'manager' in dir(plugin_code):
+        candidate = getattr(plugin_code, 'manager')
+        if isinstance(candidate, Manager):
+            return candidate
+    raise ValueError('%s is not a valid manager plugin' % plugin_name)
+
+## Let's load all the managers that are composing this Invenio manage CLI
+_MANAGERS = PluginContainer(
+    os.path.join(CFG_PYLIBDIR, 'invenio', '*_manager.py'),
+    plugin_builder=_invenio_manager_plugin_builder)
+
+## Let's report about broken plugins
+open(os.path.join(CFG_LOGDIR, 'broken-managers.log'), 'w').write(
+    pformat(_MANAGERS.get_broken_plugins()))
+
+for plugin_name, plugin in _MANAGERS.iteritems():
+    name = plugin_name[:-len('_manager')]
+    manager.add_command(name, plugin)
+
+manager.add_command("clean", Clean())
+manager.add_command("show_urls", ShowUrls())
+
+
+def main():
+    manager.run()
+
+if __name__ == "__main__":
+    main()

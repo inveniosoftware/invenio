@@ -829,7 +829,7 @@ def cmd_upgrade_check(dummy_conf, upgrader=None):
     logger = upgrader.get_logger()
 
     try:
-        from invenio.flaskshell import db
+        from invenio.sqlalchemyutils import db
     except ImportError:
         logger.error("make check-upgrade is unfortunately not supported for "
             "non-SQLAlchemy based Invenio installations")

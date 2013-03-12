@@ -42,9 +42,9 @@ except ImportError:
 # modules for debugging.
 
 CFG_REMOTE_DEBUGGER_IMPORT = {
-                            'rpdb2' : 'rpdb2', #windpb debugging
-                            'pydev.pydevd' : 'pydevd', # eclipse/pydev
-                            'pydev.pydevd_file_utils': 'putils', # eclipse/pydev
+                            #'rpdb2' : 'rpdb2', #windpb debugging
+                            #'pydev.pydevd' : 'pydevd', # eclipse/pydev
+                            #'pydev.pydevd_file_utils': 'putils', # eclipse/pydev
 
                              }
 
