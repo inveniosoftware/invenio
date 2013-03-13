@@ -1248,15 +1248,15 @@ class BibSched(object):
                 register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
                 run_sql("UPDATE schTASK SET status='ERRORS REPORTED' WHERE status='CERROR'")
 
-            max_bibupload_priority = run_sql(
-                        """SELECT MAX(priority)
+            max_bibupload_priority, min_bibupload_priority = run_sql(
+                        """SELECT MAX(priority), MIN(priority)
                            FROM schTASK
                            WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
                                     'ABOUT TO STOP', 'ABOUT TO SLEEP',
                                     'SCHEDULED', 'CONTINUING')
                            AND proc = 'bibupload'
-                           AND runtime <= NOW()""")
-            if max_bibupload_priority:
+                           AND runtime <= NOW()""")[0]
+            if max_bibupload_priority > min_bibupload_priority:
                 run_sql(
                 """UPDATE schTASK SET priority = %s
                    WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
@@ -1264,8 +1264,8 @@ class BibSched(object):
                                     'SCHEDULED', 'CONTINUING')
                    AND proc = 'bibupload'
                    AND runtime <= NOW()
-                   AND priority < %s""", (max_bibupload_priority[0][0],
-                                          max_bibupload_priority[0][0]))
+                   AND priority < %s""", (max_bibupload_priority,
+                                          max_bibupload_priority))
             ## The bibupload tasks are sorted by id, which means by the order they were scheduled
             self.node_relevant_bibupload_tasks = run_sql(
                 """SELECT id, proc, runtime, status, priority, host, sequenceid
