@@ -22,10 +22,8 @@
     {{ super() }}
     <script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
     {% js 'js/plupload/plupload.full.js' %}
-    {% js 'js/plupload/jquery.plupload.queue/jquery.plupload.queue.js' %}
     {% js 'js/webdeposit_form.js' %}
     {% js 'js/jquery-ui.min.js' %}
-    {% css 'js/plupload/jquery.plupload.queue/css/jquery.plupload.queue.css' %}
     {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css' %}
     {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css' %}
 {% endblock %}
@@ -74,6 +72,13 @@ div#conditions{
 .required:after {
     color: red;
     content:" *";
+}
+
+.rmlink {
+    cursor: pointer;
+    display: block;
+    margin-left: auto;
+    margin-right: auto
 }
 </style>
 
@@ -136,7 +141,7 @@ div#conditions{
     <div class="control-group {{ "error" if field.errors }}" id="error-group-{{ field.name }}">
 
       <div class="control-label {{ "error" if field.errors }}">
-      {% if "submit" not in field.__html__() %}
+      {% if "submit" not in field.__html__() and "pluploader" not in field.__html__() %}
         {% set label_class = (' required' if field.required else '') %}
         {% if field.form %}
           <h5>
@@ -148,6 +153,7 @@ div#conditions{
       {% endif %}
     </div>
 
+
     {% if field.form %}
       </div>
 
@@ -157,14 +163,14 @@ div#conditions{
           <div class="control-group {{ "error" if subfield.errors }}" id="error-group-{{ subfield.name }}">
 
           <div class="control-label {{ "error" if subfield.errors }}">
-          {% if "submit" not in subfield.__html__() %}
-            {% set label_class = (' required' if subfield.required else '') %}
-            {{ subfield.label(class_=label_class) }}
-          {% endif %}
+            {% if "submit" not in subfield.__html__() and "pluploader" not in subfield.__html__() %}
+              {% set label_class = (' required' if subfield.required else '') %}
+              {{ subfield.label(class_=label_class) }}
+            {% endif %}
           </div>
 
         <div class="controls" id="field-{{ subfield.name }}">
-          {% if subfield._icon_html and "pluploader" not in subfield.__html__() %}
+              {% if subfield._icon_html and "pluploader" not in subfield.__html__() %}
                 <div class="input-prepend">
                     <span class="add-on">
                     {{ subfield._icon_html|safe }}
@@ -192,7 +198,7 @@ div#conditions{
 
         {% if ("keywords" in field.__html__()) %}
         <div class="control-group" style="display: none;">
-          <input name="keywords-{{ field.short_name}}" type="text" value="">
+            <input name="keywords-{{ field.short_name}}" type="text" value="">
         </div>
 
         {% endif %}
@@ -206,29 +212,28 @@ div#conditions{
 
     <div class="controls" id="field-{{ field.name }}">
           {% if field._icon_html and "pluploader" not in field.__html__() %}
-                <div class="input-prepend">
-                    <span class="add-on">
-                    {{ field._icon_html|safe }}
-                    </span>
-              {% elif "pluploader" not in field.__html__() %}
-                <div style="margin-left: 27px;">
-              {% else %}
-                <div>
-              {% endif %}
-
+            <div class="input-prepend">
+                <span class="add-on">
+                {{ field._icon_html|safe }}
+                </span>
+          {% elif "pluploader" not in field.__html__() %}
+            <div style="margin-left: 27px;">
+          {% else %}
+            <div>
+          {% endif %}
               {{ field(class_=field.short_name) }}
-
-              </div>
+            </div>
 
           {% if field.errors %}
             {% for error in field.errors %}
               <div class="alert alert-error help-inline error-list-{{ field.name }}">{{ error }}</div>
             {% endfor %}
           {% endif %}
-          <div class="alert alert-error help-inline" id="error-{{ field.name }}" style="display:none;">error message</div>
-          <div class="alert alert-info help-inline" id="info-{{ field.name }}" style="display:none;">info message</div>
-          <div class="alert alert-success help-inline" id="success-{{ field.name }}" style="display:none;">success message</div>
+              <div class="alert alert-error help-inline" id="error-{{ field.name }}" style="display:none;">error message</div>
+              <div class="alert alert-info help-inline" id="info-{{ field.name }}" style="display:none;">info message</div>
+              <div class="alert alert-success help-inline" id="success-{{ field.name }}" style="display:none;">success message</div>
           </div>
+
         </div>
 
         {% if ("keywords" in field.__html__()) %}
@@ -246,10 +251,15 @@ div#conditions{
 <div class="alert alert-error" id="empty-fields-error" style="font-size:12px; display:none;"></div>
 
 <script type="text/javascript">
-$(function() {
+
+$(document).ready(function() {
   var required_fields = {{ form.required_field_names|tojson|safe }};
 
-  webdeposit_init_plupload('.pluploader', '{{ url_for('webdeposit.plupload', uuid=uuid) }}')
+  webdeposit_init_plupload('.pluploader',
+                            '{{ url_for('webdeposit.plupload', deposition_type=deposition_type, uuid=uuid) }}',
+                            '{{ url_for('webdeposit.plupload_delete', deposition_type=deposition_type, uuid=uuid) }}',
+                            '{{ url_for('webdeposit.plupload_get_file', deposition_type=deposition_type, uuid=uuid) }}',
+                            {{ form.files|safe }})
   webdeposit_input_error_check('#submitForm input, #submitForm textarea, #submitForm select',
                                '{{ url_for("webdeposit.error_check", deposition_type=deposition_type, uuid=uuid) }}',
                                required_fields)

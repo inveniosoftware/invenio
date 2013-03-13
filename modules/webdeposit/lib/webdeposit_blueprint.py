@@ -29,8 +29,10 @@ from flask import current_app, \
                   jsonify, \
                   redirect, \
                   url_for, \
-                  flash
+                  flash, \
+                  send_file
 from werkzeug.utils import secure_filename
+from uuid import uuid1 as new_uuid
 from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft
 from invenio.webdeposit_load_deposition_types import deposition_types, \
@@ -48,23 +50,24 @@ from invenio.webdeposit_utils import get_current_form, \
                                      get_latest_or_new_workflow, \
                                      get_workflow, \
                                      draft_field_get_all, \
-                                     draft_field_error_check
+                                     draft_field_error_check, \
+                                     draft_field_get
 from invenio.webuser_flask import current_user
 from invenio.bibworkflow_engine import CFG_WORKFLOW_STATUS
 from invenio.bibworkflow_model import Workflow
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
-                              url_prefix='/deposit',
-                              config='invenio.websubmit_config',
-                              menubuilder=[('main.webdeposit',
+                             url_prefix='/deposit',
+                             config='invenio.websubmit_config',
+                             menubuilder=[('main.webdeposit',
                                           _('Deposit'),
-                                            'webdeposit.index_deposition_types', 2)],
-                              breadcrumbs=[(_('Deposit'), 'webdeposit.index_deposition_types')])
+                                          'webdeposit.index_deposition_types', 2)],
+                             breadcrumbs=[(_('Deposit'), 'webdeposit.index_deposition_types')])
 
 
-@blueprint.route('/upload/<uuid>', methods=['POST', 'GET'])
+@blueprint.route('/upload/<deposition_type>/<uuid>', methods=['POST'])
 @blueprint.invenio_authenticated
-def plupload(uuid):
+def plupload(deposition_type, uuid):
     """ The file is splitted in chunks on the client-side
         and it is merged again on the server-side
     """
@@ -80,51 +83,105 @@ def plupload(uuid):
 
         try:
             filename = name + "_" + chunk
-        except Exception:
+        except UnboundLocalError:
             filename = name
 
-        # check if webdeposit folder exists
-        # FIXME: create filesystem with structure:
-        #        user_id/document/type/filename
+        # Check if webdeposit folder exists
         if not os.path.exists(CFG_WEBDEPOSIT_UPLOAD_FOLDER):
             os.makedirs(CFG_WEBDEPOSIT_UPLOAD_FOLDER)
 
-        # save the chunk
-        current_chunk.save(os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, filename))
+        # Create user filesystem
+        # user/deposition_type/uuid/files
+        CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER,
+                                                  "user_" +
+                                                  str(current_user.get_id()))
+        if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
+            os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
+
+        CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                                  deposition_type)
+        if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
+            os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
+
+        CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                                  uuid)
+        if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
+            os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
+
+        # Save the chunk
+        current_chunk.save(os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, filename))
+
+        unique_filename = ""
 
         if chunks is None:  # file is a single chunk
-            file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, name)
-
-            draft_field_list_add(current_user.get_id(), \
-                                 uuid, \
-                                 "files", \
-                                 file_path)
+            unique_filename = str(new_uuid()) + name
+            old_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, filename)
+            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, unique_filename)
+            os.rename(old_path, file_path)  # Rename the chunk
+            size = os.path.getsize(file_path)
+            file_metadata = dict(name=name, file=file_path, size=size)
+            draft_field_list_add(current_user.get_id(), uuid,
+                                 "files", file_metadata)
         elif int(chunk) == int(chunks) - 1:
             '''All chunks have been uploaded!
                 start merging the chunks'''
 
             chunk_files = []
-            for filename in iglob(os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, name + '_*')):
+            for filename in iglob(os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, name + '_*')):
                 chunk_files.append(filename)
 
-            #Sort files in numerical order
+            # Sort files in numerical order
             chunk_files.sort(key=lambda x: int(x.split("_")[-1]))
 
-            file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, name)
+            unique_filename = str(new_uuid()) + name
+            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, unique_filename)
             destination = open(file_path, 'wb')
-            for filename in chunk_files:
-                shutil.copyfileobj(open(filename, 'rb'), destination)
+            for chunk in chunk_files:
+                shutil.copyfileobj(open(chunk, 'rb'), destination)
+                os.remove(chunk)
             destination.close()
+            size = os.path.getsize(file_path)
+            file_metadata = dict(name=name, file=file_path, size=size)
 
-            draft_field_list_add(current_user.get_id(), \
-                                 uuid, \
-                                 "files", \
-                                 file_path)
-    return ""
+            draft_field_list_add(current_user.get_id(), uuid,
+                                 "files", json.dumps(file_metadata))
+    return unique_filename
 
 
-@blueprint.route('/<deposition_type>/_autocomplete/<uuid>',
-                 methods=['GET', 'POST'])
+@blueprint.route('/plupload_delete/<deposition_type>/<uuid>', methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+def plupload_delete(deposition_type, uuid):
+    if request.method == 'POST':
+        files = draft_field_get(current_user.get_id(), uuid, "files")
+        result = "File Not Found"
+        filename = request.form['filename']
+        files = draft_field_get(current_user.get_id(), uuid, "files")
+        for index, f in enumerate(files):
+            if filename == f['file'].split('/')[-1]:  # get the unique name from the path
+                os.remove(f['file'])
+                del files[index]
+                result = str(files) + "              "
+                draft_field_set(current_user.get_id(), uuid, "files", files)
+                result = "File " + f['name'] + " Deleted"
+                break
+    return result
+
+
+@blueprint.route('/plupload_get_file/<deposition_type>/<uuid>', methods=['GET'])
+@blueprint.invenio_authenticated
+def plupload_get_file(deposition_type, uuid):
+    filename = request.args.get('filename')
+    tmp = ""
+    files = draft_field_get(current_user.get_id(), uuid, "files")
+    for f in files:
+        tmp += f['file'].split('/')[-1] + '<br><br>'
+        if filename == f['file'].split('/')[-1]:
+            return send_file(f['file'], attachment_filename=f['name'], as_attachment=True)
+
+    return "filename: " + filename + '<br>' + tmp
+
+
+@blueprint.route('/<deposition_type>/_autocomplete/<uuid>', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 def autocomplete(deposition_type, uuid):
     """ Returns a list with of suggestions for the field

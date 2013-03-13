@@ -215,10 +215,19 @@ def get_form(user_id, uuid, step=None):
                 if subfield_name in draft_data[field_name]:
                     form.__dict__["_fields"][field_name].\
                         form.__dict__["_fields"][subfield_name].\
-                            process_data(draft_data[field_name][subfield_name])
+                        process_data(draft_data[field_name][subfield_name])
         elif field_name in draft_data:
             form[field_name].process_data(draft_data[field_name])
 
+
+    import json
+    if 'files' in draft_data:
+        for file_metadata in draft_data['files']:
+            file_metadata['unique_filename'] = file_metadata['file'].split('/')[-1]
+            del file_metadata['file']
+        form.__setattr__('files', json.dumps(draft_data['files']))
+    else:
+        form.__setattr__('files', {})
     return form
 
 
@@ -333,10 +342,7 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
            { field_name : {key : value} }
     """
 
-    webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
+    webdeposit_draft_query = db.session.query(WebDepositDraft).filter(
                             WebDepositDraft.uuid == uuid)
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
@@ -345,7 +351,7 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
     try:
         if isinstance(values[field_name], list):
             values[field_name].append(value)
-        elif key is not None:
+        elif subfield is not None:
             if not isinstance(values[field_name], dict):
                 values[field_name] = dict()
             values[field_name][subfield] = value

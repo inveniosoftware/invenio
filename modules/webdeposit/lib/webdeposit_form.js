@@ -21,26 +21,151 @@
  * Plupload
  */
 
-function webdeposit_init_plupload(selector, url) {
-  // Convert divs to queue widgets.
-  $(selector).pluploadQueue({
-    // General settings
-    runtimes : 'html5',
-    url : url,
-    max_file_size : '460mb',
-    chunk_size : '1mb',
-    unique_names : true,
+ function unique_ID(){
+    return Math.round(new Date().getTime() + (Math.random() * 100));
+ }
 
-    // Resize images on clientside if we can
-    resize : {width : 320, height : 240, quality : 90},
+function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_files) {
 
-    // Specify what files to browse for
-    filters : [
-       {title : "Image files", extensions : "jpg,gif,png,tif"},
-       {title : "Compressed files", extensions : "zip,tar,gz"},
-       {title : "PDF files", extensions : "pdf"}
-    ]
-  });
+    uploader = new plupload.Uploader({
+        // General settings
+        runtimes : 'html5',
+        url : url,
+        max_file_size : '460mb',
+        chunk_size : '1mb',
+        //unique_names : true,
+        browse_button : 'pickfiles',
+        drop_element : 'filebox',
+
+        // Specify what files to browse for
+        filters : [
+            {title : "Image files", extensions : "jpg,gif,png,tif"},
+            {title : "Compressed files", extensions : "rar,zip,tar,gz"},
+            {title : "PDF files", extensions : "pdf"}
+        ]
+    });
+
+    uploader.init();
+
+    $(function() {
+        if (!jQuery.isEmptyObject(db_files)){
+            $('#file-table').show('slow');
+
+            $.each(db_files, function(i, file) {
+                // Simulate a plupload file object
+                id = unique_ID();
+                var plfile = new plupload.File({
+                    id: id,
+                    name: file.name,
+                    size: file.size
+                });
+                // Dont touch it!
+                // For some reason the constructor doesn't initialize
+                // the data members
+                plfile.id = id,
+                plfile.name = file.name;
+                plfile.size = file.size;
+                plfile.loaded = file.size;
+                plfile.status = 5;
+                plfile.percent = 100;
+                plfile.unique_filename = file.unique_filename;
+                ///////
+                uploader.files.push(plfile);
+                $('#filelist').append(
+                    '<tr id="' + plfile.id + '" style="display:none;">' +
+                        '<td><a href="' + get_file_url + "?filename=" + plfile.unique_filename + '">' + plfile.name + '</a></td>'
+                      + '<td>' + plupload.formatSize(plfile.size) + '</td>'
+                      + '<td width="30%"><div class="progress active"><div class="bar" style="width: 100%;"></div></div></td>'
+                      + '<td><a id="' + plfile.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>'
+                  + '</tr>');
+                $('#filelist #' + plfile.id).show('fast');
+                $("#" + plfile.id + "_rm").on("click", function(event){
+                    uploader.removeFile(plfile);
+                });
+            });
+        }
+    });
+
+    $('#uploadfiles').click(function(e) {
+        uploader.start();
+        $('#uploadfiles').hide();
+        $('#stopupload').show();
+        e.preventDefault();
+    });
+
+    $('#stopupload').click(function(d){
+        uploader.stop();
+        $('#stopupload').hide();
+        $('#uploadfiles').show();
+        $.each(uploader.files, function(i, file) {
+            if (file.loaded < file.size){
+                $("#" + file.id + "_rm").show();
+                $('#' + file.id + " .bar").css('width', "0%");
+            }
+        });
+    });
+
+    uploader.bind('FilesRemoved', function(up, files) {
+        $.each(files, function(i, file) {
+            $('#filelist #' + file.id).hide('fast');
+            if (file.loaded == file.size) {
+                $.ajax({
+                    type: "POST",
+                    url: delete_url,
+                    data: $.param({
+                        filename: file.unique_filename
+                    })
+                });
+            }
+        });
+        if(uploader.files.length == 0){
+            $('#uploadfiles').addClass("disabled");
+            $('#file-table').hide('slow');
+        }
+    });
+
+    uploader.bind('UploadProgress', function(up, file) {
+        $('#' + file.id + " .bar").css('width', file.percent + "%");
+        console.log("Progress " + file.name + " - " + file.percent);
+    });
+
+    uploader.bind('UploadFile', function(up, file) {
+        $('#' + file.id + "_rm").hide();
+    });
+
+
+    uploader.bind('FilesAdded', function(up, files) {
+        $('#uploadfiles').removeClass("disabled");
+        $('#file-table').show('slow');
+        $.each(files, function(i, file) {
+            $('#filelist').append(
+                '<tr id="' + file.id + '" style="display:none;z-index:-100;">'
+                  + '<td id="' + file.id + '_link">' + file.name + '</td>'
+                  + '<td>' + plupload.formatSize(file.size) + '</td>'
+                  + '<td width="30%"><div class="progress progress-striped active"><div class="bar" style="width: 0%;"></div></div></td>'
+                  + '<td><a id="' + file.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>'
+              + '</tr>');
+            $('#filelist #' + file.id).show('fast');
+            $('#' + file.id + '_rm').on("click", function(event){
+                uploader.removeFile(file);
+            });
+        });
+    });
+
+    uploader.bind('FileUploaded', function(up, file, responseObj) {
+        console.log("Done " + file.name);
+        $('#' + file.id + " .progress").removeClass("progress-striped");
+        $('#' + file.id + " .bar").css('width', "100%");
+        $('#' + file.id + '_rm').show();
+        $('#' + file.id + '_link').html('<a href="' + get_file_url + "?filename=" + responseObj.response + '">' + file.name + '</a>');
+        file.unique_filename = responseObj.response;
+        if (uploader.total.queued == 0)
+            $('#stopupload').hide();
+
+        $('#uploadfiles').addClass('disabled');
+        $('#uploadfiles').show();
+
+    });
 }
 
 
@@ -53,14 +178,14 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
     // handles a response from the server for the field
     if (data.error == 1) {
         errorMsg = data.error_message;
-        $('#error-'+name).html(errorMsg);
-        $('.error-list-'+name).hide('slow');
-        $('#error-'+name).show('slow');
+        $('#error-' + name).html(errorMsg);
+        $('.error-list-' + name).hide('slow');
+        $('#error-' + name).show('slow');
         $("#error-group-" + name).addClass('error');
         errors++;
     } else {
-        $('#error-'+name).hide('slow');
-        $('.error-list-'+name).hide('slow');
+        $('#error-' + name).hide('slow');
+        $('.error-list-' + name).hide('slow');
         $("#error-group-" + name).removeClass('error');
         if (errors > 0)
             errors--;
@@ -228,5 +353,4 @@ function webdeposit_field_autocomplete(selector, url) {
   $('#editable').on("click", "#delete_tag", function(event) {
         alert(this);
         alert("click!!!!");
-  });
-*/
+  }); */

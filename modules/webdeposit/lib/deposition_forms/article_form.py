@@ -38,21 +38,21 @@ class ArticleForm(Form):
     author = fields.AuthorField(label=_('Author'))
     abstract = fields.AbstractField(label=_('Abstract'))
     pagesnum = fields.PagesNumberField(label=_('Number of Pages'))
-    languages = [("en", _("English")), \
-                ("fre", _("French")), \
-                ("ger", _("German")), \
-                ("dut", _("Dutch")), \
-                ("ita", _("Italian")), \
-                ("spa", _("Spanish")), \
-                ("por", _("Portuguese")), \
-                ("gre", _("Greek")), \
-                ("slo", _("Slovak")), \
-                ("cze", _("Czech")), \
-                ("hun", _("Hungarian")), \
-                ("pol", _("Polish")), \
-                ("nor", _("Norwegian")), \
-                ("swe", _("Swedish")), \
-                ("fin", _("Finnish")), \
+    languages = [("en", _("English")),
+                ("fre", _("French")),
+                ("ger", _("German")),
+                ("dut", _("Dutch")),
+                ("ita", _("Italian")),
+                ("spa", _("Spanish")),
+                ("por", _("Portuguese")),
+                ("gre", _("Greek")),
+                ("slo", _("Slovak")),
+                ("cze", _("Czech")),
+                ("hun", _("Hungarian")),
+                ("pol", _("Polish")),
+                ("nor", _("Norwegian")),
+                ("swe", _("Swedish")),
+                ("fin", _("Finnish")),
                 ("rus", _("Russian"))]
     language = fields.LanguageField(label=_("Language"), choices=languages)
     date = fields.Date(label=_('Date of Document'), widget=date_widget)
@@ -61,6 +61,7 @@ class ArticleForm(Form):
     file = fields.FileUploadField(label=_('File'))
     plupload_file = fields.FileUploadField(label=_('File'), widget=plupload_widget)
     submit = SubmitField(label=_('Submit Article'), widget=bootstrap_submit)
+
 
     """ Form Configuration variables """
     _title = _("Submit an Article")

@@ -17,34 +17,57 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from wtforms import Label
 from wtforms.widgets import html_params, HTMLString
+
 
 def date_widget(field, **kwargs):
     field_id = kwargs.pop('id', field.id)
-    html = [u'<input class="datepicker" %s value="" type="text">' \
+    html = [u'<input class="datepicker" %s value="" type="text">'
             % html_params(id=field_id, name=field_id)]
     field_class = kwargs.pop('class', '') or kwargs.pop('class_', '')
     kwargs['class'] = u'datepicker %s' % field_class
     kwargs['class'] = u'date %s' % field_class
     return HTMLString(u''.join(html))
 
+
 def plupload_widget(field, **kwargs):
     field_id = kwargs.pop('id', field.id)
-    html = [u'</td></tr><tr><td colspan="3"><div class="pluploader" %s>\
-                <p>You browser doesn\'t have HTML5 support.</p>\
-                </div></td></tr>' % html_params(id=field_id)]
+    # FIXME: Move html code in a template and initialize html variable
+    #        with the render_template_to_string function
+    html = [u' \
+            <div class="pluploader" %s > \
+                <div class="well" id="filebox">\
+                    <div id="drag_and_drop_text" style="text-align:center;z-index:-100;">\
+                        <h1><small>Drag and Drop files here</small></h1>\
+                    </div>\
+                </div> \
+                <table id="file-table" class="table table-striped table-bordered" style="display:none;">\
+                    <thead>\
+                        <tr>\
+                        <th>Filename</th>\
+                        <th>Size</th>\
+                        <th>Status</th>\
+                        <td></td>\
+                        </tr>\
+                    </thead>\
+                    <tbody id="filelist">\
+                    </tbody>\
+                </table>\
+                <a class="btn btn-primary" id="pickfiles" >Select files</a> \
+                <a class="btn btn-success disabled" id="uploadfiles"><i class="icon-upload icon-white"></i> Start upload</a>\
+                <a class="btn btn-danger" id="stopupload" style="display:none;"><i class="icon-stop icon-white"></i> Stop upload</a>\
+                <div id="upload-errors"></div>\
+            </div>' % html_params(id=field_id)]
     kwargs['class'] = u'plupload'
     return HTMLString(u''.join(html))
 
 
 def bootstrap_submit(field, **kwargs):
-    html = u'<input %s >' \
-                % html_params(style="float:right;", \
-                              id="submitButton", \
-                              class_="btn btn-primary btn-large", \
-                              name="submitButton",
-                              type="submitButton", \
-                              value=field.label.text,)
-    html = [u'<div style="float:right;" ></br>' + html + u'</div>']
+    html = u'<input %s >' % html_params(style="float:right;",
+                                        id="submitButton",
+                                        class_="btn btn-primary btn-large",
+                                        name="submitButton",
+                                        type="submitButton",
+                                        value=field.label.text,)
+    html = [u'<div style="float:right;" >' + html + u'</div>']
     return HTMLString(u''.join(html))
