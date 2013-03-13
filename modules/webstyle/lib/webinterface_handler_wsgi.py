@@ -559,8 +559,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
             ## expect parameters to be of type str.
             ## When legacy publisher will be removed all this
             ## pain will go away anyway :-)
-            if isinstance(value, str):
-                form[key] = str(value)
+            if isinstance(value, unicode):
+                form[key] = value.encode('utf8')
             else:
                 ## NOTE: this is a workaround for e.g. legacy webupload
                 ## that is still using legacy publisher and expect to
