@@ -68,6 +68,13 @@ class PluginContainer(object):
     @param plugin_signature: a stub to be used in order to check if a loaded
         plugin respect a particular signature or not.
     @type plugin_signature: class/function
+    @param external: are the plugins loaded from outside the Invenio standard lib
+        directory? Defaults to False.
+    @type external: bool
+    @param register_exception: should exceptions be registered when loading
+        plugins? Defaults to True.
+    @type register_exception: bool
+
 
     @ivar _plugin_map: a map between plugin_name and a dict with keys
         "error", "plugin", "plugin_path", "enabled", "api_version"
@@ -79,6 +86,12 @@ class PluginContainer(object):
     @type plugin_builder: function
     @ivar api_version: the version as provided to the constructor.
     @type api_version: integer
+    @ivar external: are the plugins loaded from outside the Invenio standard lib
+        directory? Defaults to False.
+    @type external: bool
+    @ivar exception_registration: should exceptions be registered when loading
+        plugins? Defaults to True.
+    @type exception_registration: bool
 
     @group Mapping interface: __contains__,__getitem__,get,has_key,items,
         iteritems,iterkeys,itervalues,keys,values,__len__
@@ -92,11 +105,13 @@ class PluginContainer(object):
             plugin_builder=None,
             api_version=None,
             plugin_signature=None,
-            external=False):
+            external=False,
+            exception_registration=True):
         self._plugin_map = {}
         self._plugin_pathnames = []
         self._external = external
         self.api_version = api_version
+        self._register_exception = exception_registration
         if plugin_builder is None:
             self._plugin_builder = self.default_plugin_builder
         else:
@@ -343,7 +358,8 @@ class PluginContainer(object):
                 'api_version': api_version,
             }
         except Exception:
-            register_exception()
+            if self._register_exception:
+                register_exception()
             self._plugin_map[plugin_name] = {
                 'plugin': None,
                 'error': sys.exc_info(),
