@@ -35,7 +35,9 @@ from flask import current_app
 USE_TASK_QUEUE = False
 
 if CFG_BIBWORKFLOW_WORKER:
-    workers = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibworkflow', 'workers', '*.py'))
+    worker_plugin_path = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibworkflow',
+                                      'workers', '*.py')
+    workers = PluginContainer(worker_plugin_path, exception_registration=False)
     try:
         WORKER = workers.get_enabled_plugins()[CFG_BIBWORKFLOW_WORKER]
         USE_TASK_QUEUE = True
