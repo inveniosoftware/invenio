@@ -1,5 +1,6 @@
+{#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,16 +15,25 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-templatesdir = $(sysconfdir)/templates
-templates_DATA = page.html \
-                 legacy_page.html \
-		 404.html \
-                 _formhelpers.html \
-		 breadcrumbs.html \
-		 header.html \
-		 footer.html
-
-EXTRA_DIST = $(templates_DATA)
-
-CLEANFILES = *~ *.tmp
+#}
+{% if breadcrumbs|length > 1 %}
+<div class="container">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+    {% if loop.last %}
+    <li class="active">
+      {{ breadcrumb[0] }}
+    </li>
+    {% else %}
+    <li>
+      {% set url_args = breadcrumb[2] or {} %}
+      <a href="{{ url_for(breadcrumb[1], **url_args) }}"
+         class="navtrail">
+        {{ breadcrumb[0] }}
+      </a> <span class="divider">/</span>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}

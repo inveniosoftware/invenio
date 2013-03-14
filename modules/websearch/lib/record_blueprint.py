@@ -26,7 +26,7 @@ from flask import session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app, \
                   abort
 from invenio.cache import cache
-from invenio.config import CFG_SITE_RECORD
+from invenio.config import CFG_SITE_RECORD, CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \
     mail_cookie_create_authorize_action
@@ -126,6 +126,12 @@ def request_record(f):
             tabs.append(t)
             if v['visible']:
                 g.record_tab_keys.append(b+'.'+k)
+
+        if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
+            @register_template_context_processor
+            def trackback_context():
+                from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
+                return dict(headerLinkbackTrackbackLink=get_trackback_auto_discovery_tag(recid))
 
         @register_template_context_processor
         def record_context():

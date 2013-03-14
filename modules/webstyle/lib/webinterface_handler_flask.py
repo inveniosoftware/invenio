@@ -102,7 +102,7 @@ def create_invenio_flask_app():
     from invenio.dateutils import convert_datetext_to_dategui, \
                                   convert_datestruct_to_dategui, \
                                   pretty_date
-    from invenio.urlutils import create_url
+    from invenio.urlutils import create_url, get_canonical_and_alternates_urls
     from invenio.cache import cache
     from invenio.jinja2utils import CollectionExtension, DynCacheExtension, \
                                     hack_jinja2_utf8decoding
@@ -481,15 +481,22 @@ def create_invenio_flask_app():
         else:
             breadcrumbs = [(_('Home'), '')]
 
-        menubuilder = filter(lambda x: x.display(), current_app.config['menubuilder_map']['main'].\
-                        children.itervalues())
+        menubuilder = filter(lambda x: x.display(),
+                             current_app.config['menubuilder_map']['main'].
+                             children.itervalues())
 
         user = current_user._get_current_object()
+        canonical_url, alternate_urls = get_canonical_and_alternates_urls(
+            request.environ['PATH_INFO'])
+        alternate_urls = dict((ln.replace('_', '-'), alternate_url)
+                              for ln, alternate_url in alternate_urls.iteritems())
         return dict(_=g._,
                     current_user=user,
                     get_css_bundle=_app.jinja_env.get_css_bundle,
                     get_js_bundle=_app.jinja_env.get_js_bundle,
                     is_language_rtl=is_language_rtl(g.ln),
+                    canonical_url=canonical_url,
+                    alternate_urls=alternate_urls,
                     url_for=invenio_url_for,
                     breadcrumbs=breadcrumbs,
                     menu=menubuilder)

@@ -49,14 +49,16 @@ from invenio.urlutils import make_canonical_urlargd, create_html_link, \
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
+from bs4 import BeautifulSoup
 from invenio import template
 websearch_templates = template.load('websearch')
 
+
 class Template:
 
-    def tmpl_navtrailbox_body(self, ln, title, previous_links,
-                              separator, prolog, epilog):
-        """Create navigation trail box body
+    def tmpl_navtrailbox_body(self, ln, title, previous_links, separator,
+                              prolog, epilog):
+        """Bootstrap friendly-Create navigation trail box body
 
            Parameters:
 
@@ -82,42 +84,27 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = ""
-
         if title == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
-            # return empty string for the Home page
-            return out
-        else:
-            out += create_html_link(CFG_SITE_URL, {'ln': ln},
-                                    _("Home"), {'class': 'navtrail'})
+            return ""
+
+        # First element
+        breadcrumbs = [(_("Home"), CFG_SITE_URL), ]
+
+        # Decode previous elements
         if previous_links:
-            if out:
-                out += separator
-            out += previous_links
+            soup = BeautifulSoup(previous_links)
+            for link in soup.find_all('a'):
+                breadcrumbs.append((unicode(" ".join(link.contents)),
+                                   link.get('href')))
+
+        # Add head
         if title:
-            if out:
-                out += separator
-            if title == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME): # hide site name, print Home instead
-                out += cgi.escape(_("Home"))
-            else:
-                out += cgi.escape(title)
+            breadcrumbs.append((title, ''))
 
-        return cgi.escape(prolog) + out + cgi.escape(epilog)
+        return render_template_to_string("breadcrumbs.html",
+                                         breadcrumbs=breadcrumbs).encode('utf8')
 
-    def tmpl_page(self, req=None, ln=CFG_SITE_LANG, description="",
-                  keywords="", userinfobox="", useractivities_menu="",
-                  adminactivities_menu="", navtrailbox="",
-                  pageheaderadd="", boxlefttop="", boxlefttopadd="",
-                  boxleftbottom="", boxleftbottomadd="",
-                  boxrighttop="", boxrighttopadd="",
-                  boxrightbottom="", boxrightbottomadd="",
-                  titleprologue="", title="", titleepilogue="",
-                  body="", lastupdated=None, pagefooteradd="", uid=0,
-                  secure_page_p=0, navmenuid="", metaheaderadd="",
-                  rssurl=CFG_SITE_URL+"/rss",
-                  show_title_p=True, body_css_classes=None,
-                  show_header=True, show_footer=True):
-
+    def tmpl_page(self, req, **kwargs):
         """Creates a complete page
 
            Parameters:
@@ -191,81 +178,23 @@ class Template:
           - HTML code of the page
         """
 
-        # load the right message language
-        _ = gettext_set_language(ln)
-        out = ''
-        if show_header:
-            out += self.tmpl_pageheader(req,
-                                   ln = ln,
-                                   headertitle = title,
-                                   description = description,
-                                   keywords = keywords,
-                                   metaheaderadd = metaheaderadd,
-                                   userinfobox = userinfobox,
-                                   useractivities_menu = useractivities_menu,
-                                   adminactivities_menu = adminactivities_menu,
-                                   navtrailbox = navtrailbox,
-                                   pageheaderadd = pageheaderadd,
-                                   uid=uid,
-                                   secure_page_p = secure_page_p,
-                                   navmenuid=navmenuid,
-                                   rssurl=rssurl,
-                                   body_css_classes=body_css_classes)
-        out += """
-<div class="pagebody">
-  <div class="pagebodystripeleft">
-    <div class="pageboxlefttop">%(boxlefttop)s</div>
-    <div class="pageboxlefttopadd">%(boxlefttopadd)s</div>
-    <div class="pageboxleftbottomadd">%(boxleftbottomadd)s</div>
-    <div class="pageboxleftbottom">%(boxleftbottom)s</div>
-  </div>
-  <div class="pagebodystriperight">
-    <div class="pageboxrighttop">%(boxrighttop)s</div>
-    <div class="pageboxrighttopadd">%(boxrighttopadd)s</div>
-    <div class="pageboxrightbottomadd">%(boxrightbottomadd)s</div>
-    <div class="pageboxrightbottom">%(boxrightbottom)s</div>
-  </div>
-  <div class="pagebodystripemiddle">
-    %(titleprologue)s
-    %(title)s
-    %(titleepilogue)s
-    %(body)s
-  </div>
-  <div class="clear"></div>
-</div>
-""" % {
-  'boxlefttop' : boxlefttop,
-  'boxlefttopadd' : boxlefttopadd,
+        ctx = dict(ln=CFG_SITE_LANG, description="",
+                   keywords="", userinfobox="", useractivities_menu="",
+                   adminactivities_menu="", navtrailbox="",
+                   pageheaderadd="", boxlefttop="", boxlefttopadd="",
+                   boxleftbottom="", boxleftbottomadd="",
+                   boxrighttop="", boxrighttopadd="",
+                   boxrightbottom="", boxrightbottomadd="",
+                   titleprologue="", title="", titleepilogue="",
+                   body="", lastupdated=None, pagefooteradd="", uid=0,
+                   secure_page_p=0, navmenuid="", metaheaderadd="",
+                   rssurl=CFG_SITE_URL+"/rss",
+                   show_title_p=True, body_css_classes=None,
+                   show_header=True, show_footer=True)
+        ctx.update(kwargs)
+        return render_template_to_string("legacy_page.html", **ctx).encode('utf8')
 
-  'boxleftbottom' : boxleftbottom,
-  'boxleftbottomadd' : boxleftbottomadd,
-
-  'boxrighttop' : boxrighttop,
-  'boxrighttopadd' : boxrighttopadd,
-
-  'boxrightbottom' : boxrightbottom,
-  'boxrightbottomadd' : boxrightbottomadd,
-
-  'titleprologue' : titleprologue,
-  'title' : (title and show_title_p) and '<div class="headline_div"><h1 class="headline">' + cgi.escape(title) + '</h1></div>' or '',
-  'titleepilogue' : titleepilogue,
-
-  'body' : body,
-
-  }
-        if show_footer:
-            out += self.tmpl_pagefooter(req, ln = ln,
-                           lastupdated = lastupdated,
-                           pagefooteradd = pagefooteradd)
-        return out
-
-    def tmpl_pageheader(self, req, ln=CFG_SITE_LANG, headertitle="",
-                        description="", keywords="", userinfobox="",
-                        useractivities_menu="", adminactivities_menu="",
-                        navtrailbox="", pageheaderadd="", uid=0,
-                        secure_page_p=0, navmenuid="admin", metaheaderadd="",
-                        rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
-
+    def tmpl_pageheader(self, req, **kwargs):
         """Creates a page header
 
            Parameters:
@@ -307,164 +236,23 @@ class Template:
           - HTML code of the page headers
         """
 
-        # load the right message language
-        _ = gettext_set_language(ln)
+        ctx = dict(ln=CFG_SITE_LANG, headertitle="",
+                   description="", keywords="", userinfobox="",
+                   useractivities_menu="", adminactivities_menu="",
+                   navtrailbox="", pageheaderadd="", uid=0,
+                   secure_page_p=0, navmenuid="admin", metaheaderadd="",
+                   rssurl=CFG_SITE_URL+"/rss", body_css_classes=None)
+        ctx.update(kwargs)
+        ctx['body_css_classes'] = ctx.get('body_css_classes', []).append(
+            ctx.get('navmenuid', ''))
+        return render_template_to_string(
+            "legacy_page.html",
+            no_pagebody=True,
+            no_pagefooter=True,
+            **ctx
+        ).encode('utf8')
 
-        if body_css_classes is None:
-            body_css_classes = []
-        body_css_classes.append(navmenuid)
-
-        uri = req.unparsed_uri
-        headerLinkbackTrackbackLink = ''
-        if CFG_WEBLINKBACK_TRACKBACK_ENABLED:
-            from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
-            # Embed a link in the header to subscribe trackbacks
-            # TODO: This hack must be replaced with the introduction of the new web framework
-            recordIndexInURI = uri.find('/' + CFG_SITE_RECORD + '/')
-            # substring found --> offer trackback link in header
-            if recordIndexInURI != -1:
-                recid = uri[recordIndexInURI:len(uri)].split('/')[2].split("?")[0] #recid might end with ? for journal records
-                headerLinkbackTrackbackLink = get_trackback_auto_discovery_tag(recid)
-
-        if CFG_WEBSTYLE_INSPECT_TEMPLATES:
-            inspect_templates_message = '''
-<table width="100%%" cellspacing="0" cellpadding="2" border="0">
-<tr bgcolor="#aa0000">
-<td width="100%%">
-<font color="#ffffff">
-<strong>
-<small>
-CFG_WEBSTYLE_INSPECT_TEMPLATES debugging mode is enabled.  Please
-hover your mouse pointer over any region on the page to see which
-template function generated it.
-</small>
-</strong>
-</font>
-</td>
-</tr>
-</table>
-'''
-        else:
-            inspect_templates_message = ""
-
-        sitename = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
-        if headertitle == sitename:
-            pageheadertitle = headertitle
-        else:
-            pageheadertitle = headertitle + ' - ' + sitename
-
-
-        data = {
-          'rtl_direction': is_language_rtl(ln) and ' dir="rtl"' or '',
-          'siteurl' : CFG_SITE_URL,
-          'sitesecureurl' : CFG_SITE_SECURE_URL,
-          'canonical_and_alternate_urls' : self.tmpl_canonical_and_alternate_urls(uri),
-          'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
-          'cssskin' : CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or '',
-          'rssurl': rssurl,
-          'ln' : ln,
-          'ln_iso_639_a' : ln.split('_', 1)[0],
-          'langlink': '?ln=' + ln,
-
-          'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-          'pageheadertitle': cgi.escape(pageheadertitle),
-
-          'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
-
-          'description' : cgi.escape(description, True),
-          'keywords' : cgi.escape(keywords, True),
-          'metaheaderadd' : metaheaderadd,
-
-          'userinfobox' : userinfobox,
-          'navtrailbox' : navtrailbox,
-          'useractivities': useractivities_menu,
-          'adminactivities': adminactivities_menu and ('<td class="headermoduleboxbodyblank">&nbsp;</td><td class="headermoduleboxbody%(personalize_selected)s">%(adminactivities)s</td>' % \
-          {'personalize_selected': navmenuid.startswith('admin') and "selected" or "",
-          'adminactivities': adminactivities_menu}) or '<td class="headermoduleboxbodyblank">&nbsp;</td>',
-
-          'pageheaderadd' : pageheaderadd,
-          'body_css_classes' : body_css_classes and ' class="%s"' % ' '.join(body_css_classes) or '',
-
-          'search_selected': navmenuid == 'search' and "selected" or "",
-          'submit_selected': navmenuid == 'submit' and "selected" or "",
-          'personalize_selected': navmenuid.startswith('your') and "selected" or "",
-          'help_selected': navmenuid == 'help' and "selected" or "",
-
-          'msg_search' : _("Search"),
-          'msg_submit' : _("Submit"),
-          'msg_personalize' : _("Personalize"),
-          'msg_help' : _("Help"),
-          'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
-          'linkbackTrackbackLink': headerLinkbackTrackbackLink,
-          'inspect_templates_message' : inspect_templates_message
-        }
-
-        for k, v in data.iteritems():
-            if isinstance(v, unicode):
-                data[k] = v.encode('utf-8')
-
-        out = """\
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s" xmlns:og="http://opengraphprotocol.org/schema/" >
-<head>
- <title>%(pageheadertitle)s</title>
- <link rev="made" href="mailto:%(sitesupportemail)s" />
- <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
- <!--[if lt IE 8]>
-    <link rel="stylesheet" type="text/css" href="%(cssurl)s/img/invenio%(cssskin)s-ie7.css" />
- <![endif]-->
- <!--[if gt IE 8]>
-    <style type="text/css">div.restrictedflag {filter:none;}</style>
- <![endif]-->
- <link rel="stylesheet" href="%(siteurl)s/css/bootstrap.min.css" type="text/css" />
- <link rel="stylesheet" href="%(siteurl)s/css/bootstrap-responsive.min.css" type="text/css" />
- %(canonical_and_alternate_urls)s
- <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
- <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
- <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
- %(linkbackTrackbackLink)s
- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
- <meta http-equiv="Content-Language" content="%(ln)s" />
- <meta name="description" content="%(description)s" />
- <meta name="keywords" content="%(keywords)s" />
- <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
- <script type="text/javascript" src="%(cssurl)s/js/bootstrap.js"></script>
- %(metaheaderadd)s
-</head>
-<body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
-<div class="pageheader">
-%(inspect_templates_message)s
-<!-- replaced page header -->
-<table class="navtrailbox">
- <tr>
-  <td class="navtrailboxbody">
-   %(navtrailbox)s
-  </td>
- </tr>
-</table>
-<!-- end replaced page header -->
-%(pageheaderadd)s
-</div>
-        """ % data
-
-        out += render_template_to_string('header.html').encode('utf-8')
-        return out
-
-    def tmpl_canonical_and_alternate_urls(self, url):
-        """
-        Return the snippet of HTML to be put within the HTML HEAD tag in order
-        to declare the canonical and language alternate URLs of a page.
-        """
-        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url)
-        out = """  <link rel="canonical" href="%s" />\n""" % cgi.escape(canonical_url, True)
-        for ln, alternate_url in alternate_urls.iteritems():
-            ln = ln.replace('_', '-') ## zh_CN -> zh-CN
-            out += """  <link rel="alternate" hreflang="%s" href="%s" />\n""" % (ln, cgi.escape(alternate_url, True))
-        return out
-
-    def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
-                        pagefooteradd=""):
+    def tmpl_pagefooter(self, req, **kwargs):
         """Creates a page footer
 
            Parameters:
@@ -479,35 +267,19 @@ template function generated it.
 
           - HTML code of the page headers
         """
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
+        ctx = dict(ln=CFG_SITE_LANG, lastupdated=None, pagefooteradd=None)
+        ctx.update(kwargs)
+        lastupdated = ctx.get('lastupdated')
         if lastupdated and lastupdated != '$Date$':
-            if lastupdated.startswith("$Date: ") or \
-            lastupdated.startswith("$Id: "):
-                lastupdated = convert_datecvs_to_datestruct(lastupdated)
+            if lastupdated.startswith("$Date: ") or lastupdated.startswith("$Id: "):
+                ctx['lastupdated'] = convert_datecvs_to_datestruct(lastupdated)
 
-        out = """
-<div class="pagefooter">
-%(pagefooteradd)s
-</div>""" % {
-          'pagefooteradd': pagefooteradd
-        }
-
-        from datetime import datetime
-        try:
-            lastupdated = datetime(*lastupdated[:7])
-        except:
-            lastupdated = None
-
-        out += render_template_to_string('footer.html',
-                                      lastupdated=lastupdated).encode('utf-8')
-        out += """
-</body>
-</html>
-        """
-        return out
+        return render_template_to_string(
+            "legacy_page.html",
+            no_pagebody=True,
+            no_pageheader=True,
+            **ctx
+        ).encode('utf8')
 
     def tmpl_language_selection_box(self, req, language=CFG_SITE_LANG):
         """Take URLARGS and LANGUAGE and return textual language
