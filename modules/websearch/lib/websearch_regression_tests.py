@@ -2758,6 +2758,42 @@ class WebSearchGetRecordTests(unittest.TestCase):
         self.assertEqual(get_record(self.recid), {'001': [([], ' ', ' ', str(self.recid), 1)]})
 
 
+class WebSearchExactTitleIndexTest(unittest.TestCase):
+    """Checks if exact title index works correctly """
+
+    def test_exacttitle_query_solves_problems(self):
+        """websearch - check exacttitle query solves problems"""
+        error_messages = []
+        error_messages.extend(test_web_page_content(CFG_SITE_URL + "/search?ln=en&p=exacttitle%3A'solves+problems'&f=&action_search=Search",
+                                                    expected_text = "Non-compact supergravity solves problems"))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_exacttitle_query_solve_problems(self):
+        """websearch - check exacttitle query solve problems"""
+        error_messages = []
+        error_messages.extend(test_web_page_content(CFG_SITE_URL + "/search?ln=en&p=exacttitle%3A'solve+problems'&f=&action_search=Search",
+                                                    expected_text = ['Search term', 'solve problems', 'did not match']))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_exacttitle_query_photon_beam(self):
+        """websearch - check exacttitle search photon beam"""
+        error_messages = []
+        error_messages.extend(test_web_page_content(CFG_SITE_URL + "/search?ln=en&p=exacttitle%3A'photon+beam'&f=&action_search=Search",
+                                                    expected_text = "Development of photon beam diagnostics"))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_exacttitle_query_photons_beam(self):
+        """websearch - check exacttitle search photons beam"""
+        error_messages = []
+        error_messages.extend(test_web_page_content(CFG_SITE_URL + "/search?ln=en&p=exacttitle%3A'photons+beam'&f=&action_search=Search",
+                                                    expected_text = ['Search term', 'photons beam', 'did not match']))
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -2800,7 +2836,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchWashCollectionsTest,
                              WebSearchAuthorCountQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest,
-                             WebSearchGetRecordTests)
+                             WebSearchGetRecordTests,
+                             WebSearchExactTitleIndexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

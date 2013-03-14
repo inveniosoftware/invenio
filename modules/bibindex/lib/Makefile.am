@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,8 +20,7 @@ pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_unit_t
              bibindexadminlib.py bibindex_engine_stemmer.py bibindex_engine_stopwords.py \
              bibindex_engine_stemmer_unit_tests.py bibindex_engine_stemmer_greek.py \
              bibindex_engine_tokenizer.py bibindex_engine_tokenizer_unit_tests.py \
-             bibindexadmin_regression_tests.py \
-	     bibindex_engine_washer.py
+             bibindexadmin_regression_tests.py bibindex_engine_washer.py
 
 EXTRA_DIST = $(pylib_DATA)
 
