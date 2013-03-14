@@ -20,7 +20,7 @@
 {{ recids }}
 {%- else -%}
 {% from "_formhelpers.html" import render_filter_form with context %}
-{% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, record_brief_links with context %}
+{% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, search_form_javascript, record_brief_links with context %}
 {% from "websearch_results.html" import render_search_results with context %}
 {% extends "page.html" %}
 {# set title = collection.name_ln if collection.id > 1 else None #}
@@ -58,6 +58,7 @@
 
 
 {% block body %}
+
 <style>
 .modal-backdrop {
   /* Show lighter modal window for search. */
@@ -160,6 +161,12 @@ body {
   </div>
 </div>
 
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+{% if recids|length %}
 <script>
 (function($) {
 
@@ -468,8 +475,9 @@ body {
 })(jQuery);
 
 </script>
-
 {% endif %}
-
+{{ search_form_javascript(collection) }}
 {% endblock %}
+
+
 {%- endif -%}

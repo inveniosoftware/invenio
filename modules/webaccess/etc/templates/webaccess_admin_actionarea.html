@@ -25,7 +25,7 @@
   <h1>{{ title }} <small>{{ _('administration with actions as access point') }}</small></h1>
 {% endblock title %}
 
-{% block body %}
+{% block javascript %}
 <script type="text/javascript">
 $(document).ready(function() {
   $('#toggleids').change(function() {
@@ -37,6 +37,9 @@ $(document).ready(function() {
   $('[rel=tooltip]').tooltip({placement:'bottom'});
 });
 </script>
+{% endblock %}
+
+{% block body %}
 
 <ul class="nav nav-pills">
   <li>

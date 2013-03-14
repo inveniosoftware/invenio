@@ -35,16 +35,10 @@
 </div>
 {% endblock %}
 
-{% block header %}
-  {{ super() }}
-  {% css "img/jquery-ui/themes/redmond/jquery-ui.css" %}
-  {% js "js/jquery-ui.min.js" %}
-  {#
-  {% js "js/jquery-ui-timepicker-addon.js" %}
-  #}
-{% endblock header %}
-
 {% block body %}
+
+{% css "img/jquery-ui/themes/redmond/jquery-ui.css" %}
+{% js "js/jquery-ui.min.js" %}
 
 <div class="container">
   <div class="row">
@@ -92,6 +86,23 @@
   </div>
 </div>
 
+<style>
+#widgets li .thumbnail {
+  background: white;
+}
+
+#widgets li.ui-sortable-placeholder {
+  background: #CCC;
+  height: 120px;
+  display: block;
+  float: left;
+  visibility: visible!important;
+}
+</style>
+
+{% endblock %}
+
+{% block javascript %}
 <script>
   $(function() {
     $('input[name=widget]').keyup(function(e) {
@@ -136,19 +147,4 @@
     $( "#widgets" ).disableSelection();
   });
 </script>
-
-<style>
-#widgets li .thumbnail {
-  background: white;
-}
-
-#widgets li.ui-sortable-placeholder {
-  background: #CCC;
-  height: 120px;
-  display: block;
-  float: left;
-  visibility: visible!important;
-}
-</style>
-
 {% endblock %}
