@@ -455,52 +455,52 @@ class Record(dict):
             return self.server_url + "/"+ CFG_SITE_RECORD +"/" + str(self.recid)
         else:
             return None
+if MECHANIZE_AVAILABLE:
+    class _SGMLParserFactory(mechanize.DefaultFactory):
+        """
+        Black magic to be able to interact with CERN SSO forms.
+        """
+        def __init__(self, i_want_broken_xhtml_support=False):
+            if OLD_MECHANIZE_VERSION:
+                forms_factory = mechanize.FormsFactory(
+                    form_parser_class=ClientForm.XHTMLCompatibleFormParser)
+            else:
+                forms_factory = mechanize.FormsFactory(
+                    form_parser_class=mechanize.XHTMLCompatibleFormParser)
+            mechanize.Factory.__init__(
+                self,
+                forms_factory=forms_factory,
+                links_factory=mechanize.LinksFactory(),
+                title_factory=mechanize.TitleFactory(),
+                response_type_finder=mechanize._html.ResponseTypeFinder(
+                    allow_xhtml=i_want_broken_xhtml_support),
+                )
 
-class _SGMLParserFactory(mechanize.DefaultFactory):
-    """
-    Black magic to be able to interact with CERN SSO forms.
-    """
-    def __init__(self, i_want_broken_xhtml_support=False):
-        if OLD_MECHANIZE_VERSION:
-            forms_factory = mechanize.FormsFactory(
-                form_parser_class=ClientForm.XHTMLCompatibleFormParser)
-        else:
-            forms_factory = mechanize.FormsFactory(
-                form_parser_class=mechanize.XHTMLCompatibleFormParser)
-        mechanize.Factory.__init__(
-            self,
-            forms_factory=forms_factory,
-            links_factory=mechanize.LinksFactory(),
-            title_factory=mechanize.TitleFactory(),
-            response_type_finder=mechanize._html.ResponseTypeFinder(
-                allow_xhtml=i_want_broken_xhtml_support),
-            )
+    class CDSInvenioConnector(InvenioConnector):
+        def __init__(self, user="", password="", local_import_path="invenio"):
+            """
+            This is a specialized InvenioConnector class suitable to connect
+            to the CERN Document Server (CDS), which uses centralized SSO.
+            """
+            cds_url = CFG_CDS_URL
+            if user:
+                cds_url = cds_url.replace('http', 'https')
+            super(CDSInvenioConnector, self).__init__(cds_url, user, password, local_import_path=local_import_path)
 
-class CDSInvenioConnector(InvenioConnector):
-    def __init__(self, user="", password="", local_import_path="invenio"):
-        """
-        This is a specialized InvenioConnector class suitable to connect
-        to the CERN Document Server (CDS), which uses centralized SSO.
-        """
-        cds_url = CFG_CDS_URL
-        if user:
-            cds_url = cds_url.replace('http', 'https')
-        super(CDSInvenioConnector, self).__init__(cds_url, user, password, local_import_path=local_import_path)
-
-    def _init_browser(self):
-        """
-        @note: update this everytime the CERN SSO login form is refactored.
-        """
-        self.browser = mechanize.Browser(factory=_SGMLParserFactory(i_want_broken_xhtml_support=True))
-        self.browser.set_handle_robots(False)
-        self.browser.open(self.server_url)
-        self.browser.follow_link(text_regex="Sign in")
-        self.browser.select_form(nr=0)
-        self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsLogin'] = self.user
-        self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsPassword'] = self.password
-        self.browser.submit()
-        self.browser.select_form(nr=0)
-        self.browser.submit()
+        def _init_browser(self):
+            """
+            @note: update this everytime the CERN SSO login form is refactored.
+            """
+            self.browser = mechanize.Browser(factory=_SGMLParserFactory(i_want_broken_xhtml_support=True))
+            self.browser.set_handle_robots(False)
+            self.browser.open(self.server_url)
+            self.browser.follow_link(text_regex="Sign in")
+            self.browser.select_form(nr=0)
+            self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsLogin'] = self.user
+            self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsPassword'] = self.password
+            self.browser.submit()
+            self.browser.select_form(nr=0)
+            self.browser.submit()
 
 class RecordsHandler(xml.sax.handler.ContentHandler):
     "MARCXML Parser"
