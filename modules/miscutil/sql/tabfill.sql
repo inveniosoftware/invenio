@@ -56,6 +56,7 @@ INSERT INTO field VALUES (28,'first author','firstauthor');
 INSERT INTO field VALUES (29,'exact first author','exactfirstauthor');
 INSERT INTO field VALUES (30,'author count','authorcount');
 INSERT INTO field VALUES (31,'reference to','rawref');
+INSERT INTO field VALUES (32,'exact title','exacttitle');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
@@ -197,6 +198,8 @@ INSERT INTO field_tag VALUES (28,1,100);
 INSERT INTO field_tag VALUES (29,1,100);
 INSERT INTO field_tag VALUES (30,1,100);
 INSERT INTO field_tag VALUES (30,2,90);
+INSERT INTO field_tag VALUES (32,3,100);
+INSERT INTO field_tag VALUES (32,4,90);
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -387,6 +390,8 @@ INSERT INTO idxINDEX VALUES (15,'caption','This index contains exact words/phras
 INSERT INTO idxINDEX VALUES (16,'firstauthor','This index contains fuzzy words/phrases from first author field.','0000-00-00 00:00:00', '', 'native');
 INSERT INTO idxINDEX VALUES (17,'exactfirstauthor','This index contains exact words/phrases from first author field.','0000-00-00 00:00:00', '', 'native');
 INSERT INTO idxINDEX VALUES (18,'authorcount','This index contains number of authors of the record.','0000-00-00 00:00:00', '', 'native');
+INSERT INTO idxINDEX VALUES (19,'exacttitle','This index contains exact words/phrases from title fields.','0000-00-00 00:00:00', '', 'native');
+
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
@@ -406,6 +411,7 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (15,27);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (16,28);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (17,29);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (18,30);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (19,32);
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');

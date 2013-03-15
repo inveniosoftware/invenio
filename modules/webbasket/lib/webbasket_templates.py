@@ -1472,6 +1472,8 @@ class Template:
                            es_title='',
                            es_desc='',
                            es_url='',
+                           copy=False,
+                           referer='',
                            ln=CFG_SITE_LANG):
         """Template for basket creation
         @param new_basket_name: prefilled value (string)
@@ -1490,6 +1492,8 @@ class Template:
     %(es_desc)s
     %(es_url)s
     <input type="hidden" name="colid" value="%(colid)s" />
+    <input type="hidden" name="copy" value="%(copy)i" />
+    <input type="hidden" name="referer" value="%(referer)s" />
     <input type="submit" value="%(label)s" class="formbutton"/>
   </div>
 </form>""" % {'action': CFG_SITE_URL + '/yourbaskets/create_basket',
@@ -1511,6 +1515,8 @@ class Template:
                 '<input type="hidden" name="es_url" value="%s" />' % \
                 (cgi.escape(es_url, True),) or '',
               'colid': colid,
+              'copy': copy and 1 or 0,
+              'referer': referer,
               'label': _("Create new basket")}
         return out
 
@@ -1627,11 +1633,10 @@ class Template:
                             {'x_url_open': '<a href="%s">' % referer,
                              'x_url_close': '</a>'}
                 else:
-                    out +=  _(' or return to your %(x_url_open)ssearch%(x_url_close)s') % \
+                    out +=  _(' or go %(x_url_open)sback%(x_url_close)s') % \
                             {'x_url_open': '<a href="%s">' % referer,
                              'x_url_close': '</a>'}
-            else:
-                out += "."
+            out += "."
 
             return out
 
@@ -1748,8 +1753,10 @@ class Template:
                                                                         '&amp;es_url=' + encodeURIComponent(document.add_to_basket.es_url.value) + \
                                                                         '&amp;es_desc=' + encodeURIComponent(document.add_to_basket.es_desc.value);">''' % \
                                                                     (CFG_SITE_URL,))
-                                                                or ('<a href="%s/yourbaskets/create_basket?colid=%i&amp;recid=%s">' % \
+                                                                or ('<a href="%s/yourbaskets/create_basket?copy=%i&amp;referer=%s&amp;colid=%i&amp;recid=%s">' % \
                                                                     (CFG_SITE_URL,
+                                                                     copy and 1 or 0,
+                                                                     urllib.quote(referer),
                                                                      colid,
                                                                      '&amp;recid='.join(str(recid) for recid in recids))),
                                      'x_url_close': '</a>',

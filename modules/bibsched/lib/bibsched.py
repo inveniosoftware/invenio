@@ -181,7 +181,7 @@ def get_task_options(task_id):
         return list()
 
 
-def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
+def gc_tasks(verbose=False, statuses=None, since=None, tasks=None): # pylint: disable=W0613
     """Garbage collect the task queue."""
     if tasks is None:
         tasks = CFG_BIBSCHED_GC_TASKS_TO_REMOVE + CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE
@@ -200,7 +200,7 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
         if task in CFG_BIBSCHED_GC_TASKS_TO_REMOVE:
             res = run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
                              runtime<%%s""" % status_query, (task, date))
-            write_message('Deleted %s %s tasks (created before %s) with %s' \
+            write_message('Deleted %s %s tasks (created before %s) with %s'
                                             % (res, task, date, status_query))
         elif task in CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE:
             run_sql("""INSERT INTO hstTASK(id,proc,host,user,
@@ -211,7 +211,7 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
                        runtime<%%s""" % status_query, (task, date))
             res = run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
                              runtime<%%s""" % status_query, (task, date))
-            write_message('Archived %s %s tasks (created before %s) with %s' \
+            write_message('Archived %s %s tasks (created before %s) with %s'
                                             % (res, task, date, status_query))
 
 
@@ -224,7 +224,9 @@ def spawn_task(command, wait=False):
     def preexec():  # Don't forward signals.
         os.setsid()
 
-    process = Popen(command, preexec_fn=preexec, shell=True)
+    devnull = open(os.devnull, "w")
+    process = Popen(command, preexec_fn=preexec, shell=True,
+                    stderr=devnull, stdout=devnull)
     if wait:
         process.wait()
 
@@ -282,6 +284,21 @@ def bibsched_send_signal(proc, task_id, sig):
     return False
 
 
+def is_monotask(task_id, proc, runtime, status, priority, host, sequenceid): # pylint: disable=W0613
+    procname = proc.split(':')[0]
+    return procname in CFG_BIBTASK_MONOTASKS
+
+
+def stop_task(other_task_id, other_proc, other_priority, other_status, other_sequenceid): # pylint: disable=W0613
+    Log("Send STOP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
+    bibsched_set_status(other_task_id, 'ABOUT TO STOP', other_status)
+
+
+def sleep_task(other_task_id, other_proc, other_priority, other_status, other_sequenceid): # pylint: disable=W0613
+    Log("Send SLEEP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
+    bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
+
+
 class Manager(object):
     def __init__(self, old_stdout):
         import curses
@@ -326,13 +343,12 @@ class Manager(object):
                                            self.curses.KEY_DOWN,
                                            self.curses.KEY_PPAGE,
                                            self.curses.KEY_NPAGE,
-                                           ord("g"), ord("G"),
+                                           ord("g"), ord("G"), ord("n"),
                                            ord("q"), ord("Q"), ord("a"),
                                            ord("A"), ord("1"), ord("2"), ord("3"),
                                            ord("p"), ord("P"), ord("o"), ord("O"),
                                            ord("l"), ord("L"), ord("e"), ord("E"))):
             self.display_in_footer("in automatic mode")
-            self.stdscr.refresh()
         else:
             status = self.currentrow and self.currentrow[5] or None
             if char == self.curses.KEY_UP:
@@ -396,16 +412,25 @@ class Manager(object):
                 self.display = 1
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
+                # We need to update the display to display done tasks
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("only done processes are displayed")
             elif char == ord("2"):
                 self.display = 2
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
+                # We need to update the display to display not done tasks
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("only not done processes are displayed")
             elif char == ord("3"):
                 self.display = 3
                 self.first_visible_line = 0
                 self.selected_line = self.header_lines
+                # We need to update the display to display archived tasks
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("only archived processes are displayed")
             elif char in (ord("q"), ord("Q")):
                 if self.curses.panel.top_panel() == self.panel:
@@ -429,7 +454,9 @@ class Manager(object):
                 print >> self.old_stdout, "\rPress ENTER to continue",
                 self.old_stdout.flush()
                 raw_input()
-                self.curses.panel.update_panels()
+                # We need to redraw the bibsched task list
+                # since we are displaying "Press ENTER to continue"
+                self.repaint()
             else:
                 self._display_message_box("No pager was found")
 
@@ -442,13 +469,16 @@ class Manager(object):
             previous = self.motd
             self.curses.endwin()
             os.system("%s %s" % (editor, motdpath))
-            self.curses.panel.update_panels()
             try:
                 self.motd = open(motdpath).read().strip()
             except IOError:
                 self.motd = ""
             if len(self.motd) > 0:
                 self.motd = "MOTD [%s] " % time.strftime("%m-%d-%Y %H:%M", time.localtime(os.path.getmtime(motdpath))) + self.motd
+
+            # We need to redraw the MOTD part
+            self.repaint()
+
             if previous[24:] != self.motd[24:]:
                 if len(previous) == 0:
                     Log('motd set to "%s"' % self.motd.replace("\n", "|"))
@@ -494,7 +524,7 @@ class Manager(object):
                 width,
                 (self.height - height) / 2 + 1,
                 (self.width - width) / 2 + 1
-                )
+            )
         except self.curses.error:
             return
         self.panel = self.curses.panel.new_panel(self.win)
@@ -526,13 +556,19 @@ class Manager(object):
 priority for task %s. The smaller the number the less the priority. Note that \
 a number less than -10 will mean to always postpone the task while a number \
 bigger than 10 will mean some tasks with less priority could be stopped in \
-order to let this task run. The current priority is %s. New value:" \
+order to let this task run. The current priority is %s. New value:"
                                                         % (task_id, priority))
         try:
             new_priority = int(new_priority)
         except ValueError:
             return
         bibsched_set_priority(task_id, new_priority)
+
+        # We need to update the tasks list with our new priority
+        # to be able to display it
+        self.update_rows()
+        # We need to update the priority number next to the task
+        self.repaint()
 
     def wakeup(self):
         task_id = self.currentrow[0]
@@ -543,6 +579,8 @@ order to let this task run. The current priority is %s. New value:" \
         if status == "SLEEPING":
             if not bibsched_send_signal(process, task_id, signal.SIGCONT):
                 bibsched_set_status(task_id, "ERROR", "SLEEPING")
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("process woken up")
         else:
             self.display_in_footer("process is not sleeping")
@@ -560,7 +598,7 @@ order to let this task run. The current priority is %s. New value:" \
             width,
             (self.height - height) / 2 + 1,
             (self.width - width) / 2 + 1
-            )
+        )
         self.panel = self.curses.panel.new_panel(self.win)
         self.panel.top()
         self.win.border()
@@ -590,7 +628,7 @@ order to let this task run. The current priority is %s. New value:" \
             width,
             (self.height - height) / 2 + 1,
             (self.width - width) / 2 + 1
-            )
+        )
         self.panel = self.curses.panel.new_panel(self.win)
         self.panel.top()
         self.win.border()
@@ -603,6 +641,7 @@ order to let this task run. The current priority is %s. New value:" \
         self.curses.echo()
         ret = self.win.getstr()
         self.curses.noecho()
+        self.panel = None
         return ret
 
     def _display_message_box(self, msg):
@@ -615,7 +654,7 @@ order to let this task run. The current priority is %s. New value:" \
             width,
             (self.height - height) / 2 + 1,
             (self.width - width) / 2 + 1
-            )
+        )
         self.panel = self.curses.panel.new_panel(self.win)
         self.panel.top()
         self.win.border()
@@ -627,6 +666,7 @@ order to let this task run. The current priority is %s. New value:" \
         self.win.move(height - 2, 2)
         self.win.getkey()
         self.curses.noecho()
+        self.panel = None
 
     def purge_done(self):
         """Garbage collector."""
@@ -640,23 +680,28 @@ order to let this task run. The current priority is %s. New value:" \
                 ', '.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE),
                 CFG_BIBSCHED_GC_TASKS_OLDER_THAN)):
             gc_tasks()
+            # We removed some tasks from our list
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("DONE processes purged")
 
     def run(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
-        #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
-            #self.display_in_footer("a process is already running!")
+
         if status == "WAITING":
             if process in self.helper_modules:
                 if run_sql("""UPDATE schTASK SET status='SCHEDULED', host=%s
                               WHERE id=%s and status='WAITING'""",
                            (self.hostname, task_id)):
                     program = os.path.join(CFG_BINDIR, process)
-                    command = "%s %s > /dev/null 2> /dev/null" % (program, str(task_id))
+                    command = "%s %s" % (program, str(task_id))
                     spawn_task(command)
                     Log("manually running task #%d (%s)" % (task_id, process))
+                    # We changed the status of one of our tasks
+                    self.update_rows()
+                    self.repaint()
                 else:
                     ## Process already running (typing too quickly on the keyboard?)
                     pass
@@ -670,6 +715,8 @@ order to let this task run. The current priority is %s. New value:" \
         status = self.currentrow[5]
         if status in ('ERROR', 'DONE WITH ERRORS', 'ERRORS REPORTED'):
             bibsched_set_status(task_id, 'ACK ' + status, status)
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("Acknowledged error")
 
     def sleep(self):
@@ -677,6 +724,8 @@ order to let this task run. The current priority is %s. New value:" \
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING'):
             bibsched_set_status(task_id, 'ABOUT TO SLEEP', status)
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("SLEEP signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot put to sleep non-running processes")
@@ -689,6 +738,8 @@ order to let this task run. The current priority is %s. New value:" \
             if self._display_YN_box("Are you sure you want to kill the %s process %s?" % (process, task_id)):
                 bibsched_send_signal(process, task_id, signal.SIGKILL)
                 bibsched_set_status(task_id, 'KILLED')
+                self.update_rows()
+                self.repaint()
                 self.display_in_footer("KILL signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot kill non-running processes")
@@ -705,12 +756,16 @@ order to let this task run. The current priority is %s. New value:" \
                 while bibsched_get_status(task_id) == 'NOW STOP':
                     if count <= 0:
                         bibsched_set_status(task_id, 'ERROR', 'NOW STOP')
+                        self.update_rows()
+                        self.repaint()
                         self.display_in_footer("It seems impossible to wakeup this task.")
                         return
                     time.sleep(CFG_BIBSCHED_REFRESHTIME)
                     count -= 1
             else:
                 bibsched_set_status(task_id, 'ABOUT TO STOP', status)
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("STOP signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot stop non-running processes")
@@ -733,24 +788,23 @@ order to let this task run. The current priority is %s. New value:" \
             bibsched_set_status(task_id, "WAITING")
             bibsched_set_progress(task_id, "")
             bibsched_set_host(task_id, "")
+            self.update_rows()
+            self.repaint()
             self.display_in_footer("process initialised")
         else:
             self.display_in_footer("Cannot initialise running processes")
 
     def change_auto_mode(self):
+        program = os.path.join(CFG_BINDIR, "bibsched")
         if self.auto_mode:
-            program = os.path.join(CFG_BINDIR, "bibsched")
             COMMAND = "%s -q halt" % program
-            os.system(COMMAND)
-
-            self.auto_mode = 0
         else:
-            program = os.path.join(CFG_BINDIR, "bibsched")
             COMMAND = "%s -q start" % program
-            os.system(COMMAND)
+        os.system(COMMAND)
 
-            self.auto_mode = 1
-        self.stdscr.refresh()
+        self.auto_mode = not self.auto_mode
+        # We need to refresh the color of the header and footer
+        self.repaint()
 
     def put_line(self, row, header=False, motd=False):
         ## ROW: (id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host)
@@ -972,7 +1026,7 @@ class BibSched(object):
         self.node_relevant_active_tasks = ()
         ## All tasks of all nodes
         self.active_tasks_all_nodes = ()
-
+        self.mono_tasks_all_nodes = ()
         self.allowed_task_types = CFG_BIBSCHED_NODE_TASKS.get(self.hostname, CFG_BIBTASK_VALID_TASKS)
         os.environ['BIBSCHED_MODE'] = 'automatic'
 
@@ -994,20 +1048,24 @@ class BibSched(object):
     def filter_for_allowed_tasks(self):
         """ Removes all tasks that are not allowed in this Invenio instance
         """
-        n_waiting = []
-        n_active = []
-        if "bibupload" not in self.allowed_task_types:
-            self.node_relevant_bibupload_tasks = ()
-        for task_id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_waiting_tasks:
+
+        def relevant_task(task_id, proc, runtime, status, priority, host, sequenceid): # pylint: disable=W0613
+            # if host and self.hostname != host:
+            #     return False
+
             procname = proc.split(':')[0]
-            if procname in self.allowed_task_types:
-                n_waiting.append((task_id, proc, runtime, status, priority, host, sequenceid))
-        for task_id, proc, runtime, status, priority, host, sequenceid in self.node_relevant_active_tasks:
-            procname = proc.split(':')[0]
-            if procname in self.allowed_task_types:
-                n_active.append((task_id, proc, runtime, status, priority, host, sequenceid))
-        self.node_relevant_active_tasks = tuple(n_active)
-        self.node_relevant_waiting_tasks = tuple(n_waiting)
+            if procname not in self.allowed_task_types:
+                return False
+
+            return True
+
+        def filter_tasks(tasks):
+            return tuple(t for t in tasks if relevant_task(*t))
+
+        self.node_relevant_bibupload_tasks = filter_tasks(self.node_relevant_bibupload_tasks)
+        self.node_relevant_active_tasks = filter_tasks(self.node_relevant_active_tasks)
+        self.node_relevant_waiting_tasks = filter_tasks(self.node_relevant_waiting_tasks)
+        self.node_relevant_sleeping_tasks = filter_tasks(self.node_relevant_sleeping_tasks)
 
     def is_task_safe_to_execute(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
@@ -1018,7 +1076,7 @@ class BibSched(object):
         of tasks to sleep.
         """
         if proc in CFG_BIBTASK_MONOTASKS:
-            return [], [t for t in task_set \
+            return [], [t for t in task_set
                                 if t[3] not in ('SLEEPING', 'ABOUT TO SLEEP')]
 
         min_prio = None
@@ -1053,8 +1111,8 @@ class BibSched(object):
         those with higher or equal priority."""
         higher = []
         lower = []
-        ### !!! We allready have this in node_relevant_active_tasks
-        for other_task_id, task_proc, runtime, status, task_priority, task_host, sequenceid in self.node_relevant_active_tasks:
+        ### !!! We already have this in node_relevant_active_tasks
+        for other_task_id, task_proc, dummy, status, task_priority, task_host, sequenceid in self.node_relevant_active_tasks:
         # for other_task_id, task_proc, runtime, status, task_priority, task_host in self.node_relevant_active_tasks:
         # for other_task_id, task_proc, task_priority, status in self.get_running_tasks():
             if task_id == other_task_id:
@@ -1073,11 +1131,24 @@ class BibSched(object):
             Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s, host: %s, sequenceid: %s" %
                 (task_id, proc, runtime, status, priority, host, sequenceid))
 
-        if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
+        if (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_active_tasks:
+            # For multi-node
+            # check if we need to sleep ourselves for monotasks to be able to run
+            for other_task_id, other_proc, dummy_other_runtime, other_status, other_priority, other_host, other_sequenceid in self.mono_tasks_all_nodes:
+                if priority < other_priority:
+                    # Sleep ourselves
+                    if status not in ('SLEEPING', 'ABOUT TO SLEEP'):
+                        sleep_task(task_id, proc, priority, status, sequenceid)
+                        return True
+                    return False
+
+        elif (task_id, proc, runtime, status, priority, host, sequenceid) in self.node_relevant_waiting_tasks:
             if debug:
                 Log("Trying to run %s" % task_id)
 
             if priority < -10:
+                if debug:
+                    Log("Cannot run because priority < -10")
                 return False
 
             lower, higher = self.split_active_tasks_by_priority(task_id, priority)
@@ -1085,9 +1156,10 @@ class BibSched(object):
                 Log('lower: %s' % lower)
                 Log('higher: %s' % higher)
 
-            for other_task_id, other_proc, other_runtime, other_status, \
+            for other_task_id, other_proc, dummy_other_runtime, other_status, \
                 other_priority, other_host, other_sequenceid in chain(
-                self.node_relevant_sleeping_tasks, self.active_tasks_all_nodes):
+                    self.node_relevant_sleeping_tasks,
+                    self.active_tasks_all_nodes):
                 if task_id != other_task_id and \
                             not self.is_task_safe_to_execute(proc, other_proc):
                     ### !!! WE NEED TO CHECK FOR TASKS THAT CAN ONLY BE EXECUTED ON ONE MACHINE AT ONE TIME
@@ -1100,6 +1172,8 @@ class BibSched(object):
                     return False
 
             if sequenceid:
+                ## Let's normalize the prority of all tasks in a sequenceid to the
+                ## max priority of the group
                 max_priority = run_sql("""SELECT MAX(priority) FROM schTASK
                                           WHERE status='WAITING'
                                           AND sequenceid=%s""",
@@ -1107,10 +1181,13 @@ class BibSched(object):
                 if run_sql("""UPDATE schTASK SET priority=%s
                               WHERE status='WAITING' AND sequenceid=%s""",
                            (max_priority, sequenceid)):
-                    Log("Raised all waiting tasks with sequenceid " \
+                    Log("Raised all waiting tasks with sequenceid "
                         "%s to the max priority %s" % (sequenceid, max_priority))
                     ## Some priorities where raised
-                    return False
+                    return True
+
+                ## Let's normalize the runtime of all tasks in a sequenceid to
+                ## the compatible runtime.
                 current_runtimes = run_sql("""SELECT id, runtime FROM schTASK WHERE sequenceid=%s AND status='WAITING' ORDER by id""", (sequenceid, ))
                 runtimes_adjusted = False
                 if current_runtimes:
@@ -1125,14 +1202,14 @@ class BibSched(object):
                         last_runtime = runtime
                 if runtimes_adjusted:
                     ## Some runtime have been adjusted
-                    return False
+                    return True
 
-            for other_task_id, other_proc, other_dummy, other_status, other_sequenceid in higher + lower:
-                if sequenceid is not None and \
-                    sequenceid == other_sequenceid and task_id > other_task_id:
-                    Log('Task %s need to run after task %s since they have the same sequence id: %s' % (task_id, other_task_id, sequenceid))
-                    ## If there is a task with same sequence number then do not run the current task
-                    return False
+            if sequenceid is not None:
+                for other_task_id, dummy_other_proc, dummy_other_runtime, dummy_other_status, dummy_other_priority, dummy_other_host, other_sequenceid in self.active_tasks_all_nodes:
+                    if sequenceid == other_sequenceid and task_id > other_task_id:
+                        Log('Task %s need to run after task %s since they have the same sequence id: %s' % (task_id, other_task_id, sequenceid))
+                        ## If there is a task with same sequence number then do not run the current task
+                        return False
 
             if proc in CFG_BIBTASK_MONOTASKS and higher:
                 ## This is a monotask
@@ -1142,12 +1219,16 @@ class BibSched(object):
 
             ## No higher priority task have issue with the given task.
             if proc not in CFG_BIBTASK_FIXEDTIMETASKS and len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
-                ### !!! THIS HAS TO BE ADAPTED FOR MULTINODE
-                ### !!! Basically, the number of concurrent tasks should count per node
-                ## Not enough resources.
                 if debug:
                     Log("Cannot run because all resources (%s) are used (%s), higher: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
                 return False
+
+            ## Check for monotasks wanting to run
+            for other_task_id, other_proc, dummy_other_runtime, other_status, other_priority, other_host, other_sequenceid in self.mono_tasks_all_nodes:
+                if priority < other_priority:
+                    if debug:
+                        Log("Cannot run because there is a monotask with higher priority: %s %s" % (other_task_id, other_proc))
+                    return False
 
             ## We check if it is necessary to stop/put to sleep some lower priority
             ## task.
@@ -1165,19 +1246,34 @@ class BibSched(object):
 
             procname = proc.split(':')[0]
             if not tasks_to_stop and (not tasks_to_sleep or (proc not in CFG_BIBTASK_MONOTASKS and len(self.node_relevant_active_tasks) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS)):
-                if proc in CFG_BIBTASK_MONOTASKS and self.node_relevant_active_tasks:
+                if proc in CFG_BIBTASK_MONOTASKS and self.active_tasks_all_nodes:
                     if debug:
                         Log("Cannot run because this is a monotask and there are other tasks running: %s" % (self.node_relevant_active_tasks, ))
                     return False
 
-                if len(self.node_relevant_active_tasks) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
+                def task_in_same_host(dummy_task_id, dummy_proc, dummy_runtime, dummy_status, dummy_priority, host, dummy_sequenceid):
+                    return host == self.hostname
+
+                def filter_by_host(tasks):
+                    return tuple(t for t in tasks if task_in_same_host(*t))
+
+                node_active_tasks = filter_by_host(self.node_relevant_active_tasks)
+                if len(node_active_tasks) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
                     if debug:
-                        Log("Cannot run because all resources (%s) are used (%s), active: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(self.node_relevant_active_tasks), self.node_relevant_active_tasks))
+                        Log("Cannot run because all resources (%s) are used (%s), active: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(node_active_tasks), node_active_tasks))
                     return False
 
                 if status in ("SLEEPING", "ABOUT TO SLEEP"):
                     if host == self.hostname:
                         ## We can only wake up tasks that are running on our own host
+                        for other_task_id, other_proc, dummy_other_runtime, other_status, dummy_other_priority, other_host, dummy_other_sequenceid in self.node_relevant_active_tasks:
+                            ## But only if there are not other tasks still going to sleep, otherwise
+                            ## we might end up stealing the slot for an higher priority  task.
+                            if other_task_id != task_id and other_status in ('ABOUT TO SLEEP', 'ABOUT TO STOP') and other_host == self.hostname:
+                                if debug:
+                                    Log("Not yet waking up task #%d since there are other tasks (%s #%d) going to sleep (higher priority task incoming?)" % (task_id, other_proc, other_task_id))
+                                return False
+
                         bibsched_set_status(task_id, "CONTINUING", status)
                         if not bibsched_send_signal(proc, task_id, signal.SIGCONT):
                             bibsched_set_status(task_id, "ERROR", "CONTINUING")
@@ -1191,7 +1287,7 @@ class BibSched(object):
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s' % (task_id, proc, os.path.join(CFG_LOGDIR, 'bibsched.log'))
-                    command = "(%s %s > /dev/null 2> /dev/null %s)" % (program, str(task_id), exit_str)
+                    command = "%s %s %s" % (program, str(task_id), exit_str)
                     ### Set the task to scheduled and tie it to this host
                     if self.tie_task_to_host(task_id):
                         Log("Task #%d (%s) started" % (task_id, proc))
@@ -1212,94 +1308,106 @@ class BibSched(object):
                     raise StandardError("%s is not in the allowed modules" % procname)
             else:
                 ## It's not still safe to run the task.
-                ## We first need to stop task that should be stopped
-                ## and to put to sleep task that should be put to sleep
-                for (other_task_id, other_proc, other_priority, other_status, other_sequenceid) in tasks_to_stop:
-                    Log("Send STOP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
-                    bibsched_set_status(other_task_id, 'ABOUT TO STOP', other_status)
-                for (other_task_id, other_proc, other_priority, other_status, other_sequenceid) in tasks_to_sleep:
-                    Log("Send SLEEP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
-                    bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
+                ## We first need to stop tasks that should be stopped
+                ## and to put to sleep tasks that should be put to sleep
+                for t in tasks_to_stop:
+                    stop_task(*t)
+                for t in tasks_to_sleep:
+                    sleep_task(*t)
+
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
                 return True
 
-    def watch_loop(self):
-        def check_errors():
-            sql = "SELECT count(id) FROM schTASK WHERE status='ERROR'" \
-                  " OR status='DONE WITH ERRORS' OR STATUS='CERROR'"
-            if run_sql(sql)[0][0] > 0:
-                errors = run_sql("""SELECT id,proc,status FROM schTASK
-                                    WHERE status = 'ERROR'
-                                    OR status = 'DONE WITH ERRORS'
-                                    OR status = 'CERROR'""")
-                msg_errors = ["    #%s %s -> %s" % row for row in errors]
-                msg = 'BibTask with ERRORS:\n%s' % "\n".join(msg_errors)
-                err_types = set(e[2] for e in errors if e[2])
-                if 'ERROR' in err_types or 'DONE WITH ERRORS' in err_types:
-                    raise StandardError(msg)
-                else:
+    def check_errors(self):
+        errors = run_sql("""SELECT id,proc,status FROM schTASK
+                            WHERE status = 'ERROR'
+                            OR status = 'DONE WITH ERRORS'
+                            OR status = 'CERROR'""")
+        if errors:
+            error_msgs = []
+            error_recoverable = True
+            for e_id, e_proc, e_status in errors:
+                if run_sql("""UPDATE schTASK
+                               SET status='ERRORS REPORTED'
+                               WHERE id = %s AND (status='CERROR'
+                               OR status='ERROR'
+                               OR status='DONE WITH ERRORS')""", [e_id]):
+                    msg = "    #%s %s -> %s" % (e_id, e_proc, e_status)
+                    error_msgs.append(msg)
+                    if e_status in ('ERROR', 'DONE WITH ERRORS'):
+                        error_recoverable = False
+            if error_msgs:
+                msg = "BibTask with ERRORS:\n%s" % '\n'.join(error_msgs)
+                if error_recoverable:
                     raise RecoverableError(msg)
+                else:
+                    raise StandardError(msg)
 
-        def calculate_rows():
-            """Return all the node_relevant_active_tasks to work on."""
-            try:
-                check_errors()
-            except RecoverableError, msg:
-                register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
-                run_sql("UPDATE schTASK SET status='ERRORS REPORTED' WHERE status='CERROR'")
+    def calculate_rows(self):
+        """Return all the node_relevant_active_tasks to work on."""
+        try:
+            self.check_errors()
+        except RecoverableError, msg:
+            register_emergency('Light emergency from %s: BibTask failed: %s' % (CFG_SITE_URL, msg))
 
-            max_bibupload_priority = run_sql(
-                        """SELECT MAX(priority)
-                           FROM schTASK
-                           WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
-                                    'ABOUT TO STOP', 'ABOUT TO SLEEP',
-                                    'SCHEDULED', 'CONTINUING')
-                           AND proc = 'bibupload'
-                           AND runtime <= NOW()""")
-            if max_bibupload_priority:
-                run_sql(
+        max_bibupload_priority, min_bibupload_priority = run_sql(
+                    """SELECT MAX(priority), MIN(priority)
+                        FROM schTASK
+                        WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
+                                'ABOUT TO STOP', 'ABOUT TO SLEEP',
+                                'SCHEDULED', 'CONTINUING')
+                        AND proc = 'bibupload'
+                        AND runtime <= NOW()""")[0]
+        if max_bibupload_priority > min_bibupload_priority:
+            run_sql(
                 """UPDATE schTASK SET priority = %s
                    WHERE status IN ('WAITING', 'RUNNING', 'SLEEPING',
                                     'ABOUT TO STOP', 'ABOUT TO SLEEP',
                                     'SCHEDULED', 'CONTINUING')
                    AND proc = 'bibupload'
                    AND runtime <= NOW()
-                   AND priority < %s""", (max_bibupload_priority[0][0],
-                                          max_bibupload_priority[0][0]))
-            ## The bibupload tasks are sorted by id, which means by the order they were scheduled
-            self.node_relevant_bibupload_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host, sequenceid
-                   FROM schTASK WHERE status IN ('WAITING', 'SLEEPING')
-                   AND proc = 'bibupload'
-                   AND runtime <= NOW()
-                   ORDER BY id ASC LIMIT 1""", n=1)
-            ## The other tasks are sorted by priority
-            self.node_relevant_waiting_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host, sequenceid
-                   FROM schTASK WHERE (status='WAITING' AND runtime <= NOW())
-                   OR status = 'SLEEPING'
-                   ORDER BY priority DESC, runtime ASC, id ASC""")
-            self.node_relevant_sleeping_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host, sequenceid
-                   FROM schTASK WHERE status = 'SLEEPING'
-                   ORDER BY priority DESC, runtime ASC, id ASC""")
-            self.node_relevant_active_tasks = run_sql(
-                """SELECT id, proc, runtime, status, priority, host,sequenceid
-                   FROM schTASK WHERE status IN ('RUNNING', 'CONTINUING',
-                                                 'SCHEDULED', 'ABOUT TO STOP',
-                                                 'ABOUT TO SLEEP')""")
-            self.active_tasks_all_nodes = tuple(self.node_relevant_active_tasks)
-            ## Remove tasks that can not be executed on this host
-            self.filter_for_allowed_tasks()
+                   AND priority < %s""", (max_bibupload_priority,
+                                          max_bibupload_priority))
+        ## The bibupload tasks are sorted by id, which means by the order they were scheduled
+        self.node_relevant_bibupload_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
+               FROM schTASK WHERE status IN ('WAITING', 'SLEEPING')
+               AND proc = 'bibupload'
+               AND runtime <= NOW()
+               ORDER BY id ASC LIMIT 1""", n=1)
+        ## The other tasks are sorted by priority
+        self.node_relevant_waiting_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
+               FROM schTASK WHERE (status='WAITING' AND runtime <= NOW())
+               OR status = 'SLEEPING'
+               ORDER BY priority DESC, runtime ASC, id ASC""")
+        self.node_relevant_sleeping_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
+               FROM schTASK WHERE status = 'SLEEPING'
+               ORDER BY priority DESC, runtime ASC, id ASC""")
+        self.node_relevant_active_tasks = run_sql(
+            """SELECT id, proc, runtime, status, priority, host, sequenceid
+               FROM schTASK WHERE status IN ('RUNNING', 'CONTINUING',
+                                             'SCHEDULED', 'ABOUT TO STOP',
+                                             'ABOUT TO SLEEP')""")
+        self.active_tasks_all_nodes = tuple(self.node_relevant_active_tasks)
+        self.mono_tasks_all_nodes = tuple(t for t in self.node_relevant_waiting_tasks if is_monotask(*t))
+        ## Remove tasks that can not be executed on this host
+        self.filter_for_allowed_tasks()
 
+    def watch_loop(self):
         ## Cleaning up scheduled task not run because of bibsched being
         ## interrupted in the middle.
-        run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
+        run_sql("""UPDATE schTASK
+                   SET status = 'WAITING'
+                   WHERE status = 'SCHEDULED'
+                   AND host = %s""", (self.hostname, ))
 
         try:
             while True:
-                #Log("New bibsched cycle")
-                calculate_rows()
+                if self.debug:
+                    Log("New bibsched cycle")
+                self.calculate_rows()
                 ## Let's first handle running node_relevant_active_tasks.
                 for task in self.node_relevant_active_tasks:
                     if self.handle_task(*task):
@@ -1337,7 +1445,7 @@ class TimedOutExc(Exception):
 
 
 def timed_out(f, timeout, *args, **kwargs):
-    def handler(signum, frame):
+    def handler(signum, frame): # pylint: disable=W0613
         raise TimedOutExc()
 
     old = signal.signal(signal.SIGALRM, handler)
@@ -1499,7 +1607,7 @@ def start(verbose=True, debug=False):
             pass
 
 
-def halt(verbose=True, soft=False, debug=False):
+def halt(verbose=True, soft=False, debug=False): # pylint: disable=W0613
     pid = server_pid()
     if not pid:
         if soft:
@@ -1520,7 +1628,7 @@ def halt(verbose=True, soft=False, debug=False):
     os.unlink(pidfile)
 
 
-def monitor(verbose=True, debug=False):
+def monitor(verbose=True, debug=False): # pylint: disable=W0613
     old_stdout, old_stderr = redirect_stdout_and_stderr()
     try:
         Manager(old_stdout)
@@ -1528,7 +1636,7 @@ def monitor(verbose=True, debug=False):
         restore_stdout_and_stderr(old_stdout, old_stderr)
 
 
-def write_message(msg, stream=None, verbose=1):
+def write_message(msg, stream=None, verbose=1): # pylint: disable=W0613
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
     if stream is None:
@@ -1546,7 +1654,7 @@ def write_message(msg, stream=None, verbose=1):
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
 
-def report_queue_status(verbose=True, status=None, since=None, tasks=None):
+def report_queue_status(verbose=True, status=None, since=None, tasks=None): # pylint: disable=W0613
     """
     Report about the current status of BibSched queue on standard output.
     """
@@ -1573,16 +1681,15 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
                                 status, progress, priority
                         FROM schTASK WHERE status=%%s %(task_query)s
                         %(since_query)s ORDER BY id ASC""" % {
-                            'task_query' : task_query,
-                            'since_query' : since_query
-                        },
+                            'task_query': task_query,
+                            'since_query' : since_query},
                     (status,))
 
         write_message("%s processes: %d" % (status, len(res)))
         for (proc_id, proc_proc, proc_user, proc_runtime, proc_sleeptime,
              proc_status, proc_progress, proc_priority) in res:
-            write_message(' * ID="%s" PRIORITY="%s" PROC="%s" USER="%s" ' \
-                          'RUNTIME="%s" SLEEPTIME="%s" STATUS="%s" ' \
+            write_message(' * ID="%s" PRIORITY="%s" PROC="%s" USER="%s" '
+                          'RUNTIME="%s" SLEEPTIME="%s" STATUS="%s" '
                           'PROGRESS="%s"' % (proc_id,
                           proc_priority, proc_proc, proc_user, proc_runtime,
                           proc_sleeptime, proc_status, proc_progress))
@@ -1700,8 +1807,7 @@ def main():
     try:
         if cmd in ('status', 'purge'):
             {'status' : report_queue_status,
-              'purge' : gc_tasks,
-            }[cmd](verbose, status, since, tasks)
+              'purge' : gc_tasks}[cmd](verbose, status, since, tasks)
         else:
             {'start': start,
             'halt': halt,
