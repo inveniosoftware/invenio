@@ -468,6 +468,8 @@ def create_invenio_flask_app():
             try:
                 return url_for(endpoint, **values)
             except BuildError:
+                if endpoint.startswith('http://') or endpoint.startswith('https://'):
+                    return endpoint
                 if endpoint.startswith('.'):
                     endpoint = request.blueprint + endpoint
                 return create_url('/' + '/'.join(endpoint.split('.')), values, False).decode('utf-8')
