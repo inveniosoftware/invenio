@@ -320,7 +320,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                                        text = _("You are not authorized to use ill."))
 
         if CFG_CERN_SITE:
-            borrower_id = search_user('ccid', user_info['external_hidden_personid'])
+            borrower_id = search_user('ccid', user_info['external_personid'])
         else:
             borrower_id = search_user('email', user_info['email'])
 

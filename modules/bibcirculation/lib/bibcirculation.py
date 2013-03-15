@@ -229,7 +229,7 @@ def perform_new_request_send(uid, recid, period_from, period_to,
     user = collect_user_info(uid)
     if CFG_CERN_SITE:
         try:
-            borrower = search_user('ccid', user['external_hidden_personid'])
+            borrower = search_user('ccid', user['external_personid'])
         except:
             borrower = ()
     else:
