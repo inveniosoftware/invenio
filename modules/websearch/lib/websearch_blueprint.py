@@ -552,6 +552,7 @@ def export():
     recids = request.values.getlist('recid', type=int)
     rg = request.args.get('rg', len(recids), type=int)
     page = request.args.get('jrec', 1, type=int)
+    pages = int(ceil(page / float(rg))) if rg > 0 else 1
     content_type = Format.query.filter(Format.code == of).one()
     name = request.args.get('cc')
     if name:
@@ -566,8 +567,7 @@ def export():
                 collection=collection,
                 RecordInfo=RecordInfo,
                 rg=rg,
-                pagination=Pagination(int(ceil(page / float(rg))), rg,
-                                      len(recids)))
+                pagination=Pagination(pages, rg, len(recids)))
 
     from invenio.bibformat import print_records
     response = make_response(print_records(recids, of=of, ln=g.ln))
