@@ -83,6 +83,7 @@
   {% assets get_css_bundle() %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
   {% endassets %}
+  {% block _top_assets %}{% endblock _top_assets %}
   {% block css %}{% endblock css %}
   <style>
     /*
@@ -180,9 +181,11 @@
   <!-- replaced page footer -->
   {%- include 'footer.html' -%}
 </footer>
+{% block _bottom_assets %}
 {% assets get_js_bundle() %}
   <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
+{% endblock _bottom_assets %}
 {% block javascript %}{% endblock javascript %}
 </body>
 </html>
