@@ -39,7 +39,10 @@ from optparse import OptionParser
 
 try:
     from invenio.hocrlib import create_pdf, extract_hocr, CFG_PPM_RESOLUTION
-    from pyPdf import PdfFileReader, PdfFileWriter
+    try:
+        from PyPDF2 import PdfFileReader, PdfFileWriter
+    except ImportError:
+        from pyPdf import PdfFileReader, PdfFileWriter
     CFG_CAN_DO_OCR = True
 except ImportError:
     CFG_CAN_DO_OCR = False
