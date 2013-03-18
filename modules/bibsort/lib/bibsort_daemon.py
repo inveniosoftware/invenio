@@ -55,6 +55,7 @@ import sys
 import optparse
 import time
 import ConfigParser
+from invenio.dateutils import strftime
 from invenio.dbquery import run_sql, Error
 from invenio.config import CFG_ETCDIR
 from invenio.bibsort_engine import run_bibsort_update, \
@@ -115,7 +116,7 @@ def dump_configuration():
             config.set(section, "definition", item[2])
             config.set(section, "washer", item[3])
         output_file_name = CFG_ETCDIR + '/bibsort/bibsort_db_dump_%s.cfg' % \
-                           time.strftime("%d%m%Y%H%M%S", time.localtime())
+                           strftime("%d%m%Y%H%M%S", time.localtime())
         write_message('Opening the output file %s' %output_file_name)
         try:
             output_file = open(output_file_name, 'w')

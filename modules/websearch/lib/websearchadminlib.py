@@ -25,6 +25,7 @@ import cgi
 import random
 import time
 import sys
+from invenio.dateutils import strftime
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -2383,7 +2384,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
 
     # reformat collection_web_update_time to the format suitable for comparisons
     try:
-        collection_web_update_time = time.strftime("%Y-%m-%d %H:%M:%S",
+        collection_web_update_time = strftime("%Y-%m-%d %H:%M:%S",
                            time.strptime(collection_web_update_time, "%d %b %Y %H:%M:%S"))
     except ValueError, e:
         pass

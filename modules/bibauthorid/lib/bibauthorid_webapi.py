@@ -30,7 +30,8 @@ import invenio.webauthorprofile_interface as webauthorapi
 import invenio.search_engine as search_engine
 from search_engine import perform_request_search
 from cgi import escape
-from time import gmtime, strftime, ctime
+from invenio.dateutils import strftime
+from time import gmtime, ctime
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.webuser import collect_user_info, get_session, getUid
 from invenio.webuser import isUserSuperAdmin

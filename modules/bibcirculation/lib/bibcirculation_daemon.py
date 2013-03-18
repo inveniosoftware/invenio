@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,7 +24,6 @@ BibCirculation daemon.
 __revision__ = "$Id$"
 
 import sys
-import datetime
 import time
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, \
@@ -42,6 +41,7 @@ from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
 from invenio.bibcirculation_utils import generate_email_body, \
                                          book_title_from_MARC, \
                                          update_user_info_from_ldap
+import datetime
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key, checks its meaning and returns True if
@@ -143,9 +143,12 @@ def must_send_second_recall(date_letters):
     #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
     tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(weeks=1)
 
-    if tmp_date.strftime("%Y-%m-%d") <= today.strftime("%Y-%m-%d"):
-        return True
-    else:
+    try:
+        if tmp_date.strftime("%Y-%m-%d") <= today.strftime("%Y-%m-%d"):
+            return True
+        else:
+            return False
+    except ValueError:
         return False
 
 def must_send_third_recall(date_letters):
@@ -161,9 +164,12 @@ def must_send_third_recall(date_letters):
     #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on Python 2.5)
     tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(days=3)
 
-    if tmp_date.strftime("%Y-%m-%d") <= today.strftime("%Y-%m-%d"):
-        return True
-    else:
+    try:
+        if tmp_date.strftime("%Y-%m-%d") <= today.strftime("%Y-%m-%d"):
+            return True
+        else:
+            return False
+    except ValueError:
         return False
 
 def update_borrowers_information():
