@@ -38,6 +38,13 @@ import urlparse
 import zlib
 import sys
 
+try:
+    ## import optional module:
+    import numpy
+    CFG_NUMPY_IMPORTABLE = True
+except:
+    CFG_NUMPY_IMPORTABLE = False
+
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
     from sets import Set as set
@@ -6469,7 +6476,8 @@ def get_all_field_values(tag):
     table = 'bib%02dx' % int(tag[:2])
     return [row[0] for row in run_sql("SELECT DISTINCT(value) FROM %s WHERE tag=%%s" % table, (tag, ))]
 
-def get_most_popular_field_values(recids, tags, exclude_values=None, count_repetitive_values=True):
+
+def get_most_popular_field_values(recids, tags, exclude_values=None, count_repetitive_values=True, split_by=0):
     """
     Analyze RECIDS and look for TAGS and return most popular values
     and the frequency with which they occur sorted according to
@@ -6483,18 +6491,22 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
     (But, if the same value occurs in another record, we count it, of
     course.)
 
+    @return: list of tuples containing tag and its frequency
+
     Example:
      >>> get_most_popular_field_values(range(11,20), '980__a')
-     (('PREPRINT', 10), ('THESIS', 7), ...)
+     [('PREPRINT', 10), ('THESIS', 7), ...]
      >>> get_most_popular_field_values(range(11,20), ('100__a', '700__a'))
-     (('Ellis, J', 10), ('Ellis, N', 7), ...)
+     [('Ellis, J', 10), ('Ellis, N', 7), ...]
      >>> get_most_popular_field_values(range(11,20), ('100__a', '700__a'), ('Ellis, J'))
-     (('Ellis, N', 7), ...)
+     [('Ellis, N', 7), ...]
     """
 
     def _get_most_popular_field_values_helper_sorter(val1, val2):
-        "Compare VAL1 and VAL2 according to, firstly, frequency, then secondly, alphabetically."
-        compared_via_frequencies = cmp(valuefreqdict[val2], valuefreqdict[val1])
+        """Compare VAL1 and VAL2 according to, firstly, frequency, then
+        secondly, alphabetically."""
+        compared_via_frequencies = cmp(valuefreqdict[val2],
+                                       valuefreqdict[val1])
         if compared_via_frequencies == 0:
             return cmp(val1.lower(), val2.lower())
         else:
@@ -6512,7 +6524,8 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
     if count_repetitive_values:
         # counting technique A: can look up many records at once: (very fast)
         for tag in tags:
-            vals_to_count.extend(get_fieldvalues(recids, tag, sort=False))
+            vals_to_count.extend(get_fieldvalues(recids, tag, sort=False,
+                                                 split_by=split_by))
     else:
         # counting technique B: must count record-by-record: (slow)
         for recid in recids:
@@ -6531,22 +6544,36 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
     ## are we to exclude some of found values?
     for val in vals_to_count:
         if val not in exclude_values:
-            if valuefreqdict.has_key(val):
+            if val in valuefreqdict:
                 valuefreqdict[val] += 1
             else:
                 valuefreqdict[val] = 1
     ## sort by descending frequency of values:
-    out = ()
-    vals = valuefreqdict.keys()
-    vals.sort(_get_most_popular_field_values_helper_sorter)
-    for val in vals:
-        tmpdisplv = ''
-        if displaytmp.has_key(val):
-            tmpdisplv = displaytmp[val]
-        else:
-            tmpdisplv = val
-        out += (tmpdisplv, valuefreqdict[val]),
-    return out
+    if not CFG_NUMPY_IMPORTABLE:
+        ## original version
+        out = []
+        vals = valuefreqdict.keys()
+        vals.sort(_get_most_popular_field_values_helper_sorter)
+        for val in vals:
+            tmpdisplv = ''
+            if val in displaytmp:
+                tmpdisplv = displaytmp[val]
+            else:
+                tmpdisplv = val
+            out.append((tmpdisplv, valuefreqdict[val]))
+        return out
+    else:
+        f = []   # frequencies
+        n = []   # original names
+        ln = []  # lowercased names
+        ## build lists within one iteration
+        for (val, freq) in valuefreqdict.iteritems():
+            f.append(-1 * freq)
+            n.append(displaytmp[val] if val in displaytmp else val)
+            ln.append(val.lower())
+        ## sort by frequency (desc) and then by lowercased name.
+        return [(n[i], -1 * f[i]) for i in numpy.lexsort([ln, f])]
+
 
 def profile(p="", f="", c=CFG_SITE_NAME):
     """Profile search time."""

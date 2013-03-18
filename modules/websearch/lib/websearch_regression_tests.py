@@ -2225,36 +2225,36 @@ class WebSearchSummarizerTest(unittest.TestCase):
     def test_most_popular_field_values_singletag(self):
         """websearch - most popular field values, simple tag"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7),
+        self.assertEqual([('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7),
                          ('DRAFT', 2), ('POETRY', 2), ('REPORT', 2), ('ALEPHPAPER', 1), ('ATLANTISTIMESNEWS', 1),
-                         ('ISOLDEPAPER', 1)),
+                         ('ISOLDEPAPER', 1)],
                          get_most_popular_field_values(range(0,100), '980__a'))
 
     def test_most_popular_field_values_singletag_multiexclusion(self):
         """websearch - most popular field values, simple tag, multiple exclusions"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('DRAFT', 2), ('REPORT', 2),
-                          ('ALEPHPAPER', 1), ('ATLANTISTIMESNEWS', 1), ('ISOLDEPAPER', 1)),
+        self.assertEqual([('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('DRAFT', 2), ('REPORT', 2),
+                          ('ALEPHPAPER', 1), ('ATLANTISTIMESNEWS', 1), ('ISOLDEPAPER', 1)],
                          get_most_popular_field_values(range(0,100), '980__a', ('THESIS', 'PICTURE', 'POETRY')))
 
     def test_most_popular_field_values_multitag(self):
         """websearch - most popular field values, multiple tags"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('Ellis, J', 3), ('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)),
+        self.assertEqual([('Ellis, J', 3), ('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)],
                          get_most_popular_field_values((9, 14, 18), ('100__a', '700__a')))
 
     def test_most_popular_field_values_multitag_singleexclusion(self):
         """websearch - most popular field values, multiple tags, single exclusion"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)),
+        self.assertEqual([('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)],
                          get_most_popular_field_values((9, 14, 18), ('100__a', '700__a'), ('Ellis, J')))
 
     def test_most_popular_field_values_multitag_countrepetitive(self):
         """websearch - most popular field values, multiple tags, counting repetitive occurrences"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('THESIS', 2), ('REPORT', 1)),
+        self.assertEqual([('THESIS', 2), ('REPORT', 1)],
                          get_most_popular_field_values((41,), ('690C_a', '980__a'), count_repetitive_values=True))
-        self.assertEqual((('REPORT', 1), ('THESIS', 1)),
+        self.assertEqual([('REPORT', 1), ('THESIS', 1)],
                          get_most_popular_field_values((41,), ('690C_a', '980__a'), count_repetitive_values=False))
 
     def test_ellis_citation_summary(self):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,8 +22,9 @@
 """Invenio search engine utilities."""
 
 from invenio.dbquery import run_sql
+from invenio.intbitset import intbitset
 
-def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True):
+def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True, split_by=0):
     """
     Return list of field values for field TAG for the given record ID
     or list of record IDs.  (RECIDS can be both an integer or a list
@@ -40,7 +41,7 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True):
         pass
     if isinstance(recIDs, (int, long)):
         recIDs = [recIDs,]
-    if not isinstance(recIDs, (list, tuple)):
+    if not isinstance(recIDs, (list, tuple, intbitset)):
         return []
     if len(recIDs) == 0:
         return []
@@ -60,9 +61,6 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True):
             return []
         bx = "bib%sx" % digits
         bibx = "bibrec_bib%sx" % digits
-        queryparam = []
-        for recID in recIDs:
-            queryparam.append(recID)
         if not repetitive_values:
             queryselect = "DISTINCT(bx.value)"
         else:
@@ -73,11 +71,17 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True):
         else:
             sort_sql = ""
 
-        query = "SELECT %s FROM %s AS bx, %s AS bibx " \
-                "WHERE bibx.id_bibrec IN (%s) AND bx.id=bibx.id_bibxxx AND " \
-                "bx.tag LIKE %%s %s" % \
-                (queryselect, bx, bibx, ("%s,"*len(queryparam))[:-1], sort_sql)
-        res = run_sql(query, tuple(queryparam) + (tag,))
-        for row in res:
-            out.append(row[0])
+        def get_res(recIDs):
+            query = "SELECT %s FROM %s AS bx, %s AS bibx " \
+                    "WHERE bibx.id_bibrec IN (%s) AND bx.id=bibx.id_bibxxx AND " \
+                    "bx.tag LIKE %%s %s" % \
+                    (queryselect, bx, bibx, ("%s,"*len(recIDs))[:-1], sort_sql)
+            return [i[0] for i in run_sql(query, tuple(recIDs) + (tag,))]
+
+        #print not sort and split_by>0 and len(recIDs)>split_by
+        if sort or split_by<=0 or len(recIDs)<=split_by:
+            return get_res(recIDs)
+        else:
+            return [i for res in map(get_res, zip(*[iter(recIDs)]*split_by)) for i in res]
+
     return out
