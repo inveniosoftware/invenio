@@ -209,4 +209,8 @@ The xmlDict.py code is authored by Duncan McGreggor and is licensed
 under PSF license.  It was taken from
 <http://code.activestate.com/recipes/410469/>.
 
+The original dateutils.stfrtime function was taken from
+<https://github.com/django/django/blob/stable/1.4.x/django/utils/datetime_safe.py>
+Author: Russell Keith-Magee <russell@keith-magee.com>
+
 - end of file -

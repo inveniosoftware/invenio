@@ -1500,6 +1500,26 @@ ul.bsk_export_as_list{
    color: #000;
    font-size: small;
 }
+.bsk_directory_box_nav_extra_options{
+   padding: 5px;
+   white-space: nowrap;
+   text-align: right;
+}
+.bsk_directory_box_nav_extra_options img{
+   vertical-align: middle;
+   margin-right: 3px;
+   border: none;
+}
+.bsk_directory_box_nav_extra_options a, .bsk_directory_box_nav_extra_options a:link, .bsk_directory_box_nav_extra_options a:visited, .bsk_directory_box_nav_extra_options a:active{
+   text-decoration: none;
+   color: #000;
+   font-size: small;
+}
+.bsk_directory_box_nav_extra_options a:hover{
+   text-decoration: underline;
+   color: #000;
+   font-size: small;
+}
 .bsk_directory_box_content{
    width: 100%;
 }

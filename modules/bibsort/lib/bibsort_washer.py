@@ -19,7 +19,8 @@
 
 """Applies a transformation function to a value"""
 
-from time import strptime, strftime
+from time import strptime
+from invenio.dateutils import strftime
 from invenio.textutils import strip_accents
 
 LEADING_ARTICLES = ['the', 'a', 'an', 'at', 'on', 'of']

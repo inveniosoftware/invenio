@@ -61,6 +61,8 @@ CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING',
                     '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED',
                     'SLEEPING', 'KILLED', 'NOW STOP', 'ERRORS REPORTED')
 
+CFG_MOTD_PATH = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
+
 SHIFT_RE = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 
@@ -322,19 +324,26 @@ class Manager(object):
         self.auto_mode = 0
         self.currentrow = None
         self.current_attr = 0
-        self.header_lines = 2
         self.hostname = gethostname()
         self.allowed_task_types = CFG_BIBSCHED_NODE_TASKS.get(self.hostname, CFG_BIBTASK_VALID_TASKS)
-        try:
-            motd_path = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
-            self.motd = open(motd_path).read().strip()
-            if len(self.motd) > 0:
-                self.motd = "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M", time.localtime(os.path.getmtime(motd_path))) + self.motd
-                self.header_lines = 3
-        except IOError:
-            self.motd = ""
+        self.motd = ""
+        self.header_lines = 2
+        self.read_motd()
         self.selected_line = self.header_lines
         wrapper(self.start)
+
+    def read_motd(self):
+        """Get a fresh motd from disk, if it exists."""
+        self.motd = ""
+        self.header_lines = 2
+        try:
+            if os.path.exists(CFG_MOTD_PATH):
+                motd = open(CFG_MOTD_PATH).read().strip()
+                if motd:
+                    self.motd = "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M", time.localtime(os.path.getmtime(CFG_MOTD_PATH))) + motd
+                    self.header_lines = 3
+        except IOError:
+            pass
 
     def handle_keys(self, char):
         if char == -1:
@@ -408,6 +417,7 @@ class Manager(object):
                 self.display_task_options()
             elif char in (ord("e"), ord("E")):
                 self.edit_motd()
+                self.read_motd()
             elif char == ord("1"):
                 self.display = 1
                 self.first_visible_line = 0
@@ -465,18 +475,12 @@ class Manager(object):
         bibsched monitor starts."""
         editor = get_editor()
         if editor:
-            motdpath = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
             previous = self.motd
             self.curses.endwin()
-            os.system("%s %s" % (editor, motdpath))
-            try:
-                self.motd = open(motdpath).read().strip()
-            except IOError:
-                self.motd = ""
-            if len(self.motd) > 0:
-                self.motd = "MOTD [%s] " % time.strftime("%m-%d-%Y %H:%M", time.localtime(os.path.getmtime(motdpath))) + self.motd
+            os.system("%s %s" % (editor, CFG_MOTD_PATH))
 
             # We need to redraw the MOTD part
+            self.read_motd()
             self.repaint()
 
             if previous[24:] != self.motd[24:]:
@@ -985,6 +989,7 @@ order to let this task run. The current priority is %s. New value:"
             self._display_message_box(self.motd + "\nPress any key to close")
         while self.running:
             if ring == 4:
+                self.read_motd()
                 self.update_rows()
                 ring = 0
                 self.repaint()
