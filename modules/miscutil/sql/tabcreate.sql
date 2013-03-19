@@ -3860,6 +3860,8 @@ CREATE TABLE IF NOT EXISTS crcILLREQUEST (
   borrower_comments text,
   only_this_edition varchar(10) NOT NULL default '',
   library_notes text,
+  overdue_letter_number int(3) unsigned NOT NULL default '0',
+  overdue_letter_date datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY (id),
   KEY id_crcborrower (id_crcBORROWER),
   KEY id_crclibrary (id_crcLIBRARY)
@@ -4341,5 +4343,7 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_27_new_selfcite_
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_11_new_citation_errors_table',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_08_new_goto_table',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_bibdocfile_model',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY_last_updated',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
 
 -- end of file

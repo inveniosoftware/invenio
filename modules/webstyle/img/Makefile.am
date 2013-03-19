@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -47,7 +47,7 @@ img_DATA = add-small.png \
            aid_to_other.png \
            aid_to_other_gray.png \
            ajax-loader.gif \
-	         application_pdf.png \
+           application_pdf.png \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
            balloon_bottom_shadow.png \
@@ -63,6 +63,7 @@ img_DATA = add-small.png \
            bibedit_textmarc.png \
            blankicon.gif \
            blue_gradient.gif \
+           book_cover_placeholder.gif \
            bullet_toggle_minus.png \
            bullet_toggle_plus.png \
            circle_green.png \
@@ -264,7 +265,7 @@ img_DATA = add-small.png \
            wb-unsubscribe.png \
            white_field.gif \
            wsignout.gif \
-	         compare.png \
+           compare.png \
            document-preview.png \
            ui-anim_basic_16x16.gif
 

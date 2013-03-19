@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,64 +17,56 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+   Invenio Bibcirculation User.
+   When applicable, methods should be renamed, refactored and
+   appropriate documentation added.
+"""
 
 __revision__ = "$Id$"
 
-# bibcirculation imports
-import invenio.bibcirculation_dblayer as db
-import invenio.template
-bc_templates = invenio.template.load('bibcirculation')
-from invenio.bibcirculationadminlib import load_template
-# other invenio imports
+import datetime, time
+
+# Invenio imports
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_CERN_SITE, \
      CFG_SITE_URL
-#from invenio.dateutils import get_datetext
-#import datetime
-#from invenio.urlutils import create_html_link
 from invenio.webuser import collect_user_info
 from invenio.mailutils import send_email
 from invenio.messages import gettext_set_language
+from invenio.bibrecord import record_get_field_value
+from invenio.search_engine import get_record
+
+# Bibcirculation imports
+import invenio.bibcirculation_dblayer as db
+from invenio.bibcirculationadminlib import load_template
 from invenio.bibcirculation_utils import book_title_from_MARC, \
      book_information_from_MARC, \
-     create_ill_record, search_user, \
+     create_ill_record, \
      tag_all_requests_as_done, \
+     generate_tmp_barcode, \
      generate_new_due_date, \
-     update_requests_statuses
-     #make_copy_available, \
-     #update_status_if_expired, \
-     #book_information_from_MARC
+     update_requests_statuses, \
+     search_user
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
                                     CFG_BIBCIRCULATION_LOANS_EMAIL, \
+                                    CFG_BIBCIRCULATION_ITEM_STATUS_UNDER_REVIEW, \
                                     CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING, \
                                     CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
-                                    CFG_BIBCIRCULATION_ILL_STATUS_NEW
-
-
-def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
-    """
-    Display Loans historical overview for user uid.
-
-    @param uid: user id
-    @param ln: language of the page
-
-    @return body(html)
-    """
-    invenio_user_email = db.get_invenio_user_email(uid)
-    borrower_id = db.get_borrower_id_by_email(invenio_user_email)
-    result = db.get_historical_overview(borrower_id)
-
-    body = bc_templates.tmpl_loanshistoricaloverview(result=result, ln=ln)
-
-    return body
+                                    CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED, \
+                                    CFG_BIBCIRCULATION_ILL_STATUS_NEW, \
+                                    CFG_BIBCIRCULATION_PROPOSAL_STATUS_NEW, \
+                                    AMZ_BOOK_PUBLICATION_DATE_TAG, \
+                                    CFG_BIBCIRCULATION_DEFAULT_LIBRARY_ID
+import invenio.template
+bc_templates = invenio.template.load('bibcirculation')
 
 
 def perform_borrower_loans(uid, barcode, borrower_id,
                            request_id, action, ln=CFG_SITE_LANG):
-    """perofirme
-
+    """
     Display all the loans and the requests of a given borrower.
 
     @param barcode: identify the item. Primary key of crcITEM.
@@ -100,7 +92,8 @@ def perform_borrower_loans(uid, barcode, borrower_id,
     #renew loan
     if action == 'renew':
         recid = db.get_id_bibrec(barcode)
-        queue = db.get_queue_request(recid)
+        item_description = db.get_item_description(barcode)
+        queue = db.get_queue_request(recid, item_description)
 
         if len(queue) != 0 and queue[0][0] != borrower_id:
             message = "It is not possible to renew your loan for %(x_strong_tag_open)s%(x_title)s%(x_strong_tag_close)s" % {'x_title': book_title_from_MARC(recid), 'x_strong_tag_open': '<strong>', 'x_strong_tag_close': '</strong>'}
@@ -124,8 +117,9 @@ def perform_borrower_loans(uid, barcode, borrower_id,
     elif action == 'renew_all':
         list_of_barcodes = db.get_borrower_loans_barcodes(borrower_id)
         for bc in list_of_barcodes:
-            bc_recid = db.get_recid(bc)
-            queue = db.get_queue_request(bc_recid)
+            bc_recid = db.get_id_bibrec(bc)
+            item_description = db.get_item_description(bc)
+            queue = db.get_queue_request(bc_recid, item_description)
 
             #check if there are requests
             if len(queue) != 0 and queue[0][0] != borrower_id:
@@ -143,45 +137,81 @@ def perform_borrower_loans(uid, barcode, borrower_id,
 
     loans = db.get_borrower_loans(borrower_id)
     requests = db.get_borrower_requests(borrower_id)
+    proposals = db.get_borrower_proposals(borrower_id)
 
-    body = bc_templates.tmpl_yourloans(loans=loans, requests=requests,
-                                       borrower_id=borrower_id, infos=infos,
-                                       ln=ln)
+    body = bc_templates.tmpl_yourloans(loans=loans, requests=requests, proposals=proposals,
+                                       borrower_id=borrower_id, infos=infos, ln=ln)
     return body
 
-### with message ###
-def perform_get_holdings_information(recid, req, ln=CFG_SITE_LANG):
+def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
     """
-    Display all the copies of an item.
+    Display Loans historical overview for user uid.
+
+    @param uid: user id
+    @param ln: language of the page
+
+    @return body(html)
+    """
+    invenio_user_email = db.get_invenio_user_email(uid)
+    borrower_id = db.get_borrower_id_by_email(invenio_user_email)
+    result = db.get_historical_overview(borrower_id)
+
+    body = bc_templates.tmpl_loanshistoricaloverview(result=result, ln=ln)
+
+    return body
+
+def perform_get_holdings_information(recid, req, action="borrowal", ln=CFG_SITE_LANG):
+    """
+    Display all the copies of an item. If the parameter action is 'proposal', display
+    appropriate information to the user.
 
     @param recid: identify the record. Primary key of bibrec.
     @type recid: int
 
+    @param action: Specifies whether the current record is put up to solicit acquisition
+    proposals(if "proposal") or not("borrowal").
+    @type proposal: string
+
     @return body(html)
     """
+    _ = gettext_set_language(ln)
 
-    holdings_information = db.get_holdings_information(recid, False)
+    if action == "proposal":
+        tag = AMZ_BOOK_PUBLICATION_DATE_TAG
+        publication_date = record_get_field_value(get_record(recid), tag[:3],
+                                                  ind1=tag[3], ind2=tag[4],
+                                                  code=tag[5])
+        msg = ''
+        if publication_date:
+            cur_date = datetime.date.today()
+            try:
+                pub_date = time.strptime(publication_date, '%d %b %Y')
+                pub_date = datetime.date(pub_date[0], pub_date[1], pub_date[2])
+                if cur_date < pub_date:
+                    msg += _("The publication date of this book is %s.") % (publication_date)
+                    msg += "<br /><br />"
+                else:
+                    msg += _("This book has no copies in the library. ")
+            except:
+                msg += _("This book has no copies in the library. ")
 
-    body = bc_templates.tmpl_holdings_information2(recid=recid,
+        msg += _("If you think this book is interesting, suggest it and tell us why you consider this \
+                  book is important. The library will consider your opinion and if we decide to buy the \
+                  book, we will issue a loan for you as soon as it arrives and send it by internal mail.")
+        msg += "<br \><br \>"
+        msg += _("In case we decide not to buy the book, we will offer you an interlibrary loan")
+
+        body = bc_templates.tmpl_book_proposal_information(recid, msg, ln=ln)
+    else:
+        holdings_information = db.get_holdings_information(recid, False)
+        body = bc_templates.tmpl_holdings_information(recid=recid,
                                             req=req,
                                             holdings_info=holdings_information,
                                             ln=ln)
 
     return body
 
-def perform_get_pending_request(ln=CFG_SITE_LANG):
-    """
-    @param ln: language of the page
-    """
-
-    status = db.get_loan_request_by_status(CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
-
-    body = bc_templates.tmpl_get_pending_request(status=status, ln=ln)
-
-    return body
-
-
-def perform_new_request(recid, barcode, ln=CFG_SITE_LANG):
+def perform_new_request(recid, barcode, action="borrowal", ln=CFG_SITE_LANG):
     """
     Display form to be filled by the user.
 
@@ -197,10 +227,62 @@ def perform_new_request(recid, barcode, ln=CFG_SITE_LANG):
     @return request form
     """
 
-    body = bc_templates.tmpl_new_request(recid=recid, barcode=barcode, ln=ln)
+    body = bc_templates.tmpl_new_request(recid=recid, barcode=barcode, action=action, ln=ln)
 
     return body
 
+def perform_book_proposal_send(uid, recid, period_from, period_to,
+                                        remarks, ln=CFG_SITE_LANG):
+    """
+    The subfield containing the information about the source of importation
+    of the record acts as the marker for the records put up for acquisition
+    proposals.
+
+    Register the user's book proposal, his period of interest and his remarks
+    in the 'ILLREQUEST' table. Add a new 'dummy' copy for the proposed book.
+
+    Create a loan(hold) request on behalf of the user for that copy and send
+    a confirmation e-mail to her/him.
+    """
+    user = collect_user_info(uid)
+
+    if CFG_CERN_SITE:
+        try:
+            borrower = search_user('ccid', user['external_personid'])
+        except:
+            borrower = ()
+    else:
+        borrower = search_user('email', user['email'])
+
+    if borrower != ():
+        if not db.has_copies(recid):
+            tmp_barcode = generate_tmp_barcode()
+            ill_register_request_with_recid(recid, uid, period_from, period_to, remarks,
+                                            conditions='register_acquisition_suggestion',
+                                            only_edition='False', barcode=tmp_barcode, ln=CFG_SITE_LANG)
+
+            db.add_new_copy(tmp_barcode, recid, library_id=CFG_BIBCIRCULATION_DEFAULT_LIBRARY_ID,
+                            collection='', location='',
+                            description='This book was suggested for acquisition', loan_period='',
+                            status=CFG_BIBCIRCULATION_ITEM_STATUS_UNDER_REVIEW, expected_arrival_date='')
+
+            db.delete_brief_format_cache(recid)
+
+            return perform_new_request_send_message(uid, recid, period_from, period_to, tmp_barcode,
+                                                    status=CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED,
+                                                    mail_subject='Acquisition Suggestion',
+                                                    mail_template='proposal_notification',
+                                                    mail_remarks=remarks, ln=CFG_SITE_LANG)
+        return "This item already has copies."
+    else:
+        if CFG_CERN_SITE:
+            message = bc_templates.tmpl_message_request_send_fail_cern("Borrower ID not found.")
+        else:
+            message = bc_templates.tmpl_message_request_send_fail_other("Borrower ID not found.")
+
+        body = bc_templates.tmpl_new_request_send(message=message, ln=ln)
+
+        return body
 
 def perform_new_request_send(uid, recid, period_from, period_to,
                              barcode, ln=CFG_SITE_LANG):
@@ -212,7 +294,8 @@ def perform_new_request_send(uid, recid, period_from, period_to,
 
     nb_requests = 0
     all_copies_on_loan = True
-    copies = db.get_barcodes(recid)
+    description = db.get_item_description(barcode)
+    copies = db.get_barcodes(recid, description)
     for bc in copies:
         nb_requests += db.get_number_requests_per_copy(bc)
         if db.is_item_on_loan(bc) is None:
@@ -226,7 +309,17 @@ def perform_new_request_send(uid, recid, period_from, period_to,
     else:
         status = CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING
 
+    return perform_new_request_send_message(uid, recid, period_from, period_to, barcode,
+                                            status, mail_subject='New request',
+                                            mail_template='notification',
+                                            mail_remarks='', ln=CFG_SITE_LANG)
+
+def perform_new_request_send_message(uid, recid, period_from, period_to, barcode,
+                                     status, mail_subject, mail_template,
+                                     mail_remarks='', ln=CFG_SITE_LANG):
+
     user = collect_user_info(uid)
+
     if CFG_CERN_SITE:
         try:
             borrower = search_user('ccid', user['external_personid'])
@@ -236,8 +329,11 @@ def perform_new_request_send(uid, recid, period_from, period_to,
         borrower = search_user('email', user['email'])
 
     if borrower != ():
-        borrower = borrower[0]
-        borrower_id = borrower[0]
+        borrower_id = borrower[0][0]
+        if db.is_doc_already_requested(recid, barcode, borrower_id):
+            message = bc_templates.tmpl_message_send_already_requested()
+            return bc_templates.tmpl_new_request_send(message=message, ln=ln)
+
         borrower_details = db.get_borrower_details(borrower_id)
         (_id, ccid, name, email, _phone, address, mailbox) = borrower_details
 
@@ -247,51 +343,34 @@ def perform_new_request_send(uid, recid, period_from, period_to,
         req_id = db.new_hold_request(borrower_id, recid, barcode,
                                 period_from, period_to, status)
 
-        details = db.get_loan_request_details(req_id)
-        if details:
-            library = details[3]
-            location = details[4]
-            request_date = details[7]
+
+        location = '-'
+        library = ''
+        request_date = ''
+        if status != CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED:
+            details = db.get_loan_request_details(req_id)
+            if details:
+                library = details[3]
+                location = details[4]
+                request_date = details[7]
+
+        message_template = load_template(mail_template)
+
+        # A message to be sent to the user detailing his loan request
+        # or his new book proposal.
+        if status == CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED:
+            message_for_user = message_template % (title)
         else:
-            location = ''
-            library = ''
-            request_date = ''
-
-        link_to_holdings_details = CFG_SITE_URL + \
-                                   '/record/%s/holdings' % str(recid)
-
-        link_to_item_request_details = CFG_SITE_URL + \
-            "/admin2/bibcirculation/get_item_requests_details?ln=%s&recid=%s" \
-                % (ln, str(recid))
-
-        subject = 'New request'
-        message_template = load_template('notification')
-
-        message_for_user = message_template % (name, ccid, email, address,
-                                        mailbox, title, author, publisher,
-                                        year, isbn, location, library,
-                                        link_to_holdings_details, request_date)
-
-        message_for_librarian = message_template % (name, ccid, email, address,
-                                        mailbox, title, author, publisher,
-                                        year, isbn, location, library,
-                                        link_to_item_request_details,
-                                        request_date)
-
-        if status == CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING:
-            send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                       toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
-                       subject  = subject,
-                       content  = message_for_librarian,
-                       header   = '',
-                       footer   = '',
-                       attempt_times=1,
-                       attempt_sleeptime=10
-                      )
+            link_to_holdings_details = CFG_SITE_URL + \
+                '/record/%s/holdings' % str(recid)
+            message_for_user = message_template % (name, ccid, email, address,
+                                            mailbox, title, author, publisher,
+                                            year, isbn, location, library,
+                                            link_to_holdings_details, request_date)
 
         send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
                    toaddr   = email,
-                   subject  = subject,
+                   subject  = mail_subject,
                    content  = message_for_user,
                    header   = '',
                    footer   = '',
@@ -299,21 +378,59 @@ def perform_new_request_send(uid, recid, period_from, period_to,
                    attempt_sleeptime=10
                   )
 
+        if status == CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING:
+            # A message to be sent to the librarian about the pending status.
+            link_to_item_request_details = CFG_SITE_URL + \
+                "/admin2/bibcirculation/get_item_requests_details?ln=%s&recid=%s" \
+                % (ln, str(recid))
+            message_for_librarian = message_template % (name, ccid, email, address,
+                                        mailbox, title, author, publisher,
+                                        year, isbn, location, library,
+                                        link_to_item_request_details,
+                                        request_date)
+            send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                       toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
+                       subject  = mail_subject,
+                       content  = message_for_librarian,
+                       header   = '',
+                       footer   = '',
+                       attempt_times=1,
+                       attempt_sleeptime=10
+                      )
+
         if CFG_CERN_SITE:
-            message = bc_templates.tmpl_message_request_send_ok_cern()
+            if status == CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED:
+                message = bc_templates.tmpl_message_proposal_send_ok_cern()
+            else:
+                message = bc_templates.tmpl_message_request_send_ok_cern()
         else:
-            message = bc_templates.tmpl_message_request_send_ok_other()
+            if status == CFG_BIBCIRCULATION_REQUEST_STATUS_PROPOSED:
+                message = bc_templates.tmpl_message_proposal_send_ok_other()
+            else:
+                message = bc_templates.tmpl_message_request_send_ok_other()
 
     else:
         if CFG_CERN_SITE:
-            message = bc_templates.tmpl_message_request_send_fail_cern()
+            message = bc_templates.tmpl_message_request_send_fail_cern("Borrower ID not found")
         else:
-            message = bc_templates.tmpl_message_request_send_fail_other()
+            message = bc_templates.tmpl_message_request_send_fail_other("Borrower ID not found")
 
     body = bc_templates.tmpl_new_request_send(message=message, ln=ln)
 
     return body
 
+
+def display_ill_form(ln=CFG_SITE_LANG):
+    """
+    Display ILL form
+
+    @param uid: user id
+    @type: int
+    """
+
+    body = bc_templates.tmpl_display_ill_form(infos=[], ln=ln)
+
+    return body
 
 def ill_request_with_recid(recid, ln=CFG_SITE_LANG):
     """
@@ -333,15 +450,9 @@ def ill_request_with_recid(recid, ln=CFG_SITE_LANG):
 
     return body
 
- #(title, year, authors,
- # isbn, publisher) = book_information_from_MARC(int(recid))
- #book_info = {'title': title, 'authors': authors, 'place': place,
- #             'publisher': publisher, 'year' : year,  'edition': edition,
- #             'isbn' : isbn}
-
 def ill_register_request_with_recid(recid, uid, period_of_interest_from,
                                     period_of_interest_to, additional_comments,
-                                    conditions, only_edition,
+                                    conditions, only_edition, barcode='',
                                     ln=CFG_SITE_LANG):
     """
     Register a new ILL request.
@@ -361,8 +472,8 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
 
     _ = gettext_set_language(ln)
 
-    # create a dictionnary
-    book_info = {'recid': recid}
+    # Create a dictionary.
+    book_info = "{'recid': " + str(recid) + "}"
 
     user = collect_user_info(uid)
     borrower_id = db.get_borrower_id_by_email(user['email'])
@@ -404,9 +515,9 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
             if address is not None:
                 db.new_borrower(ccid, name, email, phone, address, mailbox, '')
             else:
-                message = bc_templates.tmpl_message_request_send_fail_cern()
+                message = bc_templates.tmpl_message_request_send_fail_cern("Office address not available.")
         else:
-            message = bc_templates.tmpl_message_request_send_fail_other()
+            message = bc_templates.tmpl_message_request_send_fail_other("Office address not available.")
 
         return bc_templates.tmpl_ill_register_request_with_recid(
                                                             message=message,
@@ -426,9 +537,9 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
             if address is not None:
                 db.add_borrower_address(address, email)
             else:
-                message = bc_templates.tmpl_message_request_send_fail_cern()
+                message = bc_templates.tmpl_message_request_send_fail_cern("Office address not available.")
         else:
-            message = bc_templates.tmpl_message_request_send_fail_other()
+            message = bc_templates.tmpl_message_request_send_fail_other("Office address not available.")
 
         return bc_templates.tmpl_ill_register_request_with_recid(
                                                                message=message,
@@ -441,12 +552,20 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
                                                         infos=infos,
                                                         ln=ln)
 
+    elif conditions == 'register_acquisition_suggestion':
+        # This ILL request entry is a book proposal.
+        db.ill_register_request(book_info, borrower_id,
+                                period_of_interest_from, period_of_interest_to,
+                                CFG_BIBCIRCULATION_PROPOSAL_STATUS_NEW,
+                                additional_comments,
+                                only_edition or 'False','proposal-book', barcode=barcode)
+
     else:
         db.ill_register_request(book_info, borrower_id,
                                 period_of_interest_from, period_of_interest_to,
                                 CFG_BIBCIRCULATION_ILL_STATUS_NEW,
                                 additional_comments,
-                                only_edition or 'False','book')
+                                only_edition or 'False','book', barcode=barcode)
 
         if CFG_CERN_SITE == 1:
             message = bc_templates.tmpl_message_request_send_ok_cern()
@@ -466,23 +585,10 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
                                                                message=message,
                                                                ln=ln)
 
-
-def display_ill_form(ln=CFG_SITE_LANG):
-    """
-    Display ILL form
-
-    @param uid: user id
-    @type: int
-    """
-
-    body = bc_templates.tmpl_display_ill_form(infos=[], ln=ln)
-
-    return body
-
 def ill_register_request(uid, title, authors, place, publisher, year, edition,
                 isbn, period_of_interest_from, period_of_interest_to,
                 additional_comments, conditions, only_edition, request_type,
-                ln=CFG_SITE_LANG):
+                barcode='', ln=CFG_SITE_LANG):
     """
     Register new ILL request. Create new record (collection: ILL Books)
 
@@ -551,7 +657,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                                         period_of_interest_to,
                                         CFG_BIBCIRCULATION_ILL_STATUS_NEW,
                                         additional_comments,
-                                        only_edition or 'False', request_type)
+                                        only_edition or 'False', request_type,
+                                        budget_code='', barcode=barcode)
 
                 #Display confirmation message.
                 message = _("Your ILL request has been registered and the " \
@@ -596,7 +703,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                                         CFG_BIBCIRCULATION_ILL_STATUS_NEW,
                                         additional_comments,
                                         only_edition or 'False',
-                                        request_type)
+                                        request_type, budget_code='', barcode=barcode)
 
                     message = _("Your ILL request has been registered and" \
                               " the document will be sent to you via" \
@@ -664,7 +771,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                                         CFG_BIBCIRCULATION_ILL_STATUS_NEW,
                                         additional_comments,
                                         only_edition or 'False',
-                                        request_type)
+                                        request_type, budget_code='', barcode=barcode)
 
                 message = _("Your ILL request has been registered and" \
                           " the document will be sent to you via" \
@@ -684,7 +791,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                 message += ' ' + _("Please contact %(contact_email)s") % \
                            {'contact_email': CFG_BIBCIRCULATION_LIBRARIAN_EMAIL}
 
-    body = bc_templates.tmpl_ill_register_request_with_recid(message=message,
+    body = bc_templates.tmpl__with_recid(message=message,
                                                              ln=ln)
 
     return body

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,14 +27,15 @@ import re
 import time
 
 from invenio.search_engine_utils import get_fieldvalues
-import invenio.bibcirculation_dblayer as db
+from invenio.urlutils import make_invenio_opener
 from invenio.search_engine import get_field_tags
 from invenio.bibtask import task_low_level_submission
 from invenio.textutils import encode_for_xml
+from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR, CFG_SITE_LANG
-from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+
+import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import \
-                                CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
                                 CFG_BIBCIRCULATION_WORKING_DAYS, \
                                 CFG_BIBCIRCULATION_HOLIDAYS, \
                                 CFG_CERN_SITE, \
@@ -46,13 +47,9 @@ from invenio.bibcirculation_config import \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_ON_LOAN, \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED, \
                                 CFG_BIBCIRCULATION_LOAN_STATUS_RETURNED
-from invenio.urlutils import create_html_link, make_invenio_opener
-from invenio.messages import gettext_set_language
-
-BIBCIRCULATION_OPENER = make_invenio_opener('BibCirculation')
 
 DICC_REGEXP = re.compile("^\{('[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None)(, ?'[^']*': ?('[^']*'|\"[^\"]+\"|[0-9]*|None))*)?\}$")
-
+BIBCIRCULATION_OPENER = make_invenio_opener('BibCirculation')
 
 def search_user(column, string):
     if string is not None:
@@ -133,8 +130,12 @@ def search_user(column, string):
     return result
 
 def update_user_info_from_ldap(user_id):
+
+    from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+
     ccid = db.get_borrower_ccid(user_id)
     ldap_info = get_user_info_from_ldap(ccid=ccid)
+
     if not ldap_info:
         result = ()
     else:
@@ -175,15 +176,14 @@ def get_book_cover(isbn):
     from xml.dom import minidom
 
     # connect to AWS
-    cover_xml = BIBCIRCULATION_OPENER.open('http://ecs.amazonaws.com/onca/xml' \
+    """cover_xml = BIBCIRCULATION_OPENER.open('http://ecs.amazonaws.com/onca/xml' \
                                '?Service=AWSECommerceService&AWSAccessKeyId=' \
                                + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                '&Operation=ItemSearch&Condition=All&' \
                                'ResponseGroup=Images&SearchIndex=Books&' \
-                               'Keywords=' + isbn)
-
+                               'Keywords=' + isbn)"""
+    cover_xml=""
     # parse XML
-
     try:
         xml_img = minidom.parse(cover_xml)
         retrieve_book_cover = xml_img.getElementsByTagName('MediumImage')
@@ -781,7 +781,7 @@ def all_copies_are_missing(recid):
 #        else:
 #            return True
 
-def generate_email_body(template, loan_id):
+def generate_email_body(template, loan_id, ill=0):
     """
     Generate the body of an email for loan recalls.
 
@@ -794,11 +794,15 @@ def generate_email_body(template, loan_id):
     @return email(body)
     """
 
-    recid = db.get_loan_recid(loan_id)
-    (book_title, book_year, book_author,
-     book_isbn, book_editor) = book_information_from_MARC(int(recid))
+    if ill:
+        # Inter library loan.
+        out = template
+    else:
+        recid = db.get_loan_recid(loan_id)
+        (book_title, book_year, book_author,
+         book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
-    out = template % (book_title, book_year, book_author,
+        out = template % (book_title, book_year, book_author,
                       book_isbn, book_editor)
 
     return out
@@ -809,18 +813,21 @@ def create_item_details_url(recid, ln):
     return CFG_SITE_URL + url
 
 def tag_all_requests_as_done(barcode, user_id):
-    recid = db.get_recid(barcode)
-    list_of_barcodes = db.get_barcodes(recid)
+    recid = db.get_id_bibrec(barcode)
+    description = db.get_item_description(barcode)
+    list_of_barcodes = db.get_barcodes(recid, description)
     for bc in list_of_barcodes:
-        db.tag_requests_as_done(bc, user_id)
+        db.tag_requests_as_done(user_id, bc)
 
-def update_requests_statuses(barcode, recid=None):
-    if recid == None:
-        recid = db.get_recid(barcode)
-    list_of_pending_requests = db.get_requests(recid,
+def update_requests_statuses(barcode):
+
+    recid = db.get_id_bibrec(barcode)
+    description = db.get_item_description(barcode)
+
+    list_of_pending_requests = db.get_requests(recid, description,
                                     CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
     some_copy_available = False
-    copies_status = db.get_copies_status(recid)
+    copies_status = db.get_copies_status(recid, description)
     if copies_status is not None:
         for status in copies_status:
             if status in (CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF,
@@ -829,29 +836,29 @@ def update_requests_statuses(barcode, recid=None):
 
     if len(list_of_pending_requests) == 1:
         if not some_copy_available:
-            db.update_loan_request_status(list_of_pending_requests[0][0],
-                                    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
+            db.update_loan_request_status(CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING,
+                                          list_of_pending_requests[0][0])
         else:
             return list_of_pending_requests[0][0]
 
     elif len(list_of_pending_requests) == 0:
         if some_copy_available:
-            list_of_waiting_requests = db.get_requests(recid,
+            list_of_waiting_requests = db.get_requests(recid, description,
                                     CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
             if len(list_of_waiting_requests) > 0:
-                db.update_loan_request_status(list_of_waiting_requests[0][0],
-                                    CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
+                db.update_loan_request_status(CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                                              list_of_waiting_requests[0][0])
                 return list_of_waiting_requests[0][0]
 
     elif len(list_of_pending_requests) > 1:
         for request in list_of_pending_requests:
-            db.update_loan_request_status(request[0],
-                                    CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
-        list_of_waiting_requests = db.get_requests(recid,
+            db.update_loan_request_status(CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING,
+                                          request[0])
+        list_of_waiting_requests = db.get_requests(recid, description,
                                     CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING)
         if some_copy_available:
-            db.update_loan_request_status(list_of_waiting_requests[0][0],
-                                    CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING)
+            db.update_loan_request_status(CFG_BIBCIRCULATION_REQUEST_STATUS_PENDING,
+                                          list_of_waiting_requests[0][0])
             return list_of_waiting_requests[0][0]
 
     return None

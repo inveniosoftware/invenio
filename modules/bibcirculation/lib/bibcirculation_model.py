@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -147,6 +147,10 @@ class CrcILLREQUEST(db.Model):
     only_this_edition = db.Column(db.String(10), nullable=False,
                 server_default='')
     library_notes = db.Column(db.Text, nullable=True)
+    overdue_letter_number = db.Column(db.Integer(3, unsigned=True),
+                                      nullable=False, server_default='0')
+    overdue_letter_date = db.Column(db.DateTime, nullable=False,
+                                    server_default='0001-01-01 00:00:00')
     borrower = db.relationship(CrcBORROWER, backref='illrequests')
     item = db.relationship(CrcITEM, backref='illrequests')
     library = db.relationship(CrcLIBRARY, backref='illrequests')

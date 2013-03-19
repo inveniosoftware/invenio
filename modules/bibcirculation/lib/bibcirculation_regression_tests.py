@@ -68,6 +68,17 @@ class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
 
         return
 
+    def test_item_search_availability(self):
+        """bibcirculation - availability of item search"""
+
+        baseurl = CFG_SITE_URL + '/admin2/bibcirculation/' \
+                              + 'item_search_result?f=barcode&p=bc-34001'
+
+        self.assertEqual([], test_web_page_content(baseurl, username='admin',
+                                        expected_text='Item details'))
+
+        return
+
 TEST_SUITE = make_test_suite(BibCirculationUsersWebPagesAvailabilityTest,
                              BibCirculationAdminsWebPagesAvailabilityTest)
 
