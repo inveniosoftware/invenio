@@ -774,15 +774,19 @@ URI: http://%(host)s%(page)s
         @param referencenum: show (this) number of references in the references tab
         @param discussionnum: show (this) number of comments/reviews in the discussion tab
         """
-        from invenio.search_engine import record_public_p
+        from invenio.search_engine import \
+             get_restricted_collections_for_recid, \
+             is_record_in_any_collection
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         # Prepare restriction flag
         restriction_flag = ''
-        if not record_public_p(recid):
+        if get_restricted_collections_for_recid(recid, recreate_cache_if_needed=False):
             restriction_flag = '<div class="restrictedflag"><span>%s</span></div>' % _("Restricted")
+        elif not is_record_in_any_collection(recid, recreate_cache_if_needed=False):
+            restriction_flag = '<div class="restrictedflag restrictedflag-pending"><span>%s</span></div>' % _("Restricted (Processing Record)")
 
         # If no tabs, returns nothing (excepted if restricted)
         if len(tabs) <= 1:

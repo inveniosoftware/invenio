@@ -1404,6 +1404,15 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         else:
             self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
 
+        # Flag also appear on records that exist both in a public and
+        # restricted collection:
+        error_messages = test_web_page_content(CFG_SITE_URL + '/%s/109' % CFG_SITE_RECORD,
+                                               username='admin',
+                                               password='',
+                                               expected_text=['Restricted'])
+        if error_messages:
+            self.fail("Oops, a 'Restricted' flag should appear on restricted records.")
+
 
 class WebSearchRestrictedCollectionHandlingTest(unittest.TestCase):
     """
