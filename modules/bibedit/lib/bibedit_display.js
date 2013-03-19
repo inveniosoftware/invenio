@@ -28,7 +28,7 @@ function displayRecord() {
 
     // Every time we display the table, mark all checkboxes to show/hide
     // specific tags
-    displayAllTags();
+    displayAllTagsCheckboxes();
 
     var table = '' + '<table id="bibEditTable">' +
         '<col span="1" class="bibEditColFieldBox"/>' +
@@ -96,8 +96,7 @@ function createControlField(tag, field, fieldPosition) {
     return '<tbody id="rowGroup_' + fieldID + '">' +
         '<tr id="row_' + fieldID + '" >' +
             '<td class="bibEditCellField">' +
-                input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField', {
-                onclick: 'onFieldBoxClick(this)', tabindex: -1}) + '</td>' +
+            '</td>' +
             '<td id="fieldTag_' + fieldID +
                 '" class="bibEditCellFieldTag">' + getFieldTag(tag) + '</td>' +
             '<td></td>' + '<td></td>' +
@@ -190,7 +189,7 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     // If first subfield, add tag and selection box, remove up arrow.
     if (subfieldIndex == 0) {
         boxField = input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField', {
-            onclick: 'onFieldBoxClick(this)',
+            onclick: 'onFieldBoxClick(event, this)',
             tabindex: -1
         });
         cellFieldTagAttrs = 'id="fieldTag_' + fieldID +
@@ -294,7 +293,7 @@ function redrawFields(tag, skipAddFileds) {
 
     // Now redraw all the Holding Pen changes connected controls
     for (changeNr in gHoldingPenChanges) {
-        if (gHoldingPenChanges[changeNr]["tag"] == tag) {
+        if (gHoldingPenChanges[changeNr]["tag"] == tag && gHoldingPenChanges[changeNr]["applied_change"] != true ) {
             addChangeControl(changeNr, skipAddFileds);
         }
     }
@@ -321,6 +320,9 @@ function removeAddFieldControl(changeNo) {
         changeNo: a number of the change, the control is associated with
    */
     $("#changeBox_" + changeNo).remove();
+    if ( $('#bibEditHoldingPenAddedFields').find('.bibeditHPCorrection').length < 1 ) {
+         $('#bibEditHoldingPenAddedFields').remove();
+    }
 }
 
 /// generating the changes controls
@@ -364,9 +366,24 @@ function addSubfieldChangedControl(changeNo) {
 
     newel = "<div class=\"bibeditHPCorrection\"><span>" + content +
         "</span>&nbsp;&nbsp;" +
+        "<div class=\"HPCorrectionButtonWrapper\">" +
         applyButton +
         rejectButton +
         addButton +
+        "</div>" +
+        "</div>";
+
+    $("#content_" + fieldId + "_" + fieldPos + "_" + sfPos).append(newel);
+}
+
+function addSubfieldSameControl(changeNo) {
+    fieldId = gHoldingPenChanges[changeNo]["tag"];
+    fieldPos = gHoldingPenChanges[changeNo]["field_position"];
+    sfPos = gHoldingPenChanges[changeNo]["subfield_position"];
+    content = "Same content";
+
+    newel = "<div class=\"bibeditHPCorrection bibeditHPSame\"><span>" + content +
+        "</span>&nbsp;&nbsp;" +
         "</div>";
 
     $("#content_" + fieldId + "_" + fieldPos + "_" + sfPos).append(newel);
@@ -386,7 +403,7 @@ function addSubfieldAddedControl(changeNo) {
         subfieldContent;
     newel = "<tr><td></td><td></td><td></td><td></td><td>" +
         "<div class=\"bibeditHPCorrection\"><span>Subfield added: " +
-        subfieldPreview + "</span>" + "<div>" + applyButton + rejectButton +
+        subfieldPreview + "</span>" + "<div>" + "<div class=\"HPCorrectionButtonWrapper\">" + applyButton + rejectButton + "</div>" +
         "</div></div></td><td></td></tr>";
 
     $("#rowGroup_" + fieldId + "_" + fieldPos).append(newel);
@@ -402,8 +419,8 @@ function addSubfieldRemovedControl(changeNo) {
     rejectButton = getRejectChangeButton(changeNo);
 
     newel = "<div class=\"bibeditHPCorrection\"><span>" +
-        "The subfield has been removed " + "</span>" + applyButton +
-        rejectButton + "</div>";
+        "The subfield has been removed " + "</span>" + "<div class=\"HPCorrectionButtonWrapper\">" + applyButton +
+        rejectButton + "</div>" + "</div>";
     $("#content_" + fieldId + "_" + fieldPos + "_" + sfPos).append(newel);
 }
 
@@ -417,8 +434,8 @@ function addFieldRemovedControl(changeNo) {
 
     newel = "<tr><td></td><td></td><td></td><td></td><td>" +
         "<div class=\"bibeditHPCorrection\">" +
-        "Field has been removed in the Holding Pen. " + applyButton +
-        rejectButton + "</div></td><td></td></tr>";
+        "Field has been removed in the Holding Pen. " + "<div class=\"HPCorrectionButtonWrapper\">" + applyButton +
+        rejectButton + "</div>" + "</div></td><td></td></tr>";
 
     $("#rowGroup_" + fieldId + "_" + fieldPos).append(newel);
 }
@@ -440,7 +457,7 @@ function addFieldChangedControl(changeNo) {
     newel = "<tr><td></td><td></td><td></td><td></td><td>" +
     "<div class=\"bibeditHPCorrection\">" +
     "Field structure has changed. New value: " + fieldPreview + "<br>" +
-    applyButton + rejectButton + addButton + "</div></td><td></td></tr>";
+    "<div class=\"HPCorrectionButtonWrapper\">" + applyButton + rejectButton + addButton + "</div>" + "</div></td><td></td></tr>";
 
     $("#rowGroup_" + fieldId + "_" + fieldPos).append(newel);
 }
@@ -457,18 +474,25 @@ function addFieldAddedControl(changeNo) {
     applyButton = getApplyChangeButton("applyFieldAdded", changeNo);
     rejectButton = getRejectChangeButton(changeNo);
 
-    content = "<div class=\"bibeditHPCorrection\" id=\"changeBox_" + changeNo +
+    content = "<div style=\"clear:both;\"></div><div class=\"bibeditHPCorrection\" id=\"changeBox_" + changeNo +
         "\">" + "<div>A field has been added in the Holding Pen entry </div> " +
-        "<div>" + fieldContent + "</div>" + "<div>" + applyButton +
-        rejectButton + "</div></div>";
+        "<div>" + fieldContent + "</div>" + "<div>" + "<div class=\"HPCorrectionButtonWrapper\">" + applyButton +
+        rejectButton + "</div>" + "</div></div>";
 
-    $('#bibEditContentTable').append(content);
+    if ( $('#bibEditHoldingPenAddedFields').length < 1 ) {
+      var addedFiedsDivHtml = "<div id=\"bibEditHoldingPenAddedFields\"><div id=\"bibEditHoldingPenAddedFieldsLabel\">" +
+      "<strong>Added fields in Holding Pen</div></strong></div>";
+      $("#bibEditContentTable").append(addedFiedsDivHtml);
+    }
+
+    $('#bibEditHoldingPenAddedFields').append(content);
 }
 
 function removeAllChangeControls() {
     /** Removing all the change controls from the interface
      */
     $(".bibeditHPCorrection").remove();
+    $('#bibEditHoldingPenAddedFields').remove();
 }
 
 function addChangeControl(changeNum, skipAddedField) {
@@ -480,7 +504,7 @@ function addChangeControl(changeNum, skipAddedField) {
         return;
     }
     changeType = gHoldingPenChanges[changeNum]["change_type"];
-    if (changeType == "field_added" && skipAddedField != true) {
+    if (changeType == "field_added" && skipAddedField != true && $("#changeBox_" + changeNum).length < 1 ) {
         addFieldAddedControl(changeNum);
     }
     if (changeType == "subfield_changed") {
@@ -488,6 +512,9 @@ function addChangeControl(changeNum, skipAddedField) {
     }
     if (changeType == "subfield_removed") {
         addSubfieldRemovedControl(changeNum);
+    }
+    if (changeType == "subfield_same") {
+        addSubfieldSameControl(changeNum);
     }
     if (changeType == "subfield_added") {
         addSubfieldAddedControl(changeNum);
@@ -509,18 +536,20 @@ function createFieldPreviewCore(tag, indicators, subfields) {
     var result = "";
 
     for (subfield in subfields) {
-        result += "<tr><td>" + headerData +
-            "</td><td>$$" + subfields[subfield][0] +
-            "&nbsp;&nbsp;&nbsp;</td><td>" + subfields[subfield][1] +
-            "</td></tr>";
-        headerData = "";
+        if (subfields[subfield][1].substring(0,9) != "VOLATILE:") {
+            result += "<tr><td>" + headerData +
+                "</td><td>$$" + subfields[subfield][0] +
+                "&nbsp;&nbsp;&nbsp;</td><td>" + subfields[subfield][1] +
+                "</td></tr>";
+            headerData = "";
+        }
     }
     return result;
 }
 
 function createFieldPreview(tag, indicators, subfields) {
     /* Creating a preview of a single field */
-    return "<table>" + createFieldPreviewCore(tag, indicators, subfields) +
+    return "<table class=\"bibeditHPFieldPreview\" >" + createFieldPreviewCore(tag, indicators, subfields) +
         "</table>";
 }
 
@@ -558,8 +587,17 @@ function createRecordPreview(recordData) {
             indicators = sortedIndicators[indicatorsInd];
             for (fieldInd in indicatorLists[indicators]) {
                 field = indicatorLists[indicators][fieldInd];
+                var isVolatile = true;
+                for (var sfPos in recordData[tag][field][0] ) {
+                   if (recordData[tag][field][0][sfPos][1].substring(0,9) != "VOLATILE:"){
+                     isVolatile = false;
+                     break;
+                   }
+                }
+                if (!isVolatile) {
                 result += createFieldPreviewCore(tag, indicators,
                                                  recordData[tag][field][0]);
+                }
             }
         }
     }
@@ -643,6 +681,7 @@ function createGeneralControlsPanel() {
     result = "<div id=\"bibeditHoldingPenGC\">";
     result += "<button onClick=\"onAcceptAllChanges();\">Apply all the changes</button>";
     result += "<button onClick=\"onRejectAllChanges();\"> Reject all the changes</button>";
+    result += "<button id=\"acceptReferences\" onClick=\"onAcceptAllReferences();\"> Apply all references</button>";
     result += "</div>";
 
     return result;
@@ -1130,6 +1169,10 @@ function displayAlert(msgType, args) {
         break;
     case 'alertDeleteProtectedField':
         msg = 'ERROR: Cannot delete protected field ' + args[0] + '.';
+        break;
+    case 'alertDeleteHPAffectedField':
+        msg = 'Field ' + args[0] + ' cannot be deleted.\n' +
+        'It contains subfield changed in Holding Pen\'s record and an action should be taken first';
         break;
     case 'errorPhysicalCopiesExist':
         msg = "ERROR: Cannot delete record when physical copies exist. " +

@@ -179,6 +179,8 @@ var gReqQueue = [];
 // count number of requests since last save
 var gReqCounter = 0;
 
+// last checkbox checked
+var gLastChecked = null;
 
 /*
  * **************************** 2. Initialization ******************************
@@ -360,7 +362,7 @@ function initJeditable(){
         addHandler_autocompleteAffiliations(textarea);
     }
 
-    initInputHotkeys(textarea);
+    initInputHotkeys(textarea, original);
     return(textarea);
   };
 
@@ -387,9 +389,9 @@ function initJeditable(){
 
                 $(this).blur();
 
-                var currentElementIndex = $(".tabSwitch").index($(original));
+                var currentElementIndex = $(".tabSwitch:visible").index($(original));
                 var step = e.shiftKey ? -1 : 1;
-                $(".tabSwitch").eq(currentElementIndex + step).click();
+                $(".tabSwitch:visible").eq(currentElementIndex + step).click();
                 break;
             }
         });
@@ -432,7 +434,7 @@ function createReq(data, onSuccess, asynchronous, deferred, onError) {
   }
 
   if (typeof onError === "undefined") {
-    asynchronous = onAjaxError;
+    onError = onAjaxError;
   }
 
   // Include and increment transaction ID.
@@ -690,24 +692,32 @@ function initStateFromHash(){
   var tmpReadOnlyMode = gHashParsed.romode;
 
   // Find out which internal state the new hash leaves us with
-  if (tmpState && tmpRecID){
+  if ( tmpState && tmpRecID ) {
     // We have both state and record ID.
-    if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord', 'hpapply']) != -1)
-  gState = tmpState;
-    else
+    if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord', 'hpapply']) != -1) {
+      gState = tmpState;
+    }
+    else {
       // Invalid state, fail...
       return;
+    }
   }
-  else if (tmpState){
+  else if ( tmpState ) {
     // We only have state.
-    if (tmpState == 'edit')
+    if ( tmpState == 'edit' ) {
       gState = 'startPage';
-    else if (tmpState == 'newRecord')
+    }
+    else if ( tmpState == 'newRecord' ) {
       gState = 'newRecord';
-    else
+    }
+    else if ( tmpState == 'search' ) {
+      gState = "search";
+    }
+    else {
       // Invalid state, fail... (all states but 'edit' and 'newRecord' are
       // illegal without record ID).
       return;
+    }
   }
   else
     // Invalid hash, fail...
@@ -721,27 +731,28 @@ function initStateFromHash(){
     // We have an actual and legal change of state. Clean up and update the
     // page.
     updateStatus('updating');
-    if (gRecID && !gRecordDirty && !tmpReadOnlyMode)
+    if ( gRecID && !gRecordDirty && !tmpReadOnlyMode ) {
       // If the record is unchanged, delete the cache.
       createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
                 true, undefined, onDeleteRecordCacheError);
-    switch (gState){
+    }
+    switch (gState) {
       case 'startPage':
         cleanUp(true, '', 'recID', true, true);
         updateStatus('ready');
         break;
       case 'edit':
         var recID = parseInt(tmpRecID, 10);
-        if (isNaN(recID)){
+        if ( isNaN(recID) ) {
           // Invalid record ID.
           cleanUp(true, tmpRecID, 'recID', true);
           displayMessage(102);
           updateStatus('error', gRESULT_CODES[102]);
         }
-        else{
+        else {
           cleanUp(true, recID, 'recID');
           gReadOnlyMode = tmpReadOnlyMode;
-            if (tmpRecRev != undefined && tmpRecRev != 0){
+            if (tmpRecRev != undefined && tmpRecRev != 0) {
               getRecord(recID, tmpRecRev);
             } else {
               getRecord(recID);
@@ -768,6 +779,16 @@ function initStateFromHash(){
           });
           getRecord(recID);
         }
+        break;
+      case 'search':
+        cleanUp(true, '', null, null, true);
+        var search_pattern = gHashParsed.p;
+        if ( typeof search_pattern !== "undefined" ) {
+          // There is a pattern to seach for
+          createReq({requestType: 'searchForRecord', searchType: 'anywhere',
+      searchPattern: search_pattern}, onSearchForRecordSuccess);
+        }
+        updateStatus('ready');
         break;
       case 'newRecord':
         cleanUp(true, '', null, null, true);
@@ -894,6 +915,20 @@ function deleteFieldFromTag(tag, fieldPosition){
    */
   var field = gRecord[tag][fieldPosition];
   var fields = gRecord[tag];
+  for (var change in gHoldingPenChanges) {
+      // If deleted field contains a HP change then mark change as applied or decrease the field position
+      if ((gHoldingPenChanges[change]["tag"] == tag)) {  // TODO add indicators
+            if (gHoldingPenChanges[change]["field_position"] == fieldPosition) {
+              // there are more changes associated with this field ! They are no more correct
+              // and should be removed... it is also possible to consider transforming them into add field
+              // change, but seems to be an unnecessary effort
+              gHoldingPenChanges[change].applied_change = true;
+            }
+            else if (gHoldingPenChanges[change]["field_position"] > fieldPosition) {
+              gHoldingPenChanges[change]["field_position"] -= 1;
+            }
+        }
+  }
   fields.splice($.inArray(field, fields), 1);
   // If last field, delete tag.
   if (fields.length == 0){
@@ -1022,27 +1057,41 @@ function compareFields(fieldId, indicators, fieldPos, field1, field2){
            "field_content" : field2}];
       } else
       {
-        if (field1[sfPos][1] != field2[sfPos][1]){
+        // in case where gRec subfield is normal and HP record's subfield is volatile ignore it
+        if ( (field1[sfPos][1].toLowerCase() != field2[sfPos][1].toLowerCase()) && (field2[sfPos][1].substring(0,9) != "VOLATILE:")){
           result.push({"change_type" : "subfield_changed",
+            "tag" : fieldId,
+            "indicators" : indicators,
+            "field_position" : fieldPos,
+            "field_content" : field2,
+            "subfield_position" : sfPos,
+            "subfield_code" : field2[sfPos][0],
+            "subfield_content" : field2[sfPos][1]});
+
+        }
+        // in case where both gRec and HP record's subfield is volatile ignore them
+        else if ( (field1[sfPos][1].toLowerCase() == field2[sfPos][1].toLowerCase()) && (field1[sfPos][1].substring(0,9) != "VOLATILE:")) {
+          result.push({"change_type" : "subfield_same",
             "tag" : fieldId,
             "indicators" : indicators,
             "field_position" : fieldPos,
             "subfield_position" : sfPos,
             "subfield_code" : field2[sfPos][0],
             "subfield_content" : field2[sfPos][1]});
-
         }
       }
     }
   }
 
-  for (sfPos in field1){
-    if (field2[sfPos] == undefined){
-      result.push({"change_type" : "subfield_removed",
-                "tag" : fieldId,
-                "indicators" : indicators,
-                "field_position" : fieldPos,
-                "subfield_position" : sfPos});
+  if ( gSHOW_HP_REMOVED_FIELDS == 1) {
+    for (sfPos in field1){
+      if (field2[sfPos] == undefined){
+        result.push({"change_type" : "subfield_removed",
+                  "tag" : fieldId,
+                  "indicators" : indicators,
+                  "field_position" : fieldPos,
+                  "subfield_position" : sfPos});
+      }
     }
   }
 
@@ -1061,17 +1110,42 @@ function compareIndicators(fieldId, indicators, fields1, fields2){
                   "indicators" : indicators,
                   "field_content" : fields2[fieldPos][0]});
     } else { // comparing the content of the subfields
-      result = result.concat(compareFields(fieldId, indicators, fields1[fieldPos][1], fields1[fieldPos][0], fields2[fieldPos][0]));
+      var isVolatile1 = true;
+      for (var sfPos in fields1[fieldPos][0]) {
+        if (fields1[fieldPos][0][sfPos][1].substring(0,9) != "VOLATILE:"){
+          isVolatile1 = false;
+          break;
+        }
+      }
+      var isVolatile2 = true;
+      for (var sfPos in fields2[fieldPos][0]) {
+        if (fields2[fieldPos][0][sfPos][1].substring(0,9) != "VOLATILE:"){
+          isVolatile2 = false;
+          break;
+        }
+      }
+      // in case where gRec's field is volatile and HP's is not
+      if (isVolatile1 && !isVolatile2){
+      result.push({"change_type" : "field_added",
+                  "tag" : fieldId,
+                  "indicators" : indicators,
+                  "field_content" : fields2[fieldPos][0]});
+      }
+      else {
+        result = result.concat(compareFields(fieldId, indicators, fields1[fieldPos][1], fields1[fieldPos][0], fields2[fieldPos][0]));
+      }
     }
   }
 
-  for (fieldPos in fields1){
-    if (fields2[fieldPos] == undefined){
-      fieldPosition = fields1[fieldPos][1];
-      result.push({"change_type" : "field_removed",
-             "tag" : fieldId,
-             "indicators" : indicators,
-             "field_position" : fieldPosition});
+  if ( gSHOW_HP_REMOVED_FIELDS == 1) {
+    for (fieldPos in fields1){
+      if (fields2[fieldPos] == undefined){
+        fieldPosition = fields1[fieldPos][1];
+        result.push({"change_type" : "field_removed",
+               "tag" : fieldId,
+               "indicators" : indicators,
+               "field_position" : fieldPosition});
+      }
     }
   }
   return result;
@@ -1118,32 +1192,36 @@ function compareRecords(record1, record2){
         }
       }
 
-      for (indicators in r1[fieldId]){
-        if (r2[fieldId][indicators] == undefined){
-          for (fieldInd in r1[fieldId][indicators]){
-            fieldPosition = r1[fieldId][indicators][fieldInd][1];
-            result.push({"change_type" : "field_removed",
-                 "tag" : fieldId,
-                 "field_position" : fieldPosition});
-          }
+      if ( gSHOW_HP_REMOVED_FIELDS == 1) {
+        for (indicators in r1[fieldId]){
+          if (r2[fieldId][indicators] == undefined){
+            for (fieldInd in r1[fieldId][indicators]){
+              fieldPosition = r1[fieldId][indicators][fieldInd][1];
+               result.push({"change_type" : "field_removed",
+                    "tag" : fieldId,
+                    "field_position" : fieldPosition});
+            }
 
+          }
         }
       }
 
     }
   }
 
-  for (fieldId in r1){
-    if (r2[fieldId] == undefined){
-      for (indicators in r1[fieldId]){
-        for (field in r1[fieldId][indicators])
-        {
-          // field position has to be calculated here !!!
-          fieldPosition = r1[fieldId][indicators][field][1]; // field position inside the mark
-          result.push({"change_type" : "field_removed",
-                       "tag" : fieldId,
-                       "field_position" : fieldPosition});
+  if ( gSHOW_HP_REMOVED_FIELDS == 1) {
+    for (fieldId in r1){
+      if (r2[fieldId] == undefined){
+        for (indicators in r1[fieldId]){
+          for (field in r1[fieldId][indicators])
+          {
+            // field position has to be calculated here !!!
+            fieldPosition = r1[fieldId][indicators][field][1]; // field position inside the mark
+            result.push({"change_type" : "field_removed",
+                         "tag" : fieldId,
+                         "field_position" : fieldPosition});
 
+          }
         }
       }
     }
@@ -1200,6 +1278,50 @@ function containsProtectedField(fieldData){
   return false;
 }
 
+function containsHPAffectedField(fieldData){
+  /*
+   * Determine if a field data structure contains affected from HP elements (useful
+   * when checking if a deletion command is valid).
+   * The data structure must be an object with the following levels
+   * - Tag
+   *   - Field position
+   *     - Subfield index
+   */
+   // First find all fields and their position containing subfield changed in Holding Pen
+  var fieldPositions, subfieldIndexes;
+  var hpTags = {};
+  for (var changePos in gHoldingPenChanges) {
+      var change = gHoldingPenChanges[changePos];
+      if ( (change["change_type"] == "field_changed" || change["change_type"] == "subfield_changed") &&
+            change["applied_change"] != true ) {
+        if ( hpTags[change["tag"]] == undefined ) {
+            hpTags[change["tag"]] = [change["field_position"]];
+        }
+        else {
+            hpTags[change["tag"]].push(change["field_position"]);
+        }
+      }
+  }
+  // For every field selected to be deleted check if it exists in hpTags dictionary
+  for (var type in fieldData) {
+    fields = fieldData[type];
+    for (var field in fields){
+      if ( hpTags[field] != undefined ) {
+        var field_positions = hpTags[field];
+        subfieldIndexes = fields[field];
+        var keys = Object.keys(subfieldIndexes);
+        for (var i=0, l=keys.length; i<l; i++){
+            for (var j=0, m=field_positions.length; j<m; j++){
+                if ( keys[i] == field_positions[j] ) {
+                  return field;
+                }
+            }
+        }
+      }
+    }
+  }
+  return false;
+}
 
 function getMARC(tag, fieldPosition, subfieldIndex){
   /*
@@ -1358,10 +1480,15 @@ function getRecord(recID, recRev, onSuccess){
     recRev = 0;
   }
 
-  var getRecordPromise = new $.Deferred();
+  /* If we are changing recids always change to write mode */
+  if ( recID != gRecID ) {
+    gReadOnlyMode = false;
+  }
 
-  if (onSuccess == undefined)
+  if (typeof onSuccess === 'undefined') {
     onSuccess = onGetRecordSuccess;
+  }
+
   if (recRev != undefined && recRev != 0){
     changeAndSerializeHash({state: 'edit', recid: recID, recrev: recRev});
   }
@@ -1378,9 +1505,14 @@ function getRecord(recID, recRev, onSuccess){
              clonedRecord: getRecord.clonedRecord,
              inReadOnlyMode: gReadOnlyMode};
 
-  if (recRev != undefined && recRev != 0){
+  if (recRev != undefined && recRev != 0) {
     reqData.recordRevision = recRev;
-    reqData.inReadOnlyMode = true;
+    if (recRev === gRecLatestRev) {
+      reqData.inReadOnlyMode = false;
+    }
+    else {
+      reqData.inReadOnlyMode = true;
+    }
   }
 
   resetBibeditState();
@@ -1486,7 +1618,7 @@ function onGetRecordSuccess(json){
   updateStatus('report', gRESULT_CODES[json['resultCode']]);
   updateRevisionsHistory();
   adjustGeneralHPControlsVisibility();
-
+  $("#loadingTickets").show();
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
 
   // Refresh top toolbar
@@ -1534,7 +1666,7 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
                               // Submission was successful.
                               changeAndSerializeHash({state: 'submit', recid: gRecID});
                               updateStatus('report', gRESULT_CODES[resCode]);
-                              cleanUp(!gNavigatingRecordSet, '', null, true, false);
+                              cleanUp(!gNavigatingRecordSet, '', null, !gNavigatingRecordSet, false);
                               updateToolbar(false);
                               resetBibeditState();
                               displayMessage(resCode, false, [json['recID'], json["new_cnum"]]);
@@ -1676,8 +1808,10 @@ function onPreviewClick() {
                   enable popups for this page.";
         displayMessage(undefined, true, [msg]);
       }
-      preview_window.document.write(html_preview);
-      preview_window.document.close(); // needed for chrome and safari
+      else {
+        preview_window.document.write(html_preview);
+        preview_window.document.close(); // needed for chrome and safari
+      }
     });
   });
 }
@@ -1816,12 +1950,14 @@ function onOpenPDFClick() {
         var pdf_url = json['pdf_url'];
         var preview_window = openCenteredPopup(pdf_url);
         if ( preview_window === null ) {
-        var msg = "<strong> The preview window cannot be opened.</strong><br />\
-                  Your browser might be blocking popups. Check the options and\
-                  enable popups for this page.";
-        displayMessage(undefined, true, [msg]);
+          var msg = "<strong> The preview window cannot be opened.</strong><br />\
+                    Your browser might be blocking popups. Check the options and\
+                    enable popups for this page.";
+          displayMessage(undefined, true, [msg]);
         }
-        preview_window.document.close(); // needed for chrome and safari
+        else {
+          preview_window.document.close(); // needed for chrome and safari
+        }
        });
 
 }
@@ -2054,6 +2190,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
     gNavigatingRecordSet = false;
   }
   // Clear main content area.
+  $('#bibeditHoldingPenGC').remove();
   $('#bibEditContentTable').empty();
   $('#bibEditMessage').empty();
 
@@ -2066,6 +2203,8 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
     $('#txtSearchPattern').focus();
   // Clear tickets.
   $('#tickets').empty();
+  $('#newTicketDiv').remove();
+  $('#rtError').remove();
   // Clear data.
   gRecID = null;
   gRecord = null;
@@ -2077,6 +2216,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   $('#btnSwitchReadOnly').html("Read-only");
   gHoldingPenLoadedChanges = null;
   gHoldingPenChanges = null;
+  gLastChecked = null;
   gUndoList = [];
   gRedoList = [];
   gBibCircUrl = null;
@@ -2116,7 +2256,7 @@ function colorFields(){
   /*
    * Color every other field (rowgroup) gray to increase readability.
    */
-  $('#bibEditTable tbody:even').each(function(){
+  $('#bibEditTable tbody:visible:even').each(function(){
     $(this).addClass('bibEditFieldColored');
   });
 }
@@ -2220,10 +2360,34 @@ function updateTags(){
 }
 
 
-function onFieldBoxClick(box){
+function onFieldBoxClick(e, box){
   /*
    * Handle field select boxes.
    */
+   if ( !jQuery.contains(document.documentElement, gLastChecked)) {
+       gLastChecked = box;
+       clickBox(box);
+       return;
+   }
+   if (e.shiftKey) {
+   // If shift key is pressed check/uncheck all the select boxes from
+   // current clicked select box till the previous clicked select box
+     var checkboxes = $('.bibEditBoxField');
+     var checked = box.checked;
+     var start = checkboxes.index(box);
+     var end = checkboxes.index(gLastChecked);
+     checkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).each( function(){
+       $(this).prop("checked", checked);
+       clickBox(this);
+     });
+   }
+   else {
+     clickBox(box);
+   }
+   gLastChecked = box;
+}
+
+function clickBox(box) {
   // Check/uncheck all subfield boxes, add/remove selected class.
   var rowGroup = $('#rowGroup_' + box.id.slice(box.id.indexOf('_')+1));
   if (box.checked){
@@ -2856,7 +3020,7 @@ function addFieldSave(fieldTmpNo)
   if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
       $('#bibEditColFieldTag').css('width', '48px');
   // Redraw all fields with the same tag and recolor the full table.
-  redrawFields(tag);
+  redrawFields(tag, true);
   reColorFields();
   // Scroll and color the new field for a short period.
   var rowGroup = $('#rowGroup_' + tag + '_' + fieldPosition);
@@ -3066,6 +3230,12 @@ function onAddSubfieldsSave(event, tag, fieldPosition) {
       var rows = $('#rowGroup_' + fieldID + ' tr');
       $(rows).slice(rows.length - subfields.length).effect('highlight', {
         color: gNEW_CONTENT_COLOR}, gNEW_CONTENT_COLOR_FADE_DURATION);
+      for (var changePos in gHoldingPenChanges) {
+          var change = gHoldingPenChanges[changePos];
+          if ( change["tag"] == tag && change["field_position"] == fieldPosition ) {// TODO: add indicators?
+            addChangeControl(changePos,true);
+          }
+      }
   } else {
     // No valid fields were submitted.
     $('#rowAddSubfields_' + fieldID + '_' + 0).nextAll().andSelf().remove();
@@ -3584,6 +3754,13 @@ function onDeleteClick(event){
   var toDelete = getSelectedFields();
   // Assert that no protected fields are scheduled for deletion.
   var protectedField = containsProtectedField(toDelete);
+  var affectedField = containsHPAffectedField(toDelete);
+
+  if (affectedField){
+    displayAlert('alertDeleteHPAffectedField', [affectedField]);
+    updateStatus('ready');
+    return;
+  }
   if (protectedField){
     displayAlert('alertDeleteProtectedField', [protectedField]);
     updateStatus('ready');
@@ -3981,7 +4158,7 @@ function onPerformPaste(){
   }
   tags.sort();
   for (tagInd in tags){
-      redrawFields(tags[tagInd]);
+      redrawFields(tags[tagInd], true);
   }
   reColorFields();
 }
@@ -4130,7 +4307,6 @@ function prepareUndoHandlerRemoveAllHPChanges(hpChanges){
   return result;
 }
 
-
 function prepareUndoHandlerBulkOperation(undoHandlers, handlerTitle){
   /*
     Preparing an und/redo handler allowing to treat the bulk operations
@@ -4160,7 +4336,7 @@ function urPerformAddSubfields(tag, fieldPosition, subfields, isUndo){
     };
 
     gRecord[tag][fieldPosition][0] = gRecord[tag][fieldPosition][0].concat(subfields);
-    redrawFields(tag);
+    redrawFields(tag, true);
     reColorFields();
 
     return ajaxData;
@@ -4281,8 +4457,8 @@ function processURUntil(entry){
 }
 
 
-function prepareUndoHandlerChangeSubfield(tag, fieldPos, subfieldPos, oldVal, 
-         newVal, oldCode, newCode, operation_type){
+function prepareUndoHandlerChangeSubfield (tag, fieldPos, subfieldPos, oldVal,
+         newVal, oldCode, newCode, operation_type) {
   var result = {};
   result.operation_type = operation_type;
   result.tag = tag;
@@ -4368,7 +4544,7 @@ function urPerformRemoveField(tag, position, isUndo){
   if (gRecord[tag] == []){
     gRecord[tag] = undefined;
   }
-  redrawFields(tag);
+  redrawFields(tag, true);
   reColorFields();
 
   return ajaxData;
@@ -4641,7 +4817,7 @@ function urPerformAddField(controlfield, fieldPosition, tag, ind1, ind2, subfiel
   var newField = [(controlfield ? [] : subfields), ind1, ind2,
                   (controlfield ? value: ""), 0];
   gRecord[tag].splice(fieldPosition, 0, newField);
-  redrawFields(tag);
+  redrawFields(tag, true);
   reColorFields();
 
   return ajaxData;
@@ -4666,7 +4842,7 @@ function urPerformRemoveSubfields(tag, fieldPosition, subfields, isUndo){
 
   // modifying the client-side interface
   gRecord[tag][fieldPosition][0].splice( gRecord[tag][fieldPosition][0].length - subfields.length, subfields.length);
-  redrawFields(tag);
+  redrawFields(tag, true);
   reColorFields();
 
   return ajaxData;
@@ -5147,6 +5323,19 @@ function deleteFields(toDeleteStruct, undoRedo){
         field = gRecord[tag][fieldPosition];
         subfields = field[0];
         for (var j = subfieldIndexesToDelete.length - 1; j >= 0; j--){
+          for (var change in gHoldingPenChanges) {
+              if ((gHoldingPenChanges[change]["tag"] == tag) && (gHoldingPenChanges[change]["field_position"] == fieldPosition)) {  // TODO add indicators
+                    if (gHoldingPenChanges[change]["subfield_position"] == subfieldIndexesToDelete[j]) {
+                      // there are more changes associated with this field ! They are no more correct
+                      // and should be removed... it is also possible to consider transforming them into add field
+                      // change, but seems to be an unnecessary effort
+                      gHoldingPenChanges[change].applied_change = true;
+                    }
+                    else if (gHoldingPenChanges[change]["subfield_position"] > subfieldIndexesToDelete[j]) {
+                      gHoldingPenChanges[change]["subfield_position"] -= 1;
+                    }
+                }
+          }
           subfields.splice(subfieldIndexesToDelete[j], 1);
         }
       }
@@ -5156,7 +5345,7 @@ function deleteFields(toDeleteStruct, undoRedo){
   // If entire fields has been deleted, redraw all fields with the same tag
   // and recolor the full table.
   for (tag in tagsToRedraw) {
-      redrawFields(tagsToRedraw[tag]);
+      redrawFields(tagsToRedraw[tag], true);
   }
   reColorFields();
 
@@ -5240,7 +5429,7 @@ function urPerformChangeSubfieldContent(tag, fieldPos, subfieldPos, code, val, i
   gRecord[tag][fieldPos][0][subfieldPos][1] = val;
 
   // changing the display .... what if being edited right now ?
-  redrawFields(tag);
+  redrawFields(tag, true);
   reColorFields();
 
   return ajaxData;
@@ -5264,7 +5453,7 @@ function urPerformChangeSubfieldCode(tag, fieldPos, subfieldPos, code, val, isUn
   gRecord[tag][fieldPos][0][subfieldPos][1] = val;
 
   // changing the display .... what if being edited right now ?
-  redrawFields(tag);
+  redrawFields(tag, true);
   reColorFields();
 
   return ajaxData;
@@ -5306,8 +5495,8 @@ function urPerformChangeFieldCode(oldTag, oldInd1, oldInd2, newTag, ind1, ind2,
       gRecord[oldTag].splice(fieldNewPos, 0, currentField);
   }
   // changing the display .... what if being edited right now ?
-  redrawFields(newTag);
-  redrawFields(oldTag);
+  redrawFields(newTag, true);
+  redrawFields(oldTag, true);
   reColorFields();
 
   return ajaxData;
@@ -5342,7 +5531,7 @@ function performChangeField(tag, fieldPos, ind1, ind2, subFields, isControlfield
   gRecord[tag][fieldPos][1] = ind1;
   gRecord[tag][fieldPos][2] = ind2;
   gRecord[tag][fieldPos][3] = value;
-  redrawFields(tag);
+  redrawFields(tag, true);
   reColorFields();
 
   return ajaxData;
@@ -5477,7 +5666,7 @@ function createFields(toCreateFields, isUndo){
   // - redrawint the affected tags
 
   for (tag in tagsToRedraw){
-   redrawFields(tag);
+   redrawFields(tag, true);
   }
   reColorFields();
 
@@ -5617,7 +5806,7 @@ function isSubjectSubfield(tag_ind, subfield_code) {
 function sanitize_value(value) {
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   value = value.replace(/^\s+|\s+$/g,""); // Remove whitespace from the ends of strings
-  return escapeHTML(value);
+  return value;
 }
 
 
@@ -5651,8 +5840,8 @@ function onFieldTagChange(value, cell) {
     }
 
     function redrawTags() {
-        redrawFields(oldTag);
-        redrawFields(newTag);
+        redrawFields(oldTag, true);
+        redrawFields(newTag, true);
         reColorFields();
     }
 
@@ -5687,8 +5876,8 @@ function onFieldTagChange(value, cell) {
 
     /* Update client side model */
     updateModel();
-
     redrawTags();
+    highlight_change(cell, value);
 
     return value;
 }
@@ -5729,6 +5918,8 @@ function onSubfieldCodeChange(value, cell) {
                       subfield_instance[1], null, urHandler, true);
 
   updateModel();
+
+  highlight_change(cell, value);
 
   return value;
 }
@@ -5806,7 +5997,7 @@ function onContentChange(value, cell) {
                                                      cell.fieldPosition,
                                                      subfieldsToAdd));
 
-    urHandler = prepareUndoHandlerBulkOperation(undoHandlers, "addSufields");
+    urHandler = prepareUndoHandlerBulkOperation(undoHandlers, "addSubfields");
     addUndoOperation(urHandler);
 
     bulkUpdateSubfieldContent(cell.tag, cell.fieldPosition, cell.subfieldIndex, subfield_instance[0], value, null,
@@ -5831,6 +6022,8 @@ function onContentChange(value, cell) {
                         value, null, urHandler);
     updateModel();
   }
+
+  highlight_change(cell, value);
 
   return value;
 
@@ -5929,16 +6122,22 @@ function onEditableCellChange(value, th) {
         return value;
     }
 
-    highlight_change(cell, value);
-
-    return value;
+    return escapeHTML(value);
 }
 
 
-/* Functions specific to display modes */
+/******************** Functions specific to display modes ********************/
+/*****************************************************************************/
 
-function onfocusreference() {
-  if ($("#focuson_references").prop("checked") === true) {
+function onfocusreference(check_box) {
+  var $reference_checkbox = $("#focuson_references");
+
+  /* For cases when we call the function without click on the interface */
+  if ( check_box === true ) {
+    $reference_checkbox.prop("checked", !$reference_checkbox.prop("checked"));
+  }
+
+  if ( $reference_checkbox.prop("checked") === true ) {
     $.each(gDisplayReferenceTags, function() {
       $("tbody[id^='rowGroup_" + this + "']").show();
     });
@@ -5951,8 +6150,15 @@ function onfocusreference() {
 }
 
 
-function onfocusauthor() {
-  if ($("#focuson_authors").prop("checked") === true) {
+function onfocusauthor(check_box) {
+  var $author_checkbox = $("#focuson_authors");
+
+  /* For cases when we call the function without click on the interface */
+  if ( check_box === true ) {
+    $author_checkbox.prop("checked", !$author_checkbox.prop("checked"));
+  }
+
+  if ($author_checkbox.prop("checked") === true) {
     $.each(gDisplayAuthorTags, function() {
       $("tbody[id^='rowGroup_" + this + "']").show();
     });
@@ -5962,10 +6168,18 @@ function onfocusauthor() {
       $("tbody[id^='rowGroup_" + this + "']").hide();
     });
   }
+  reColorFields();
 }
 
 
-function onfocusother() {
+function onfocusother(check_box) {
+  var $others_checkbox = $("#focuson_others");
+
+  /* For cases when we call the function without click on the interface */
+  if ( check_box === true ) {
+    $others_checkbox.prop("checked", !$others_checkbox.prop("checked"));
+  }
+
   var tags = [];
   tags = tags.concat(gDisplayReferenceTags, gDisplayAuthorTags);
 
@@ -5974,7 +6188,7 @@ function onfocusother() {
     myselector = myselector.add("tbody[id^='rowGroup_" + this + "']");
   });
 
-  if ($("#focuson_others").prop("checked") === true) {
+  if ($others_checkbox.prop("checked") === true) {
     $("tbody:[id^='rowGroup_']").not(myselector).show();
   }
   else {
@@ -5982,8 +6196,35 @@ function onfocusother() {
   }
 }
 
+function onfocuscurator(check_box) {
+  var $curator_checkbox = $("#focuson_curator");
 
-function displayAllTags() {
+  if ( $curator_checkbox.length === 0 ) {
+    return;
+  }
+
+  /* For cases when we call the function without click on the interface */
+  if ( check_box === true ) {
+    $curator_checkbox.prop("checked", !$curator_checkbox.prop("checked"));
+  }
+
+  $("#focuson_references").prop("checked", true);
+  $("#focuson_authors").prop("checked", true);
+  $("#focuson_others").prop("checked", true);
+  onfocusreference();
+  onfocusother();
+  onfocusauthor();
+
+  if ( $curator_checkbox.prop("checked") === true ) {
+    $.each(gExcludeCuratorTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").hide();
+    });
+  }
+  reColorFields();
+}
+
+
+function displayAllTagsCheckboxes() {
   $("#focuson_references").prop("checked", true);
   $("#focuson_authors").prop("checked", true);
   $("#focuson_others").prop("checked", true);
@@ -6006,4 +6247,56 @@ function bindFocusHandlers() {
   $("#focuson_references").on("click", onfocusreference);
   $("#focuson_authors").on("click", onfocusauthor);
   $("#focuson_others").on("click", onfocusother);
+  $("#focuson_curator").on("click", onfocuscurator);
+}
+
+
+function displayOnlyAuthors() {
+  $("#focuson_references").prop("checked", false);
+  $("#focuson_authors").prop("checked", true);
+  $("#focuson_others").prop("checked", false);
+  $("#focuson_curator").prop("checked", false);
+  onfocusreference();
+  onfocusother();
+  onfocusauthor();
+}
+
+
+function displayOnlyReferences() {
+  $("#focuson_references").prop("checked", true);
+  $("#focuson_authors").prop("checked", false);
+  $("#focuson_others").prop("checked", false);
+  $("#focuson_curator").prop("checked", false);
+  onfocusreference();
+  onfocusother();
+  onfocusauthor();
+}
+
+
+function displayOnlyOthers() {
+  $("#focuson_references").prop("checked", false);
+  $("#focuson_authors").prop("checked", false);
+  $("#focuson_others").prop("checked", true);
+  $("#focuson_curator").prop("checked", false);
+  onfocusreference();
+  onfocusother();
+  onfocusauthor();
+}
+
+function displayOnlyCurator() {
+  $("#focuson_references").prop("checked", true);
+  $("#focuson_authors").prop("checked", true);
+  $("#focuson_others").prop("checked", true);
+  $("#focuson_curator").prop("checked", true);
+  onfocusreference();
+  onfocusother();
+  onfocusauthor();
+  onfocuscurator();
+}
+
+function displayAll() {
+  displayAllTagsCheckboxes();
+  onfocusreference();
+  onfocusother();
+  onfocusauthor();
 }

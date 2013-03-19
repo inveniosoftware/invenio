@@ -51,14 +51,17 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
     CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
     CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT, \
-    CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
+    CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS, \
+    CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS
 
-from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
+from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE, \
+    CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS
+
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
     get_record_last_modification_date, get_record_revision_author, \
     get_marcxml_of_record_revision, delete_related_holdingpen_changes, \
-    get_record_revisions
+    get_record_revisions, get_info_of_record_revision
 
 from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_bibrecord, \
@@ -90,6 +93,7 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
 from invenio.search_engine import record_exists, perform_request_search
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog_system import get_bibcat_from_prefs
 from invenio.webpage import page
 from invenio.htmlutils import get_mathjax_header
 from invenio.textutils import wash_for_xml, show_diff
@@ -101,7 +105,7 @@ from invenio.batchuploader_engine import perform_upload_check
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
 
-from invenio.refextract_api import FullTextNotAvailable
+from invenio.refextract_api import FullTextNotAvailable, record_has_fulltext
 from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 
@@ -212,6 +216,7 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gSITE_URL': '"' + CFG_SITE_URL + '"',
             'gSITE_RECORD': '"' + CFG_SITE_RECORD + '"',
             'gCERN_SITE': cern_site,
+            'gINSPIRE_SITE': CFG_INSPIRE_SITE,
             'gHASH_CHECK_INTERVAL': CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL,
             'gCHECK_SCROLL_INTERVAL': CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL,
             'gSTATUS_ERROR_TIME': CFG_BIBEDIT_JS_STATUS_ERROR_TIME,
@@ -239,7 +244,10 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS,
             'gDOILookupField': '"' + CFG_BIBEDIT_DOI_LOOKUP_FIELD + '"',
             'gDisplayReferenceTags': CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS,
-            'gDisplayAuthorTags': CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
+            'gDisplayAuthorTags': CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS,
+            'gExcludeCuratorTags': CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS,
+            'gSHOW_HP_REMOVED_FIELDS': CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
+            'gBIBCATALOG_SYSTEM_RT_URL': repr(CFG_BIBCATALOG_SYSTEM_RT_URL)
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -279,6 +287,7 @@ def perform_request_init(uid, ln, req, lastupdated):
 
     return body, errors, warnings
 
+
 def get_available_kbs():
     """
     Return list of KBs that are available in the system to be used with
@@ -288,13 +297,6 @@ def get_available_kbs():
     available_kbs = [kb for kb in kb_list if kb_exists(kb)]
     return available_kbs
 
-
-def record_has_pdf(recid):
-    """ Check if record has a pdf attached
-    """
-    rec_info = BibRecDocs(recid)
-    docs = rec_info.list_bibdocs()
-    return bool(docs)
 
 def get_marcxml_of_revision_id(recid, revid):
     """
@@ -322,6 +324,8 @@ def perform_request_compare(ln, recid, rev1, rev2):
     body = ""
     errors = []
     warnings = []
+    person1 = ""
+    person2 = ""
 
     if (not record_revision_exists(recid, rev1)) or \
        (not record_revision_exists(recid, rev2)):
@@ -335,8 +339,15 @@ def perform_request_compare(ln, recid, rev1, rev2):
         comparison = show_diff(marc1, marc2)
         job_date1 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev1).groups()
         job_date2 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev2).groups()
-        body += bibedit_templates.history_comparebox(ln, job_date1,
-                                                 job_date2, comparison)
+        # Geting the author of each revision
+        info1 = get_info_of_record_revision(recid, job_date1)
+        info2 = get_info_of_record_revision(recid, job_date2)
+        if info1:
+            person1 = info1[0][1]
+        if info2:
+            person2 = info2[0][1]
+        body += bibedit_templates.history_comparebox(ln, job_date1, job_date2,
+                                                person1, person2, comparison)
     return body, errors, warnings
 
 def perform_request_newticket(recid, uid):
@@ -401,9 +412,9 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         response.update(perform_request_autocomplete(request_type, recid, uid, \
                                                      data))
 
-    elif request_type in ('getTickets', ):
+    elif request_type in ('getTickets', 'closeTicket', 'openTicket'):
         # BibCatalog requests.
-        response.update(perform_request_bibcatalog(request_type, recid, uid))
+        response.update(perform_request_bibcatalog(request_type, uid, data))
     elif request_type in ('getHoldingPenUpdates', ):
         response.update(perform_request_holdingpen(request_type, recid))
 
@@ -472,6 +483,8 @@ def perform_request_bibedit_search(data, req):
         pattern = searchPattern
     else:
         pattern = searchType + ':' + searchPattern
+
+    pattern = urllib.unquote(pattern)
     result_set = list(perform_request_search(req=req, p=pattern))
     response['resultCode'] = 1
     response['resultSet'] = result_set[0:CFG_BIBEDIT_MAX_SEARCH_RESULTS]
@@ -502,6 +515,7 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         changes = []
         for change in changeSet:
             changes.append((str(change[0]), str(change[1])))
+        changes.reverse()  # newest to older order
         response["changes"] = changes
     elif request_type == 'getHoldingPenUpdateDetails':
         # returning the list of changes related to the holding pen update
@@ -510,6 +524,12 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         assert(changeId != None)
         hpContent = get_hp_update_xml(changeId)
         holdingPenRecord = create_record(hpContent[0], "xm")[0]
+        template_to_merge = extend_record_with_template(recId)
+        if template_to_merge:
+            merged_record = merge_record_with_template(holdingPenRecord, template_to_merge)
+            if merged_record:
+                holdingPenRecord = merged_record
+
         # order subfields alphabetically
         record_order_subfields(holdingPenRecord)
 #        databaseRecord = get_record(hpContent[1])
@@ -705,14 +725,13 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 if merged_record:
                     record = merged_record
                     create_cache_file(recid, uid, record, True)
+                    mtime = get_cache_mtime(recid, uid)
 
             if record_status == -1:
                 # The record was deleted
                 response['resultCode'] = 103
 
-            response['record_has_pdf'] = record_has_pdf(recid)
-            # order subfields alphabetically
-            record_order_subfields(record)
+            response['record_has_pdf'] = record_has_fulltext(recid)
 
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
@@ -1178,7 +1197,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                 response['resultCode'] = 30
 
         response['cacheMTime'], response['cacheDirty'] = \
-            update_cache_file_contents(recid, uid, record_revision,
+            update_cache_file_contents(recid, uid, record_revision, \
                                        record, \
                                        pending_changes, \
                                        deactivated_hp_changes, \
@@ -1274,44 +1293,96 @@ def perform_request_autocomplete(request_type, recid, uid, data):
     response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['autosuggestion_scanned']
     return response
 
-
-def perform_request_bibcatalog(request_type, recid, uid):
+def perform_request_bibcatalog(request_type, uid, data):
     """Handle request to BibCatalog (RT).
 
     """
     response = {}
 
     if request_type == 'getTickets':
-        # Insert the ticket data in the response, if possible
+        # Insert the tickets data in the response, if possible
         if bibcatalog_system is None:
             response['tickets'] = "<!--No ticket system configured-->"
         elif bibcatalog_system and uid:
             bibcat_resp = bibcatalog_system.check_system(uid)
             if bibcat_resp == "":
                 tickets_found = bibcatalog_system.ticket_search(uid, \
-                    status=['new', 'open'], recordid=recid)
-                t_url_str = '' #put ticket urls here, formatted for HTML display
-                for t_id in tickets_found:
-                    #t_url = bibcatalog_system.ticket_get_attribute(uid, \
-                    #    t_id, 'url_display')
+                    status=['new', 'open'], recordid=data['recID'])
+                tickets = []
+                for i,t_id in enumerate(tickets_found):
                     ticket_info = bibcatalog_system.ticket_get_info( \
-                        uid, t_id, ['url_display', 'url_close'])
+                        uid, t_id, ['url_display', 'url_close', 'subject', 'text', 'queue', 'created'])
                     t_url = ticket_info['url_display']
                     t_close_url = ticket_info['url_close']
-                    #format..
-                    t_url_str += "#" + str(t_id) + '<a href="' + t_url + \
-                        '">[read]</a> <a href="' + t_close_url + \
-                        '">[close]</a><br/>'
-                #put ticket header and tickets links in the box
-                t_url_str = "<strong>Tickets</strong><br/>" + t_url_str + \
-                    "<br/>" + '<a href="new_ticket?recid=' + str(recid) + \
-                    '>[new ticket]</a>'
-                response['tickets'] = t_url_str
-                #add a new ticket link
+                    t_subject = ticket_info['subject']
+                    t_text = ticket_info['text']
+                    t_queue = ticket_info['queue']
+                    date_string = ticket_info['created']
+                    date_splitted = date_string.split(" ")
+                    # convert date to readable format
+                    t_date = date_splitted[2] + ' ' + date_splitted[1] + " " + date_splitted[4] +\
+                             " " + date_splitted[3].split(":")[0] + ":" + date_splitted[3].split(":")[1]
+                    ticket = { "id": str(t_id), "queue": t_queue, "date": t_date, "url": t_url,
+                               "close_url": t_close_url, "subject": t_subject, "text": t_text }
+                    tickets.append(ticket)
+                response['tickets'] = tickets
+                # add available queues
+                response['queues'] = bibcatalog_system.get_queues(uid)
+                response['resultCode'] = 31
+            else:
+                # put something in the tickets container, for debug
+                response['tickets'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
+                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
+    # closeTicket usecase
+    elif request_type == 'closeTicket':
+        if bibcatalog_system is None:
+            response['ticket_closed_description'] = "<!--No ticket system configured-->"
+            response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_closed']
+        elif bibcatalog_system and uid:
+            bibcat_resp = bibcatalog_system.check_system(uid)
+            if bibcat_resp == "":
+                un, pw = get_bibcat_from_prefs(uid)
+                if un and pw:
+                    ticket_assigned = bibcatalog_system.ticket_steal(uid, data['ticketid'])
+                    ticket_closed = bibcatalog_system.ticket_set_attribute(uid, data['ticketid'], 'status', 'resolved')
+                    if ticket_closed == 1:
+                        response['ticket_closed_description'] = 'Ticket resolved'
+                        response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['ticket_closed']
+                    else:
+                        response['ticket_closed_description'] = 'Ticket could not be resolved.Try again'
+                        response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_closed']
+                else:
+                    response['ticket_closed_description'] = 'RT user does not exist'
+                    response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_closed']
             else:
                 #put something in the tickets container, for debug
-                response['tickets'] = "<!--"+bibcat_resp+"-->"
-        response['resultCode'] = 31
+                response['ticket_closed_description'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
+                response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
+        response['ticketid'] = data['ticketid']
+    elif request_type == 'openTicket':
+        if bibcatalog_system is None:
+            response['ticket_opened_description'] = "<!--No ticket system configured-->"
+            response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_opened']
+        elif bibcatalog_system and uid:
+            bibcat_resp = bibcatalog_system.check_system(uid)
+            if bibcat_resp == "":
+                un, pw = get_bibcat_from_prefs(uid)
+                if un and pw:
+                    ticket_opened = bibcatalog_system.ticket_set_attribute(uid, data['ticketid'], 'status', 'open')
+                    if ticket_opened == 1:
+                        response['ticket_opened_description'] = 'Ticket opened'
+                        response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['ticket_opened']
+                    else:
+                        response['ticket_opened_description'] = 'Ticket could not be opened.Try again'
+                        response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_opened']
+                else:
+                    response['ticket_opened_description'] = 'RT user does not exist'
+                    response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_opened']
+            else:
+                #put something in the tickets container, for debug
+                response['ticket_opened_description'] = "Error connecting to RT<!--" + bibcat_resp + "-->"
+                response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
+        response['ticketid'] = data['ticketid']
     return response
 
 

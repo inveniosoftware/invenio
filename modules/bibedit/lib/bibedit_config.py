@@ -114,7 +114,12 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'error_no_doi_specified': 117,
     'error_crossref_record_not_found': 118,
     'error_crossref_malformed_doi': 119,
-    'error_crossref_no_account' : 120
+    'error_crossref_no_account' : 120,
+    'ticket_closed' : 121,
+    'error_ticket_closed': 122,
+    'ticket_opened' : 123,
+    'error_ticket_opened': 124,
+    'error_rt_connection': 125
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {
@@ -220,3 +225,7 @@ CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS = ['999']
 # CFG_BIBEDIT_AUTHOR_TAGS - which tags to be considered when showing/hiding
 # authors
 CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS = ['100', '700']
+
+# CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS - which tags to be excludeed when for the
+# curator view
+CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS = ['035', '041', '520', '540', '595', '650', '653', '690', '695', '856']

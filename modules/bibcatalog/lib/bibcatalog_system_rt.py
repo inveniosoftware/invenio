@@ -31,7 +31,8 @@ from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_CLI, \
                            CFG_BIBCATALOG_SYSTEM_RT_URL, \
                            CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER, \
-                           CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
+                           CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD, \
+                           CFG_BIBEDIT_ADD_TICKET_RT_QUEUES
 
 class BibCatalogSystemRT(BibCatalogSystem):
 
@@ -231,6 +232,14 @@ class BibCatalogSystemRT(BibCatalogSystem):
         """assign a ticket to an RT user. Returns 1 on success, 0 on failure"""
         return self.ticket_set_attribute(uid, ticketid, 'owner', to_user)
 
+    def ticket_steal(self, uid, ticketid):
+        """steal a ticket from an RT user. Returns 1 on success, 0 on failure"""
+        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " steal " + str(ticketid)
+        command_out = self._run_rt_command(command, uid)
+        if command_out == None:
+            return 0
+        return 1
+
     def ticket_set_attribute(self, uid, ticketid, attribute, new_value):
         """change the ticket's attribute. Returns 1 on success, 0 on failure"""
         #check that the attribute is accepted..
@@ -303,7 +312,6 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid)
         command_out = self._run_rt_command(command, uid)
-
         if command_out == None:
             return 0
 
@@ -371,6 +379,24 @@ class BibCatalogSystemRT(BibCatalogSystem):
                 return tdict
         else:
             return None
+
+    def get_queues(self, uid):
+        """get all the queues from RT. Returns a list of queues"""
+        # get all queues with id from 1-100 in order to get all the available queues.
+        # Then filters the queues keeping these selected in the configuration variable
+        command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show -t queue -f name 1-100"
+        command_out = self._run_rt_command(command, uid)
+        spl = command_out.split("\n")
+        queues = []
+        for i,line in enumerate(spl):
+            if 'id' in line:
+                id = line.split("/")[1]
+                # name is on the next line after id
+                name = spl[i+1].split(": ")[1]
+                if name in CFG_BIBEDIT_ADD_TICKET_RT_QUEUES:
+                    queue = {'id': id, 'name': name}
+                    queues.append(queue)
+        return queues
 
     def _run_rt_command(self, command, uid=None):
         """

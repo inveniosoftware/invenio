@@ -29,11 +29,13 @@
 var gSelectionModeOn = false;
 var gReady = true;
 
-function initInputHotkeys(input_element) {
+function initInputHotkeys(input_element, original) {
     /* Binding of shortcuts for input elements */
 
     // Lauch autosuggest
     $(input_element).bind('keydown', 'ctrl+shift+a', function (event)  { onAutosuggest(event); } );
+    $(input_element).bind('keydown', 'ctrl+/', function (event)  { onJumpField(event, original, -1); } );
+    $(input_element).bind('keydown', 'ctrl+*', function (event)  { onJumpField(event, original, 1); } );
     // Save content and jump to next content field.
     // $(input_element).bind('keydown', 'tab', onKeyTab);
     // Save content and jump to previous content field.
@@ -65,6 +67,44 @@ function initHotkeys() {
 
   $(document).bind('keydown', 'ctrl+v', function(event) {
       onPerformPaste();
+      event.preventDefault();
+  });
+
+  $(document).bind('keydown', 'shift+p', function(event) {
+      onOpenPDFClick();
+      event.preventDefault();
+  });
+
+  /* Shortcuts related to viewing only references, authors ot others */
+  $(document).bind('keydown', 'ctrl+shift+r', function(event) {
+      displayOnlyReferences();
+      event.preventDefault();
+  });
+
+  $(document).bind('keydown', 'ctrl+shift+a', function(event) {
+      displayOnlyAuthors();
+      event.preventDefault();
+  });
+
+  $(document).bind('keydown', 'ctrl+shift+o', function(event) {
+      displayOnlyOthers();
+      event.preventDefault();
+  });
+
+  if ( gINSPIRE_SITE ) {
+    $(document).bind('keydown', 'ctrl+shift+c', function(event) {
+      onfocuscurator(true);
+      event.preventDefault();
+    });
+  }
+
+  $(document).bind('keydown', 'ctrl+shift+d', function(event) {
+      displayAll();
+      event.preventDefault();
+  });
+
+  $(document).bind('keydown', 's', function(event) {
+      openFirstField();
       event.preventDefault();
   });
 
@@ -152,7 +192,7 @@ function initHotkeys() {
   });
 
   // Toggle 'selection mode'.
-  $(document).bind('keydown', 'alt+s', onKeyAltS);
+  //$(document).bind('keydown', 'alt+s', onKeyAltS);
   // Edit focused subfield.
   $(document).bind('keydown', 'return',
 		   onKeyReturn);
@@ -165,31 +205,31 @@ function initHotkeys() {
   $(document).bind('keydown', 'ctrl+shift+y', onRedo);
 }
 
-function onKeyAltS(event) {
-  /*
-   * Handle key 'alt+s' (toggle selection mode).
-   */
-  if (gRecID){
-    if (gSelectionModeOn){
-      $('#bibEditContentTable td').unbind('mouseover');
-      gSelectionModeOn = false;
-      updateStatus('report', 'Selection mode: Off');
-    }
-    else{
-      $('#bibEditContentTable td').bind('mouseover', function(event){
-       var targetID = event.target.id;
-       if (targetID.slice(0, targetID.indexOf('_')) == 'fieldTag' &&
-           !$(event.target).hasClass('bibEditSelected')) {
-          onSelectHandle(event);
-       }
-      });
-      gSelectionModeOn = true;
-      updateStatus('report', 'Selection mode: On');
-    }
-    if (!event.isDefaultPrevented())
-      event.preventDefault();
-  }
-}
+// function onKeyAltS(event) {
+//   /*
+//    * Handle key 'alt+s' (toggle selection mode).
+//    */
+//   if (gRecID){
+//     if (gSelectionModeOn){
+//       $('#bibEditContentTable td').unbind('mouseover');
+//       gSelectionModeOn = false;
+//       updateStatus('report', 'Selection mode: Off');
+//     }
+//     else{
+//       $('#bibEditContentTable td').bind('mouseover', function(event){
+//        var targetID = event.target.id;
+//        if (targetID.slice(0, targetID.indexOf('_')) == 'fieldTag' &&
+//            !$(event.target).hasClass('bibEditSelected')) {
+//           onSelectHandle(event);
+//        }
+//       });
+//       gSelectionModeOn = true;
+//       updateStatus('report', 'Selection mode: On');
+//     }
+//     if (!event.isDefaultPrevented())
+//       event.preventDefault();
+//   }
+// }
 
 function onSelectHandle(event) {
   /*
@@ -391,3 +431,35 @@ function onKeyCtrlDown(event) {
 //     }
 //   }
 // }
+
+
+/**
+ * Jump from field to field, skipping subfields
+ * @param  {Object} event
+ * @param  {Object} DOM node
+ */
+function onJumpField(event, original, step) {
+  event.stopPropagation();
+
+  /* close the current editable textarea*/
+  $(event.target).blur();
+
+  /* id of any table cell is like content_595_1_1 */
+  /* so first find the closest first field replacing the last part of the
+  id by 0*/
+  var fieldFirstElemId = $(original).attr("id").slice(0,-1) + "0";
+  var $currentFirstField = $('#' + fieldFirstElemId);
+
+  /* Get all the first fields present in the table */
+  var $firstElemFields = $(".tabSwitch:visible[id$='_0']");
+
+  var currentElementIndex = $firstElemFields.index($currentFirstField);
+
+  /* Jump to the next field */
+  $firstElemFields.eq(currentElementIndex + step).click();
+}
+
+function openFirstField() {
+  var $fields = $(".tabSwitch:visible");
+  $fields.eq(0).click();
+}

@@ -232,7 +232,8 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_OPENID_PROVIDERS',
                        'CFG_OAUTH1_PROVIDERS',
                        'CFG_OAUTH2_PROVIDERS',
-                       'CFG_BIBFORMAT_CACHED_FORMATS']:
+                       'CFG_BIBFORMAT_CACHED_FORMATS',
+                       'CFG_BIBEDIT_ADD_TICKET_RT_QUEUES', ]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
