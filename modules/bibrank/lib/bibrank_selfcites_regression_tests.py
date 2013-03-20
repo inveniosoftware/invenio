@@ -21,11 +21,13 @@
 
 
 from invenio.testutils import InvenioTestCase
-import sys
-from StringIO import StringIO
 from datetime import datetime, timedelta
 
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.intbitset import intbitset
+
+
+RANK_METHOD_CODE = 'selfcites'
 
 
 class SelfCitesIndexerTests(InvenioTestCase):
@@ -33,7 +35,7 @@ class SelfCitesIndexerTests(InvenioTestCase):
 
     def setUp(self):
         from invenio.bibrank_selfcites_task import fill_self_cites_tables
-        fill_self_cites_tables({'algorithm': 'simple'})
+        fill_self_cites_tables(RANK_METHOD_CODE, {'algorithm': 'simple'})
 
     def test_get_personids_from_record(self):
         from invenio.bibrank_selfcites_indexer import get_personids_from_record
@@ -174,25 +176,6 @@ class SelfCitesIndexerTests(InvenioTestCase):
 
 
 class SelfCitesTaskTests(InvenioTestCase):
-    def test_check_options(self):
-        from invenio.bibrank_selfcites_task import check_options
-        old_stderr = sys.stderr
-        sys.stderr = StringIO()
-        try:
-            self.assert_(not check_options())
-        finally:
-            sys.stderr = old_stderr
-
-    def test_parse_option(self):
-        from invenio.bibrank_selfcites_task import parse_option
-        parse_option('-a', None, None, None)
-        parse_option('-m', None, None, None)
-        parse_option('-c', '1', None, None)
-        parse_option('-r', '1', None, None)
-        parse_option('--recids', '1-10', None, None)
-        parse_option('-r', '1,2,3-6', None, None)
-        parse_option('--rebuild', None, None, None)
-
     def test_compute_and_store_self_citations(self):
         from invenio.bibrank_selfcites_indexer import get_authors_tags
         from invenio.bibrank_selfcites_task import compute_and_store_self_citations
@@ -202,14 +185,14 @@ class SelfCitesTaskTests(InvenioTestCase):
         tags = get_authors_tags()
         for algorithm in ALL_ALGORITHMS:
             citation_fun = get_citations_fun(algorithm=algorithm)
-        compute_and_store_self_citations(1, tags, citation_fun)
+        compute_and_store_self_citations(1, tags, citation_fun, {})
 
     def test_rebuild_tables(self):
         from invenio.bibrank_selfcites_task import rebuild_tables
         from invenio.bibrank_selfcites_indexer import ALL_ALGORITHMS
         for algorithm in ALL_ALGORITHMS.iterkeys():
             config = {'algorithm': algorithm, 'friends_threshold': 3}
-            assert rebuild_tables(config)
+            assert rebuild_tables(RANK_METHOD_CODE, config)
 
     def test_fetch_bibauthorid_last_update(self):
         from invenio.bibrank_selfcites_task import \
@@ -238,12 +221,23 @@ class SelfCitesTaskTests(InvenioTestCase):
         except IndexError:
             original_date = old_date
         store_last_updated(name, old_date)
-        self.assert_(fetch_concerned_records('selfcites'))
+        recids, end_date = fetch_concerned_records('selfcites', None)
+        self.assert_(recids)
+        self.assert_(end_date)
         future_date = datetime.now() + timedelta(days=1)
         store_last_updated(name, future_date)
-        self.assert_(not fetch_concerned_records('selfcites'))
+        recids, end_date = fetch_concerned_records('selfcites', None)
+        self.assert_(not recids)
+        self.assert_(end_date)
         # Restore value in db
         store_last_updated(name, original_date)
+
+    def test_fetch_concerned_records_recids(self):
+        from invenio.bibrank_selfcites_task import fetch_concerned_records
+        ids_param = ((1, 3), (5, 10))
+        recids, end_date = fetch_concerned_records('selfcites', ids_param)
+        self.assertEqual(recids, intbitset([1, 2, 3, 5, 6, 7, 8, 9, 10]))
+        self.assertEqual(end_date, None)
 
     def test_process_updates(self):
         from invenio.bibrank_selfcites_task import process_updates
@@ -262,7 +256,7 @@ class SelfCitesTaskTests(InvenioTestCase):
         tags = get_authors_tags()
         for algorithm in ALL_ALGORITHMS:
             citation_fun = get_citations_fun(algorithm=algorithm)
-            process_one(1, tags, citation_fun)
+            process_one(1, tags, citation_fun, {})
 
     def test_empty_self_cites_tables(self):
         from invenio.bibrank_selfcites_task import empty_self_cites_tables
@@ -278,8 +272,8 @@ class SelfCitesTaskTests(InvenioTestCase):
     def test_fill_self_cites_tables(self):
         from invenio.bibrank_selfcites_task import fill_self_cites_tables
         from invenio.dbquery import run_sql
-        config = {'algorithm':'friends', 'friends_threshold': 3}
-        fill_self_cites_tables(config)
+        config = {'algorithm': 'friends', 'friends_threshold': 3}
+        fill_self_cites_tables(RANK_METHOD_CODE, config)
         counts = [
             run_sql('SELECT count(*) from rnkRECORDSCACHE')[0][0],
             run_sql('SELECT count(*) from rnkEXTENDEDAUTHORS')[0][0],

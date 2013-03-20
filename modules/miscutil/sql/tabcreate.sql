@@ -3037,6 +3037,25 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDICT (
   KEY reverse (citer, citee)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS rnkSELFCITEDICT (
+  citee int(10) unsigned NOT NULL,
+  citer int(10) unsigned NOT NULL,
+  last_updated datetime NOT NULL,
+  PRIMARY KEY id (citee, citer),
+  KEY reverse (citer, citee)
+) ENGINE=MyISAM;
+
+-- a table for logging changes in the citation dict
+CREATE TABLE IF NOT EXISTS rnkCITATIONLOG (
+  id int(11) unsigned NOT NULL auto_increment,
+  citee int(10) unsigned NOT NULL,
+  citer int(10) unsigned NOT NULL,
+  `type` ENUM('added', 'removed'),
+  action_date datetime NOT NULL,
+  PRIMARY KEY (id),
+  KEY citee (citee),
+  KEY citer (citer)
+) ENGINE=MyISAM;
 
 -- a table for missing citations. This should be scanned by a program
 -- occasionally to check if some publication has been cited more than
@@ -4700,5 +4719,7 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_25_virtual_index
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_30_indexer_interface',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_04_30_new_plotextractor_websubmit_function',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_06_new_collectionboxname_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_20_new_self_citation_dict_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_26_new_citation_log_table',NOW());
 
 -- end of file

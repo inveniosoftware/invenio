@@ -221,11 +221,6 @@ def compute_simple_self_citations(recid, tags):
     return compute_self_citations(recid, tags, get_authors_from_record)
 
 
-def get_all_precomputed_selfcites():
-    sql = "SELECT id_bibrec, count FROM rnkSELFCITES"
-    return run_sql(sql)
-
-
 def get_self_citations_count(recids, algorithm='simple',
                                   precompute=CFG_BIBRANK_SELFCITES_PRECOMPUTE):
     """Depending on our site we config, we either:

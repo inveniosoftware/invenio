@@ -48,12 +48,12 @@ class CitationDictsDataCacher(DataCacher):
             alldicts['citations_counts'].sort(key=itemgetter(1), reverse=True)
 
             # Self-cites
-            from invenio.bibrank_selfcites_indexer import get_all_precomputed_selfcites
-            selfcites = {}
-            for recid, counts in get_all_precomputed_selfcites():
-                selfcites[recid] = weights.get(recid, 0) - counts
-            alldicts['selfcites_weights'] = selfcites
-            alldicts['selfcites_counts'] = [(recid, selfcites.get(recid, cites)) for recid, cites in alldicts['citations_counts']]
+            selfcites = fromDB('selfcites')
+            selfcites_weights = {}
+            for recid, counts in alldicts['citations_counts']:
+                selfcites_weights[recid] = counts - selfcites.get(recid, 0)
+            alldicts['selfcites_weights'] = selfcites_weights
+            alldicts['selfcites_counts'] = [(recid, selfcites_weights.get(recid, cites)) for recid, cites in alldicts['citations_counts']]
             alldicts['selfcites_counts'].sort(key=itemgetter(1), reverse=True)
 
             return alldicts
