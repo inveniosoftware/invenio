@@ -1748,6 +1748,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
   stemming_language varchar(10) NOT NULL default '',
   indexer varchar(10) NOT NULL default 'native',
+  synonym_kbrs varchar(255) NOT NULL default '',
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
 ) ENGINE=MyISAM;
@@ -4331,5 +4332,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_11_rnkDOWNLOADS_file_format',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_20_idxINDEX_synonym_kb',NOW());
 
 -- end of file

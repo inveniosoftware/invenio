@@ -35,14 +35,15 @@ from invenio.config import \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
      CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
-     CFG_BIBINDEX_SYNONYM_KBRS, \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
      CFG_BIBINDEX_SPLASH_PAGES, \
      CFG_SOLR_URL, \
      CFG_XAPIAN_ENABLED
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, \
-    CFG_CHECK_MYSQL_THREADS
+    CFG_CHECK_MYSQL_THREADS, \
+    CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \
+    CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
 from invenio.bibindex_engine_tokenizer import \
      BibIndexFuzzyNameTokenizer, BibIndexExactNameTokenizer, \
      BibIndexPairTokenizer, BibIndexWordTokenizer, \
@@ -567,6 +568,37 @@ def get_all_indexes():
         out.append(row[0])
     return out
 
+def get_all_index_names_and_column_values(column_name):
+    """Returns a list of tuples of name and another column of all defined words indexes.
+       Returns empty list in case there are no tags indexed in this index or in case
+       the column name does not exist.
+       Example: output=[('global', something), ('title', something)]."""
+    out = []
+    query = """SELECT name, %s FROM idxINDEX""" % column_name
+    try:
+        res = run_sql(query)
+        for row in res:
+            out.append((row[0], row[1]))
+    except DatabaseError:
+        write_message("Exception caught for SQL statement: %s; column %s might not exist" % (query, column_name), sys.stderr)
+    return out
+
+def get_all_synonym_knowledge_bases():
+    """Returns a dictionary of name key and knowledge base name and match type tuple value
+        information of all defined words indexes that have knowledge base information.
+        Returns empty dictionary in case there are no tags indexed.
+        Example: output['global'] = ('INDEX-SYNONYM-TITLE', 'exact'), output['title'] = ('INDEX-SYNONYM-TITLE', 'exact')."""
+    res = get_all_index_names_and_column_values("synonym_kbrs")
+    out = {}
+    for row in res:
+        kb_data = row[1]
+        # ignore empty strings
+        if len(kb_data):
+            out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
+    return out
+
+
+
 def split_ranges(parse_string):
     """Parse a string a return the list or ranges."""
     recIDs = []
@@ -1056,15 +1088,17 @@ class WordTable:
                     wlist[recID] = list_union(new_words, wlist[recID])
 
         # lookup index-time synonyms:
-        if CFG_BIBINDEX_SYNONYM_KBRS.has_key(self.index_name):
+        synonym_kbrs = get_all_synonym_knowledge_bases()
+        if synonym_kbrs.has_key(self.index_name):
             if len(wlist) == 0: return 0
             recIDs = wlist.keys()
             for recID in recIDs:
                 for word in wlist[recID]:
                     word_synonyms = get_synonym_terms(word,
-                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][0],
-                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][1],
+                                                      synonym_kbrs[self.index_name][0],
+                                                      synonym_kbrs[self.index_name][1],
                                                       use_memoise=True)
+
                     if word_synonyms:
                         wlist[recID] = list_union(word_synonyms, wlist[recID])
 

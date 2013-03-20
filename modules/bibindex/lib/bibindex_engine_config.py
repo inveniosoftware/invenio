@@ -35,3 +35,12 @@ CFG_MAX_MYSQL_THREADS = 50 # how many threads (connections) we
                            # consider as still safe
 CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping
                               # for more than X seconds
+
+
+
+CFG_BIBINDEX_SYNONYM_MATCH_TYPE = {
+                                    'None': '-None-',
+                                    'exact': 'exact',
+                                    'leading_to_comma': 'leading_to_comma',
+                                    'leading_to_number': 'leading_to_number'}
+CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR = ","

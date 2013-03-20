@@ -98,6 +98,7 @@ from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requires_phrase_search, \
      BibIndexPairTokenizer
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
+from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
 from invenio.bibindexadminlib import get_idx_indexer
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
@@ -1566,12 +1567,12 @@ def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
     term_for_lookup = term
     term_remainder = ''
     ## but maybe match different term:
-    if match_type == 'leading_to_comma':
+    if match_type == CFG_BIBINDEX_SYNONYM_MATCH_TYPE['leading_to_comma']:
         mmm = re.match(r'^(.*?)(\s*,.*)$', term)
         if mmm:
             term_for_lookup = mmm.group(1)
             term_remainder = mmm.group(2)
-    elif match_type == 'leading_to_number':
+    elif match_type == CFG_BIBINDEX_SYNONYM_MATCH_TYPE['leading_to_number']:
         mmm = re.match(r'^(.*?)(\s*\d.*)$', term)
         if mmm:
             term_for_lookup = mmm.group(1)
