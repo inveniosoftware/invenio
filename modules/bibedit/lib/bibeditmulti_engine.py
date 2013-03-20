@@ -126,7 +126,7 @@ class BaseSubfieldCommand:
             if field[4] == field_number:
                 subfield_index = 0
                 for subfield in field[0]:
-                    if self._condition != 'condition':
+                    if self._condition != '':
                         if subfield[0] == self._subfield:
                             for subfield in field[0]:
                                 if self._condition_subfield == subfield[0]:
@@ -170,7 +170,7 @@ class AddSubfieldCommand(BaseSubfieldCommand):
                                          self._subfield, self._value,
                                          None,
                                          field_position_global=field_number)
-        if self._condition != 'condition' or self._condition_does_not_exist:
+        if self._condition != '' or self._condition_does_not_exist:
             self._perform_on_all_matching_subfields_add_subfield(record, tag,
                                                                 field_number, action)
         else:
