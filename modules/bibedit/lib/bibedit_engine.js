@@ -182,6 +182,9 @@ var gLastChecked = null;
 // last time a bulk request completed
 var gLastRequestCompleted = new Date();
 
+// last checkbox checked
+var gLastChecked = null;
+
 /*
  * **************************** 2. Initialization ******************************
  */

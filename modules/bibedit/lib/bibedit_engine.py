@@ -1326,7 +1326,7 @@ def perform_request_bibcatalog(request_type, uid, data):
                 tickets_found = bibcatalog_system.ticket_search(uid,
                     status=['new', 'open'], recordid=data['recID'])
                 tickets = []
-                for i, t_id in enumerate(tickets_found):
+                for t_id in tickets_found:
                     ticket_info = bibcatalog_system.ticket_get_info(
                         uid, t_id, ['url_display', 'url_close', 'subject', 'text', 'queue', 'created'])
                     t_url = ticket_info['url_display']
