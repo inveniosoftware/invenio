@@ -68,7 +68,9 @@
 						createReq({recID: gRecID, recXML: xmlrecord, requestType: 'updateCacheRef'});
 						/* Redraw whole content table and enable submit button */
 						$('#bibEditTable').remove();
+						var unmarked_tags = getUnmarkedTags();
 						displayRecord();
+						setUnmarkedTags(unmarked_tags);
 						activateSubmitButton();
 						$( this ).remove();
 						},

@@ -2233,7 +2233,8 @@ form input.hyperlinkformSubmitButton {
 
 .bibeditHPDetailsOpener{
     display: table-cell;
-    width: 20%;
+    width: 80%;
+    cursor: pointer;
 }
 .bibeditHPInformationsSection{
 
@@ -2257,6 +2258,7 @@ form input.hyperlinkformSubmitButton {
 
 .bibeditHPEntryCol1{
     display: table-cell;
+    vertical-align: middle;
 }
 
 .bibeditHPEntryCol2{
@@ -2860,6 +2862,10 @@ div.restrictedflag {
    float:left;
    text-align:center;
 }
+div.restrictedflag-pending {
+    background-color: #FF7011;
+}
+
 .restrictedfilerowheader{
    background-color: #f11;
    color: #fff;
@@ -3868,5 +3874,17 @@ div.bibcircbottom {
     margin-left: 10px;
 }
 #mathpreviewareabar span{float:left; clear:none}
+
+/* Classes used for diff between two records */
+
+.diff_field_deleted {
+   color: #ff0000;
+}
+
+.diff_field_added {
+   color: #00aa00;
+}
+
+/* end of Classes used for diff between two records */
 
 /* end of invenio.css */

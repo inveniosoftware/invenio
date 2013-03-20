@@ -673,3 +673,36 @@ def strip_accents(x):
     y = re_unicode_uppercase_n.sub("N", y)
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
+
+
+def show_diff(original, modified, prefix="<pre>", sufix="</pre>"):
+    """
+    Returns the diff view between source and changed strings.
+    Function checks both arguments line by line and returns a string
+    with additional css classes for difference view
+    @param original: base string
+    @param modified: changed string
+    @param prefix: prefix of the output string
+    @param sufix: sufix of the output string
+
+    @return: string with the comparison of the records
+    @rtype: string
+    """
+    import difflib
+    differ = difflib.Differ()
+
+    result = [prefix]
+    for line in differ.compare(modified.splitlines(), original.splitlines()):
+        if line[0] == ' ':
+            result.append(line.strip())
+        elif line[0] == '-':
+            # Mark as deleted
+            result.append('<strong class="diff_field_deleted">' + line[2:].strip() + "</strong>")
+        elif line[0] == '+':
+            # Mark as added/modified
+            result.append('<strong class="diff_field_added">' + line[2:].strip() + "</strong>")
+        else:
+            continue
+
+    result.append(sufix)
+    return '\n'.join(result)

@@ -120,13 +120,17 @@ def split_name_parts(name_string, delete_name_additions=True,
         if name_string.count(sep) >= 1:
             found_sep = sep
             surname, rest_of_name = string_partition(name_string, sep)[0::2]
-            surname = surname.strip().title()
+            surname = surname.strip().capitalize()
+            # Fix for dashes
+            surname = re.sub('-([a-z])', lambda n:'-' + n.group(1).upper(), surname)
             break
 
     if not found_sep:
         if name_string.count(" ") > 0:
             rest_of_name, surname = string_partition(name_string, ' ', direc='r')[0::2]
-            surname = surname.strip().title()
+            surname = surname.strip().capitalize()
+            # Fix for dashes
+            surname = re.sub('-([a-z])', lambda n:'-' + n.group(1).upper(), surname)
         else:
             if not return_all_lower:
                 return [name_string.strip().capitalize(), [], [], []]

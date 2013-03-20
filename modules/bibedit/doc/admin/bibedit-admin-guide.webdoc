@@ -40,19 +40,18 @@ single record, do global replacements, and other cataloguing tasks.</p>
 <a name="2"></a><h2>2. Edit records via Web interface</h2>
 
 <p>To edit records via the web interface, please go to <a
-href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/edit/">BibEdit Admin
-Interface</a>.  This interface will let you to add, change or
-delete fields in a record.</p>
+href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/edit/">BibEdit Editor</a>.  This interface will let you add, change or delete fields in a record.</p>
 
-<p>If you want to change several records at once, please use the batch
-command-line techniques describe below.</p>
+<p>If you want to change several records at once, you can use the batch
+command-line techniques described below or the <a
+href="#3.1">Multi-Record Editor</a>.</p>
 
 <p>Please note that 8564 tags pointing to fulltext files managed by Invenio
 can't be manipulated via BibEdit. In order to modify them please use the
 <a href="bibupload-admin-guide#3.5">FFT tags through BibUpload</a> or the
 bibdocfile command line tool.</p>
 
-<a name="2.1"></a><h3>2.1 Keyboard shortcuts</h3>
+<a name="2.1"></a><h3>2.1 Keyboard shortcuts on BibEdit</h3>
 
 <h4>Basic record actions</h4>
 <table border="1" width="600px">
@@ -79,17 +78,12 @@ bibdocfile command line tool.</p>
   </tbody>
 </table>
 
-<h4>Focused (clicked) subfield</h4>
+<h4>Focused (clicked) subfield or field</h4>
 <table border="1" width="600px">
   <thead>
     <tr> <th>Shortcut</th> <th>Definition</th> <th>Action</th> </tr>
   </thead>
   <tbody>
-    <tr> <td>Esc</td> <td>Cancel</td> <td>Cancel edition of subfield</td> </tr>
-    <tr> <td>Tab</td> <td>Next</td> <td>Move focus to next subfield.</td> </tr>
-    <tr> <td>Shift+Tab</td> <td>Previous</td> <td>Move focus to previous
-	subfield.</td> </tr>
-    <tr> <td>Return</td> <td>Edit</td> <td>Edit focused subfield.</td> </tr>
     <tr> <td>Ctrl+Up</td> <td>Move up</td> <td>Move focused subfield up.</td> </tr>
     <tr> <td>Ctrl+Down</td> <td>Move down</td> <td>Move focused subfield
 	down.</td> </tr>
@@ -102,10 +96,7 @@ bibdocfile command line tool.</p>
     <tr> <th>Shortcut</th> <th>Definition</th> <th>Action</th> </tr>
   </thead>
   <tbody>
-    <tr> <td>Ctrl+Shift+e</td> <td>Add subfield</td> <td>Add an additional
-	subfield at the end.</td> </tr>
-    <tr> <td>Ctrl+Shift+d</td> <td>Remove subfield</td> <td>Remove a subfield
-	from the end.</td> </tr>
+    <tr> <td>Esc</td> <td>Cancel</td> <td>Cancel edition of subfield</td> </tr>
   </tbody>
 </table>
 
@@ -121,6 +112,7 @@ bibdocfile command line tool.</p>
   </tbody>
 </table>
 
+<br />
 <a name="3"></a><h2>3. Edit multiple records via web interface</h2>
 
 <p>The purpose of the <a href="<CFG_SITE_URL>/<CFG_SITE_RECORD>/multiedit/">Multi-Record Editor Web interface</a> is to allow cataloguers to easily edit more than one record in one go.</p>

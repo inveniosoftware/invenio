@@ -134,6 +134,8 @@ img_DATA = add-small.png \
            line.gif \
            loading.gif \
            logo_white.png \
+           magnifying_minus.png \
+           magnifying_plus.png \
            mail-icon-12x8.gif \
            mainmenu.gif \
            merge-small.png \

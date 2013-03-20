@@ -34,6 +34,7 @@ from invenio import bibformat
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.urlutils import auto_version_url
+from invenio.xmlmarc2textmarc import create_marc_record
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
@@ -49,7 +50,8 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
     CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
-    CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT
+    CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT, \
+    CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -79,7 +81,7 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields, record_get_field_instances, record_add_fields, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
-    record_strip_controlfields, record_order_subfields
+    record_strip_controlfields, record_order_subfields, field_xml_output
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
@@ -89,7 +91,7 @@ from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
 from invenio.htmlutils import get_mathjax_header
-from invenio.textutils import wash_for_xml
+from invenio.textutils import wash_for_xml, show_diff
 from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
@@ -234,7 +236,9 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gREQUESTS_UNTIL_SAVE' : CFG_BIBEDIT_REQUESTS_UNTIL_SAVE,
             'gAVAILABLE_KBS': get_available_kbs(),
             'gTagsToAutocomplete': CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS,
-            'gDOILookupField': '"' + CFG_BIBEDIT_DOI_LOOKUP_FIELD + '"'
+            'gDOILookupField': '"' + CFG_BIBEDIT_DOI_LOOKUP_FIELD + '"',
+            'gDisplayReferenceTags': CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS,
+            'gDisplayAuthorTags': CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -264,6 +268,7 @@ def perform_request_init(uid, ln, req, lastupdated):
     #oaiId = record_extract_oai_id(rec)
 
     body += bibedit_templates.menu()
+    body += bibedit_templates.focuson()
     body += """<div id="bibEditContent">
                <div class="revisionLine"></div>
                <div id="Toptoolbar"></div>
@@ -290,32 +295,29 @@ def record_has_pdf(recid):
     docs = rec_info.list_bibdocs()
     return bool(docs)
 
-
-def get_xml_comparison(header1, header2, xml1, xml2):
-    """
-    Return diffs of two MARCXML records.
-    """
-    return "".join(difflib.unified_diff(xml1.splitlines(1),
-        xml2.splitlines(1), header1, header2))
-
-
 def get_marcxml_of_revision_id(recid, revid):
     """
     Return MARCXML string with corresponding to revision REVID
     (=RECID.REVDATE) of a record.  Return empty string if revision
     does not exist.
     """
-    res = ""
     job_date = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(revid).groups()
     tmp_res = get_marcxml_of_record_revision(recid, job_date)
     if tmp_res:
         for row in tmp_res:
-            res += zlib.decompress(row[0]) + "\n"
-    return res
+            xml = zlib.decompress(row[0]) + "\n"
+            # xml contains marcxml of record
+            # now we create a record object from this xml and sort fields and subfields
+            # and return marcxml
+            rec = create_record(xml)[0]
+            record_order_subfields(rec)
+            marcxml = record_xml_output(rec, order_fn="_order_by_tags")
+    return marcxml
 
 
 def perform_request_compare(ln, recid, rev1, rev2):
     """Handle a request for comparing two records"""
+
     body = ""
     errors = []
     warnings = []
@@ -326,17 +328,15 @@ def perform_request_compare(ln, recid, rev1, rev2):
     else:
         xml1 = get_marcxml_of_revision_id(recid, rev1)
         xml2 = get_marcxml_of_revision_id(recid, rev2)
-        fullrevid1 = "%i.%s" % (recid, rev1)
-        fullrevid2 = "%i.%s" % (recid, rev2)
-        comparison = bibedit_templates.clean_value(
-            get_xml_comparison(fullrevid1, fullrevid2, xml1, xml2),
-            'text').replace('\n', '<br />\n           ')
+        # Create MARC representations of the records
+        marc1 = create_marc_record(create_record(xml1)[0], '', {"text-marc": 1, "aleph-marc": 0})
+        marc2 = create_marc_record(create_record(xml2)[0], '', {"text-marc": 1, "aleph-marc": 0})
+        comparison = show_diff(marc1, marc2)
         job_date1 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev1).groups()
         job_date2 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev2).groups()
         body += bibedit_templates.history_comparebox(ln, job_date1,
                                                  job_date2, comparison)
     return body, errors, warnings
-
 
 def perform_request_newticket(recid, uid):
     """create a new ticket with this record's number
@@ -700,14 +700,18 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             # For some collections, merge template with record
             template_to_merge = extend_record_with_template(recid)
             if template_to_merge:
-                record = merge_record_with_template(record, template_to_merge)
-                create_cache_file(recid, uid, record, True)
+                merged_record = merge_record_with_template(record, template_to_merge)
+                if merged_record:
+                    record = merged_record
+                    create_cache_file(recid, uid, record, True)
 
             if record_status == -1:
                 # The record was deleted
                 response['resultCode'] = 103
 
             response['record_has_pdf'] = record_has_pdf(recid)
+            # order subfields alphabetically
+            record_order_subfields(record)
 
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \

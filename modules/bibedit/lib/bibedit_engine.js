@@ -1,6 +1,6 @@
 /*
  * This file is part of Invenio.
- * Copyright (C) 2009, 2010, 2011, 2012 CERN.
+ * Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
  *
  * Invenio is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -228,6 +228,7 @@ function init_bibedit() {
   initHotkeys();
   initClipboardLibrary();
   initClipboard();
+  bindFocusHandlers();
   // Modify BibEdit content table height dinamically to avoid going over the
   // viewport
   resize_content();
@@ -273,6 +274,14 @@ function initDialogs(){
 }
 
 
+/**
+ * Error handler when deleting cache of the record
+ */
+function onDeleteRecordCacheError(XHR, textStatus, errorThrown) {
+  console.log("Cannot delete record cache file");
+  updateStatus('ready');
+}
+
 function initMisc(){
   /*
    * Miscellaneous initialization operations.
@@ -294,7 +303,7 @@ function initMisc(){
     }
     else {
       createReq({recID: gRecID, requestType: 'deleteRecordCache'},
-        function() {}, false);
+        function() {}, false, undefined, onDeleteRecordCacheError);
     }
   };
 
@@ -361,11 +370,32 @@ function initJeditable(){
         $('textarea', this).bind('click', function(e) {
             e.stopPropagation();
         });
-        $('textarea', this).bind('keydown', 'return', function(e) {
-            e.stopPropagation();
-            $(this).blur();
+
+        $('textarea', this).bind('keydown', function(e) {
+            var TABKEY = 9;
+            var RETURNKEY = 13;
+
+            switch (e.keyCode) {
+              case RETURNKEY:
+                // Just save field content
+                e.stopPropagation();
+                $(this).blur();
+                break;
+              case TABKEY:
+                // Move between fields
+                e.preventDefault();
+
+                $(this).blur();
+
+                var currentElementIndex = $(".tabSwitch").index($(original));
+                var step = e.shiftKey ? -1 : 1;
+                $(".tabSwitch").eq(currentElementIndex + step).click();
+                break;
+            }
         });
+
         $('textarea', this).keyup(function() {
+          // Keep the limit of max chars for fields/subfields
           var max = parseInt($(this).attr('maxlength'));
           if( $(this).val().length > max ) {
               $(this).val($(this).val().substr(0, $(this).attr('maxlength')));
@@ -393,13 +423,16 @@ function initAjax(){
   );
 }
 
-
-function createReq(data, onSuccess, asynchronous) {
+function createReq(data, onSuccess, asynchronous, deferred, onError) {
   /*
    * Create Ajax request.
    */
   if (typeof asynchronous === "undefined") {
     asynchronous = true;
+  }
+
+  if (typeof onError === "undefined") {
+    asynchronous = onAjaxError;
   }
 
   // Include and increment transaction ID.
@@ -416,13 +449,44 @@ function createReq(data, onSuccess, asynchronous) {
   $.ajax({data: {jsondata: JSON.stringify(data)},
            success: function(json){
                       onAjaxSuccess(json, onSuccess);
+                      if (deferred !== undefined) {
+                        deferred.resolve(json);
+                      }
                     },
-           async: asynchronous
+           error: onError,
+           async: asynchronous})
+  .done(function(){
+    createReqAjaxDone(data);
   });
 }
 // Transactions data.
 createReq.transactionID = 0;
 createReq.transactions = [];
+
+function createReqAjaxDone(data){
+/*
+ * This function is executed after the ajax request in createReq function was finished
+ * data: the data parameter that was send with ajax request
+ */
+  // If the request was from holding pen, trigger the event to apply holding pen changes
+  if (data['requestType'] == 'getHoldingPenUpdates') {
+    $.event.trigger('HoldingPenPageLoaded');
+  }
+}
+
+
+/**
+ * Error handler for AJAX bulk requests
+ * @param  {object} data - object describing all operations to be done
+ * @return {function}      function to be used as error handler
+ */
+function onBulkReqError(data) {
+  return function (XHR, textStatus, errorThrown) {
+            console.log("Error while processing:");
+            console.log(data);
+            updateStatus("ready");
+          }
+}
 
 
 function createBulkReq(reqsData, onSuccess, optArgs){
@@ -440,7 +504,9 @@ function createBulkReq(reqsData, onSuccess, optArgs){
         data.undoRedo = optArgs.undoRedo;
     }
 
-    createReq(data, onSuccess, optArgs.asynchronous);
+    var errorCallback = onBulkReqError(data);
+
+    createReq(data, onSuccess, optArgs.asynchronous, undefined, errorCallback);
 }
 
 
@@ -448,9 +514,10 @@ function onAjaxError(XHR, textStatus, errorThrown){
   /*
    * Handle Ajax request errors.
    */
-  alert('Request completed with status ' + textStatus +
+  console.log('Request completed with status ' + textStatus +
     '\nResult: ' + XHR.responseText +
     '\nError: ' + errorThrown);
+  updateStatus('ready');
 }
 
 
@@ -527,8 +594,8 @@ function onAjaxSuccess(json, onSuccess){
         }
       }
       if (onSuccess) {
-          // No critical errors; call onSuccess function.
-          onSuccess(json);
+        // No critical errors; call onSuccess function.
+        onSuccess(json);
       }
     }
   }
@@ -625,7 +692,7 @@ function initStateFromHash(){
   // Find out which internal state the new hash leaves us with
   if (tmpState && tmpRecID){
     // We have both state and record ID.
-    if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord']) != -1)
+    if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord', 'hpapply']) != -1)
   gState = tmpState;
     else
       // Invalid state, fail...
@@ -656,7 +723,8 @@ function initStateFromHash(){
     updateStatus('updating');
     if (gRecID && !gRecordDirty && !tmpReadOnlyMode)
       // If the record is unchanged, delete the cache.
-      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+                true, undefined, onDeleteRecordCacheError);
     switch (gState){
       case 'startPage':
         cleanUp(true, '', 'recID', true, true);
@@ -679,27 +747,48 @@ function initStateFromHash(){
               getRecord(recID);
             }
         }
-      break;
-    case 'newRecord':
-      cleanUp(true, '', null, null, true);
-      displayNewRecordScreen();
-      bindNewRecordHandlers();
-      updateStatus('ready');
-      break;
-    case 'submit':
-      cleanUp(true, '', null, true);
-      displayMessage(4);
-      updateStatus('ready');
-      break;
-    case 'cancel':
-      cleanUp(true, '', null, true, true);
-      updateStatus('ready');
-      break;
-    case 'deleteRecord':
-      cleanUp(true, '', null, true);
-      displayMessage(10);
-      updateStatus('ready');
         break;
+      case 'hpapply':
+        var hpID = parseInt(gHashParsed.hpid, 10);
+        var recID = parseInt(tmpRecID, 10);
+        if (isNaN(recID) || isNaN(hpID)){
+          // Invalid record ID or HoldingPen ID.
+          cleanUp(true, tmpRecID, 'recID', true);
+          displayMessage(102);
+          updateStatus('error', gRESULT_CODES[102]);
+        }
+        else {
+          cleanUp(true, recID, 'recID');
+          gReadOnlyMode = tmpReadOnlyMode;
+          var hpButton = '#bibeditHPApplyChange' + hpID;
+          // after the record is created and all the data on the page is loaded
+          // trigger the click on holdingPen button
+          $(document).one('HoldingPenPageLoaded', function () {
+            $(hpButton).click();
+          });
+          getRecord(recID);
+        }
+        break;
+      case 'newRecord':
+        cleanUp(true, '', null, null, true);
+        displayNewRecordScreen();
+        bindNewRecordHandlers();
+        updateStatus('ready');
+        break;
+      case 'submit':
+        cleanUp(true, '', null, true);
+        displayMessage(4);
+        updateStatus('ready');
+        break;
+      case 'cancel':
+        cleanUp(true, '', null, true, true);
+        updateStatus('ready');
+        break;
+      case 'deleteRecord':
+        cleanUp(true, '', null, true);
+        displayMessage(10);
+        updateStatus('ready');
+          break;
     }
   }
   else
@@ -1221,7 +1310,8 @@ function onNewRecordClick(event){
   else
     // If the record is unchanged, erase the cache.
     if (gReadOnlyMode == false){
-      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+                true, undefined, onDeleteRecordCacheError);
   }
   changeAndSerializeHash({state: 'newRecord'});
   cleanUp(true, '');
@@ -1240,6 +1330,18 @@ function onTemplateRecordClick(event){
 }
 
 
+/**
+ * Error handler when opening a record
+ */
+function onGetRecordError() {
+  var msg = "<em>Error</em>: record cannot be opened. <br /><br /> \
+            If the problem persists, contact the site admin."
+
+  displayMessage(undefined, false, [msg]);
+  updateStatus("ready");
+}
+
+
 function getRecord(recID, recRev, onSuccess){
   /* A function retrieving the bibliographic record, using an AJAX request.
    *
@@ -1251,8 +1353,13 @@ function getRecord(recID, recRev, onSuccess){
    *             interface
    */
 
-  // Temporary store the record ID by attaching it to the onGetRecordSuccess
-  // function.
+  /* Make sure the record revision exists, otherwise default to current */
+  if ($.inArray(recRev, gRecRevisionHistory) === -1) {
+    recRev = 0;
+  }
+
+  var getRecordPromise = new $.Deferred();
+
   if (onSuccess == undefined)
     onSuccess = onGetRecordSuccess;
   if (recRev != undefined && recRev != 0){
@@ -1277,12 +1384,16 @@ function getRecord(recID, recRev, onSuccess){
   }
 
   resetBibeditState();
-  createReq(reqData, onSuccess);
+  createReq(reqData, function(json) {
+      onSuccess(json);
+      // reloading the Holding Pen toolbar
+      onHoldingPenPanelRecordIdChanged(recID);
+  }, true, undefined, onGetRecordError);
 
-  onHoldingPenPanelRecordIdChanged(recID); // reloading the Holding Pen toolbar
   getRecord.deleteRecordCache = false;
   getRecord.clonedRecord = false;
 }
+
 // Enable this flag to delete any existing cache before fetching next record.
 getRecord.deleteRecordCache = false;
 // Enable this flag to tell that we are fetching a record that has just been
@@ -1559,6 +1670,12 @@ function onPreviewClick() {
       }
       var html_preview = json['html_preview'];
       var preview_window = openCenteredPopup('', 'Record preview', 768, 768);
+      if ( preview_window === null ) {
+        var msg = "<strong> The preview window cannot be opened.</strong><br />\
+                  Your browser might be blocking popups. Check the options and\
+                  enable popups for this page.";
+        displayMessage(undefined, true, [msg]);
+      }
       preview_window.document.write(html_preview);
       preview_window.document.close(); // needed for chrome and safari
     });
@@ -1698,6 +1815,12 @@ function onOpenPDFClick() {
         // Preview was successful.
         var pdf_url = json['pdf_url'];
         var preview_window = openCenteredPopup(pdf_url);
+        if ( preview_window === null ) {
+        var msg = "<strong> The preview window cannot be opened.</strong><br />\
+                  Your browser might be blocking popups. Check the options and\
+                  enable popups for this page.";
+        displayMessage(undefined, true, [msg]);
+        }
         preview_window.document.close(); // needed for chrome and safari
        });
 
@@ -1785,7 +1908,8 @@ function onCloneRecordClick(){
   }
   else if (!gRecordDirty) {
     // If the record is unchanged, erase the cache.
-    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+              true, undefined, onDeleteRecordCacheError);
   }
   createReq({requestType: 'newRecord', newType: 'clone', recID: gRecID},
     function(json){
@@ -3470,6 +3594,9 @@ function onDeleteClick(event){
   addUndoOperation(urHandler);
   var ajaxData = deleteFields(toDelete, urHandler);
 
+  // Disable the delete button
+  $('#btnDeleteSelected').attr('disabled', 'disabled');
+
   queue_request(ajaxData);
 }
 
@@ -3535,7 +3662,8 @@ function switchToReadOnlyMode(){
     return false;
   }
   gReadOnlyMode = true;
-  createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
+            true, undefined, onDeleteRecordCacheError);
   gCacheMTime = 0;
 
   updateInterfaceAccordingToMode();
@@ -3600,14 +3728,15 @@ function onRevertClick(revisionId){
   if (displayAlert('confirmRevert')){
     createReq({recID: gRecID, revId: revisionId, requestType: 'revert',
          force: onSubmitClick.force}, function(json){
-    // Submission was successful.
+      // Submission was successful.
       changeAndSerializeHash({state: 'submit', recid: gRecID});
       var resCode = json['resultCode'];
       cleanUp(!gNavigatingRecordSet, '', null, true);
-      updateStatus('report', gRESULT_CODES[resCode]);
-      displayMessage(resCode);
       // clear the list of record revisions
-      resetBibeditState()
+      resetBibeditState();
+      displayMessage(resCode, false, [json['recID']]);
+      updateToolbar(false);
+      updateStatus('report', gRESULT_CODES[resCode]);
     });
     onSubmitClick.force = false;
   }
@@ -3775,6 +3904,9 @@ function onPerformPaste(){
 
      According to the default behaviour, the fields are appended as last of the same kind
    */
+   if (!gRecord) {
+    return;
+   }
 
   if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
     /*we do not want to perform this in case we are in an ordinary text area*/
@@ -3782,11 +3914,14 @@ function onPerformPaste(){
   }
 
   var clipboardContent = clipboardPasteValue();
+  if (!clipboardContent) {
+    return;
+  }
 
   var record = null;
-  try{
+  try {
     record = decodeMarcXMLRecord(clipboardContent);
-  } catch (err){
+  } catch (err) {
     alert("Error when parsing XML occured ... " + err.mesage);
   }
 
@@ -5797,4 +5932,78 @@ function onEditableCellChange(value, th) {
     highlight_change(cell, value);
 
     return value;
+}
+
+
+/* Functions specific to display modes */
+
+function onfocusreference() {
+  if ($("#focuson_references").prop("checked") === true) {
+    $.each(gDisplayReferenceTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").show();
+    });
+  }
+  else {
+    $.each(gDisplayReferenceTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").hide();
+    });
+  }
+}
+
+
+function onfocusauthor() {
+  if ($("#focuson_authors").prop("checked") === true) {
+    $.each(gDisplayAuthorTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").show();
+    });
+  }
+  else {
+    $.each(gDisplayAuthorTags, function() {
+      $("tbody[id^='rowGroup_" + this + "']").hide();
+    });
+  }
+}
+
+
+function onfocusother() {
+  var tags = [];
+  tags = tags.concat(gDisplayReferenceTags, gDisplayAuthorTags);
+
+  var myselector = $();
+  $.each(tags, function() {
+    myselector = myselector.add("tbody[id^='rowGroup_" + this + "']");
+  });
+
+  if ($("#focuson_others").prop("checked") === true) {
+    $("tbody:[id^='rowGroup_']").not(myselector).show();
+  }
+  else {
+    $("tbody:[id^='rowGroup_']").not(myselector).hide();
+  }
+}
+
+
+function displayAllTags() {
+  $("#focuson_references").prop("checked", true);
+  $("#focuson_authors").prop("checked", true);
+  $("#focuson_others").prop("checked", true);
+}
+
+
+function getUnmarkedTags() {
+  return $("#focuson_list input:checkbox:not(:checked)");
+}
+
+
+function setUnmarkedTags(tags) {
+  $.each(tags, function() {
+    this.click();
+  })
+}
+
+
+function bindFocusHandlers() {
+  $("#focuson_references").on("click", onfocusreference);
+  $("#focuson_authors").on("click", onfocusauthor);
+  $("#focuson_others").on("click", onfocusother);
 }

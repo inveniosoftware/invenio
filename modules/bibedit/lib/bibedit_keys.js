@@ -35,13 +35,13 @@ function initInputHotkeys(input_element) {
     // Lauch autosuggest
     $(input_element).bind('keydown', 'ctrl+shift+a', function (event)  { onAutosuggest(event); } );
     // Save content and jump to next content field.
-    $(input_element).bind('keydown', 'tab', onKeyTab);
+    // $(input_element).bind('keydown', 'tab', onKeyTab);
     // Save content and jump to previous content field.
-    $(input_element).bind('keydown', 'shift+tab', onKeyTab);
-    // Add subfield in form.
-    $(input_element).bind('keydown', 'ctrl+shift+e', onKeyCtrlShiftE);
-    // Remove subfield from form.
-    $(input_element).bind('keydown', 'ctrl+shift+d', onKeyCtrlShiftD);
+    // $(input_element).bind('keydown', 'shift+tab', onKeyTab);
+    // // Add subfield in form.
+    // $(input_element).bind('keydown', 'ctrl+shift+e', onKeyCtrlShiftE);
+    // // Remove subfield from form.
+    // $(input_element).bind('keydown', 'ctrl+shift+d', onKeyCtrlShiftD);
 }
 
 function initHotkeys() {
@@ -247,24 +247,24 @@ function onKeyReturn(event) {
   }
 }
 
-function onKeyTab(event){
-  /*
-   * Handle key tab (save content and jump to next content field).
-   */
-  if (event.target.nodeName == 'TEXTAREA'){
-    var contentCells = $('.bibEditCellContent');
-    var cell = $(event.target).parent().parent();
-    var foo = $(event.target).parent();
-    foo.submit();
-    if (!event.shiftKey) {
-      $(contentCells).eq($(contentCells).index(cell)+1).trigger('click');
-    }
-    else {
-      $(contentCells).eq($(contentCells).index(cell)-1).trigger('click');
-    }
-    event.preventDefault();
-  }
-}
+// function onKeyTab(event){
+//   /*
+//    * Handle key tab (save content and jump to next content field).
+//    */
+//   if (event.target.nodeName == 'TEXTAREA'){
+//     var contentCells = $('.bibEditCellContent');
+//     var cell = $(event.target).parent().parent();
+//     var foo = $(event.target).parent();
+//     foo.submit();
+//     if (!event.shiftKey) {
+//       $(contentCells).eq($(contentCells).index(cell)+1).trigger('click');
+//     }
+//     else {
+//       $(contentCells).eq($(contentCells).index(cell)-1).trigger('click');
+//     }
+//     event.preventDefault();
+//   }
+// }
 
 function onKeyCtrlUp(event) {
   /*
@@ -324,70 +324,70 @@ function onKeyCtrlDown(event) {
   gReady = true;
 }
 
-function onKeyCtrlShiftE(event) {
-  /*
-   * Handle key 'Ctrl+Shift+e' (add subfield to form).
-   */
-  var nodeName = event.target.nodeName;
-  if (nodeName == 'TD' || nodeName == 'INPUT' || nodeName == 'BUTTON' ||
-      nodeName == 'TEXTAREA'){
-    var rowGroup = $(event.target).closest('tbody')[0];
-    if (rowGroup){
-      var btnAddSubfield;
-      if (rowGroup.id.indexOf('rowGroupAddField')+1) {
-	// Add extra subfield to 'Add field' form.
-	var fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
-	if (!$('#chkAddFieldControlfield_' + fieldID).attr('checked'))
-	  btnAddSubfield = $('#btnAddFieldAddSubfield_' + fieldID);
-      }
-      else if (rowGroup.id.indexOf('rowGroup')+1)
-	// Add extra subfield to 'Add subfields' form.
-	btnAddSubfield = $('#btnAddSubfield_' + rowGroup.id.slice(
-			   rowGroup.id.indexOf('_')+1));
-      if (btnAddSubfield){
-	$(btnAddSubfield).trigger('click');
-	event.preventDefault();
-      }
-    }
-  }
-}
+// function onKeyCtrlShiftE(event) {
+//   /*
+//    * Handle key 'Ctrl+Shift+e' (add subfield to form).
+//    */
+//   var nodeName = event.target.nodeName;
+//   if (nodeName == 'TD' || nodeName == 'INPUT' || nodeName == 'BUTTON' ||
+//       nodeName == 'TEXTAREA'){
+//     var rowGroup = $(event.target).closest('tbody')[0];
+//     if (rowGroup){
+//       var btnAddSubfield;
+//       if (rowGroup.id.indexOf('rowGroupAddField')+1) {
+// 	// Add extra subfield to 'Add field' form.
+// 	var fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
+// 	if (!$('#chkAddFieldControlfield_' + fieldID).attr('checked'))
+// 	  btnAddSubfield = $('#btnAddFieldAddSubfield_' + fieldID);
+//       }
+//       else if (rowGroup.id.indexOf('rowGroup')+1)
+// 	// Add extra subfield to 'Add subfields' form.
+// 	btnAddSubfield = $('#btnAddSubfield_' + rowGroup.id.slice(
+// 			   rowGroup.id.indexOf('_')+1));
+//       if (btnAddSubfield){
+// 	$(btnAddSubfield).trigger('click');
+// 	event.preventDefault();
+//       }
+//     }
+//   }
+// }
 
-function onKeyCtrlShiftD(event) {
-  /*
-   * Handle key 'Ctrl+Shift+d' (remove subfield from form).
-   */
-  var nodeName = event.target.nodeName;
-  if (nodeName == 'TD' || nodeName == 'INPUT' || nodeName == 'BUTTON' ||
-      nodeName == 'TEXTAREA'){
-    var rowGroup = $(event.target).closest('tbody')[0];
-    if (rowGroup){
-      var fieldID, tmpNo, btnRemoveSubfield;
-      if (rowGroup.id.indexOf('rowGroupAddField')+1) {
-	// Remove extra subfield from 'Add field' form.
-	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
-	tmpNo = $('#rowGroupAddField_' + fieldID).data('freeSubfieldTmpNo')-1;
-	btnRemoveSubfield = $('#btnAddFieldRemove_' + fieldID + '_' + tmpNo);
-	while (!btnRemoveSubfield.length && tmpNo >= 1){
-	  tmpNo--;
-	  btnRemoveSubfield = $('#btnAddFieldRemove_' + fieldID + '_' + tmpNo);
-	}
-      }
-      else if (rowGroup.id.indexOf('rowGroup')+1) {
-	// Remove extra subfield from 'Add subfields' form.
-      	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
-	tmpNo = $('#rowGroup_' + fieldID).data('freeSubfieldTmpNo')-1;
-	btnRemoveSubfield = $('#btnAddSubfieldsRemove_' + fieldID + '_' +
-			      tmpNo);
-	while (!btnRemoveSubfield.length && tmpNo > 1) {
-	  tmpNo--;
-	  btnRemoveSubfield = $('#btnAddSubfieldsRemove_' + fieldID + '_' +
-				tmpNo);
-	}
-      }
-      if (btnRemoveSubfield.length) {
-	       $(btnRemoveSubfield).trigger('click');
-	       event.preventDefault();
-      }
-    }
-  }
-}
+// function onKeyCtrlShiftD(event) {
+//   /*
+//    * Handle key 'Ctrl+Shift+d' (remove subfield from form).
+//    */
+//   var nodeName = event.target.nodeName;
+//   if (nodeName == 'TD' || nodeName == 'INPUT' || nodeName == 'BUTTON' ||
+//       nodeName == 'TEXTAREA'){
+//     var rowGroup = $(event.target).closest('tbody')[0];
+//     if (rowGroup){
+//       var fieldID, tmpNo, btnRemoveSubfield;
+//       if (rowGroup.id.indexOf('rowGroupAddField')+1) {
+// 	// Remove extra subfield from 'Add field' form.
+// 	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
+// 	tmpNo = $('#rowGroupAddField_' + fieldID).data('freeSubfieldTmpNo')-1;
+// 	btnRemoveSubfield = $('#btnAddFieldRemove_' + fieldID + '_' + tmpNo);
+// 	while (!btnRemoveSubfield.length && tmpNo >= 1){
+// 	  tmpNo--;
+// 	  btnRemoveSubfield = $('#btnAddFieldRemove_' + fieldID + '_' + tmpNo);
+// 	}
+//       }
+//       else if (rowGroup.id.indexOf('rowGroup')+1) {
+// 	// Remove extra subfield from 'Add subfields' form.
+//       	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
+// 	tmpNo = $('#rowGroup_' + fieldID).data('freeSubfieldTmpNo')-1;
+// 	btnRemoveSubfield = $('#btnAddSubfieldsRemove_' + fieldID + '_' +
+// 			      tmpNo);
+// 	while (!btnRemoveSubfield.length && tmpNo > 1) {
+// 	  tmpNo--;
+// 	  btnRemoveSubfield = $('#btnAddSubfieldsRemove_' + fieldID + '_' +
+// 				tmpNo);
+// 	}
+//       }
+//       if (btnRemoveSubfield.length) {
+// 	       $(btnRemoveSubfield).trigger('click');
+// 	       event.preventDefault();
+//       }
+//     }
+//   }
+// }

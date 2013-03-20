@@ -39,7 +39,7 @@ class Template:
             '          %(imgCompressMenuSection)sRecord\n' \
             '          %(imgNewRecord)s\n' \
             '          %(imgCloneRecord)s\n' \
-            '          &nbsp;&nbsp;%(imgTemplateRecord)s\n' \
+            '          %(imgTemplateRecord)s\n' \
             '        </div>\n' \
             '        <table>\n' \
             '          <col width="28px">\n' \
@@ -274,7 +274,8 @@ class Template:
     def history_comparebox(self, ln, revdate, revdate_cmp, comparison):
         """ Display the bibedit history comparison box. """
         _ = gettext_set_language(ln)
-        title = '<b>%(comp)s</b><br />%(rev)s %(revdate)s<br />%(rev)s %(revdate_cmp)s' % {
+        title = '<b>%(comp)s</b><br /><span class="diff_field_added">%(rev)s %(revdate)s</span>\
+        <br /><span class="diff_field_deleted">%(rev)s %(revdate_cmp)s</span>' % {
             'comp': _('Comparison of:'),
             'rev': _('Revision'),
             'revdate': revdate,
@@ -301,6 +302,28 @@ class Template:
             value = value.replace('&gt;', '>')
 
         return value
+
+    def focuson(self):
+        html = """
+        <div id='display_div'>
+            <strong>Display</strong> <br />
+            <ul id='focuson_list' class='list-plain'>
+                <li>
+                    <input type="checkbox" name="references" id="focuson_references" value="references" checked/>
+                    <label for="focuson_references">References</label>
+                </li>
+                <li>
+                    <input type="checkbox" name="authors" id="focuson_authors" value="authors" checked/>
+                    <label for="focuson_authors">Authors</label>
+                </li>
+                <li>
+                    <input type="checkbox" name="others" id="focuson_others" value="others" checked/>
+                    <label for="focuson_others">Others</label>
+                </li>
+            </ul>
+        </div>
+        """
+        return html
 
 def img(src, _class='', **kargs):
     """Create an HTML <img> element."""
