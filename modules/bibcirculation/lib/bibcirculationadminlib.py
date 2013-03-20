@@ -79,8 +79,8 @@ from invenio.config import \
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
      CFG_BIBCIRCULATION_TEMPLATES, CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
-     CFG_BIBCIRCULATION_LOANS_EMAIL, CFG_BIBCIRCULATION_PROPOSAL_TYPE, \
-     CFG_BIBCIRCULATION_ACQ_STATUS
+     CFG_BIBCIRCULATION_LOANS_EMAIL, CFG_BIBCIRCULATION_ILLS_EMAIL, \
+     CFG_BIBCIRCULATION_PROPOSAL_TYPE, CFG_BIBCIRCULATION_ACQ_STATUS
 from invenio.bibcirculation_utils import book_title_from_MARC, \
       update_status_if_expired, \
       renew_loan_for_X_days, \
@@ -964,6 +964,7 @@ def claim_book_return(req, borrower_id, recid, loan_id,
                                                    subject=subject,
                                                    email_body=email_body,
                                                    borrower_id=borrower_id,
+                                                   from_address=CFG_BIBCIRCULATION_LOANS_EMAIL,
                                                    ln=ln)
 
 
@@ -2662,7 +2663,7 @@ def add_new_copy_step5(req, barcode, library, location, collection, description,
 
     infos = []
     if not db.barcode_in_use(barcode):
-        db.add_new_copy(barcode, recid, library, collection, location, description.strip().lower() or '-',
+        db.add_new_copy(barcode, recid, library, collection, location, description.strip() or '-',
                         loan_period, status, expected_arrival_date)
         update_requests_statuses(barcode)
     else:
@@ -2967,7 +2968,7 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
         infos.append(_("Item <strong>[%s]</strong> updated, but the <strong>status was not modified</strong>.") % (old_barcode))
 
     # update item information.
-    db.update_item_info(old_barcode, library_id, collection, location, description.strip().lower(),
+    db.update_item_info(old_barcode, library_id, collection, location, description.strip(),
                         loan_period, status, expected_arrival_date)
     update_requests_statuses(old_barcode)
     navtrail_previous_links = '<a class="navtrail"' \
@@ -3712,11 +3713,11 @@ def bor_ill_historical_overview(req, borrower_id, request_type='', ln=CFG_SITE_L
 
 
 
-def borrower_notification(req, borrower_id, borrower_email, template, message,
-                          load_msg_template, subject, send_message,
-                          ln=CFG_SITE_LANG):
+def borrower_notification(req, borrower_id, template, message, load_msg_template,
+                          subject, send_message, from_address, ln=CFG_SITE_LANG):
     """
-    Send a message/email to a borrower.
+    Send an email to a borrower or simply load and display an editable email
+    template.
 
     @type borrower_id:   integer.
     @param borrower_id:  identify the borrower. It is also the primary key of
@@ -3725,28 +3726,30 @@ def borrower_notification(req, borrower_id, borrower_email, template, message,
     @type borrower_email:   string.
     @param borrower_email:  The librarian can change the email manually.
                             In that case, this value will be taken instead
-                            of the borrower details email
+                            of the that in borrower details.
 
     @type template:      string.
-    @param template:     identify the template that will be used in the notification.
+    @param template:     The name of the notification template to be loaded.
+                         If the @param load_msg_template holds True, the
+                         template is not loaded.
 
     @type message:       string.
-    @param message:      message written by the administrator.
+    @param message:      Message to be sent if the flag @param send_message is set.
 
     @type subject:       string.
-    @param subject:      subject of the message.
+    @param subject:      Subject of the message.
 
-    @return:             send a message/email to a borrower.
+    @type from_address:  string.
+    @param from_address: From address in the message sent.
+
+    @return:             Display the email template or send an email to a borrower.
     """
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    if borrower_email != None:
-        email = borrower_email
-    else:
-        email = db.get_borrower_email(borrower_id)
+    email = db.get_borrower_email(borrower_id)
 
     if load_msg_template == 'False' and template is not None:
         # Do not load the template. It is the email body itself.
@@ -3754,10 +3757,11 @@ def borrower_notification(req, borrower_id, borrower_email, template, message,
                                                        subject=subject,
                                                        email_body=template,
                                                        borrower_id=borrower_id,
+                                                       from_address=from_address,
                                                        ln=ln)
 
     elif send_message:
-        send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
+        send_email(fromaddr = from_address,
                    toaddr   = email,
                    subject  = subject,
                    content  = message,
@@ -3774,6 +3778,7 @@ def borrower_notification(req, borrower_id, borrower_email, template, message,
                                                        subject=subject,
                                                        email_body=show_template,
                                                        borrower_id=borrower_id,
+                                                       from_address=from_address,
                                                        ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -4732,9 +4737,13 @@ def register_purchase_request_step3(req, request_type, recid, title, authors,
         if cash and budget_code == '':
             budget_code = 'cash'
 
-        borrower_email = db.get_invenio_user_email(id_user)
-        if borrower_id == '':
+
+        if borrower_id:
+            borrower_email = db.get_borrower_email(borrower_id)
+        else:
+            borrower_email = db.get_invenio_user_email(id_user)
             borrower_id = db.get_borrower_id_by_email(borrower_email)
+
         db.ill_register_request_on_desk(borrower_id, item_info,
                                         period_of_interest_from,
                                         period_of_interest_to,
@@ -4743,7 +4752,7 @@ def register_purchase_request_step3(req, request_type, recid, title, authors,
                                         this_edition_only, request_type, budget_code)
 
         msg_for_user = load_template('purchase_notification') % title
-        send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
+        send_email(fromaddr = CFG_BIBCIRCULATION_ILLS_EMAIL,
                    toaddr   = borrower_email,
                    subject  = _("Your book purchase request"),
                    header = '', footer = '',
@@ -4784,8 +4793,9 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status,
     if delete_key and ill_request_id:
         if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
             library_notes = eval(db.get_ill_request_notes(ill_request_id))
-            del library_notes[delete_key]
-            db.update_ill_request_notes(ill_request_id, library_notes)
+            if delete_key in library_notes.keys():
+                del library_notes[delete_key]
+                db.update_ill_request_notes(ill_request_id, library_notes)
 
     if new_status:
         db.update_ill_request_status(ill_request_id, new_status)
@@ -4846,8 +4856,9 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status,
     if delete_key and ill_request_id:
         if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
             library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-            del library_previous_notes[delete_key]
-            db.update_ill_request_notes(ill_request_id, library_previous_notes)
+            if delete_key in library_previous_notes.keys():
+                del library_previous_notes[delete_key]
+                db.update_ill_request_notes(ill_request_id, library_previous_notes)
 
     if db.get_ill_request_notes(ill_request_id):
         if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
@@ -4894,10 +4905,10 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status,
                                create_url(CFG_SITE_SECURE_URL +
                                           '/admin2/bibcirculation/borrower_notification',
                                           {'borrower_id': bid,
-                                           'borrower_email': db.get_borrower_email(bid),
                                            'subject': subject,
                                            'load_msg_template': False,
-                                           'template': msg
+                                           'template': msg,
+                                           'from_address': CFG_BIBCIRCULATION_ILLS_EMAIL
                                            }
                                           )
                                )
@@ -4920,8 +4931,9 @@ def purchase_details_step1(req, delete_key, ill_request_id, new_status,
     if delete_key and ill_request_id:
         if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
             library_notes = eval(db.get_ill_request_notes(ill_request_id))
-            del library_notes[delete_key]
-            db.update_ill_request_notes(ill_request_id, library_notes)
+            if delete_key in library_notes.keys():
+                del library_notes[delete_key]
+                db.update_ill_request_notes(ill_request_id, library_notes)
 
     if new_status:
         db.update_ill_request_status(ill_request_id, new_status)
@@ -4979,8 +4991,9 @@ def purchase_details_step2(req, delete_key, ill_request_id, new_status,
     if delete_key and ill_request_id:
         if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
             library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-            del library_previous_notes[delete_key]
-            db.update_ill_request_notes(ill_request_id, library_previous_notes)
+            if delete_key in library_previous_notes.keys():
+                del library_previous_notes[delete_key]
+                db.update_ill_request_notes(ill_request_id, library_previous_notes)
 
     if db.get_ill_request_notes(ill_request_id):
         if looks_like_dictionary(db.get_ill_request_notes(ill_request_id)):
@@ -5031,9 +5044,9 @@ def purchase_details_step2(req, delete_key, ill_request_id, new_status,
                                            create_url(CFG_SITE_SECURE_URL +
                                            '/admin2/bibcirculation/borrower_notification',
                                            {'borrower_id': bid,
-                                            'borrower_email': db.get_borrower_email(bid),
                                             'subject': subject,
-                                            'template': template
+                                            'template': template,
+                                            'from_address': CFG_BIBCIRCULATION_ILLS_EMAIL
                                             }
                                             )
                                            )
@@ -5073,10 +5086,10 @@ def purchase_details_step2(req, delete_key, ill_request_id, new_status,
                                create_url(CFG_SITE_SECURE_URL +
                                           '/admin2/bibcirculation/borrower_notification',
                                           {'borrower_id': bid,
-                                           'borrower_email': db.get_borrower_email(bid),
                                            'subject': subject,
                                            'load_msg_template': False,
-                                           'template': msg
+                                           'template': msg,
+                                           'from_address': CFG_BIBCIRCULATION_ILLS_EMAIL
                                            }
                                           )
                                )
@@ -5106,8 +5119,9 @@ def get_ill_library_notes(req, ill_id, delete_key, library_notes,
     if delete_key and ill_id:
         if looks_like_dictionary(db.get_ill_notes(ill_id)):
             ill_notes = eval(db.get_ill_notes(ill_id))
-            del ill_notes[delete_key]
-            db.update_ill_notes(ill_id, ill_notes)
+            if delete_key in ill_notes.keys():
+                del ill_notes[delete_key]
+                db.update_ill_notes(ill_id, ill_notes)
 
     elif library_notes:
         if db.get_ill_notes(ill_id):
@@ -5725,8 +5739,9 @@ def get_library_notes(req, library_id, delete_key,
     if delete_key and library_id:
         if looks_like_dictionary(db.get_library_notes(library_id)):
             lib_notes = eval(db.get_library_notes(library_id))
-            del lib_notes[delete_key]
-            db.update_library_notes(library_id, lib_notes)
+            if delete_key in lib_notes.keys():
+                del lib_notes[delete_key]
+                db.update_library_notes(library_id, lib_notes)
 
     elif library_notes:
         if db.get_library_notes(library_id):

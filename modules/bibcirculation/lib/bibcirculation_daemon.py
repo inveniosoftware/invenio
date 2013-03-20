@@ -36,6 +36,7 @@ from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
                                           CFG_BIBCIRCULATION_LOANS_EMAIL, \
+                                          CFG_BIBCIRCULATION_ILLS_EMAIL, \
                                           CFG_BIBCIRCULATION_REQUEST_STATUS_WAITING, \
                                           CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED
 
@@ -85,7 +86,7 @@ def update_expired_loan(loan_id, ill=0):
                """, (CFG_BIBCIRCULATION_LOAN_STATUS_EXPIRED,
                      loan_id))
 
-def send_overdue_letter(borrower_id, subject, content):
+def send_overdue_letter(borrower_id, from_address, subject, content):
     """
     Send an overdue letter
 
@@ -98,7 +99,7 @@ def send_overdue_letter(borrower_id, subject, content):
 
     to_borrower = db.get_borrower_email(borrower_id)
 
-    send_email(fromaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
+    send_email(fromaddr=from_address,
                toaddr=to_borrower,
                subject=subject,
                content=content,
@@ -210,7 +211,7 @@ def task_run_core():
                 subject = "LOAN RECALL: " + title
 
                 update_expired_loan(loan_id)
-                send_overdue_letter(borrower_id, subject, content)
+                send_overdue_letter(borrower_id, CFG_BIBCIRCULATION_LOANS_EMAIL, subject, content)
 
             if done % 10 == 0:
                 task_update_progress("Loan recall: sent %d out of %d." % (done, total_expired_loans))
@@ -244,7 +245,7 @@ def task_run_core():
                     book_title = item_info['title']
                     subject = "ILL RECALL: " + str(book_title)
                     update_expired_loan(loan_id=ill_id, ill=1)
-                    send_overdue_letter(borrower_id, subject, content)
+                    send_overdue_letter(borrower_id, CFG_BIBCIRCULATION_ILLS_EMAIL, subject, content)
             if done % 10 == 0:
                 task_update_progress("ILL recall: sent %d out of %d." % (done, total_expired_ills))
                 task_sleep_now_if_required(can_stop_too=True)

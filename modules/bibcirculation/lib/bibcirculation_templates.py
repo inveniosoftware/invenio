@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import datetime
 import cgi
-
+from time import localtime
 import invenio.dateutils as dateutils
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
@@ -48,6 +48,8 @@ from invenio.bibcirculation_config import \
     CFG_BIBCIRCULATION_LIBRARY_TYPE, \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
+    CFG_BIBCIRCULATION_LOANS_EMAIL, \
+    CFG_BIBCIRCULATION_ILLS_EMAIL, \
     CFG_BIBCIRCULATION_ITEM_STATUS, \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_SHELF, \
@@ -5633,7 +5635,7 @@ onClick="location.href='%s/admin2/bibcirculation/list_purchase?ln=%s&status=%s&r
             <br />
             """ % (CFG_SITE_URL, ln, recid, _("Add new copy"),
     _("Hold requests and loans overview on %(date)s")
-    % {'date': dateutils.convert_datestruct_to_datetext(dateutils.localtime())},
+    % {'date': dateutils.convert_datestruct_to_datetext(localtime())},
     _("Hold requests"), len(requests), _("More details"), CFG_SITE_URL, ln, recid,
     _("Loans"), len(loans), _("More details"), CFG_SITE_URL, ln, recid,
     _("Purchases"), len(purchases), _("More details"), CFG_SITE_URL, ln,
@@ -7976,12 +7978,12 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                 value='%s' class='formbutton'>
 
             <input type=button
-    onClick="location.href='%s/admin2/bibcirculation/borrower_notification?ln=%s&borrower_id=%s'"
+    onClick="location.href='%s/admin2/bibcirculation/borrower_notification?ln=%s&borrower_id=%s&from_address=%s'"
                 value='%s' class='formbutton'>
         """ % (CFG_SITE_URL, ln, borrower_id, _("New loan"),
                CFG_SITE_URL, ln, borrower_id, _("New request"),
                CFG_SITE_URL, ln, borrower_id, _("New ILL request"),
-               CFG_SITE_URL, ln, borrower_id, _("Notify this borrower"))
+               CFG_SITE_URL, ln, borrower_id, CFG_BIBCIRCULATION_LOANS_EMAIL, _("Notify this borrower"))
 
         if CFG_CERN_SITE:
             out += """
@@ -8111,7 +8113,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
         <br />
         </div>
         """ % (_("Requests, Loans and ILL overview on"),
-               dateutils.convert_datestruct_to_datetext(dateutils.localtime()),
+               dateutils.convert_datestruct_to_datetext(localtime()),
                _("Requests"), nb_requests, CFG_SITE_URL, ln, borrower_id,
                _("More details"),
                _("Loans"), nb_loans, CFG_SITE_URL, ln, borrower_id,
@@ -8614,8 +8616,8 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
 
         return out
 
-    def tmpl_borrower_notification(self, email, subject, email_body,
-                                   borrower_id, ln=CFG_SITE_LANG):
+    def tmpl_borrower_notification(self, email, subject, email_body, borrower_id,
+                                   from_address, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
@@ -8634,6 +8636,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
               method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value="%s">
+            <input type=hidden name=from_address value="%s">
             <br />
             <table class="tablesortermedium" border="0" cellpadding="0" cellspacing="1">
                 <tr>
@@ -8642,19 +8645,15 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                 </tr>
                 <tr>
                     <th width="50">%s</th>
+                    <td>%s</td>
+                </tr>
         """ % (CFG_SITE_URL,
                borrower_id,
+               from_address,
                _("From"),
                _("CERN Library"),
-               _("To"))
-
-        out += """
-        <td>
-        <input type="text" name="borrower_email"
-               size="60" style='border: 1px solid #cfcfcf' value="%s">
-        </td>
-        </tr>
-        """ % (email)
+               _("To"),
+               email)
 
         out += """
             <tr>
@@ -8700,7 +8699,7 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                     </select>
                     <br />
                     <br />
-                    <input type="submit" name="load_template" value='%s' class="formbutton">
+                    <button type="submit" name="load_msg_template" value="True" class="formbutton">%s</button>
                </td>
                </tr>
         </table>
@@ -13601,9 +13600,9 @@ onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid
                     subject = _("Inter library loan recall: ") + str(title)
 
                     out += """
-                       <input type=button onClick="location.href='%s/admin2/bibcirculation/borrower_notification?borrower_id=%s&borrower_email=%s&subject=%s&load_msg_template=True&template=%s'"
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/borrower_notification?borrower_id=%s&subject=%s&load_msg_template=True&template=%s&from_address=%s'"
                        onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'" value="%s" class='bibcircbutton'>
-                    """ % (CFG_SITE_URL, borrower_id, db.get_borrower_email(borrower_id), subject, 'ill_recall1', _('Send Recall'))
+                    """ % (CFG_SITE_URL, borrower_id, subject, 'ill_recall1', CFG_BIBCIRCULATION_ILLS_EMAIL, _('Send Recall'))
 
                 out +=   """</td>
                           </tr>

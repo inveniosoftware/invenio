@@ -66,7 +66,7 @@ from invenio.bibcirculation import perform_new_request, \
                                    ill_register_request_with_recid
 from invenio.bibcirculationadminlib import is_adminuser, \
                                            load_template
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LOANS_EMAIL, \
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_ILLS_EMAIL, \
                                           CFG_BIBCIRCULATION_ILL_STATUS_NEW, \
                                           CFG_BIBCIRCULATION_ACQ_STATUS_NEW, \
                                           AMZ_ACQUISITION_IDENTIFIER_TAG
@@ -793,7 +793,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                                             budget_code)
 
             msg_for_user = load_template('purchase_notification') % title
-            send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
+            send_email(fromaddr = CFG_BIBCIRCULATION_ILLS_EMAIL,
                        toaddr   = borrower_email,
                        subject  = _("Your book purchase request"),
                        header = '', footer = '',

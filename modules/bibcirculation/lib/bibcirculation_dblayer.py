@@ -1417,24 +1417,24 @@ def get_holdings_information(recid, include_hidden_libraries=True):
 def get_number_copies(recid):
     """
     Get the number of copies of a given recid.
-
+    This function is used by the 'BibEdit' module to display the
+    number of copies for the record being edited.
     @param recid: identify the record. Primary key of bibrec.
     @type recid: int
 
     @return number_of_copies
     """
-
-    if type(recid) is not int:
+    try:
+        recid = int(recid)
+    except ValueError:
         return 0
 
-    else:
-
-        res = run_sql("""SELECT count(barcode)
+    res = run_sql("""SELECT count(barcode)
                      FROM crcITEM
                      WHERE id_bibrec=%s
                   """, (recid, ))
 
-        return res[0][0]
+    return res[0][0]
 
 def has_copies(recid):
     """
