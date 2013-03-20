@@ -48,6 +48,7 @@ class WebDepositDraft(db.Model):
                 autoincrement=False)
     form_type = db.Column(db.String(45), nullable=False)
     form_values = db.Column(db.JSON, nullable=False)
+    status = db.Column(db.Integer(15, unsigned=True), autoincrement=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     workflow = db.relationship(Workflow, backref='drafts')
 

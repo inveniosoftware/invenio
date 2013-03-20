@@ -32,6 +32,8 @@ class TitleField(WebDepositField, TextField, JsonCookerMixinBuilder('title')):
 
     def pre_validate(self, form=None):
         value = self.data
+        if value == "" or value.isspace():
+            return dict(error=0, error_message='')
         error_message = 'Document Title must have at least 4 characters'
         if len(str(value)) < 4:
             try:
@@ -39,6 +41,6 @@ class TitleField(WebDepositField, TextField, JsonCookerMixinBuilder('title')):
             except AttributeError:
                 self.errors = list(self.process_errors)
                 self.errors.append(error_message)
-            return dict(error=1, \
-                   error_message=error_message)
+            return dict(error=1,
+                        error_message=error_message)
         return dict(error=0, error_message='')

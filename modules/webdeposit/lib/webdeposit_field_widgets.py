@@ -71,3 +71,20 @@ def bootstrap_submit(field, **kwargs):
                                         value=field.label.text,)
     html = [u'<div style="float:right;" >' + html + u'</div>']
     return HTMLString(u''.join(html))
+
+
+def ckeditor_widget(field, **kwargs):
+    field.ckeditor = True
+    field_id = kwargs.pop('id', field.id)
+    html = [u'<textarea %s >'
+            % html_params(id=field_id, name=field_id)]
+    if field.data is not None:
+        html.append('%s</textarea>' % field.data)
+    else:
+        html.append('</textarea>')
+    return HTMLString(u''.join(html))
+
+    field_id = "ckeditor_" + field_id
+    html = [u'<textarea %s ></textarea>'
+            % html_params(id=field_id, name=field_id)]
+    return HTMLString(u''.join(html))

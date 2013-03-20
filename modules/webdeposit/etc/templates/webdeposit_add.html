@@ -18,17 +18,22 @@
 #}
 
 {% extends "page.html" %}
+
+
 {% block header %}
     {{ super() }}
-    <script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
-    {% js 'js/plupload/plupload.full.js' %}
-    {% js 'js/webdeposit_form.js' %}
-    {% js 'js/jquery-ui.min.js' %}
-    {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css' %}
-    {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css' %}
+    {% js 'js/jquery-ui.min.js', '20-jquery-ui' %}
+    {% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
+    {% js 'js/webdeposit_form.js', '50-webdeposit' %}
+    {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
+    {% js 'ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
+    {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '20-jquery-ui' %}
+    {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css', '20-jquery-ui' %}
+
 {% endblock %}
 
 {% block body %}
+
 <style>
 
 .ui-autocomplete-loading { background: white url('{{ url_for('static', filename='img/loading.gif') }}') right center no-repeat; }
@@ -170,12 +175,12 @@ div#conditions{
           </div>
 
         <div class="controls" id="field-{{ subfield.name }}">
-              {% if subfield._icon_html and "pluploader" not in subfield.__html__() %}
+              {% if subfield._icon_html and "pluploader" not in subfield.__html__() and not field.ckeditor %}
                 <div class="input-prepend">
                     <span class="add-on">
                     {{ subfield._icon_html|safe }}
                     </span>
-              {% elif "pluploader" not in subfield.__html__() %}
+              {% elif "pluploader" not in subfield.__html__() and not field.ckeditor %}
                 <div style="margin-left: 27px;">
               {% else %}
                 <div>
@@ -211,12 +216,12 @@ div#conditions{
     {% else %}
 
     <div class="controls" id="field-{{ field.name }}">
-          {% if field._icon_html and "pluploader" not in field.__html__() %}
+          {% if field._icon_html and "pluploader" not in field.__html__() and not field.ckeditor %}
             <div class="input-prepend">
                 <span class="add-on">
                 {{ field._icon_html|safe }}
                 </span>
-          {% elif "pluploader" not in field.__html__() %}
+          {% elif "pluploader" not in field.__html__() and not field.ckeditor %}
             <div style="margin-left: 27px;">
           {% else %}
             <div>
@@ -250,6 +255,12 @@ div#conditions{
 
 <div class="alert alert-error" id="empty-fields-error" style="font-size:12px; display:none;"></div>
 
+{% endblock %}
+
+
+{% block javascript %}
+{{ super() }}
+<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -259,16 +270,28 @@ $(document).ready(function() {
                             '{{ url_for('webdeposit.plupload', deposition_type=deposition_type, uuid=uuid) }}',
                             '{{ url_for('webdeposit.plupload_delete', deposition_type=deposition_type, uuid=uuid) }}',
                             '{{ url_for('webdeposit.plupload_get_file', deposition_type=deposition_type, uuid=uuid) }}',
-                            {{ form.files|safe }})
+                            {{ form.files|safe }});
+
   webdeposit_input_error_check('#submitForm input, #submitForm textarea, #submitForm select',
                                '{{ url_for("webdeposit.error_check", deposition_type=deposition_type, uuid=uuid) }}',
-                               required_fields)
+                               required_fields);
+
+  webdeposit_check_status('{{ url_for('webdeposit.check_status', deposition_type=deposition_type, uuid=uuid) }}');
+
 {% for field in form %}
-  {% if field.autocomplete %}
-  webdeposit_field_autocomplete('input[name="{{ field.name }}"]',
-                                '{{ url_for("webdeposit.autocomplete", deposition_type=deposition_type, uuid=uuid, type=field.name) }}')
-  {% endif %}
+    {% if field.autocomplete %}
+        webdeposit_field_autocomplete('input[name="{{ field.name }}"]',
+                                    '{{ url_for("webdeposit.autocomplete", deposition_type=deposition_type, uuid=uuid, type=field.name) }}');
+    {% endif %}
+
+    {% if field.ckeditor %}
+        webdeposit_ckeditor_init( '{{ field.id }}',
+                                  '{{ url_for("webdeposit.error_check", deposition_type=deposition_type, uuid=uuid) }}',
+                                  required_fields );
+    {% endif %}
+
 {% endfor %}
+
   $(".datepicker").datepicker();
 
   $("input#submitButton").click(function(e ) {

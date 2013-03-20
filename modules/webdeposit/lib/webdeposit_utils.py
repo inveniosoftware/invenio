@@ -33,6 +33,12 @@ from invenio.webdeposit_workflow import DepositionWorkflow
 """ Deposition Type Functions """
 
 
+CFG_DRAFT_STATUS = {
+    'unfinished': 0,
+    'finished': 1
+}
+
+
 def get_latest_or_new_workflow(deposition_type):
     """ Creates new workflow or returns a new one """
 
@@ -219,17 +225,65 @@ def get_form(user_id, uuid, step=None):
         elif field_name in draft_data:
             form[field_name].process_data(draft_data[field_name])
 
-
     import json
     if 'files' in draft_data:
         for file_metadata in draft_data['files']:
-            file_metadata['unique_filename'] = file_metadata['file'].split('/')[-1]
+            # Replace the path with the unique filename
+            filepath = file_metadata['file'].split('/')
+            unique_filename = filepath[-1]
+            file_metadata['unique_filename'] = unique_filename
             del file_metadata['file']
-        form.__setattr__('files', json.dumps(draft_data['files']))
+        form.__setattr__('files', draft_data['files'])
     else:
         form.__setattr__('files', {})
     return form
 
+
+def get_form_status(user_id, uuid, step=None):
+    if step is None:
+        webdeposit_draft_query = db.session.query(WebDepositDraft).\
+                                join(Workflow).\
+                                filter(
+                                Workflow.user_id == user_id,
+                                WebDepositDraft.uuid == uuid)
+        try:
+            # get the draft with the max step
+            webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+        except ValueError:
+            return None
+    else:
+        webdeposit_draft = db.session.query(WebDepositDraft).\
+                            join(Workflow).\
+                            filter(
+                            Workflow.user_id == user_id,
+                            WebDepositDraft.uuid == uuid,
+                            WebDepositDraft.step == step).one()
+
+    return webdeposit_draft.status
+
+
+def set_form_status(user_id, uuid, status, step=None):
+    if step is None:
+        webdeposit_draft_query = db.session.query(WebDepositDraft).\
+                                join(Workflow).\
+                                filter(
+                                Workflow.user_id == user_id,
+                                WebDepositDraft.uuid == uuid)
+        try:
+            # get the draft with the max step
+            webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+        except ValueError:
+            return None
+    else:
+        webdeposit_draft = db.session.query(WebDepositDraft).\
+                            join(Workflow).\
+                            filter(
+                            Workflow.user_id == user_id,
+                            WebDepositDraft.uuid == uuid,
+                            WebDepositDraft.step == step).one()
+
+    webdeposit_draft.status = status
+    db.session.commit()
 
 def get_last_step(steps):
     if type(steps[-1]) is list:

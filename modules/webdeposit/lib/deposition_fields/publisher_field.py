@@ -68,11 +68,11 @@ class PublisherField(WebDepositField, TextField, JsonCookerMixinBuilder('publish
                 if isinstance(copyright_links['copyrightlink'], list):
                     for copyright in copyright_links['copyrightlink']:
                         copyright_links_html = '<a href="' + copyright['copyrightlinkurl'] + \
-                                            '">' + copyright['copyrightlinktext'] + "</a><br>"
+                                               '">' + copyright['copyrightlinktext'] + "</a><br>"
                 else:
                     copyright = copyright_links['copyrightlink']
                     copyright_links_html = '<a href="' + copyright['copyrightlinkurl'] + \
-                                            '">' + copyright['copyrightlinktext'] + "</a><br>"
+                                           '">' + copyright['copyrightlinktext'] + "</a><br>"
 
             home_url = s.parser.get_publishers(attribute='homeurl')
             if home_url is not None and home_url != []:

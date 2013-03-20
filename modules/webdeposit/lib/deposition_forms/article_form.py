@@ -21,7 +21,8 @@ from wtforms import SubmitField
 from wtforms.validators import Required
 from invenio.wtforms_utils import InvenioForm as Form
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_field_widgets import date_widget, plupload_widget, bootstrap_submit
+from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
+                                             bootstrap_submit, ckeditor_widget
 
 # Import custom fields
 from invenio.webdeposit_load_fields import fields
@@ -36,7 +37,7 @@ class ArticleForm(Form):
     issn = fields.ISSNField(label='ISSN')
     title = fields.TitleField(label=_('Document Title'))
     author = fields.AuthorField(label=_('Author'))
-    abstract = fields.AbstractField(label=_('Abstract'))
+    abstract = fields.AbstractField(label=_('Abstract'), widget=ckeditor_widget)
     pagesnum = fields.PagesNumberField(label=_('Number of Pages'))
     languages = [("en", _("English")),
                 ("fre", _("French")),

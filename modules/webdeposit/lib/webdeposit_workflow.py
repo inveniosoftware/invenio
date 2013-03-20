@@ -125,11 +125,12 @@ class DepositionWorkflow(object):
             (check CFG_WORKFLOW_STATUS from bibworkflow_engine)
         """
         finished = Workflow.query.filter(Workflow.uuid == self.get_uuid()).one().\
-                        counter_finished >= 1
+                                         counter_finished >= 1
 
         if finished:
             return CFG_WORKFLOW_STATUS['finished']
-        return Workflow.query.filter(Workflow.uuid == self.get_uuid()).one().status
+        else:
+            return CFG_WORKFLOW_STATUS['running']
 
     def get_output(self, form_validation=None):
         """ Returns a representation of the current state of the workflow
@@ -177,7 +178,7 @@ class DepositionWorkflow(object):
         self.update_db()
 
     def jump_forward(self, synchronize=False):
-        restart_workflow(self.eng, [self.bib_obj], 'next')
+        restart_workflow(self.eng, [self.bib_obj], 'next', stop_on_halt=True)
 
     def jump_backwards(self, synchronize=False):
         if self.current_step > 1:
@@ -206,11 +207,9 @@ class DepositionWorkflow(object):
         obj.pop('step')
         obj.pop('deposition_type')
         WebDepositWorkflow.query.filter(WebDepositWorkflow.uuid == uuid).\
-            update({
-                'status': self.get_status(),
-                'current_step': self.current_step,
-                'obj_json': obj
-                })
+            update({'status': self.get_status(),
+                    'current_step': self.current_step,
+                    'obj_json': obj})
         db.session.commit()
 
     def update_workflow_object(self):

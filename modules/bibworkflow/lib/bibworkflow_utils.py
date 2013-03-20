@@ -22,8 +22,6 @@ import logging
 from invenio.bibrecord import create_record
 from sqlalchemy import func
 from invenio.sqlalchemyutils import db
-from invenio.webdeposit_model import WebDepositDraft, \
-                                     WebDepositWorkflow
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR
 
@@ -49,47 +47,6 @@ def create_objects(path_to_file):
         bwo = BibWorkflowObject(rec, "bibrecord")
         list_of_bwo.append(bwo)
     return list_of_bwo
-
-
-def authorize_user(user_id=None):
-    def user_auth(obj, eng):
-        if user_id is not None:
-            obj.data['user_id'] = user_id
-        else:
-            from invenio.webuser_flask import current_user
-            obj.data['user_id'] = current_user.get_id()
-    return user_auth
-
-
-def render_form(form):
-    def render(obj, eng):
-        uuid = eng.uuid
-        # if 'user_id' in obj.data:
-        #     user_id = obj.data['user_id']
-        # else:
-        #     from invenio.webuser_flask import current_user
-        #     user_id = current_user.get_id()
-        # deposition_type = obj.data['deposition_type']
-
-        # TODO: get the current step from the object
-        step = max(obj.db_obj.task_counter)  # data['step']
-        form_type = form.__name__
-        webdeposit_draft = WebDepositDraft(uuid=uuid,
-                                  form_type=form_type,
-                                  form_values={},
-                                  step=step,
-                                  timestamp=func.current_timestamp())
-        db.session.add(webdeposit_draft)
-        db.session.commit()
-    return render
-
-
-def wait_for_submission():
-    def wait(obj, eng):
-        eng.haltProcessing(msg='Waiting for form submission.')
-        #obj.data['break'] = True
-        #eng.current_step -= 1
-    return wait
 
 
 def getWorkflowDefinition(name):
@@ -136,3 +93,4 @@ class dictproperty(object):
         if obj is None:
             return self
         return self._proxy(obj, self._fget, self._fset, self._fdel)
+

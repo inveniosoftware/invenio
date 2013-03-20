@@ -51,7 +51,10 @@ from invenio.webdeposit_utils import get_current_form, \
                                      get_workflow, \
                                      draft_field_get_all, \
                                      draft_field_error_check, \
-                                     draft_field_get
+                                     draft_field_get, \
+                                     set_form_status, \
+                                     get_form_status, \
+                                     CFG_DRAFT_STATUS
 from invenio.webuser_flask import current_user
 from invenio.bibworkflow_engine import CFG_WORKFLOW_STATUS
 from invenio.bibworkflow_model import Workflow
@@ -179,6 +182,13 @@ def plupload_get_file(deposition_type, uuid):
             return send_file(f['file'], attachment_filename=f['name'], as_attachment=True)
 
     return "filename: " + filename + '<br>' + tmp
+
+
+@blueprint.route('/check_status/<deposition_type>/<uuid>/', methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+def check_status(deposition_type, uuid):
+    form_status = get_form_status(current_user.get_id(), uuid)
+    return jsonify({"status": form_status})
 
 
 @blueprint.route('/<deposition_type>/_autocomplete/<uuid>', methods=['GET', 'POST'])
@@ -348,10 +358,10 @@ def add(deposition_type, uuid=None):
                 continue
             file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, filename)
             uploaded_file.save(file_path)
-            draft_field_list_add(current_user.get_id(), \
-                     uuid, \
-                     "files", \
-                     file_path)
+            draft_field_list_add(current_user.get_id(),
+                                 uuid,
+                                 "files",
+                                 file_path)
 
         # Save form values
         for (field_name, value) in request.form.items():
@@ -366,10 +376,10 @@ def add(deposition_type, uuid=None):
             return render_template('webdeposit_add.html',
                                   **workflow.get_output(form_validation=True))
 
-        # Submission, proceed to the next steps
-        workflow.jump_forward()
-    else:
-        workflow.run()
+        #Set the latest form status to finished
+        set_form_status(current_user.get_id(), uuid, CFG_DRAFT_STATUS['finished'])
+
+    workflow.run()
     status = workflow.get_status()
 
     if status == 0:

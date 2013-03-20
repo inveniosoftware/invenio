@@ -32,6 +32,8 @@ class PagesNumberField(WebDepositField, TextField, JsonCookerMixinBuilder('page_
 
     def pre_validate(self, form=None):
         value = self.data
+        if value == "" or value.isspace():
+            return dict(error=0, error_message='')
 
         def is_number(s):
             try:
@@ -40,16 +42,14 @@ class PagesNumberField(WebDepositField, TextField, JsonCookerMixinBuilder('page_
             except ValueError:
                 return False
 
-        if value.isspace():
-            return dict(error=0, error_message='')
-        elif not is_number(value):
+        if not is_number(value):
             error_message = 'Pages number must be a number!'
             try:
                 self.errors.append(error_message)
             except AttributeError:
                 self.errors = list(self.process_errors)
                 self.errors.append(error_message)
-            return dict(error=1, \
+            return dict(error=1,
                         error_message=error_message)
         else:
             return dict(error=0, error_message='')

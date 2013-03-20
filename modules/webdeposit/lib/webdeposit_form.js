@@ -17,6 +17,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
+
 /*
  * Plupload
  */
@@ -267,6 +268,22 @@ function webdeposit_input_error_check(selector, url, required_fields) {
 }
 
 
+/*
+ * CKEditor
+ */
+
+function webdeposit_ckeditor_init(selector, url, required_fields) {
+    CKEDITOR.replace(selector);
+
+    var ckeditor = CKEDITOR.instances[selector];
+    ckeditor.on('blur',function(event){
+        webdeposit_handle_new_value(selector, ckeditor.getData(), url, required_fields)
+    });
+}
+
+/********************************************************/
+
+
 function checkEmptyFields(all_fields, field, required_fields) {
     var emptyFields = "";
     var empty = 0;
@@ -325,6 +342,19 @@ function webdeposit_field_autocomplete(selector, url) {
       minLength: 5,
       items: 50
     });
+}
+
+
+function webdeposit_check_status(url){
+    setInterval(function() {
+        $.ajax({
+            type: 'GET',
+            url: url
+        }).done(function(data) {
+            if (data.status == 1)
+                location.reload();
+        })
+    }, 7000);
 }
 
 /*
