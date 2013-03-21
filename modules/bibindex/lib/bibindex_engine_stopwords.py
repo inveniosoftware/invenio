@@ -19,8 +19,8 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE, \
-     CFG_BIBINDEX_REMOVE_STOPWORDS
+from invenio.config import CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE
+
 
 def create_stopwords(filename=CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE):
     """Create stopword dictionary out of FILENAME."""
@@ -46,7 +46,6 @@ def is_stopword(word, force_check=0):
        useful for ranking.
     """
     # note: input word is assumed to be in lowercase
-    if (CFG_BIBINDEX_REMOVE_STOPWORDS or force_check) and \
-           stopwords.has_key(word):
+    if stopwords.has_key(word):
         return True
     return False

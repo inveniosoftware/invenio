@@ -86,19 +86,42 @@ def remove_latex_markup(phrase):
     ret_phrase += phrase[index:]
     return ret_phrase
 
-def apply_stemming_and_stopwords_and_length_check(word, stemming_language):
-    """Return WORD after applying stemming and stopword and length checks.
-       See the config file in order to influence these.
+
+def apply_stemming(word, stemming_language):
+    """Returns word after applying stemming (if stemming language is set).
+       You can change your stemming language in database.
+
+       @param word: word to be checked
+       @type word: str
+       @param stemming_language: abbreviation of language or None
+       @type stemming_language: str
     """
-    # now check against stopwords:
-    if is_stopword(word):
-        return ""
-    # finally check the word length:
-    if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
-        return ""
-    # stem word, when configured so:
     if stemming_language:
         word = stem(word, stemming_language)
+    return word
+
+
+def remove_stopwords(word, remove='Yes'):
+    """Returns word after stopword check.
+
+       @param word: word to be checked
+       @type word: str
+       @param remove: if 'remove' is set to 'No' function will have no effect in any case.
+       @type word: str
+    """
+    if remove == 'Yes':
+        if is_stopword(word):
+            return ""
+    return word
+
+def length_check(word):
+    """Returns word after length check.
+
+       @param word: word to be checked
+       @type word: str
+    """
+    if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
+        return ""
     return word
 
 def wash_index_term(term, max_char_length=50, lower_term=True):

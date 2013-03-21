@@ -108,7 +108,7 @@ class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
 
         base = "/admin/bibindex/bibindexadmin.py/editindex"
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifysynonymkb'}
-        url = make_url(base,**parameters)
+        url = make_url(base, **parameters)
 
         browser = get_authenticated_mechanize_browser("admin","")
         browser.open(url)
@@ -125,8 +125,68 @@ class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
             error_messages = """There is no "Operation successfully completed." in html response."""
             self.fail(merge_error_messages(error_messages))
 
+
+class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
+    """Tests BibIndexAdmin's ability to change stopwords configuration details for indexes.
+       Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
+    """
+
+    def setUp(self):
+        self.re_operation_successfull = re.compile(r"Operation successfully completed")
+        self.re_stopwords_not_changed = re.compile(r"Stopwords have not been changed")
+
+    def test_change_title_index_remove_stopword_configuration(self):
+        """tests if index's remove stopwords configuration can be changed"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
+        url = make_url(base, **parameters)
+
+        browser = get_authenticated_mechanize_browser("admin","")
+        browser.open(url)
+        browser.select_form(nr=0)
+        form = browser.form
+        form["idxSTOPWORDS"] = ["Yes"]
+        resp = browser.submit()
+        if self.re_stopwords_not_changed.search(resp.read()):
+            #leave becouse 'Yes' is an option which is currently set and everything is fine
+            return
+        #second page - confirmation
+        browser.select_form(nr=1)
+        resp = browser.submit()
+        success = self.re_operation_successfull.search(resp.read())
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
+
+
+    def test_change_title_index_remove_stopword_configuration_back(self):
+        """tests if index's remove stopwords configuration can be changed back"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
+        url = make_url(base, **parameters)
+
+        browser = get_authenticated_mechanize_browser("admin","")
+        browser.open(url)
+        browser.select_form(nr=0)
+        form = browser.form
+        form["idxSTOPWORDS"] = ["No"]
+        resp = browser.submit()
+        #second page - confirmation
+        browser.select_form(nr=1)
+        resp = browser.submit()
+        success = self.re_operation_successfull.search(resp.read())
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
+
+
+
+
 TEST_SUITE = make_test_suite(BibIndexAdminWebPagesAvailabilityTest,
-                             BibIndexAdminSynonymKnowledgeBaseTest)
+                             BibIndexAdminSynonymKnowledgeBaseTest,
+                             BibIndexAdminRemoveStopwordsTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

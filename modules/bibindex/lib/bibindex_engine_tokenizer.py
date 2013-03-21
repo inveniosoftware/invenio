@@ -35,7 +35,7 @@ from invenio.textutils import wash_for_utf8, strip_accents
 
 from invenio.bibindex_engine_washer import \
      lower_index_term, remove_latex_markup, \
-     apply_stemming_and_stopwords_and_length_check, \
+     apply_stemming, remove_stopwords, length_check, \
      wash_author_name
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
@@ -129,8 +129,9 @@ class BibIndexTokenizer(object):
 class BibIndexPhraseTokenizer(BibIndexTokenizer):
     """The original phrase is returned"""
 
-    def __init__(self, stemming_language = None):
+    def __init__(self, stemming_language = None, remove_stopwords = 'No'):
         self.stemming_language = stemming_language
+        self.remove_stopwords = remove_stopwords
 
     def tokenize(self, phrase):
         """Return list of phrases found in PHRASE.  Note that the phrase is
@@ -166,8 +167,9 @@ class BibIndexPhraseTokenizer(BibIndexTokenizer):
 class BibIndexWordTokenizer(BibIndexTokenizer):
     """A phrase is split into words"""
 
-    def __init__(self, stemming_language = None):
+    def __init__(self, stemming_language = None, remove_stopwords = 'No'):
         self.stemming_language = stemming_language
+        self.remove_stopwords = remove_stopwords
 
     def tokenize(self, phrase):
         """Return list of words found in PHRASE.  Note that the phrase is
@@ -190,7 +192,9 @@ class BibIndexWordTokenizer(BibIndexTokenizer):
             block = re_block_punctuation_begin.sub("", block)
             block = re_block_punctuation_end.sub("", block)
             if block:
-                stemmed_block = apply_stemming_and_stopwords_and_length_check(block, self.stemming_language)
+                stemmed_block = remove_stopwords(block, self.remove_stopwords)
+                stemmed_block = length_check(stemmed_block)
+                stemmed_block = apply_stemming(stemmed_block, self.stemming_language)
                 if stemmed_block:
                     words[stemmed_block] = 1
                 if re_arxiv.match(block):
@@ -200,12 +204,16 @@ class BibIndexWordTokenizer(BibIndexTokenizer):
                     words[block.split(':', 1)[1]] = 1
                 # 3rd break each block into subblocks according to punctuation and add subblocks:
                 for subblock in re_punctuation.split(block):
-                    stemmed_subblock = apply_stemming_and_stopwords_and_length_check(subblock, self.stemming_language)
+                    stemmed_subblock = remove_stopwords(subblock, self.remove_stopwords)
+                    stemmed_subblock = length_check(stemmed_subblock)
+                    stemmed_subblock = apply_stemming(stemmed_subblock, self.stemming_language)
                     if stemmed_subblock:
                         words[stemmed_subblock] = 1
                     # 4th break each subblock into alphanumeric groups and add groups:
                     for alphanumeric_group in re_separators.split(subblock):
-                        stemmed_alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, self.stemming_language)
+                        stemmed_alphanumeric_group = remove_stopwords(alphanumeric_group, self.remove_stopwords)
+                        stemmed_alphanumeric_group = length_check(stemmed_alphanumeric_group)
+                        stemmed_alphanumeric_group = apply_stemming(stemmed_alphanumeric_group, self.stemming_language)
                         if stemmed_alphanumeric_group:
                             words[stemmed_alphanumeric_group] = 1
         for block in formulas:
@@ -215,8 +223,9 @@ class BibIndexWordTokenizer(BibIndexTokenizer):
 class BibIndexPairTokenizer(BibIndexTokenizer):
     """A phrase is split into pairs of words"""
 
-    def __init__(self, stemming_language = None):
+    def __init__(self, stemming_language = None, remove_stopwords = 'No'):
         self.stemming_language = stemming_language
+        self.remove_stopwords = remove_stopwords
 
     def tokenize(self, phrase):
         """Return list of words found in PHRASE.  Note that the phrase is
@@ -238,17 +247,20 @@ class BibIndexPairTokenizer(BibIndexTokenizer):
             block = re_block_punctuation_begin.sub("", block)
             block = re_block_punctuation_end.sub("", block)
             if block:
-                if self.stemming_language:
-                    block = apply_stemming_and_stopwords_and_length_check(block, self.stemming_language)
+                block = remove_stopwords(block, self.remove_stopwords)
+                block = length_check(block)
+                block = apply_stemming(block, self.stemming_language)
                 # 3rd break each block into subblocks according to punctuation and add subblocks:
                 for subblock in re_punctuation.split(block):
-                    if self.stemming_language:
-                        subblock = apply_stemming_and_stopwords_and_length_check(subblock, self.stemming_language)
+                    subblock = remove_stopwords(subblock, self.remove_stopwords)
+                    subblock = length_check(subblock)
+                    subblock = apply_stemming(subblock, self.stemming_language)
                     if subblock:
                         # 4th break each subblock into alphanumeric groups and add groups:
                         for alphanumeric_group in re_separators.split(subblock):
-                            if self.stemming_language:
-                                alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, self.stemming_language)
+                            alphanumeric_group = remove_stopwords(alphanumeric_group, self.remove_stopwords)
+                            alphanumeric_group = length_check(alphanumeric_group)
+                            alphanumeric_group = apply_stemming(alphanumeric_group, self.stemming_language)
                             if alphanumeric_group:
                                 if last_word:
                                     words['%s %s' % (last_word, alphanumeric_group)] = 1

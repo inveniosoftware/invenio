@@ -187,10 +187,11 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindexfields">Modify index fields</a></small></td>
     <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindexstemming">Modify index stemming language</a></small></td>
     <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifysynonymkb">Modify synonym knowledge base</a></small></td>
-    <td>6.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
+    <td>6.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifystopwords">Modify remove stopwords</a></small></td>
+    <td>7.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln)
+    """ % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln)
 
     if mtype == "perform_modifyindex" and content:
         fin_output += content
@@ -217,6 +218,11 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     elif mtype == "perform_modifysynonymkb" or not mtype:
         fin_output += perform_modifysynonymkb(idxID, ln, callback='')
 
+    if mtype == "perform_modifystopwords" and content:
+        fin_output += content
+    elif mtype == "perform_modifystopwords" or not mtype:
+        fin_output += perform_modifystopwords(idxID, ln, callback='')
+
     if mtype == "perform_deleteindex" and content:
         fin_output += content
     elif mtype == "perform_deleteindex" or not mtype:
@@ -227,14 +233,14 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
 def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Overview of indexes"""
     output = """<table cellpadding="3" border="1">"""
-    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language", "Synonym knowledge base")
+    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language", "Synonym knowledge base", "Remove stopwords")
     idx = get_idx()
     idx_dict = dict(get_def_name('', "idxINDEX"))
 
     stemming_language_map = get_stemming_language_map()
     stemming_language_map_reversed = dict([(elem[1], elem[0]) for elem in stemming_language_map.iteritems()])
 
-    for idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB in idx:
+    for idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB, idxSTOPWORDS in idx:
         forward_table_status_info = get_table_status_info('idxWORD%sF' % (idxID < 10 and '0%s' % idxID or idxID))
         reverse_table_status_info = get_table_status_info('idxWORD%sR' % (idxID < 10 and '0%s' % idxID or idxID))
         if str(idxUPD)[-3:] == ".00":
@@ -254,12 +260,16 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
         if not stemming_lang:
             stemming_lang = """<strong><span class="info">None</span></strong>"""
 
-        synonym_kb = field_value = get_idx_synonym_kb(idxID)
+        synonym_kb = get_idx_synonym_kb(idxID)
         if not synonym_kb:
             synonym_kb = """<strong><span class="info">None</span></strong>"""
 
+        remove_stopwords = get_idx_remove_stopwords(idxID)
+        if not remove_stopwords:
+            remove_stopwords = """<strong><span class="info">None</span></strong>"""
+
         if forward_table_status_info and reverse_table_status_info:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
@@ -270,9 +280,10 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        fld,
                        lang,
                        stemming_lang,
-                       synonym_kb)
+                       synonym_kb,
+                       remove_stopwords)
         elif not forward_table_status_info:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "Error", "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
@@ -281,9 +292,10 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        date,
                        "",
                        lang,
-                       synonym_kb)
+                       synonym_kb,
+                       remove_stopwords)
         elif not reverse_table_status_info:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
@@ -292,7 +304,8 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        date,
                        "",
                        lang,
-                       synonym_kb)
+                       synonym_kb,
+                       remove_stopwords)
     output += "</table>"
 
     body = [output]
@@ -316,7 +329,7 @@ def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1
         <select name="idxID" class="admin_w200">
         <option value="-1">- Select a index -</option>
         """
-        for (idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB) in idx:
+        for (idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB, idxSTOPWORDS) in idx:
             text += """<option value="%s">%s</option>""" % (idxID, idxNAME)
         text += """</select>"""
 
@@ -713,7 +726,7 @@ def perform_deleteindex(idxID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """
 
     if idxID:
-        subtitle = """<a name="5"></a>5. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
+        subtitle = """<a name="5"></a>7. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         output  = ""
 
         if confirm in ["0", 0]:
@@ -907,7 +920,7 @@ def perform_modifysynonymkb(idxID, ln=CFG_SITE_LANG, idxKB='', idxMATCH='', call
     if not idx:
         idxID = -1
     if idxID not in [-1, "-1"]:
-        subtitle = """<a name="4"></a>4. Modify knowledge base for synonym lookup.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
+        subtitle = """<a name="4"></a>5. Modify knowledge base for synonym lookup.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         if confirm in [-1, "-1"]:
             field_value = get_idx_synonym_kb(idxID)
             if CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR in field_value:
@@ -948,7 +961,7 @@ def perform_modifysynonymkb(idxID, ln=CFG_SITE_LANG, idxKB='', idxMATCH='', call
                                    ln=ln,
                                    confirm=0)
 
-        if confirm in [0, "0"] and get_idx(idxID)[0][5] == idxKB:
+        if confirm in [0, "0"] and get_idx(idxID)[0][5] == idxKB + CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR + idxMATCH:
             output += """<span class="info">Knowledge base has not been changed</span>"""
         elif confirm in [0, "0"]:
             text = """
@@ -979,6 +992,72 @@ def perform_modifysynonymkb(idxID, ln=CFG_SITE_LANG, idxKB='', idxMATCH='', call
     else:
         return addadminbox(subtitle, body)
 
+
+
+def perform_modifystopwords(idxID, ln=CFG_SITE_LANG, idxSTOPWORDS='', callback='yes', confirm=-1):
+    """Form to modify the stopwords configuration
+       @param idxID: id of the index on which modification will be performed.
+       @param idxSTOPWORDS: remove stopwords or not ('Yes' or 'No')
+    """
+
+    subtitle = ""
+    output = ""
+
+    idx = get_idx(idxID)
+    if not idx:
+        idxID = -1
+    if idxID not in [-1, "-1"]:
+        subtitle = """<a name="4"></a>6. Modify remove stopwords.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
+        if confirm in [-1, "-1"]:
+            idxSTOPWORDS = get_idx_remove_stopwords(idxID)
+        if not idxSTOPWORDS:
+            idxSTOPWORDS = ''
+        stopwords_html_element = """<select name="idxSTOPWORDS" class="admin_w200">"""
+        if idxSTOPWORDS == 'Yes':
+            stopwords_html_element += """<option value="Yes" selected ="selected">Yes</option>"""
+            stopwords_html_element += """<option value="No">No</option>"""
+        elif idxSTOPWORDS == 'No':
+            stopwords_html_element += """<option value="Yes">Yes</option>"""
+            stopwords_html_element += """<option value="No" selected ="selected">No</option>"""
+        stopwords_html_element += """</select>"""
+
+        text = """<span class="adminlabel">Remove stopwords</span>""" + stopwords_html_element
+
+        output += createhiddenform(action="modifystopwords#4",
+                                   text=text,
+                                   button="Modify",
+                                   idxID=idxID,
+                                   ln=ln,
+                                   confirm=0)
+
+        if confirm in [0, "0"] and get_idx(idxID)[0][6] == idxSTOPWORDS:
+            output += """<span class="info">Stopwords have not been changed</span>"""
+        elif confirm in [0, "0"]:
+            text = """<span class="important">You are going to change the stopwords configuration for this index.<br />
+                      <strong>Are you sure you want to do this?</strong>"""
+            output += createhiddenform(action="modifystopwords#4",
+                                       text=text,
+                                       button="Modify",
+                                       idxID=idxID,
+                                       idxSTOPWORDS=idxSTOPWORDS,
+                                       ln=ln,
+                                       confirm=1)
+        elif idxID > -1 and confirm in [1, "1"]:
+            res = modify_idx_stopwords(idxID, idxSTOPWORDS)
+            output += write_outcome(res)
+            output += """<br /><span class="info">Please note you must run as soon as possible:
+                         <pre>$> %s/bibindex --reindex -w %s</pre></span>""" % (CFG_BINDIR, get_idx(idxID)[0][1])
+        elif confirm in [1, "1"]:
+            output += """<br /><b><span class="info">Please give a name for the index.</span></b>"""
+    else:
+        output = """No index to modify."""
+
+    body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_modifystopwords", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
 
 def perform_modifyfield(fldID, ln=CFG_SITE_LANG, code='', callback='yes', confirm=-1):
     """form to modify a field.
@@ -1417,7 +1496,7 @@ def get_col_fld(colID=-1, type = '', id_field=''):
         return ""
 
 def get_idx(idxID=''):
-    sql = "SELECT id,name,description,last_updated,stemming_language,synonym_kbrs FROM idxINDEX"
+    sql = "SELECT id,name,description,last_updated,stemming_language,synonym_kbrs,remove_stopwords FROM idxINDEX"
     params = []
     try:
         if idxID:
@@ -1435,6 +1514,14 @@ def get_idx_synonym_kb(idxID):
 
     try:
         return run_sql("SELECT synonym_kbrs FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
+    except StandardError, e:
+        return (0, e)
+
+def get_idx_remove_stopwords(idxID):
+    """Returns a stopwords field value"""
+
+    try:
+        return run_sql("SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
     except StandardError, e:
         return (0, e)
 
@@ -1807,9 +1894,9 @@ def modify_idx_stemming(idxID, idxSTEM):
 
 def modify_idx_synonym_kb(idxID, idxKB, idxMATCH):
     """Modify the knowledge base for the synonym lookup in idxINDEX table
-       idxID - id of the index in idxINDEX table
-       idxKB - name of the knowledge base (for example: INDEX-SYNONYM-TITLE)
-       idxMATCH - type of match in the knowledge base: exact, leading-to-coma, leading-to-number
+       @param idxID: id of the index in idxINDEX table
+       @param idxKB: name of the knowledge base (for example: INDEX-SYNONYM-TITLE)
+       @param idxMATCH: type of match in the knowledge base: exact, leading-to-coma, leading-to-number
     """
 
     try:
@@ -1821,6 +1908,18 @@ def modify_idx_synonym_kb(idxID, idxKB, idxMATCH):
     except StandardError, e:
         return (0, e)
 
+
+def modify_idx_stopwords(idxID, idxSTOPWORDS):
+    """Modify the stopwords in idxINDEX table
+       @param idxID: id of the index which we modify
+       @param idxSTOPWORDS: tells if stopwords should be removed ('Yes' or 'No')
+    """
+
+    try:
+        run_sql("UPDATE idxINDEX SET remove_stopwords=%s WHERE ID=%s", (idxSTOPWORDS, idxID))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
 
 
 def modify_fld(fldID, code):

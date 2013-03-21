@@ -256,7 +256,7 @@ def get_author_canonical_ids_for_recid(recID):
             lwords.append(author_canonical_id)
     return lwords
 
-def get_words_from_date_tag(datestring, stemming_language=None):
+def get_words_from_date_tag(datestring, stemming_language=None, remove_stopwords = 'No'):
     """
     Special procedure to index words from tags storing date-like
     information in format YYYY or YYYY-MM or YYYY-MM-DD.  Namely, we
@@ -272,7 +272,7 @@ def get_words_from_date_tag(datestring, stemming_language=None):
             out.append("-".join(parts[:nb]))
     return out
 
-def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
+def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None, remove_stopwords = 'No'):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
        SRE_SEPARATORS regexp set earlier.  If FORCE_FILE_EXTENSION is
@@ -313,7 +313,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 text = ""
                 if hasattr(bibdoc, "get_text"):
                     text = bibdoc.get_text()
-                return get_words_from_phrase(text, stemming_language)
+                return get_words_from_phrase(text, stemming_language, remove_stopwords)
         else:
             if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY:
                 write_message("... %s is external URL but indexing only local files" % url_direct_or_indirect, verbose=2)
@@ -358,7 +358,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                             # return nothing here:
                             tmpwords = []
                         else:
-                            tmpwords = get_words_from_phrase(text, stemming_language)
+                            tmpwords = get_words_from_phrase(text, stemming_language, remove_stopwords)
                         words.update(dict(map(lambda x: (x, 1), tmpwords)))
                     except Exception, e:
                         message = 'ERROR: it\'s impossible to correctly extract words from %s referenced by %s: %s' % (url, url_direct_or_indirect, e)
@@ -376,7 +376,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
         return []
 
 
-def get_nothing_from_phrase(phrase, stemming_language=None):
+def get_nothing_from_phrase(phrase, stemming_language=None, remove_stopwords = 'No'):
     """ A dump implementation of get_words_from_phrase to be used when
     when a tag should not be indexed (such as when trying to extract phrases from
     8564_u)."""
@@ -459,63 +459,72 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
     run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
 
-def get_fuzzy_authors_from_phrase(phrase, stemming_language=None):
+def get_fuzzy_authors_from_phrase(phrase, stemming_language=None, remove_stopwords = 'No'):
     """
     Return list of fuzzy phrase-tokens suitable for storing into
     author phrase index.
+    @param phrase: phrase to get fuzzy authors tokens from
+    @param stemming_language: what language we use for stemming
+    @param remove_stopwords: dummy - added for the future
     """
     author_tokenizer = BibIndexFuzzyNameTokenizer()
     return author_tokenizer.tokenize(phrase)
 
-def get_exact_authors_from_phrase(phrase, stemming_language=None):
+def get_exact_authors_from_phrase(phrase, stemming_language=None, remove_stopwords = 'No'):
     """
     Return list of exact phrase-tokens suitable for storing into
     exact author phrase index.
+    @param phrase: phrase to get exact author from
+    @param stemming_language: what language we use for stemming
+    @param remove_stopwords: dummy - added for the future
     """
     author_tokenizer = BibIndexExactNameTokenizer()
     return author_tokenizer.tokenize(phrase)
 
-def get_author_family_name_words_from_phrase(phrase, stemming_language=None):
+def get_author_family_name_words_from_phrase(phrase, stemming_language=None, remove_stopwords = 'No'):
     """
     Return list of words from author family names, not his/her first
     names.  The phrase is assumed to be the full author name.  This is
     useful for CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES.
+    @param phrase: phrase to get family name from
+    @param stemming_language: what language we use for stemming
+    @param remove_stopwords: dummy - added for the future
     """
     d_family_names = {}
     # first, treat everything before first comma as surname:
     if ',' in phrase:
         d_family_names[phrase.split(',', 1)[0]] = 1
     # second, try fuzzy author tokenizer to find surname variants:
-    for name in get_fuzzy_authors_from_phrase(phrase, stemming_language):
+    for name in get_fuzzy_authors_from_phrase(phrase, stemming_language, remove_stopwords):
         if ',' in name:
             d_family_names[name.split(',', 1)[0]] = 1
     # now extract words from these surnames:
     d_family_names_words = {}
     for family_name in d_family_names.keys():
-        for word in get_words_from_phrase(family_name, stemming_language):
+        for word in get_words_from_phrase(family_name, stemming_language, remove_stopwords):
             d_family_names_words[word] = 1
     return d_family_names_words.keys()
 
-def get_words_from_phrase(phrase, stemming_language=None):
+def get_words_from_phrase(phrase, stemming_language=None, remove_stopwords = 'No'):
     """
     Return a list of words extracted from phrase.
     """
-    words_tokenizer = BibIndexWordTokenizer(stemming_language)
+    words_tokenizer = BibIndexWordTokenizer(stemming_language, remove_stopwords)
     return words_tokenizer.tokenize(phrase)
 
-def get_phrases_from_phrase(phrase, stemming_language=None):
+def get_phrases_from_phrase(phrase, stemming_language=None, remove_stopwords = 'No'):
     """Return list of phrases found in PHRASE.  Note that the phrase is
        split into groups depending on the alphanumeric characters and
        punctuation characters definition present in the config file.
     """
-    phrase_tokenizer = BibIndexPhraseTokenizer(stemming_language)
+    phrase_tokenizer = BibIndexPhraseTokenizer(stemming_language, remove_stopwords)
     return phrase_tokenizer.tokenize(phrase)
 
-def get_pairs_from_phrase(phrase, stemming_language=None):
+def get_pairs_from_phrase(phrase, stemming_language=None, remove_stopwords = 'No'):
     """
     Return list of oairs extracted from phrase.
     """
-    pairs_tokenizer = BibIndexPairTokenizer(stemming_language)
+    pairs_tokenizer = BibIndexPairTokenizer(stemming_language, remove_stopwords)
     return pairs_tokenizer.tokenize(phrase)
 
 def remove_subfields(s):
@@ -597,7 +606,19 @@ def get_all_synonym_knowledge_bases():
             out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
     return out
 
-
+def get_index_remove_stopwords(index_id):
+    """Returns value of remove_stopword field from idxINDEX database table
+       @param index_id: id of the index
+    """
+    query = "SELECT remove_stopwords FROM idxINDEX WHERE id=%s" % index_id
+    out = 'No'
+    try:
+        res = run_sql(query)
+        if res:
+            return res[0][0]
+    except DatabaseError:
+        return out
+    return out
 
 def split_ranges(parse_string):
     """Parse a string a return the list or ranges."""
@@ -741,6 +762,7 @@ class WordTable:
         self.fields_to_index = fields_to_index
         self.value = {}
         self.stemming_language = get_index_stemming_language(index_id)
+        self.remove_stopwords = get_index_remove_stopwords(index_id)
         self.is_fulltext_index = is_fulltext_index
         self.wash_index_terms = wash_index_terms
 
@@ -1084,7 +1106,9 @@ class WordTable:
                     recID, phrase = row
                     if not wlist.has_key(recID):
                         wlist[recID] = []
-                    new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
+                    new_words = get_words_function(phrase,
+                                                   stemming_language=self.stemming_language,
+                                                   remove_stopwords=self.remove_stopwords) # ,self.separators
                     wlist[recID] = list_union(new_words, wlist[recID])
 
         # lookup index-time synonyms:

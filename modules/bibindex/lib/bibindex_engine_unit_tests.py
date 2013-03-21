@@ -83,6 +83,20 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         self.assertNotEqual(l_words_obtained, l_words_not_expected)
         self.assertEqual(l_words_obtained, l_words_expected)
 
+    def test_remove_stopwords_phrase(self):
+        """bibindex engine - test for removing stopwords from 'theory of' """
+        test_phrase = 'theory of'
+        words_obtained = bibindex_engine.get_words_from_phrase(test_phrase, remove_stopwords='Yes')
+        words_expected = ['theory']
+        self.assertEqual(words_expected, words_obtained)
+
+    def test_stemming_and_remove_stopwords_phrase(self):
+        """bibindex engine - test for removing stopwords and stemming from 'beams of photons' """
+        test_phrase = 'beams of photons'
+        words_obtained = bibindex_engine.get_words_from_phrase(test_phrase, 'en', remove_stopwords='Yes')
+        words_expected = ['beam','photon']
+        self.assertEqual(words_expected, words_obtained)
+
     def test_dashed_phrase(self):
         """bibindex engine - getting words from `word1-word2' phrase"""
         test_phrase = 'word1-word2'
@@ -106,6 +120,25 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
         l_words_obtained.sort()
         self.assertEqual(l_words_obtained, l_words_expected)
+
+
+class TestGetPairsFromPhrase(unittest.TestCase):
+    """Tests for getting pairs from phrase."""
+
+    def test_remove_stopwords_phrase_first(self):
+        """bibindex engine - getting pairs from phrase with stopwords removed first"""
+        test_phrase = 'Matrices on a point as the theory of everything'
+        pairs_obtained = bibindex_engine.get_pairs_from_phrase(test_phrase, remove_stopwords='Yes')
+        pairs_expected = ['matrices theory']
+        self.assertEqual(pairs_expected, pairs_obtained)
+
+    def test_remove_stopwords_phrase_second(self):
+        """bibindex engine - getting pairs from phrase with stopwords removed second"""
+        test_phrase = 'Nonlocal action for long-distance'
+        pairs_obtained = bibindex_engine.get_pairs_from_phrase(test_phrase, remove_stopwords='Yes')
+        pairs_expected = ['nonlocal action', 'long distance', 'action long']
+        self.assertEqual(pairs_expected, pairs_obtained)
+
 
 class TestGetWordsFromDateTag(unittest.TestCase):
     """Tests for getting words for date-like tag."""
@@ -153,6 +186,7 @@ class TestGetAuthorFamilyNameWords(unittest.TestCase):
 TEST_SUITE = make_test_suite(TestListSetOperations,
                              TestWashIndexTerm,
                              TestGetWordsFromPhrase,
+                             TestGetPairsFromPhrase,
                              TestGetWordsFromDateTag,
                              TestGetAuthorFamilyNameWords)
 
