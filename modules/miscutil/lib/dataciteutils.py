@@ -562,7 +562,11 @@ class DataciteMetadata(object):
 
     def get_creators(self, attribute='creatorName'):
         if 'creators' in self.xml:
-            [c[attribute] for c in self.xml['creators']['creator']]
+            if isinstance(self.xml['creators']['creator'], list):
+                return [c[attribute] for c in self.xml['creators']['creator']]
+            else:
+                return self.xml['creators']['creator'][attribute]
+
         return None
 
     def get_titles(self):
@@ -577,6 +581,8 @@ class DataciteMetadata(object):
 
     def get_dates(self):
         if 'dates' in self.xml:
+            if isinstance(self.xml['dates']['date'], dict):
+                return self.xml['dates']['date'].values()[0]
             return self.xml['dates']['date']
         return None
 
