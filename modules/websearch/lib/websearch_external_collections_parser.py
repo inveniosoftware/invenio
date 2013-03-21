@@ -27,6 +27,7 @@ engine.
 __revision__ = "$Id$"
 
 import re
+from cStringIO import StringIO
 #from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
@@ -44,6 +45,10 @@ import cgi
 xml_parser_type = 0
 try:
     from lxml import etree
+    lxml_version = etree.LXML_VERSION
+    if lxml_version < (2, 0, 11, 0):
+        raise ImportError("Minimum lxml version supported is 2.0.11.0, available is %s" % \
+                          ('.'.join([str(v) for v in lxml_version]),))
     xml_parser_type = 1
 except ImportError:
     try:
@@ -620,8 +625,9 @@ class ScienceCinemaXMLExternalCollectionResultsParser(ExternalCollectionResultsP
 
         if xml_parser_type == 1:
             # lxml
-            document = etree.XML(self.buffer)
-            nodes = document.iterchildren()
+            document = etree.parse(StringIO(self.buffer))
+            document_root = document.getroot()
+            nodes = document_root.iterchildren()
             for node in nodes:
                 current_nodename = node.tag
                 if current_nodename in ['audio']:

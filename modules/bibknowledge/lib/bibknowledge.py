@@ -23,6 +23,7 @@ Provide API-callable functions for knowledge base management (using kb's).
 
 import os
 import re
+from cStringIO import StringIO
 
 from invenio import bibknowledge_dblayer
 from invenio.jsonutils import json
@@ -32,6 +33,10 @@ from invenio.config import CFG_WEBDIR
 processor_type = 0
 try:
     from lxml import etree
+    lxml_version = etree.LXML_VERSION
+    if lxml_version < (2, 0, 11, 0):
+        raise ImportError("Minimum lxml version supported is 2.0.11.0, available is %s" % \
+                          ('.'.join([str(v) for v in lxml_version]),))
     processor_type = 1
 except ImportError:
     try:
@@ -456,8 +461,8 @@ def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
 
     if processor_type == 1:
         # lxml
-        doc = etree.XML(taxonomyfilename)
-        styledoc = etree.XML(templatefilename)
+        doc = etree.parse(StringIO(taxonomyfilename))
+        styledoc = etree.parse(StringIO(templatefilename))
         style = etree.XSLT(styledoc)
         result = style(doc)
         strres = str(result)
