@@ -206,7 +206,7 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines, pr
 
     for (finished, engine) in zip(finished_list, engines_list):
         if not finished:
-            url = engine[0]
+            url = engine[2] or engine[0]
             name = engine[1].name
             print_timeout(req, lang, engine[1], name, url)
 
