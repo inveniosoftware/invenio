@@ -573,7 +573,7 @@ class SpiresToInvenioSyntaxConverter:
         'parx' : '037__c:',
         'primarch' : '037__c:',
         # texkey
-        'texkey' : '035__z:',
+        'texkey' : '035__%:',
         # type code
         'tc' : 'collection:',
         'ty' : 'collection:',
