@@ -243,8 +243,11 @@ class Template:
                    secure_page_p=0, navmenuid="admin", metaheaderadd="",
                    rssurl=CFG_SITE_URL+"/rss", body_css_classes=None)
         ctx.update(kwargs)
-        ctx['body_css_classes'] = ctx.get('body_css_classes', []).append(
-            ctx.get('navmenuid', ''))
+        if ctx['body_css_classes'] is None:
+            ctx['body_css_classes'] = [ctx.get('navmenuid', '')]
+        else:
+            ctx['body_css_classes'].append([ctx.get('navmenuid', '')])
+
         return render_template_to_string(
             "legacy_page.html",
             no_pagebody=True,
