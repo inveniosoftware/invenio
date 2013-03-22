@@ -60,7 +60,7 @@ def get_recids_matching_query(p, f, m='e'):
     return search_pattern(p=p, f=f, m=m) - INTBITSET_OF_DELETED_RECORDS
 
 
-def get_citation_weight(rank_method_code, config, chunk_size=9000):
+def get_citation_weight(rank_method_code, config, chunk_size=25000):
     """return a dictionary which is used by bibrank daemon for generating
     the index of sorted research results by citation information
     """
@@ -101,18 +101,21 @@ def get_citation_weight(rank_method_code, config, chunk_size=9000):
         # Process fully the updated records
         weights = process_and_store(updated_recids, config, chunk_size)
         end_time = time.time()
-        write_message("Total time of get_citation_weight(): %.2f sec" % \
+        write_message("Total time of get_citation_weight(): %.2f sec" %
                                                       (end_time - begin_time))
         task_update_progress("citation analysis done")
     else:
         weights = None
-        write_message("No new records added since last time this " \
+        write_message("No new records added since last time this "
                       "rank method was executed")
 
     return weights, index_update_time
 
 
 def process_and_store(recids, config, chunk_size):
+    # Limit of # of citation we can loose in one chunk
+    function = config.get("rank_method", "function")
+    citation_loss_limit = int(config.get(function, "citation_loss_limit"))
     # If we have nothing to process
     # Do not update the weights dictionary
     modified = False
@@ -133,6 +136,12 @@ def process_and_store(recids, config, chunk_size):
         write_message("Processing chunk #%s to #%s" % (chunk[0], chunk[-1]))
         # The core work
         cites, refs = process_chunk(chunk, config)
+        # Check that we haven't lost too many citations
+        cites_diff = compute_dicts_diff(chunk, refs, cites)
+        write_message("Citations balance %s" % cites_diff)
+        if citation_loss_limit and cites_diff <= -citation_loss_limit:
+            raise Exception('Lost too many references, aborting')
+
         # Store processed citations/references
         store_dicts(chunk, refs, cites)
         modified = True
@@ -163,7 +172,7 @@ def process_chunk(recids, config):
 
 
 def get_bibrankmethod_lastupdate(rank_method_code):
-    """return the last excution date of bibrank method
+    """Return the last excution date of bibrank method
     """
     query = """SELECT DATE_FORMAT(last_updated, '%%Y-%%m-%%d %%H:%%i:%%s')
                FROM rnkMETHOD WHERE name =%s"""
@@ -177,6 +186,8 @@ def get_bibrankmethod_lastupdate(rank_method_code):
 
 
 def get_bibindex_update_time():
+    """Return the last indexing date of the journals and report number indexes
+    """
     try:
         # check indexing times of `journal' and `reportnumber`
         # indexes, and only fetch records which have been indexed
@@ -300,6 +311,7 @@ def get_tags_config(config):
 
 
 def get_journal_info(recid, tags):
+    """Fetch journal info for given recid"""
     record_info = []
 
     record = get_record(recid)
@@ -368,6 +380,13 @@ def get_journal_info(recid, tags):
 
 
 def get_alt_volume(volume):
+    """Get alternate volume form
+
+    We handle the inversed volume letter bug
+    Some metadata is wrong which leads to journals with the volume letter
+    at the end.
+    e.g.  Phys.Rev.,51B,1 instead of Phys.Rev.,B51,1
+    """
     alt_volume = None
     if re.match(ur'[a-zA-Z]\d+', volume, re.U|re.I):
         alt_volume = volume[1:] + volume[0]
@@ -377,7 +396,7 @@ def get_alt_volume(volume):
 
 
 def get_citation_informations(recid_list, tags, fetch_catchup_info=True):
-    """scans the collections searching references (999C5x -fields) and
+    """Scans the collections searching references (999C5x -fields) and
        citations for items in the recid_list
        returns a 4 list of dictionaries that contains the citation information
        of cds records
@@ -512,7 +531,11 @@ def get_citation_informations(recid_list, tags, fetch_catchup_info=True):
 
 
 def standardize_report_number(report_number):
-    # Remove category for arxiv papers
+    """Format the report number to a standard form.
+
+    Currently we:
+    * remove category for arxiv papers
+    """
     report_number = re.sub(ur'(?:arXiv:)?(\d{4}\.\d{4}) \[[a-zA-Z\.-]+\]',
                   ur'arXiv:\g<1>',
                   report_number,
@@ -582,7 +605,7 @@ def ref_analyzer(citation_informations, updated_recids, tags):
             refnumber = standardize_report_number(refnumber)
             # Search for "hep-th/5644654 or such" in existing records
             recids = get_recids_matching_query(p=refnumber, f=field)
-            write_message("These match searching %s in %s: %s" % \
+            write_message("These match searching %s in %s: %s" %
                                    (refnumber, field, list(recids)), verbose=9)
 
             if not recids:
@@ -628,7 +651,7 @@ def ref_analyzer(citation_informations, updated_recids, tags):
                 continue  # skip this ill-formed value
 
             recids = search_unit(p, field) - INTBITSET_OF_DELETED_RECORDS
-            write_message("These match searching %s in %s: %s" \
+            write_message("These match searching %s in %s: %s"
                                  % (reference, field, list(recids)), verbose=9)
 
             if not recids:
@@ -665,7 +688,7 @@ def ref_analyzer(citation_informations, updated_recids, tags):
             field = 'doi'
 
             recids = get_recids_matching_query(p, field)
-            write_message("These match searching %s in %s: %s" \
+            write_message("These match searching %s in %s: %s"
                                  % (reference, field, list(recids)), verbose=9)
 
             if not recids:
@@ -731,7 +754,7 @@ def ref_analyzer(citation_informations, updated_recids, tags):
             # Phys. Lett., B 482 (2000) 417 in 999C5s
             recids = search_unit(p=journal, f=tags['refs_journal'], m='a') \
                                                 - INTBITSET_OF_DELETED_RECORDS
-            write_message("These records match %s in %s: %s" \
+            write_message("These records match %s in %s: %s"
                     % (journal, tags['refs_journal'], list(recids)), verbose=9)
 
             for recid in recids:
@@ -753,7 +776,7 @@ def ref_analyzer(citation_informations, updated_recids, tags):
             # Phys. Lett., B 482 (2000) 417 in 999C5a
             recids = search_unit(p=doi, f=tags['refs_doi'], m='a') \
                                                 - INTBITSET_OF_DELETED_RECORDS
-            write_message("These records match %s in %s: %s" \
+            write_message("These records match %s in %s: %s"
                             % (doi, tags['refs_doi'], list(recids)), verbose=9)
 
             for recid in recids:
@@ -771,12 +794,10 @@ def ref_analyzer(citation_informations, updated_recids, tags):
         write_message("reference_list (x cites y):")
         write_message(dict(islice(references.iteritems(), 10)))
         write_message("size: %s" % len(references))
-        write_message("selfcitedbydic (x is cited by y and one of the " \
-                      "authors of x same as y's):")
 
     t7 = os.times()[4]
 
-    write_message("Execution time for analyzing the citation information " \
+    write_message("Execution time for analyzing the citation information "
                   "generating the dictionary:")
     write_message("... checking ref report numbers: %.2f sec" % (t2-t1))
     write_message("... checking ref journals: %.2f sec" % (t3-t2))
@@ -789,6 +810,47 @@ def ref_analyzer(citation_informations, updated_recids, tags):
     return citations, references
 
 
+def compute_refs_diff(recid, new_refs):
+    """
+    Given a set of references for a record, returns how many references were
+    added to it. The value can be negative which means the record lost
+    citations.
+    """
+    old_refs = set(row[0] for row in run_sql("""SELECT citee
+                                                FROM rnkCITATIONDICT
+                                                WHERE citer = %s""", [recid]))
+
+    refs_to_add = new_refs - old_refs
+    refs_to_delete = old_refs - new_refs
+    return len(refs_to_add) - len(refs_to_delete)
+
+
+def compute_cites_diff(recid, new_cites):
+    """
+    This function does the same thing as compute_refs_diff but with citations.
+    """
+    old_cites = set(row[0] for row in run_sql("""SELECT citer
+                                                 FROM rnkCITATIONDICT
+                                                 WHERE citee = %s""", [recid]))
+
+    cites_to_add = new_cites - old_cites
+    cites_to_delete = old_cites - new_cites
+    return len(cites_to_add) - len(cites_to_delete)
+
+
+def compute_dicts_diff(recids, refs, cites):
+    """
+    Given the new dictionaries for references and citations, computes how
+    many references were added or removed by comparing them to the current
+    stored in the database.
+    """
+    cites_diff = 0
+    for recid in recids:
+        cites_diff += compute_refs_diff(recid, refs[recid])
+        cites_diff += compute_cites_diff(recid, cites[recid])
+    return cites_diff
+
+
 def store_dicts(recids, refs, cites):
     """Insert the reference and citation list into the database"""
     for recid in recids:
@@ -797,6 +859,11 @@ def store_dicts(recids, refs, cites):
 
 
 def replace_refs(recid, new_refs):
+    """
+    Given a set of references, replaces the references of given recid
+    in the database.
+    The changes are logged into rnkCITATIONLOG.
+    """
     old_refs = set(row[0] for row in run_sql("""SELECT citee
                                                 FROM rnkCITATIONDICT
                                                 WHERE citer = %s""", [recid]))
@@ -809,14 +876,26 @@ def replace_refs(recid, new_refs):
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         run_sql("""INSERT INTO rnkCITATIONDICT (citer, citee, last_updated)
                    VALUES (%s, %s, %s)""", (recid, ref, now))
+        run_sql("""INSERT INTO rnkCITATIONLOG (citer, citee, type, action_date)
+                   VALUES (%s, %s, %s, %s)""", (recid, ref, 'added', now))
 
     for ref in refs_to_delete:
         write_message('deleting ref %s %s' % (recid, ref), verbose=1)
+        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         run_sql("""DELETE FROM rnkCITATIONDICT
                    WHERE citer = %s and citee = %s""", (recid, ref))
+        run_sql("""INSERT INTO rnkCITATIONLOG (citer, citee, type, action_date)
+                   VALUES (%s, %s, %s, %s)""", (recid, ref, 'removed', now))
 
 
 def replace_cites(recid, new_cites):
+    """
+    Given a set of citations, replaces the citations of given recid
+    in the database.
+    The changes are logged into rnkCITATIONLOG.
+
+    See @replace_refs
+    """
     old_cites = set(row[0] for row in run_sql("""SELECT citer
                                                 FROM rnkCITATIONDICT
                                                 WHERE citee = %s""", [recid]))
@@ -837,8 +916,13 @@ def replace_cites(recid, new_cites):
 
 
 def insert_into_missing(recid, report):
-    """put the referingrecordnum-publicationstring into
-       the "we are missing these" table"""
+    """Mark reference string as missing.
+
+       If a reference is a report number / journal / DOI but we do not have
+       the corresping record in the database, we mark that particualar
+       reference string as missing, by adding a row in rnkCITATIONDATAEXT.
+       The recid represents the record containing the reference string.
+    """
     if len(report) >= 255:
         # Invalid report, it is too long
         # and does not fit in the database column
@@ -855,8 +939,9 @@ def insert_into_missing(recid, report):
 
 
 def remove_from_missing(report):
-    """remove the recid-ref -pairs from the "missing" table for report x: prob
-       in the case ref got in our library collection"""
+    """Remove the reference string from the missing table
+
+       See @insert_into_missing"""
     run_sql("""DELETE FROM rnkCITATIONDATAEXT
                WHERE extcitepubinfo = %s""", (report,))
 
@@ -895,6 +980,11 @@ def tagify(parsedtag):
 
 
 def store_citation_warning(warning_type, cit_info):
+    """Store citation indexing warnings in the database
+
+    If we encounter a problem during the citation indexing, such as multiple
+    results for a report number, we store a warning in rnkCITATIONDATAERR
+    """
     r = run_sql("""SELECT 1 FROM rnkCITATIONDATAERR
                    WHERE type = %s
                    AND citinfo = %s""", (warning_type, cit_info))

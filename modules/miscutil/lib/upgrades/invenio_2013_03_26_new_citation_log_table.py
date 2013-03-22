@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,24 +17,37 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-[rank_method]
-function = citation
+from invenio.dbquery import run_sql
 
-[citation]
-primary_report_number = 037__a
-additional_report_number = 088__a
-reference_via_report_number = 999C5r
-reference_via_pubinfo = 999C5s
-reference_via_doi= 999C5a
-pubinfo_journal_title = 909C4p
-pubinfo_journal_pages = 909C4c
-pubinfo_journal_vol = 909C4v
-pubinfo_journal_year = 909C4y
-pubinfo_journal_format = "p v (y) c"
-first_author = 100__a
-additional_author = 700__a
-alternative_author_name = 720__a
-collaboration_name = 710__g
-relevance_number_output_prologue = (
-relevance_number_output_epilogue = )
-citation_loss_limit = 50
+depends_on = ['invenio_release_1_1_0']
+
+
+def info():
+    return "Adds table to log citation dict changes"
+
+
+def do_upgrade():
+    run_sql("""
+CREATE TABLE IF NOT EXISTS rnkCITATIONLOG (
+  id int(11) unsigned NOT NULL auto_increment,
+  citee int(10) unsigned NOT NULL,
+  citer int(10) unsigned NOT NULL,
+  `type` ENUM('added', 'removed'),
+  action_date datetime NOT NULL,
+  PRIMARY KEY (id),
+  KEY citee (citee),
+  KEY citer (citer)
+) ENGINE=MyISAM;
+""")
+
+
+def estimate():
+    return 1
+
+
+def pre_upgrade():
+    pass
+
+
+def post_upgrade():
+    pass
