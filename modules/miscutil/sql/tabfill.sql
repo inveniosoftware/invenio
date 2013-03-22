@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+-- Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -226,6 +226,7 @@ INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (22
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (23,'WebAuthorProfile affiliations helper','wapaff', 'cPickled dicts', 'text', 0);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (24,'EndNote (8-X)','xe8x', 'XML EndNote (8-X).', 'text/xml', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (25,'HTML citesummary extended','hcs2', 'HTML cite summary format, including self-citations counts.', 'text/html', 0);
+INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (26,'DataCite','dcite', 'DataCite XML format.', 'text/xml', 0);
 
 INSERT INTO tag VALUES (1,'first author name','100__a');
 INSERT INTO tag VALUES (2,'additional author name','700__a');
