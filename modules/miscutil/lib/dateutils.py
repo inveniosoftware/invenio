@@ -41,10 +41,12 @@ Lexicon
 
 __revision__ = "$Id$"
 
-import datetime
 import re
 import time
-from datetime import date as real_date, datetime as real_datetime
+from datetime import date as real_date, \
+                     datetime as real_datetime, \
+                     time as real_time, \
+                     timedelta
 from time import strptime, strftime as real_strftime, localtime
 from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
@@ -67,8 +69,9 @@ class datetime(real_datetime):
     def strftime(self, fmt):
         return strftime(fmt, self)
 
+    @classmethod
     def combine(self, date, time):
-        return datetime(date.year, date.month, date.day, time.hour, time.minute, time.microsecond, time.tzinfo)
+        return self(date.year, date.month, date.day, time.hour, time.minute, time.microsecond, time.tzinfo)
 
     def date(self):
         return date(self.year, self.month, self.day)
@@ -316,7 +319,7 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG
     return out
 
 _RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?", re.I)
-_RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hour>\d\d?)(:(?P<minutes>\d\d?))?')
+_RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hours>\d\d?)(:(?P<minutes>\d\d?))?')
 def parse_runtime_limit(value):
     """
     Parsing CLI option for runtime limit, supplied as VALUE.
@@ -327,11 +330,11 @@ def parse_runtime_limit(value):
 
     def extract_time(value):
         value = _RE_RUNTIMELIMIT_HOUR.search(value).groupdict()
-        hour = int(value['hour']) % 24
-        minutes = (value['minutes'] is not None and int(value['minutes']) or 0) % 60
-        return hour * 3600 + minutes * 60
+        return timedelta(hours=int(value['hours']),
+                         minutes=int(value['minutes']))
 
     def extract_weekday(value):
+        key = value[:3].lower()
         try:
             return {
                 'mon' : 0,
@@ -341,56 +344,53 @@ def parse_runtime_limit(value):
                 'fri' : 4,
                 'sat' : 5,
                 'sun' : 6,
-            }[value[:3].lower()]
+            }[key]
         except KeyError:
-            raise ValueError, "%s is not a good weekday name." % value
+            raise ValueError("%s is not a good weekday name." % value)
 
-    today = datetime.today()
-    try:
-        g = _RE_RUNTIMELIMIT_FULL.search(value)
-        if not g:
-            raise ValueError
-        pieces = g.groupdict()
-        today_weekday = today.isoweekday() - 1
+    today = date.today()
+    g = _RE_RUNTIMELIMIT_FULL.search(value)
+    if not g:
+        raise ValueError('"%s" does not seem to be correct format for parse_runtime_limit() [Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value)
+    pieces = g.groupdict()
 
-        if pieces['weekday'] is None:
-            ## No weekday specified. So either today or tomorrow
-            first_occasion_day = 0
-            next_occasion_day = 24 * 3600
-        else:
-            ## Weekday specified. So either this week or next
-            weekday = extract_weekday(pieces['weekday'])
-            first_occasion_day = -((today_weekday - weekday) % 7) * 24 * 3600
-            next_occasion_day = first_occasion_day + 7 * 24 * 3600
+    if pieces['weekday'] is None:
+        ## No weekday specified. So either today or tomorrow
+        first_occasion_day = timedelta(days=0)
+        next_occasion_delta = timedelta(days=1)
+    else:
+        ## Weekday specified. So either this week or next
+        weekday = extract_weekday(pieces['weekday'])
+        days = (weekday - today.weekday()) % 7
+        first_occasion_day = timedelta(days=days)
+        next_occasion_delta = timedelta(days=7)
 
-        if pieces['begin'] is None:
-            pieces['begin'] = '00:00'
-        if pieces['end'] is None:
-            pieces['end'] = '00:00'
+    if pieces['begin'] is None:
+        pieces['begin'] = '00:00'
+    if pieces['end'] is None:
+        pieces['end'] = '00:00'
 
-        beginning_time = extract_time(pieces['begin'])
-        ending_time = extract_time(pieces['end'])
+    beginning_time = extract_time(pieces['begin'])
+    ending_time = extract_time(pieces['end'])
 
-        if not ending_time:
-            ending_time += 24 * 3600
-        elif beginning_time and ending_time:
-            if beginning_time > ending_time:
-                beginning_time -= 24 * 3600
+    if not ending_time:
+        ending_time = beginning_time + timedelta(days=1)
+    elif beginning_time and ending_time and beginning_time > ending_time:
+        ending_time += timedelta(days=1)
 
-        reference_time = time.mktime(datetime(today.year, today.month, today.day).timetuple())
-        current_range = (
-            reference_time + first_occasion_day + beginning_time,
-            reference_time + first_occasion_day + ending_time
-        )
-        future_range = (
-            reference_time + next_occasion_day + beginning_time,
-            reference_time + next_occasion_day + ending_time
-        )
-        return current_range, future_range
-    except ValueError:
-        raise
-    except:
-        raise ValueError, '"%s" does not seem to be correct format for parse_runtime_limit() [Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value
+    start_time = real_datetime.combine(today, real_time(hour=0, minute=0))
+    current_range = (
+        start_time + first_occasion_day + beginning_time,
+        start_time + first_occasion_day + ending_time
+    )
+    if datetime.now() > current_range[1]:
+        current_range = tuple(t + next_occasion_delta for t in current_range)
+
+    future_range = (
+        current_range[0] + next_occasion_delta,
+        current_range[1] + next_occasion_delta
+    )
+    return current_range, future_range
 
 def guess_datetime(datetime_string):
     """
