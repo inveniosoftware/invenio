@@ -167,21 +167,23 @@ def main():
     """
     Entry point for the CLI
     """
-    def get_json_parameters_from_cli(option, dummy_opt_str, value, dummy_parser):
+    def get_json_parameters_from_cli(dummy_option, dummy_opt_str, value, parser):
         try:
-            option.parameters = json_unicode_to_utf8(json.loads(value))
+            setattr(parser.values, 'parameters', json_unicode_to_utf8(json.loads(value)))
         except Exception, err:
             raise optparse.OptionValueError("Cannot parse as a valid JSON serialization the provided parameters: %s. %s" % (value, err))
 
-    def get_parameter_from_cli(option, dummy_opt_str, value, dummy_parser):
-        if not hasattr(option, 'parameters'):
-            option.parameters = {}
+    def get_parameter_from_cli(dummy_option, dummy_opt_str, value, parser):
+        if not hasattr(parser.values, 'parameters'):
+            setattr(parser.values, 'parameters', {})
         param, value = value.split('=', 1)
         try:
             value = int(value)
         except:
             pass
-        option.parameters[param] = value
+        parameters = parser.values.parameters
+        parameters[param] = value
+        setattr(parser.values, 'parameters', parameters)
 
     parser = optparse.OptionParser()
 
