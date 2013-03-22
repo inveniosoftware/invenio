@@ -683,7 +683,9 @@ CFG_WEBACCESS_MSGS = {
                                 5: 'Authorization failure',
                                 6: '%s temporarily closed' % CFG_SITE_NAME,
                                 7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
-                                8: 'Functionality temporarily closed'
+                                8: 'Functionality temporarily closed',
+                                9: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>',
+                               10: '<br />You might also want to check <a href="%s">%s</a>',
         }
 
 CFG_WEBACCESS_WARNING_MSGS = {

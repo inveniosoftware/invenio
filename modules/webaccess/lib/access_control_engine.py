@@ -28,7 +28,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.config import CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_SECURE_URL, CFG_CERN_SITE
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_find_possible_roles, acc_is_user_in_role, CFG_SUPERADMINROLE_ID, acc_get_role_users
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
@@ -65,6 +65,16 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
             return (20, CFG_WEBACCESS_WARNING_MSGS[20] % cgi.escape(name_action))
     ## User is not authorized
     in_a_web_request_p = bool(user_info['uri'])
+    if CFG_CERN_SITE and arguments.has_key('collection'):
+        # We apply the checks for all actions with that 'collection'
+        # argument, for simplicity not necessity.
+        from invenio.search_engine import get_collection_allchildren
+        if arguments.get('collection', None) in get_collection_allchildren('e-Tendering', recreate_cache_if_needed=False):
+            return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1],
+                                  (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[9] % ("purchasing.service@cern.ch", "purchasing.service@cern.ch"),
+                                                                     CFG_WEBACCESS_MSGS[10] % (CFG_SITE_SECURE_URL + "/goto/etendering-faq", "Frequently Asked Questions (FAQ) concerning the CERN e-tendering application")
+                                                                     ) or "")))
+
     return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
 
 def acc_get_authorized_emails(name_action, **arguments):
