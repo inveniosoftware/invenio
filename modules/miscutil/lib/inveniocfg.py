@@ -736,7 +736,7 @@ def cli_cmd_create_secret_key(conf):
         secret_key = ''.join([random.choice(string.letters + string.digits) \
                               for dummy in range(0,256)])
         with open(invenio_local_path, 'a') as f:
-            f.write('CFG_SITE_SECRET_KEY = %s\n' % (secret_key, ))
+            f.write('\nCFG_SITE_SECRET_KEY = %s\n' % (secret_key, ))
         print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
 
 def cli_cmd_create_tables(conf):
