@@ -122,6 +122,11 @@ def create_invenio_flask_app():
     # function documentation
     hack_jinja2_utf8decoding()
 
+    # Handle both url with and without trailing slashe by Flask.
+    # @blueprint.route('/test')
+    # @blueprint.route('/test/') -> not necessary when strict_slashes == False
+    _app.url_map.strict_slashes = False
+
     # SECRET_KEY is needed by Flask Debug Toolbar
     if not CFG_SITE_SECRET_KEY or CFG_SITE_SECRET_KEY == '':
         fill_secret_key = """
