@@ -106,7 +106,7 @@ from invenio.bibedit_webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.bibmerge_webinterface import WebInterfaceMergePages
 from invenio.bibdocfile_webinterface import WebInterfaceManageDocFilesPages, WebInterfaceFilesPages
-from invenio.search_engine import get_record
+from invenio.bibfield import get_record
 from invenio.shellutils import mymkdir
 
 import invenio.template
@@ -742,6 +742,14 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 real_url = "http://" + '/'.join(path)
                 redirect_to_url(req, real_url)
             return redirecter, []
+        elif component == 'doi':
+            doi = '/'.join(path)
+            def doi_answer(req, form):
+                """Resolve DOI"""
+                argd = wash_urlargd(form, {'verbose': (int, 0),})
+                return resolve_doi(req, doi, verbose=argd['verbose'], ln=argd['ln'])
+
+            return doi_answer, []
 
         return None, []
 
@@ -923,6 +931,64 @@ def display_collection(req, c, aas, verbose, ln, em=""):
                 show_title_p=show_title_p,
                 show_header=em == "" or EM_REPOSITORY["header"] in em,
                 show_footer=em == "" or EM_REPOSITORY["footer"] in em)
+
+def resolve_doi(req, doi, ln=CFG_SITE_LANG, verbose=0):
+    """
+    Redirect to given DOI, or display error page when DOI cannot be
+    resolved.
+    """
+    _ = gettext_set_language(ln)
+    # Fetch user ID:
+    try:
+        uid = getUid(req)
+    except Error:
+        register_exception(req=req, alert_admin=True)
+        return page(title=_("Internal Error"),
+                    body=create_error_box(req, verbose=verbose, ln=ln),
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
+                    language=ln,
+                    req=req,
+                    navmenuid='search')
+    # Resolve DOI
+    recids = perform_request_search(p='doi:"%s"' % doi, of="id", verbose=verbose)
+    recids = [recid for recid in recids if doi.lower() in \
+              [doi.lower() for doi in get_record(recid).get('doi', '') if doi]]
+
+    # Answer
+    if len(recids) == 1:
+        # Found unique matching record
+        return redirect_to_url(req, CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recids[0]))
+    elif len(recids) == 0:
+        # No corresponding record found
+        page_body = '<p>' + (_("Sorry, DOI %s could not be resolved.") % \
+                             ('<strong>' + str(doi) + '</strong>')) + '</p>'
+        if req.header_only:
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        return page(title=_('DOI "%s" Not Found') % cgi.escape(doi),
+                    body=page_body,
+                    description=(CFG_SITE_NAME + ' - ' + _("Not found") + ': ' + cgi.escape(str(doi))),
+                    keywords="%s" % CFG_SITE_NAME,
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navmenuid='search')
+    else:
+        # Found multiple matching records
+        try:
+            raise Exception('DOI "%s" matched multiple records (%s) -- Please check' % (doi, ', '.join([str(recid) for recid in recids])))
+        except Exception, e:
+            register_exception(req=req, alert_admin=True)
+        page_body = websearch_templates.tmpl_multiple_dois_found_page(doi, recids, ln)
+        return page(title=_('Found multiple records matching DOI %s') % cgi.escape(doi),
+                    body=page_body,
+                    description=(CFG_SITE_NAME + ' - ' + _("Found multiple records matching DOI") + ': ' + cgi.escape(str(doi))),
+                    keywords="%s" % CFG_SITE_NAME,
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navmenuid='search')
+    return
 
 class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
     """RSS 2.0 feed service pages."""

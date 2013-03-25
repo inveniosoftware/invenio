@@ -72,6 +72,7 @@ from invenio.config import \
 from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
 from invenio.websearch_services import \
      CFG_WEBSEARCH_MAX_SEARCH_COLL_RESULTS_TO_PRINT
+from invenio.bibformat import format_record
 
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
@@ -4889,4 +4890,25 @@ class Template:
             else:
                 out += '<format name="%s" type="%s" />\n' % (xml_escape(format_name), xml_escape(format_type))
         out += "</formats>"
+        return out
+
+    def tmpl_multiple_dois_found_page(self, doi, recids, ln=CFG_SITE_LANG, verbose=0):
+        """
+        Page displayed when multiple records would match a DOIs
+
+        @param doi: DOI that has multiple matching records
+        @param recids: record IDs matched by given C{DOI}
+        @param ln: language
+        """
+        _ = gettext_set_language(ln)
+        out = ""
+        out += _('For some unknown reason multiple records matching the specified DOI "%s" have been found.') % cgi.escape(doi)
+        out += '<br/>' + _('The system administrators have been alerted.')
+        out += '<br/>' + _('In the meantime you can pick one of the retrieved candidates:')
+        out += '<br/><ul>' + '\n'.join(['<li>' + format_record(recid, of='hb', verbose=verbose) + '<br/>' + \
+                                        create_html_link(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recid), \
+                                                         {}, _("Detailed record"), {'class': 'moreinfo'}) + \
+                                     '</li>' \
+                                     for recid in recids]) + \
+                     '</ul>'
         return out
