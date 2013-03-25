@@ -26,8 +26,6 @@ on the input string as tokens suitable for word or phrase indexing.
 import re
 
 from invenio.config import \
-     CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
-     CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
 from invenio.htmlutils import remove_html_markup
@@ -129,9 +127,11 @@ class BibIndexTokenizer(object):
 class BibIndexPhraseTokenizer(BibIndexTokenizer):
     """The original phrase is returned"""
 
-    def __init__(self, stemming_language = None, remove_stopwords = 'No'):
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
         self.stemming_language = stemming_language
         self.remove_stopwords = remove_stopwords
+        self.remove_html_markup = remove_html_markup
+        self.remove_latex_markup = remove_latex_markup
 
     def tokenize(self, phrase):
         """Return list of phrases found in PHRASE.  Note that the phrase is
@@ -167,9 +167,11 @@ class BibIndexPhraseTokenizer(BibIndexTokenizer):
 class BibIndexWordTokenizer(BibIndexTokenizer):
     """A phrase is split into words"""
 
-    def __init__(self, stemming_language = None, remove_stopwords = 'No'):
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
         self.stemming_language = stemming_language
         self.remove_stopwords = remove_stopwords
+        self.remove_html_markup = remove_html_markup
+        self.remove_latex_markup = remove_latex_markup
 
     def tokenize(self, phrase):
         """Return list of words found in PHRASE.  Note that the phrase is
@@ -178,9 +180,9 @@ class BibIndexWordTokenizer(BibIndexTokenizer):
         """
         words = {}
         formulas = []
-        if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
+        if self.remove_html_markup == 'Yes' and phrase.find("</") > -1:
             phrase = remove_html_markup(phrase)
-        if CFG_BIBINDEX_REMOVE_LATEX_MARKUP:
+        if self.remove_latex_markup == 'Yes':
             formulas = latex_formula_re.findall(phrase)
             phrase = remove_latex_markup(phrase)
             phrase = latex_formula_re.sub(' ', phrase)
@@ -223,9 +225,11 @@ class BibIndexWordTokenizer(BibIndexTokenizer):
 class BibIndexPairTokenizer(BibIndexTokenizer):
     """A phrase is split into pairs of words"""
 
-    def __init__(self, stemming_language = None, remove_stopwords = 'No'):
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
         self.stemming_language = stemming_language
         self.remove_stopwords = remove_stopwords
+        self.remove_html_markup = remove_html_markup
+        self.remove_latex_markup = remove_latex_markup
 
     def tokenize(self, phrase):
         """Return list of words found in PHRASE.  Note that the phrase is
@@ -233,9 +237,9 @@ class BibIndexPairTokenizer(BibIndexTokenizer):
            punctuation characters definition present in the config file.
         """
         words = {}
-        if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
+        if self.remove_html_markup == 'Yes' and phrase.find("</") > -1:
             phrase = remove_html_markup(phrase)
-        if CFG_BIBINDEX_REMOVE_LATEX_MARKUP:
+        if self.remove_latex_markup == 'Yes':
             phrase = remove_latex_markup(phrase)
             phrase = latex_formula_re.sub(' ', phrase)
         phrase = wash_for_utf8(phrase)

@@ -47,7 +47,10 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
                     'field?mtype=perform_showfieldoverview',
                     'field?mtype=perform_editfields',
                     'field?mtype=perform_addfield',
-                    'editindex?idxID=8&ln=en&mtype=perform_modifysynonymkb',
+                    'editindex?mtype=perform_modifysynonymkb',
+                    'editindex?mtype=perform_modifystopwords',
+                    'editindex?mtype=perform_modifyremovehtml',
+                    'editindex?mtype=perform_modifyremovelatex'
                     ]
 
         error_messages = []
@@ -182,11 +185,124 @@ class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 
+class BibIndexAdminRemoveHTMLTest(unittest.TestCase):
+    """Tests BibIndexAdmin's ability to change 'remove html' configuration details for indexes.
+       Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
+    """
+
+    def setUp(self):
+        self.re_operation_successfull = re.compile(r"Operation successfully completed")
+        self.re_removehtml_not_changed = re.compile(r"Remove HTML markup parameter has not been changed")
+
+    def test_change_title_index_remove_html_configuration(self):
+        """tests if index's 'remove html' configuration can be changed"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovehtml'}
+        url = make_url(base, **parameters)
+
+        browser = get_authenticated_mechanize_browser("admin","")
+        browser.open(url)
+        browser.select_form(nr=0)
+        form = browser.form
+        form["idxHTML"] = ["Yes"]
+        resp = browser.submit()
+        if self.re_removehtml_not_changed.search(resp.read()):
+            #leave becouse 'Yes' is an option which is currently set and everything is fine
+            return
+        #second page - confirmation
+        browser.select_form(nr=1)
+        resp = browser.submit()
+        success = self.re_operation_successfull.search(resp.read())
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
+
+
+    def test_change_title_index_remove_html_configuration_back(self):
+        """tests if index's 'remove html' configuration can be changed back"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovehtml'}
+        url = make_url(base, **parameters)
+
+        browser = get_authenticated_mechanize_browser("admin","")
+        browser.open(url)
+        browser.select_form(nr=0)
+        form = browser.form
+        form["idxHTML"] = ["No"]
+        resp = browser.submit()
+        #second page - confirmation
+        browser.select_form(nr=1)
+        resp = browser.submit()
+        success = self.re_operation_successfull.search(resp.read())
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
+
+
+
+class BibIndexAdminRemoveLatexTest(unittest.TestCase):
+    """Tests BibIndexAdmin's ability to change 'remove latex' configuration details for indexes.
+       Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
+    """
+
+    def setUp(self):
+        self.re_operation_successfull = re.compile(r"Operation successfully completed")
+        self.re_removehtml_not_changed = re.compile(r"Remove latex markup parameter has not been changed")
+
+    def test_change_title_index_remove_html_configuration(self):
+        """tests if index's 'remove latex' configuration can be changed"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovelatex'}
+        url = make_url(base, **parameters)
+
+        browser = get_authenticated_mechanize_browser("admin","")
+        browser.open(url)
+        browser.select_form(nr=0)
+        form = browser.form
+        form["idxLATEX"] = ["Yes"]
+        resp = browser.submit()
+        if self.re_removehtml_not_changed.search(resp.read()):
+            #leave becouse 'Yes' is an option which is currently set and everything is fine
+            return
+        #second page - confirmation
+        browser.select_form(nr=1)
+        resp = browser.submit()
+        success = self.re_operation_successfull.search(resp.read())
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
+
+
+    def test_change_title_index_remove_html_configuration_back(self):
+        """tests if index's 'remove latex' configuration can be changed back"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovelatex'}
+        url = make_url(base, **parameters)
+
+        browser = get_authenticated_mechanize_browser("admin","")
+        browser.open(url)
+        browser.select_form(nr=0)
+        form = browser.form
+        form["idxLATEX"] = ["No"]
+        resp = browser.submit()
+        #second page - confirmation
+        browser.select_form(nr=1)
+        resp = browser.submit()
+        success = self.re_operation_successfull.search(resp.read())
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
 
 
 TEST_SUITE = make_test_suite(BibIndexAdminWebPagesAvailabilityTest,
                              BibIndexAdminSynonymKnowledgeBaseTest,
-                             BibIndexAdminRemoveStopwordsTest)
+                             BibIndexAdminRemoveStopwordsTest,
+                             BibIndexAdminRemoveHTMLTest,
+                             BibIndexAdminRemoveLatexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

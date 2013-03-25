@@ -323,6 +323,57 @@ def modifystopwords(req, idxID, ln=CFG_SITE_LANG, idxSTOPWORDS='', callback='yes
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
+def modifyremovehtml(req, idxID, ln=CFG_SITE_LANG, idxHTML='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail()
+    navtrail_previous_links += """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyremovehtml(idxID=idxID,
+                                                      ln=ln,
+                                                      idxHTML=idxHTML,
+                                                      callback=callback,
+                                                      confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def modifyremovelatex(req, idxID, ln=CFG_SITE_LANG, idxLATEX='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail()
+    navtrail_previous_links += """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyremovelatex(idxID=idxID,
+                                                       ln=ln,
+                                                       idxLATEX=idxLATEX,
+                                                       callback=callback,
+                                                       confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
 
 def modifytag(req, fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (CFG_SITE_URL)
