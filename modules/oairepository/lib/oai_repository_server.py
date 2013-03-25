@@ -60,7 +60,7 @@ from invenio.config import \
 from invenio.intbitset import intbitset
 from invenio.htmlutils import X, EscapedXMLString
 from invenio.dbquery import run_sql, wash_table_column_name
-from invenio.search_engine import record_exists, get_all_restricted_recids, get_all_field_values, search_unit_in_bibxxx, get_record
+from invenio.search_engine import record_exists, get_all_restricted_recids, get_all_field_values, search_unit_in_bibxxx, get_record, search_pattern
 from invenio.bibformat import format_record
 from invenio.bibrecord import record_get_field_instances
 from invenio.errorlib import register_exception
@@ -630,14 +630,19 @@ def oai_get_response_date(delay=0):
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() + delay))
 
 def oai_get_recid(identifier):
-    """Returns the first database BIB ID for the OAI identifier 'identifier', if it exists."""
-    recid = None
+    """Returns the recid corresponding to the OAI identifier. Prefer a non deleted
+    record if multiple recids matches but some of them are deleted (e.g. in
+    case of merging). Returns None if no record matches."""
     if identifier:
-        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag=%%s AND bb.id_bibxxx=bx.id AND bx.value=%%s" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2])
-        res = run_sql(query, (CFG_OAI_ID_FIELD, identifier))
-        for row in res:
-            recid = row[0]
-    return recid
+        recids = search_pattern(p=identifier, f=CFG_OAI_ID_FIELD, m='e')
+        if recids:
+            restricted_recids = get_all_restricted_recids()
+            for recid in recids:
+                if record_exists(recid) > 0 and recid not in restricted_recids:
+                    return recid
+            if recid not in restricted_recids:
+                return recid
+    return None
 
 
 def get_set_last_update(set_spec=""):
