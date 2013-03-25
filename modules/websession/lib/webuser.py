@@ -236,7 +236,7 @@ def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
     """
     if uid > 0:
-        login_user(uid, rememeber_me)
+        login_user(uid, remember_me)
     else:
         logout_user()
     return uid
