@@ -27,7 +27,7 @@ pylib_DATA = __init__.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
              flask_sslify.py \
-	     data_cacher.py \
+             data_cacher.py \
              dbdump.py \
              web_api_key.py \
              web_api_key_model.py \
@@ -59,11 +59,12 @@ pylib_DATA = __init__.py \
              urlutils.py \
              urlutils_unit_tests.py \
              w3c_validator.py \
+             importutils.py \
              intbitset_unit_tests.py \
              intbitset_helper.py \
              inveniocfg.py \
              inveniocfg_unit_tests.py \
-	     settings.py \
+             settings.py \
              shellutils.py \
              shellutils_unit_tests.py \
              sqlalchemyutils.py \
@@ -99,8 +100,8 @@ pylib_DATA = __init__.py \
              sequtils_model.py \
              sequtils_regression_tests.py \
              crossrefutils.py \
-	     flaskshell.py \
-	     wtforms_utils.py \
+             flaskshell.py \
+             wtforms_utils.py \
              sherpa_romeo.py \
              sherpa_romeo_testing.py \
              orcid.py \
