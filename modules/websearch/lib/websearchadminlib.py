@@ -3505,6 +3505,7 @@ def get_detailed_page_tabs_counts(recID):
     num_reviews = 0 #num of reviews
     tabs_counts = {'Citations'   : 0,
                    'References'  : -1,
+                   'Discussions' : 0,
                    'Comments' : 0,
                    'Reviews' : 0
                    }
@@ -3527,7 +3528,9 @@ def get_detailed_page_tabs_counts(recID):
         num_reviews = get_nb_reviews(recID, count_deleted=False)
     if num_comments:
         tabs_counts['Comments'] = num_comments
+        tabs_counts['Discussions'] += num_comments
     if num_reviews:
         tabs_counts['Reviews'] = num_reviews
+        tabs_counts['Discussions'] += num_reviews
 
     return tabs_counts
