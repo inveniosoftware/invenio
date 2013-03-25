@@ -68,8 +68,10 @@ Bibrec.user_comment_subscritions = db.relationship(
 def request_record(f):
     @wraps(f)
     def decorated(recid, *args, **kwargs):
+        # ensure recid to be integer
+        recid = int(recid)
         g.collection = collection = Collection.query.filter(
-            Collection.name==guess_primary_collection_of_a_record(recid)).\
+            Collection.name == guess_primary_collection_of_a_record(recid)).\
             one()
 
         (auth_code, auth_msg) = check_user_can_view_record(current_user, recid)

@@ -204,7 +204,7 @@ def comments(recid):
     return render_template('webcomment_comments.html', comments=comments)
 
 
-@blueprint.route('/<recid>/reviews', methods=['GET', 'POST'])
+@blueprint.route('/<int:recid>/reviews', methods=['GET', 'POST'])
 #@blueprint.invenio_templated('webcomment_display.html')
 @request_record
 def reviews(recid):
@@ -278,7 +278,7 @@ def toggle(recid, id, show=None):
         return 'OK'
 
 
-@blueprint.route('/<recid>/comments/subscribe', methods=['GET', 'POST'])
+@blueprint.route('/<int:recid>/comments/subscribe', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @request_record
 def subscribe(recid):
@@ -325,10 +325,11 @@ from invenio.search_engine_utils import get_fieldvalues
 @blueprint.invenio_authenticated
 def subscriptions():
     uid = current_user.get_id()
-    all = CmtSUBSCRIPTION.query.filter(CmtSUBSCRIPTION.id_user==uid).all()
+    subscriptions = CmtSUBSCRIPTION.query.filter(CmtSUBSCRIPTION.id_user==uid).all()
     @register_template_context_processor
     def get_title():
         return dict(get_title = lambda r: get_fieldvalues(r, '245__a')[0])
-    return render_template('webcomment_subscriptions.html', subscriptions=all)
+    return render_template('webcomment_subscriptions.html',
+                           subscriptions=subscriptions)
 
 
