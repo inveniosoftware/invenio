@@ -44,7 +44,6 @@ from invenio.textutils import \
      translate_latex2unicode, \
      translate_to_ascii, \
      strip_accents, \
-     remove_control_characters, \
      transliterate_ala_lc
 
 from invenio.testutils import make_test_suite, run_test_suite
@@ -444,8 +443,10 @@ class TestStripping(unittest.TestCase):
     if UNIDECODE_AVAILABLE:
         def test_text_to_ascii(self):
             """textutils - transliterate to ascii using unidecode"""
-            self.assertEqual(translate_to_ascii(["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]), \
-                                                ["a i U", "Hohne", "Age Ost Vaer", "normal"])
+            self.assertEqual(translate_to_ascii(
+                ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]),
+                ["a i U", "Hohne", "Age Ost Vaer", "normal"]
+            )
             self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
             self.assertEqual(translate_to_ascii(None), None)
             self.assertEqual(translate_to_ascii([]), [])
@@ -459,13 +460,6 @@ class TestStripping(unittest.TestCase):
                          strip_accents('mémêmëmè'))
         self.assertEqual("MEMEMEME",
                          strip_accents('MÉMÊMËMÈ'))
-
-    def test_remove_control_characters(self):
-        """textutils - stripping of accented letters"""
-        self.assertEqual("foo\nbar\tfab\n\r",
-                         remove_control_characters('foo\nbar\tfab\n\r'))
-        self.assertEqual("abc de",
-                         remove_control_characters('abc\02de'))
 
 
 class TestALALC(unittest.TestCase):
