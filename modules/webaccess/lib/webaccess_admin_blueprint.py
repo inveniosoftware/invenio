@@ -19,21 +19,10 @@
 
 """WebAccess Admin Flask Blueprint"""
 
-import pprint
-from string import rfind, strip
-from datetime import datetime
-from hashlib import md5
-
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
-from invenio.cache import cache
-from invenio.intbitset import intbitset as HitSet
-from invenio.sqlalchemyutils import db
+from flask import redirect, url_for
 from invenio.webaccess_model import AccACTION, AccROLE
 from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webuser_flask import current_user
-from sqlalchemy.sql import operators
 
 from invenio.access_control_config import \
     WEBACCESSACTION
@@ -41,11 +30,11 @@ from invenio.access_control_config import \
 blueprint = InvenioBlueprint('webaccess_admin', __name__,
                              url_prefix="/admin/webaccess",
                              config='invenio.access_control_config',
-                             breadcrumbs=[(_('Administration'),'help.admin'),
-                                          (_('WebAccess'),'webaccesss_admin.index')],
+                             breadcrumbs=[(_('Administration'), 'help.admin'),
+                                          (_('WebAccess'), 'webaccesss_admin.index')],
                              menubuilder=[('main.admin.webaccess',
-                                            _('Configure WebAccess'),
-                                            'webaccess_admin.index', 90)])
+                                          _('Configure WebAccess'),
+                                          'webaccess_admin.index', 90)])
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -75,7 +64,7 @@ def index():
         dict(url=url_for('.managerobotlogin'),
              title=_('Manage Robot Login'),
              description=_('Manage robot login keys and test URLs.')),
-        ]
+    ]
     return dict(actions=actions)
 
 
@@ -85,7 +74,7 @@ def index():
 @blueprint.invenio_sorted(AccACTION)
 @blueprint.invenio_templated('webaccess_admin_actionarea.html')
 def actionarea(sort=False, filter=None):
-    if sort==False:
+    if sort is False:
         sort = AccACTION.name
     actions = AccACTION.query.order_by(sort).filter(filter).all()
     return dict(actions=actions)
@@ -97,10 +86,11 @@ def actionarea(sort=False, filter=None):
 @blueprint.invenio_sorted(AccROLE)
 @blueprint.invenio_templated('webaccess_admin_rolearea.html')
 def rolearea(sort=False, filter=None):
-    if sort==False:
+    if sort is False:
         sort = AccROLE.name
     roles = AccROLE.query.order_by(sort).filter(filter).all()
     return dict(roles=roles)
+
 
 @blueprint.route('/showroledetails/<int:id_role>', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
@@ -109,13 +99,14 @@ def rolearea(sort=False, filter=None):
 def showroledetails(id_role):
     return dict(role=AccROLE.query.get_or_404(id_role))
 
+
 @blueprint.route('/userarea', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_authorized(WEBACCESSACTION)
 @blueprint.invenio_sorted(User)
 @blueprint.invenio_templated('webaccess_admin_userarea.html')
 def userarea(sort=False, filter=None):
-    if sort==False:
+    if sort is False:
         sort = User.nickname
     users = User.query.order_by(sort).filter(filter).all()
     return dict(users=users)
@@ -123,18 +114,23 @@ def userarea(sort=False, filter=None):
 
 @blueprint.route('/resetarea', methods=['GET', 'POST'])
 def resetarea():
-    pass
+    #FIXME reimplement this function
+    return redirect('/admin/webaccess/webaccessadmin.py/resetarea')
+
 
 @blueprint.route('/manageaccounts', methods=['GET', 'POST'])
 def manageaccounts():
-    pass
+    #FIXME reimplement this function
+    return redirect('/admin/webaccess/webaccessadmin.py/manageaccounts')
 
 
 @blueprint.route('/delegate_startarea', methods=['GET', 'POST'])
 def delegate_startarea():
-    pass
+    #FIXME reimplement this function
+    return redirect('/admin/webaccess/webaccessadmin.py/delegate_startarea')
+
 
 @blueprint.route('/managerobotlogin', methods=['GET', 'POST'])
 def managerobotlogin():
-    pass
-
+    #FIXME reimplement this function
+    return redirect('/admin/webaccess/webaccessadmin.py/managerobotlogin')
