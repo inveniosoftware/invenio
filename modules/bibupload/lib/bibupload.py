@@ -571,10 +571,10 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         write_message("Stage 5: Start (Update bibrec table with current date).",
                     verbose=2)
         if opt_stage_to_start_from <= 5 and \
-        opt_notimechange == 0 and \
-        not insert_mode_p:
+        opt_notimechange == 0:
+            bibrec_now = convert_datestruct_to_datetext(time.localtime())
             write_message("   -Retrieved current localtime: DONE", verbose=2)
-            update_bibrec_modif_date(now.strftime("%Y-%m-%d %H:%M:%S"), rec_id, pretend=pretend)
+            update_bibrec_date(bibrec_now, rec_id, insert_mode_p, pretend=pretend)
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
@@ -2214,16 +2214,20 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
 ### Update functions
 
-def update_bibrec_modif_date(now, bibrec_id, pretend=False):
+def update_bibrec_date(now, bibrec_id, insert_mode_p, pretend=False):
     """Update the date of the record in bibrec table """
-    query = """UPDATE bibrec SET modification_date=%s WHERE id=%s"""
-    params = (now, bibrec_id)
+    if insert_mode_p:
+        query = """UPDATE bibrec SET creation_date=%s, modification_date=%s WHERE id=%s"""
+        params = (now, now, bibrec_id)
+    else:
+        query = """UPDATE bibrec SET modification_date=%s WHERE id=%s"""
+        params = (now, bibrec_id)
     try:
         if not pretend:
             run_sql(query, params)
-        write_message("   -Update record modification date: DONE" , verbose=2)
+        write_message("   -Update record creation/modification date: DONE" , verbose=2)
     except Error, error:
-        write_message("   Error during update_bibrec_modif_date function: %s" % error,
+        write_message("   Error during update_bibrec_date function: %s" % error,
                       verbose=1, stream=sys.stderr)
 
 def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date=None, pretend=False):

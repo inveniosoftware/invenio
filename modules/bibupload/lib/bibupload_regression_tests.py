@@ -943,7 +943,7 @@ class BibUploadInsertModeTest(GenericBibUploadTest):
         # Retrive the inserted record based on the record id
         rec = get_record(recid)
         # We retrieve the creationdate date from the database
-        query = """SELECT DATE_FORMAT(creation_date,'%%Y%%m%%d%%H%%i%%s') FROM bibrec where id = %s"""
+        query = """SELECT DATE_FORMAT(last_updated,'%%Y%%m%%d%%H%%i%%s') FROM bibfmt where id_bibrec=%s AND format='XM'"""
         res = run_sql(query, (recid, ))
         self.assertEqual(record_has_field(rec,'005'),True)
         self.assertEqual(str(res[0][0])+'.0',record_get_field_value(rec,'005','',''))
@@ -1032,7 +1032,7 @@ class BibUploadAppendModeTest(GenericBibUploadTest):
         # Retrieve current localtime
         now = time.localtime()
         # We update the modification date
-        bibupload.update_bibrec_modif_date(convert_datestruct_to_datetext(now), rec_id)
+        bibupload.update_bibrec_date(convert_datestruct_to_datetext(now), rec_id, False)
         # We retrieve the modification date from the database
         query = """SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec where id = %s"""
         res = run_sql(query, (str(rec_id), ))
