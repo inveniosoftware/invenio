@@ -40,7 +40,7 @@ $(document).ready(function() {
 {% endif %}
 
 <ul class="nav nav-pills">
-  <li><a href="{{ url_for('.write') }}">{{ _("Write new message") }}</a></li>
+  <li><a href="{{ url_for('.add') }}">{{ _("Write new message") }}</a></li>
   <li><a href="{{ url_for('.delete_all') }}">{{ _("Delete All") }}</a></li>
   <li><button class="btn" data-toggle="collapse" data-target="#filter" href="#filter">{{ _("Toggle Filter") }}</button></li>
 </ul>
