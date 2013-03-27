@@ -1794,6 +1794,7 @@ CREATE TABLE IF NOT EXISTS idxWORD01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1809,6 +1810,7 @@ CREATE TABLE IF NOT EXISTS idxWORD02R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1824,6 +1826,7 @@ CREATE TABLE IF NOT EXISTS idxWORD03R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1839,6 +1842,7 @@ CREATE TABLE IF NOT EXISTS idxWORD04R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1854,6 +1858,7 @@ CREATE TABLE IF NOT EXISTS idxWORD05R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1869,6 +1874,7 @@ CREATE TABLE IF NOT EXISTS idxWORD06R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1884,6 +1890,7 @@ CREATE TABLE IF NOT EXISTS idxWORD07R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1899,6 +1906,7 @@ CREATE TABLE IF NOT EXISTS idxWORD08R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1914,6 +1922,7 @@ CREATE TABLE IF NOT EXISTS idxWORD09R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1929,6 +1938,7 @@ CREATE TABLE IF NOT EXISTS idxWORD10R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1944,6 +1954,7 @@ CREATE TABLE IF NOT EXISTS idxWORD11R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1959,6 +1970,7 @@ CREATE TABLE IF NOT EXISTS idxWORD12R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1974,6 +1986,7 @@ CREATE TABLE IF NOT EXISTS idxWORD13R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -1989,6 +2002,7 @@ CREATE TABLE IF NOT EXISTS idxWORD14R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2004,6 +2018,7 @@ CREATE TABLE IF NOT EXISTS idxWORD15R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2019,6 +2034,7 @@ CREATE TABLE IF NOT EXISTS idxWORD16R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2034,6 +2050,7 @@ CREATE TABLE IF NOT EXISTS idxWORD17R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2049,6 +2066,7 @@ CREATE TABLE IF NOT EXISTS idxWORD18R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2064,6 +2082,7 @@ CREATE TABLE IF NOT EXISTS idxWORD19R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2079,6 +2098,7 @@ CREATE TABLE IF NOT EXISTS idxWORD20R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2095,6 +2115,7 @@ CREATE TABLE IF NOT EXISTS idxWORD21R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2110,6 +2131,7 @@ CREATE TABLE IF NOT EXISTS idxWORD22R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2125,6 +2147,7 @@ CREATE TABLE IF NOT EXISTS idxWORD23R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2140,6 +2163,7 @@ CREATE TABLE IF NOT EXISTS idxWORD24R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2155,6 +2179,7 @@ CREATE TABLE IF NOT EXISTS idxWORD25R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2185,6 +2210,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2200,6 +2226,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR02R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2215,6 +2242,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR03R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2230,6 +2258,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR04R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2245,6 +2274,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR05R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2260,6 +2290,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR06R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2275,6 +2306,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR07R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2290,6 +2322,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR08R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2305,6 +2338,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR09R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2320,6 +2354,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR10R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2335,6 +2370,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR11R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2350,6 +2386,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR12R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2365,6 +2402,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR13R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2380,6 +2418,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR14R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2395,6 +2434,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR15R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2410,6 +2450,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR16R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2425,6 +2466,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR17R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2440,6 +2482,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR18R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2455,6 +2498,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR19R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2470,6 +2514,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR20R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2485,6 +2530,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR21R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2500,6 +2546,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR22R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2515,6 +2562,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR23R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2530,6 +2578,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR24R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2545,6 +2594,7 @@ CREATE TABLE IF NOT EXISTS idxPAIR25R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2575,6 +2625,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2590,6 +2641,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE02R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2605,6 +2657,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE03R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2620,6 +2673,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE04R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2635,6 +2689,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE05R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2650,6 +2705,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE06R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2665,6 +2721,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE07R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
@@ -2998,6 +3055,7 @@ CREATE TABLE IF NOT EXISTS rnkWORD01R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  KEY type (type),
   PRIMARY KEY  (id_bibrec,type)
 ) ENGINE=MyISAM;
 
