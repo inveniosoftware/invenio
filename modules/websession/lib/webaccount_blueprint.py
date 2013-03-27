@@ -52,7 +52,8 @@ def login():
         try:
             #TODO add login_methods
             user = User.query.filter(db.and_(
-                User.nickname == form.nickname.data,
+                db.or_(User.nickname == form.nickname.data,
+                       User.email == form.nickname.data),
                 User.password == form.password.data)).one()
             login_user(user.get_id(), remember_me=form.remember.data)
             flash(_("You are logged in as %s.") % user.nickname, "info")
@@ -74,6 +75,7 @@ def login():
 @blueprint.invenio_set_breadcrumb(_("Logout"))
 def logout():
     logout_user()
+    flash(_("You have been logged out."), 'info')
     return render_template('webaccount_logout.html',
                             using_sso=CFG_EXTERNAL_AUTH_USING_SSO,
                             logout_sso=CFG_EXTERNAL_AUTH_LOGOUT_SSO)
