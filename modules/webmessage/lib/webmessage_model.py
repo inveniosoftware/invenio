@@ -157,9 +157,8 @@ class MsgMESSAGE(db.Model):
 
 from invenio.webmessage_config import CFG_WEBMESSAGE_EMAIL_ALERT
 from invenio.config import CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL
-from invenio.mailutils import send_email,\
-                              scheduled_send_email
-from flask import render_template, current_app
+from invenio.mailutils import send_email, scheduled_send_email
+from invenio.jinja2utils import render_template_to_string
 from invenio.dateutils import datetext_format
 from datetime import datetime
 
@@ -179,14 +178,17 @@ def email_alert(mapper, connection, target):
     for u in m.recipients:
         if isinstance(u.settings, dict) and \
             u.settings.get('webmessage_email_alert', True):
-            alert(
-                CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
-                u.email,
-                subject = m.subject,
-                content = render_template(
-                        'webmessage_email_alert.html',
-                        message=m, user=u))
-
+            try:
+                alert(
+                    CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
+                    u.email,
+                    subject = m.subject,
+                    content = render_template_to_string(
+                            'webmessage_email_alert.html',
+                            message=m, user=u))
+            except:
+                # FIXME tests are not in request context
+                pass
 
 
 if CFG_WEBMESSAGE_EMAIL_ALERT:

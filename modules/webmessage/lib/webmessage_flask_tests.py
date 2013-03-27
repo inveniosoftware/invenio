@@ -1,50 +1,51 @@
-import base64
-from flask import current_app, request
+# -*- coding: utf-8 -*-
+#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 from invenio.sqlalchemyutils import db
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE
-from flask import session, g
-
 from invenio.testutils import make_flask_test_suite, run_test_suite, \
-                              FlaskSQLAlchemyTest
+    FlaskSQLAlchemyTest, InvenioFixture
 
 from fixture import SQLAlchemyFixture
 from invenio.webaccount_fixtures import UserData
 
-#class UsergroupData(DataSet):
-#    class thesisViewers:
-#        name = 'Theses viewers'
-#        all_users = set([UserData.romeo, UserData.juliet])
-#    class montagueFamily:
-#        name = 'montague-family'
 
-## This was used when there are subtransactions in test.
-#class FlaskSQLAlchemyFixture(SQLAlchemyFixture):
-#    def create_transaction(self):
-#        if self.connection is not None:
-#            transaction = self.session.begin(subtransactions=True)
-#        else:
-#            transaction = self.session.begin(subtransactions=True)
-#        return transaction
+def fixture_builder():
+    from invenio.websession_model import User
+    return SQLAlchemyFixture(env={'UserData': User}, engine=db.metadata.bind,
+                             session=db.session)
 
-from invenio.websession_model import *
-from invenio.webmessage_model import *
 
-fixture = SQLAlchemyFixture(
-        env={'UserData': User},
-        engine=db.metadata.bind,
-        session=db.session
-        )
+fixture = InvenioFixture(fixture_builder)
 
 
 class MsgMESSAGETest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData)
     def test_index(data, self):
-        users = data.UserData
+        from invenio.websession_model import User
+        from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
 
+        users = data.UserData
         admin = User.query.filter(User.nickname.like('admin')).one()
         romeo = User.query.filter(User.nickname.like('romeo')).one()
-        juliet= User.query.filter(User.nickname.like('juliet')).one()
+        juliet = User.query.filter(User.nickname.like('juliet')).one()
 
         m = MsgMESSAGE()
         m.subject = 'Message 1 Subject'
@@ -52,7 +53,7 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
         try:
             m.sent_to_user_nicks = 'admin, NOTEXISTS'
         except:
-            assert m.sent_to_user_nicks == None
+            assert m.sent_to_user_nicks is None
         m.sent_to_user_nicks = ', '.join([users.admin.nickname,
                                           users.romeo.nickname])
 
@@ -63,9 +64,9 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
             assert m.sent_to_user_nicks == ','.join([users.admin.nickname,
                                                      users.romeo.nickname])
 
-
         m.sent_to_group_names = ''
         m.id_user_from = users.admin.id
+
         db.session.add(m)
         db.session.commit()
 
@@ -75,19 +76,19 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
         assert juliet not in m.recipients
 
         response = self.login(users.admin.nickname, users.admin.password)
-        assert 'You have been logged in' in response.data
+        assert users.admin.nickname in response.data
         response = self.client.get("/yourmessages/", follow_redirects=True)
         assert 'Message 1 Subject' in response.data
         self.logout()
 
         response = self.login(users.romeo.nickname, users.romeo.password)
-        assert 'You have been logged in' in response.data
+        assert users.romeo.nickname in response.data
         response = self.client.get("/yourmessages/", follow_redirects=True)
         assert 'Message 1 Subject' in response.data
         self.logout()
 
         response = self.login(users.juliet.nickname, users.juliet.password)
-        assert 'You have been logged in' in response.data
+        assert users.juliet.nickname in response.data
         response = self.client.get("/yourmessages/", follow_redirects=True)
         assert 'Message 1 Subject' not in response.data
         self.logout()
@@ -99,6 +100,9 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData)
     def test_send_later(data, self):
+        from invenio.websession_model import User
+        from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
+
         users = data.UserData
         romeo = User.query.filter(User.nickname.like('romeo')).one()
 
@@ -118,7 +122,7 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
         m.id_user_from = users.romeo.id
         m.sent_date = sent
         db.session.add(m)
-        db.session.commit()
+        #db.session.commit()
 
         m = MsgMESSAGE()
         m.subject = 'sent_later'
@@ -153,7 +157,6 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
 
         while datetime.now() <= received:
             time.sleep(1)
-            print '.',
 
         time.sleep(1)
 
@@ -162,16 +165,19 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
         assert 'sent_later' in response.data
 
         # Avoid problems with foreign keys.
-        UserMsgMESSAGE.query.delete()
-        MsgMESSAGE.query.delete()
+        UserMsgMESSAGE.query.delete(synchronize_session='fetch')
+        MsgMESSAGE.query.delete(synchronize_session='fetch')
         db.session.commit()
 
     @fixture.with_data(UserData)
     def test_with_fixture(data, self):
+        from invenio.websession_model import User
         u = User.query.all()
         assert len(u) == len(dict(data.UserData))
+        db.session.commit()
 
     def test_without_fixture(self):
+        from invenio.websession_model import User
         u = User.query.all()
         assert len(u) == 0
 

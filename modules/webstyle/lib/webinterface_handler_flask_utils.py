@@ -255,14 +255,12 @@ class InvenioBlueprint(Blueprint):
                     except:
                         flash(_("Invalid filtering key '%s'.") % column)
                 if form is not None:
-                    current_app.logger.info("Values %s" % request.values)
                     filter_form = form(request.values)
                     @register_template_context_processor
                     def inject_filter_form():
                         return dict(filter_form=filter_form)
                 # Generate ClauseElement for filtered columns.
                 kwargs['filter'] = db.and_(*where)
-                current_app.logger.info("Where: %s" % kwargs['filter'])
                 return f(*args, **kwargs)
             return decorated_function
         return decorator

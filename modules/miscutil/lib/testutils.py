@@ -132,8 +132,31 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
     CFG_DATABASE_SLAVE
 from invenio.webinterface_handler_flask import create_invenio_flask_app
 from invenio.sqlalchemyutils import db
-from flask.ext.testing import TestCase, Twill
+from flask.ext.testing import TestCase
 from sqlalchemy.engine.url import URL
+from functools import wraps
+
+
+class InvenioFixture(object):
+
+    def __init__(self, fixture_builder=None):
+        self.fixture = None
+        self.fixture_builder = fixture_builder
+
+    def with_data(self, *datatypes):
+        def dictate(func):
+            @wraps(func)
+            def patched(*args, **kwargs):
+                if self.fixture is None:
+                    self.fixture = self.fixture_builder()
+
+                @self.fixture.with_data(*datatypes)
+                def with_data_func(data):
+                    return func(data, *args, **kwargs)
+                return with_data_func()
+            return patched
+        return dictate
+
 
 class FlaskSQLAlchemyTest(TestCase):
     engine = CFG_DATABASE_TYPE
@@ -153,30 +176,24 @@ class FlaskSQLAlchemyTest(TestCase):
             )
 
     def create_app(self):
-        db.init_invenio(engine=self.engine)
-        app = create_invenio_flask_app()
-        app.debug = False
-        app.config['SQLALCHEMY_ECHO'] = False
-        app.config['SQLALCHEMY_DATABASE_URI'] = self.SQLALCHEMY_DATABASE_URI
-        db.init_app(app)
+        app = create_invenio_flask_app(engine=self.engine,
+                                       SQLALCHEMY_DATABASE_URI=self.SQLALCHEMY_DATABASE_URI)
+        app.testing = True
         return app
 
     def setUp(self):
         db.create_all()
 
     def tearDown(self):
-        #db.session.remove()
         db.session.expunge_all()
         db.session.rollback()
         db.drop_all()
 
     def login(self, username, password):
         return self.client.post('/youraccount/login',
-                #base_url=request.base_url.replace('http:','https:'),
-                data=dict(
-                nickname=username,
-                password=password
-                ), follow_redirects=True)
+                                # base_url=request.base_url.replace('http:','https:'),
+                                data=dict(nickname=username, password=password),
+                                follow_redirects=True)
 
     def logout(self):
         return self.client.get('/youraccount/logout', follow_redirects=True)
@@ -187,11 +204,12 @@ def make_flask_test_suite(*test_cases):
     """ Build up a Flask test suite given separate test cases"""
     from operator import add
     from invenio.config import CFG_DEVEL_TEST_DATABASE_ENGINES
-    create_type = lambda c: [type(k+c.__name__, (c,), d)
-                             for k,d in CFG_DEVEL_TEST_DATABASE_ENGINES.iteritems()]
+    create_type = lambda c: [type(k + c.__name__, (c,), d)
+                             for k, d in CFG_DEVEL_TEST_DATABASE_ENGINES.iteritems()]
 
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
-                for case in reduce(add, map(create_type, test_cases))])
+                              for case in reduce(add, map(create_type,
+                                                          test_cases))])
 
 
 @nottest
@@ -200,7 +218,6 @@ def run_test_suite(testsuite, warn_user=False):
     Convenience function to embed in test suites.  Run given testsuite
     and eventually ask for confirmation of warn_user is True.
     """
-    from invenio.flaskshell import *
     if warn_user:
         warn_user_about_tests()
     res = unittest.TextTestRunner(verbosity=2).run(testsuite)
@@ -524,6 +541,7 @@ def build_and_run_regression_test_suite():
     run it.  Called by 'inveniocfg --run-regression-tests'.
     """
 
+    from invenio import flaskshell
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_regression_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
@@ -548,7 +566,7 @@ def build_and_run_web_test_suite():
     '*_web_tests.py', build a complete test suite of them, and
     run it.  Called by 'inveniocfg --run-web-tests'.
     """
-
+    from invenio import flaskshell
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_web_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))

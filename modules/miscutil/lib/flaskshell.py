@@ -27,13 +27,9 @@ from invenio.sqlalchemyutils import db
 
 # STEP 2 - Create application object and initialize database.
 app = create_invenio_flask_app()
-db.init_invenio()
-db.init_cfg(app)
-db.init_app(app)
 
 # STEP 3 - Create fake application request context and use it.
 ctx = app.test_request_context()
 ctx.push()
 # For explanation see: http://flask.pocoo.org/docs/shell/#firing-before-after-request
 app.preprocess_request()
-

@@ -32,7 +32,6 @@ from flask import Flask, session, request, g, \
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError
 
-from invenio.sqlalchemyutils import db
 from invenio import config
 from invenio.errorlib import register_exception
 from invenio.config import CFG_PYLIBDIR, \
@@ -50,7 +49,7 @@ CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
 
-def create_invenio_flask_app():
+def create_invenio_flask_app(**kwargs_config):
     """
     Prepare WSGI Invenio application based on Flask.
 
@@ -84,10 +83,26 @@ def create_invenio_flask_app():
         static_url_path='',
         static_folder=CFG_WEBDIR)
 
+    ## Update application config from parameters.
+    _app.config.update(kwargs_config)
+
+    if 'SQLALCHEMY_DATABASE_URI' not in _app.config:
+        from sqlalchemy.engine.url import URL
+        # Global variables
+        from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_PORT,\
+            CFG_DATABASE_NAME, CFG_DATABASE_USER, CFG_DATABASE_PASS, \
+            CFG_DATABASE_TYPE
+
+        _app.config['SQLALCHEMY_DATABASE_URI'] = URL(CFG_DATABASE_TYPE,
+                                                     username=CFG_DATABASE_USER,
+                                                     password=CFG_DATABASE_PASS,
+                                                     host=CFG_DATABASE_HOST,
+                                                     database=CFG_DATABASE_NAME,
+                                                     port=CFG_DATABASE_PORT,
+                                                     )
+
     ## Let's initialize database.
-    db.init_invenio()
-    db.init_cfg(_app)
-    # Register Flask application in flask-sqlalchemy extension
+    from invenio.sqlalchemyutils import db
     db.init_app(_app)
 
     ## Make sure that all tables are loaded in `db.metadata.tables`.

@@ -18,14 +18,21 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import sqlalchemy
-import sqlalchemy.orm
 import base64
 import json
-from sqlalchemy.orm import class_mapper, \
-                           properties
-from sqlalchemy.ext.hybrid import hybrid_property
-from invenio.intbitset import intbitset
+from sqlalchemy import event
+from sqlalchemy.pool import Pool
+from sqlalchemy.ext.hybrid import hybrid_property, Comparator
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.orm import class_mapper, properties
 from sqlalchemy.types import TypeDecorator, TEXT
+from sqlalchemy.sql.expression import FunctionElement
+from invenio.intbitset import intbitset
+
+try:
+    from flask.ext.sqlalchemy import SQLAlchemy
+except:
+    from flaskext.sqlalchemy import SQLAlchemy
 
 
 def getRelationships(self):
@@ -71,6 +78,7 @@ def todict(self):
             value = value.tolist()
         yield(c.name, value)
 
+
 def fromdict(self, args):
     """
     """
@@ -86,6 +94,7 @@ def fromdict(self, args):
     #
     #    setattr(self, c.name, d)
 
+
 def iterfunc(self):
     """Returns an iterable that supports .next()
         so we can do dict(sa_instance)
@@ -93,18 +102,10 @@ def iterfunc(self):
     """
     return self.todict()
 
-# Global variables
-from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_PORT,\
-    CFG_DATABASE_NAME, CFG_DATABASE_USER, CFG_DATABASE_PASS
-
-# TODO Add to invenio.config
-CFG_DATABASE_TYPE = 'mysql'
-
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.sql.expression import ColumnClause, FunctionElement
 
 class AsBINARY(FunctionElement):
     name = 'AsBINARY'
+
 
 @compiles(AsBINARY)
 def compile(element, compiler, **kw):
@@ -138,9 +139,8 @@ class JSONEncodedTextDict(TypeDecorator):
 #def compile_binary_postgresql(type_, compiler, **kw):
 #    return "BYTEA"
 
+
 def _include_sqlalchemy(obj, engine=None):
-    if engine is None:
-        engine = CFG_DATABASE_TYPE
     #for module in sqlalchemy, sqlalchemy.orm:
     #    for key in module.__all__:
     #        if not hasattr(obj, key):
@@ -154,14 +154,26 @@ def _include_sqlalchemy(obj, engine=None):
 
     setattr(obj, 'JSON', JSONEncodedTextDict)
     setattr(obj, 'Char', engine_types.CHAR)
-    setattr(obj, 'TinyText', engine_types.TINYTEXT)
+    try:
+        setattr(obj, 'TinyText', engine_types.TINYTEXT)
+    except:
+        setattr(obj, 'TinyText', engine_types.TEXT)
     setattr(obj, 'hybrid_property', hybrid_property)
-    setattr(obj, 'Double', engine_types.DOUBLE)
+    try:
+        setattr(obj, 'Double', engine_types.DOUBLE)
+    except:
+        setattr(obj, 'Double', engine_types.FLOAT)
     setattr(obj, 'Integer', engine_types.INTEGER)
     setattr(obj, 'SmallInteger', engine_types.SMALLINT)
-    setattr(obj, 'MediumInteger', engine_types.MEDIUMINT)
+    try:
+        setattr(obj, 'MediumInteger', engine_types.MEDIUMINT)
+    except:
+        setattr(obj, 'MediumInteger', engine_types.INT)
     setattr(obj, 'BigInteger', engine_types.BIGINT)
-    setattr(obj, 'TinyInteger', engine_types.TINYINT)
+    try:
+        setattr(obj, 'TinyInteger', engine_types.TINYINT)
+    except:
+        setattr(obj, 'TinyInteger', engine_types.INT)
     setattr(obj, 'Binary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iBinary', sqlalchemy.types.LargeBinary)
     setattr(obj, 'iLargeBinary', sqlalchemy.types.LargeBinary)
@@ -176,28 +188,13 @@ def _include_sqlalchemy(obj, engine=None):
 
     def default_enum(f):
         def decorated(*args, **kwargs):
-            kwargs['native_enum'] = engine == 'mysql' #False
+            kwargs['native_enum'] = engine == 'mysql'  # False
             return f(*args, **kwargs)
         return decorated
 
     obj.Enum.__init__ = default_enum(obj.Enum.__init__)
-
     obj.AsBINARY = AsBINARY
 
-def _model_plugin_builder(plugin_name, plugin_code):
-    return plugin_code
-
-def load_all_model_files(db=None):
-    """Load all SQLAlchemy database models."""
-    import os
-    import invenio
-    from invenio.config import CFG_PYLIBDIR
-    from invenio.pluginutils import PluginContainer
-    models = os.path.join(CFG_PYLIBDIR, 'invenio', '*_model.py')
-    return PluginContainer(models,
-        plugin_builder=_model_plugin_builder).values()
-
-from sqlalchemy.ext.hybrid import Comparator
 
 class PasswordComparator(Comparator):
     def __eq__(self, other):
@@ -210,15 +207,6 @@ class PasswordComparator(Comparator):
         email = self.__clause_element__().table.columns.email
         return db.func.aes_encrypt(email, password)
 
-try:
-    from flask.ext.sqlalchemy import SQLAlchemy
-except:
-    from flaskext.sqlalchemy import SQLAlchemy
-
-from sqlalchemy.engine.url import URL
-
-from sqlalchemy import event
-from sqlalchemy.pool import Pool
 
 def autocommit_on_checkin(dbapi_con, con_record):
     """Calls autocommit on raw mysql connection for fixing bug in MySQL 5.5"""
@@ -227,40 +215,26 @@ def autocommit_on_checkin(dbapi_con, con_record):
 ## Possibly register globally.
 #event.listen(Pool, 'checkin', autocommit_on_checkin)
 
+
 class InvenioDB(SQLAlchemy):
     """Invenio database object."""
 
     PasswordComparator = PasswordComparator
 
-    def init_invenio(self, engine=None):
-        #               connect_args={'use_unicode':False, 'charset':'utf8'})
-        #self.session = scoped_session(sessionmaker(autocommit=False,
-        #                                 autoflush=False,
-        #                                 bind=self.engine))
-
+    def init_app(self, app):
+        super(InvenioDB, self).init_app(app)
+        engine = app.config.get('CFG_DATABASE_TYPE', 'mysql')
         self.Model.todict = todict
         self.Model.fromdict = fromdict
         self.Model.__iter__ = iterfunc
-        #if engine == 'mysql':
-        self.Model.__table_args__ = {
-            'keep_existing':    True,
-            'extend_existing':  False,
-            'mysql_engine':     'MyISAM',
-            'mysql_charset':    'utf8'
-            }
+        self.Model.__table_args__ = {}
+        if engine == 'mysql':
+            self.Model.__table_args__ = {'keep_existing':    True,
+                                         'extend_existing':  False,
+                                         'mysql_engine':     'MyISAM',
+                                         'mysql_charset':    'utf8'}
 
         _include_sqlalchemy(self, engine=engine)
-
-    def init_cfg(self, app):
-        app.debug = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = URL(
-            CFG_DATABASE_TYPE,
-            username = CFG_DATABASE_USER,
-            password = CFG_DATABASE_PASS,
-            host = CFG_DATABASE_HOST,
-            database = CFG_DATABASE_NAME,
-            port = CFG_DATABASE_PORT,
-            )
 
     def __getattr__(self, name):
         # This is only called when the normal mechanism fails, so in practice
@@ -272,10 +246,9 @@ class InvenioDB(SQLAlchemy):
 
     def schemadiff(self, excludeTables=None):
         from migrate.versioning import schemadiff
-        for m in load_all_model_files():
-            exec("from %s import *"%(m.__name__))
         return schemadiff.getDiffOfModelAgainstDatabase(self.metadata,
-            self.engine, excludeTables=excludeTables)
+                                                        self.engine,
+                                                        excludeTables=excludeTables)
 
     def apply_driver_hacks(self, app, info, options):
         """
@@ -284,10 +257,8 @@ class InvenioDB(SQLAlchemy):
         # Don't forget to apply hacks defined on parent object.
         super(InvenioDB, self).apply_driver_hacks(app, info, options)
         if info.drivername == 'mysql':
-            options.setdefault('execution_options', {'autocommit': True })
+            options.setdefault('execution_options', {'autocommit': True})
             event.listen(Pool, 'checkin', autocommit_on_checkin)
 
 
 db = InvenioDB()
-# FIXME add __init__ method for db.
-_include_sqlalchemy(db, engine=None)
