@@ -236,7 +236,9 @@ class SimulatedModPythonRequest(object):
         return request.remote_addr
 
     def get_remote_host(self):
-        return request.environ['REMOTE_HOST']
+        return request.environ.get('REMOTE_HOST',  # apache
+                                   request.environ.get('HTTP_HOST',
+                                                       '0.0.0.0'))  # not found
 
     def get_header_only(self):
         return request.environ['REQUEST_METHOD'] == 'HEAD'
