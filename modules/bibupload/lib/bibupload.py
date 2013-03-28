@@ -46,10 +46,14 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBUPLOAD_DELETE_FORMATS, \
-     CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, \
+     CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
+     CFG_SITE_RECORD, \
      CFG_OAI_PROVENANCE_ALTERED_SUBFIELD, \
      CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
-     CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE
+     CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, \
+     CFG_CERN_SITE, \
+     CFG_INSPIRE_SITE
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
@@ -77,7 +81,7 @@ from invenio.bibrecord import create_records, \
                               record_extract_dois, \
                               record_has_field,\
                               records_identical
-from invenio.search_engine import get_record
+from invenio.search_engine import get_record, record_exists, search_pattern
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibcatalog import bibcatalog_system
@@ -646,7 +650,7 @@ def find_record_ids_by_oai_id(oaiId):
         recids = search_pattern(p=oaiId, f=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, m='e')
 
         # Is this record already in invenio (matching by reportnumber i.e.
-        # particularly 037. Idea: to avoid doubbles insertions)
+        # particularly 037. Idea: to avoid double insertions)
         repnumber = oaiId.split(":")[-1]
         if repnumber:
             recids |= search_pattern(p = repnumber,
@@ -660,7 +664,15 @@ def find_record_ids_by_oai_id(oaiId):
                                 f = "reportnumber",
                                 m = 'e' )
 
-        return recids
+        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
+            ## FIXME: for the time being this functionality is available only on INSPIRE
+            ## or CDS, and waiting to be replaced by proper pidstore integration
+            if CFG_CERN_SITE:
+                return recids - (search_pattern(p='DELETED', f='980__%', m='e') | search_pattern(p='DUMMY', f='980__%', m='e'))
+            else:
+                return recids - search_pattern(p='DELETED', f='980__%', m='e')
+        else:
+            return recids
     else:
         return intbitset()
 
@@ -847,14 +859,19 @@ def find_record_from_sysno(sysno):
     bibrec_bibxxx = 'bibrec_' + bibxxx
     res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
         %(bibxxx)s AS b WHERE b.tag=%%s AND b.value=%%s
-        AND bb.id_bibxxx=b.id""" % \
+        AND bb.id_bibxxx=b.id""" %
                     {'bibxxx': bibxxx,
                     'bibrec_bibxxx': bibrec_bibxxx},
                     (CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, sysno,))
-    if res:
-        return res[0][0]
-    else:
-        return None
+    for recid in res:
+        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
+            ## FIXME: for the time being this functionality is available only on INSPIRE
+            ## or CDS, and waiting to be replaced by proper pidstore integration
+            if record_exists(recid[0]) > 0: ## Only non deleted records
+                return recid[0]
+        else:
+            return recid[0]
+    return None
 
 def find_records_from_extoaiid(extoaiid, extoaisrc=None):
     """
@@ -864,16 +881,26 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
     assert(CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:5] == CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[:5])
     bibxxx = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:2]+'x'
     bibrec_bibxxx = 'bibrec_' + bibxxx
+
     write_message('   Looking for extoaiid="%s" with extoaisrc="%s"' % (extoaiid, extoaisrc), verbose=9)
     id_bibrecs = intbitset(run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
         %(bibxxx)s AS b WHERE b.tag=%%s AND b.value=%%s
-        AND bb.id_bibxxx=b.id""" % \
+        AND bb.id_bibxxx=b.id""" %
                     {'bibxxx': bibxxx,
                     'bibrec_bibxxx': bibrec_bibxxx},
                     (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, extoaiid,)))
     write_message('   Partially found %s for extoaiid="%s"' % (id_bibrecs, extoaiid), verbose=9)
+
     ret = intbitset()
     for id_bibrec in id_bibrecs:
+
+        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
+            ## FIXME: for the time being this functionality is available only on INSPIRE
+            ## or CDS, and waiting to be replaced by proper pidstore integration
+            if record_exists(id_bibrec) < 1:
+                ## We don't match not existing records
+                continue
+
         record = get_record(id_bibrec)
         instances = record_get_field_instances(record, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
         write_message('   recid %s -> instances "%s"' % (id_bibrec, instances), verbose=9)
@@ -904,14 +931,19 @@ def find_record_from_oaiid(oaiid):
     bibrec_bibxxx = 'bibrec_' + bibxxx
     res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
         %(bibxxx)s AS b WHERE b.tag=%%s AND b.value=%%s
-        AND bb.id_bibxxx=b.id""" % \
+        AND bb.id_bibxxx=b.id""" %
                     {'bibxxx': bibxxx,
                     'bibrec_bibxxx': bibrec_bibxxx},
                     (CFG_OAI_ID_FIELD, oaiid,))
-    if res:
-        return res[0][0]
-    else:
-        return None
+    for recid in res:
+        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
+            ## FIXME: for the time being this functionality is available only on INSPIRE
+            ## or CDS, and waiting to be replaced by proper pidstore integration
+            if record_exists(recid[0]) > 0: ## Only non deleted records
+                return recid[0]
+        else:
+            return recid[0]
+    return None
 
 def find_record_from_doi(doi):
     """
@@ -923,22 +955,31 @@ def find_record_from_doi(doi):
     res = run_sql("""SELECT bb.id_bibrec, bb.field_number
         FROM %(bibrec_bibxxx)s AS bb, %(bibxxx)s AS b
         WHERE b.tag=%%s AND b.value=%%s
-        AND bb.id_bibxxx=b.id""" % \
+        AND bb.id_bibxxx=b.id""" %
                     {'bibxxx': bibxxx,
                     'bibrec_bibxxx': bibrec_bibxxx},
                     ('0247_a', doi,))
 
     # For each of the result, make sure that it is really tagged as doi
     for (id_bibrec, field_number) in res:
+
+        if CFG_INSPIRE_SITE or CFG_CERN_SITE:
+            ## FIXME: for the time being this functionality is available only on INSPIRE
+            ## or CDS, and waiting to be replaced by proper pidstore integration
+            if record_exists(id_bibrec) < 1:
+                ## We don't match not existing records
+                continue
+
         res = run_sql("""SELECT bb.id_bibrec
         FROM %(bibrec_bibxxx)s AS bb, %(bibxxx)s AS b
         WHERE b.tag=%%s AND b.value=%%s
-        AND bb.id_bibxxx=b.id and bb.field_number=%%s and bb.id_bibrec=%%s""" % \
+        AND bb.id_bibxxx=b.id and bb.field_number=%%s and bb.id_bibrec=%%s""" %
                     {'bibxxx': bibxxx,
                     'bibrec_bibxxx': bibrec_bibxxx},
                     ('0247_2', "doi", field_number, id_bibrec))
         if res and res[0][0] == id_bibrec:
             return res[0][0]
+
     return None
 
 def extract_tag_from_record(record, tag_number):
