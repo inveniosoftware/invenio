@@ -50,7 +50,8 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
                     'editindex?mtype=perform_modifysynonymkb',
                     'editindex?mtype=perform_modifystopwords',
                     'editindex?mtype=perform_modifyremovehtml',
-                    'editindex?mtype=perform_modifyremovelatex'
+                    'editindex?mtype=perform_modifyremovelatex',
+                    'editindex?mtype=perform_modifytokenizer'
                     ]
 
         error_messages = []
@@ -246,11 +247,50 @@ class BibIndexAdminRemoveLatexTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 
+class BibIndexAdminTokenizerTest(unittest.TestCase):
+    """Tests BibIndexAdmin's ability to change tokenizer configuration details for indexes.
+       Tests change the databse entries in idxINDEX table, but don't reindex information contained in idxWORDXXF/R.
+    """
+
+    def setUp(self):
+        self.re_operation_successfull = re.compile(r"Operation successfully completed")
+
+
+    def test_change_title_index_tokenizer_configuration(self):
+        """tests if index's tokenizer configuration can be changed"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifytokenizer'}
+        url = make_url(base, **parameters)
+
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxTOK":"BibIndexEmptyTokenizer"})
+        success = self.re_operation_successfull.search(html_response)
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
+
+
+    def test_change_title_index_tokenizer_configuration_back(self):
+        """tests if index's tokenizer configuration can be changed back"""
+
+        base = "/admin/bibindex/bibindexadmin.py/editindex"
+        parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifytokenizer'}
+        url = make_url(base, **parameters)
+
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxTOK":"BibIndexDefaultTokenizer"})
+        success = self.re_operation_successfull.search(html_response)
+        if not success:
+            error_messages = """There is no "Operation successfully completed" in html response."""
+            self.fail(merge_error_messages(error_messages))
+
+
+
 TEST_SUITE = make_test_suite(BibIndexAdminWebPagesAvailabilityTest,
                              BibIndexAdminSynonymKnowledgeBaseTest,
                              BibIndexAdminRemoveStopwordsTest,
                              BibIndexAdminRemoveHTMLTest,
-                             BibIndexAdminRemoveLatexTest)
+                             BibIndexAdminRemoveLatexTest,
+                             BibIndexAdminTokenizerTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

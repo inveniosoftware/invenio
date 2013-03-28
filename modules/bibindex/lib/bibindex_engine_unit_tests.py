@@ -25,6 +25,7 @@ __revision__ = \
 import unittest
 
 from invenio import bibindex_engine
+from invenio import bibindex_engine_tokenizer
 from invenio.testutils import make_test_suite, run_test_suite
 
 
@@ -65,11 +66,13 @@ class TestWashIndexTerm(unittest.TestCase):
 class TestGetWordsFromPhrase(unittest.TestCase):
     """Tests for getting words from phrase."""
 
+
     def test_easy_phrase(self):
         """bibindex engine - getting words from `word1 word2' phrase"""
         test_phrase = 'word1 word2'
         l_words_expected = ['word1', 'word2']
-        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer()
+        l_words_obtained = tokenizer.tokenize_for_words(test_phrase)
         l_words_obtained.sort()
         self.assertEqual(l_words_obtained, l_words_expected)
 
@@ -78,7 +81,8 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         test_phrase = "l'anthropologie"
         l_words_not_expected = ['anthropolog', 'l', "l'anthropolog", "l'anthropologi"]
         l_words_expected = ['anthropologi', 'l', "l'anthropologi"]
-        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase, 'en')
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer('en')
+        l_words_obtained = tokenizer.tokenize_for_words(test_phrase)
         l_words_obtained.sort()
         self.assertNotEqual(l_words_obtained, l_words_not_expected)
         self.assertEqual(l_words_obtained, l_words_expected)
@@ -86,14 +90,16 @@ class TestGetWordsFromPhrase(unittest.TestCase):
     def test_remove_stopwords_phrase(self):
         """bibindex engine - test for removing stopwords from 'theory of' """
         test_phrase = 'theory of'
-        words_obtained = bibindex_engine.get_words_from_phrase(test_phrase, remove_stopwords='Yes')
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer(remove_stopwords='Yes')
+        words_obtained = tokenizer.tokenize_for_words(test_phrase)
         words_expected = ['theory']
         self.assertEqual(words_expected, words_obtained)
 
     def test_stemming_and_remove_stopwords_phrase(self):
         """bibindex engine - test for removing stopwords and stemming from 'beams of photons' """
         test_phrase = 'beams of photons'
-        words_obtained = bibindex_engine.get_words_from_phrase(test_phrase, 'en', remove_stopwords='Yes')
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer('en', remove_stopwords='Yes')
+        words_obtained = tokenizer.tokenize_for_words(test_phrase)
         words_expected = ['beam','photon']
         self.assertEqual(words_expected, words_obtained)
 
@@ -101,7 +107,8 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         """bibindex engine - getting words from `word1-word2' phrase"""
         test_phrase = 'word1-word2'
         l_words_expected = ['word1', 'word1-word2', 'word2']
-        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer()
+        l_words_obtained = tokenizer.tokenize_for_words(test_phrase)
         l_words_obtained.sort()
         self.assertEqual(l_words_obtained, l_words_expected)
 
@@ -109,7 +116,8 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         """bibindex engine - getting words from `arXiv:1007.5048' phrase"""
         test_phrase = 'arXiv:1007.5048'
         l_words_expected = ['1007', '1007.5048', '5048', 'arxiv', 'arxiv:1007.5048']
-        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer()
+        l_words_obtained = tokenizer.tokenize_for_words(test_phrase)
         l_words_obtained.sort()
         self.assertEqual(l_words_obtained, l_words_expected)
 
@@ -117,7 +125,8 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         """bibindex engine - getting words from `arXiv:1xy7.5z48' phrase"""
         test_phrase = 'arXiv:1xy7.5z48'
         l_words_expected = ['1xy7', '5z48', 'arxiv', 'arxiv:1xy7.5z48']
-        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer()
+        l_words_obtained = tokenizer.tokenize_for_words(test_phrase)
         l_words_obtained.sort()
         self.assertEqual(l_words_obtained, l_words_expected)
 
@@ -128,14 +137,16 @@ class TestGetPairsFromPhrase(unittest.TestCase):
     def test_remove_stopwords_phrase_first(self):
         """bibindex engine - getting pairs from phrase with stopwords removed first"""
         test_phrase = 'Matrices on a point as the theory of everything'
-        pairs_obtained = bibindex_engine.get_pairs_from_phrase(test_phrase, remove_stopwords='Yes')
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer(remove_stopwords='Yes')
+        pairs_obtained = tokenizer.tokenize_for_pairs(test_phrase)
         pairs_expected = ['matrices theory']
         self.assertEqual(pairs_expected, pairs_obtained)
 
     def test_remove_stopwords_phrase_second(self):
         """bibindex engine - getting pairs from phrase with stopwords removed second"""
         test_phrase = 'Nonlocal action for long-distance'
-        pairs_obtained = bibindex_engine.get_pairs_from_phrase(test_phrase, remove_stopwords='Yes')
+        tokenizer = bibindex_engine_tokenizer.BibIndexDefaultTokenizer(remove_stopwords='Yes')
+        pairs_obtained = tokenizer.tokenize_for_pairs(test_phrase)
         pairs_expected = ['nonlocal action', 'long distance', 'action long']
         self.assertEqual(pairs_expected, pairs_obtained)
 
@@ -145,23 +156,27 @@ class TestGetWordsFromDateTag(unittest.TestCase):
 
     def test_dateindex_yyyy(self):
         """bibindex engine - index date-like tag, yyyy"""
+        tokenizer = bibindex_engine_tokenizer.BibIndexYearTokenizer()
         self.assertEqual(["2010"],
-                         bibindex_engine.get_words_from_date_tag("2010"))
+                         tokenizer.get_words_from_date_tag("2010"))
 
     def test_dateindex_yyyy_mm(self):
         """bibindex engine - index date-like tag, yyyy-mm"""
+        tokenizer = bibindex_engine_tokenizer.BibIndexYearTokenizer()
         self.assertEqual(["2010-03", "2010"],
-                         bibindex_engine.get_words_from_date_tag("2010-03"))
+                         tokenizer.get_words_from_date_tag("2010-03"))
 
     def test_dateindex_yyyy_mm_dd(self):
         """bibindex engine - index date-like tag, yyyy-mm-dd"""
+        tokenizer = bibindex_engine_tokenizer.BibIndexYearTokenizer()
         self.assertEqual(["2010-03-08", "2010", "2010-03", ],
-                         bibindex_engine.get_words_from_date_tag("2010-03-08"))
+                         tokenizer.get_words_from_date_tag("2010-03-08"))
 
     def test_dateindex_freetext(self):
         """bibindex engine - index date-like tag, yyyy-mm-dd"""
+        tokenizer = bibindex_engine_tokenizer.BibIndexYearTokenizer()
         self.assertEqual(["dd", "mon", "yyyy"],
-          bibindex_engine.get_words_from_date_tag("dd mon yyyy"))
+                         tokenizer.get_words_from_date_tag("dd mon yyyy"))
 
 
 class TestGetAuthorFamilyNameWords(unittest.TestCase):
@@ -169,18 +184,21 @@ class TestGetAuthorFamilyNameWords(unittest.TestCase):
 
     def test_authornames_john_doe(self):
         """bibindex engine - get author family name words for John Doe"""
+        tokenizer = bibindex_engine_tokenizer.BibIndexAuthorTokenizer()
         self.assertEqual(['doe',],
-          bibindex_engine.get_author_family_name_words_from_phrase('John Doe'))
+                         tokenizer.get_author_family_name_words_from_phrase('John Doe'))
 
     def test_authornames_doe_john(self):
         """bibindex engine - get author family name words for Doe, John"""
+        tokenizer = bibindex_engine_tokenizer.BibIndexAuthorTokenizer()
         self.assertEqual(['doe',],
-          bibindex_engine.get_author_family_name_words_from_phrase('Doe, John'))
+                         tokenizer.get_author_family_name_words_from_phrase('Doe, John'))
 
     def test_authornames_campbell_wilson(self):
         """bibindex engine - get author family name words for Campbell-Wilson, D"""
+        tokenizer = bibindex_engine_tokenizer.BibIndexAuthorTokenizer()
         self.assertEqual(['campbell', 'wilson', 'campbell-wilson'],
-          bibindex_engine.get_author_family_name_words_from_phrase('Campbell-Wilson, D'))
+                         tokenizer.get_author_family_name_words_from_phrase('Campbell-Wilson, D'))
 
 
 TEST_SUITE = make_test_suite(TestListSetOperations,

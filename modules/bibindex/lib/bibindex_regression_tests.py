@@ -25,10 +25,10 @@ import unittest
 
 from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio.dbquery import run_sql
-from invenio.bibindex_engine import WordTable, get_words_from_phrase, \
-                                    get_nothing_from_phrase, get_index_tags, \
-                                    get_index_id_from_index_name
+import invenio.bibindex_engine_tokenizer as lib
+from invenio.bibindex_engine import WordTable, get_index_id_from_index_name, get_index_tags
 from invenio.intbitset import intbitset
+from invenio.bibindex_engine_config import CFG_BIBINDEX_WORDTABLE_TYPE
 
 def prepare_for_index_update(index_id, remove_stopwords = '',
                                        remove_html_markup = '',
@@ -40,6 +40,7 @@ def prepare_for_index_update(index_id, remove_stopwords = '',
                                         '' to leave it unchanged
        @param index_id: id of the index to change
     """
+
 
     if remove_stopwords == '' and remove_html_markup == '' and remove_latex_markup == '':
         return ''
@@ -103,7 +104,8 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
     run_sql(query_drop_reversed_index_table)
     run_sql(query_create_forward_index_table)
     run_sql(query_create_reversed_index_table)
-    run_sql(query_update)
+    if query_update:
+        run_sql(query_update)
     run_sql(query_last_updated)
 
     pattern = '%s_idxWORD' % prefix
@@ -111,8 +113,8 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                           index_id=index_id,
                           fields_to_index=get_index_tags(index_name),
                           table_name_pattern= pattern + '%02dF',
-                          default_get_words_fnc=get_words_from_phrase,
-                          tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                          wordtable_type = CFG_BIBINDEX_WORDTABLE_TYPE["Words"],
+                          tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                           is_fulltext_index=False,
                           wash_index_terms=50)
     wordTable.add_recIDs_by_date([],10000)
@@ -344,9 +346,178 @@ class BibIndexRemoveHtmlTest(unittest.TestCase):
         self.assertNotEqual(ilist, ilist_test)
 
 
+class BibIndexYearIndexTest(unittest.TestCase):
+    """
+        Checks year index. Tests are diffrent than those inside WebSearch module because
+        they only test content and reindexation and not the search itself.
+    """
+
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('year')
+            self.reindexed = True
+
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter == 3:
+            remove_reindexed_word_testtables('year')
+
+
+    def test_occurances_in_year_index_1973(self):
+        """checks content of year index for year 1973"""
+        word = '1973'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('year'), word)
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([34], ilist)
+
+
+    def test_occurances_in_year_index_2001(self):
+        """checks content of year index for year 2001"""
+        word = '2001'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('year'), word)
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([2, 11, 12, 15], ilist)
+
+
+    def test_comparison_for_number_of_items(self):
+        """checks the reindexation of year index"""
+        query_test = "SELECT count(*) FROM test_idxWORD%02dF" % get_index_id_from_index_name('year')
+        query_orig = "SELECT count(*) FROM idxWORD%02dF" % get_index_id_from_index_name('year')
+        num_orig = 0
+        num_test = 1
+        res = run_sql(query_test)
+        if res:
+            num_test = res[0][0]
+        res = run_sql(query_orig)
+        if res:
+            num_orig = res[0][0]
+        self.assertEqual(num_orig, num_test)
+
+
+
+class BibIndexAuthorCountIndexTest(unittest.TestCase):
+    """
+       Checks author count index. Tests are diffrent than those inside WebSearch module because
+       they only test content and reindexation and not the search itself.
+    """
+
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('authorcount')
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter == 2:
+            remove_reindexed_word_testtables('authorcount')
+
+
+    def test_occurances_in_authorcount_index(self):
+        """checks content of authorcount index for papers with 4 authors"""
+        word = '4'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('authorcount'), word)
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([51, 54, 59, 66, 92, 96], ilist)
+
+
+    def test_comparison_for_number_of_items(self):
+        """checks the reindexation of authorcount index"""
+        query_test = "SELECT count(*) FROM test_idxWORD%02dF" % get_index_id_from_index_name('authorcount')
+        query_orig = "SELECT count(*) FROM idxWORD%02dF" % get_index_id_from_index_name('authorcount')
+        num_orig = 0
+        num_test = 1
+        res = run_sql(query_test)
+        if res:
+            num_test = res[0][0]
+        res = run_sql(query_orig)
+        if res:
+            num_orig = res[0][0]
+        self.assertEqual(num_orig, num_test)
+
+class BibIndexJournalIndexTest(unittest.TestCase):
+    """
+        Checks journal index. Tests are diffrent than those inside WebSearch module because
+        they only test content and reindexation and not the search itself.
+    """
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('journal')
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter == 2:
+            remove_reindexed_word_testtables('journal')
+
+
+
+    def test_occurances_in_journal_index(self):
+        """checks content of journal index for phrase: 'prog. theor. phys.' """
+        word = 'prog. theor. phys.'
+        query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('journal'), word)
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([86], ilist)
+
+
+    def test_comparison_for_number_of_items(self):
+        """checks the reindexation of journal index"""
+        query_test = "SELECT count(*) FROM test_idxWORD%02dF" % get_index_id_from_index_name('journal')
+        query_orig = "SELECT count(*) FROM idxWORD%02dF" % get_index_id_from_index_name('journal')
+        num_orig = 0
+        num_test = 1
+        res = run_sql(query_test)
+        if res:
+            num_test = res[0][0]
+        res = run_sql(query_orig)
+        if res:
+            num_orig = res[0][0]
+        self.assertEqual(num_orig, num_test)
+
+
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
-                             BibIndexRemoveHtmlTest)
+                             BibIndexRemoveHtmlTest,
+                             BibIndexYearIndexTest,
+                             BibIndexAuthorCountIndexTest,
+                             BibIndexJournalIndexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

@@ -1752,6 +1752,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
   remove_stopwords varchar(255) NOT NULL default '',
   remove_html_markup varchar(10) NOT NULL default '',
   remove_latex_markup varchar(10) NOT NULL default '',
+  tokenizer varchar(50) NOT NULL default '',
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
 ) ENGINE=MyISAM;
@@ -4338,5 +4339,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_11_rnkDOWNLOADS_
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_20_idxINDEX_synonym_kb',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_21_idxINDEX_stopwords',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_25_idxINDEX_html_markup',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_28_idxINDEX_tokenizer',NOW());
 
 -- end of file

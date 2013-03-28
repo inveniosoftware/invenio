@@ -38,9 +38,22 @@ CFG_MYSQL_THREAD_TIMEOUT = 20 # we'll kill threads that were sleeping
 
 
 
-CFG_BIBINDEX_SYNONYM_MATCH_TYPE = {
-                                    'None': '-None-',
+CFG_BIBINDEX_SYNONYM_MATCH_TYPE = { 'None': '-None-',
                                     'exact': 'exact',
                                     'leading_to_comma': 'leading_to_comma',
                                     'leading_to_number': 'leading_to_number'}
 CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR = ","
+CFG_BIBINDEX_WORDTABLE_TYPE = { 'Words': 'Words',
+                                'Pairs': 'Pairs',
+                                'Phrases': 'Phrases' }
+
+CFG_BIBINDEX_REGISTERED_TOKENIZERS = { 'Default' : 'BibIndexDefaultTokenizer',
+                                       'Author' : 'BibIndexAuthorTokenizer',
+                                       'Exact Author' : 'BibIndexExactAuthorTokenizer',
+                                       'Year' : 'BibIndexYearTokenizer',
+                                       'Full text' : 'BibIndexFulltextTokenizer',
+                                       'Empty' : 'BibIndexEmptyTokenizer',
+                                       'Author Count' : 'BibIndexAuthorCountTokenizer',
+                                       'Journal' : 'BibIndexJournalTokenizer'}
+
+

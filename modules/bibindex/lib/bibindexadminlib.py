@@ -33,7 +33,8 @@ from invenio.dbquery import run_sql, get_table_status_info, wash_table_column_na
 from invenio.bibindex_engine_stemmer import get_stemming_language_map
 import invenio.template
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \
-                                           CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
+                                           CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
+                                           CFG_BIBINDEX_REGISTERED_TOKENIZERS
 from invenio.bibknowledge_dblayer import get_all_kb_names
 
 
@@ -190,10 +191,11 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     <td>6.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifystopwords">Modify remove stopwords</a></small></td>
     <td>7.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyremovehtml">Modify remove HTML markup</a></small></td>
     <td>8.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyremovelatex">Modify remove latex markup</a></small></td>
-    <td>9.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
+    <td>9.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifytokenizer">Modify tokenizer</a></small></td>
+    <td>10.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln)
+    """ % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln)
 
     if mtype == "perform_modifyindex" and content:
         fin_output += content
@@ -235,6 +237,11 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     elif mtype == "perform_modifyremovelatex" or not mtype:
         fin_output += perform_modifyremovelatex(idxID, ln, callback='')
 
+    if mtype == "perform_modifytokenizer" and content:
+        fin_output += content
+    elif mtype == "perform_modifytokenizer" or not mtype:
+        fin_output += perform_modifytokenizer(idxID, ln, callback='')
+
     if mtype == "perform_deleteindex" and content:
         fin_output += content
     elif mtype == "perform_deleteindex" or not mtype:
@@ -245,14 +252,14 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
 def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Overview of indexes"""
     output = """<table cellpadding="3" border="1">"""
-    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language", "Synonym knowledge base", "Remove stopwords", "Remove HTML markup", "Remove Latex markup")
+    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language", "Synonym knowledge base", "Remove stopwords", "Remove HTML markup", "Remove Latex markup", "Tokenizer")
     idx = get_idx()
     idx_dict = dict(get_def_name('', "idxINDEX"))
 
     stemming_language_map = get_stemming_language_map()
     stemming_language_map_reversed = dict([(elem[1], elem[0]) for elem in stemming_language_map.iteritems()])
 
-    for idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB, idxSTOPWORDS, idxHTML, idxLATEX in idx:
+    for idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB, idxSTOPWORDS, idxHTML, idxLATEX, idxTOK in idx:
         forward_table_status_info = get_table_status_info('idxWORD%sF' % (idxID < 10 and '0%s' % idxID or idxID))
         reverse_table_status_info = get_table_status_info('idxWORD%sR' % (idxID < 10 and '0%s' % idxID or idxID))
         if str(idxUPD)[-3:] == ".00":
@@ -288,9 +295,13 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
         if not remove_latex_markup:
             remove_latex_markup = """<strong><span class="info">None</span></strong>"""
 
+        tokenizer = get_idx_tokenizer(idxID)
+        if not remove_latex_markup:
+            tokenizer = """<strong><span class="info">None</span></strong>"""
+
 
         if forward_table_status_info and reverse_table_status_info:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
@@ -304,9 +315,10 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        synonym_kb,
                        remove_stopwords,
                        remove_html_markup,
-                       remove_latex_markup)
+                       remove_latex_markup,
+                       tokenizer)
         elif not forward_table_status_info:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "Error", "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
@@ -318,9 +330,10 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        synonym_kb,
                        remove_stopwords,
                        remove_html_markup,
-                       remove_latex_markup)
+                       remove_latex_markup,
+                       tokenizer)
         elif not reverse_table_status_info:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
@@ -332,7 +345,8 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        synonym_kb,
                        remove_stopwords,
                        remove_html_markup,
-                       remove_latex_markup)
+                       remove_latex_markup,
+                       tokenizer)
     output += "</table>"
 
     body = [output]
@@ -356,7 +370,7 @@ def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1
         <select name="idxID" class="admin_w200">
         <option value="-1">- Select a index -</option>
         """
-        for (idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB, idxSTOPWORDS, idxHTML, idxLATEX) in idx:
+        for (idxID, idxNAME, idxDESC, idxUPD, idxSTEM, idxSYNKB, idxSTOPWORDS, idxHTML, idxLATEX, idxTOK) in idx:
             text += """<option value="%s">%s</option>""" % (idxID, idxNAME)
         text += """</select>"""
 
@@ -753,7 +767,7 @@ def perform_deleteindex(idxID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """
 
     if idxID:
-        subtitle = """<a name="5"></a>10. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
+        subtitle = """<a name="5"></a>11. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         output  = ""
 
         if confirm in ["0", 0]:
@@ -1225,6 +1239,74 @@ def perform_modifyremovelatex(idxID, ln=CFG_SITE_LANG, idxLATEX='', callback='ye
         return addadminbox(subtitle, body)
 
 
+def perform_modifytokenizer(idxID, ln=CFG_SITE_LANG, idxTOK='', callback='yes', confirm=-1):
+    """Form to modify the 'tokenizer' configuration.
+       @param idxID: id of the index on which modification will be performed.
+       @param idxTOK: tokenizer name"""
+
+    subtitle = ""
+    output = ""
+
+    idx = get_idx(idxID)
+    if not idx:
+        idxID = -1
+    if idxID not in [-1, "-1"]:
+        subtitle = """<a name="4"></a>9. Modify tokenizer.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
+        if confirm in [-1, "-1"]:
+            idxTOK = get_idx_tokenizer(idxID)
+        if not idxTOK:
+            idxTOK = ''
+
+        tokenizer_element = """<select name="idxTOK" class="admin_w200">"""
+        for key in CFG_BIBINDEX_REGISTERED_TOKENIZERS:
+            value = CFG_BIBINDEX_REGISTERED_TOKENIZERS[key]
+            if value == idxTOK:
+                tokenizer_element += """<option value="%s" selected ="selected">%s</option>""" % (value, value)
+            else:
+                tokenizer_element += """<option value="%s">%s</option>""" % (value, value)
+        tokenizer_element += """</select>"""
+
+        text = """<span class="adminlabel">Tokenizer</span>""" + tokenizer_element
+        output += createhiddenform(action="modifytokenizer#4",
+                                   text=text,
+                                   button="Modify",
+                                   idxID=idxID,
+                                   ln=ln,
+                                   confirm=0)
+
+
+        if confirm in [0, "0"] and get_idx_tokenizer(idxID) == idxTOK:
+            output += """<span class="info">Tokenizer has not been changed</span>"""
+        elif confirm in [0, "0"]:
+            text = """<span class="important">You are going to change a tokenizer for this index.<br />
+                      <strong>Are you sure you want to do this?</strong>"""
+            output += createhiddenform(action="modifytokenizer#4",
+                                       text=text,
+                                       button="Modify",
+                                       idxID=idxID,
+                                       idxTOK=idxTOK,
+                                       ln=ln,
+                                       confirm=1)
+        elif idxID > -1 and confirm in [1, "1"]:
+            res = modify_idx_tokenizer(idxID, idxTOK)
+            output += write_outcome(res)
+            output += """<br /><span class="info">Please note you must run as soon as possible:
+                         <pre>$> %s/bibindex --reindex -w %s</pre></span>""" % (CFG_BINDIR, get_idx(idxID)[0][1])
+        elif confirm in [1, "1"]:
+            output += """<br /><b><span class="info">Please give a name for the index.</span></b>"""
+
+    else:
+        output = """No index to modify."""
+
+    body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_modifytokenizer", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+
+
 def perform_modifyfield(fldID, ln=CFG_SITE_LANG, code='', callback='yes', confirm=-1):
     """form to modify a field.
     fldID - the field to change."""
@@ -1662,7 +1744,7 @@ def get_col_fld(colID=-1, type = '', id_field=''):
         return ""
 
 def get_idx(idxID=''):
-    sql = "SELECT id,name,description,last_updated,stemming_language,synonym_kbrs,remove_stopwords,remove_html_markup,remove_latex_markup FROM idxINDEX"
+    sql = "SELECT id,name,description,last_updated,stemming_language, synonym_kbrs,remove_stopwords,remove_html_markup,remove_latex_markup,tokenizer FROM idxINDEX"
     params = []
     try:
         if idxID:
@@ -1707,6 +1789,14 @@ def get_idx_remove_latex_markup(idxID):
 
     try:
         return run_sql("SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
+    except StandardError, e:
+        return (0, e)
+
+def get_idx_tokenizer(idxID):
+    """Returns a tokenizer field value"""
+
+    try:
+        return run_sql("SELECT tokenizer FROM idxINDEX WHERE ID=%s", (idxID, ))[0][0]
     except StandardError, e:
         return (0, e)
 
@@ -2121,6 +2211,16 @@ def modify_idx_latex_markup(idxID, idxLATEX):
 
     try:
         run_sql("UPDATE idxINDEX SET remove_latex_markup=%s WHERE ID=%s", (idxLATEX, idxID))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+
+
+def modify_idx_tokenizer(idxID, idxTOK):
+    """Modify a tokenizer in idxINDEX table for given index"""
+
+    try:
+        run_sql("UPDATE idxINDEX SET tokenizer=%s WHERE ID=%s", (idxTOK, idxID))
         return (1, "")
     except StandardError, e:
         return (0, e)

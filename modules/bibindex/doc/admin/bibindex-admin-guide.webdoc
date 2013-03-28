@@ -126,13 +126,13 @@ characters higher than this will be added to the index.</p>
 
 <a name="3.6"></a><h3>3.6 Configure Removal of HTML and LaTeX Code</h3>
 
-<p>By setting the value of <b>CFG_BIBINDEX_REMOVE_HTML_MARKUP</b> in
-the general config file, the indexer may try to remove all HTML code
+<p>If you set the <b>Remove HTML Markup</b> parameter in the admin interface
+to 'Yes' the indexer will try to remove all HTML code
 from documents before indexing, and index only the text left.  (HTML
 code is defined as everything between '&lt;' and '>' in a text.)</p>
 
-<p>By setting the value of <b>CFG_BIBINDEX_REMOVE_LATEX_MARKUP</b> in
-the general config file, the indexer may try to remove all LaTeX code
+<p>If you set the <b>Remove LATEX Markup</b> parameter in the admin interface
+to 'Yes', the indexer will try to remove all LaTeX code
 from documents before indexing, and index only the text left.  (LaTeX
 code is defined as everything between '\command{' and '}' in a text, or
 '{\command ' and '}').</p>

@@ -23,39 +23,23 @@ BibIndex indexing engine implementation.  See bibindex executable for entry poin
 
 __revision__ = "$Id$"
 
-import os
 import re
 import sys
 import time
-import urllib2
-import logging
 
-from invenio.config import \
-     CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS, \
-     CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
-     CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
-     CFG_CERN_SITE, CFG_INSPIRE_SITE, \
-     CFG_BIBINDEX_SPLASH_PAGES, \
-     CFG_SOLR_URL, \
-     CFG_XAPIAN_ENABLED
+
+
+import invenio.bibindex_engine_tokenizer as tokenizers
+
+from invenio.config import CFG_SOLR_URL
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
-    CFG_MYSQL_THREAD_TIMEOUT, \
-    CFG_CHECK_MYSQL_THREADS, \
-    CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \
-    CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
-from invenio.bibindex_engine_tokenizer import \
-     BibIndexFuzzyNameTokenizer, BibIndexExactNameTokenizer, \
-     BibIndexPairTokenizer, BibIndexWordTokenizer, \
-     BibIndexPhraseTokenizer
-from invenio.bibindexadminlib import get_idx_indexer, \
-                                     get_idx_remove_html_markup, \
+     CFG_MYSQL_THREAD_TIMEOUT, \
+     CFG_CHECK_MYSQL_THREADS, \
+     CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
+     CFG_BIBINDEX_WORDTABLE_TYPE
+from invenio.bibindexadminlib import get_idx_remove_html_markup, \
                                      get_idx_remove_latex_markup
-from invenio.bibdocfile import bibdocfile_url_p, \
-     bibdocfile_url_to_bibdoc, normalize_format, \
-     download_url, guess_format_from_url, BibRecDocs, \
-     decompose_bibdocfile_url
-from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
+from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine import perform_request_search, \
      get_index_stemming_language, \
      get_synonym_terms
@@ -67,11 +51,11 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
-from invenio.htmlutils import get_links_in_html_page
-from invenio.search_engine_utils import get_fieldvalues
-from invenio.solrutils_bibindex_indexer import solr_add_fulltext, solr_commit
-from invenio.xapianutils_bibindex_indexer import xapian_add
 from invenio.bibrankadminlib import get_def_name
+from invenio.solrutils_bibindex_indexer import solr_commit
+from invenio.bibindex_engine_tokenizer import CFG_JOURNAL_TAG, \
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 
 
 if sys.hexversion < 0x2040000:
@@ -79,35 +63,16 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-# FIXME: journal tag and journal pubinfo standard format are defined here:
-if CFG_CERN_SITE:
-    CFG_JOURNAL_TAG = '773__%'
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p 773__v (773__y) 773__c"
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
-elif CFG_INSPIRE_SITE:
-    CFG_JOURNAL_TAG = '773__%'
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*,\w.*,\w.*$'
-else:
-    CFG_JOURNAL_TAG = '909C4%'
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "909C4p 909C4v (909C4y) 909C4c"
-    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
-re_block_punctuation_begin = re.compile(r"^" + CFG_BIBINDEX_CHARS_PUNCTUATION + "+")
-re_block_punctuation_end = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + "+$")
-re_punctuation = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
-re_separators = re.compile(CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS)
 re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
-re_arxiv = re.compile(r'^arxiv:\d\d\d\d\.\d\d\d\d')
+
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 base_process_size = 4500 # process base size
 _last_word_table = None
-
-fulltext_added = intbitset() # stores ids of records whose fulltexts have been added
 
 
 def list_union(list1, list2):
@@ -176,68 +141,6 @@ def get_field_tags(field):
     res = run_sql(query, (field,))
     return [row[0] for row in res]
 
-def get_words_from_journal_tag(recID, tag):
-    """
-    Special procedure to extract words from journal tags.  Joins
-    title/volume/year/page into a standard form that is also used for
-    citations.
-    """
-
-    # get all journal tags/subfields:
-    bibXXx = "bib" + tag[0] + tag[1] + "x"
-    bibrec_bibXXx = "bibrec_" + bibXXx
-    query = """SELECT bb.field_number,b.tag,b.value FROM %s AS b, %s AS bb
-                WHERE bb.id_bibrec=%%s
-                  AND bb.id_bibxxx=b.id AND tag LIKE %%s""" % (bibXXx, bibrec_bibXXx)
-    res = run_sql(query, (recID, tag))
-    # construct journal pubinfo:
-    dpubinfos = {}
-    for row in res:
-        nb_instance, subfield, value = row
-        if subfield.endswith("c"):
-            # delete pageend if value is pagestart-pageend
-            # FIXME: pages may not be in 'c' subfield
-            value = value.split('-', 1)[0]
-        if dpubinfos.has_key(nb_instance):
-            dpubinfos[nb_instance][subfield] = value
-        else:
-            dpubinfos[nb_instance] = {subfield: value}
-    # construct standard format:
-    lwords = []
-    for dpubinfo in dpubinfos.values():
-        # index all journal subfields separately
-        for tag, val in dpubinfo.items():
-            lwords.append(val)
-        # index journal standard format:
-        pubinfo = CFG_JOURNAL_PUBINFO_STANDARD_FORM
-        for tag, val in dpubinfo.items():
-            pubinfo = pubinfo.replace(tag, val)
-        if CFG_JOURNAL_TAG[:-1] in pubinfo:
-            # some subfield was missing, do nothing
-            pass
-        else:
-            lwords.append(pubinfo)
-    # return list of words and pubinfos:
-    return lwords
-
-def get_field_count(recID, tags):
-    """
-    Return number of field instances having TAGS in record RECID.
-
-    @param recID: record ID
-    @type recID: int
-    @param tags: list of tags to count, e.g. ['100__a', '700__a']
-    @type tags: list
-    @return: number of tags present in record
-    @rtype: int
-    @note: Works internally via getting field values, which may not be
-        very efficient.  Could use counts only, or else retrieve stored
-        recstruct format of the record and walk through it.
-    """
-    out = 0
-    for tag in tags:
-        out += len(get_fieldvalues(recID, tag))
-    return out
 
 def get_author_canonical_ids_for_recid(recID):
     """
@@ -258,140 +161,6 @@ def get_author_canonical_ids_for_recid(recID):
             lwords.append(author_canonical_id)
     return lwords
 
-def get_words_from_date_tag(datestring, stemming_language=None,
-                                        remove_stopwords = 'No',
-                                        remove_html_markup = 'No',
-                                        remove_latex_markup = 'No'):
-    """
-    Special procedure to index words from tags storing date-like
-    information in format YYYY or YYYY-MM or YYYY-MM-DD.  Namely, we
-    are indexing word-terms YYYY, YYYY-MM, YYYY-MM-DD, but never
-    standalone MM or DD.
-    """
-    out = []
-    for dateword in datestring.split():
-        # maybe there are whitespaces, so break these too
-        out.append(dateword)
-        parts = dateword.split('-')
-        for nb in range(1, len(parts)):
-            out.append("-".join(parts[:nb]))
-    return out
-
-def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None,
-                                                    remove_stopwords = 'No',
-                                                    remove_html_markup = 'No',
-                                                    remove_latex_markup = 'No'):
-    """Returns all the words contained in the document specified by
-       URL_DIRECT_OR_INDIRECT with the words being split by various
-       SRE_SEPARATORS regexp set earlier.  If FORCE_FILE_EXTENSION is
-       set (e.g. to "pdf", then treat URL_DIRECT_OR_INDIRECT as a PDF
-       file.  (This is interesting to index Indico for example.)  Note
-       also that URL_DIRECT_OR_INDIRECT may be either a direct URL to
-       the fulltext file or an URL to a setlink-like page body that
-       presents the links to be indexed.  In the latter case the
-       URL_DIRECT_OR_INDIRECT is parsed to extract actual direct URLs
-       to fulltext documents, for all knows file extensions as
-       specified by global CONV_PROGRAMS config variable.
-    """
-    write_message("... reading fulltext files from %s started" % url_direct_or_indirect, verbose=2)
-    try:
-        if bibdocfile_url_p(url_direct_or_indirect):
-            write_message("... %s is an internal document" % url_direct_or_indirect, verbose=2)
-            bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
-            indexer = get_idx_indexer('fulltext')
-            if indexer != 'native':
-                # A document might belong to multiple records
-                for rec_link in bibdoc.bibrec_links:
-                    recid = rec_link["recid"]
-                    # Adds fulltexts of all files once per records
-                    if not recid in fulltext_added:
-                        bibrecdocs = BibRecDocs(recid)
-                        text = bibrecdocs.get_text()
-                        if indexer == 'SOLR' and CFG_SOLR_URL:
-                            solr_add_fulltext(recid, text)
-                        elif indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
-                            xapian_add(recid, 'fulltext', text)
-
-                    fulltext_added.add(recid)
-                # we are relying on an external information retrieval system
-                # to provide full-text indexing, so dispatch text to it and
-                # return nothing here:
-                return []
-            else:
-                text = ""
-                if hasattr(bibdoc, "get_text"):
-                    text = bibdoc.get_text()
-                return get_words_from_phrase(text, stemming_language, remove_stopwords, remove_html_markup, remove_latex_markup)
-        else:
-            if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY:
-                write_message("... %s is external URL but indexing only local files" % url_direct_or_indirect, verbose=2)
-                return []
-            write_message("... %s is an external URL" % url_direct_or_indirect, verbose=2)
-            urls_to_index = set()
-            for splash_re, url_re in CFG_BIBINDEX_SPLASH_PAGES.iteritems():
-                if re.match(splash_re, url_direct_or_indirect):
-                    write_message("... %s is a splash page (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
-                    html = urllib2.urlopen(url_direct_or_indirect).read()
-                    urls = get_links_in_html_page(html)
-                    write_message("... found these URLs in %s splash page: %s" % (url_direct_or_indirect, ", ".join(urls)), verbose=3)
-                    for url in urls:
-                        if re.match(url_re, url):
-                            write_message("... will index %s (matched by %s)" % (url, url_re), verbose=2)
-                            urls_to_index.add(url)
-            if not urls_to_index:
-                urls_to_index.add(url_direct_or_indirect)
-            write_message("... will extract words from %s" % ', '.join(urls_to_index), verbose=2)
-            words = {}
-            for url in urls_to_index:
-                tmpdoc = download_url(url)
-                file_converter_logger = get_file_converter_logger()
-                old_logging_level = file_converter_logger.getEffectiveLevel()
-                if task_get_task_param("verbose") > 3:
-                    file_converter_logger.setLevel(logging.DEBUG)
-                try:
-                    try:
-                        tmptext = convert_file(tmpdoc, output_format='.txt')
-                        text = open(tmptext).read()
-                        os.remove(tmptext)
-
-                        indexer = get_idx_indexer('fulltext')
-                        if indexer != 'native':
-                            if indexer == 'SOLR' and CFG_SOLR_URL:
-                                solr_add_fulltext(None, text) # FIXME: use real record ID
-                            if indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
-                                #xapian_add(None, 'fulltext', text) # FIXME: use real record ID
-                                pass
-                            # we are relying on an external information retrieval system
-                            # to provide full-text indexing, so dispatch text to it and
-                            # return nothing here:
-                            tmpwords = []
-                        else:
-                            tmpwords = get_words_from_phrase(text, stemming_language, remove_stopwords, remove_html_markup, remove_latex_markup)
-                        words.update(dict(map(lambda x: (x, 1), tmpwords)))
-                    except Exception, e:
-                        message = 'ERROR: it\'s impossible to correctly extract words from %s referenced by %s: %s' % (url, url_direct_or_indirect, e)
-                        register_exception(prefix=message, alert_admin=True)
-                        write_message(message, stream=sys.stderr)
-                finally:
-                    os.remove(tmpdoc)
-                    if task_get_task_param("verbose") > 3:
-                        file_converter_logger.setLevel(old_logging_level)
-            return words.keys()
-    except Exception, e:
-        message = 'ERROR: it\'s impossible to correctly extract words from %s: %s' % (url_direct_or_indirect, e)
-        register_exception(prefix=message, alert_admin=True)
-        write_message(message, stream=sys.stderr)
-        return []
-
-
-def get_nothing_from_phrase(phrase, stemming_language=None,
-                                    remove_stopwords = 'No',
-                                    remove_html_markup = 'No',
-                                    remove_latex_markup = 'No'):
-    """ A dump implementation of get_words_from_phrase to be used when
-    when a tag should not be indexed (such as when trying to extract phrases from
-    8564_u)."""
-    return []
 
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Atomically swap reindexed temporary table with the original one.
@@ -470,97 +239,6 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
     run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
 
-def get_fuzzy_authors_from_phrase(phrase, stemming_language=None,
-                                          remove_stopwords = 'No',
-                                          remove_html_markup = 'No',
-                                          remove_latex_markup = 'No'):
-    """
-    Return list of fuzzy phrase-tokens suitable for storing into
-    author phrase index.
-    @param phrase: phrase to get fuzzy authors tokens from
-    @param stemming_language: what language we use for stemming
-    @param remove_stopwords: dummy - added for the future
-    @param remove_html_markup: dummy - added for the future
-    @param remove_latex_markup: dummy - added for the future
-    """
-    author_tokenizer = BibIndexFuzzyNameTokenizer()
-    return author_tokenizer.tokenize(phrase)
-
-def get_exact_authors_from_phrase(phrase, stemming_language=None,
-                                          remove_stopwords = 'No',
-                                          remove_html_markup = 'No',
-                                          remove_latex_markup = 'No'):
-    """
-    Return list of exact phrase-tokens suitable for storing into
-    exact author phrase index.
-    @param phrase: phrase to get exact author from
-    @param stemming_language: what language we use for stemming
-    @param remove_stopwords: dummy - added for the future
-    @param remove_html_markup: dummy
-    @param remove_latex_markup: dummy
-    """
-    author_tokenizer = BibIndexExactNameTokenizer()
-    return author_tokenizer.tokenize(phrase)
-
-def get_author_family_name_words_from_phrase(phrase, stemming_language=None,
-                                                     remove_stopwords = 'No',
-                                                     remove_html_markup = 'No',
-                                                     remove_latex_markup = 'No'):
-    """
-    Return list of words from author family names, not his/her first
-    names.  The phrase is assumed to be the full author name.  This is
-    useful for CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES.
-    @param phrase: phrase to get family name from
-    @param stemming_language: what language we use for stemming
-    @param remove_stopwords: 'Yes' to remove stopwords, 'No' to leave them
-    @param remove_html_markup: 'Yes' to remove html markup, 'No' to indicate that it's not necessary
-    @param remove_latex_markup: 'Yes' to remove latex markup, 'No' to indicate that it's not necessary
-    """
-    d_family_names = {}
-    # first, treat everything before first comma as surname:
-    if ',' in phrase:
-        d_family_names[phrase.split(',', 1)[0]] = 1
-    # second, try fuzzy author tokenizer to find surname variants:
-    for name in get_fuzzy_authors_from_phrase(phrase, stemming_language, remove_stopwords, remove_html_markup, remove_latex_markup):
-        if ',' in name:
-            d_family_names[name.split(',', 1)[0]] = 1
-    # now extract words from these surnames:
-    d_family_names_words = {}
-    for family_name in d_family_names.keys():
-        for word in get_words_from_phrase(family_name, stemming_language, remove_stopwords, remove_html_markup, remove_latex_markup):
-            d_family_names_words[word] = 1
-    return d_family_names_words.keys()
-
-def get_words_from_phrase(phrase, stemming_language=None,
-                                  remove_stopwords = 'No',
-                                  remove_html_markup = 'No',
-                                  remove_latex_markup = 'No'):
-    """
-    Return a list of words extracted from phrase.
-    """
-    words_tokenizer = BibIndexWordTokenizer(stemming_language, remove_stopwords, remove_html_markup, remove_latex_markup)
-    return words_tokenizer.tokenize(phrase)
-
-def get_phrases_from_phrase(phrase, stemming_language=None,
-                                    remove_stopwords = 'No',
-                                    remove_html_markup = 'No',
-                                    remove_latex_markup = 'No'):
-    """Return list of phrases found in PHRASE.  Note that the phrase is
-       split into groups depending on the alphanumeric characters and
-       punctuation characters definition present in the config file.
-    """
-    phrase_tokenizer = BibIndexPhraseTokenizer(stemming_language, remove_stopwords, remove_html_markup, remove_latex_markup)
-    return phrase_tokenizer.tokenize(phrase)
-
-def get_pairs_from_phrase(phrase, stemming_language=None,
-                                  remove_stopwords = 'No',
-                                  remove_html_markup = 'No',
-                                  remove_latex_markup = 'No'):
-    """
-    Return list of oairs extracted from phrase.
-    """
-    pairs_tokenizer = BibIndexPairTokenizer(stemming_language, remove_stopwords, remove_html_markup, remove_latex_markup)
-    return pairs_tokenizer.tokenize(phrase)
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
@@ -642,7 +320,7 @@ def get_all_synonym_knowledge_bases():
     return out
 
 def get_index_remove_stopwords(index_id):
-    """Returns value of remove_stopword field from idxINDEX database table
+    """Returns value of a remove_stopword field from idxINDEX database table
        @param index_id: id of the index
     """
     query = "SELECT remove_stopwords FROM idxINDEX WHERE id=%s" % index_id
@@ -654,6 +332,22 @@ def get_index_remove_stopwords(index_id):
     except DatabaseError:
         return out
     return out
+
+
+def get_index_tokenizer(index_id):
+    """Returns value of a tokenizer field from idxINDEX database table
+       @param index_id: id of the index
+    """
+    query = "SELECT tokenizer FROM idxINDEX WHERE id=%s" % index_id
+    out = None
+    try:
+        res = run_sql(query)
+        if res:
+            out = getattr(tokenizers, res[0][0])
+    except DatabaseError:
+        write_message("Exception caught for SQL statement: %s; column tokenizer might not exist" % query, sys.stderr)
+    return out
+
 
 def split_ranges(parse_string):
     """Parse a string a return the list or ranges."""
@@ -776,14 +470,14 @@ def get_percentage_completed(num_done, num_total):
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, index_name, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map, wash_index_terms=50, is_fulltext_index=False):
+    def __init__(self, index_name, index_id, fields_to_index, table_name_pattern, wordtable_type, tag_to_tokenizer_map, wash_index_terms=50, is_fulltext_index=False):
         """Creates words table instance.
         @param index_name: the index name
         @param index_id: the index integer identificator
         @param fields_to_index: a list of fields to index
         @param table_name_pattern: i.e. idxWORD%02dF or idxPHRASE%02dF
-        @parm default_get_words_fnc: the default function called to extract words from a metadata
-        @param tag_to_words_fnc_map: a mapping to specify particular function to
+        @parm wordtable_type: type of the wordtable: Words, Pairs, Phrases
+        @param tag_to_tokenizer_map: a mapping to specify particular tokenizer to
             extract words from particular metdata (such as 8564_u)
         @param wash_index_terms: do we wash index terms, and if yes (when >0),
             how many characters do we keep in the index terms; see
@@ -800,13 +494,24 @@ class WordTable:
         self.remove_stopwords = get_index_remove_stopwords(index_id)
         self.remove_html_markup = get_idx_remove_html_markup(index_id)
         self.remove_latex_markup = get_idx_remove_latex_markup(index_id)
+        self.tokenizer = get_index_tokenizer(index_id)(self.stemming_language,
+                                                       self.remove_stopwords,
+                                                       self.remove_html_markup,
+                                                       self.remove_latex_markup)
+        self.default_tokenizer_function = self.tokenizer.get_function_by_type(wordtable_type)
         self.is_fulltext_index = is_fulltext_index
         self.wash_index_terms = wash_index_terms
 
-        # tagToFunctions mapping. It offers an indirection level necessary for
-        # indexing fulltext. The default is get_words_from_phrase
-        self.tag_to_words_fnc_map = tag_to_words_fnc_map
-        self.default_get_words_fnc = default_get_words_fnc
+        # tagToTokenizer mapping. It offers an indirection level necessary for
+        # indexing fulltext.
+        self.tag_to_words_fnc_map = {}
+        for k in tag_to_tokenizer_map.keys():
+            special_tokenizer_for_tag = getattr(tokenizers, tag_to_tokenizer_map[k])(self.stemming_language,
+                                                                                     self.remove_stopwords,
+                                                                                     self.remove_html_markup,
+                                                                                     self.remove_latex_markup)
+            special_tokenizer_function = special_tokenizer_for_tag.get_function_by_type(wordtable_type)
+            self.tag_to_words_fnc_map[k] = special_tokenizer_function
 
         if self.stemming_language and self.tablename.startswith('idxWORD'):
             write_message('%s has stemming enabled, language %s' % (self.tablename, self.stemming_language))
@@ -1104,28 +809,19 @@ class WordTable:
                     wlist[recID] = []
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
-        # special case of journal index:
-        if self.fields_to_index == [CFG_JOURNAL_TAG]:
-            # FIXME: quick hack for the journal index; a special
-            # treatment where we need to associate more than one
-            # subfield into indexed term
-            for recID in range(recID1, recID2 + 1):
-                new_words = get_words_from_journal_tag(recID, self.fields_to_index[0])
-                if not wlist.has_key(recID):
-                    wlist[recID] = []
-                wlist[recID] = list_union(new_words, wlist[recID])
-        elif self.index_name in ('authorcount',):
-            # FIXME: quick hack for the authorcount index; we have to
-            # count the number of author fields only
-            for recID in range(recID1, recID2 + 1):
-                new_words = [str(get_field_count(recID, self.fields_to_index)),]
-                if not wlist.has_key(recID):
-                    wlist[recID] = []
-                wlist[recID] = list_union(new_words, wlist[recID])
+        # case of special indexes:
+        if self.index_name in ('authorcount', 'journal'):
+            for tag in self.fields_to_index:
+                get_words_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
+                for recID in range(recID1, recID2 + 1):
+                    new_words = get_words_function(recID)
+                    if not wlist.has_key(recID):
+                        wlist[recID] = []
+                    wlist[recID] = list_union(new_words, wlist[recID])
         else:
             # usual tag-by-tag indexing:
             for tag in self.fields_to_index:
-                get_words_function = self.tag_to_words_fnc_map.get(tag, self.default_get_words_fnc)
+                get_words_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
                 bibXXx = "bib" + tag[0] + tag[1] + "x"
                 bibrec_bibXXx = "bibrec_" + bibXXx
                 query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
@@ -1143,10 +839,7 @@ class WordTable:
                     recID, phrase = row
                     if not wlist.has_key(recID):
                         wlist[recID] = []
-                    new_words = get_words_function(phrase, stemming_language=self.stemming_language,
-                                                           remove_stopwords=self.remove_stopwords,
-                                                           remove_html_markup=self.remove_html_markup,
-                                                           remove_latex_markup=self.remove_latex_markup) # ,self.separators
+                    new_words = get_words_function(phrase)
                     wlist[recID] = list_union(new_words, wlist[recID])
 
         # lookup index-time synonyms:
@@ -1548,52 +1241,36 @@ def task_run_core():
     if task_get_option("cmd") == "check":
         wordTables = get_word_tables(task_get_option("windex"))
         for index_id, index_name, index_tags in wordTables:
-            if index_name == 'year' and CFG_INSPIRE_SITE:
-                fnc_get_words_from_phrase = get_words_from_date_tag
-            elif index_name in ('author', 'firstauthor') and \
-                     CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
-                fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
-            else:
-                fnc_get_words_from_phrase = get_words_from_phrase
             wordTable = WordTable(index_name=index_name,
                                   index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxWORD%02dF',
-                                  default_get_words_fnc=fnc_get_words_from_phrase,
-                                  tag_to_words_fnc_map={'8564_u': get_words_from_fulltext},
+                                  wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Words"],
+                                  tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                                   wash_index_terms=50)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-            if index_name in ('author', 'firstauthor') and \
-                   CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
-                fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
-            else:
-                fnc_get_pairs_from_phrase = get_pairs_from_phrase
+
             wordTable = WordTable(index_name=index_name,
                                   index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxPAIR%02dF',
-                                  default_get_words_fnc=fnc_get_pairs_from_phrase,
-                                  tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                                  wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Pairs"],
+                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=100)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-            if index_name in ('author', 'firstauthor'):
-                fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
-            elif index_name in ('exactauthor', 'exactfirstauthor'):
-                fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
-            else:
-                fnc_get_phrases_from_phrase = get_phrases_from_phrase
+
             wordTable = WordTable(index_name=index_name,
                                   index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxPHRASE%02dF',
-                                  default_get_words_fnc=fnc_get_phrases_from_phrase,
-                                  tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                                  wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Phrases"],
+                                  tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=0)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
@@ -1609,19 +1286,13 @@ def task_run_core():
         if task_get_option("reindex"):
             reindex_prefix = "tmp_"
             init_temporary_reindex_tables(index_id, reindex_prefix)
-        if index_name == 'year' and CFG_INSPIRE_SITE:
-            fnc_get_words_from_phrase = get_words_from_date_tag
-        elif index_name in ('author', 'firstauthor') and \
-                 CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
-            fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
-        else:
-            fnc_get_words_from_phrase = get_words_from_phrase
+
         wordTable = WordTable(index_name=index_name,
                               index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxWORD%02dF',
-                              default_get_words_fnc=fnc_get_words_from_phrase,
-                              tag_to_words_fnc_map={'8564_u': get_words_from_fulltext},
+                              wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Words"],
+                              tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                               is_fulltext_index=is_fulltext_index,
                               wash_index_terms=50)
         _last_word_table = wordTable
@@ -1680,17 +1351,12 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
 
         # Let's work on pairs now
-        if index_name in ('author', 'firstauthor') and \
-               CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
-            fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
-        else:
-            fnc_get_pairs_from_phrase = get_pairs_from_phrase
         wordTable = WordTable(index_name=index_name,
                               index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxPAIR%02dF',
-                              default_get_words_fnc=fnc_get_pairs_from_phrase,
-                              tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                              wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Pairs"],
+                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=100)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
@@ -1747,18 +1413,12 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
 
         # Let's work on phrases now
-        if index_name in ('author', 'firstauthor'):
-            fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
-        elif index_name in ('exactauthor', 'exactfirstauthor'):
-            fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
-        else:
-            fnc_get_phrases_from_phrase = get_phrases_from_phrase
         wordTable = WordTable(index_name=index_name,
                               index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxPHRASE%02dF',
-                              default_get_words_fnc=fnc_get_phrases_from_phrase,
-                              tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                              wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Phrases"],
+                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=0)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()

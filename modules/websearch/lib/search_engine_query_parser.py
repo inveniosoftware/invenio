@@ -41,7 +41,7 @@ except ImportError:
     # since this package is only recommended, not mandatory.
     GOT_DATEUTIL = False
 
-from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
+from invenio.bibindex_engine_tokenizer import BibIndexAuthorTokenizer as FNT
 from invenio.logicutils import to_cnf
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
 from invenio.dateutils import strptime
@@ -1122,7 +1122,7 @@ class SpiresToInvenioSyntaxConverter:
             result += query[current_position : match.start() ]
             if match.group('secondorderop'):
                 result += match.group('secondorderop')
-            scanned_name = NameScanner.scan(match.group('name'))
+            scanned_name = NameScanner.scan_string_for_phrases(match.group('name'))
             author_atoms = self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name)
             if match.group('first'):
                 author_atoms = author_atoms.replace('author:', 'firstauthor:')

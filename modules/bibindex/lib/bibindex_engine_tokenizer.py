@@ -23,42 +23,69 @@ input strings into lists of strings.  The output strings are calculated based
 on the input string as tokens suitable for word or phrase indexing.
 """
 
+import os
+import sys
+import logging
+import urllib2
 import re
 
-from invenio.config import \
-     CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
-from invenio.htmlutils import remove_html_markup
-from invenio.textutils import wash_for_utf8, strip_accents
 
+from invenio.config import \
+     CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
+     CFG_CERN_SITE, \
+     CFG_INSPIRE_SITE, \
+     CFG_SOLR_URL, \
+     CFG_XAPIAN_ENABLED, \
+     CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
+     CFG_BIBINDEX_SPLASH_PAGES
+from invenio.bibindex_engine_config import \
+     CFG_BIBINDEX_WORDTABLE_TYPE
+from invenio.htmlutils import remove_html_markup, \
+                              get_links_in_html_page
+from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
+from invenio.solrutils_bibindex_indexer import solr_add_fulltext
+from invenio.xapianutils_bibindex_indexer import xapian_add
+from invenio.textutils import wash_for_utf8, strip_accents
+from invenio.bibdocfile import bibdocfile_url_p, \
+     bibdocfile_url_to_bibdoc, download_url, \
+     BibRecDocs
+from invenio.bibindexadminlib import get_idx_indexer
+from invenio.bibtask import write_message
+from invenio.errorlib import register_exception
 from invenio.bibindex_engine_washer import \
      lower_index_term, remove_latex_markup, \
      apply_stemming, remove_stopwords, length_check, \
      wash_author_name
+from invenio.intbitset import intbitset
+from invenio.dbquery import run_sql
+from invenio.bibindex_engine_utils import latex_formula_re, \
+     re_block_punctuation_begin, \
+     re_block_punctuation_end, \
+     re_punctuation, \
+     re_separators, \
+     re_arxiv, \
+     get_field_count
 
-latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
-phrase_delimiter_re = re.compile(r'[\.:;\?\!]')
-space_cleaner_re = re.compile(r'\s+')
-re_block_punctuation_begin = re.compile(r"^" + CFG_BIBINDEX_CHARS_PUNCTUATION + "+")
-re_block_punctuation_end = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION + "+$")
-re_punctuation = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
-re_separators = re.compile(CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS)
-re_arxiv = re.compile(r'^arxiv:\d\d\d\d\.\d\d\d\d')
 
-re_pattern_fuzzy_author_trigger = re.compile(r'[\s\,\.]')
-# FIXME: re_pattern_fuzzy_author_trigger could be removed and an
-# BibAuthorID API function could be called instead after we
-# double-check that there are no circular imports.
-re_pattern_author_canonical_id = re.compile(r'\.[0-9]+$')
 
-def author_name_requires_phrase_search(p):
-    """
-    Detect whether author query pattern p requires phrase search.
-    Notably, look for presence of spaces and commas.
-    """
-    if re_pattern_fuzzy_author_trigger.search(p):
-        return True
-    return False
+if CFG_CERN_SITE:
+    CFG_JOURNAL_TAG = '773__%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p 773__v (773__y) 773__c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
+elif CFG_INSPIRE_SITE:
+    CFG_JOURNAL_TAG = '773__%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*,\w.*,\w.*$'
+else:
+    CFG_JOURNAL_TAG = '909C4%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "909C4p 909C4v (909C4y) 909C4c"
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = r'^\w.*\s\w.*\s\(\d+\)\s\w.*$'
+
+
+
+
+fulltext_added = intbitset() # stores ids of records whose fulltexts have been added
+
 
 class BibIndexTokenizer(object):
     """Base class for the tokenizers
@@ -66,8 +93,8 @@ class BibIndexTokenizer(object):
     Tokenizers act as filters which turn input strings into lists of strings
     which represent the idexable components of that string.
     """
-
-    def scan_string(self, s):
+    #words part
+    def scan_string_for_words(self, s):
         """Return an intermediate representation of the tokens in s.
 
         Every tokenizer should have a scan_string function, which scans the
@@ -95,7 +122,7 @@ class BibIndexTokenizer(object):
         """
         raise NotImplementedError
 
-    def parse_scanned(self, o):
+    def parse_scanned_for_words(self, o):
         """Calculate the token list from the intermediate representation o.
 
         While this should be an interesting computation over the intermediate
@@ -110,7 +137,7 @@ class BibIndexTokenizer(object):
         """
         raise NotImplementedError
 
-    def tokenize(self, s):
+    def tokenize_for_words(self, s):
         """Main entry point.  Return token list from input string s.
 
         Simply composes the functionality above.
@@ -123,61 +150,104 @@ class BibIndexTokenizer(object):
         """
         raise NotImplementedError
 
+    #pairs part
+    def scan_string_for_pairs(self, s):
+        """ See: scan_string_for_words """
+        raise NotImplementedError
 
-class BibIndexPhraseTokenizer(BibIndexTokenizer):
-    """The original phrase is returned"""
+    def parse_scanned_for_pairs(self, o):
+        """ See: parse_scanned_for_words """
+        raise NotImplementedError
+
+    def tokenize_for_pairs(self, s):
+        """ See: tokenize_for_words """
+        raise NotImplementedError
+
+    #phrases part
+    def scan_string_for_phrases(self, s):
+        """ See: scan_string_for_words """
+        raise NotImplementedError
+
+    def parse_scanned_for_phrases(self, o):
+        """ See: parse_scanned_for_words """
+        raise NotImplementedError
+
+    def tokenize_for_phrases(self, s):
+        """ See: tokenize_for_words """
+        raise NotImplementedError
+
+
+    def get_function_by_type(self, wordtable_type):
+        """Chooses tokenize_for_words, tokenize_for_phrases or tokenize_for_pairs
+           depending on type of tokenization we want to perform."""
+        raise NotImplementedError
+
+
+class BibIndexEmptyTokenizer(BibIndexTokenizer):
+    """Empty tokenizer do nothing.
+       It returns empty lists for tokenize_for_words, tokenize_for_pairs and tokenize_for_phrases methods.
+    """
 
     def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
-        self.stemming_language = stemming_language
-        self.remove_stopwords = remove_stopwords
-        self.remove_html_markup = remove_html_markup
-        self.remove_latex_markup = remove_latex_markup
-
-    def tokenize(self, phrase):
-        """Return list of phrases found in PHRASE.  Note that the phrase is
-           split into groups depending on the alphanumeric characters and
-           punctuation characters definition present in the config file.
+        """@param stemming_language: dummy
+           @param remove_stopwords: dummy
+           @param remove_html_markup: dummy
+           @param remove_latex_markup: dummy
         """
-        phrase = wash_for_utf8(phrase)
-        return [phrase]
-        ## Note that we don't break phrases, they are used for exact style
-        ## of searching.
-        words = {}
-        phrase = strip_accents(phrase)
-        # 1st split phrase into blocks according to whitespace
-        for block1 in phrase_delimiter_re.split(strip_accents(phrase)):
-            block1 = block1.strip()
-            if block1 and self.stemming_language:
-                new_words = []
-                for block2 in re_punctuation.split(block1):
-                    block2 = block2.strip()
-                    if block2:
-                        for block3 in block2.split():
-                            block3 = block3.strip()
-                            if block3:
-                                # Note that we don't stem phrases, they
-                                # are used for exact style of searching.
-                                new_words.append(block3)
-                block1 = ' '.join(new_words)
-            if block1:
-                words[block1] = 1
-        return words.keys()
+        pass
 
 
-class BibIndexWordTokenizer(BibIndexTokenizer):
-    """A phrase is split into words"""
+    def get_function_by_type(self, wordtable_type):
+        """Picks correct tokenize_for_xxx function depending on type of tokenization (wordtable_type)"""
+        if wordtable_type == CFG_BIBINDEX_WORDTABLE_TYPE["Words"]:
+            return self.tokenize_for_words
+        elif wordtable_type == CFG_BIBINDEX_WORDTABLE_TYPE["Pairs"]:
+            return self.tokenize_for_pairs
+        elif wordtable_type == CFG_BIBINDEX_WORDTABLE_TYPE["Phrases"]:
+            return self.tokenize_for_phrases
+
+
+    def tokenize_for_words(self, phrase):
+        return []
+
+    def tokenize_for_pairs(self, phrase):
+        return []
+
+    def tokenize_for_phrases(self, phrase):
+        return []
+
+
+class BibIndexDefaultTokenizer(BibIndexTokenizer):
+    """
+        It's a standard tokenizer. It is useful for most of the indexes.
+        Its behaviour depends on stemming, remove stopwords, remove html markup and remove latex markup parameters.
+    """
 
     def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
+        """initialization"""
         self.stemming_language = stemming_language
         self.remove_stopwords = remove_stopwords
         self.remove_html_markup = remove_html_markup
         self.remove_latex_markup = remove_latex_markup
 
-    def tokenize(self, phrase):
+
+    def get_function_by_type(self, wordtable_type):
+        """Picks correct tokenize_for_xxx function depending on type of tokenization (wordtable_type)"""
+        if wordtable_type == CFG_BIBINDEX_WORDTABLE_TYPE["Words"]:
+            return self.tokenize_for_words
+        elif wordtable_type == CFG_BIBINDEX_WORDTABLE_TYPE["Pairs"]:
+            return self.tokenize_for_pairs
+        elif wordtable_type == CFG_BIBINDEX_WORDTABLE_TYPE["Phrases"]:
+            return self.tokenize_for_phrases
+
+
+
+    def tokenize_for_words(self, phrase):
         """Return list of words found in PHRASE.  Note that the phrase is
            split into groups depending on the alphanumeric characters and
            punctuation characters definition present in the config file.
         """
+
         words = {}
         formulas = []
         if self.remove_html_markup == 'Yes' and phrase.find("</") > -1:
@@ -222,20 +292,13 @@ class BibIndexWordTokenizer(BibIndexTokenizer):
             words[block] = 1
         return words.keys()
 
-class BibIndexPairTokenizer(BibIndexTokenizer):
-    """A phrase is split into pairs of words"""
 
-    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
-        self.stemming_language = stemming_language
-        self.remove_stopwords = remove_stopwords
-        self.remove_html_markup = remove_html_markup
-        self.remove_latex_markup = remove_latex_markup
-
-    def tokenize(self, phrase):
+    def tokenize_for_pairs(self, phrase):
         """Return list of words found in PHRASE.  Note that the phrase is
            split into groups depending on the alphanumeric characters and
            punctuation characters definition present in the config file.
         """
+
         words = {}
         if self.remove_html_markup == 'Yes' and phrase.find("</") > -1:
             phrase = remove_html_markup(phrase)
@@ -271,18 +334,37 @@ class BibIndexPairTokenizer(BibIndexTokenizer):
                                 last_word = alphanumeric_group
         return words.keys()
 
-class BibIndexExactNameTokenizer(BibIndexTokenizer):
+
+    def tokenize_for_phrases(self, phrase):
+        """Return list of phrases found in PHRASE.  Note that the phrase is
+           split into groups depending on the alphanumeric characters and
+           punctuation characters definition present in the config file.
+        """
+        phrase = wash_for_utf8(phrase)
+        return [phrase]
+
+
+
+class BibIndexExactAuthorTokenizer(BibIndexDefaultTokenizer):
     """
     Human name exact tokenizer.
+    Old: BibIndexExactNameTokenizer
     """
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
+        BibIndexDefaultTokenizer.__init__(self, stemming_language,
+                                                remove_stopwords,
+                                                remove_html_markup,
+                                                remove_latex_markup)
 
-    def tokenize(self, s):
+    def tokenize_for_phrases(self, s):
         """
-        Main API.
+        Returns washed autor name.
         """
         return [wash_author_name(s)]
 
-class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
+
+
+class BibIndexAuthorTokenizer(BibIndexDefaultTokenizer):
     """Human name tokenizer.
 
     Human names are divided into three classes of tokens:
@@ -291,7 +373,11 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
     'titles', both incidental and permanent, e.g., 'VIII', '(ed.)', 'Msc'
     """
 
-    def __init__(self):
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
+        BibIndexDefaultTokenizer.__init__(self, stemming_language,
+                                                remove_stopwords,
+                                                remove_html_markup,
+                                                remove_latex_markup)
         self.single_initial_re = re.compile('^\w\.$')
         self.split_on_re = re.compile('[\.\s-]')
         # lastname_stopwords describes terms which should not be used for indexing,
@@ -299,7 +385,7 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
         # same function as the American hyphen, but using linguistic constructs.
         self.lastname_stopwords = set(['y', 'of', 'and', 'de'])
 
-    def scan(self, s):
+    def scan_string_for_phrases(self, s):
         """Scan a name string and output an object representing its structure.
 
         @param s: the input to be lexically tagged
@@ -352,7 +438,7 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
 
         return retval
 
-    def parse_scanned(self, scanned):
+    def parse_scanned_for_phrases(self, scanned):
         """Return all the indexable variations for a tagged token dictionary.
 
         Does this via the combinatoric expansion of the following rules:
@@ -506,8 +592,9 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
 
         return _add_squashed(_expand_contract(namelist))
 
-    def tokenize(self, s):
-        """Main entry point.  Output the list of strings expanding s.
+
+    def tokenize_for_fuzzy_authors(self, phrase):
+        """Output the list of strings expanding phrase.
 
         Does this via the combinatoric expansion of the following rules:
         - Expands first names as name, first initial with period, first initial
@@ -520,29 +607,320 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
         "Ibanez y Gracia", with the title, "(ed.)", then only the combination
         of those two strings will do, not "Ibanez" and not "Gracia".
 
-        @param s: the input to be lexically tagged
-        @type s: string
+        Old: BibIndexFuzzyAuthorTokenizer
+
+        @param phrase: the input to be lexically tagged
+        @type phrase: string
 
         @return: combinatorically expanded list of strings for indexing
         @rtype: list of string
 
         @note: A simple wrapper around scan and parse_scanned.
         """
-        return self.parse_scanned(self.scan(s))
+        return self.parse_scanned_for_phrases(self.scan_string_for_phrases(phrase))
 
 
-if __name__ == "__main__":
-    """Trivial manual test framework"""
-    import sys
-    args = sys.argv[1:]
+    def tokenize_for_phrases(self, phrase):
+        """
+            Another name for tokenize_for_fuzzy_authors.
+            It's for the compatibility.
+            See: tokenize_for_fuzzy_authors
+        """
+        return self.tokenize_for_fuzzy_authors(phrase)
 
-    test_str = ''
-    if len(args) == 0:
-        test_str = "Michael Peskin"
-    elif len(args) == 1:
-        test_str = args[0]
-    else:
-        test_str = ' '.join(args)
 
-    tokenizer = BibIndexFuzzyNameTokenizer()
-    print "Tokenizes as:", tokenizer.tokenize(test_str)
+    def tokenize_for_words_default(self, phrase):
+        """Default tokenize_for_words inherited from default tokenizer"""
+        return super(BibIndexAuthorTokenizer, self).tokenize_for_words(phrase)
+
+
+    def get_author_family_name_words_from_phrase(self, phrase):
+        """ Return list of words from author family names, not his/her first names.
+
+        The phrase is assumed to be the full author name.  This is
+        useful for CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES.
+
+        @param phrase: phrase to get family name from
+        """
+        d_family_names = {}
+        # first, treat everything before first comma as surname:
+        if ',' in phrase:
+            d_family_names[phrase.split(',', 1)[0]] = 1
+        # second, try fuzzy author tokenizer to find surname variants:
+        for name in self.tokenize_for_phrases(phrase):
+            if ',' in name:
+                d_family_names[name.split(',', 1)[0]] = 1
+        # now extract words from these surnames:
+        d_family_names_words = {}
+        for family_name in d_family_names.keys():
+            for word in self.tokenize_for_words_default(family_name):
+                d_family_names_words[word] = 1
+        return d_family_names_words.keys()
+
+
+    def tokenize_for_words(self, phrase):
+        """
+            If CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES is 1 we tokenize only for family names.
+            In other case we perform standard tokenization for words.
+        """
+        if CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
+            return self.get_author_family_name_words_from_phrase(phrase)
+        else:
+            return self.tokenize_for_words_default(phrase)
+
+
+
+class BibIndexYearTokenizer(BibIndexDefaultTokenizer):
+    """
+       Year tokenizer. It tokenizes words from date tags or uses default word tokenizer.
+    """
+
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
+        BibIndexDefaultTokenizer.__init__(self, stemming_language,
+                                                remove_stopwords,
+                                                remove_html_markup,
+                                                remove_latex_markup)
+
+
+    def get_words_from_date_tag(self, datestring):
+        """
+        Special procedure to index words from tags storing date-like
+        information in format YYYY or YYYY-MM or YYYY-MM-DD.  Namely, we
+        are indexing word-terms YYYY, YYYY-MM, YYYY-MM-DD, but never
+        standalone MM or DD.
+        """
+        out = []
+        for dateword in datestring.split():
+            # maybe there are whitespaces, so break these too
+            out.append(dateword)
+            parts = dateword.split('-')
+            for nb in range(1, len(parts)):
+                out.append("-".join(parts[:nb]))
+        return out
+
+
+    def tokenize_for_words_default(self, phrase):
+        """Default tokenize_for_words inherited from default tokenizer"""
+        return super(BibIndexYearTokenizer, self).tokenize_for_words(phrase)
+
+
+    def tokenize_for_words(self, phrase):
+        """
+            If CFG_INSPIRE_SITE is 1 we perform special tokenization which relies on getting words form date tag.
+            In other case we perform default tokenization.
+        """
+        if CFG_INSPIRE_SITE:
+            return self.get_words_from_date_tag(phrase)
+        else:
+            return self.tokenize_for_words_default(phrase)
+
+
+class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
+    """
+        Exctracts all the words contained in document specified by url.
+    """
+
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
+        self.verbose = 3
+        BibIndexDefaultTokenizer.__init__(self, stemming_language,
+                                                remove_stopwords,
+                                                remove_html_markup,
+                                                remove_latex_markup)
+
+    def set_verbose(self, verbose):
+        """Allows to change verbosity level during indexing"""
+        self.verbose = verbose
+
+    def tokenize_for_words_default(self, phrase):
+        """Default tokenize_for_words inherited from default tokenizer"""
+        return super(BibIndexFulltextTokenizer, self).tokenize_for_words(phrase)
+
+
+    def get_words_from_fulltext(self, url_direct_or_indirect):
+        """Returns all the words contained in the document specified by
+           URL_DIRECT_OR_INDIRECT with the words being split by various
+           SRE_SEPARATORS regexp set earlier.  If FORCE_FILE_EXTENSION is
+           set (e.g. to "pdf", then treat URL_DIRECT_OR_INDIRECT as a PDF
+           file.  (This is interesting to index Indico for example.)  Note
+           also that URL_DIRECT_OR_INDIRECT may be either a direct URL to
+           the fulltext file or an URL to a setlink-like page body that
+           presents the links to be indexed.  In the latter case the
+           URL_DIRECT_OR_INDIRECT is parsed to extract actual direct URLs
+           to fulltext documents, for all knows file extensions as
+           specified by global CONV_PROGRAMS config variable.
+        """
+        write_message("... reading fulltext files from %s started" % url_direct_or_indirect, verbose=2)
+        try:
+            if bibdocfile_url_p(url_direct_or_indirect):
+                write_message("... %s is an internal document" % url_direct_or_indirect, verbose=2)
+                bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
+                indexer = get_idx_indexer('fulltext')
+                if indexer != 'native':
+                    # A document might belong to multiple records
+                    for rec_link in bibdoc.bibrec_links:
+                        recid = rec_link["recid"]
+                        # Adds fulltexts of all files once per records
+                        if not recid in fulltext_added:
+                            bibrecdocs = BibRecDocs(recid)
+                            text = bibrecdocs.get_text()
+                            if indexer == 'SOLR' and CFG_SOLR_URL:
+                                solr_add_fulltext(recid, text)
+                            elif indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
+                                xapian_add(recid, 'fulltext', text)
+
+                        fulltext_added.add(recid)
+                    # we are relying on an external information retrieval system
+                    # to provide full-text indexing, so dispatch text to it and
+                    # return nothing here:
+                    return []
+                else:
+                    text = ""
+                    if hasattr(bibdoc, "get_text"):
+                        text = bibdoc.get_text()
+                    return self.tokenize_for_words_default(text)
+            else:
+                if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY:
+                    write_message("... %s is external URL but indexing only local files" % url_direct_or_indirect, verbose=2)
+                    return []
+                write_message("... %s is an external URL" % url_direct_or_indirect, verbose=2)
+                urls_to_index = set()
+                for splash_re, url_re in CFG_BIBINDEX_SPLASH_PAGES.iteritems():
+                    if re.match(splash_re, url_direct_or_indirect):
+                        write_message("... %s is a splash page (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
+                        html = urllib2.urlopen(url_direct_or_indirect).read()
+                        urls = get_links_in_html_page(html)
+                        write_message("... found these URLs in %s splash page: %s" % (url_direct_or_indirect, ", ".join(urls)), verbose=3)
+                        for url in urls:
+                            if re.match(url_re, url):
+                                write_message("... will index %s (matched by %s)" % (url, url_re), verbose=2)
+                                urls_to_index.add(url)
+                if not urls_to_index:
+                    urls_to_index.add(url_direct_or_indirect)
+                write_message("... will extract words from %s" % ', '.join(urls_to_index), verbose=2)
+                words = {}
+                for url in urls_to_index:
+                    tmpdoc = download_url(url)
+                    file_converter_logger = get_file_converter_logger()
+                    old_logging_level = file_converter_logger.getEffectiveLevel()
+                    if self.verbose > 3:
+                        file_converter_logger.setLevel(logging.DEBUG)
+                    try:
+                        try:
+                            tmptext = convert_file(tmpdoc, output_format='.txt')
+                            text = open(tmptext).read()
+                            os.remove(tmptext)
+
+                            indexer = get_idx_indexer('fulltext')
+                            if indexer != 'native':
+                                if indexer == 'SOLR' and CFG_SOLR_URL:
+                                    solr_add_fulltext(None, text) # FIXME: use real record ID
+                                if indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:
+                                    #xapian_add(None, 'fulltext', text) # FIXME: use real record ID
+                                    pass
+                                # we are relying on an external information retrieval system
+                                # to provide full-text indexing, so dispatch text to it and
+                                # return nothing here:
+                                tmpwords = []
+                            else:
+                                tmpwords = self.tokenize_for_words_default(text)
+                            words.update(dict(map(lambda x: (x, 1), tmpwords)))
+                        except Exception, e:
+                            message = 'ERROR: it\'s impossible to correctly extract words from %s referenced by %s: %s' % (url, url_direct_or_indirect, e)
+                            register_exception(prefix=message, alert_admin=True)
+                            write_message(message, stream=sys.stderr)
+                    finally:
+                        os.remove(tmpdoc)
+                        if self.verbose > 3:
+                            file_converter_logger.setLevel(old_logging_level)
+                return words.keys()
+        except Exception, e:
+            message = 'ERROR: it\'s impossible to correctly extract words from %s: %s' % (url_direct_or_indirect, e)
+            register_exception(prefix=message, alert_admin=True)
+            write_message(message, stream=sys.stderr)
+            return []
+
+
+    def tokenize_for_words(self, phrase):
+        return self.get_words_from_fulltext(phrase)
+
+
+class BibIndexJournalTokenizer(BibIndexEmptyTokenizer):
+    """
+        Tokenizer for journal index. It returns joined title/volume/year/page as a word from journal tag.
+        (In fact it's an aggregator.)
+    """
+
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
+        self.tag = CFG_JOURNAL_TAG
+        self.journal_pubinfo_standard_form = CFG_JOURNAL_PUBINFO_STANDARD_FORM
+        self.journal_pubinfo_standard_form_regexp_check = CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
+
+
+    def tokenize(self, recID):
+        """
+        Special procedure to extract words from journal tags.  Joins
+        title/volume/year/page into a standard form that is also used for
+        citations.
+        """
+        # get all journal tags/subfields:
+        bibXXx = "bib" + self.tag[0] + self.tag[1] + "x"
+        bibrec_bibXXx = "bibrec_" + bibXXx
+        query = """SELECT bb.field_number,b.tag,b.value FROM %s AS b, %s AS bb
+                    WHERE bb.id_bibrec=%%s
+                      AND bb.id_bibxxx=b.id AND tag LIKE %%s""" % (bibXXx, bibrec_bibXXx)
+        res = run_sql(query, (recID, self.tag))
+        # construct journal pubinfo:
+        dpubinfos = {}
+        for row in res:
+            nb_instance, subfield, value = row
+            if subfield.endswith("c"):
+                # delete pageend if value is pagestart-pageend
+                # FIXME: pages may not be in 'c' subfield
+                value = value.split('-', 1)[0]
+            if dpubinfos.has_key(nb_instance):
+                dpubinfos[nb_instance][subfield] = value
+            else:
+                dpubinfos[nb_instance] = {subfield: value}
+
+        # construct standard format:
+        lwords = []
+        for dpubinfo in dpubinfos.values():
+            # index all journal subfields separately
+            for tag, val in dpubinfo.items():
+                lwords.append(val)
+            # index journal standard format:
+            pubinfo = self.journal_pubinfo_standard_form
+            for tag, val in dpubinfo.items():
+                pubinfo = pubinfo.replace(tag, val)
+            if self.tag[:-1] in pubinfo:
+                # some subfield was missing, do nothing
+                pass
+            else:
+                lwords.append(pubinfo)
+
+        # return list of words and pubinfos:
+        return lwords
+
+    def get_function_by_type(self, wordtable_type):
+        return self.tokenize
+
+
+class BibIndexAuthorCountTokenizer(BibIndexEmptyTokenizer):
+    """
+        Returns a number of authors who created a publication with given recID in the database.
+    """
+
+    def __init__(self, stemming_language = None, remove_stopwords = 'No', remove_html_markup = 'No', remove_latex_markup = 'No'):
+        self.tags = ['100__a', '700__a']
+
+
+    def tokenize(self, recID):
+        """Uses get_field_count from bibindex_engine_utils
+           for finding a number of authors of a publication and pass it in the list"""
+        return [str(get_field_count(recID, self.tags)),]
+
+
+    def get_function_by_type(self, wordtable_type):
+        return self.tokenize
+
+

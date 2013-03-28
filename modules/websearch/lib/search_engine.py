@@ -95,8 +95,8 @@ from invenio.bibrecord import create_record, record_xml_output
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requires_phrase_search, \
-     BibIndexPairTokenizer
+from invenio.bibindex_engine_tokenizer import BibIndexDefaultTokenizer
+from invenio.bibindex_engine_utils import author_name_requires_phrase_search
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
 from invenio.bibindexadminlib import get_idx_indexer
@@ -2425,7 +2425,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
     if not index_id:
         return intbitset()
     stemming_language = get_index_stemming_language(index_id)
-    pairs_tokenizer = BibIndexPairTokenizer(stemming_language)
+    pairs_tokenizer = BibIndexDefaultTokenizer(stemming_language)
     idxpair_table_washed = wash_table_column_name("idxPAIR%02dF" % index_id)
 
     if p.startswith("%") and p.endswith("%"):
@@ -2438,8 +2438,8 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
     ps = string.split(p, "->", 1)
     if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
         #so we are dealing with a span query
-        pairs_left = pairs_tokenizer.tokenize(ps[0])
-        pairs_right = pairs_tokenizer.tokenize(ps[1])
+        pairs_left = pairs_tokenizer.tokenize_for_pairs(ps[0])
+        pairs_right = pairs_tokenizer.tokenize_for_pairs(ps[1])
         if not pairs_left or not pairs_right:
             # we are not actually dealing with pairs but with words
             return search_unit_in_bibwords(original_pattern, f, type, wl)
@@ -2465,7 +2465,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         #tokenizing p will remove the '%', so we have to make sure it stays
         replacement = 'xxxxxxxxxx' #hopefuly this will not clash with anything in the future
         p = string.replace(p, '%', replacement)
-        pairs = pairs_tokenizer.tokenize(p)
+        pairs = pairs_tokenizer.tokenize_for_pairs(p)
         if not pairs:
             # we are not actually dealing with pairs but with words
             return search_unit_in_bibwords(original_pattern, f, type, wl)
@@ -2479,7 +2479,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         do_exact_search = False
     else:
         #normal query
-        pairs = pairs_tokenizer.tokenize(p)
+        pairs = pairs_tokenizer.tokenize_for_pairs(p)
         if not pairs:
             # we are not actually dealing with pairs but with words
             return search_unit_in_bibwords(original_pattern, f, type, wl)

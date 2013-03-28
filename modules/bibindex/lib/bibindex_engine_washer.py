@@ -26,6 +26,7 @@ re_pattern_fuzzy_author_dots = re.compile(r'[\.\-]+')
 re_pattern_fuzzy_author_spaces = re.compile(r'\s+')
 re_pattern_author_canonical_id = re.compile(r'\.[0-9]+$')
 
+
 re_unicode_lowercase_a = re.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
 re_unicode_lowercase_ae = re.compile(unicode(r"(?u)[æ]", "utf-8"))
 re_unicode_lowercase_e = re.compile(unicode(r"(?u)[éèëê]", "utf-8"))
