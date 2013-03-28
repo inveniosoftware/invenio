@@ -867,6 +867,7 @@ class WebSearchTestSearch(unittest.TestCase):
                                            unexpected_text=unexpected_text))
         return
 
+
 class WebSearchTestWildcardLimit(unittest.TestCase):
     """Checks if the wildcard limit is correctly passed and that
     users without autorization can not exploit it"""

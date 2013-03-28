@@ -78,6 +78,27 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
         return
 
 
+def check_admin_forms_with_dropdown_list(url, fields):
+    """Logs in as 'admin' and checks given url for
+       dropdown lists in forms available in the given page.
+       Fills them with given fields and returns html body response.
+       @param url: url of the forms to test
+       @param fields: a dict of the form fields and their values (only dropdown lists)
+       @return: html body
+    """
+    browser = get_authenticated_mechanize_browser("admin","")
+    browser.open(url)
+    browser.select_form(nr=0)
+    form = browser.form
+    for key in fields:
+        form[key] = [fields[key]]
+    resp = browser.submit()
+    #second page - confirmation
+    browser.select_form(nr=1)
+    resp = browser.submit()
+    return resp.read()
+
+
 class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
     """Tests BibIndexAdmin's ability to change knowledge base details for indexes"""
 
@@ -91,17 +112,9 @@ class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifysynonymkb'}
         url = make_url(base,**parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxKB"] = ["INDEX-SYNONYM-TITLE"]
-        form["idxMATCH"] = ["leading_to_comma"]
-        resp = browser.submit()
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxKB":"INDEX-SYNONYM-TITLE",
+                                                                   "idxMATCH":"leading_to_comma"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
@@ -113,17 +126,9 @@ class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifysynonymkb'}
         url = make_url(base, **parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxKB"] = ["INDEX-SYNONYM-TITLE"]
-        form["idxMATCH"] = ["exact"]
-        resp = browser.submit()
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxKB":"INDEX-SYNONYM-TITLE",
+                                                                   "idxMATCH":"exact"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed." in html response."""
             self.fail(merge_error_messages(error_messages))
@@ -145,19 +150,8 @@ class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
         url = make_url(base, **parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxSTOPWORDS"] = ["Yes"]
-        resp = browser.submit()
-        if self.re_stopwords_not_changed.search(resp.read()):
-            #leave becouse 'Yes' is an option which is currently set and everything is fine
-            return
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxSTOPWORDS":"Yes"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
@@ -170,16 +164,8 @@ class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
         url = make_url(base, **parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxSTOPWORDS"] = ["No"]
-        resp = browser.submit()
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxSTOPWORDS":"No"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
@@ -201,19 +187,8 @@ class BibIndexAdminRemoveHTMLTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovehtml'}
         url = make_url(base, **parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxHTML"] = ["Yes"]
-        resp = browser.submit()
-        if self.re_removehtml_not_changed.search(resp.read()):
-            #leave becouse 'Yes' is an option which is currently set and everything is fine
-            return
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxHTML":"Yes"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
@@ -226,16 +201,8 @@ class BibIndexAdminRemoveHTMLTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovehtml'}
         url = make_url(base, **parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxHTML"] = ["No"]
-        resp = browser.submit()
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxHTML":"No"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
@@ -258,19 +225,8 @@ class BibIndexAdminRemoveLatexTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovelatex'}
         url = make_url(base, **parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxLATEX"] = ["Yes"]
-        resp = browser.submit()
-        if self.re_removehtml_not_changed.search(resp.read()):
-            #leave becouse 'Yes' is an option which is currently set and everything is fine
-            return
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxLATEX":"Yes"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
@@ -283,16 +239,8 @@ class BibIndexAdminRemoveLatexTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifyremovelatex'}
         url = make_url(base, **parameters)
 
-        browser = get_authenticated_mechanize_browser("admin","")
-        browser.open(url)
-        browser.select_form(nr=0)
-        form = browser.form
-        form["idxLATEX"] = ["No"]
-        resp = browser.submit()
-        #second page - confirmation
-        browser.select_form(nr=1)
-        resp = browser.submit()
-        success = self.re_operation_successfull.search(resp.read())
+        html_response = check_admin_forms_with_dropdown_list(url, {"idxLATEX":"No"})
+        success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
             self.fail(merge_error_messages(error_messages))
