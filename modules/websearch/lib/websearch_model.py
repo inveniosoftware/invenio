@@ -170,10 +170,9 @@ class Collection(db.Model):
                 index=True)
     nbrecs = db.Column(db.Integer(10, unsigned=True),
                 server_default='0')
-    #FIXME mutable has not very good performance
+    #FIXME read only!!!
     reclist = db.Column(db.PickleType(pickler=IntbitsetPickle(),
-                                     comparator=IntbitsetCmp,
-                                     mutable=True))
+                                     comparator=IntbitsetCmp))
     _names = db.relationship(lambda: Collectionname,
                 backref='collection',
                 collection_class=attribute_mapped_collection('ln_type'),

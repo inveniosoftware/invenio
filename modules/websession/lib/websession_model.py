@@ -23,14 +23,14 @@ WebSession database models.
 
 # General imports.
 from invenio.sqlalchemyutils import db
-from sqlalchemy.orm import column_property
 from sqlalchemy.ext.hybrid import hybrid_property
-from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
 # Create your models here.
 #from invenio.webuser import get_default_user_preferences
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
-    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT
+    CFG_EXTERNAL_AUTH_DEFAULT
+
+
 def get_default_user_preferences():
     user_preference = {
         'login_method': ''}
@@ -40,67 +40,29 @@ def get_default_user_preferences():
     return user_preference
 
 
-
-#TODO Consider using standard cPickle or pickle
-#     (then just remove pickler=MarshalPickle()).
-class MarshalPickle(object):
-    def __init__(self, set_empty=False, default=None):
-        self.set_empty = set_empty
-        self.default = default or {}
-
-    def dumps(self, obj, protocol=None):
-        if obj is not None:
-            obj = serialize_via_marshal(obj)
-        elif self.set_empty:
-            obj = serialize_via_marshal(self.default)
-        return obj
-
-    def loads(self, obj):
-        try:
-            obj = deserialize_via_marshal(obj)
-        except:
-            obj = self.default
-        return obj
-
-
 class User(db.Model):
     """Represents a User record."""
     def __str__(self):
         return "%s <%s>" % (self.nickname, self.email)
     __tablename__ = 'user'
-    id = db.Column(db.Integer(15, unsigned=True),
-                primary_key=True,
-                autoincrement=True)
-    email = db.Column(db.String(255), nullable=False,
-                server_default='', index=True)
+    id = db.Column(db.Integer(15, unsigned=True), primary_key=True,
+                   autoincrement=True)
+    email = db.Column(db.String(255), nullable=False, server_default='',
+                      index=True)
     _password = db.Column(db.LargeBinary, name="password",
-                nullable=False)
+                          nullable=False)
     note = db.Column(db.String(255), nullable=True)
-    _settings = db.Column(
-                db.PickleType(
-                    mutable=True,
-                    pickler=MarshalPickle(
-                        set_empty=True,
-                        default=get_default_user_preferences())),
-                name='settings',
-                nullable=True)
-    nickname = db.Column(db.String(255), nullable=False,
-                server_default='', index=True)
+    settings = db.Column(db.MutableDict.as_mutable(db.MarshalBinary(
+        default_value=get_default_user_preferences, force_type=dict)),
+        nullable=True)
+    nickname = db.Column(db.String(255), nullable=False, server_default='',
+                         index=True)
     last_login = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+                           server_default='0001-01-01 00:00:00')
 
     #TODO re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
     _password_comparator = db.PasswordComparator(_password)
-
-    @hybrid_property
-    def settings(self):
-        return self._settings if self._settings is not None else \
-               get_default_user_preferences()
-
-    @settings.setter
-    def settings(self, settings):
-        self._settings = settings
 
     @hybrid_property
     def password(self):

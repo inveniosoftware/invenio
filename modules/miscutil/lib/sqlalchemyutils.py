@@ -25,9 +25,10 @@ from sqlalchemy.pool import Pool
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import class_mapper, properties
-from sqlalchemy.types import TypeDecorator, TEXT
+from sqlalchemy.types import TypeDecorator, TEXT, BINARY
 from sqlalchemy.sql.expression import FunctionElement
 from invenio.intbitset import intbitset
+from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
 
 try:
     from flask.ext.sqlalchemy import SQLAlchemy
@@ -131,6 +132,32 @@ class JSONEncodedTextDict(TypeDecorator):
             value = json.loads(value)
         return value
 
+
+class MarshalBinary(TypeDecorator):
+
+    impl = BINARY
+
+    def __init__(self, default_value, force_type=None, *args, **kwargs):
+        super(MarshalBinary, self).__init__(*args, **kwargs)
+        self.default_value = default_value() if callable(default_value) \
+            else default_value
+        self.force_type = force_type if force_type is not None else lambda x: x
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = serialize_via_marshal(self.force_type(value))
+            return value
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            try:
+                value = deserialize_via_marshal(value)
+            except:
+                value = None
+        return value if value is not None else self.default_value
+
+
 #@compiles(sqlalchemy.types.LargeBinary, "postgresql")
 #def compile_binary_postgresql(type_, compiler, **kw):
 #    return "BYTEA"
@@ -194,6 +221,17 @@ def _include_sqlalchemy(obj, engine=None):
 
     obj.Enum.__init__ = default_enum(obj.Enum.__init__)
     obj.AsBINARY = AsBINARY
+    obj.MarshalBinary = MarshalBinary
+
+    ## Overwrite :meth:`MutableDick.update` to detect changes.
+    from sqlalchemy.ext.mutable import MutableDict
+
+    def update_mutable_dict(self, *args, **kwargs):
+        super(MutableDict, self).update(*args, **kwargs)
+        self.changed()
+
+    MutableDict.update = update_mutable_dict
+    obj.MutableDict = MutableDict
 
 
 class PasswordComparator(Comparator):
