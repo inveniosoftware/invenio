@@ -438,13 +438,12 @@ def pretty_date(time=False, ln=CFG_SITE_LANG):
     'just now', etc.
     """
 
-    #FIXME move to dateutils.py
     _ = gettext_set_language(ln)
 
-    now = datetime.datetime.now()
+    now = real_datetime.now()
     if type(time) is int:
-        diff = now - datetime.datetime.fromtimestamp(time)
-    elif isinstance(time, datetime.datetime):
+        diff = now - real_datetime.fromtimestamp(time)
+    elif isinstance(time, real_datetime):
         diff = now - time
     elif not time:
         diff = now - now
