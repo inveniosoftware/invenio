@@ -127,8 +127,13 @@ webcomment_templates = invenio.template.load('webcomment')
 
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, \
-    get_refersto_hitset, get_citedby_hitset
+    get_refersto_hitset, get_citedby_hitset, get_cited_by_list, \
+    get_refers_to_list
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
+from invenio.bibrank_selfcites_searcher import get_self_cited_by_list, \
+                                               get_self_cited_by, \
+                                               get_self_refers_to, \
+                                               get_self_refers_to_list
 
 
 from invenio.dbquery import run_sql, \
@@ -2347,6 +2352,9 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif f == 'refersto':
         # we are doing search by the citation count
         hitset = search_unit_refersto(p)
+    elif f == 'referstoexcludingselfcites':
+        # we are doing search by the citation count
+        hitset = search_unit_refersto_excluding_selfcites(p)
     elif f == 'rawref':
         from invenio.refextract_api import search_from_reference
         field, pattern = search_from_reference(p)
@@ -2354,6 +2362,9 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif f == 'citedby':
         # we are doing search by the citation count
         hitset = search_unit_citedby(p)
+    elif f == 'citedbyexcludingselfcites':
+        # we are doing search by the citation count
+        hitset = search_unit_citedby_excluding_selfcites(p)
     elif m == 'a' or m == 'r':
         # we are doing either phrase search or regexp search
         if f == 'fulltext':
@@ -2375,6 +2386,9 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif p.startswith("cited:"):
         # we are doing search by the citation count
         hitset = search_unit_by_times_cited(p[6:])
+    elif p.startswith("citedexcludingselfcites:"):
+        # we are doing search by the citation count
+        hitset = search_unit_by_times_cited(p[6:], exclude_selfcites=True)
     else:
         # we are doing bibwords search by default
         hitset = search_unit_in_bibwords(p, f, m, wl=wl)
@@ -2820,7 +2834,7 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
         set += row[0]
     return set
 
-def search_unit_by_times_cited(p):
+def search_unit_by_times_cited(p, exclude_selfcites=False):
     """
     Return histset of recIDs found that are cited P times.
     Usually P looks like '10->23'.
@@ -2834,7 +2848,8 @@ def search_unit_by_times_cited(p):
     if p == 0 or p == "0" or \
        p.startswith("0->") or p.endswith("->0"):
         allrecs = intbitset(run_sql("SELECT id FROM bibrec"))
-    return get_records_with_num_cites(numstr, allrecs)
+    return get_records_with_num_cites(numstr, allrecs,
+                                      exclude_selfcites=exclude_selfcites)
 
 def search_unit_refersto(query):
     """
@@ -2843,10 +2858,24 @@ def search_unit_refersto(query):
     """
     if query:
         ahitset = search_pattern(p=query)
-        if ahitset:
-            return get_refersto_hitset(ahitset)
-        else:
-            return intbitset([])
+        return get_refersto_hitset(ahitset)
+    else:
+        return intbitset([])
+
+def search_unit_refersto_excluding_selfcites(query):
+    """
+    Search for records satisfying the query (e.g. author:ellis) and
+    return list of records referred to by these records.
+    """
+    if query:
+        ahitset = search_pattern(p=query)
+        citers = intbitset()
+        citations = get_cited_by_list(ahitset)
+        selfcitations = get_self_cited_by_list(ahitset)
+        for cites, selfcites in zip(citations, selfcitations):
+            # cites is in the form [(citee, citers), ...]
+            citers += cites[1] - selfcites[1]
+        return citers
     else:
         return intbitset([])
 
@@ -2861,6 +2890,23 @@ def search_unit_citedby(query):
             return get_citedby_hitset(ahitset)
         else:
             return intbitset([])
+    else:
+        return intbitset([])
+
+def search_unit_citedby_excluding_selfcites(query):
+    """
+    Search for records satisfying the query (e.g. author:ellis) and
+    return list of records referred to by these records.
+    """
+    if query:
+        ahitset = search_pattern(p=query)
+        citees = intbitset()
+        references = get_refers_to_list(ahitset)
+        selfreferences = get_self_refers_to_list(ahitset)
+        for refs, selfrefs in zip(references, selfreferences):
+            # refs is in the form [(citer, citees), ...]
+            citees += refs[1] - selfrefs[1]
+        return citees
     else:
         return intbitset([])
 
@@ -3103,9 +3149,9 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
             # FIXME: workaround for not having native phrase index yet
             t = 'w'
     # special indexes:
-    if f == 'refersto':
+    if f == 'refersto' or f == 'referstoexcludingselfcites':
         return _("There are no records referring to %s.") % cgi.escape(p)
-    if f == 'citedby':
+    if f == 'citedby' or f == 'citedbyexcludingselfcites':
         return _("There are no records cited by %s.") % cgi.escape(p)
     # look for nearest terms:
     if t == 'w':
@@ -4417,7 +4463,6 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                                  sp=sp,
                                                                                                  rm=rm))
                         # Self-cited
-                        from invenio.bibrank_selfcites_indexer import get_self_cited_by
                         selfcited = get_self_cited_by(recid)
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))

@@ -125,13 +125,20 @@ def get_cited_by_count(recordid):
     return len(rows)
 
 
-def get_records_with_num_cites(numstr, allrecs=intbitset([])):
+def get_records_with_num_cites(numstr, allrecs=intbitset([]),
+                               exclude_selfcites=False):
     """Return an intbitset of record IDs that are cited X times,
        X defined in numstr.
        Warning: numstr is string and may not be numeric! It can
        be 10,0->100 etc
     """
-    cache_cited_by_dictionary_counts = get_citation_dict("citations_counts")
+    if exclude_selfcites:
+        cache_cited_by_dictionary_counts = get_citation_dict("selfcites_counts")
+        citations_keys = intbitset(get_citation_dict("selfcites_weights").keys())
+    else:
+        cache_cited_by_dictionary_counts = get_citation_dict("citations_counts")
+        citations_keys = get_citation_dict("citations_keys")
+
     matches = intbitset()
     #once again, check that the parameter is a string
     if type(numstr) != type("thisisastring"):
@@ -146,10 +153,10 @@ def get_records_with_num_cites(numstr, allrecs=intbitset([])):
         num = int(singlenum[0])
         if num == 0:
             #we return recids that are not in keys
-            return allrecs - get_citation_dict("citations_keys")
+            return allrecs - citations_keys
         else:
-            return intbitset([recid for recid, cit_count \
-                        in cache_cited_by_dictionary_counts \
+            return intbitset([recid for recid, cit_count
+                        in cache_cited_by_dictionary_counts
                         if cit_count == num])
 
     # Try to get 1->10 or such
@@ -159,20 +166,20 @@ def get_records_with_num_cites(numstr, allrecs=intbitset([])):
         sec = int(firstsec[0][1])
         if first == 0:
             # Start with those that have no cites..
-            matches = allrecs - get_citation_dict("citations_keys")
+            matches = allrecs - citations_keys
         if first <= sec:
             matches += intbitset([recid for recid, cit_count
-                             in cache_cited_by_dictionary_counts \
+                             in cache_cited_by_dictionary_counts
                              if first <= cit_count <= sec])
         return matches
 
     # Try to get 10+
     firstsec = re.findall("(\d+)\+", numstr)
     if firstsec:
-        first = firstsec[0]
+        first = int(firstsec[0])
         matches = intbitset([recid for recid, cit_count
                          in cache_cited_by_dictionary_counts \
-                         if cit_count > int(first)])
+                         if cit_count > first])
 
     return matches
 
@@ -192,7 +199,25 @@ def get_cited_by_list(recids):
     for citer, citee in rows:
         cites.setdefault(citee, set()).add(citer)
 
-    return [(recid, cites.get(recid, [])) for recid in recids]
+    return [(recid, cites.get(recid, set())) for recid in recids]
+
+
+def get_refers_to_list(recids):
+    """Return a tuple of ([recid,list_of_citing_records],...) for all the
+       records in recordlist.
+    """
+    if not recids:
+        return []
+
+    in_sql = ','.join('%s' for dummy in recids)
+    rows = run_sql("""SELECT citee, citer FROM rnkCITATIONDICT
+                       WHERE citer IN (%s)""" % in_sql, recids)
+
+    refs = {}
+    for citee, citer in rows:
+        refs.setdefault(citer, set()).add(citee)
+
+    return [(recid, refs.get(recid, set())) for recid in recids]
 
 
 def get_refersto_hitset(ahitset):
@@ -204,11 +229,15 @@ def get_refersto_hitset(ahitset):
     out = intbitset()
     if ahitset:
         try:
-            for recid in ahitset:
-                out += get_cited_by(recid)
+            iter(ahitset)
         except OverflowError:
             # ignore attempt to iterate over infinite ahitset
             pass
+        else:
+            in_sql = ','.join('%s' for dummy in ahitset)
+            rows = run_sql("""SELECT citer FROM rnkCITATIONDICT
+                              WHERE citee IN (%s)""" % in_sql, ahitset)
+            out = intbitset(rows)
     return out
 
 
@@ -233,11 +262,15 @@ def get_citedby_hitset(ahitset):
     out = intbitset()
     if ahitset:
         try:
-            for recid in ahitset:
-                out += get_refers_to(recid)
+            iter(ahitset)
         except OverflowError:
             # ignore attempt to iterate over infinite ahitset
             pass
+        else:
+            in_sql = ','.join('%s' for dummy in ahitset)
+            rows = run_sql("""SELECT citee FROM rnkCITATIONDICT
+                              WHERE citer IN (%s)""" % in_sql, ahitset)
+            out = intbitset(rows)
     return out
 
 

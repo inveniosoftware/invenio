@@ -322,11 +322,11 @@ def store_record_coauthors(recid, authors, deleted_authors,
         to_process = added_authors
 
     for personid in get_author_coauthors_list(deleted_authors, config):
-        run_sql('DELETE FROM rnkEXTENDEDAUTHORS WHERE'\
+        run_sql('DELETE FROM rnkEXTENDEDAUTHORS WHERE'
                 ' id = %s AND authorid = %s', (recid, personid))
 
     for personid in get_author_coauthors_list(to_process, config):
-        run_sql('INSERT IGNORE INTO rnkEXTENDEDAUTHORS (id, authorid) ' \
+        run_sql('INSERT IGNORE INTO rnkEXTENDEDAUTHORS (id, authorid) '
                 'VALUES (%s,%s)', (recid, personid))
 
 
@@ -337,20 +337,6 @@ def get_record_coauthors(recid):
     """
     sql = 'SELECT authorid FROM rnkEXTENDEDAUTHORS WHERE id = %s'
     return (r[0] for r in run_sql(sql, (recid, )))
-
-
-def get_self_cited_by(recid, precompute=CFG_BIBRANK_SELFCITES_PRECOMPUTE):
-    if not precompute:
-        tags = get_authors_tags()
-        selfcites_fun = ALL_ALGORITHMS['simple']
-        results = selfcites_fun(recid, tags)
-    else:
-        function = SELFCITES_CONFIG.get("rank_method", "function")
-        algorithm = SELFCITES_CONFIG.get(function, 'algorithm')
-        selfcites_fun = ALL_ALGORITHMS[algorithm]
-        results = selfcites_fun(recid, tags)
-
-    return results
 
 
 SELFCITES_CONFIG = load_config_file('selfcites')

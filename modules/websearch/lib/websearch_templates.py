@@ -4704,6 +4704,10 @@ class Template:
         out = """<tr><td>%(fame)s</td>""" % \
               {'fame': _(fame), }
         for coll, colldef in l_colls:
+            if 'excluding self cites' in coll:
+                keyword = 'citedexcludingselfcites'
+            else:
+                keyword = 'cited'
             link_url = CFG_SITE_URL + '/search?p='
             if searchpatterns.get(coll, None):
                 p = searchpatterns.get(coll, None)
@@ -4716,9 +4720,9 @@ class Template:
             if colldef:
                 link_url += quote(colldef) + '%20AND%20'
             if low == 0 and high == 0:
-                link_url += quote('cited:0')
+                link_url += quote('%s:0' % keyword)
             else:
-                link_url += quote('cited:%i->%i' % (low, high))
+                link_url += quote('%s:%i->%i' % (keyword, low, high))
             link_text = self.tmpl_nice_number(d_cites[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url,
                                                                    link_text)

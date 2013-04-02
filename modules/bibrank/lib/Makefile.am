@@ -43,6 +43,7 @@ pylib_DATA = bibrankadminlib.py \
              bibrank_citerank_indexer.py \
              bibrank_citerank_indexer_unit_tests.py \
              bibrank_selfcites_indexer.py \
+             bibrank_selfcites_searcher.py \
              bibrank_selfcites_task.py \
              bibrank_selfcites_unit_tests.py \
              bibrank_selfcites_regression_tests.py
