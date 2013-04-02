@@ -27,6 +27,7 @@ pylib_DATA = docextract_pdf.py \
              docextract_record.py \
              docextract_record_regression_tests.py \
              docextract_convert_journals.py \
+             docextract_convert_journals_unit_tests.py \
              refextract.py \
              refextract_task.py \
              refextract_config.py \

@@ -22,6 +22,7 @@ import os
 import subprocess
 from tempfile import NamedTemporaryFile, mkstemp
 
+from invenio.testutils import make_test_suite, run_test_suite
 from invenio.docextract_record import BibRecord
 from invenio.refextract_kbs import get_kbs
 from invenio.config import CFG_BINDIR, CFG_TMPDIR
@@ -94,3 +95,9 @@ class ScriptTests(XmlTest):
 </collection>""")
         finally:
             os.unlink(dest_temp_path)
+
+
+TEST_SUITE = make_test_suite(ScriptTests)
+
+if __name__ == '__main__':
+    run_test_suite(TEST_SUITE)
