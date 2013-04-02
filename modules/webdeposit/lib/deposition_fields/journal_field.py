@@ -19,7 +19,8 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.sherpa_romeo import SherpaRomeoSearch
+from invenio.webdeposit_autocomplete_utils import sherpa_romeo_journals
+from invenio.webdeposit_validation_utils import sherpa_romeo_journal_validate
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['JournalField']
@@ -32,35 +33,7 @@ class JournalField(WebDepositField, TextField, JsonCookerMixinBuilder('journal')
         self._icon_html = '<i class="icon-book"></i>'
 
     def pre_validate(self, form=None):
-        value = self.data
-        if value == "" or value.isspace():
-            return dict(error=0, error_message='')
-
-        s = SherpaRomeoSearch()
-        s.search_journal(value, 'exact')
-        if s.error:
-            return dict(info=1, info_message=s.error_message)
-
-        if s.get_num_hits() == 1:
-            issn = s.parser.get_journals(attribute='issn')
-            if issn != [] and issn is not None:
-                issn = issn[0]
-                publisher = s.parser.get_publishers(journal=value)
-                if publisher is not None and publisher != []:
-                    return dict(error=0, error_message='',
-                               fields=dict(issn=issn, publisher=publisher['name']))
-                return dict(error=0, error_message='',
-                            info=1, info_message="Journal's Publisher not found",
-                            fields=dict(publisher="", issn=issn))
-            else:
-                return dict(info=1, info_message="Couldn't find ISSN")
-        return dict(error=0, error_message='')
+        return sherpa_romeo_journal_validate(self)
 
     def autocomplete(self):
-        value = self.data
-
-        s = SherpaRomeoSearch()
-        journals = s.search_journal(value)
-        if journals is None:
-            return []
-        return journals
+        return sherpa_romeo_journals(self.data)

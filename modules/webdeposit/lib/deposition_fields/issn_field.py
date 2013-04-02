@@ -20,7 +20,7 @@
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
-from invenio.sherpa_romeo import SherpaRomeoSearch
+from invenio.webdeposit_validation_utils import sherpa_romeo_issn_validate
 
 __all__ = ['ISSNField']
 
@@ -32,23 +32,4 @@ class ISSNField(WebDepositField, TextField, JsonCookerMixinBuilder('issn')):
         self._icon_html = '<i class="icon-barcode"></i>'
 
     def pre_validate(self, form=None):
-        value = self.data
-        if value == "" or value.isspace():
-            return dict(error=0, error_message='')
-        s = SherpaRomeoSearch()
-        s.search_issn(value)
-        if s.error:
-            return dict(error=1, error_message=s.error_message)
-
-        if s.get_num_hits() == 1:
-            journal = s.parser.get_journals(attribute='jtitle')
-            journal = journal[0]
-            publisher = s.parser.get_publishers(journal=journal)
-            if publisher is not None and publisher != []:
-                return dict(error=0, error_message='',
-                            fields=dict(journal=journal, publisher=publisher['name']))
-            else:
-                return dict(error=0, error_message='',
-                            fields=dict(journal=journal))
-
-        return dict(info=1, info_message="Couldn't find Journal")
+        return sherpa_romeo_issn_validate(self)

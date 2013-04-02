@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2013 CERN.
 ##
@@ -15,29 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = deposition_forms deposition_fields deposition_types
+from invenio.sherpa_romeo import SherpaRomeoSearch
+from invenio.orcid import OrcidSearch
 
-pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = __init__.py \
-             webdeposit_blueprint.py \
-             webdeposit_utils.py \
-             webdeposit_load_fields.py \
-             webdeposit_load_forms.py \
-             webdeposit_load_deposition_types.py \
-             webdeposit_field_widgets.py \
-             webdeposit_model.py \
-             webdeposit_workflow.py \
-             webdeposit_workflow_utils.py \
-             webdeposit_field.py \
-             webdeposit_autocomplete_utils.py \
-             webdeposit_validation_utils.py
+def sherpa_romeo_publishers(value):
+    sherpa_romeo = SherpaRomeoSearch()
+    publishers = sherpa_romeo.search_publisher(value)
+    if publishers is None:
+        return []
+    return publishers
 
-jsdir=$(localstatedir)/www/js
 
-js_DATA = webdeposit_form.js
+def sherpa_romeo_journals(value):
+    s = SherpaRomeoSearch()
+    journals = s.search_journal(value)
+    if journals is None:
+        return []
+    return journals
 
-EXTRA_DIST = $(pylib_DATA) \
-             $(js_DATA)
 
-CLEANFILES = *~ *.tmp *.pyc
+def orcid_authors(value):
+    orcid = OrcidSearch()
+    orcid.search_authors(value)
+    return orcid.get_authors_names()

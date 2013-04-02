@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.orcid import OrcidSearch
+from invenio.webdeposit_autocomplete_utils import orcid_authors
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['AuthorField']
@@ -35,7 +35,4 @@ class AuthorField(WebDepositField, TextField, JsonCookerMixinBuilder('author')):
         return dict(error=0, error_message='')
 
     def autocomplete(self):
-        orcid = OrcidSearch()
-        value = self.data
-        orcid.search_authors(value)
-        return orcid.get_authors_names()
+        return orcid_authors(self.data)

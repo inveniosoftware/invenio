@@ -20,7 +20,7 @@
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
-from invenio.dataciteutils import DataciteMetadata
+from invenio.webdeposit_validation_utils import datacite_doi_validate
 
 __all__ = ['DOIField']
 
@@ -32,16 +32,4 @@ class DOIField(WebDepositField, TextField, JsonCookerMixinBuilder('doi')):
         self._icon_html = '<i class="icon-barcode"></i>'
 
     def pre_validate(self, form=None):
-        value = self.data
-        if value == "" or value.isspace():
-            return dict()
-        datacite = DataciteMetadata(value)
-        if datacite.error:
-            return dict(info=1, info_message="Couldn't retrieve doi metadata")
-
-        return dict(fields=dict(publisher=datacite.get_publisher(),
-                                title=datacite.get_titles(),
-                                date=datacite.get_dates(),
-                                abstract=datacite.get_description()),
-                    success=1,
-                    success_message='Datacite.org metadata imported successfully')
+        return datacite_doi_validate(self)

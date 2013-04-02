@@ -20,6 +20,7 @@
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
+from invenio.webdeposit_validation_utils import number_validate
 
 __all__ = ['PagesNumberField']
 
@@ -31,25 +32,4 @@ class PagesNumberField(WebDepositField, TextField, JsonCookerMixinBuilder('page_
         self._icon_html = '<i class="icon-th"></i>'
 
     def pre_validate(self, form=None):
-        value = self.data
-        if value == "" or value.isspace():
-            return dict(error=0, error_message='')
-
-        def is_number(s):
-            try:
-                float(s)
-                return True
-            except ValueError:
-                return False
-
-        if not is_number(value):
-            error_message = 'Pages number must be a number!'
-            try:
-                self.errors.append(error_message)
-            except AttributeError:
-                self.errors = list(self.process_errors)
-                self.errors.append(error_message)
-            return dict(error=1,
-                        error_message=error_message)
-        else:
-            return dict(error=0, error_message='')
+        return number_validate(self, error_message='Pages must be a number!')
