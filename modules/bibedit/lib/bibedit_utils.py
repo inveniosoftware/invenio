@@ -307,7 +307,8 @@ def delete_disabled_changes(used_changes):
     for change_id in used_changes:
         delete_hp_change(change_id)
 
-def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
+def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False,
+                    task_name="bibedit", sequence_id=None):
     """Write XML record to file. Default behaviour is to read the record from
     a BibEdit cache file, filter out the unchanged volatile subfields,
     write it back to an XML file and then pass this file to BibUpload.
@@ -350,9 +351,13 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
 
     user_name = get_user_info(uid)[1]
     if to_upload:
-        # Pass XML file to BibUpload.
-        task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r',
-                                  file_path, '-u', user_name)
+        args = ['bibupload', task_name, '-P', '5', '-r',
+                file_path, '-u', user_name]
+        if task_name == "bibedit":
+            args += ['--name', 'bibedit']
+        if sequence_id:
+            args += ["-I", sequence_id]
+        task_low_level_submission(*args)
     return True
 
 

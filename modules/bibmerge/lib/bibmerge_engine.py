@@ -20,6 +20,7 @@
 """Invenio BibMerge Engine."""
 
 import os
+import random
 
 from invenio.bibmerge_merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
@@ -150,9 +151,18 @@ def perform_request_record(requestType, uid, data):
             # add recid of deleted record to master record
             record_add_field(record1, '981', ' ', ' ', '', [('a', str(recid2))])
 
+            # To ensure updates happen in order, use a seq id
+            sequence_id = str(random.randrange(1, 4294967296))
+
             # submit record2 to be deleted
             xml_record2 = record_xml_output(record2)
-            save_xml_record(recid2, uid, xml_record2)
+            save_xml_record(recid2, uid, xml_record2, task_name="bibmerge",
+                            sequence_id=sequence_id)
+
+            # submit record1
+            xml_record1 = record_xml_output(record1)
+            save_xml_record(recid1, uid, xml_record1, task_name="bibmerge",
+                            sequence_id=sequence_id)
 
             #submit record1
             xml_record1 = record_xml_output(record1)
@@ -162,7 +172,7 @@ def perform_request_record(requestType, uid, data):
             return result
 
         #submit record1 from cache
-        save_xml_record(recid1, uid)
+        save_xml_record(recid1, uid, task_name="bibmerge")
 
         # Delete cache file if it exists
         if cache_exists(recid1, uid):
