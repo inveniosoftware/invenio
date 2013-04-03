@@ -51,6 +51,7 @@
  *   - cmpFields
  *   - fieldIsProtected
  *   - containsProtected
+ *   - containsManagedDOI
  *   - getMARC
  *   - getFieldTag
  *   - getSubfieldTag
@@ -688,6 +689,7 @@ function resetBibeditState(){
   gRedoList = [];
   gPhysCopiesNum = 0;
   gBibCircUrl = null;
+  gManagedDOIs = [];
 
   clearWarnings();
   updateRevisionsHistory();
@@ -1479,6 +1481,60 @@ function containsHPAffectedField(fieldData){
   return false;
 }
 
+function containsManagedDOI(fieldData){
+  /*
+   * Determine if a field data structure contains DOIs managed by this
+   * site (useful to ask confirmation to the user).
+   * The data structure must be an object with the following levels
+   * - Tag
+   *   - Field position
+   *     - Subfield index
+   */
+    var data_for_fieldtype, tags, y, fields, subfields, subfieldvalue;
+    var managed_dois_in_fields = new Array();
+
+    if (typeof gDOILookupField === 'undefined') {
+	return false;
+    }
+
+    for (var fieldtype in fieldData){
+	data_for_fieldtype = fieldData[fieldtype];
+	for (var tag in data_for_fieldtype){
+	    if (tag == gDOILookupField.substring(0,3)) {
+		fieldPositions = data_for_fieldtype[tag];
+		for (var fieldPosition in fieldPositions){
+		    fields = fieldPositions[fieldPosition];
+		    if (fieldtype == 'fields') {
+			/* in the case of datafields, ignore info
+			 * about indicators & co. Just keep the list
+			 * of fields */
+			fields = [fields[0]]
+		    }
+		    for (var subfieldPosition in fields){
+			subfields = fields[subfieldPosition]
+			if (fieldtype == 'subfields') {
+			    subfields = [subfields]
+			}
+			for (var subfield in subfields) {
+			    subfieldcode = subfields[subfield][0]
+			    subfieldvalue = subfields[subfield][1]
+			    if (subfieldcode == gDOILookupField.substring(5,6) && gManagedDOIs.indexOf(subfieldvalue) != -1) {
+				managed_dois_in_fields.push(subfieldvalue)
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+  if (managed_dois_in_fields.length > 0){
+    return managed_dois_in_fields
+  } else {
+    return false;
+  }
+}
+
 function getMARC(tag, fieldPosition, subfieldIndex){
   /*
    * Return the MARC representation of a field or a subfield.
@@ -1708,6 +1764,7 @@ function onGetRecordSuccess(json){
   gDisplayBibCircPanel = json['canRecordHavePhysicalCopies'];
   gRecordHasPDF = json['record_has_pdf']
   gRecordHideAuthors = json['record_hide_authors']
+  gManagedDOIs = json['managed_DOIs']
 
   // Get KB information
   gKBSubject = json['KBSubject'];
@@ -2230,6 +2287,17 @@ function onDeleteRecordClick(){
     displayAlert('errorPhysicalCopiesExist');
     return;
   }
+  if (gINTERNAL_DOI_PROTECTION_LEVEL > 0 && gManagedDOIs.length > 0){
+      if (gINTERNAL_DOI_PROTECTION_LEVEL == 1){
+	  if (!displayAlert('confirmDeleteManagedDOIs', gManagedDOIs)){
+	      return;
+	  }
+      } else if (gINTERNAL_DOI_PROTECTION_LEVEL == 2) {
+	  displayAlert('alertDeleteManagedDOIs', gManagedDOIs)
+	  updateStatus('ready');
+	  return;
+      }
+  }
   if (displayAlert('confirmDeleteRecord')){
     updateStatus('updating');
     createReq({recID: gRecID, requestType: 'deleteRecord'}, function(json){
@@ -2412,6 +2480,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gBibCircUrl = null;
   gPhysCopiesNum = 0;
   gSubmitMode = "default";
+  gManagedDOIs = [];
 }
 
 
@@ -3958,6 +4027,20 @@ function onDeleteClick(event){
     displayAlert('alertDeleteProtectedField', [protectedField]);
     updateStatus('ready');
     return;
+  }
+  // Special care must be taken when deleting DOIs we manage
+  if (gINTERNAL_DOI_PROTECTION_LEVEL > 0){
+      var managedDOIField = containsManagedDOI(toDelete);
+      if (managedDOIField && gINTERNAL_DOI_PROTECTION_LEVEL == 1){
+	  if (!displayAlert('confirmDeleteManagedDOIsField', [managedDOIField])){
+	      updateStatus('ready');
+	      return;
+	  }
+      } else if (managedDOIField && gINTERNAL_DOI_PROTECTION_LEVEL == 2) {
+	  displayAlert('alertDeleteManagedDOIsField', [managedDOIField])
+	  updateStatus('ready');
+	  return;
+      }
   }
   // register the undo Handler
   var urHandler = prepareUndoHandlerDeleteFields(toDelete);

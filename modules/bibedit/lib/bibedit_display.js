@@ -1188,6 +1188,28 @@ function displayAlert(msgType, args) {
         msg = "ERROR: Cannot delete record when physical copies exist. " +
             "First remove the copies in the BibCirculation module and then try again";
         break;
+    case 'confirmDeleteManagedDOIs':
+        msg = '******************** WARNING ********************\n' +
+            'You are about to delete a record that contain DOI(s) managed by the system:\n' +
+	    args.join('\n') + '\n' +
+            'Are you really sure you want to delete this record?'
+        popUpType = 'confirm';
+        break;
+    case 'alertDeleteManagedDOIs':
+        msg = 'ERROR: Cannot delete a record that contains DOI(s) managed by the system:\n' +
+	    args.join('\n');
+        break;
+    case 'confirmDeleteManagedDOIsField':
+        msg = '******************** WARNING ********************\n' +
+            'You are about to delete a field that contain DOI(s) managed by the system:\n' +
+	    args.join('\n') + '\n' +
+            'Are you really sure you want to delete this field?'
+        popUpType = 'confirm';
+        break;
+    case 'alertDeleteManagedDOIsField':
+        msg = 'ERROR: Cannot delete field(s) that contain DOI(s) managed by the system:\n' +
+	    args.join('\n');
+        break;
     default:
         msg = msgType;
     }
