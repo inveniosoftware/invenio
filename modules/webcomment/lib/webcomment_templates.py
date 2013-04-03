@@ -3,7 +3,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,6 +22,8 @@
 """HTML Templates for commenting features """
 
 __revision__ = "$Id$"
+
+import cgi
 
 # CDS Invenio imports
 from invenio.webuser import get_user_info
@@ -383,7 +385,7 @@ class Template:
 %(abuse)s''' % {'siteurl'        : CFG_SITE_URL,
                'star_score_img': star_score_img,
                'star_score'    : star_score,
-               'title'         : title,
+               'title'         : cgi.escape(title),
                'reviewed_label': reviewed_label,
                'useful_label'  : useful_label,
                'body'          : _body,
@@ -902,7 +904,7 @@ class Template:
                                'title_label': _("Give a title to your review"),
                                'write_label': _("Write your review"),
                                'note_label': note_label,
-                               'note'      : note!='' and note or "",
+                               'note'      : note!='' and cgi.escape(note, quote=True) or "",
                                'msg'       : msg!='' and msg or "",
                                #'record'    : record_details
                                'add_review': show_title_p and ('<h2>'+_('Add review')+'</h2>') or '',
