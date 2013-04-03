@@ -18,9 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.webdeposit_load_forms import forms
-from invenio.bibworkflow_utils import authorize_user, \
+from invenio.webdeposit_workflow_utils import authorize_user, \
                                               render_form, \
-                                              wait_for_submission
+                                              wait_for_submission, \
+                                              export_marc_from_json, \
+                                              create_record_from_marc
 
 __all__ = ['Article']
 
@@ -33,7 +35,9 @@ plural = "Articles"
 group = "Articles & Preprints"
 wf = [authorize_user(),
       render_form(ArticleForm),
-      wait_for_submission()]
+      wait_for_submission(),
+      export_marc_from_json(),
+      create_record_from_marc()]
 
 # form = get_metadata_creation_form_from_doctype(doc_type)  # # This will use BibField to create a simple form which is the concatenation of all the fields neeeded for doc_type "Article"
 

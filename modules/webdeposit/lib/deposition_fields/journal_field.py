@@ -21,19 +21,31 @@ from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_autocomplete_utils import sherpa_romeo_journals
 from invenio.webdeposit_validation_utils import sherpa_romeo_journal_validate
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['JournalField']
 
 
-class JournalField(WebDepositField, TextField, JsonCookerMixinBuilder('journal')):
+class JournalField(WebDepositField(), TextField):
 
     def __init__(self, **kwargs):
         super(JournalField, self).__init__(**kwargs)
         self._icon_html = '<i class="icon-book"></i>'
 
     def pre_validate(self, form=None):
+        # Load custom validation
+        validators = self.config.get_validators()
+        if validators is not [] and validators is not None:
+            validation_json = {}
+            for validator in validators:
+                json = validator(self)
+                validation_json = self.merge_validation_json(validation_json, json)
+
+            return validation_json
         return sherpa_romeo_journal_validate(self)
 
     def autocomplete(self):
+        # Load custom autocompletion function
+        autocomplete = self.config.get_autocomplete_function()
+        if autocomplete is not None:
+            return autocomplete(self.data)
         return sherpa_romeo_journals(self.data)

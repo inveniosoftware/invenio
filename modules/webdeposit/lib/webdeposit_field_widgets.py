@@ -63,11 +63,11 @@ def plupload_widget(field, **kwargs):
 
 
 def bootstrap_submit(field, **kwargs):
-    html = u'<input %s >' % html_params(style="float:right;",
+    html = u'<input %s >' % html_params(style="float:right; width: 250px;",
                                         id="submitButton",
                                         class_="btn btn-primary btn-large",
                                         name="submitButton",
-                                        type="submitButton",
+                                        type="submit",
                                         value=field.label.text,)
     html = [u'<div style="float:right;" >' + html + u'</div>']
     return HTMLString(u''.join(html))

@@ -19,12 +19,11 @@
 
 from wtforms import DateField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['Date']
 
 
-class Date(WebDepositField, DateField, JsonCookerMixinBuilder('date')):
+class Date(WebDepositField(), DateField):
 
     def __init__(self, **kwargs):
         super(Date, self).__init__(**kwargs)

@@ -18,79 +18,47 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.sqlalchemyutils import db
-from invenio.webdeposit_model import WebDepositWorkflow
-from invenio.bibworkflow_engine import BibWorkflowEngine
+from sqlalchemy import func
+from invenio.webdeposit_model import WebDepositDraft
+from invenio.bibfield_jsonreader import JsonReader
+from invenio.bibupload import bibupload
+from invenio.bibrecord import create_record
 
+"""
+    Functions to implement workflows
 
-class JsonCookerMixin(object):
-    def cook_json(self, json_reader):
-        """
-        This is a stub implementation.
-        """
-        return json_reader
+    The workflow functions must have the following structure:
 
-
-def JsonCookerMixinBuilder(key):
-    class CustomJsonCookerMixin(JsonCookerMixin):
-        def cook_json(self, json_reader):
-            value = self.data
-            json_reader[key] = value
-            return json_reader
-    return CustomJsonCookerMixin
-
-
-def create_deposition_document(deposition_type, user_id):
-    def create_dep_doc(obj, eng):
-        obj['deposition_type'] = deposition_type
-        uuid = obj['uuid']
-        temp_obj = dict(obj)
-        temp_obj.pop('uuid')
-        temp_obj.pop('step')
-
-        eng = BibWorkflowEngine(name=deposition_type, uuid=uuid, module_name="webdeposit")
-        eng.setWorkflow(eng.workflow)
-        eng.save()
-        return
-
-        webdeposit_workflow = WebDepositWorkflow(uuid=uuid,
-                                                 deposition_type=deposition_type,
-                                                 user_id=user_id,
-                                                 obj_json=temp_obj,
-                                                 current_step=0,
-                                                 status=0)
-        db.session.add(webdeposit_workflow)
-        db.session.commit()
-    return create_dep_doc
+    def function_name(arg1, arg2):
+            def fun_name2(obj, eng):
+                # do stuff
+            return fun_name2
+"""
 
 
 def authorize_user(user_id=None):
-    def user_auth(obj, eng):
+    def user_auth(obj, dummy_eng):
         if user_id is not None:
-            obj['user_id'] = user_id
+            obj.data['user_id'] = user_id
         else:
             from invenio.webuser_flask import current_user
-            obj['user_id'] = current_user.get_id()
+            obj.data['user_id'] = current_user.get_id()
     return user_auth
 
 
 def render_form(form):
     def render(obj, eng):
-        uuid = obj['uuid']
-        if 'user_id' in obj:
-            user_id = obj['user_id']
-        else:
-            from invenio.webuser_flask import current_user
-            user_id = current_user.get_id()
-        deposition_type = obj['deposition_type']
-        step = obj['step']
+        uuid = eng.uuid
+        # TODO: get the current step from the object
+        step = max(obj.db_obj.task_counter)  # data['step']
         form_type = form.__name__
+        from invenio.webdeposit_utils import CFG_DRAFT_STATUS
         webdeposit_draft = WebDepositDraft(uuid=uuid,
-                                  user_id=user_id,
-                                  deposition_type=deposition_type,
-                                  form_type=form_type,
-                                  form_values={},
-                                  step=step,
-                                  timestamp=func.current_timestamp())
+                                           form_type=form_type,
+                                           form_values={},
+                                           step=step,
+                                           status=CFG_DRAFT_STATUS['unfinished'],
+                                           timestamp=func.current_timestamp())
         db.session.add(webdeposit_draft)
         db.session.commit()
     return render
@@ -98,7 +66,43 @@ def render_form(form):
 
 def wait_for_submission():
     def wait(obj, eng):
-        obj['break'] = True
-        eng.current_step -= 1
+        user_id = obj.data['user_id']
+        uuid = eng.uuid
+        from invenio.webdeposit_utils import CFG_DRAFT_STATUS, get_form_status
+        status = get_form_status(user_id, uuid)
+        if status == CFG_DRAFT_STATUS['unfinished']:
+            # If form is unfinished stop the workflow
+            eng.halt('Waiting for form submission.')
+        else:
+            # If form is completed, continue with next step
+            eng.jumpCallForward(1)
     return wait
 
+
+def export_marc_from_json():
+    def export(obj, eng):
+        user_id = obj.data['user_id']
+        uuid = eng.uuid
+        steps_num = obj.data['steps_num']
+
+        from invenio.webdeposit_utils import get_form
+
+        json_reader = JsonReader()
+        for step in range(steps_num):
+            try:
+                form = get_form(user_id, uuid, step)
+                json_reader = form.cook_json(json_reader)
+            except:
+                # some steps don't have any form ...
+                pass
+
+        marc = json_reader.legacy_export_as_marc()
+        obj.data['marc'] = marc
+    return export
+
+
+def create_record_from_marc():
+    def create(obj, dummy_eng):
+        rec = create_record(obj.data['marc'])
+        bibupload(rec[0], opt_mode='insert')
+    return create

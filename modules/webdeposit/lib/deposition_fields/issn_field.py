@@ -19,17 +19,24 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 from invenio.webdeposit_validation_utils import sherpa_romeo_issn_validate
 
 __all__ = ['ISSNField']
 
 
-class ISSNField(WebDepositField, TextField, JsonCookerMixinBuilder('issn')):
+class ISSNField(WebDepositField(key='issn'), TextField):
 
     def __init__(self, **kwargs):
         super(ISSNField, self).__init__(**kwargs)
         self._icon_html = '<i class="icon-barcode"></i>'
 
     def pre_validate(self, form=None):
+        # Load custom validation
+        validators = self.config.get_validators()
+        if validators is not [] and validators is not None:
+            validation_json = {}
+            for validator in validators:
+                json = validator(self)
+                validation_json = self.merge_validation_json(validation_json, json)
+            return validation_json
         return sherpa_romeo_issn_validate(self)

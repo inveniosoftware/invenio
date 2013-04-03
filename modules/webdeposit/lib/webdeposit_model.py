@@ -28,24 +28,13 @@ from invenio.bibworkflow_model import Workflow
 # Create your models here.
 
 
-class WebDepositWorkflow(db.Model):
-    """Represents a deposition workflow."""
-    __tablename__ = 'depWORKFLOW'
-    uuid = db.Column(db.String(36), primary_key=True)
-    deposition_type = db.Column(db.String(45), nullable=False)
-    user_id = db.Column(db.Integer(15, unsigned=True), nullable=False)
-    obj_json = db.Column(db.JSON, nullable=False)
-    current_step = db.Column(db.Integer(15, unsigned=True), nullable=False)
-    status = db.Column(db.Integer(10, unsigned=True), nullable=False)
-
-
 class WebDepositDraft(db.Model):
     """Represents a deposition draft."""
     __tablename__ = 'depDRAFT'
     uuid = db.Column(db.String(36), db.ForeignKey(Workflow.uuid),
-                primary_key=True)
+                     primary_key=True)
     step = db.Column(db.Integer(15, unsigned=True), primary_key=True,
-                autoincrement=False)
+                     autoincrement=False)
     form_type = db.Column(db.String(45), nullable=False)
     form_values = db.Column(db.JSON, nullable=False)
     status = db.Column(db.Integer(15, unsigned=True), autoincrement=False)
@@ -53,4 +42,4 @@ class WebDepositDraft(db.Model):
     workflow = db.relationship(Workflow, backref='drafts')
 
 
-__all__ = ['WebDepositDraft', 'WebDepositWorkflow']
+__all__ = ['WebDepositDraft']

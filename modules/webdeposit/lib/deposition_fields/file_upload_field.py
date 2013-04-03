@@ -19,12 +19,11 @@
 
 from wtforms import FileField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_workflow_utils import JsonCookerMixin
 
 __all__ = ['FileUploadField']
 
 
-class FileUploadField(WebDepositField, FileField, JsonCookerMixin):
+class FileUploadField(WebDepositField(), FileField):
 
     def __init__(self, **kwargs):
         super(FileUploadField, self).__init__(**kwargs)

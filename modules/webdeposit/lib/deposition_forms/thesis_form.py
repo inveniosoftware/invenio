@@ -19,7 +19,7 @@
 
 from wtforms import SelectField, SubmitField
 from wtforms.validators import Required
-from invenio.wtforms_utils import InvenioForm as Form
+from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, bootstrap_submit
 
@@ -60,14 +60,13 @@ class ThesisForm(Form):
     submission_date = fields.Date(label=_('Date of Submission'), widget=date_widget)
     defence_date = fields.Date(label=_('Date of Defence'), widget=date_widget)
 
-    funded = [("yes", _("Yes")), \
-                ("no", _("No"))]
+    funded_choices = [("yes", _("Yes")), ("no", _("No"))]
     funded = SelectField(label=_("Has your thesis been funded by the CERN Doctoral Student Program?"),
-                                  choices=funded)
+                                  choices=funded_choices)
 
-    file = fields.FileUploadField(label=_('File'))
+    file_field = fields.FileUploadField(label=_('File'), widget=plupload_widget)
     submit = SubmitField(label=_('Submit Thesis'), widget=bootstrap_submit)
 
     """ Form Configuration variables """
     _title = _("Submit a Thesis")
-    _drafting = True  #enable and disable drafting
+    _drafting = True  # enable and disable drafting

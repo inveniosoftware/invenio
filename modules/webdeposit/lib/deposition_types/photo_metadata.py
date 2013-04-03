@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.webdeposit_load_forms import forms
-from invenio.bibworkflow_utils import authorize_user, \
+from invenio.webdeposit_workflow_utils import authorize_user, \
                                               render_form, \
                                               wait_for_submission
 
@@ -30,12 +30,12 @@ PhotoForm = forms['PhotoForm']
 dep_type = "Photo"
 plural = "Photos"
 group = "Articles & Preprints"
-wf = [authorize_user(), \
+wf = [authorize_user(),
       render_form(PhotoForm),
       wait_for_submission()]
 
-Photo = {"dep_type": dep_type, \
-         "workflow": wf, \
-         "plural": plural, \
-         "group": group, \
+Photo = {"dep_type": dep_type,
+         "workflow": wf,
+         "plural": plural,
+         "group": group,
          "enabled": False}

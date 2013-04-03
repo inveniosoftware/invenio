@@ -244,25 +244,26 @@ $(document).ready(function() {
 
   webdeposit_init_plupload('.pluploader',
                             '{{ url_for('webdeposit.plupload', deposition_type=deposition_type, uuid=uuid) }}',
-                            '{{ url_for('webdeposit.plupload_delete', deposition_type=deposition_type, uuid=uuid) }}',
-                            '{{ url_for('webdeposit.plupload_get_file', deposition_type=deposition_type, uuid=uuid) }}',
+                            '{{ url_for('webdeposit.plupload_delete', uuid=uuid) }}',
+                            '{{ url_for('webdeposit.plupload_get_file', uuid=uuid) }}',
                             {{ form.files|safe }});
 
   webdeposit_input_error_check('#submitForm input, #submitForm textarea, #submitForm select',
-                               '{{ url_for("webdeposit.error_check", deposition_type=deposition_type, uuid=uuid) }}',
+                               '{{ url_for("webdeposit.error_check", uuid=uuid) }}',
                                required_fields);
 
-  webdeposit_check_status('{{ url_for('webdeposit.check_status', deposition_type=deposition_type, uuid=uuid) }}');
+  webdeposit_check_status('{{ url_for('webdeposit.check_status', uuid=uuid) }}');
 
 {% for field in form %}
     {% if field.autocomplete %}
         webdeposit_field_autocomplete('input[name="{{ field.name }}"]',
-                                    '{{ url_for("webdeposit.autocomplete", deposition_type=deposition_type, uuid=uuid, type=field.name) }}');
+                                    '{{ url_for("webdeposit.autocomplete",
+                                        uuid=uuid, type=field.name) }}');
     {% endif %}
 
     {% if field.ckeditor %}
         webdeposit_ckeditor_init( '{{ field.id }}',
-                                  '{{ url_for("webdeposit.error_check", deposition_type=deposition_type, uuid=uuid) }}',
+                                  '{{ url_for("webdeposit.error_check", uuid=uuid) }}',
                                   required_fields );
     {% endif %}
 

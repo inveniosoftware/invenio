@@ -19,12 +19,11 @@
 
 from wtforms import SelectField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['LanguageField']
 
 
-class LanguageField(WebDepositField, SelectField, JsonCookerMixinBuilder('language')):
+class LanguageField(WebDepositField(key='language'), SelectField):
 
     def __init__(self, **kwargs):
         super(LanguageField, self).__init__(**kwargs)

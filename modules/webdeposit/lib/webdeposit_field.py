@@ -18,22 +18,99 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms.validators import Required
+from invenio.webdeposit_config_utils import WebDepositConfiguration
 
 __all__ = ['WebDepositField']
 
 
-class WebDepositField(object):
-    """
-    Class that all webdeposit fields must inherit.
+def WebDepositField(key=None):
+    class WebDepositFieldClass(object):
+        """
+        Class that all webdeposit fields must inherit.
 
-    A helper to add attributes and methods to every webdeposit field.
-    """
+        A helper to add attributes and methods to every webdeposit field.
+        """
 
-    def __init__(self, **kwargs):
-        # Create our own Required data member
-        # for client-side use
-        if 'validators' in kwargs:
-            for v in kwargs.get("validators"):
-                if type(v) is Required:
-                    self.required = True
-        super(WebDepositField, self).__init__(**kwargs)
+        def __init__(self, **kwargs):
+            # Create our own Required data member
+            # for client-side use
+            if 'validators' in kwargs:
+                for v in kwargs.get("validators"):
+                    if type(v) is Required:
+                        self.required = True
+
+            super(WebDepositFieldClass, self).__init__(**kwargs)
+            self.config = WebDepositConfiguration(field_type=self.__class__.__name__)
+
+        def merge_validation_json(self, json1, json2):
+            """ Merges 2 jsons returned from 2 validation functions
+
+                @param json1: the first json
+                @param json2: the second json
+                @returns: a dictionary with info, success and error messages unified
+                          and the dictionary with fields to be updated merged.
+                          Be carefull with jsons that update the same field!
+            """
+
+            json = {}
+            if 'success' in json1 and json1['success'] == 1:
+                json['success'] = 1
+                json['success_message'] = json1['success_message']
+            else:
+                json['success'] = 0
+                json['success_message'] = ''
+
+            if 'success' in json2 and json2['success'] == 1:
+                json['success'] = 1
+                if json['success_message'] != '':
+                    json['success_message'] += '<br>'
+                json['success_message'] += json2['success_message']
+
+            if 'info' in json1 and json1['info'] == 1:
+                json['info'] = 1
+                json['info_message'] = json1['info_message']
+            else:
+                json['info'] = 0
+                json['info_message'] = ''
+
+            if 'info' in json2 and json2['info'] == 1:
+                json['info'] = 1
+                if json['info_message'] != '':
+                    json['info_message'] += '<br>'
+                json['info_message'] += json2['info_message']
+
+            if 'error' in json1 and json1['error'] == 1:
+                json['error'] = 1
+                json['error_message'] = json1['error_message']
+            else:
+                json['error'] = 0
+                json['error_message'] = ''
+
+            if 'error' in json2 and json2['error'] == 1:
+                json['error'] = 1
+                if json['error_message'] != '':
+                    json['error_message'] += '<br>'
+                json['error_message'] += json2['error_message']
+
+            if 'fields' in json1 and 'fields' in json2:
+                """ Be carefull when the two validators change the
+                    value of the same field.
+                """
+                json['fields'] = dict(json1['fields'].items() + json2['fields'].items())
+            elif 'fields' in json1:
+                json['fields'] = json1['fields']
+            elif 'fields' in json2:
+                json['fields'] = json2['fields']
+
+            return json
+
+        def cook_json(self, json_reader):
+            cook_json_function = self.config.get_cook_json_function()
+            if cook_json_function is not None:
+                return cook_json_function(json_reader, self.data)
+            elif key is not None:  # Default behaviour
+                json_reader[key] = self.data
+
+            return json_reader
+
+    return WebDepositFieldClass

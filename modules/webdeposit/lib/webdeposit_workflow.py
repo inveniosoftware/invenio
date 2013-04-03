@@ -17,12 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.webdeposit_model import WebDepositWorkflow
-from invenio.bibworkflow_engine import BibWorkflowEngine, CFG_WORKFLOW_STATUS
+from invenio.bibworkflow_engine import BibWorkflowEngine
 from invenio.bibworkflow_object import BibWorkflowObject
 from invenio.bibworkflow_model import Workflow, WfeObject
 from invenio.bibworkflow_client import restart_workflow
-from invenio.sqlalchemyutils import db
+from invenio.bibfield_jsonreader import JsonReader
 from uuid import uuid1 as new_uuid
 
 
@@ -30,9 +29,9 @@ class DepositionWorkflow(object):
     """ class for running webdeposit workflows using the BibWorkflow engine
 
         The user_id and workflow must always be defined
-        If the workflow has been initialized before the appropriate uuid
-        must be defined
-        otherwise a new workflow will be created
+        If the workflow has been initialized before,
+        the appropriate uuid must be passed as a parameter.
+        Otherwise a new workflow will be created
 
         The workflow functions must have the following structure:
 
@@ -42,7 +41,7 @@ class DepositionWorkflow(object):
             return fun_name2
     """
 
-    def __init__(self, engine=None, workflow=None,
+    def __init__(self, engine=None, workflow=[],
                  uuid=None, deposition_type=None, user_id=None):
 
         self.obj = {}
@@ -53,8 +52,8 @@ class DepositionWorkflow(object):
 
         self.current_step = 0
         self.set_engine(engine)
-        self.set_object()
         self.set_workflow(workflow)
+        self.set_object()
 
     def set_uuid(self, uuid=None):
         """ Sets the uuid or obtains a new one """
@@ -83,16 +82,18 @@ class DepositionWorkflow(object):
         self.eng.setWorkflow(workflow)
         self.workflow = workflow
         self.steps_num = len(workflow)
+        self.obj['steps_num'] = self.steps_num
 
     def set_object(self):
-        self.db_workflow_obj = WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid()).\
-                                      first()
+        self.db_workflow_obj = \
+            WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid()). \
+            first()
         if self.db_workflow_obj is None:
             self.bib_obj = BibWorkflowObject(data=self.obj,
-                                         workflow_id=self.get_uuid(),
-                                         user_id=self.get_user_id())
+                                             workflow_id=self.get_uuid(),
+                                             user_id=self.get_user_id())
         else:
-            self.bib_obj = BibWorkflowObject(id=self.db_workflow_obj.id,
+            self.bib_obj = BibWorkflowObject(wfobject_id=self.db_workflow_obj.id,
                                              workflow_id=self.get_uuid(),
                                              user_id=self.get_user_id())
 
@@ -124,13 +125,12 @@ class DepositionWorkflow(object):
         """ Returns the status of the workflow
             (check CFG_WORKFLOW_STATUS from bibworkflow_engine)
         """
-        finished = Workflow.query.filter(Workflow.uuid == self.get_uuid()).one().\
-                                         counter_finished >= 1
+        status = \
+            Workflow.query. \
+            filter(Workflow.uuid == self.get_uuid()).\
+            one().status
 
-        if finished:
-            return CFG_WORKFLOW_STATUS['finished']
-        else:
-            return CFG_WORKFLOW_STATUS['running']
+        return status
 
     def get_output(self, form_validation=None):
         """ Returns a representation of the current state of the workflow
@@ -140,7 +140,7 @@ class DepositionWorkflow(object):
         uuid = self.get_uuid()
 
         from invenio.webdeposit_utils import get_form, \
-                                             draft_field_get_all
+            draft_field_get_all
         form = get_form(user_id, uuid)
 
         deposition_type = self.obj['deposition_type']
@@ -161,10 +161,13 @@ class DepositionWorkflow(object):
         if finished:
             # The workflow is finished, nothing to do
             return
-        wfobjects = WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid())
+        wfobjects = \
+            WfeObject.query. \
+            filter(WfeObject.workflow_id == self.get_uuid())
         wfobject = max(wfobjects.all(), key=lambda w: w.modified)
         starting_point = wfobject.task_counter
-        restart_workflow(self.eng, [self.bib_obj], starting_point, stop_on_halt=True)
+        restart_workflow(self.eng, [self.bib_obj],
+                         starting_point, stop_on_halt=True)
 
     def run_next_step(self):
         if self.current_step >= self.steps_num:
@@ -177,7 +180,7 @@ class DepositionWorkflow(object):
         self.obj['step'] = self.current_step
         self.update_db()
 
-    def jump_forward(self, synchronize=False):
+    def jump_forward(self):
         restart_workflow(self.eng, [self.bib_obj], 'next', stop_on_halt=True)
 
     def jump_backwards(self, synchronize=False):
@@ -188,40 +191,8 @@ class DepositionWorkflow(object):
         if synchronize:
             self.update_db()
 
-    def set_current_step(self, step, synchronize=False):
-        self.current_step = step
-        if synchronize:
-            self.update_db()
-
-    def get_current_step(self):
-        return self.current_step
-
     def get_workflow_from_db(self):
         return Workflow.query.filter(Workflow.uuid == self.get_uuid()).first()
-
-    def update_db(self):
-        uuid = self.get_uuid()
-        obj = dict(**self.obj)
-        # These keys have separate columns
-        obj.pop('uuid')
-        obj.pop('step')
-        obj.pop('deposition_type')
-        WebDepositWorkflow.query.filter(WebDepositWorkflow.uuid == uuid).\
-            update({'status': self.get_status(),
-                    'current_step': self.current_step,
-                    'obj_json': obj})
-        db.session.commit()
-
-    def update_workflow_object(self):
-        obj = WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid()).first()
-
-        bib_obj = BibWorkflowObject(id=obj.id, workflow_id=self.get_uuid())
-        self.set_object(bib_obj)
-
-        wf = self.get_workflow_from_db()
-        self.set_user_id(wf.user_id)
-        self.set_deposition_type(wf.name)
-        self.obj.update(obj)
 
     def cook_json(self):
         user_id = self.obj['user_id']
@@ -229,12 +200,11 @@ class DepositionWorkflow(object):
 
         from invenio.webdeposit_utils import get_form
 
-        json_reader = {}
+        json_reader = JsonReader()
         for step in range(self.steps_num):
             try:
                 form = get_form(user_id, uuid, step)
-                for field in form:
-                    json_reader = field.cook_json(json_reader)
+                json_reader = form.cook_json(json_reader)
             except:
                 # some steps don't have any form ...
                 pass

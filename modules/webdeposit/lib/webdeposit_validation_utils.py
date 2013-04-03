@@ -20,6 +20,10 @@
 from invenio.dataciteutils import DataciteMetadata
 from invenio.sherpa_romeo import SherpaRomeoSearch
 
+#FIXME: make the functions to return functions so that
+#       in the config file we can define parameters
+#       eg. length(5,10)
+
 
 def datacite_doi_validate(field):
     value = field.data
@@ -91,18 +95,18 @@ def sherpa_romeo_publisher_validate(field):
 
         if isinstance(copyright_links, list):
             copyright_links_html = ""
-            for copyright in copyright_links['copyrightlink']:
-                copyright_links_html += '<a href="' + copyright['copyrightlinkurl'] + \
-                                        '">' + copyright['copyrightlinktext'] + "</a><br>"
+            for copyright_link in copyright_links['copyrightlink']:
+                copyright_links_html += '<a href="' + copyright_link['copyrightlinkurl'] + \
+                                        '">' + copyright_link['copyrightlinktext'] + "</a><br>"
         elif isinstance(copyright_links, dict):
             if isinstance(copyright_links['copyrightlink'], list):
-                for copyright in copyright_links['copyrightlink']:
-                    copyright_links_html = '<a href="' + copyright['copyrightlinkurl'] + \
-                                           '">' + copyright['copyrightlinktext'] + "</a><br>"
+                for copyright_link in copyright_links['copyrightlink']:
+                    copyright_links_html = '<a href="' + copyright_link['copyrightlinkurl'] + \
+                                           '">' + copyright_link['copyrightlinktext'] + "</a><br>"
             else:
-                copyright = copyright_links['copyrightlink']
-                copyright_links_html = '<a href="' + copyright['copyrightlinkurl'] + \
-                                       '">' + copyright['copyrightlinktext'] + "</a><br>"
+                copyright_link = copyright_links['copyrightlink']
+                copyright_links_html = '<a href="' + copyright_link['copyrightlinkurl'] + \
+                                       '">' + copyright_link['copyrightlinktext'] + "</a><br>"
 
         home_url = s.parser.get_publishers(attribute='homeurl')
         if home_url is not None and home_url != []:

@@ -19,12 +19,11 @@
 
 from wtforms import TextAreaField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['NotesField']
 
 
-class NotesField(WebDepositField, TextAreaField, JsonCookerMixinBuilder('notes')):
+class NotesField(WebDepositField(), TextAreaField):
 
     def __init__(self, **kwargs):
         super(NotesField, self).__init__(**kwargs)

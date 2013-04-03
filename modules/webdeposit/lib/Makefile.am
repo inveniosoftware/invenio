@@ -31,7 +31,11 @@ pylib_DATA = __init__.py \
              webdeposit_workflow_utils.py \
              webdeposit_field.py \
              webdeposit_autocomplete_utils.py \
-             webdeposit_validation_utils.py
+             webdeposit_validation_utils.py \
+             webdeposit_config.py \
+             webdeposit_config_utils.py \
+             webdeposit_form.py \
+             webdeposit_cook_json_utils.py
 
 jsdir=$(localstatedir)/www/js
 

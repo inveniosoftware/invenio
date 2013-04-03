@@ -19,8 +19,8 @@
 
 from wtforms import SubmitField
 from wtforms.validators import Required
-from invenio.wtforms_utils import InvenioForm as Form
 from invenio.webinterface_handler_flask_utils import _
+from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
                                              bootstrap_submit, ckeditor_widget
 
@@ -34,7 +34,7 @@ class ArticleForm(Form):
     doi = fields.DOIField(label=_('DOI'))
     publisher = fields.PublisherField(label=_('Publisher'), validators=[Required()])
     journal = fields.JournalField(label=_('Journal Title'), validators=[Required()])
-    issn = fields.ISSNField(label='ISSN')
+    issn = fields.ISSNField(label=_('ISSN'))
     title = fields.TitleField(label=_('Document Title'))
     author = fields.AuthorField(label=_('Author'))
     abstract = fields.AbstractField(label=_('Abstract'), widget=ckeditor_widget)
@@ -55,15 +55,17 @@ class ArticleForm(Form):
                 ("swe", _("Swedish")),
                 ("fin", _("Finnish")),
                 ("rus", _("Russian"))]
-    language = fields.LanguageField(label=_("Language"), choices=languages)
-    date = fields.Date(label=_('Date of Document'), widget=date_widget)
+    language = fields.LanguageField(label=_('Language'),
+                                    choices=languages)
+    date = fields.Date(label=_('Date of Document'),
+                       widget=date_widget)
     keywords = fields.KeywordsField(label=_('Keywords'))
-    notes = fields.NotesField(label=_('Notes or Comments'))
-    file = fields.FileUploadField(label=_('File'))
-    plupload_file = fields.FileUploadField(label=_('File'), widget=plupload_widget)
-    submit = SubmitField(label=_('Submit Article'), widget=bootstrap_submit)
-
+    notes = fields.NotesField(label=_('Notes'))
+    plupload_file = fields.FileUploadField(label=_('Files'),
+                                           widget=plupload_widget)
+    submit = SubmitField(label=_('Submit Article'),
+                         widget=bootstrap_submit)
 
     """ Form Configuration variables """
-    _title = _("Submit an Article")
-    _drafting = True  #enable and disable drafting
+    _title = _('Submit an Article')
+    _drafting = True   # enable and disable drafting

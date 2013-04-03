@@ -21,7 +21,7 @@ from wtforms import TextField, \
                     FileField, \
                     FormField, \
                     SubmitField
-from invenio.wtforms_utils import InvenioForm as Form
+from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webinterface_handler_flask_utils import _
 # Import custom fields
 from invenio.webdeposit_load_fields import fields
@@ -39,9 +39,9 @@ class PhotoForm(Form):
 
     title = fields.TitleField(label=_('Photo Title'))
     dimensions = FormField(Dimensions)
-    file = FileField(label=_('File'))
+    file_field = FileField(label=_('File'))
     submit = SubmitField(label=_('Submit Photo'), widget=bootstrap_submit)
 
     #configuration variables
     _title = _("Submit a Photo")
-    _drafting = True #enable and disable drafting
+    _drafting = True  # enable and disable drafting

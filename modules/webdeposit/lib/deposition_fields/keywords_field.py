@@ -19,12 +19,11 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
 
 __all__ = ['KeywordsField']
 
 
-class KeywordsField(WebDepositField, TextField, JsonCookerMixinBuilder('keywords')):
+class KeywordsField(WebDepositField(), TextField):
 
     def __init__(self, **kwargs):
         super(KeywordsField, self).__init__(**kwargs)

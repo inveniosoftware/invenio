@@ -25,7 +25,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft
 from invenio.bibworkflow_model import Workflow
-from invenio.bibworkflow_engine import CFG_WORKFLOW_STATUS
+from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
 from invenio.webdeposit_load_forms import forms
 from invenio.webuser_flask import current_user
 from invenio.webdeposit_load_deposition_types import deposition_metadata
@@ -82,7 +82,7 @@ def get_workflow(deposition_type, uuid):
                               workflow=wf)
 
 
-def create_workflow(user_id, deposition_type):
+def create_workflow(deposition_type, user_id=None):
     """ Creates a new workflow and returns it """
     try:
         wf = deposition_metadata[deposition_type]["workflow"]
@@ -90,43 +90,24 @@ def create_workflow(user_id, deposition_type):
         # deposition type not found
         return None
 
-    return DepositionWorkflow(deposition_type=deposition_type, workflow=wf)
+    return DepositionWorkflow(deposition_type=deposition_type,
+                              workflow=wf, user_id=user_id)
 
 
-def delete_workflow(user_id, deposition_type, uuid):
+def delete_workflow(user_id, uuid):
     """ Deletes all workflow related data
         (workflow and drafts)
     """
 
-    db.session.query(Workflow).filter_by(\
-                                      uuid=uuid,
-                                      user_id=user_id).\
-                                      delete()
+    db.session.query(Workflow). \
+        filter_by(uuid=uuid,
+                  user_id=user_id). \
+        delete()
 
-    db.session.query(WebDepositDraft).filter_by(\
-                                      uuid=uuid).\
-                                      delete()
+    db.session.query(WebDepositDraft). \
+        filter_by(uuid=uuid).\
+        delete()
     db.session.commit()
-
-
-def create_deposition_type(user_id, deposition_type):
-    """Creates a deposition object (initiates workflow)
-    and returns the uuid and the form to be rendered
-    TODO: check if dep type exists
-    (deprecated, use create_workflow instead)
-    """
-    try:
-        wf = deposition_metadata[deposition_type]["workflow"]
-    except KeyError:
-        # deposition_type not found
-        return None, None
-
-    webdep_workflow = DepositionWorkflow(workflow=wf,
-                                         deposition_type=deposition_type,\
-                                         user_id=user_id)
-    webdep_workflow.run()
-    uuid = webdep_workflow.get_uuid()
-    return get_current_form(user_id, uuid=uuid)
 
 
 def get_current_form(user_id, deposition_type=None, uuid=None):
@@ -140,28 +121,29 @@ def get_current_form(user_id, deposition_type=None, uuid=None):
 
     try:
         if uuid is not None:
-            webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                                        join(Workflow).\
-                                        filter(
-                                        Workflow.user_id == user_id,
-                                        WebDepositDraft.uuid == uuid)
+            webdeposit_draft_query = \
+                db.session.query(WebDepositDraft).\
+                join(Workflow).\
+                filter(Workflow.user_id == user_id,
+                       WebDepositDraft.uuid == uuid)
             # get the draft with the max step, the latest
-            webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+            webdeposit_draft = max(webdeposit_draft_query.all(),
+                                   key=lambda w: w.step)
         elif deposition_type is not None:
-            webdeposit_draft = db.session.query(WebDepositDraft).\
-                                            join(Workflow).\
-                                            filter(
-                            Workflow.user_id == user_id,
-                            Workflow.name == deposition_type,
-                            WebDepositDraft.timestamp == db.func.max(
-                            WebDepositDraft.timestamp).select())[0]
+            webdeposit_draft = \
+                db.session.query(WebDepositDraft).\
+                join(Workflow).\
+                filter(Workflow.user_id == user_id,
+                       Workflow.name == deposition_type,
+                       WebDepositDraft.timestamp == db.func.max(
+                       WebDepositDraft.timestamp).select())[0]
         else:
-            webdeposit_draft = db.session.query(WebDepositDraft).\
-                                            join(Workflow).\
-                                            filter(
-                                        Workflow.user_id == user_id,
-                                        WebDepositDraft.timestamp == db.func.max(
-                                        WebDepositDraft.timestamp).select())[0]
+            webdeposit_draft = \
+                db.session.query(WebDepositDraft).\
+                join(Workflow).\
+                filter(Workflow.user_id == user_id,
+                       WebDepositDraft.timestamp == db.func.max(
+                       WebDepositDraft.timestamp).select())[0]
     except NoResultFound:
         # No Form draft was found
         return None, None
@@ -169,16 +151,18 @@ def get_current_form(user_id, deposition_type=None, uuid=None):
     form = forms[webdeposit_draft.form_type]()
     draft_data = webdeposit_draft.form_values
 
-    for field_name, field_data in form.data.iteritems():
-        if isinstance(form.__dict__['_fields'][field_name], FormField) \
+    for field_name in form.data.keys():
+        if isinstance(form._fields[field_name], FormField) \
                 and field_name in draft_data:
-            subfield_names = form.__dict__['_fields'][field_name].form.__dict__['_fields'].keys()
+            subfield_names = \
+                form._fields[field_name]. \
+                form._fields.keys()
             #upperfield_name, subfield_name = field_name.split('-')
             for subfield_name in subfield_names:
                 if subfield_name in draft_data[field_name]:
-                    form.__dict__["_fields"][field_name].\
-                        form.__dict__["_fields"][subfield_name].\
-                            process_data(draft_data[field_name][subfield_name])
+                    form._fields[field_name].\
+                        form._fields[subfield_name]. \
+                        process_data(draft_data[field_name][subfield_name])
         elif field_name in draft_data:
             form[field_name].process_data(draft_data[field_name])
 
@@ -191,38 +175,40 @@ def get_form(user_id, uuid, step=None):
     """
 
     if step is None:
-        webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                                join(Workflow).\
-                                filter(
-                                Workflow.user_id == user_id,
-                                WebDepositDraft.uuid == uuid)
+        webdeposit_draft_query = \
+            db.session.query(WebDepositDraft).\
+            join(Workflow).\
+            filter(Workflow.user_id == user_id,
+                   WebDepositDraft.uuid == uuid)
         try:
             # get the draft with the max step
-            webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+            webdeposit_draft = max(webdeposit_draft_query.all(),
+                                   key=lambda w: w.step)
         except ValueError:
             return None
     else:
-        webdeposit_draft = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
-                            WebDepositDraft.uuid == uuid,
-                            WebDepositDraft.step == step).one()
+        webdeposit_draft = \
+            db.session.query(WebDepositDraft).\
+            join(Workflow).\
+            filter(Workflow.user_id == user_id,
+                   WebDepositDraft.uuid == uuid,
+                   WebDepositDraft.step == step).one()
 
     form = forms[webdeposit_draft.form_type]()
 
     draft_data = webdeposit_draft.form_values
 
-    for field_name, field_data in form.data.iteritems():
-        if isinstance(form.__dict__['_fields'][field_name], FormField) \
+    for field_name in form.data.keys():
+        if isinstance(form._fields[field_name], FormField) \
                 and field_name in draft_data:
-            subfield_names = form.__dict__['_fields'][field_name].\
-                             form.__dict__['_fields'].keys()
+            subfield_names = \
+                form._fields[field_name].\
+                form.fields.keys()
             #upperfield_name, subfield_name = field_name.split('-')
             for subfield_name in subfield_names:
                 if subfield_name in draft_data[field_name]:
-                    form.__dict__["_fields"][field_name].\
-                        form.__dict__["_fields"][subfield_name].\
+                    form._fields[field_name].\
+                        form._fields[subfield_name].\
                         process_data(draft_data[field_name][subfield_name])
         elif field_name in draft_data:
             form[field_name].process_data(draft_data[field_name])
@@ -252,49 +238,52 @@ def get_form(user_id, uuid, step=None):
 
 def get_form_status(user_id, uuid, step=None):
     if step is None:
-        webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                                join(Workflow).\
-                                filter(
-                                Workflow.user_id == user_id,
-                                WebDepositDraft.uuid == uuid)
+        webdeposit_draft_query = \
+            db.session.query(WebDepositDraft).\
+            join(Workflow).\
+            filter(Workflow.user_id == user_id,
+                   WebDepositDraft.uuid == uuid)
         try:
             # get the draft with the max step
-            webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+            webdeposit_draft = max(webdeposit_draft_query.all(),
+                                   key=lambda w: w.step)
         except ValueError:
             return None
     else:
-        webdeposit_draft = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
-                            WebDepositDraft.uuid == uuid,
-                            WebDepositDraft.step == step).one()
+        webdeposit_draft = \
+            db.session.query(WebDepositDraft).\
+            join(Workflow).\
+            filter(Workflow.user_id == user_id,
+                   WebDepositDraft.uuid == uuid,
+                   WebDepositDraft.step == step).one()
 
     return webdeposit_draft.status
 
 
 def set_form_status(user_id, uuid, status, step=None):
     if step is None:
-        webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                                join(Workflow).\
-                                filter(
-                                Workflow.user_id == user_id,
-                                WebDepositDraft.uuid == uuid)
+        webdeposit_draft_query = \
+            db.session.query(WebDepositDraft).\
+            join(Workflow).\
+            filter(Workflow.user_id == user_id,
+                   WebDepositDraft.uuid == uuid)
         try:
             # get the draft with the max step
-            webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
+            webdeposit_draft = max(webdeposit_draft_query.all(),
+                                   key=lambda w: w.step)
         except ValueError:
             return None
     else:
-        webdeposit_draft = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
-                            WebDepositDraft.uuid == uuid,
-                            WebDepositDraft.step == step).one()
+        webdeposit_draft = \
+            db.session.query(WebDepositDraft).\
+            join(Workflow).\
+            filter(Workflow.user_id == user_id,
+                   WebDepositDraft.uuid == uuid,
+                   WebDepositDraft.step == step).one()
 
     webdeposit_draft.status = status
     db.session.commit()
+
 
 def get_last_step(steps):
     if type(steps[-1]) is list:
@@ -303,9 +292,11 @@ def get_last_step(steps):
         return steps[-1]
 
 
-def get_current_step(user_id, uuid):
-    webdep_workflow = db.session.query(Workflow).filter(\
-                Workflow.uuid == uuid).one()
+def get_current_step(uuid):
+    webdep_workflow = \
+        db.session.query(Workflow). \
+        filter(Workflow.uuid == uuid). \
+        one()
     steps = webdep_workflow.task_counter
 
     return get_last_step(steps)
@@ -322,11 +313,11 @@ def draft_field_get(user_id, uuid, field_name, subfield_name=None):
         or, in case of error, None
     """
 
-    webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
-                            WebDepositDraft.uuid == uuid)
+    webdeposit_draft_query = \
+        db.session.query(WebDepositDraft).\
+        join(Workflow).\
+        filter(Workflow.user_id == user_id,
+               WebDepositDraft.uuid == uuid)
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
 
@@ -352,21 +343,21 @@ def draft_field_error_check(user_id, uuid, field_name, value):
     if '-' in field_name:  # check if its subfield
         field_name, subfield_name = field_name.split('-')
 
-        form = form.__dict__["_fields"][field_name].form
+        form = form._fields[field_name].form
         field_name = subfield_name
 
-    form.__dict__["_fields"][field_name].process_data(value)
-    return form.__dict__["_fields"][field_name].pre_validate(form)
+    form._fields[field_name].process_data(value)
+    return form._fields[field_name].pre_validate(form)
 
 
 def draft_field_set(user_id, uuid, field_name, value):
     """ Alters the value of a field """
 
-    webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
-                            WebDepositDraft.uuid == uuid)
+    webdeposit_draft_query = \
+        db.session.query(WebDepositDraft).\
+        join(Workflow).\
+        filter(Workflow.user_id == user_id,
+               WebDepositDraft.uuid == uuid)
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
     values = draft.form_values
@@ -383,16 +374,16 @@ def draft_field_set(user_id, uuid, field_name, value):
             values[field_name][subfield_name] = value
     else:
         values[field_name] = value  # change value
-    #draft.form_values = values
-    #draft.timestamp = datetime.now()  # update draft's timestamp
-    webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                            filter(WebDepositDraft.uuid == uuid,
-                                   WebDepositDraft.step == draft.step).\
-                            update({"form_values": values,
-                                   "timestamp": datetime.now()})
+    webdeposit_draft_query = \
+        db.session.query(WebDepositDraft).\
+        filter(WebDepositDraft.uuid == uuid,
+               WebDepositDraft.step == draft.step).\
+        update({"form_values": values,
+                "timestamp": datetime.now()})
 
 
-def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=None):
+def draft_field_list_add(user_id, uuid, field_name, value,
+                         subfield=None):
     """Adds value to field
     Used for fields that contain multiple values
     e.g.1: { field_name : value1 } OR
@@ -407,8 +398,11 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
            { field_name : {key : value} }
     """
 
-    webdeposit_draft_query = db.session.query(WebDepositDraft).filter(
-                            WebDepositDraft.uuid == uuid)
+    webdeposit_draft_query = \
+        db.session.query(WebDepositDraft). \
+        join(Workflow).\
+        filter(Workflow.user_id == user_id,
+               WebDepositDraft.uuid == uuid)
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
     values = draft.form_values
@@ -426,22 +420,12 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
             values[field_name] = new_values_list
     except KeyError:
         values[field_name] = [value]
-    webdeposit_draft_query.update({"form_values": values,
-                                   "timestamp": datetime.now()})
 
-
-def new_draft(user_id, deposition_type, form_type):
-    """ Creates new draft
-        gets new uuid
-        (deprecated inside workflow context)
-    """
-
-    webdeposit_draft = WebDepositDraft(user_id=user_id, \
-                                     form_type=form_type, \
-                                     form_values={})
-    db.session.add(webdeposit_draft)
-    db.session.commit()
-    return webdeposit_draft.uuid
+    db.session.query(WebDepositDraft).\
+        filter(WebDepositDraft.uuid == uuid,
+               WebDepositDraft.step == draft.step).\
+        update({"form_values": values,
+                "timestamp": datetime.now()})
 
 
 def get_draft(user_id, uuid, field_name=None):
@@ -449,11 +433,11 @@ def get_draft(user_id, uuid, field_name=None):
         or if field_name is defined, returns the associated value
     """
 
-    webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
-                            WebDepositDraft.uuid == uuid)
+    webdeposit_draft_query = \
+        db.session.query(WebDepositDraft).\
+        join(Workflow).\
+        filter(Workflow.user_id == user_id,
+               WebDepositDraft.uuid == uuid)
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
 
@@ -475,17 +459,17 @@ def delete_draft(user_id, deposition_type, uuid):
         (usage not recommended inside workflow context)
     """
 
-    db.session.query(WebDepositDraft).filter_by(\
-                                     uuid=uuid, \
-                                     user_id=user_id).delete()
+    db.session.query(WebDepositDraft). \
+        filter_by(uuid=uuid, user_id=user_id). \
+        delete()
     db.session.commit()
 
-    latest_draft = db.session.query(WebDepositDraft).filter_by(\
-                                    user_id=user_id, \
-                                    deposition_type=deposition_type).\
-                                    order_by(\
-                                        desc(WebDepositDraft.timestamp)).\
-                                    first()
+    latest_draft = \
+        db.session.query(WebDepositDraft). \
+        filter_by(user_id=user_id,
+                  deposition_type=deposition_type). \
+        order_by(desc(WebDepositDraft.timestamp)). \
+        first()
     if latest_draft is None:  # There is no draft left
         return None
     else:
@@ -519,11 +503,11 @@ def draft_field_get_all(user_id, deposition_type):
 
 
 def set_current_draft(user_id, uuid):
-    webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                            join(Workflow).\
-                            filter(
-                            Workflow.user_id == user_id,
-                            WebDepositDraft.uuid == uuid)
+    webdeposit_draft_query = \
+        db.session.query(WebDepositDraft).\
+        join(Workflow).\
+        filter(Workflow.user_id == user_id,
+               WebDepositDraft.uuid == uuid)
     # get the draft with the max step
     draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
 
@@ -532,13 +516,13 @@ def set_current_draft(user_id, uuid):
 
 
 def get_current_draft(user_id, deposition_type):
-    webdeposit_draft = db.session.query(WebDepositDraft).\
-                        join(Workflow).\
-                        filter(
-                        Workflow.user_id == user_id,
-                        Workflow.name == deposition_type).\
-                        order_by(desc(WebDepositDraft.timestamp)). \
-                        first()
+    webdeposit_draft = \
+        db.session.query(WebDepositDraft).\
+        join(Workflow).\
+        filter(Workflow.user_id == user_id,
+               Workflow.name == deposition_type).\
+        order_by(desc(WebDepositDraft.timestamp)). \
+        first()
     return webdeposit_draft
 
 
@@ -567,12 +551,13 @@ def create_user_file_system(user_id, deposition_type, uuid):
     return CFG_USER_WEBDEPOSIT_FOLDER
 
 
-def decode_dict_from_unicode(input):
-    if isinstance(input, dict):
-        return {decode_dict_from_unicode(key): decode_dict_from_unicode(value) for key, value in input.iteritems()}
-    elif isinstance(input, list):
-        return [decode_dict_from_unicode(element) for element in input]
-    elif isinstance(input, unicode):
-        return input.encode('utf-8')
+def decode_dict_from_unicode(unicode_input):
+    if isinstance(unicode_input, dict):
+        return {decode_dict_from_unicode(key): decode_dict_from_unicode(value)
+                for key, value in unicode_input.iteritems()}
+    elif isinstance(unicode_input, list):
+        return [decode_dict_from_unicode(element) for element in unicode_input]
+    elif isinstance(unicode_input, unicode):
+        return unicode_input.encode('utf-8')
     else:
-        return input
+        return unicode_input

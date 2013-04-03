@@ -19,7 +19,7 @@
 
 from wtforms import TextField, SubmitField
 from wtforms.validators import Required
-from invenio.wtforms_utils import InvenioForm as Form
+from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_field_widgets import date_widget, bootstrap_submit
 
@@ -53,7 +53,7 @@ class PreprintForm(Form):
                 ("rus", _("Russian"))]
     language = fields.LanguageField(label=_("Language"), choices=languages)
     date = fields.Date(label=_('Date'), widget=date_widget)
-    file = fields.FileUploadField(label=_('File'))
+    file_field = fields.FileUploadField(label=_('File'))
     submit = SubmitField(label=_('Submit Preprint'), widget=bootstrap_submit)
 
     """ Form Configuration variables """

@@ -311,12 +311,6 @@ function checkEmptyFields(all_fields, field, required_fields) {
         return [0, emptyFields];
 }
 
-/* Sherpa Romeo auto completion "_autocomplete?type=journal" */
-
-function type(o){
-    return !!o && Object.prototype.toString.call(o).match(/(\w+)\]/)[1];
-}
-
 var autocomplete_request = $.ajax();
 
 function webdeposit_field_autocomplete(selector, url) {
@@ -340,6 +334,9 @@ function webdeposit_field_autocomplete(selector, url) {
       });
     };
 
+    // FIXME: typeahead doesn't support a delay option
+    //        so for every change an ajax request is
+    //        being sent to the server.
     $(selector).typeahead({
       source: source,
       minLength: 5,
@@ -359,31 +356,3 @@ function webdeposit_check_status(url){
         });
     }, 10000);
 }
-
-/*
-  $(function() {
-    $('#keywords').keyup( function() {
-        keywords = $('#keywords').val();
-        if (keywords.indexOf(" ") == -1)
-            return;
-        keywordsArr = keywords.split(" ");
-        txt = "";
-        $.each(keywordsArr, function(index, value) {
-            if (value != "")
-                txt += "<div class='label label-info' id='"+value+"' style='margin-right:5px;margin-bottom:5px; display:inline-block;padding-right:2px;'><i class='icon-tag icon-white'></i><span style='margin-left:1px;margin-right:1px;'>"+ value +"</span><span id='delete_tag'><i class='icon-remove-sign icon-white' style='margin-left:5px;cursor:pointer;'></i></span></div>"
-        });
-        newtags = $('#editable').html() + txt;
-        $('#editable').html(newtags);
-        $('#keywords').val('');
-        $('#editable').show();
-
-        tempkeywords = $('#keywords2').val();
-        $('#keywords2').val(tempkeywords+" "+keywords);
-
-    });
-  });
-
-  $('#editable').on("click", "#delete_tag", function(event) {
-        alert(this);
-        alert("click!!!!");
-  }); */

@@ -21,43 +21,42 @@
 
 import os
 import shutil
-import json
+
 from glob import iglob
 from flask import current_app, \
-                  render_template, \
-                  request, \
-                  jsonify, \
-                  redirect, \
-                  url_for, \
-                  flash, \
-                  send_file
+    render_template, \
+    request, \
+    jsonify, \
+    redirect, \
+    url_for, \
+    flash, \
+    send_file
 from werkzeug.utils import secure_filename
 from uuid import uuid1 as new_uuid
+
+from invenio.cache import cache
 from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft
 from invenio.webdeposit_load_deposition_types import deposition_types, \
-                                                     deposition_metadata
+    deposition_metadata
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-
-from invenio.config import CFG_WEBDEPOSIT_UPLOAD_FOLDER
-from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.webdeposit_utils import get_current_form, \
-                                     get_form, \
-                                     draft_field_set, \
-                                     draft_field_list_add, \
-                                     delete_workflow, \
-                                     create_workflow, \
-                                     get_latest_or_new_workflow, \
-                                     get_workflow, \
-                                     draft_field_get_all, \
-                                     draft_field_error_check, \
-                                     draft_field_get, \
-                                     set_form_status, \
-                                     get_form_status, \
-                                     create_user_file_system, \
-                                     CFG_DRAFT_STATUS
+    get_form, \
+    draft_field_set, \
+    draft_field_list_add, \
+    delete_workflow, \
+    create_workflow, \
+    get_latest_or_new_workflow, \
+    get_workflow, \
+    draft_field_get_all, \
+    draft_field_error_check, \
+    draft_field_get, \
+    set_form_status, \
+    get_form_status, \
+    create_user_file_system, \
+    CFG_DRAFT_STATUS
 from invenio.webuser_flask import current_user
-from invenio.bibworkflow_engine import CFG_WORKFLOW_STATUS
+from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
 from invenio.bibworkflow_model import Workflow
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
@@ -65,8 +64,10 @@ blueprint = InvenioBlueprint('webdeposit', __name__,
                              config='invenio.websubmit_config',
                              menubuilder=[('main.webdeposit',
                                           _('Deposit'),
-                                          'webdeposit.index_deposition_types', 2)],
-                             breadcrumbs=[(_('Deposit'), 'webdeposit.index_deposition_types')])
+                                          'webdeposit.index_deposition_types',
+                                          2)],
+                             breadcrumbs=[(_('Deposit'),
+                                           'webdeposit.index_deposition_types')])
 
 
 @blueprint.route('/upload/<deposition_type>/<uuid>', methods=['POST'])
@@ -122,33 +123,32 @@ def plupload(deposition_type, uuid):
             chunk_files.sort(key=lambda x: int(x.split("_")[-1]))
 
             unique_filename = str(new_uuid()) + filename
-            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, unique_filename)
+            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                     unique_filename)
             destination = open(file_path, 'wb')
             for chunk in chunk_files:
                 shutil.copyfileobj(open(chunk, 'rb'), destination)
                 os.remove(chunk)
             destination.close()
-            current_app.logger.info(file_path)
             size = os.path.getsize(file_path)
-            current_app.logger.info(size)
             file_metadata = dict(name=name, file=file_path, size=size)
             draft_field_list_add(current_user.get_id(), uuid,
                                  "files", file_metadata)
     return unique_filename
 
 
-@blueprint.route('/plupload_delete/<deposition_type>/<uuid>', methods=['GET', 'POST'])
+@blueprint.route('/plupload_delete/<uuid>', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-def plupload_delete(deposition_type, uuid):
+def plupload_delete(uuid):
     if request.method == 'POST':
         files = draft_field_get(current_user.get_id(), uuid, "files")
         result = "File Not Found"
         filename = request.form['filename']
         files = draft_field_get(current_user.get_id(), uuid, "files")
-        for index, f in enumerate(files):
+        for i, f in enumerate(files):
             if filename == f['file'].split('/')[-1]:  # get the unique name from the path
                 os.remove(f['file'])
-                del files[index]
+                del files[i]
                 result = str(files) + "              "
                 draft_field_set(current_user.get_id(), uuid, "files", files)
                 result = "File " + f['name'] + " Deleted"
@@ -156,30 +156,32 @@ def plupload_delete(deposition_type, uuid):
     return result
 
 
-@blueprint.route('/plupload_get_file/<deposition_type>/<uuid>', methods=['GET'])
+@blueprint.route('/plupload_get_file/<uuid>', methods=['GET'])
 @blueprint.invenio_authenticated
-def plupload_get_file(deposition_type, uuid):
+def plupload_get_file(uuid):
     filename = request.args.get('filename')
     tmp = ""
     files = draft_field_get(current_user.get_id(), uuid, "files")
     for f in files:
         tmp += f['file'].split('/')[-1] + '<br><br>'
         if filename == f['file'].split('/')[-1]:
-            return send_file(f['file'], attachment_filename=f['name'], as_attachment=True)
+            return send_file(f['file'],
+                             attachment_filename=f['name'],
+                             as_attachment=True)
 
     return "filename: " + filename + '<br>' + tmp
 
 
-@blueprint.route('/check_status/<deposition_type>/<uuid>/', methods=['GET', 'POST'])
+@blueprint.route('/check_status/<uuid>/', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-def check_status(deposition_type, uuid):
+def check_status(uuid):
     form_status = get_form_status(current_user.get_id(), uuid)
     return jsonify({"status": form_status})
 
 
-@blueprint.route('/<deposition_type>/_autocomplete/<uuid>', methods=['GET', 'POST'])
+@blueprint.route('_autocomplete/<uuid>', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-def autocomplete(deposition_type, uuid):
+def autocomplete(uuid):
     """ Returns a list with of suggestions for the field
         based on the current value
     """
@@ -192,41 +194,15 @@ def autocomplete(deposition_type, uuid):
 
     #Check if field has an autocomplete function
     if hasattr(form.__dict__["_fields"][field_type], "autocomplete"):
-        return jsonify(results=form.__dict__["_fields"][field_type].autocomplete()[:limit])
+        return jsonify(results=form.__dict__["_fields"][field_type].
+                       autocomplete()[:limit])
     else:
         return jsonify(results=[])
 
 
-@blueprint.route('/<deposition_type>/_ISSN/<uuid>', methods=['GET', 'POST'])
-# @cache.cached(timeout=50, key_prefix='issn')
-def autocomplete_ISSN_Conditions(deposition_type, uuid):
-    query = request.args.get('title')
-
-    s = SherpaRomeoSearch()
-
-    s.search_journal(query)
-
-    response = dict()
-    response['issn'] = s.parser.get_issn()
-    response['conditions'] = s.parser.get_conditions()
-
-    draft_id, form = get_current_form(current_user.get_id(), uuid=uuid)
-
-    draft_field_set(current_user.get_id(), \
-                    draft_id, \
-                    "issn", \
-                    response['issn'])
-    draft_field_set(current_user.get_id(), \
-                    draft_id, \
-                    "conditions", \
-                    response['conditions'])
-
-    return json.dumps(response)
-
-
-@blueprint.route('/<deposition_type>/_errorCheck/<uuid>')
+@blueprint.route('_errorCheck/<uuid>')
 @blueprint.invenio_authenticated
-def error_check(deposition_type, uuid):
+def error_check(uuid):
     """ Used for field error checking
     """
     value = request.args.get('attribute')
@@ -236,8 +212,9 @@ def error_check(deposition_type, uuid):
         return "{}"
 
     draft_field_set(current_user.get_id(), uuid, field_name, value)
-    check_result = draft_field_error_check(current_user.get_id(), \
-                                       uuid, field_name, value)
+
+    check_result = draft_field_error_check(current_user.get_id(),
+                                           uuid, field_name, value)
     try:
         return jsonify(check_result)
     except TypeError:
@@ -251,9 +228,9 @@ def delete(deposition_type, uuid):
         (including form drafts)
         redirects to load another workflow
     """
-    delete_workflow(current_user.get_id(), deposition_type, uuid)
+    delete_workflow(current_user.get_id(), uuid)
     flash(_('Deposition %s deleted!') % (uuid,), 'error')
-    return redirect(url_for("webdeposit.index", \
+    return redirect(url_for("webdeposit.index",
                             deposition_type=deposition_type))
 
 
@@ -262,10 +239,12 @@ def delete(deposition_type, uuid):
 def create_new(deposition_type):
     """ Creates new deposition
     """
-    workflow = create_workflow(current_user.get_id(), deposition_type)
+    workflow = create_workflow(deposition_type, current_user.get_id())
     uuid = workflow.get_uuid()
     flash(_('Deposition %s created!') % (uuid,), 'info')
-    return redirect(url_for("webdeposit.add", deposition_type=deposition_type, uuid=uuid))
+    return redirect(url_for("webdeposit.add",
+                            deposition_type=deposition_type,
+                            uuid=uuid))
 
 
 @blueprint.route('/')
@@ -291,14 +270,9 @@ def index_deposition_types():
 @blueprint.invenio_authenticated
 def index(deposition_type):
     current_app.config['breadcrumbs_map'][request.endpoint] = [
-                    (_('Home'), '')] + blueprint.breadcrumbs + [(deposition_type, None)]
+        (_('Home'), '')] + blueprint.breadcrumbs + [(deposition_type, None)]
     user_id = current_user.get_id()
     drafts = draft_field_get_all(user_id, deposition_type)
-    # drafts = WebDepositDraft.query.filter(db.and_(
-    #                 WebDepositDraft.user_id == current_user.get_id(),
-    #                 WebDepositDraft.deposition_type == deposition_type,
-    #                 WebDepositWorkflow.status == CFG_WEBDEPOSIT_WORKFLOW_STATUS['running']
-    #               )).group_by(WebDepositDraft.uuid).all()
 
     return render_template('webdeposit_index.html', drafts=drafts,
                            deposition_type=deposition_type,
@@ -324,21 +298,25 @@ def add(deposition_type, uuid=None):
         workflow = get_latest_or_new_workflow(deposition_type)
         uuid = workflow.get_uuid()
         #flash(_('Deposition %s') % (uuid,), 'info')
-        return redirect(url_for('.add', deposition_type=deposition_type, uuid=uuid))
+        return redirect(url_for('.add', deposition_type=deposition_type,
+                                uuid=uuid))
     else:
         # get workflow with specific uuid
         workflow = get_workflow(deposition_type, uuid)
 
     current_app.config['breadcrumbs_map'][request.endpoint] = [
-                    (_('Home'), '')] + blueprint.breadcrumbs + \
-                    [(deposition_type, 'webdeposit.index',
-                     {'deposition_type': deposition_type}),
-                     (uuid, 'webdeposit.add',
-                     {'deposition_type': deposition_type, 'uuid': uuid})]
+        (_('Home'), '')] + blueprint.breadcrumbs + \
+        [(deposition_type, 'webdeposit.index',
+         {'deposition_type': deposition_type}),
+         (uuid, 'webdeposit.add',
+         {'deposition_type': deposition_type, 'uuid': uuid})]
+
+    cache.add(str(current_user.get_id()) + ":current_deposition_type", deposition_type)
+    cache.add(str(current_user.get_id()) + ":current_uuid", uuid)
 
     if request.method == 'POST':
         # Save the files
-        for (field, uploaded_file) in request.files.items():
+        for uploaded_file in request.files.values():
             filename = secure_filename(uploaded_file.filename)
             if filename == "":
                 continue
@@ -347,7 +325,8 @@ def add(deposition_type, uuid=None):
                                                                  deposition_type,
                                                                  uuid)
             unique_filename = str(new_uuid()) + filename
-            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, unique_filename)
+            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                     unique_filename)
             uploaded_file.save(file_path)
             size = os.path.getsize(file_path)
             file_metadata = dict(name=filename, file=file_path, size=size)
@@ -368,20 +347,19 @@ def add(deposition_type, uuid=None):
                                    **workflow.get_output(form_validation=True))
 
         #Set the latest form status to finished
-        set_form_status(current_user.get_id(), uuid, CFG_DRAFT_STATUS['finished'])
-
+        set_form_status(current_user.get_id(), uuid,
+                        CFG_DRAFT_STATUS['finished'])
     workflow.run()
     status = workflow.get_status()
-
-    if status == 0:
+    if status != CFG_WORKFLOW_STATUS.FINISHED and \
+            status != CFG_WORKFLOW_STATUS.ERROR:
         # render current step of the workflow
         return render_template('webdeposit_add.html', **workflow.get_output())
-    elif status == CFG_WORKFLOW_STATUS['finished']:
+    elif status == CFG_WORKFLOW_STATUS.FINISHED:
         flash(_('Deposition %s has been successfully finished.') % (uuid, ),
               'success')
         return redirect(url_for('.index_deposition_types'))
-    else:
-        flash(_('Deposition %s has return error code %d.') % (uuid, status),
-              'error')
-        current_app.logger.error('Deposition: %s has return error code: %d' % (uuid, status))
+    elif status == CFG_WORKFLOW_STATUS.ERROR:
+        flash(_('Deposition %s has returned error.') % uuid)
+        current_app.logger.error('Deposition: %s has returned error. %d' % uuid)
         return redirect(url_for('.index_deposition_types'))
