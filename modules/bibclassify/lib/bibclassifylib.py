@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,12 +31,19 @@ import sys
 import time
 import copy
 import shelve
+import cgi
 
 # Please point the following variables to the correct paths if using standalone (Invenio-independent) version
 TMPDIR_STANDALONE = "/tmp"
 PDFTOTEXT_STANDALONE = "/usr/bin/pdftotext"
 
 fontSize = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+
+def encode_for_xml(text):
+    "Encode special chars in string so that it would be XML-compliant."
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;')
+    return text
 
 def write_message(msg, stream=sys.stdout):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
@@ -480,7 +487,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
             <datafield tag="653" ind1="1" ind2=" ">
               <subfield code="a">%s</subfield>
               <subfield code="9">BibClassify/%s</subfield>
-            </datafield>""" % (key[1],os.path.splitext(os.path.basename(ontology))[0])
+            </datafield>""" % (encode_for_xml(key[1]), os.path.splitext(os.path.basename(ontology))[0])
         return xml
     else:
         # Output some HTML
@@ -559,7 +566,7 @@ def make_tag_cloud(entries):
         cloud += '<span class=\"level%s\" ' % cloud_list[i][1]
         if int(cloud_list[i][2]) > 0:
             cloud += 'style="color:red" '
-        cloud += '><a href=""> %s </a></span>' % cloud_list[i][0]
+        cloud += '><a href=""> %s </a></span>' % cgi.escape(cloud_list[i][0])
     cloud += '</div></tr>'
 
     ret += cloud + '\n'
@@ -659,8 +666,6 @@ def makePattern(candidate, mode):
         print "Invalid thesaurus term: " + re.escape(candidate) + "<br />"
 
     return pattern
-
-
 
 def profile(t="", d=""):
     import profile
@@ -815,5 +820,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
