@@ -21,7 +21,11 @@
 
 import os
 import random
+import re
 
+from invenio.config import \
+     CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN, \
+     CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL
 from invenio.bibmerge_merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
                                     add_subfield, replace_subfield, \
@@ -38,7 +42,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     get_marcxml_of_revision_id
 from invenio.htmlutils import remove_html_markup
 from invenio.bibrecord import create_record, record_xml_output, record_add_field, \
-                              record_order_subfields
+                              record_order_subfields, \
+                              record_extract_dois
 from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 
 import invenio.template
@@ -144,6 +149,15 @@ def perform_request_record(requestType, uid, data):
             record2 = _get_record_slave(recid2, result, 'recid', uid)
             if result['resultCode'] != 0: #return in case of error
                 return result
+            (errcode, message) = check_doi_status_after_merge(data["recID1"], data['duplicate'],
+                                                              record1, record2,
+                                                              record2_marked_as_duplicate_p=data.has_key('duplicate'),
+                                                              submit_confirmed_p=data.get('additional_data', {'confirmed_submit': False}).get('confirmed_submit', False))
+            if errcode:
+                result['resultCode'] = errcode
+                result['resultText'] = message
+                return result
+
             # mark record2 as deleted
             record_add_field(record2, '980', ' ', ' ', '', [('c', 'DELETED')])
             # mark record2 as duplicate of record1
@@ -169,6 +183,14 @@ def perform_request_record(requestType, uid, data):
                 delete_cache(recid1, uid)
 
             result['resultText'] = 'Records submitted'
+            return result
+
+        (errcode, message) = check_doi_status_after_merge(data["recID1"], data["recID2"],
+                                                          record1, None,
+                                                          submit_confirmed_p=data.get('additional_data', {'confirmed_submit': False}).get('confirmed_submit', False))
+        if errcode:
+            result['resultCode'] = errcode
+            result['resultText'] = message
             return result
 
         #submit record1 from cache
@@ -450,3 +472,98 @@ def _fieldtagNum_and_indicators(fieldTag):
     if ind2 == '_':
         ind2 = ' '
     return (fnum, ind1, ind2)
+
+def get_dois(record, internal_only_p=False):
+    """
+    Return the list of DOIs in the given record. If C{internal_only_p}
+    is set to True, only those DOIs that are considered owned/managed
+    by this installation (as defined in
+    CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN) will be returned.
+
+    @param record: the record we want to get DOIs from
+    @type record: BibRecord object
+    @param internal_only_p: if True, returns only DOIs managed/owned by the system
+    @type internal_only_p: bool
+    @rtype: list(string)
+    """
+    return [doi for doi in record_extract_dois(record) if \
+            not internal_only_p or re.compile(CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN).match(doi)]
+
+def check_doi_status_after_merge(original_recid1, original_recid2, final_record1, final_record_2, record2_marked_as_duplicate_p=False, submit_confirmed_p=False):
+    """
+    Check that the result of the merge does not removed DOIs managed
+    by the system, and that not duplicate DOI would be
+    created. Returns a tuple(error_code, message).
+
+    @param original_recid1: the record ID of the original record 1 (master)
+    @type original_recid1: int
+    @param original_recid2: the record ID of the original record 2 (slave)
+    @type original_recid2: int
+    @param final_record1: the resulting merged record
+    @type final_record1: BibRecord object
+    @param final_record_2: the resulting slave "merged" record (optional when record2_marked_as_duplicate_p is False)
+    @type final_record_2: BibRecord object
+    @param record2_marked_as_duplicate_p: True if the record 2 will be marked as duplicate (and deleted)
+    @type record2_marked_as_duplicate_p: bool
+    @param submit_confirmed_p: if the user has already confirmed to proceed with submission, according to previous messages displayed. If True, do not ask again confirmation and proceed if all tests pass.
+    @type submit_confirmed_p: bool
+    """
+    errcode = 0
+    message = ''
+    new_record1_dois = get_dois(final_record1)
+    new_record1_managed_dois = get_dois(final_record1, internal_only_p=True)
+    original_record1_managed_dois = get_dois(create_record(print_record(original_recid1, 'xm'))[0],
+                                             internal_only_p=True)
+    original_record2_dois = get_dois(create_record(print_record(original_recid2, 'xm'))[0])
+
+    # Are there any DOI from record 1 (master) lost in the merging?
+    lost_dois_in_record1 = [doi for doi in original_record1_managed_dois \
+                            if not doi in new_record1_managed_dois]
+
+    # Enough to check for duplicate DOI creation in this record,
+    # not whole DB
+    duplicate_dois_after_merge = [doi for doi in new_record1_dois if new_record1_dois.count(doi) > 1]
+
+    if record2_marked_as_duplicate_p:
+        new_record2_managed_dois = get_dois(final_record_2, internal_only_p=True)
+        original_record2_managed_dois = get_dois(create_record(print_record(original_recid2, 'xm'))[0],
+                                                 internal_only_p=True)
+        # Are there any DOI from record 2 (slave) lost in the merging?
+        lost_dois_in_record2 = [doi for doi in original_record2_managed_dois \
+                                    if not doi in new_record1_managed_dois]
+    else:
+        lost_dois_in_record2 = []
+        duplicate_dois_after_merge += [doi for doi in new_record1_dois if doi in original_record2_dois]
+
+    if ((lost_dois_in_record1 or lost_dois_in_record2) and \
+        CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL > 0) or \
+        duplicate_dois_after_merge:
+
+        if CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL == 1 and \
+               not duplicate_dois_after_merge and \
+               not submit_confirmed_p:
+            errcode = 1
+            message = 'The resulting merged record misses DOI(s) managed by the system.<script type="text/javascript">%(check_duplicate_box)sif (confirm(\'The resulting merged record will lose DOI(s) managed by the system.\\n' + \
+                      'The following DOI(s) were in the original record (#1) but are not in the final merged one:\\n' + '\\n'.join(lost_dois_in_record1) + \
+                      '\\nAre you sure that you want to submit the merged records without the DOI(s)?\')) {onclickSubmitButton(confirm_p=false, additional_data={\'confirmed_submit\': true})}</script>'
+        elif duplicate_dois_after_merge and lost_dois_in_record1:
+            errcode = 1
+            message = 'The changes cannot be submitted because the resulting merged record (a) misses DOI(s) managed by the system and/or (b) will create duplicate DOIs.<script type="text/javascript">%(check_duplicate_box)salert(\'The changes cannot be submitted because the resulting merged record (a) misses DOI(s) managed by the system and (b) will create duplicate DOIs.\\n' + \
+                      'The following DOI(s) were in the original record (#1) but are not in the final merged one:\\n' + '\\n'.join(lost_dois_in_record1) + \
+                      '\\nThe following DOI(s) would be duplicate after merge:\\n' + '\\n'.join(duplicate_dois_after_merge) + \
+                      '\\nMake sure that the mentionned DOI(s) are included in the final merged record and/or no duplicate DOIs are created (suggestion: merge in the other way around).\');</script>'
+        elif duplicate_dois_after_merge:
+            errcode = 1
+            message = 'The changes cannot be submitted because the resulting merged record will create a duplicate DOI.<script type="text/javascript">%(check_duplicate_box)salert(\'The changes cannot be submitted because the resulting merged record will create a duplicate DOI.\\n' + \
+                      'The following DOI(s) would be duplicate after merge:\\n' + '\\n'.join(duplicate_dois_after_merge) + \
+                      '\\nMake sure that the mentionned DOI(s) are not duplicated (suggestion: merge in the other way around).\');</script>'
+        elif not (CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL == 1 and submit_confirmed_p):
+            # lost DOIs after merge
+            errcode = 1
+            message = 'The changes cannot be submitted because the resulting merged record misses DOI(s) managed by the system.<script type="text/javascript">%(check_duplicate_box)salert(\'The changes cannot be submitted because the resulting merged record misses the DOI(s) managed by the system.\\n' + \
+                      'The following DOI(s) were in the original record (#1) but are not in the final merged one:\\n' + '\\n'.join(lost_dois_in_record1) + \
+                          '\\nMake sure that the mentionned DOI(s) are included in the final merged record.\');</script>'
+
+    message = message % {'check_duplicate_box': record2_marked_as_duplicate_p and '$(\'#bibMergeDupeCheckbox\').attr(\'checked\', true);' or ''}
+
+    return (errcode, message)

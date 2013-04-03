@@ -862,18 +862,32 @@ function isRevisionID(str) {
   }
   return false;
 }
-function onclickSubmitButton() {
+function onclickSubmitButton(confirm_p, additional_data) {
+  /*
+   confirm_p: if false, do not ask user confirmation before submitting
+   additional_data: additional data sent to server
+   */
+  if (typeof(confirm) == 'undefined') {
+      confirm_p = true
+  }
   var checkbox = $('#bibMergeDupeCheckbox').is(':checked');
+  var submit_p = false;
 
-  if (displayAlert('confirmSubmit')){
+  if (!confirm_p) {
+      submit_p = true;
+  } else {
+      submit_p = displayAlert('confirmSubmit');
+  }
+  if (submit_p){
       var _data = {
         requestType: 'submit',
         record2Mode: gRecord2Mode,
         recID1: gRecID1
+        recID2: gRecID2
       };
       if (checkbox == true)
         _data['duplicate'] = gRecID2;
-
+      _data['additional_data'] = additional_data;
       showMessage('LoadingMsg', 'Submitting...');
       ajaxRequest(_data, function(html){
         window.location.hash = '';
