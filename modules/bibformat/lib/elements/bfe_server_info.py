@@ -17,9 +17,12 @@
 """BibFormat element - Prints server info
 """
 
-from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, \
-        CFG_SITE_NAME, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL, \
-        CFG_SITE_RECORD
+import urllib
+import re
+from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_SITE_ADMIN_EMAIL, \
+        CFG_SITE_LANG, CFG_SITE_NAME, CFG_VERSION, CFG_SITE_NAME_INTL, \
+        CFG_SITE_SUPPORT_EMAIL, CFG_SITE_RECORD, CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN
+from invenio.bibrecord import record_extract_dois
 
 
 def format_element(bfo, var=''):
@@ -35,7 +38,14 @@ def format_element(bfo, var=''):
            CFG_SITE_URL: the base url for the server
            searchurl: the search url for the server
            recurl: the base url for the record
+           recinternaldoiurl_or_recurl: the base url for the record, as an internal CFG_SITE_URL + '/doi' URL when DOI is available and matched by CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN
     '''
+    dois = []
+    if var == 'recinternaldoiurl_or_recurl':
+        # Prepare list of internal DOIs of that record
+        dois = [doi for doi in record_extract_dois(bfo.get_record()) if \
+                re.compile(CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN).match(doi)]
+
     recID = bfo.recID
     if var == '':
         out = ''
@@ -69,16 +79,22 @@ def format_element(bfo, var=''):
         out = CFG_SITE_URL + '/search'
         if not out.endswith('/'):
             out += '/'
-    elif var == 'recurl':
-        out = CFG_BASE_URL
-        if not out.endswith('/'):
-            out += '/'
-        out += CFG_SITE_RECORD + '/' + str(recID)
     elif var == 'absoluterecurl':
         out = CFG_SITE_URL
         if not out.endswith('/'):
             out += '/'
         out += CFG_SITE_RECORD + '/' + str(recID)
+    elif var == 'recinternaldoiurl_or_recurl' and \
+             dois:
+        out = CFG_SITE_URL
+        if not out.endswith('/'):
+            out += '/'
+        out += 'doi/' + urllib.quote(dois[0])
+    elif var in ('recurl', 'recinternaldoiurl_or_recurl'):
+        out = CFG_SITE_URL
+        if not out.endswith('/'):
+            out += '/'
+        out += CFG_SITE_RECORD +'/' + str(recID)
     else:
         out = 'Unknown variable: %s' % (var)
     return out

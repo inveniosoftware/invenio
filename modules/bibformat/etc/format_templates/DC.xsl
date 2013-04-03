@@ -165,7 +165,7 @@ exclude-result-prefixes="marc fn">
             </xsl:if>
         </xsl:for-each>
 	<!-- Link to main record -->
-	<dc:identifier><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')"/></dc:identifier>
+	<dc:identifier><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recinternaldoiurl_or_recurl&quot;>')"/></dc:identifier>
 	<!-- OAI Identifier -->
 	<xsl:value-of disable-output-escaping="yes" select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_OAI_IDENTIFIER instance_prefix=&quot;&lt;dc:identifier>&quot; separator=&quot;&quot; instance_suffix=&quot;&lt;/dc:identifier>&quot;>')"/>
 	<xsl:if test="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;CFG_SITE_NAME&quot; >')='CERN Document Server'">

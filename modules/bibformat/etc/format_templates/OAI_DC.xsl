@@ -51,7 +51,7 @@
       </xsl:for-each>
     </xsl:if>
     <!-- Link to main record -->
-    <dc:identifier><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')"/></dc:identifier>
+    <dc:identifier><xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recinternaldoiurl_or_recurl&quot;>')"/></dc:identifier>
     <!-- Language -->
     <xsl:for-each select="datafield[@tag=041]">
       <dc:language><xsl:value-of select="subfield[@code='a']"/></dc:language>
