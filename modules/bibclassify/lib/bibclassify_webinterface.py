@@ -185,7 +185,7 @@ def _get_keywords_list(keywords, argd):
             state = 'composite'
         if weight == 0:
             weighted = 'unweighted'
-        sorted_keywords[weighted][state].append((keyword, weight))
+        sorted_keywords[weighted][state].append((escape(keyword), weight))
 
     out = []
 
