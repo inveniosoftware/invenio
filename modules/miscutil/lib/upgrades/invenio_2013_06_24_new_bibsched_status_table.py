@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,24 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = tasklets
+from invenio.dbquery import run_sql
 
-pylibdir = $(libdir)/python/invenio
+depends_on = ['invenio_release_1_1_0']
 
-pylib_DATA = \
-	bibsched.py \
-	bibtask.py \
-	bibtaskex.py \
-	bibtask_config.py \
-	bibtasklet.py \
-	bibsched_webapi.py \
-	bibsched_webinterface.py \
-	bibsched_monitor.py
+def info():
+    return "New bibsched status (schSTATUS) table"
 
-jsdir=$(localstatedir)/www/js
+def do_upgrade():
+    run_sql("""CREATE TABLE IF NOT EXISTS schSTATUS (
+  name varchar(50),
+  value mediumblob,
+  PRIMARY KEY (name)
+) ENGINE=MyISAM
+    """)
 
-js_DATA = bibsched.js
-
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+def estimate():
+    return 1

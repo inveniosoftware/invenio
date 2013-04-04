@@ -62,15 +62,19 @@ from socket import gethostname
 
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
+from invenio.config import CFG_PREFIX, CFG_BINDIR, \
     CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.errorlib import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
 from invenio.webuser import get_user_preferences, get_email
-from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
-    CFG_BIBTASK_DEFAULT_TASK_SETTINGS, CFG_BIBTASK_FIXEDTIMETASKS
+from invenio.bibtask_config import \
+    CFG_BIBTASK_VALID_TASKS, \
+    CFG_BIBTASK_DEFAULT_TASK_SETTINGS, \
+    CFG_BIBTASK_FIXEDTIMETASKS, \
+    CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS, \
+    CFG_BIBSCHED_LOGDIR
 from invenio.dateutils import parse_runtime_limit
 from invenio.shellutils import escape_shell_arg
 from invenio.mailutils import send_email
@@ -79,27 +83,7 @@ from invenio.bibsched import bibsched_set_host, \
 
 
 # Global _TASK_PARAMS dictionary.
-_TASK_PARAMS = {
-        'version': '',
-        'task_stop_helper_fnc': None,
-        'task_name': os.path.basename(sys.argv[0]),
-        'task_specific_name': '',
-        'task_id': 0,
-        'user': '',
-        # If the task is not initialized (usually a developer debugging
-        # a single method), output all messages.
-        'verbose': 9,
-        'sleeptime': '',
-        'runtime': time.strftime("%Y-%m-%d %H:%M:%S"),
-        'priority': 0,
-        'runtime_limit': None,
-        'profile': [],
-        'post-process': [],
-        'sequence-id':None,
-        'stop_queue_on_error': False,
-        'fixed_time': False,
-        'email_logs_to': [],
-        }
+_TASK_PARAMS = dict(CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS)
 
 # Global _OPTIONS dictionary.
 _OPTIONS = {}
@@ -107,6 +91,11 @@ _OPTIONS = {}
 # Which tasks don't need to ask the user for authorization?
 CFG_VALID_PROCESSES_NO_AUTH_NEEDED = ("bibupload", )
 CFG_TASK_IS_NOT_A_DEAMON = ("bibupload", )
+
+
+class RecoverableError(StandardError):
+    pass
+
 
 def fix_argv_paths(paths, argv=None):
     """Given the argv vector of cli parameters, and a list of path that
@@ -147,7 +136,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 'P:', ['priority='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 'P:', ['priority='])
             except getopt.GetoptError, err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -170,7 +159,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 'N:', ['name='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 'N:', ['name='])
             except getopt.GetoptError, err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -190,7 +179,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 't:', ['runtime='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 't:', ['runtime='])
             except getopt.GetoptError, err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -213,7 +202,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 's:', ['sleeptime='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 's:', ['sleeptime='])
             except getopt.GetoptError, err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -236,7 +225,7 @@ def task_low_level_submission(name, user, *argv):
         argv = list(argv)
         while True:
             try:
-                opts, args = getopt.gnu_getopt(argv, 'I:', ['sequence-id='])
+                opts, dummy_args = getopt.gnu_getopt(argv, 'I:', ['sequence-id='])
             except getopt.GetoptError, err:
                 ## We remove one by one all the non recognized parameters
                 if len(err.opt) > 1:
@@ -252,6 +241,29 @@ def task_low_level_submission(name, user, *argv):
                 except ValueError:
                     pass
         return sequenceid
+
+    def get_host(argv):
+        """Try to get the sequenceid by analysing the arguments."""
+        host = ''
+        argv = list(argv)
+        while True:
+            try:
+                opts, dummy_args = getopt.gnu_getopt(argv, '', ['host='])
+            except getopt.GetoptError, err:
+                ## We remove one by one all the non recognized parameters
+                if len(err.opt) > 1:
+                    argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
+                else:
+                    argv = [arg for arg in argv if not arg.startswith('-%s' % err.opt)]
+            else:
+                break
+        for opt in opts:
+            if opt[0] in ('--host',):
+                try:
+                    host = opt[1]
+                except ValueError:
+                    pass
+        return host
 
     task_id = None
     try:
@@ -269,6 +281,7 @@ def task_low_level_submission(name, user, *argv):
         runtime = get_runtime(argv)
         sleeptime = get_sleeptime(argv)
         sequenceid = get_sequenceid(argv)
+        host = get_host(argv)
         argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
 
         if special_name:
@@ -277,10 +290,11 @@ def task_low_level_submission(name, user, *argv):
         verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
 
         ## submit task:
-        task_id = run_sql("""INSERT INTO schTASK (proc,user,
+        task_id = run_sql("""INSERT INTO schTASK (proc,host,user,
             runtime,sleeptime,status,progress,arguments,priority,sequenceid)
-            VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
-            (name, user, runtime, sleeptime, verbose_argv, marshal.dumps(argv), priority, sequenceid))
+            VALUES (%s,%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
+            (name, host, user, runtime, sleeptime, verbose_argv,
+             marshal.dumps(argv), priority, sequenceid))
 
     except Exception:
         register_exception(alert_admin=True)
@@ -326,8 +340,8 @@ def setup_loggers(task_id=None):
         logger.removeHandler(handler)
     formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
     if task_id is not None:
-        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
-        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
+        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
+        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
         log_logger.setFormatter(formatter)
         log_logger.setLevel(logging.DEBUG)
         err_logger.setFormatter(formatter)
@@ -392,6 +406,7 @@ def task_init(
         "sequence-id": None,
         "stop_queue_on_error": False,
         "fixed_time": False,
+        "host": '',
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
@@ -476,7 +491,7 @@ def task_init(
                                 profile_dump.append(strstream.getvalue())
                         profile_dump = '\n'.join(profile_dump)
                         profile_dump += '\nYou can use profile=%s' % existing_sorts
-                        open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a').write("%s" % profile_dump)
+                        open(os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a').write("%s" % profile_dump)
                         os.remove(filename)
                     except ImportError:
                         ret = _task_run(task_run_fnc)
@@ -486,12 +501,19 @@ def task_init(
                 if not ret:
                     write_message("Error occurred.  Exiting.", sys.stderr)
             except Exception, e:
+                if isinstance(e, SystemExit) and e.code == 0:
+                    raise
                 register_exception(alert_admin=True)
                 write_message("Unexpected error occurred: %s." % e, sys.stderr)
                 write_message("Traceback is:", sys.stderr)
                 write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
                 write_message("Exiting.", sys.stderr)
-                task_update_status("ERROR")
+                if task_get_task_param('stop_queue_on_error'):
+                    task_update_status("ERROR")
+                elif isinstance(e, RecoverableError) and task_get_task_param('email_logs_to'):
+                    task_update_status("ERRORS REPORTED")
+                else:
+                    task_update_status("CERROR")
         finally:
             _task_email_logs()
             logging.shutdown()
@@ -542,7 +564,8 @@ def _task_build_params(
                 "stop-on-error",
                 "continue-on-error",
                 "fixed-time",
-                "email-logs-to="
+                "email-logs-to=",
+                "host=",
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
@@ -573,7 +596,7 @@ def _task_build_params(
                 _TASK_PARAMS["profile"] += opt[1].split(',')
             elif opt[0] in ("--post-process", ):
                 _TASK_PARAMS["post-process"] += [opt[1]]
-            elif opt[0] in ("-I","--sequence-id"):
+            elif opt[0] in ("-I", "--sequence-id"):
                 _TASK_PARAMS["sequence-id"] = opt[1]
             elif opt[0] in ("--stop-on-error", ):
                 _TASK_PARAMS["stop_queue_on_error"] = True
@@ -583,6 +606,8 @@ def _task_build_params(
                 _TASK_PARAMS["fixed_time"] = True
             elif opt[0] in ("--email-logs-to",):
                 _TASK_PARAMS["email_logs_to"] = opt[1].split(',')
+            elif opt[0] in ("--host",):
+                _TASK_PARAMS["host"] = opt[1]
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -845,10 +870,12 @@ def _task_submit(argv, authorization_action, authorization_msg):
     write_message("storing task options %s\n" % argv, verbose=9)
     verbose_argv = 'Will execute: %s' % ' '.join([escape_shell_arg(str(arg)) for arg in argv])
     _TASK_PARAMS['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
-                                           runtime,sleeptime,status,progress,arguments,priority,sequenceid)
-                                         VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
+                                           runtime,sleeptime,status,progress,arguments,priority,sequenceid,host)
+                                         VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s,%s)""",
         (task_name, _TASK_PARAMS['user'], _TASK_PARAMS["runtime"],
-         _TASK_PARAMS["sleeptime"], verbose_argv, marshal.dumps(argv), _TASK_PARAMS['priority'], _TASK_PARAMS['sequence-id']))
+         _TASK_PARAMS["sleeptime"], verbose_argv, marshal.dumps(argv),
+         _TASK_PARAMS['priority'], _TASK_PARAMS['sequence-id'],
+         _TASK_PARAMS['host']))
 
     ## update task number:
     write_message("Task #%d submitted." % _TASK_PARAMS['task_id'])
@@ -896,8 +923,8 @@ runtime: %s
 options: %s
 status: %s
 """ % (task_name, _TASK_PARAMS['task_id'], runtime, _OPTIONS, status)
-    err_file = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id'])
-    log_file = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id'])
+    err_file = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id'])
+    log_file = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id'])
     return send_email(CFG_SITE_SUPPORT_EMAIL, email_logs_to, title, body, attachments=[(log_file, 'text/plain'), (err_file, 'text/plain')])
 
 def _task_run(task_run_fnc):
@@ -980,20 +1007,12 @@ def _task_run(task_run_fnc):
 
     sleeptime = _TASK_PARAMS['sleeptime']
     try:
-        try:
-            if callable(task_run_fnc) and task_run_fnc():
-                task_update_status("DONE")
-            else:
-                task_update_status("DONE WITH ERRORS")
-        except SystemExit:
-            pass
-        except:
-            write_message(traceback.format_exc()[:-1])
-            register_exception(alert_admin=True)
-            if task_get_task_param('stop_queue_on_error'):
-                task_update_status("ERROR")
-            else:
-                task_update_status("CERROR")
+        if callable(task_run_fnc) and task_run_fnc():
+            task_update_status("DONE")
+        elif task_get_task_param('email_logs_to'):
+            task_update_status("ERRORS REPORTED")
+        else:
+            task_update_status("DONE WITH ERRORS")
     finally:
         task_status = task_read_status()
         if sleeptime:
@@ -1011,7 +1030,7 @@ def _task_run(task_run_fnc):
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host='' WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['task_id']))
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s, host=%s WHERE id=%s", (new_runtime, verbose_argv, _TASK_PARAMS['host'], _TASK_PARAMS['task_id']))
                 write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
                 run_sql("UPDATE schTASK SET status='WAITING', progress=%s, host='' WHERE id=%s", (verbose_argv, _TASK_PARAMS['task_id'], ))

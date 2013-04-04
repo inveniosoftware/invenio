@@ -77,7 +77,7 @@ def get_javascript():
                     </script>
                     <script type="text/javascript" src="%(site_url)s/js/bibsched.js">
                     </script>
-                 """ % {'site_url':CFG_SITE_URL}
+                 """ % {'site_url': CFG_SITE_URL}
     return js_scripts
 
 def get_bibsched_tasks():
@@ -88,8 +88,8 @@ def get_bibsched_tasks():
     other_tasks = run_sql("SELECT id,proc,priority,user,runtime,status,progress\
                            FROM schTASK WHERE status IN ('RUNNING',\
                            'CONTINUING','SCHEDULED','ABOUT TO STOP',\
-                           'ABOUT TO SLEEP', 'DONE WITH ERRORS')")
-    return waiting_tasks + other_tasks
+                           'ABOUT TO SLEEP', 'DONE WITH ERRORS', 'ERRORS REPORTED')")
+    return other_tasks + waiting_tasks
 
 def get_bibsched_mode():
     """
@@ -110,12 +110,13 @@ def get_motd_msg():
     """
     Gets content from motd file
     """
+    from invenio.bibsched_monitor import CFG_MOTD_PATH
     motd_path = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
     try:
         motd_msg = open(motd_path).read().strip()
     except IOError:
         return ""
     if len(motd_msg) > 0:
-        return "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M",time.localtime(os.path.getmtime(motd_path))) + motd_msg
+        return "MOTD [%s] " % time.strftime("%Y-%m-%d %H:%M", time.localtime(os.path.getmtime(CFG_MOTD_PATH))) + motd_msg
     else:
         return ""

@@ -285,6 +285,7 @@ class WebInterfaceAdminPages(WebInterfaceDirectory):
     def index(self, req, form):
         return "FIXME: return /help/admin content"
     bibcirculation = WebInterfaceBibCirculationAdminPages()
+
     bibsched = WebInterfaceBibSchedPages()
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):

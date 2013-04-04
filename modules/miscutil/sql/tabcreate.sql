@@ -4002,6 +4002,13 @@ CREATE TABLE IF NOT EXISTS schTASK (
   KEY sequenceid (sequenceid)
 ) ENGINE=MyISAM;
 
+-- FIXME, To be moved to redis when available
+CREATE TABLE IF NOT EXISTS schSTATUS (
+  name varchar(50),
+  value mediumblob,
+  PRIMARY KEY (name)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS hstTASK (
   id int(15) unsigned NOT NULL,
   proc varchar(255) NOT NULL,

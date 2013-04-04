@@ -22,7 +22,10 @@
 __revision__ = "$Id$"
 
 import os
-from invenio.config import CFG_LOGDIR, CFG_PYLIBDIR
+import sys
+import time
+from invenio.config import CFG_LOGDIR, CFG_PYLIBDIR, CFG_INSPIRE_SITE, \
+                           CFG_BIBSCHED_LOGDIR
 
 # Which tasks are recognized as valid?
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
@@ -34,13 +37,41 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webauthorprofile", "selfcites")
 
 # Tasks that should be run as standalone task
-CFG_BIBTASK_MONOTASKS = ("bibupload", "dbdump", "inveniogc")
+if CFG_INSPIRE_SITE:
+    CFG_BIBTASK_MONOTASKS = ("dbdump", "inveniogc")
+else:
+    CFG_BIBTASK_MONOTASKS = ("bibupload", "dbdump", "inveniogc")
 
 # Tasks that should be run during fixed times
 CFG_BIBTASK_FIXEDTIMETASKS = ("oaiharvest", )
 
 # Task that should not be reinstatiated
 CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload', )
+
+## Default options for any bibtasks
+## This is then overridden by each specific BibTask in
+## CFG_BIBTASK_DEFAULT_TASK_SETTINGS
+CFG_BIBTASK_DEFAULT_GLOBAL_TASK_SETTINGS = {
+    'version': '',
+    'task_stop_helper_fnc': None,
+    'task_name': os.path.basename(sys.argv[0]),
+    'task_specific_name': '',
+    'task_id': 0,
+    'user': '',
+    # If the task is not initialized (usually a developer debugging
+    # a single method), output all messages.
+    'verbose': 9,
+    'sleeptime': '',
+    'runtime': time.strftime("%Y-%m-%d %H:%M:%S"),
+    'priority': 0,
+    'runtime_limit': None,
+    'profile': [],
+    'post-process': [],
+    'sequence-id':None,
+    'stop_queue_on_error': not CFG_INSPIRE_SITE,
+    'fixed_time': False,
+    'email_logs_to': [],
+    }
 
 ## Default options for each bibtasks
 # for each bibtask name are specified those settings that the bibtask expects
@@ -72,7 +103,6 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'stage_to_start_from': 1,
         'pretend': False,
         'force': False,
-        'stop_queue_on_error': True,
     },
     'bibindex': {
         'cmd': 'add',
@@ -120,3 +150,4 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
 }
 
 CFG_BIBTASK_TASKLETS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibsched_tasklets')
+CFG_BIBSCHED_LOGDIR = os.path.join(CFG_LOGDIR, CFG_BIBSCHED_LOGDIR)

@@ -34,6 +34,7 @@ try:
          CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
          write_message, write_messages
+    from invenio.bibtask_config import CFG_BIBSCHED_LOGDIR
     from invenio.access_control_mailcookie import mail_cookie_gc
     from invenio.bibdocfile import BibDoc
     from invenio.bibsched import gc_tasks
@@ -101,13 +102,13 @@ def clean_logs():
     vstr = task_get_option('verbose') > 1 and '-v' or ''
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -size 0c -exec rm %s -f {} \;' \
-            % (CFG_LOGDIR, vstr))
+            % (CFG_BIBSCHED_LOGDIR, vstr))
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (CFG_LOGDIR, CFG_MAX_ATIME_RM_LOG, vstr))
+            % (CFG_BIBSCHED_LOGDIR, CFG_MAX_ATIME_RM_LOG, vstr))
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (CFG_LOGDIR, CFG_MAX_ATIME_ZIP_LOG, vstr))
+            % (CFG_BIBSCHED_LOGDIR, CFG_MAX_ATIME_ZIP_LOG, vstr))
     write_message("""CLEANING OF LOG FILES FINISHED""")
 
 def clean_tempfiles():
