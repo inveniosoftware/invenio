@@ -742,7 +742,7 @@ def task_sleep_now_if_required(can_stop_too=False):
     if can_stop_too:
         runtime_limit = task_get_option("limit")
         if runtime_limit is not None:
-            if not (runtime_limit[0] <= time.time() <= runtime_limit[1]):
+            if not (runtime_limit[0] <= datetime.datetime.now() <= runtime_limit[1]):
                 write_message("stopped (outside runtime limit)")
                 task_update_status("STOPPED")
                 sys.exit(0)
@@ -924,13 +924,13 @@ def _task_run(task_run_fnc):
             (_TASK_PARAMS['task_id'], task_status), sys.stderr)
         return False
 
-    time_now = time.time()
+    time_now = datetime.datetime.now()
     if _TASK_PARAMS['runtime_limit'] is not None and os.environ.get('BIBSCHED_MODE', 'manual') != 'manual':
         if not _TASK_PARAMS['runtime_limit'][0][0] <= time_now <= _TASK_PARAMS['runtime_limit'][0][1]:
             if time_now <= _TASK_PARAMS['runtime_limit'][0][0]:
-                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_TASK_PARAMS['runtime_limit'][0][0]))
+                new_runtime = _TASK_PARAMS['runtime_limit'][0][0].strftime("%Y-%m-%d %H:%M:%S")
             else:
-                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_TASK_PARAMS['runtime_limit'][1][0]))
+                new_runtime = _TASK_PARAMS['runtime_limit'][1][0].strftime("%Y-%m-%d %H:%M:%S")
             progress = run_sql("SELECT progress FROM schTASK WHERE id=%s", (_TASK_PARAMS['task_id'], ))
             if progress:
                 progress = progress[0][0]

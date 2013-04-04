@@ -44,8 +44,9 @@ from invenio.bibrankadminlib import \
      tupletotable, \
      createhiddenform
 from invenio.dbquery import run_sql
+from invenio.oai_harvest_dblayer import get_holdingpen_day_size
 
-from invenio.oai_harvest_dblayer import  get_month_logs_size, \
+from invenio.oai_harvest_dblayer import get_month_logs_size, \
      get_history_entries_for_day, get_day_logs_size, get_entry_history, \
      get_entry_logs_size, get_holdingpen_entries, delete_holdingpen_entry, \
      get_holdingpen_years, get_holdingpen_month, get_holdingpen_year, \
@@ -235,10 +236,10 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
     if sets:
         sets.sort()
         # Show available sets to users
-        sets_specs = [set[0] for set in sets]
-        sets_labels = [((set[1] and set[0] + ' (' + set[1] + ')') or set[0]) \
-                       for set in sets]
-        sets_states = [ ((set[0] in oai_src_sets and 1) or 0) for set in sets]
+        sets_specs = [aset[0] for aset in sets]
+        sets_labels = [((aset[1] and aset[0] + ' (' + aset[1] + ')') or aset[0]) \
+                       for aset in sets]
+        sets_states = [ ((aset[0] in oai_src_sets and 1) or 0) for aset in sets]
         text += oaiharvest_templates.tmpl_admin_checkboxes(ln=ln,
                                                            title="Sets",
                                                            name="oai_src_sets",
@@ -389,11 +390,11 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
         if sets:
             sets.sort()
             # Show available sets to users
-            sets_specs = [set[0] for set in sets]
-            sets_labels = [((set[1] and set[0] + ' (' + set[1] + ')') or set[0]) \
-                           for set in sets]
-            sets_states = [ ((set[0] in oai_src_sets and 1) or 0) \
-                            for set in sets]
+            sets_specs = [aset[0] for aset in sets]
+            sets_labels = [((aset[1] and aset[0] + ' (' + aset[1] + ')') or aset[0]) \
+                           for aset in sets]
+            sets_states = [ ((aset[0] in oai_src_sets and 1) or 0) \
+                            for aset in sets]
             text += oaiharvest_templates.tmpl_admin_checkboxes(ln=ln,
                                                                title="Sets",
                                                                name="oai_src_sets",
@@ -614,9 +615,9 @@ def perform_request_viewtasklogs(ln, task_id):
     result += oaiharvest_templates.tmpl_output_menu(ln, None, guideurl)
 
     if log_name != None:
-        file = open(log_name)
-        content = file.read(-1)
-        file.close();
+        file_descriptor = open(log_name)
+        content = file_descriptor.read(-1)
+        file_descriptor.close();
         result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Log file : " + \
                                                               log_name, guideurl)
 
@@ -624,9 +625,9 @@ def perform_request_viewtasklogs(ln, task_id):
             oaiharvest_templates.tmpl_output_preformatted(content))
 
     if err_name != None:
-        file = open(err_name)
-        content = file.read(-1)
-        file.close();
+        file_descriptor = open(err_name)
+        content = file_descriptor.read(-1)
+        file_descriptor.close();
         result += oaiharvest_templates.tmpl_print_brs(ln, 2)
         result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Log file : " + \
                                                               err_name, guideurl)
@@ -1169,38 +1170,53 @@ def perform_request_accepthprecord(hpupdate_id):
 
 # new functions for the holding pen
 
-def perform_request_gethpyears(prefix, filter):
-    years = get_holdingpen_years(filter)
+def perform_request_gethpall(prefix, filter_key):
+    years = get_holdingpen_years(filter_key)
     result = ""
     for year in years:
-        result += "<li id=\"%s_%s_%s\"><span>Year %s (%s entries)</span> <ul id=\"%s_%s_%s_ul\"></ul></li>" % (prefix, str(year[0]), filter, str(year[0]), str(year[1]), prefix, str(year[0]), filter)
+        result += "<h1 id=\"%s_%s_%s\"><a href='#'>Year %s (%s entries)</a></h1><div>" % (prefix, str(year[0]), filter_key, str(year[0]), str(year[1]))
+        months = get_holdingpen_year(year[0], filter_key)
+        for month in months:
+            result += "<h2 id=\"%s_%s_%s_%s\"><a href='#'>%s-%s (%s entries)</a></h2><div>" % (prefix, year[0], str(month[0]), filter_key, year[0], str(month[0]), str(month[1]))
+            days = get_holdingpen_month(year[0], month[0], filter_key)
+            for day in days:
+                result += "<h3 id=\"%s_%s_%s_%s_%s\"><a href='#'>%s-%s-%s (%s entries)</a></h3><div></div>" % (prefix, year[0], month[0], str(day[0]), filter_key, year[0], month[0], str(day[0]), str(day[1]))
+            result += "</div>"
+        result += "</div>"
     return result
 
-def perform_request_gethpyear(prefix, year, filter):
-    months = get_holdingpen_year(year, filter)
+def perform_request_gethpyears(prefix, filter_key):
+    years = get_holdingpen_years(filter_key)
+    result = ""
+    for year in years:
+        result += "<li id=\"%s_%s_%s\"><span>Year %s (%s entries)</span> <ul id=\"%s_%s_%s_ul\"></ul></li>" % (prefix, str(year[0]), filter_key, str(year[0]), str(year[1]), prefix, str(year[0]), filter_key)
+    return result
+
+def perform_request_gethpyear(prefix, year, filter_key):
+    months = get_holdingpen_year(year, filter_key)
     result = ""
     for month in months:
-        result += "<li id=\"%s_%s_%s_%s\"><span>%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_ul\"></ul></li>" % (prefix, year, str(month[0]), filter, year, str(month[0]), str(month[1]), prefix, year, str(month[0]), filter)
+        result += "<li id=\"%s_%s_%s_%s\"><span>%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_ul\"></ul></li>" % (prefix, year, str(month[0]), filter_key, year, str(month[0]), str(month[1]), prefix, year, str(month[0]), filter_key)
     return result
 
-def perform_request_gethpmonth(prefix, year, month, filter):
-    days = get_holdingpen_month(year, month, filter)
+def perform_request_gethpmonth(prefix, year, month, filter_key):
+    days = get_holdingpen_month(year, month, filter_key)
     result = ""
     for day in days:
-        result += "<li id=\"%s_%s_%s_%s_%s\"><span>%s-%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_%s_ul\"></ul></li>" % (prefix, year, month, str(day[0]), filter, year, month, str(day[0]), str(day[1]), prefix, year, month, str(day[0]), filter)
+        result += "<li id=\"%s_%s_%s_%s_%s\"><span>%s-%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_%s_ul\"></ul></li>" % (prefix, year, month, str(day[0]), filter_key, year, month, str(day[0]), str(day[1]), prefix, year, month, str(day[0]), filter_key)
     return result
 
-def perform_request_gethpdayfragment(year, month, day, limit, start, filter):
-    data = get_holdingpen_day_fragment(year, month, day, limit, start, filter)
+def perform_request_gethpdayfragment(year, month, day, limit, start, filter_key):
+    data = get_holdingpen_day_fragment(year, month, day, limit, start, filter_key)
     return build_holdingpen_table(data, "en")
 
 
 def view_holdingpen_headers():
     return  oaiharvest_templates.tmpl_view_holdingpen_headers()
 
-def perform_request_view_holdingpen_tree(filter):
+def perform_request_view_holdingpen_tree(filter_key):
     return  oaiharvest_templates.tmpl_view_holdingpen_body(\
-                filter, perform_request_gethpyears("holdingpencontainer", filter))
+                filter_key, perform_request_gethpall("holdingpencontainer", filter_key))
 
 
 ##################################################################

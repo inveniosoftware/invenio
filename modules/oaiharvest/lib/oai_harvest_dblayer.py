@@ -164,62 +164,60 @@ def delete_holdingpen_entry(hpupdate_id):
     query = "DELETE FROM bibHOLDINGPEN WHERE changeset_id=%s"
     run_sql(query, (hpupdate_id, ))
 
-
-def get_holdingpen_day_fragment(year, month, day, limit, start, filter):
+def get_holdingpen_day_fragment(year, month, day, limit, start, filter_key):
     """
        returning the entries form the a particular day
     """
-   # query = "SELECT oai_id, changeset_date FROM bibHOLDINGPEN WHERE year(changeset_date) = '%i' and month(changeset_date) = '%i' and day(changeset_date) = '%i' ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, start, limit)
     filterSql = ""
-    if filter != "":
-        filterSql = " and oai_id like '%%%s%%' " % (filter, )
-    query = "SELECT oai_id, changeset_date, changeset_id FROM bibHOLDINGPEN WHERE changeset_date >= '%i-%i-%i 00:00:00' and changeset_date <= '%i-%i-%i 23:59:59' %s ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, year, month, day, filterSql, start, limit)
+    if filter_key != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter_key, )
+    query = "SELECT oai_id, changeset_date, changeset_id FROM bibHOLDINGPEN WHERE changeset_date > '%i-%i-%i 00:00:00' and changeset_date <= '%i-%i-%i 23:59:59' %s ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, year, month, day, filterSql, start, limit)
     query_results = run_sql(query)
     return query_results
 
-def get_holdingpen_day_size(year, month, day, filter):
+def get_holdingpen_day_size(year, month, day, filter_key):
     """
        returning the entries form the a particular day
     """
     filterSql = ""
-    if filter != "":
-        filterSql = " and oai_id like '%%%s%%' " % (filter, )
+    if filter_key != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter_key, )
     query = "SELECT count(*) FROM bibHOLDINGPEN WHERE year(changeset_date) = '%i' and month(changeset_date) = '%i' and day(changeset_date) = '%i' %s" % (year, month, day, filterSql)
     query_results = run_sql(query)
     return int(query_results[0][0])
 
 
-def get_holdingpen_month(year, month, filter):
+def get_holdingpen_month(year, month, filter_key):
     """
        Returning the statistics about the entries form a particular month
     """
     filterSql = ""
-    if filter != "":
-        filterSql = " and oai_id like '%%%s%%' " % (filter, )
+    if filter_key != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter_key, )
 
     query = "select day(changeset_date), count(*) from bibHOLDINGPEN where year(changeset_date) = '%i' and month(changeset_date) = '%i' %s group by day(changeset_date)" % (year, month, filterSql)
     return run_sql(query)
 
 
-def get_holdingpen_year(year, filter):
+def get_holdingpen_year(year, filter_key):
     """
     Returning the statistics about the entries from a particular year
     """
     filterSql = ""
-    if filter != "":
-        filterSql = " and oai_id like '%%%s%%' " % (filter, )
+    if filter_key != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter_key, )
     query = "select month(changeset_date), count(*) from bibHOLDINGPEN where year(changeset_date) = '%i' %s group by month(changeset_date)" % (year, filterSql)
     return run_sql(query)
 
 
 
-def get_holdingpen_years(filter):
+def get_holdingpen_years(filter_key):
     """
     Returning the particular years of records present in the holding pen
     """
     filterSql = ""
-    if filter != "":
-        filterSql = " where oai_id like '%%%s%%' " % (filter, )
+    if filter_key != "":
+        filterSql = " where oai_id like '%%%s%%' " % (filter_key, )
     query = "select year(changeset_date), count(*) changeset_date from bibHOLDINGPEN %s group by year(changeset_date)" % (filterSql,)
     results = run_sql(query)
     return results

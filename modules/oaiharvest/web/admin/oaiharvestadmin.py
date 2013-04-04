@@ -22,7 +22,6 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import datetime
-import math
 import urllib
 
 import invenio.oai_harvest_admin as oha
@@ -33,6 +32,7 @@ from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.bibrankadminlib import check_user
 from invenio.oai_harvest_dblayer import get_holdingpen_day_size
+from invenio.oai_harvest_admin import perform_request_gethpdayfragment
 
 def index(req, ln=CFG_SITE_LANG):
     """Main OAI Harvest admin page"""
@@ -498,67 +498,42 @@ def getHoldingPenData(req, elementId):
         getUid(req)
     except Error:
         return "unauthorised access !"
-    auth = check_user(req,'cfgoaiharvest')
+    auth = check_user(req, 'cfgoaiharvest')
     if auth[0]:
         return "unauthorised access !"
 
     elements = elementId.split("_")
     resultHtml = None
-    additionalData = None
 
     if len(elements) == 2:
-        filter = elements[1]
-        resultHtml =  oha.perform_request_gethpyears(elements[0], filter);
+        filter_key = elements[1]
+        resultHtml = oha.perform_request_gethpyears(elements[0], filter_key)
     elif len(elements) == 3:
         # only the year is specified
-        filter = elements[2]
+        filter_key = elements[2]
         nodeYear = int(elements[1])
-        resultHtml = oha.perform_request_gethpyear(elements[0], nodeYear, filter)
+        resultHtml = oha.perform_request_gethpyear(elements[0], nodeYear, filter_key)
 
     elif len(elements) == 4:
         # year and month specified
         nodeYear = int(elements[1])
         nodeMonth = int(elements[2])
-        filter = elements[3]
-        resultHtml = oha.perform_request_gethpmonth(elements[0], nodeYear, nodeMonth, filter)
+        filter_key = elements[3]
+        resultHtml = oha.perform_request_gethpmonth(elements[0], nodeYear, nodeMonth, filter_key)
 
     elif len(elements) == 5:
         # year, month and day specified - returning the entries themselves
         nodeYear = int(elements[1])
         nodeMonth = int(elements[2])
         nodeDay = int(elements[3])
-        filter = elements[4]
-        daySize = get_holdingpen_day_size(nodeYear, nodeMonth, nodeDay, filter);
-        resultHtml = """<li><div id="%s_pager"></div>&nbsp;</li>""" % (elementId,)
-        resultsPerPage = 20
-        numberOfPages = math.ceil(float(daySize) / resultsPerPage)
-        pages = []
-        urlFilter = urllib.quote(filter)
-        for i in range(0, numberOfPages):
-            pages += [
-            {
-              "baseurl": "%s/admin/oaiharvest/oaiharvestadmin.py/get_entries_fragment" % (CFG_SITE_URL, ),
-              "selector": False,
-              "type": "ajax",
-              "year" : nodeYear,
-              "month" : nodeMonth,
-              "day" : nodeDay,
-              "start": i * resultsPerPage,
-              "limit": resultsPerPage,
-              "filter": urlFilter
-            }]
-
-        additionalData = {
-               "pagerId": elementId + "_pager",
-               "pages" : pages
-           }
+        filter_key = elements[4]
+        daySize = get_holdingpen_day_size(nodeYear, nodeMonth, nodeDay, filter_key)
+        urlFilter = urllib.quote(filter_key)
+        resultHtml = perform_request_gethpdayfragment(nodeYear, nodeMonth, nodeDay, daySize, 0, urlFilter)
     else:
         # nothing of the above. error
         resultHtml = "Wrong request"
-
-    return json.dumps({"elementId": elementId, "html" : resultHtml, "additionalData" : additionalData})
-
-#        return "<li id=\"ajax_generated_li\"><span>Ajax generated position " + element_id + "</span><ul id=\"ble_ajaxgenerated_ul\"><li>element</li></ul></li>"
+    return json.dumps({"elementId": elementId, "html": resultHtml})
 
 def get_entries_fragment(req, year, month, day, start, limit, filter, pagerPrefix, pageNumber):
     """ Serve the request of getting only part of the result set """
@@ -571,14 +546,11 @@ def get_entries_fragment(req, year, month, day, start, limit, filter, pagerPrefi
         }
     auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
-        result["html"] = oha.perform_request_gethpdayfragment(int(year), int(month), int(day), int(limit), int(start), filter)
-        return json.dumps(result)
+        return oha.perform_request_gethpdayfragment(int(year), int(month), int(day), int(limit), int(start), filter_key)
     else:
         return "unauthorised access !"
 
-
-
-def viewholdingpen(req, filter = "", ln=CFG_SITE_LANG):
+def viewholdingpen(req, filter_key = "", ln=CFG_SITE_LANG):
     navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/oaiharvest/oaiharvestadmin.py">OAIHarvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
@@ -587,18 +559,18 @@ def viewholdingpen(req, filter = "", ln=CFG_SITE_LANG):
                     body=e,
                     uid=uid,
                     language=ln,
-                    navtrail = navtrail_previous_links,
+                    navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
     auth = check_user(req, 'cfgoaiharvest')
     if not auth[0]:
         return page(title="Holding Pen",
-                    metaheaderadd = oha.view_holdingpen_headers(),
-                    body = oha.perform_request_view_holdingpen_tree(filter),
-                    uid = uid,
-                    language = ln,
-                    req = req,
-                    navtrail = navtrail_previous_links,
-                    lastupdated = __lastupdated__)
+                    metaheaderadd=oha.view_holdingpen_headers(),
+                    body=oha.perform_request_view_holdingpen_tree(filter_key),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail=navtrail_previous_links,
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)

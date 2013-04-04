@@ -31,8 +31,23 @@ from mechanize import Browser
 from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio import webuser
 
-class WebSessionYourSettingsTest(unittest.TestCase):
+class IsUserSuperAdminTests(unittest.TestCase):
+    """Test functions related to the isUserSuperAdmin function."""
+    def setUp(self):
+        self.id_admin = run_sql('SELECT id FROM user WHERE nickname="admin"')[0][0]
+        self.id_hyde = run_sql('SELECT id FROM user WHERE nickname="hyde"')[0][0]
+
+    def test_isUserSuperAdmin_admin(self):
+        """webuser - isUserSuperAdmin with admin"""
+        self.failUnless(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_admin)))
+
+    def test_isUserSuperAdmin_hyde(self):
+        """webuser - isUserSuperAdmin with hyde"""
+        self.failIf(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_hyde)))
+
+class WebSessionYourSettingsTests(unittest.TestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def tearDown(self):
@@ -270,7 +285,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
 
 
 
-TEST_SUITE = make_test_suite(WebSessionYourSettingsTest)
+TEST_SUITE = make_test_suite(WebSessionYourSettingsTests, IsUserSuperAdminTests)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
