@@ -1210,6 +1210,7 @@ class Template:
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/batchuploader/metadata?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
                 if action == "cfgbibformat":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
+                if action == "cfgbibknowledge":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/kb?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibKnowledge"))
                 if action == "cfgoaiharvest":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/oaiharvest/oaiharvestadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure OAI Harvest"))

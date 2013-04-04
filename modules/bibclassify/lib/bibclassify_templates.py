@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ Some template variables are coming directly from the config
 module, those starting with CFG_BIBCLASSIFY_WEB....
 """
 
+import cgi
 from invenio import config
 from invenio.messages import gettext_set_language
 from urllib import quote
@@ -342,7 +343,7 @@ class Template:
             ln)
 
     def tmpl_href(self, keyword, ln):
-        return '<a href="%s" class="keyword %s %s">%s</a>' % (self.tmpl_search_link(keyword, ln), keyword.getType(), keyword.isComposite() and 'composite' or 'single', str(keyword))
+        return '<a href="%s" class="keyword %s %s">%s</a>' % (self.tmpl_search_link(keyword, ln), keyword.getType(), keyword.isComposite() and 'composite' or 'single', cgi.escape(str(keyword)))
 
 
     def tmpl_snippet_sorting_options(self, keywords,
