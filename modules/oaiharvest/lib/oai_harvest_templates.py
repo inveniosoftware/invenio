@@ -289,8 +289,8 @@ class Template:
         inner_text = self.tmpl_history_day_details_link(ln, date, oai_src_id)
         return self.tmpl_table_output_cell(inner_text, colspan=7)
 
-    def tmpl_output_checkbox(self, name, id, value):
-        return "<input type=\"checkbox\" id=\"" + id + "\"name=\"" + name + "\" value=\"" + value + "\" />"
+    def tmpl_output_checkbox(self, name, aid, value):
+        return "<input type=\"checkbox\" id=\"" + aid + "\"name=\"" + name + "\" value=\"" + value + "\" />"
 
     def tmpl_output_preformatted(self, content):
         return "<pre style=\"background-color: #eeeeee;\">" + content + "</pre>"
@@ -505,7 +505,7 @@ class Template:
                self.format_al_twodigits(datetime_obj.minute) + ":" + \
                self.format_al_twodigits(datetime_obj.second)
 
-    def tmpl_view_holdingpen_body(self, filter, content):
+    def tmpl_view_holdingpen_body(self, filter_key, content):
         return """<div>
     <form>
         <label>Show entries containing :</label>
@@ -513,15 +513,15 @@ class Template:
         <input type="submit" value="Show"></input>
     </form>
     </div>
-    <ul id="holdingpencontainer"> %s </ul>""" % (filter, content,)
-
+    <ul id="holdingpencontainer"> %s</ul>
+    """ % (filter_key, content,)
 
     def tmpl_view_holdingpen_headers(self):
         """
             returning the HTML headers necessary in order to open the view
             holdingpen page
         """
-        jquery_scripts = ["jquery.ui.core.js", "jquery.ui.widget.js",
+        jquery_scripts = ["jquery-ui.min.js",
                           "jquery-treeview/jquery.treeview.js",
                           "jquery-treeview/jquery.treeview.async.js",
                           "jquery.ajaxPager.js"]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,31 +19,14 @@
 
 """Unit tests for the user handling library."""
 
-__revision__ = "$Id$"
+# Note: unit tests located here were moved to the regression test
+# suite.  Keeping this file here with empty test case set in order to
+# overwrite any previously installed file.  Also, keeping TEST_SUITE
+# empty so that `inveniocfg --run-unit-tests' would not complain.
 
-import unittest
-
-from invenio import webuser
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.dbquery import run_sql
 
-class IsUserSuperAdminTests(unittest.TestCase):
-    """Test functions related to the isUserSuperAdmin function."""
-    def setUp(self):
-        self.id_admin = run_sql('SELECT id FROM user WHERE nickname="admin"')[0][0]
-        self.id_hyde = run_sql('SELECT id FROM user WHERE nickname="hyde"')[0][0]
-
-    def test_isUserSuperAdmin_admin(self):
-        """webuser - isUserSuperAdmin with admin"""
-        self.failUnless(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_admin)))
-
-    def test_isUserSuperAdmin_hyde(self):
-        """webuser - isUserSuperAdmin with hyde"""
-        self.failIf(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_hyde)))
-
-TEST_SUITE = make_test_suite(IsUserSuperAdminTests)
+TEST_SUITE = make_test_suite()
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
-

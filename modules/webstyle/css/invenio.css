@@ -3887,4 +3887,24 @@ div.bibcircbottom {
 
 /* end of Classes used for diff between two records */
 
+/* BibHarvest Holding Pen style*/
+#holdingpencontainer h1{
+    font-size:20px;
+}
+#holdingpencontainer h2{
+    font-size:16px;
+}
+#holdingpencontainer h3{
+    margin:0 0 10px 0;
+    border-bottom:none;
+}
+#holdingpencontainer > div > *{
+    margin-left:20px;
+}
+#holdingpencontainer > div > div > *{
+    margin-left:20px;
+}
+
+/* end od BibHarvest Holding Pen style*/
+
 /* end of invenio.css */
