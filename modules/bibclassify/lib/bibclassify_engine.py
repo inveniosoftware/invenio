@@ -37,6 +37,7 @@ import os
 import random
 import sys
 import time
+import cgi
 
 import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.engine")
@@ -53,6 +54,12 @@ except ImportError:
     ## Not in Invenio, we simply use default agent
     def make_user_agent_string(component=None):
         return bconfig.CFG_BIBCLASSIFY_USER_AGENT
+
+try:
+    from invenio.textutils import encode_for_xml
+except ImportError:
+    ## Not in Invenio, we use a simple workaround
+    encode_for_xml = lambda text: text.replace('&', '&amp;').replace('<', '&lt;')
 
 # ---------------------------------------------------------------------
 #                          API
@@ -377,15 +384,16 @@ def _output_marc(skw_matches, ckw_matches, author_keywords, acronyms, spires=Fal
     for keywords in (skw_matches, ckw_matches):
         if keywords and len(keywords):
             for kw, info in keywords:
-                output.append(kw_template % (tag, ind1, ind2, provenience,
-                                             kw.output(spires), len(info[0]), kw.getType()))
+                output.append(kw_template % (tag, ind1, ind2, encode_for_xml(provenience),
+                                             encode_for_xml(kw.output(spires)), len(info[0]),
+                                             encode_for_xml(kw.getType())))
 
     for field, keywords in ((auth_field, author_keywords), (acro_field, acronyms)):
         if keywords and len(keywords) and field: # field='' we shall not save the keywords
             tag, ind1, ind2 = _parse_marc_code(field)
             for kw, info in keywords.items():
-                output.append(kw_template % (tag, ind1, ind2, provenience,
-                                             kw, '', kw.getType()))
+                output.append(kw_template % (tag, ind1, ind2, encode_for_xml(provenience),
+                                             encode_for_xml(kw), '', encode_for_xml(kw.getType())))
 
 
     return "".join(output)
