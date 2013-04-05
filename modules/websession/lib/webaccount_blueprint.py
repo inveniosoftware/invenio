@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,19 +20,26 @@
 """WebAccount Flask Blueprint"""
 
 from werkzeug.urls import url_unquote
-from flask import render_template, request, flash, redirect, url_for, abort
+from flask import render_template, request, flash, redirect, url_for, g
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, \
-    CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import \
+    CFG_SITE_URL, \
+    CFG_SITE_SECURE_URL, \
+    CFG_ACCESS_CONTROL_LEVEL_SITE, \
+    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
+    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
+    CFG_OPENAIRE_SITE
 from invenio.access_control_config import \
     CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTH_LOGOUT_SSO
-
 from invenio import webuser
+from invenio.access_control_mailcookie import \
+    InvenioWebAccessMailCookieError, \
+    mail_cookie_check_authorize_action
 
-from invenio.webaccount_forms import LoginForm
+from invenio.webaccount_forms import LoginForm, RegisterForm
 from invenio.webuser_flask import login_user, logout_user, current_user
 from invenio.websession_webinterface import wash_login_method
 from invenio.webstat import register_customevent
@@ -124,6 +131,63 @@ def login(nickname=None, password=None, login_method=None, action='',
                               if "CFG_" == k[:4]))
 
     return render_template('webaccount_login.html', form=form)
+
+
+@blueprint.route('/register', methods=['GET', 'POST'])
+@blueprint.invenio_set_breadcrumb(_("Register"))
+@blueprint.invenio_force_https
+def register():
+    req = request.get_legacy_request()
+
+    # FIXME
+    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+        return webuser.page_not_authorized(req, "../youraccount/register?ln=%s" % g.ln,
+                                           navmenuid='youraccount')
+
+    form = RegisterForm(request.values, csrf_enabled=False)
+    #uid = current_user.get_id()
+
+    title = _("Register")
+    messages = []
+    state = ""
+
+    if form.validate_on_submit():
+        ruid = webuser.registerUser(req, form.email.data.encode('utf8'),
+                                    form.password.data.encode('utf8'),
+                                    form.nickname.data.encode('utf8'),
+                                    ln=g.ln)
+        if ruid == 0:
+            title = _("Account created")
+            messages.append(_("Your account has been successfully created."))
+            state = "success"
+            if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
+                messages.append(_("In order to confirm its validity, an email message containing an account activation key has been sent to the given email address."))
+                messages.append(_("Please follow instructions presented there in order to complete the account registration process."))
+            if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
+                messages.append(_("A second email will be sent when the account has been activated and can be used."))
+            elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT != 1:
+                user = User.query.filter(User.email == form.email.data.lower()).one()
+                login_user(user.get_id())
+                messages.append(_("You can now access your account."))
+        else:
+            title = _("Registration failure")
+            state = "danger"
+            if ruid == 5:
+                messages.append(_("Users cannot register themselves, only admin can register them."))
+            elif ruid == 6 or ruid == 1:
+                # Note, code 1 is used both for invalid email, and email sending
+                # problems, however the email address is validated by the form,
+                # so we only have to report a problem sending the email here
+                messages.append(_("The site is having troubles in sending you an email for confirming your email address."))
+                messages.append(_("The error has been logged and will be taken in consideration as soon as possible."))
+            else:
+                # Errors [-2, (1), 2, 3, 4] taken care of by form validation
+                messages.append(_("Internal error %s") % ruid)
+    elif request.method == 'POST':
+        state = "warning"
+
+    return render_template('webaccount_register.html', form=form, title=title,
+                           messages=messages, state=state)
 
 
 @blueprint.route('/logout', methods=['GET', 'POST'])

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,10 +17,11 @@
 
 templatesdir = $(sysconfdir)/templates
 templates_DATA = webgroup_index.html \
-		 webaccount_index.html \
-		 webaccount_edit.html \
-		 webaccount_login.html \
-		 webaccount_logout.html
+                 webaccount_index.html \
+                 webaccount_edit.html \
+                 webaccount_login.html \
+                 webaccount_logout.html \
+                 webaccount_register.html
 
 EXTRA_DIST = $(templates_DATA)
 
