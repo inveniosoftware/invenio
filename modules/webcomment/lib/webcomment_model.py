@@ -25,6 +25,7 @@ WebComment database models.
 from sqlalchemy import event
 from invenio.sqlalchemyutils import db
 from invenio.webcomment import get_reply_order_cache_data
+from invenio.webuser_flask import current_user
 
 # Create your models here.
 
@@ -154,6 +155,12 @@ class CmtSUBSCRIPTION(db.Model):
                 server_default='0001-01-01 00:00:00')
     bibrec = db.relationship(Bibrec)
     user = db.relationship(User, backref='comment_subscriptions')
+    user_commented_records = db.relationship(Bibrec,
+            backref='user_comment_subscritions',
+            primaryjoin=lambda: db.and_(
+                CmtSUBSCRIPTION.id_bibrec == Bibrec.id,
+                CmtSUBSCRIPTION.id_user == current_user.get_id()
+            ), viewonly=True)
 
 
 class CmtCOLLAPSED(db.Model):

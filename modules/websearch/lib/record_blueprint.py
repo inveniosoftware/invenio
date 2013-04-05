@@ -34,7 +34,6 @@ from invenio.sqlalchemyutils import db
 from invenio.websearch_model import Collection
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec
-from invenio.webcomment_model import CmtSUBSCRIPTION
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
                                   register_template_context_processor
 from invenio.webuser_flask import current_user
@@ -55,14 +54,6 @@ blueprint = InvenioBlueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
                              breadcrumbs=[])
                              #menubuilder=[('main.search', _('Search'),
                              #              'search.index', 1)])
-
-Bibrec.user_comment_subscritions = db.relationship(
-    CmtSUBSCRIPTION,
-    primaryjoin=lambda: db.and_(
-        CmtSUBSCRIPTION.id_bibrec==Bibrec.id,
-        CmtSUBSCRIPTION.id_user==current_user.get_id()
-    ),
-    viewonly=True)
 
 
 def request_record(f):
