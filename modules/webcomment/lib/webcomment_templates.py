@@ -1268,7 +1268,7 @@ class Template:
                        'title_label': _("Give a title to your review"),
                        'write_label': _("Write your review"),
                        'note_label': note_label,
-                       'note'      : note!='' and note or "",
+                       'note'      : note!='' and cgi.escape(note, quote=True) or "",
                        'msg'       : msg!='' and msg or "",
                        #'record'    : record_details
                        'add_review': show_title_p and ('<h2>'+_('Add review')+'</h2>') or '',
