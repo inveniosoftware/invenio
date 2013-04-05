@@ -110,6 +110,7 @@ import warnings
 try:
     from invenio.dbquery import run_sql
     from invenio.config import CFG_PREFIX
+    from invenio.webinterface_handler_flask import with_app_context
     HAS_INVENIO = True
 except ImportError:
     HAS_INVENIO = False
@@ -863,11 +864,11 @@ def cmd_upgrade_check(dummy_conf, upgrader=None):
         sys.exit(1)
 
 
+@with_app_context()
 def cmd_upgrade(dummy_conf, upgrader=None):
     """ Command for applying upgrades """
     from invenio.config import CFG_LOGDIR
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
-    from invenio.flaskshell import db
 
     logfilename = os.path.join(CFG_LOGDIR, 'invenio_upgrader.log')
     if not upgrader:
@@ -924,6 +925,7 @@ def cmd_upgrade(dummy_conf, upgrader=None):
         sys.exit(1)
 
 
+@with_app_context()
 def cmd_upgrade_show_pending(dummy_conf, upgrader=None):
     """ Command for showing upgrades ready to be applied """
     if not upgrader:
@@ -931,7 +933,7 @@ def cmd_upgrade_show_pending(dummy_conf, upgrader=None):
     logger = upgrader.get_logger()
 
     try:
-        from invenio.flaskshell import db
+        from invenio.sqlalchemyutils import db
     except ImportError:
         logger.error("make check-upgrade is unfortunately not supported for "
             "non-SQLAlchemy based Invenio installations")

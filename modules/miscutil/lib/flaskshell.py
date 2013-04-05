@@ -21,15 +21,17 @@
 This module implement a helper for interactive shell or commandline tools.
 """
 
-# STEP 1 - Import Invenio Flask Application constructor and database object.
-from invenio.webinterface_handler_flask import create_invenio_flask_app
-from invenio.sqlalchemyutils import db
+from flask import has_app_context
 
-# STEP 2 - Create application object and initialize database.
-app = create_invenio_flask_app()
+if not has_app_context():
+    # STEP 1 - Import Invenio Flask Application constructor and database object.
+    from invenio.webinterface_handler_flask import create_invenio_flask_app
 
-# STEP 3 - Create fake application request context and use it.
-ctx = app.test_request_context()
-ctx.push()
-# For explanation see: http://flask.pocoo.org/docs/shell/#firing-before-after-request
-app.preprocess_request()
+    # STEP 2 - Create application object and initialize database.
+    app = create_invenio_flask_app()
+
+    # STEP 3 - Create fake application request context and use it.
+    ctx = app.test_request_context()
+    ctx.push()
+    # For explanation see: http://flask.pocoo.org/docs/shell/#firing-before-after-request
+    app.preprocess_request()

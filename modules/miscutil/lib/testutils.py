@@ -122,7 +122,7 @@ def make_test_suite(*test_cases):
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in test_cases])
 
-from invenio.config import *
+#from invenio.config import *
 from invenio.dbquery import CFG_DATABASE_HOST, \
     CFG_DATABASE_PORT, \
     CFG_DATABASE_NAME, \
@@ -130,7 +130,8 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
     CFG_DATABASE_PASS, \
     CFG_DATABASE_TYPE, \
     CFG_DATABASE_SLAVE
-from invenio.webinterface_handler_flask import create_invenio_flask_app
+from invenio.webinterface_handler_flask import create_invenio_flask_app, \
+    with_app_context
 from invenio.sqlalchemyutils import db
 from flask.ext.testing import TestCase
 from sqlalchemy.engine.url import URL
@@ -213,6 +214,7 @@ def make_flask_test_suite(*test_cases):
 
 
 @nottest
+@with_app_context()
 def run_test_suite(testsuite, warn_user=False):
     """
     Convenience function to embed in test suites.  Run given testsuite
@@ -437,13 +439,13 @@ def merge_error_messages(error_messages):
     return out
 
 @nottest
+@with_app_context()
 def build_and_run_unit_test_suite():
     """
     Detect all Invenio modules with names ending by '*_unit_tests.py', build
     a complete test suite of them, and run it.
     Called by 'inveniocfg --run-unit-tests'.
     """
-
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_unit_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
@@ -534,14 +536,13 @@ def build_and_run_js_unit_test_suite():
     return exitcode
 
 @nottest
+@with_app_context()
 def build_and_run_regression_test_suite():
     """
     Detect all Invenio modules with names ending by
     '*_regression_tests.py', build a complete test suite of them, and
     run it.  Called by 'inveniocfg --run-regression-tests'.
     """
-
-    from invenio import flaskshell
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_regression_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))
@@ -566,7 +567,6 @@ def build_and_run_web_test_suite():
     '*_web_tests.py', build a complete test suite of them, and
     run it.  Called by 'inveniocfg --run-web-tests'.
     """
-    from invenio import flaskshell
     test_modules_map = PluginContainer(
         os.path.join(CFG_PYLIBDIR, 'invenio', '*_web_tests.py'),
         lambda plugin_name, plugin_code: getattr(plugin_code, "TEST_SUITE"))

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,72 +20,49 @@
 """
 Flask-sqlalchemy re-implementation of webuser.
 """
-from flask import Request, Flask, logging, session, request, g, url_for, current_app
-
-from invenio.config import \
-     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN, \
-     CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS, \
-     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-     CFG_SITE_ADMIN_EMAIL, \
-     CFG_SITE_LANG, \
-     CFG_SITE_NAME, \
-     CFG_SITE_NAME_INTL, \
-     CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_SECURE_URL, \
-     CFG_SITE_URL, \
-     CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, \
-     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-     CFG_CERN_SITE, \
-     CFG_INSPIRE_SITE, \
-     CFG_BIBAUTHORID_ENABLED, \
-     CFG_SITE_RECORD
-
-from invenio.cache import cache
-from invenio.messages import gettext_set_language, wash_languages, wash_language
-from invenio.mailutils import send_email
-from invenio.errorlib import register_exception
-from invenio.external_authentication import InvenioWebAccessExternalAuthError
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
-    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT
 
 from functools import wraps
-#from invenio.webinterface_handler_flask_utils import _
+from flask import session, request, url_for, current_app, has_request_context,\
+    _request_ctx_stack, abort, redirect
 from werkzeug.local import LocalProxy
 from werkzeug.datastructures import CallbackDict, CombinedMultiDict
-from flask import current_app, session, _request_ctx_stack, redirect, url_for,\
-                  request, flash, abort
+
+from invenio.cache import cache
+from invenio.config import \
+    CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
+    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, \
+    CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+    CFG_BIBAUTHORID_ENABLED
 
 CFG_USER_DEFAULT_INFO = {
-            'remote_ip' : '',
-            'remote_host' : '',
-            'referer' : '',
-            'uri' : '',
-            'agent' : '',
-            'uid' :-1,
-            'nickname' : '',
-            'email' : '',
-            'group' : [],
-            'guest' : '1',
-            'session' : None,
-            'precached_permitted_restricted_collections' : [],
-            'precached_usebaskets' : False,
-            'precached_useloans' : False,
-            'precached_usegroups' : False,
-            'precached_usealerts' : False,
-            'precached_usemessages' : False,
-            'precached_viewsubmissions' : False,
-            'precached_useapprove' : False,
-            'precached_useadmin' : False,
-            'precached_usestats' : False,
-            'precached_viewclaimlink' : False,
-            'precached_usepaperclaim' : False,
-            'precached_usepaperattribution' : False,
-            'precached_canseehiddenmarctags' : False,
-            'precached_sendcomments' : False,
-            }
+    'remote_ip': '',
+    'remote_host': '',
+    'referer': '',
+    'uri': '',
+    'agent': '',
+    'uid': -1,
+    'nickname': '',
+    'email': '',
+    'group': [],
+    'guest': '1',
+    'session': None,
+    'precached_permitted_restricted_collections': [],
+    'precached_usebaskets': False,
+    'precached_useloans': False,
+    'precached_usegroups': False,
+    'precached_usealerts': False,
+    'precached_usemessages': False,
+    'precached_viewsubmissions': False,
+    'precached_useapprove': False,
+    'precached_useadmin': False,
+    'precached_usestats': False,
+    'precached_viewclaimlink': False,
+    'precached_usepaperclaim': False,
+    'precached_usepaperattribution': False,
+    'precached_canseehiddenmarctags': False,
+    'precached_sendcomments': False,
+}
+
 
 class UserInfo(CombinedMultiDict):
 
@@ -110,22 +87,19 @@ class UserInfo(CombinedMultiDict):
 
         self.info = CallbackDict(data, on_update)
         #FIXME remove req after everybody start using flask request.
-        CombinedMultiDict.__init__(self, [self.req, self.info, acc, dict(CFG_USER_DEFAULT_INFO)])
+        CombinedMultiDict.__init__(self, [self.req, self.info, acc,
+                                          dict(CFG_USER_DEFAULT_INFO)])
         self.save()
-
 
     def get_key(self):
         """ Generates key for caching user information. """
         key = 'current_user::' + str(self.uid)
         return key
 
-
     def get_acc_key(self):
         """ Generates key for caching autorizations. """
-        key = 'current_user::' + str(self.uid) + \
-              '::' + str(request.remote_addr)
-        return key
-
+        remote_ip = str(request.remote_addr) if has_request_context() else '0'
+        return 'current_user::' + str(self.uid) + '::' + remote_ip
 
     def save(self):
         """
@@ -142,7 +116,8 @@ class UserInfo(CombinedMultiDict):
         data = self._login(self.uid, force=True)
         acc = self._precache(data, force=True)
         self.info.update(data)
-        CombinedMultiDict.__init__(self, [self.req, self.info, acc, dict(CFG_USER_DEFAULT_INFO)])
+        CombinedMultiDict.__init__(self, [self.req, self.info, acc,
+                                          dict(CFG_USER_DEFAULT_INFO)])
         self.save()
 
     def update_request_info(self):
@@ -152,14 +127,16 @@ class UserInfo(CombinedMultiDict):
         """
         Get request information.
         """
+
         #FIXME: we should support IPV6 too. (hint for FireRole)
         data = {}
-        data['remote_ip'] = request.remote_addr or ''
-        data['remote_host'] = request.environ.get('REMOTE_HOST', '')
-        data['referer'] = request.referrer
-        data['uri'] = request.environ['PATH_INFO'] or ''
-        data['agent'] = request.user_agent or 'N/A'
-        #data['session'] = session.sid
+        if has_request_context():
+            data['remote_ip'] = request.remote_addr or ''
+            data['remote_host'] = request.environ.get('REMOTE_HOST', '')
+            data['referer'] = request.referrer
+            data['uri'] = request.environ['PATH_INFO'] or ''
+            data['agent'] = request.user_agent or 'N/A'
+            #data['session'] = session.sid
         return data
 
     def _create_guest(self):
@@ -169,16 +146,15 @@ class UserInfo(CombinedMultiDict):
             from invenio.sqlalchemyutils import db
             from invenio.websession_model import User
             note = '1' if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0 else '0'
-            u = User(email = '', note = note, password='guest')
+            u = User(email='', note=note, password='guest')
             db.session.add(u)
             db.session.commit()
             data.update(u.__dict__)
         else:
             # Minimal information about user.
-            data['id'] = data['uid'] = 0
+            data['id'] = data['uid'] = -1
 
         return data
-
 
     def _login(self, uid, force=False):
         """
@@ -201,7 +177,7 @@ class UserInfo(CombinedMultiDict):
             data['note'] = user.note or ''
             data.update(user.settings or {})
             data['settings'] = user.settings or {}
-            data['guest'] = str(int(user.guest)) # '1' or '0'
+            data['guest'] = str(int(user.guest))  # '1' or '0'
             self.modified = True
         except:
             data = self._create_guest()
@@ -217,7 +193,7 @@ class UserInfo(CombinedMultiDict):
         # get autorization key
         acc_key = self.get_acc_key()
         acc = cache.get(acc_key)
-        if not force and acc is not None:
+        if not force and acc_key is not None and acc is not None:
             return acc
 
         #FIXME: acc_authorize_action should use flask request directly
@@ -225,10 +201,10 @@ class UserInfo(CombinedMultiDict):
         user_info.update(self.req)
 
         from invenio.webuser import isUserSubmitter, isUserReferee, \
-                                    isUserAdmin, isUserSuperAdmin
+            isUserAdmin, isUserSuperAdmin
         from invenio.access_control_engine import acc_authorize_action
         from invenio.access_control_admin import acc_get_role_id, \
-                                                 acc_is_user_in_role
+            acc_is_user_in_role
         from invenio.search_engine import get_permitted_restricted_collections
 
         data = {}
@@ -249,12 +225,12 @@ class UserInfo(CombinedMultiDict):
         usepaperattribution = False
         viewclaimlink = False
 
-        if (CFG_BIBAUTHORID_ENABLED
-            and acc_is_user_in_role(user_info, acc_get_role_id("paperclaimviewers"))):
+        if (CFG_BIBAUTHORID_ENABLED and acc_is_user_in_role(user_info,
+                                                            acc_get_role_id("paperclaimviewers"))):
             usepaperclaim = True
 
-        if (CFG_BIBAUTHORID_ENABLED
-            and acc_is_user_in_role(user_info, acc_get_role_id("paperattributionviewers"))):
+        if (CFG_BIBAUTHORID_ENABLED and acc_is_user_in_role(user_info,
+                                                            acc_get_role_id("paperattributionviewers"))):
             usepaperattribution = True
 
         viewlink = False
@@ -263,9 +239,7 @@ class UserInfo(CombinedMultiDict):
         except (KeyError, TypeError):
             pass
 
-        if (CFG_BIBAUTHORID_ENABLED
-            and usepaperattribution
-            and viewlink):
+        if (CFG_BIBAUTHORID_ENABLED and usepaperattribution and viewlink):
             viewclaimlink = True
 
 #                if (CFG_BIBAUTHORID_ENABLED
@@ -278,7 +252,7 @@ class UserInfo(CombinedMultiDict):
         data['precached_usepaperattribution'] = usepaperattribution
 
         cache.set(acc_key, data,
-                  timeout = CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT*3600)
+                  timeout=CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT*3600)
         return data
 
     def is_authenticated(self):
@@ -294,7 +268,7 @@ class UserInfo(CombinedMultiDict):
 
     @property
     def is_guest(self):
-        return True if self['email']=='' else False
+        return True if self['email'] == '' else False
 
     @property
     def is_admin(self):
@@ -305,11 +279,10 @@ class UserInfo(CombinedMultiDict):
         return self.get('precached_usesuperadmin', False)
 
     def get_id(self):
-        return self.get('id', None)
-
-
+        return self.get('id', -1)
 
 KEY_USER_ID = '_uid'
+
 
 class InvenioLoginManager(object):
 
@@ -326,6 +299,7 @@ class InvenioLoginManager(object):
     def setup_app(self, app):
         app.login_manager = self
         app.before_request(self._load_user)
+
         def save_user(response):
             current_user.save()
             return response
@@ -340,7 +314,9 @@ class InvenioLoginManager(object):
             return self.unauthorized_callback()
         if not self.login_view:
             abort(401)
-        return redirect(url_for(self.login_view, referer=request.url))
+        if has_request_context():
+            return redirect(url_for(self.login_view, referer=request.url))
+        return redirect(url_for(self.login_view))
 
     def _load_user(self):
         #FIXME add remember me
@@ -357,16 +333,18 @@ class InvenioLoginManager(object):
                 logout_user()
             else:
                 ctx.user = user
-        ctx.user.save() #.reload(update_session=True)
+        ctx.user.save()  # .reload(update_session=True)
 
-# A proxy for current user
+
 def _request_top_user():
+    """A proxy object of current user."""
     try:
         return _request_ctx_stack.top.user
     except:
         return UserInfo()
 
 current_user = LocalProxy(_request_top_user)
+
 
 def login_user(uid, remember_me=False, force=False):
     #FIXME: create user info from uid
@@ -392,4 +370,3 @@ def login_required(fn):
             return current_app.login_manager.unauthorized()
         return fn(*args, **kwargs)
     return decorated_view
-

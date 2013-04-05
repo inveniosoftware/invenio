@@ -24,11 +24,12 @@ import os
 from os.path import join
 from pprint import pformat
 from datetime import datetime
+from functools import wraps
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
 from flask import Flask, session, request, g, \
                 url_for, current_app, render_template, \
-                redirect, flash, abort
+                redirect, flash, abort, has_app_context
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError
 
@@ -134,7 +135,6 @@ def create_invenio_flask_app(**kwargs_config):
     from invenio.flask_sslify import SSLify
     from invenio.webinterface_handler_wsgi import application as legacy_application
     from invenio.webinterface_handler_wsgi import is_mp_legacy_publisher_path, \
-                                                  SimulatedModPythonRequest, \
                                                   mp_legacy_publisher
 
     # See note on Jinja2 string decoding using ASCII codec instead of UTF8 in
@@ -619,3 +619,28 @@ def create_invenio_flask_app(**kwargs_config):
         pass
 
     return _app
+
+
+def with_app_context(app=None, new_context=False, **kwargs_config):
+    """Run function within application context"""
+
+    def get_application():
+        if app is None:
+            application = create_invenio_flask_app(**kwargs_config)
+        elif not isinstance(app, Flask) and callable(app):
+            application = app(**kwargs_config)
+        return application
+
+    def decorator(f):
+        @wraps(f)
+        def decorated_func(*args, **kwargs):
+            """This function has to run within application context."""
+
+            if not has_app_context() or new_context:
+                with get_application().app_context():
+                    result = f(*args, **kwargs)
+            else:
+                result = f(*args, **kwargs)
+            return result
+        return decorated_func
+    return decorator

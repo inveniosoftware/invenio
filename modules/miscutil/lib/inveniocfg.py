@@ -771,32 +771,33 @@ def cli_cmd_load_webstat_conf(conf):
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
     print ">>> Going to drop tables and related data on filesystem ..."
-    from invenio import flaskshell
+    from invenio.webinterface_handler_flask import with_app_context
 
-    from invenio.config import CFG_PREFIX
-    from invenio.textutils import wrap_text_in_a_box, wait_for_user
-    from invenio.webstat import destroy_customevents
-    wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
-your database tables and related data on filesystem!"""))
-    msg = destroy_customevents()
-    if msg:
-        print msg
+    @with_app_context()
+    def run():
+        from invenio.textutils import wrap_text_in_a_box, wait_for_user
+        from invenio.webstat import destroy_customevents
+        wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
+    your database tables and related data on filesystem!"""))
+        msg = destroy_customevents()
+        if msg:
+            print msg
 
-    import shutil
-    from invenio.sqlalchemyutils import db
-    from invenio.bibdocfile import _make_base_dir
-    from sqlalchemy import event
+        from invenio.sqlalchemyutils import db
+        from invenio.bibdocfile import _make_base_dir
+        from sqlalchemy import event
 
-    def bibdoc_before_drop(target, connection, **kw):
-        for (docid,) in db.session.query(target.c.id).all():
-            directory = _make_base_dir(docid)
-            if os.path.isdir(directory):
-                shutil.rmtree(directory)
+        def bibdoc_before_drop(target, connection_dummy, **kw_dummy):
+            for (docid,) in db.session.query(target.c.id).all():
+                directory = _make_base_dir(docid)
+                if os.path.isdir(directory):
+                    shutil.rmtree(directory)
 
-    from invenio.bibedit_model import Bibdoc
-    event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
+        from invenio.bibedit_model import Bibdoc
+        event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
 
-    db.drop_all()
+        db.drop_all()
+    run()
     print ">>> Tables dropped successfully."
 
 def cli_cmd_create_demo_site(conf):

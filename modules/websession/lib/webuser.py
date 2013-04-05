@@ -1148,7 +1148,7 @@ def collect_user_info(req, login_time=False, refresh=False):
     setApacheUser & setUid will properly reset it.
     """
 
-    if type(req) in [long, int]:
+    if type(req) in [long, int] or req is None:
         from invenio.webuser_flask import UserInfo
         return UserInfo(req)
 
