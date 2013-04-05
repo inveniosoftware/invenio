@@ -6524,7 +6524,10 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
         ## build lists within one iteration
         for (val, freq) in valuefreqdict.iteritems():
             f.append(-1 * freq)
-            n.append(displaytmp[val] if val in displaytmp else val)
+            if val in displaytmp:
+                n.append(displaytmp[val])
+            else:
+                n.append(val)
             ln.append(val.lower())
         ## sort by frequency (desc) and then by lowercased name.
         return [(n[i], -1 * f[i]) for i in numpy.lexsort([ln, f])]
