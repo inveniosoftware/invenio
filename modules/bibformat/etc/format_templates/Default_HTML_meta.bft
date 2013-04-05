@@ -25,7 +25,10 @@
 <BFE_META tag="245__a" tag_name="title" name="og:title" protocol="opengraph"/>
 <BFE_META tag="980__a" tag_name="collection" name="og:type" kb="DBCOLLID2OPENGRAPHTYPE" kb_default_output="website" protocol="opengraph"/>
 <BFE_META var="recurl" name="og:url" protocol="opengraph"/>
-<BFE_META_OPENGRAPH_VIDEO />
 <BFE_META_OPENGRAPH_IMAGE />
+<BFE_META_OPENGRAPH_VIDEO />
 <BFE_META var="CFG_SITE_NAME" name="og:site_name" protocol="opengraph"/>
 <BFE_META tag="520__a" tag_name="abstract" name="og:description" protocol="opengraph"/>
+
+<!-- Twitter Card -->
+<BFE_META tag="980__a" name="twitter:card" kb="DBCOLLID2TWITTERCARDTYPE" kb_default_output="summary" protocol="opengraph"/>
