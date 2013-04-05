@@ -272,10 +272,36 @@ Contents
         - a library for MP3 encoding
           <http://lame.sourceforge.net/>
 
-   Note that the configure script checks whether you have all the
-   prerequisite software installed and that it won't let you continue
-   unless everything is in order.  It also warns you if it cannot find
-   some optional but recommended software.
+     o) (recommended) RabbitMQ is a message broker used by Celery for running
+        a distributed task queue <http://www.rabbitmq.com/download.html>.
+
+        - Install
+            sudo aptitude install rabbitmq-server
+
+        - Enable web interface
+            sudo rabbitmq-plugins enable rabbitmq_management
+
+        - Add user and vhost
+            sudo rabbitmqctl add_user myuser mypassword
+            sudo rabbitmqctl add_vhost myvhost
+            sudo rabbitmqctl set_permissions -p myvhost myuser ".*" ".*" ".*"
+
+        - Allow Web UI login
+            sudo rabbitmqctl set_user_tags myuser management
+
+        - Change default user password
+            sudo rabbitmqctl change_password guest guest
+            sudo service rabbitmq-server restart
+
+        - Starting Celery worker (after Invenio is installed):
+            celery worker -A invenio -l info -B -E
+
+        - Starting Flower (monitoring web interface, requires Python 2.6):
+            pip install flower
+            flower --port=5555
+
+            http://localhost:55672 (RabbitMQ web admin)
+            http://localhost:5555 (Flower UI)
 
 
 1. Quick instructions for the impatient Invenio admin

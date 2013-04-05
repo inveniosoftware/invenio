@@ -27,6 +27,10 @@ pylib_DATA = __init__.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
              flask_sslify.py \
+             celery.py \
+             celery_config.py \
+             celery_unit_tests.py \
+             celery_tasks.py \
              data_cacher.py \
              database_manager.py \
              dbdump.py \
@@ -112,6 +116,7 @@ pylib_DATA = __init__.py \
              sherpa_romeo_testing.py \
              orcid.py \
              xmlDict.py
+
 
 jsdir=$(localstatedir)/www/js
 
