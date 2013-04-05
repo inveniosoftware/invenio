@@ -802,6 +802,7 @@ def open_marc_file(path):
         else:
             task_update_status("ERROR")
         sys.exit(1)
+
     return marc
 
 def xml_marc_to_records(xml_marc):
@@ -2781,9 +2782,20 @@ def task_submit_check_options():
         write_message("Please specify at least one update/insert mode!")
         return False
 
-    if task_get_option('file_path') is None:
+    file_path = task_get_option('file_path')
+    if file_path is None:
         write_message("Missing filename! -h for help.")
         return False
+
+    try:
+        open(file_path).read().decode('utf-8')
+    except IOError:
+        print >> sys.stderr, """File is not accessible: %s""" % file_path
+        return False
+    except UnicodeDecodeError:
+        print >> sys.stderr, """File encoding is not valid utf-8: %s""" % file_path
+        return False
+
     return True
 
 def writing_rights_p():
