@@ -17,55 +17,78 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Invenio import helper functions."""
+"""
+Invenio import helper functions.
 
-from __future__ import absolute_import
+Usage example:
+  autodiscover_modules(['invenio'], '.+_tasks\.py')
+
+An import difference from pluginutils is that modules are imported in their
+package hierarchy, contrary to pluginutils where modules are imported as
+standalone Python modules.
+"""
 
 import imp
-import importlib
-import itertools
-import glob
 import os
+import re
 
 _RACE_PROTECTION = False
 
 
-def autodiscover_modules(packages, related_name_glob='*_tasks.py'):
+def autodiscover_modules(packages, related_name_re='*.py'):
     """
-    Autodiscover function follows the pattern used by Celery itself.
+    Autodiscover function follows the pattern used by Celery.
+
+    @param packages: List of package names to auto discover modules in.
+    @type packages: list of str
+    @param related_name_re: Regular expression used to match modules names.
+    @type related_name_re: str
     """
     global _RACE_PROTECTION
 
     if _RACE_PROTECTION:
         return
     _RACE_PROTECTION = True
+    modules = []
     try:
-        return list(
-            itertools.chain.from_iterable(
-                filter(
-                    lambda x: x is not None,
-                    [find_related_modules(pkg, related_name_glob)
-                     for pkg in packages]
-                )
-            ))
-    finally:
+        tmp = [find_related_modules(pkg, related_name_re) for pkg in packages]
+
+        for l in tmp:
+            for m in l:
+                if m is not None:
+                    modules.append(m)
+    # Workaround for finally-statement
+    except:
         _RACE_PROTECTION = False
+        raise
+    _RACE_PROTECTION = False
+    return modules
 
 
-def find_related_modules(package, related_name_glob):
-    """Given a package name and a module name, tries to find that
-    module."""
+def find_related_modules(package, related_name_re='(.+)\.py'):
+    """Given a package name and a module name pattern, tries to find matching
+    modules."""
+    package_elements = package.rsplit(".", 1)
     try:
-        pkg_path = importlib.import_module(package).__path__
+        if len(package_elements) == 2:
+            pkg = __import__(package_elements[0], globals(), locals(), [package_elements[1]])
+            pkg = getattr(pkg, package_elements[1])
+        else:
+            pkg = __import__(package_elements[0], globals(), locals(), [])
+        pkg_path = pkg.__path__
     except AttributeError:
         return
 
     # Find all modules named according to related_name
-    candidates = [os.path.basename(m)[:-3] for m in glob.glob(
-                  os.path.join(pkg_path[0], related_name_glob)
-                  )]
-
+    p = re.compile(related_name_re)
+    candidates = []
+    for name in os.listdir(pkg_path[0]):
+        name = os.path.basename(name)
+        if p.match(name):
+            # Remove .py from name
+            candidates.append(name[:-3])
     modules = []
+
     for related_name in candidates:
         modules.append(import_related_module(package, pkg_path, related_name))
 
@@ -83,4 +106,7 @@ def import_related_module(package, pkg_path, related_name):
     except ImportError:
         return
 
-    return importlib.import_module('{0}.{1}'.format(package, related_name))
+    return getattr(
+        __import__('%s' % (package), globals(), locals(), [related_name]),
+        related_name
+    )

@@ -89,7 +89,8 @@ pylib_DATA = __init__.py \
              sequtils.py \
              sequtils_regression_tests.py \
              crossrefutils.py \
-             importutils.py
+             importutils.py \
+             importutils_unit_tests.py
 
 jsdir=$(localstatedir)/www/js
 
