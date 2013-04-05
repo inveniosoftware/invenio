@@ -321,6 +321,10 @@ def is_user_owner_of_record(user_info, recid):
         email = email_or_group.strip().lower()
         if user_info['email'].strip().lower() == email:
             return True
+        if CFG_CERN_SITE:
+            #the egroup might be in the form egroup@cern.ch
+            if email_or_group.replace('@cern.ch', ' [CERN]') in user_info['group']:
+                return True
     return False
 
 ###FIXME: This method needs to be refactorized
