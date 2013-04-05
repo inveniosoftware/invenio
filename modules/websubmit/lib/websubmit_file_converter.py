@@ -1359,7 +1359,18 @@ def execute_command(*args, **argd):
     """Wrapper to run_process_with_timeout."""
     get_file_converter_logger().debug("Executing: %s" % (args, ))
     args = [str(arg) for arg in args]
-    res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), filename_err=argd.get('filename_err'), sudo=argd.get('sudo'))
+    sudo = argd.get('sudo') or None
+    if sudo:
+        pass
+        # May be forbidden by sudo
+        # args = ['CFG_OPENOFFICE_TMPDIR="%s"' % CFG_OPENOFFICE_TMPDIR] + args
+    else:
+        os.putenv('CFG_OPENOFFICE_TMPDIR', CFG_OPENOFFICE_TMPDIR)
+    res, stdout, stderr = run_process_with_timeout(args,
+                                        cwd=argd.get('cwd'),
+                                        filename_out=argd.get('filename_out'),
+                                        filename_err=argd.get('filename_err'),
+                                        sudo=sudo)
     get_file_converter_logger().debug('res: %s, stdout: %s, stderr: %s' % (res, stdout, stderr))
     if res != 0:
         message = "ERROR: Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr)
