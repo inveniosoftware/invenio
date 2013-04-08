@@ -1178,7 +1178,12 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47, 118],
                          perform_request_search(p='ellis'))
 
-    def test_search_engine_python_api_ignore_paging_parameter(self):
+    def test_search_engine_python_api_for_successful_query_format_intbitset(self):
+        """websearch - search engine Python API for successful query, output format intbitset"""
+        self.assertEqual(intbitset([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47, 118]),
+                         perform_request_search(p='ellis', of='intbitset'))
+
+    def test_search_engine_web_api_ignore_paging_parameter(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47, 118],
                          perform_request_search(p='ellis', rg=5, jrec=3))
@@ -1202,10 +1207,20 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
         self.assertEqual([8],
                          perform_request_search(recid=8))
 
+    def test_search_engine_python_api_for_existing_record_format_intbitset(self):
+        """websearch - search engine Python API for existing record, output format intbitset"""
+        self.assertEqual(intbitset([8]),
+                         perform_request_search(recid=8, of='intbitset'))
+
     def test_search_engine_python_api_for_nonexisting_record(self):
         """websearch - search engine Python API for non-existing record"""
         self.assertEqual([],
                          perform_request_search(recid=16777215))
+
+    def test_search_engine_python_api_for_nonexisting_record_format_intbitset(self):
+        """websearch - search engine Python API for non-existing record, output format intbitset"""
+        self.assertEqual(intbitset(),
+                         perform_request_search(recid=16777215, of='intbitset'))
 
     def test_search_engine_python_api_for_nonexisting_collection(self):
         """websearch - search engine Python API for non-existing collection"""
@@ -1909,6 +1924,11 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns&of=id',
                                                expected_text="[]"))
 
+    def test_search_engine_web_api_for_failed_query_format_intbitset(self):
+        """websearch - search engine Web API for failed query, output format intbitset"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns&of=intbitset',
+                                               expected_text=intbitset().fastdump()))
 
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
@@ -1938,6 +1958,10 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&sf=909C4v',
                                                username="admin",
                                                expected_text="[77, 85, 84]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=intbitset&sf=909C4v',
+                                               username="admin",
+                                               expected_text=intbitset([77, 84, 85]).fastdump()))
 
     def test_search_engine_web_api_respect_ranking_parameter(self):
         """websearch - search engine Web API for successful query, respect ranking parameters"""
@@ -1955,6 +1979,10 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
                                                username="admin",
                                                expected_text="[85, 77, 84]"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=intbitset&rm=citation',
+                                               username="admin",
+                                               expected_text=intbitset([77, 84, 85]).fastdump()))
 
     def test_search_engine_web_api_for_existing_record(self):
         """websearch - search engine Web API for existing record"""

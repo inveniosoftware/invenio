@@ -317,7 +317,9 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
         # mod_python does not like to return [] in case when of=id:
         out = perform_request_search(req, **argd)
-        if out == []:
+        if isinstance(out, intbitset):
+            return out.fastdump()
+        elif out == []:
             return str(out)
         else:
             return out
@@ -406,7 +408,9 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
         # mod_python does not like to return [] in case when of=id:
         out = perform_request_search(req, **argd)
-        if out == []:
+        if isinstance(out, intbitset):
+            return out.fastdump()
+        elif out == []:
             return str(out)
         else:
             return out
@@ -519,7 +523,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
         # mod_python does not like to return [] in case when of=id:
         out = perform_request_search(req, **argd)
-        if out == []:
+        if isinstance(out, intbitset):
+            return out.fastdump()
+        elif out == []:
             return str(out)
         else:
             return out
@@ -581,7 +587,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
         # mod_python does not like to return [] in case when of=id:
         out = perform_request_search(req, **argd)
-        if out == []:
+        if isinstance(out, intbitset):
+            return out.fastdump()
+        elif out == []:
             return str(out)
         else:
             return out
@@ -1132,7 +1140,9 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
 
         # mod_python does not like to return [] in case when of=id:
         out = perform_request_search(req, **argd)
-        if out == []:
+        if isinstance(out, intbitset):
+            return out.fastdump()
+        elif out == []:
             return str(out)
         else:
             return out

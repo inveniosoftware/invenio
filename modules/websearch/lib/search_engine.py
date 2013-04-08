@@ -937,6 +937,9 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
         # we are doing plain text output:
         req.content_type = "text/plain"
         req.send_http_header()
+    elif of == "intbitset":
+        req.content_type = "application/octet-stream"
+        req.send_http_header()
     elif of == "id":
         pass # nothing to do, we shall only return list of recIDs
     elif content_type == 'text/html':
@@ -1036,6 +1039,8 @@ def page_end(req, of="hb", ln=CFG_SITE_LANG, em=""):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of == "id":
         return [] # empty recID list
+    if of == "intbitset":
+        return intbitset()
     if not req:
         return # we were called from CLI
     if of.startswith('h'):
@@ -3878,7 +3883,7 @@ for sorting_method in sorting_methods:
         cache_sorted_data[sorting_method] = BibSortDataCacher(sorting_method)
 
 
-def get_tags_form_sort_fields(sort_fields):
+def get_tags_from_sort_fields(sort_fields):
     """Given a list of sort_fields, return the tags associated with it and
     also the name of the field that has no tags associated, to be able to
     display a message to the user."""
@@ -3958,7 +3963,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                 #use BibSort
                 return sort_records_bibsort(req, recIDs, sort_method, sort_field, sort_order, verbose, of, ln, rg, jrec)
     #deduce sorting MARC tag out of the 'sort_field' argument:
-    tags, error_field = get_tags_form_sort_fields(sort_fields)
+    tags, error_field = get_tags_from_sort_fields(sort_fields)
     if error_field:
         if use_sorting_buckets:
             return sort_records_bibsort(req, recIDs, 'latest first', sort_field, sort_order, verbose, of, ln, rg, jrec)
@@ -4077,7 +4082,7 @@ def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_p
     if not tags:
         # tags have not been camputed yet
         sort_fields = string.split(sort_field, ",")
-        tags, error_field = get_tags_form_sort_fields(sort_fields)
+        tags, error_field = get_tags_from_sort_fields(sort_fields)
         if error_field:
             if of.startswith('h'):
                 write_warning(_("Sorry, %s does not seem to be a valid sort option. The records will not be sorted.") % cgi.escape(error_field), "Error", req=req)
@@ -5129,7 +5134,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                HTML output (and "hb" for HTML brief, "hd" for HTML
                detailed), "x" means XML output, "t" means plain text
                output, "id" means no output at all but to return list
-               of recIDs found.  (Suitable for high-level API.)
+               of recIDs found, "intbitset" means to return an intbitset
+               representation of the recIDs found (no sorting or ranking
+               will be performed).  (Suitable for high-level API.)
 
           ot - output only these MARC tags (e.g. "100,700,909C0b").
                Useful if only some fields are to be shown in the
@@ -5325,6 +5332,8 @@ def prs_wash_arguments_colls(kwargs=None, of=None, req=None, cc=None, c=None, sc
             return ''
         elif of == "id":
             return []
+        elif of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5483,8 +5492,12 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
     if record_exists(recid):
         if recidb <= recid: # sanity check
             recidb = recid + 1
-        if of == "id":
-            return [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
+        if of in ["id", "intbitset"]:
+            result = [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
+            if of == "intbitset":
+                return intbitset(result)
+            else:
+                return result
         else:
             print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose,
                           tab=tab, sf=sf, so=so, sp=sp, rm=rm, em=em)
@@ -5494,6 +5507,8 @@ def prs_detailed_record(kwargs=None, req=None, of=None, cc=None, aas=None, ln=No
     else: # record does not exist
         if of == "id":
             return []
+        elif of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5562,6 +5577,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                 write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []
+        if of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5586,6 +5603,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                               search_pattern=p, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm, em=em)
             elif of == "id":
                 return results_similar_recIDs
+            elif of == "intbitset":
+                return intbitset(results_similar_recIDs)
             elif of.startswith("x"):
                 print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
                               results_similar_relevances, results_similar_relevances_prologue,
@@ -5599,6 +5618,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                     write_warning(results_similar_comments, req=req)
                 if of == "id":
                     return []
+                elif of == "intbitset":
+                    return intbitset()
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
@@ -5626,6 +5647,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
             write_warning(_("Requested record does not seem to exist."), req=req)
         if of == "id":
             return []
+        elif of == "intbitset":
+            return intbitset()
         elif of.startswith("x"):
             # Print empty, but valid XML
             print_records_prologue(req, of)
@@ -5646,6 +5669,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
                               sf=sf, so=so, sp=sp, rm=rm, em=em)
             elif of == "id":
                 return results_cocited_recIDs
+            elif of == "intbitset":
+                return intbitset(results_cocited_recIDs)
             elif of.startswith("x"):
                 print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose,
                               sf=sf, so=so, sp=sp, rm=rm, em=em)
@@ -5655,6 +5680,8 @@ def prs_search_cocitedwith(kwargs=None, req=None, of=None, cc=None, pl_in_url=No
                     write_warning("nothing found", req=req)
                 if of == "id":
                     return []
+                elif of == "intbitset":
+                    return intbitset()
                 elif of.startswith("x"):
                     # Print empty, but valid XML
                     print_records_prologue(req, of)
@@ -6041,7 +6068,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     write_warning(results_final_relevances_prologue, req=req)
                     write_warning(results_final_relevances_epilogue, req=req)
             elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
-                results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg=None, jrec=None)
+                results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
 
             if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
                 results_final_colls.append(results_final_recIDs)
@@ -6286,7 +6313,10 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
             if coll not in colls_to_search:
                 colls_to_search.append(coll)
         # print results overview:
-        if of == "id":
+        if of == "intbitset":
+            #return the result as an intbitset
+            return results_final_for_all_selected_colls
+        elif of == "id":
             # we have been asked to return list of recIDs
             recIDs = list(results_final_for_all_selected_colls)
             if rm: # do we have to rank?
