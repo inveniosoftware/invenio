@@ -60,6 +60,7 @@ pylib_DATA = __init__.py \
              urlutils_unit_tests.py \
              w3c_validator.py \
              importutils.py \
+             importutils_unit_tests.py \
              intbitset_unit_tests.py \
              intbitset_helper.py \
              inveniocfg.py \
@@ -105,9 +106,7 @@ pylib_DATA = __init__.py \
              sherpa_romeo.py \
              sherpa_romeo_testing.py \
              orcid.py \
-             xmlDict.py \
-             importutils.py \
-             importutils_unit_tests.py
+             xmlDict.py
 
 jsdir=$(localstatedir)/www/js
 
