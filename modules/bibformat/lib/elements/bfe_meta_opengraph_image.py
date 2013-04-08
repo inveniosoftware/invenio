@@ -23,7 +23,7 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_CERN_SITE
 from invenio.bibdocfile import BibRecDocs, get_superformat_from_format
 from invenio.config import CFG_WEBSEARCH_ENABLE_OPENGRAPH
 
-def format_element(bfo, max_photos='', one_icon_per_bibdoc='yes', twitter_card_type='photo'):
+def format_element(bfo, max_photos='', one_icon_per_bibdoc='yes', twitter_card_type='photo', use_webjournal_featured_image='no'):
     """Return an image of the record, suitable for the Open Graph protocol.
 
     Will look for any icon stored with the record, and will fallback to any
@@ -35,6 +35,7 @@ def format_element(bfo, max_photos='', one_icon_per_bibdoc='yes', twitter_card_t
     @param max_photos: the maximum number of photos to display
     @param one_icon_per_bibdoc: shall we keep just one icon per bibdoc in the output (not repetition of same preview in multiple sizes)?
     @param twitter_card_type: the type of Twitter card: 'photo' (single photo) or 'gallery'. Fall back to 'photo' if not enough pictures for a 'gallery'.
+    @param use_webjournal_featured_image: if 'yes', use the "featured image" (as defined in bfe_webjournal_articles_overview) as image for the Twitter Card
     """
     if not CFG_WEBSEARCH_ENABLE_OPENGRAPH:
         return ""
@@ -80,6 +81,21 @@ def format_element(bfo, max_photos='', one_icon_per_bibdoc='yes', twitter_card_t
     tags = ['<meta property="og:image" content="%s" />%s' % (image_url, image_url != image_secure_url and '\n<meta property="og:image:secure_url" content="%s" />' % image_secure_url or "") for image_url, image_secure_url, image_size in images]
 
     # Twitter Card
+
+    if use_webjournal_featured_image.lower() == 'yes':
+        # First look for the prefered image, if available. Note that
+        # it might be a remote one.
+        try:
+            from invenio.bibformat_elements import bfe_webjournal_articles_overview
+            image_url = bfe_webjournal_articles_overview._get_feature_image(bfo)
+            image_secure_url = image_url.replace('http:', 'https:')
+            image_size = 500 * 1024 # TODO: check for real image size
+            if image_url.strip():
+                images.insert(0, (image_url, image_secure_url, image_size))
+        except:
+            pass
+
+    # Filter out images that would not be compatible
     twitter_compatible_images = [image_url for image_url, image_secure_url, image_size in images if \
                                  image_size < 1024*1024][:4] #Max 1MB according to Twitter Card APIs, max 4 photos
     twitter_card_tags = []

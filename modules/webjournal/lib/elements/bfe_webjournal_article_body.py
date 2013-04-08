@@ -28,11 +28,12 @@ from invenio.urlutils import create_html_mailto
 from invenio.config import CFG_CERN_SITE
 from invenio.bibformat_elements import bfe_fulltext
 
-def format_element(bfo, separator='<br/>'):
+def format_element(bfo, separator='<br/>', max_chars=""):
     """
     Display article body
 
     @param separator: separator between each body
+    @param max_chars: if defined, limit the output to given char length
     """
     ln = bfo.lang
     _ = gettext_set_language(ln)
@@ -52,7 +53,11 @@ def format_element(bfo, separator='<br/>'):
 
     if not CFG_CERN_SITE or \
            not bfo.field('980__a').startswith('BULLETIN'):
-        return separator.join(article)
+        output = separator.join(article)
+        if max_chars.isdigit() and \
+               int(max_chars) > 0 and len(output) > int(max_chars):
+            output = output[:int(max_chars)] + ' [...]'
+        return output
 
     ################################################################
     #                  CERN Bulletin-specific code                 #
@@ -74,7 +79,11 @@ def format_element(bfo, separator='<br/>'):
     header_out = ''
     if not is_old_cern_bulletin_article:
         # Return the same as any other journal article
-        return separator.join(article)
+        output = separator.join(article)
+        if max_chars.isdigit() and \
+               int(max_chars) > 0 and len(output) > int(max_chars):
+            output = output[:int(max_chars)] + ' [...]'
+        return output
 
     # Old CERN articles
     if year < 2007 or bfo.field('980__a').startswith('BULLETINSTAFF'):
@@ -198,7 +207,12 @@ def format_element(bfo, separator='<br/>'):
             article_out += page_elements[key]
             article_out += '</p>'
 
-    return header_out + article_out
+    output = header_out + article_out
+    if max_chars.isdigit() and \
+           int(max_chars) > 0 and len(output) > int(max_chars):
+        output = output[:int(max_chars)] + ' [...]'
+
+    return output
 
 def escape_values(bfo):
     """
