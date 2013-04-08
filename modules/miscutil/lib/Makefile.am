@@ -53,6 +53,7 @@ pylib_DATA = __init__.py \
              urlutils_unit_tests.py \
              w3c_validator.py \
              importutils.py \
+             importutils_unit_tests.py \
              intbitset_unit_tests.py \
              intbitset_helper.py \
              inveniocfg.py \
@@ -88,9 +89,7 @@ pylib_DATA = __init__.py \
              sequtils_cnum.py \
              sequtils.py \
              sequtils_regression_tests.py \
-             crossrefutils.py \
-             importutils.py \
-             importutils_unit_tests.py
+             crossrefutils.py
 
 jsdir=$(localstatedir)/www/js
 
