@@ -38,6 +38,18 @@
   {%- endif -%}
   {%- endfor -%}
   </ul>
+  {% endblock %}
+
+  <div id="record_content">
+  {% block record_content %}
+    <!-- record content -->
+  {% endblock %}
+  </div>
+<div style="clear: both;"></div>
+{% endblock %}
+
+{% block javascript %}
+{{ super() }}
 <script>
 $(function () {
 
@@ -84,12 +96,4 @@ $(function () {
 
 });
 </script>
-  {% endblock %}
-
-  <div id="record_content">
-  {% block record_content %}
-    <!-- record content -->
-  {% endblock %}
-  </div>
-<div style="clear: both;"></div>
-{% endblock %}
+{% endblock javascript %}
