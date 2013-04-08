@@ -175,7 +175,7 @@ def get_nice_bibsched_related_message(curdir, ln=CFG_SITE_LANG):
     ## WRT informing the user.
     _ = gettext_set_language(ln)
     res = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE (status='WAITING' AND runtime<=NOW()) OR status='SLEEPING'")
-    pre = _("Note that your submission as been inserted into the bibliographic task queue and is waiting for execution.\n")
+    pre = _("Note that your submission has been inserted into the bibliographic task queue and is waiting for execution.\n")
     if server_pid():
         ## BibSched is up and running
         msg = _("The task queue is currently running in automatic mode, and there are currently %s tasks waiting to be executed. Your record should be available within a few minutes and searchable within an hour or thereabouts.\n") % (len(res))
