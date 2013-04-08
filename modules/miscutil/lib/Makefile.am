@@ -105,7 +105,9 @@ pylib_DATA = __init__.py \
              sherpa_romeo.py \
              sherpa_romeo_testing.py \
              orcid.py \
-             xmlDict.py
+             xmlDict.py \
+             importutils.py \
+             importutils_unit_tests.py
 
 jsdir=$(localstatedir)/www/js
 
