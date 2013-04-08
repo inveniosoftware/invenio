@@ -78,6 +78,17 @@ class CeleryTest(unittest.TestCase):
         # Call task via Celery machinery
         self.assertEqual(invenio_version.delay().get(), CFG_VERSION)
 
+    def test_task_invenio_db_test(self):
+        """ Test Flask request context in tasks """
+        from invenio.celery_tasks import invenio_db_test
+        # Call task via Celery machinery
+        self.assertEqual(invenio_db_test.delay(1).get(), 1)
+        self.assertEqual(invenio_db_test.delay(2).get(), 2)
+        self.assertEqual(invenio_db_test.delay(3).get(), 3)
+        # Call task without Celery machinery.
+        with celery.loader.flask_app.test_request_context():
+            self.assertEqual(invenio_db_test(1), 1)
+
 
 TEST_SUITE = make_test_suite(CeleryTest)
 

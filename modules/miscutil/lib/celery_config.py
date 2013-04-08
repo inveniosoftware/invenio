@@ -30,8 +30,8 @@ CELERY_INCLUDE = []
 
 ## Result backend
 ## --------------
-CELERY_RESULT_BACKEND = getattr(config, "CFG_CELERY_RESULT_BACKEND", "amqp://guest:guest@localhost:5672//")
-CELERY_RESULT_SERIALIZER = getattr(config, "CFG_CELERY_RESULT_SERIALIZER", "json")
+CELERY_RESULT_BACKEND = getattr(config, "CFG_CELERY_RESULT_BACKEND", "redis://localhost/0")
+CELERY_RESULT_SERIALIZER = getattr(config, "CFG_CELERY_RESULT_SERIALIZER", "msgpack")
 
 ## Routing
 ## -------
@@ -41,7 +41,7 @@ CELERY_RESULT_SERIALIZER = getattr(config, "CFG_CELERY_RESULT_SERIALIZER", "json
 ## --------------
 CELERY_ALWAYS_EAGER = False
 CELERY_IGNORE_RESULT = False
-CELERY_TASK_SERIALIZER = getattr(config, "CFG_CELERY_TASK_SERIALIZER", "json")
+CELERY_TASK_SERIALIZER = getattr(config, "CFG_CELERY_TASK_SERIALIZER", "msgpack")
 
 ## Worker
 ## ------

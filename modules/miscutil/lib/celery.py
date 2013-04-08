@@ -26,7 +26,7 @@ The loader's purposes is to load modules defined in invenio.*_tasks modules
 # Important for 'from celery import Celery' to find the right celery module.
 from __future__ import absolute_import
 
-from celery import Celery
+from celery import Celery, signals
 from celery.datastructures import DictAttribute
 from celery.loaders.base import BaseLoader
 
@@ -39,6 +39,74 @@ class InvenioLoader(BaseLoader):
     """
     def __init__(self, *args, **kwargs):
         super(InvenioLoader, self).__init__(*args, **kwargs)
+        self._install_signal_handlers()
+        self.flask_app = None
+        self.db = None
+
+    def _install_signal_handlers(self):
+        # Need to close any open database connection after
+        # any embedded celerybeat process forks.
+        signals.beat_embedded_init.connect(self.close_database)
+        # Handlers for settings Flask request context
+        signals.task_prerun.connect(self.on_task_prerun)
+        signals.task_postrun.connect(self.on_task_postrun)
+
+    def _init_flask(self):
+        """
+        Initialize Flask application.
+
+        The Flask application should only be created in the workers, thus
+        this method should not be called from the __init__ method.
+        """
+        if not self.flask_app:
+            from flask import current_app
+            if current_app:
+                self.flask_app = current_app
+            else:
+                from invenio.webinterface_handler_flask import create_invenio_flask_app
+                self.flask_app = create_invenio_flask_app()
+                from invenio.sqlalchemyutils import db
+                self.db = db
+
+    def on_task_init(self, task_id, task):
+        """Called before every task."""
+        try:
+            is_eager = task.request.is_eager
+        except AttributeError:
+            is_eager = False
+        if not is_eager:
+            self.close_database()
+
+    def on_task_prerun(self, task=None, **dummy_kwargs):
+        """
+        Called before a task is run - pushes a new Flask request context
+        for the task.
+        """
+        task.request.flask_ctx = self.flask_app.test_request_context()
+        task.request.flask_ctx.push()
+
+    def on_task_postrun(self, task=None, **dummy_kwargs):
+        """
+        Called after a task is run - pops the pushed Flask request context
+        for the task.
+        """
+        task.request.flask_ctx.pop()
+
+    def on_process_cleanup(self):
+        """Does everything necessary for Invenio to work in a long-living,
+        multiprocessing environment. Called after on_task_postrun.
+        """
+        self.close_database()
+
+    def on_worker_init(self):
+        """Called when the worker starts.
+
+        Automatically discovers any ``*_tasks.py`` files in the Invenio module.
+        """
+        self.close_database()
+
+    def on_worker_process_init(self):
+        self.close_database()
 
     def read_configuration(self):
         """ Read configuration defined in invenio.celery_config """
@@ -46,10 +114,18 @@ class InvenioLoader(BaseLoader):
         self.configured = True
         return DictAttribute(usercfg)
 
+    def close_database(self, **dummy_kwargs):
+        self.db.session.remove()
+
     def import_default_modules(self):
         """ Called before on_worker_init """
-        super(InvenioLoader, self).import_default_modules()
-        self.autodiscover()
+        # First setup Flask application
+        self._init_flask()
+        # Next import all task modules with a request context (otherwise
+        # the SQLAlchemy models cannot be imported).
+        with self.flask_app.test_request_context():
+            super(InvenioLoader, self).import_default_modules()
+            self.autodiscover()
 
     def autodiscover(self):
         """
