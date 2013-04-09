@@ -28,17 +28,15 @@ import sys
 import time
 
 
-
-import invenio.bibindex_engine_tokenizer as tokenizers
-
 from invenio.config import CFG_SOLR_URL
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_MYSQL_THREAD_TIMEOUT, \
      CFG_CHECK_MYSQL_THREADS, \
      CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
-     CFG_BIBINDEX_WORDTABLE_TYPE
+     CFG_BIBINDEX_INDEX_TABLE_TYPE
 from invenio.bibindexadminlib import get_idx_remove_html_markup, \
-                                     get_idx_remove_latex_markup
+                                     get_idx_remove_latex_markup, \
+                                     get_idx_remove_stopwords
 from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine import perform_request_search, \
      get_index_stemming_language, \
@@ -53,9 +51,13 @@ from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.bibrankadminlib import get_def_name
 from invenio.solrutils_bibindex_indexer import solr_commit
-from invenio.bibindex_engine_tokenizer import CFG_JOURNAL_TAG, \
+from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
+    CFG_JOURNAL_TAG, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
+from invenio.bibindex_engine_utils import get_all_index_names_and_column_values, \
+    load_tokenizers
+
 
 
 if sys.hexversion < 0x2040000:
@@ -73,6 +75,9 @@ nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
 base_process_size = 4500 # process base size
 _last_word_table = None
+
+
+_TOKENIZERS = load_tokenizers()
 
 
 def list_union(list1, list2):
@@ -290,20 +295,6 @@ def get_all_indexes():
         out.append(row[0])
     return out
 
-def get_all_index_names_and_column_values(column_name):
-    """Returns a list of tuples of name and another column of all defined words indexes.
-       Returns empty list in case there are no tags indexed in this index or in case
-       the column name does not exist.
-       Example: output=[('global', something), ('title', something)]."""
-    out = []
-    query = """SELECT name, %s FROM idxINDEX""" % column_name
-    try:
-        res = run_sql(query)
-        for row in res:
-            out.append((row[0], row[1]))
-    except DatabaseError:
-        write_message("Exception caught for SQL statement: %s; column %s might not exist" % (query, column_name), sys.stderr)
-    return out
 
 def get_all_synonym_knowledge_bases():
     """Returns a dictionary of name key and knowledge base name and match type tuple value
@@ -319,19 +310,39 @@ def get_all_synonym_knowledge_bases():
             out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
     return out
 
+
 def get_index_remove_stopwords(index_id):
     """Returns value of a remove_stopword field from idxINDEX database table
+       if it's not 'No'. If it's 'No' returns False.
+       Just for consistency with WordTable.
        @param index_id: id of the index
     """
-    query = "SELECT remove_stopwords FROM idxINDEX WHERE id=%s" % index_id
-    out = 'No'
-    try:
-        res = run_sql(query)
-        if res:
-            return res[0][0]
-    except DatabaseError:
-        return out
-    return out
+    result = get_idx_remove_stopwords(index_id)
+    if isinstance(result, tuple):
+        return False
+    if result == 'No' or result == '':
+        return False
+    return result
+
+
+def get_index_remove_html_markup(index_id):
+    """ Gets remove_html_markup parameter from database ('Yes' or 'No') and
+        changes it  to True, False.
+        Just for consistency with WordTable."""
+    result = get_idx_remove_html_markup(index_id)
+    if result == 'Yes':
+        return True
+    return False
+
+
+def get_index_remove_latex_markup(index_id):
+    """ Gets remove_latex_markup parameter from database ('Yes' or 'No') and
+        changes it  to True, False.
+        Just for consistency with WordTable."""
+    result = get_idx_remove_latex_markup(index_id)
+    if result == 'Yes':
+        return True
+    return False
 
 
 def get_index_tokenizer(index_id):
@@ -343,9 +354,12 @@ def get_index_tokenizer(index_id):
     try:
         res = run_sql(query)
         if res:
-            out = getattr(tokenizers, res[0][0])
+            out = _TOKENIZERS[res[0][0]]
     except DatabaseError:
         write_message("Exception caught for SQL statement: %s; column tokenizer might not exist" % query, sys.stderr)
+    except KeyError:
+        write_message("Exception caught: there is no such tokenizer")
+        out = None
     return out
 
 
@@ -492,13 +506,13 @@ class WordTable:
         self.value = {}
         self.stemming_language = get_index_stemming_language(index_id)
         self.remove_stopwords = get_index_remove_stopwords(index_id)
-        self.remove_html_markup = get_idx_remove_html_markup(index_id)
-        self.remove_latex_markup = get_idx_remove_latex_markup(index_id)
+        self.remove_html_markup = get_index_remove_html_markup(index_id)
+        self.remove_latex_markup = get_index_remove_latex_markup(index_id)
         self.tokenizer = get_index_tokenizer(index_id)(self.stemming_language,
                                                        self.remove_stopwords,
                                                        self.remove_html_markup,
                                                        self.remove_latex_markup)
-        self.default_tokenizer_function = self.tokenizer.get_function_by_type(wordtable_type)
+        self.default_tokenizer_function = self.tokenizer.get_tokenizing_function(wordtable_type)
         self.is_fulltext_index = is_fulltext_index
         self.wash_index_terms = wash_index_terms
 
@@ -506,11 +520,11 @@ class WordTable:
         # indexing fulltext.
         self.tag_to_words_fnc_map = {}
         for k in tag_to_tokenizer_map.keys():
-            special_tokenizer_for_tag = getattr(tokenizers, tag_to_tokenizer_map[k])(self.stemming_language,
-                                                                                     self.remove_stopwords,
-                                                                                     self.remove_html_markup,
-                                                                                     self.remove_latex_markup)
-            special_tokenizer_function = special_tokenizer_for_tag.get_function_by_type(wordtable_type)
+            special_tokenizer_for_tag = _TOKENIZERS[tag_to_tokenizer_map[k]](self.stemming_language,
+                                                                             self.remove_stopwords,
+                                                                             self.remove_html_markup,
+                                                                             self.remove_latex_markup)
+            special_tokenizer_function = special_tokenizer_for_tag.get_tokenizing_function(wordtable_type)
             self.tag_to_words_fnc_map[k] = special_tokenizer_function
 
         if self.stemming_language and self.tablename.startswith('idxWORD'):
@@ -1245,7 +1259,7 @@ def task_run_core():
                                   index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxWORD%02dF',
-                                  wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Words"],
+                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                                   wash_index_terms=50)
             _last_word_table = wordTable
@@ -1257,7 +1271,7 @@ def task_run_core():
                                   index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxPAIR%02dF',
-                                  wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Pairs"],
+                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=100)
             _last_word_table = wordTable
@@ -1269,7 +1283,7 @@ def task_run_core():
                                   index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxPHRASE%02dF',
-                                  wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Phrases"],
+                                  wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                                   tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                                   wash_index_terms=0)
             _last_word_table = wordTable
@@ -1291,7 +1305,7 @@ def task_run_core():
                               index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxWORD%02dF',
-                              wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Words"],
+                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
                               is_fulltext_index=is_fulltext_index,
                               wash_index_terms=50)
@@ -1355,7 +1369,7 @@ def task_run_core():
                               index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxPAIR%02dF',
-                              wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Pairs"],
+                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Pairs"],
                               tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=100)
         _last_word_table = wordTable
@@ -1417,7 +1431,7 @@ def task_run_core():
                               index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxPHRASE%02dF',
-                              wordtable_type=CFG_BIBINDEX_WORDTABLE_TYPE["Phrases"],
+                              wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Phrases"],
                               tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                               wash_index_terms=0)
         _last_word_table = wordTable

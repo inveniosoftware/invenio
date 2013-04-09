@@ -693,6 +693,7 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibindex/doc/admin/Makefile \
      modules/bibindex/doc/hacking/Makefile \
      modules/bibindex/lib/Makefile \
+     modules/bibindex/lib/tokenizers/Makefile \
      modules/bibindex/web/Makefile \
      modules/bibindex/web/admin/Makefile \
      modules/bibknowledge/Makefile \

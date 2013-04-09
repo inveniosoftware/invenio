@@ -4340,5 +4340,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_20_idxINDEX_syno
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_21_idxINDEX_stopwords',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_25_idxINDEX_html_markup',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_28_idxINDEX_tokenizer',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_29_idxINDEX_stopwords_update',NOW());
 
 -- end of file

@@ -20,7 +20,8 @@
 import re
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.config import CFG_BIBINDEX_MIN_WORD_LENGTH
+from invenio.config import CFG_BIBINDEX_MIN_WORD_LENGTH, \
+     CFG_ETCDIR
 
 re_pattern_fuzzy_author_dots = re.compile(r'[\.\-]+')
 re_pattern_fuzzy_author_spaces = re.compile(r'\s+')
@@ -102,16 +103,18 @@ def apply_stemming(word, stemming_language):
     return word
 
 
-def remove_stopwords(word, remove='Yes'):
+def remove_stopwords(word, stopwords_kb = False):
     """Returns word after stopword check.
+       One must specify the name of the knowledge base.
 
        @param word: word to be checked
        @type word: str
-       @param remove: if 'remove' is set to 'No' function will have no effect in any case.
+       @param stopwords_kb: name of the stopwords knowledge base
        @type word: str
     """
-    if remove == 'Yes':
-        if is_stopword(word):
+    if stopwords_kb:
+        stopwords_path = CFG_ETCDIR + "/bibrank/" + stopwords_kb
+        if is_stopword(word, stopwords_path):
             return ""
     return word
 

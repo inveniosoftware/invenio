@@ -193,7 +193,7 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance, verb
     #Check terms, remove non alphanumeric characters. Use both unstemmed and stemmed version of all terms.
     for i in range(0, len(lwords_old)):
         term = string.lower(lwords_old[i])
-        if not methods[rank_method_code]["stopwords"] == "True" or methods[rank_method_code]["stopwords"] and not is_stopword(term, 1):
+        if not methods[rank_method_code]["stopwords"] == "True" or methods[rank_method_code]["stopwords"] and not is_stopword(term):
             lwords.append((term, methods[rank_method_code]["rnkWORD_table"]))
             terms = string.split(string.lower(re.sub(methods[rank_method_code]["chars_alphanumericseparators"], ' ', term)))
             for term in terms:

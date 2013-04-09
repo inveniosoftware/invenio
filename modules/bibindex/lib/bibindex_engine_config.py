@@ -24,8 +24,9 @@ BibIndex indexing engine configuration parameters.
 __revision__ = \
     "$Id$"
 
+import os
 ## configuration parameters read from the general config file:
-from invenio.config import CFG_VERSION
+from invenio.config import CFG_VERSION, CFG_PYLIBDIR
 ## version number:
 BIBINDEX_ENGINE_VERSION = "Invenio/%s bibindex/%s" % (CFG_VERSION, CFG_VERSION)
 
@@ -43,17 +44,11 @@ CFG_BIBINDEX_SYNONYM_MATCH_TYPE = { 'None': '-None-',
                                     'leading_to_comma': 'leading_to_comma',
                                     'leading_to_number': 'leading_to_number'}
 CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR = ","
-CFG_BIBINDEX_WORDTABLE_TYPE = { 'Words': 'Words',
+CFG_BIBINDEX_INDEX_TABLE_TYPE = { 'Words': 'Words',
                                 'Pairs': 'Pairs',
                                 'Phrases': 'Phrases' }
 
-CFG_BIBINDEX_REGISTERED_TOKENIZERS = { 'Default' : 'BibIndexDefaultTokenizer',
-                                       'Author' : 'BibIndexAuthorTokenizer',
-                                       'Exact Author' : 'BibIndexExactAuthorTokenizer',
-                                       'Year' : 'BibIndexYearTokenizer',
-                                       'Full text' : 'BibIndexFulltextTokenizer',
-                                       'Empty' : 'BibIndexEmptyTokenizer',
-                                       'Author Count' : 'BibIndexAuthorCountTokenizer',
-                                       'Journal' : 'BibIndexJournalTokenizer'}
+CFG_BIBINDEX_TOKENIZERS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibindex_tokenizers')
+
 
 

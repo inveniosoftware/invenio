@@ -41,7 +41,7 @@ except ImportError:
     # since this package is only recommended, not mandatory.
     GOT_DATEUTIL = False
 
-from invenio.bibindex_engine_tokenizer import BibIndexAuthorTokenizer as FNT
+from invenio.bibindex_tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
 from invenio.logicutils import to_cnf
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
 from invenio.dateutils import strptime

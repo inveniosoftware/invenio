@@ -35,8 +35,9 @@ from invenio.refextract_engine import parse_references, \
                                       get_kbs
 from invenio.refextract_text import extract_references_from_fulltext
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
-                                    CFG_JOURNAL_TAG
+from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
+    CFG_JOURNAL_TAG
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from invenio.search_engine import get_record
 from invenio.bibtask import task_low_level_submission

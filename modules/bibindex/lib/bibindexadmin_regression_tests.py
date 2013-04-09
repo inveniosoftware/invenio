@@ -99,6 +99,25 @@ def check_admin_forms_with_dropdown_list(url, fields):
     resp = browser.submit()
     return resp.read()
 
+def check_admin_forms_with_input_text(url, fields):
+    """Logs in as 'admin' and checks given url for
+       input texts in forms available in the given page.
+       Fills them with given fields and returns html body response.
+       @param url: url of the forms to test
+       @param fields: a dict of the form fields and their values
+       @return: html body
+    """
+    browser = get_authenticated_mechanize_browser("admin","")
+    browser.open(url)
+    browser.select_form(nr=0)
+    form = browser.form
+    for key in fields:
+        form[key] = fields[key]
+    resp = browser.submit()
+    #second page - confirmation
+    browser.select_form(nr=1)
+    resp = browser.submit()
+    return resp.read()
 
 class BibIndexAdminSynonymKnowledgeBaseTest(unittest.TestCase):
     """Tests BibIndexAdmin's ability to change knowledge base details for indexes"""
@@ -151,7 +170,8 @@ class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxSTOPWORDS":"Yes"})
+        html_response = check_admin_forms_with_input_text(url, {"idxSTOPWORDS":"stopwords.kb"})
+
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""
@@ -165,7 +185,8 @@ class BibIndexAdminRemoveStopwordsTest(unittest.TestCase):
         parameters = {'idxID':'8', 'ln':'en', 'mtype':'perform_modifystopwords'}
         url = make_url(base, **parameters)
 
-        html_response = check_admin_forms_with_dropdown_list(url, {"idxSTOPWORDS":"No"})
+        html_response = check_admin_forms_with_input_text(url, {"idxSTOPWORDS":"No"})
+
         success = self.re_operation_successfull.search(html_response)
         if not success:
             error_messages = """There is no "Operation successfully completed" in html response."""

@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""bibindex_engine_tokenizer_tests - unit tests for bibindex_engine_tokenizer
+"""bibindex_engine_tokenizer_tests - unit tests for tokenizers
 
 There should always be at least one test class for each class in b_e_t.
 """
@@ -24,14 +24,17 @@ There should always be at least one test class for each class in b_e_t.
 import unittest
 
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio import bibindex_engine_tokenizer as tokenizer_lib
+from invenio.bibindex_engine_utils import load_tokenizers
+
+_TOKENIZERS = load_tokenizers()
+
 
 
 class TestAuthorTokenizerScanning(unittest.TestCase):
     """Test BibIndex name tokenization"""
 
     def setUp(self):
-        self.tokenizer = tokenizer_lib.BibIndexAuthorTokenizer()
+        self.tokenizer = _TOKENIZERS["BibIndexAuthorTokenizer"]()
         self.scan = self.tokenizer.scan_string_for_phrases
 
     def test_bifnt_scan_single(self):
@@ -140,7 +143,7 @@ class TestAuthorTokenizerTokens(unittest.TestCase):
     """Test BibIndex name variant token generation from scanned and tagged sets"""
 
     def setUp(self):
-        self.tokenizer = tokenizer_lib.BibIndexAuthorTokenizer()
+        self.tokenizer = _TOKENIZERS["BibIndexAuthorTokenizer"]()
         self.get_index_tokens = self.tokenizer.parse_scanned_for_phrases
 
     def test_bifnt_tokenize_single(self):
@@ -282,7 +285,7 @@ class TestExactAuthorTokenizer(unittest.TestCase):
 
     def setUp(self):
         """setup"""
-        self.tokenizer = tokenizer_lib.BibIndexExactAuthorTokenizer()
+        self.tokenizer = _TOKENIZERS["BibIndexExactAuthorTokenizer"]()
         self.tokenize = self.tokenizer.tokenize_for_phrases
 
     def test_exact_author_name_tokenizer_bare(self):

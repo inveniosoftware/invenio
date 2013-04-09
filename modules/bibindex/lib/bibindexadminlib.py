@@ -33,9 +33,12 @@ from invenio.dbquery import run_sql, get_table_status_info, wash_table_column_na
 from invenio.bibindex_engine_stemmer import get_stemming_language_map
 import invenio.template
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE, \
-                                           CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
-                                           CFG_BIBINDEX_REGISTERED_TOKENIZERS
+                                           CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
 from invenio.bibknowledge_dblayer import get_all_kb_names
+from invenio.bibindex_engine_utils import load_tokenizers
+
+
+_TOKENIZERS = load_tokenizers()
 
 
 websearch_templates = invenio.template.load('websearch')
@@ -1053,16 +1056,12 @@ def perform_modifystopwords(idxID, ln=CFG_SITE_LANG, idxSTOPWORDS='', callback='
             idxSTOPWORDS = get_idx_remove_stopwords(idxID)
         if not idxSTOPWORDS:
             idxSTOPWORDS = ''
-        stopwords_html_element = """<select name="idxSTOPWORDS" class="admin_w200">"""
-        if idxSTOPWORDS == 'Yes':
-            stopwords_html_element += """<option value="Yes" selected ="selected">Yes</option>"""
-            stopwords_html_element += """<option value="No">No</option>"""
-        elif idxSTOPWORDS == 'No':
-            stopwords_html_element += """<option value="Yes">Yes</option>"""
-            stopwords_html_element += """<option value="No" selected ="selected">No</option>"""
-        stopwords_html_element += """</select>"""
+        if isinstance(idxSTOPWORDS, tuple):
+            idxSTOPWORDS = ''
 
-        text = """<span class="adminlabel">Remove stopwords</span>""" + stopwords_html_element
+        stopwords_html_element = """<input class="admin_w200" type="text" name="idxSTOPWORDS" value="%s" /><br />""" % idxSTOPWORDS
+
+        text = """<span class="adminlabel">Remove stopwords</span><br />"""  + stopwords_html_element
 
         output += createhiddenform(action="modifystopwords#4",
                                    text=text,
@@ -1073,6 +1072,8 @@ def perform_modifystopwords(idxID, ln=CFG_SITE_LANG, idxSTOPWORDS='', callback='
 
         if confirm in [0, "0"] and get_idx(idxID)[0][6] == idxSTOPWORDS:
             output += """<span class="info">Stopwords have not been changed</span>"""
+        elif confirm in [0, "0"] and idxSTOPWORDS == '':
+            output += """<span class="info">You need to provide a name of the file with stopwords</span>"""
         elif confirm in [0, "0"]:
             text = """<span class="important">You are going to change the stopwords configuration for this index.<br />
                       <strong>Are you sure you want to do this?</strong>"""
@@ -1257,13 +1258,13 @@ def perform_modifytokenizer(idxID, ln=CFG_SITE_LANG, idxTOK='', callback='yes', 
         if not idxTOK:
             idxTOK = ''
 
+
         tokenizer_element = """<select name="idxTOK" class="admin_w200">"""
-        for key in CFG_BIBINDEX_REGISTERED_TOKENIZERS:
-            value = CFG_BIBINDEX_REGISTERED_TOKENIZERS[key]
-            if value == idxTOK:
-                tokenizer_element += """<option value="%s" selected ="selected">%s</option>""" % (value, value)
+        for key in _TOKENIZERS:
+            if key == idxTOK:
+                tokenizer_element += """<option value="%s" selected ="selected">%s</option>""" % (key, key)
             else:
-                tokenizer_element += """<option value="%s">%s</option>""" % (value, value)
+                tokenizer_element += """<option value="%s">%s</option>""" % (key, key)
         tokenizer_element += """</select>"""
 
         text = """<span class="adminlabel">Tokenizer</span>""" + tokenizer_element

@@ -25,20 +25,23 @@ import unittest
 
 from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio.dbquery import run_sql
-import invenio.bibindex_engine_tokenizer as lib
 from invenio.bibindex_engine import WordTable, get_index_id_from_index_name, get_index_tags
 from invenio.intbitset import intbitset
-from invenio.bibindex_engine_config import CFG_BIBINDEX_WORDTABLE_TYPE
+from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
 
 def prepare_for_index_update(index_id, remove_stopwords = '',
                                        remove_html_markup = '',
                                        remove_latex_markup = ''):
-    """Prepares SQL query for an update of a index in the idxINDEX table. Takes
-       into account remove_stopwords, remove_html_markup, remove_latex_markup
-       and tokenizer as parameters to change.
-       remove_html_markup and remove_latex_markup accepts these values:
+    """ Prepares SQL query for an update of a index in the idxINDEX table. Takes
+        into account remove_stopwords, remove_html_markup, remove_latex_markup
+        as parameters to change.
+        remove_html_markup and remove_latex_markup accepts these values:
                                         '' to leave it unchanged
-       @param index_id: id of the index to change
+                                        'Yes' to change it to 'Yes'
+                                        'No' to change it to 'No'.
+        For remove_stopwords instead of 'Yes' one must give the name of the file (for example: 'stopwords.kb')
+        from CFG_ETCDIR/bibrank/ directory pointing at stopwords knowledge base.
+        @param index_id: id of the index to change
     """
 
 
@@ -113,7 +116,7 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                           index_id=index_id,
                           fields_to_index=get_index_tags(index_name),
                           table_name_pattern= pattern + '%02dF',
-                          wordtable_type = CFG_BIBINDEX_WORDTABLE_TYPE["Words"],
+                          wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                           tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                           is_fulltext_index=False,
                           wash_index_terms=50)
@@ -148,7 +151,7 @@ class BibIndexRemoveStopwordsTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('title', remove_stopwords = 'Yes')
+            reindex_word_tables_into_testtables('title', remove_stopwords = 'stopwords.kb')
             self.reindexed = True
 
     @classmethod
@@ -160,21 +163,21 @@ class BibIndexRemoveStopwordsTest(unittest.TestCase):
             reverse_changes = prepare_for_index_update(get_index_id_from_index_name('title'), remove_stopwords = 'No')
             run_sql(reverse_changes)
 
-    def test_check_occurances_of_stopwords_in_testable_word_of(self):
+    def test_check_occurrences_of_stopwords_in_testable_word_of(self):
         """Tests if term 'of' is in the new reindexed table"""
 
         query = "SELECT hitlist FROM test_idxWORD08F WHERE term='of'"
         res = run_sql(query)
         self.assertEqual(0, len(res))
 
-    def test_check_occurances_of_stopwords_in_testable_word_everything(self):
+    def test_check_occurrences_of_stopwords_in_testable_word_everything(self):
         """Tests if term 'everything' is in the new reindexed table"""
 
         query = "SELECT hitlist FROM test_idxWORD08F WHERE term='everything'"
         res = run_sql(query)
         self.assertEqual(0, len(res))
 
-    def test_compare_non_stopwords_occurances_in_original_and_test_tables_word_theory(self):
+    def test_compare_non_stopwords_occurrences_in_original_and_test_tables_word_theory(self):
         """Checks if stopwords removing has no influence on indexation of word 'theory' """
 
         word = "theori" #theori not theory, because of default stemming for title index
@@ -190,7 +193,7 @@ class BibIndexRemoveStopwordsTest(unittest.TestCase):
             iset_original = intbitset(res[0][0])
         self.assertEqual(len(iset_removed), len(iset_original))
 
-    def test_compare_non_stopwords_occurances_in_original_and_test_tables_word_on(self):
+    def test_compare_non_stopwords_occurrences_in_original_and_test_tables_word_on(self):
         """Checks if stopwords removing has no influence on indexation of word 'o(n)' """
 
         word = "o(n)"
@@ -233,7 +236,7 @@ class BibIndexRemoveLatexTest(unittest.TestCase):
             run_sql(reverse_changes)
 
 
-    def test_check_occurances_after_latex_removal_word_u1(self):
+    def test_check_occurrences_after_latex_removal_word_u1(self):
         """Tests how many times experssion 'u(1)' occures"""
 
         word = "u(1)"
@@ -244,19 +247,19 @@ class BibIndexRemoveLatexTest(unittest.TestCase):
             iset = intbitset(res[0][0])
         self.assertEqual(3, len(iset))
 
-    def test_check_exact_occurances_after_latex_removal_word_theta(self):
+    def test_check_exact_occurrences_after_latex_removal_word_theta(self):
         """Tests where experssion 'theta' occures"""
 
         word = "theta"
         query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('abstract'), word)
         res = run_sql(query)
-        iset = []
+        ilist = []
         if res:
             iset = intbitset(res[0][0])
             ilist = iset.tolist()
         self.assertEqual([12], ilist)
 
-    def test_compare_occurances_after_and_before_latex_removal_math_expression(self):
+    def test_compare_occurrences_after_and_before_latex_removal_math_expression(self):
         """Checks if latex removal has no influence on indexation of expression 's(u(n_1)*u(n_2))' """
 
         word = 's(u(n_1)*u(n_2))'
@@ -275,7 +278,7 @@ class BibIndexRemoveLatexTest(unittest.TestCase):
             ilist = iset.tolist()
         self.assertEqual(ilist, ilist_test)
 
-    def test_check_occurances_latex_expression_with_u1(self):
+    def test_check_occurrences_latex_expression_with_u1(self):
         """Tests influence of latex removal on record 80"""
 
         word = '%over u(1)%'
@@ -314,7 +317,7 @@ class BibIndexRemoveHtmlTest(unittest.TestCase):
             run_sql(reverse_changes)
 
 
-    def test_check_occurances_after_html_removal_tag_p(self):
+    def test_check_occurrences_after_html_removal_tag_p(self):
         """Tests if expression 'water-hog</p>' is not indexed after html markup removal"""
 
         word = 'water-hog</p>'
@@ -327,7 +330,7 @@ class BibIndexRemoveHtmlTest(unittest.TestCase):
         self.assertEqual(0, len(ilist))
 
 
-    def test_check_occurances_after_and_before_html_removal_word_style(self):
+    def test_check_occurrences_after_and_before_html_removal_word_style(self):
         """Tests html markup removal influence on expression 'style="width' """
 
         word = 'style="width'
@@ -371,7 +374,7 @@ class BibIndexYearIndexTest(unittest.TestCase):
             remove_reindexed_word_testtables('year')
 
 
-    def test_occurances_in_year_index_1973(self):
+    def test_occurrences_in_year_index_1973(self):
         """checks content of year index for year 1973"""
         word = '1973'
         query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('year'), word)
@@ -383,7 +386,7 @@ class BibIndexYearIndexTest(unittest.TestCase):
         self.assertEqual([34], ilist)
 
 
-    def test_occurances_in_year_index_2001(self):
+    def test_occurrences_in_year_index_2001(self):
         """checks content of year index for year 2001"""
         word = '2001'
         query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('year'), word)
@@ -435,7 +438,7 @@ class BibIndexAuthorCountIndexTest(unittest.TestCase):
             remove_reindexed_word_testtables('authorcount')
 
 
-    def test_occurances_in_authorcount_index(self):
+    def test_occurrences_in_authorcount_index(self):
         """checks content of authorcount index for papers with 4 authors"""
         word = '4'
         query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('authorcount'), word)
@@ -485,7 +488,7 @@ class BibIndexJournalIndexTest(unittest.TestCase):
 
 
 
-    def test_occurances_in_journal_index(self):
+    def test_occurrences_in_journal_index(self):
         """checks content of journal index for phrase: 'prog. theor. phys.' """
         word = 'prog. theor. phys.'
         query = "SELECT hitlist FROM test_idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('journal'), word)

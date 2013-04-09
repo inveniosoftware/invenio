@@ -23,6 +23,7 @@
 
 import re
 import sys
+import os
 
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.bibtask import write_message
@@ -30,6 +31,8 @@ from invenio.search_engine_utils import get_fieldvalues
 from invenio.config import \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
+from invenio.pluginutils import PluginContainer
+from invenio.bibindex_engine_config import CFG_BIBINDEX_TOKENIZERS_PATH
 
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
@@ -45,6 +48,14 @@ re_pattern_fuzzy_author_trigger = re.compile(r'[\s\,\.]')
 # FIXME: re_pattern_fuzzy_author_trigger could be removed and an
 # BibAuthorID API function could be called instead after we
 # double-check that there are no circular imports.
+
+
+
+def load_tokenizers():
+    """
+    Load all the bibindex tokenizers and returns it.
+    """
+    return PluginContainer(os.path.join(CFG_BIBINDEX_TOKENIZERS_PATH, 'BibIndex*.py'))
 
 
 
