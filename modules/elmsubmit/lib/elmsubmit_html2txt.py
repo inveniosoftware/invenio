@@ -43,7 +43,7 @@ class UnicodeHTMLParser(htmllib.HTMLParser):
             raise HTMLParsingFailed
 
     # myhtmlentitydefs.py should be found in the dir with this file:
-    from myhtmlentitydefs import entitydefs
+    from invenio.myhtmlentitydefs import entitydefs
 
 class NativeParser:
 

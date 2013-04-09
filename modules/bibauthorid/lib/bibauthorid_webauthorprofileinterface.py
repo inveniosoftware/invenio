@@ -43,7 +43,7 @@ from invenio.bibauthorid_name_utils import split_name_parts #emitting #pylint: d
 from invenio.bibauthorid_config import AID_ENABLED #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_config import AID_ON_AUTHORPAGES #emitting #pylint: disable-msg=W0611
 
-import bibauthorid_searchinterface as pt #emitting #pylint: disable-msg=W0611
+from invenio import bibauthorid_searchinterface as pt #emitting #pylint: disable-msg=W0611
 
 def gathered_names_by_personid(pid):
     return [p[0] for p in get_person_names_count(pid)]

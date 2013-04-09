@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import re
-import bibauthorid_config as bconfig
+from invenio import bibauthorid_config as bconfig
 from itertools import starmap
 from operator import mul, itemgetter
 from invenio.bibauthorid_name_utils import compare_names

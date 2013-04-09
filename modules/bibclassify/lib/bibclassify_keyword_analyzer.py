@@ -31,7 +31,7 @@ import re
 import sys
 import time
 
-import bibclassify_config as bconfig
+from invenio import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.keyword_analyzer")
 
 _MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)

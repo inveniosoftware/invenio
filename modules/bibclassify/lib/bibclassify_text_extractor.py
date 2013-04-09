@@ -38,12 +38,12 @@ import re
 import sys
 import tempfile
 import urllib2
-import bibclassify_config as bconfig
+from invenio import bibclassify_config as bconfig
 
 if bconfig.STANDALONE:
     from urllib2 import urlopen
 else:
-    from urlutils import make_invenio_opener
+    from invenio.urlutils import make_invenio_opener
     urlopen = make_invenio_opener('BibClassify').open
 
 log = bconfig.get_logger("bibclassify.text_extractor")

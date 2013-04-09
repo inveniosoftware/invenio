@@ -21,7 +21,7 @@ bibauthorid_general_utils
     Bibauthorid utilities used by many parts of the framework
 '''
 
-import bibauthorid_config as bconfig
+from invenio import bibauthorid_config as bconfig
 from datetime import datetime
 import sys
 

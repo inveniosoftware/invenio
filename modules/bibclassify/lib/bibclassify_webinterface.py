@@ -25,7 +25,7 @@ import os
 from cgi import escape
 from urllib import quote
 import time
-import bibupload
+from invenio import bibupload
 
 from invenio.messages import gettext_set_language
 from invenio.bibdocfile import BibRecDocs
@@ -43,10 +43,10 @@ from invenio import dbquery
 from invenio import bibtask
 from invenio import bibrecord
 
-import bibclassify_config as bconfig
-import bibclassify_text_extractor
-import bibclassify_engine
-import bibclassify_ontology_reader as bor
+from invenio import bibclassify_config as bconfig
+from invenio import bibclassify_text_extractor
+from invenio import bibclassify_engine
+from invenio import bibclassify_ontology_reader as bor
 
 log = bconfig.get_logger("bibclassify.webinterface")
 

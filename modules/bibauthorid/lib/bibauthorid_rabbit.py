@@ -21,7 +21,7 @@ from itertools import cycle, imap, chain, izip
 from operator import itemgetter
 
 from invenio.bibtask import task_sleep_now_if_required
-import bibauthorid_config as bconfig
+from invenio import bibauthorid_config as bconfig
 
 from invenio.bibauthorid_comparison import cached_sym
 from invenio.bibauthorid_name_utils import compare_names as comp_names

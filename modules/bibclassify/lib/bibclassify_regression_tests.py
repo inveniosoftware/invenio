@@ -30,21 +30,21 @@ from invenio.testutils import make_test_suite, run_test_suite, \
 
 from invenio.bibclassify_unit_tests import BibClassifyTestCase, suite
 
-import bibclassify_config as bconfig
-from testutils import make_test_suite, run_test_suite
-import config
-import bibclassify_engine
-import bibclassify_cli
-import bibclassify_ontology_reader
+from invenio import bibclassify_config as bconfig
+from invenio.testutils import make_test_suite, run_test_suite
+from invenio import config
+from invenio import bibclassify_engine
+from invenio import bibclassify_cli
+from invenio import bibclassify_ontology_reader
 
 log = bconfig.get_logger("bibclassify.regression_tests")
 
 # do this only if not in STANDALONE mode
 bibclassify_daemon = dbquery = None
 if not bconfig.STANDALONE:
-    import dbquery
-    import bibclassify_daemon
-    import bibdocfile
+    from invenio import dbquery
+    from invenio import bibclassify_daemon
+    from invenio import bibdocfile
 
 
 class BibClassifyRegressionTest(BibClassifyTestCase):

@@ -73,8 +73,8 @@ from invenio.errorlib import register_exception
 from invenio.webuser import collect_user_info
 from invenio.webcomment import check_user_can_attach_file_to_comments
 from invenio.access_control_engine import acc_authorize_action
-from htmlutils import is_html_text_editor_installed
-from ckeditor_invenio_connector import process_CKEditor_upload, send_response
+from invenio.htmlutils import is_html_text_editor_installed
+from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
 from invenio.bibdocfile import stream_file
 
 class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):

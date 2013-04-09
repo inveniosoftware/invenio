@@ -31,29 +31,22 @@ import sys
 import unittest
 import tempfile
 import cStringIO
-import random
-import copy
 import os
-import glob
 import time
 import stat
 import shutil
 
-import bibclassify_config as bconfig
-from testutils import make_test_suite, run_test_suite, nottest
-import config
-import bibclassify_engine
-import bibclassify_cli
-import bibclassify_ontology_reader
+from invenio import bibclassify_config as bconfig
+from invenio.testutils import make_test_suite, run_test_suite, nottest
+from invenio import config
+from invenio import bibclassify_ontology_reader
 
 log = bconfig.get_logger("bibclassify.tests")
 
 # do this only if not in STANDALONE mode
 bibclassify_daemon = dbquery = None
 if not bconfig.STANDALONE:
-    import dbquery
-    import bibclassify_daemon
-    import bibdocfile
+    from invenio import bibdocfile
 
 
 class BibClassifyTestCase(unittest.TestCase):
@@ -78,7 +71,6 @@ class BibClassifyTestCase(unittest.TestCase):
         if self.stdout:
             self.unredirect()
         bconfig.set_global_level(self.log_level)
-
 
     def redirect(self):
         # just for debugging in Eclipse (to see messages printed)

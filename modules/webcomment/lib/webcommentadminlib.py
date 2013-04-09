@@ -105,7 +105,7 @@ def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_L
     """
     _ = gettext_set_language(ln)
 
-    from search_engine import record_exists
+    from invenio.search_engine import record_exists
 
     warnings = []
 

@@ -25,8 +25,8 @@ import glob
 import traceback
 import codecs
 
-import bibclassify_config as bconfig
-import bibclassify_engine as engine
+from invenio import bibclassify_config as bconfig
+from invenio import bibclassify_engine as engine
 log = bconfig.get_logger("bibclassify.microtest")
 
 

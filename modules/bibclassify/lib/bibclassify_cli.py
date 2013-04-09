@@ -30,12 +30,12 @@ import getopt
 import sys
 
 
-import bibclassify_config as bconfig
+from invenio import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.cli")
 
 
-import bibclassify_engine as engine
-import bibclassify_ontology_reader as reader
+from invenio import bibclassify_engine as engine
+from invenio import bibclassify_ontology_reader as reader
 
 daemon = None
 
@@ -93,7 +93,7 @@ def main():
                 run_as_daemon = True
 
     if run_as_daemon:
-        import bibclassify_daemon as daemon
+        from invenio import bibclassify_daemon as daemon
         if daemon:
             daemon.bibclassify_daemon()
         else:

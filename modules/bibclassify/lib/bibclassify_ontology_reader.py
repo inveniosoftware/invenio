@@ -54,17 +54,17 @@ except ImportError:
     rdflib = None
     rdflib_exceptions_Error = None
 
-import bibclassify_config as bconfig
+from invenio import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.ontology_reader")
-import config
+from invenio import config
 
 # only if not running in a stanalone mode
 if bconfig.STANDALONE:
     dbquery = None
     from urllib2 import urlopen
 else:
-    import dbquery
-    from urlutils import make_invenio_opener
+    from invenio import dbquery
+    from invenio.urlutils import make_invenio_opener
     urlopen = make_invenio_opener('BibClassify').open
 
 _contains_digit = re.compile("\d")

@@ -31,16 +31,16 @@ import sys
 import time
 import os
 
-import bibclassify_config as bconfig
-import bibclassify_text_extractor
-import bibclassify_engine
-import bibclassify_webinterface
+from invenio import bibclassify_config as bconfig
+from invenio import bibclassify_text_extractor
+from invenio import bibclassify_engine
+from invenio import bibclassify_webinterface
 
-import bibtask
-from dbquery import run_sql
-from intbitset import intbitset
-from search_engine import get_collection_reclist
-from bibdocfile import BibRecDocs
+from invenio import bibtask
+from invenio.dbquery import run_sql
+from invenio.intbitset import intbitset
+from invenio.search_engine import get_collection_reclist
+from invenio.bibdocfile import BibRecDocs
 
 # Global variables allowing to retain the progress of the task.
 _INDEX = 0
