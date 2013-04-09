@@ -20,18 +20,29 @@
 """WebAccount Flask Blueprint"""
 
 from werkzeug.urls import url_unquote
-from flask import session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
+from flask import render_template, request, flash, redirect, url_for, abort
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, \
+    CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.access_control_config import \
-     CFG_EXTERNAL_AUTH_USING_SSO, \
-     CFG_EXTERNAL_AUTH_LOGOUT_SSO
+    CFG_EXTERNAL_AUTH_USING_SSO, \
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO
+
+from invenio import webuser
 
 from invenio.webaccount_forms import LoginForm
 from invenio.webuser_flask import login_user, logout_user, current_user
+from invenio.websession_webinterface import wash_login_method
+from invenio.webstat import register_customevent
+from invenio.errorlib import register_exception
+
+from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
+    mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
+    mail_cookie_create_pw_reset, mail_cookie_check_role, \
+    mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
+    InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
 
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
@@ -44,42 +55,89 @@ blueprint = InvenioBlueprint('webaccount', __name__,
                                            'webaccount.index')])
 
 
+def update_login(nickname, password=None, remember_me=False):
+    where = [db.or_(User.nickname == nickname, User.email == nickname)]
+    if password is not None:
+        where.append(User.password == password)
+    user = User.query.filter(*where).one()
+    login_user(user.get_id(), remember_me=remember_me)
+    return user
+
+
 @blueprint.route('/login', methods=['GET', 'POST'])
+@blueprint.invenio_wash_urlargd({'nickname': (unicode, None),
+                                 'password': (unicode, None),
+                                 'login_method': (wash_login_method, 'Local'),
+                                 'action': (unicode, ''),
+                                 'remember_me': (bool, False),
+                                 'referer': (unicode, None)})
 @blueprint.invenio_set_breadcrumb(_("Login"))
 @blueprint.invenio_force_https
-def login():
-    form = LoginForm(request.values, csrf_enabled=False)
-    if form.validate_on_submit():
+def login(nickname=None, password=None, login_method=None, action='',
+          remember_me=False, referer=None):
+
+    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+        return abort(401)  # page is not authorized
+
+    if action:
         try:
-            #TODO add login_methods
-            user = User.query.filter(db.and_(
-                db.or_(User.nickname == form.nickname.data,
-                       User.email == form.nickname.data),
-                User.password == form.password.data)).one()
-            login_user(user.get_id(), remember_me=form.remember.data)
+            action, arguments = mail_cookie_check_authorize_action(action)
+        except InvenioWebAccessMailCookieError:
+            pass
+
+    form = LoginForm(request.values, csrf_enabled=False)
+    try:
+        user = None
+        if not CFG_EXTERNAL_AUTH_USING_SSO:
+            if login_method is 'Local':
+                if form.validate_on_submit():
+                    user = update_login(nickname, password, remember_me)
+            elif login_method in ['openid', 'oauth1', 'oauth2']:
+                pass
+                req = request.get_legacy_request()
+                (iden, nickname, password, msgcode) = webuser.loginUser(req, nickname, password, login_method)
+                if iden:
+                    user = update_login(nickname)
+            else:
+                flash(_('Invalid login method.'), 'error')
+
+        else:
+            req = request.get_legacy_request()
+            # Fake parameters for p_un & p_pw because SSO takes them from the environment
+            (iden, nickname, password, msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
+            if iden:
+                user = update_login(nickname)
+
+        if user:
             flash(_("You are logged in as %s.") % user.nickname, "info")
-            # Change HTTP method to https if needed.
-            referer = url_unquote(request.form.get("referer",
-                                                   url_for(".login")))
-            if CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and \
-                request.url.startswith('https://') and \
-                referer.startswith('http://'):
-                referer = referer.replace('http://', 'https://', 1)
-            return redirect(referer)
-        except:
-            flash(_("Problem with login."), "error")
+            if referer is not None:
+                # Change HTTP method to https if needed.
+                referer = referer.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL)
+                return redirect(referer)
+    except:
+        flash(_("Problem with login."), "error")
+
+    from invenio import websession_config
+    from flask import current_app
+    current_app.config.update(dict((k, v) for k, v in
+                              vars(websession_config).iteritems()
+                              if "CFG_" == k[:4]))
 
     return render_template('webaccount_login.html', form=form)
 
 
 @blueprint.route('/logout', methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Logout"))
+@blueprint.invenio_authenticated
 def logout():
     logout_user()
-    flash(_("You have been logged out."), 'info')
+
+    if CFG_EXTERNAL_AUTH_USING_SSO:
+        return redirect(CFG_EXTERNAL_AUTH_LOGOUT_SSO)
+
     return render_template('webaccount_logout.html',
-                            using_sso=CFG_EXTERNAL_AUTH_USING_SSO,
-                            logout_sso=CFG_EXTERNAL_AUTH_LOGOUT_SSO)
+                           using_sso=CFG_EXTERNAL_AUTH_USING_SSO,
+                           logout_sso=CFG_EXTERNAL_AUTH_LOGOUT_SSO)
 
 
 def _invenio_settings_plugin_builder(plugin_name, plugin_code):
@@ -106,13 +164,13 @@ _USER_SETTINGS = PluginContainer(
 @blueprint.invenio_authenticated
 def index():
     # load plugins
-    plugins = [a for a in [s() for (k, s) in _USER_SETTINGS.items()] \
+    plugins = [a for a in [s() for (k, s) in _USER_SETTINGS.items()]
                if a.is_authorized]
 
     dashboard_settings = current_user.get('dashboard_settings', {})
     order = dashboard_settings.get('order', [])
-    plugins = sorted(plugins, key=lambda w: order.index(w.__class__.__name__) \
-                            if w.__class__.__name__ in order else len(order))
+    plugins = sorted(plugins, key=lambda w: order.index(w.__class__.__name__)
+                     if w.__class__.__name__ in order else len(order))
 
     return render_template('webaccount_index.html', plugins=plugins)
 
@@ -145,5 +203,5 @@ def edit(name):
         from werkzeug.datastructures import MultiDict
         form = plugin.form_builder(MultiDict(plugin.load()))
 
-    return render_template(getattr(plugin, 'edit_template', '') or \
+    return render_template(getattr(plugin, 'edit_template', '') or
                            'webaccount_edit.html', plugin=plugin, form=form)

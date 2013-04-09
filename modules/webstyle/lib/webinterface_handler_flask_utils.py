@@ -20,6 +20,7 @@
 Invenio -> Flask adapter utilities
 """
 
+import types
 from functools import wraps
 from flask import Blueprint, current_app, request, session, redirect, abort, g, \
                   render_template, jsonify, get_flashed_messages, flash, \
@@ -401,6 +402,11 @@ def wash_urlargd(form, content):
             # in all the other cases, we are only interested in the
             # first value.
             value = value[0]
+
+        # Allow passing argument modyfing function.
+        if isinstance(dst_type, types.FunctionType):
+            result[k] = dst_type(value)
+            continue
 
         # Maybe we already have what is expected? Then don't change
         # anything.
