@@ -179,7 +179,7 @@ def citations(recid):
                            citations = citations)
 
 
-from bibclassify_webinterface import record_get_keywords
+from invenio.bibclassify_webinterface import record_get_keywords
 
 @blueprint.route('/<int:recid>/keywords', methods=['GET', 'POST'])
 @request_record
@@ -204,6 +204,3 @@ def usage(recid):
                             viewsimilarity = viewsimilarity,
                             downloadsimilarity = downloadsimilarity,
                             downloadgraph = downloadgraph)
-
-
-
