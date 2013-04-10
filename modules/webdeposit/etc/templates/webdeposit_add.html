@@ -45,33 +45,8 @@
     overflow-x: hidden;
 }
 
-#link{
-    float: left;
-    position:absolute;
-    font-size: 15px;
-    /*color:#272727;*/
-    color:rgb(59, 89, 152);
-    font-weight:bold;
-}
-
-#link:hover {
-    text-decoration:underline;
-}
-
 .l{
     size: 10px;
-}
-
-div#editable{
-    border: none;
-    z-index:-1;
-    display:none;
-}
-
-div#conditions{
-    border: none;
-    z-index:-1;
-    display:none;
 }
 
 .required:after {
@@ -260,6 +235,7 @@ div#conditions{
 
 {% block javascript %}
 {{ super() }}
+<!-- yahooapis is imported for pluploader -->
 <script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
 <script type="text/javascript">
 

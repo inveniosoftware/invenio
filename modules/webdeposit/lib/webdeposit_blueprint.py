@@ -54,6 +54,7 @@ from invenio.webdeposit_utils import get_current_form, \
                                      draft_field_get, \
                                      set_form_status, \
                                      get_form_status, \
+                                     create_user_file_system, \
                                      CFG_DRAFT_STATUS
 from invenio.webuser_flask import current_user
 from invenio.bibworkflow_engine import CFG_WORKFLOW_STATUS
@@ -85,31 +86,13 @@ def plupload(deposition_type, uuid):
         current_chunk = request.files['file']
 
         try:
-            filename = name + "_" + chunk
+            filename = secure_filename(name) + "_" + chunk
         except UnboundLocalError:
-            filename = name
+            filename = secure_filename(name)
 
-        # Check if webdeposit folder exists
-        if not os.path.exists(CFG_WEBDEPOSIT_UPLOAD_FOLDER):
-            os.makedirs(CFG_WEBDEPOSIT_UPLOAD_FOLDER)
-
-        # Create user filesystem
-        # user/deposition_type/uuid/files
-        CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER,
-                                                  "user_" +
-                                                  str(current_user.get_id()))
-        if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
-            os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
-
-        CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
-                                                  deposition_type)
-        if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
-            os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
-
-        CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
-                                                  uuid)
-        if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
-            os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
+        CFG_USER_WEBDEPOSIT_FOLDER = create_user_file_system(current_user.get_id(),
+                                                             deposition_type,
+                                                             uuid)
 
         # Save the chunk
         current_chunk.save(os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, filename))
@@ -117,9 +100,10 @@ def plupload(deposition_type, uuid):
         unique_filename = ""
 
         if chunks is None:  # file is a single chunk
-            unique_filename = str(new_uuid()) + name
+            unique_filename = str(new_uuid()) + filename
             old_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, filename)
-            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, unique_filename)
+            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                     unique_filename)
             os.rename(old_path, file_path)  # Rename the chunk
             size = os.path.getsize(file_path)
             file_metadata = dict(name=name, file=file_path, size=size)
@@ -128,26 +112,28 @@ def plupload(deposition_type, uuid):
         elif int(chunk) == int(chunks) - 1:
             '''All chunks have been uploaded!
                 start merging the chunks'''
-
+            filename = secure_filename(name)
             chunk_files = []
-            for filename in iglob(os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, name + '_*')):
-                chunk_files.append(filename)
+            for chunk_file in iglob(os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                                 filename + '_*')):
+                chunk_files.append(chunk_file)
 
             # Sort files in numerical order
             chunk_files.sort(key=lambda x: int(x.split("_")[-1]))
 
-            unique_filename = str(new_uuid()) + name
+            unique_filename = str(new_uuid()) + filename
             file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, unique_filename)
             destination = open(file_path, 'wb')
             for chunk in chunk_files:
                 shutil.copyfileobj(open(chunk, 'rb'), destination)
                 os.remove(chunk)
             destination.close()
+            current_app.logger.info(file_path)
             size = os.path.getsize(file_path)
+            current_app.logger.info(size)
             file_metadata = dict(name=name, file=file_path, size=size)
-
             draft_field_list_add(current_user.get_id(), uuid,
-                                 "files", json.dumps(file_metadata))
+                                 "files", file_metadata)
     return unique_filename
 
 
@@ -286,17 +272,17 @@ def create_new(deposition_type):
 def index_deposition_types():
     """ Renders the deposition types (workflows) list """
     current_app.config['breadcrumbs_map'][request.endpoint] = [
-                        (_('Home'), '')] + blueprint.breadcrumbs
-    drafts = dict(db.session.query(Workflow.name,
-                    db.func.count(db.func.distinct(WebDepositDraft.uuid))).\
-                  join(WebDepositDraft.workflow).\
-                  filter(db.and_(
-                    Workflow.user_id == current_user.get_id(),
-                    Workflow.status == CFG_WORKFLOW_STATUS['running']
-                  )).\
-                  group_by(Workflow.name).all())
+        (_('Home'), '')] + blueprint.breadcrumbs
+    drafts = dict(
+        db.session.query(Workflow.name,
+                         db.func.count(
+                         db.func.distinct(WebDepositDraft.uuid))).
+        join(WebDepositDraft.workflow).
+        filter(db.and_(Workflow.user_id == current_user.get_id(),
+                       Workflow.status != CFG_WORKFLOW_STATUS.FINISHED)).
+        group_by(Workflow.name).all())
 
-    return render_template('webdeposit_index_deposition_types.html', \
+    return render_template('webdeposit_index_deposition_types.html',
                            deposition_types=deposition_types,
                            drafts=drafts)
 
@@ -356,12 +342,17 @@ def add(deposition_type, uuid=None):
             filename = secure_filename(uploaded_file.filename)
             if filename == "":
                 continue
-            file_path = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER, filename)
+
+            CFG_USER_WEBDEPOSIT_FOLDER = create_user_file_system(current_user.get_id(),
+                                                                 deposition_type,
+                                                                 uuid)
+            unique_filename = str(new_uuid()) + filename
+            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER, unique_filename)
             uploaded_file.save(file_path)
-            draft_field_list_add(current_user.get_id(),
-                                 uuid,
-                                 "files",
-                                 file_path)
+            size = os.path.getsize(file_path)
+            file_metadata = dict(name=filename, file=file_path, size=size)
+            draft_field_list_add(current_user.get_id(), uuid,
+                                 "files", file_metadata)
 
         # Save form values
         for (field_name, value) in request.form.items():
@@ -374,7 +365,7 @@ def add(deposition_type, uuid=None):
         if not form.validate():
             # render the form with error messages
             return render_template('webdeposit_add.html',
-                                  **workflow.get_output(form_validation=True))
+                                   **workflow.get_output(form_validation=True))
 
         #Set the latest form status to finished
         set_form_status(current_user.get_id(), uuid, CFG_DRAFT_STATUS['finished'])

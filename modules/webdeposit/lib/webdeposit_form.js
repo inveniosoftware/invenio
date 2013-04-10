@@ -36,14 +36,14 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
         chunk_size : '1mb',
         //unique_names : true,
         browse_button : 'pickfiles',
-        drop_element : 'filebox',
+        drop_element : 'filebox'
 
         // Specify what files to browse for
-        filters : [
-            {title : "Image files", extensions : "jpg,gif,png,tif"},
-            {title : "Compressed files", extensions : "rar,zip,tar,gz"},
-            {title : "PDF files", extensions : "pdf"}
-        ]
+        //filters : [
+        //    {title : "Image files", extensions : "jpg,gif,png,tif"},
+        //    {title : "Compressed files", extensions : "rar,zip,tar,gz"},
+        //    {title : "PDF files", extensions : "pdf"}
+        //]
     });
 
     uploader.init();
@@ -74,11 +74,11 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
                 uploader.files.push(plfile);
                 $('#filelist').append(
                     '<tr id="' + plfile.id + '" style="display:none;">' +
-                        '<td><a href="' + get_file_url + "?filename=" + plfile.unique_filename + '">' + plfile.name + '</a></td>'
-                      + '<td>' + plupload.formatSize(plfile.size) + '</td>'
-                      + '<td width="30%"><div class="progress active"><div class="bar" style="width: 100%;"></div></div></td>'
-                      + '<td><a id="' + plfile.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>'
-                  + '</tr>');
+                        '<td><a href="' + get_file_url + "?filename=" + plfile.unique_filename + '">' + plfile.name + '</a></td>' +
+                        '<td>' + plupload.formatSize(plfile.size) + '</td>' +
+                        '<td width="30%"><div class="progress active"><div class="bar" style="width: 100%;"></div></div></td>' +
+                        '<td><a id="' + plfile.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>' +
+                    '</tr>');
                 $('#filelist #' + plfile.id).show('fast');
                 $("#" + plfile.id + "_rm").on("click", function(event){
                     uploader.removeFile(plfile);
@@ -119,7 +119,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
                 });
             }
         });
-        if(uploader.files.length == 0){
+        if(uploader.files.length === 0){
             $('#uploadfiles').addClass("disabled");
             $('#file-table').hide('slow');
         }
@@ -140,12 +140,12 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
         $('#file-table').show('slow');
         $.each(files, function(i, file) {
             $('#filelist').append(
-                '<tr id="' + file.id + '" style="display:none;z-index:-100;">'
-                  + '<td id="' + file.id + '_link">' + file.name + '</td>'
-                  + '<td>' + plupload.formatSize(file.size) + '</td>'
-                  + '<td width="30%"><div class="progress progress-striped active"><div class="bar" style="width: 0%;"></div></div></td>'
-                  + '<td><a id="' + file.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>'
-              + '</tr>');
+                '<tr id="' + file.id + '" style="display:none;z-index:-100;">' +
+                '<td id="' + file.id + '_link">' + file.name + '</td>' +
+                '<td>' + plupload.formatSize(file.size) + '</td>' +
+                '<td width="30%"><div class="progress progress-stri´ped active"><div class="bar" style="width: 0%;"></div></div></td>' +
+                '<td><a id="' + file.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>' +
+                '</tr>');
             $('#filelist #' + file.id).show('fast');
             $('#' + file.id + '_rm').on("click", function(event){
                 uploader.removeFile(file);
@@ -160,7 +160,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
         $('#' + file.id + '_rm').show();
         $('#' + file.id + '_link').html('<a href="' + get_file_url + "?filename=" + responseObj.response + '">' + file.name + '</a>');
         file.unique_filename = responseObj.response;
-        if (uploader.total.queued == 0)
+        if (uploader.total.queued === 0)
             $('#stopupload').hide();
 
         $('#uploadfiles').addClass('disabled');
@@ -191,7 +191,7 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
         if (errors > 0)
             errors--;
         emptyForm = checkEmptyFields(false, name, required_fields);
-        if (emptyForm[0] == 0) {
+        if (emptyForm[0] === 0) {
             $('#empty-fields-error').hide('slow');
         }
         else {
@@ -203,8 +203,8 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
     dismiss = '<button type="button" class="close" data-dismiss="alert">&times;</button>';
 
     if (data.success == 1) {
-        success = '<div class="alert alert-success help-inline" id="success-' + name + '" style="display:none;">'
-                  + dismiss + data.success_message +
+        success = '<div class="alert alert-success help-inline" id="success-' + name + '" style="display:none;">' +
+                  dismiss + data.success_message +
                   '</div>';
         $('#success-' + name).remove();
         $('#field-' + name).append(success);
@@ -215,8 +215,8 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
     }
 
     if (data.info == 1) {
-        info = '<div class="alert alert-info help-inline" id="info-' + name + '" style="display:none;">'
-               + dismiss + data.info_message +
+        info = '<div class="alert alert-info help-inline" id="info-' + name + '" style="display:none;">' +
+               dismiss + data.info_message +
                '</div>';
         $('#info-' + name).remove();
         $('#field-' + name).append(info);
@@ -235,12 +235,14 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
             errors--;
             old_value = $('[name=' + name + ']').val();
             if (old_value != value) {
-                $('[name=' + name + ']').val(value);
+                if (ckeditor.name == name)
+                    ckeditor.setData(value);
+                else
+                    $('[name=' + name + ']').val(value);
                 webdeposit_handle_new_value(name, value, url, required_fields);
             }
         });
     }
-
   }
 
 function webdeposit_handle_new_value(name, value, url, required_fields) {
@@ -255,14 +257,14 @@ function webdeposit_handle_new_value(name, value, url, required_fields) {
 
 function webdeposit_input_error_check(selector, url, required_fields) {
   $(selector).change( function() {
-      name = this.name;
-      value = this.value;
-      $.getJSON(url, {
-          name: name,
-          attribute: value
-      }, function(data){
-            webdeposit_handle_field_data(name, value, data, url, required_fields)
-      });
+        name = this.name;
+        value = this.value;
+        $.getJSON(url, {
+            name: name,
+            attribute: value
+        }, function(data){
+            webdeposit_handle_field_data(name, value, data, url, required_fields);
+        });
     return false;
   });
 }
@@ -275,9 +277,9 @@ function webdeposit_input_error_check(selector, url, required_fields) {
 function webdeposit_ckeditor_init(selector, url, required_fields) {
     CKEDITOR.replace(selector);
 
-    var ckeditor = CKEDITOR.instances[selector];
+    ckeditor = CKEDITOR.instances[selector];
     ckeditor.on('blur',function(event){
-        webdeposit_handle_new_value(selector, ckeditor.getData(), url, required_fields)
+        webdeposit_handle_new_value(selector, ckeditor.getData(), url, required_fields);
     });
 }
 
@@ -337,6 +339,7 @@ function webdeposit_field_autocomplete(selector, url) {
         $(selector).removeClass('ui-autocomplete-loading');
       });
     };
+
     $(selector).typeahead({
       source: source,
       minLength: 5,
@@ -353,8 +356,8 @@ function webdeposit_check_status(url){
         }).done(function(data) {
             if (data.status == 1)
                 location.reload();
-        })
-    }, 7000);
+        });
+    }, 10000);
 }
 
 /*

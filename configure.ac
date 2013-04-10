@@ -927,7 +927,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/docextract/doc/hacking/Makefile \
      modules/webdeposit/Makefile \
      modules/webdeposit/etc/Makefile \
-     modules/webdeposit/etc/static/Makefile \
      modules/webdeposit/etc/templates/Makefile \
      modules/webdeposit/lib/Makefile \
      modules/webdeposit/lib/deposition_fields/Makefile \

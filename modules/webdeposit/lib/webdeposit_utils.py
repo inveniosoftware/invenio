@@ -17,6 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
 from datetime import datetime
 from sqlalchemy import desc
 from wtforms import FormField
@@ -29,6 +30,7 @@ from invenio.webdeposit_load_forms import forms
 from invenio.webuser_flask import current_user
 from invenio.webdeposit_load_deposition_types import deposition_metadata
 from invenio.webdeposit_workflow import DepositionWorkflow
+from invenio.config import CFG_WEBDEPOSIT_UPLOAD_FOLDER
 
 """ Deposition Type Functions """
 
@@ -52,7 +54,7 @@ def get_latest_or_new_workflow(deposition_type):
             Workflow.user_id == user_id,
             Workflow.name == deposition_type,
             Workflow.module_name == 'webdeposit',
-            Workflow.status == CFG_WORKFLOW_STATUS['running']).\
+            Workflow.status != CFG_WORKFLOW_STATUS.FINISHED).\
         order_by(db.desc(WebDepositDraft.timestamp)).\
         first()
     if webdeposit_draft is None:
@@ -225,10 +227,19 @@ def get_form(user_id, uuid, step=None):
         elif field_name in draft_data:
             form[field_name].process_data(draft_data[field_name])
 
-    import json
     if 'files' in draft_data:
+        # FIXME: sql alchemy(0.8.0) returns the value from the
+        #        column form_values with keys and values in unicode.
+        #        This creates problem when the dict is rendered
+        #        in the page to be used by javascript functions. There must
+        #        be a more elegant way than decoding the dict from unicode.
+
+        draft_data['files'] = decode_dict_from_unicode(draft_data['files'])
         for file_metadata in draft_data['files']:
             # Replace the path with the unique filename
+            if isinstance(file_metadata, basestring):
+                import json
+                file_metadata = json.loads(file_metadata)
             filepath = file_metadata['file'].split('/')
             unique_filename = filepath[-1]
             file_metadata['unique_filename'] = unique_filename
@@ -415,7 +426,6 @@ def draft_field_list_add(user_id, uuid, field_name, value, key=None, subfield=No
             values[field_name] = new_values_list
     except KeyError:
         values[field_name] = [value]
-
     webdeposit_draft_query.update({"form_values": values,
                                    "timestamp": datetime.now()})
 
@@ -489,22 +499,22 @@ def draft_field_get_all(user_id, deposition_type):
     """
 
     ## Select drafts with max step from each uuid.
-    subquery = db.session.query(WebDepositDraft.uuid,
-                                db.func.max(WebDepositDraft.step)).\
-                    join(WebDepositDraft.workflow).\
-                    filter(db.and_(
-                        Workflow.status == CFG_WORKFLOW_STATUS['running'],
-                        Workflow.user_id == user_id,
-                        Workflow.name == deposition_type,
-                        Workflow.module_name == 'webdeposit'
-                    )).\
-                    group_by(WebDepositDraft.uuid)
+    subquery = \
+        db.session.query(WebDepositDraft.uuid,
+                         db.func.max(WebDepositDraft.step)). \
+        join(WebDepositDraft.workflow).\
+        filter(db.and_(Workflow.status != CFG_WORKFLOW_STATUS.FINISHED,
+                       Workflow.user_id == user_id,
+                       Workflow.name == deposition_type,
+                       Workflow.module_name == 'webdeposit')). \
+        group_by(WebDepositDraft.uuid)
 
-    drafts = WebDepositDraft.query.filter(db.tuple_(WebDepositDraft.uuid,
-                                                    WebDepositDraft.step).\
-                                          in_(subquery)).\
-                                   order_by(db.desc(WebDepositDraft.timestamp)).\
-                                   all()
+    drafts = \
+        WebDepositDraft.query. \
+        filter(db.tuple_(WebDepositDraft.uuid, WebDepositDraft.step).
+               in_(subquery)). \
+        order_by(db.desc(WebDepositDraft.timestamp)). \
+        all()
     return drafts
 
 
@@ -530,3 +540,39 @@ def get_current_draft(user_id, deposition_type):
                         order_by(desc(WebDepositDraft.timestamp)). \
                         first()
     return webdeposit_draft
+
+
+def create_user_file_system(user_id, deposition_type, uuid):
+    # Check if webdeposit folder exists
+    if not os.path.exists(CFG_WEBDEPOSIT_UPLOAD_FOLDER):
+        os.makedirs(CFG_WEBDEPOSIT_UPLOAD_FOLDER)
+
+    # Create user filesystem
+    # user/deposition_type/uuid/files
+    CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_WEBDEPOSIT_UPLOAD_FOLDER,
+                                              "user_" + str(user_id))
+    if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
+        os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
+
+    CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                              deposition_type)
+    if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
+        os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
+
+    CFG_USER_WEBDEPOSIT_FOLDER = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                                              uuid)
+    if not os.path.exists(CFG_USER_WEBDEPOSIT_FOLDER):
+        os.makedirs(CFG_USER_WEBDEPOSIT_FOLDER)
+
+    return CFG_USER_WEBDEPOSIT_FOLDER
+
+
+def decode_dict_from_unicode(input):
+    if isinstance(input, dict):
+        return {decode_dict_from_unicode(key): decode_dict_from_unicode(value) for key, value in input.iteritems()}
+    elif isinstance(input, list):
+        return [decode_dict_from_unicode(element) for element in input]
+    elif isinstance(input, unicode):
+        return input.encode('utf-8')
+    else:
+        return input

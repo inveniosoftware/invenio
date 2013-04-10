@@ -71,7 +71,7 @@ def sherpa_romeo_publisher_validate(field):
         return dict(info=1, info_message=s.error_message)
 
     conditions = s.parser.get_publishers(attribute='conditions')
-    if conditions is not None:
+    if conditions is not None and s.get_num_hits() == 1:
         conditions = conditions[0]
     else:
         conditions = []
