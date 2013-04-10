@@ -42,6 +42,7 @@ import gc
 
 from flask import current_app, session
 from invenio import webinterface_handler_config as apache
+from invenio import config
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR, \
     CFG_SITE_RECORD, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.messages import wash_language
@@ -288,7 +289,7 @@ def create_handler(root):
         args = {}
         if req.args:
             args = cgi.parse_qs(req.args)
-        if 'profile' in args:
+        if 'profiler' in getattr(config, 'CFG_DEVEL_TOOLS', []) and 'profile' in args:
             if not isUserSuperAdmin(collect_user_info(req)):
                 return _handler(req)
 
@@ -346,7 +347,7 @@ def create_handler(root):
             profile_dump += '\nYou can use profile=%s or profile=memory' % existing_sorts
             req.write("\n<pre>%s</pre>" % profile_dump)
             return ret
-        elif 'debug' in args and args['debug']:
+        elif 'remote-debugger' in getattr(config, 'CFG_DEVEL_TOOLS', []) and 'debug' in args and args['debug']:
             #remote_debugger.start(["3"]) # example starting debugger on demand
             if remote_debugger:
                 debug_starter = remote_debugger.get_debugger(args['debug'])

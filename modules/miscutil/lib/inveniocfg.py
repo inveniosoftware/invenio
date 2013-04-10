@@ -225,7 +225,8 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS',
                        'CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS',
                        'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',
-                       'CFG_FLASK_DISABLED_BLUEPRINTS']:
+                       'CFG_FLASK_DISABLED_BLUEPRINTS',
+                       'CFG_DEVEL_TOOLS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
@@ -268,17 +269,20 @@ CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS.
 Please, update your invenio-local.conf file accordingly.""")
         option_value = option_value[1:-1]
     elif option_name in ['CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
-                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
-                          'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
-                          'CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT',
-                          'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
-                          'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
+                         'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
+                         'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_MISC',
+                         'CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT',
+                         'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
+                         'CFG_WEBSUBMIT_DESIRED_CONVERSIONS']:
         new_option_name = option_name.replace('WEBSUBMIT', 'BIBDOCFILE')
         print >> sys.stderr, ("""ERROR: %s has been renamed to %s.
 Please, update your invenio-local.conf file accordingly.""" % (option_name, new_option_name))
         option_name = new_option_name
-
-
+    elif option_name in ['CFG_WEBSTYLE_INSPECT_TEMPLATES']:
+        print >> sys.stderr, ("""ERROR: CFG_WEBSTYLE_INSPECT_TEMPLATES has been dropped in favour of
+CFG_DEVEL_TOOLS.
+Please, update your invenio-local.conf file accordingly.""")
+        return
 
     ## 5) finally, return output line:
     return '%s = %s' % (option_name, option_value)

@@ -19,12 +19,13 @@
 # no remote debugging is available, if you run the debugger for the Invenio
 # site, make sure also your config contains the same directive
 
-CFG_REMOTE_DEBUGGER_ENABLED = 0 # by default, we don't want to enable debugger
+# Remote debugging is enabled via CFG_DEVEL_TOOLS (note, invenio.wsgi will not
+# import the remote debugger if not set).
+CFG_REMOTE_DEBUGGER_ENABLED = 0  # by default, we don't want to enable debugger
 
-# if CFG_DEVEL_SITE is defined, then we do want to enable debugger:
 try:
-    from invenio.config import CFG_DEVEL_SITE
-    if CFG_DEVEL_SITE:
+    from invenio.config import CFG_DEVEL_TOOLS
+    if 'remote-debugger' in CFG_DEVEL_TOOLS:
         CFG_REMOTE_DEBUGGER_ENABLED = 1
 except ImportError:
     pass

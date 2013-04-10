@@ -42,8 +42,8 @@ import re
 import atexit
 from zlib import compress, decompress
 from thread import get_ident
+from invenio import config
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
-    CFG_DEVEL_SITE, \
     CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
     CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
 
@@ -206,7 +206,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     if run_on_slave and CFG_DATABASE_SLAVE:
         dbhost = CFG_DATABASE_SLAVE
 
-    if CFG_DEVEL_SITE > 8:
+    if 'sql-logger' in getattr(config, 'CFG_DEVEL_TOOLS', []):
         log_sql_query(dbhost, sql, param)
 
     try:

@@ -18,15 +18,15 @@
 """Invenio templating framework."""
 
 from __future__ import nested_scopes
-import os, sys, inspect, getopt, new, cgi
+import os, sys, inspect, getopt, new, cgi, warnings
 
 try:
     # This tool can be run before Invenio is installed:
     # invenio files might then not exist.
+    from invenio import config
     from invenio.config import \
          CFG_WEBSTYLE_TEMPLATE_SKIN, \
-         CFG_PREFIX, \
-         CFG_WEBSTYLE_INSPECT_TEMPLATES
+         CFG_PREFIX
     CFG_WEBSTYLE_PYLIBDIR = CFG_PREFIX + os.sep + 'lib' + os.sep + 'python'
 except ImportError:
     CFG_WEBSTYLE_PYLIBDIR = None
@@ -110,7 +110,7 @@ def load(module=''):
         except ImportError:
             mymodule = __import__("invenio.%s_templates" % (module), local, local,
                                   ["invenio.templates.%s" % (module)])
-    if CFG_WEBSTYLE_INSPECT_TEMPLATES:
+    if 'inspect-templates' in getattr(config, 'CFG_DEVEL_TOOLS', []):
         for method_name in dir(mymodule.Template):
             if method_name.startswith('tmpl_'):
                 enhance_method(module, mymodule.Template, method_name, method_wrapper)

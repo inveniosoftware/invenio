@@ -41,6 +41,7 @@
 
 
 from flask import request, redirect
+from invenio import config
 
 YEAR_IN_SECS = 31536000
 
@@ -86,8 +87,8 @@ class SSLify(object):
         # Should we redirect?
         criteria = [
             request.is_secure,
-            self.app.debug,
-            request.headers.get('X-Forwarded-Proto', 'http') == 'https'
+            request.headers.get('X-Forwarded-Proto', 'http') == 'https',
+            'no-https-redirect' in getattr(config, 'CFG_DEVEL_TOOLS', []),
         ]
 
         if self.criteria_callback is not None:

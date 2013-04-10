@@ -166,10 +166,12 @@ def create_invenio_flask_app(**kwargs_config):
     _app.config["SECRET_KEY"] = CFG_SITE_SECRET_KEY
 
     # Enable Flask Debug Toolbar early to also catch HTTPS redirects
-    if CFG_DEVEL_SITE > 8:
+    if 'debug-toolbar' in getattr(config, 'CFG_DEVEL_TOOLS', []):
+        _app.config["DEBUG_TB_ENABLED"] = True
+        _app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = 'intercept-redirects' in getattr(config, 'CFG_DEVEL_TOOLS', [])
         from flask_debugtoolbar import DebugToolbarExtension
-        _toolbar = DebugToolbarExtension(_app)
-        del _toolbar
+        DebugToolbarExtension(_app)
+
 
     if CFG_HAS_HTTPS_SUPPORT:
         # Makes request always run over HTTPS.
@@ -343,7 +345,7 @@ def create_invenio_flask_app(**kwargs_config):
 
     # Let's create assets environment.
     _assets = Environment(_app)
-    _assets.debug = config.CFG_DEVEL_SITE > 1
+    _assets.debug = 'assets-debug' in getattr(config, 'CFG_DEVEL_TOOLS', [])
     _assets.directory = config.CFG_WEBDIR
 
     def _jinja2_new_bundle(tag, collection):

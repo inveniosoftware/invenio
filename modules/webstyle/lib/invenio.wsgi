@@ -20,12 +20,15 @@
 mod_wsgi Invenio application loader.
 """
 
+from invenio import config
+
 # start remote debugger if appropriate:
-try:
-    from invenio import remote_debugger
-    remote_debugger.start_file_changes_monitor()
-except:
-    pass
+if 'remote-debugger' in getattr(config, 'CFG_DEVEL_TOOLS', []):
+    try:
+        from invenio import remote_debugger
+        remote_debugger.start_file_changes_monitor()
+    except:
+        pass
 
 # wrap warnings (usually from sql queries) to log the traceback
 # of their origin for debugging
@@ -55,7 +58,6 @@ sys.stdout = sys.stderr
 from invenio.webinterface_handler_flask import create_invenio_flask_app
 application = create_invenio_flask_app()
 
-from invenio.config import CFG_DEVEL_SITE
-if CFG_DEVEL_SITE > 8:
+if 'werkzeug-debugger' in getattr(config, 'CFG_DEVEL_TOOLS', []):
     from werkzeug.debug import DebuggedApplication
     application = DebuggedApplication(application, evalex=True)
