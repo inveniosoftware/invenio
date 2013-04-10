@@ -380,10 +380,9 @@ def eval_bibformat_lxml(ctx, recID, template_code):
     @param template_code: the code calling a BFE_ as it would be use in format template
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
-    """ #'
-    from invenio.bibformat_engine import \
-    format_with_format_template, \
-    BibFormatObject
+    """
+    from invenio.bibformat_engine import BibFormatObject
+    from invenio.bibformat import format_with_format_template
     try:
         if isinstance(recID, str):
             recID_int = int(recID)

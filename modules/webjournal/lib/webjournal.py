@@ -22,9 +22,8 @@ WebJournal - Main Public interface of the WebJournals
 
 import datetime
 import time
-from invenio.bibformat_engine import \
-     BibFormatObject, \
-     format_with_format_template
+from invenio.bibformat_engine import BibFormatObject
+from invenio.bibformat import format_with_format_template
 from invenio.errorlib import register_exception
 from invenio.config import \
      CFG_SITE_URL, \

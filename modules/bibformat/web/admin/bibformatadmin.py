@@ -26,6 +26,7 @@ import MySQLdb
 from invenio import bibformatadminlib, \
                     bibformat_dblayer,\
                     bibformat_engine
+from invenio.bibformat import format_with_format_template
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, error_page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
@@ -826,10 +827,10 @@ def format_template_show_preview_or_save(req, bft, ln=CFG_SITE_LANG, code=None,
                                                search_pattern = keywords,
                                                xml_record = None,
                                                user_info = user_info)
-        body = bibformat_engine.format_with_format_template(bft,
-                                                            bfo,
-                                                            verbose=7,
-                                                            format_template_code=code)
+        body = format_with_format_template(bft,
+                                           bfo,
+                                           verbose=7,
+                                           format_template_code=code)
 
         if content_type_for_preview == 'text/html':
             #Standard page display with CDS headers, etc.

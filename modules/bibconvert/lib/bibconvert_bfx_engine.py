@@ -205,14 +205,7 @@ class XML2XMLTranslator:
         @param parameters: a dictionary of the parameters to pass as key=value pairs
         @return: a string value, which is the result of the function call
         '''
-        #No support for this in bibconvert_bfx_engine
-        ## if parameters is None:
-##             parameters = {}
-##         bfo = BibFormatObject(self.recID)
-##         format_element = get_format_element(function_name)
-##         (value, errors) = eval_format_element(format_element, bfo, parameters)
-##         #to do: check errors from function call
-##        return value
+        # No support for this in bibconvert_bfx_engine
         return ""
 
     def set_xml_source(self, xmltext):

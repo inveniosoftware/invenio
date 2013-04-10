@@ -462,14 +462,17 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
     else:
         run_on_slave = True # for other formats, we can use DB slave
     # Try to fetch preformatted record
-    query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
+    query = """SELECT value, needs_2nd_pass FROM bibfmt
+               WHERE id_bibrec = %s AND format = %s"""
     params = (recID, of)
     res = run_sql(query, params, run_on_slave=run_on_slave)
     if res:
+        value = decompress(res[0][0])
+        needs_2nd_pass = bool(res[0][1])
         # record 'recID' is formatted in 'of', so return it
-        return "%s" % decompress(res[0][0])
+        return value, needs_2nd_pass
     else:
-        return None
+        return None, None
 
 def get_preformatted_record_date(recID, of):
     """
@@ -497,7 +500,7 @@ def get_preformatted_record_date(recID, of):
     else:
         return None
 
-def save_preformatted_record(recID, of, res,
+def save_preformatted_record(recID, of, res, needs_2nd_pass=False,
                              low_priority=False, compress=zlib.compress):
     start_date = time.strftime('%Y-%m-%d %H:%M:%S')
     formatted_record = compress(res)
@@ -506,13 +509,14 @@ def save_preformatted_record(recID, of, res,
     else:
         sql_str = " DELAYED"
     run_sql("""INSERT%s INTO bibfmt
-               (id_bibrec, format, last_updated, value)
-               VALUES (%%s, %%s, %%s, %%s)
+               (id_bibrec, format, last_updated, value, needs_2nd_pass)
+               VALUES (%%s, %%s, %%s, %%s, %%s)
                ON DUPLICATE KEY UPDATE
                     last_updated = VALUES(last_updated),
-                    value = VALUES(value)
+                    value = VALUES(value),
+                    needs_2nd_pass = VALUES(needs_2nd_pass)
                """ % sql_str,
-            (recID, of, start_date, formatted_record))
+            (recID, of, start_date, formatted_record, needs_2nd_pass))
 
 
 

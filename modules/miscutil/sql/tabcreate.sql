@@ -1734,6 +1734,7 @@ CREATE TABLE IF NOT EXISTS bibfmt (
   format varchar(10) NOT NULL default '',
   last_updated datetime NOT NULL default '0000-00-00',
   value longblob,
+  needs_2nd_pass TINYINT(1) DEFAULT 0,
   PRIMARY KEY  (id_bibrec, format),
   KEY format (format),
   KEY last_updated (last_updated)

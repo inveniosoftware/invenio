@@ -755,16 +755,18 @@ class FormatTest(InvenioTestCase):
         #self.assertEqual(result.replace("\n", ""),"")
 
         #use output format that link to unknown template
-        result = bibformat_engine.format_record(recID=None, of="test3", xml_record=self.xml_text_2)
-        self.assertEqual(result.replace("\n", ""),"")
+        result, needs_2nd_pass = bibformat_engine.format_record(recID=None, of="test3", xml_record=self.xml_text_2)
+        self.assertEqual(result.replace("\n", ""), "")
+        self.assertEqual(needs_2nd_pass, False)
 
         #Unknown output format TEST DISABLED DURING MIGRATION
         #result = bibformat_engine.format_record(recID=None, of="unkno", xml_record=self.xml_text_3)
         #self.assertEqual(result.replace("\n", ""),"")
 
         #Default formatting
-        result = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)
+        result, needs_2nd_pass = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)
         self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n''')
+        self.assertEqual(needs_2nd_pass, False)
 
     def test_empty_formatting(self):
         """bibformat - formatting empty record"""
@@ -772,7 +774,7 @@ class FormatTest(InvenioTestCase):
                                                 of='hb',
                                                 verbose=9,
                                                 xml_record=self.empty_record_xml)
-        self.assertEqual(result, '')
+        self.assertEqual(result, ('', False))
 
         # FIXME: The commented test below currently fails, since xm
         # format is generated from the database
@@ -787,13 +789,76 @@ class FormatTest(InvenioTestCase):
         """ bibformat - correct formatting with given template"""
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
         template = bibformat_engine.get_format_template("Test3.bft")
-        result = bibformat_engine.format_with_format_template(format_template_filename = None,
-                                                              bfo=self.bfo_1,
-                                                              verbose=0,
-                                                              format_template_code=template['code'])
+        result, no_cache = bibformat_engine.format_with_format_template(
+                                        format_template_filename=None,
+                                        bfo=self.bfo_1,
+                                        verbose=0,
+                                        format_template_code=template['code'])
 
-        self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
+        self.assertEqual(result, '''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
+        self.assertEqual(no_cache, False)
 
+
+    def test_format_2_passes_manually(self):
+        result, needs_2nd_pass = bibformat_engine.format_record(
+                                                recID=None,
+                                                of="test6",
+                                                xml_record=self.xml_text_2)
+        self.assertEqual(result, "<bfe_test_6 />\n")
+        self.assertEqual(needs_2nd_pass, True)
+
+        out = bibformat_engine.format_record_2nd_pass(recID=None,
+                                                      of="test6",
+                                                      template=result)
+        self.assertEqual(out, "helloworld\n")
+
+    def test_format_translations_no_2nd_pass_en(self):
+        result, needs_2nd_pass = bibformat_engine.format_record(
+                                                recID=None,
+                                                of="test7",
+                                                xml_record=self.xml_text_2,
+                                                ln='en')
+        self.assertEqual(result.strip(), 'Title en\n<input type="button" value="Record"/>')
+        self.assertEqual(needs_2nd_pass, False)
+
+    def test_format_translations_no_2nd_pass_fr(self):
+        result, needs_2nd_pass = bibformat_engine.format_record(
+                                                recID=None,
+                                                of="test7",
+                                                xml_record=self.xml_text_2,
+                                                ln='fr')
+        self.assertEqual(result.strip(), 'Titre fr\n<input type="button" value="Notice"/>')
+        self.assertEqual(needs_2nd_pass, False)
+
+    def test_format_translations_with_2nd_pass_en(self):
+        result, needs_2nd_pass = bibformat_engine.format_record(
+                                                recID=None,
+                                                of="test8",
+                                                xml_record=self.xml_text_2,
+                                                ln='en')
+        self.assertEqual(result.strip(), '<lang>\n  <en>Title en</en>\n  <fr>Titre fr</fr>\n</lang>\n<bfe_test_6 />\n<input type="button" value="_(Record)_"/>')
+        self.assertEqual(needs_2nd_pass, True)
+
+        out = bibformat_engine.format_record_2nd_pass(recID=None,
+                                                      of="test8",
+                                                      template=result,
+                                                      ln='en')
+        self.assertEqual(out, 'Title en\nhelloworld\n<input type="button" value="Record"/>')
+
+    def test_format_translations_with_2nd_pass_fr(self):
+        result, needs_2nd_pass = bibformat_engine.format_record(
+                                                recID=None,
+                                                of="test8",
+                                                xml_record=self.xml_text_2,
+                                                ln='fr')
+        self.assertEqual(result.strip(), '<lang>\n  <en>Title en</en>\n  <fr>Titre fr</fr>\n</lang>\n<bfe_test_6 />\n<input type="button" value="_(Record)_"/>')
+        self.assertEqual(needs_2nd_pass, True)
+
+        out = bibformat_engine.format_record_2nd_pass(recID=None,
+                                                      of="test8",
+                                                      template=result,
+                                                      ln='fr')
+        self.assertEqual(out, 'Titre fr\nhelloworld\n<input type="button" value="Notice"/>')
 
 class MarcFilteringTest(InvenioTestCase):
     """ bibformat - MARC tag filtering tests"""
@@ -830,10 +895,10 @@ class MarcFilteringTest(InvenioTestCase):
         '''
     def test_filtering(self):
         """bibformat - filter hidden fields"""
-        newxml = bibformat.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=True)
+        newxml = bibformat_engine.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=True)
         numhfields = newxml.count("595")
         self.assertEqual(numhfields, 0)
-        newxml = bibformat.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=False)
+        newxml = bibformat_engine.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=False)
         numhfields = newxml.count("595")
         self.assertEqual(numhfields, 1)
 

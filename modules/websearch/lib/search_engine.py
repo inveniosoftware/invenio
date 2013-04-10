@@ -4495,7 +4495,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                      referencenum=references,
                                                      discussionnum=discussions))
 
-                        req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose))
+                        req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose, force_2nd_pass=True))
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
                                                                                       ln))

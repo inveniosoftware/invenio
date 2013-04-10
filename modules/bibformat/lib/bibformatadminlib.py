@@ -400,7 +400,7 @@ def perform_request_format_element_test(bfe, ln=CFG_SITE_LANG, param_values=None
                                                search_pattern = search_pattern.split(' '),
                                                xml_record = None,
                                                user_info = user_info)
-        (result, dummy) = bibformat_engine.eval_format_element(format_element, bfo, params)
+        (result, dummy, dummy) = bibformat_engine.eval_format_element(format_element, bfo, params)
     else:
         try:
             raise InvenioBibFormatError(_('No Record Found for %s.') % search_pattern)
@@ -1491,7 +1491,7 @@ def check_format_template(filename, checking=0):
                             if len(recIDs) > 0:
                                 recID = recIDs[0]
                                 bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
-                                (result, errors_) = bibformat_engine.eval_format_element(format_element, bfo, all_params, verbose=7)
+                                (result, errors_, dummy) = bibformat_engine.eval_format_element(format_element, bfo, all_params, verbose=7)
                                 errors.extend(errors_)
 
     else:# Template cannot be read
@@ -1534,7 +1534,7 @@ def check_format_element(name):
                     recID = recIDs[0]
                     bfo = bibformat_engine.BibFormatObject(recID, search_pattern="Test")
                     element = bibformat_engine.get_format_element(name)
-                    (result, errors_) = bibformat_engine.eval_format_element(element, bfo, verbose=7)
+                    (result, errors_, dummy) = bibformat_engine.eval_format_element(element, bfo, verbose=7)
                     errors.extend(errors_)
             except Exception, e:
                 try:

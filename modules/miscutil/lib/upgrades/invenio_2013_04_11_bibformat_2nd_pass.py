@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,19 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibformat/output_formats
+from invenio.dbquery import run_sql
 
-etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo \
-	   XD.bfo HS.bfo HA.bfo \
-	   XE.bfo XE8X.bfo XN.bfo XR.bfo XW.bfo \
-	   XOAIDC.bfo XO.bfo XOAIMARC.bfo \
-	   HDREF.bfo HDFILE.bfo HDACT.bfo XP.bfo BSR.bfo WAPAFF.bfo \
-	   HDM.bfo DCITE.bfo MOBB.bfo MOBD.bfo
+depends_on = ['invenio_release_1_1_0']
 
-tmpdir = $(prefix)/var/tmp
+def info():
+    return """Adds a new column to bibfmt for knowing when a second pass
+              is required on the cached template"""
 
-tmp_DATA = TEST1.bfo TEST2.bfo TEST3.bfo TEST6.bfo TEST7.bfo TEST8.bfo
+def do_upgrade():
+    create_statement = run_sql('SHOW CREATE TABLE bibfmt')[0][1]
+    if 'needs_2nd_pass' not in create_statement:
+        run_sql("ALTER TABLE bibfmt ADD COLUMN needs_2nd_pass TINYINT(1) DEFAULT 0")
 
-EXTRA_DIST = $(etc_DATA) $(tmp_DATA)
-
-CLEANFILES = *.tmp
+def estimate():
+    """  Estimate running time of upgrade in seconds (optional). """
+    count_rows = run_sql("SELECT COUNT(*) FROM bibfmt")[0][0]
+    return count_rows / 40
