@@ -43,7 +43,8 @@ from invenio.textutils import \
      decode_to_unicode, \
      translate_latex2unicode, \
      translate_to_ascii, \
-     strip_accents
+     strip_accents, \
+     transliterate_ala_lc
 
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -442,8 +443,10 @@ class TestStripping(unittest.TestCase):
     if UNIDECODE_AVAILABLE:
         def test_text_to_ascii(self):
             """textutils - transliterate to ascii using unidecode"""
-            self.assertEqual(translate_to_ascii(["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]), \
-                                                ["a i U", "Hohne", "Age Ost Vaer", "normal"])
+            self.assertEqual(translate_to_ascii(
+                ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]),
+                ["a i U", "Hohne", "Age Ost Vaer", "normal"]
+            )
             self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
             self.assertEqual(translate_to_ascii(None), None)
             self.assertEqual(translate_to_ascii([]), [])
@@ -458,10 +461,24 @@ class TestStripping(unittest.TestCase):
         self.assertEqual("MEMEMEME",
                          strip_accents('MÉMÊMËMÈ'))
 
+
+class TestALALC(unittest.TestCase):
+    """Test for handling ALA-LC transliteration."""
+
+    if UNIDECODE_AVAILABLE:
+        def test_alalc(self):
+            msg = "眾鳥高飛盡"
+            encoded_text, encoding = guess_minimum_encoding(msg)
+            unicode_text = unicode(encoded_text.decode(encoding))
+            self.assertEqual("Zhong Niao Gao Fei Jin ",
+                             transliterate_ala_lc(unicode_text))
+
+
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
                              WashForXMLTest, WashForUTF8Test, DecodeToUnicodeTest,
-                             Latex2UnicodeTest, TestStripping)
+                             Latex2UnicodeTest, TestStripping,
+                             TestALALC)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
