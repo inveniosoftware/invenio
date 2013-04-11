@@ -716,6 +716,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
             inv_search = "title:bob and title:sam and title:couch"
             self._compare_searches(inv_search, spi_search)
 
+        def test_date_invalid(self):
+            """SPIRES search syntax - searching an invalid date"""
+            spi_search = "find date foo"
+            inv_search = "year:foo"
+            self._compare_searches(inv_search, spi_search)
+
         def test_date_by_yr(self):
             """SPIRES search syntax - searching by date year"""
             spi_search = "find date 2002"

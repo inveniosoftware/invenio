@@ -938,8 +938,12 @@ class SpiresToInvenioSyntaxConverter:
                 begin = '0'
             else:
                 default = datetime(datetime.today().year, 1, 1)
-                d = du_parser.parse(date_str, default=default)
-                begin = datetime.strftime(d, '%Y-%m-%d')
+                try:
+                    d = du_parser.parse(date_str, default=default)
+                except ValueError:
+                    begin = date_str
+                else:
+                    begin = datetime.strftime(d, '%Y-%m-%d')
 
             return begin, end
 
