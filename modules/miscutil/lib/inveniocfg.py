@@ -771,6 +771,8 @@ def cli_cmd_load_webstat_conf(conf):
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
     print ">>> Going to drop tables and related data on filesystem ..."
+    from invenio import flaskshell
+
     from invenio.config import CFG_PREFIX
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     from invenio.webstat import destroy_customevents
@@ -781,26 +783,20 @@ your database tables and related data on filesystem!"""))
         print msg
 
     import shutil
-    from invenio import flaskshell
-    from flask import current_app
-    current_app.logger.info('Dropping tables')
-    from invenio.sqlalchemyutils import db, load_all_model_files
+    from invenio.sqlalchemyutils import db
     from invenio.bibdocfile import _make_base_dir
     from sqlalchemy import event
 
     def bibdoc_before_drop(target, connection, **kw):
         for (docid,) in db.session.query(target.c.id).all():
-            shutil.rmtree(_make_base_dir(docid))
+            directory = _make_base_dir(docid)
+            if os.path.isdir(directory):
+                shutil.rmtree(directory)
 
-    try:
-        from invenio.bibrecord_model import Bibdoc
-        event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
+    from invenio.bibedit_model import Bibdoc
+    event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
 
-        modules = load_all_model_files()
-        db.drop_all()
-    except:
-        print "ERROR: failed execution of DROP ALL"
-        sys.exit(1)
+    db.drop_all()
     print ">>> Tables dropped successfully."
 
 def cli_cmd_create_demo_site(conf):
