@@ -739,7 +739,7 @@
             var typeahead = this
             $.ajax({
               type: 'GET',
-              url: '{{ url_for('search.list', field='exactauthor') }}',
+              url: '{{ url_for('search.autocomplete', field='exactauthor') }}',
               data: $.param({
                 q: query.substr(query.lastIndexOf(':')+1)
               })

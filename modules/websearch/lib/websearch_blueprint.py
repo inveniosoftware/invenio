@@ -544,7 +544,7 @@ def results(qid):
 
 
 @blueprint.route('/list/<field>', methods=['GET', 'POST'])
-def list(field):
+def autocomplete(field):
     """
     Autocompletes data from indexes.
 

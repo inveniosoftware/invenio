@@ -33,6 +33,9 @@
     <li class="{{ 'active' if tab.key == request.endpoint }} {{ 'disabled' if not tab.enabled }}">
       <a href="{{ url_for(tab.key, recid=recid) if tab.enabled else '#' }}">
         {{ tab.label }}
+        {% if tab.count and tab.count > -1 %}
+          &nbsp;<small class="muted">({{ tab.count }})</small>
+        {% endif %}
       </a>
     </li>
   {%- endif -%}

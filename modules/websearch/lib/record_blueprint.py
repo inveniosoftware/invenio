@@ -22,15 +22,12 @@
 from functools import wraps
 from invenio import webinterface_handler_config as apache
 
-from flask import session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app, \
-                  abort
-from invenio.cache import cache
+from flask import g, render_template, request, flash, redirect, url_for, \
+    current_app, abort
 from invenio.config import CFG_SITE_RECORD, CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \
     mail_cookie_create_authorize_action
-from invenio.sqlalchemyutils import db
 from invenio.websearch_model import Collection
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec
@@ -73,8 +70,8 @@ def request_record(f):
 
         if auth_code and current_user.is_guest:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
-                'collection' : guess_primary_collection_of_a_record(recid)})
-            url_args = {'action': cookie, 'ln' : g.ln, 'referer' : request.referrer}
+                'collection': guess_primary_collection_of_a_record(recid)})
+            url_args = {'action': cookie, 'ln': g.ln, 'referer': request.referrer}
             return redirect(url_for('webaccount.login', **url_args))
         elif auth_code:
             flash(auth_msg, 'error')
@@ -89,7 +86,7 @@ def request_record(f):
         if record_status == -1 and merged_recid:
             return redirect(url_for('record.metadata', recid=merged_recid))
         elif record_status == -1:
-            abort(apache.HTTP_GONE)  ## The record is gone!
+            abort(apache.HTTP_GONE)  # The record is gone!
 
         g.record = record = Bibrec.query.get(recid)
         user = None
@@ -98,13 +95,15 @@ def request_record(f):
         title = get_fieldvalues(recid, '245__a')
         title = title[0] if len(title) > 0 else ''
 
-        b = get_collection_breadcrumbs(collection, [(_('Home'),'')])
+        b = get_collection_breadcrumbs(collection, [(_('Home'), '')])
         b += [(title, 'record.metadata', dict(recid=recid))]
         current_app.config['breadcrumbs_map'][request.endpoint] = b
         g.record_tab_keys = []
         tabs = []
-        for k,v in get_detailed_page_tabs(collection.id, recid,
-                                          g.ln).iteritems():
+        counts = get_detailed_page_tabs_counts(recid)
+        for k, v in get_detailed_page_tabs(collection.id, recid,
+                                           g.ln).iteritems():
+            t = {}
             b = 'record'
             if k == '':
                 k = 'metadata'
@@ -114,7 +113,9 @@ def request_record(f):
                 b = 'weblinkback'
                 k = 'index'
 
-            t = {'key':b+'.'+k}
+            t['key'] = b + '.' + k
+            t['count'] = counts.get(k.capitalize(), -1)
+
             t.update(v)
             tabs.append(t)
             if v['visible']:
@@ -128,17 +129,16 @@ def request_record(f):
 
         @register_template_context_processor
         def record_context():
-            return dict(
-                recid = recid,
-                record = record,
-                user = user,
-                tabs = tabs,
-                title = title,
-                get_mini_reviews = lambda *args, **kwargs: get_mini_reviews(
-                                          *args, **kwargs).decode('utf8'),
-                collection = collection,
-                format_record = cached_format_record
-                )
+            return dict(recid=recid,
+                        record=record,
+                        user=user,
+                        tabs=tabs,
+                        title=title,
+                        get_mini_reviews=lambda *args, **kwargs:
+                        get_mini_reviews(*args, **kwargs).decode('utf8'),
+                        collection=collection,
+                        format_record=cached_format_record
+                        )
         return f(recid, *args, **kwargs)
     return decorated
 
