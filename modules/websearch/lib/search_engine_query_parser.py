@@ -903,6 +903,14 @@ class SpiresToInvenioSyntaxConverter:
             except ValueError:
                 pass
 
+            try:
+                d = datetime.strptime(date_str, '%b %y')
+                if d.year > datetime.today().year:
+                    d -= du_delta(years=100)
+                return datetime.strftime(d, '%Y-%m'), end
+            except ValueError:
+                pass
+
             if 'this week' in date_str:
                 # Past monday to today
                 # This week is iffy, not sure if we should

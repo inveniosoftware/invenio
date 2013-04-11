@@ -790,6 +790,16 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
                 inv_search = 'year:1978'
                 self._compare_searches(inv_search, spi_search)
 
+        if DATEUTIL_AVAILABLE:
+            def test_date_2_digits_month_year(self):
+                """SPIRES search syntax - searching by date feb 12"""
+                # This should give us "feb 12" with us locale
+                d = datetime.datetime(year=2012, month=2, day=1)
+                date_str = d.strftime('%b %y')
+                spi_search = "find date %s" % date_str
+                inv_search = 'year:2012-02'
+                self._compare_searches(inv_search, spi_search)
+
         def test_spires_syntax_trailing_colon(self):
             """SPIRES search syntax - test for blowup with trailing colon"""
             spi_search = "find a watanabe:"
