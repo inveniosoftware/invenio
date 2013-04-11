@@ -856,6 +856,12 @@ class SpiresToInvenioSyntaxConverter:
                 units = int(datemath.group('operator') + datemath.group('units'))
             return date_str, units
 
+        def guess_best_year(d):
+            if d.year > datetime.today().year + 10:
+                return d - du_delta(years=100)
+            else:
+                return d
+
         def parse_date_unit(date_str):
             begin = date_str
             end = None
@@ -874,8 +880,7 @@ class SpiresToInvenioSyntaxConverter:
             try:
                 d = datetime.strptime(date_str, '%y-%m-%d')
                 d += du_delta(days=relative_units)
-                if d.year > datetime.today().year:
-                    d -= du_delta(years=100)
+                d = guess_best_year(d)
                 return datetime.strftime(d, '%Y-%m-%d'), end
             except ValueError:
                 pass
@@ -897,16 +902,14 @@ class SpiresToInvenioSyntaxConverter:
             try:
                 d = datetime.strptime(date_str, '%y')
                 d += du_delta(days=relative_units)
-                if d.year > datetime.today().year:
-                    d -= du_delta(years=100)
+                d = guess_best_year(d)
                 return datetime.strftime(d, '%Y'), end
             except ValueError:
                 pass
 
             try:
                 d = datetime.strptime(date_str, '%b %y')
-                if d.year > datetime.today().year:
-                    d -= du_delta(years=100)
+                d = guess_best_year(d)
                 return datetime.strftime(d, '%Y-%m'), end
             except ValueError:
                 pass

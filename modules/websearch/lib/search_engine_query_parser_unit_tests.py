@@ -791,6 +791,14 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
                 self._compare_searches(inv_search, spi_search)
 
         if DATEUTIL_AVAILABLE:
+            def test_date_2_digits_year_future(self):
+                """SPIRES search syntax - searching by date 2 years in the future"""
+                d = datetime.datetime.today() + datetime.timedelta(days=730)
+                spi_search = "find date %s" % d.strftime("%y")
+                inv_search = 'year:%s' % d.strftime("%Y")
+                self._compare_searches(inv_search, spi_search)
+
+        if DATEUTIL_AVAILABLE:
             def test_date_2_digits_month_year(self):
                 """SPIRES search syntax - searching by date feb 12"""
                 # This should give us "feb 12" with us locale
