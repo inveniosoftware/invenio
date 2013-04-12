@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -44,14 +44,16 @@ that makes remote debugging possible and easy.
 # number to them. Please see get_debugger() function for more information on
 # how to create a new call, and see the individual debuggers for information
 # what parameters they accept.
+#
+# Important: Remember to set WSGIDaemonProcess processes=1 threads=1 in Apache
 
 # ----------------------------- CONFIGURATION -----------------------------------------
 
 from invenio.remote_debugger_config import CFG_REMOTE_DEBUGGER_ENABLED, \
-	CFG_REMOTE_DEBUGGER_IMPORT, CFG_REMOTE_DEBUGGER_WINPDB_PASSWORD, \
-	CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_IP, CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_PORT, \
-	CFG_REMOTE_DEBUGGER_PYDEV_PATHS, CFG_REMOTE_DEBUGGER_WSGI_RELOAD, \
-	CFG_PYDEV_DEBUG
+    CFG_REMOTE_DEBUGGER_IMPORT, CFG_REMOTE_DEBUGGER_WINPDB_PASSWORD, \
+    CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_IP, CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_PORT, \
+    CFG_REMOTE_DEBUGGER_PYDEV_PATHS, CFG_REMOTE_DEBUGGER_WSGI_RELOAD, \
+    CFG_PYDEV_DEBUG, CFG_REMOTE_DEBUGGER_TYPE, CFG_REMOTE_DEBUGGER_NAME
 
 # -------------------------------------------------------------------------------------
 # --------------------------- no config past this point -------------------------------
@@ -88,7 +90,7 @@ if not CFG_REMOTE_DEBUGGER_ENABLED:
 
 # import modules that are configured for this debugger, at least for Eclipse, this
 # MUST HAPPEN before other stuff gets loaded
-for path, name in CFG_REMOTE_DEBUGGER_IMPORT.items():
+for path, name in CFG_REMOTE_DEBUGGER_IMPORT.get(CFG_REMOTE_DEBUGGER_TYPE, {}).items():
     try:
         if '.' in path:
             globals()[name] = __import__(path, globals(), locals(), path.split('.'))
@@ -118,35 +120,30 @@ def error_msg(debugger_args):
             sys.stderr.write('\n\n')
 
 
-
-def start(debugger_args):
+def start():
     """
     Switch into a debugger mode manualy - to be called fromt the command line scripts mostly
     @var debugger_args: string, eg. "3|ip:192.168.31.1|port:9999"
     """
-    if not isinstance(debugger_args, list) or not isinstance(debugger_args, tuple):
-        debugger_args = [str(debugger_args)]
+    debug_starter = get_debugger()
 
-    debug_starter = get_debugger(debugger_args)
     if debug_starter is None:
-        raise Exception("Requested debugger not found or not initalized properly: %s" % debugger_args)
+        raise Exception("Requested debugger not found or not initalized properly.")
     debug_starter()
 
 
-def get_debugger(arg):
+def get_debugger():
     """
     Returns function that will initialize the debugger
     @var arg: arg passed from url parameter debug=xxx
     @return: function call
     """
-
-    debug_no, params = parse_args(arg)
-
-    if debug_no == '1':
+    params = {}
+    if 'winpdb-local' == CFG_REMOTE_DEBUGGER_NAME:
         func = start_embedded_winpdb_debugger
-    elif debug_no == '2':
+    elif 'winpdb-remote' == CFG_REMOTE_DEBUGGER_NAME:
         func = start_remote_winpdb_debugger
-    elif debug_no == '3':
+    elif 'pydev-remote' == CFG_REMOTE_DEBUGGER_NAME:
         func = start_remote_pydev_debugger
     else:
         return None

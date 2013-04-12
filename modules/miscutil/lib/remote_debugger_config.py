@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,15 +23,37 @@
 # import the remote debugger if not set).
 CFG_REMOTE_DEBUGGER_ENABLED = 0  # by default, we don't want to enable debugger
 
+CFG_REMOTE_DEBUGGER_TYPE = ''
+CFG_REMOTE_DEBUGGER_NAME = ''
+
 try:
     from invenio.config import CFG_DEVEL_TOOLS
-    if 'remote-debugger' in CFG_DEVEL_TOOLS:
+    if 'winpdb-local' in CFG_DEVEL_TOOLS:
+        CFG_REMOTE_DEBUGGER_TYPE = 'winpdb'
+        CFG_REMOTE_DEBUGGER_NAME = 'winpdb-local'
+        CFG_REMOTE_DEBUGGER_ENABLED = 1
+    elif 'winpdb-remote' in CFG_DEVEL_TOOLS:
+        CFG_REMOTE_DEBUGGER_TYPE = 'winpdb'
+        CFG_REMOTE_DEBUGGER_NAME = 'winpdb-remote'
+        CFG_REMOTE_DEBUGGER_ENABLED = 1
+    elif 'pydev' in CFG_DEVEL_TOOLS:
+        CFG_REMOTE_DEBUGGER_TYPE = 'pydev'
+        CFG_REMOTE_DEBUGGER_NAME = 'pydev'
         CFG_REMOTE_DEBUGGER_ENABLED = 1
 except ImportError:
     pass
 
+# Start debugger on WSGI application loading (i.e loading of invenio.wsgi).
+# Default is only to start debugger on per request basis and not on application
+# loading.
+try:
+    from invenio.config import CFG_REMOTE_DEBUGGER_WSGI_LOADING
+except ImportError:
+    CFG_REMOTE_DEBUGGER_WSGI_LOADING = False
+
+
 # Modules that should be imported during initialization
-# the structure is: 'module_path' : 'name'
+# the structure is: 'debugger name': { 'module_path' : 'name', ... }, ...
 #
 # So, 'pydev.pydevd': 'pydev' means: "import pydev.pydevd as pydev"
 # WARNING! The name of the module is quite important, as the functions
@@ -43,22 +65,28 @@ except ImportError:
 # modules for debugging.
 
 CFG_REMOTE_DEBUGGER_IMPORT = {
-                            #'rpdb2' : 'rpdb2', #windpb debugging
-                            #'pydev.pydevd' : 'pydevd', # eclipse/pydev
-                            #'pydev.pydevd_file_utils': 'putils', # eclipse/pydev
-
-                             }
+    '': {},  # no debugger specified
+    'winpdb': {
+        'rpdb2': 'rpdb2',  # windpb debugging
+    },
+    'pydev': {
+        'pydev.pydevd': 'pydevd',  # eclipse/pydev
+        'pydev.pydevd_file_utils': 'putils',  # eclipse/pydev
+    },
+}
 
 # -----------------------------------------------------------------------------
 # configuration options for winpdb debugging
-
-CFG_REMOTE_DEBUGGER_WINPDB_PASSWORD = 'Change1Me'
+try:
+    from invenio.config import CFG_REMOTE_DEBUGGER_WINPDB_PASSWORD
+except ImportError:
+    CFG_REMOTE_DEBUGGER_WINPDB_PASSWORD = 'Change1Me'
 
 
 # -----------------------------------------------------------------------------
 # configuration options for Eclipse/Pydev
 
-# Remote debuggin with Eclipse Pydev - Apache does not need to be configured
+# Remote debugging with Eclipse Pydev - Apache does not need to be configured
 # as a single-worker. But you do the following:
 #
 # 1. find pydevd.py inside your Eclipse/Pydev installation
@@ -77,7 +105,7 @@ CFG_REMOTE_DEBUGGER_WINPDB_PASSWORD = 'Change1Me'
 # can be anything that Invenio can access (ie. the machine that is running Invenio
 # must have access to the IP)
 
-CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_IP = '127.0.0.1' #'192.168.0.1'
+CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_IP = '127.0.0.1'  #'192.168.0.1'
 CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_PORT = 5678
 
 
@@ -102,21 +130,18 @@ CFG_REMOTE_DEBUGGER_PYDEV_REMOTE_PORT = 5678
 # and I also recommend using (back)slashes at the end, ie. /opt/ and not /opt
 
 CFG_REMOTE_DEBUGGER_PYDEV_PATHS = [
-                                   #('/opt/cds-invenio/lib/python/invenio/', '/usr/local/lib/python2.5/site-packages/invenio/'),
-                                   #('U:\\opt\\', '/opt/'),
-                                   #('\\\\Invenio-ubu\\root\\', '/'),
-                                   #('U:\\usr\\', '/usr/'),
+    #('/opt/cds-invenio/lib/python/invenio/', '/usr/local/lib/python2.5/site-packages/invenio/'),
+    #('U:\\opt\\', '/opt/'),
+    #('\\\\Invenio-ubu\\root\\', '/'),
+    #('U:\\usr\\', '/usr/'),
 
-                                   #('\\\\invenio-ubu\\root\\usr\\', '/usr/'),
-                                   #('\\\\invenio-ubu\\root\\opt\\', '/opt/')
-                                   ]
-
-
+    #('\\\\invenio-ubu\\root\\usr\\', '/usr/'),
+    #('\\\\invenio-ubu\\root\\opt\\', '/opt/')
+    ]
 
 # Shall we monitor changes and restart daemon threads when you change source code?
 # Put here list of glob patters (files) to monitor. The paths are relative to the
 # Invenio root dir.
-
 CFG_REMOTE_DEBUGGER_WSGI_RELOAD = ['lib/python/invenio/*.py']
 
 

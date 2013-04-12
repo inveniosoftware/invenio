@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,13 +22,18 @@ mod_wsgi Invenio application loader.
 
 from invenio import config
 
-# start remote debugger if appropriate:
-if 'remote-debugger' in getattr(config, 'CFG_DEVEL_TOOLS', []):
-    try:
+# Start remote debugger if appropriate:
+try:
+    from inveni.remote_debugger_config import CFG_REMOTE_DEBUGGER_ENABLED, \
+        CFG_REMOTE_DEBUGGER_WSGI_LOADING
+
+    if CFG_REMOTE_DEBUGGER_ENABLED:
         from invenio import remote_debugger
         remote_debugger.start_file_changes_monitor()
-    except:
-        pass
+        if CFG_REMOTE_DEBUGGER_WSGI_LOADING:
+            remote_debugger.start()
+except:
+    pass
 
 # wrap warnings (usually from sql queries) to log the traceback
 # of their origin for debugging

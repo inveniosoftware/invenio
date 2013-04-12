@@ -20,6 +20,12 @@
 Invenio -> Flask adapter
 """
 
+## Import the remote debugger as a first thing, if allowed
+try:
+    from invenio import remote_debugger
+except:
+    remote_debugger = None
+
 import os
 from os.path import join
 from pprint import pformat
@@ -192,6 +198,9 @@ def create_invenio_flask_app(**kwargs_config):
             self.app = app
 
         def __call__(self, environ, start_response):
+            if remote_debugger:
+                remote_debugger.start()
+
             with self.app.request_context(environ):
                 g.start_response = start_response
                 try:
