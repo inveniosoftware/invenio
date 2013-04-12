@@ -1,5 +1,6 @@
+{#
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,5 +15,28 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- extends "invenio-apache-vhost.tpl" -%}
 
-SUBDIRS = bash_completion.d ckeditor_scientificchar templates
+{% set log_suffix = '-ssl' %}
+
+{%- block header -%}
+ServerSignature Off
+ServerTokens Prod
+{{ '#' if not listen_directive_needed }}{{ 'Listen ' + vhost_site_url_port}}
+NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
+{{ ssl_pem_directive }}
+{{ ssl_crt_directive }}
+{{ ssl_key_directive }}
+{{ super() }}
+{%- endblock -%}
+
+{%- block server %}
+        {{ super() }}
+        SSLEngine on
+{%- endblock server -%}
+
+{%- block wsgi %}
+        RedirectMatch /sslredirect/(.*) http://$1
+        {{ super() }}
+{%- endblock wsgi -%}
