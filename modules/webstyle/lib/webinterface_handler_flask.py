@@ -23,13 +23,11 @@ Invenio -> Flask adapter
 import os
 from os.path import join
 from pprint import pformat
-from datetime import datetime
 from functools import wraps
 from logging.handlers import RotatingFileHandler
 from logging import Formatter
-from flask import Flask, session, request, g, \
-                url_for, current_app, render_template, \
-                redirect, flash, abort, has_app_context
+from flask import Flask, session, request, g, url_for, current_app, \
+    render_template, redirect, flash, abort, has_app_context
 from jinja2 import FileSystemLoader, MemcachedBytecodeCache
 from werkzeug.routing import BuildError
 
@@ -119,14 +117,11 @@ def create_invenio_flask_app(**kwargs_config):
     from invenio.webuser_flask import InvenioLoginManager, current_user
     from invenio.messages import wash_language, gettext_set_language, \
                                  language_list_long, is_language_rtl
-    from invenio.dateutils import convert_datetext_to_dategui, \
-                                  convert_datestruct_to_dategui, \
-                                  pretty_date
     from invenio.urlutils import create_url, get_canonical_and_alternates_urls
     from invenio.cache import cache
     from invenio.jinja2utils import CollectionExtension, DynCacheExtension, \
-                                    LangExtension, hack_jinja2_utf8decoding
-    from invenio.webmessage_mailutils import email_quoted_txt2html
+                                    LangExtension, hack_jinja2_utf8decoding, \
+                                    extend_application_template_filters
     from flask.ext.assets import Environment, Bundle
     from invenio.webinterface_handler_flask_utils import unicodifier, InvenioRequest
     from flaskext.gravatar import Gravatar
@@ -368,6 +363,9 @@ def create_invenio_flask_app(**kwargs_config):
     _app.jinja_env.add_extension(LangExtension)
     _app.jinja_env.add_extension('jinja2.ext.do')
 
+    # Let's extend application with custom template filters.
+    extend_application_template_filters(_app)
+
     # Let's create Gravatar bridge.
     _gravatar = Gravatar(_app,
                     size=100,
@@ -444,42 +442,6 @@ def create_invenio_flask_app(**kwargs_config):
         ## Well, let's make it global now
         g.ln = session["ln"]
         g._ = gettext_set_language(g.ln, use_unicode=True)
-
-    @_app.template_filter('quoted_txt2html')
-    def _quoted_txt2html(*args, **kwargs):
-        return email_quoted_txt2html(*args, **kwargs)
-
-    @_app.template_filter('invenio_format_date')
-    def _format_date(date):
-        """
-        This is a special Jinja2 filter that will call
-        convert_datetext_to_dategui to print a human friendly date.
-        """
-        if isinstance(date, datetime):
-            return convert_datestruct_to_dategui(date.timetuple(),
-                                                 g.ln).decode('utf-8')
-        return convert_datetext_to_dategui(date, g.ln).decode('utf-8')
-
-    @_app.template_filter('invenio_pretty_date')
-    def _pretty_date(date):
-        """
-        This is a special Jinja2 filter that will call
-        pretty_date to print a human friendly timestamp.
-        """
-        if isinstance(date, datetime):
-            return pretty_date(date, ln=g.ln)
-        return date
-
-    @_app.template_filter('invenio_url_args')
-    def _url_args(d, append=u'?', filter=[]):
-        from jinja2.utils import escape
-        rv = append + u'&'.join(
-            u'%s=%s' % (escape(key), escape(value))
-            for key, value in d.iteritems(True)
-            if value is not None and key not in filter
-            # and not isinstance(value, Undefined)
-        )
-        return rv
 
     @_app.context_processor
     def _inject_utils():

@@ -29,6 +29,7 @@ except ImportError:
 
 ENV_PREFIX = '_collected_'
 
+
 def prepare_tag_bundle(cls, tag):
     """
     Construct function that returns collected data specified
@@ -352,4 +353,74 @@ class Markup(jinja2_Markup):
         if encoding is None and isinstance(base, str):
             encoding = 'utf8'
         return jinja2_Markup.__new__(cls, base=base, encoding=encoding,
-            errors=errors)
+                                     errors=errors)
+
+
+def extend_application_template_filters(app):
+    """
+    Extends application template filters with custom filters and fixes.
+
+    List of applied filters:
+    ------------------------
+    * filesizeformat
+    * path_join
+    * quoted_txt2html
+    * invenio_format_date
+    * invenio_pretty_date
+    * invenio_url_args
+    """
+    import os
+    from datetime import datetime
+    from invenio.textutils import nice_size
+    from invenio.dateutils import convert_datetext_to_dategui, \
+        convert_datestruct_to_dategui, pretty_date
+    from invenio.webmessage_mailutils import email_quoted_txt2html
+
+    @app.template_filter('filesizeformat')
+    def _filesizeformat_filter(value):
+        """
+        Jinja2 filesizeformat filters is broken in Jinja2 up to v2.7, so
+        let's implement our own.
+        """
+        return nice_size(value)
+
+    @app.template_filter('path_join')
+    def _os_path_join(d):
+        """Shortcut for `os.path.join`."""
+        return os.path.join(*d)
+
+    @app.template_filter('quoted_txt2html')
+    def _quoted_txt2html(*args, **kwargs):
+        return email_quoted_txt2html(*args, **kwargs)
+
+    @app.template_filter('invenio_format_date')
+    def _format_date(date):
+        """
+        This is a special Jinja2 filter that will call
+        convert_datetext_to_dategui to print a human friendly date.
+        """
+        if isinstance(date, datetime):
+            return convert_datestruct_to_dategui(date.timetuple(),
+                                                 g.ln).decode('utf-8')
+        return convert_datetext_to_dategui(date, g.ln).decode('utf-8')
+
+    @app.template_filter('invenio_pretty_date')
+    def _pretty_date(date):
+        """
+        This is a special Jinja2 filter that will call
+        pretty_date to print a human friendly timestamp.
+        """
+        if isinstance(date, datetime):
+            return pretty_date(date, ln=g.ln)
+        return date
+
+    @app.template_filter('invenio_url_args')
+    def _url_args(d, append=u'?', filter=[]):
+        from jinja2.utils import escape
+        rv = append + u'&'.join(
+            u'%s=%s' % (escape(key), escape(value))
+            for key, value in d.iteritems(True)
+            if value is not None and key not in filter
+            # and not isinstance(value, Undefined)
+        )
+        return rv
