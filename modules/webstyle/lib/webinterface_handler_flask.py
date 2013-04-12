@@ -391,6 +391,8 @@ def create_invenio_flask_app(**kwargs_config):
     @_app.context_processor
     def _inject_template_context():
         context = {}
+        if not hasattr(g, '_template_context_processor'):
+            reset_template_context_processor()
         for func in g._template_context_processor:
             context.update(func())
         return context
@@ -483,11 +485,11 @@ def create_invenio_flask_app(**kwargs_config):
             request.environ['PATH_INFO'])
         alternate_urls = dict((ln.replace('_', '-'), alternate_url)
                               for ln, alternate_url in alternate_urls.iteritems())
-        return dict(_=g._,
+        return dict(_=lambda *args, **kwargs: g._(*args, **kwargs),
                     current_user=user,
                     get_css_bundle=_app.jinja_env.get_css_bundle,
                     get_js_bundle=_app.jinja_env.get_js_bundle,
-                    is_language_rtl=is_language_rtl(g.ln),
+                    is_language_rtl=is_language_rtl,
                     canonical_url=canonical_url,
                     alternate_urls=alternate_urls,
                     url_for=invenio_url_for,

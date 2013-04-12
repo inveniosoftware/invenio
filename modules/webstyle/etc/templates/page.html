@@ -44,7 +44,7 @@
 
 {%- if not no_pageheader -%}
 <!DOCTYPE html>
-<html lang="{{ ln|safe }}" {% if is_language_rtl %}dir="rtl"{% endif %}>
+<html lang="{{ ln|safe }}" {% if is_language_rtl(g.ln) %}dir="rtl"{% endif %}>
 <head>
   <meta charset="utf-8">
   <title>{{ title+' - ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
