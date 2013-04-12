@@ -580,17 +580,17 @@ class ScienceCinemaXMLExternalCollectionResultsParser(ExternalCollectionResultsP
                 subnodes = record_node.iterchildren()
                 for subnode in subnodes:
                     if subnode.tag == 'ostiId':
-                        ostiId = str(subnode.text)
+                        ostiId = str(subnode.text is not None and subnode.text or "")
                     elif subnode.tag == 'title':
-                        title = str(subnode.text)
+                        title = str(subnode.text is not None and subnode.text or "")
                     elif subnode.tag == 'description':
-                        description = str(subnode.text)
+                        description = str(subnode.text is not None and subnode.text or "")
                     elif subnode.tag == 'link':
-                        link = str(subnode.text)
+                        link = str(subnode.text is not None and subnode.text or "")
                     elif subnode.tag == 'image':
-                        image = str(subnode.text)
+                        image = str(subnode.text is not None and subnode.text or "")
                     elif subnode.tag == 'snippets':
-                        snippets = str(subnode.text)
+                        snippets = str(subnode.text is not None and subnode.text or "")
             elif xml_parser_type == 2:
                 # libxml2
                 subnode = record_node.children
