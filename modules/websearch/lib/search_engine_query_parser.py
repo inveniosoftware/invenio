@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -30,6 +30,7 @@ try:
     if not hasattr(dateutil, '__version__') or dateutil.__version__ != '2.0':
         from dateutil import parser as du_parser
         from dateutil.relativedelta import relativedelta as du_delta
+        from dateutil import relativedelta
         GOT_DATEUTIL = True
     else:
         from warnings import warn
@@ -428,7 +429,6 @@ class SpiresToInvenioSyntaxConverter:
     _A_TAG = 'author:'
     _EA_TAG = 'exactauthor:'
 
-
     # Dictionary containing the matches between SPIRES keywords
     # and their corresponding Invenio keywords or fields
     # SPIRES keyword : Invenio keyword or field
@@ -735,6 +735,10 @@ class SpiresToInvenioSyntaxConverter:
         self._re_pattern_space = re.compile("__SPACE__")
         self._re_pattern_equals = re.compile("__EQUALS__")
 
+        # for date math:
+        self._re_datemath = re.compile(r'(?P<datestamp>.+)\s+(?P<operator>[-+])\s+(?P<units>\d+)')
+
+
     def is_applicable(self, query):
         """Is this converter applicable to this query?
 
@@ -845,51 +849,134 @@ class SpiresToInvenioSyntaxConverter:
     def _convert_dates(self, query):
         """Tries to find dates in query and make them look like ISO-8601."""
 
+        def parse_relative_unit(date_str):
+            units = 0
+            datemath = self._re_datemath.match(date_str)
+            if datemath:
+                date_str = datemath.group('datestamp')
+                units = int(datemath.group('operator') + datemath.group('units'))
+            return date_str, units
+
+        def guess_best_year(d):
+            if d.year > datetime.today().year + 10:
+                return d - du_delta(years=100)
+            else:
+                return d
+
+        def parse_date_unit(date_str):
+            begin = date_str
+            end = None
+
+            # First split, relative time directive
+            # e.g. "2012-01-01 - 3" to ("2012-01-01", -3)
+            date_str, relative_units = parse_relative_unit(date_str)
+
+            try:
+                d = datetime.strptime(date_str, '%Y-%m-%d')
+                d += du_delta(days=relative_units)
+                return datetime.strftime(d, '%Y-%m-%d'), end
+            except ValueError:
+                pass
+
+            try:
+                d = datetime.strptime(date_str, '%y-%m-%d')
+                d += du_delta(days=relative_units)
+                d = guess_best_year(d)
+                return datetime.strftime(d, '%Y-%m-%d'), end
+            except ValueError:
+                pass
+
+            try:
+                d = datetime.strptime(date_str, '%Y-%m')
+                d += du_delta(months=relative_units)
+                return datetime.strftime(d, '%Y-%m'), end
+            except ValueError:
+                pass
+
+            try:
+                d = datetime.strptime(date_str, '%Y')
+                d += du_delta(years=relative_units)
+                return datetime.strftime(d, '%Y'), end
+            except ValueError:
+                pass
+
+            try:
+                d = datetime.strptime(date_str, '%y')
+                d += du_delta(days=relative_units)
+                d = guess_best_year(d)
+                return datetime.strftime(d, '%Y'), end
+            except ValueError:
+                pass
+
+            try:
+                d = datetime.strptime(date_str, '%b %y')
+                d = guess_best_year(d)
+                return datetime.strftime(d, '%Y-%m'), end
+            except ValueError:
+                pass
+
+            if 'this week' in date_str:
+                # Past monday to today
+                # This week is iffy, not sure if we should
+                # start with sunday or monday
+                begin = datetime.today()
+                begin += du_delta(weekday=relativedelta.SU(-1))
+                end = datetime.today()
+                begin = datetime.strftime(begin, '%Y-%m-%d')
+                end = datetime.strftime(end, '%Y-%m-%d')
+            elif 'last week' in date_str:
+                # Past monday to today
+                # Same problem as last week
+                begin = datetime.today()
+                begin += du_delta(weekday=relativedelta.SU(-2))
+                end = datetime.today()
+                end += du_delta(weekday=relativedelta.SA(-1))
+                begin = datetime.strftime(begin, '%Y-%m-%d')
+                end = datetime.strftime(end, '%Y-%m-%d')
+            elif 'this month' in date_str:
+                d = datetime.today()
+                begin = datetime.strftime(d, '%Y-%m')
+            elif 'last month' in date_str:
+                d = datetime.today() - du_delta(months=1)
+                begin = datetime.strftime(d, '%Y-%m')
+            elif 'yesterday' in date_str:
+                d = datetime.today() - du_delta(days=1)
+                begin = datetime.strftime(d, '%Y-%m-%d')
+            elif 'today' in date_str:
+                start = datetime.today()
+                start += du_delta(days=relative_units)
+                begin = datetime.strftime(start, '%Y-%m-%d')
+            elif date_str.strip() == '0':
+                begin = '0'
+            else:
+                default = datetime(datetime.today().year, 1, 1)
+                try:
+                    d = du_parser.parse(date_str, default=default)
+                except ValueError:
+                    begin = date_str
+                else:
+                    begin = datetime.strftime(d, '%Y-%m-%d')
+
+            return begin, end
+
         def mangle_with_dateutils(query):
-            DEFAULT = datetime(datetime.today().year, 1, 1)
             result = ''
             position = 0
             for match in self._re_keysubbed_date_expr.finditer(query):
                 result += query[position : match.start()]
+                datestamp = match.group('content')
+                if '->' in datestamp:
+                    begin_unit, end_unit = datestamp.split('->', 1)
+                    begin, dummy = parse_date_unit(begin_unit)
+                    end, dummy = parse_date_unit(end_unit)
+                else:
+                    begin, end = parse_date_unit(datestamp)
 
-                isodates = []
-                dates = match.group('content').split('->') # Warning: generalizing but should only ever be 2 items
-                for datestamp in dates:
-                    if datestamp != None:
-                        if re.match('[0-9]{1,4}$', datestamp):
-                            isodates.append(datestamp)
-                        else:
-                            units = 0
-                            datestamp = re.sub('yesterday', datetime.strftime(datetime.today()
-                                                            +du_delta(days=-1), '%Y-%m-%d'),
-                                               datestamp)
-                            datestamp = re.sub('today', datetime.strftime(datetime.today(), '%Y-%m-%d'), datestamp)
-                            datestamp = re.sub('this week', datetime.strftime(datetime.today()
-                                                            +du_delta(days=-(datetime.today().isoweekday()%7)), '%Y-%m-%d'),
-                                                datestamp)
-                            datestamp = re.sub('last week', datetime.strftime(datetime.today()
-                                                            +du_delta(days=-((datetime.today().isoweekday()%7)+7)), '%Y-%m-%d'),
-                                                datestamp)
-                            datestamp = re.sub('this month', datetime.strftime(datetime.today(), '%Y-%m'),
-                                                datestamp)
-                            datestamp = re.sub('last month', datetime.strftime(datetime.today()
-                                                            +du_delta(months=-1), '%Y-%m'),
-                                               datestamp)
-                            datemath = re.match(r'(?P<datestamp>.+)\s+(?P<operator>[-+])\s+(?P<units>\d+)', datestamp)
-                            if datemath:
-                                datestamp = datemath.group('datestamp')
-                                units += int(datemath.group('operator') + datemath.group('units'))
-                            try:
-                                dtobj = du_parser.parse(datestamp, default=DEFAULT)
-                                dtobj = dtobj + du_delta(days=units)
-                                if dtobj.day == 1:
-                                    isodates.append("%d-%02d" % (dtobj.year, dtobj.month))
-                                else:
-                                    isodates.append("%d-%02d-%02d" % (dtobj.year, dtobj.month, dtobj.day))
-                            except ValueError:
-                                isodates.append(datestamp)
+                if end:
+                    daterange = '%s->%s' % (begin, end)
+                else:
+                    daterange = begin
 
-                daterange = '->'.join(isodates)
                 result += match.group('term') + daterange
                 position = match.end()
             result += query[position : ]

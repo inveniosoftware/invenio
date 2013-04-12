@@ -188,10 +188,11 @@ Contents
               <http://code.google.com/p/ocropus/>
           - to perform different image elaborations: ImageMagick
               <http://www.imagemagick.org/>
-          - to generate PDF after OCR: netpbm, ReportLab and pyPdf
+          - to generate PDF after OCR: netpbm, ReportLab and pyPdf or pyPdf2
               <http://netpbm.sourceforge.net/>
               <http://www.reportlab.org/rl_toolkit.html>
               <http://pybrary.net/pyPdf/>
+              <http://knowah.github.io/PyPDF2/>
 
      h) If you have chosen to install fast XML MARC Python processors
         in the step d) above, then you have to install the parsers

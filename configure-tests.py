@@ -333,14 +333,17 @@ except ImportError, msg:
     )
 
 try:
-    import pyPdf
+    try:
+        import PyPDF2
+    except ImportError:
+        import pyPdf
 except ImportError, msg:
     warning_messages.append(
     """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
-    ** Note that pyPdf module is not really            **
+    ** Note that pyPdf or pyPdf2 module is not really  **
     ** required, but we recommend it you want to       **
     ** enrich PDF with OCR information.                **
     **                                                 **
