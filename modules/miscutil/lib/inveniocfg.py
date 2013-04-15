@@ -743,24 +743,20 @@ def cli_cmd_create_secret_key(conf):
             f.write('\nCFG_SITE_SECRET_KEY = %s\n' % (secret_key, ))
         print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
 
+
 def cli_cmd_create_tables(conf):
     """Create and fill Invenio DB tables.  Useful for the installation process."""
-    print ">>> Going to create and fill tables..."
-    from invenio.config import CFG_PREFIX
-    test_db_connection()
-    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabcreate.sql" % (CFG_PREFIX, CFG_PREFIX),
-                "%s/bin/dbexec < %s/lib/sql/invenio/tabfill.sql" % (CFG_PREFIX, CFG_PREFIX)]:
-        if os.system(cmd):
-            print "ERROR: failed execution of", cmd
-            sys.exit(1)
-    cli_cmd_reset_sitename(conf)
-    cli_cmd_reset_siteadminemail(conf)
-    cli_cmd_reset_fieldnames(conf)
-    for cmd in ["%s/bin/webaccessadmin -u admin -c -a" % CFG_PREFIX]:
-        if os.system(cmd):
-            print "ERROR: failed execution of", cmd
-            sys.exit(1)
-    print ">>> Tables created and filled successfully."
+    import sys
+    from warnings import warn
+    from invenio.database_manager import main
+
+    warn('inveniocfg --create-tables is deprecated. Please use \n$ inveniomanage database drop')
+
+    sys_argv = sys.argv
+    sys.argv = 'database_manager.py create'.split()
+    main()
+    sys.argv = sys_argv
+
 
 def cli_cmd_load_webstat_conf(conf):
     print ">>> Going to load WebStat config..."
@@ -775,34 +771,20 @@ def cli_cmd_load_webstat_conf(conf):
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
     print ">>> Going to drop tables and related data on filesystem ..."
-    from invenio.webinterface_handler_flask import with_app_context
 
-    @with_app_context()
-    def run():
-        from invenio.textutils import wrap_text_in_a_box, wait_for_user
-        from invenio.webstat import destroy_customevents
-        wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
-    your database tables and related data on filesystem!"""))
-        msg = destroy_customevents()
-        if msg:
-            print msg
+    import sys
+    from warnings import warn
+    from invenio.database_manager import main
 
-        from invenio.sqlalchemyutils import db
-        from invenio.bibdocfile import _make_base_dir
-        from sqlalchemy import event
+    warn('inveniocfg --drop-tables is deprecated. Please use \n$ inveniomanage database drop')
 
-        def bibdoc_before_drop(target, connection_dummy, **kw_dummy):
-            for (docid,) in db.session.query(target.c.id).all():
-                directory = _make_base_dir(docid)
-                if os.path.isdir(directory):
-                    shutil.rmtree(directory)
+    sys_argv = sys.argv
+    if '--yes-i-know' in sys_argv:
+        sys.argv.append('--yes-i-know')
+    sys.argv = 'database_manager.py drop'.split()
+    main()
+    sys.argv = sys_argv
 
-        from invenio.bibedit_model import Bibdoc
-        event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
-
-        db.drop_all()
-    run()
-    print ">>> Tables dropped successfully."
 
 def cli_cmd_create_demo_site(conf):
     """Create demo site.  Useful for testing purposes."""
