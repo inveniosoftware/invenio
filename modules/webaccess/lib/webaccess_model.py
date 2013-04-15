@@ -44,7 +44,7 @@ class AccACTION(db.Model):
 class AccARGUMENT(db.Model):
     """Represents a AccARGUMENT record."""
     __tablename__ = 'accARGUMENT'
-    id = db.Column(db.Integer(15, unsigned=True),
+    id = db.Column(db.Integer(15),  # , unsigned=True),
                 primary_key=True,
                 autoincrement=True)
     keyword = db.Column(db.String(32), nullable=True)
@@ -93,7 +93,7 @@ class AccAuthorization(db.Model):
                 nullable=True,
                 autoincrement=False,
                 primary_key=True, index=True)
-    id_accARGUMENT = db.Column(db.Integer(15, unsigned=True),
+    id_accARGUMENT = db.Column(db.Integer(15),  # , unsigned=True),
                 db.ForeignKey(AccARGUMENT.id),
                 nullable=True, primary_key=True,
                 autoincrement=False,

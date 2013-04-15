@@ -26,16 +26,16 @@ import re
 from operator import itemgetter
 from flask import g
 from invenio.intbitset import intbitset
-from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
-from invenio.search_engine import collection_restricted_p
+#from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
+#from invenio.search_engine import collection_restricted_p
 from invenio.sqlalchemyutils import db
 from sqlalchemy.orm.collections import InstrumentedList
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.orm.collections import collection
 from sqlalchemy.ext.orderinglist import ordering_list
-from invenio.websearch_external_collections_searcher import \
-    external_collections_dictionary
+#from invenio.websearch_external_collections_searcher import \
+#    external_collections_dictionary
 
 # Create your models here.
 
@@ -233,6 +233,7 @@ class Collection(db.Model):
     @property
     #@cache.memoize(make_name=lambda fname: fname + '::' + g.ln)
     def is_restricted(self):
+        from invenio.search_engine import collection_restricted_p
         return collection_restricted_p(self.name)
 
     @property
@@ -320,6 +321,7 @@ class Collection(db.Model):
         """
         Collect search within options.
         """
+        from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
         default = [('', g._('any field'))]
         found = [(o.field.code, o.field.name_ln) for o in self._search_within]
         if not found:
@@ -541,7 +543,9 @@ class Externalcollection(db.Model):
 
     @property
     def engine(self):
-        if external_collections_dictionary.has_key(self.name):
+        from invenio.websearch_external_collections_searcher import external_collections_dictionary
+
+        if self.name in external_collections_dictionary.has_key:
             return external_collections_dictionary[self.name]
 
 

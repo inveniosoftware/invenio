@@ -39,7 +39,6 @@ from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.sqlalchemyutils import db
 from invenio.websearch_forms import EasySearchForm
 from invenio.websearch_model import Collection, Format, Tag
-from invenio.websearch_webinterface import wash_search_urlargd
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
                                   register_template_context_processor
 from invenio.webuser_flask import current_user
@@ -88,14 +87,19 @@ def plugin_builder(plugin_name, plugin_code):
     format_element = getattr(plugin_code, 'format_element')
     return format_element
 
-BFE_ELEMENTS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                            'bibformat_elements',
-                                            'bfe_*.py'),
-                               plugin_builder=plugin_builder)
 
-## Let's report about broken plugins
-open(os.path.join(CFG_LOGDIR, 'broken-bibformat-elements.log'), 'w').write(
-    pformat(BFE_ELEMENTS.get_broken_plugins()))
+@blueprint.before_app_first_request
+def load_bfe_elements():
+    BFE_ELEMENTS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
+                                                'bibformat_elements',
+                                                'bfe_*.py'),
+                                   plugin_builder=plugin_builder)
+
+    ## Let's report about broken plugins
+    open(os.path.join(CFG_LOGDIR, 'broken-bibformat-elements.log'), 'w').write(
+        pformat(BFE_ELEMENTS.get_broken_plugins()))
+
+    current_app.config['BFE_ELEMENTS'] = BFE_ELEMENTS
 
 sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
 fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
@@ -104,6 +108,7 @@ fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
 @blueprint.app_context_processor
 def add_bfe_functions():
     # get functions from files
+    BFE_ELEMENTS = current_app.config.get('BFE_ELEMENTS', {})
     bfe_from_files = dict((name.lower(), insert(name.lower()))
                           for name in BFE_ELEMENTS.keys())
     # get functions from tag table
@@ -373,6 +378,7 @@ def search():
         elif auth_code:
             return abort(401)
 
+    from invenio.websearch_webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 

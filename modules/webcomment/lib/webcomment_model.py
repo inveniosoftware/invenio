@@ -24,7 +24,6 @@ WebComment database models.
 # General imports.
 from sqlalchemy import event
 from invenio.sqlalchemyutils import db
-from invenio.webcomment import get_reply_order_cache_data
 from invenio.webuser_flask import current_user
 
 # Create your models here.
@@ -100,6 +99,7 @@ class CmtRECORDCOMMENT(db.Model):
 
 def update_reply_order_cache_data(mapper, connection, target):
     """Updates reply order cache data."""
+    from invenio.webcomment import get_reply_order_cache_data
     if target.in_reply_to_id_cmtRECORDCOMMENT > 0:
         parent = CmtRECORDCOMMENT.query.get(
             target.in_reply_to_id_cmtRECORDCOMMENT)
