@@ -511,10 +511,6 @@ def strftime(fmt, dt):
     return s
 
 
-def strptime(date_string, fmt):
-    return real_datetime(*(time.strptime(date_string, fmt)[:6]))
-
-
 def get_dst(date_obj):
     """Determine if dst is locally enabled at this time"""
     dst = 0
@@ -551,3 +547,7 @@ def localtime_to_utc(date_str, fmt="%Y-%m-%dT%H:%M:%SZ", input_fmt="%Y-%m-%d %H:
     date_struct -= timedelta(hours=get_dst(date_struct))
     date_struct += timedelta(seconds=time.timezone)
     return strftime(fmt, date_struct)
+
+
+def strptime(date_string, fmt):
+    return real_datetime(*(time.strptime(date_string, fmt)[:6]))
