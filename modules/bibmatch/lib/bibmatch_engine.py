@@ -340,6 +340,8 @@ class Querystring:
         operator_delimiter = " %s " % (self.operator,)
         parser = SearchQueryParenthesisedParser()
         query_parts = parser.parse_query(self.pattern)
+        author_query = []
+        author_operator = None
         # Go through every expression in the query and generate fuzzy searches
         for i in xrange(0, len(query_parts) - 1, 2):
             current_operator = query_parts[i]
@@ -349,16 +351,52 @@ class Querystring:
                 # No reference to record value, add query 'as is'
                 fuzzy_query_list.append((current_operator, current_pattern))
             else:
+                # Each reference will be split into prefix, field-ref and suffix.
+                # Example:
+                # 773__p:"[773__p]" 100__a:/.*[100__a].*/ =>
+                # [('773__p:"', '773__p', '"'), ('100__a:/.*', '100__a', '.*/')]
                 for field_prefix, field_reference, field_suffix in fieldname_list:
-                    for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                    if field_reference == '245__a':
                         new_query = []
-                        # Grab the x longest words in the string and perform boolean AND for each word
-                        # x is determined by the configuration dict and is tag-based. Defaults to 3 words
-                        word_list = get_longest_words(value, limit=CFG_BIBMATCH_FUZZY_WORDLIMITS.get(field_reference, 3))
-                        for word in word_list:
-                            # Create fuzzy query with key + word, including any surrounding elements like quotes, regexp etc.
-                            new_query.append(current_pattern.replace("[%s]" % (field_reference,), word))
-                        fuzzy_query_list.append((current_operator, operator_delimiter.join(new_query)))
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            # Grab the x+1 longest words in the string and perform boolean OR
+                            # for all combinations of x words (boolean AND)
+                            # x is determined by the configuration dict and is tag-based. Defaults to 3 words
+                            word_list = get_longest_words(value, limit=CFG_BIBMATCH_FUZZY_WORDLIMITS.get(field_reference, 3)+1)
+                            for i in range(len(word_list)):
+                                words = list(word_list)
+                                words.pop(i)
+                                new_query.append("(" + current_pattern.replace("[%s]" % (field_reference,), " ".join(words)) + ")")
+                            fuzzy_query_list.append((current_operator, " OR ".join(new_query)))
+                    elif field_reference == '100__a':
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            author_query.append(current_pattern.replace("[%s]" % (field_reference,), value))
+                            author_operator = current_operator
+                    elif field_reference == '700__a':
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            # take only the first 2nd author
+                            author_query.append(current_pattern.replace("[%s]" % (field_reference,), value))
+                            if not author_operator:
+                                author_operator = current_operator
+                            break
+                    # for unique idenifier (DOI, repno) fuzzy search makes no sense
+                    elif field_reference == '037__a':
+                        continue
+                    elif field_reference == '0247_a':
+                        continue
+                    else:
+                        new_query = []
+                        for value in self.fields.get((field_prefix, field_reference, field_suffix), []):
+                            # Grab the x longest words in the string and perform boolean AND for each word
+                            # x is determined by the configuration dict and is tag-based. Defaults to 3 words
+                            # AND can be overwritten by command line argument -o o
+                            word_list = get_longest_words(value, limit=CFG_BIBMATCH_FUZZY_WORDLIMITS.get(field_reference, 3))
+                            for word in word_list:
+                                # Create fuzzy query with key + word, including any surrounding elements like quotes, regexp etc.
+                                new_query.append(current_pattern.replace("[%s]" % (field_reference,), word))
+                            fuzzy_query_list.append((current_operator, operator_delimiter.join(new_query)))
+        if author_query:
+            fuzzy_query_list.append((author_operator, " OR ".join(author_query)))
         # Return a list of unique queries
         return list(set(fuzzy_query_list))
 
