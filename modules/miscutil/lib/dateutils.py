@@ -47,7 +47,6 @@ from datetime import date as real_date, \
                      datetime as real_datetime, \
                      time as real_time, \
                      timedelta
-from time import strptime, strftime as real_strftime, localtime
 from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 
@@ -104,7 +103,7 @@ def convert_datetext_to_datestruct(datetext):
     '2005-11-16 15:11:57' => (2005, 11, 16, 15, 11, 44, 2, 320, 0)
     """
     try:
-        return strptime(datetext, datetext_format)
+        return time.strptime(datetext, datetext_format)
     except:
         return datestruct_default
 
@@ -147,11 +146,11 @@ def convert_datecvs_to_datestruct(datecvs):
     try:
         if datecvs.startswith("$Id"):
             date_time = ' '.join(datecvs.split(" ")[3:5])
-            return strptime(date_time, '%Y/%m/%d %H:%M:%S')
+            return time.strptime(date_time, '%Y/%m/%d %H:%M:%S')
         else:
             # here we have to use '$' + 'Date...' here, otherwise the CVS
             # commit would erase this time format to put commit date:
-            return strptime(datecvs, '$' + 'Date: %Y/%m/%d %H:%M:%S $')
+            return time.strptime(datecvs, '$' + 'Date: %Y/%m/%d %H:%M:%S $')
     except ValueError:
         return datestruct_default
 
@@ -161,7 +160,7 @@ def get_datetext(year, month, day):
     """
     input_format = "%Y-%m-%d"
     try:
-        datestruct = strptime("%i-%i-%i"% (year, month, day), input_format)
+        datestruct = time.strptime("%i-%i-%i"% (year, month, day), input_format)
         return strftime(datetext_format, datestruct)
     except:
         return datetext_default
@@ -172,7 +171,7 @@ def get_datestruct(year, month, day):
     """
     input_format = "%Y-%m-%d"
     try:
-        return strptime("%i-%i-%i"% (year, month, day), input_format)
+        return time.strptime("%i-%i-%i"% (year, month, day), input_format)
     except ValueError or TypeError:
         return datestruct_default
 
@@ -304,7 +303,7 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG
     """
     _ = gettext_set_language(ln)
     if from_year < 0:
-        from_year = localtime()[0]
+        from_year = time.localtime()[0]
     out = "<select name=\"%s\">\n"% name
     out += '  <option value="0"'
     if selected_year == 0:
@@ -409,7 +408,7 @@ def guess_datetime(datetime_string):
     else:
         for format in (None, '%x %X', '%X %x', '%Y-%M-%dT%h:%m:%sZ'):
             try:
-                return strptime(datetime_string, format)
+                return time.strptime(datetime_string, format)
             except ValueError:
                 pass
     raise ValueError("It is not possible to guess the datetime format of %s" % datetime_string)
@@ -507,7 +506,7 @@ def strftime(fmt, dt):
     if not isinstance(dt, real_date):
         dt = datetime(dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_hour, dt.tm_min, dt.tm_sec)
     if dt.year >= 1900:
-        return real_strftime(fmt, dt.timetuple())
+        return time.strftime(fmt, dt.timetuple())
     illegal_formatting = _illegal_formatting.search(fmt)
     if illegal_formatting:
         raise TypeError("strftime of dates before 1900 does not handle" + illegal_formatting.group(0))
@@ -522,10 +521,10 @@ def strftime(fmt, dt):
     # Move to around the year 2000
     year = year + ((2000 - year) // 28) * 28
     timetuple = dt.timetuple()
-    s1 = real_strftime(fmt, (year,) + timetuple[1:])
+    s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))
 
-    s2 = real_strftime(fmt, (year+28,) + timetuple[1:])
+    s2 = time.strftime(fmt, (year+28,) + timetuple[1:])
     sites2 = _findall(s2, str(year+28))
 
     sites = []
@@ -538,3 +537,7 @@ def strftime(fmt, dt):
     for site in sites:
         s = s[:site] + syear + s[site+4:]
     return s
+
+
+def strptime(date_string, fmt):
+    return real_datetime(*(time.strptime(date_string, fmt)[:6]))
