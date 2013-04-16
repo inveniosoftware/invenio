@@ -25,13 +25,12 @@ WebSession database models.
 from invenio.sqlalchemyutils import db
 from sqlalchemy.ext.hybrid import hybrid_property
 # Create your models here.
-#from invenio.webuser import get_default_user_preferences
-
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
-    CFG_EXTERNAL_AUTH_DEFAULT
 
 
 def get_default_user_preferences():
+    from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
+        CFG_EXTERNAL_AUTH_DEFAULT
+
     user_preference = {
         'login_method': ''}
 

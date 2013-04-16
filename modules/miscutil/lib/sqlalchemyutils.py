@@ -139,8 +139,7 @@ class MarshalBinary(TypeDecorator):
 
     def __init__(self, default_value, force_type=None, *args, **kwargs):
         super(MarshalBinary, self).__init__(*args, **kwargs)
-        self.default_value = default_value() if callable(default_value) \
-            else default_value
+        self.default_value = default_value
         self.force_type = force_type if force_type is not None else lambda x: x
 
     def process_bind_param(self, value, dialect):
@@ -155,7 +154,9 @@ class MarshalBinary(TypeDecorator):
                 value = deserialize_via_marshal(value)
             except:
                 value = None
-        return value if value is not None else self.default_value
+        return value if value is not None else \
+            (self.default_value() if callable(self.default_value) else
+             self.default_value)
 
 
 #@compiles(sqlalchemy.types.LargeBinary, "postgresql")
