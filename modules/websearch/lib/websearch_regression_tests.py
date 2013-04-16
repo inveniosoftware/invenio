@@ -58,6 +58,7 @@ from invenio.intbitset import intbitset
 from invenio.search_engine import intersect_results_with_collrecs
 from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
 from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
+from invenio.bibindex_regression_tests import reindex_word_tables_into_testtables
 
 if 'fr' in CFG_SITE_LANGS:
     lang_french_configured = True
@@ -866,6 +867,46 @@ class WebSearchTestSearch(unittest.TestCase):
                                            expected_text=expected_text,
                                            unexpected_text=unexpected_text))
         return
+
+
+class WebSearchCJKTokenizedSearchTest(unittest.TestCase):
+    """
+        Reindexes record 104 (the one with chinese poetry) with use of BibIndexCJKTokenizer.
+        After tests it reindexes record 104 back with BibIndexDefaultTokenizer.
+        Checks if one can find record 104 specifying only one or two CJK characters.
+    """
+
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('title',
+                                                recids=[[104,104]],
+                                                prefix = False,
+                                                tokenizer = 'BibIndexCJKTokenizer')
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        self.test_counter += 1
+        if self.test_counter == 2:
+            reindex_word_tables_into_testtables('title',
+                                                recids=[[104,104]],
+                                                prefix = False,
+                                                tokenizer = 'BibIndexDefaultTokenizer')
+
+
+    def test_title_cjk_tokenized_two_characters(self):
+        """CJKTokenizer - test for finding chinese poetry with two CJK characters"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=title%3A敬亭&f=&of=id',
+                                                   expected_text='[104]'))
+
+    def test_title_cjk_tokenized_single_character(self):
+        """CJKTokenizer - test for finding chinese poetry with one CJK character"""
+        self.assertEqual([], test_web_page_content(CFG_SITE_URL + '/search?ln=en&sc=1&p=title%3A亭&f=&of=id',
+                                                   expected_text='[104]'))
 
 
 class WebSearchTestWildcardLimit(unittest.TestCase):
@@ -4633,7 +4674,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchAuthorCountQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest,
                              WebSearchGetRecordTests,
-                             WebSearchExactTitleIndexTest)
+                             WebSearchExactTitleIndexTest,
+                             WebSearchCJKTokenizedSearchTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

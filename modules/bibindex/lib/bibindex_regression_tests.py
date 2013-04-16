@@ -24,14 +24,16 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.testutils import make_test_suite, run_test_suite, nottest
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, deserialize_via_marshal
 from invenio.bibindex_engine import WordTable, get_index_id_from_index_name, get_index_tags
 from invenio.intbitset import intbitset
 from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
 
+
 def prepare_for_index_update(index_id, remove_stopwords = '',
                                        remove_html_markup = '',
-                                       remove_latex_markup = ''):
+                                       remove_latex_markup = '',
+                                       tokenizer=''):
     """ Prepares SQL query for an update of a index in the idxINDEX table. Takes
         into account remove_stopwords, remove_html_markup, remove_latex_markup
         as parameters to change.
@@ -41,18 +43,20 @@ def prepare_for_index_update(index_id, remove_stopwords = '',
                                         'No' to change it to 'No'.
         For remove_stopwords instead of 'Yes' one must give the name of the file (for example: 'stopwords.kb')
         from CFG_ETCDIR/bibrank/ directory pointing at stopwords knowledge base.
+        For tokenizer please specify the name of the tokenizer.
         @param index_id: id of the index to change
     """
 
 
-    if remove_stopwords == '' and remove_html_markup == '' and remove_latex_markup == '':
+    if remove_stopwords == '' and remove_html_markup == '' and remove_latex_markup == '' and tokenizer == '':
         return ''
 
     parameter_set = False
     query_update = "UPDATE idxINDEX SET "
     params = {'remove_stopwords':remove_stopwords,
               'remove_html_markup':remove_html_markup,
-              'remove_latex_markup':remove_latex_markup}
+              'remove_latex_markup':remove_latex_markup,
+              'tokenizer':tokenizer}
     for key in params:
         if params[key]:
             query_update += parameter_set and ", " or ""
@@ -65,7 +69,8 @@ def prepare_for_index_update(index_id, remove_stopwords = '',
 @nottest
 def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'test', remove_stopwords = '',
                                                                                     remove_html_markup = '',
-                                                                                    remove_latex_markup = ''):
+                                                                                    remove_latex_markup = '',
+                                                                                    tokenizer = ''):
     """Function for setting up a test enviroment. Reindexes an index with a given name to a
        new temporary table with a given prefix. During the reindexation it changes some parameters
        of chosen index. It's useful for conducting tests concerning the reindexation.
@@ -77,11 +82,13 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
        @param remove_stopwords: name of the stopwords knowledge base, 'No' to set it to 'No'
        @param remove_html_markup: 'Yes' to set remove_html_markup to 'Yes', 'No' to set it to 'No'
        @param remove_latex_markup: 'Yes' to set remove_latex_markup to 'Yes', 'No' to set it to 'No'
+       @param tokenizer: name of the tokenizer
     """
     index_id = get_index_id_from_index_name(index_name)
     query_update = prepare_for_index_update(index_id, remove_stopwords,
                                                       remove_html_markup,
-                                                      remove_latex_markup)
+                                                      remove_latex_markup,
+                                                      tokenizer)
 
     query_last_updated = "UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s" % index_id
 
@@ -111,7 +118,9 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
         run_sql(query_update)
     run_sql(query_last_updated)
 
-    pattern = '%s_idxWORD' % prefix
+    pattern = 'idxWORD'
+    if prefix:
+        pattern = '%s_idxWORD' % prefix
     wordTable = WordTable(index_name=index_name,
                           index_id=index_id,
                           fields_to_index=get_index_tags(index_name),
@@ -120,7 +129,10 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                           tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
                           is_fulltext_index=False,
                           wash_index_terms=50)
-    wordTable.add_recIDs_by_date([],10000)
+    if recids:
+        wordTable.add_recIDs(recids, 10000)
+    else:
+        wordTable.add_recIDs_by_date([],10000)
 
 
 @nottest
@@ -515,12 +527,58 @@ class BibIndexJournalIndexTest(unittest.TestCase):
         self.assertEqual(num_orig, num_test)
 
 
+class BibIndexCJKTokenizerTitleIndexTest(unittest.TestCase):
+    """
+       Checks CJK tokenization on title index.
+    """
+    test_counter = 0
+    reindexed = False
+
+    @classmethod
+    def setUp(self):
+        """reindexation to new table"""
+        if not self.reindexed:
+            reindex_word_tables_into_testtables('title', tokenizer = 'BibIndexCJKTokenizer')
+            self.reindexed = True
+
+    @classmethod
+    def tearDown(self):
+        """cleaning up"""
+        self.test_counter += 1
+        if self.test_counter == 2:
+            remove_reindexed_word_testtables('title')
+            reverse_changes = prepare_for_index_update(get_index_id_from_index_name('title'), tokenizer = 'BibIndexDefaultTokenizer')
+            run_sql(reverse_changes)
+
+
+    def test_splliting_and_indexing_CJK_characters_forward_table(self):
+        """CJK Tokenizer - searching for a CJK term in title index, forward table"""
+        query = "SELECT * from test_idxWORD%02dF where term='\xe6\x95\xac'" % get_index_id_from_index_name('title')
+        res = run_sql(query)
+        iset = []
+        if res:
+            iset = intbitset(res[0][2])
+            iset = iset.tolist()
+        self.assertEqual(iset, [104])
+
+    def test_splliting_and_indexing_CJK_characters_reversed_table(self):
+        """CJK Tokenizer - comparing terms for record with chinese poetry in title index, reverse table"""
+        query = "SELECT * from test_idxWORD%02dR where id_bibrec='104'" % get_index_id_from_index_name('title')
+        res = run_sql(query)
+        iset = []
+        if res:
+            iset = deserialize_via_marshal(res[0][1])
+        self.assertEqual(iset, ['\xe6\x95\xac', '\xe7\x8d\xa8', '\xe4\xba\xad', '\xe5\x9d\x90'])
+
+
+
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
                              BibIndexRemoveHtmlTest,
                              BibIndexYearIndexTest,
                              BibIndexAuthorCountIndexTest,
-                             BibIndexJournalIndexTest)
+                             BibIndexJournalIndexTest,
+                             BibIndexCJKTokenizerTitleIndexTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

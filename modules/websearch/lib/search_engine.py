@@ -96,6 +96,7 @@ from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, 
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_tokenizers.BibIndexDefaultTokenizer import BibIndexDefaultTokenizer
+from invenio.bibindex_tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenizer, is_there_any_CJK_character_in_text
 from invenio.bibindex_engine_utils import author_name_requires_phrase_search
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
@@ -424,6 +425,44 @@ def get_index_stemming_language(index_id, recreate_cache_if_needed=True):
     if recreate_cache_if_needed:
         index_stemming_cache.recreate_cache_if_needed()
     return index_stemming_cache.cache[index_id]
+
+
+class FieldTokenizerDataCacher(DataCacher):
+    """
+    Provides cache for tokenizer information for fields corresponding to indexes.
+    This class is not to be used directly; use function
+    get_field_tokenizer_type() instead.
+    """
+    def __init__(self):
+        def cache_filler():
+            try:
+                res = run_sql("""SELECT fld.code, ind.tokenizer FROM idxINDEX AS ind, field AS fld, idxINDEX_field AS indfld WHERE ind.id = indfld.id_idxINDEX AND indfld.id_field = fld.id""")
+            except DatabaseError:
+                # database problems, return empty cache
+                return {}
+            return dict(res)
+
+        def timestamp_verifier():
+            return get_table_update_time('idxINDEX')
+
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+try:
+    field_tokenizer_cache.is_ok_p
+except Exception:
+    field_tokenizer_cache = FieldTokenizerDataCacher()
+
+def get_field_tokenizer_type(field_name, recreate_cache_if_needed=True):
+    """Return tokenizer type for given field corresponding to an index if applicable."""
+    if recreate_cache_if_needed:
+        field_tokenizer_cache.recreate_cache_if_needed()
+    tokenizer = None
+    try:
+        tokenizer = field_tokenizer_cache.cache[field_name]
+    except KeyError:
+        return None
+    return tokenizer
+
 
 class CollectionRecListDataCacher(DataCacher):
     """
@@ -2243,6 +2282,15 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     if not p: # sanity checking
         return hitset
 
+    tokenizer = get_field_tokenizer_type(f)
+    hitset_cjk = intbitset()
+    if tokenizer == "BibIndexCJKTokenizer":
+        if is_there_any_CJK_character_in_text(p):
+            cjk_tok = BibIndexCJKTokenizer()
+            chars = cjk_tok.tokenize_for_words(p)
+            for char in chars:
+                hitset_cjk |= search_unit_in_bibwords(char, f, m, wl)
+
     ## eventually look up runtime synonyms:
     hitset_synonyms = intbitset()
     if CFG_WEBSEARCH_SYNONYM_KBRS.has_key(f):
@@ -2321,6 +2369,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
 
     ## merge synonym results and return total:
     hitset |= hitset_synonyms
+    hitset |= hitset_cjk
     return hitset
 
 

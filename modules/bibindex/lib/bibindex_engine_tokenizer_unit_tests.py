@@ -315,9 +315,52 @@ class TestExactAuthorTokenizer(unittest.TestCase):
                          ['Doe, Jean Pierre'])
 
 
+
+class TestCJKTokenizer(unittest.TestCase):
+    """Tests for CJK Tokenizer which splits CJK words into characters and treats
+       every single character as a word"""
+
+
+    @classmethod
+    def setUp(self):
+        self.tokenizer = _TOKENIZERS["BibIndexCJKTokenizer"]()
+
+    def test_tokenize_for_words_phrase_galaxy(self):
+        """tokenizing phrase: galaxy s4据信"""
+        phrase = "galaxy s4据信"
+        result = self.tokenizer.tokenize_for_words(phrase)
+        self.assertEqual(sorted(['galaxy','s4','据','信']), sorted(result))
+
+    def test_tokenize_for_words_phrase_with_special_punctuation(self):
+        """tokenizing phrase: 马英九：台湾民"""
+        phrase = u"马英九：台湾民"
+        result = self.tokenizer.tokenize_for_words(phrase)
+        self.assertEqual(sorted(['马','英','九','台','湾','民']), sorted(result))
+
+    def test_tokenize_for_words_phrase_with_special_punctuation_two(self):
+        """tokenizing phrase: 色的“刀子嘴”"""
+        phrase = u"色的“刀子嘴”"
+        result = self.tokenizer.tokenize_for_words(phrase)
+        self.assertEqual(sorted(['色','的','刀','子','嘴']), sorted(result))
+
+    def test_tokenize_for_words_simple_phrase(self):
+        """tokenizing phrase: 春眠暁覚"""
+        self.assertEqual(sorted(self.tokenizer.tokenize_for_words(u'春眠暁覚')), sorted(['春', '眠', '暁', '覚']))
+
+    def test_tokenize_for_words_mixed_phrase(self):
+        """tokenizing phrase: 春眠暁ABC覚"""
+        self.assertEqual(sorted(self.tokenizer.tokenize_for_words(u'春眠暁ABC覚')), sorted(['春', '眠', '暁', 'abc', '覚']))
+
+    def test_tokenize_for_words_phrase_with_comma(self):
+        """tokenizing phrase: 春眠暁, 暁"""
+        phrase = u"春眠暁, 暁"
+        self.assertEqual(sorted(self.tokenizer.tokenize_for_words(phrase)), sorted(['春','眠','暁']))
+
+
 TEST_SUITE = make_test_suite(TestAuthorTokenizerScanning,
                              TestAuthorTokenizerTokens,
-                             TestExactAuthorTokenizer,)
+                             TestExactAuthorTokenizer,
+                             TestCJKTokenizer)
 
 
 if __name__ == '__main__':

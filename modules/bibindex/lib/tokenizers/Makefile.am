@@ -19,8 +19,8 @@ pylibdir=$(libdir)/python/invenio/bibindex_tokenizers
 
 pylib_DATA = __init__.py BibIndexTokenizer.py BibIndexEmptyTokenizer.py BibIndexDefaultTokenizer.py \
     BibIndexAuthorTokenizer.py BibIndexExactAuthorTokenizer.py BibIndexAuthorCountTokenizer.py \
-    BibIndexJournalTokenizer.py BibIndexYearTokenizer.py BibIndexFulltextTokenizer.py
-
+    BibIndexJournalTokenizer.py BibIndexYearTokenizer.py BibIndexFulltextTokenizer.py \
+    BibIndexCJKTokenizer.py
 
 EXTRA_DIST = $(pylib_DATA)
 

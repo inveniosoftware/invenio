@@ -210,7 +210,7 @@ TEST_SUITE = make_test_suite(TestListSetOperations,
                              TestGetWordsFromPhrase,
                              TestGetPairsFromPhrase,
                              TestGetWordsFromDateTag,
-                             TestGetAuthorFamilyNameWords)
+                             TestGetAuthorFamilyNameWords,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
