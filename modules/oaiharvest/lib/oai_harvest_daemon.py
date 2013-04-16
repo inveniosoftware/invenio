@@ -957,7 +957,7 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
     if CFG_INSPIRE_SITE == 1:
         doctype = "arXiv"
     elif CFG_CERN_SITE == 1:
-        doctype = ""
+        doctype = "arXiv"
     else:
         doctype = ""
 
