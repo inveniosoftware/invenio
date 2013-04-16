@@ -195,6 +195,12 @@ def bft2tpl(rewrite_existing_templates=False, verbose=0):
         len(output_formats))
 
     for name, output_format in output_formats:
+        if not any(map(lambda rule: rule['template'][-3:] == CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION,
+                   output_format['rules'])):
+            print '    [!]', name, 'does not contain any',
+            print CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, 'template.'
+            continue
+
         new_name = name[:-4] + \
             '_legacy.' + CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
         if os.path.exists(os.path.join(CFG_BIBFORMAT_OUTPUTS_PATH, new_name)):
