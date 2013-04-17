@@ -152,7 +152,7 @@ class UserInfo(CombinedMultiDict):
             data.update(u.__dict__)
         else:
             # Minimal information about user.
-            data['id'] = data['uid'] = -1
+            data['id'] = data['uid'] = 0
 
         return data
 

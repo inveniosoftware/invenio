@@ -187,12 +187,9 @@ def getUid(req):
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 2: return -1
 
     guest = 0
-    try:
-        session = session._get_current_object()
-    except Exception:
-        ## Not possible to obtain a session
-        return 0
-    uid = session.get('uid', -1)
+    from flask import session
+
+    uid = session.uid
     if not session.need_https:
         if uid == -1: # first time, so create a guest user
             if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
@@ -231,6 +228,7 @@ def getUid(req):
 
 from invenio.webuser_flask import current_user, login_user, logout_user
 getUid = lambda req: current_user.get_id()
+
 
 def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
