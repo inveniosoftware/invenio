@@ -174,9 +174,9 @@ class AccessControlFireRoleTest(unittest.TestCase):
     def test_firerole_uid(self):
         """firerole - firerole core testing with integer uid"""
         self.assertEqual(False, acc_firerole_check_user(self.guest,
-            compile_role_definition("deny uid '-1'\nallow all")))
+            compile_role_definition("deny uid '-1', '0'\nallow all")))
         self.assertEqual(True, acc_firerole_check_user(self.user_info,
-            compile_role_definition("deny uid '-1'\nallow all")))
+            compile_role_definition("deny uid '-1', '0'\nallow all")))
 
     def test_firerole_guest(self):
         """firerole - firerole core testing with guest"""
