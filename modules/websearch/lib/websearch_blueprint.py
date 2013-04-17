@@ -19,20 +19,24 @@
 
 """WebSearch Flask Blueprint"""
 
+import os
 import re
 import json
 from math import ceil
+from pprint import pformat
 from itertools import groupby
 from operator import itemgetter
 from flask import make_response, g, render_template, request, flash, jsonify, \
-                    redirect, url_for, current_app, abort
+    redirect, url_for, current_app, abort
 
+from invenio import bibindex_model as BibIndex
 from invenio.config import CFG_PYLIBDIR, CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, \
-                           CFG_SITE_LANG
+    CFG_SITE_LANG, CFG_LOGDIR
 from invenio.cache import cache
+from invenio.pluginutils import PluginContainer
+from invenio.bibformat_engine import get_format_element, eval_format_element
 from invenio.websearch_cache import search_results_cache, \
-                                    get_search_query_id, \
-                                    get_search_results_cache_key_from_qid
+    get_search_query_id, get_search_results_cache_key_from_qid
 from invenio.intbitset import intbitset as HitSet
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -40,31 +44,18 @@ from invenio.sqlalchemyutils import db
 from invenio.websearch_forms import EasySearchForm
 from invenio.websearch_model import Collection, Format, Tag
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
-                                  register_template_context_processor
+    register_template_context_processor
 from invenio.webuser_flask import current_user
-from invenio import bibindex_model as BibIndex
+
 from invenio.bibindex_engine import get_index_id_from_index_name
-from invenio.search_engine import get_creation_date,\
-                                  perform_request_search,\
-                                  search_pattern, \
-                                  print_record, \
-                                  get_field_tags, \
-                                  get_most_popular_field_values, \
-                                  get_records_that_can_be_displayed, \
-                                  create_nearest_terms_box
+from invenio.search_engine import get_creation_date, perform_request_search,\
+    search_pattern, print_record, create_nearest_terms_box
 
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              config='invenio.search_engine_config',
                              breadcrumbs=[],
                              menubuilder=[('main.search', _('Search'),
                                            'search.index', 1)])
-
-from invenio.bibformat_engine import get_format_element, eval_format_element
-
-import os
-from pprint import pformat
-from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
-from invenio.pluginutils import PluginContainer
 
 
 def insert(name):
@@ -322,8 +313,6 @@ def _create_neareset_term_box(argd_orig):
         return '<!-- not found -->'
 
 
-import os
-from invenio.pluginutils import PluginContainer
 from invenio.websearch_facet_builders import \
     get_current_user_records_that_can_be_displayed
 
@@ -340,13 +329,18 @@ def _invenio_facet_plugin_builder(plugin_name, plugin_code):
     raise ValueError('%s is not a valid facet plugin' % plugin_name)
 
 
-## Let's load all facets.
-_FACETS = PluginContainer(
-    os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_facets', 'facet_*.py'),
-    plugin_builder=_invenio_facet_plugin_builder)
+@blueprint.before_app_first_request
+def load_facet_builders():
+    ## Let's load all facets.
+    _FACETS = PluginContainer(
+        os.path.join(CFG_PYLIBDIR, 'invenio', 'websearch_facets', 'facet_*.py'),
+        plugin_builder=_invenio_facet_plugin_builder)
 
-FACET_DICTS = dict((f.name, f) for f in _FACETS.values())
-FACET_SORTED_LIST = sorted(FACET_DICTS.values(), key=lambda x: x.order)
+    FACET_DICTS = dict((f.name, f) for f in _FACETS.values())
+    FACET_SORTED_LIST = sorted(FACET_DICTS.values(), key=lambda x: x.order)
+
+    current_app.config['FACET_DICTS'] = FACET_DICTS
+    current_app.config['FACET_SORTED_LIST'] = FACET_SORTED_LIST
 
 
 @blueprint.route('/search', methods=['GET', 'POST'])
@@ -406,23 +400,23 @@ def search():
     if (argd_orig.get('so') or argd_orig.get('rm')):
         recids.reverse()
 
+    FACET_SORTED_LIST = current_app.config.get('FACET_SORTED_LIST', [])
     facets = map(lambda x: x.get_conf(collection=collection, qid=qid),
                  FACET_SORTED_LIST)
 
     @register_template_context_processor
     def index_context():
-        return dict(
-                collection=collection,
-                facets=facets,
-                RecordInfo=RecordInfo,
-                create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
-                pagination=Pagination(int(ceil(page / float(rg))), rg, len(recids)),
-                rg=rg,
-                qid=qid,
-                easy_search_form=EasySearchForm(csrf_enabled=False),
-                format_record=cached_format_record,
-                #FIXME: move to DB layer
-                export_formats=get_export_formats())
+        return dict(collection=collection,
+                    facets=facets,
+                    RecordInfo=RecordInfo,
+                    create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
+                    pagination=Pagination(int(ceil(page / float(rg))), rg, len(recids)),
+                    rg=rg,
+                    qid=qid,
+                    easy_search_form=EasySearchForm(csrf_enabled=False),
+                    format_record=cached_format_record,
+                    #FIXME: move to DB layer
+                    export_formats=get_export_formats())
     return dict(recids=recids)
 
 
@@ -436,6 +430,7 @@ def facet(name, qid):
 
     @return: jsonified facet list sorted by number of records
     """
+    FACET_DICTS = current_app.config.get('FACET_DICTS', {})
     if name not in FACET_DICTS:
         abort(406)
 
@@ -445,8 +440,7 @@ def facet(name, qid):
     if request.is_xhr:
         return jsonify(facet=out)
     else:
-        response = make_response('<html><body>%s</body></html>' % \
-            str(out))
+        response = make_response('<html><body>%s</body></html>' % str(out))
         response.mimetype = 'text/html'
         return response
 
@@ -498,6 +492,7 @@ def results(qid):
 
     filter = out
     output = recIDsHitSet
+    FACET_DICTS = current_app.config.get('FACET_DICTS', {})
 
     if '+' in filter:
         values = filter['+']
@@ -514,11 +509,12 @@ def results(qid):
     #TODO sort
     if request.values.get('so'):
         recids = output.tolist()
+        recids.reverse()
     elif request.values.get('rm'):
         from invenio.bibrank_record_sorter import rank_records
         ranked = rank_records(
                     request.values.get('rm'),
-                    0, output, request.values.get('p').split())
+                    0, output, request.values.get('p', '').split())
         if ranked[0]:
             recids = ranked[0]
             recids.reverse()
@@ -526,6 +522,7 @@ def results(qid):
             recids = output.tolist()
     else:
         recids = output.tolist()
+        recids.reverse()
 
     rg = request.values.get('rg', 10, type=int)
     page = request.values.get('jrec', 1, type=int)
