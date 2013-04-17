@@ -61,13 +61,13 @@ from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
 from invenio.access_control_engine import acc_authorize_action
 
 blueprint = InvenioBlueprint('webcomment', __name__,
-                            url_prefix="/" + CFG_SITE_RECORD,
-                            config='invenio.webcomment_config',
-                            #breadcrumbs=[(_('Comments'),
-                            #              'webcomment.subscribtions')],
-                            menubuilder=[('main.personalize.comment_subscriptions',
-                                          _('Your comment subscriptions'),
-                                          'webcomment.subscriptions', 20)])
+                             url_prefix="/" + CFG_SITE_RECORD,
+                             config='invenio.webcomment_config',
+                             breadcrumbs=[(_('Comments'),
+                                           'webcomment.subscribtions')],
+                             menubuilder=[('personalize.comment_subscriptions',
+                                           _('Your comment subscriptions'),
+                                           'webcomment.subscriptions', 20)])
 
 from invenio.record_blueprint import request_record
 

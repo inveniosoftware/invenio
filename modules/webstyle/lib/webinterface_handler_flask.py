@@ -476,10 +476,6 @@ def create_invenio_flask_app(**kwargs_config):
         else:
             breadcrumbs = [(_('Home'), '')]
 
-        menubuilder = filter(lambda x: x.display(),
-                             current_app.config['menubuilder_map']['main'].
-                             children.itervalues())
-
         user = current_user._get_current_object()
         canonical_url, alternate_urls = get_canonical_and_alternates_urls(
             request.environ['PATH_INFO'])
@@ -494,7 +490,7 @@ def create_invenio_flask_app(**kwargs_config):
                     alternate_urls=alternate_urls,
                     url_for=invenio_url_for,
                     breadcrumbs=breadcrumbs,
-                    menu=menubuilder)
+                    )
 
     def _invenio_blueprint_plugin_builder(plugin_name, plugin_code):
         """
@@ -547,12 +543,16 @@ def create_invenio_flask_app(**kwargs_config):
                                 lambda: current_user.is_admin),
             'main.help': Menu('main.help', _('Help'), 'help', 9999)})
 
-    menu = {'main': Menu('main', '', '')}
+    menu = {'main': Menu('main', '', ''),
+            'personalize': Menu('personalize', '', '')}
     for key, item in _app.config['menubuilder_map'].iteritems():
         start = menu
 
         if '.' not in key:
-            menu[key] = item
+            if key in menu:
+                menu[key] = item.children.update(menu[key].children)
+            else:
+                menu[key] = item
             continue
 
         keys = key.split('.')

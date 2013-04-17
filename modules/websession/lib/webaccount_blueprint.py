@@ -37,10 +37,11 @@ CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
 blueprint = InvenioBlueprint('webaccount', __name__,
-                url_prefix="/youraccount",
-                breadcrumbs=[(_("Your Account"), 'webaccount.index')],
-                menubuilder=[('main.personalize', _('Personalize'),
-                              'webaccount.display', 3)])
+                             url_prefix="/youraccount",
+                             breadcrumbs=[(_("Your Account"),
+                                           'webaccount.index')],
+                             menubuilder=[('personalize', _('Personalize'),
+                                           'webaccount.display')])
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])

@@ -81,13 +81,15 @@ class MessagesMenu(object):
 not_guest = lambda: not current_user.is_guest
 
 blueprint = InvenioBlueprint('webmessage', __name__, url_prefix="/yourmessages",
-            config='invenio.webmessage_config',
-            menubuilder=[('main.personalize.messages', _('Your messages'),
-                          'webmessage.index', 10),
-                         ('main.messages', MessagesMenu(),
-                          'webmessage.index', -3, [], not_guest)],
-            breadcrumbs=[(_("Your Account"), 'webaccount.display'),
-                         ('Your Messages', 'webmessage.display')])
+                             config='invenio.webmessage_config',
+                             menubuilder=[('personalize.messages',
+                                           _('Your messages'),
+                                           'webmessage.index', 10),
+                                          ('main.messages', MessagesMenu(),
+                                           'webmessage.index', -3, [],
+                                           not_guest)],
+                             breadcrumbs=[(_("Your Account"), 'webaccount.display'),
+                                          ('Your Messages', 'webmessage.display')])
 
 
 @blueprint.route('/menu', methods=['GET'])
