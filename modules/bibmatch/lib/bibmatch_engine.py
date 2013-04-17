@@ -25,7 +25,7 @@ if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
     from sets import Set as set #for "&" intersection
     # pylint: enable=W0622
-
+import string
 import os
 import getopt
 import re
@@ -48,7 +48,11 @@ from invenio.bibrecord import create_records, \
     record_get_field_values, record_xml_output, record_modify_controlfield, \
     record_has_field, record_add_field
 from invenio import bibconvert
-from invenio.search_engine import get_fieldcodes
+from invenio.search_engine import get_fieldcodes, \
+    re_pattern_single_quotes, \
+    re_pattern_double_quotes, \
+    re_pattern_regexp_quotes, \
+    re_pattern_spaces_after_colon
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser
 from invenio.dbquery import run_sql
 from invenio.textmarc2xmlmarc import transform_file
@@ -598,7 +602,23 @@ def get_longest_words(wstr, limit=5):
     """
     words = []
     if wstr:
+        # Protect spaces within quotes
+        wstr = re_pattern_single_quotes.sub(
+            lambda x: "'" + string.replace(x.group(1), ' ', '__SPACE__') + "'",
+            wstr)
+        wstr = re_pattern_double_quotes.sub(
+            lambda x: "\"" + string.replace(x.group(1), ' ', '__SPACE__') + "\"",
+            wstr)
+        wstr = re_pattern_regexp_quotes.sub(
+            lambda x: "/" + string.replace(x.group(1), ' ', '__SPACE__') + "/",
+            wstr)
+        # and spaces after colon as well:
+        wstr = re_pattern_spaces_after_colon.sub(
+            lambda x: string.replace(x.group(1), ' ', '__SPACE__'),
+            wstr)
         words = wstr.split()
+        for i in range(len(words)):
+            words[i] = words[i].replace('__SPACE__', ' ')
         words.sort(cmp=bylen)
         words.reverse()
         words = words[:limit]
