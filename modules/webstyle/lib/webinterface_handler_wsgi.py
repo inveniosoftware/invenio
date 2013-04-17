@@ -554,7 +554,9 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
         from flask import request
-        form = dict(request.values.to_dict(flat=True))
+        form = dict()
+        for k, v in request.values.to_dict(flat=False).iteritems():
+            form[k] = v if len(v) > 1 else v[0]
         for key, value in form.items():
             ## FIXME: this is a backward compatibility workaround
             ## because most of the old administration web handler
