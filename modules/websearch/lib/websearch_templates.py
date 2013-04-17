@@ -1764,6 +1764,14 @@ class Template:
 
             term = cgi.escape(term)
 
+            # FIXME this is hack to get correct links to nearest terms
+            from flask import has_request_context, request
+            if has_request_context() and request.values.get('of', '') != argd.get('of', ''):
+                if 'of' in request.values:
+                    argd['of'] = request.values.get('of')
+                else:
+                    del argd['of']
+
             if term == p: # print search word for orientation:
                 nearesttermsboxbody_class = "nearesttermsboxbodyselected"
                 if hits > 0:
