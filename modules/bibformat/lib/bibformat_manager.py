@@ -27,6 +27,7 @@ generates new Jinja2 templates in CFG_BIBFORMAT_JINJA_TEMPLATE_PATH.
 """
 
 import os
+import re
 import shutil
 from flask.ext.script import Manager
 
@@ -36,8 +37,11 @@ manager = Manager(usage="Perform migration operations")
 @manager.option('--rewrite-existing-templates',
                 dest='rewrite_existing_templates',
                 action='store_true', default=False)
+@manager.option('-t', '--template',
+                dest='only_template_re', default=None,
+                help="only templates matching regular expression")
 @manager.option('--verbose', dest='verbose')
-def bft2tpl(rewrite_existing_templates=False, verbose=0):
+def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
     """Converts bft templates to Jinja2 templates."""
 
     ## Import all invenio modules inside to avoid side-efects ouside
@@ -55,8 +59,12 @@ def bft2tpl(rewrite_existing_templates=False, verbose=0):
         ln_pattern, get_format_templates
     from invenio.bibformatadminlib import update_output_format_rules
 
+    only_template = re.compile(only_template_re) \
+        if only_template_re is not None else None
+
     def rename_template(template):
-        if template[-3:] == CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION:
+        if template[-3:] == CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION and \
+                (only_template is None or only_template.match(template)):
             return template[:-3] + \
                 CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION
         return template
@@ -151,8 +159,8 @@ def bft2tpl(rewrite_existing_templates=False, verbose=0):
                                                     format_template)
         return filtered_format_template
 
-    skip_xsl = lambda (name, key): name[-3:] != 'xsl'
-    format_templates = filter(skip_xsl, get_format_templates(True).iteritems())
+    skip_templates = lambda (name, key): name[-3:] != 'xsl'
+    format_templates = filter(skip_templates, get_format_templates(True).iteritems())
 
     print '>>> Going to migrate %d format template(s) ...' % (
         len(format_templates), )
@@ -161,6 +169,9 @@ def bft2tpl(rewrite_existing_templates=False, verbose=0):
         os.makedirs(CFG_BIBFORMAT_JINJA_TEMPLATE_PATH)
 
     for name, template in format_templates:
+
+        if not (only_template is None or only_template.match(name)):
+            continue
 
         new_name = os.path.join(CFG_BIBFORMAT_JINJA_TEMPLATE_PATH,
                                 rename_template(name))
@@ -198,7 +209,10 @@ def bft2tpl(rewrite_existing_templates=False, verbose=0):
         if not any(map(lambda rule: rule['template'][-3:] == CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION,
                    output_format['rules'])):
             print '    [!]', name, 'does not contain any',
-            print CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, 'template.'
+            print CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, 'template',
+            if only_template is not None:
+                print 'or does not match', only_template_re,
+            print '.'
             continue
 
         new_name = name[:-4] + \
