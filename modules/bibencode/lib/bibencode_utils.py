@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,7 +28,12 @@ import unicodedata
 import re
 import sys
 import time
-import uuid
+try:
+    from uuid import uuid4
+except ImportError:
+    import random
+    def uuid4():
+        return "%x" % random.getrandbits(16*8)
 
 from invenio.bibencode_config import (
                     CFG_BIBENCODE_FFMPEG_PROBE_LOG,
@@ -43,7 +48,7 @@ from invenio.config import CFG_PATH_FFPROBE
 def generate_timestamp():
     """ Generates a timestamp for the logfile to make it unique
     """
-    return "%s-%s" % (time.strftime("%Y%m%d%H%M%S", time.gmtime()), str(uuid.uuid4()))
+    return "%s-%s" % (time.strftime("%Y%m%d%H%M%S", time.gmtime()), str(uuid4()))
 
 ## The following functions are for ffmpeg specific timecodes
 ## The format is HH:MM:SS.ss
