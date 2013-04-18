@@ -546,7 +546,7 @@ class Template:
             "scriptsstring" : jquery_scripts_string
        }
 
-    def tmpl_should_process_record_with_mode(self, marcxml, postmode):
+    def tmpl_should_process_record_with_mode(self, marcxml, postmode, source_id):
         """
         Return True if the given C{marcxml} should be processed in the
         given C{mode}.
@@ -561,6 +561,10 @@ class Template:
         @type marcxml: string
         @param postmode: processing mode currently executed
         @type postmode: string
+        @param source_id: source_id
+        @type source_id: integer
+        @return: if record should be processed
+        @rtype: boolean
         """
         if CFG_CERN_SITE:
             if not 'CERN-' in marcxml and \
