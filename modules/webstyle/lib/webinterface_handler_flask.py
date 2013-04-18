@@ -119,7 +119,7 @@ def create_invenio_flask_app(**kwargs_config):
                                  language_list_long, is_language_rtl
     from invenio.urlutils import create_url, get_canonical_and_alternates_urls
     from invenio.cache import cache
-    from invenio.jinja2utils import CollectionExtension, DynCacheExtension, \
+    from invenio.jinja2utils import CollectionExtension, \
                                     LangExtension, hack_jinja2_utf8decoding, \
                                     extend_application_template_filters
     from flask.ext.assets import Environment, Bundle
@@ -299,6 +299,8 @@ def create_invenio_flask_app(**kwargs_config):
 
     ## Cache
     _app.config['CACHE_TYPE'] = CFG_FLASK_CACHE_TYPE
+    # FIXME problem in Flask-Cache==0.11.1
+    cache.app = _app
     cache.init_app(_app)
     if CFG_FLASK_CACHE_TYPE == 'redis':
         def with_try_except_block(f):
@@ -313,6 +315,10 @@ def create_invenio_flask_app(**kwargs_config):
         ## When the redis is down, we would like to keep the site running.
         cache.cache._client.execute_command = with_try_except_block(
             cache.cache._client.execute_command)
+
+    # FIXME problem in Flask-Cache==0.11.1
+    cache.app = current_app
+
 
     _flask_log_handler = RotatingFileHandler(os.path.join(CFG_LOGDIR,
                                                           'flask.log'))
@@ -359,7 +365,6 @@ def create_invenio_flask_app(**kwargs_config):
     _app.jinja_env.extend(new_bundle=_jinja2_new_bundle)
 
     _app.jinja_env.add_extension(CollectionExtension)
-    _app.jinja_env.add_extension(DynCacheExtension)
     _app.jinja_env.add_extension(LangExtension)
     _app.jinja_env.add_extension('jinja2.ext.do')
 

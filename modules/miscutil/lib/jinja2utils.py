@@ -19,7 +19,6 @@
 from jinja2 import nodes
 from jinja2.ext import Extension
 from flask import _request_ctx_stack
-from flask.ext.cache import JINJA_CACHE_ATTR_NAME
 
 try:
     from MarkupSafe import Markup as jinja2_Markup, escape as jinja2_escape
@@ -180,71 +179,6 @@ def render_template_to_string(input, _from_string=False, **context):
     else:
         template = ctx.app.jinja_env.get_or_select_template(input)
     return template.render(context)
-
-
-## Following code has been written by `guotie` and it has been
-## waiting for integration to flaskext/cache/jinja2ext.py.
-##
-## See:
-## https://github.com/guotie/flask-cache/commit/3d7f43d3e0545e6e07972f01b989a83fcc0ea1b2
-##
-## Info:
-## Update flaskext/cache/jinja2ext.py
-## Add dynamic cache for jinja template
-## for example, you can cache a query list as this:
-##
-##  >>> {% cache 60 page, options %}
-##  >>> {% for post in posts %}{{ render_post(post) }} {%endfor%}
-##  >>> {% endcache %}
-
-class DynCacheExtension(Extension):
-    tags = set(['dyncache'])
-
-    def parse(self, parser):
-        lineno = parser.stream.next().lineno
-        #cache key name is "template file path" + "line no"
-        default_cache_key_name = u"%s%s" % (parser.filename, lineno)
-        default_cache_key_name.encode('utf-8')
-
-        cache_key_names = [nodes.Const(default_cache_key_name)]
-        #parse timeout
-        if parser.stream.current.type != 'block_end':
-            timeout = parser.parse_expression()
-            while parser.stream.skip_if('comma'):
-                keyname = parser.parse_expression()
-                if isinstance(keyname, nodes.Name):
-                    keyname = nodes.Name(keyname.name, 'load')
-                cache_key_names.append(keyname)
-        else:
-            timeout = nodes.Const(None)
-
-        args = [nodes.List(cache_key_names), timeout]
-
-        body = parser.parse_statements(['name:endcache'], drop_needle=True)
-
-        return nodes.CallBlock(self.call_method('_cache', args),
-            [], [], body).set_lineno(lineno)
-
-    def _cache(self, keys_list, timeout, caller):
-        try:
-            cache = getattr(self.environment, JINJA_CACHE_ATTR_NAME)
-        except AttributeError, e:
-            raise e
-
-        if timeout == "del":
-            cache.delete_many(*keys_list)
-            return caller()
-
-        key = '_'.join(keys_list)
-        rv = cache.get(key)
-
-        if rv is None:
-            rv = caller()
-
-            cache.set(key, rv, timeout)
-
-        return rv
-
 
 from flask import g
 from invenio.bibformat_engine import filter_languages
