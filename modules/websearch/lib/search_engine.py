@@ -119,6 +119,7 @@ from invenio.errorlib import register_exception
 from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
+from invenio import bibrecord
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -3614,11 +3615,7 @@ def record_empty(recID):
     @return: 1 if the record is empty, 0 otherwise.
     @rtype: int
     """
-    record = get_record(recID)
-    if record is None or len(record) < 2:
-        return 1
-    else:
-        return 0
+    return bibrecord.record_empty(get_record(recID))
 
 def record_public_p(recID, recreate_cache_if_needed=True):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.

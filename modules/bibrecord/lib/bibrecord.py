@@ -1248,6 +1248,14 @@ def record_order_subfields(rec, tag=None):
             ordered_subfields = sorted(field[0], key=lambda subfield: subfield[0])
             rec[tag][i] = (ordered_subfields, field[1], field[2], field[3], field[4])
 
+
+def record_empty(rec):
+    for key in rec.iterkeys():
+        if key not in ('001', '005'):
+            return False
+    return True
+
+
 ### IMPLEMENTATION / INVISIBLE FUNCTIONS
 
 def _compare_fields(field1, field2, strict=True):

@@ -59,7 +59,8 @@ from invenio.bibrecord import \
      record_get_field_instances, \
      record_get_field_value, \
      record_get_field_values, \
-     record_xml_output
+     record_xml_output, \
+     record_empty
 from invenio.bibformat_xslt_engine import format
 from invenio.dbquery import run_sql
 from invenio.messages import \
@@ -335,8 +336,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     #Create a BibFormat Object to pass that contain record and context
     bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
 
-    if of.lower() != 'xm' and \
-           (not bfo.get_record() or len(bfo.get_record()) <= 1):
+    if of.lower() != 'xm' and (not bfo.get_record()
+                                            or record_empty(bfo.get_record())):
         # Record only has recid: do not format, excepted
         # for xm format
         return ""
