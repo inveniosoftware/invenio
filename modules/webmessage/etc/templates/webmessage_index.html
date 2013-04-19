@@ -22,16 +22,6 @@
 {% set title = _("Your Messages") %}
 {% set personalize_selected = True %}
 {% block body %}
-<script type="text/javascript">
-$(document).ready(function() {
-  $('#togglemsg').change(function() {
-    var toggle = $('#togglemsg').attr("checked")
-    $(".msgid").attr("checked", function(i, val) {
-      return ! $(this).attr("checked");
-    });
-  });
-});
-</script>
 
 {% if not no_quota %}
     {% set ratio = 1.0 * nb_messages / config.CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES %}
@@ -101,4 +91,18 @@ $(document).ready(function() {
   </tbody>
 </table>
 </form>
+{% endblock %}
+
+{% block javacript %}
+{{ super() }}
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#togglemsg').change(function() {
+    var toggle = $('#togglemsg').attr("checked")
+    $(".msgid").attr("checked", function(i, val) {
+      return ! $(this).attr("checked");
+    });
+  });
+});
+</script>
 {% endblock %}
