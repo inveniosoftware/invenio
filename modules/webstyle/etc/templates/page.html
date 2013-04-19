@@ -31,16 +31,16 @@
 {%- set usepaperattribution = current_user['precached_usepaperattribution'] -%}
 
 {# Global CSS #}
-{%- css 'css/bootstrap.css' -%}
-{%- css 'css/bootstrap-responsive.min.css' -%}
-{%- css 'css/token-input.css' -%}
-{%- css 'css/token-input-facebook.css' -%}
+{%- css 'css/bootstrap.css', '00-invenio' -%}
+{%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
+{%- css 'css/token-input.css', '00-invenio' -%}
+{%- css 'css/token-input-facebook.css', '00-invenio' -%}
 {# FIXME CFG_WEBSTYLE_TEMPLATE_SKIN #}
 
 {# Global Javascript files #}
-{%- js 'js/jquery.min.js' -%}
-{%- js 'js/bootstrap.js' -%}
-{%- js 'js/jquery.tokeninput.js' -%}
+{%- js 'js/jquery.min.js', '00-invenio' -%}
+{%- js 'js/bootstrap.js', '00-invenio' -%}
+{%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
 
 {%- if not no_pageheader -%}
 <!DOCTYPE html>
@@ -80,9 +80,11 @@
   {% block header %}
     {{ metaheaderadd|safe }}
   {% endblock header %}
-  {% assets get_css_bundle() %}
+  {% for bundle in get_css_bundle(iterate=True) %}
+  {% assets bundle %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
   {% endassets %}
+  {% endfor %}
   {% block _top_assets %}{% endblock _top_assets %}
   {% block css %}{% endblock css %}
   <style>
@@ -182,9 +184,11 @@
   {%- include 'footer.html' -%}
 </footer>
 {% block _bottom_assets %}
-{% assets get_js_bundle() %}
+{% for bundle in get_js_bundle(iterate=True) %}
+{% assets bundle %}
   <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
+{% endfor %}
 {% endblock _bottom_assets %}
 {% block javascript %}{% endblock javascript %}
 </body>

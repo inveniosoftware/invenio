@@ -32,9 +32,11 @@
 
 {# Overwrites place where the javascript libraries are loaded #}
 {% block _top_assets %}
-{% assets get_js_bundle() %}
+{% for bundle in get_js_bundle(iterate=True) %}
+{% assets bundle %}
   <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %}
+{% endfor %}
 {% endblock _top_assets %}
 
 {% block _bottom_assets %}{% endblock _bottom_assets %}

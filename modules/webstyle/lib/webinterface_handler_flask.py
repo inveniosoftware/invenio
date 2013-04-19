@@ -349,20 +349,23 @@ def create_invenio_flask_app(**kwargs_config):
     _assets.debug = 'assets-debug' in getattr(config, 'CFG_DEVEL_TOOLS', [])
     _assets.directory = config.CFG_WEBDIR
 
-    def _jinja2_new_bundle(tag, collection):
+    def _jinja2_new_bundle(tag, collection, name=None):
         if not _assets.debug:
             files = [f for f in collection if os.path.isfile(
-                    os.path.join(_assets.directory, f))]
+                     os.path.join(_assets.directory, f))]
             if len(files) != len(collection):
                 ## Turn on debuging to generate 404 request on missing files.
                 _assets.debug = True
                 current_app.logger.error('Missing files: ' + ','.join(
                     set(collection) - set(files)))
 
-        return Bundle(output="%s/invenio-%s.%s" % \
-           (tag, hash('|'.join(collection)), tag), *collection)
+        if len(collection):
+            return Bundle(output="%s/%s-%s.%s" %
+                          (tag, 'invenio' if name is None else name,
+                           hash('|'.join(collection)), tag), *collection)
 
-    _app.jinja_env.extend(new_bundle=_jinja2_new_bundle)
+    _app.jinja_env.extend(new_bundle=_jinja2_new_bundle,
+                          default_bundle_name='90-invenio')
 
     _app.jinja_env.add_extension(CollectionExtension)
     _app.jinja_env.add_extension(LangExtension)

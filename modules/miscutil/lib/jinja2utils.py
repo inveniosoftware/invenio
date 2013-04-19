@@ -16,6 +16,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from operator import itemgetter
 from jinja2 import nodes
 from jinja2.ext import Extension
 from flask import _request_ctx_stack
@@ -54,30 +55,81 @@ def prepare_tag_bundle(cls, tag):
         [template1.css, template2.css, template3.css]
 
     """
-    def get_bundle():
+    def get_bundle(key=None, iterate=False):
+
+        def _get_data_by_key(data_, key_):
+            return map(itemgetter(1), filter(lambda (k, v): k == key_, data_))
+
         data = getattr(cls.environment, ENV_PREFIX+tag)
-        cls._reset(tag)
-        return cls.environment.new_bundle(tag, data)
+
+        if iterate:
+            bundles = sorted(set(map(itemgetter(0), data)))
+
+            def _generate_bundles():
+                for bundle in bundles:
+                    cls._reset(tag, bundle)
+                    yield cls.environment.new_bundle(tag,
+                                                     _get_data_by_key(data,
+                                                                      bundle),
+                                                     bundle)
+            return _generate_bundles()
+        else:
+            if key is not None:
+                data = _get_data_by_key(data, key)
+            else:
+                bundles = sorted(set(map(itemgetter(0), data)))
+                data = [f for bundle in bundles
+                        for f in _get_data_by_key(data, bundle)]
+
+            cls._reset(tag, key)
+            return cls.environment.new_bundle(tag, data, key)
     return get_bundle
+
 
 class CollectionExtension(Extension):
     """
-     CollectionExtension adds new tags `css` and `js` and functions
-     ``get_css_bundle`` and ``get_js_bundle`` for jinja2 templates.
-     The ``new_bundle`` method is used to create bundle from
-     list of file names collected using `css` and `js` tags.
+    CollectionExtension adds new tags `css` and `js` and functions
+    ``get_css_bundle`` and ``get_js_bundle`` for jinja2 templates.
+    The ``new_bundle`` method is used to create bundle from
+    list of file names collected using `css` and `js` tags.
 
-     Example:
-       {% css 'css/invenio.css' %}
-       {% js 'js/jquery.js' %}
-       {% js 'js/invenio.js' %}
-       ...
-       {% assets get_css_bundle() %}
+    Example: simple case
+
+        {% css 'css/invenio.css' %}
+        {% js 'js/jquery.js' %}
+        {% js 'js/invenio.js' %}
+        ...
+        {% assets get_css_bundle() %}
            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
-       {% endassets %}
-       {% assets get_js_bundle() %}
+        {% endassets %}
+        {% assets get_js_bundle() %}
            In template, use {{ ASSETS_URL }} for printing file URL.
-       {% endassets %}
+        {% endassets %}
+
+    Example: named bundles
+
+        record.html:
+        {% extend 'page.html' %}
+        {% css 'css/may-vary.css' %}
+        # default bundle name can be changed in application factory
+        # app.jinja_env.extend(default_bundle_name='90-default')
+        {% css 'css/record.css', '10-record' %}
+        {% css 'css/form.css', '10-record' %}
+
+        page.html:
+        {% css 'css/bootstrap.css', '00-base' %}
+        {% css 'css/invenio.css', '00-base' %}
+        ...
+        {% for bundle in get_css_bundle(iterate=True) %}
+          {% assets bundle %}
+            <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
+          {% endassets %}
+        {% endfor %}
+
+        Output:
+            <link rel="stylesheet" type="text/css" href="/css/00-base.css"></link>
+            <link rel="stylesheet" type="text/css" href="/css/10-record.css"></link>
+            <link rel="stylesheet" type="text/css" href="/css/90-default.css"></link>
 
      Note:
        If you decide not to use assets bundle but directly print
@@ -98,34 +150,40 @@ class CollectionExtension(Extension):
 
     def __init__(self, environment):
         super(CollectionExtension, self).__init__(environment)
-        ext = dict(('get_%s_bundle' % tag, prepare_tag_bundle(self, tag)) for tag in self.tags)
+        ext = dict(('get_%s_bundle' % tag, prepare_tag_bundle(self, tag))
+                   for tag in self.tags)
         environment.extend(
+            default_bundle_name='10-default',
             use_bundle=True,
-            collection_templates=dict((tag, lambda x:x) for tag in self.tags),
-            new_bundle=lambda tag, collection: collection,
+            collection_templates=dict((tag, lambda x: x) for tag in self.tags),
+            new_bundle=lambda tag, collection, name: collection,
             **ext)
         for tag in self.tags:
             self._reset(tag)
 
-    def _reset(self, tag):
+    def _reset(self, tag, key=None):
         """
         Empty list of used scripts.
         """
-        setattr(self.environment, ENV_PREFIX+tag, [])
+        if key is None:
+            setattr(self.environment, ENV_PREFIX+tag, [])
+        else:
+            data = filter(lambda (k, v): k != key,
+                          getattr(self.environment, ENV_PREFIX+tag))
+            setattr(self.environment, ENV_PREFIX+tag, data)
 
-    def _update(self, tag, value, caller=None):
+    def _update(self, tag, value, key, caller=None):
         """
         Update list of used scripts.
         """
         try:
             values = getattr(self.environment, ENV_PREFIX+tag)
-            values.append(value)
+            values.append((key, value))
         except:
-            values = [value]
-        #current_app.logger.info(values)
+            values = [(key, value)]
+
         setattr(self.environment, ENV_PREFIX+tag, values)
         return ''
-        #return values
 
     def parse(self, parser):
         """
@@ -139,8 +197,23 @@ class CollectionExtension(Extension):
         """
         tag = parser.stream.current.value
         lineno = next(parser.stream).lineno
-        value = parser.parse_tuple()
-        #current_app.logger.info("%s: Collecting %s (%s)" % (parser.name, tag, value))
+
+        default_bundle_name = u"%s" % (self.environment.default_bundle_name)
+        default_bundle_name.encode('utf-8')
+        bundle_name = nodes.Const(default_bundle_name)
+
+        #parse filename
+        if parser.stream.current.type != 'block_end':
+            value = parser.parse_expression()
+            # get first optional argument: bundle_name
+            if parser.stream.skip_if('comma'):
+                bundle_name = parser.parse_expression()
+                if isinstance(bundle_name, nodes.Name):
+                    bundle_name = nodes.Name(bundle_name.name, 'load')
+        else:
+            value = parser.parse_tuple()
+
+        args = [nodes.Const(tag), value, bundle_name]
 
         # Return html tag with link to corresponding script file.
         if self.environment.use_bundle is False:
@@ -152,11 +225,9 @@ class CollectionExtension(Extension):
             return nodes.Output([nodes.MarkSafeIfAutoescape(nodes.Const(node))])
 
         # Call :meth:`_update` to collect names of used scripts.
-        return nodes.CallBlock(
-            self.call_method('_update',
-                args=[nodes.Const(tag), value],
-                lineno=lineno),
-            [], [], '')
+        return nodes.CallBlock(self.call_method('_update', args=args,
+                                                lineno=lineno),
+                               [], [], '')
 
 
 def render_template_to_string(input, _from_string=False, **context):
