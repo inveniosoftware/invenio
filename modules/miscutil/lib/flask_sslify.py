@@ -96,7 +96,9 @@ class SSLify(object):
 
         if not any(criteria):
             if request.url.startswith('http://'):
-                url = request.url.replace('http://', 'https://', 1)
+                url = request.url.replace(getattr(config, 'CFG_SITE_URL', 'http://'),
+                                          getattr(config, 'CFG_SITE_SECURE_URL', 'https://'),
+                                          1)
                 code = 302
                 if self.permanent:
                     code = 301
