@@ -27,16 +27,18 @@ from cgi import parse_qs
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.urlutils import \
-     create_AWS_request_url, \
-     string_to_numeric_char_reference, \
-     make_canonical_urlargd, \
-     create_html_link, \
-     create_html_mailto, \
-     same_urls_p, \
-     HASHLIB_IMPORTED, \
-     wash_url_argument, \
-     create_url, \
-     create_Indico_request_url
+    create_AWS_request_url, \
+    string_to_numeric_char_reference, \
+    make_canonical_urlargd, \
+    create_html_link, \
+    create_html_mailto, \
+    same_urls_p, \
+    HASHLIB_IMPORTED, \
+    wash_url_argument, \
+    create_url, \
+    create_Indico_request_url, \
+    rewrite_to_secure_url
+
 
 class TestWashUrlArgument(unittest.TestCase):
     def test_wash_url_argument(self):
@@ -59,6 +61,18 @@ class TestWashUrlArgument(unittest.TestCase):
                          wash_url_argument(['ellis'], 'str'))
         self.assertEqual(["ellis"],
                          wash_url_argument(['ellis'], 'list'))
+
+
+class TestSecureUrlRewrite(unittest.TestCase):
+    def test_to_secure_url(self):
+        self.assertEqual(rewrite_to_secure_url("http://foo.bar", secure_base="https://foo.bar/"), "https://foo.bar")
+        self.assertEqual(rewrite_to_secure_url("http://foo.bar/", secure_base="https://foo.bar"), "https://foo.bar/")
+        self.assertEqual(rewrite_to_secure_url("http://foo.bar/some/path?query=a", secure_base="https://foo.bar"), "https://foo.bar/some/path?query=a")
+        self.assertEqual(rewrite_to_secure_url("http://foo.bar:4000/some/path?query=a", secure_base="https://foo.bar:4001"), "https://foo.bar:4001/some/path?query=a")
+        self.assertEqual(rewrite_to_secure_url("http://foo.bar:80/some/path?query=a", secure_base="https://foo.bar:443"), "https://foo.bar:443/some/path?query=a")
+        self.assertEqual(rewrite_to_secure_url("http://foo.bar/some/path?query=a", secure_base="https://foo.bar:443"), "https://foo.bar:443/some/path?query=a")
+        self.assertEqual(rewrite_to_secure_url("http://foo.bar:80/some/path?query=a&b=d#hd", secure_base="https://foo.bar"), "https://foo.bar/some/path?query=a&b=d#hd")
+
 
 class TestUrls(unittest.TestCase):
     """Tests on URLs"""
@@ -301,7 +315,8 @@ class TestEmailObfuscationMode(unittest.TestCase):
 TEST_SUITE = make_test_suite(TestWashUrlArgument,
                              TestUrls,
                              TestHtmlLinks,
-                             TestEmailObfuscationMode)
+                             TestEmailObfuscationMode,
+                             TestSecureUrlRewrite)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

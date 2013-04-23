@@ -52,7 +52,7 @@ except ImportError:
 
 from invenio import webinterface_handler_config as apache
 from invenio.config import \
-     CFG_SITE_URL, \
+     CFG_SITE_URL, CFG_SITE_SECURE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE, \
      CFG_WEBDIR, CFG_SITE_NAME,  CFG_VERSION, CFG_SITE_LANGS
 
@@ -182,6 +182,20 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
     req.write('<p>Please go to <a href="%s">here</a></p>\n' % url)
 
     raise apache.SERVER_RETURN, apache.DONE
+
+
+def rewrite_to_secure_url(url, secure_base=CFG_SITE_SECURE_URL):
+    """
+    Rewrite URL to a Secure URL
+
+    @param url URL to be rewritten to a secure URL.
+    @param secure_base: Base URL of secure site (defaults to CFG_SITE_SECURE_URL).
+    """
+    url_parts = list(urlparse(url))
+    url_secure_parts = urlparse(secure_base)
+    url_parts[0] = url_secure_parts[0]
+    url_parts[1] = url_secure_parts[1]
+    return urlunparse(url_parts)
 
 
 def get_referer(req, replace_ampersands=False):
