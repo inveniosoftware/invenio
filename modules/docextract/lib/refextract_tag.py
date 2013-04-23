@@ -72,13 +72,10 @@ from invenio.refextract_re import \
     RE_ATLAS_CONF_PRE_2010, \
     RE_ATLAS_CONF_POST_2010
 
-from invenio.authorextract_re import re_auth, \
-                                     re_auth_near_miss, \
-                                     re_etal, \
-                                     etal_matches, \
-                                     re_ed_notation
-
-
+from invenio.authorextract_re import (get_author_regexps,
+                                      etal_matches,
+                                      re_ed_notation,
+                                      re_etal)
 from invenio.docextract_text import wash_line
 
 
@@ -386,7 +383,7 @@ def tag_arxiv_more(line):
 
     for report_re, report_repl in RE_OLD_ARXIV:
         report_number = report_repl + ur"/\g<num>"
-        line = report_re.sub(u'<cds.REPORTNUMBER>' + report_number \
+        line = report_re.sub(u'<cds.REPORTNUMBER>' + report_number
                                                      + u'</cds.REPORTNUMBER>',
                              line)
     return line
@@ -434,7 +431,7 @@ def tag_atlas_conf(line):
 
 def identifiy_journals_re(line, kb_journals):
     matches = {}
-    for pattern, dummy in kb_journals:
+    for pattern, dummy_journal in kb_journals:
         match = re.search(pattern, line)
         if match:
             matches[match.start()] = match.group(0)
@@ -806,7 +803,7 @@ def account_for_stripped_whitespace(spaces_keys,
             spare_replacement_index += removed_spaces[space]
         elif space >= spare_replacement_index and \
                  replacement_types[replacement_index] == u"journal" and \
-                 space < (spare_replacement_index + \
+                 space < (spare_replacement_index +
                                      len(journals_matches[replacement_index])):
             # A periodical title is being replaced. Account for multi-spaces
             # that may have been stripped from the title before its
@@ -815,7 +812,7 @@ def account_for_stripped_whitespace(spaces_keys,
             extras += removed_spaces[space]
         elif space >= spare_replacement_index and \
                  replacement_types[replacement_index] == u"reportnumber" and \
-                 space < (spare_replacement_index + \
+                 space < (spare_replacement_index +
                            len_reportnums[replacement_index]):
             # An institutional preprint report-number is being replaced.
             # Account for multi-spaces that may have been stripped from it
@@ -852,7 +849,7 @@ def identify_and_tag_collaborations(line, collaborations_kb):
        which won't influence the reference splitting heuristics
        (used when looking at mulitple <AUTH> tags in a line).
     """
-    for dummy, re_collab in collaborations_kb.iteritems():
+    for dummy_collab, re_collab in collaborations_kb.iteritems():
         matches = re_collab.finditer(strip_tags(line))
 
         for match in reversed(list(matches)):
@@ -869,6 +866,8 @@ def identify_and_tag_authors(line, authors_kb):
     """Given a reference, look for a group of author names,
        place tags around the author group, return the newly tagged line.
     """
+    re_auth, re_auth_near_miss = get_author_regexps()
+
     # Replace authors which do not convert well from utf-8
     for pattern, repl in authors_kb:
         line = line.replace(pattern, repl)
@@ -1208,18 +1207,18 @@ def identify_report_numbers(line, kb_reports):
     repnum_matches_repl_str = {}  # standardised report numbers matched
                                   # at given locations in line
 
-    preprint_repnum_search_kb, preprint_repnum_standardised_categs = kb_reports
-    preprint_repnum_categs = preprint_repnum_standardised_categs.keys()
-    preprint_repnum_categs.sort(_by_len)
+    repnum_search_kb, repnum_standardised_categs = kb_reports
+    repnum_categs = repnum_standardised_categs.keys()
+    repnum_categs.sort(_by_len)
 
     # Handle CERN/LHCC/98-013
     line = line.replace('/', ' ')
 
     # try to match preprint report numbers in the line:
-    for categ in preprint_repnum_categs:
+    for categ in repnum_categs:
         # search for all instances of the current report
         # numbering style in the line:
-        repnum_matches_iter = preprint_repnum_search_kb[categ].finditer(line)
+        repnum_matches_iter = repnum_search_kb[categ].finditer(line)
 
         # for each matched report number of this style:
         for repnum_match in repnum_matches_iter:
@@ -1245,7 +1244,7 @@ def identify_report_numbers(line, kb_reports):
                                                     len(repnum_match.group(1))
             # standardised replacement for the matched preprint report number:
             repnum_matches_repl_str[repnum_match.start(1)] = \
-                                    preprint_repnum_standardised_categs[categ] \
+                                    repnum_standardised_categs[categ] \
                                     + numeration_match
 
     # return recorded information about matched report numbers, along with
@@ -1362,7 +1361,7 @@ def identify_and_tag_URLs(line):
     found_url_positions = found_url_urlstring.keys()
     found_url_positions.sort()
     for url_position in found_url_positions:
-        identified_urls.append((found_url_urlstring[url_position], \
+        identified_urls.append((found_url_urlstring[url_position],
                                 found_url_urldescr[url_position]))
 
     # Somehow the number of URLs found doesn't match the number of

@@ -160,7 +160,7 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
             url = form['url'].value
             references_xml = extract_references_from_url_xml(url)
         elif 'txt' in form and form['txt'].value:
-            txt = form['txt'].value.decode('utf-8', errors='ignore')
+            txt = form['txt'].value.decode('utf-8', 'ignore')
             references_xml = extract_references_from_string_xml(txt)
         else:
             references_xml = None
