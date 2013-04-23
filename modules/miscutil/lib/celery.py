@@ -115,7 +115,8 @@ class InvenioLoader(BaseLoader):
         return DictAttribute(usercfg)
 
     def close_database(self, **dummy_kwargs):
-        self.db.session.remove()
+        if self.db:
+            self.db.session.remove()
 
     def import_default_modules(self):
         """ Called before on_worker_init """
