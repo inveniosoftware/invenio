@@ -51,6 +51,7 @@ pylib_DATA = __init__.py \
              miscutil_model.py \
              messages.py \
              messages_unit_tests.py \
+             signalutils.py \
              textutils.py \
              textutils_unit_tests.py \
              dateutils.py \

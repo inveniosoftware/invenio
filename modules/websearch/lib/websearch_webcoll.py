@@ -62,6 +62,8 @@ from invenio.websearch_external_collections_searcher import external_collections
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
 from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
 
+from invenio.signalutils import webcoll_after_webpage_cache_update
+
 ## global vars
 COLLECTION_HOUSE = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
 
@@ -1106,6 +1108,7 @@ def task_run_core():
                     write_message("%s / webpage cache update" % coll.name)
                     for lang in CFG_SITE_LANGS:
                         coll.update_webpage_cache(lang)
+                        webcoll_after_webpage_cache_update.send(coll.name, collection=coll, lang=lang)
                 else:
                     write_message("%s / webpage cache seems not to need an update and --quick was used" % coll.name, verbose=2)
                 task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
