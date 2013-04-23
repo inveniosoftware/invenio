@@ -750,7 +750,7 @@ def cli_cmd_create_tables(conf):
     from warnings import warn
     from invenio.database_manager import main
 
-    warn('inveniocfg --create-tables is deprecated. Please use \n$ inveniomanage database drop')
+    warn('inveniocfg --create-tables is deprecated. Please use \n$ inveniomanage database create')
 
     sys_argv = sys.argv
     sys.argv = 'database_manager.py create'.split()
@@ -1253,6 +1253,10 @@ def main(*cmd_args):
 
         if not actions:
             print """ERROR: Please specify a command.  Please see '--help'."""
+            sys.exit(1)
+
+        if len(actions) > 1:
+            print """ERROR: Please specify only one command.  Please see '--help'."""
             sys.exit(1)
 
         for action in actions:
