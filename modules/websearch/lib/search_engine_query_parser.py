@@ -889,12 +889,14 @@ class SpiresToInvenioSyntaxConverter:
             except ValueError:
                 pass
 
-            try:
-                d = strptime(date_str, '%Y-%m')
-                d += du_delta(months=relative_units)
-                return datetime.strftime(d, '%Y-%m'), end
-            except ValueError:
-                pass
+
+            for date_fmt in ('%Y-%m', '%y-%m', '%m/%y', '%m/%Y'):
+                try:
+                    d = strptime(date_str, date_fmt)
+                    d += du_delta(months=relative_units)
+                    return datetime.strftime(d, '%Y-%m'), end
+                except ValueError:
+                    pass
 
             try:
                 d = strptime(date_str, '%Y')
