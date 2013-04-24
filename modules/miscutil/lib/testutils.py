@@ -28,7 +28,7 @@ CFG_TESTUTILS_VERBOSE = 1
 import os
 import sys
 import time
-import unittest
+
 import cgi
 import subprocess
 
@@ -43,6 +43,8 @@ try:
 except ImportError:
     # web tests will not be available, but unit and regression tests will:
     pass
+
+import unittest
 
 from invenio.config import CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL, CFG_PYLIBDIR, \
@@ -95,9 +97,9 @@ def warn_user_about_tests(test_suite_type='regression'):
 ** The %s test suite needs to be run on a clean demo site   **
 ** that you can obtain by doing:                                    **
 **                                                                  **
-**    $ inveniocfg --drop-demo-site \                               **
-**                 --create-demo-site \                             **
-**                 --load-demo-records                              **
+**    $ inveniocfg --drop-demo-site                                 **
+**    $ inveniocfg --create-demo-site                               **
+**    $ inveniocfg --load-demo-records                              **
 **                                                                  **
 ** Note that DOING THE ABOVE WILL ERASE YOUR ENTIRE DATABASE.       **
 **                                                                  **
@@ -132,7 +134,7 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
     CFG_DATABASE_SLAVE
 from invenio.webinterface_handler_flask import create_invenio_flask_app, \
     with_app_context
-from invenio.sqlalchemyutils import db
+from invenio.urlutils import rewrite_to_secure_url
 from flask.ext.testing import TestCase
 from sqlalchemy.engine.url import URL
 from functools import wraps
@@ -159,7 +161,8 @@ class InvenioFixture(object):
         return dictate
 
 
-class FlaskSQLAlchemyTest(TestCase):
+class InvenioTestCase(TestCase):
+
     engine = CFG_DATABASE_TYPE
     username = CFG_DATABASE_USER
     password = CFG_DATABASE_PASS
@@ -168,31 +171,36 @@ class FlaskSQLAlchemyTest(TestCase):
 
     @property
     def SQLALCHEMY_DATABASE_URI(self):
-        return URL(
-            self.engine,
-            username = self.username,
-            password = self.password,
-            host = self.host,
-            database = self.database
-            )
+        return URL(self.engine,
+                   username=self.username,
+                   password=self.password,
+                   host=self.host,
+                   database=self.database
+                   )
 
     def create_app(self):
-        app = create_invenio_flask_app(engine=self.engine,
+        app = create_invenio_flask_app(CFG_DATABASE_TYPE=self.engine,
                                        SQLALCHEMY_DATABASE_URI=self.SQLALCHEMY_DATABASE_URI)
         app.testing = True
         return app
 
+
+class FlaskSQLAlchemyTest(InvenioTestCase):
+
     def setUp(self):
+        from invenio.sqlalchemyutils import db
         db.create_all()
 
     def tearDown(self):
+        from invenio.sqlalchemyutils import db
         db.session.expunge_all()
         db.session.rollback()
         db.drop_all()
 
     def login(self, username, password):
+        from flask import request
         return self.client.post('/youraccount/login',
-                                # base_url=request.base_url.replace('http:','https:'),
+                                base_url=rewrite_to_secure_url(request.base_url),
                                 data=dict(nickname=username, password=password),
                                 follow_redirects=True)
 
@@ -214,7 +222,6 @@ def make_flask_test_suite(*test_cases):
 
 
 @nottest
-@with_app_context()
 def run_test_suite(testsuite, warn_user=False):
     """
     Convenience function to embed in test suites.  Run given testsuite
@@ -224,6 +231,7 @@ def run_test_suite(testsuite, warn_user=False):
         warn_user_about_tests()
     res = unittest.TextTestRunner(verbosity=2).run(testsuite)
     return res.wasSuccessful()
+
 
 def make_url(path, **kargs):
     """ Helper to generate an absolute invenio URL with query
@@ -585,7 +593,7 @@ def build_and_run_web_test_suite():
     return res.wasSuccessful()
 
 
-class InvenioWebTestCase(unittest.TestCase):
+class InvenioWebTestCase(InvenioTestCase):
     """ Helper library of useful web test functions
     for web tests creation.
     """
