@@ -30,8 +30,8 @@
 {% endif %}
 
 <ul class="nav nav-pills">
-  <li><a href="{{ url_for('.add') }}">{{ _("Write new message") }}</a></li>
-  <li><a href="{{ url_for('.delete_all') }}">{{ _("Delete All") }}</a></li>
+  <li><a href="{{ url_for('webmessage.add') }}">{{ _("Write new message") }}</a></li>
+  <li><a href="{{ url_for('webmessage.delete_all') }}">{{ _("Delete All") }}</a></li>
   <li><button class="btn" data-toggle="collapse" data-target="#filter" href="#filter">{{ _("Toggle Filter") }}</button></li>
 </ul>
 
@@ -39,7 +39,7 @@
 {{ render_filter_form(filter_form, id="filter", class="well form-horizontal") }}
 </div>
 
-<form name="message" action="{{ url_for('.delete') }}" method="post">
+<form name="message" action="{{ url_for('webmessage.delete') }}" method="post">
 <table class="table table-striped table-bordered table-condensed">
   <thead class="mailboxheader">
     <tr class="inboxheader">
@@ -75,7 +75,7 @@
                 <td>
                     <input class="msgid" id="msgid{{ m.id }}" type="checkbox" name="msgid" value="{{ m.id }}" />
                 </td>
-                <td style="{{ status_style }}"><a href="{{ url_for('.display_msg', msgid=m.id) }}">
+                <td style="{{ status_style }}"><a href="{{ url_for('webmessage.view', msgid=m.id) }}">
                 {% if m.subject %}
                     {{ m.subject }}
                 {% else %}
@@ -84,7 +84,7 @@
                 </a></td>
                 <td>{{ m.user_from.nickname }}</td>
                 <td>{{ m.sent_date }}</td>
-                <td><a href="{{url_for('.delete', msgid=m.id) }}">{{ _("Delete") }}</a></td>
+                <td><a href="{{url_for('webmessage.delete', msgid=m.id) }}">{{ _("Delete") }}</a></td>
             </tr>
         {% endfor %}
     {% endif %}

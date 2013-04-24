@@ -46,7 +46,7 @@ wsgiweb_DATA = invenio.wsgi
 
 jsdir=$(localstatedir)/www/js
 
-js_DATA = bootstrap-select.js
+js_DATA = bootstrap-select.js invenio.js
 
 EXTRA_DIST = $(pylib_DATA) $(wsgiweb_DATA)
 

@@ -19,63 +19,38 @@
 
 """WebMessage Flask Blueprint"""
 
-import pprint
-from string import rfind, strip
 from datetime import datetime
-
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app, \
-                  url_for
+from flask import render_template, request, flash, redirect, url_for
 from invenio import webmessage_dblayer as dbplayer
+from invenio.config import CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES
 from invenio.sqlalchemyutils import db
 from invenio.webmessage import is_no_quota_user
-from invenio.webmessage_config import CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
-                                      CFG_WEBMESSAGE_STATUS_CODE, \
-                                      CFG_WEBMESSAGE_SEPARATOR, \
-                                      CFG_WEBMESSAGE_EMAIL_ALERT
-from invenio.config import CFG_SITE_LANG, \
-                           CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
-                           CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
+from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE
 from invenio.webmessage_mailutils import email_quote_txt
 from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
 from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
 from invenio import webmessage_query as dbquery
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webinterface_handler import wash_urlargd
 from invenio.webuser_flask import current_user
 
 from sqlalchemy.sql import operators
 
+
 class MessagesMenu(object):
     def __str__(self):
-        uid = session.uid #current_user.get_id()
-        #dbquery.update_user_inbox_for_reminders(uid)
+        uid = current_user.get_id()
+        dbquery.update_user_inbox_for_reminders(uid)
         unread = db.session.query(db.func.count(UserMsgMESSAGE.id_msgMESSAGE)).\
             filter(db.and_(
                 UserMsgMESSAGE.id_user_to == uid,
                 UserMsgMESSAGE.status == CFG_WEBMESSAGE_STATUS_CODE['NEW']
             )).scalar()
 
-        out = '<i class="icon-envelope icon-white"></i>'#_('Messages')
+        out = '<div data-menu="click" data-menu-source="' + url_for('webmessage.menu') + '">'
+        out += '<i class="icon-envelope icon-white"></i>'
         if unread:
             out += ' <span class="badge badge-important">%d</span>' % unread
-        out += """
-    <script id="menu_msg">
-      $(function() {
-        var menu_a = $('#menu_msg').parent();
-        var message_update = function(obj) {
-          $(menu_a).parent().addClass('dropdown');
-          $(menu_a).unbind('hover');
-          $.ajax({
-            url: '%(url)s'
-          }).done(function ( data ) {
-            $(menu_a).parent().append(data);
-          });
-        }
-        $(menu_a).on('hover', message_update);
-      });
-    </script>
-        """ % {'url': url_for('webmessage.menu')}
+        out += "</div>"
         return out
 
 not_guest = lambda: not current_user.is_guest
@@ -88,8 +63,8 @@ blueprint = InvenioBlueprint('webmessage', __name__, url_prefix="/yourmessages",
                                           ('main.messages', MessagesMenu(),
                                            'webmessage.index', -3, [],
                                            not_guest)],
-                             breadcrumbs=[(_("Your Account"), 'webaccount.display'),
-                                          ('Your Messages', 'webmessage.display')])
+                             breadcrumbs=[(_("Your Account"), 'webaccount.index'),
+                                          ('Your Messages', 'webmessage.index')])
 
 
 @blueprint.route('/menu', methods=['GET'])
@@ -104,7 +79,7 @@ def menu():
     # join: msgMESSAGE -> user_msgMESSAGE, msgMESSAGE -> users
     # filter: all messages from user AND filter form
     # order: sorted by one of the table column
-    messages=db.session.query(MsgMESSAGE, UserMsgMESSAGE).\
+    messages = db.session.query(MsgMESSAGE, UserMsgMESSAGE).\
         join(MsgMESSAGE.user_from, MsgMESSAGE.sent_to_users).\
         filter(db.and_(dbquery.filter_all_messages_from_user(uid))).\
         order_by(db.desc(MsgMESSAGE.received_date)).limit(5)
@@ -120,9 +95,9 @@ def menu():
 @blueprint.invenio_authorized('usemessages')
 @blueprint.invenio_sorted(MsgMESSAGE)
 @blueprint.invenio_filtered(MsgMESSAGE, columns={
-                    'subject':operators.startswith_op,
-                    'user_from.nickname':operators.contains_op},
-                    form=FilterMsgMESSAGEForm)
+    'subject': operators.startswith_op,
+    'user_from.nickname': operators.contains_op},
+    form=FilterMsgMESSAGEForm)
 @blueprint.invenio_templated('webmessage_index.html')
 def index(sort=False, filter=None):
     uid = current_user.get_id()
@@ -131,7 +106,7 @@ def index(sort=False, filter=None):
     # join: msgMESSAGE -> user_msgMESSAGE, msgMESSAGE -> users
     # filter: all messages from user AND filter form
     # order: sorted by one of the table column
-    messages=db.session.query(MsgMESSAGE, UserMsgMESSAGE).\
+    messages = db.session.query(MsgMESSAGE, UserMsgMESSAGE).\
         join(MsgMESSAGE.user_from, MsgMESSAGE.sent_to_users).\
         filter(db.and_(dbquery.filter_all_messages_from_user(uid), (filter))).\
         order_by(sort)
@@ -140,12 +115,13 @@ def index(sort=False, filter=None):
                 nb_messages=dbquery.count_nb_messages(uid),
                 no_quota=is_no_quota_user(uid))
 
+
 @blueprint.route("/add", methods=['GET', 'POST'])
 @blueprint.route("/write", methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Write a message"))
 @blueprint.invenio_authenticated
 @blueprint.invenio_authorized('usemessages')
-@blueprint.invenio_wash_urlargd({'msg_reply_id': (int, 0) })
+@blueprint.invenio_wash_urlargd({'msg_reply_id': (int, 0)})
 def add(msg_reply_id):
     uid = current_user.get_id()
     if msg_reply_id:
@@ -157,7 +133,7 @@ def add(msg_reply_id):
                 m = dbquery.get_message(uid, msg_reply_id)
                 message = MsgMESSAGE()
                 message.sent_to_user_nicks = m.message.user_from.nickname \
-                                            or str(m.message.id_user_from)
+                    or str(m.message.id_user_from)
                 message.subject = _("Re:") + " " + m.message.subject
                 message.body = email_quote_txt(m.message.body)
                 form = AddMsgMESSAGEForm(request.form, obj=message)
@@ -217,7 +193,6 @@ def add(msg_reply_id):
 @blueprint.invenio_wash_urlargd({'msgid': (int, 0)})
 @blueprint.invenio_templated('webmessage_view.html')
 def view(msgid):
-    data = ()
     uid = current_user.get_id()
     if (dbquery.check_user_owns_message(uid, msgid) == 0):
         flash(_('Sorry, this message (#%d) is not in your mailbox.') % (msgid, ), "error")
@@ -238,6 +213,7 @@ def view(msgid):
             flash(_('Problem with loading message.'), "error")
 
     return redirect(url_for('.index'))
+
 
 @blueprint.route("/delete", methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
@@ -260,6 +236,7 @@ def delete():
 
     return redirect(url_for('.index'))
 
+
 @blueprint.route("/delete_all", methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_("Delete all messages"))
 @blueprint.invenio_authenticated
@@ -279,4 +256,3 @@ def delete_all(confirmed=0):
     else:
         flash(_("Could not empty your mailbox."), "warning")
     return redirect(url_for('.index'))
-
