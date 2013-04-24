@@ -571,7 +571,7 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
         else:
             filter_tags = "All tags" not in outputTags and outputTags
             result = ['<pre>']
-            for line in old_record_textmarc.splitlines()[:-1]:
+            for line in old_record_textmarc.splitlines():
                 if not filter_tags or line.split()[0].replace('_', '') in outputTags:
                     result.append("%09d " % record_id + line.strip())
             result.append('</pre>')
