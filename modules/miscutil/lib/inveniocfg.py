@@ -750,7 +750,7 @@ def cli_cmd_create_tables(conf):
     from warnings import warn
     from invenio.database_manager import main
 
-    warn('inveniocfg --create-tables is deprecated. Please use \n$ inveniomanage database create')
+    warn('inveniocfg --create-tables is deprecated. Using instead: inveniomanage database create')
 
     sys_argv = sys.argv
     sys.argv = 'database_manager.py create'.split()
@@ -776,7 +776,7 @@ def cli_cmd_drop_tables(conf):
     from warnings import warn
     from invenio.database_manager import main
 
-    warn('inveniocfg --drop-tables is deprecated. Please use \n$ inveniomanage database drop')
+    warn('inveniocfg --drop-tables is deprecated. Using instead: inveniomanage database drop')
 
     sys_argv = sys.argv
     if '--yes-i-know' in sys_argv:
@@ -922,7 +922,7 @@ def cli_cmd_create_apache_conf(conf):
     from warnings import warn
     from invenio.apache_manager import main
 
-    warn('inveniocfg --create-apache-conf is deprecated. Please use \n$ inveniomanage apache create_conf')
+    warn('inveniocfg --create-apache-conf is deprecated. Using instead: inveniomanage apache create_conf')
 
     sys_argv = sys.argv
     sys.argv = 'apache_manager.py create_conf'.split()
