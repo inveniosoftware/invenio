@@ -3769,7 +3769,7 @@ def download_local_file(filename, docformat=None):
 
     return tmppath
 
-def download_external_url(url, docformat=None):
+def download_external_url(url, docformat=None, progress_callback=None):
     """
     Download a url (if it corresponds to a remote file) and return a
     local url to it.
@@ -3812,6 +3812,9 @@ def download_external_url(url, docformat=None):
 
     try:
         tmppath = safe_mkstemp(docformat)
+        if progress_callback:
+            total_size = int(from_file.info().getheader('Content-Length').strip())
+            progress_size = 0
 
         to_file = open(tmppath, 'w')
         while True:
@@ -3819,6 +3822,10 @@ def download_external_url(url, docformat=None):
             if not block:
                 break
             to_file.write(block)
+            if progress_callback:
+                progress_size += CFG_BIBDOCFILE_BLOCK_SIZE
+                progress_callback(progress_size, CFG_BIBDOCFILE_BLOCK_SIZE,
+                                  total_size)
         to_file.close()
         from_file.close()
 
