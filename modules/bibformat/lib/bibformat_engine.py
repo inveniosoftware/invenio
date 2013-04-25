@@ -90,6 +90,7 @@ from invenio.bibknowledge import get_kbr_values
 from invenio.jinja2utils import render_template_to_string
 from HTMLParser import HTMLParseError
 from invenio.shellutils import escape_shell_arg
+from flask import current_app, has_app_context
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -482,6 +483,10 @@ def format_with_format_template(format_template_filename, bfo,
     elif format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         evaluated_format = '<!-- empty -->'
         try:
+            # Check if BFE_ELEMENTS are loaded, otherwise load them.
+            if has_app_context() and current_app.config.get('BFE_ELEMENTS', None) is None:
+                from invenio.websearch_blueprint import load_bfe_elements
+                load_bfe_elements()
             evaluated_format = render_template_to_string(
                 CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
                 bfo=bfo).encode('utf-8')
