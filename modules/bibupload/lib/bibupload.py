@@ -79,8 +79,9 @@ from invenio.bibrecord import create_records, \
                               record_find_field, \
                               record_extract_oai_id, \
                               record_extract_dois, \
-                              record_has_field,\
-                              records_identical
+                              record_has_field, \
+                              records_identical, \
+                              print_rec
 from invenio.search_engine import get_record, record_exists, search_pattern
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
@@ -212,6 +213,8 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         opt_mode = 'correct'
 
     assert(opt_mode in CFG_BIBUPLOAD_OPT_MODES)
+
+    print_rec(record).decode('utf-8')
 
     error = None
     affected_tags = {}
@@ -2679,7 +2682,8 @@ Examples:
                    "stage=",
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
-            task_run_fnc=task_run_core)
+            task_run_fnc=task_run_core,
+            task_submit_check_options_fnc=task_submit_check_options)
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args): # pylint: disable=W0613
     """ Given the string key it checks it's meaning, eventually using the
