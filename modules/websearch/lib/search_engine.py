@@ -2336,13 +2336,13 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
 
     ## eventually look up runtime synonyms:
     hitset_synonyms = intbitset()
-    if f in CFG_WEBSEARCH_SYNONYM_KBRS:
+    if CFG_WEBSEARCH_SYNONYM_KBRS.has_key(f or 'anyfield'):
         if ignore_synonyms is None:
             ignore_synonyms = []
         ignore_synonyms.append(p)
         for p_synonym in get_synonym_terms(p,
-                             CFG_WEBSEARCH_SYNONYM_KBRS[f][0],
-                             CFG_WEBSEARCH_SYNONYM_KBRS[f][1]):
+                             CFG_WEBSEARCH_SYNONYM_KBRS[f or 'anyfield'][0],
+                             CFG_WEBSEARCH_SYNONYM_KBRS[f or 'anyfield'][1]):
             if p_synonym != p and \
                    not p_synonym in ignore_synonyms:
                 hitset_synonyms |= search_unit(p_synonym, f, m, wl,
