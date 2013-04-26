@@ -32,10 +32,7 @@ import re
 import logging
 import sys
 import os
-# make sure invenio lib is importable
-if os.path.dirname(__file__) not in sys.path:
-    sys.path.insert(0, os.path.dirname(__file__))
-import config
+from invenio import config
 
 VERSION = '0.4.9'
 
@@ -256,12 +253,12 @@ def set_global_level(level):
 log = get_logger('bibclassify')
 
 STANDALONE = False
-try:
-    import search_engine
-except:
-    STANDALONE = True
-    log.warning('Bibclassify is running in a standalone mode, access to database is not supported')
-
+## Standalone mode has been removed.
+#try:
+#    from invenio import search_engine
+#except:
+#    STANDALONE = True
+#    log.warning('Bibclassify is running in a standalone mode, access to database is not supported')
 
 
 if STANDALONE:
@@ -296,7 +293,7 @@ CFG_TMPDIR = config.CFG_TMPDIR
 
 # Redefine variable definitions if local config exists
 try:
-    import bibclassify_config_local as localconf
+    from invenio import bibclassify_config_local as localconf
     for confid in dir(localconf):
         if 'CFG' in confid:
             if hasattr(config, confid):

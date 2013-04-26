@@ -22,13 +22,13 @@ webauthorprofile_cli
     This module provides a command-line interface for WebAuthorProfile.
 """
 
-import bibauthorid_config as bconfig
+from invenio import bibauthorid_config as bconfig
 
 
 def main():
     """Main function """
     try:
-        import webauthorprofile_daemon as daemon
+        from invenio import webauthorprofile_daemon as daemon
     except ImportError:
         bconfig.LOGGER.error("Hmm...No Daemon process running.")
         return
@@ -38,4 +38,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

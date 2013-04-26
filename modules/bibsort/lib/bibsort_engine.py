@@ -29,7 +29,7 @@ from invenio.intbitset import intbitset
 from invenio.bibtask import write_message, task_update_progress, \
 task_sleep_now_if_required
 from invenio.config import CFG_BIBSORT_BUCKETS, CFG_CERN_SITE
-from bibsort_washer import BibSortWasher, \
+from invenio.bibsort_washer import BibSortWasher, \
 InvenioBibSortWasherNotImplementedError
 
 import invenio.template

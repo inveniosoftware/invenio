@@ -94,7 +94,7 @@ else:
 
 from invenio.external_authentication_robot import ExternalAuthRobot
 if CFG_CERN_SITE:
-    import external_authentication_sso as ea_sso
+    from invenio import external_authentication_sso as ea_sso
     CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
     CFG_EXTERNAL_AUTH_DEFAULT = CFG_EXTERNAL_AUTH_USING_SSO
     CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'

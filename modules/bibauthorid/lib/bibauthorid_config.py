@@ -24,9 +24,6 @@ bibauthorid_config
     declare any configuration options for the modules within themselves.
 """
 
-import sys
-import os.path as osp
-
 try:
     from invenio.access_control_config import SUPERADMINROLE
 except ImportError:
@@ -49,12 +46,6 @@ except ImportError:
 
 # Current version of the framework
 VERSION = '1.1.2'
-
-# make sure current directory is importable
-FILE_PATH = osp.dirname(osp.abspath(__file__))
-
-if FILE_PATH not in sys.path:
-    sys.path.insert(0, FILE_PATH)
 
 # Permission definitions as in actions defined in roles
 CLAIMPAPER_ADMIN_ROLE = "claimpaperoperators"

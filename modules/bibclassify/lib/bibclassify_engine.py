@@ -39,14 +39,14 @@ import sys
 import time
 import cgi
 
-import bibclassify_config as bconfig
+from invenio import bibclassify_config as bconfig
 log = bconfig.get_logger("bibclassify.engine")
 
-import bibclassify_ontology_reader as reader
-import bibclassify_text_extractor as extractor
-import bibclassify_text_normalizer as normalizer
-import bibclassify_keyword_analyzer as keyworder
-import bibclassify_acronym_analyzer as acronymer
+from invenio import bibclassify_ontology_reader as reader
+from invenio import bibclassify_text_extractor as extractor
+from invenio import bibclassify_text_normalizer as normalizer
+from invenio import bibclassify_keyword_analyzer as keyworder
+from invenio import bibclassify_acronym_analyzer as acronymer
 
 try:
     from invenio.urlutils import make_user_agent_string

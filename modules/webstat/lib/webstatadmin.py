@@ -20,8 +20,9 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import sys, webstat
+import sys
 
+from invenio import webstat
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
                             task_has_option, task_update_progress, write_message

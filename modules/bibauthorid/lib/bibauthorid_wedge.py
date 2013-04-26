@@ -17,15 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import bibauthorid_config as bconfig
+from invenio import bibauthorid_config as bconfig
 from itertools import izip, starmap
 from operator import mul
-from bibauthorid_backinterface import Bib_matrix
-from bibauthorid_general_utils import update_status \
+from invenio.bibauthorid_backinterface import Bib_matrix
+from invenio.bibauthorid_general_utils import update_status \
                                     , update_status_final \
                                     , bibauthor_print \
                                     , wedge_print
-from bibauthorid_prob_matrix import ProbabilityMatrix
+from invenio.bibauthorid_prob_matrix import ProbabilityMatrix
 import numpy
 #mport cPickle as SER
 import msgpack as SER
@@ -408,7 +408,7 @@ def join(cl1, cl2):
 
 
 def export_to_dot(cs, fname, graph_info, extra_edge=None):
-    from bibauthorid_dbinterface import get_name_by_bibrecref
+    from invenio.bibauthorid_dbinterface import get_name_by_bibrecref
 
     fptr = open(fname, "w")
     fptr.write("graph wedgy {\n")

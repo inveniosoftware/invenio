@@ -24,8 +24,7 @@ There should always be at least one test class for each class in b_e_t.
 import unittest
 
 from invenio.testutils import make_test_suite, run_test_suite
-
-import bibindex_engine_tokenizer as tokenizer_lib
+from invenio import bibindex_engine_tokenizer as tokenizer_lib
 
 
 class TestFuzzyNameTokenizerScanning(unittest.TestCase):

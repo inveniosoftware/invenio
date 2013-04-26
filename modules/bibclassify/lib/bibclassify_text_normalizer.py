@@ -30,7 +30,7 @@ references section and to replace unicode characters.
 
 import sys
 import re
-import bibclassify_config as bconfig
+from invenio import bibclassify_config as bconfig
 
 from invenio.docextract_pdf import replace_undesirable_characters
 from invenio.refextract_find import find_reference_section, find_end_of_reference_section

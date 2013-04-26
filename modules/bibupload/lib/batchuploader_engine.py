@@ -438,7 +438,7 @@ def perform_basic_upload_checks(xml_record):
     an exit status 1, to prevent batchupload from crashing while alarming
     the user wabout the issue
     """
-    from bibupload import writing_rights_p
+    from invenio.bibupload import writing_rights_p
 
     errors = []
     if not writing_rights_p():

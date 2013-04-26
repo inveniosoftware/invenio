@@ -21,5 +21,5 @@
     to extract information about the authors.
 '''
 
-from bibauthorid_dbinterface import get_person_bibrecs                  #emitting #pylint: disable-msg=W0611
-from bibauthorid_dbinterface import get_personids_from_bibrec           #emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_dbinterface import get_person_bibrecs                  #emitting #pylint: disable-msg=W0611
+from invenio.bibauthorid_dbinterface import get_personids_from_bibrec           #emitting #pylint: disable-msg=W0611

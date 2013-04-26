@@ -38,7 +38,7 @@ from invenio.bibauthorid_backinterface import personid_get_recids_affected_since
 
 
 def convert_personid():
-    from dbquery import run_sql # oh come on, the whole function will be removed soon
+    from invenio.dbquery import run_sql # oh come on, the whole function will be removed soon
     from itertools import repeat
     chunk = 1000
 

@@ -22,11 +22,11 @@ WebAuthorProfile daemon
 """
 
 import sys
-import bibtask
+from invenio import bibtask
 
-from bibauthorid_dbinterface import get_existing_personids
-from webauthorprofile_dbapi import get_expired_person_ids
-from webauthorprofile_corefunctions import _compute_cache_for_person
+from invenio.bibauthorid_dbinterface import get_existing_personids
+from invenio.webauthorprofile_dbapi import get_expired_person_ids
+from invenio.webauthorprofile_corefunctions import _compute_cache_for_person
 
 def webauthorprofile_daemon():
     """Constructs the webauthorprofile bibtask."""

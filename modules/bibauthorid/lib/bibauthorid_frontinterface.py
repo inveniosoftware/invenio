@@ -26,7 +26,7 @@
 from invenio.bibauthorid_name_utils import split_name_parts #emitting #pylint: disable-msg=W0611
 from invenio.bibauthorid_name_utils import soft_compare_names
 from invenio.bibauthorid_name_utils import create_normalized_name #emitting #pylint: disable-msg=W0611
-import bibauthorid_dbinterface as dbinter
+from invenio import bibauthorid_dbinterface as dbinter
 from cgi import escape
 
 #Well this is bad, BUT otherwise there must 100+ lines

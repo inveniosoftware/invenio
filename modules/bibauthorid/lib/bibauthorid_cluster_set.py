@@ -31,7 +31,7 @@ from invenio.bibauthorid_general_utils import  bibauthor_print
 
 
 #python2.4 compatibility
-from bibauthorid_general_utils import bai_all as all
+from invenio.bibauthorid_general_utils import bai_all as all
 
 class Blob(object):
     def __init__(self, personid_records):

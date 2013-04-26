@@ -23,20 +23,20 @@ Bibauthorid Daemon
 """
 
 import sys
-import bibauthorid_config as bconfig
-import bibtask
+from invenio import bibauthorid_config as bconfig
+from invenio import bibtask
 
-from bibauthorid_backinterface import get_recently_modified_record_ids
-from bibauthorid_backinterface import get_user_log
-from bibauthorid_backinterface import insert_user_log
-from bibauthorid_backinterface import get_sql_time
-from bibauthorid_backinterface import get_personids_from_bibrec
-from bibauthorid_backinterface import get_claimed_papers_from_papers
-from bibauthorid_backinterface import get_all_valid_bibrecs
+from invenio.bibauthorid_backinterface import get_recently_modified_record_ids
+from invenio.bibauthorid_backinterface import get_user_log
+from invenio.bibauthorid_backinterface import insert_user_log
+from invenio.bibauthorid_backinterface import get_sql_time
+from invenio.bibauthorid_backinterface import get_personids_from_bibrec
+from invenio.bibauthorid_backinterface import get_claimed_papers_from_papers
+from invenio.bibauthorid_backinterface import get_all_valid_bibrecs
 
 
 #python 2.4 compatibility
-from bibauthorid_general_utils import bai_any as any
+from invenio.bibauthorid_general_utils import bai_any as any
 
 def bibauthorid_daemon():
     """Constructs the Bibauthorid bibtask."""
@@ -252,7 +252,7 @@ def _get_personids_to_update_extids(papers=None):
     return personids_to_update_extids
 
 def rabbit_with_log(papers, check_invalid_papers, log_comment, partial=False):
-    from bibauthorid_rabbit import rabbit
+    from invenio.bibauthorid_rabbit import rabbit
 
     personids_to_update_extids = _get_personids_to_update_extids(papers)
     starting_time = get_sql_time()
@@ -289,7 +289,7 @@ def run_rabbit(paperslist, all_records=False):
 
 
 def run_tortoise(from_scratch):
-    from bibauthorid_tortoise import tortoise, tortoise_from_scratch
+    from invenio.bibauthorid_tortoise import tortoise, tortoise_from_scratch
 
     if from_scratch:
         tortoise_from_scratch()
@@ -308,5 +308,5 @@ def run_tortoise(from_scratch):
 
 
 def run_merge():
-    from bibauthorid_merge import merge_dynamic
+    from invenio.bibauthorid_merge import merge_dynamic
     merge_dynamic()
