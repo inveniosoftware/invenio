@@ -1016,11 +1016,18 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
             ## Fuzzy matching: Analyze all queries and perform individual searches, then intersect results.
             for querystring, complete, field in query_list:
                 result_hitset = None
+                if (verbose > 8):
+                    sys.stderr.write("\n Start new search ------------ \n")
                 fuzzy_query_list = querystring.fuzzy_queries()
                 empty_results = 0
                 # Go through every expression in the query and generate fuzzy searches
                 for current_operator, qry in fuzzy_query_list:
                     current_resultset = None
+                    if qry == "":
+                        if (verbose > 1):
+                            sys.stderr.write("\nEmpty query. Skipping...\n")
+                            # Empty query, no point searching database
+                            continue
                     search_params = dict(p=qry, f=field, of='id', c=collections)
                     CFG_BIBMATCH_LOGGER.info("Fuzzy searching with values %s" % (search_params,))
                     try:
@@ -1056,7 +1063,11 @@ def match_record(bibmatch_recid, record, server, qrystrs=None, search_mode=None,
                         elif current_operator == '|':
                             result_hitset = list(set(result_hitset) | set(current_resultset))
                 else:
-                    if result_hitset and len(result_hitset) < CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT:
+                    # We did not hit a break in the for-loop: we were allowed to search.
+                    if result_hitset and len(result_hitset) > CFG_BIBMATCH_SEARCH_RESULT_MATCH_LIMIT:
+                        if (verbose > 1):
+                            sys.stderr.write("\nToo many results... %d  " % (len(result_hitset)))
+                    elif result_hitset:
                         # This was a fuzzy match
                         query_out = " ".join(["%s %s" % (op, qu) for op, qu in fuzzy_query_list])
                         if validate:
