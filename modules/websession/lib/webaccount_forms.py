@@ -120,6 +120,10 @@ class RegisterForm(Form):
         except SQLAlchemyError:
             pass
 
+    def validate_password(self, field):
+        if len(field.data) <= 6:
+            raise validators.ValidationError(_("Password must be at least 6 characters long."))
+
     def validate_password2(self, field):
         if field.data != self.password.data:
             raise validators.ValidationError(_("Both passwords must match."))
