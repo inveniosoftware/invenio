@@ -23,6 +23,7 @@ Invenio database dumper.
 """
 
 try:
+    from invenio.flaskshell import *
     from invenio.dbdump import main
 except ImportError, e:
     print "Error: %s" % e
