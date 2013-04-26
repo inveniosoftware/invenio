@@ -21,6 +21,8 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = websubmit_config.py websubmit_engine.py \
              websubmit_dblayer.py \
+             websubmit_fixtures.py \
+             websubmit_fixtures_demosite.py \
              websubmit_model.py \
              websubmit_webinterface.py \
              websubmit_templates.py \
