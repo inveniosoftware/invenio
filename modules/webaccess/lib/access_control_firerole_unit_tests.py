@@ -21,16 +21,18 @@
 
 __revision__ = "$Id$"
 
-import unittest
 
-from invenio.access_control_firerole import compile_role_definition, \
-    serialize, deserialize, acc_firerole_check_user
-from invenio.access_control_config import InvenioWebAccessFireroleError, \
-        CFG_ACC_EMPTY_ROLE_DEFINITION_SER
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.webuser import collect_user_info
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class AccessControlFireRoleTest(unittest.TestCase):
+acc_firerole_check_user = lazy_import('invenio.access_control_firerole:acc_firerole_check_user')
+compile_role_definition = lazy_import('invenio.access_control_firerole:compile_role_definition')
+deserialize = lazy_import('invenio.access_control_firerole:deserialize')
+serialize = lazy_import('invenio.access_control_firerole:serialize')
+collect_user_info = lazy_import('invenio.webuser:collect_user_info')
+
+
+class AccessControlFireRoleTest(InvenioTestCase):
     """Test functions related to the firewall like role definitions."""
 
     def setUp(self):
@@ -42,8 +44,9 @@ class AccessControlFireRoleTest(unittest.TestCase):
 
     def test_compile_role_definition_empty(self):
         """firerole - compiling empty role definitions"""
+        from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER
         self.assertEqual(compile_role_definition(None),
-            deserialize(CFG_ACC_EMPTY_ROLE_DEFINITION_SER))
+                         deserialize(CFG_ACC_EMPTY_ROLE_DEFINITION_SER))
 
     def test_compile_role_definition_allow_any(self):
         """firerole - compiling allow any role definitions"""
@@ -97,6 +100,8 @@ class AccessControlFireRoleTest(unittest.TestCase):
 
     def test_compile_role_definition_with_date(self):
         """firerole - compiling date based role definitions"""
+        from invenio.access_control_config import InvenioWebAccessFireroleError
+
         self.failUnless(serialize(compile_role_definition(
             "allow from '2010-11-11'")))
         self.failUnless(serialize(compile_role_definition(
@@ -108,6 +113,8 @@ class AccessControlFireRoleTest(unittest.TestCase):
 
     def test_compile_role_definition_wrong(self):
         """firerole - compiling wrong role definitions"""
+        from invenio.access_control_config import InvenioWebAccessFireroleError
+
         self.assertRaises(InvenioWebAccessFireroleError,
             compile_role_definition, "allow al")
         self.assertRaises(InvenioWebAccessFireroleError,

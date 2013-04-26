@@ -27,8 +27,6 @@ This module is STANDALONE SAFE
 """
 
 import sys
-
-import unittest
 import tempfile
 import cStringIO
 import os
@@ -36,25 +34,19 @@ import time
 import stat
 import shutil
 
-from invenio import bibclassify_config as bconfig
-from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio import config
-from invenio import bibclassify_ontology_reader
-
-log = bconfig.get_logger("bibclassify.tests")
-
-# do this only if not in STANDALONE mode
-bibclassify_daemon = dbquery = None
-if not bconfig.STANDALONE:
-    from invenio import bibdocfile
+from invenio.testutils import make_test_suite, run_test_suite, nottest, \
+    InvenioTestCase
 
 
-class BibClassifyTestCase(unittest.TestCase):
+class BibClassifyTestCase(InvenioTestCase):
     """ Abusive test suite - the one that takes sooooo long """
 
     def setUp(self):
         """Initialize stuff"""
-        #self.tmpdir = invenio.config.CFG_TMPDIR
+        ## NOTE next time please make sure that you change global variables
+        ## back to initial values in tearDown. Thank you!!!
+        self.__CFG_TMPDIR = config.CFG_TMPDIR
         config.CFG_TMPDIR = tempfile.gettempdir()
 
         self.oldstdout = sys.stdout
@@ -63,14 +55,17 @@ class BibClassifyTestCase(unittest.TestCase):
         self.stderr = None
 
         self.taxonomy_name = "test"
-
+        from invenio import bibclassify_config as bconfig
+        self.log = bconfig.get_logger("bibclassify.tests")
         self.log_level = bconfig.logging_level
         bconfig.set_global_level(bconfig.logging.CRITICAL)
 
     def tearDown(self):
         if self.stdout:
             self.unredirect()
+        from invenio import bibclassify_config as bconfig
         bconfig.set_global_level(self.log_level)
+        config.CFG_TMPDIR = self.__CFG_TMPDIR
 
     def redirect(self):
         # just for debugging in Eclipse (to see messages printed)
@@ -103,10 +98,10 @@ class BibClassifyTestCase(unittest.TestCase):
 
         return sin, serr
 
-
     @nottest
     def get_test_file(self, recid, type='Main', format='pdf'):
 
+        from invenio import bibdocfile
         br = bibdocfile.BibRecDocs(recid)
         bibdocs = br.list_bibdocs(type)
         # we grab the first
@@ -116,13 +111,12 @@ class BibClassifyTestCase(unittest.TestCase):
                 return x.get_full_path(), x.get_url()
 
 
-
 class BibClassifyTest(BibClassifyTestCase):
-
 
     def test_rebuild_cache(self):
         """bibclassify - test rebuilding cache (takes long time)"""
 
+        from invenio import bibclassify_ontology_reader
         info = bibclassify_ontology_reader._get_ontology(self.taxonomy_name)
 
         if info[0]:
@@ -145,7 +139,7 @@ class BibClassifyTest(BibClassifyTestCase):
 
     def test_cache_accessibility(self):
         """bibclassify - test cache accessibility/writability"""
-
+        from invenio import bibclassify_ontology_reader
         # we will do tests with a copy of test taxonomy, in case anything goes wrong...
         orig_name, orig_taxonomy_path, orig_taxonomy_url = bibclassify_ontology_reader._get_ontology(self.taxonomy_name)
 
@@ -169,7 +163,7 @@ class BibClassifyTest(BibClassifyTestCase):
         bibclassify_ontology_reader.get_regular_expressions(taxonomy_name, rebuild=True, no_cache=False)
         assert(os.path.exists(cache))
 
-        log.error('Testing corrupted states, please ignore errors...')
+        self.log.error('Testing corrupted states, please ignore errors...')
 
         # set cache unreadable
         os.chmod(cache, 000)
@@ -247,7 +241,7 @@ class BibClassifyTest(BibClassifyTestCase):
         finally:
             os.rename(taxonomy_path+'x', taxonomy_path)
 
-        log.error('...testing of corrupted states finished.')
+        self.log.error('...testing of corrupted states finished.')
 
         name, taxonomy_path, taxonomy_url = bibclassify_ontology_reader._get_ontology(taxonomy_name)
         cache = bibclassify_ontology_reader._get_cache_path(name)
@@ -276,23 +270,7 @@ class BibClassifyTest(BibClassifyTestCase):
         """test the function returns {<keyword>: [ [spans...], [correct component counts] ] }"""
 
 
-
-
-
-def suite(cls=BibClassifyTest):
-    tests = []
-    for x in sys.argv[1:]:
-        if x[0:4] == 'test':
-            tests.append(x)
-    if len(tests) < 1:
-        raise Exception('You must specify tests to run')
-
-    return unittest.TestSuite(map(cls, tests))
-
-if 'custom' in sys.argv:
-    TEST_SUITE = suite(BibClassifyTest)
-else:
-    TEST_SUITE = make_test_suite(BibClassifyTest)
+TEST_SUITE = make_test_suite(BibClassifyTest)
 
 
 if __name__ == '__main__':

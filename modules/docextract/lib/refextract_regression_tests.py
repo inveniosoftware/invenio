@@ -24,16 +24,16 @@ The tests will not modifiy the database.
 They are intended to make sure there is no regression in references parsing.
 """
 
-import unittest
 import re
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 ## Import the minimal necessary methods and variables needed to run Refextract
-from invenio.refextract_engine import parse_references
-from invenio.docextract_utils import setup_loggers
-from invenio.refextract_text import wash_and_repair_reference_line
-from invenio import refextract_kbs
-from invenio import refextract_xml
+parse_references = lazy_import('invenio.refextract_engine:parse_references')
+setup_loggers = lazy_import('invenio.docextract_utils:setup_loggers')
+wash_and_repair_reference_line = lazy_import('invenio.refextract_text:wash_and_repair_reference_line')
+refextract_kbs = lazy_import('invenio.refextract_kbs')
+refextract_xml = lazy_import('invenio.refextract_xml')
 
 
 def compare_references(test, references, expected_references, ignore_misc=True):
@@ -67,7 +67,7 @@ def _reference_test(test, ref_line, parsed_reference, ignore_misc=True):
     compare_references(test, out, parsed_reference, ignore_misc=ignore_misc)
 
 
-class RefextractInvenioTest(unittest.TestCase):
+class RefextractInvenioTest(InvenioTestCase):
 
     def setUp(self):
         self.old_override = refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE
@@ -145,7 +145,7 @@ class RefextractInvenioTest(unittest.TestCase):
 </record>""")
 
 
-class RefextractTest(unittest.TestCase):
+class RefextractTest(InvenioTestCase):
     """Testing output of refextract"""
 
     def setUp(self):
@@ -2428,7 +2428,7 @@ Rev. D 80 034030 1-25"""
 </record>""")
 
 
-class TaskTest(unittest.TestCase):
+class TaskTest(InvenioTestCase):
     def setUp(self):
         setup_loggers(verbosity=0)
 

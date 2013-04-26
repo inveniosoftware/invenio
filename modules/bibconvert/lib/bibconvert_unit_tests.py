@@ -2,7 +2,7 @@
 ## Invenio bibconvert unit tests.
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,12 +22,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+bibconvert = lazy_import('invenio.bibconvert')
 
-from invenio import bibconvert
-from invenio.testutils import make_test_suite, run_test_suite
 
-class TestFormattingFunctions(unittest.TestCase):
+class TestFormattingFunctions(InvenioTestCase):
     """Test bibconvert formatting functions."""
 
     def test_ff(self):
@@ -68,7 +68,7 @@ class TestFormattingFunctions(unittest.TestCase):
                 bibconvert.FormatField("Hello world!", "IF(//^Hello .*x$//,lala,lolo)"))
 
 
-class TestGlobalFormattingFunctions(unittest.TestCase):
+class TestGlobalFormattingFunctions(InvenioTestCase):
     """Test bibconvert global formatting functions."""
 
     def test_gff(self):
@@ -76,7 +76,7 @@ class TestGlobalFormattingFunctions(unittest.TestCase):
 
         self.assertEqual("Hello world!", bibconvert.FormatField("Hello world!","DEFP()"))
 
-class TestGenerateValues(unittest.TestCase):
+class TestGenerateValues(InvenioTestCase):
     """Test bibconvert value generation."""
 
     def test_gv(self):
@@ -84,7 +84,7 @@ class TestGenerateValues(unittest.TestCase):
 
         self.assertEqual("Hello world!", bibconvert.generate("VALUE(Hello world!)"))
 
-class TestParseData(unittest.TestCase):
+class TestParseData(InvenioTestCase):
     """Test bibconvert input data parsing."""
 
     def test_idp(self):
@@ -92,7 +92,7 @@ class TestParseData(unittest.TestCase):
 
         self.assertEqual(['A','B','C','D'], bibconvert.parse_field_definition("A---B---C---D"))
 
-class TestRegExp(unittest.TestCase):
+class TestRegExp(InvenioTestCase):
     """Test bibconvert regular expressions"""
 
     def test_regexp(self):
@@ -100,7 +100,7 @@ class TestRegExp(unittest.TestCase):
 
         self.assertEqual("Hello world!", bibconvert.FormatField("Hello world!", "RE([A-Z][a-z].*!)"))
 
-class TestLim(unittest.TestCase):
+class TestLim(InvenioTestCase):
     """Test bibconvert LIM() function."""
 
     def test_lim_default(self):
@@ -127,7 +127,7 @@ class TestLim(unittest.TestCase):
         self.assertEqual("sep_",
                          bibconvert.FormatField(test_input, "LIM(4,R)"))
 
-class TestLimw(unittest.TestCase):
+class TestLimw(InvenioTestCase):
     """Test bibconvert LIMW() function."""
 
     def test_limw_default(self):
@@ -176,7 +176,7 @@ class TestLimw(unittest.TestCase):
                 bibconvert.FormatField(test_input, "LIMW(//[!-]//,R)"))
 
 
-class TestWords(unittest.TestCase):
+class TestWords(InvenioTestCase):
     """Test bibconvert WORDS() function."""
 
     def test_words_default(self):
@@ -209,7 +209,7 @@ class TestWords(unittest.TestCase):
         self.assertEqual(test_input,
                          bibconvert.FormatField(test_input, "WORDS(2,R)"))
 
-class TestBCCL(unittest.TestCase):
+class TestBCCL(InvenioTestCase):
     """Test bibconvert BCCL compliance"""
 
     def xtest_bccl_09(self):
@@ -218,7 +218,7 @@ class TestBCCL(unittest.TestCase):
         # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
-class TestKnowledgeBase(unittest.TestCase):
+class TestKnowledgeBase(InvenioTestCase):
     """Test bibconvert knowledge base"""
 
     def xtest_enc(self):
@@ -227,7 +227,7 @@ class TestKnowledgeBase(unittest.TestCase):
         # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
-class TestErrorCodes(unittest.TestCase):
+class TestErrorCodes(InvenioTestCase):
     """Test bibconvert error codes"""
 
     def xtest_enc(self):
@@ -236,7 +236,7 @@ class TestErrorCodes(unittest.TestCase):
         # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
-class TestEncodings(unittest.TestCase):
+class TestEncodings(InvenioTestCase):
     """Test bibconvert encodings"""
 
     def xtest_enc(self):

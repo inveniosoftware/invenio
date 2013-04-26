@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,15 +19,18 @@
 
 """WebLinkback - Unit Test Suite"""
 
-import unittest
+
 import datetime
 
-from invenio.weblinkback import split_in_days
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+
+split_in_days = lazy_import('invenio.weblinkback:split_in_days')
+
 from invenio.weblinkback_config import CFG_WEBLINKBACK_TYPE, CFG_WEBLINKBACK_STATUS
 
 
-class TestSplitLinkbacksInInsertionDayGroups(unittest.TestCase):
+class TestSplitLinkbacksInInsertionDayGroups(InvenioTestCase):
     """Test for splitting linkbacks in insertion day groups"""
 
     def setUp(self):

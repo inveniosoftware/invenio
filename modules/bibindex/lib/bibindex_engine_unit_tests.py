@@ -22,13 +22,12 @@
 __revision__ = \
     "$Id$"
 
-import unittest
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+bibindex_engine = lazy_import('invenio.bibindex_engine')
 
-from invenio import bibindex_engine
-from invenio.testutils import make_test_suite, run_test_suite
 
-
-class TestListSetOperations(unittest.TestCase):
+class TestListSetOperations(InvenioTestCase):
     """Tests for list set operations."""
 
     def test_list_union(self):
@@ -38,7 +37,7 @@ class TestListSetOperations(unittest.TestCase):
                                                     [1, 3, 4]))
 
 
-class TestWashIndexTerm(unittest.TestCase):
+class TestWashIndexTerm(InvenioTestCase):
     """Tests for washing index terms, useful for both searching and indexing."""
 
     def test_wash_index_term_short(self):
@@ -62,7 +61,7 @@ class TestWashIndexTerm(unittest.TestCase):
           bibindex_engine.wash_index_term("Ελληνικό αλφάβητο"))
 
 
-class TestGetWordsFromPhrase(unittest.TestCase):
+class TestGetWordsFromPhrase(InvenioTestCase):
     """Tests for getting words from phrase."""
 
     def test_easy_phrase(self):
@@ -107,7 +106,7 @@ class TestGetWordsFromPhrase(unittest.TestCase):
         l_words_obtained.sort()
         self.assertEqual(l_words_obtained, l_words_expected)
 
-class TestGetWordsFromDateTag(unittest.TestCase):
+class TestGetWordsFromDateTag(InvenioTestCase):
     """Tests for getting words for date-like tag."""
 
     def test_dateindex_yyyy(self):
@@ -131,7 +130,7 @@ class TestGetWordsFromDateTag(unittest.TestCase):
           bibindex_engine.get_words_from_date_tag("dd mon yyyy"))
 
 
-class TestGetAuthorFamilyNameWords(unittest.TestCase):
+class TestGetAuthorFamilyNameWords(InvenioTestCase):
     """Tests for getting family name words from author names."""
 
     def test_authornames_john_doe(self):

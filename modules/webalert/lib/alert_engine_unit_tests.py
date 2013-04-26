@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011 CERN.
+## Copyright (C) 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,12 +22,15 @@
 __revision__ = \
     "$Id$"
 
-import unittest
-from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.htmlparser import RecordHTMLParser
 
-class TestWashHTMLtoText(unittest.TestCase):
+from invenio.config import CFG_SITE_URL
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+
+RecordHTMLParser = lazy_import('invenio.htmlparser:RecordHTMLParser')
+
+
+class TestWashHTMLtoText(InvenioTestCase):
     """Test HTML to text conversion."""
 
     def test_wash_html_to_text(self):

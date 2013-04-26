@@ -48,12 +48,11 @@ sys.path = filter(
     sys.path
 )
 
-import unittest
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.celery import celery
 
 
-class CeleryTest(unittest.TestCase):
+class CeleryTest(InvenioTestCase):
     def setUp(self):
         # Execute tasks synchronously
         celery.conf.CELERY_ALWAYS_EAGER = True

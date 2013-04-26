@@ -22,15 +22,17 @@
 
 __revision__ = "$Id$"
 
-import unittest
-import re
 
+import re
 from cStringIO import StringIO
 
-from invenio import oai_repository_server
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class TestVerbs(unittest.TestCase):
+oai_repository_server = lazy_import('invenio.oai_repository_server')
+
+
+class TestVerbs(InvenioTestCase):
     """Test for OAI verb functionality."""
 
     def test_verbs(self):
@@ -47,7 +49,7 @@ class TestVerbs(unittest.TestCase):
         self.assertNotEqual(None, re.search("GetRecord", oai_repository_server.oai_get_record({'identifier': 'oai:atlantis.cern.ch:1', 'verb': 'GetRecord'})))
 
 
-class TestErrorCodes(unittest.TestCase):
+class TestErrorCodes(InvenioTestCase):
     """Test for handling OAI error codes."""
 
     def test_issue_error_identify(self):

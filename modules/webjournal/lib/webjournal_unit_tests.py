@@ -24,16 +24,14 @@ __revision__ = \
 
 # pylint invenio/modules/webjournal/lib/webjournal_tests.py
 
-import unittest
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-from invenio.webjournal_utils import compare_issues
-from invenio.webjournal import issue_is_later_than
+issue_is_later_than = lazy_import('invenio.webjournal:issue_is_later_than')
+compare_issues = lazy_import('invenio.webjournal_utils:compare_issues')
 
-#from invenio import webjournal_utils
-from invenio.testutils import make_test_suite, run_test_suite
-#from invenio.config import CFG_SITE_URL
 
-class TestCompareIssues(unittest.TestCase):
+class TestCompareIssues(InvenioTestCase):
     """Tests for comparing issues."""
 
     def test_compare_issues(self):

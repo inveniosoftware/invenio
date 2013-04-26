@@ -21,15 +21,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
 
-from invenio.config import CFG_SITE_LANG, \
-                           CFG_SITE_LANGS, \
-                           CFG_SITE_URL
-from invenio.messages import gettext_set_language
-from invenio.testutils import make_test_suite, \
-                              run_test_suite
-from invenio.webdoc import transform
+from invenio.config import CFG_SITE_LANG, CFG_SITE_LANGS, CFG_SITE_URL
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+gettext_set_language = lazy_import('invenio.messages:gettext_set_language')
+transform = lazy_import('invenio.webdoc:transform')
 
 if 'en' in CFG_SITE_LANGS:
     lang_english_configured = True
@@ -46,7 +43,7 @@ if 'fr' in CFG_SITE_LANGS:
 else:
     lang_french_configured = False
 
-class WebDocLanguageTest(unittest.TestCase):
+class WebDocLanguageTest(InvenioTestCase):
     """Check that WebDoc correctly supports <lang> translation
        directives and _()_ syntax"""
 
@@ -85,7 +82,7 @@ class WebDocLanguageTest(unittest.TestCase):
             self.assertEqual(result[0][1],
                              'my_string: %s (end)' % _("Search"))
 
-class WebDocPartsTest(unittest.TestCase):
+class WebDocPartsTest(InvenioTestCase):
     """Check that WebDoc correctly returns values for the different
        parts of webdoc files"""
 
@@ -116,7 +113,7 @@ class WebDocPartsTest(unittest.TestCase):
             # Description
             self.assertEqual(result[0][6], 'A description')
 
-class WebDocVariableReplacementTest(unittest.TestCase):
+class WebDocVariableReplacementTest(InvenioTestCase):
     """Check that WebDoc correctly replaces variables with their
        values"""
 
@@ -140,7 +137,7 @@ class WebDocVariableReplacementTest(unittest.TestCase):
             result = transform('<lang:link />', languages=['fr'])
             self.assertEqual(result[0][1], '?ln=fr')
 
-class WebDocCommentsFiltering(unittest.TestCase):
+class WebDocCommentsFiltering(InvenioTestCase):
     """Check that comments are correctly removed from webdoc files"""
 
     if lang_english_configured:

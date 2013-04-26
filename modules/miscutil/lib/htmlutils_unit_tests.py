@@ -21,21 +21,21 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 
 from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
      remove_html_markup, create_html_select, \
      CFG_TIDY_INSTALLED, \
      CFG_BEAUTIFULSOUP_INSTALLED, tidy_html, \
      escape_javascript_string
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class XSSEscapingTest(unittest.TestCase):
+class XSSEscapingTest(InvenioTestCase):
     """Test functions related to the prevention of XSS attacks."""
 
     def __init__(self, methodName='test'):
         self.washer = HTMLWasher()
-        unittest.TestCase.__init__(self, methodName)
+        InvenioTestCase.__init__(self, methodName)
 
     def test_forbidden_formatting_tags(self):
         """htmlutils - washing of tags altering formatting of a page (e.g. </html>)"""
@@ -82,7 +82,7 @@ class XSSEscapingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '<a href="">link</a>')
 
-class CharactersEscapingTest(unittest.TestCase):
+class CharactersEscapingTest(InvenioTestCase):
     """Test functions related to escaping reserved or forbidden characters """
 
     def test_convert_string_to_nmtoken(self):
@@ -97,7 +97,7 @@ class CharactersEscapingTest(unittest.TestCase):
         for char in nmtoken:
             self.assert_(char in ['.', '-', '_', ':'] or char.isalnum())
 
-class JavascriptCharactersEscapingTest(unittest.TestCase):
+class JavascriptCharactersEscapingTest(InvenioTestCase):
     """Test functions related to escaping Javascript characters for use in various context """
 
     def test_newline(self):
@@ -188,12 +188,12 @@ class JavascriptCharactersEscapingTest(unittest.TestCase):
         self.assertEqual(escape_javascript_string(input_string, escape_for_html=False, escape_quote_for_html=True),
                          output_string)
 
-class HTMLWashingTest(unittest.TestCase):
+class HTMLWashingTest(InvenioTestCase):
     """Test functions related to general washing of HTML source"""
 
     def __init__(self, methodName='test'):
         self.washer = HTMLWasher()
-        unittest.TestCase.__init__(self, methodName)
+        InvenioTestCase.__init__(self, methodName)
 
     def test_wash_html(self):
         """htmlutils - washing HTML tags"""
@@ -230,7 +230,7 @@ class HTMLWashingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          'styled text')
 
-class HTMLTidyingTest(unittest.TestCase):
+class HTMLTidyingTest(InvenioTestCase):
     """Test functions related to tidying up HTML source"""
 
     html_buffer_1 = 'test</blockquote >'
@@ -288,7 +288,7 @@ class HTMLTidyingTest(unittest.TestCase):
         self.assertEqual(res.replace('\n', '').replace(' ', ''),
                          self.html_buffer_1.replace('\n', '').replace(' ', ''))
 
-class HTMLMarkupRemovalTest(unittest.TestCase):
+class HTMLMarkupRemovalTest(InvenioTestCase):
     """Test functions related to removing HTML markup."""
 
     def test_remove_html_markup_empty(self):
@@ -305,12 +305,12 @@ class HTMLMarkupRemovalTest(unittest.TestCase):
         self.assertEqual(remove_html_markup(test_input, 'X'),
                          test_expected)
 
-class HTMLAutomaticLinksTransformation(unittest.TestCase):
+class HTMLAutomaticLinksTransformation(InvenioTestCase):
     """Test functions related to transforming links into HTML context"""
 
     def __init__(self, methodName='test'):
         self.washer = HTMLWasher()
-        unittest.TestCase.__init__(self, methodName)
+        InvenioTestCase.__init__(self, methodName)
 
     def test_transform_link(self):
         """htmlutils - transforming a link"""
@@ -344,7 +344,7 @@ class HTMLAutomaticLinksTransformation(unittest.TestCase):
                                           automatic_link_transformation=True),
                          body_expected)
 
-class HTMLCreation(unittest.TestCase):
+class HTMLCreation(InvenioTestCase):
     """Test functions related to creation of HTML markup."""
 
     def test_create_html_select(self):

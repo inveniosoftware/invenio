@@ -19,15 +19,17 @@
 
 """Testing module for BibSort Engine"""
 
-import unittest
 
-from invenio.bibsort_engine import perform_modify_record, \
-    perform_insert_record, perform_delete_record, \
-    binary_search
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+
+binary_search = lazy_import('invenio.bibsort_engine:binary_search')
+perform_delete_record = lazy_import('invenio.bibsort_engine:perform_delete_record')
+perform_insert_record = lazy_import('invenio.bibsort_engine:perform_insert_record')
+perform_modify_record = lazy_import('invenio.bibsort_engine:perform_modify_record')
 
 
-class TestBibSort(unittest.TestCase):
+class TestBibSort(InvenioTestCase):
     """Test BibSort."""
 
     def test_perform_modify_record(self):

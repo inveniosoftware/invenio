@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 import sys
 import zlib
 import os
@@ -33,7 +33,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.intbitset import intbitset
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.config import CFG_TMPDIR
 
 CFG_INTBITSET_BIG_EXAMPLE = open(os.path.join(CFG_TMPDIR, "intbitset_example.int")).read()
@@ -55,7 +55,7 @@ def _check_enough_ram():
 
 CFG_ENOUGH_RAM = _check_enough_ram()
 
-class IntBitSetTest(unittest.TestCase):
+class IntBitSetTest(InvenioTestCase):
     """Test functions related to intbitset data structure."""
     def setUp(self):
         self.sets = [

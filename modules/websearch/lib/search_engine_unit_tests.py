@@ -22,12 +22,13 @@
 __revision__ = \
     "$Id$"
 
-import unittest
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-from invenio import search_engine
-from invenio.testutils import make_test_suite, run_test_suite
+search_engine = lazy_import('invenio.search_engine')
 
-class TestMiscUtilityFunctions(unittest.TestCase):
+
+class TestMiscUtilityFunctions(InvenioTestCase):
     """Test whatever non-data-specific utility functions are essential."""
 
     def test_ziplist2x2(self):
@@ -40,7 +41,7 @@ class TestMiscUtilityFunctions(unittest.TestCase):
                          [[1, 'a', 9], [2, 'b', 8], [3, 'c', 7]])
 
 
-class TestWashQueryParameters(unittest.TestCase):
+class TestWashQueryParameters(InvenioTestCase):
     """Test for washing of search query parameters."""
 
     def test_wash_pattern(self):
@@ -73,7 +74,7 @@ class TestWashQueryParameters(unittest.TestCase):
         self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03", d2y=2003, d2m=2, d2d=3),
                          ('1980-01-28 01:02:03', '2003-02-03 00:00:00'))
 
-class TestQueryParser(unittest.TestCase):
+class TestQueryParser(InvenioTestCase):
     """Test of search pattern (or query) parser."""
 
     def _check(self, p, f, m, result_wanted):
@@ -263,7 +264,7 @@ class TestQueryParser(unittest.TestCase):
                     [['+', 's = 630', 'title', 'a']])
 
 
-class TestSearchUnitFunction(unittest.TestCase):
+class TestSearchUnitFunction(InvenioTestCase):
     """Test for washing of search query parameters."""
 
     def test_collection_equality_results(self):

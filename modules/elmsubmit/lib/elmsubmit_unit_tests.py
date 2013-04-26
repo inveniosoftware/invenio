@@ -22,7 +22,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 import os
 from string import expandtabs
 import xml.dom.minidom
@@ -30,7 +30,7 @@ import xml.dom.minidom
 from invenio.config import CFG_TMPDIR
 import invenio.elmsubmit_config as elmsubmit_config
 from invenio import elmsubmit
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 if os.path.exists(os.path.join(CFG_TMPDIR,
                   elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1'])):
@@ -44,7 +44,7 @@ if os.path.exists(os.path.join(CFG_TMPDIR,
 else:
     test_case_2_file_exists = False
 
-class MarcTest(unittest.TestCase):
+class MarcTest(InvenioTestCase):
     """ elmsubmit - test for sanity """
 
     if test_case_1_file_exists:
@@ -184,7 +184,7 @@ class MarcTest(unittest.TestCase):
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
 
-class FileStorageTest(unittest.TestCase):
+class FileStorageTest(InvenioTestCase):
     """ testing proper storage of files """
 
     if test_case_2_file_exists:

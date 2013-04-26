@@ -19,10 +19,11 @@
 
 __revision__ = "$Id$"
 
-import unittest
-import cgi
 
-from invenio.testutils import make_test_suite, run_test_suite
+import cgi
+from invenio.config import CFG_SITE_LANG
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 # SLIPPERY SLOPE AHEAD
 #
@@ -31,6 +32,7 @@ from invenio.testutils import make_test_suite, run_test_suite
 #
 # This must be done early, as many imports somehow end up importing
 # apache in turn, which makes the trick useless.
+
 
 class _FakeApache(object):
 
@@ -71,14 +73,13 @@ class _FakeReq(object):
         self.method = "GET"
         return
 
-from invenio.webinterface_handler_wsgi_utils import FieldStorage
+FieldStorage = lazy_import('invenio.webinterface_handler_wsgi_utils:FieldStorage')
 # --------------------------------------------------
 
-from invenio import webinterface_handler
-from invenio.config import CFG_SITE_LANG
+webinterface_handler = lazy_import('invenio.webinterface_handler')
 
 
-class TestWashArgs(unittest.TestCase):
+class TestWashArgs(InvenioTestCase):
     """webinterface - Test for washing of URL query arguments"""
 
     def _check(self, query, default, expected):

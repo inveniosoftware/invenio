@@ -20,14 +20,15 @@
 """Unit tests for the search engine query parsers."""
 
 
-import unittest
 import datetime
 
-from invenio import search_engine_query_parser
-
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.search_engine import create_basic_search_units, perform_request_search
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+
+search_engine_query_parser = lazy_import('invenio.search_engine_query_parser')
+create_basic_search_units = lazy_import('invenio.search_engine:create_basic_search_units')
+perform_request_search = lazy_import('invenio.search_engine:perform_request_search')
 
 if search_engine_query_parser.GOT_DATEUTIL:
     import dateutil
@@ -37,7 +38,7 @@ else:
     DATEUTIL_AVAILABLE = False
 
 
-class TestParserUtilityFunctions(unittest.TestCase):
+class TestParserUtilityFunctions(InvenioTestCase):
     """Test utility functions for the parsing components"""
 
     def setUp(self):
@@ -92,7 +93,7 @@ class TestParserUtilityFunctions(unittest.TestCase):
                          self.parser.parse_query(self.converter.convert_query('find a mangano, m not a ellis, j')))
 
 
-class TestSearchQueryParenthesisedParser(unittest.TestCase):
+class TestSearchQueryParenthesisedParser(InvenioTestCase):
     """Test parenthesis parsing."""
 
     def setUp(self):
@@ -336,7 +337,7 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(self.parser.parse_query('refersto:(author:ellis or author:hawking)'),
                          ['+', 'refersto:"author:ellis | author:hawking"'])
 
-class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
+class TestSpiresToInvenioSyntaxConverter(InvenioTestCase):
     """Test SPIRES query parsing and translation to Invenio syntax."""
 
     def _compare_searches(self, invenio_syntax, spires_syntax):

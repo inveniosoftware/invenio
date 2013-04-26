@@ -21,13 +21,15 @@
 
 __revision__ = "$Id$"
 
-import unittest
 
-from invenio import bibrank_tag_based_indexer
-from invenio.bibrank import split_ranges
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class TestListSetOperations(unittest.TestCase):
+bibrank_tag_based_indexer = lazy_import('invenio.bibrank_tag_based_indexer')
+split_ranges = lazy_import('invenio.bibrank:split_ranges')
+
+
+class TestListSetOperations(InvenioTestCase):
     """Test list set operations."""
 
     def test_union_dicts(self):

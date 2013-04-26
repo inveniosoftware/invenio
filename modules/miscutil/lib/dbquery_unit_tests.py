@@ -21,12 +21,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 
 from invenio import dbquery
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class TableUpdateTimesTest(unittest.TestCase):
+class TableUpdateTimesTest(InvenioTestCase):
     """Test functions related to the update_times of MySQL tables."""
 
     def _check_table_update_time(self, tablename):
@@ -84,7 +84,7 @@ class TableUpdateTimesTest(unittest.TestCase):
                          ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L))
         dbquery.run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
 
-class WashTableColumnNameTest(unittest.TestCase):
+class WashTableColumnNameTest(InvenioTestCase):
     """Test if wash_table_column_name and real_escape_string evaluates correctly."""
 
     def test_wash_table_column_name(self):

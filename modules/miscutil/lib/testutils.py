@@ -447,7 +447,6 @@ def merge_error_messages(error_messages):
     return out
 
 @nottest
-@with_app_context()
 def build_and_run_unit_test_suite():
     """
     Detect all Invenio modules with names ending by '*_unit_tests.py', build

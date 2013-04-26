@@ -21,16 +21,16 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 import sys
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
     from sets import Set as set
     # pylint: enable=W0622
 
-class WebGroupTests(unittest.TestCase):
+class WebGroupTests(InvenioTestCase):
     """Test functions related to the WebGroup usage."""
 
     def test_set(self):

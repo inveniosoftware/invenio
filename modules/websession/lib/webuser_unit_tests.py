@@ -24,7 +24,8 @@
 # overwrite any previously installed file.  Also, keeping TEST_SUITE
 # empty so that `inveniocfg --run-unit-tests' would not complain.
 
-from invenio.testutils import make_test_suite, run_test_suite
+#from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite  # , InvenioTestCase
 
 TEST_SUITE = make_test_suite()
 

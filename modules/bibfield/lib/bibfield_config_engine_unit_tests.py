@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,20 +21,18 @@
 BibFieldParser Unit tests.
 """
 
-import unittest
-
-from invenio.bibfield_config_engine import BibFieldParser
-
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 
-class BibFieldParserUnitTests(unittest.TestCase):
+class BibFieldParserUnitTests(InvenioTestCase):
     """
     Test to verify the correct creation of bibfield_config.py from the rules and
     doctypes files.
     """
     def setUp(self):
         """Loads bibfield configuration test files"""
+        super(BibFieldParserUnitTests, self).setUp()
+        from invenio.bibfield_config_engine import BibFieldParser
         parser = BibFieldParser(main_config_file="test_bibfield.cfg")
         self.config_rules = parser.config_rules
 

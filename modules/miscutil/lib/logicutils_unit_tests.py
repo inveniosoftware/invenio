@@ -19,12 +19,12 @@
 
 """Unit tests for logic library."""
 
-import unittest
+
 
 from invenio.logicutils import expr, Expr, to_cnf, pl_true
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class exprExprOpsTest(unittest.TestCase):
+class exprExprOpsTest(InvenioTestCase):
     """Testing expr and Expr against one another."""
 
     def test_trivial_expr(self):
@@ -37,7 +37,7 @@ class exprExprOpsTest(unittest.TestCase):
                          Expr('|', Expr('|', Expr('|', Expr('|', 'a', 'b'), 'c'), 'd'), 'e'))
 
 
-class toCNFTest(unittest.TestCase):
+class toCNFTest(InvenioTestCase):
     """Testing conversion to conjunctive normal form"""
 
     def test_singleton(self):
@@ -61,7 +61,7 @@ class toCNFTest(unittest.TestCase):
                          Expr('&', 'a', 'b'))
 
 
-class prop_logicTest(unittest.TestCase):
+class prop_logicTest(InvenioTestCase):
     """Testing basic propositional logic functionality"""
     P = Expr('P')
 

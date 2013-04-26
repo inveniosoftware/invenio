@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,12 +19,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-from invenio.webcomment import calculate_start_date
-from invenio.testutils import make_test_suite, run_test_suite
+calculate_start_date = lazy_import('invenio.webcomment:calculate_start_date')
 
-class TestCalculateStartDate(unittest.TestCase):
+
+class TestCalculateStartDate(InvenioTestCase):
     """Test for calculating previous date."""
 
     def test_previous_year(self):

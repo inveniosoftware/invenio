@@ -19,12 +19,10 @@
 
 """Unit tests for BibKnowledge."""
 
-import unittest
-
-from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 
-class BibknowledgeTests(unittest.TestCase):
+class BibknowledgeTests(InvenioTestCase):
     """Unit test functions for bibknowledge."""
     pass
 
@@ -42,5 +40,3 @@ TEST_SUITE = make_test_suite(BibknowledgeTests)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
-

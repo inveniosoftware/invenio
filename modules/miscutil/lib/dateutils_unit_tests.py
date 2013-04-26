@@ -21,15 +21,14 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 import datetime
 import calendar
-import time
+from time import strptime
 
-from time import mktime, strptime
 from invenio import dateutils
 from invenio.config import CFG_SITE_LANGS
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 if 'en' in CFG_SITE_LANGS:
     lang_english_configured = True
@@ -53,7 +52,7 @@ def format_timestamp_tuples(t):
     )
 
 
-class ConvertFromDateCVSTest(unittest.TestCase):
+class ConvertFromDateCVSTest(InvenioTestCase):
     """
     Testing conversion of CVS dates.
     """
@@ -83,7 +82,7 @@ class ConvertFromDateCVSTest(unittest.TestCase):
         self.assertEqual(dateutils.convert_datecvs_to_datestruct(datecvs)[:6],
                          datestruct_beginning_expected)
 
-class ConvertIntoDateGUITest(unittest.TestCase):
+class ConvertIntoDateGUITest(InvenioTestCase):
     """
     Testing conversion into dategui with various languages.
     """
@@ -124,7 +123,7 @@ class ConvertIntoDateGUITest(unittest.TestCase):
                                                                ln='sk')
             self.assertEqual(dategui_sk, dategui_sk_expected)
 
-class ParseRuntimeLimitTest(unittest.TestCase):
+class ParseRuntimeLimitTest(InvenioTestCase):
     """
     Testing the runtime limit parser used by BibSched to determine task
     runtimes and also by the errorlib.register_emergency function to parse the
@@ -203,7 +202,7 @@ class ParseRuntimeLimitTest(unittest.TestCase):
         result = dateutils.parse_runtime_limit(limit)
         self.assertEqual(expected, result)
 
-class STRFTimeTest(unittest.TestCase):
+class STRFTimeTest(InvenioTestCase):
     """
     Testing support of datest before 1900 for function strftime
     """
@@ -231,7 +230,7 @@ class STRFTimeTest(unittest.TestCase):
         result = dateutils.strftime("%a, %d %b %Y %H:%M:%S +0000", datetime.date(1765,1,3))
         self.assertEqual(expected, result)
 
-class DateTest(unittest.TestCase):
+class DateTest(InvenioTestCase):
     """
     Testing creation of date object
     """
@@ -246,7 +245,7 @@ class DateTest(unittest.TestCase):
         result = date_object.strftime("%a, %d %b %Y %H:%M:%S +0000")
         self.assertEqual(expected, result)
 
-class DateTimeTest(unittest.TestCase):
+class DateTimeTest(InvenioTestCase):
     """
     Testing creation of date object
     """

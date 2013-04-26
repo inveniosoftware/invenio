@@ -25,11 +25,14 @@
 
 __revision__ = "$Id$"
 
-import unittest
+from invenio.webinterface_handler_flask import with_app_context
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, nottest, InvenioTestCase
 
-from invenio.websearch_external_collections_searcher import external_collections_dictionary
-from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
-from invenio.testutils import make_test_suite, run_test_suite, nottest
+HTTPAsyncPageGetter = lazy_import('invenio.websearch_external_collections_getter:HTTPAsyncPageGetter')
+async_download = lazy_import('invenio.websearch_external_collections_getter:async_download')
+external_collections_dictionary = lazy_import('invenio.websearch_external_collections_searcher:external_collections_dictionary')
+
 
 def download_and_parse():
     """Try to make a query that always return results on all search engines.
@@ -70,6 +73,7 @@ def download_and_parse():
     return errors
 
 @nottest
+@with_app_context()
 def build_search_urls_test():
     """Build some classical urls from basic_search_units."""
     print "Testing external_search_engines build_search_url functions."
@@ -84,7 +88,7 @@ def build_search_urls_test():
             url = engine.build_search_url(test)
             print "    Url: " + str(url)
 
-class ExtCollTests(unittest.TestCase):
+class ExtCollTests(InvenioTestCase):
     """Test cases for websearch_external_collections_*"""
 
     @nottest

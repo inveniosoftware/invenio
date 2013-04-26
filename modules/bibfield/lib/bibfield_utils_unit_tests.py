@@ -21,14 +21,17 @@
 BibFieldUtils Unit tests.
 """
 
-import unittest
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-from invenio.bibfield_utils import prepare_field_keys, build_data_structure, CoolList, CoolDict, BibFieldDict
+BibFieldDict = lazy_import('invenio.bibfield_utils:BibFieldDict')
+CoolDict = lazy_import('invenio.bibfield_utils:CoolDict')
+CoolList = lazy_import('invenio.bibfield_utils:CoolList')
+build_data_structure = lazy_import('invenio.bibfield_utils:build_data_structure')
+prepare_field_keys = lazy_import('invenio.bibfield_utils:prepare_field_keys')
 
-from invenio.testutils import make_test_suite, run_test_suite
 
-
-class BibFieldCoolListDictUnitTests(unittest.TestCase):
+class BibFieldCoolListDictUnitTests(InvenioTestCase):
     """
     Test class to verify the correct behaviour of the classes involved into the
     intermediate structure
@@ -99,7 +102,7 @@ class BibFieldCoolListDictUnitTests(unittest.TestCase):
         self.assertTrue(d.consumed)
 
 
-class BibFieldUtilsUnitTests(unittest.TestCase):
+class BibFieldUtilsUnitTests(InvenioTestCase):
     """
     Test class for bibfield utilities
     """
@@ -138,7 +141,7 @@ class BibFieldUtilsUnitTests(unittest.TestCase):
         self.assertEqual(d, {'a': [{'b': [{'c': {'d': [None]}}]}]})
 
 
-class BibFieldDictUnitTest(unittest.TestCase):
+class BibFieldDictUnitTest(InvenioTestCase):
     """
     Test class for bibfield base dictionary
     """

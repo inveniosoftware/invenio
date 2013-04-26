@@ -21,12 +21,12 @@
 The BibRecord test suite.
 """
 
-import unittest
+
 
 from invenio.config import CFG_TMPDIR, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio import bibrecord, bibrecord_config
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 try:
     import pyRXP
@@ -53,7 +53,7 @@ try:
 except ImportError:
     parser_minidom_available = False
 
-class BibRecordSuccessTest(unittest.TestCase):
+class BibRecordSuccessTest(InvenioTestCase):
     """ bibrecord - demo file parsing test """
 
     def setUp(self):
@@ -128,7 +128,7 @@ class BibRecordSuccessTest(unittest.TestCase):
         record1 = bibrecord.create_records(xmltext)[0]
         self.assertEqual(record1, record)
 
-class BibRecordParsersTest(unittest.TestCase):
+class BibRecordParsersTest(InvenioTestCase):
     """ bibrecord - testing the creation of records with different parsers"""
 
     def setUp(self):
@@ -174,7 +174,7 @@ class BibRecordParsersTest(unittest.TestCase):
             record = bibrecord._create_record_minidom(self.xmltext)
             self.assertEqual(record, self.expected_record)
 
-class BibRecordBadInputTreatmentTest(unittest.TestCase):
+class BibRecordBadInputTreatmentTest(InvenioTestCase):
     """ bibrecord - testing for bad input treatment """
     def test_empty_collection(self):
         """bibrecord - empty collection"""
@@ -282,7 +282,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
                     ee = i
         self.assertEqual(bibrecord._warning((99, '(Tagname : datafield)')), ee)
 
-class BibRecordAccentedUnicodeLettersTest(unittest.TestCase):
+class BibRecordAccentedUnicodeLettersTest(InvenioTestCase):
     """ bibrecord - testing accented UTF-8 letters """
 
     def setUp(self):
@@ -317,7 +317,7 @@ class BibRecordAccentedUnicodeLettersTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "245", " ", "1"),
                          [([('a', 'Пушкин')], " ", '1', "", 5)])
 
-class BibRecordGettingFieldValuesTest(unittest.TestCase):
+class BibRecordGettingFieldValuesTest(InvenioTestCase):
     """ bibrecord - testing for getting field/subfield values """
 
     def setUp(self):
@@ -372,7 +372,7 @@ class BibRecordGettingFieldValuesTest(unittest.TestCase):
         self.assertEqual(bibrecord.field_get_subfield_values(fi1, "b"), [])
         self.assertEqual(bibrecord.field_get_subfield_values(fi2, "b"), ["editor"])
 
-class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
+class BibRecordGettingFieldValuesViaWildcardsTest(InvenioTestCase):
     """ bibrecord - testing for getting field/subfield values via wildcards """
 
     def setUp(self):
@@ -524,7 +524,7 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "55%", " ", " ", "a"),
                          'val4a')
 
-class BibRecordAddFieldTest(unittest.TestCase):
+class BibRecordAddFieldTest(InvenioTestCase):
     """ bibrecord - testing adding field """
 
     def setUp(self):
@@ -608,7 +608,7 @@ class BibRecordAddFieldTest(unittest.TestCase):
         self.assertEqual(field_position_global_1, 3)
         self.assertEqual(field_position_global_2, 5)
 
-class BibRecordManageMultipleFieldsTest(unittest.TestCase):
+class BibRecordManageMultipleFieldsTest(InvenioTestCase):
     """ bibrecord - testing the management of multiple fields """
 
     def setUp(self):
@@ -677,7 +677,7 @@ class BibRecordManageMultipleFieldsTest(unittest.TestCase):
         self.assertEqual(self.rec['245'][3],
             ([('a', 'subfield4')], ' ', ' ', '', 6))
 
-class BibRecordDeleteFieldTest(unittest.TestCase):
+class BibRecordDeleteFieldTest(InvenioTestCase):
     """ bibrecord - testing field deletion """
 
     def setUp(self):
@@ -756,7 +756,7 @@ class BibRecordDeleteFieldTest(unittest.TestCase):
                          ['SzGeCERN2'])
 
 
-class BibRecordDeleteFieldFromTest(unittest.TestCase):
+class BibRecordDeleteFieldFromTest(InvenioTestCase):
     """ bibrecord - testing field deletion from position"""
 
     def setUp(self):
@@ -800,7 +800,7 @@ class BibRecordDeleteFieldFromTest(unittest.TestCase):
         bibrecord.record_delete_field(self.rec, '245', field_position_global=999)
 
 
-class BibRecordAddSubfieldIntoTest(unittest.TestCase):
+class BibRecordAddSubfieldIntoTest(InvenioTestCase):
     """ bibrecord - testing subfield addition """
 
     def setUp(self):
@@ -850,7 +850,7 @@ class BibRecordAddSubfieldIntoTest(unittest.TestCase):
             field_position_global=999)
 
 
-class BibRecordModifyControlfieldTest(unittest.TestCase):
+class BibRecordModifyControlfieldTest(InvenioTestCase):
     """ bibrecord - testing controlfield modification """
 
     def setUp(self):
@@ -894,7 +894,7 @@ class BibRecordModifyControlfieldTest(unittest.TestCase):
                          ["On the foo and bar2"])
 
 
-class BibRecordModifySubfieldTest(unittest.TestCase):
+class BibRecordModifySubfieldTest(InvenioTestCase):
     """ bibrecord - testing subfield modification """
 
     def setUp(self):
@@ -939,7 +939,7 @@ class BibRecordModifySubfieldTest(unittest.TestCase):
             bibrecord.record_modify_subfield, self.rec, "245", "a", "Burn",
             999, field_position_global=4)
 
-class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
+class BibRecordDeleteSubfieldFromTest(InvenioTestCase):
     """ bibrecord - testing subfield deletion """
 
     def setUp(self):
@@ -991,7 +991,7 @@ class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
             field_position_global=4)
 
 
-class BibRecordDeleteSubfieldTest(unittest.TestCase):
+class BibRecordDeleteSubfieldTest(InvenioTestCase):
     """ bibrecord - testing subfield deletion """
 
     def setUp(self):
@@ -1077,7 +1077,7 @@ class BibRecordDeleteSubfieldTest(unittest.TestCase):
         self.assertEqual(rec["100"][0][0], [("b", "editor"), ("z", "Skal vi danse?"), ("d", "Doe4, Joachim")])
 
 
-class BibRecordMoveSubfieldTest(unittest.TestCase):
+class BibRecordMoveSubfieldTest(InvenioTestCase):
     """ bibrecord - testing subfield moving """
 
     def setUp(self):
@@ -1123,7 +1123,7 @@ class BibRecordMoveSubfieldTest(unittest.TestCase):
             bibrecord.record_move_subfield, self.rec, "100", 999, 0,
             field_position_global=3)
 
-class BibRecordSpecialTagParsingTest(unittest.TestCase):
+class BibRecordSpecialTagParsingTest(InvenioTestCase):
     """ bibrecord - parsing special tags (FMT, FFT)"""
 
     def setUp(self):
@@ -1252,7 +1252,7 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
                          ['Let us see if this gets inserted well.'])
 
 
-class BibRecordPrintingTest(unittest.TestCase):
+class BibRecordPrintingTest(InvenioTestCase):
     """ bibrecord - testing for printing record """
 
     def setUp(self):
@@ -1324,7 +1324,7 @@ class BibRecordPrintingTest(unittest.TestCase):
         self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["001", "037"]), 1, 1)[0], rec_short)
         self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["037"]), 1, 1)[0], rec_short)
 
-class BibRecordCreateFieldTest(unittest.TestCase):
+class BibRecordCreateFieldTest(InvenioTestCase):
     """ bibrecord - testing for creating field """
 
     def test_create_valid_field(self):
@@ -1382,7 +1382,7 @@ class BibRecordCreateFieldTest(unittest.TestCase):
         self.assertEqual(False,
             bibrecord._compare_fields(field0, field1, strict=False))
 
-class BibRecordFindFieldTest(unittest.TestCase):
+class BibRecordFindFieldTest(InvenioTestCase):
     """ bibrecord - testing for finding field """
 
     def setUp(self):
@@ -1431,7 +1431,7 @@ class BibRecordFindFieldTest(unittest.TestCase):
             bibrecord.record_find_field(self.rec, '037', self.field2,
             strict=False))
 
-class BibRecordSingletonTest(unittest.TestCase):
+class BibRecordSingletonTest(InvenioTestCase):
     """ bibrecord - testing singleton removal """
 
     def setUp(self):
@@ -1488,7 +1488,7 @@ class BibRecordSingletonTest(unittest.TestCase):
                                            keep_singletons=False)[0][0]
             self.assertEqual(rec, self.rec_expected)
 
-class BibRecordNumCharRefTest(unittest.TestCase):
+class BibRecordNumCharRefTest(InvenioTestCase):
     """ bibrecord - testing numerical character reference expansion"""
 
     def setUp(self):
@@ -1545,7 +1545,7 @@ class BibRecordNumCharRefTest(unittest.TestCase):
                                            correct=1, parser='lxml')[0][0]
             self.assertEqual(rec, self.rec_expected)
 
-class BibRecordExtractIdentifiersTest(unittest.TestCase):
+class BibRecordExtractIdentifiersTest(InvenioTestCase):
     """ bibrecord - testing for getting identifiers from record """
 
     def setUp(self):

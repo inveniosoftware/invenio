@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 
 from invenio import bibrank_word_searcher
 from invenio.intbitset import intbitset
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class TestListSetOperations(unittest.TestCase):
+class TestListSetOperations(InvenioTestCase):
     """Test list set operations."""
 
     def test_record_sorter(self):

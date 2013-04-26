@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,16 +23,18 @@
 
 __revision__ = "$Id$"
 
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibmatch_validator import compare_fieldvalues_normal, \
-                                       compare_fieldvalues_authorname, \
-                                       compare_fieldvalues_identifier, \
-                                       compare_fieldvalues_title, \
-                                       compare_fieldvalues_date, \
-                                       get_paired_comparisons
-import unittest
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class BibMatchTest(unittest.TestCase):
+compare_fieldvalues_normal = lazy_import('invenio.bibmatch_validator:compare_fieldvalues_normal')
+compare_fieldvalues_authorname = lazy_import('invenio.bibmatch_validator:compare_fieldvalues_authorname')
+compare_fieldvalues_identifier = lazy_import('invenio.bibmatch_validator:compare_fieldvalues_identifier')
+compare_fieldvalues_title = lazy_import('invenio.bibmatch_validator:compare_fieldvalues_title')
+compare_fieldvalues_date = lazy_import('invenio.bibmatch_validator:compare_fieldvalues_date')
+get_paired_comparisons = lazy_import('invenio.bibmatch_validator:get_paired_comparisons')
+
+
+class BibMatchTest(InvenioTestCase):
     """Test functions to check the validator of Bibmatch."""
 
     def test_validation_get_paired_comparisons(self):

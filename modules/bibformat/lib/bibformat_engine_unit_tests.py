@@ -24,17 +24,18 @@ __revision__ = "$Id$"
 
 # pylint: disable=C0301
 
-import unittest
 import os
 import sys
 
-from invenio import bibformat
-from invenio import bibformat_engine
-from invenio import bibformat_utils
-from invenio import bibformat_config
-from invenio import bibformatadminlib
 from invenio.config import CFG_TMPDIR
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+bibformat = lazy_import('invenio.bibformat')
+bibformat_engine = lazy_import('invenio.bibformat_engine')
+bibformat_utils = lazy_import('invenio.bibformat_utils')
+bibformat_config = lazy_import('invenio.bibformat_config')
+bibformat_engine = lazy_import('invenio.bibformat_engine')
+bibformatadminlib = lazy_import('invenio.bibformatadminlib')
 
 #CFG_BIBFORMAT_OUTPUTS_PATH = "..%setc%soutput_formats" % (os.sep, os.sep)
 #CFG_BIBFORMAT_TEMPLATES_PATH = "..%setc%sformat_templates" % (os.sep, os.sep)
@@ -44,7 +45,8 @@ CFG_BIBFORMAT_TEMPLATES_PATH = "%s" % (CFG_TMPDIR)
 CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (CFG_TMPDIR, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "tests_bibformat_elements"
 
-class FormatTemplateTest(unittest.TestCase):
+
+class FormatTemplateTest(InvenioTestCase):
     """ bibformat - tests on format templates"""
 
     def setUp(self):
@@ -108,7 +110,7 @@ class FormatTemplateTest(unittest.TestCase):
         path = bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename_and_name_2[0]
         self.assert_(not os.path.exists(path))
 
-class FormatElementTest(unittest.TestCase):
+class FormatElementTest(InvenioTestCase):
     """ bibformat - tests on format templates"""
 
     def setUp(self):
@@ -250,7 +252,7 @@ class FormatElementTest(unittest.TestCase):
         self.failUnless(len(tags) == 4,
                         'Could not correctly identify tags used in bfe_abstract.py')
 
-class OutputFormatTest(unittest.TestCase):
+class OutputFormatTest(InvenioTestCase):
     """ bibformat - tests on output formats"""
 
     def setUp(self):
@@ -360,7 +362,7 @@ class OutputFormatTest(unittest.TestCase):
         path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename_and_name_3[0]
         self.assert_(not os.path.exists(path))
 
-class PatternTest(unittest.TestCase):
+class PatternTest(InvenioTestCase):
     """ bibformat - tests on re patterns"""
 
     def test_pattern_lang(self):
@@ -485,7 +487,7 @@ class PatternTest(unittest.TestCase):
         result = bibformat_engine.pattern_format_element_seealso.search(text)
         self.assertEqual(result.group('see').strip(), 'seethis, seethat')
 
-class EscapingAndWashingTest(unittest.TestCase):
+class EscapingAndWashingTest(InvenioTestCase):
     """ bibformat - test escaping and washing metadata"""
 
     def test_escaping(self):
@@ -575,7 +577,7 @@ class EscapingAndWashingTest(unittest.TestCase):
         self.assert_('<a' not in result.lower())
 
 
-class MiscTest(unittest.TestCase):
+class MiscTest(InvenioTestCase):
     """ bibformat - tests on various functions"""
 
     def test_parse_tag(self):
@@ -614,7 +616,7 @@ class MiscTest(unittest.TestCase):
             parsed_tag = bibformat_utils.parse_tag(tags_and_parsed_tags[i])
             self.assertEqual(parsed_tag, tags_and_parsed_tags[i+1])
 
-class FormatTest(unittest.TestCase):
+class FormatTest(InvenioTestCase):
     """ bibformat - generic tests on function that do the formatting. Main functions"""
 
     def setUp(self):
@@ -795,7 +797,7 @@ class FormatTest(unittest.TestCase):
         self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
 
 
-class MarcFilteringTest(unittest.TestCase):
+class MarcFilteringTest(InvenioTestCase):
     """ bibformat - MARC tag filtering tests"""
 
     def setUp(self):

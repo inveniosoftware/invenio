@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,26 +21,25 @@
 
 __revision__ = "$Id$"
 
-import unittest
-
 from cgi import parse_qs
 from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.urlutils import \
-    create_AWS_request_url, \
-    string_to_numeric_char_reference, \
-    make_canonical_urlargd, \
-    create_html_link, \
-    create_html_mailto, \
-    same_urls_p, \
-    HASHLIB_IMPORTED, \
-    wash_url_argument, \
-    create_url, \
-    create_Indico_request_url, \
-    rewrite_to_secure_url
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+
+HASHLIB_IMPORTED = lazy_import('invenio.urlutils:HASHLIB_IMPORTED')
+create_AWS_request_url = lazy_import('invenio.urlutils:create_AWS_request_url')
+create_Indico_request_url = lazy_import('invenio.urlutils:create_Indico_request_url')
+create_html_link = lazy_import('invenio.urlutils:create_html_link')
+create_html_mailto = lazy_import('invenio.urlutils:create_html_mailto')
+create_url = lazy_import('invenio.urlutils:create_url')
+make_canonical_urlargd = lazy_import('invenio.urlutils:make_canonical_urlargd')
+rewrite_to_secure_url = lazy_import('invenio.urlutils:rewrite_to_secure_url')
+same_urls_p = lazy_import('invenio.urlutils:same_urls_p')
+string_to_numeric_char_reference = lazy_import('invenio.urlutils:string_to_numeric_char_reference')
+wash_url_argument = lazy_import('invenio.urlutils:wash_url_argument')
 
 
-class TestWashUrlArgument(unittest.TestCase):
+class TestWashUrlArgument(InvenioTestCase):
     def test_wash_url_argument(self):
         """urlutils - washing of URL arguments"""
         self.assertEqual(1,
@@ -63,7 +62,7 @@ class TestWashUrlArgument(unittest.TestCase):
                          wash_url_argument(['ellis'], 'list'))
 
 
-class TestSecureUrlRewrite(unittest.TestCase):
+class TestSecureUrlRewrite(InvenioTestCase):
     def test_to_secure_url(self):
         self.assertEqual(rewrite_to_secure_url("http://foo.bar", secure_base="https://foo.bar/"), "https://foo.bar")
         self.assertEqual(rewrite_to_secure_url("http://foo.bar/", secure_base="https://foo.bar"), "https://foo.bar/")
@@ -74,7 +73,7 @@ class TestSecureUrlRewrite(unittest.TestCase):
         self.assertEqual(rewrite_to_secure_url("http://foo.bar:80/some/path?query=a&b=d#hd", secure_base="https://foo.bar"), "https://foo.bar/some/path?query=a&b=d#hd")
 
 
-class TestUrls(unittest.TestCase):
+class TestUrls(InvenioTestCase):
     """Tests on URLs"""
 
     def test_url_creation(self):
@@ -190,7 +189,7 @@ class TestUrls(unittest.TestCase):
                                      CFG_SITE_URL + '?e=f&c=d&a=b&ln=en'),
                          False)
 
-class TestHtmlLinks(unittest.TestCase):
+class TestHtmlLinks(InvenioTestCase):
     """Tests on HTML links"""
 
     def test_html_link_creation(self):
@@ -241,7 +240,7 @@ class TestHtmlLinks(unittest.TestCase):
         self.assertEqual(string_to_numeric_char_reference('\/&;,#$%~é'),
                          "&#92;&#47;&#38;&#59;&#44;&#35;&#36;&#37;&#126;&#195;&#169;")
 
-class TestEmailObfuscationMode(unittest.TestCase):
+class TestEmailObfuscationMode(InvenioTestCase):
     """Tests on HTML mailto links creation and obfuscation modes"""
 
     def test_html_mailto_obfuscation_mode_minus1(self):

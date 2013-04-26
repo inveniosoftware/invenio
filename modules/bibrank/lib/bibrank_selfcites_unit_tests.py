@@ -20,7 +20,7 @@
 """Unit tests for the search engine query parsers."""
 
 
-import unittest
+
 
 try:
     from mock import patch
@@ -28,7 +28,7 @@ try:
 except ImportError:
     HAS_MOCK = False
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 
 def get_author_tags_mock():
@@ -92,7 +92,7 @@ def get_record_coauthors_mock(recID, dummy_tags):
 # 5 -> 4
 
 
-class SelfCitesOtherTests(unittest.TestCase):
+class SelfCitesOtherTests(InvenioTestCase):
     if HAS_MOCK:
         @patch('invenio.bibrank_selfcites_indexer.get_fieldvalues',
             get_fieldvalues_mock)

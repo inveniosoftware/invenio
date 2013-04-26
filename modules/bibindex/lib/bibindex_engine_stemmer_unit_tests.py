@@ -21,12 +21,12 @@
 
 __revision__ = "$Id$"
 
-import unittest
 
 from invenio import bibindex_engine_stemmer
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class TestStemmer(unittest.TestCase):
+
+class TestStemmer(InvenioTestCase):
     """Test stemmer."""
 
     def test_stemmer_none(self):

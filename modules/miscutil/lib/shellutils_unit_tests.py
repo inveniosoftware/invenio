@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-import unittest
+
 import time
 import os
 
@@ -29,10 +29,10 @@ from invenio.config import CFG_TMPDIR
 
 from invenio.shellutils import escape_shell_arg, run_shell_command, \
     run_process_with_timeout, Timeout, split_cli_ids_arg
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 
-class EscapeShellArgTest(unittest.TestCase):
+class EscapeShellArgTest(InvenioTestCase):
     """Testing of escaping shell arguments."""
 
     def test_escape_simple(self):
@@ -93,7 +93,7 @@ class EscapeShellArgTest(unittest.TestCase):
                          escape_shell_arg(r'5 < 10'))
 
 
-class RunShellCommandTest(unittest.TestCase):
+class RunShellCommandTest(InvenioTestCase):
     """Testing of running shell commands."""
 
     def test_run_cmd_hello(self):
@@ -117,7 +117,7 @@ class RunShellCommandTest(unittest.TestCase):
                           "echo %s %s %s", ("hello", "world",))
 
 
-class RunProcessWithTimeoutTest(unittest.TestCase):
+class RunProcessWithTimeoutTest(InvenioTestCase):
     """Testing of running a process with timeout."""
     def setUp(self):
         self.script_path = os.path.join(CFG_TMPDIR, 'test_sleeping.sh')
@@ -188,7 +188,7 @@ else:
         self.assertNotEqual(exitstatus, 0)
 
 
-class SplitIdsTest(unittest.TestCase):
+class SplitIdsTest(InvenioTestCase):
     def test_one(self):
         self.assertEqual(split_cli_ids_arg("1"), set([1]))
 

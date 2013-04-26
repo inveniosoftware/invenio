@@ -3,7 +3,7 @@
 ## $Id: search_engine_tests.py,v 1.20 2008/08/11 12:49:27 kaplun Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,10 +24,12 @@
 __revision__ = \
     "$Id: search_engine_tests.py,v 1.20 2008/08/11 12:49:27 kaplun Exp $"
 
-import unittest
-from invenio.testutils import make_test_suite, run_test_suite
 
-from invenio.bibexport_method_fieldexporter_dblayer import QueryResult
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+
+QueryResult = lazy_import('invenio.bibexport_method_fieldexporter_dblayer:QueryResult')
+
 
 def _create_record_marc_xml():
     """Creates MARC XML containing one record"""
@@ -65,11 +67,11 @@ def _create_record_marc_xml():
 
     return xml_text
 
-class TestFieldExporter(unittest.TestCase):
+class TestFieldExporter(InvenioTestCase):
     """Tests for exporting of fields."""
     pass
 
-class TesQueryResult(unittest.TestCase):
+class TesQueryResult(InvenioTestCase):
     """Tests QueryResult class"""
 
     def test_get_number_of_records_found(self):

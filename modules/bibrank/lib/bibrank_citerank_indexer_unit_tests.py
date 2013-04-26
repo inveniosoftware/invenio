@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
+
 import sys
 
 if sys.hexversion < 0x2040000:
@@ -25,11 +25,14 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio import bibrank_citerank_indexer
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibtask import task_set_task_param
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
-class TestCiterankIndexer(unittest.TestCase):
+bibrank_citerank_indexer = lazy_import('invenio.bibrank_citerank_indexer')
+task_set_task_param = lazy_import('invenio.bibtask:task_set_task_param')
+
+
+class TestCiterankIndexer(InvenioTestCase):
 
     def setUp(self):
         """Initialization"""
