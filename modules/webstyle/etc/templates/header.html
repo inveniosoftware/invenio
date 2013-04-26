@@ -73,7 +73,7 @@
                   <i class="icon icon-white icon-user"></i> {{ _("guest") }}
                 </a>
               {% else %}
-                <a href="{{ url_for('webaccount.display') }}" style="display: inline-block; padding-right: 5px;">
+                <a href="{{ url_for('webaccount.index') }}" style="display: inline-block; padding-right: 5px;">
                   <i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }}
                 </a>
               {% endif %}

@@ -41,7 +41,7 @@ blueprint = InvenioBlueprint('webaccount', __name__,
                              breadcrumbs=[(_("Your Account"),
                                            'webaccount.index')],
                              menubuilder=[('personalize', _('Personalize'),
-                                           'webaccount.display')])
+                                           'webaccount.index')])
 
 
 @blueprint.route('/login', methods=['GET', 'POST'])
@@ -114,7 +114,7 @@ def index():
     plugins = sorted(plugins, key=lambda w: order.index(w.__class__.__name__) \
                             if w.__class__.__name__ in order else len(order))
 
-    return render_template('webaccount_display.html', plugins=plugins)
+    return render_template('webaccount_index.html', plugins=plugins)
 
 
 @blueprint.route('/edit/<name>', methods=['GET', 'POST'])
