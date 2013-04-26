@@ -98,6 +98,8 @@ Contents
         as well as the following Python modules:
           - (mandatory) MySQLdb (version >= 1.2.1_p2; see below)
              <http://sourceforge.net/projects/mysql-python>
+          - (mandatory) Pyparsing, for document parsing
+             <http://pyparsing.wikispaces.com/>
           - (recommended) python-dateutil, for complex date processing:
              <http://labix.org/python-dateutil>
           - (recommended) PyXML, for XML processing:

@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
@@ -40,6 +41,8 @@ class Bibrec(db.Model):
     modification_date = db.Column(db.DateTime, nullable=False,
                 server_default='0001-01-01 00:00:00',
                 index=True)
+    master_format = db.Column(db.String(16), nullable=False,
+                              server_default='marc')
 
 class Bibfmt(db.Model):
     """Represents a Bibfmt record."""

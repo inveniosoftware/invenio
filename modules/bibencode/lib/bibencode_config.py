@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 
 import invenio.config
 import re
-import uuid
 
 
 #-----------------------#
