@@ -15,12 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from sqlalchemy.dialects import mysql
-from sqlalchemy.orm import backref
-from datetime import datetime
-from uuid import uuid1 as new_uuid
-import cPickle
 from inveniomanage import db
+from datetime import datetime
 
 
 class TaskLogging(db.Model):
@@ -38,7 +34,9 @@ class TaskLogging(db.Model):
         self.workflow_name = workflow_name
 
     def __repr__(self):
-        return "<Task(%i, %s, %s, %s, %s)>" % (self.id, self.task_name, self.data, self.created, self.workflow_name)
+        return "<Task(%i, %s, %s, %s, %s)>" % (self.id, self.task_name,
+                                               self.data, self.created,
+                                               self.workflow_name)
 
 
 class AuditLogging(db.Model):
@@ -91,14 +89,13 @@ class Workflow(db.Model):
     module_name = db.Column(db.String(64), nullable=False)
 
     def __repr__(self):
-        return "<Workflow(name: %s, module: %s, cre: %s, mod: %s, user_id: %s, status: %s)>" % (
-        str(self.name),
-        str(self.module_name),
-        str(self.created),
-        str(self.modified),
-        str(self.user_id),
-        str(self.status)
-        )
+        return "<Workflow(name: %s, module: %s, cre: %s, mod: %s, user_id: %s, status: %s)>" % \
+            (str(self.name),
+             str(self.module_name),
+             str(self.created),
+             str(self.modified),
+             str(self.user_id),
+             str(self.status))
 
 
 class WfeObject(db.Model):
@@ -120,13 +117,21 @@ class WfeObject(db.Model):
     last_task_name = db.Column(db.String(60), default="")
 
     def __repr__(self):
-        return "<WfeObject(id = %s, data = %s, workflow_id = %s, version = %s, parent_id = %s, created = %s)" \
-                % (str(self.id), str(self.data), str(self.workflow_id), \
-                   str(self.version), str(self.parent_id), str(self.created))
+        repr = "<WfeObject(id = %s, data = %s, workflow_id = %s, " \
+               "version = %s, parent_id = %s, created = %s)" \
+               % (str(self.id), str(self.data), str(self.workflow_id),
+                  str(self.version), str(self.parent_id), str(self.created))
+        return repr
 
     def __eq__(self, other):
         if isinstance(other, WfeObject):
-            if self.data == other.data and self.extra_data == other.extra_data and self.workflow_id == other.workflow_id and self.version == other.version and self.parent_id == other.parent_id and isinstance(self.created,datetime) and isinstance(self.modified,datetime):
+            if self.data == other.data and \
+                    self.extra_data == other.extra_data and \
+                    self.workflow_id == other.workflow_id and \
+                    self.version == other.version and \
+                    self.parent_id == other.parent_id and \
+                    isinstance(self.created, datetime) and \
+                    isinstance(self.modified, datetime):
                 return True
             else:
                 return False
@@ -134,7 +139,13 @@ class WfeObject(db.Model):
 
     def __ne__(self, other):
         if isinstance(other, WfeObject):
-            if self.data == other.data and self.extra_data == other.extra_data and self.workflow_id == other.workflow_id and self.version == other.version and self.parent_id == other.parent_id and isinstance(self.created,datetime) and isinstance(self.modified,datetime):
+            if self.data == other.data and \
+                    self.extra_data == other.extra_data and \
+                    self.workflow_id == other.workflow_id and \
+                    self.version == other.version and \
+                    self.parent_id == other.parent_id and \
+                    isinstance(self.created, datetime) and \
+                    isinstance(self.modified, datetime):
                 return False
             else:
                 return True
@@ -159,16 +170,15 @@ class WfeObject(db.Model):
         self.version = state["version"]
         self.parent_id = state["parent_id"]
         self.created = state["created"]
-        self.modified = state["modified"] #should we update the modification date??
-        self.owner = state["owner"]
+        self.modified = state["modified"]  # should we update
+        self.owner = state["owner"]        # the modification date??
         self.status = state["status"]
         self.user_id = state["user_id"]
         self.task_counter = state["task_counter"]
         self.error_msg = state["error_msg"]
-        
+
     def copy(self, other):
         """Copies data and metadata except id and workflow_id"""
-        
         self.data = other.data
         self.extra_data = other.extra_data 
         self.version = other.version 
@@ -181,4 +191,5 @@ class WfeObject(db.Model):
         self.task_counter = other.task_counter 
         self.error_msg = other.error_msg 
 
-__all__ = ['Workflow','WfeObject','WorkflowLogging','AuditLogging','TaskLogging']
+__all__ = ['Workflow', 'WfeObject', 'WorkflowLogging',
+           'AuditLogging', 'TaskLogging']

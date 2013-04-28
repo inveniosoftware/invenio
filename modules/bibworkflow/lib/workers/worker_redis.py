@@ -17,7 +17,7 @@
 
 from redis import Redis
 from rq.decorators import job
-from invenio.bibworkflow_worker_engine import *
+from invenio.bibworkflow_worker_engine import runit, restartit
 
 redis_conn = Redis()
 
@@ -31,9 +31,11 @@ class worker_redis(object):
         @wname: str, name of the workflow to be run
         @data: list of dictionaries, objects for the workflow
         """
-        return job(queue='default', connection=redis_conn)(runit).delay(wname, data, external_save=external_save)
+        return job(queue='default', connection=redis_conn)(runit). \
+            delay(wname, data, external_save=external_save)
 
-    def restart(self, wid, data=None, restart_point="beginning", external_save=None):
+    def restart(self, wid, data=None, restart_point="beginning",
+                external_save=None):
         """
         Registers restartit as a new task in RQ
         The delay method executes it asynchronously
@@ -44,4 +46,6 @@ class worker_redis(object):
         list of dictionaries, objects for the workflow
         @restart_point: str, sets the restart point
         """
-        return job(queue='default', connection=redis_conn)(restartit).delay(wid, data=None, restart_point="beginning", external_save=external_save)
+        return job(queue='default', connection=redis_conn)(restartit). \
+            delay(wid, data=None, restart_point="beginning",
+                  external_save=external_save)

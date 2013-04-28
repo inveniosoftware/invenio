@@ -18,38 +18,41 @@
 import time
 from invenio.bibconvert_xslt_engine import convert
 
+
 ###### Basic test functions - NOT FOR XML ########
 def higher_than_20():
-     def _higher_than_20(obj, eng):
+    def _higher_than_20(obj, eng):
         """Function checks if variable is lower than 20"""
         if obj.data['a'] < 20:
             print "a < 20"
             eng.haltProcessing("Value of filed: a in object is lower than 20.")
         return
-     return _higher_than_20
- 
+    return _higher_than_20
+
 
 def lower_than_20():
-     def _lower_than_20(obj, eng):
+    def _lower_than_20(obj, eng):
         """Function checks if variable is higher than 20"""
         if obj.data['a'] > 20:
             print "a > 20"
             eng.haltProcessing("Value of filed: a in object is higher than 20.")
         return
-     return _lower_than_20
+    return _lower_than_20
 
 
 def add(value):
-     def _add(obj, eng):
+    def _add(obj, eng):
         """Function adds value to variable"""
         obj.data['a'] += value
-     return _add
-     
+    return _add
+
+
 def subtract(value):
-     def _subtract(obj, eng):
+    def _subtract(obj, eng):
         """Function subtract value from variable"""
         obj.data['a'] -= value
-     return _subtract
+    return _subtract
+
 
 ###### XML functions #######
 def xml_convert_record(xslt_stylesheet):
@@ -64,8 +67,10 @@ def xml_convert_record(xslt_stylesheet):
         obj.data = newtext
     return _xml_convert_record
 
+
 def xml_print_record(obj, eng):
     print obj.data
+
 
 ###### other functions #######
 def sleep_task(t):
@@ -74,19 +79,22 @@ def sleep_task(t):
         print "Going to sleep..."
         time.sleep(t)
         print "I've woken up:)"
-    return _sleep_task    
-    
+    return _sleep_task
+
+
 def save_workflow():
     def _save_workflow(obj, eng):
         """Function saves workflow"""
         eng.save()
         print "Workflow saved from task"
     return _save_workflow
-    
+
+
 def save_object():
     def _save_object(obj, eng):
         """Function saves object in ERROR state"""
-        #We should consider creating other state for saving in execution purpose
+        # We should consider creating other state
+        # for saving in execution purpose
         obj.save(2)
         print "Object saved from task"
     return _save_object

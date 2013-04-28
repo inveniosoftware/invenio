@@ -23,57 +23,56 @@ import unittest
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibworkflow_api import run
-from invenio.bibworkflow_model import *
-import datetime
 from invenio.sqlalchemyutils import db
-from sqlalchemy.orm import aliased
-from invenio.bibworkflow_model import WfeObject
 
-import cPickle
 
 class TestWorkflowStart(unittest.TestCase):
     """Tests for BibWorkflow API."""
 
     def test_workflow_first_run(self):
         """Tests running workflow with new data"""
-
+        from invenio.bibworkflow_model import WfeObject, Workflow
         workflow1 = run("test1", [{"a":20}], task_queue=False)
 
-        objects1 = WfeObject.query.filter(WfeObject.workflow_id == workflow1.uuid, WfeObject.parent_id == None)
+        objects1 = \
+            WfeObject.query. \
+            filter(WfeObject.workflow_id == workflow1.uuid,
+                   WfeObject.parent_id is None)
 
-        wfeobject1 = WfeObject({"a":20},workflow1.uuid,0)
-        wfeobject2 = WfeObject({"a":20},workflow1.uuid,1,objects1[0].id)
+        wfeobject1 = WfeObject({"a": 20}, workflow1.uuid, 0)
+        wfeobject2 = WfeObject({"a": 20}, workflow1.uuid, 1, objects1[0].id)
 
         ### check first object
         self.assertEqual(objects1[0], wfeobject1)
         self.assertEqual(objects1[0].child_objects[0], wfeobject2)
 
         WfeObject.query.filter(WfeObject.workflow_id == workflow1.uuid).delete()
-        Workflow.query.filter(workflow.uuid == workflow1.uuid).delete()
+        Workflow.query.filter(wfeobject1.workflowid == workflow1.uuid).delete()
         db.session.commit()
         print "Test objects deleted from database."
 
     def test_workflow_complex_run(self):
         """Tests running workflow with complex data"""
 
-        workflow = run("test2", [{"a":1},{"a":"wwww"},{"a":10}], task_queue=False)
+        workflow = run("test2", [{"a": 1}, {"a": "wwww"}, {"a": 10}],
+                       task_queue=False)
 
-        objects = WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid, WfeObject.parent_id == None)
-        wfeobject3 = WfeObject({"a":1},workflow.uuid,0)
-        wfeobject4 = WfeObject({"a":21},workflow.uuid,1,objects[0].id)
+        objects = WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid,
+                                         WfeObject.parent_id is None)
+        wfeobject3 = WfeObject({"a": 1}, workflow.uuid,0)
+        wfeobject4 = WfeObject({"a": 21}, workflow.uuid, 1, objects[0].id)
 
-        wfeobject5 = WfeObject({"a":"wwww"},workflow.uuid,0)
-        wfeobject6 = WfeObject({"a":"wwww"},workflow.uuid,2,objects[1].id)
+        wfeobject5 = WfeObject({"a": "wwww"}, workflow.uuid, 0)
+        wfeobject6 = WfeObject({"a": "wwww"}, workflow.uuid, 2, objects[1].id)
 
-        wfeobject7 = WfeObject({"a":10},workflow.uuid,0)
-        wfeobject8 = WfeObject({"a":30},workflow.uuid,1,objects[2].id)
+        wfeobject7 = WfeObject({"a": 10}, workflow.uuid, 0)
+        wfeobject8 = WfeObject({"a": 30}, workflow.uuid, 1, objects[2].id)
 
         ### check first object
         print "Checking first object"
 
         self.assertEqual(objects[0], wfeobject3)
         self.assertEqual(objects[0].child_objects[0], wfeobject4)
-
 
         print "Checking secound object"
         self.assertEqual(objects[1], wfeobject5)
@@ -82,7 +81,6 @@ class TestWorkflowStart(unittest.TestCase):
         print "Checking third object"
         self.assertEqual(objects[2], wfeobject7)
         self.assertEqual(objects[2].child_objects[0], wfeobject8)
-
 
         WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid).delete()
         Workflow.query.filter(workflow.uuid == workflow.uuid).delete()
@@ -93,4 +91,3 @@ TEST_SUITE = make_test_suite(TestWorkflowStart)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-

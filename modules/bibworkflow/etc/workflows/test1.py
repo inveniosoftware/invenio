@@ -15,12 +15,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow.tasks.my_tasks import *
+from invenio.bibworkflow.tasks.my_tasks import task_b
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
+
 
 class test1(WorkflowDefinition):
     def __init__(self):
         super(test1, self).__init__()
-        self.definition = [
-                       task_b()
-                       ]
+        self.definition = [task_b()]

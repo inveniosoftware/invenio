@@ -15,18 +15,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow.tasks.my_tasks import *
+from invenio.bibworkflow.tasks.my_tasks import simple_task, sleep_task, \
+    save_workflow
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
 
 
 class workflow2(WorkflowDefinition):
     def __init__(self):
         super(workflow2, self).__init__()
-        self.definition = [
-            simple_task(5),
-            sleep_task(10),
-            simple_task(3),
-            save_workflow(),
-            simple_task(3),
-            simple_task(10)
-        ]
+        self.definition = [simple_task(5),
+                           sleep_task(10),
+                           simple_task(3),
+                           save_workflow(),
+                           simple_task(3),
+                           simple_task(10)]

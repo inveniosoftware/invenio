@@ -15,15 +15,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow.tasks.record_tasks import print_record, convert_record
+from invenio.bibworkflow.tasks.record_tasks import \
+    print_record, \
+    convert_record, \
+    check_record
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
+
 
 class record_workflow(WorkflowDefinition):
     def __init__(self):
         super(record_workflow, self).__init__()
-        self.definition = [
-                       print_record, 
-                       convert_record("oaiarxiv2marcxml.xsl"),
-                       check_record,
-                       print_record
-                      ]
+        self.definition = [print_record,
+                           convert_record("oaiarxiv2marcxml.xsl"),
+                           check_record,
+                           print_record]

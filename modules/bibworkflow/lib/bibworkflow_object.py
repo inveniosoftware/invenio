@@ -22,9 +22,7 @@ from datetime import datetime
 from invenio.sqlalchemyutils import db
 from invenio.bibworkflow_utils import dictproperty
 from invenio.bibworkflow_config import add_log, \
-     CFG_BIBWORKFLOW_OBJECTS_LOGDIR, CFG_OBJECT_VERSION
-from invenio.config import CFG_LOGDIR
-
+    CFG_BIBWORKFLOW_OBJECTS_LOGDIR, CFG_OBJECT_VERSION
 
 
 class BibWorkflowObject(object):
@@ -39,24 +37,26 @@ class BibWorkflowObject(object):
             if id is not None:
                 self.db_obj = WfeObject.query.filter(WfeObject.id == id).first()
             else:
-                self.db_obj = WfeObject(data=data, workflow_id=workflow_id, \
-                                        version=version, parent_id=parent_id, \
-                                        task_counter=task_counter, user_id=user_id)
+                self.db_obj = WfeObject(data=data, workflow_id=workflow_id,
+                                        version=version, parent_id=parent_id,
+                                        task_counter=task_counter,
+                                        user_id=user_id)
                 self._create_db_obj()
         self.add_log()
 
     def add_log(self):
         self.log = add_log(os.path.join(CFG_BIBWORKFLOW_OBJECTS_LOGDIR,
-            "object_%s_%s.log" % (self.db_obj.id, self.db_obj.workflow_id)),
-            'object.%s' % self.db_obj.id)
+                           'object_%s_%s.log' % (self.db_obj.id,
+                                                 self.db_obj.workflow_id)),
+                           'object.%s' % self.db_obj.id)
 
-    @property
-    def data(self):
+    def get_data(self):
         return self.db_obj.data
 
-    @data.setter
-    def data(self, value):
+    def set_data(self, value):
         self.db_obj.data = value
+
+    data = property(get_data, set_data)
 
     def extra_data_get(self, key):
         if key not in self.db_obj.extra_data.keys():
@@ -67,7 +67,7 @@ class BibWorkflowObject(object):
         self.db_obj.extra_data[key] = value
 
     extra_data = dictproperty(fget=extra_data_get, fset=extra_data_set,
-                      doc= "Sets up property")
+                              doc="Sets up property")
 
     del extra_data_get, extra_data_set
 
@@ -92,22 +92,22 @@ class BibWorkflowObject(object):
         if self.extra_object_class:
             extra_obj = self.extra_object_class(self.db_obj)
             extra_obj.save()
-    
+
     def _create_version_obj(self, workflow_id, version, parent_id):
-        obj = WfeObject(data=self.db_obj.data, \
-                              workflow_id=workflow_id, \
-                              version=version, \
-                              parent_id=parent_id, \
-                              task_counter=self.db_obj.task_counter, \
-                              user_id=self.db_obj.user_id, \
-                              extra_data=self.db_obj.extra_data)
+        obj = WfeObject(data=self.db_obj.data,
+                        workflow_id=workflow_id,
+                        version=version,
+                        parent_id=parent_id,
+                        task_counter=self.db_obj.task_counter,
+                        user_id=self.db_obj.user_id,
+                        extra_data=self.db_obj.extra_data)
         db.session.add(obj)
         db.session.commit()
         # Run extra save method
         if self.extra_object_class:
             extra_obj = self.extra_object_class(obj)
             extra_obj.save()
-        
+
         return obj.id
 
     def save(self, version=None, task_counter=[0], workflow_id=None):
@@ -120,22 +120,27 @@ class BibWorkflowObject(object):
         print "Parent id before save is: " + str(self.db_obj.parent_id)
         self.db_obj.task_counter = task_counter
         self.db_obj.modified = datetime.now()
-        
+
         if not workflow_id:
             workflow_id = self.db_obj.workflow_id
-        
+
         if version == CFG_OBJECT_VERSION.HALTED:
-            # Processing was interrupted or error happened, we save the current state ("error" version)
+            # Processing was interrupted or error happened,
+            # we save the current state ("error" version)
             if self.db_obj.parent_id is not None:
                 # We are a child, so we update ourselves.
                 self._update_db()
                 return int(self.db_obj.id)
             else:
-                # First time this object has an error/interrupt. Add new child from this object. (version error)
-                return int(self._create_version_obj(workflow_id, CFG_OBJECT_VERSION.HALTED, int(self.db_obj.id)))
+                # First time this object has an error/interrupt.
+                # Add new child from this object. (version error)
+                return int(self._create_version_obj(workflow_id,
+                                                    CFG_OBJECT_VERSION.HALTED,
+                                                    int(self.db_obj.id)))
 
         elif version == CFG_OBJECT_VERSION.FINAL:
-            # This means the object was successfully run through the workflow. (finished version)
+            # This means the object was successfully run
+            # through the workflow. (finished version)
             # We update or insert the final object
             if self.db_obj.version == CFG_OBJECT_VERSION.FINAL:
                 self._update_db()
@@ -145,16 +150,14 @@ class BibWorkflowObject(object):
                     parent_id = self.db_obj.parent_id
                 else:
                     parent_id = self.db_obj.id
-                return int(self._create_version_obj(workflow_id, CFG_OBJECT_VERSION.FINAL, parent_id))
-
+                return int(self._create_version_obj(workflow_id,
+                                                    CFG_OBJECT_VERSION.FINAL,
+                                                    parent_id))
         else:
             # version == 0
             # First save of the object (original version)
             self._create_db_obj()
             self.get_log().info('Saved in db')
-
-    def changeStatus(self, message, save=False):
-        return
 
     def set_log(self, log):
         self.log = log
@@ -163,22 +166,23 @@ class BibWorkflowObject(object):
         return self.log
 
     def __repr__(self):
-        return "<BibWorkflowObject(id: %s, data: %s, workflow_id: %s, version: %s, parent_id: %s)>" % (
-        str(self.db_obj.id),
-        str(self.db_obj.data),
-        str(self.db_obj.workflow_id),
-        str(self.db_obj.version),
-        str(self.db_obj.parent_id)
+        return "<%s(id: %s, data: %s, workflow_id: %s, version: %s, parent_id: %s)>" % (
+            "BibWorkflowObject",
+            str(self.db_obj.id),
+            str(self.db_obj.data),
+            str(self.db_obj.workflow_id),
+            str(self.db_obj.version),
+            str(self.db_obj.parent_id)
         )
-    
+
     def add_task_result(self, task_name, result):
         self.extra_data["tasks_results"][task_name] = result
-        
+
     def add_metadata(self, key, value):
         self.extra_data[key] = value
-        
+
     def changeStatus(self, message, save=False):
         self.db_obj.status = message
-        
-        if(save==True):
+
+        if save:
             self._update_db()

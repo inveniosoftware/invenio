@@ -53,12 +53,13 @@ def set_db_context(f):
             return f(*args, **kwargs)
     return wraps(f)(initialize)
 
+
 def runit(wname, data, external_save=None):
     """
     Runs workflow with given name and given data.
-    Data can be specified as list of objects or single id of WfeObject/BibWorkflowObjects.
+    Data can be specified as list of objects or
+    single id of WfeObject/BibWorkflowObjects.
     """
-
     wfe = BibWorkflowEngine(wname, user_id=0, module_name="aa")
     wfe.setWorkflowByName(wname)
     wfe.setCounterInitial(data)
@@ -80,31 +81,36 @@ def runit(wname, data, external_save=None):
             objects.append(d)
         else:
             objects.append(BibWorkflowObject(d, wfe.db_obj.uuid, extra_object_class=external_save))
-            
+
     print objects
     run_workflow(wfe, objects)
     return wfe
 
+
 def restartit(wid, data=None, restart_point="beginning", external_save=None):
     """
-    Restarts workfloe with given id (wid) and given data. If data are not
+    Restarts workflow with given id (wid) and given data. If data are not
     specified then it will load all initial data for workflow. Depending on
     restart_point function can load initial or current objects.
 
-    Data can be specified as list of objects or single id of WfeObject/BibWorkflowObjects.
+    Data can be specified as list of objects
+    or single id of WfeObject/BibWorkflowObjects.
     """
     if data is None:
         if isinstance(restart_point, str):
-            data = WfeObject.query.filter(WfeObject.workflow_id == wid, WfeObject.version == 0)
+            data = WfeObject.query.filter(WfeObject.workflow_id == wid,
+                                          WfeObject.version == 0)
         else:
-            data = WfeObject.query.filter(WfeObject.workflow_id == wid, WfeObject.child_objects is None)
+            data = WfeObject.query.filter(WfeObject.workflow_id == wid,
+                                          WfeObject.child_objects is None)
     else:
         #restart for oid, only one object
         if isinstance(data[0], (int, long)):
             data = [WfeObject.query.filter(WfeObject.id == data[0]).first()]
 
     workflow = Workflow.query.filter(Workflow.uuid == wid).first()
-    wfe = BibWorkflowEngine(None, uuid=None, user_id=0, workflow_object=workflow, module_name="module")
+    wfe = BibWorkflowEngine(None, uuid=None, user_id=0, workflow_object=workflow,
+                            module_name="module")
     wfe.setWorkflowByName(workflow.name)
 
     # do only if not this type already

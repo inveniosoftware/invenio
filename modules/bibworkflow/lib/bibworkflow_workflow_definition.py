@@ -15,10 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+
 class WorkflowDefinition(object):
     def __init__(self, definition=None):
         self.definition = definition
-    
+
     def get_definition(self):
         return self.definition
-    

@@ -15,15 +15,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow.tasks.regression_tests_tasks import *
+from invenio.bibworkflow.tasks.regression_tests_tasks import add,
+                                                             lower_than_20,
+                                                             higher_than_20
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
+
 
 class test3(WorkflowDefinition):
     def __init__(self):
         super(test3, self).__init__()
-        self.definition = [
-                  add(1),
-                  lower_than_20(),
-                  add(20),
-                  higher_than_20()         
-                  ]
+        self.definition = [add(1),
+                           lower_than_20(),
+                           add(20),
+                           higher_than_20()]
