@@ -40,12 +40,11 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
     """
 
     def test_normal_fields_availability_and_values(self):
-        """
-        bibfield - access to normal fields
-        """
+        """bibfield - access to normal fields"""
         record = get_record(12)
         self.assertTrue(record.get('asdas') is None)
         self.assertEqual('12', record['recid'])
+        self.assertTrue('recid' in record.get_persistent_identifiers())
         self.assertEqual(record['recid'], record.get('recid'))
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title.title'])
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title']['title'])
@@ -57,24 +56,18 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         self.assertEqual(19, len(record['authors.last_name']))
 
     def test_compare_field_values_with_bibrecord_values(self):
-        """
-        bibfield - same value as in bibrecord
-        """
+        """bibfield - same value as in bibrecord"""
         record = get_record(1)
         bibrecord_value = record_get_field_values(search_engine_get_record(1), '245', ' ', ' ', 'a')[0]
         self.assertEqual(bibrecord_value, record['title.title'])
 
     def test_derived_fields_availability_and_values(self):
-        """
-        bibfield - values of derived fields
-        """
+        """bibfield - values of derived fields"""
         record = get_record(12)
         self.assertEqual(19, record['number_of_authors'])
 
     def test_calculated_fields_availability_and_values(self):
-        """
-        bibfield - values of calculated fields
-        """
+        """bibfield - values of calculated fields"""
         record = get_record(31)
         self.assertEqual(2, record['_number_of_copies'])
         run_sql("insert into crcITEM(barcode, id_bibrec) VALUES('test',31)")
@@ -93,9 +86,7 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         #self.assertEqual('Treusch, R', record.get('authors[0]', formatstring="{0[last_name]}, {0[first_name]}"))
 
     def test_get_using_formating_function(self):
-        """
-        bibfield - format values using formating function
-        """
+        """bibfield - format values using formating function"""
         def dummy(s):
             return s.upper()
         record = get_record(1)
@@ -154,7 +145,7 @@ class BibFieldLegacyTests(unittest.TestCase):
         pass
 
     def test_get_legacy_recstruct(self):
-        """docstring for test_get_legacy_recstruct"""
+        """bibfield - legacy functions"""
         bibfield_recstruct = get_record(8).get_legacy_recstruct()
         bibrecord = search_engine_get_record(8)
 

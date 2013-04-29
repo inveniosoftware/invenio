@@ -52,7 +52,7 @@ class JsonReader(BibFieldDict):
 
     def __init__(self, blob_wrapper=None):
         """
-        blob -> _prepare_blob(...) -> rec_tree -> _translate(...) -> json_dict -> check_record(...)
+        blob -> _prepare_blob(...) -> rec_tree -> _translate(...) -> rec_json -> check_record(...)
         """
         super(JsonReader, self).__init__()
         self.blob_wrapper = blob_wrapper
@@ -87,6 +87,13 @@ class JsonReader(BibFieldDict):
         """
         raise NotImplementedError("This method must be implemented by each reader")
 
+    def get_persistent_identifiers(self):
+        """
+        Using _persistent_identifiers_keys calculated fields gets a subset
+        of the record containing al persistent indentifiers
+        """
+        return dict((key, self[key]) for key in self.get('_persistent_identifiers_keys', reset_cache=True))
+
     def is_empty(self):
         """
         One record is empty if there is nothing stored inside rec_json or there is
@@ -95,6 +102,8 @@ class JsonReader(BibFieldDict):
         if not self.rec_json:
             return True
         if self.keys() == ['__master_format']:
+            return True
+        if all(key.startswith('_') for key in self.keys()):
             return True
         return False
 
