@@ -665,7 +665,7 @@ class Fieldname(db.Model):
     """Represents a Fieldname record."""
     __tablename__ = 'fieldname'
     id_field = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Field.id), primary_key=True)
+                         db.ForeignKey(Field.id), primary_key=True)
     ln = db.Column(db.Char(5), primary_key=True, server_default='')
     type = db.Column(db.Char(3), primary_key=True, server_default='sn')
     value = db.Column(db.String(255), nullable=False)
@@ -675,13 +675,19 @@ class Fieldname(db.Model):
 class Tag(db.Model):
     """Represents a Tag record."""
     __tablename__ = 'tag'
-    id = db.Column(db.MediumInteger(9, unsigned=True),
-                primary_key=True)
+    id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     value = db.Column(db.Char(6), nullable=False)
 
-    def __init__(self, tup):
-        self.name, self.value = tup
+    def __init__(self, tup=None, *args, **kwargs):
+        if tup is not None and isinstance(tup, tuple):
+            self.name, self.value = tup
+            super(Tag, self).__init__(*args, **kwargs)
+        else:
+            if tup is None:
+                super(Tag, self).__init__(*args, **kwargs)
+            else:
+                super(Tag, self).__init__(tup, *args, **kwargs)
 
     @property
     def as_tag(self):
@@ -701,9 +707,12 @@ class FieldTag(db.Model):
     tag = db.relationship(Tag, backref='fields', order_by=score)
     field = db.relationship(Field, backref='tags', order_by=score)
 
-    def __init__(self, score, tup):
-        self.score = score
-        self.tag = Tag(tup)
+    def __init__(self, score=None, tup=None, *args, **kwargs):
+        if score is not None:
+            self.score = score
+        if tup is not None:
+            self.tag = Tag(tup)
+        super(FieldTag, self).__init__(*args, **kwargs)
 
     @property
     def as_tag(self):
