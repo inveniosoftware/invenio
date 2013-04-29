@@ -28,24 +28,25 @@ from invenio.sqlalchemyutils import db
 
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec, Bibdoc
+from invenio.websearch_model import Collection
 
 
 class RnkMETHOD(db.Model):
     """Represents a RnkMETHOD record."""
     __tablename__ = 'rnkMETHOD'
     id = db.Column(db.MediumInteger(9, unsigned=True), primary_key=True,
-                nullable=False)
+                   nullable=False)
     name = db.Column(db.String(20), unique=True, nullable=False,
-                server_default='')
+                     server_default='')
     last_updated = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                             server_default='0001-01-01 00:00:00')
 
 
 class RnkMETHODDATA(db.Model):
     """Represents a RnkMETHODDATA record."""
     __tablename__ = 'rnkMETHODDATA'
     id_rnkMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(RnkMETHOD.id), nullable=False, primary_key=True)
+                             db.ForeignKey(RnkMETHOD.id), primary_key=True)
     relevance_data = db.Column(db.iLargeBinary, nullable=True)
 
 
@@ -53,7 +54,7 @@ class RnkMETHODNAME(db.Model):
     """Represents a RnkMETHODNAME record."""
     __tablename__ = 'rnkMETHODNAME'
     id_rnkMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(RnkMETHOD.id), primary_key=True)
+                             db.ForeignKey(RnkMETHOD.id), primary_key=True)
     ln = db.Column(db.Char(5), primary_key=True, server_default='')
     type = db.Column(db.Char(3), primary_key=True, server_default='sn')
     value = db.Column(db.String(255), nullable=False)
@@ -63,19 +64,18 @@ class RnkMETHODNAME(db.Model):
 class RnkCITATIONDATA(db.Model):
     """Represents a RnkCITATIONDATA record."""
     __tablename__ = 'rnkCITATIONDATA'
-    id = db.Column(db.MediumInteger(8, unsigned=True), primary_key=True,
-                nullable=False)
+    id = db.Column(db.MediumInteger(8, unsigned=True), primary_key=True)
     object_name = db.Column(db.String(20), unique=True, nullable=False)
     object_value = db.Column(db.iLargeBinary, nullable=True)
     last_updated = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                             server_default='0001-01-01 00:00:00')
 
 
 class RnkCITATIONDATAERR(db.Model):
     """Represents a RnkCITATIONDATAERR record."""
     __tablename__ = 'rnkCITATIONDATAERR'
     type = db.Column(db.Enum('multiple-matches', 'not-well-formed'),
-                primary_key=True)
+                     primary_key=True)
     citinfo = db.Column(db.String(255), primary_key=True, server_default='')
 
 
@@ -180,6 +180,19 @@ class RnkSELFCITES(db.Model):
     last_updated = db.Column(db.DateTime, nullable=False)
 
 
+class CollectionRnkMETHOD(db.Model):
+    """Represents a CollectionRnkMETHOD record."""
+    __tablename__ = 'collection_rnkMETHOD'
+    id_collection = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(Collection.id), primary_key=True, nullable=False)
+    id_rnkMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(RnkMETHOD.id), primary_key=True, nullable=False)
+    score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
+                server_default='0')
+    collection = db.relationship(Collection, backref='rnkMETHODs')
+    rnkMETHOD = db.relationship(RnkMETHOD, backref='collections')
+
+
 __all__ = ['RnkMETHOD',
            'RnkMETHODDATA',
            'RnkMETHODNAME',
@@ -193,4 +206,5 @@ __all__ = ['RnkMETHOD',
            'RnkWORD01R',
            'RnkEXTENDEDAUTHORS',
            'RnkRECORDSCACHE',
-           'RnkSELFCITES']
+           'RnkSELFCITES',
+           'CollectionRnkMETHOD']

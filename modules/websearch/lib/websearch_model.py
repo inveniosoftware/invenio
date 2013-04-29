@@ -41,7 +41,6 @@ from sqlalchemy.ext.orderinglist import ordering_list
 
 from invenio.websession_model import User
 from invenio.bibclassify_model import ClsMETHOD
-from invenio.bibrank_model import RnkMETHOD
 
 
 class IntbitsetPickle(object):
@@ -769,19 +768,6 @@ class CollectionClsMETHOD(db.Model):
     clsMETHOD = db.relationship(ClsMETHOD, backref='collections')
 
 
-class CollectionRnkMETHOD(db.Model):
-    """Represents a CollectionRnkMETHOD record."""
-    __tablename__ = 'collection_rnkMETHOD'
-    id_collection = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Collection.id), primary_key=True, nullable=False)
-    id_rnkMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(RnkMETHOD.id), primary_key=True, nullable=False)
-    score = db.Column(db.TinyInteger(4, unsigned=True), nullable=False,
-                server_default='0')
-    collection = db.relationship(Collection, backref='rnkMETHODs')
-    rnkMETHOD = db.relationship(RnkMETHOD, backref='collections')
-
-
 __all__ = ['Collection',
            'Collectionname',
            'Collectiondetailedrecordpagetabs',
@@ -803,5 +789,4 @@ __all__ = ['Collection',
            'WebQuery',
            'UserQuery',
            'CollectionFieldFieldvalue',
-           'CollectionClsMETHOD',
-           'CollectionRnkMETHOD']
+           'CollectionClsMETHOD']
