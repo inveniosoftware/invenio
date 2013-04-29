@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+#
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,15 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
-pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_unit_tests.py \
-             bibindex_fixtures.py \
-             bibindex_model.py \
-             bibindexadminlib.py bibindex_engine_stemmer.py bibindex_engine_stopwords.py \
-             bibindex_engine_stemmer_unit_tests.py bibindex_engine_stemmer_greek.py \
-             bibindex_engine_tokenizer.py bibindex_engine_tokenizer_unit_tests.py \
-             bibindexadmin_regression_tests.py bibindex_engine_washer.py
+from fixture import DataSet
 
-EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = *~ *.tmp *.pyc
+class SwrREMOTESERVERData(DataSet):
+
+    class SwrREMOTESERVER_1:
+        id = 1L
+        username = u'CDS_Invenio'
+        url_base_record = u'http://arxiv.org/abs'
+        password = u'sword_invenio'
+        xml_servicedocument = ''
+        realm = u'SWORD at arXiv'
+        name = u'arXiv'
+        last_update = 0L
+        email = u'admin'
+        host = u'arxiv.org'
+        url_servicedocument = u'https://arxiv.org/sword-app/servicedocument'

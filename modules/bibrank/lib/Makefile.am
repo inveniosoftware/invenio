@@ -34,6 +34,7 @@ pylib_DATA = bibrankadminlib.py \
              bibrank_citation_indexer_regression_tests.py \
              bibrank_citation_searcher.py \
              bibrank_citation_searcher_unit_tests.py \
+             bibrank_fixtures.py \
              bibrank_model.py \
              bibrank_regression_tests.py \
              bibrank.py \

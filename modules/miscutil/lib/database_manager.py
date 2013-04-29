@@ -21,6 +21,13 @@ from flask.ext.script import Manager
 
 manager = Manager(usage="Perform database operations")
 
+# Shortcuts for manager options to keep code DRY.
+option_yes_i_know = manager.option('--yes-i-know', action='store_true',
+                                   dest='yes_i_know', help='use with care!')
+option_default_data = manager.option('--no-data', action='store_false',
+                                     dest='default_data',
+                                     help='do not populate tables with default data')
+
 
 def _print_progress(p, L=40, prefix='', suffix=''):
     bricks = int(p * L)
@@ -30,10 +37,9 @@ def _print_progress(p, L=40, prefix='', suffix=''):
     print suffix,
 
 
-@manager.option('--yes-i-know', action='store_true', dest='yes_i_know',
-                help='use with care!')
+@option_yes_i_know
 def drop(yes_i_know=False):
-    "Drops database tables"
+    """Drops database tables"""
 
     print ">>> Going to drop tables and related data on filesystem ..."
 
@@ -81,7 +87,7 @@ def drop(yes_i_know=False):
     from invenio.bibedit_model import Bibdoc
     event.listen(Bibdoc.__table__, "before_drop", bibdoc_before_drop)
 
-    tables = [t for t in db.metadata.tables.values()]
+    tables = list(reversed(db.metadata.sorted_tables))
     N = len(tables)
 
     prefix = '>>> Dropping %d tables ...' % N
@@ -106,24 +112,14 @@ def drop(yes_i_know=False):
         print ">>> Dropped", dropped, 'out of', N
 
 
-@manager.command
-def create():
-    "Creates database tables from sqlalchemy models"
+@option_default_data
+def create(default_data=True):
+    """Creates database tables from sqlalchemy models"""
 
-    print ">>> Going to create and fill tables..."
+    print ">>> Going to create tables..."
 
-    from invenio.config import CFG_ETCDIR
-    from invenio.inveniocfg import prepare_conf
-
-    class TmpOptions(object):
-        conf_dir = CFG_ETCDIR
-    conf = prepare_conf(TmpOptions())
-
-    import os
-    import sys
     import datetime
     from sqlalchemy import event
-    from invenio.config import CFG_PREFIX
     from invenio.dateutils import get_time_estimator
     from invenio.inveniocfg import test_db_connection
     from invenio.sqlalchemyutils import db
@@ -142,7 +138,7 @@ def create():
     from invenio.websearch_model import CollectionFieldFieldvalue
     event.listen(CollectionFieldFieldvalue.__table__, "after_create", cfv_after_create)
 
-    tables = [t for t in db.metadata.tables.values()]
+    tables = db.metadata.sorted_tables
     N = len(tables)
 
     prefix = '>>> Creating %d tables ...' % N
@@ -167,10 +163,73 @@ def create():
         print "ERROR: not all tables were properly created."
         print ">>> Created", created, 'out of', N
 
-    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabfill.sql" % (CFG_PREFIX, CFG_PREFIX)]:
-        if os.system(cmd):
-            print "ERROR: failed execution of", cmd
-            sys.exit(1)
+    populate(default_data)
+
+
+@option_yes_i_know
+@option_default_data
+def recreate(yes_i_know=False, default_data=True):
+    """Recreates database tables (same as issuing 'drop' and then 'create')"""
+    drop()
+    create(default_data)
+
+
+@manager.command
+def uri():
+    """Prints SQLAlchemy database uri."""
+    from flask import current_app
+    print current_app.config['SQLALCHEMY_DATABASE_URI']
+
+
+@option_default_data
+def populate(default_data=True):  # , sample_data=False):
+    """Populate database with default data"""
+
+    from invenio.sqlalchemyutils import db
+    from fixture import SQLAlchemyFixture
+    from invenio.importutils import autodiscover_modules
+
+    if not default_data:
+        print '>>> No data filled...'
+        return
+
+    print ">>> Going to fill tables..."
+
+    fixture_modules = autodiscover_modules(['invenio'],
+                                           related_name_re=".+_fixtures\.py")
+    model_modules = autodiscover_modules(['invenio'],
+                                         related_name_re=".+_model\.py")
+    fixtures = dict((f, getattr(ff, f)) for ff in fixture_modules
+                    for f in dir(ff) if f[-4:] == 'Data')
+    fixture_names = fixtures.keys()
+    models = dict((m+'Data', getattr(mm, m)) for mm in model_modules
+                  for m in dir(mm) if m+'Data' in fixture_names)
+
+    dbfixture = SQLAlchemyFixture(env=models, engine=db.metadata.bind,
+                                  session=db.session)
+    data = dbfixture.data(*fixtures.values())
+
+    if len(models) != len(fixtures):
+        print ">>> ERROR: There are", len(models), "tables and", len(fixtures), "fixtures."
+    else:
+        print ">>> There are", len(models), "tables to be loaded."
+
+    #for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabfill.sql" % (CFG_PREFIX, CFG_PREFIX)]:
+    #    if os.system(cmd):
+    #        print "ERROR: failed execution of", cmd
+    #        sys.exit(1)
+
+    data.setup()
+
+    from invenio.config import CFG_ETCDIR, CFG_PREFIX
+    from invenio.inveniocfg import prepare_conf
+
+    class TmpOptions(object):
+        conf_dir = CFG_ETCDIR
+    conf = prepare_conf(TmpOptions())
+
+    import os
+    import sys
 
     from invenio.inveniocfg import cli_cmd_reset_sitename, \
         cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
@@ -188,31 +247,7 @@ def create():
     iu = InvenioUpgrader()
     map(iu.register_success, iu.get_upgrades())
 
-    print ">>> Tables created and filled successfully."
-
-
-@manager.option('--yes-i-know', action='store_true', dest='yes_i_know',
-                help='use with care!')
-def recreate(yes_i_know=False):
-    "Recreates database tables (same as issuing 'drop' and then 'create')"
-    drop()
-    create()
-
-
-# @manager.command
-# def populate(default_data=False, sample_data=False):
-#     "Populate database with default data"
-#     from fixtures import dbfixture
-
-#     if default_data:
-#         from fixtures.default_data import all
-#         default_data = dbfixture.data(*all)
-#         default_data.setup()
-
-#     if sample_data:
-#         from fixtures.sample_data import all
-#         sample_data = dbfixture.data(*all)
-#         sample_data.setup()
+    print ">>> Tables filled successfully."
 
 
 def main():
