@@ -264,7 +264,7 @@ class BibFieldDict(object):
         field. If any formating parameter is present, then the return value
         will be the formated value.
         """
-        if field.startswith('_') and reset_cache:
+        if re.search('^_[a-zA-Z0-9]', field) and reset_cache:
             self.update_field_cache(field)
 
         value = self.rec_json
@@ -291,7 +291,7 @@ class BibFieldDict(object):
         """
         calculated_field = self.rec_json.get(field)
 
-        if calculated_field and field.startswith('_'):
+        if calculated_field and re.search('^_[a-zA-Z0-9]', field):
             calculated_field[0] = self._try_to_eval(calculated_field[1])
 
     def update_all_fields_cache(self):
@@ -299,7 +299,7 @@ class BibFieldDict(object):
         Update the cache of all the calculated fields
         @see: update_field_cache()
         """
-        for field in [key for key in self.keys() if key.startswith('_')]:
+        for field in [key for key in self.keys() if re.search('^_[a-zA-Z0-9]', key)]:
             self.update_field_cache(field)
 
     def _try_to_eval(self, string, bibfield_functions_only=False, **context):

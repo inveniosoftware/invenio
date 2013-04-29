@@ -269,7 +269,12 @@ class JsonReader(BibFieldDict):
     def _apply_rule(self, field_name, aliases, rule):
         """docstring for _apply_rule"""
         if 'entire_record' in rule['source_tag'] or any(key in self.rec_tree for key in rule['source_tag']):
-            if rule['parse_first'] and not all(self._unpack_rule(json_id) for json_id in self._try_to_eval(rule['parse_first'])):
+            if rule['parse_first']:
+                for json_id in self._try_to_eval(rule['parse_first']):
+                    self._unpack_rule(json_id)
+            if rule['depends_on'] and not all(k in self for k in self._try_to_eval(rule['depends_on'])):
+                return False
+            if rule['only_if'] and not all(self._try_to_eval(rule['only_if'])):
                 return False
             if 'entire_record' in rule['source_tag']:
                 self[field_name] = self._try_to_eval(rule['value'], value=self.rec_tree)
@@ -286,15 +291,16 @@ class JsonReader(BibFieldDict):
         else:
             return False
 
-    def _apply_virtual_rule(self, field_name, rule, type):
-        if rule['parse_first'] and not all(self._unpack_rule(json_id) for json_id in self._try_to_eval(rule['parse_first'])):
-            return False
-        if rule['parse_first'] and not all(k in self for k in self._try_to_eval(rule['depends_on'])):
+    def _apply_virtual_rule(self, field_name, rule, rule_type):
+        if rule['parse_first']:
+            for json_id in self._try_to_eval(rule['parse_first']):
+                self._unpack_rule(json_id)
+        if rule['depends_on'] and not all(k in self for k in self._try_to_eval(rule['depends_on'])):
             return False
         if rule['only_if'] and not all(self._try_to_eval(rule['only_if'])):
             return False
         #Apply rule
-        if type == 'derived':
+        if rule_type == 'derived':
             self[field_name] = self._try_to_eval(rule['value'])
         else:
             self[field_name] = [self._try_to_eval(rule['value']), rule['value']]

@@ -138,7 +138,7 @@ def _create_config_parser():
                 .setResultsName("source_tag", listAllMatches=True)
     source_format = oneOf(CFG_BIBFIELD_MASTER_FORMATS)\
                     .setResultsName("source_format", listAllMatches=True)
-    creator_body = (Optional(parse_first) + Optional(legacy) + source_format + Suppress(",") + source_tag + Suppress(",") + python_allowed_expr)\
+    creator_body = (Optional(parse_first) + Optional(depends_on) + Optional(only_if) +  Optional(legacy) + source_format + Suppress(",") + source_tag + Suppress(",") + python_allowed_expr)\
                                             .setResultsName("creator_def", listAllMatches=True)
     creator = "creator" + Suppress(":") + INDENT + OneOrMore(creator_body) + UNDENT
 
@@ -310,14 +310,20 @@ class BibFieldParser(object):
             if creator.legacy:
                 legacy = eval(creator.legacy[0][0])
 
-            parse_first = None
+            depends_on = only_if = parse_first = None
             if creator.parse_first:
                 parse_first = creator.parse_first[0]
+            if rule.depends_on:
+                depends_on = rule.depends_on[0]
+            if rule.only_if:
+                only_if = rule.only_if[0]
 
             rules[source_format].append({'source_tag' : creator.source_tag[0].split(),
                                          'value'      : creator.value[0],
                                          'legacy'     : legacy,
-                                         'parse_first': parse_first})
+                                         'parse_first': parse_first,
+                                         'depends_on' : depends_on,
+                                         'only_if'    : only_if})
 
         #Chech duplicate names to overwrite configuration
         if not json_id in self.config_rules:
