@@ -612,6 +612,7 @@ def with_app_context(app=None, new_context=False, **kwargs_config):
 
             if not has_app_context() or new_context:
                 with get_application().app_context():
+                    current_app.preprocess_request()
                     result = f(*args, **kwargs)
             else:
                 result = f(*args, **kwargs)

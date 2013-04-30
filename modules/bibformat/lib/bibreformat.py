@@ -24,6 +24,8 @@ __revision__ = "$Id$"
 
 import sys
 
+from invenio.webinterface_handler_flask import with_app_context
+
 try:
     from invenio.dbquery import run_sql
     from invenio.config import \
@@ -72,6 +74,7 @@ def store_last_updated(format, update_date):
 ### run the bibreformat task bibsched scheduled
 ###
 
+@with_app_context()
 def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, recids):
     """
     BibReformat main task
@@ -277,6 +280,7 @@ def iterate_over_new(list, fmt):
     for recID in list:
         t1 = os.times()[4]
         start_date = time.strftime('%Y-%m-%d %H:%M:%S')
+        write_message(format_record(recID, fmt, on_the_fly=True))
         formatted_record = zlib.compress(format_record(recID, fmt, on_the_fly=True))
         run_sql('REPLACE LOW_PRIORITY INTO bibfmt (id_bibrec, format, last_updated, value) VALUES (%s, %s, %s, %s)',
                 (recID, fmt, start_date, formatted_record))
