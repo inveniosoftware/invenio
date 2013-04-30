@@ -16,6 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
+import tempfile
 
 from invenio.bibworkflow_model import WfeObject
 from datetime import datetime
@@ -23,24 +24,33 @@ from invenio.sqlalchemyutils import db
 from invenio.bibworkflow_utils import dictproperty
 from invenio.bibworkflow_config import add_log, \
     CFG_BIBWORKFLOW_OBJECTS_LOGDIR, CFG_OBJECT_VERSION
+from invenio.config import CFG_TMPSHAREDDIR
 
 
 class BibWorkflowObject(object):
 
-    def __init__(self, data=None, workflow_id=None, version=CFG_OBJECT_VERSION.INITIAL, parent_id=None,
-                 id=None, extra_data=None, task_counter=[0], user_id=0, extra_object_class=None):
+    def __init__(self, data=None, workflow_id=None,
+                 version=CFG_OBJECT_VERSION.INITIAL, parent_id=None,
+                 id=None, extra_data=None, task_counter=[0], user_id=0,
+                 extra_object_class=None):
         self.extra_object_class = extra_object_class
+        self.status = None
         if isinstance(data, WfeObject):
-            print "Create BibWorkflowObject, is instance and looks like = " + str(data)
             self.db_obj = data
         else:
             if id is not None:
                 self.db_obj = WfeObject.query.filter(WfeObject.id == id).first()
             else:
+                # If data is a dictionary and contains type key,
+                # we can directly derive the data_type
+                if isinstance(data, dict) and 'type' in data:
+                    data_type = data['type']
+                else:
+                    data_type = ""
                 self.db_obj = WfeObject(data=data, workflow_id=workflow_id,
                                         version=version, parent_id=parent_id,
                                         task_counter=task_counter,
-                                        user_id=user_id)
+                                        user_id=user_id, data_type=data_type)
                 self._create_db_obj()
         self.add_log()
 
@@ -100,7 +110,8 @@ class BibWorkflowObject(object):
                         parent_id=parent_id,
                         task_counter=self.db_obj.task_counter,
                         user_id=self.db_obj.user_id,
-                        extra_data=self.db_obj.extra_data)
+                        extra_data=self.db_obj.extra_data,
+                        status=self.status)
         db.session.add(obj)
         db.session.commit()
         # Run extra save method
@@ -117,7 +128,6 @@ class BibWorkflowObject(object):
          => save_object() could return than
         return int(o.id)
         """
-        print "Parent id before save is: " + str(self.db_obj.parent_id)
         self.db_obj.task_counter = task_counter
         self.db_obj.modified = datetime.now()
 
@@ -181,8 +191,22 @@ class BibWorkflowObject(object):
     def add_metadata(self, key, value):
         self.extra_data[key] = value
 
-    def changeStatus(self, message, save=False):
-        self.db_obj.status = message
+    def changeStatus(self, message):
+        self.status = message
 
-        if save:
-            self._update_db()
+    def save_to_file(self, dir=CFG_TMPSHAREDDIR,
+                     prefix="bibworkflow_object_data_", suffix=".obj"):
+        """
+        Saves the contents of self.data['data'] to file.
+
+        Returns path to saved file.
+
+        Warning: Currently assumes non-binary content.
+        """
+        if "data" in self.db_obj.data:
+            tmp_fd, filename = tempfile.mkstemp(dir=CFG_TMPSHAREDDIR,
+                                                prefix=prefix,
+                                                suffix=suffix)
+            os.write(tmp_fd, self.db_obj.data['data'])
+            os.close(tmp_fd)
+        return filename

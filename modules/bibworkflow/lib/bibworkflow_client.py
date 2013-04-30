@@ -42,13 +42,9 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
         except HaltProcessing as e:
             # Processing was halted. Lets save current object and continue.
             wfe.log.info("Processing halted!")
-            wfe.log.info("saving objects!")
             wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED, wfe.getCurrTaskId(), workflow_id=wfe.uuid)
-            wfe.log.info("saving workflow!")
             wfe.save(CFG_WORKFLOW_STATUS.HALTED)
-            wfe.log.info("setting workflow possition")
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
-            wfe.log.info("end")
             if stop_on_halt:
                 break
         except Exception as e:
@@ -79,16 +75,13 @@ def restart_workflow(wfe, data, restart_point, stop_on_halt=False, stop_on_error
 
     if restart_point == "beginning":
         wfe.setPosition(wfe.db_obj.current_object, [0])
-        print "beginning: " + str(restart_point)
     elif restart_point == "next":
         current_task_id = wfe.getCurrTaskId()
         current_task_id[-1] += 1
         wfe.setPosition(wfe.db_obj.current_object, current_task_id)
-        print "current_task_id: " + str(current_task_id)
     elif restart_point == "current":
         pass
     else:
-        print "else: " + str(restart_point)
         wfe.setPosition(wfe.db_obj.current_object, restart_point)
     wfe._unpickled = True
 

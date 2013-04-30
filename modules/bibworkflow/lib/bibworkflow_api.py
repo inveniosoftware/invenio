@@ -119,7 +119,6 @@ def run_by_oid(oid, start_point="beginning", task_queue=USE_TASK_QUEUE, external
     if start_point == "prev":
         restart_point = cPickle.loads(object.task_counter)
         restart_point[-1] -= 1
-    print restart_point
 
     if task_queue:
         return WORKER().restart(object.workflow_id, [oid], restart_point, external_save=external_save)

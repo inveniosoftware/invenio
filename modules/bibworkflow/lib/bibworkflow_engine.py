@@ -294,33 +294,28 @@ class BibWorkflowEngine(GenericWorkflowEngine):
             ####self.save()
 
             obj.get_log().info('Success!')
-            self.log.info("Done saving object in: %s" % (self,))
+            self.log.debug("Done saving object in: %s" % (self,))
 
         self.after_processing(objects, self)
 
-    def haltProcessing(self, msg):
+    def halt(self, msg):
         """Halt the workflow (stop also any parent wfe)"""
         raise HaltProcessing("Processing halted at task %s with message: %s" %
                              (self.getCurrTaskId(), msg, ))
 
     def setCounterInitial(self, obj_list):
-        print "Counters initial"
         self.db_obj.counter_initial = len(obj_list)
         self.db_obj.counter_halted = 0
         self.db_obj.counter_error = 0
         self.db_obj.counter_finished = 0
-        traceback.print_exc()
 
     def increaseCounterHalted(self):
-        print "Counters halted"
         self.db_obj.counter_halted += 1
 
     def increaseCounterError(self):
-        print "Counters error"
         self.db_obj.counter_error += 1
 
     def increaseCounterFinished(self):
-        print "Counters finished"
         self.db_obj.counter_finished += 1
 
     def setWorkflowByName(self, workflow_name):

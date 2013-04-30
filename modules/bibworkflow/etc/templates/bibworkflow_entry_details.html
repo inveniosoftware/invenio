@@ -1,23 +1,7 @@
-{% extends "layout_workflow_details.html" %}
+{%- js 'js/bibworkflow_entry_details.js' -%}
+{% extends "bibworkflow_layout_workflow_details.html" %}
 {% import 'bibworkflow_utils.html' as utils %}
 {% block body %}
-<script>
-    if ( window.addEventListener ) {
-        $("div.btn-group[name='object_preview_btn']").bind('click', function(event){
-              var format = event.target.name;
-              jQuery.ajax({
-                                url: "/admin/bibworkflow/entry_data_preview?oid={{ entry.id }}&format=" + format,
-                                success: function(json){
-                                    if(format == 'xm' || format == 'marcxml'){
-                                        $('div[name="object_preview"]').wrapAll('<debug>').text(json);
-                                    }else{
-                                        $('div[name="object_preview"]').html(json);
-                                    }
-                                }
-                         })
-        });
-    }
-</script>
 <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">{{ entry.id }}</h3>

@@ -1,24 +1,6 @@
-{% extends "layout_workflow_details.html" %}
+{% extends "bibworkflow_layout_workflow_details.html" %}
 {% import 'bibworkflow_utils.html' as utils %}
 {% block body %}
-
-{% macro status_image(status_id) -%}
-    {% if status_id == 0 %}
-        <img src="/static/images/icons/new.png" />
-    {% endif %}
-    {% if status_id == 1 %}
-        <img src="/static/images/icons/running.png" />
-    {% endif %}
-    {% if status_id == 2 %}
-        <img src="/static/images/icons/pending.png" />
-    {% endif %}
-    {% if status_id == 3 %}
-        <img src="/static/images/icons/error.png" />
-    {% endif %}
-    {% if status_id == 4 %}
-        <img src="/static/images/icons/done.png" />
-    {% endif %}
-{%- endmacro %}
 <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">{{ workflow_metadata.name }}</h3>
@@ -66,8 +48,4 @@
         <button id="extra" class="btn">Assign ticket <i class="icon-flag"></i></button>
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 </div>
-
-
-
-
 {% endblock %}

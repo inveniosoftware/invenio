@@ -29,7 +29,6 @@ from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.bibworkflow_utils import getWorkflowDefinition
-from invenio.bibholdingpen_item import HoldingPenItem
 
 import traceback
 
@@ -114,14 +113,16 @@ def workflows():
 @blueprint.route('/run_workflow', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_wash_urlargd({'workflow_name': (unicode, ""), 'extra_save': (unicode, "")})
-def run_workflow(workflow_name, extra_save):
+def run_workflow(workflow_name, extra_save, data=10):
     try:
-        data = open('test_record2').read()
         data = [{'data': data}]
-
         external_save = None
         if(extra_save == 'hp'):
-            external_save = HoldingPenItem
+            try:
+                from invenio.bibholdingpen_item import HoldingPenItem
+                external_save = HoldingPenItem
+            except ImportError:
+                pass
         run(workflow_name, data, external_save=external_save)
     except:
         traceback.print_exc()

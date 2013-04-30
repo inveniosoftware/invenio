@@ -68,6 +68,7 @@ def runit(wname, data, external_save=None):
     objects = []
     for d in data:
         if isinstance(d, int):
+            # Load list of object ids
             obj_old = WfeObject.query.filter(WfeObject.id == d).first()
             if obj_old.version != CFG_OBJECT_VERSION.INITIAL:
                 obj = WfeObject()
@@ -75,14 +76,12 @@ def runit(wname, data, external_save=None):
                 objects.append(BibWorkflowObject(obj, wfe.db_obj.uuid, extra_object_class=external_save))
             else:
                 obj = obj_old
-                print "Obj.workflow_id = ", obj.workflow_id
                 objects.append(BibWorkflowObject(obj, obj.workflow_id, extra_object_class=external_save))
         elif isinstance(d, BibWorkflowObject):
             objects.append(d)
         else:
             objects.append(BibWorkflowObject(d, wfe.db_obj.uuid, extra_object_class=external_save))
 
-    print objects
     run_workflow(wfe, objects)
     return wfe
 

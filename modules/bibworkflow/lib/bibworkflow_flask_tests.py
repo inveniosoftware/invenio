@@ -19,75 +19,159 @@
 BibWorkflow Unit tests - functions to test workflows
 """
 
-import unittest
-
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_flask_test_suite, run_test_suite, \
+    FlaskSQLAlchemyTest
 from invenio.bibworkflow_api import run
-from invenio.sqlalchemyutils import db
+from invenio.inveniomanage import db
+from invenio.bibworkflow_config import CFG_OBJECT_VERSION
 
 
-class TestWorkflowStart(unittest.TestCase):
+class TestWorkflowStart(FlaskSQLAlchemyTest):
     """Tests for BibWorkflow API."""
 
-    def test_workflow_first_run(self):
-        """Tests running workflow with new data"""
+    def setUp(self):
+        self.test_data = {}
+        self.workflow_ids = []
+        self.recxml = """<?xml version="1.0" encoding="UTF-8"?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+<responseDate>2013-04-03T13:56:49Z</responseDate>
+<request verb="ListRecords" from="2013-03-25" metadataPrefix="arXiv" set="physics:astro-ph">http://export.arxiv.org/oai2</request>
+<ListRecords>
+<record>
+<header>
+ <identifier>oai:arXiv.org:0801.3931</identifier>
+ <datestamp>2013-03-26</datestamp>
+ <setSpec>physics:astro-ph</setSpec>
+</header>
+<metadata>
+ <arXiv xmlns="http://arxiv.org/OAI/arXiv/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://arxiv.org/OAI/arXiv/ http://arxiv.org/OAI/arXiv.xsd">
+ <id>0801.3931</id><created>2008-01-25</created><authors><author><keyname>Manos</keyname><forenames>T.</forenames></author><author><keyname>Athanassoula</keyname><forenames>E.</forenames></author></authors><title>Dynamical study of 2D and 3D barred galaxy models</title><categories>astro-ph</categories><comments>8 pages, 3 figures, to appear in the proceedings of the international
+  conference &quot;Chaos in Astronomy&quot;, Athens, Greece (talk contribution)</comments><journal-ref>Chaos in Astronomy Astrophysics and Space Science Proceedings
+  2009, pp 115-122</journal-ref><doi>10.1007/978-3-540-75826-6_11</doi><abstract>  We study the dynamics of 2D and 3D barred galaxy analytical models, focusing
+on the distinction between regular and chaotic orbits with the help of the
+Smaller ALigment Index (SALI), a very powerful tool for this kind of problems.
+We present briefly the method and we calculate the fraction of chaotic and
+regular orbits in several cases. In the 2D model, taking initial conditions on
+a Poincar\'{e} $(y,p_y)$ surface of section, we determine the fraction of
+regular and chaotic orbits. In the 3D model, choosing initial conditions on a
+cartesian grid in a region of the $(x, z, p_y)$ space, which in coordinate
+space covers the inner disc, we find how the fraction of regular orbits changes
+as a function of the Jacobi constant. Finally, we outline that regions near the
+$(x,y)$ plane are populated mainly by regular orbits. The same is true for
+regions that lie either near to the galactic center, or at larger relatively
+distances from it.
+</abstract></arXiv>
+</metadata>
+</record>
+</ListRecords>
+</OAI-PMH>
+"""
+
+    def tearDown(self):
+        """ Clean up created objects """
         from invenio.bibworkflow_model import WfeObject, Workflow
-        workflow1 = run("test1", [{"a":20}], task_queue=False)
-
-        objects1 = \
-            WfeObject.query. \
-            filter(WfeObject.workflow_id == workflow1.uuid,
-                   WfeObject.parent_id is None)
-
-        wfeobject1 = WfeObject({"a": 20}, workflow1.uuid, 0)
-        wfeobject2 = WfeObject({"a": 20}, workflow1.uuid, 1, objects1[0].id)
-
-        ### check first object
-        self.assertEqual(objects1[0], wfeobject1)
-        self.assertEqual(objects1[0].child_objects[0], wfeobject2)
-
-        WfeObject.query.filter(WfeObject.workflow_id == workflow1.uuid).delete()
-        Workflow.query.filter(wfeobject1.workflowid == workflow1.uuid).delete()
+        for wid in self.workflow_ids:
+            WfeObject.query.filter(WfeObject.workflow_id == wid).delete()
+            Workflow.query.filter(Workflow.uuid == wid).delete()
         db.session.commit()
-        print "Test objects deleted from database."
 
-    def test_workflow_complex_run(self):
-        """Tests running workflow with complex data"""
+    def test_workflow_basic_run(self):
+        """Tests running workflow with one data object"""
+        from invenio.bibworkflow_model import WfeObject
 
-        workflow = run("test2", [{"a": 1}, {"a": "wwww"}, {"a": 10}],
+        self.test_data = {'data': 20}
+        initial_data = self.test_data
+        final_data = {'data': 41}
+
+        workflow = run(wname="test_workflow",
+                       data=[self.test_data],
                        task_queue=False)
 
+        # Keep id for cleanup after
+        self.workflow_ids.append(workflow.uuid)
+
+        # Get parent object of the workflow we just ran
+        # NOTE: ignore PEP8 here for None
         objects = WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid,
-                                         WfeObject.parent_id is None)
-        wfeobject3 = WfeObject({"a": 1}, workflow.uuid,0)
-        wfeobject4 = WfeObject({"a": 21}, workflow.uuid, 1, objects[0].id)
+                                         WfeObject.parent_id == None)
 
-        wfeobject5 = WfeObject({"a": "wwww"}, workflow.uuid, 0)
-        wfeobject6 = WfeObject({"a": "wwww"}, workflow.uuid, 2, objects[1].id)
+        self._check_workflow_execution(workflow, objects,
+                                       initial_data, final_data)
 
-        wfeobject7 = WfeObject({"a": 10}, workflow.uuid, 0)
-        wfeobject8 = WfeObject({"a": 30}, workflow.uuid, 1, objects[2].id)
+    def test_workflow_complex_run(self):
+        """Tests running workflow with several data objects"""
+        from invenio.bibworkflow_model import WfeObject
 
-        ### check first object
-        print "Checking first object"
+        self.test_data = [{"data": 1}, {"data": "wwww"}, {"data": 20}]
+        final_data = [{"data": 19}, {"data": "wwww"}, {"data": 38}]
 
-        self.assertEqual(objects[0], wfeobject3)
-        self.assertEqual(objects[0].child_objects[0], wfeobject4)
+        workflow = run(wname="test_workflow_2",
+                       data=self.test_data,
+                       task_queue=False)
 
-        print "Checking secound object"
-        self.assertEqual(objects[1], wfeobject5)
-        self.assertEqual(objects[1].child_objects[0], wfeobject6)
+        # Keep id for cleanup after
+        self.workflow_ids.append(workflow.uuid)
 
-        print "Checking third object"
-        self.assertEqual(objects[2], wfeobject7)
-        self.assertEqual(objects[2].child_objects[0], wfeobject8)
+        # Get parent objects of the workflow we just ran
+        # NOTE: ignore PEP8 here for None
+        objects = WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid,
+                                         WfeObject.parent_id == None)
 
-        WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid).delete()
-        Workflow.query.filter(workflow.uuid == workflow.uuid).delete()
-        db.session.commit()
-        print "Test objects deleted from database."
+        # Let's check that we found anything. There should only be three objects
+        self.assertEqual(objects.count(), 3)
 
-TEST_SUITE = make_test_suite(TestWorkflowStart)
+        for obj in objects.all():
+            # The child object should have the final or halted version
+            self.assertTrue(obj.child_objects[0].version
+                            in (CFG_OBJECT_VERSION.FINAL,
+                                CFG_OBJECT_VERSION.HALTED))
+            # Making sure the final data is correct
+            self.assertTrue(obj.child_objects[0].data
+                            in final_data)
+
+    def test_workflow_recordxml(self):
+        """Tests runnning a record ingestion workflow"""
+        from invenio.bibworkflow_model import WfeObject
+
+        initial_data = {"data": self.recxml, 'type': "text/xml"}
+        workflow = run(wname="marcxml_workflow",
+                       data=[{"data": self.recxml, 'type': "text/xml"}],
+                       task_queue=False)
+
+        # Keep id for cleanup after
+        self.workflow_ids.append(workflow.uuid)
+
+        # Get parent object of the workflow we just ran
+        # NOTE: ignore PEP8 here for None
+        objects = WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid,
+                                         WfeObject.parent_id == None)
+
+        self._check_workflow_execution(workflow, objects,
+                                       initial_data, None)
+
+    def _check_workflow_execution(self, workflow, objects,
+                                  initial_data, final_data):
+        # Let's check that we found anything. There should only be one object
+        self.assertEqual(objects.count(), 1)
+
+        parent_object = objects[0]
+
+        # The object should be the inital version
+        self.assertEqual(parent_object.version, CFG_OBJECT_VERSION.INITIAL)
+
+        # The object should have the inital data
+        self.assertEqual(parent_object.data, initial_data)
+
+        # Fetch final object which should exist
+        final_object = objects[0].child_objects[0]
+        self.assertTrue(final_object)
+
+        if final_data:
+            # Check that final data is correct
+            self.assertEqual(final_object.data, final_data)
+
+
+TEST_SUITE = make_flask_test_suite(TestWorkflowStart)
 
 if __name__ == "__main__":
-    run_test_suite(TEST_SUITE, warn_user=True)
+    run_test_suite(TEST_SUITE)

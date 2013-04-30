@@ -21,9 +21,21 @@ pylibdir = $(libdir)/python/invenio
 
 jsdir=$(localstatedir)/www/js
 
-js_DATA = *.js
+js_DATA = bibworkflow_workflows.js \
+          bibworkflow_index.js \
+          bibworkflow_entry_details.js
 
-pylib_DATA = *.py
+pylib_DATA = bibworkflow_admin_blueprint.py \
+			 bibworkflow_api.py \
+			 bibworkflow_client.py \
+			 bibworkflow_config.py \
+			 bibworkflow_engine.py \
+			 bibworkflow_model.py \
+			 bibworkflow_object.py \
+			 bibworkflow_flask_tests.py \
+			 bibworkflow_utils.py \
+			 bibworkflow_worker_engine.py \
+			 bibworkflow_workflow_definition.py
 
 EXTRA_DIST = $(pylib_DATA) \
 			 $(js_DATA)

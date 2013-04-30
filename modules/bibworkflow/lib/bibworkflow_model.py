@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from inveniomanage import db
+from invenio.inveniomanage import db
 from datetime import datetime
 
 
@@ -102,7 +102,7 @@ class WfeObject(db.Model):
     __tablename__ = "bwlOBJECT"
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.JSON, nullable=False)
-    extra_data = db.Column(db.JSON, default={"tasks_results":{}})
+    extra_data = db.Column(db.JSON, default={"tasks_results": {}})
     workflow_id = db.Column(db.String(36), db.ForeignKey("bwlWORKFLOW.uuid"), nullable=False)
     version = db.Column(db.Integer(3), default=0, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"), default=None)
@@ -115,6 +115,7 @@ class WfeObject(db.Model):
     task_counter = db.Column(db.JSON, nullable=False)
     error_msg = db.Column(db.String(500), default="", nullable=False)
     last_task_name = db.Column(db.String(60), default="")
+    data_type = db.Column(db.String(50), default="", nullable=False)
 
     def __repr__(self):
         repr = "<WfeObject(id = %s, data = %s, workflow_id = %s, " \
@@ -162,7 +163,9 @@ class WfeObject(db.Model):
                 "status": self.status,
                 "user_id": self.user_id,
                 "task_counter": self.task_counter,
-                "error_msg": self.error_msg}
+                "error_msg": self.error_msg,
+                "last_task_name": self.last_task_name,
+                "data_type": self.data_type}
 
     def __setstate__(self, state):
         self.data = state["data"]
@@ -176,20 +179,24 @@ class WfeObject(db.Model):
         self.user_id = state["user_id"]
         self.task_counter = state["task_counter"]
         self.error_msg = state["error_msg"]
+        self.last_task_name = state["last_task_name"]
+        self.data_type = state["data_type"]
 
     def copy(self, other):
         """Copies data and metadata except id and workflow_id"""
         self.data = other.data
-        self.extra_data = other.extra_data 
-        self.version = other.version 
-        self.parent_id = other.parent_id 
-        self.created = other.created 
+        self.extra_data = other.extra_data
+        self.version = other.version
+        self.parent_id = other.parent_id
+        self.created = other.created
         self.modified = datetime.now()
-        self.owner = other.owner 
-        self.status = other.status 
-        self.user_id = other.user_id 
-        self.task_counter = other.task_counter 
-        self.error_msg = other.error_msg 
+        self.owner = other.owner
+        self.status = other.status
+        self.user_id = other.user_id
+        self.task_counter = other.task_counter
+        self.error_msg = other.error_msg
+        self.last_task_name = other.last_task_name
+        self.data_type = other.data_type
 
 __all__ = ['Workflow', 'WfeObject', 'WorkflowLogging',
            'AuditLogging', 'TaskLogging']

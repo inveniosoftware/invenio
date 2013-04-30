@@ -15,14 +15,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow.tasks.regression_tests_tasks import lower_than_20,
-                                                             add, higher_than_20
+"""Implements an example of a typical ingestion workflow for MARCXML records"""
+
+
+from invenio.bibworkflow.tasks.marcxml_tasks import \
+    print_record, \
+    convert_record, \
+    download_fulltext, \
+    match_record
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
 
 
-class test2(WorkflowDefinition):
+class marcxml_workflow(WorkflowDefinition):
     def __init__(self):
-        super(test2, self).__init__()
-        self.definition = [lower_than_20(),
-                           add(20),
-                           higher_than_20()]
+        super(marcxml_workflow, self).__init__()
+        self.definition = [print_record,
+                           convert_record("oaiarxiv2marcxml.xsl"),
+                           print_record,
+                           download_fulltext,
+                           match_record]
