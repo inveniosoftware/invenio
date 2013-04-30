@@ -31,6 +31,7 @@ from invenio.bibrecord import record_get_field_instances, \
 from invenio.shellutils import run_shell_command
 from invenio.plotextractor_output_utils import write_message
 from invenio.urlutils import make_invenio_opener
+from invenio.bibdocfile import BibRecDocs
 
 PLOTEXTRACTOR_OPENER = make_invenio_opener('plotextractor')
 
@@ -230,14 +231,18 @@ def get_list_of_all_matching_files(basedir, filetypes):
 
     return file_paths
 
-def tarballs_by_recids(recids, sdir):
+def tarballs_by_recids(recids, sdir, docname=None, doctype=None, docformat=None):
     """
     Take a string representing one recid or several and get the associated
-    tarballs for those ids.
+    tarballs for those ids. By default look for files with names matching
+    the report number and with source field 'arXiv'. This can be changed
+    with C{docname}, C{doctype}, C{docformat}
 
     @param: recids (string): the record id or ids
     @param: sdir (string): where the tarballs should live
-
+    @param docname: select tarball for given recid(s) that match docname
+    @param doctype: select tarball for given recid(s) that match doctype
+    @param docformat: select tarball for given recid(s) that match docformat
     @return: tarballs ([string, string, ...]): locations of tarballs
     """
     list_of_ids = []
@@ -261,14 +266,31 @@ def tarballs_by_recids(recids, sdir):
             list_of_ids = [int(recids)]
 
     arXiv_ids = []
-
+    local_files = []
     for recid in list_of_ids:
         rec = get_record(recid)
-        for afieldinstance in record_get_field_instances(rec, tag='037'):
-            if len(field_get_subfield_values(afieldinstance, '9')) > 0:
-                if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
-                    arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
-                    arXiv_ids.append(arXiv_id)
+        if not doctype and not docname and not docformat:
+            for afieldinstance in record_get_field_instances(rec, tag='037'):
+                if len(field_get_subfield_values(afieldinstance, '9')) > 0:
+                    if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
+                        arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
+                        arXiv_ids.append(arXiv_id)
+        else:
+            bibarchive = BibRecDocs(recid)
+            all_files = bibarchive.list_latest_files()
+            if doctype:
+                all_files = [docfile for docfile in all_files if \
+                             docfile.get_type() == doctype]
+            if docname:
+                all_files = [docfile for docfile in all_files if \
+                             docfile.get_name() == docname]
+            if docformat:
+                all_files = [docfile for docfile in all_files if \
+                             docfile.get_format() == docformat]
+            local_files.extend([(docfile.get_path(), recid) for docfile in all_files])
+
+    if doctype or docname or docformat:
+        return local_files
 
     return tarballs_by_arXiv_id(arXiv_ids, sdir)
 

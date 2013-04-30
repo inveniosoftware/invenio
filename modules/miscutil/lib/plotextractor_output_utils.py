@@ -303,7 +303,7 @@ def create_MARC(extracted_image_data, tarball, refno):
         else:
             # Merge subfolder into docname, until root directory
             relative_image_path = image_location.replace(root_dir, '')
-            docname = "_".join(relative_image_path.split('.')[:-1]).replace('/', '_')
+            docname = "_".join(relative_image_path.split('.')[:-1]).replace('/', '_').replace(';', '').replace(':', '')
             if len(caption) < 3:
                 subfields = []
                 subfields.append(('a', image_location))
