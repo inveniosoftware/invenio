@@ -198,7 +198,7 @@ class SbmFIELD(db.Model):
 class SbmFIELDDESC(db.Model):
     """Represents a SbmFIELDDESC record."""
     __tablename__ = 'sbmFIELDDESC'
-    name = db.Column(db.String(15), db.ForeignKey(SbmFIELD.fidesc),
+    name = db.Column(db.String(15), #db.ForeignKey(SbmFIELD.fidesc),
                 nullable=False, server_default='', primary_key=True)
     alephcode = db.Column(db.String(50), nullable=True)
     marccode = db.Column(db.String(50), nullable=False, server_default='')
@@ -215,7 +215,7 @@ class SbmFIELDDESC(db.Model):
     fddfi2 = db.Column(db.Text, nullable=True)
     cookie = db.Column(db.Integer(11), nullable=True,
                 server_default='0')
-    field = db.relationship(SbmFIELD, backref='fielddescs')
+    #field = db.relationship(SbmFIELD, backref='fielddescs')
 
 
 class SbmFORMATEXTENSION(db.Model):
