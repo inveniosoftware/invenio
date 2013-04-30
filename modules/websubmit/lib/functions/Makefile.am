@@ -90,7 +90,8 @@ pylib_DATA = __init__.py \
              Video_Processing.py \
              DEMOVID_Validation.py \
              Set_RN_From_Sysno.py \
-             Notify_URL.py
+             Notify_URL.py \
+             Run_PlotExtractor.py
 
 EXTRA_DIST = $(pylib_DATA)
 

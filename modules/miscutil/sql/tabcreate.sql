@@ -4673,5 +4673,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_delete_recjso
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_hstRECORD_affected_fields',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_25_virtual_indexes',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_30_indexer_interface',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_04_30_new_plotextractor_websubmit_function',NOW());
 
 -- end of file

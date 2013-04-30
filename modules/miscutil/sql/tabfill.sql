@@ -666,6 +666,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Link_Records','Link two records toghether v
 INSERT INTO sbmALLFUNCDESCR VALUES ('Video_Processing',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Set_RN_From_Sysno', 'Set the value of global rn variable to the report number identified by sysno (recid)');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Notify_URL','Access URL, possibly to post content');
+INSERT INTO sbmALLFUNCDESCR VALUES ('Run_PlotExtractor','Run PlotExtractor on the current record');
 
 INSERT INTO sbmFIELDDESC VALUES ('Upload_Photos',NULL,'','R',NULL,NULL,NULL,NULL,NULL,'\"\"\"\r\nThis is an example of element that creates a photos upload interface.\r\nClone it, customize it and integrate it into your submission. Then add function \r\n\'Move_Photos_to_Storage\' to your submission functions list, in order for files \r\nuploaded with this interface to be attached to the record. More information in \r\nthe WebSubmit admin guide.\r\n\"\"\"\r\n\r\nfrom invenio.websubmit_functions.Shared_Functions import ParamFromFile\r\nfrom invenio.websubmit_functions.Move_Photos_to_Storage import \\\r\n    read_param_file, \\\r\n    create_photos_manager_interface, \\\r\n    get_session_id\r\n\r\n# Retrieve session id\r\ntry:\r\n    # User info is defined only in MBI/MPI actions...\r\n    session_id = get_session_id(None, uid, user_info) \r\nexcept:\r\n    session_id = get_session_id(req, uid, {})\r\n\r\n# Retrieve context\r\nindir = curdir.split(\'/\')[-3]\r\ndoctype = curdir.split(\'/\')[-2]\r\naccess = curdir.split(\'/\')[-1]\r\n\r\n# Get the record ID, if any\r\nsysno = ParamFromFile(\"%s/%s\" % (curdir,\'SN\')).strip()\r\n\r\n\"\"\"\r\nModify below the configuration of the photos manager interface.\r\nNote: `can_reorder_photos\' parameter is not yet fully taken into consideration\r\n\r\nDocumentation of the function is available at <http://localhost/admin/websubmit/websubmitadmin.py/functionedit?funcname=Move_Photos_to_Storage>\r\n\"\"\"\r\ntext += create_photos_manager_interface(sysno, session_id, uid,\r\n                                        doctype, indir, curdir, access,\r\n                                        can_delete_photos=True,\r\n                                        can_reorder_photos=True,\r\n                                        can_upload_photos=True,\r\n                                        editor_width=700,\r\n                                        editor_height=400,\r\n                                        initial_slider_value=100,\r\n                                        max_slider_value=200,\r\n                                        min_slider_value=80)','0000-00-00','0000-00-00',NULL,NULL,0);
 
@@ -840,6 +841,10 @@ INSERT INTO sbmFUNDESC VALUES ('Notify_URL','content_type');
 INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_times');
 INSERT INTO sbmFUNDESC VALUES ('Notify_URL','attempt_sleeptime');
 INSERT INTO sbmFUNDESC VALUES ('Notify_URL','user');
+INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','with_docname');
+INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','with_doctype');
+INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','with_docformat');
+INSERT INTO sbmFUNDESC VALUES ('Run_PlotExtractor','extract_plots_switch_file');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
