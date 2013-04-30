@@ -82,11 +82,11 @@ def main():
     refno_url_param = 'refno-url'
     refno_param = 'skip-refno'
     clean_param = 'clean'
-    param_abbrs = 'h:t:d:s:i:a:l:xfuyrqck'
+    param_abbrs = 'h:t:d:s:i:a:l:xfuyr:qck'
     params = [help_param, tarball_param + '=', tardir_param + '=', \
               sdir_param + '=', infile_param + '=', arXiv_param + '=', refno_url_param + '=', \
-              extract_text_param, force_param, upload_param, yes_i_know_param, recid_param, \
-              squash_param, clean_param]
+              extract_text_param, force_param, upload_param, yes_i_know_param, recid_param + '=', \
+              squash_param, clean_param, refno_param]
     try:
         opts, args = getopt.getopt(sys.argv[1:], param_abbrs, params)
     except getopt.GetoptError, err:
@@ -111,36 +111,36 @@ def main():
     skip_refno = False
 
     for opt, arg in opts:
-        if opt in ['-h', help_param]:
+        if opt in ['-h', '--' + help_param]:
             usage()
             sys.exit()
-        elif opt in ['-t', tarball_param]:
+        elif opt in ['-t', '--' + tarball_param]:
             tarball = arg
-        elif opt in ['-d', tardir_param]:
+        elif opt in ['-d', '--' + tardir_param]:
             tdir = arg
-        elif opt in ['-i', infile_param]:
+        elif opt in ['-i', '--' + infile_param]:
             infile = arg
-        elif opt in ['-r', recid_param]:
+        elif opt in ['-r', '--' + recid_param]:
             recids = arg
-        elif opt in ['-a', arXiv_param]:
+        elif opt in ['-a', '--' + arXiv_param]:
             arXiv = arg
-        elif opt in ['-s', sdir_param]:
+        elif opt in ['-s', '--' + sdir_param]:
             sdir = arg
-        elif opt in ['-x', extract_text_param]:
+        elif opt in ['-x', '--' + extract_text_param]:
             xtract_text = True
-        elif opt in ['-f', force_param]:
+        elif opt in ['-f', '--' + force_param]:
             force = True
-        elif opt in ['-u', upload_param]:
+        elif opt in ['-u', '--' + upload_param]:
             upload_plots = True
-        elif opt in ['-q', squash_param]:
+        elif opt in ['-q', '--' + squash_param]:
             squash = True
-        elif opt in ['-y', yes_i_know_param]:
+        elif opt in ['-y', '--' + yes_i_know_param]:
             yes_i_know = True
-        elif opt in ['-c', clean_param]:
+        elif opt in ['-c', '--' + clean_param]:
             clean = True
-        elif opt in ['-l', refno_url_param]:
+        elif opt in ['-l', '--' + refno_url_param]:
             refno_url = arg
-        elif opt in ['-k', refno_param]:
+        elif opt in ['-k', '--' + refno_param]:
             skip_refno = True
         else:
             usage()

@@ -258,16 +258,17 @@ def tarballs_by_recids(recids, sdir):
             low, high = recid.split('-')
             list_of_ids = range(int(low), int(high))
         else:
-            list_of_ids = int(recid)
+            list_of_ids = [int(recids)]
 
     arXiv_ids = []
 
     for recid in list_of_ids:
         rec = get_record(recid)
         for afieldinstance in record_get_field_instances(rec, tag='037'):
-            if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
-                arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
-                arXiv_ids.append(arXiv_id)
+            if len(field_get_subfield_values(afieldinstance, '9')) > 0:
+                if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
+                    arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
+                    arXiv_ids.append(arXiv_id)
 
     return tarballs_by_arXiv_id(arXiv_ids, sdir)
 
