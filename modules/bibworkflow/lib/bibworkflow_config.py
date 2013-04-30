@@ -32,7 +32,6 @@ if not os.path.exists(CFG_BIBWORKFLOW_WORKERS_LOGDIR):
 if not os.path.exists(CFG_BIBWORKFLOW_OBJECTS_LOGDIR):
     os.makedirs(CFG_BIBWORKFLOW_OBJECTS_LOGDIR)
 
-
 def add_log(path, logger):
     logger = logging.getLogger(logger)
     handler = logging.FileHandler(path)
@@ -40,3 +39,14 @@ def add_log(path, logger):
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     return logger
+    
+def enum(**enums):
+    return type('Enum', (), enums)
+
+CFG_WORKFLOW_STATUS = enum(NEW=0, RUNNING=1, HALTED=2, ERROR=3, FINISHED=4)
+CFG_OBJECT_VERSION = enum(INITIAL=0, FINAL=1, HALTED=2)
+CFG_OBJECT_STATUS = enum(
+                        ERROR="ERROR - Something went wrong!", 
+                        RUNNING="RUNNING - Workflow in process",
+                        FINISHED="FINISHED - Workflow was finished for this object"
+                        )

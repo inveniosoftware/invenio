@@ -55,21 +55,24 @@ Halted: {{ workflow.counter_halted }}
 Error: {{ workflow.counter_error }}
 Finished: {{ workflow.counter_finished }}">
                         {% if workflow.counter_initial %}
-                            {%- set progress = (workflow.counter_error + workflow.counter_finished) / workflow.counter_initial * 100 -%}
+                            {%- set progress = (workflow.counter_error + workflow.counter_finished + workflow.counter_halted) / workflow.counter_initial * 100 -%}
                         {% else %}
                             {%- set progress = 0 -%}
                         {% endif %}
                         Progress: <span class="pull-right strong">{{ progress|int }}%</span>
                             {% if workflow.status == 0 %}
-                                <div class="progress progress-striped active">
+                                <div class="progress progress active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% elif workflow.status == 1 %}
-                                <div class="progress progress-warning active">
+                                <div class="progress progress-striped active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% elif workflow.status == 2 %}
-                                <div class="progress progress-danger active">    
+                                <div class="progress progress-warning active">    
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% elif workflow.status == 3 %}
+                                <div class="progress progress-danger active">    
+                                    <div class="bar" style="width: {{ progress }}%;"></div>
+                            {% elif workflow.status == 4 %}
                                 <div class="progress progress-success active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% endif %}

@@ -16,13 +16,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import time
-
+from invenio.bibworkflow_config import CFG_OBJECT_STATUS
 def task_a(a):
     def _task_a(obj, eng):
         """Function task_a docstring"""
         print "executing task a " + str(a)
+        print obj.data
         obj.data['a'] += a
         print obj
+        obj.add_metadata("foo","bar")
         return
     return _task_a
 
@@ -32,7 +34,10 @@ def task_b():
         print "executing task b"
         print obj
         if obj.data['a'] < 20:
+            obj.changeStatus(CFG_OBJECT_STATUS.ERROR)
+            print obj.db_obj.status
             print "a < 20"
+            obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c':14})
             eng.haltProcessing("Value of filed: a in object is too small.")
         return
     return _task_b

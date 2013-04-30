@@ -19,8 +19,13 @@ SUBDIRS = workers
 
 pylibdir = $(libdir)/python/invenio
 
+jsdir=$(localstatedir)/www/js
+
+js_DATA = *.js
+
 pylib_DATA = *.py
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) \
+			 $(js_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

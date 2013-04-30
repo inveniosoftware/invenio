@@ -20,25 +20,24 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from flask import Flask, render_template, redirect, url_for, Markup
+from flask import render_template, current_app
 from invenio.bibworkflow_model import Workflow, WfeObject
 from invenio.bibworkflow_api import run
 import os
-from sqlalchemy import or_
-from invenio.sqlalchemyutils import db
 from invenio.pluginutils import PluginContainer
-from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_URL, CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_PYLIBDIR, CFG_LOGDIR
-from invenio.urlutils import redirect_to_url
+from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.bibworkflow_utils import getWorkflowDefinition
+from invenio.bibholdingpen_item import HoldingPenItem
 
 import traceback
 
 blueprint = InvenioBlueprint('bibworkflow', __name__, url_prefix="/admin/bibworkflow",
-            menubuilder=[('main.admin.bibworkflow', _('BibWorkflow'),
-                          'bibworkflow.index')],
-            breadcrumbs=[(_('Administration'),'help.admin'),
-                         (_('BibWorkflow'),'bibworkflow.index')],)
+                             menubuilder=[('main.admin.bibworkflow', _('BibWorkflow'),
+                                           'bibworkflow.index')],
+                             breadcrumbs=[(_('Administration'), 'help.admin'),
+                                          (_('BibWorkflow'), 'bibworkflow.index')],)
+
 
 #@app.route("/")
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -52,6 +51,7 @@ def index():
     w = Workflow.query.all()
     return dict(workflows=w)
 
+
 @blueprint.route('/entry_details', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_wash_urlargd({'entry_id': (int, 0)})
@@ -61,14 +61,13 @@ def entry_details(entry_id):
     """
     object = WfeObject.query.filter(WfeObject.id == entry_id).first()
     try:
-        #object_210_w_18
-        f = open(CFG_LOGDIR + "/object_"+ str(object.id) + "_w_" + str(object.workflow_id) + ".log", "r")
+        f = open(CFG_LOGDIR + "/object_" + str(object.id) + "_w_" + str(object.workflow_id) + ".log", "r")
         logtext = f.read()
-    except IOError, e:
-        # no file
-        logtext = "" 
- 
-    return render_template('bibworkflow_entry_details.html', entry=object, log=logtext, data_preview=_entry_data_preview(object.data,'hd'), workflow_func=getWorkflowDefinition(object.bwlWORKFLOW.name))
+    except IOError:
+        logtext = ""
+
+    return render_template('bibworkflow_entry_details.html', entry=object, log=logtext, data_preview=_entry_data_preview(object.data, 'hd'), workflow_func=getWorkflowDefinition(object.bwlWORKFLOW.name))
+
 
 @blueprint.route('/workflow_details', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
@@ -79,11 +78,12 @@ def workflow_details(workflow_id):
     try:
         f = open(CFG_LOGDIR + "/workflow_" + str(workflow_id) + ".log", "r")
         logtext = f.read()
-    except IOError, e:
+    except IOError:
         # no file
         logtext = ""
 
     return render_template('bibworkflow_workflow_details.html', workflow_metadata=w_metadata, log=logtext, workflow_func=getWorkflowDefinition(w_metadata.name))
+
 
 @blueprint.route('/workflows', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
@@ -94,33 +94,39 @@ def workflows():
         print workflows.get_broken_plugins()
     except:
         traceback.print_exc()
-    return dict(workflows=workflows.get_enabled_plugins(),broken_workflows=workflows.get_broken_plugins())
+    return dict(workflows=workflows.get_enabled_plugins(), broken_workflows=workflows.get_broken_plugins())
+
 
 @blueprint.route('/run_workflow', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'workflow_name': (unicode, "")})
-def run_workflow(workflow_name):
+@blueprint.invenio_wash_urlargd({'workflow_name': (unicode, ""), 'extra_save': (unicode, "")})
+def run_workflow(workflow_name, extra_save):
     try:
-        #data = [{'596':120},{'a': 'bbb'},{'a': 20},{'a': 50},{'a': 100},{'a': 'aa'}]
-        data = [{'a': 3}, {'b': 4}]
-        run(workflow_name, data)
+        data = open('test_record2').read()
+        data = [{'data': data}]
+
+        external_save = None
+        if(extra_save == 'hp'):
+            external_save = HoldingPenItem
+        run(workflow_name, data, external_save=external_save)
     except:
         traceback.print_exc()
     return "Workflow has been started."
-    
+
+
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_wash_urlargd({'oid': (int, 0), 'format': (unicode, 'default')})
 def entry_data_preview(oid, format):
     object = WfeObject.query.filter(WfeObject.id == oid).first()
-    return _entry_data_preview(object.data,format)
-    
+    return _entry_data_preview(object.data, format)
 
-def _entry_data_preview(data,format='default'):
+
+def _entry_data_preview(data, format='default'):
     if format == 'hd' or format == 'xm':
         from invenio.bibformat import format_record
         try:
-            data['record'] = format_record(recID = None, of = format, xml_record = data['record'])
+            data['record'] = format_record(recID=None, of=format, xml_record=data['record'])
         except:
             print "This is not a XML string"
     try:

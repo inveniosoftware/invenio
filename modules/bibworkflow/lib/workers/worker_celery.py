@@ -17,45 +17,41 @@
 
 import os
 
-from celery import Celery
 from invenio.config import CFG_LOGDIR, \
-     CFG_BIBWORKFLOW_MSG_BROKER_URL, \
-     CFG_BIBWORKFLOW_MSG_BACKEND_URL
+     CFG_BROKER_URL, \
+     CFG_CELERY_RESULT_BACKEND
 from invenio.bibworkflow_config import add_log, \
      CFG_BIBWORKFLOW_WORKERS_LOGDIR
 from invenio.bibworkflow_worker_engine import *
-
-celery = Celery('run_celery', broker=CFG_BIBWORKFLOW_MSG_BROKER_URL,
-                backend=CFG_BIBWORKFLOW_MSG_BACKEND_URL)
-
+from invenio.celery import celery
 
 class worker_celery(object):
-    def run(self, wname, data):
+    def run(self, wname, data, external_save=None):
         """
         Helper function to get celery task
         decorators to worker_celery
         """
-        return self.celery_runit.apply_async([wname, data])
+        return self.celery_runit.delay(wname, data, external_save)
 
     @celery.task(name='invenio.bibworkflow.workers.worker_celery.runit')
-    def celery_runit(wname, data):
+    def celery_runit(wname, data, external_save=None):
         """
         Runs the workflow with Celery
         """
         add_log(os.path.join(CFG_BIBWORKFLOW_WORKERS_LOGDIR,
                              "worker_celery.log"), 'celery')
-        runit(wname, data)
+        runit(wname, data, external_save=external_save)
 
-    def restart(self, wid, data, restart_point):
+    def restart(self, wid, data, restart_point, external_save=None):
         """
         Helper function to get celery task
         decorators to worker_celery
         """
-        return self.celery_restartit.apply_async([wid, data, restart_point])
+        return self.celery_restartit.delay(wid, data, restart_point, external_save)
 
     @celery.task(name='invenio.bibworkflow.workers.worker_celery.restartit')
-    def celery_restartit(wid, data=None, restart_point="beginning"):
+    def celery_restartit(wid, data=None, restart_point="beginning", external_save=None):
         """
         Restarts the workflow with Celery
         """
-        restartit(wid, data, restart_point)
+        restartit(wid, data, restart_point, external_save=external_save)

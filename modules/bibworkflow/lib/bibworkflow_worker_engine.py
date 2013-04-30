@@ -20,6 +20,7 @@ from invenio.bibworkflow_client import run_workflow, restart_workflow
 from invenio.bibworkflow_engine import BibWorkflowEngine
 from invenio.bibworkflow_object import BibWorkflowObject
 from invenio.bibworkflow_model import Workflow, WfeObject
+from invenio.bibworkflow_config import CFG_OBJECT_VERSION
 
 
 def set_db_context(f):
@@ -52,26 +53,39 @@ def set_db_context(f):
             return f(*args, **kwargs)
     return wraps(f)(initialize)
 
-
-@set_db_context
-def runit(wname, data):
+def runit(wname, data, external_save=None):
     """
     Runs workflow with given name and given data.
     Data can be specified as list of objects or single id of WfeObject/BibWorkflowObjects.
     """
+
     wfe = BibWorkflowEngine(wname, user_id=0, module_name="aa")
     wfe.setWorkflowByName(wname)
     wfe.setCounterInitial(data)
     wfe.save()
 
-    # do only if not this type already
-    data = [BibWorkflowObject(d, wfe.db_obj.uuid) for d in data]
-    run_workflow(wfe, data)
+    objects = []
+    for d in data:
+        if isinstance(d, int):
+            obj_old = WfeObject.query.filter(WfeObject.id == d).first()
+            if obj_old.version != CFG_OBJECT_VERSION.INITIAL:
+                obj = WfeObject()
+                obj.copy(obj_old)
+                objects.append(BibWorkflowObject(obj, wfe.db_obj.uuid, extra_object_class=external_save))
+            else:
+                obj = obj_old
+                print "Obj.workflow_id = ", obj.workflow_id
+                objects.append(BibWorkflowObject(obj, obj.workflow_id, extra_object_class=external_save))
+        elif isinstance(d, BibWorkflowObject):
+            objects.append(d)
+        else:
+            objects.append(BibWorkflowObject(d, wfe.db_obj.uuid, extra_object_class=external_save))
+            
+    print objects
+    run_workflow(wfe, objects)
     return wfe
 
-
-@set_db_context
-def restartit(wid, data=None, restart_point="beginning"):
+def restartit(wid, data=None, restart_point="beginning", external_save=None):
     """
     Restarts workfloe with given id (wid) and given data. If data are not
     specified then it will load all initial data for workflow. Depending on
@@ -94,7 +108,7 @@ def restartit(wid, data=None, restart_point="beginning"):
     wfe.setWorkflowByName(workflow.name)
 
     # do only if not this type already
-    data = [BibWorkflowObject(d, wfe.uuid) for d in data]
+    data = [BibWorkflowObject(d, wfe.uuid, extra_object_class=external_save) for d in data]
     wfe.setCounterInitial(data)
     wfe.save()
     restart_workflow(wfe, data, restart_point)

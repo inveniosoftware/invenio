@@ -1,30 +1,18 @@
 {% extends "bibworkflow_layout.html" %}
+{%- js 'js/bibworkflow_workflows.js' -%}
 {% block body2 %}
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $("#example_my_workflow").popover({
-                                    trigger: 'hover',
-                                    placement: 'right',
-                                    content: "Workflow has been started."
-                                    });  
-            $("input[type=submit]").bind('click', function(){
-                            w_name = $(this).attr('name');
-                            $(this).attr('disabled','disabled');
-                            jQuery.ajax({
-                                url: "/admin/bibworkflow/run_workflow?workflow_name=" + w_name,
-                                success: function(json){
-                                    $("#myModal").html(json);
-                                    $('#myModal').modal('show');
-                                    activate_button();
-                                    }
-                                })
-            });
-        });
-        function activate_button(){
-            $("input[type=submit]").removeAttr("disabled");
-        }
-    </script>
+    <div id = "alert_placeholder"></div>
+
     <h1>Workflows</h1>
+    <form>
+        <fieldset>
+            <legend>Extra save</legend>
+            <span class="help-block">Select box if you would like some extra save.</span>
+            <label class="checkbox">
+              <input type="checkbox" name="extra_save" value="hp"> Save to HoldingPen
+            </label>
+        </fieldset>
+    </form>
     <table class="table">
         <thead>
             <tr>

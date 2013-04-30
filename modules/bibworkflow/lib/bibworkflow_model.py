@@ -17,10 +17,10 @@
 
 from sqlalchemy.dialects import mysql
 from sqlalchemy.orm import backref
-from invenio.sqlalchemyutils import db
 from datetime import datetime
 from uuid import uuid1 as new_uuid
 import cPickle
+from inveniomanage import db
 
 
 class TaskLogging(db.Model):
@@ -105,7 +105,7 @@ class WfeObject(db.Model):
     __tablename__ = "bwlOBJECT"
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.JSON, nullable=False)
-    extra_data = db.Column(db.JSON)
+    extra_data = db.Column(db.JSON, default={"tasks_results":{}})
     workflow_id = db.Column(db.String(36), db.ForeignKey("bwlWORKFLOW.uuid"), nullable=False)
     version = db.Column(db.Integer(3), default=0, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"), default=None)
@@ -113,10 +113,11 @@ class WfeObject(db.Model):
     created = db.Column(db.DateTime, default=datetime.now(), nullable=False)
     modified = db.Column(db.DateTime, default=datetime.now(), nullable=False)
     owner = db.Column(db.String(255))
-    status = db.Column(db.String(255), default=0, nullable=False)
+    status = db.Column(db.String(255), default="", nullable=False)
     user_id = db.Column(db.String(255), default=0, nullable=False)
     task_counter = db.Column(db.JSON, nullable=False)
     error_msg = db.Column(db.String(500), default="", nullable=False)
+    last_task_name = db.Column(db.String(60), default="")
 
     def __repr__(self):
         return "<WfeObject(id = %s, data = %s, workflow_id = %s, version = %s, parent_id = %s, created = %s)" \
@@ -164,5 +165,20 @@ class WfeObject(db.Model):
         self.user_id = state["user_id"]
         self.task_counter = state["task_counter"]
         self.error_msg = state["error_msg"]
+        
+    def copy(self, other):
+        """Copies data and metadata except id and workflow_id"""
+        
+        self.data = other.data
+        self.extra_data = other.extra_data 
+        self.version = other.version 
+        self.parent_id = other.parent_id 
+        self.created = other.created 
+        self.modified = datetime.now()
+        self.owner = other.owner 
+        self.status = other.status 
+        self.user_id = other.user_id 
+        self.task_counter = other.task_counter 
+        self.error_msg = other.error_msg 
 
 __all__ = ['Workflow','WfeObject','WorkflowLogging','AuditLogging','TaskLogging']

@@ -22,15 +22,18 @@ from datetime import datetime
 from invenio.sqlalchemyutils import db
 from invenio.bibworkflow_utils import dictproperty
 from invenio.bibworkflow_config import add_log, \
-     CFG_BIBWORKFLOW_OBJECTS_LOGDIR
+     CFG_BIBWORKFLOW_OBJECTS_LOGDIR, CFG_OBJECT_VERSION
 from invenio.config import CFG_LOGDIR
+
 
 
 class BibWorkflowObject(object):
 
-    def __init__(self, data=None, workflow_id=None, version=0, parent_id=None,
-                 id=None, extra_data=None, task_counter=[0], user_id=0):
+    def __init__(self, data=None, workflow_id=None, version=CFG_OBJECT_VERSION.INITIAL, parent_id=None,
+                 id=None, extra_data=None, task_counter=[0], user_id=0, extra_object_class=None):
+        self.extra_object_class = extra_object_class
         if isinstance(data, WfeObject):
+            print "Create BibWorkflowObject, is instance and looks like = " + str(data)
             self.db_obj = data
         else:
             if id is not None:
@@ -79,21 +82,49 @@ class BibWorkflowObject(object):
 
     def _update_db(self):
         db.session.commit()
+        if self.extra_object_class:
+            extra_obj = self.extra_object_class(self.db_obj)
+            extra_obj.update()
 
     def _create_db_obj(self):
         db.session.add(self.db_obj)
         db.session.commit()
+        if self.extra_object_class:
+            extra_obj = self.extra_object_class(self.db_obj)
+            extra_obj.save()
+    
+    def _create_version_obj(self, workflow_id, version, parent_id):
+        obj = WfeObject(data=self.db_obj.data, \
+                              workflow_id=workflow_id, \
+                              version=version, \
+                              parent_id=parent_id, \
+                              task_counter=self.db_obj.task_counter, \
+                              user_id=self.db_obj.user_id, \
+                              extra_data=self.db_obj.extra_data)
+        db.session.add(obj)
+        db.session.commit()
+        # Run extra save method
+        if self.extra_object_class:
+            extra_obj = self.extra_object_class(obj)
+            extra_obj.save()
+        
+        return obj.id
 
-    def save(self, version=None, task_counter=[0]):
+    def save(self, version=None, task_counter=[0], workflow_id=None):
         """
         .update() should be changed to create new object,
         this will make function more constant and avoid code replication
          => save_object() could return than
         return int(o.id)
         """
+        print "Parent id before save is: " + str(self.db_obj.parent_id)
         self.db_obj.task_counter = task_counter
         self.db_obj.modified = datetime.now()
-        if version == 2:
+        
+        if not workflow_id:
+            workflow_id = self.db_obj.workflow_id
+        
+        if version == CFG_OBJECT_VERSION.HALTED:
             # Processing was interrupted or error happened, we save the current state ("error" version)
             if self.db_obj.parent_id is not None:
                 # We are a child, so we update ourselves.
@@ -101,20 +132,12 @@ class BibWorkflowObject(object):
                 return int(self.db_obj.id)
             else:
                 # First time this object has an error/interrupt. Add new child from this object. (version error)
-                o = WfeObject(data=self.db_obj.data, \
-                              workflow_id=self.db_obj.workflow_id, \
-                              version=2, \
-                              parent_id=int(self.db_obj.id), \
-                              task_counter=self.db_obj.task_counter, \
-                              user_id=self.db_obj.user_id)
-                db.session.add(o)
-                db.session.commit()
-                return int(o.id)
+                return int(self._create_version_obj(workflow_id, CFG_OBJECT_VERSION.HALTED, int(self.db_obj.id)))
 
-        elif version == 1:
+        elif version == CFG_OBJECT_VERSION.FINAL:
             # This means the object was successfully run through the workflow. (finished version)
             # We update or insert the final object
-            if self.db_obj.version == 1:
+            if self.db_obj.version == CFG_OBJECT_VERSION.FINAL:
                 self._update_db()
                 return int(self.db_obj.id)
             else:
@@ -122,15 +145,7 @@ class BibWorkflowObject(object):
                     parent_id = self.db_obj.parent_id
                 else:
                     parent_id = self.db_obj.id
-                o = WfeObject(data=self.db_obj.data, \
-                              workflow_id=self.db_obj.workflow_id, \
-                              version=1, \
-                              parent_id=parent_id, \
-                              task_counter=self.db_obj.task_counter, \
-                              user_id=self.db_obj.user_id)
-                db.session.add(o)
-                db.session.commit()
-                return int(o.id)
+                return int(self._create_version_obj(workflow_id, CFG_OBJECT_VERSION.FINAL, parent_id))
 
         else:
             # version == 0
@@ -148,9 +163,22 @@ class BibWorkflowObject(object):
         return self.log
 
     def __repr__(self):
-        return "<Object(id: %s, data: %s, workflow_id: %s, version: %s)>" % (
+        return "<BibWorkflowObject(id: %s, data: %s, workflow_id: %s, version: %s, parent_id: %s)>" % (
         str(self.db_obj.id),
         str(self.db_obj.data),
         str(self.db_obj.workflow_id),
         str(self.db_obj.version),
+        str(self.db_obj.parent_id)
         )
+    
+    def add_task_result(self, task_name, result):
+        self.extra_data["tasks_results"][task_name] = result
+        
+    def add_metadata(self, key, value):
+        self.extra_data[key] = value
+        
+    def changeStatus(self, message, save=False):
+        self.db_obj.status = message
+        
+        if(save==True):
+            self._update_db()

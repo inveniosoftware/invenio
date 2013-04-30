@@ -15,10 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-imgdir=$(localstatedir)/www/img
+cssdir=$(localstatedir)/www/css
 
-img_DATA = bibworkflow_style.css
+css_DATA = bibworkflow_style.css
 
-EXTRA_DIST = $(img_DATA)
+EXTRA_DIST = $(css_DATA)
 
 CLEANFILES = *~ *.tmp

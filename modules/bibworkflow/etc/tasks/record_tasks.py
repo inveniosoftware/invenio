@@ -20,6 +20,7 @@ BibWorkflow
 """
 
 from invenio.bibconvert_xslt_engine import convert
+#from invenio.bibholdingpen.widgets import checking_widget
 
 
 def convert_record(stylesheet):
@@ -32,8 +33,21 @@ def convert_record(stylesheet):
         newtext = convert(obj.data['record'], stylesheet)
         obj.log.info("Object: test object logging")
         obj.data['record'] = newtext
+
+    _convert_record.__title__ = "Record convertion"
+    _convert_record.__description__ = "This task converts a record."
+
     return _convert_record
+
+
+def check_record(obj, eng):
+    obj.log.info("We need to check it")
+    #obj.widget = checking_widget()
+    raise HaltProcessing
 
 
 def print_record(obj, eng):
     print obj.data['record']
+
+print_record.__title__ = "Print Record"
+print_record.__description__ = "prints the records"

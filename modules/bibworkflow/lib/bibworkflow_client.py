@@ -17,6 +17,8 @@
 
 import traceback
 from workflow.engine import HaltProcessing
+from invenio.bibworkflow_config import CFG_OBJECT_VERSION
+from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
 
 
 def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
@@ -40,9 +42,13 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
         except HaltProcessing as e:
             # Processing was halted. Lets save current object and continue.
             wfe.log.info("Processing halted!")
-            wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
-            wfe.save(0)
+            wfe.log.info("saving objects!")
+            wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED, wfe.getCurrTaskId(), workflow_id=wfe.uuid)
+            wfe.log.info("saving workflow!")
+            wfe.save(CFG_WORKFLOW_STATUS.HALTED)
+            wfe.log.info("setting workflow possition")
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
+            wfe.log.info("end")
             if stop_on_halt:
                 break
         except Exception as e:
@@ -52,8 +58,8 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
             wfe.log.info(traceback.format_exc())
             # Changing counter should be moved to wfe object together with default exception handling
             wfe.increaseCounterError()
-            wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
-            wfe.save(0)
+            wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED, wfe.getCurrTaskId(), workflow_id=wfe.uuid)
+            wfe.save(CFG_WORKFLOW_STATUS.ERROR)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             if stop_on_halt or stop_on_error:
                 raise e
@@ -105,7 +111,7 @@ def restart_workflow(wfe, data, restart_point, stop_on_halt=False, stop_on_error
             # Processing was halted. Lets save current object and continue.
             wfe.log.info("Processing halted!")
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
-            wfe.save(0)
+            wfe.save(CFG_WORKFLOW_STATUS.HALTED)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             if stop_on_halt:
                 break
@@ -117,7 +123,7 @@ def restart_workflow(wfe, data, restart_point, stop_on_halt=False, stop_on_error
             # Changing counter should be moved to wfe object together with default exception handling
             wfe.increaseCounterError()
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
-            wfe.save(0)
+            wfe.save(CFG_WORKFLOW_STATUS.ERROR)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             if stop_on_halt or stop_on_error:
                 raise e

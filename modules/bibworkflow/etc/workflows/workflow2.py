@@ -18,14 +18,15 @@
 from invenio.bibworkflow.tasks.my_tasks import *
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
 
+
 class workflow2(WorkflowDefinition):
     def __init__(self):
         super(workflow2, self).__init__()
         self.definition = [
-                       simple_task(5),
-                       sleep_task(10),
-                       simple_task(3),
-                       save_workflow(),
-                       simple_task(3),
-                       simple_task(10)
-                      ]
+            simple_task(5),
+            sleep_task(10),
+            simple_task(3),
+            save_workflow(),
+            simple_task(3),
+            simple_task(10)
+        ]
