@@ -3,7 +3,7 @@
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -71,6 +71,7 @@ from invenio.htmlutils import \
      cfg_html_buffer_allowed_attribute_whitelist
 from invenio.webuser import collect_user_info
 from HTMLParser import HTMLParseError
+from invenio.shellutils import escape_shell_arg
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -234,7 +235,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
 ##         if platform.python_compiler().find('Red Hat') > -1:
 ##             # use os.system
         (result_code, result_path) = tempfile.mkstemp()
-        command = "( %s/bibformat otype=%s )  > %s" % (CFG_BINDIR, format, result_path)
+        command = "( %s/bibformat otype=%s )  > %s" % (CFG_BINDIR, escape_shell_arg(format), result_path)
         (xm_code, xm_path) = tempfile.mkstemp()
         xm_file = open(xm_path, "w")
         xm_file.write(xm_record)
@@ -2066,4 +2067,3 @@ if __name__ == "__main__":
     profile.run('bf_profile()', "bibformat_profile")
     p = pstats.Stats("bibformat_profile")
     p.strip_dirs().sort_stats("cumulative").print_stats()
-
