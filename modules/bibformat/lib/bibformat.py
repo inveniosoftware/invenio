@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -438,8 +438,30 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_
 
     return excel_formatted_records
 
+
 # Utility functions
 ##
+def make_filter_line(hide_tag):
+    """
+    Generate a line used for filtering MARCXML
+    """
+    hide_tag = str(hide_tag)
+    tag = hide_tag[:3]
+    ind1 = hide_tag[3:4]
+    ind2 = hide_tag[4:5]
+
+    if ind1 == "_":
+        ind1 = " "
+    if ind2 == "_":
+        ind2 = " "
+
+    if not ind1 and not ind2:
+        return 'datafield tag="%s"' % tag
+    if not ind2 and ind1:
+        return 'datafield tag="%s" ind1="%s"' % (tag, ind1)
+    return 'datafield tag="%s" ind1="%s"  ind2="%s"' % (tag, ind1, ind2)
+
+
 def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
                          force_filtering=False):
     """
@@ -466,15 +488,17 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
     #filter..
     out = ""
     omit = False
+    filter_lines = map(make_filter_line, filter_tags)
     for line in recxml.splitlines(True):
         #check if this block needs to be omitted
-        for htag in filter_tags:
-            if line.count('datafield tag="'+str(htag)+'"'):
+        for hide_line in filter_lines:
+            if line.count(hide_line):
                 omit = True
         if not omit:
             out += line
         if omit and line.count('</datafield>'):
             omit = False
+
     return out
 
 def get_output_format_content_type(of, default_content_type="text/html"):
