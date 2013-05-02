@@ -287,7 +287,8 @@ class DataCiteRequest(object):
                 # HTTP client requests must end with double newline (not added
                 # by urllib2)
                 body += '\r\n\r\n'
-                body = body.encode('utf-8')
+                if isinstance(body, unicode):
+                    body = body.encode('utf-8')
         else:
             if params:
                 url = "%s?%s" % (url, urlencode(params))
