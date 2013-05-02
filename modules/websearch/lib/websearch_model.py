@@ -545,7 +545,7 @@ class Externalcollection(db.Model):
     def engine(self):
         from invenio.websearch_external_collections_searcher import external_collections_dictionary
 
-        if self.name in external_collections_dictionary.has_key:
+        if self.name in external_collections_dictionary:
             return external_collections_dictionary[self.name]
 
 
