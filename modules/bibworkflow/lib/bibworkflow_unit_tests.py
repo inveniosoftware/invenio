@@ -19,17 +19,20 @@
 BibWorkflow Unit tests - functions to test workflows
 """
 
-from invenio.testutils import make_flask_test_suite, run_test_suite, \
-    FlaskSQLAlchemyTest
-from invenio.bibworkflow_api import run
-from invenio.inveniomanage import db
+from invenio.importutils import lazy_import
+from invenio.testutils import make_test_suite, run_test_suite, \
+    InvenioTestCase
+from invenio.sqlalchemyutils import db
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION
 
+run = lazy_import('invenio.bibworkflow_api:run')
 
-class TestWorkflowStart(FlaskSQLAlchemyTest):
+
+class TestWorkflowStart(InvenioTestCase):
     """Tests for BibWorkflow API."""
 
     def setUp(self):
+        super(TestWorkflowStart, self).setUp()
         self.test_data = {}
         self.workflow_ids = []
         self.recxml = """<?xml version="1.0" encoding="UTF-8"?>
@@ -74,6 +77,7 @@ distances from it.
             WfeObject.query.filter(WfeObject.workflow_id == wid).delete()
             Workflow.query.filter(Workflow.uuid == wid).delete()
         db.session.commit()
+        super(TestWorkflowStart, self).tearDown()
 
     def test_workflow_basic_run(self):
         """Tests running workflow with one data object"""
@@ -171,7 +175,7 @@ distances from it.
             self.assertEqual(final_object.data, final_data)
 
 
-TEST_SUITE = make_flask_test_suite(TestWorkflowStart)
+TEST_SUITE = make_test_suite(TestWorkflowStart)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
