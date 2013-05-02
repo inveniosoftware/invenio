@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -85,6 +85,7 @@ from invenio.htmlutils import \
 from invenio.webuser import collect_user_info
 from invenio.bibknowledge import get_kbr_values
 from HTMLParser import HTMLParseError
+from invenio.shellutils import escape_shell_arg
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -253,7 +254,7 @@ def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
 ##             # use os.system
         (result_code, result_path) = tempfile.mkstemp()
         command = "( %s/bibformat otype=%s )  > %s" % \
-                                     (CFG_BINDIR, of, result_path)
+                                     (CFG_BINDIR, escape_shell_arg(of), result_path)
         (xm_code, xm_path) = tempfile.mkstemp()
         xm_file = open(xm_path, "w")
         xm_file.write(xm_record)
