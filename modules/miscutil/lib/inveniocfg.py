@@ -1086,49 +1086,64 @@ def cli_cmd_upgrade(conf):
     """
     Command for applying upgrades
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade
-    cmd_upgrade(conf)
+    import sys
+    from warnings import warn
+    from invenio.upgrade_manager import main
+
+    warn('inveniocfg --upgrade-check is deprecated. Using instead: inveniomanage upgrade run')
+
+    sys_argv = sys.argv
+    sys.argv = 'upgrade_manager.py run'.split()
+    main()
+    sys.argv = sys_argv
+
 
 def cli_cmd_upgrade_check(conf):
     """
     Command for running pre-upgrade checks
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_check
-    cmd_upgrade_check(conf)
+    import sys
+    from warnings import warn
+    from invenio.upgrade_manager import main
+
+    warn('inveniocfg --upgrade-check is deprecated. Using instead: inveniomanage upgrade check')
+
+    sys_argv = sys.argv
+    sys.argv = 'upgrade_manager.py check'.split()
+    main()
+    sys.argv = sys_argv
 
 
 def cli_cmd_upgrade_show_pending(conf):
     """
     Command for showing upgrades ready to be applied
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_show_pending
-    cmd_upgrade_show_pending(conf)
+    import sys
+    from warnings import warn
+    from invenio.upgrade_manager import main
+
+    warn('inveniocfg --upgrade-show-pending is deprecated. Using instead: inveniomanage upgrade show pending')
+
+    sys_argv = sys.argv
+    sys.argv = 'upgrade_manager.py show pending'.split()
+    main()
+    sys.argv = sys_argv
 
 
 def cli_cmd_upgrade_show_applied(conf):
     """
     Command for showing all upgrades already applied.
     """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_show_applied
-    cmd_upgrade_show_applied(conf)
+    import sys
+    from warnings import warn
+    from invenio.upgrade_manager import main
 
+    warn('inveniocfg --upgrade-show-applied is deprecated. Using instead: inveniomanage upgrade show applied')
 
-def cli_cmd_upgrade_create_release_recipe(conf, path):
-    """
-    Create a new release upgrade recipe (for developers).
-    """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_create_release_recipe
-    cmd_upgrade_create_release_recipe(conf, path)
-
-
-def cli_cmd_upgrade_create_standard_recipe(conf, path, depends_on=None,
-                                          release=False):
-    """
-    Create a new upgrade recipe (for developers).
-    """
-    from invenio.inveniocfg_upgrader import cmd_upgrade_create_standard_recipe
-    cmd_upgrade_create_standard_recipe(conf, path, depends_on=depends_on,
-                                       release=release)
+    sys_argv = sys.argv
+    sys.argv = 'upgrade_manager.py show applied'.split()
+    main()
+    sys.argv = sys_argv
 
 
 def prepare_option_parser():
@@ -1233,8 +1248,8 @@ def prepare_option_parser():
     upgrade_options.add_option("", "--upgrade-check", dest='actions', const='upgrade-check', action="append_const", help="run pre-upgrade checks for pending upgrades")
     upgrade_options.add_option("", "--upgrade-show-pending", dest='actions', const='upgrade-show-pending', action="append_const", help="show pending upgrades")
     upgrade_options.add_option("", "--upgrade-show-applied", dest='actions', const='upgrade-show-applied', action="append_const", help="show history of applied upgrades")
-    upgrade_options.add_option("", "--upgrade-create-standard-recipe", dest='actions', metavar='REPOSITORY[,DIR]', const='upgrade-create-standard-recipe', action="store_append_const", help="create a new standard upgrade recipe (for developers)")
-    upgrade_options.add_option("", "--upgrade-create-release-recipe", dest='actions', metavar='REPOSITORY[,DIR]', const='upgrade-create-release-recipe', action="store_append_const", help="create a new release upgrade recipe (for developers)")
+    upgrade_options.add_option("", "--upgrade-create-standard-recipe", dest='actions', metavar='REPOSITORY[,DIR]', const='upgrade-create-standard-recipe', action="append_const", help="use: inveniomanage upgrade create recipe")
+    upgrade_options.add_option("", "--upgrade-create-release-recipe", dest='actions', metavar='REPOSITORY[,DIR]', const='upgrade-create-release-recipe', action="append_const", help="use: inveniomanage upgrade create release")
     parser.add_option_group(upgrade_options)
 
     helper_options = OptionGroup(parser, "Options to help the work")
@@ -1386,9 +1401,11 @@ def main(*cmd_args):
             elif action == 'upgrade-show-applied':
                 cli_cmd_upgrade_show_applied(conf)
             elif action == 'upgrade-create-standard-recipe':
-                cli_cmd_upgrade_create_standard_recipe(conf, getattr(options, 'upgrade_create_standard_recipe', None))
+                print >> sys.stderr, 'ERROR: inveniocfg --upgrade-create-release-recipe is not supported anymore. Use instead: inveniomanage upgrade create release'
+                sys.exit(1)
             elif action == 'upgrade-create-release-recipe':
-                cli_cmd_upgrade_create_release_recipe(conf, getattr(options, 'upgrade_create_release_recipe', None))
+                print >> sys.stderr, 'ERROR: inveniocfg --upgrade-create-standard-recipe is not supported anymore. Use instead: inveniomanage upgrade create recipe'
+                sys.exit(1)
             else:
                 print "ERROR: Unknown command", action
                 sys.exit(1)

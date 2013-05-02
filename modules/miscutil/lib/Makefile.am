@@ -61,7 +61,7 @@ pylib_DATA = __init__.py \
              inveniocfg_upgrader.py \
              inveniocfg_upgrader_model.py \
              inveniocfg_upgrader_unit_tests.py \
-             upgrader_manager.py \
+             upgrade_manager.py \
              invenio_connector.py \
              invenio_connector_regression_tests.py \
              jinja2utils.py \
@@ -74,6 +74,7 @@ pylib_DATA = __init__.py \
              intbitset_helper.py \
              inveniocfg.py \
              inveniomanage.py \
+             inveniomanage_unit_tests.py \
              inveniocfg_unit_tests.py \
              settings.py \
              shellutils.py \

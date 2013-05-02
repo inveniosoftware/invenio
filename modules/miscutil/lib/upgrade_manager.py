@@ -27,51 +27,65 @@ def run():
     """
     Command for applying upgrades
     """
-    from invenio import config as conf
     from invenio.inveniocfg_upgrader import cmd_upgrade
-    cmd_upgrade(conf)
+    cmd_upgrade()
 
 
 @manager.command
-def show_pending():
+def check():
+    """
+    Command for checking upgrades
+    """
+    from invenio.inveniocfg_upgrader import cmd_upgrade_check
+    cmd_upgrade_check()
+
+
+show = Manager(usage="Display pending or applied upgrades.")
+manager.add_command("show", show)
+
+
+@show.command
+def pending():
     """
     Command for showing upgrades ready to be applied
     """
-    from invenio import config as conf
     from invenio.inveniocfg_upgrader import cmd_upgrade_show_pending
-    cmd_upgrade_show_pending(conf)
+    cmd_upgrade_show_pending()
 
 
-@manager.command
-def show_applied():
+@show.command
+def applied():
     """
     Command for showing all upgrades already applied.
     """
-    from invenio import config as conf
     from invenio.inveniocfg_upgrader import cmd_upgrade_show_applied
-    cmd_upgrade_show_applied(conf)
+    cmd_upgrade_show_applied()
 
 
-@manager.option('-p', '--path', dest='path')
-def create_release_recipe(path):
+create = Manager(usage="Display pending or applied upgrades.")
+manager.add_command("create", create)
+
+
+@create.option('-p', '--path', dest='path')
+@create.option('-r', '--repository', dest='repository', default='invenio')
+def release(path, repository):
     """
     Create a new release upgrade recipe (for developers).
     """
-    from invenio import config as conf
     from invenio.inveniocfg_upgrader import cmd_upgrade_create_release_recipe
-    cmd_upgrade_create_release_recipe(conf, path)
+    cmd_upgrade_create_release_recipe(path, repository)
 
 
-@manager.option('-p', '--path', dest='path')
-@manager.option('-d', '--depends_on', dest='depends_on')
-@manager.option('-r', '--release', dest='release')
-def create_standard_recipe(path, depends_on=None, release=False):
+@create.option('-p', '--path', dest='path')
+@create.option('-r', '--repository', dest='repository', default='invenio')
+@create.option('-d', '--depends_on', dest='depends_on')
+@create.option('--release', dest='release', action='store_true')
+def recipe(path, repository, depends_on=None, release=False):
     """
     Create a new upgrade recipe (for developers).
     """
-    from invenio import config as conf
     from invenio.inveniocfg_upgrader import cmd_upgrade_create_standard_recipe
-    cmd_upgrade_create_standard_recipe(conf, path, depends_on=depends_on,
+    cmd_upgrade_create_standard_recipe(path, repository, depends_on=depends_on,
                                        release=release)
 
 

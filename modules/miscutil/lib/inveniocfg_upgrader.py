@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,14 +20,14 @@
 """
 Invenio upgrade engine.
 
-Usage (via inveniocfg)::
+Usage (via inveniomanage)::
 
-  inveniocfg --upgrade-create-standard-recipe=invenio,~/src/invenio/modules/miscutil/lib/upgrades/
-  inveniocfg --upgrade-create-release-recipe=invenio,~/src/invenio/modules/miscutil/lib/upgrades/
-  inveniocfg --upgrade-show-applied
-  inveniocfg --upgrade-show-pending
-  inveniocfg --upgrade-check
-  inveniocfg --upgrade
+  inveniomanage upgrade create recipe -r invenio -p ~/src/invenio/modules/miscutil/lib/upgrades/
+  inveniomanage upgrade create release -r invenio -p ~/src/invenio/modules/miscutil/lib/upgrades/
+  inveniomanage upgrade show applied
+  inveniomanage upgrade show pending
+  inveniomanage upgrade check
+  inveniomanage upgrade run
 
 Recommendations for writing upgrades
 ------------------------------------
@@ -110,7 +110,6 @@ import warnings
 try:
     from invenio.dbquery import run_sql
     from invenio.config import CFG_PREFIX
-    from invenio.webinterface_handler_flask import with_app_context
     HAS_INVENIO = True
 except ImportError:
     HAS_INVENIO = False
@@ -220,6 +219,7 @@ class InvenioUpgraderLogFormatter(logging.Formatter):
 # Upgrade engine
 #
 
+
 class InvenioUpgrader(object):
     """
     Class responsible for loading, sorting and executing upgrades
@@ -254,7 +254,7 @@ class InvenioUpgrader(object):
             self._paths = paths
         else:
             self._paths = [os.path.join(CFG_PREFIX,
-                "lib/python/invenio/upgrades/")]
+                                        "lib/python/invenio/upgrades/")]
         self.upgrades = None
         self.history = {}
         self.ordered_history = []
@@ -264,7 +264,7 @@ class InvenioUpgrader(object):
         if not self.global_pre_upgrade:
             # Default global pre-upgrade checks
             self.global_pre_upgrade = [pre_check_custom_templates,
-                                      pre_check_bibsched]
+                                       pre_check_bibsched]
 
         self.global_post_upgrade = global_post_upgrade
         if not self.global_post_upgrade:
@@ -497,9 +497,9 @@ class InvenioUpgrader(object):
                 logger = self.get_logger()
                 logger.error("\n".join(msg))
 
-                raise RuntimeError("Upgrade '%s' failed. Your installation is in an" \
-                    " inconsistent state. Please manually review the upgrade " \
-                    "and resolve inconsistencies." % upgrade['id'])
+                raise RuntimeError("Upgrade '%s' failed. Your installation is in an"
+                                   " inconsistent state. Please manually review the upgrade "
+                                   "and resolve inconsistencies." % upgrade['id'])
         finally:
             self._teardown_log_prefix()
 
@@ -521,8 +521,8 @@ class InvenioUpgrader(object):
                 res = run_sql("SHOW TABLES LIKE 'upgrade'")
                 if res:
                     raise RuntimeError("There seem to be a problem with the "
-                        "upgrade-table. Please validate it manually (following "
-                        "statement couldn't be executed %s)." % stmt)
+                                       "upgrade-table. Please validate it manually (following "
+                                       "statement couldn't be executed %s)." % stmt)
 
     def latest_applied_upgrade(self, repository='invenio'):
         """
@@ -539,9 +539,9 @@ class InvenioUpgrader(object):
             res = run_sql("SHOW TABLES LIKE 'upgrade'")
             if res:
                 raise RuntimeError("There seem to be a problem with the "
-                                    "upgrade-table. Please validate it manually"
-                                    " (following statement couldn't be executed"
-                                    " %s)." % stmt)
+                                   "upgrade-table. Please validate it manually"
+                                   " (following statement couldn't be executed"
+                                   " %s)." % stmt)
         return None
 
     def register_success(self, upgrade):
@@ -640,7 +640,7 @@ class InvenioUpgrader(object):
 
             # List of un-applied upgrades in topological order
             self.upgrades = map(_upgrade_doc_mapper,
-                self.order_upgrades(plugins, self.history))
+                                self.order_upgrades(plugins, self.history))
         return self.upgrades
 
     def _create_graph(self, upgrades, history={}):
@@ -729,11 +729,11 @@ class InvenioUpgrader(object):
             for d in depends_on:
                 if d not in graph_incoming:
                     raise RuntimeError("Upgrade %s depends on an unknown"
-                                    " upgrade %s" % (node_id, d))
+                                       " upgrade %s" % (node_id, d))
                 if upgrades[node_id]['repository'] != upgrades[d]['repository']:
                     raise RuntimeError("Upgrade %s depends on an upgrade from "
-                                    "another repository %s" % (node_id,
-                                    upgrades[d]['repository']))
+                                       "another repository %s" % (node_id,
+                                       upgrades[d]['repository']))
 
         # Nodes with no incoming edges
         start_nodes = filter(lambda x: len(graph_incoming[x]) == 0,
@@ -757,7 +757,7 @@ class InvenioUpgrader(object):
         for node, edges in graph_incoming.items():
             if edges:
                 raise RuntimeError("The upgrades have at least one cyclic "
-                                "dependency involving %s." % node)
+                                   "dependency involving %s." % node)
 
         return map(lambda x: upgrades[x], topo_order)
 
@@ -791,7 +791,8 @@ def pre_check_bibsched():
     logger.info("Checking bibsched process...")
 
     output, error = subprocess.Popen(["%s/bin/bibsched" % CFG_PREFIX, "status"],
-                   stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE).communicate()
 
     is_manual = False
     is_0_running = False
@@ -804,8 +805,8 @@ def pre_check_bibsched():
     stopped = is_manual and is_0_running
 
     if not stopped:
-        raise RuntimeError("Bibsched is running. Please stop bibsched " \
-            "using the command:\n%s/bin/bibsched stop" % CFG_PREFIX)
+        raise RuntimeError("Bibsched is running. Please stop bibsched "
+                           "using the command:\n%s/bin/bibsched stop" % CFG_PREFIX)
 
 
 def post_check_bibsched():
@@ -814,8 +815,8 @@ def post_check_bibsched():
     """
     if HAS_INVENIO:
         logger = logging.getLogger('invenio_upgrader')
-        logger.info("Remember to start bibsched again:\n" \
-            "%s/bin/bibsched start" % CFG_PREFIX)
+        logger.info("Remember to start bibsched again:\n"
+                    "%s/bin/bibsched start" % CFG_PREFIX)
     return True
 
 
@@ -823,7 +824,7 @@ def post_check_bibsched():
 # Commands
 #
 
-def cmd_upgrade_check(dummy_conf, upgrader=None):
+def cmd_upgrade_check(upgrader=None):
     """ Command for running pre-upgrade checks """
     if not upgrader:
         upgrader = InvenioUpgrader()
@@ -833,7 +834,7 @@ def cmd_upgrade_check(dummy_conf, upgrader=None):
         from invenio.sqlalchemyutils import db
     except ImportError:
         logger.error("make check-upgrade is unfortunately not supported for "
-            "non-SQLAlchemy based Invenio installations")
+                     "non-SQLAlchemy based Invenio installations")
         sys.exit(1)
 
     try:
@@ -864,8 +865,7 @@ def cmd_upgrade_check(dummy_conf, upgrader=None):
         sys.exit(1)
 
 
-@with_app_context()
-def cmd_upgrade(dummy_conf, upgrader=None):
+def cmd_upgrade(upgrader=None):
     """ Command for applying upgrades """
     from invenio.config import CFG_LOGDIR
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
@@ -925,8 +925,7 @@ def cmd_upgrade(dummy_conf, upgrader=None):
         sys.exit(1)
 
 
-@with_app_context()
-def cmd_upgrade_show_pending(dummy_conf, upgrader=None):
+def cmd_upgrade_show_pending(upgrader=None):
     """ Command for showing upgrades ready to be applied """
     if not upgrader:
         upgrader = InvenioUpgrader()
@@ -936,7 +935,7 @@ def cmd_upgrade_show_pending(dummy_conf, upgrader=None):
         from invenio.sqlalchemyutils import db
     except ImportError:
         logger.error("make check-upgrade is unfortunately not supported for "
-            "non-SQLAlchemy based Invenio installations")
+                     "non-SQLAlchemy based Invenio installations")
         sys.exit(1)
 
     try:
@@ -960,7 +959,7 @@ def cmd_upgrade_show_pending(dummy_conf, upgrader=None):
         sys.exit(1)
 
 
-def cmd_upgrade_show_applied(dummy_conf, upgrader=None):
+def cmd_upgrade_show_applied(upgrader=None):
     """ Command for showing all upgrades already applied. """
     if not upgrader:
         upgrader = InvenioUpgrader()
@@ -983,7 +982,7 @@ def cmd_upgrade_show_applied(dummy_conf, upgrader=None):
         sys.exit(1)
 
 
-def cmd_upgrade_create_release_recipe(conf, path, upgrader=None):
+def cmd_upgrade_create_release_recipe(path, repository='invenio', upgrader=None):
     """
     Create a new release upgrade recipe (for developers).
     """
@@ -998,25 +997,24 @@ def cmd_upgrade_create_release_recipe(conf, path, upgrader=None):
             logger.error("No upgrades found.")
             sys.exit(1)
 
-        repository, dummy_path = _upgrade_recipe_parse_path(path)
-
         try:
             depends_on = endpoints[repository]
         except KeyError:
             raise RuntimeError("No upgrades found for repository '%s'" % repository)
 
-        return cmd_upgrade_create_standard_recipe(conf, path,
-                                                     depends_on=depends_on,
-                                                     release=True,
-                                                     upgrader=upgrader)
+        return cmd_upgrade_create_standard_recipe(path, repository,
+                                                  depends_on=depends_on,
+                                                  release=True,
+                                                  upgrader=upgrader)
     except RuntimeError, e:
         for msg in e.args:
             logger.error(unicode(msg))
         sys.exit(1)
 
 
-def cmd_upgrade_create_standard_recipe(dummy_conf, path, depends_on=None,
-                                          release=False, upgrader=None):
+def cmd_upgrade_create_standard_recipe(path, repository='invenio',
+                                       depends_on=None, release=False,
+                                       upgrader=None):
     """
     Create a new upgrade recipe (for developers).
     """
@@ -1025,7 +1023,7 @@ def cmd_upgrade_create_standard_recipe(dummy_conf, path, depends_on=None,
     logger = upgrader.get_logger()
 
     try:
-        repository, path = _upgrade_recipe_parse_path(path)
+        path = _upgrade_recipe_parse_path(path)
 
         if not os.path.exists(path):
             raise RuntimeError("Path does not exists: %s" % path)
@@ -1048,7 +1046,7 @@ def cmd_upgrade_create_standard_recipe(dummy_conf, path, depends_on=None,
 
         if os.path.exists(upgrade_file):
             raise RuntimeError("Could not generate upgrade - %s already exists."
-                % upgrade_file)
+                               % upgrade_file)
 
         # Determine latest installed upgrade
         if depends_on is None:
@@ -1099,31 +1097,23 @@ def load_module(name, path):
 
     return module
 
+
 def _upgrade_recipe_parse_path(path):
     srcdir = os.getenv('CFG_INVENIO_SRCDIR', None)
 
     if not path:
-        repository = 'invenio'
         if srcdir:
             path = os.path.join(srcdir, 'modules/miscutil/lib/upgrades/')
         else:
             path = os.getcwd()
-    else:
-        try:
-            repository, path = path.split(",", 1)
-        except ValueError:
-            repository = path
-            if srcdir:
-                path = os.path.join(srcdir, 'modules/miscutil/lib/upgrades/')
-            else:
-                path = os.getcwd()
 
     path = os.path.expandvars(os.path.expanduser(path))
-    return (repository, path)
+    return path
 
 #
 # Main
 #
+
 
 def main():
     """
@@ -1144,7 +1134,7 @@ def main():
     try:
         run_sql("SELECT 1")
     except Exception:
-        print ">>> WARNING: Existing Invenio installation detected but cannot" \
+        print ">>> WARNING: Existing Invenio installation detected but cannot"
         " connect to database. Aborting."
         sys.exit(1)
 
@@ -1171,8 +1161,10 @@ def main():
     pluginutils = load_module('pluginutils', pluginutils_modules_path)
     webstyle_template_module = load_module('template', template_modules_path)
 
-    upgrader = InvenioUpgrader(paths=[upgrades_path, os.path.join(CFG_PREFIX,
-            'lib/python/invenio/lib/upgrades/')], pluginutils=pluginutils,)
+    upgrader = InvenioUpgrader(
+        paths=[upgrades_path,
+               os.path.join(CFG_PREFIX, 'lib/python/invenio/lib/upgrades/')],
+        pluginutils=pluginutils)
     logger = upgrader.get_logger()
 
     # Alert user to run via inveniocfg instead.
@@ -1189,15 +1181,15 @@ def main():
             sys.exit(1)
 
     if '--upgrade-show-pending' in sys.argv:
-        cmd_upgrade_show_pending(None, upgrader=upgrader)
+        cmd_upgrade_show_pending(upgrader=upgrader)
         sys.exit(0)
 
     if '--upgrade-show-applied' in sys.argv:
-        cmd_upgrade_show_applied(None, upgrader=upgrader)
+        cmd_upgrade_show_applied(upgrader=upgrader)
         sys.exit(0)
 
     if '--upgrade-check' in sys.argv:
-        cmd_upgrade_check(None, upgrader=upgrader)
+        cmd_upgrade_check(upgrader=upgrader)
         sys.exit(0)
 
     logger.error("Unknown command")

@@ -21,7 +21,7 @@
 import os
 from pprint import pformat
 from flask.ext.script import Manager
-from flask.ext.script.commands import ShowUrls, Clean
+from flask.ext.script.commands import ShowUrls  # , Clean
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.pluginutils import PluginContainer
 from invenio.sqlalchemyutils import db
@@ -56,11 +56,12 @@ _MANAGERS = PluginContainer(
 open(os.path.join(CFG_LOGDIR, 'broken-managers.log'), 'w').write(
     pformat(_MANAGERS.get_broken_plugins()))
 
-for plugin_name, plugin in _MANAGERS.iteritems():
-    name = plugin_name[:-len('_manager')]
+for manager_name, plugin in _MANAGERS.iteritems():
+    name = manager_name[:-len('_manager')]
     manager.add_command(name, plugin)
 
-manager.add_command("clean", Clean())
+#FIXME clean command is broken
+#manager.add_command("clean", Clean())
 manager.add_command("show_urls", ShowUrls())
 
 

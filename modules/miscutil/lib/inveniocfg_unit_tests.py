@@ -90,32 +90,6 @@ class InveniocfgTest(InvenioTestCase):
                              '--some-invalid-option-which-does-not-exists')
         self.stop_capture()
 
-    def test_upgrade_show_applied_cmd(self):
-        """ Test --upgrade-show-applied command. """
-        self.capture()
-        main('--conf-dir', '%s/etc/' % CFG_PREFIX, '--upgrade-show-applied')
-
-        lines = self.output.getvalue().split('\n')
-        self.stop_capture()
-
-        expected = ['>>> Following upgrade(s) have been applied:',
-                    '>>> No upgrades have been applied.']
-        self.assertTrue(expected[0] in lines,
-                         "%s was not found in output %s" % (expected, lines))
-
-    def test_upgrade_show_pending_cmd(self):
-        """ Test --upgrade-show-pending command. """
-        self.capture()
-        main('--conf-dir', '%s/etc/' % CFG_PREFIX, '--upgrade-show-pending')
-
-        lines = self.output.getvalue().split('\n')
-        self.stop_capture()
-
-        expected = ['>>> Following upgrade(s) are ready to be applied:',
-                 '>>> All upgrades have been applied.']
-        self.assertTrue(expected[0] in lines or expected[1] in lines,
-                        "%s was not found in output %s" % (expected, lines))
-
     def test_cmd_get(self):
         """ Test --get cmd """
         # New way of calling get
