@@ -1,7 +1,7 @@
 -- $Id$
 
 -- This file is part of CDS Invenio.
--- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+-- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
 --
 -- CDS Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -43,6 +43,11 @@ INSERT INTO collection VALUES (15,'Articles & Preprints',NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (16,'Books & Reports',NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (17,'Multimedia & Arts',NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (18,'Poetry','collection:POETRY',NULL,NULL,NULL);
+
+INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (17, 'usage;comments;metadata');
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','','NASA Subjects','0000-00-00 00:00:00');

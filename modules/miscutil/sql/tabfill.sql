@@ -1,7 +1,7 @@
 -- $Id$
 
 -- This file is part of CDS Invenio.
--- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+-- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2013 CERN.
 --
 -- CDS Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -524,10 +524,5 @@ INSERT INTO sbmGFILERESULT VALUES ('Compressed PostScript','gzip compressed data
 INSERT INTO sbmGFILERESULT VALUES ('Tarred Tex (.tar)','tar archive');
 INSERT INTO sbmGFILERESULT VALUES ('JPEG','JPEG image');
 INSERT INTO sbmGFILERESULT VALUES ('GIF','GIF');
-
-INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (17, 'usage;comments;metadata');
 
 -- end of file
