@@ -103,30 +103,33 @@ def run_by_oid(oid, start_point="beginning", task_queue=USE_TASK_QUEUE, external
     from invenio.bibworkflow_model import WfeObject
     from invenio.bibworkflow_worker_engine import restartit
 
-    object = WfeObject.query.filter(WfeObject.id == oid).first()
+    wf_object = WfeObject.query.filter(WfeObject.id == oid).first()
     if start_point == "beginning":
         restart_point = "beginning"
 
         # restarting from beginning for error and halted objects
         # always choose initial object
-        if object.parent_id is not None:
-            oid = object.parent_id
+        if wf_object.parent_id is not None:
+            oid = wf_object.parent_id
     if start_point == "continue":
-        restart_point = cPickle.loads(object.task_counter)
+        restart_point = cPickle.loads(wf_object.task_counter)
     if start_point == "next":
-        restart_point = cPickle.loads(object.task_counter)
+        restart_point = cPickle.loads(wf_object.task_counter)
         restart_point[-1] += 1
     if start_point == "prev":
-        restart_point = cPickle.loads(object.task_counter)
+        restart_point = cPickle.loads(wf_object.task_counter)
         restart_point[-1] -= 1
 
     if task_queue:
-        return WORKER().restart(object.workflow_id, [oid], restart_point, external_save=external_save)
+        return WORKER().restart(wf_object.workflow_id, [oid],
+                                restart_point, external_save=external_save)
     else:
-        return restartit(object.workflow_id, [oid], restart_point, external_save=external_save)
+        return restartit(wf_object.workflow_id, [oid],
+                         restart_point, external_save=external_save)
 
 
-def run_by_object(object, start_point="beginning", task_queue=USE_TASK_QUEUE, external_save=None):
+def run_by_object(wf_object, start_point="beginning",
+                  task_queue=USE_TASK_QUEUE, external_save=None):
     """
     Runs workflow asociated with object given. If object doens't have id it
     will save it automatically. It can start from beginning, prev, next and
@@ -135,10 +138,12 @@ def run_by_object(object, start_point="beginning", task_queue=USE_TASK_QUEUE, ex
     from invenio.bibworkflow_object import BibWorkflowObject
     from invenio.bibworkflow_worker_engine import restartit
 
-    if isinstance(object, BibWorkflowObject):
-        if object.id is None:
-            object.save()
+    if isinstance(wf_object, BibWorkflowObject):
+        if wf_object.id is None:
+            wf_object.save()
     if task_queue:
-        return WORKER().restart(object.workflow_id, [object.id], start_point, external_save=external_save)
+        return WORKER().restart(wf_object.workflow_id, [wf_object.id],
+                                start_point, external_save=external_save)
     else:
-        return restartit(object.workflow_id, [object.id], start_point, external_save=external_save)
+        return restartit(wf_object.workflow_id, [wf_object.id], start_point,
+                         external_save=external_save)

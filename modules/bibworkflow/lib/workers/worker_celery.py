@@ -19,7 +19,7 @@ import os
 
 from invenio.bibworkflow_config import add_log, \
     CFG_BIBWORKFLOW_WORKERS_LOGDIR
-from invenio.bibworkflow_worker_engine import *
+from invenio.bibworkflow_worker_engine import runit, restartit
 from invenio.celery import celery
 
 

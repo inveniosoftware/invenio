@@ -99,7 +99,7 @@ distances from it.
         objects = WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid,
                                          WfeObject.parent_id == None)
 
-        self._check_workflow_execution(workflow, objects,
+        self._check_workflow_execution(objects,
                                        initial_data, final_data)
 
     def test_workflow_complex_run(self):
@@ -150,10 +150,10 @@ distances from it.
         objects = WfeObject.query.filter(WfeObject.workflow_id == workflow.uuid,
                                          WfeObject.parent_id == None)
 
-        self._check_workflow_execution(workflow, objects,
+        self._check_workflow_execution(objects,
                                        initial_data, None)
 
-    def _check_workflow_execution(self, workflow, objects,
+    def _check_workflow_execution(self, objects,
                                   initial_data, final_data):
         # Let's check that we found anything. There should only be one object
         self.assertEqual(objects.count(), 1)

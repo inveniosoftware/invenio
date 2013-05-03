@@ -49,16 +49,16 @@ Finished: {{ workflow.counter_finished }}">
                                 <div class="progress progress-striped active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% elif workflow.status == 2 %}
-                                <div class="progress progress-warning active">    
+                                <div class="progress progress-warning active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% elif workflow.status == 3 %}
-                                <div class="progress progress-danger active">    
+                                <div class="progress progress-danger active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% elif workflow.status == 4 %}
                                 <div class="progress progress-success active">
                                     <div class="bar" style="width: {{ progress }}%;"></div>
                             {% endif %}
-                                <!-- closing progress bar --> 
+                                <!-- closing progress bar -->
                                 </div>
                     </td>
                     <td>{{ workflow.error_msg }}</td>
@@ -83,7 +83,7 @@ Finished: {{ workflow.counter_finished }}">
                         </thead>
                         <tbody>
                         {% for object in workflow.objects %}
-                           
+
                                 <tr class="object" name="{{ object.id }}">
                                     <td>{{ object.id }}</td>
                                     <td>{{ object.name|truncate(20) }}</td>
@@ -104,7 +104,7 @@ Finished: {{ workflow.counter_finished }}">
                                     <td>{{ object.parent_id }}</td>
                                     <td>{{ object.state }}</td>
                                 </tr>
-                           
+
                         {% endfor %}
                         </tbody>
                     </table>
@@ -114,4 +114,4 @@ Finished: {{ workflow.counter_finished }}">
             {% endfor %}
         </tbody>
         </table>
-{% endblock %}
+        {% endblock %}

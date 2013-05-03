@@ -63,7 +63,7 @@ def simple_task(times):
 
 
 def sleep_task(t):
-    def _sleep_task(obj, eng):
+    def _sleep_task(dummy_obj, eng):
         eng.log.info("Going to sleep...")
         time.sleep(t)
         eng.log.info("I've woken up :)")
@@ -85,14 +85,14 @@ def higher_than_20(obj, eng):
 
 
 def add(value):
-    def _add(obj, eng):
+    def _add(obj, dummy_eng):
         """Function adds value to variable"""
         obj.data['data'] += value
     return _add
 
 
 def subtract(value):
-    def _subtract(obj, eng):
+    def _subtract(obj, dummy_eng):
         """Function subtract value from variable"""
         obj.data['data'] -= value
     return _subtract

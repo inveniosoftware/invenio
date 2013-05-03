@@ -17,11 +17,8 @@
 
 import os
 import re
-import logging
 
 from invenio.bibrecord import create_record
-from sqlalchemy import func
-from invenio.sqlalchemyutils import db
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR
 
@@ -93,4 +90,3 @@ class dictproperty(object):
         if obj is None:
             return self
         return self._proxy(obj, self._fget, self._fset, self._fdel)
-

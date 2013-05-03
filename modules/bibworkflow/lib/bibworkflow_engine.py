@@ -17,7 +17,6 @@
 
 import os
 import cPickle
-import traceback
 
 from invenio.bibworkflow_model import Workflow
 from workflow.engine import GenericWorkflowEngine, \
@@ -155,7 +154,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     def _update_db(self):
         db.session.commit()
 
-    def save(self, status=CFG_WORKFLOW_STATUS.NEW, e=""):
+    def save(self, status=CFG_WORKFLOW_STATUS.NEW):
         """
         Save the workflow instance to database.
         Just storing the necessary data.

@@ -31,15 +31,15 @@ class BibWorkflowObject(object):
 
     def __init__(self, data=None, workflow_id=None,
                  version=CFG_OBJECT_VERSION.INITIAL, parent_id=None,
-                 id=None, extra_data=None, task_counter=[0], user_id=0,
+                 wfobject_id=None, task_counter=[0], user_id=0,
                  extra_object_class=None):
         self.extra_object_class = extra_object_class
         self.status = None
         if isinstance(data, WfeObject):
             self.db_obj = data
         else:
-            if id is not None:
-                self.db_obj = WfeObject.query.filter(WfeObject.id == id).first()
+            if wfobject_id is not None:
+                self.db_obj = WfeObject.query.filter(WfeObject.id == wfobject_id).first()
             else:
                 # If data is a dictionary and contains type key,
                 # we can directly derive the data_type
@@ -194,7 +194,7 @@ class BibWorkflowObject(object):
     def changeStatus(self, message):
         self.status = message
 
-    def save_to_file(self, dir=CFG_TMPSHAREDDIR,
+    def save_to_file(self, directory=CFG_TMPSHAREDDIR,
                      prefix="bibworkflow_object_data_", suffix=".obj"):
         """
         Saves the contents of self.data['data'] to file.
@@ -204,7 +204,7 @@ class BibWorkflowObject(object):
         Warning: Currently assumes non-binary content.
         """
         if "data" in self.db_obj.data:
-            tmp_fd, filename = tempfile.mkstemp(dir=CFG_TMPSHAREDDIR,
+            tmp_fd, filename = tempfile.mkstemp(dir=directory,
                                                 prefix=prefix,
                                                 suffix=suffix)
             os.write(tmp_fd, self.db_obj.data['data'])

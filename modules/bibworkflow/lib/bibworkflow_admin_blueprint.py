@@ -126,17 +126,17 @@ def run_workflow(workflow_name, data=10):
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_wash_urlargd({'oid': (int, 0),
-                                'format': (unicode, 'default')})
-def entry_data_preview(oid, format):
+                                'of': (unicode, 'default')})
+def entry_data_preview(oid, of):
     workflow_object = WfeObject.query.filter(WfeObject.id == oid).first()
-    return _entry_data_preview(workflow_object.data, format)
+    return _entry_data_preview(workflow_object.data, of)
 
 
-def _entry_data_preview(data, format='default'):
+def _entry_data_preview(data, of='default'):
     if format == 'hd' or format == 'xm':
         from invenio.bibformat import format_record
         try:
-            data['record'] = format_record(recID=None, of=format,
+            data['record'] = format_record(recID=None, of=of,
                                            xml_record=data['record'])
         except:
             print "This is not a XML string"
