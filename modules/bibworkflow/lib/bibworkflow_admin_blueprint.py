@@ -35,11 +35,11 @@ import traceback
 blueprint = InvenioBlueprint('bibworkflow', __name__,
                              url_prefix="/admin/bibworkflow",
                              menubuilder=[('main.admin.bibworkflow',
-                                           _('BibWorkflow'),
+                                           _('Configure BibWorkflow'),
                                           'bibworkflow.index')],
                              breadcrumbs=[(_('Administration'),
                                            'help.admin'),
-                                          (_('BibWorkflow'),
+                                          (_('Configure BibWorkflow'),
                                            'bibworkflow.index')],)
 
 
@@ -112,17 +112,11 @@ def workflows():
 
 @blueprint.route('/run_workflow', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'workflow_name': (unicode, ""), 'extra_save': (unicode, "")})
-def run_workflow(workflow_name, extra_save, data=10):
+@blueprint.invenio_wash_urlargd({'workflow_name': (unicode, "")})
+def run_workflow(workflow_name, data=10):
     try:
         data = [{'data': data}]
         external_save = None
-        if(extra_save == 'hp'):
-            try:
-                from invenio.bibholdingpen_item import HoldingPenItem
-                external_save = HoldingPenItem
-            except ImportError:
-                pass
         run(workflow_name, data, external_save=external_save)
     except:
         traceback.print_exc()
