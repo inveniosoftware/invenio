@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+-- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -62,6 +62,11 @@ INSERT INTO collection VALUES (30, 'ISOLDE Papers', '980:"ISOLDEPAPER"', NULL, N
 INSERT INTO collection VALUES (31, 'ISOLDE Internal Notes', '980:"ISOLDENOTE"', NULL, NULL);
 INSERT INTO collection VALUES (32, 'Drafts', '980:"DRAFT"', NULL, NULL);
 INSERT INTO collection VALUES (33,'Videos','980:"VIDEO"',NULL,NULL);
+
+INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (17, 'usage;comments;metadata');
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
