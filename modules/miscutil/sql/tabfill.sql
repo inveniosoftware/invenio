@@ -660,11 +660,6 @@ INSERT INTO sbmGFILERESULT VALUES ('Tarred Tex (.tar)','tar archive');
 INSERT INTO sbmGFILERESULT VALUES ('JPEG','JPEG image');
 INSERT INTO sbmGFILERESULT VALUES ('GIF','GIF');
 
-INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (17, 'usage;comments;metadata');
-
 INSERT INTO swrREMOTESERVER VALUES (1, 'arXiv', 'arxiv.org', 'CDS_Invenio', 'sword_invenio', 'admin', 'SWORD at arXiv', 'http://arxiv.org/abs', 'https://arxiv.org/sword-app/servicedocument', '', 0);
 
 -- end of file
