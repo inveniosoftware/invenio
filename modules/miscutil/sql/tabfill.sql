@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+-- Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -650,11 +650,6 @@ INSERT INTO sbmGFILERESULT VALUES ('Compressed PostScript','gzip compressed data
 INSERT INTO sbmGFILERESULT VALUES ('Tarred Tex (.tar)','tar archive');
 INSERT INTO sbmGFILERESULT VALUES ('JPEG','JPEG image');
 INSERT INTO sbmGFILERESULT VALUES ('GIF','GIF');
-
-INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
-INSERT INTO collectiondetailedrecordpagetabs VALUES (17, 'usage;comments;metadata');
 
 INSERT INTO swrREMOTESERVER VALUES (1, 'arXiv', 'arxiv.org', 'CDS_Invenio', 'sword_invenio', 'admin', 'SWORD at arXiv', 'http://arxiv.org/abs', 'https://arxiv.org/sword-app/servicedocument', '', 0);
 

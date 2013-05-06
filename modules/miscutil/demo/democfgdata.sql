@@ -1,5 +1,5 @@
 -- This file is part of Invenio.
--- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+-- Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 --
 -- Invenio is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License as
@@ -53,6 +53,11 @@ INSERT INTO collection VALUES (23,'Atlantis Institute Books','hostedcollection:'
 INSERT INTO collection VALUES (24,'Atlantis Institute Articles','hostedcollection:',NULL,NULL);
 INSERT INTO collection VALUES (25,'Atlantis Times Drafts','980:"ATLANTISTIMESSCIENCEDRAFT" or 980:"ATLANTISTIMESARTSDRAFT" or 980:"ATLANTISTIMESNEWSDRAFT"',NULL,NULL);
 INSERT INTO collection VALUES (26,'Videos','980:"VIDEO"',NULL,NULL);
+
+INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
+INSERT INTO collectiondetailedrecordpagetabs VALUES (17, 'usage;comments;metadata');
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
