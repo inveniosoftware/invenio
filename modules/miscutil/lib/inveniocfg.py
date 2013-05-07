@@ -544,10 +544,12 @@ def cli_cmd_reset_recstruct_cache(conf):
         print ">>> Cleaning recstruct cache..."
         run_sql("DELETE FROM bibfmt WHERE format='recstruct'")
 
+
 def cli_cmd_reset_recjson_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recjson
     format."""
+    from invenio.flaskshell import app
     try:
         import cPickle as pickle
     except:
