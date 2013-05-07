@@ -24,6 +24,7 @@ pylib_DATA = bibfield.py \
              bibfield_config_engine.py \
              bibfield_config_engine_unit_tests.py \
              bibfield_jsonreader.py \
+             bibfield_manager.py \
              bibfield_marcreader.py \
              bibfield_marcreader_regression_tests.py \
              bibfield_utils.py \

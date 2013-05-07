@@ -555,40 +555,18 @@ def cli_cmd_reset_recjson_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recjson
     format."""
-    from invenio.flaskshell import app
-    try:
-        import cPickle as pickle
-    except:
-        import pickle
-    from invenio.intbitset import intbitset
-    from invenio.dbquery import run_sql
-    from invenio.bibfield import get_record
-    from invenio.bibsched import server_pid, pidfile
-    enable_recjson_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
-    enable_recjson_cache = enable_recjson_cache in ('True', '1')
-    pid = server_pid(ping_the_process=False)
-    if pid:
-        print >> sys.stderr, "ERROR: bibsched seems to run with pid %d, according to %s." % (pid, pidfile)
-        print >> sys.stderr, "       Please stop bibsched before running this procedure."
-        sys.exit(1)
-    if enable_recjson_cache:
-        print ">>> Searching records which need recjson cache resetting; this may take a while..."
-        all_recids = intbitset(run_sql("SELECT id FROM bibrec"))
-        #TODO: prevent doing all records?
-        recids = all_recids
-        print ">>> Generating recjson cache..."
-        tot = len(recids)
-        count = 0
-        for recid in recids:
-            run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recjson'", (recid,))
-            #TODO: Update the cache or wait for the first access
-            get_record(recid)
-            count += 1
-            if count % 1000 == 0:
-                print "    ... done records %s/%s" % (count, tot)
-        if count % 1000 != 0:
-            print "    ... done records %s/%s" % (count, tot)
-        print ">>> recjson cache generated successfully."
+    import sys
+    from warnings import warn
+    from invenio.database_manager import main
+
+    warn('inveniocfg --reset-recjson-cache is deprecated. Using instead: inveniomanage bibfield reset')
+
+    sys_argv = sys.argv
+    sys.argv = 'bibfield_manager.py reset'.split()
+    main()
+    sys.argv = sys_argv
+
+
 
 def cli_cmd_reset_siteadminemail(conf):
     """
@@ -816,11 +794,19 @@ def cli_cmd_load_webstat_conf(conf):
         sys.exit(1)
     print ">>> WebStat config load successfully."
 
+
 def cli_cmd_load_bibfield_config(conf):
-    print ">>> Going to load BibField config..."
-    from invenio.bibfield_config_engine import BibFieldParser
-    BibFieldParser().write_to_file()
-    print ">>> BibField config load successfully."
+    import sys
+    from warnings import warn
+    from invenio.bibfield_manager import main
+
+    warn('inveniocfg --load-bibfield-conf is deprecated. Using instead: inveniomanage bibfield config load')
+
+    sys_argv = sys.argv
+    sys.argv = 'bibfield_manager.py config load'.split()
+    main()
+    sys.argv = sys_argv
+
 
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
