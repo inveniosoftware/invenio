@@ -36,6 +36,11 @@ def cook_publisher_name(json_reader, publisher):
     return json_reader
 
 
+def cook_date(json_reader, date):
+    json_reader['imprint.date'] = date
+    return json_reader
+
+
 def cook_language(json_reader, language):
     json_reader['language'] = language
     return json_reader

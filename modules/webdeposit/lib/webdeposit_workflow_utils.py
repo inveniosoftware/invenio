@@ -17,12 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.sqlalchemyutils import db
+import os
+import time
 from sqlalchemy import func
+from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft
 from invenio.bibfield_jsonreader import JsonReader
-from invenio.bibupload import bibupload
-from invenio.bibrecord import create_record
+from tempfile import mkstemp
+from invenio.bibtask import task_low_level_submission
+from invenio.config import CFG_TMPSHAREDDIR
 
 """
     Functions to implement workflows
@@ -103,6 +106,13 @@ def export_marc_from_json():
 
 def create_record_from_marc():
     def create(obj, dummy_eng):
-        rec = create_record(obj.data['marc'])
-        bibupload(rec[0], opt_mode='insert')
+        marc = obj.data['marc']
+        tmp_file_fd, tmp_file_name = mkstemp(suffix='.marcxml',
+                                             prefix="webdeposit_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"),
+                                             dir=CFG_TMPSHAREDDIR)
+        os.write(tmp_file_fd, marc)
+        os.close(tmp_file_fd)
+        os.chmod(tmp_file_name, 0644)
+
+        task_low_level_submission('bibupload', 'webdeposit', '-i', tmp_file_name)
     return create

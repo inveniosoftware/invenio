@@ -78,7 +78,8 @@ config = {
                 },
                 'Date': {
                     'label': 'Date of Document',
-                    'widget': 'invenio.webdeposit_field_widgets:date_widget'
+                    'widget': 'invenio.webdeposit_field_widgets:date_widget',
+                    'cook': 'invenio.webdeposit_cook_json_utils:cook_date'
                 },
                 'NotesField': {
                     'label': 'Notes or Comments'
