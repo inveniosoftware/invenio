@@ -77,6 +77,7 @@ def get_workflow(deposition_type, uuid):
     except KeyError:
         # deposition type not found
         return None
+    # FIXME: check if uuid exists first
     return DepositionWorkflow(uuid=uuid,
                               deposition_type=deposition_type,
                               workflow=wf)
@@ -173,6 +174,8 @@ def get_form(user_id, uuid, step=None):
     """ Returns the current state of the workflow in a form
         or a previous state (step)
     """
+
+    #FIXME: merge with get_current_form
 
     if step is None:
         webdeposit_draft_query = \

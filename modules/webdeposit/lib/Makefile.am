@@ -35,7 +35,8 @@ pylib_DATA = __init__.py \
              webdeposit_config.py \
              webdeposit_config_utils.py \
              webdeposit_form.py \
-             webdeposit_cook_json_utils.py
+             webdeposit_cook_json_utils.py \
+             webdeposit_regression_tests.py
 
 jsdir=$(localstatedir)/www/js
 
