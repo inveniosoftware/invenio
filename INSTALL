@@ -306,6 +306,7 @@ Contents
       $ sudo -u www-data emacs /opt/invenio/etc/invenio-local.conf
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-tables
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-bibfield-conf
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-webstat-conf
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --create-apache-conf
       $ sudo /etc/init.d/apache2 restart
@@ -663,6 +664,13 @@ Contents
           At this point you should now have successfully completed the
           "make install" process.  We continue by setting up the
           Apache web server.
+
+      $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-bibfield-conf
+
+          Load the configuration file of the BibField module.  It will
+          create `bibfield_config.py' file.  (FIXME: When BibField
+          becomes essential part of Invenio, this step should be later
+          automatised so that people do not have to run it manually.)
 
       $ sudo -u www-data /opt/invenio/bin/inveniocfg --load-webstat-conf
 
