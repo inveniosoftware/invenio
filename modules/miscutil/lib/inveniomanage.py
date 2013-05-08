@@ -20,7 +20,7 @@
 
 import os
 from pprint import pformat
-from flask.ext.script import Manager
+from flask.ext.script import Manager, Command
 from flask.ext.script.commands import ShowUrls  # , Clean
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.pluginutils import PluginContainer
@@ -59,6 +59,13 @@ open(os.path.join(CFG_LOGDIR, 'broken-managers.log'), 'w').write(
 for manager_name, plugin in _MANAGERS.iteritems():
     name = manager_name[:-len('_manager')]
     manager.add_command(name, plugin)
+
+
+@manager.command
+def version():
+    """ Get running version of Invenio """
+    from invenio.config import CFG_VERSION
+    return CFG_VERSION
 
 #FIXME clean command is broken
 #manager.add_command("clean", Clean())

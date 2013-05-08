@@ -1265,7 +1265,12 @@ def main(*cmd_args):
     (options, dummy_args) = parser.parse_args(list(cmd_args))
 
     if getattr(options, 'version', False):
-        print_version()
+        from invenio import inveniomanage
+        warn('inveniocfg --version is deprecated. Using instead: inveniomanage version')
+        sys_argv = sys.argv
+        sys.argv = 'inveniomanage.py version'.split()
+        inveniomanage.main()
+        sys.argv = sys_argv
     else:
         # Read configuration
         try:
