@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -40,6 +40,8 @@ from invenio.config import CFG_WEBAUTHORPROFILE_MAX_KEYWORD_LIST
 from invenio.config import CFG_WEBAUTHORPROFILE_MAX_AFF_LIST
 from invenio.config import CFG_WEBAUTHORPROFILE_MAX_COAUTHOR_LIST
 
+import cgi
+import urllib
 
 CFG_HEPNAMES_EMAIL = 'authors@inspirehep.net'
 MAX_ITEM_BEFORE_COLLAPSE = 10
@@ -160,7 +162,7 @@ class Template:
 
         # first find total number of hits:
         out = ('<table class="searchresultsbox" ><thead><tr><th class="searchresultsboxheader">'
-            + header + '</th></tr></thead><tbody><tr><td id ="%s" class="searchresultsboxbody">' % id
+            + header + '</th></tr></thead><tbody><tr><td id ="%s" class="searchresultsboxbody">' % cgi.escape(id)
             + body + '</td></tr></tbody></table>')
         return out
 
@@ -226,7 +228,7 @@ class Template:
             name_lnk = create_html_link(websearch_templates.build_search_url(p=prquery),
                                                               {},
                                                               str(frequency),)
-            content.append("%s (%s)" % (name, name_lnk))
+            content.append("%s (%s)" % (cgi.escape(name), name_lnk))
 
         if not content:
             content = [_("No Name Variants")]
@@ -693,14 +695,14 @@ class Template:
         else:
             headernumpapers = ''
         headertext = ('<h1><span id="authornametitle">%s</span> <span id="numpaperstitle" style="font-size:50%%;">%s</span></h1>'
-                      % (display_name, headernumpapers))
+                      % (cgi.escape(display_name), headernumpapers))
 
         html = []
         html.append(headertext)
 
         if person_link or person_link == 'None':
             cmp_link = ('<div><a href="%s/person/claimstub?person=%s">%s</a></div>'
-                      % (CFG_SITE_URL, person_link,
+                      % (CFG_SITE_URL, urllib.quote(person_link),
                          _("This is me.  Verify my publication list.")))
             html.append(cmp_link)
 
