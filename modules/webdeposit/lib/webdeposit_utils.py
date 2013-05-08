@@ -553,8 +553,9 @@ def create_user_file_system(user_id, deposition_type, uuid):
 
 def decode_dict_from_unicode(unicode_input):
     if isinstance(unicode_input, dict):
-        return {decode_dict_from_unicode(key): decode_dict_from_unicode(value)
-                for key, value in unicode_input.iteritems()}
+        return dict((decode_dict_from_unicode(key),
+                     decode_dict_from_unicode(value))
+                    for key, value in unicode_input.iteritems())
     elif isinstance(unicode_input, list):
         return [decode_dict_from_unicode(element) for element in unicode_input]
     elif isinstance(unicode_input, unicode):
