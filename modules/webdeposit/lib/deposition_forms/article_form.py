@@ -37,7 +37,7 @@ class ArticleForm(Form):
     issn = fields.ISSNField(label=_('ISSN'))
     title = fields.TitleField(label=_('Document Title'))
     author = fields.AuthorField(label=_('Author'))
-    abstract = fields.AbstractField(label=_('Abstract'), widget=ckeditor_widget)
+    abstract = fields.AbstractField(label=_('Abstract'))
     pagesnum = fields.PagesNumberField(label=_('Number of Pages'))
     languages = [("en", _("English")),
                 ("fre", _("French")),

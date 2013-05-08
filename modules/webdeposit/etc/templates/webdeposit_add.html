@@ -269,7 +269,7 @@ $(document).ready(function() {
 
 {% endfor %}
 
-  $(".datepicker").datepicker();
+  $(".datepicker").datepicker({dateFormat: 'yy-mm-dd'});
 
   $("input#submitButton").click(function(e ) {
           e.preventDefault();

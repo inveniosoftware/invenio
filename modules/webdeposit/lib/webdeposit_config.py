@@ -66,7 +66,6 @@ config = {
                 },
                 'AbstractField': {
                     'label': 'Abstract',
-                    'widget': 'invenio.webdeposit_field_widgets:ckeditor_widget',
                     'cook': 'invenio.webdeposit_cook_json_utils:cook_abstract_summary'
                 },
                 'PagesNumberField': {
