@@ -56,7 +56,8 @@ config = {
                     'cook': 'invenio.webdeposit_cook_json_utils:cook_issn'
                 },
                 'TitleField': {
-                    'label': 'Document Title'
+                    'label': 'Document Title',
+                    'cook': 'invenio.webdeposit_cook_json_utils:cook_title'
                 },
                 'AuthorField': {
                     'label': 'Author',
@@ -99,6 +100,7 @@ config = {
                 }
             },
             'title': _('Submit an Article')
-        }
+        },
+        'collection': 'Article'
     }
 }

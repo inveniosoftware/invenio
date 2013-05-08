@@ -21,7 +21,9 @@ import os
 import time
 from sqlalchemy import func
 from invenio.sqlalchemyutils import db
+from invenio.webdeposit_config_utils import WebDepositConfiguration
 from invenio.webdeposit_model import WebDepositDraft
+from invenio.bibworkflow_model import Workflow
 from invenio.bibfield_jsonreader import JsonReader
 from tempfile import mkstemp
 from invenio.bibtask import task_low_level_submission
@@ -98,6 +100,18 @@ def export_marc_from_json():
             except:
                 # some steps don't have any form ...
                 pass
+
+        deposition_type = \
+            db.session.query(Workflow.name).\
+            filter(Workflow.user_id == user_id,
+                   Workflow.uuid == uuid).\
+            one()[0]
+
+        # Get the collection from configuration
+        deposition_conf = WebDepositConfiguration(deposition_type=deposition_type)
+        # or if it's not there, name the collection after the deposition type
+        json_reader['collection.primary'] = \
+            deposition_conf.get_collection() or deposition_type
 
         marc = json_reader.legacy_export_as_marc()
         obj.data['marc'] = marc

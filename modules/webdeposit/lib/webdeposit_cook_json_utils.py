@@ -27,7 +27,7 @@ Functions to be used in for transforming a webdeposit json
 
 
 def cook_title(json_reader, title):
-    json_reader['title_full.title'] = title
+    json_reader['title.title'] = title
     return json_reader
 
 

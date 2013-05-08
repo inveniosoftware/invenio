@@ -210,3 +210,13 @@ class WebDepositConfiguration(object):
                         return import_string(field_config['cook'])
         else:
             return None
+
+    def get_collection(self, deposition_type=None):
+        deposition_type = deposition_type or self.get_deposition_type()
+
+        if deposition_type in self.config:
+            deposition_config = self.config[deposition_type]
+            if 'collection' in deposition_config:
+                return deposition_config['collection']
+        else:
+            return None
