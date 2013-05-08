@@ -63,7 +63,7 @@ blueprint = InvenioBlueprint('webmessage', __name__, url_prefix="/yourmessages",
                                           ('main.messages', MessagesMenu(),
                                            'webmessage.index', -3, [],
                                            not_guest)],
-                             breadcrumbs=[(_("Your Account"), 'webaccount.index'),
+                             breadcrumbs=[(_("Your Account"), 'youraccount.edit'),
                                           ('Your Messages', 'webmessage.index')])
 
 
@@ -137,7 +137,7 @@ def add(msg_reply_id):
                 message.subject = _("Re:") + " " + m.message.subject
                 message.body = email_quote_txt(m.message.body)
                 form = AddMsgMESSAGEForm(request.form, obj=message)
-                return dict(form=form)
+                return render_template('webmessage_add.html', form=form)
             except db.sqlalchemy.orm.exc.NoResultFound:
                 # The message exists in table user_msgMESSAGE
                 # but not in table msgMESSAGE => table inconsistency

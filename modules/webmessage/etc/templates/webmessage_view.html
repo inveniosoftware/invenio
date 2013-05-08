@@ -24,7 +24,7 @@
 <dl class="dl-horizontal well offset1 span5">
   <dt>{{ _("From") }}</dt>
   <dd>
-    <a href="{{ url_for('.write', msg_to=m.message.user_from.nickname) }}">
+    <a href="{{ url_for('.add', sent_to_user_nicks=m.message.user_from.nickname) }}">
       {{ m.message.user_from.nickname }}
     </a>
   </dd>
@@ -35,13 +35,13 @@
   <dt>{{ _("Sent to") }}</dt>
   <dd>
     {% for nickname in m.message.user_nicks %}
-    <a href="{{ url_for('.write', msg_to=nickname) }}">{{ nickname }}</a>{{ ", " if not loop.last }}
+    <a href="{{ url_for('.add', sent_to_user_nicks=nickname) }}">{{ nickname }}</a>{{ ", " if not loop.last }}
     {% endfor %}
   </dd>
   <dt>{{ _("Sent to groups") }}</dt>
   <dd>
     {% for group in m.message.group_names %}
-    <a href="{{ url_for('.write', msg_to_group=group) }}">{{ group }}</a>{{ ", " if not loop.last }}
+    <a href="{{ url_for('.add', sent_to_group_names=group) }}">{{ group }}</a>{{ ", " if not loop.last }}
     {% endfor %}
   </dd>
 </dl>
@@ -52,7 +52,7 @@
   </div>
 </div>
 <div class="form-actions">
-    <a href="{{ url_for('.write', msg_reply_id=m.message.id) }}" class="btn btn-primary">{{ _("Reply") }}</a>
+    <a href="{{ url_for('.add', msg_reply_id=m.message.id) }}" class="btn btn-primary">{{ _("Reply") }}</a>
     <a href="{{ url_for('.delete', msgid=m.message.id) }}" class="pull-right btn btn-danger">{{ _("Delete") }}</a>
 </div>
 
