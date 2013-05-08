@@ -135,6 +135,8 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
 from invenio.webinterface_handler_flask import create_invenio_flask_app, \
     with_app_context
 from invenio.urlutils import rewrite_to_secure_url
+import pyparsing  # needed to import here before flask.ext.testing in
+                  # order to avoid pyparsing troubles due to twill
 from flask.ext.testing import TestCase
 from sqlalchemy.engine.url import URL
 from functools import wraps
