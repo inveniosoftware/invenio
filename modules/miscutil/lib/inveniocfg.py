@@ -88,6 +88,7 @@ import shutil
 import socket
 import string
 import sys
+from warnings import warn
 
 
 def print_usage():
@@ -416,6 +417,7 @@ def cli_cmd_update_dbexec(conf):
     fdesc.close()
     print ">>> dbexec updated successfully."
 
+
 def cli_cmd_update_bibconvert_tpl(conf):
     """
     Update bibconvert/config/*.tpl files looking for 856
@@ -423,30 +425,15 @@ def cli_cmd_update_bibconvert_tpl(conf):
     from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
-    print ">>> Going to update bibconvert templates..."
-    ## location where bibconvert/config/*.tpl are:
-    tpldir = conf.get("Invenio", 'CFG_ETCDIR') + \
-             os.sep + 'bibconvert' + os.sep + 'config'
-    ## find all *.tpl files:
-    for tplfilename in os.listdir(tpldir):
-        if tplfilename.endswith(".tpl"):
-            ## change tpl file:
-            tplfile = tpldir + os.sep + tplfilename
-            shutil.copy(tplfile, tplfile + '.OLD')
-            out = ''
-            for line in open(tplfile, 'r').readlines():
-                match = re.search(r'^(.*)http://.*?/%s/(.*)$' % conf.get("Invenio", 'CFG_SITE_RECORD'), line)
-                if match:
-                    out += "%s%s/%s/%s\n" % (match.group(1),
-                                                 conf.get("Invenio", 'CFG_SITE_URL'),
-                                                 conf.get("Invenio", 'CFG_SITE_RECORD'),
-                                                 match.group(2))
-                else:
-                    out += line
-            fdesc = open(tplfile, 'w')
-            fdesc.write(out)
-            fdesc.close()
-    print ">>> bibconvert templates updated successfully."
+    from invenio.bibconvert_manager import main
+
+    warn('inveniocfg --update-bibconvert-tpl is deprecated. Using instead: inveniomanage bibconvert update')
+
+    sys_argv = sys.argv
+    sys.argv = 'bibconvert_manager.py update'.split()
+    main()
+    sys.argv = sys_argv
+
 
 def cli_cmd_update_web_tests(conf):
     """
@@ -555,8 +542,6 @@ def cli_cmd_reset_recjson_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recjson
     format."""
-    import sys
-    from warnings import warn
     from invenio.database_manager import main
 
     warn('inveniocfg --reset-recjson-cache is deprecated. Using instead: inveniomanage bibfield reset')
@@ -773,8 +758,6 @@ def cli_cmd_create_secret_key(conf):
 
 def cli_cmd_create_tables(conf):
     """Create and fill Invenio DB tables.  Useful for the installation process."""
-    import sys
-    from warnings import warn
     from invenio.database_manager import main
 
     warn('inveniocfg --create-tables is deprecated. Using instead: inveniomanage database create')
@@ -796,8 +779,6 @@ def cli_cmd_load_webstat_conf(conf):
 
 
 def cli_cmd_load_bibfield_config(conf):
-    import sys
-    from warnings import warn
     from invenio.bibfield_manager import main
 
     warn('inveniocfg --load-bibfield-conf is deprecated. Using instead: inveniomanage bibfield config load')
@@ -812,8 +793,6 @@ def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
     print ">>> Going to drop tables and related data on filesystem ..."
 
-    import sys
-    from warnings import warn
     from invenio.database_manager import main
 
     warn('inveniocfg --drop-tables is deprecated. Using instead: inveniomanage database drop')
@@ -958,8 +937,6 @@ def cli_cmd_create_apache_conf(conf):
     Create Apache conf files for this site, keeping previous
     files in a backup copy.
     """
-    import sys
-    from warnings import warn
     from invenio.apache_manager import main
 
     warn('inveniocfg --create-apache-conf is deprecated. Using instead: inveniomanage apache create_conf')
@@ -1080,8 +1057,6 @@ def cli_cmd_upgrade(conf):
     """
     Command for applying upgrades
     """
-    import sys
-    from warnings import warn
     from invenio.upgrade_manager import main
 
     warn('inveniocfg --upgrade-check is deprecated. Using instead: inveniomanage upgrade run')
@@ -1096,8 +1071,6 @@ def cli_cmd_upgrade_check(conf):
     """
     Command for running pre-upgrade checks
     """
-    import sys
-    from warnings import warn
     from invenio.upgrade_manager import main
 
     warn('inveniocfg --upgrade-check is deprecated. Using instead: inveniomanage upgrade check')
@@ -1112,8 +1085,6 @@ def cli_cmd_upgrade_show_pending(conf):
     """
     Command for showing upgrades ready to be applied
     """
-    import sys
-    from warnings import warn
     from invenio.upgrade_manager import main
 
     warn('inveniocfg --upgrade-show-pending is deprecated. Using instead: inveniomanage upgrade show pending')
@@ -1128,8 +1099,6 @@ def cli_cmd_upgrade_show_applied(conf):
     """
     Command for showing all upgrades already applied.
     """
-    import sys
-    from warnings import warn
     from invenio.upgrade_manager import main
 
     warn('inveniocfg --upgrade-show-applied is deprecated. Using instead: inveniomanage upgrade show applied')

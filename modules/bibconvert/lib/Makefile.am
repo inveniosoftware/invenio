@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibconvert.py bibconvert_unit_tests.py	\
+	     bibconvert_manager.py \
 	     bibconvert_bfx_engine.py \
 	     bibconvert_xslt_engine.py \
              bibconvert_regression_tests.py
