@@ -20,12 +20,20 @@
 
 import os
 from pprint import pformat
-from flask.ext.script import Manager, Command
+from flask.ext.script import Manager
 from flask.ext.script.commands import ShowUrls  # , Clean
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.pluginutils import PluginContainer
 from invenio.sqlalchemyutils import db
 from invenio.webinterface_handler_flask import create_invenio_flask_app
+
+
+def change_command_name(action, new_name):
+    def decorator(f):
+        f.__name__ = new_name
+        return action(f)
+    return decorator
+
 
 manager = Manager(create_invenio_flask_app)
 
@@ -67,9 +75,49 @@ def version():
     from invenio.config import CFG_VERSION
     return CFG_VERSION
 
+
+@change_command_name(manager.command, 'detect-system-name')
+def detect_system_details():
+    """
+    Detect and print system details such as Apache/Python/MySQL
+    versions etc. (useful for debugging problems on various OS)
+    """
+    import sys
+    import socket
+    print ">>> Going to detect system details..."
+    print "* Hostname: " + socket.gethostname()
+    print "* Invenio version: " + version()
+    print "* Python version: " + sys.version.replace("\n", " ")
+
+    try:
+        from invenio.apache_manager import version as detect_apache_version
+        print "* Apache version: " + detect_apache_version(
+            separator=";\n                  ")
+    except ImportError:
+        print >> sys.stderr, '* Apache manager could not be imported.'
+
+    try:
+        from invenio.database_manager import \
+            mysql_info, \
+            version as detect_database_driver_version, \
+            driver as detect_database_driver_name
+
+        print "* " + detect_database_driver_name() + " version: " + \
+            detect_database_driver_version()
+        try:
+            out = mysql_info(separator="\n", line_format="    - %s: %s")
+            print "* MySQL version:\n", out
+        except Exception, e:
+            print >> sys.stderr, "* Error:", e
+    except ImportError:
+        print >> sys.stderr, '* Database manager could not be imported.'
+
+    print ">>> System details detected successfully."
+
+
 #FIXME clean command is broken
 #manager.add_command("clean", Clean())
-manager.add_command("show_urls", ShowUrls())
+manager.add_command("show-urls", ShowUrls())
 
 
 def main():

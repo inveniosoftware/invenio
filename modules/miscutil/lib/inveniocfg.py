@@ -297,15 +297,13 @@ Please, update your invenio-local.conf file accordingly.""")
     ## 5) finally, return output line:
     return '%s = %s' % (option_name, option_value)
 
-def cli_cmd_update_config_py(conf):
-    """
-    Update new config.py from conf options, keeping previous
-    config.py in a backup copy.
-    """
+
+def update_config_py(conf):
+    import sys
     print ">>> Going to update config.py..."
     ## location where config.py is:
     configpyfile = conf.get("Invenio", "CFG_PYLIBDIR") + \
-                   os.sep + 'invenio' + os.sep + 'config.py'
+        os.sep + 'invenio' + os.sep + 'config.py'
     ## backup current config.py file:
     if os.path.exists(configpyfile):
         shutil.copy(configpyfile, configpyfile + '.OLD')
@@ -346,8 +344,8 @@ def cli_cmd_update_config_py(conf):
         print >> sys.stderr, """WARNING: CFG_SITE_SECRET_KEY can not be empty.
 You may want to customise your invenio-local.conf configuration accordingly.
 
-$ %sinveniocfg --create-secret-key
-$ %sinveniocfg --update-config-py
+$ %sinveniomanage config create secret-key
+$ %sinveniomanage config update
 """ % (CFG_BINDIR, CFG_BINDIR)
 
     ## FIXME: special treatment for experimental variables
@@ -362,6 +360,23 @@ $ %sinveniocfg --update-config-py
     fdesc.close()
     print "You may want to restart Apache now."
     print ">>> config.py updated successfully."
+
+
+def cli_cmd_update_config_py(conf):
+    """
+    Update new config.py from conf options, keeping previous
+    config.py in a backup copy.
+    """
+    update_config_py(conf)
+    # from invenio.config_manager import main
+
+    # warn('inveniocfg --update-config-py is deprecated. Using instead: inveniomanage config update')
+
+    # sys_argv = sys.argv
+    # sys.argv = 'config_manager.py update'.split()
+    # main()
+    # sys.argv = sys_argv
+
 
 def cli_cmd_update_dbquery_py(conf):
     """
@@ -731,29 +746,18 @@ before continuing.""" % err)
         run_sql("DROP TABLE IF EXISTS test__invenio__utf8")
     print "ok"
 
+
 def cli_cmd_create_secret_key(conf):
     """Generate and append CFG_SITE_SECRET_KEY to invenio-local.conf.
     Useful for the installation process."""
-    print ">>> Going to generate random CFG_SITE_SECRET_KEY..."
-    try:
-        from invenio.config import CFG_ETCDIR, CFG_SITE_SECRET_KEY
-    except ImportError:
-        print "ERROR: please run 'inveniocfg --update-config-py' first."
-        sys.exit(1)
-    if CFG_SITE_SECRET_KEY is not None and len(CFG_SITE_SECRET_KEY) > 0:
-        print "ERROR: CFG_SITE_SECRET_KEY is already filled."
-        sys.exit(1)
-    invenio_local_path = CFG_ETCDIR + os.sep + 'invenio-local.conf'
-    if _grep_version_from_executable(invenio_local_path, 'CFG_SITE_SECRET_KEY'):
-        print "WARNING: invenio-local.conf already contains CFG_SITE_SECRET_KEY."
-        print "You may want to run 'inveniocfg --update-all'' now."
-        print ">>> No need to generate secret key."
-    else:
-        secret_key = ''.join([random.choice(string.letters + string.digits) \
-                              for dummy in range(0,256)])
-        with open(invenio_local_path, 'a') as f:
-            f.write('\nCFG_SITE_SECRET_KEY = %s\n' % (secret_key, ))
-        print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
+    from invenio.config_manager import main
+
+    warn('inveniocfg --create-secret-key is deprecated. Using instead: inveniomanage config create secret-key')
+
+    sys_argv = sys.argv
+    sys.argv = 'config_manager.py config create secret-key'.split()
+    main()
+    sys.argv = sys_argv
 
 
 def cli_cmd_create_tables(conf):
@@ -946,41 +950,44 @@ def cli_cmd_create_apache_conf(conf):
     main()
     sys.argv = sys_argv
 
+
 def cli_cmd_get(conf, varname):
     """
     Return value of VARNAME read from CONF files.  Useful for
     third-party programs to access values of conf options such as
     CFG_PREFIX.  Return None if VARNAME is not found.
     """
+    from invenio.config_manager import main
+
+    warn('inveniocfg --get="%(varname)s" is deprecated. '
+         'Using instead: inveniomanage config get "%(varname)s"' % {
+         'varname': varname
+         })
+
+    sys_argv = sys.argv
+    sys.argv = 'config_manager.py get'.split()
+    sys.argv.append(varname)
     try:
-        if not varname:
-            raise Exception("ERROR: Please specify a configuration variable.")
-        varname = varname.lower()
-        # do not pay attention to section names yet:
-        all_options = {}
-        for section in conf.sections():
-            for option in conf.options(section):
-                all_options[option] = conf.get(section, option)
-        varvalue = all_options.get(varname, None)
-        if varvalue is None:
-            raise Exception()
-        print varvalue
-    except Exception, e:
-        if e.message:
-            print e.message
-        sys.exit(1)
+        main()
+    except SystemExit:
+        pass
+    sys.argv = sys_argv
+
 
 def cli_cmd_list(conf):
     """
     Print a list of all conf options and values from CONF.
     """
-    sections = conf.sections()
-    sections.sort()
-    for section in sections:
-        options = conf.options(section)
-        options.sort()
-        for option in options:
-            print option.upper(), '=', conf.get(section, option)
+    from invenio.config_manager import main
+
+    warn('inveniocfg --list is deprecated. '
+         'Using instead: inveniomanage config list')
+
+    sys_argv = sys.argv
+    sys.argv = 'config_manager.py list'.split()
+    main()
+    sys.argv = sys_argv
+
 
 def _grep_version_from_executable(path_to_exec, version_regexp):
     """
@@ -1006,37 +1013,14 @@ def cli_cmd_detect_system_details(conf):
     Detect and print system details such as Apache/Python/MySQL
     versions etc.  Useful for debugging problems on various OS.
     """
-    from invenio.apache_manager import version as detect_apache_version
-    import MySQLdb
-    print ">>> Going to detect system details..."
-    print "* Hostname: " + socket.gethostname()
-    print "* Invenio version: " + conf.get("Invenio", "CFG_VERSION")
-    print "* Python version: " + sys.version.replace("\n", " ")
-    print "* Apache version: " + detect_apache_version(
-        separator=";\n                  ")
-    print "* MySQLdb version: " + MySQLdb.__version__
-    try:
-        from invenio.dbquery import run_sql
-        print "* MySQL version:"
-        for key, val in run_sql("SHOW VARIABLES LIKE 'version%'") + \
-                run_sql("SHOW VARIABLES LIKE 'charact%'") + \
-                run_sql("SHOW VARIABLES LIKE 'collat%'"):
-            if False:
-                print "    - %s: %s" % (key, val)
-            elif key in ['version',
-                         'character_set_client',
-                         'character_set_connection',
-                         'character_set_database',
-                         'character_set_results',
-                         'character_set_server',
-                         'character_set_system',
-                         'collation_connection',
-                         'collation_database',
-                         'collation_server']:
-                print "    - %s: %s" % (key, val)
-    except ImportError:
-        print "* ERROR: cannot import dbquery"
-    print ">>> System details detected successfully."
+    from invenio.inveniomanage import main
+
+    warn('inveniocfg --detect-system-name is deprecated. Using instead: inveniomanage detect-system-name')
+
+    sys_argv = sys.argv
+    sys.argv = 'inveniomanage detect-system-name'.split()
+    main()
+    sys.argv = sys_argv
 
 
 def cli_cmd_upgrade(conf):
@@ -1314,11 +1298,15 @@ def main(*cmd_args):
             elif action == 'run-flask-tests':
                 cli_cmd_run_flask_tests(conf)
             elif action == 'update-all':
-                cli_cmd_update_config_py(conf)
-                cli_cmd_update_dbquery_py(conf)
-                cli_cmd_update_dbexec(conf)
-                cli_cmd_update_bibconvert_tpl(conf)
-                cli_cmd_update_web_tests(conf)
+                for f in [cli_cmd_update_config_py,
+                          cli_cmd_update_dbquery_py,
+                          cli_cmd_update_dbexec,
+                          cli_cmd_update_bibconvert_tpl,
+                          cli_cmd_update_web_tests]:
+                    try:
+                        f(conf)
+                    except:
+                        pass
             elif action == 'update-config-py':
                 cli_cmd_update_config_py(conf)
             elif action == 'update-dbquery-py':

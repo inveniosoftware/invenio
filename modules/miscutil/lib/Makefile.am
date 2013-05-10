@@ -28,6 +28,7 @@ pylib_DATA = __init__.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
              flask_sslify.py \
+             config_manager.py \
              celery.py \
              celery_config.py \
              celery_unit_tests.py \

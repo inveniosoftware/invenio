@@ -250,6 +250,68 @@ def populate(default_data=True):  # , sample_data=False):
     print ">>> Tables filled successfully."
 
 
+@manager.command
+def version():
+    """ Get running version of database driver."""
+    from invenio.sqlalchemyutils import db
+    try:
+        return db.engine.dialect.dbapi.__version__
+    except:
+        import MySQLdb
+        return MySQLdb.__version__
+
+
+@manager.option('--verbose', action='store_true',
+                dest='verbose', help='Display more details.')
+def driver(verbose=False):
+    """ Get name of running database driver."""
+    from invenio.sqlalchemyutils import db
+    try:
+        return db.engine.dialect.dbapi.__name__ + (('==' + version())
+                                                   if verbose else '')
+    except:
+        import MySQLdb
+        return MySQLdb.__name__ + (('==' + version()) if verbose else '')
+
+
+@manager.option('-s', '--separator', dest='separator', default="\n")
+@manager.option('-l', '--line-format', dest='line_format', default="%s: %s")
+def mysql_info(separator=None, line_format=None):
+    """
+    Detect and print MySQL details useful for debugging problems on various OS.
+    """
+
+    from invenio.sqlalchemyutils import db
+    if db.engine.name != 'mysql':
+        raise Exception('Database engine is not mysql.')
+
+    from invenio.dbquery import run_sql
+    out = []
+    for key, val in run_sql("SHOW VARIABLES LIKE 'version%'") + \
+            run_sql("SHOW VARIABLES LIKE 'charact%'") + \
+            run_sql("SHOW VARIABLES LIKE 'collat%'"):
+        if False:
+            print "    - %s: %s" % (key, val)
+        elif key in ['version',
+                     'character_set_client',
+                     'character_set_connection',
+                     'character_set_database',
+                     'character_set_results',
+                     'character_set_server',
+                     'character_set_system',
+                     'collation_connection',
+                     'collation_database',
+                     'collation_server']:
+            out.append((key, val))
+
+    if separator is not None:
+        if line_format is None:
+            line_format = "%s: %s"
+        return separator.join(map(lambda i: line_format % i, out))
+
+    return dict(out)
+
+
 def main():
     from invenio.webinterface_handler_flask import create_invenio_flask_app
     app = create_invenio_flask_app()
