@@ -22,6 +22,26 @@ from flask.ext.script import Manager
 manager = Manager(usage="Perform Apache operations.")
 
 
+@manager.command
+def version(separator='\n'):
+    """
+    Try to detect Apache version by localizing httpd or apache
+    executables and grepping inside binaries.  Return list of all
+    found Apache versions and paths.  (For a given executable, the
+    returned format is 'apache_version [apache_path]'.)  Return empty
+    list if no success.
+    """
+    from invenio.inveniocfg import _grep_version_from_executable
+    from invenio.shellutils import run_shell_command
+    out = []
+    dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
+    for apache in cmd_out.split("\n"):
+        apache_version = _grep_version_from_executable(apache, '^Apache\/')
+        if apache_version:
+            out.append("%s [%s]" % (apache_version, apache))
+    return separator.join(out)
+
+
 @manager.option('-f', '--force', dest='force')
 @manager.option('--no-ssl', dest='no_ssl')
 def create_conf(force=False, no_ssl=True):

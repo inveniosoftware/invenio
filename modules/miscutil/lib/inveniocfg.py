@@ -1000,34 +1000,20 @@ def _grep_version_from_executable(path_to_exec, version_regexp):
                     exec_version = cmd2_out_line
     return exec_version
 
-def detect_apache_version():
-    """
-    Try to detect Apache version by localizing httpd or apache
-    executables and grepping inside binaries.  Return list of all
-    found Apache versions and paths.  (For a given executable, the
-    returned format is 'apache_version [apache_path]'.)  Return empty
-    list if no success.
-    """
-    from invenio.shellutils import run_shell_command
-    out = []
-    dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
-    for apache in cmd_out.split("\n"):
-        apache_version = _grep_version_from_executable(apache, '^Apache\/')
-        if apache_version:
-            out.append("%s [%s]" % (apache_version, apache))
-    return out
 
 def cli_cmd_detect_system_details(conf):
     """
     Detect and print system details such as Apache/Python/MySQL
     versions etc.  Useful for debugging problems on various OS.
     """
+    from invenio.apache_manager import version as detect_apache_version
     import MySQLdb
     print ">>> Going to detect system details..."
     print "* Hostname: " + socket.gethostname()
     print "* Invenio version: " + conf.get("Invenio", "CFG_VERSION")
     print "* Python version: " + sys.version.replace("\n", " ")
-    print "* Apache version: " + ";\n                  ".join(detect_apache_version())
+    print "* Apache version: " + detect_apache_version(
+        separator=";\n                  ")
     print "* MySQLdb version: " + MySQLdb.__version__
     try:
         from invenio.dbquery import run_sql
