@@ -235,10 +235,10 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
             errors--;
             old_value = $('[name=' + name + ']').val();
             if (old_value != value) {
-                if (ckeditor.name == name)
-                    ckeditor.setData(value);
-                else
+                if (typeof ckeditor === 'undefined')
                     $('[name=' + name + ']').val(value);
+                else if (ckeditor.name == name)
+                        ckeditor.setData(value);
                 webdeposit_handle_new_value(name, value, url, required_fields);
             }
         });
