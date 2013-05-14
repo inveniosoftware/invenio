@@ -21,35 +21,36 @@
 
 __revision__ = "$Id$"
 
-import unittest
-
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
+from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
-from invenio import webmessage
-from invenio.config import CFG_SITE_LANG
-from invenio.webmessage_dblayer import CFG_WEBMESSAGE_STATUS_CODE, \
-     check_quota, \
-     count_nb_messages, \
-     create_message, \
-     datetext_default, \
-     delete_all_messages, \
-     delete_message_from_user_inbox, \
-     get_all_messages_for_user, \
-     get_gids_from_groupnames, \
-     get_groupnames_like, \
-     get_nb_new_messages_for_user, \
-     get_nb_readable_messages_for_user, \
-     get_nicknames_like, \
-     get_nicks_from_uids, \
-     get_uids_from_emails, \
-     get_uids_from_nicks, \
-     get_uids_members_of_groups, \
-     send_message, \
-     set_message_status, \
-     user_exists
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
+webmessage = lazy_import('invenio.webmessage')
 
-class WebMessageWebPagesAvailabilityTest(unittest.TestCase):
+CFG_WEBMESSAGE_STATUS_CODE = lazy_import('invenio.webmessage_query:CFG_WEBMESSAGE_STATUS_CODE')
+check_quota = lazy_import('invenio.webmessage_query:check_quota')
+count_nb_messages = lazy_import('invenio.webmessage_query:count_nb_messages')
+create_message = lazy_import('invenio.webmessage_query:create_message')
+datetext_default = lazy_import('invenio.webmessage_query:datetext_default')
+delete_all_messages = lazy_import('invenio.webmessage_query:delete_all_messages')
+delete_message_from_user_inbox = lazy_import('invenio.webmessage_query:delete_message_from_user_inbox')
+get_all_messages_for_user = lazy_import('invenio.webmessage_query:get_all_messages_for_user')
+get_gids_from_groupnames = lazy_import('invenio.webmessage_query:get_gids_from_groupnames')
+get_groupnames_like = lazy_import('invenio.webmessage_query:get_groupnames_like')
+get_nb_new_messages_for_user = lazy_import('invenio.webmessage_query:get_nb_new_messages_for_user')
+get_nb_readable_messages_for_user = lazy_import('invenio.webmessage_query:get_nb_readable_messages_for_user')
+get_nicknames_like = lazy_import('invenio.webmessage_query:get_nicknames_like')
+get_nicks_from_uids = lazy_import('invenio.webmessage_query:get_nicks_from_uids')
+get_uids_from_emails = lazy_import('invenio.webmessage_query:get_uids_from_emails')
+get_uids_from_nicks = lazy_import('invenio.webmessage_query:get_uids_from_nicks')
+get_uids_members_of_groups = lazy_import('invenio.webmessage_query:get_uids_members_of_groups')
+send_message = lazy_import('invenio.webmessage_query:send_message')
+set_message_status = lazy_import('invenio.webmessage_query:set_message_status')
+user_exists = lazy_import('invenio.webmessage_query:user_exists')
+
+
+class WebMessageWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebMessage web pages whether they are up or not."""
 
     def test_your_message_pages_availability(self):
@@ -67,7 +68,7 @@ class WebMessageWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
+class WebMessageSendingAndReceivingMessageTest(InvenioTestCase):
     """Check sending and receiving message throught WebMessage"""
 
     def test_sending_message(self):
@@ -81,9 +82,9 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         ln=CFG_SITE_LANG)
         # it is verified that romeo received the message
         result = get_all_messages_for_user(5)
-        self.assertEqual("Hi romeo", result[0][3])
-        self.assertEqual("juliet", result[0][2])
-        webmessage.perform_request_delete_msg(5, result[0][0], ln=CFG_SITE_LANG)
+        self.assertEqual("Hi romeo", result[0].subject)
+        self.assertEqual("juliet", result[0].user_from.nickname)
+        webmessage.perform_request_delete_msg(5, result[0].id, ln=CFG_SITE_LANG)
 
     def test_setting_message_status(self):
         """webmessage - status from "new" to "read" """
@@ -93,11 +94,11 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
-        msgid =  get_all_messages_for_user(5)[0][0]
+                                        ln=CFG_SITE_LANG)
+        msgid =  get_all_messages_for_user(5)[0].id
         # status is changed
         set_message_status(5, msgid, 'R')
-        msgstatus = get_all_messages_for_user(5)[0][5]
+        msgstatus = get_all_messages_for_user(5)[0].sent_to_users[0].status
         self.assertEqual(msgstatus, 'R')
         webmessage.perform_request_delete_msg(5, msgid, ln=CFG_SITE_LANG)
 
@@ -110,7 +111,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         self.assertEqual(get_nb_new_messages_for_user(5), 1)
 
     def test_getting_nb_readable_messages(self):
@@ -122,8 +123,8 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
-        msgid =  get_all_messages_for_user(5)[0][0]
+                                        ln=CFG_SITE_LANG)
+        msgid =  get_all_messages_for_user(5)[0].id
         # status is changed
         set_message_status(5, msgid, 'R')
         self.assertEqual(get_nb_readable_messages_for_user(5), 1)
@@ -138,19 +139,19 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         self.assertEqual(len(get_all_messages_for_user(5)), 3)
         delete_all_messages(5)
 
@@ -163,19 +164,19 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         self.assertEqual(count_nb_messages(5), 3)
         delete_all_messages(5)
         self.assertEqual(count_nb_messages(5), 0)
@@ -190,8 +191,8 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
-                                       ln=CFG_SITE_LANG)
-        msg_id = get_all_messages_for_user(5)[0][0]
+                                        ln=CFG_SITE_LANG)
+        msg_id = get_all_messages_for_user(5)[0].id
         delete_message_from_user_inbox(5, msg_id)
         self.assertEqual(count_nb_messages(5), 0)
 
@@ -205,7 +206,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                msg_send_on_date=datetext_default)
         send_message(5, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW'])
         result = get_all_messages_for_user(5)
-        self.assertEqual(msgid, result[0][0] )
+        self.assertEqual(msgid, result[0].id)
         delete_all_messages(2)
 
     def test_send_message(self):
@@ -219,8 +220,8 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                msg_send_on_date=datetext_default)
         send_message(5, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW'])
         result = get_all_messages_for_user(5)
-        self.assertEqual("hello", result[0][3])
-        webmessage.perform_request_delete_msg(5, result[0][0], ln=CFG_SITE_LANG)
+        self.assertEqual("hello", result[0].subject)
+        webmessage.perform_request_delete_msg(5, result[0].id, ln=CFG_SITE_LANG)
 
     def test_check_quota(self):
         """webmessage - you give a quota, it returns users over-quota"""
@@ -229,31 +230,31 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
                                         msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="jekyll",
                                         msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="jekyll",
                                         msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="jekyll",
                                         msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
-                                       ln=CFG_SITE_LANG)
+                                        ln=CFG_SITE_LANG)
         d = check_quota(3)
         self.assertEqual(d.keys()[0], 2)
         delete_all_messages(2)
 
 
-class WebMessageGettingUidsGidsTest(unittest.TestCase):
+class WebMessageGettingUidsGidsTest(InvenioTestCase):
     """Many way to get uids or gids"""
 
     def test_get_uids_from_nicks(self):
@@ -287,7 +288,7 @@ class WebMessageGettingUidsGidsTest(unittest.TestCase):
         """webmessage - check if a user exist"""
         self.assertEqual(user_exists(6), 1)
 
-class WebMessagePatternTest(unittest.TestCase):
+class WebMessagePatternTest(InvenioTestCase):
     """pattern"""
 
     def test_get_nicknames_like(self):

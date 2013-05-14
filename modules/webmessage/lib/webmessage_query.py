@@ -123,7 +123,7 @@ def get_nb_new_messages_for_user(uid):
     update_user_inbox_for_reminders(uid)
     new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']
     return db.session.query(db.func.count(UserMsgMESSAGE.id_msgMESSAGE)).\
-           select_from(UserMsgMESSSAGE).\
+           select_from(UserMsgMESSAGE).\
            filter(filter_messages_from_user_with_status(uid, new_status)).\
            scalar()
 
@@ -210,13 +210,14 @@ def delete_all_messages(uid):
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     msg_ids = map(lambda (x, ): x,
               db.session.query(UserMsgMESSAGE.id_msgMESSAGE).\
-              filter(UserMsgMESSAGE.id_user_to==uid & \
-              UserMsgMESSAGE.status!=reminder_status).all())
+              filter(db.and_(UserMsgMESSAGE.id_user_to==uid,
+                             UserMsgMESSAGE.status!=reminder_status)).all())
     nb_messages = UserMsgMESSAGE.query.\
-                  filter(UserMsgMESSAGE.id_user_to==uid & \
-                  UserMsgMESSAGE.status!=reminder_status).\
+                  filter(db.and_(UserMsgMESSAGE.id_user_to==uid,
+                                 UserMsgMESSAGE.status!=reminder_status)).\
                   delete(synchronize_session=False)
-    check_if_need_to_delete_message_permanently(msg_ids)
+    if len(msg_ids) > 0:
+        check_if_need_to_delete_message_permanently(msg_ids)
     return nb_messages
 
 def get_uids_from_nicks(nicks):
