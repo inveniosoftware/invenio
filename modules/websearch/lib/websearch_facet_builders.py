@@ -86,6 +86,8 @@ class FacetBuilder(object):
 
     #@blueprint.invenio_memoize(timeout=CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT / 2)
     def get_value_recids(self, value):
+        if isinstance(value, unicode):
+            value = value.encode('utf8')
         p = '"' + str(value) + '"'
         return search_pattern(p=p, f=self.name)
 
@@ -115,8 +117,11 @@ class CollectionFacetBuilder(FacetBuilder):
         else:
             cc = search_results_cache.get(
                     get_search_results_cache_key_from_qid(qid) + '::cc')
-            collection = Collection.query.filter(Collection.name == cc).\
+            if cc is not None:
+                collection = Collection.query.filter(Collection.name == cc).\
                                           first_or_404()
+            else:
+                collection = Collection.query.get(1)
         facet = []
         for c in collection.collection_children_r:
             num_records = len(c.reclist.intersection(recIDsHitSet))
