@@ -20,6 +20,7 @@
 from wtforms import Label
 from invenio.wtforms_utils import InvenioForm as Form
 from invenio.webdeposit_config_utils import WebDepositConfiguration
+from invenio.webdeposit_cook_json_utils import cook_files
 
 
 class WebDepositForm(Form):
@@ -50,6 +51,7 @@ class WebDepositForm(Form):
             try:
                 json_reader = field.cook_json(json_reader)
             except AttributeError:
-                # Some fields eg. SubmitField dont have a cook json function
+                # Some fields (eg. SubmitField) don't have a cook json function
                 pass
+        json_reader = cook_files(json_reader, self.files)
         return json_reader

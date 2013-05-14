@@ -31,6 +31,11 @@ def cook_title(json_reader, title):
     return json_reader
 
 
+def cook_subtitle(json_reader, subtitle):
+    json_reader['title.subtitle'] = subtitle
+    return json_reader
+
+
 def cook_publisher_name(json_reader, publisher):
     json_reader['imprint.publisher_name'] = publisher
     return json_reader
@@ -73,4 +78,28 @@ def cook_first_authors_full_name(json_reader, full_name):
 
 def cook_abstract_summary(json_reader, summary):
     json_reader['abstract.summary'] = summary
+    return json_reader
+
+
+def cook_record_id(json_reader, recid):
+    json_reader['recid'] = recid
+    return json_reader
+
+
+def cook_comment(json_reader, comment):
+    json_reader['comment'] = comment
+    return json_reader
+
+
+def cook_files(json_reader, file_list):
+    """ @param file_json: list (as created in blueprints)
+                          containing dictionaries with files and their metadata
+    """
+
+    for file_json in file_list:
+        filename = file_json['name']
+        path = file_json['file']
+
+        json_reader['fft[n]'] = {'path': path,
+                                 'new_name': filename}
     return json_reader

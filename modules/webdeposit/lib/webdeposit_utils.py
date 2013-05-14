@@ -229,7 +229,6 @@ def get_form(user_id, uuid, step=None):
             filepath = file_metadata['file'].split('/')
             unique_filename = filepath[-1]
             file_metadata['unique_filename'] = unique_filename
-            del file_metadata['file']
         form.__setattr__('files', draft_data['files'])
     else:
         form.__setattr__('files', {})

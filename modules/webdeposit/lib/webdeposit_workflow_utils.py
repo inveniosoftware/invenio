@@ -90,14 +90,15 @@ def export_marc_from_json():
         uuid = eng.uuid
         steps_num = obj.data['steps_num']
 
+        from sqlalchemy.orm.exc import NoResultFound
         from invenio.webdeposit_utils import get_form
-
         json_reader = JsonReader()
         for step in range(steps_num):
             try:
                 form = get_form(user_id, uuid, step)
+                # Insert the fields' values in bibfield's rec_json dictionary
                 json_reader = form.cook_json(json_reader)
-            except:
+            except NoResultFound:
                 # some steps don't have any form ...
                 pass
 
