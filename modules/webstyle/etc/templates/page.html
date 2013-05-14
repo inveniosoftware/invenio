@@ -83,6 +83,8 @@
 
   {% block header %}
     {{ metaheaderadd|safe }}
+    {% block metaheader %}
+    {% endblock metaheader %}
   {% endblock header %}
   {% for bundle in get_css_bundle(iterate=True) %}
   {% assets bundle %}
@@ -171,7 +173,7 @@
       {% endif %}
       {% endblock title %}
       {% block messages %}
-        {% for category, msg in get_flashed_messages(with_categories=true) %}
+        {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['', 'info', 'error', 'warning', 'success']) %}
           <div class="alert alert-{{ category }}">
             <a class="close" data-dismiss="alert" href="#">×</a>
             {{ msg|safe }}

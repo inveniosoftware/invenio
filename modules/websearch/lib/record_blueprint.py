@@ -70,13 +70,14 @@ def request_record(f):
         if auth_code and current_user.is_guest:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
                 'collection': guess_primary_collection_of_a_record(recid)})
-            url_args = {'action': cookie, 'ln': g.ln, 'referer': request.referrer}
+            url_args = {'action': cookie, 'ln': g.ln, 'referer': request.url}
             flash(_("Authorization failure"), 'error')
             return redirect(url_for('webaccount.login', **url_args))
         elif auth_code:
             flash(auth_msg, 'error')
             abort(apache.HTTP_UNAUTHORIZED)
 
+        from invenio.bibfield import get_record
         from invenio.search_engine import record_exists, get_merged_recid
         # check if the current record has been deleted
         # and has been merged, case in which the deleted record
@@ -88,12 +89,9 @@ def request_record(f):
         elif record_status == -1:
             abort(apache.HTTP_GONE)  # The record is gone!
 
-        g.record = record = Bibrec.query.get(recid)
-        user = None
-        if not current_user.is_guest:
-            user = User.query.get(current_user.get_id())
-        title = get_fieldvalues(recid, '245__a')
-        title = title[0] if len(title) > 0 else ''
+        g.bibrec = Bibrec.query.get(recid)
+        record = get_record(recid)
+        title = record.get('title.title', '')
 
         b = [(_('Home'), '')] + collection.breadcrumbs()[1:]
         b += [(title, 'record.metadata', dict(recid=recid))]
@@ -131,7 +129,6 @@ def request_record(f):
         def record_context():
             return dict(recid=recid,
                         record=record,
-                        user=user,
                         tabs=tabs,
                         title=title,
                         get_mini_reviews=lambda *args, **kwargs:

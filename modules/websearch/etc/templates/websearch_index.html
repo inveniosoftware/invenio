@@ -121,7 +121,7 @@
         </div>
         {% endfor %}
         {% if collection.reclist|length > 10 %}
-          <a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}"
+          <a href="{{ url_for('search.search', cc=collection.name, ln=g.ln, jrec=11)|safe }}"
              class="pull-right muted">[&gt;&gt; {{ _('more')}}]</a>
         {% endif %}
         {% endif %}

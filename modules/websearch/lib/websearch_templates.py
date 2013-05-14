@@ -1762,6 +1762,8 @@ class Template:
             else:
                 hitsinfo = '-'
 
+            argd['f'] = f
+            argd['p'] = term
             term = cgi.escape(term)
 
             # FIXME this is hack to get correct links to nearest terms

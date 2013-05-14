@@ -41,12 +41,18 @@
     <generator>Invenio {{ config.CFG_VERSION }}</generator>
     <webMaster>{{ config.CFG_SITE_SUPPORT_EMAIL }}</webMaster>
     <ttl>{{ config.CFG_WEBSEARCH_RSS_TTL }}</ttl>
-    <atom:link rel="previous" href="%s" />'
-    <atom:link rel="next" href="%s" />'
-    <atom:link rel="self" href="%s" />'
-    <opensearch:totalResults>%i</opensearch:totalResults>
-    <opensearch:startIndex>%i</opensearch:startIndex>
-    <opensearch:itemsPerPage>%i</opensearch:itemsPerPage>
+    {% set args = request.args.copy().to_dict() -%}
+    <atom:link rel="self" href="{{ request.url|e }}" />
+    {% if pagination.has_prev -%}
+    {% do args.update({'jrec': jrec - rg }) %}
+    <atom:link rel="prev" href="{{ url_for(request.endpoint, _external=True, **args)|e }}"/>
+    {%- endif %}
+    {% if pagination.has_next -%}
+    {% do args.update({'jrec': jrec + rg}) %}
+    <atom:link rel="next" href="{{ url_for(request.endpoint, _external=True, **args)|e }}"/>
+    {%- endif %}
+    <opensearch:startIndex>{{ jrec }}</opensearch:startIndex>
+    <opensearch:itemsPerPage>{{ rg }}</opensearch:itemsPerPage>
     <image>
         <url>{{ config.CFG_SITE_URL }}/img/site_logo_rss.png</url>
         <title>{{ config.CFG_SITE_NAME }}</title>
@@ -64,8 +70,8 @@
       <name>p</name>
       <link>{{ url_for('search.search', _external=True) }}</link>
     </textInput>
-    {% for recid in recids %}
-    {{ format_record(recid)|indent() }}
+    {% for recid in recids[jrec:jrec+rg] %}
+    {{ format_record(recid, of)|indent() }}
     {% endfor %}
   </channel>
 </rss>

@@ -143,7 +143,9 @@ body {
     </div>
     <div class="row">
       <div id="search_results" class="span10">
+      {% block search_results %}
         {{ render_search_results(recids, collection, pagination, format_record) }}
+      {% endblock search_results %}
       </div>
     </div>
   </div>

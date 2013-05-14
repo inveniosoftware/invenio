@@ -27,6 +27,18 @@ from blinker import Namespace
 _signals = Namespace()
 
 # WebSearch signals
+websearch_before_search = _signals.signal(
+    'websearch-before-search')
+"""
+This signal is sent right before search handler is called.
+"""
+
+websearch_before_browse = _signals.signal(
+    'websearch-before-browse')
+"""
+This signal is sent right before browse handler is called.
+"""
+
 webcoll_after_webpage_cache_update = _signals.signal(
     'webcoll-after-webpage-cache-update')
 """

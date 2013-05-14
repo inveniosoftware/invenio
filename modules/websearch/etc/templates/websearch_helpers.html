@@ -525,9 +525,11 @@
 {#
  # This is a dirty hack for browser without Javascript support.
  #}
-<script>
+<script type="text/javascript">
+<![CDATA[
   var box = {{ search_box(collection)|tojson|safe }};
   document.write(box);
+]]>
 </script>
 
               <!-- Hidden configuration fields -->
@@ -555,6 +557,13 @@
     </div><!-- end span12 -->
     </div>
   </div><!-- end row -->
+  {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['websearch-after-search-form']) %}
+  <div class="row">
+    <div class="span12">
+      {{ msg|safe }}
+    </div>
+  </div>
+  {% endfor %}
 {% endmacro %}
 
 

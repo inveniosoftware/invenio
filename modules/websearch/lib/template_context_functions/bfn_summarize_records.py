@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,23 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = format_templates
+from invenio.intbitset import intbitset
 
-templatesdir = $(sysconfdir)/templates
-templates_DATA = format_records_text_html.tpl \
-		 format_records_id.tpl \
-		 format_records_hcs.tpl \
-		 format_records_x.tpl \
-		 format_records_xd.tpl \
-		 format_records_xe.tpl \
-		 format_records_xe8x.tpl \
-		 format_records_xm.tpl \
-		 format_records_xn.tpl \
-		 format_records_xo.tpl \
-		 format_records_xp.tpl \
-		 format_records_xr.tpl \
-		 format_records_xw.tpl
-
-EXTRA_DIST = $(templates_DATA)
-
-CLEANFILES = *~ *.tmp
+def template_context_function(recids, *args, **kwargs):
+    """
+    @see invenio.search_engine_summarizer:summarize_records
+    """
+    from invenio.search_engine_summarizer import summarize_records
+    return summarize_records(intbitset(recids)
+        if not isinstance(recids, intbitset) else recids, *args, **kwargs)

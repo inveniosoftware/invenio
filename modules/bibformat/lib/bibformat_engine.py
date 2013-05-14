@@ -582,7 +582,9 @@ def format_with_format_template(format_template_filename, bfo,
         evaluated_format = render_template_to_string(
             CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
             recid=bfo.recID,
-            record=record, format_record=print_record,
+            record=record,
+            format_record=lambda recid, of='hb', *args, **kwargs: print_record(
+                recid, format=of, *args, **kwargs),
             bfo=bfo, **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions).encode('utf-8')
         #except Exception:
         #    register_exception()
@@ -600,6 +602,13 @@ def format_with_format_template(format_template_filename, bfo,
 
         # Transform MARCXML using stylesheet
         evaluated_format = format(xml_record, template_source=format_content)
+        try:
+            evaluated_format = evaluated_format.decode('utf8')
+        except:
+            try:
+                evaluated_format = evaluated_format.encode('utf8')
+            except:
+                evaluated_format = '<!-- Error -->'.encode('utf8')
 
     return evaluated_format
 

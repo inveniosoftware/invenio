@@ -27,14 +27,20 @@ from flask import make_response, g, request, flash, jsonify, \
     redirect, url_for, current_app, abort
 
 from invenio import bibindex_model as BibIndex
+from invenio import websearch_receivers
 from invenio.bibindex_engine import get_index_id_from_index_name
 from invenio.bibformat import get_output_format_content_type, print_records
+from invenio.cache import cache
+from invenio.config import CFG_WEBSEARCH_RSS_TTL
 from invenio.websearch_cache import \
     get_search_query_id, get_collection_name_from_cache
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.intbitset import intbitset
+from invenio.signalutils import websearch_before_browse, websearch_before_search
 from invenio.websearch_forms import EasySearchForm
 from invenio.websearch_model import Collection
+from invenio.websearch_webinterface import wash_search_urlargd
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
     register_template_context_processor
 from invenio.webuser_flask import current_user
@@ -53,7 +59,11 @@ blueprint = InvenioBlueprint('search', __name__, url_prefix="",
 
 
 FACETS = FacetLoader()
-collection_name_from_request = lambda: request.values.get('cc')
+def collection_name_from_request():
+    collection = request.values.get('cc')
+    if collection is None and len(request.values.getlist('c')) == 1:
+        collection = request.values.get('c')
+    return collection
 
 
 def min_length(length, code=406):
@@ -85,6 +95,8 @@ def check_collection(method=None, name_getter=collection_name_from_request,
         if collection.is_restricted:
             (auth_code, auth_msg) = acc_authorize_action(uid, VIEWRESTRCOLL,
                                                          collection=collection.name)
+            if auth_code:
+                flash(_('This collection is restricted.'), 'error')
             if auth_code and current_user.is_guest:
                 return redirect(url_for('webaccount.login',
                                         referer=request.url))
@@ -102,10 +114,19 @@ def response_formated_records(recids, collection, of, **kwargs):
     return response
 
 
+@blueprint.route('/index.py', methods=['GET', 'POST'])
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.invenio_templated('websearch_index.html')
 def index():
     """ Renders homepage. """
+
+    # legacy app support
+    c = request.values.get('c')
+    if c == current_app.config['CFG_SITE_NAME']:
+        return redirect(url_for('.index', ln=g.ln))
+    elif c is not None:
+        return redirect(url_for('.collection', name=c, ln=g.ln))
+
     collection = Collection.query.get_or_404(1)
     # inject functions to the template
 
@@ -185,12 +206,21 @@ class SearchUrlargs(object):
 
 
 def _create_neareset_term_box(argd_orig):
-    try:
-        return create_nearest_terms_box(argd_orig,
-            request.args.get('p', '').encode('utf-8'),
-            '', ln=g.ln).decode('utf8')
-    except:
-        return '<!-- not found -->'
+    #try:
+    p = argd_orig.pop('p', '')#.encode('utf-8')
+    f = argd_orig.pop('f', '')#.encode('utf-8')
+    if 'rg' in argd_orig and not 'rg' in request.values:
+        del argd_orig['rg']
+    if f == '' and ':' in p:
+        fx, px = p.split(':', 1)
+        from invenio.search_engine import get_field_name
+        if get_field_name(fx) != "":
+            f, p = fx, px
+
+    return create_nearest_terms_box(argd_orig,
+        p=p, f=f.lower(), ln=g.ln, intro_text_p=True)
+    #except:
+    #return '<!-- not found -->'
 
 
 def sort_and_rank_records(recids, so=None, rm=None, p=''):
@@ -224,7 +254,8 @@ def collection_breadcrumbs(collection, endpoint=None):
         endpoint = request.endpoint
     if collection.id > 1:
         qargs = request.args.to_dict()
-        del qargs['cc']
+        k = 'cc' if 'cc' in qargs else 'c'
+        del qargs[k]
         b = [(_('Home'), endpoint, qargs)] + collection.breadcrumbs(
             builder=crumb_builder(endpoint), ln=g.ln)[1:]
     current_app.config['breadcrumbs_map'][request.endpoint] = b
@@ -244,13 +275,18 @@ def collection_breadcrumbs(collection, endpoint=None):
 def browse(collection, p, f, of, so, rm, rg, jrec):
 
     from invenio.websearch_webinterface import wash_search_urlargd
-    argd_orig = wash_search_urlargd(request.args)
+    argd = argd_orig = wash_search_urlargd(request.args)
 
     collection_breadcrumbs(collection)
 
     colls = [collection.name] + request.args.getlist('c')
     if f is None and ':' in p[1:]:
         f, p = string.split(p, ":", 1)
+        argd['f'] = f
+        argd['p'] = p
+
+
+    websearch_before_browse.send(collection, **argd)
 
     records = map(lambda (r, h): (r.decode('utf-8'), h),
                   browse_pattern_phrases(req=request.get_legacy_request(),
@@ -267,6 +303,38 @@ def browse(collection, p, f, of, so, rm, rg, jrec):
 
     return dict(records=records)
 
+websearch_before_browse.connect(websearch_receivers.websearch_before_browse_handler)
+
+
+@blueprint.route('/rss', methods=['GET'])
+# FIXME caching issue of response object
+#@cache.cached(timeout=CFG_WEBSEARCH_RSS_TTL)
+@blueprint.invenio_wash_urlargd({'p': (unicode, ''),
+                                 'jrec': (int, 1),
+                                 'so': (unicode, None),
+                                 'rm': (unicode, None)})
+@check_collection(default_collection=True)
+def rss(collection, p, jrec, so, rm):
+    of = 'xr'
+    argd = argd_orig = wash_search_urlargd(request.args)
+    argd['of'] = 'id'
+
+    # update search arguments with the search user preferences
+    if 'rg' not in request.values and current_user.get('rg'):
+        argd['rg'] = current_user.get('rg')
+    rg = int(argd['rg'])
+
+    qid = get_search_query_id(**argd)
+    recids = perform_request_search(req=request.get_legacy_request(), **argd)
+
+    if so or rm:
+        recids.reverse()
+
+    ctx = dict(records=len(get_current_user_records_that_can_be_displayed(qid)),
+               qid=qid, rg=rg)
+
+    return response_formated_records(recids, collection, of, **ctx)
+
 
 @blueprint.route('/search', methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_('Search results'))
@@ -280,8 +348,13 @@ def search(collection, p, of, so, rm):
     Renders search pages.
     """
 
-    if 'action_browse' in request.args:
+    if 'action_browse' in request.args \
+            or request.args.get('action', '') == 'browse':
         return browse()
+
+    if 'c' in request.args and len(request.args) == 1 \
+            and len(request.args.getlist('c')) == 1:
+        return redirect(url_for('.collection', name=request.args.get('c')))
 
     from invenio.websearch_webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
@@ -297,7 +370,8 @@ def search(collection, p, of, so, rm):
     qid = get_search_query_id(**argd)
     recids = perform_request_search(req=request.get_legacy_request(), **argd)
 
-    if so or rm:
+    #if so or rm:
+    if len(of)>0 and of[0] == 'h':
         recids.reverse()
 
     ctx = dict(facets=FACETS.config(collection=collection, qid=qid),

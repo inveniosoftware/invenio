@@ -102,6 +102,26 @@ class Bibrec(db.Model):
 
         return cur_id
 
+    @cached_property
+    def is_restricted(self):
+        """Returns True is record is restricted."""
+        from invenio.search_engine import get_restricted_collections_for_recid
+
+        if get_restricted_collections_for_recid(self.id,
+                                                recreate_cache_if_needed=False):
+            return True
+        elif self.is_processed:
+            return True
+        return False
+
+    @cached_property
+    def is_processed(self):
+        """Returns True is recods is processed (not in any collection)."""
+        from invenio.search_engine import is_record_in_any_collection
+        return not is_record_in_any_collection(self.id,
+                                               recreate_cache_if_needed=False)
+
+
 class Bibfmt(db.Model):
     """Represents a Bibfmt record."""
     def __init__(self):

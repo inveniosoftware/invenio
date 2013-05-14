@@ -83,7 +83,7 @@ def create_invenio_flask_app(**kwargs_config):
                 'http': current_app.config['CFG_SITE_URL'],
                 'https': current_app.config['CFG_SITE_SECURE_URL']
             }
-            force_external = kwargs.get('force_external', False)
+            force_external = kwargs.get('force_external', True)
             url_scheme = getattr(f.im_self, 'url_scheme', 'http')
             kwargs['force_external'] = False
             url = f(*args, **kwargs)

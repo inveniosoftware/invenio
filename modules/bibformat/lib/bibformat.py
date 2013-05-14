@@ -526,28 +526,28 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     import time
     from math import ceil
     from flask import request
-    from invenio.search_engine import print_record
+    from invenio.bibformat_engine import format_record
     from invenio.websearch_model import Format
     from invenio.paginationutils import Pagination
+    from invenio.bibformat_engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
 
-    of = request.values.get('of', str(of)).lower()
+    jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
     rg = request.values.get('rg', ctx.get('rg', 10), type=int)
     ln = request.values.get('ln', ln)
-    page = request.values.get('jrec', 1, type=int)
-    pages = int(ceil(page / float(rg))) if rg > 0 else 1
+    pages = int(ceil(jrec / float(rg))) if rg > 0 else 1
 
     context = dict(
-        of=of, rg=rg, ln=ln,
+        of=of, jrec=jrec, rg=rg, ln=ln,
         facets={},
         time=time,
         recids=recIDs,
         pagination=Pagination(pages, rg, ctx.get('records', len(recIDs))),
         verbose=verbose,
         export_formats=Format.get_export_formats(),
-        format_record=print_record
+        format_record=format_record,
+        **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.template_context_functions
     )
     context.update(ctx)
-
     return render_template_to_string(
         ['format_records_%s.tpl' % of,
          'format_records_%s.tpl' % of[0],

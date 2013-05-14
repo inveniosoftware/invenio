@@ -53,7 +53,11 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     authorization will be granted.
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
-    if type(req) is dict:
+    from invenio.webuser_flask import UserInfo
+    if isinstance(req, UserInfo):
+        user_info = req
+        uid = user_info.get_id()
+    elif type(req) is dict:
         uid = req.get('uid', None)
         user_info = req
     elif type(req) not in [int, long]:

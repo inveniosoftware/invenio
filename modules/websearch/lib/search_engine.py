@@ -6196,29 +6196,32 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
 
 def prs_log_query(kwargs=None, req=None, uid=None, of=None, ln=None, p=None, f=None,
                colls_to_search=None, results_final_nb_total=None, em=None, **dummy):
+    # FIXME move query logging to signal receiver
     # log query:
     try:
+        from flask.ext.login import current_user
         if req:
             from flask import request
             req = request
         id_query = log_query(req.host,
-            '&'.join(map(lambda (k,v): k+'='+v, req.args.to_dict().items())),
+            '&'.join(map(lambda (k,v): k+'='+v, request.values.iteritems(multi=True))),
             uid)
         #id_query = log_query(req.remote_host, req.args, uid)
+        #of = request.values.get('of', 'hb')
         if of.startswith("h") and id_query and (em == '' or EM_REPOSITORY["alert"] in em):
             if not of in ['hcs', 'hcs2']:
                 # display alert/RSS teaser for non-summary formats:
-                user_info = collect_user_info(req)
                 display_email_alert_part = True
-                if user_info:
-                    if user_info['email'] == 'guest':
+                if current_user:
+                    if current_user['email'] == 'guest':
                         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS > 4:
                             display_email_alert_part = False
                     else:
-                        if not user_info['precached_usealerts']:
+                        if not current_user['precached_usealerts']:
                             display_email_alert_part = False
-                req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, \
-                                     ln=ln, display_email_alert_part=display_email_alert_part))
+                from flask import flash
+                flash(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, \
+                                     ln=ln, display_email_alert_part=display_email_alert_part), 'search-results-after')
     except:
         # do not log query if req is None (used by CLI interface)
         pass

@@ -399,6 +399,10 @@ def wash_urlargd(form, content):
             result[k] = default
             continue
 
+        #FIXES problems with unicode arguments from Flask
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
+
         src_type = type(value)
 
         # First, handle the case where we want all the results. In

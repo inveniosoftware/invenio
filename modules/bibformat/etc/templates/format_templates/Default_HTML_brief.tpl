@@ -56,6 +56,9 @@
         </a>
         {%- endif -%}
       {%- endif -%}
+
+      | <a href="{{ url_for('search.search', p='recid:%s' % recid, rm='wrd') }}">{{ _("Similar records") }}</a>
+
       {% if record['keywords']|length %} | <i class="icon-tag"></i>
       {% for keyword in record['keywords'] %}
       <span class="label">
