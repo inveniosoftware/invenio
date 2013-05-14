@@ -33,6 +33,7 @@ from invenio import bibindex_model as BibIndex
 from invenio.config import CFG_PYLIBDIR, CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, \
     CFG_SITE_LANG, CFG_LOGDIR
 from invenio.cache import cache
+from invenio.errorlib import register_exception
 from invenio.pluginutils import PluginContainer
 from invenio.bibformat_engine import get_format_element, eval_format_element
 from invenio.websearch_cache import search_results_cache, \
@@ -400,6 +401,30 @@ def search():
     if (argd_orig.get('so') or argd_orig.get('rm')):
         recids.reverse()
 
+    of = request.args.get('of', 'hb')
+    #TODO deduplicate code used also in `export`
+    if of.startswith('x'):
+        rg = request.args.get('rg', len(recids), type=int)
+        page = request.args.get('jrec', 1, type=int)
+        pages = int(ceil(page / float(rg))) if rg > 0 else 1
+        try:
+            content_type = Format.query.filter(Format.code == of).one().content_type
+        except:
+            register_exception()
+            content_type = 'text/xml'
+
+        @register_template_context_processor
+        def index_context():
+            return dict(collection=collection,
+                        RecordInfo=RecordInfo,
+                        rg=rg,
+                        pagination=Pagination(pages, rg, len(recids)))
+
+        from invenio.bibformat import print_records
+        response = make_response(print_records(recids, of=of, ln=g.ln))
+        response.content_type = content_type
+        return response
+
     FACET_SORTED_LIST = current_app.config.get('FACET_SORTED_LIST', [])
     facets = map(lambda x: x.get_conf(collection=collection, qid=qid),
                  FACET_SORTED_LIST)
@@ -611,21 +636,26 @@ def export():
     rg = request.args.get('rg', len(recids), type=int)
     page = request.args.get('jrec', 1, type=int)
     pages = int(ceil(page / float(rg))) if rg > 0 else 1
-    content_type = Format.query.filter(Format.code == of).one()
+    try:
+        content_type = Format.query.filter(Format.code == of).one().content_type
+    except:
+        register_exception()
+        content_type = 'text/xml'
+
     name = request.args.get('cc')
     if name:
         collection = Collection.query.filter(Collection.name == name).\
-                                      first_or_404()
+            first_or_404()
     else:
         collection = Collection.query.get_or_404(1)
 
     @register_template_context_processor
     def index_context():
         return dict(
-                collection=collection,
-                RecordInfo=RecordInfo,
-                rg=rg,
-                pagination=Pagination(pages, rg, len(recids)))
+            collection=collection,
+            RecordInfo=RecordInfo,
+            rg=rg,
+            pagination=Pagination(pages, rg, len(recids)))
 
     from invenio.bibformat import print_records
     response = make_response(print_records(recids, of=of, ln=g.ln))
