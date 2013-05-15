@@ -85,8 +85,10 @@ def cb_parse_option(key, value, opts, args):
     elif key in ('-m', '--modified'):
         task_set_option('modified', True)
         task_set_option('no-overwrite', True)
-    elif key in ('-i', '--inspire', ):
-        task_set_option('inspire', True)
+    elif key == '--inspire':
+        msg = """The --inspire option does not exist anymore.
+Please set the config variable CFG_INSPIRE_SITE instead."""
+        raise StandardError(msg)
     elif key in ('--kb-reports', ):
         task_set_option('kb-reports', value)
     elif key in ('--kb-journals', ):
@@ -112,12 +114,21 @@ def cb_parse_option(key, value, opts, args):
             task_set_option('collections', collections)
         for v in value.split(","):
             collections.update(perform_request_search(c=v))
-    elif key in ('-r', '--recids'):
+    elif key in ('-i', '--id'):
         recids = task_get_option('recids')
         if not recids:
             recids = set()
             task_set_option('recids', recids)
         recids.update(split_ids(value))
+    elif key == '--recids':
+        msg = """The --recids has been renamed.
+please use --id for specifying recids."""
+        raise StandardError(msg)
+    elif key == '-f':
+        msg = """refextract is now used to run in daemon mode only.
+If you would like to run reference extraction on a standalone PDF file,
+please use "docextract file.pdf\""""
+        raise StandardError(msg)
 
     return True
 
@@ -260,7 +271,7 @@ def main():
 
 """,
         version="Invenio v%s" % CFG_VERSION,
-        specific_params=("hVv:x:r:c:nai",
+        specific_params=("hVv:x:r:c:naif:",
                             ["help",
                              "version",
                              "verbose=",
@@ -271,6 +282,7 @@ def main():
                              "kb-authors=",
                              "kb-books=",
                              "recids=",
+                             "id=",
                              "collections=",
                              "new",
                              "modified",

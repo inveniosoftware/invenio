@@ -43,8 +43,6 @@ DESCRIPTION = ""
 
 # Help message, used by bibtask's 'task_init()' and 'usage()'
 HELP_MESSAGE = """
-  -i, --inspire        Output journal standard reference form in the INSPIRE
-                       recognised format: [series]volume,page.
   --kb-journals        Manually specify the location of a journal title
                        knowledge-base file.
   --kb-journals-re     Manually specify the location of a journal title regexps
@@ -56,7 +54,8 @@ HELP_MESSAGE = """
   --kb-books           Manually specify the location of a book
                        knowledge-base file.
   --no-overwrite       Do not touch record if it already has references
-
+"""
+HELP_STANDALONE_MESSAGE = """
   Standalone Refextract options:
   -o, --out            Write the extracted references, in xml form, to a file
                        rather than standard output.
@@ -72,10 +71,10 @@ HELP_MESSAGE = """
 """
 
 USAGE_MESSAGE = """Usage: docextract [options] file1 [file2 ...]
-Command options: %s
+Command options: %s%s
 Examples:
     docextract -o /home/chayward/refs.xml /home/chayward/thesis.pdf
-""" % HELP_MESSAGE
+""" % (HELP_MESSAGE, HELP_STANDALONE_MESSAGE)
 
 
 def get_cli_options():
