@@ -20,15 +20,17 @@
 """WebSearch Flask Blueprint"""
 
 import json
+import string
 import functools
+from math import ceil
 from flask import make_response, g, request, flash, jsonify, \
     redirect, url_for, current_app, abort
 
 from invenio import bibindex_model as BibIndex
+from invenio.bibindex_engine import get_index_id_from_index_name
 from invenio.bibformat import get_output_format_content_type, print_records
-from invenio.websearch_cache import search_results_cache, \
-    get_search_query_id, get_search_results_cache_key_from_qid, \
-    get_collection_name_from_cache
+from invenio.websearch_cache import \
+    get_search_query_id, get_collection_name_from_cache
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.websearch_forms import EasySearchForm
@@ -39,9 +41,9 @@ from invenio.webuser_flask import current_user
 from invenio.websearch_facet_builders import \
     get_current_user_records_that_can_be_displayed, faceted_results_filter, \
     FacetLoader
-from invenio.bibindex_engine import get_index_id_from_index_name
 from invenio.search_engine import get_creation_date, perform_request_search,\
-    print_record, create_nearest_terms_box
+    print_record, create_nearest_terms_box, browse_pattern_phrases
+from invenio.paginationutils import Pagination
 
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              config='invenio.search_engine_config',
@@ -208,6 +210,64 @@ def sort_and_rank_records(recids, so=None, rm=None, p=''):
     return output
 
 
+def crumb_builder(url):
+    def _crumb_builder(collection):
+        qargs = request.args.to_dict()
+        qargs['cc'] = collection.name
+        return (collection.name_ln, url, qargs)
+    return _crumb_builder
+
+
+def collection_breadcrumbs(collection, endpoint=None):
+    b = []
+    if endpoint is None:
+        endpoint = request.blueprint + '.' + request.endpoint
+    if collection.id > 1:
+        qargs = request.args.to_dict()
+        qargs['cc'] = Collection.query.get_or_404(1).name
+        b = [(_('Home'), endpoint, qargs)] + collection.breadcrumbs(
+            builder=crumb_builder(endpoint), ln=g.ln)
+    current_app.config['breadcrumbs_map'][request.endpoint] = b
+
+
+@blueprint.route('/browse', methods=['GET', 'POST'])
+@blueprint.invenio_set_breadcrumb(_('Browse results'))
+@blueprint.invenio_templated('websearch_browse.html')
+@blueprint.invenio_wash_urlargd({'p': (unicode, ''),
+                                 'f': (unicode, None),
+                                 'of': (unicode, 'hb'),
+                                 'so': (unicode, None),
+                                 'rm': (unicode, None),
+                                 'rg': (int, 10),
+                                 'jrec': (int, 1)})
+@check_collection(default_collection=True)
+def browse(collection, p, f, of, so, rm, rg, jrec):
+
+    from invenio.websearch_webinterface import wash_search_urlargd
+    argd_orig = wash_search_urlargd(request.args)
+
+    collection_breadcrumbs(collection)
+
+    colls = [collection.name] + request.args.getlist('c')
+    if f is None and ':' in p[1:]:
+        f, p = string.split(p, ":", 1)
+
+    records = map(lambda (r, h): (r.decode('utf-8'), h),
+                  browse_pattern_phrases(req=request.get_legacy_request(),
+                                         colls=colls, p=p, f=f, rg=rg, ln=g.ln))
+
+    @register_template_context_processor
+    def index_context():
+        return dict(collection=collection,
+                    create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
+                    pagination=Pagination(int(ceil(jrec / float(rg))), rg, len(records)),
+                    rg=rg, p=p, f=f,
+                    easy_search_form=EasySearchForm(csrf_enabled=False),
+                    )
+
+    return dict(records=records)
+
+
 @blueprint.route('/search', methods=['GET', 'POST'])
 @blueprint.invenio_set_breadcrumb(_('Search results'))
 @blueprint.invenio_wash_urlargd({'p': (unicode, ''),
@@ -219,27 +279,18 @@ def search(collection, p, of, so, rm):
     """
     Renders search pages.
     """
+
+    if 'action_browse' in request.args:
+        return browse()
+
     from invenio.websearch_webinterface import wash_search_urlargd
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
-    #FIXME
-    b = []
-
-    def _crumb_builder(collection):
-        qargs = request.args.to_dict()
-        qargs['cc'] = collection.name
-        return (collection.name_ln, 'search.search', qargs)
-
-    if collection.id > 1:
-        qargs = request.args.to_dict()
-        qargs['cc'] = Collection.query.get_or_404(1).name
-        b = [(_('Home'), 'search.search', qargs)] + collection.breadcrumbs(
-            builder=_crumb_builder, ln=g.ln)
-    current_app.config['breadcrumbs_map'][request.endpoint] = b
+    collection_breadcrumbs(collection)
 
     qid = get_search_query_id(**argd)
-    recids = perform_request_search(req=request, **argd)
+    recids = perform_request_search(req=request.get_legacy_request(), **argd)
 
     if so or rm:
         recids.reverse()

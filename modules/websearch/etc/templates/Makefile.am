@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@ templates_DATA = record.html \
 		 record_keywords.html \
 		 record_references.html \
 		 record_usage.html \
+		 websearch_browse.html \
 		 websearch_collection.html \
 		 websearch_index.html \
 		 websearch_helpers.html \

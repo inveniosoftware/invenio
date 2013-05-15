@@ -1819,11 +1819,8 @@ def get_coll_real_descendants(coll, type='_', get_hosted_colls=True):
             coll_sons.extend(get_coll_real_descendants(name))
     return coll_sons
 
-def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
-    """Browse either biliographic phrases or words indexes, and display it."""
-
-    # load the right message language
-    _ = gettext_set_language(ln)
+def browse_pattern_phrases(req, colls, p, f, rg, ln=CFG_SITE_LANG):
+    """Returns either biliographic phrases or words indexes."""
 
     ## is p enclosed in quotes? (coming from exact search)
     if p.startswith('"') and p.endswith('"'):
@@ -1837,8 +1834,9 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
         f, p = string.split(p, ":", 1)
 
     ## do we search in words indexes?
-    if not f:
-        return browse_in_bibwords(req, p, f)
+    # FIXME uncomment this
+    #if not f:
+    #    return browse_in_bibwords(req, p, f)
 
     coll_hitset = intbitset()
     for coll_name in colls:
@@ -1856,8 +1854,8 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
                 browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
             except:
                 # probably there are no hits at all:
-                req.write(_("No values found."))
-                return
+                #req.write(_("No values found."))
+                return []
 
         ## try to check hits in these particular collection selection:
         browsed_phrases_in_colls = []
@@ -1881,6 +1879,20 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
                     nbhits = get_nbhits_in_bibxxx(phrase, f, coll_hitset)
                     if nbhits > 0:
                         browsed_phrases_in_colls.append([phrase, nbhits])
+
+    return browsed_phrases_in_colls
+
+
+def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
+    """Displays either biliographic phrases or words indexes."""
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    browsed_phrases_in_colls = browse_pattern_phrases(req, colls, p, f, rg, ln)
+
+    if len(browsed_phrases_in_colls) == 0:
+        req.write(_("No values found."))
+        return
 
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
