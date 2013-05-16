@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.bibformat_elements.bfe_fulltext import get_files, sort_alphanumerically
+from invenio.bibformat_elements.bfe_fulltext import get_files, sort_alphanumerically, _CFG_BIBFORMAT_HIDDEN_DOCTYPES
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
 from invenio.urlutils import get_relative_url
@@ -43,7 +43,8 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
     # Retrieve files
     (parsed_urls, old_versions, additionals) = \
                   get_files(bfo, distinguish_main_and_additional_files=focus_on_main_file.lower() == 'yes',
-                            include_subformat_icons=show_subformat_icons == 'yes')
+                            include_subformat_icons=show_subformat_icons == 'yes',
+                            hide_doctypes=_CFG_BIBFORMAT_HIDDEN_DOCTYPES)
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
@@ -140,9 +141,6 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         out += '<small class="detailedRecordActions">%s:</small>%s' % (external_link.capitalize(), separator)
         url_list = []
         for url, descr in others_urls:
-            # we don't need to show the plot links here, and all are pngs.
-            if url.find('.png') > -1:
-                continue
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
         out += '<small>' + separator.join(url_list) + '</small>'
     if out.endswith('<br />'):

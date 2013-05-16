@@ -35,6 +35,10 @@ import urllib
 
 _CFG_NORMALIZED_BIBFORMAT_HIDDEN_FILE_FORMATS = set(normalize_format(fmt) for fmt in CFG_BIBFORMAT_HIDDEN_FILE_FORMATS)
 
+_CFG_BIBFORMAT_HIDDEN_DOCTYPES = ['Plot']
+if CFG_CERN_SITE:
+    _CFG_BIBFORMAT_HIDDEN_DOCTYPES.append('arXiv')
+
 cern_arxiv_categories = ["astro-ph", "chao-dyn", "cond-mat", "gr-qc",
                          "hep-ex", "hep-lat", "hep-ph", "hep-th", "math-ph",
                          "math", "nucl-ex", "nucl-th", "out", "physics",
@@ -68,7 +72,8 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
     # Retrieve files
     (parsed_urls, old_versions, additionals) = get_files(bfo, \
                                                          distinguish_main_and_additional_files=focus_on_main_file.lower() == 'yes',
-                                                         include_subformat_icons=show_subformat_icons == 'yes')
+                                                         include_subformat_icons=show_subformat_icons == 'yes',
+                                                         hide_doctypes=_CFG_BIBFORMAT_HIDDEN_DOCTYPES)
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
@@ -99,13 +104,6 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
         main_urls_keys = sort_alphanumerically(main_urls.keys())
         for descr in main_urls_keys:
             urls = main_urls[descr]
-            if re.match(r'^\d+\s', descr) and urls[0][2] == 'png':
-                # FIXME: we have probably hit a Plot (as link
-                # description looks like '0001 This is Caption'), so
-                # do not take it.  This test is not ideal, we should
-                # rather study doc type, and base ourselves on
-                # Main/Additional/Plot etc.
-                continue
             out += "<strong>%s:</strong> " % descr
             urls_dict = {}
             for url, name, url_format in urls:
@@ -166,7 +164,8 @@ def escape_values(bfo):
     """
     return 0
 
-def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat_icons=False):
+def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat_icons=False,
+              hide_doctypes=None):
     """
     Returns the files available for the given record.
     Returned structure is a tuple (parsed_urls, old_versions, additionals):
@@ -176,6 +175,9 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
 
      Parameter 'include_subformat_icons' decides if subformat
      considered as icons should be returned
+
+     Parameter hide_doctypes (list) decides which doctypes should not
+     be included in the returned structure
 
     'parsed_urls' is a dictionary in the form::
         {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/CFG_SITE_RECORD/1/files/aFile.pdf', 'aFile', 'PDF'),
@@ -201,6 +203,9 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
 
     _ = gettext_set_language(bfo.lang)
 
+    if hide_doctypes is None:
+        hide_doctypes = []
+
     urls = bfo.fields("8564_")
     bibarchive = BibRecDocs(bfo.recID)
 
@@ -215,6 +220,13 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                   }
     if CFG_CERN_SITE:
         parsed_urls['cern_urls'] = [] # cern.ch urls
+
+        if [url for url in urls if url.get('u', '').startswith('http://arxiv.org/pdf/')]:
+            # We have a link to arXiv PDF. We can hide the files on
+            # CDS in some cases:
+            hide_doctypes.append('CMSPUB_SOURCEF')
+            hide_doctypes.append('ATLPUB_SOURCEF')
+            hide_doctypes.append('LHCBPB_SOURCEF')
 
     # Doctypes can of any type, but when there is one file marked as
     # 'Main', we consider that there is a distinction between "main"
@@ -286,7 +298,10 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                                CFG_BIBDOCFILE_ICON_SUBFORMAT_RE.match(subformat):
                             # This is an icon and we want to skip it
                             continue
-                        if not doc.get_doctype(bfo.recID) == 'Main' and \
+                        doctype = doc.get_doctype(bfo.recID)
+                        if doctype in hide_doctypes:
+                            continue
+                        if not doctype == 'Main' and \
                                distinct_main_and_additional_files == True:
                             # In that case we record that there are
                             # additional files, but don't add them to
