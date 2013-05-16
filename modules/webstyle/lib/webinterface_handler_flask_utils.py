@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -83,7 +83,8 @@ class InvenioBlueprint(Blueprint):
 
 
     def __init__(self, name, import_name, url_prefix=None, config=None,
-                 breadcrumbs=None, menubuilder=None, force_https=False):
+                 breadcrumbs=None, menubuilder=None, force_https=False,
+                 **kwargs):
         """
         Invenio extension of standard Flask blueprint.
 
@@ -95,7 +96,7 @@ class InvenioBlueprint(Blueprint):
         @param menubuilder: list of menus
         @param force_https: requires blueprint to be accessible only via https
         """
-        Blueprint.__init__(self, name, import_name, url_prefix=url_prefix)
+        Blueprint.__init__(self, name, import_name, url_prefix=url_prefix, **kwargs)
         self.config = config
         self.breadcrumbs = breadcrumbs or []
         self.breadcrumbs_map = {}
