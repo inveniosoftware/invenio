@@ -499,12 +499,16 @@ template function generated it.
         }
         return out
 
-    def tmpl_canonical_and_alternate_urls(self, url):
+    def tmpl_canonical_and_alternate_urls(self, url, quote_path=True):
         """
         Return the snippet of HTML to be put within the HTML HEAD tag in order
         to declare the canonical and language alternate URLs of a page.
+
+        @param quote_path: if True, the path section of the given
+                           C{url} is quoted according to RFC 2396.
+                           Useful if reading url from req.unparsed_uri
         """
-        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url)
+        canonical_url, alternate_urls = get_canonical_and_alternates_urls(url, quote_path=quote_path)
         out = """  <link rel="canonical" href="%s" />\n""" % cgi.escape(canonical_url, True)
         for ln, alternate_url in alternate_urls.iteritems():
             ln = ln.replace('_', '-') ## zh_CN -> zh-CN

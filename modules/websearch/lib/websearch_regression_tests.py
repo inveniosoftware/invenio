@@ -533,7 +533,18 @@ class WebSearchTestCollections(InvenioTestCase):
             self.assertEqual([], test_web_page_content(make_url(url),
                                            expected_text=expected_text,
                                            unexpected_text=unexpected_text))
-        return
+
+    def test_canonical_and_alternate_urls_quoting(self):
+        """ websearch - check that canonical and alternate URL in collection page header are properly quoted"""
+        url = CFG_SITE_URL + '/collection/Experimental%20Physics%20%28EP%29?ln=en'
+        expected_text = ['<link rel="alternate" hreflang="en" href="' + CFG_SITE_URL + '/collection/Experimental%20Physics%20%28EP%29?ln=en" />',
+                         '<link rel="canonical" href="' + CFG_SITE_URL + '/collection/Experimental%20Physics%20%28EP%29" />']
+        unexpected_text = ['<link rel="alternate" hreflang="en" href="' + CFG_SITE_URL + '/collection/Experimental Physics (EP)?ln=en" />',
+                           '<link rel="canonical" href="' + CFG_SITE_URL + '/collection/Experimental Physics (EP)" />']
+
+        self.assertEqual([], test_web_page_content(url,
+                                                   expected_text=expected_text,
+                                                   unexpected_text=unexpected_text))
 
 class WebSearchTestBrowse(InvenioTestCase):
 
