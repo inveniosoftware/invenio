@@ -118,8 +118,8 @@ pylib_DATA = __init__.py \
              sherpa_romeo_testing.py \
              orcid.py \
              xmlDict.py \
-             dataciteutils.py
-
+             dataciteutils.py \
+             containerutils.py
 
 jsdir=$(localstatedir)/www/js
 

@@ -928,25 +928,22 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def borrower_notification(self, req, form):
         """http://cds.cern.ch/admin2/bibcirculation/borrower_notification"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'borrower_email': (str, None),
-            'template': (str, None), 'message': (str, None), 'load_msg_template': (str, 'True'),
-            'subject': (str, None), 'send_message': (str, None), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'borrower_id': (str, None), 'template': (str, None),
+            'message': (str, None), 'load_msg_template': (str, 'True'), 'subject': (str, None),
+            'send_message': (str, None), 'from_address': (str, None), 'ln': (str, "en")})
 
         borrower_id = argd['borrower_id']
-        borrower_email = argd['borrower_email']
         template = argd['template']
         message = argd['message']
         load_msg_template = argd['load_msg_template']
         subject = argd['subject']
         send_message = argd['send_message']
+        from_address = argd['from_address']
         ln = argd['ln']
 
-        if borrower_email is not None:
-            borrower_email = borrower_email.strip()
-
-        return bal.borrower_notification(req, borrower_id, borrower_email, template,
-                                         message, load_msg_template,
-                                         subject, send_message, ln)
+        return bal.borrower_notification(req, borrower_id, template, message,
+                                         load_msg_template, subject, send_message, 
+                                         from_address, ln)
 
     def get_borrower_notes(self, req, form):
         """http://cds.cern.ch/admin2/bibcirculation/get_borrower_notes"""

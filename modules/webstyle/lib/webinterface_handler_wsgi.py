@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -115,6 +115,8 @@ class SimulatedModPythonRequest(object):
         self.__replace_https = False
         self.track_writings = False
         self.__what_was_written = ""
+        self.__cookies_out = {}
+        self.g = {} ## global dictionary in case it's needed
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
                 self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value

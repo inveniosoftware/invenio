@@ -49,7 +49,7 @@ def format_element(bfo, max_photos=''):
     for doc in bibdocs[:max_photos]:
         found_icons = []
         found_image_url = ''
-        for docfile in doc.list_latest_files():
+        for docfile in doc.list_latest_files(list_hidden=False):
             if docfile.is_icon():
                 found_icons.append((docfile.get_size(), docfile.get_url()))
             elif get_superformat_from_format(docfile.get_format()).lower() in [".jpg", ".gif", ".jpeg", ".png"]:

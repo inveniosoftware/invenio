@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -108,6 +108,9 @@ def scheduled_send_email(fromaddr,
         toaddr = ','.join(toaddr)
     if not isinstance(replytoaddr, (unicode, str)):
         replytoaddr = ','.join(replytoaddr)
+
+    toaddr = remove_temporary_emails(toaddr)
+
     if user is None:
         user = fromaddr
     if other_bibtasklet_arguments is None:
@@ -189,6 +192,9 @@ def send_email(fromaddr,
 
     if type(toaddr) is str:
         toaddr = toaddr.strip().split(',')
+
+    toaddr = remove_temporary_emails(toaddr)
+
     usebcc = len(toaddr) > 1  # More than one address, let's use Bcc in place of To
     if copy_to_admin:
         if CFG_SITE_ADMIN_EMAIL not in toaddr:
@@ -386,6 +392,8 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     except (UnicodeEncodeError, UnicodeDecodeError):
         replytoaddr = Header(replytoaddr, 'utf-8')
 
+    toaddr = remove_temporary_emails(toaddr)
+
     if html_content:
         if html_header is None:
             html_content = email_html_header(ln) + html_content
@@ -479,3 +487,38 @@ def email_strip_html(html_content):
         out_format.add_flowing_data(row)
         out_format.end_paragraph(1)
     return out.getvalue()
+
+def remove_temporary_emails(emails):
+    """
+    Removes the temporary emails (which are constructed randomly when user logs in
+    with an external authentication provider which doesn't supply an email
+    address) from an email list.
+
+    @param emails: email list (if string, then receivers are separated by ',')
+    @type emails: str|[str]
+
+    @rtype: str
+    """
+    from invenio.access_control_config import CFG_TEMP_EMAIL_ADDRESS
+    if not isinstance(emails, (str, unicode)):
+        emails = ','.join(emails)
+
+    # Remove all of the spaces
+    emails = emails.replace(' ', '')
+
+    # Remove all of the emails formatted like CFG_TEMP_EMAIL_ADDRESS
+    emails = re.sub((CFG_TEMP_EMAIL_ADDRESS % '\w+') + '(,|$)', '', emails,
+                                                                re.IGNORECASE)
+
+    # Remove all consecutive commas
+    emails = re.sub(',+', ',', emails)
+
+    if emails[0] == ',':
+        # Remove the comma at the beginning of the string
+        emails = emails[1:]
+
+    if emails[-1] == ',':
+        # Remove the comma at the end of the string
+        emails = emails[:-1]
+
+    return emails

@@ -244,6 +244,8 @@ def perform_book_proposal_send(uid, recid, period_from, period_to,
     Create a loan(hold) request on behalf of the user for that copy and send
     a confirmation e-mail to her/him.
     """
+    _ = gettext_set_language(ln)
+
     user = collect_user_info(uid)
 
     if CFG_CERN_SITE:
@@ -263,7 +265,7 @@ def perform_book_proposal_send(uid, recid, period_from, period_to,
 
             db.add_new_copy(tmp_barcode, recid, library_id=CFG_BIBCIRCULATION_DEFAULT_LIBRARY_ID,
                             collection='', location='',
-                            description='This book was suggested for acquisition', loan_period='',
+                            description=_("This book was suggested for acquisition"), loan_period='',
                             status=CFG_BIBCIRCULATION_ITEM_STATUS_UNDER_REVIEW, expected_arrival_date='')
 
             db.delete_brief_format_cache(recid)
@@ -273,7 +275,7 @@ def perform_book_proposal_send(uid, recid, period_from, period_to,
                                                     mail_subject='Acquisition Suggestion',
                                                     mail_template='proposal_notification',
                                                     mail_remarks=remarks, ln=CFG_SITE_LANG)
-        return "This item already has copies."
+        return _("This item already has copies.")
     else:
         if CFG_CERN_SITE:
             message = bc_templates.tmpl_message_request_send_fail_cern("Borrower ID not found.")
@@ -312,7 +314,7 @@ def perform_new_request_send(uid, recid, period_from, period_to,
     return perform_new_request_send_message(uid, recid, period_from, period_to, barcode,
                                             status, mail_subject='New request',
                                             mail_template='notification',
-                                            mail_remarks='', ln=CFG_SITE_LANG)
+					    mail_remarks='', ln=ln)
 
 def perform_new_request_send_message(uid, recid, period_from, period_to, barcode,
                                      status, mail_subject, mail_template,

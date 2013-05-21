@@ -142,12 +142,18 @@ Contents
              if you would like to use AWS connectivity:
              <http://pypi.python.org/pypi/hashlib>
           - (optional) utidylib, for HTML washing:
-	     <http://utidylib.berlios.de/>
+             <http://utidylib.berlios.de/>
           - (optional) Beautiful Soup, for HTML washing:
-	     <http://www.crummy.com/software/BeautifulSoup/>
+             <http://www.crummy.com/software/BeautifulSoup/>
           - (optional) Python Twitter (and its dependencies) if you want
              to use the Twitter Fetcher bibtasklet:
              <http://code.google.com/p/python-twitter/>
+          - (optional) Python OpenID if you want to enable OpenID support
+             for authentication:
+             <http://pypi.python.org/pypi/python-openid/>
+          - (optional) Python Rauth if you want to enable OAuth 1.0/2.0
+             support for authentication (depends on Python-2.6 or later):
+             <http://packages.python.org/rauth/>
 
         Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
               you are using an older version of MySQLdb, you may get
@@ -228,18 +234,18 @@ Contents
 
      l) (recommended) xlwt 0.7.2, Library to create spreadsheet files
         compatible with MS Excel 97/2000/XP/2003 XLS files, on any
-	platform, with Python 2.3 to 2.6
-	   <http://pypi.python.org/pypi/xlwt>
+        platform, with Python 2.3 to 2.6
+           <http://pypi.python.org/pypi/xlwt>
 
      m) (recommended) matplotlib 1.0.0 is a python 2D plotting library
-     	which produces publication quality figures in a variety of
-	hardcopy formats and interactive environments across
-	platforms. matplotlib can be used in python scripts, the
-	python and ipython  shell (ala MATLAB®	or Mathematica®),
-	web application servers, and six graphical user	interface
-	toolkits. It is used to generate pie graphs in the custom
-	summary query (WebStat)
-	   <http://matplotlib.sourceforge.net>
+             which produces publication quality figures in a variety of
+        hardcopy formats and interactive environments across
+        platforms. matplotlib can be used in python scripts, the
+        python and ipython  shell (ala MATLAB®        or Mathematica®),
+        web application servers, and six graphical user        interface
+        toolkits. It is used to generate pie graphs in the custom
+        summary query (WebStat)
+           <http://matplotlib.sourceforge.net>
 
      n) (optional) FFmpeg, an open-source tools an libraries collection
         to convert video and audio files. It makes use of both internal

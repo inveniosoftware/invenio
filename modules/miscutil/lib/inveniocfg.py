@@ -182,7 +182,10 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTYPES',
                        'CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS',
                        'CFG_DEVEL_TEST_DATABASE_ENGINES',
-                       'CFG_REFEXTRACT_KBS_OVERRIDE']:
+                       'CFG_REFEXTRACT_KBS_OVERRIDE',
+                       'CFG_OPENID_CONFIGURATIONS',
+                       'CFG_OAUTH1_CONFIGURATIONS',
+                       'CFG_OAUTH2_CONFIGURATIONS',]:
         try:
             option_value = option_value[1:-1]
         except TypeError:
@@ -229,7 +232,10 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_BIBFORMAT_HIDDEN_FILE_FORMATS',
                        'CFG_FLASK_DISABLED_BLUEPRINTS',
                        'CFG_DEVEL_TOOLS',
-                       'CFG_BIBFIELD_MASTER_FORMATS', ]:
+                       'CFG_BIBFIELD_MASTER_FORMATS',
+                       'CFG_OPENID_PROVIDERS',
+                       'CFG_OAUTH1_PROVIDERS',
+                       'CFG_OAUTH2_PROVIDERS',]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

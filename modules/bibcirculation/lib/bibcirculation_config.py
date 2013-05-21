@@ -376,11 +376,11 @@ else:
         }
 
 if CFG_CERN_SITE == 1:
-    CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'CERN Library<library.desk@cern.ch>'
-    CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'CERN Library<library.desk@cern.ch>'
-    CFG_BIBCIRCULATION_LOANS_EMAIL = 'lib.loans@cern.ch'
+    CFG_BIBCIRCULATION_ILLS_EMAIL = 'CERN External loans<external.loans@cern.ch>'
+    CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'CERN Library Desk<library.desk@cern.ch>'
+    CFG_BIBCIRCULATION_LOANS_EMAIL = 'CERN Lib loans<lib.loans@cern.ch>'
 else:
-    CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
+    CFG_BIBCIRCULATION_ILLS_EMAIL = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
     CFG_BIBCIRCULATION_LOANS_EMAIL = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 

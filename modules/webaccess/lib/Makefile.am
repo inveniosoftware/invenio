@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -33,7 +33,10 @@ pylib_DATA = access_control_engine.py \
              external_authentication_robot.py \
              webaccess_model.py \
              webaccess_admin_blueprint.py \
-             webaccess_regression_tests.py
+             webaccess_regression_tests.py \
+             external_authentication_oauth1.py \
+             external_authentication_oauth2.py \
+             external_authentication_openid.py
 
 noinst_DATA = collection_restrictions_migration_kit.py
 
