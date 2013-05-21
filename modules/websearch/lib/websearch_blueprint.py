@@ -20,22 +20,18 @@
 """WebSearch Flask Blueprint"""
 
 import os
-import re
 import json
 from math import ceil
-from pprint import pformat
 from itertools import groupby
-from operator import itemgetter
 from flask import make_response, g, render_template, request, flash, jsonify, \
     redirect, url_for, current_app, abort
 
 from invenio import bibindex_model as BibIndex
 from invenio.config import CFG_PYLIBDIR, CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, \
-    CFG_SITE_LANG, CFG_LOGDIR
+    CFG_SITE_LANG
 from invenio.cache import cache
 from invenio.errorlib import register_exception
 from invenio.pluginutils import PluginContainer
-from invenio.bibformat_engine import get_format_element, eval_format_element
 from invenio.websearch_cache import search_results_cache, \
     get_search_query_id, get_search_results_cache_key_from_qid
 from invenio.intbitset import intbitset as HitSet
@@ -43,7 +39,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.sqlalchemyutils import db
 from invenio.websearch_forms import EasySearchForm
-from invenio.websearch_model import Collection, Format, Tag
+from invenio.websearch_model import Collection, Format
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
     register_template_context_processor
 from invenio.webuser_flask import current_user
@@ -57,60 +53,6 @@ blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              breadcrumbs=[],
                              menubuilder=[('main.search', _('Search'),
                                            'search.index', 1)])
-
-
-def insert(name):
-    def _bfe_element(bfo, **kwargs):
-        # convert to utf-8 for legacy app
-        kwargs = dict((k, v.encode('utf-8') if isinstance(v, unicode) else v)
-                      for k, v in kwargs.iteritems())
-        format_element = get_format_element(name)
-        (out, dummy) = eval_format_element(format_element,
-                                           bfo,
-                                           kwargs)
-        # returns unicode for jinja2
-        return out.decode('utf-8')
-    return _bfe_element
-
-
-def plugin_builder(plugin_name, plugin_code):
-    if plugin_name == '__init__':
-        return
-    format_element = getattr(plugin_code, 'format_element')
-    return format_element
-
-
-@blueprint.before_app_first_request
-def load_bfe_elements():
-    BFE_ELEMENTS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                                'bibformat_elements',
-                                                'bfe_*.py'),
-                                   plugin_builder=plugin_builder)
-
-    ## Let's report about broken plugins
-    open(os.path.join(CFG_LOGDIR, 'broken-bibformat-elements.log'), 'w').write(
-        pformat(BFE_ELEMENTS.get_broken_plugins()))
-
-    current_app.config['BFE_ELEMENTS'] = BFE_ELEMENTS
-
-sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
-fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
-
-
-@blueprint.app_context_processor
-def add_bfe_functions():
-    # get functions from files
-    BFE_ELEMENTS = current_app.config.get('BFE_ELEMENTS', {})
-    bfe_from_files = dict((name.lower(), insert(name.lower()))
-                          for name in BFE_ELEMENTS.keys())
-    # get functions from tag table
-    bfe_from_tags = dict(('bfe_'+fix_tag_name(name),
-                          insert(fix_tag_name(name)))
-                         for name in map(itemgetter(0),
-                                         db.session.query(Tag.name).all()))
-    # overwrite functions from tag table with functions from files
-    bfe_from_tags.update(bfe_from_files)
-    return bfe_from_tags
 
 
 def cached_format_record(recIDs, of, ln='', verbose=0,
@@ -155,14 +97,13 @@ def get_collection_breadcrumbs(collection, breadcrumbs=None, builder=None,
     if collection is not None:
         if collection.id == 1:
             return breadcrumbs
-        breadcrumbs = get_collection_breadcrumbs(
-                            collection.most_specific_dad,
-                            breadcrumbs, builder=builder)
+        breadcrumbs = get_collection_breadcrumbs(collection.most_specific_dad,
+                                                 breadcrumbs, builder=builder)
         if builder is not None:
             crumb = builder(collection)
         else:
             crumb = (collection.name_ln,
-                    'search.collection',
+                     'search.collection',
                      dict(name=collection.name))
         breadcrumbs.append(crumb)
     return breadcrumbs
@@ -209,7 +150,7 @@ class Pagination(object):
         last = 0
         for num in xrange(1, self.pages + 1):
             if num <= left_edge or \
-               (num > self.page - left_current - 1 and \
+               (num > self.page - left_current - 1 and
                 num < self.page + right_current) or \
                num > self.pages - right_edge:
                 if last + 1 != num:
@@ -281,7 +222,7 @@ class RecordInfo(object):
         return "%s(%s)" % (self.__class__.__name__, self.recid)
 
     def get_nb_reviews(self, count_deleted=False):
-        @cache.cached(key_prefix='record_info::get_nb_reviews::' + \
+        @cache.cached(key_prefix='record_info::get_nb_reviews::' +
                       str(self.recid) + '::' + str(count_deleted))
         def cached():
             return get_nb_reviews(self.recid, count_deleted)
@@ -364,9 +305,8 @@ def search():
         collection = Collection.query.get_or_404(1)
 
     if collection.is_restricted:
-        (auth_code, auth_msg) = acc_authorize_action(uid,
-                                        VIEWRESTRCOLL,
-                                        collection=collection.name)
+        (auth_code, auth_msg) = acc_authorize_action(uid, VIEWRESTRCOLL,
+                                                     collection=collection.name)
         if auth_code and current_user.is_guest:
             return redirect(url_for('webaccount.login',
                                     referer=request.url))
@@ -388,9 +328,9 @@ def search():
     if collection.id > 1:
         qargs = request.args.to_dict()
         qargs['cc'] = Collection.query.get_or_404(1).name
-        b = get_collection_breadcrumbs(collection, [
-                (_('Home'), 'search.search', qargs)],
-                builder=_crumb_builder)
+        b = get_collection_breadcrumbs(collection,
+                                       [(_('Home'), 'search.search', qargs)],
+                                       builder=_crumb_builder)
     current_app.config['breadcrumbs_map'][request.endpoint] = b
 
     rg = request.args.get('rg', 10, type=int)
@@ -498,7 +438,7 @@ def results(qid):
         return _('Please reload the page')
 
     cc = search_results_cache.get(
-            get_search_results_cache_key_from_qid(qid) + '::cc')
+        get_search_results_cache_key_from_qid(qid) + '::cc')
 
     try:
         filter = json.loads(request.values.get('filter', '[]'))
@@ -555,17 +495,16 @@ def results(qid):
     @register_template_context_processor
     def index_context():
         return dict(
-                collection=collection,
-                RecordInfo=RecordInfo,
-                create_nearest_terms_box=_create_neareset_term_box,
-                pagination=Pagination(int(ceil(page / float(rg))), rg, len(recids)),
-                rg=rg,
-                format_record=cached_format_record)
+            collection=collection,
+            RecordInfo=RecordInfo,
+            create_nearest_terms_box=_create_neareset_term_box,
+            pagination=Pagination(int(ceil(page / float(rg))), rg, len(recids)),
+            rg=rg,
+            format_record=cached_format_record)
 
     if len(recids):
-        return render_template('websearch_results.html',
-                        recids=recids,
-                        export_formats=get_export_formats())
+        return render_template('websearch_results.html', recids=recids,
+                               export_formats=get_export_formats())
     else:
         return _('Your search did not match any records. Please try again.')
     #return jsonify(recids = output.tolist())
@@ -598,7 +537,7 @@ def autocomplete(field):
     if len(q) < 3:
         abort(406)
 
-    IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' % \
+    IdxPHRASE = BibIndex.__getattribute__('IdxPHRASE%02dF' %
                                           get_index_id_from_index_name(field))
 
     results = IdxPHRASE.query.filter(IdxPHRASE.term.contains(q)).all()

@@ -47,11 +47,17 @@ import inspect
 import traceback
 import zlib
 import cgi
+from flask import has_app_context
+from pprint import pformat
+from operator import itemgetter
+from werkzeug.utils import cached_property
 
 from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, \
+     CFG_PYLIBDIR, \
+     CFG_LOGDIR
 from invenio.errorlib import \
      register_exception, \
      get_tracestack
@@ -90,7 +96,7 @@ from invenio.bibknowledge import get_kbr_values
 from invenio.jinja2utils import render_template_to_string
 from HTMLParser import HTMLParseError
 from invenio.shellutils import escape_shell_arg
-from flask import current_app, has_app_context
+from invenio.pluginutils import PluginContainer
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -204,6 +210,71 @@ pattern_format_element_seealso = re.compile('''@see:\s*(?P<see>.*)''',
 ##      (?P<val2>.*)
 ##      (?P=sep2)
 ##      ''', re.VERBOSE | re.MULTILINE)
+
+sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
+fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
+
+
+class BfeElements(object):
+    """Loads bibformat elements using plugin builder and caches results."""
+
+
+    @cached_property
+    def bibformat_elements(self):
+        """Returns bibformat elements."""
+
+        def bfe_elements_plugin_builder(plugin_name, plugin_code):
+            if plugin_name == '__init__':
+                return
+            format_element = getattr(plugin_code, 'format_element')
+            return format_element
+
+        elem = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
+                                            'bibformat_elements',
+                                            'bfe_*.py'),
+                               plugin_builder=bfe_elements_plugin_builder)
+
+        ## Let's report about broken plugins
+        open(os.path.join(CFG_LOGDIR, 'broken-bibformat-elements.log'), 'w').write(
+            pformat(elem.get_broken_plugins()))
+        return elem
+
+    @cached_property
+    def functions(self):
+
+        def insert(name):
+            def _bfe_element(bfo, **kwargs):
+                # convert to utf-8 for legacy app
+                kwargs = dict((k, v.encode('utf-8') if isinstance(v, unicode) else v)
+                              for k, v in kwargs.iteritems())
+                format_element = get_format_element(name)
+                (out, dummy) = eval_format_element(format_element,
+                                                   bfo,
+                                                   kwargs)
+                # returns unicode for jinja2
+                return out.decode('utf-8')
+            return _bfe_element
+
+        bfe_from_files = dict((name.lower(), insert(name.lower()))
+                              for name in self.bibformat_elements.keys())
+
+        bfe_from_tags = {}
+        if has_app_context():
+            from invenio.sqlalchemyutils import db
+            from invenio.websearch_model import Tag
+
+            # get functions from tag table
+            bfe_from_tags = dict(('bfe_'+fix_tag_name(name),
+                                  insert(fix_tag_name(name)))
+                                 for name in map(itemgetter(0),
+                                                 db.session.query(Tag.name).all()))
+
+        # overwrite functions from tag table with functions from files
+        bfe_from_tags.update(bfe_from_files)
+        return bfe_from_tags
+
+BFE_ELEMENTS = BfeElements()
+
 
 def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
     """
@@ -483,13 +554,10 @@ def format_with_format_template(format_template_filename, bfo,
     elif format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         evaluated_format = '<!-- empty -->'
         try:
-            # Check if BFE_ELEMENTS are loaded, otherwise load them.
-            if has_app_context() and current_app.config.get('BFE_ELEMENTS', None) is None:
-                from invenio.websearch_blueprint import load_bfe_elements
-                load_bfe_elements()
             evaluated_format = render_template_to_string(
                 CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
-                bfo=bfo).encode('utf-8')
+                bfo=bfo,
+                **BFE_ELEMENTS.functions).encode('utf-8')
         except Exception:
             register_exception()
 
