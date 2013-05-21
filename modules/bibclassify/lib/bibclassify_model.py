@@ -26,6 +26,8 @@ from invenio.sqlalchemyutils import db
 
 # Create your models here.
 
+from invenio.websearch_model import Collection
+
 class ClsMETHOD(db.Model):
     """Represents a ClsMETHOD record."""
     def __init__(self):
@@ -40,9 +42,20 @@ class ClsMETHOD(db.Model):
                 server_default='')
     description = db.Column(db.String(255), nullable=False,
                 server_default='')
-    last_updated = db.Column(db.DateTime, nullable=False, 
+    last_updated = db.Column(db.DateTime, nullable=False,
             server_default='0001-01-01 00:00:00')
 
 
+class CollectionClsMETHOD(db.Model):
+    """Represents a Collection_clsMETHOD record."""
+    __tablename__ = 'collection_clsMETHOD'
+    id_collection = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(Collection.id), primary_key=True, nullable=False)
+    id_clsMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
+                db.ForeignKey(ClsMETHOD.id), primary_key=True, nullable=False)
+    collection = db.relationship(Collection, backref='clsMETHODs')
+    clsMETHOD = db.relationship(ClsMETHOD, backref='collections')
 
-__all__ = ['ClsMETHOD']
+
+__all__ = ['ClsMETHOD',
+           'CollectionClsMETHOD']

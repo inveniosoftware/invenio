@@ -27,6 +27,7 @@ pylib_DATA = \
 	websearch_forms.py \
 	websearch_flask_tests.py \
 	websearch_fixtures.py \
+	websearch_fixtures_demosite.py \
 	websearch_model.py \
 	websearch_templates.py \
 	websearch_user_settings.py \

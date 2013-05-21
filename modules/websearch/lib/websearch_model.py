@@ -40,7 +40,6 @@ from sqlalchemy.ext.orderinglist import ordering_list
 # Create your models here.
 
 from invenio.websession_model import User
-from invenio.bibclassify_model import ClsMETHOD
 
 
 class IntbitsetPickle(object):
@@ -506,14 +505,6 @@ def get_pbx_pos():
 
 class CollectionPortalbox(db.Model):
     """Represents a CollectionPortalbox record."""
-    def __init__(self, id_collection, id_portalbox, ln, position, score):
-        self.id_collection = id_collection
-        self.id_portalbox = id_portalbox
-        self.ln = ln
-        self.position = position
-        self.score = score
-
-        pass
     __tablename__ = 'collection_portalbox'
     id_collection = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Collection.id), primary_key=True)
@@ -766,17 +757,6 @@ class CollectionFieldFieldvalue(db.Model):
                 lazy='joined')
 
 
-class CollectionClsMETHOD(db.Model):
-    """Represents a Collection_clsMETHOD record."""
-    __tablename__ = 'collection_clsMETHOD'
-    id_collection = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(Collection.id), primary_key=True, nullable=False)
-    id_clsMETHOD = db.Column(db.MediumInteger(9, unsigned=True),
-                db.ForeignKey(ClsMETHOD.id), primary_key=True, nullable=False)
-    collection = db.relationship(Collection, backref='clsMETHODs')
-    clsMETHOD = db.relationship(ClsMETHOD, backref='collections')
-
-
 __all__ = ['Collection',
            'Collectionname',
            'Collectiondetailedrecordpagetabs',
@@ -797,5 +777,4 @@ __all__ = ['Collection',
            'FieldTag',
            'WebQuery',
            'UserQuery',
-           'CollectionFieldFieldvalue',
-           'CollectionClsMETHOD']
+           'CollectionFieldFieldvalue']

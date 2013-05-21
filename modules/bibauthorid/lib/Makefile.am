@@ -1,6 +1,6 @@
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,6 +21,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = \
 	bibauthorid_cli.py \
 	bibauthorid_daemon.py \
+	bibauthorid_fixtures_demosite.py \
 	bibauthorid_least_squares.py \
 	bibauthorid_personid_maintenance.py \
 	bibauthorid_scheduler.py \

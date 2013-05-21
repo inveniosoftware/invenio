@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,6 +22,7 @@ pylib_DATA = bibclassify_acronym_analyzer.py \
              bibclassify_config.py \
              bibclassify_daemon.py \
              bibclassify_engine.py \
+             bibclassify_fixtures_demosite.py \
              bibclassify_keyword_analyzer.py \
              bibclassify_regression_tests.py \
              bibclassify_model.py \

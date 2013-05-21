@@ -1,7 +1,7 @@
 ## $Id: Makefile.am,v 1.4 2008/08/25 13:23:38 joaquim Exp $
 
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,6 +27,7 @@ pylib_DATA = bibcirculation.py \
              bibcirculation_dblayer.py \
 	     bibcirculation_config.py \
 	     bibcirculation_daemon.py \
+	     bibcirculation_fixtures_demosite.py \
 	     bibcirculation_model.py \
 	     bibcirculation_utils.py \
 	     bibcirculation_cern_ldap.py \

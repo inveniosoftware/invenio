@@ -17,6 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
+import sys
+import shutil
+import datetime
+
 from flask.ext.script import Manager
 
 manager = Manager(usage="Perform database operations")
@@ -43,9 +48,6 @@ def drop(yes_i_know=False):
 
     print ">>> Going to drop tables and related data on filesystem ..."
 
-    import os
-    import shutil
-    import datetime
     from sqlalchemy import event
     from invenio.dateutils import get_time_estimator
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
@@ -118,7 +120,6 @@ def create(default_data=True):
 
     print ">>> Going to create tables..."
 
-    import datetime
     from sqlalchemy import event
     from invenio.dateutils import get_time_estimator
     from invenio.inveniocfg import test_db_connection
@@ -181,22 +182,19 @@ def uri():
     print current_app.config['SQLALCHEMY_DATABASE_URI']
 
 
-@option_default_data
-def populate(default_data=True):  # , sample_data=False):
-    """Populate database with default data"""
-
+@manager.command
+def load_fixtures(suffix='', truncate_tables_first=False):
     from invenio.sqlalchemyutils import db
     from fixture import SQLAlchemyFixture
     from invenio.importutils import autodiscover_modules
 
-    if not default_data:
-        print '>>> No data filled...'
-        return
-
-    print ">>> Going to fill tables..."
+    if len(suffix) > 0:
+        related_name_re = ".+_fixtures_%s\.py" % (suffix, )
+    else:
+        related_name_re = ".+_fixtures\.py"
 
     fixture_modules = autodiscover_modules(['invenio'],
-                                           related_name_re=".+_fixtures\.py")
+                                           related_name_re=related_name_re)
     model_modules = autodiscover_modules(['invenio'],
                                          related_name_re=".+_model\.py")
     fixtures = dict((f, getattr(ff, f)) for ff in fixture_modules
@@ -214,22 +212,35 @@ def populate(default_data=True):  # , sample_data=False):
     else:
         print ">>> There are", len(models), "tables to be loaded."
 
-    #for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabfill.sql" % (CFG_PREFIX, CFG_PREFIX)]:
-    #    if os.system(cmd):
-    #        print "ERROR: failed execution of", cmd
-    #        sys.exit(1)
+    if truncate_tables_first:
+        print ">>> Going to truncate following tables:",
+        print map(lambda t: t.__name__, models.values())
+        db.session.execute("TRUNCATE %s" % ('collectionname', ))
+        db.session.execute("TRUNCATE %s" % ('collection_externalcollection', ))
+        for m in models.values():
+            db.session.execute("TRUNCATE %s" % (m.__tablename__, ))
+        db.session.commit()
 
     data.setup()
+    db.session.commit()
 
-    from invenio.config import CFG_ETCDIR, CFG_PREFIX
-    from invenio.inveniocfg import prepare_conf
 
-    class TmpOptions(object):
-        conf_dir = CFG_ETCDIR
-    conf = prepare_conf(TmpOptions())
+@option_default_data
+def populate(default_data=True):
+    """Populate database with default data"""
 
-    import os
-    import sys
+    from invenio.config import CFG_PREFIX
+    from invenio.config_manager import get_conf
+
+    if not default_data:
+        print '>>> No data filled...'
+        return
+
+    print ">>> Going to fill tables..."
+
+    load_fixtures()
+
+    conf = get_conf()
 
     from invenio.inveniocfg import cli_cmd_reset_sitename, \
         cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
@@ -248,6 +259,46 @@ def populate(default_data=True):  # , sample_data=False):
     map(iu.register_success, iu.get_upgrades())
 
     print ">>> Tables filled successfully."
+
+
+@manager.command
+def demosite(data='demosite'):
+    """Populate database with demo site data."""
+
+    from invenio.sqlalchemyutils import db
+    from invenio.config import CFG_PREFIX
+    from invenio.websession_model import User
+    from invenio.config_manager import get_conf
+
+    print ">>> Going to create demo site..."
+    db.session.execute("TRUNCATE schTASK")
+    db.session.execute("TRUNCATE session")
+    User.query.filter(User.email == '').delete()
+    db.session.commit()
+
+    load_fixtures(suffix=data, truncate_tables_first=True)
+
+    db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');")
+    db.session.commit()
+
+    conf = get_conf()
+
+    from invenio.inveniocfg import cli_cmd_reset_sitename, \
+        cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
+
+    cli_cmd_reset_sitename(conf)
+    cli_cmd_reset_siteadminemail(conf)
+    cli_cmd_reset_fieldnames(conf)  # needed for I18N demo ranking method names
+
+    for cmd in ["%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
+                "%s/bin/webcoll -u admin" % CFG_PREFIX,
+                "%s/bin/webcoll 1" % CFG_PREFIX,
+                "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
+                "%s/bin/bibsort 2" % CFG_PREFIX, ]:
+        if os.system(cmd):
+            print "ERROR: failed execution of", cmd
+            sys.exit(1)
+    print ">>> Demo site created successfully."
 
 
 @manager.command

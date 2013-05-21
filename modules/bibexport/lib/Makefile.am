@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibexport.py \
+             bibexport_fixtures_demosite.py \
              bibexport_model.py \
              bibexport_method_sitemap.py \
              bibexport_method_googlescholar.py \
