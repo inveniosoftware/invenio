@@ -40,7 +40,7 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
              bfe_qrcode.py bfe_hepdata_table.py bfe_hepdata_parents.py \
              bfe_authority_author.py bfe_authority_institute.py \
              bfe_authority_journal.py bfe_authority_subject.py \
-             bfe_authority_control_no.py
+             bfe_authority_control_no.py bfe_meta_files.py
 
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements
 
