@@ -554,10 +554,11 @@ def format_with_format_template(format_template_filename, bfo,
     elif format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         evaluated_format = '<!-- empty -->'
         try:
+            from inveino.bibfield import get_record as bibfield_get_record
             evaluated_format = render_template_to_string(
                 CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
-                bfo=bfo,
-                **BFE_ELEMENTS.functions).encode('utf-8')
+                record=bibfield_get_record(bfo.recID),
+                bfo=bfo, **BFE_ELEMENTS.functions).encode('utf-8')
         except Exception:
             register_exception()
 
