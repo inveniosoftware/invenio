@@ -25,6 +25,19 @@ __revision__ = "$Id$"
 
 import re
 
+import sys
+if sys.version_info < (2,5):
+    def all(list):
+        for element in list:
+            if not element:
+                return False
+        return True
+    def any(list):
+        for element in list:
+            if element:
+                return True
+        return False
+
 from invenio.bibfield_utils import BibFieldDict, BibFieldCheckerException
 from invenio.bibfield_config import config_rules
 
@@ -98,7 +111,7 @@ class JsonReader(BibFieldDict):
                     try:
                         self._try_to_eval("%s(self,'%s',%s)" % (checker_function[1], key, checker_function[2]))
                     except BibFieldCheckerException, err:
-                        self._warning_messages.append(err.message)
+                        self._warning_messages.append(str(err))
         for key in self.keys():
             try:
                 check_rules(config_rules[key]['checker'], key)
@@ -141,12 +154,12 @@ class JsonReader(BibFieldDict):
                         if legacy_rule[0] == '005':
                             #Especial format for date only for 005 tag
                             formatstring = "%Y%m%d%H%M%S.0"
-                        output += formatstring_controlfield.format(tag=legacy_rule[0],
-                                                                   content=self.get(key,
-                                                                                    default='',
-                                                                                    formatstring=formatstring,
-                                                                                    formatfunction=escape)
-                                                                   )
+                        output += "<controlfield tag='%s'>%s</controlfield>" % (legacy_rule[0],
+                                                                                self.get(key,
+                                                                                         default='',
+                                                                                         formatstring=formatstring,
+                                                                                         formatfunction=escape)
+                                                                               )
                     elif len(legacy_rule[0]) == 6:
                         #Data Field
                         if not (tag == legacy_rule[0][:3] and ind1 == legacy_rule[0][3].replace('_', '') and ind2 == legacy_rule[0][4].replace('_', '')):
@@ -154,10 +167,7 @@ class JsonReader(BibFieldDict):
                             ind1 = legacy_rule[0][3].replace('_', '')
                             ind2 = legacy_rule[0][4].replace('_', '')
                             if content:
-                                output += formatstring_datafield.format(tag=tag,
-                                                                        ind1=ind1,
-                                                                        ind2=ind2,
-                                                                        content=content)
+                                output += "<datafield tag='%s' ind1='%s' ind2='%s'>%s</datafield>" % (tag, ind1, ind2, content)
                                 content = ''
                         try:
                             tmp = value.get(legacy_rule[-1])
@@ -169,10 +179,7 @@ class JsonReader(BibFieldDict):
                             tmp = escape(value)
                         content += "<subfield code='%s'>%s</subfield>" % (legacy_rule[0][5], tmp)
             if content:
-                output += formatstring_datafield.format(tag=tag,
-                                                        ind1=ind1,
-                                                        ind2=ind2,
-                                                        content=content)
+                output += "<datafield tag='%s' ind1='%s' ind2='%s'>%s</datafield>" % (tag, ind1, ind2, content)
             return output
 
         export = '<collection xmlns="http://www.loc.gov/MARC21/slim"><record>'

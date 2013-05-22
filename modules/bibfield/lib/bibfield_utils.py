@@ -117,7 +117,7 @@ class BibFieldDict(object):
                 for group in prepare_field_keys(key):
                     dict_part = self._get_intermediate_value(dict_part, group)
         except KeyError, err:
-            return self[key.replace(err.message, self._aliases[err.message].replace('[n]', '[1:]'), 1)]
+            return self[key.replace(err.args[0], self._aliases[err.args[0]].replace('[n]', '[1:]'), 1)]
 
         if re.search('^_[a-zA-Z0-9]', key):
             if key in self._do_not_cache:
@@ -254,7 +254,7 @@ class BibFieldDict(object):
         >>> d['foo'] = {'a': 'world', 'b':'hello'}
         >>> get('foo', formatstring="{0[b]} {0[a]}!")
         >>> 'hello world!'
-
+        Note: Use this parameter only if you are running python 2.5 or higher.
         @param formatfunction: Optional parameter to format the output value.
         This parameter must be function and must handle all the possible
         parameter types (strin, dict or list)
@@ -323,7 +323,7 @@ class BibFieldDict(object):
             try:
                 res = eval(string, globals().update(context), locals())  # kwalitee: disable=eval
             except NameError, err:
-                import_name = err.message.split("'")[1]
+                import_name = str(err).split("'")[1]
                 if not import_name in imports:
                     if import_name in CFG_BIBFIELD_FUNCTIONS:
                         globals()[import_name] = CFG_BIBFIELD_FUNCTIONS[import_name]
@@ -432,7 +432,7 @@ class CoolDict(dict):
         a list containing all the items inside the dictionary which key matches
         the regular expression ([] if none)
         """
-        if isinstance(key, re._pattern_type):
+        try:
             keys = filter(key.match, self.keys())
             values = []
             for key in keys:
@@ -441,7 +441,7 @@ class CoolDict(dict):
                 if not isinstance(value, dict) and not isinstance(value, list):
                     self._consumed[key] = True
             return values
-        else:
+        except AttributeError:
             try:
                 value = dict.get(self, key)
                 if not isinstance(value, dict) and not isinstance(value, list):

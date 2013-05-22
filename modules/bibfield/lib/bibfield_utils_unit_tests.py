@@ -171,7 +171,8 @@ class BibFieldDictUnitTest(unittest.TestCase):
         self.assertNotEqual(d['_cc'], 1)
         self.assertNotEqual(d['_cc'], d.get('_cc'))
 
-        self.assertEqual('hello world!', d.get('foo', formatstring="{0[b]} {0[a]}!"))
+        #Python 2.5 or higher
+        #self.assertEqual('hello world!', d.get('foo', formatstring="{0[b]} {0[a]}!"))
 
         def dummy(s):
             return s.upper()

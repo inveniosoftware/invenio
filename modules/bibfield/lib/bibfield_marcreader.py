@@ -53,9 +53,7 @@ class MarcReader(JsonReader):
         self.rec_tree = CoolDict()
         try:
             if self.blob_wrapper.schema.lower().startswith('file:'):
-                with open(self.blob_wrapper.blob_file_name, 'r') as f:
-                    self.blob_wrapper.blob = f.read()
-
+                self.blob_wrapper.blob = open(self.blob_wrapper.blob_file_name, 'r').read()
             if self.blob_wrapper.schema.lower() in ['recstruct']:
                 self.__create_rectree_from_recstruct()
             elif self.blob_wrapper.schema.lower() in ['xml', 'file:xml']:
