@@ -20,6 +20,7 @@ SUBDIRS = upgrades
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = __init__.py \
+             adminutils.py \
              apache_manager.py \
 	     cache.py \
              errorlib.py \

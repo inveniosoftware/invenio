@@ -586,6 +586,10 @@ def create_invenio_flask_app(**kwargs_config):
 
     _app.config['menubuilder_map'] = menu
 
+    # Flask-Admin
+    from invenio.adminutils import register_admin
+    register_admin(_app)
+
     try:
         ## When deploying Invenio, one can prepare a module called
         ## webinterface_handler_local.py to be deployed under

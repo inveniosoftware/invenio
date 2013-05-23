@@ -156,6 +156,7 @@
     </header>
 {%- endif -%}
 {%- if not no_pagebody -%}
+{%- block page_body -%}
     <div class="container">
       {% block title %}
       {% if title %}
@@ -176,6 +177,7 @@
         {{ body }}
         {% endblock body %}
     </div>
+{%- endblock page_body -%}
 {%- endif -%}
 {%- if not no_pagefooter -%}
     <div id="push"></div>

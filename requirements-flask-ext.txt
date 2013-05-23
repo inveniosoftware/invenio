@@ -6,3 +6,4 @@ Flask-Script==0.5.3
 Flask-SQLAlchemy==0.16
 Flask-Testing==0.4
 Flask-WTF==0.8
+Flask-Admin==1.0.6
