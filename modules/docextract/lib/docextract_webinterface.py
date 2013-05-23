@@ -103,7 +103,7 @@ class WebInterfaceAPIDocExtract(WebInterfaceDirectory):
         if 'url' not in form:
             return 'No URL specified'
 
-        url = form['url'].value
+        url = form['url']
 
         if not check_url(url):
             return 'Invalid URL specified'
@@ -117,7 +117,7 @@ class WebInterfaceAPIDocExtract(WebInterfaceDirectory):
         if 'txt' not in form:
             return 'No text specified'
 
-        txt = form['txt'].value
+        txt = form['txt']
 
         return extract_references_from_string_xml(txt)
 
@@ -161,17 +161,17 @@ class WebInterfaceDocExtract(WebInterfaceDirectory):
         user_info = collect_user_info(req)
 
         # Handle the 3 POST parameters
-        if 'pdf' in form and form['pdf'].value:
-            pdf = form['pdf'].value
+        if 'pdf' in form and form['pdf']:
+            pdf = form['pdf']
             references_xml = extract_from_pdf_string(pdf)
-        elif 'arxiv' in form and form['arxiv'].value:
-            url = make_arxiv_url(arxiv_id=form['arxiv'].value)
+        elif 'arxiv' in form and form['arxiv']:
+            url = make_arxiv_url(arxiv_id=form['arxiv'])
             references_xml = extract_references_from_url_xml(url)
-        elif 'url' in form and form['url'].value:
-            url = form['url'].value
+        elif 'url' in form and form['url']:
+            url = form['url']
             references_xml = extract_references_from_url_xml(url)
-        elif 'txt' in form and form['txt'].value:
-            txt = form['txt'].value
+        elif 'txt' in form and form['txt']:
+            txt = form['txt']
             references_xml = extract_references_from_string_xml(txt)
         else:
             references_xml = None
