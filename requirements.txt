@@ -6,8 +6,7 @@ python-dateutil<=1.9999
 python-magic==0.4.2
 http://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz
 numpy==1.7.0
-ftp://xmlsoft.org/libxml2/python/libxml2-python-2.6.21.tar.gz
-ftp://xmlsoft.org/libxslt/python/libxml2-python-2.6.21.tar.gz
+lxml==3.1.2
 mechanize==0.2.5
 python-Levenshtein==0.10.2
 pyPdf==1.13
