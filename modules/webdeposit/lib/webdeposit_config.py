@@ -26,6 +26,36 @@ Define here validators and autocomplete functions for fields
 to override the default ones.
 
 The structure must be in dictionaries as follows:
+Deposition name: Form type: 'fields': name of the field
+
+deposition:
+    collection:
+        The collection that the deposition belongs.
+
+form:
+    title:
+        string, the title to be shown to the user above the form.
+    file_cook:
+        define here a function if you want different handling in json's transformation
+        for the files of the form.
+    template:
+        the template to be used for the form.
+        if not defined, the default one is being used.
+
+fields:
+    label:
+        string, the field's label
+    validators:
+        list with path strings to be imported with werkzeug's `import_string`.
+        The validators of the field.
+    autocomplete:
+        path string to be imported with werkzeug's `import_string`.
+        The function that autocompletes the field.
+    recjson_key:
+        the association with BibField. Define here a mapping with a BibField's field.
+    widget:
+        path string to be imported with werkzeug's `import_string`.
+        WTField widget.
 
 Deposition name: Form type: 'fields': name of the field
 """

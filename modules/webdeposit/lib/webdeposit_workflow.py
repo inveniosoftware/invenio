@@ -149,7 +149,11 @@ class DepositionWorkflow(object):
         if form_validation:
             form.validate()
 
-        return dict(workflow=self,
+        # Get the template from configuration for this form
+        template = form.config.get_template() or 'webdeposit_add.html'
+
+        return dict(template_name_or_list=template,
+                    workflow=self,
                     deposition_type=deposition_type,
                     form=form,
                     drafts=drafts,

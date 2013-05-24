@@ -356,7 +356,6 @@ def draft_field_error_check(user_id, uuid, field_name, value):
     form = get_form(user_id, uuid=uuid)
 
     subfield_name = None
-    subfield_name = None
     if '-' in field_name:  # check if its subfield
         field_name, subfield_name = field_name.split('-')
 
@@ -443,6 +442,19 @@ def draft_field_list_add(user_id, uuid, field_name, value,
                WebDepositDraft.step == draft.step).\
         update({"form_values": values,
                 "timestamp": datetime.now()})
+
+
+def get_all_drafts(user_id):
+    drafts = dict(
+        db.session.query(Workflow.name,
+                         db.func.count(
+                         db.func.distinct(WebDepositDraft.uuid))).
+        join(WebDepositDraft.workflow).
+        filter(db.and_(Workflow.user_id == user_id,
+                       Workflow.status != CFG_WORKFLOW_STATUS.FINISHED)).
+        group_by(Workflow.name).all())
+
+    return drafts
 
 
 def get_draft(user_id, uuid, field_name=None):

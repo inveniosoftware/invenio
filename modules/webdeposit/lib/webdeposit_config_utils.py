@@ -211,6 +211,19 @@ class WebDepositConfiguration(object):
         else:
             return None
 
+    def get_template(self, form_type=None):
+        deposition_type = self.get_deposition_type()
+        form_type = self.get_form_type() or form_type
+
+        template = self._parse_config('template',
+                                       deposition_type=deposition_type,
+                                       form_type=form_type)
+
+        if template is None:
+            return None
+        else:
+            return template
+
     def get_collection(self, deposition_type=None):
         deposition_type = deposition_type or self.get_deposition_type()
 
