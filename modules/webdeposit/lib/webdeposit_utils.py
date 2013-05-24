@@ -41,23 +41,23 @@ CFG_DRAFT_STATUS = {
 }
 
 
-def get_latest_or_new_workflow(deposition_type):
+def get_latest_or_new_workflow(deposition_type, user_id=None):
     """ Creates new workflow or returns a new one """
 
-    user_id = current_user.get_id()
+    user_id = user_id or current_user.get_id()
     wf = deposition_metadata[deposition_type]["workflow"]
 
     # get latest draft in order to get workflow's uuid
-    webdeposit_draft = db.session.query(WebDepositDraft).\
-        join(WebDepositDraft.workflow).\
+    latest_workflow = db.session.query(Workflow).\
         filter(
             Workflow.user_id == user_id,
             Workflow.name == deposition_type,
             Workflow.module_name == 'webdeposit',
             Workflow.status != CFG_WORKFLOW_STATUS.FINISHED).\
-        order_by(db.desc(WebDepositDraft.timestamp)).\
+        order_by(db.desc(Workflow.modified)).\
         first()
-    if webdeposit_draft is None:
+
+    if latest_workflow is None:
         # We didn't find other workflows
         # Let's create a new one
         return DepositionWorkflow(deposition_type=deposition_type,
@@ -65,7 +65,7 @@ def get_latest_or_new_workflow(deposition_type):
 
     # Create a new workflow
     # based on the latest draft's uuid
-    uuid = webdeposit_draft.uuid
+    uuid = latest_workflow .uuid
     return DepositionWorkflow(deposition_type=deposition_type,
                               workflow=wf, uuid=uuid)
 
@@ -77,7 +77,12 @@ def get_workflow(deposition_type, uuid):
     except KeyError:
         # deposition type not found
         return None
-    # FIXME: check if uuid exists first
+    # Check if uuid exists first
+    try:
+        db.session.query(Workflow). \
+            filter_by(uuid=uuid).one()
+    except NoResultFound:
+        return None
     return DepositionWorkflow(uuid=uuid,
                               deposition_type=deposition_type,
                               workflow=wf)
@@ -128,8 +133,12 @@ def get_current_form(user_id, deposition_type=None, uuid=None):
                 filter(Workflow.user_id == user_id,
                        WebDepositDraft.uuid == uuid)
             # get the draft with the max step, the latest
-            webdeposit_draft = max(webdeposit_draft_query.all(),
-                                   key=lambda w: w.step)
+            try:
+                webdeposit_draft = max(webdeposit_draft_query.all(),
+                                       key=lambda w: w.step)
+            except ValueError:
+                # No drafts found
+                raise NoResultFound
         elif deposition_type is not None:
             webdeposit_draft = \
                 db.session.query(WebDepositDraft).\
@@ -190,12 +199,15 @@ def get_form(user_id, uuid, step=None):
         except ValueError:
             return None
     else:
-        webdeposit_draft = \
-            db.session.query(WebDepositDraft).\
-            join(Workflow).\
-            filter(Workflow.user_id == user_id,
-                   WebDepositDraft.uuid == uuid,
-                   WebDepositDraft.step == step).one()
+        try:
+            webdeposit_draft = \
+                db.session.query(WebDepositDraft).\
+                join(Workflow).\
+                filter(Workflow.user_id == user_id,
+                       WebDepositDraft.uuid == uuid,
+                       WebDepositDraft.step == step).one()
+        except NoResultFound:
+            return None
 
     form = forms[webdeposit_draft.form_type]()
 
@@ -252,12 +264,15 @@ def get_form_status(user_id, uuid, step=None):
         except ValueError:
             return None
     else:
-        webdeposit_draft = \
-            db.session.query(WebDepositDraft).\
-            join(Workflow).\
-            filter(Workflow.user_id == user_id,
-                   WebDepositDraft.uuid == uuid,
-                   WebDepositDraft.step == step).one()
+        try:
+            webdeposit_draft = \
+                db.session.query(WebDepositDraft).\
+                join(Workflow).\
+                filter(Workflow.user_id == user_id,
+                       WebDepositDraft.uuid == uuid,
+                       WebDepositDraft.step == step).one()
+        except NoResultFound:
+            return None
 
     return webdeposit_draft.status
 
