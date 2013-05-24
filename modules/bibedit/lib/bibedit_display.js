@@ -30,6 +30,10 @@ function displayRecord() {
     // specific tags
     displayAllTagsCheckboxes();
 
+    if (gRecordHideAuthors) {
+        $("#focuson_authors").prop("checked", false)
+    }
+
     var table = '' + '<table id="bibEditTable">' +
         '<col span="1" class="bibEditColFieldBox"/>' +
         '<col span="1" id="bibEditColFieldTag"/>' +
@@ -67,6 +71,9 @@ function displayRecord() {
     // For each instance of each field, create row(s).
     for (n = tags.length; i < n; i++) {
         tag = tags[i];
+        if ( $.inArray(tag, gDisplayAuthorTags) !== -1 && gRecordHideAuthors ) {
+            continue;
+        }
         fields = gRecord[tag];
         for (var j = 0, m = fields.length; j < m; j++) {
             table += createField(tag, fields[j], j);

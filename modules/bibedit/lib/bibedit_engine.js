@@ -1547,6 +1547,7 @@ function onGetRecordSuccess(json){
   gBibCircUrl = json['bibCirculationUrl'];
   gDisplayBibCircPanel = json['canRecordHavePhysicalCopies'];
   gRecordHasPDF = json['record_has_pdf']
+  gRecordHideAuthors = json['record_hide_authors']
 
   // Get KB information
   gKBSubject = json['KBSubject'];
@@ -2213,6 +2214,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gCacheMTime = null;
   gSelectionMode = false;
   gReadOnlyMode = false;
+  gRecordHideAuthors = false;
   $('#btnSwitchReadOnly').html("Read-only");
   gHoldingPenLoadedChanges = null;
   gHoldingPenChanges = null;
@@ -6151,6 +6153,13 @@ function onfocusreference(check_box) {
 
 
 function onfocusauthor(check_box) {
+
+  if (gRecordHideAuthors) {
+    gRecordHideAuthors = false;
+    $("#bibEditContentTable").empty();
+    displayRecord();
+  }
+
   var $author_checkbox = $("#focuson_authors");
 
   /* For cases when we call the function without click on the interface */

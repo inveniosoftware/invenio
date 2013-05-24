@@ -52,7 +52,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_REQUESTS_UNTIL_SAVE, \
     CFG_BIBEDIT_DOI_LOOKUP_FIELD, CFG_DOI_USER_AGENT, \
     CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS, \
-    CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS
+    CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS, CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE, \
     CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS
@@ -732,6 +732,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 response['resultCode'] = 103
 
             response['record_has_pdf'] = record_has_fulltext(recid)
+
+            response['record_hide_authors'] = check_hide_authors(record)
 
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
@@ -1748,3 +1750,8 @@ def perform_doi_search(doi):
     else:
         response['doi_url'] = resp.geturl()
     return response
+
+
+def check_hide_authors(record):
+    """ Check if authors should be hidden by default in the user interface """
+    return sum([len(record.get(tag, [])) for tag in CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS]) > CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD

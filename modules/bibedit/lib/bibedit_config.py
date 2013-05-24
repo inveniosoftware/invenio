@@ -226,6 +226,10 @@ CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS = ['999']
 # authors
 CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS = ['100', '700']
 
-# CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS - which tags to be excludeed when for the
+# CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS - which tags to be excluded in the
 # curator view
 CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS = ['035', '041', '520', '540', '595', '650', '653', '690', '695', '856']
+
+# CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD - if number of authors is higher than this number
+# they will be hidden by default
+CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD = 200
