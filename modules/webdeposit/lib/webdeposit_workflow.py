@@ -176,24 +176,20 @@ class DepositionWorkflow(object):
     def run_next_step(self):
         if self.current_step >= self.steps_num:
             self.obj['break'] = True
-            self.update_db()
             return
         function = self.workflow[self.current_step]
         function(self.obj, self)
         self.current_step += 1
         self.obj['step'] = self.current_step
-        self.update_db()
 
     def jump_forward(self):
         restart_workflow(self.eng, [self.bib_obj], 'next', stop_on_halt=True)
 
-    def jump_backwards(self, synchronize=False):
+    def jump_backwards(self, dummy_synchronize=False):
         if self.current_step > 1:
             self.current_step -= 1
         else:
             self.current_step = 1
-        if synchronize:
-            self.update_db()
 
     def get_workflow_from_db(self):
         return Workflow.query.filter(Workflow.uuid == self.get_uuid()).first()
@@ -214,3 +210,9 @@ class DepositionWorkflow(object):
                 pass
 
         return json_reader
+
+    def get_data(self, key):
+        if key in self.bib_obj.data:
+            return  self.bib_obj.data[key]
+        else:
+            return None

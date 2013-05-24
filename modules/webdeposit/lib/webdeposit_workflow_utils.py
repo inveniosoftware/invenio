@@ -93,10 +93,10 @@ def export_marc_from_json():
         from invenio.webdeposit_utils import get_form
         json_reader = JsonReader()
         for step in range(steps_num):
-                form = get_form(user_id, uuid, step)
-                # Insert the fields' values in bibfield's rec_json dictionary
-                if form is not None:  # some steps don't have any form ...
-                    json_reader = form.cook_json(json_reader)
+            form = get_form(user_id, uuid, step)
+            # Insert the fields' values in bibfield's rec_json dictionary
+            if form is not None:  # some steps don't have any form ...
+                json_reader = form.cook_json(json_reader)
 
         deposition_type = \
             db.session.query(Workflow.name).\
@@ -110,6 +110,10 @@ def export_marc_from_json():
         json_reader['collection.primary'] = \
             deposition_conf.get_collection() or deposition_type
 
+        if 'recid' in json_reader or 'record ID' in json_reader:
+            obj.data['update_record'] = True
+        else:
+            obj.data['update_record'] = False
         marc = json_reader.legacy_export_as_marc()
         obj.data['marc'] = marc
     return export
@@ -119,11 +123,19 @@ def create_record_from_marc():
     def create(obj, dummy_eng):
         marc = obj.data['marc']
         tmp_file_fd, tmp_file_name = mkstemp(suffix='.marcxml',
-                                             prefix="webdeposit_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"),
+                                             prefix="webdeposit_%s" %
+                                             time.strftime("%Y-%m-%d_%H:%M:%S"),
                                              dir=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, marc)
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0644)
 
-        task_low_level_submission('bibupload', 'webdeposit', '-i', tmp_file_name)
+        if obj.data['update_record']:
+            obj.data['task_id'] = task_low_level_submission('bibupload',
+                                                            'webdeposit', '-r',
+                                                            tmp_file_name)
+        else:
+            obj.data['task_id'] = task_low_level_submission('bibupload',
+                                                            'webdeposit', '-i',
+                                                            tmp_file_name)
     return create

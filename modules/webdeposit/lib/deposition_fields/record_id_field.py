@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,23 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio/webdeposit_deposition_fields
+from wtforms import TextField
+from invenio.webdeposit_field import WebDepositField
+from invenio.webdeposit_validation_utils import number_validate
 
-pylib_DATA = __init__.py \
-             author_field.py \
-             integer_text_field.py \
-             journal_field.py \
-             publisher_field.py \
-             title_field.py \
-             date_field.py \
-             abstract_field.py \
-             file_upload_field.py \
-             issn_field.py \
-             keywords_field.py \
-             language_field.py \
-             notes_field.py \
-             pages_number_field.py \
-             doi_field.py \
-             record_id_field.py
+__all__ = ['RecordIDField']
 
-CLEANFILES = *~ *.tmp *.pyc
+
+class RecordIDField(WebDepositField(key='recid'), TextField):
+    """ Used to update existing records """
+
+    def __init__(self, **kwargs):
+        super(RecordIDField, self).__init__(**kwargs)
+
+    def pre_validate(self, form=None):
+        return number_validate(self)
