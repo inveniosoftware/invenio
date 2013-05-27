@@ -44,7 +44,7 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         bibfield - access to normal fields
         """
         record = get_record(12)
-        self.assertIsNone(record.get('asdas'))
+        self.assertTrue(record.get('asdas') is None)
         self.assertEqual('12', record['recid'])
         self.assertEqual(record['recid'], record.get('recid'))
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title.title'])
@@ -88,8 +88,9 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         """
         bibfield - format values using format string
         """
-        record = get_record(97)
-        self.assertEqual('Treusch, R', record.get('authors[0]', formatstring="{0[last_name]}, {0[first_name]}"))
+        #Only python 2.5 or higher
+        #record = get_record(97)
+        #self.assertEqual('Treusch, R', record.get('authors[0]', formatstring="{0[last_name]}, {0[first_name]}"))
 
     def test_get_using_formating_function(self):
         """

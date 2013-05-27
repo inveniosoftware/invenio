@@ -40,7 +40,6 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
         """docstring for test_marcxml_to_cool_struct_preparation"""
         #First record from demobibcfg.xml
         xml = """
-            <collection xmlns="http://www.loc.gov/MARC21/slim">
             <record>
                 <datafield tag="037" ind1=" " ind2=" ">
                 <subfield code="a">CERN-EX-0106015</subfield>
@@ -114,7 +113,6 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
                 <subfield code="a">PICTURE</subfield>
                 </datafield>
             </record>
-            </collection>
         """
         blob = BlobWrapper(blob=xml, master_format='marc', schema='xml')
         r = MarcReader(blob)
@@ -126,7 +124,6 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
     def test_rec_json_creation_from_marcxml(self):
         """docstring for test_rec_json_creation_from_marcxml"""
         xml = """
-            <collection xmlns="http://www.loc.gov/MARC21/slim">
             <record>
                 <datafield tag="037" ind1=" " ind2=" ">
                 <subfield code="a">astro-ph/9812226</subfield>
@@ -447,7 +444,6 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
                 <subfield code="s">Astrophys. J. 488 (1997) 1</subfield>
                 </datafield>
             </record>
-            </collection>
         """
         blob = BlobWrapper(blob=xml, master_format='marc', schema="xml")
         r = MarcReader(blob)
@@ -470,7 +466,6 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
         import tempfile
         from invenio.config import CFG_TMPDIR
         xml = """
-            <collection xmlns="http://www.loc.gov/MARC21/slim">
                 <record>
                 <datafield tag="041" ind1=" " ind2=" ">
                 <subfield code="a">eng</subfield>
@@ -515,7 +510,6 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
                 <subfield code="a">BOOK</subfield>
                 </datafield>
                 </record>
-            </collection>
         """
         fd, name = tempfile.mkstemp(suffix='.xml', dir=CFG_TMPDIR)
         os.write(fd, xml)
