@@ -20,7 +20,9 @@
 from invenio.webdeposit_load_forms import forms
 from invenio.webdeposit_workflow_utils import authorize_user, \
                                               render_form, \
-                                              wait_for_submission
+                                              wait_for_submission, \
+                                              export_marc_from_json, \
+                                              create_record_from_marc
 
 
 __all__ = ['Photo']
@@ -29,13 +31,15 @@ PhotoForm = forms['PhotoForm']
 
 dep_type = "Photo"
 plural = "Photos"
-group = "Articles & Preprints"
+group = "Multimedia & Arts"
 wf = [authorize_user(),
       render_form(PhotoForm),
-      wait_for_submission()]
+      wait_for_submission(),
+      export_marc_from_json(),
+      create_record_from_marc()]
 
 Photo = {"dep_type": dep_type,
          "workflow": wf,
          "plural": plural,
          "group": group,
-         "enabled": False}
+         "enabled": True}

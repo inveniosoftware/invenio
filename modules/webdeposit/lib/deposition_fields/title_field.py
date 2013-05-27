@@ -23,7 +23,7 @@ from invenio.webdeposit_field import WebDepositField
 __all__ = ['TitleField']
 
 
-class TitleField(WebDepositField(), TextField):
+class TitleField(WebDepositField(key='title.title'), TextField):
 
     def __init__(self, **kwargs):
         super(TitleField, self).__init__(**kwargs)

@@ -20,7 +20,9 @@
 from invenio.webdeposit_load_forms import forms
 from invenio.webdeposit_workflow_utils import authorize_user, \
                                               render_form, \
-                                              wait_for_submission
+                                              wait_for_submission, \
+                                              export_marc_from_json, \
+                                              create_record_from_marc
 
 __all__ = ['Thesis']
 
@@ -30,12 +32,14 @@ ThesisForm = forms['ThesisForm']
 dep_type = "Thesis"
 plural = "Theses"
 group = "Articles & Preprints"
-wf = [authorize_user(), \
+wf = [authorize_user(),
       render_form(ThesisForm),
-      wait_for_submission()]
+      wait_for_submission(),
+      export_marc_from_json(),
+      create_record_from_marc()]
 
-Thesis = {"dep_type": dep_type, \
-          "workflow": wf, \
-          "plural": plural, \
-          "group": group, \
+Thesis = {"dep_type": dep_type,
+          "workflow": wf,
+          "plural": plural,
+          "group": group,
           "enabled": True}

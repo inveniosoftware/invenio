@@ -112,7 +112,8 @@ config = {
                     'cook': 'invenio.webdeposit_cook_json_utils:cook_date'
                 },
                 'NotesField': {
-                    'label': 'Notes or Comments'
+                    'label': 'Notes or Comments',
+                    'cook': 'invenio.webdeposit_cook_json_utils:cook_comment'
                 },
                 'KeywordsField': {
                     'label': 'Keywords'
@@ -131,5 +132,16 @@ config = {
             'title': _('Submit an Article')
         },
         'collection': 'Article'
+    },
+    'Photo': {
+        'PhotoForm': {
+            'fields': {
+                'NotesField': {
+                    'cook': 'invenio.webdeposit_cook_json_utils:cook_comment'
+                }
+            },
+            'file_cook': 'invenio.webdeposit_cook_json_utils:cook_picture'
+        },
+        'collection': 'Picture'
     }
 }

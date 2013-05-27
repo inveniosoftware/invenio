@@ -20,7 +20,9 @@
 from invenio.webdeposit_load_forms import forms
 from invenio.webdeposit_workflow_utils import authorize_user, \
                                               render_form, \
-                                              wait_for_submission
+                                              wait_for_submission, \
+                                              export_marc_from_json, \
+                                              create_record_from_marc
 
 __all__ = ['Preprint']
 
@@ -32,7 +34,9 @@ plural = "Preprints"
 group = "Articles & Preprints"
 wf = [authorize_user(),
       render_form(PreprintForm),
-      wait_for_submission()]
+      wait_for_submission(),
+      export_marc_from_json(),
+      create_record_from_marc()]
 
 Preprint = {"dep_type": dep_type,
             "workflow": wf,

@@ -128,6 +128,9 @@ def cook_comment(json_reader, comment):
     return json_reader
 
 
+""" Cooks for the deposition files """
+
+
 def cook_files(json_reader, file_list):
     """ @param file_json: list (as created in blueprints)
                           containing dictionaries with files and their metadata
@@ -139,4 +142,26 @@ def cook_files(json_reader, file_list):
 
         json_reader['fft[n]'] = {'path': path,
                                  'new_name': filename}
+    return json_reader
+
+
+def cook_icon(json_reader, icon_path):
+    """ helper for adding an icon to a deposition
+        e.g. Photo deposition """
+    try:
+        json_reader['fft[-1]']['icon_path'] = icon_path
+    except IndexError:
+        pass
+    return json_reader
+
+
+def cook_picture(json_reader, file_list):
+    """ Same as file cook with an additional icon cook
+        It is assumed that its used for depositing one picture
+    """
+
+    if len(file_list) == 1:
+        json_reader = cook_files(json_reader, file_list)
+        json_reader = cook_icon(json_reader, file_list[0]['file'])
+
     return json_reader
