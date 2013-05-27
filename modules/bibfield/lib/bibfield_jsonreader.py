@@ -182,7 +182,7 @@ class JsonReader(BibFieldDict):
                 output += "<datafield tag='%s' ind1='%s' ind2='%s'>%s</datafield>" % (tag, ind1, ind2, content)
             return output
 
-        export = '<collection xmlns="http://www.loc.gov/MARC21/slim"><record>'
+        export = '<record>'
 
         for key in [k for k in config_rules.iterkeys() if k in self]:
             values = self[key.replace('[n]', '[1:]')]
@@ -194,7 +194,7 @@ class JsonReader(BibFieldDict):
                 except (TypeError, KeyError):
                     break
 
-        export += "</record> </collection>"
+        export += "</record>"
         return export
 
     def get_legacy_recstruct(self):
