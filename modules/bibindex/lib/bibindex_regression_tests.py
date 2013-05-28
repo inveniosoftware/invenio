@@ -532,6 +532,37 @@ class BibIndexItemCountIndexTest(unittest.TestCase):
         self.assertEqual(deserialize_via_marshal(res[0][0]),['3'])
 
 
+class BibIndexFiletypeIndexTest(unittest.TestCase):
+    """
+       Checks filetype index. Tests are diffrent than those inside WebSearch module because
+       they only test content and indexation and not the search itself.
+    """
+
+    def test_occurances_of_tif_filetype(self):
+        """tests which records has file with 'tif' extension"""
+        query = "SELECT hitlist FROM idxWORD%02dF where term='tif'" \
+                % get_index_id_from_index_name('filetype')
+        res = run_sql(query)
+        value = []
+        if res:
+            iset = intbitset(res[0][0])
+            value = iset.tolist()
+        self.assertEqual(sorted(value), [66, 71])
+
+    def test_filetypes_of_records(self):
+        """tests files extensions of record 1 and 77"""
+        query1 = "SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=1" \
+                 % get_index_id_from_index_name('filetype')
+        query2 = "SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=77" \
+                 % get_index_id_from_index_name('filetype')
+        res1 = run_sql(query1)
+        res2 = run_sql(query2)
+        set1 = deserialize_via_marshal(res1[0][0])
+        set2 = deserialize_via_marshal(res2[0][0])
+        self.assertEqual(set1, ['gif', 'jpg'])
+        self.assertEqual(set2, ['pdf', 'ps.gz'])
+
+
 class BibIndexJournalIndexTest(unittest.TestCase):
     """
         Checks journal index. Tests are diffrent than those inside WebSearch module because
@@ -693,6 +724,7 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexYearIndexTest,
                              BibIndexAuthorCountIndexTest,
                              BibIndexItemCountIndexTest,
+                             BibIndexFiletypeIndexTest,
                              BibIndexJournalIndexTest,
                              BibIndexCJKTokenizerTitleIndexTest,
                              BibIndexAuthorityRecordTest)

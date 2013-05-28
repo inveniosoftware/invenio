@@ -4532,6 +4532,7 @@ class WebSearchAuthorCountQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=50%2B&f=authorcount&of=id',
                                                expected_text="[10, 17]"))
 
+
 class WebSearchItemCountQueryTest(unittest.TestCase):
     """Test of queries using itemcount field/index"""
 
@@ -4558,6 +4559,28 @@ class WebSearchItemCountQueryTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=2&f=itemcount&of=id',
                                                expected_text="[31, 34]"))
+
+
+class WebSearchFiletypeQueryTest(unittest.TestCase):
+    """Test of queries using filetype fields."""
+
+    def test_mpg_filetype(self):
+        """websearch - file type, query for tif extension"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=mpg&f=filetype&of=id',
+                                               expected_text="[113]"))
+
+    def test_tif_filetype_and_word_study(self):
+        """websearch - file type, query for tif extension and word 'study'"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=study+filetype%3Atif&of=id',
+                                               expected_text="[71]"))
+
+    def test_pdf_filetype_and_phrase(self):
+        """websearch - file type, query for pdf extension and phrase 'parameter test'"""
+        self.assertEqual([],
+                  test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=filetype%3Apdf+parameter+test&of=id',
+                                        expected_text="[50, 93]"))
 
 
 class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
@@ -4751,6 +4774,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSynonymQueryTest,
                              WebSearchWashCollectionsTest,
                              WebSearchAuthorCountQueryTest,
+                             WebSearchFiletypeQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest,
                              WebSearchGetRecordTests,
                              WebSearchExactTitleIndexTest,

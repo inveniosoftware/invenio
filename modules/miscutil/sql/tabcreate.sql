@@ -2135,6 +2135,21 @@ CREATE TABLE IF NOT EXISTS idxWORD24R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxWORD25F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD25R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPAIR01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(100) default NULL,
@@ -2489,6 +2504,21 @@ CREATE TABLE IF NOT EXISTS idxPAIR24F (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPAIR24R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR25F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR25R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -2854,6 +2884,22 @@ CREATE TABLE IF NOT EXISTS idxPHRASE24R (
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE25F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE25R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 -- tables for ranking:
 
 CREATE TABLE IF NOT EXISTS rnkMETHOD (
@@ -4568,5 +4614,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_29_idxINDEX_stop
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_20_bibauthority_updates',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_new_index_itemcount',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_crcLIBRARY_type',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_new_index_filetype',NOW());
 
 -- end of file

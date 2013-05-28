@@ -72,6 +72,7 @@ from invenio.bibfield import get_record
 
 
 
+
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
     from sets import Set as set
@@ -874,8 +875,8 @@ class WordTable:
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
 
-        # no-tag style of indexing for itemcount, filetype
         if len(self.fields_to_index) == 0:
+            #'no tag' style of indexing - use bibfield instead of directly consulting bibrec
             tokenizing_function = self.default_tokenizer_function
             for recID in range(recID1, recID2 + 1):
                 record = get_record(recID)

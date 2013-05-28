@@ -62,6 +62,7 @@ INSERT INTO field VALUES (34,'authority institution','authorityinstitution');
 INSERT INTO field VALUES (35,'authority journal','authorityjournal');
 INSERT INTO field VALUES (36,'authority subject','authoritysubject');
 INSERT INTO field VALUES (37,'item count','itemcount');
+INSERT INTO field VALUES (38,'file type','filetype');
 
 
 INSERT INTO field_tag VALUES (1,100,10);
@@ -431,6 +432,7 @@ INSERT INTO idxINDEX VALUES (21,'authorityinstitution','This index contains word
 INSERT INTO idxINDEX VALUES (22,'authorityjournal','This index contains words/phrases from journal authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (23,'authoritysubject','This index contains words/phrases from subject authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (24,'itemcount','This index contains number of copies of items in the library.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexItemCountTokenizer');
+INSERT INTO idxINDEX VALUES (25,'filetype','This index contains extensions of files connected to records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexFiletypeTokenizer');
 
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
@@ -457,6 +459,8 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (21,34);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (22,35);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (23,36);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (24,37);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (25,38);
+
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');
