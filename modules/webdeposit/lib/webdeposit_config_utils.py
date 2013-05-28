@@ -224,6 +224,19 @@ class WebDepositConfiguration(object):
         else:
             return template
 
+    def get_files_cook_function(self, form_type=None):
+        deposition_type = self.get_deposition_type()
+        form_type = self.get_form_type() or form_type
+
+        if deposition_type in self.config:
+            deposition_config = self.config[deposition_type]
+            if form_type in deposition_config:
+                form_config = deposition_config[form_type]
+                if 'file_cook' in form_config:
+                    return import_string(form_config['file_cook'])
+
+        return None
+
     def get_collection(self, deposition_type=None):
         deposition_type = deposition_type or self.get_deposition_type()
 

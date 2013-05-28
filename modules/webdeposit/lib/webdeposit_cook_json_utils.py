@@ -61,6 +61,43 @@ def cook_issn(json_reader, issn):
     return json_reader
 
 
+def uncook_files(webdeposit_json, recid=None, json_reader=None):
+    if 'files' not in webdeposit_json:
+        webdeposit_json['files'] = []
+
+    if recid is None:
+        for f in json_reader['url']:
+            filename = f['url'].split('/')[-1]
+            file_json = {
+                'name': filename
+            }
+            webdeposit_json['files'].append(file_json)
+
+    else:
+        for f in BibRecDocs(recid, human_readable=True).list_latest_files():
+            filename = f.get_full_name()
+            path = f.get_path()
+            size = f.get_size()
+            file_json = {
+                'name': filename,
+                'file': path,
+                'size': size
+            }
+            webdeposit_json['files'].append(file_json)
+
+    return webdeposit_json
+
+
+def cook_icon(json_reader, icon_path):
+    """ helper for adding an icon to a deposition
+        e.g. Photo deposition """
+    try:
+        json_reader['fft[-1]']['icon_path'] = icon_path
+    except IndexError:
+        pass
+    return json_reader
+
+
 def cook_publication_doi(json_reader, doi):
     json_reader['publication_info.DOI'] = doi
     return json_reader

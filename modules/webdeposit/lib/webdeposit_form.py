@@ -53,5 +53,8 @@ class WebDepositForm(Form):
             except AttributeError:
                 # Some fields (eg. SubmitField) don't have a cook json function
                 pass
-        json_reader = cook_files(json_reader, self.files)
+
+        cook_files_function = self.config.get_files_cook_function() or cook_files
+        json_reader = cook_files_function(json_reader, self.files)
+
         return json_reader
