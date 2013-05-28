@@ -17,9 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import warnings
 from invenio.dbquery import run_sql
-from invenio.textutils import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']
 
@@ -28,26 +26,27 @@ def info():
 
 def do_upgrade():
     run_sql("""
-CREATE TABLE IF NOT EXISTS `rnkRECORDSCACHE` (
-  `id_bibrec` int(10) unsigned NOT NULL,
-  `authorid` bigint(10) NOT NULL,
-  PRIMARY KEY (`id_bibrec`,`authorid`)
-) ENGINE=MyISAM;
+    CREATE TABLE IF NOT EXISTS `rnkRECORDSCACHE` (
+      `id_bibrec` int(10) unsigned NOT NULL,
+      `authorid` bigint(10) NOT NULL,
+      PRIMARY KEY (`id_bibrec`,`authorid`)
+    ) ENGINE=MyISAM""")
 
-CREATE TABLE IF NOT EXISTS `rnkEXTENDEDAUTHORS` (
-  `id` int(10) unsigned NOT NULL,
-  `authorid` bigint(10) NOT NULL,
-  PRIMARY KEY (`id`,`authorid`)
-) ENGINE=MyISAM;
+    run_sql("""
+    CREATE TABLE IF NOT EXISTS `rnkEXTENDEDAUTHORS` (
+      `id` int(10) unsigned NOT NULL,
+      `authorid` bigint(10) NOT NULL,
+      PRIMARY KEY (`id`,`authorid`)
+    ) ENGINE=MyISAM""")
 
-CREATE TABLE IF NOT EXISTS `rnkSELFCITES` (
-  `id_bibrec` int(10) unsigned NOT NULL,
-  `count` int(10) unsigned NOT NULL,
-  `references` text NOT NULL,
-  `last_updated` datetime NOT NULL,
-  PRIMARY KEY (`id_bibrec`)
-) ENGINE=MyISAM;
-""")
+    run_sql("""
+    CREATE TABLE IF NOT EXISTS `rnkSELFCITES` (
+      `id_bibrec` int(10) unsigned NOT NULL,
+      `count` int(10) unsigned NOT NULL,
+      `references` text NOT NULL,
+      `last_updated` datetime NOT NULL,
+      PRIMARY KEY (`id_bibrec`)
+    ) ENGINE=MyISAM""")
 
 def estimate():
     return 1
