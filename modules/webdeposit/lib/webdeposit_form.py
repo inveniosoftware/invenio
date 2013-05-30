@@ -20,7 +20,7 @@
 from wtforms import Label
 from invenio.wtforms_utils import InvenioForm as Form
 from invenio.webdeposit_config_utils import WebDepositConfiguration
-from invenio.webdeposit_cook_json_utils import cook_files
+from invenio.webdeposit_cook_json_utils import cook_files, uncook_files
 
 
 class WebDepositForm(Form):
@@ -58,3 +58,12 @@ class WebDepositForm(Form):
         json_reader = cook_files_function(json_reader, self.files)
 
         return json_reader
+
+    def uncook_json(self, json_reader, webdeposit_json, recid=None):
+        for field in self._fields.values():
+            if hasattr(field, 'uncook_json'):
+                # WTFields are not mapped with rec json
+                webdeposit_json = field.uncook_json(json_reader, webdeposit_json)
+
+        webdeposit_json = uncook_files(webdeposit_json, recid=recid, json_reader=json_reader)
+        return webdeposit_json

@@ -41,13 +41,14 @@ def WebDepositField(key=None):
 
             super(WebDepositFieldClass, self).__init__(**kwargs)
             self.config = WebDepositConfiguration(field_type=self.__class__.__name__)
+            self.recjson_key = self.config.get_recjson_key() or key
 
         def merge_validation_json(self, json1, json2):
             """ Merges 2 jsons returned from 2 validation functions
 
                 @param json1: the first json
                 @param json2: the second json
-                @returns: a dictionary with info, success and error messages unified
+                @returns: a dictionary with info, success and error messages
                           and the dictionary with fields to be updated merged.
                           Be carefull with jsons that update the same field!
             """
@@ -96,7 +97,8 @@ def WebDepositField(key=None):
                 """ Be carefull when the two validators change the
                     value of the same field.
                 """
-                json['fields'] = dict(json1['fields'].items() + json2['fields'].items())
+                json['fields'] = dict(json1['fields'].items() +
+                                      json2['fields'].items())
             elif 'fields' in json1:
                 json['fields'] = json1['fields']
             elif 'fields' in json2:
@@ -104,7 +106,16 @@ def WebDepositField(key=None):
 
             return json
 
+        def has_recjson_key(self):
+            return self.recjson_key is not None
+
         def cook_json(self, json_reader):
+            """
+            Fills a json_reader object with the field's value
+            based on the recjson key
+
+            @param json_reader: BibField's JsonReader object
+            """
             cook_json_function = self.config.get_cook_json_function()
             if cook_json_function is not None:
                 return cook_json_function(json_reader, self.data)
@@ -112,5 +123,25 @@ def WebDepositField(key=None):
                 json_reader[key] = self.data
 
             return json_reader
+
+        def uncook_json(self, json_reader, webdeposit_json):
+            """
+            The opposite of `cook_json` (duh)
+            Adds to the webdeposit_json the appropriate value
+            from the json_reader based on the recjson key
+
+            You have to retrieve the record with BibField and
+            instantiate a json_reader object before starting
+            the uncooking
+
+            @param json_reader: BibField's JsonReader object
+            @param webdeposit_json: a dictionary
+            @return the updated webdeposit_json
+            """
+
+            if self.has_recjson_key() and \
+                    self.recjson_key in json_reader:
+                webdeposit_json[self.name] = json_reader[self.recjson_key]
+            return webdeposit_json
 
     return WebDepositFieldClass

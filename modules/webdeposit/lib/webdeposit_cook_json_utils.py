@@ -21,43 +21,34 @@
 """
 Cook Json Functions
 
-Functions to be used in for transforming a webdeposit json
+Functions to be used for transforming (back and forth) a webdeposit json
 (json representing a form) to rec json format using BibField's JsonReader
 """
 
 
-def cook_title(json_reader, title):
-    json_reader['title.title'] = title
-    return json_reader
+def cook_to_recjson(key):
+    def cook(json_reader, value):
+        json_reader[key] = value
+        return json_reader
+    return cook
 
 
-def cook_subtitle(json_reader, subtitle):
-    json_reader['title.subtitle'] = subtitle
-    return json_reader
+""" Cooks for the deposition files """
+
+from invenio.bibdocfile import BibRecDocs
 
 
-def cook_publisher_name(json_reader, publisher):
-    json_reader['imprint.publisher_name'] = publisher
-    return json_reader
+def cook_files(json_reader, file_list):
+    """ @param file_json: list (as created in blueprints)
+                          containing dictionaries with files and their metadata
+    """
 
+    for file_json in file_list:
+        filename = file_json['name']
+        path = file_json['file']
 
-def cook_date(json_reader, date):
-    json_reader['imprint.date'] = date
-    return json_reader
-
-
-def cook_language(json_reader, language):
-    json_reader['language'] = language
-    return json_reader
-
-
-def cook_publication_title(json_reader, title):
-    json_reader['publication_info.title'] = title
-    return json_reader
-
-
-def cook_issn(json_reader, issn):
-    json_reader['issn'] = issn
+        json_reader['fft[n]'] = {'path': path,
+                                 'new_name': filename}
     return json_reader
 
 
@@ -86,63 +77,6 @@ def uncook_files(webdeposit_json, recid=None, json_reader=None):
             webdeposit_json['files'].append(file_json)
 
     return webdeposit_json
-
-
-def cook_icon(json_reader, icon_path):
-    """ helper for adding an icon to a deposition
-        e.g. Photo deposition """
-    try:
-        json_reader['fft[-1]']['icon_path'] = icon_path
-    except IndexError:
-        pass
-    return json_reader
-
-
-def cook_publication_doi(json_reader, doi):
-    json_reader['publication_info.DOI'] = doi
-    return json_reader
-
-
-def cook_url(json_reader, url):
-    json_reader['url[0].url'] = url
-    return json_reader
-
-
-def cook_first_authors_full_name(json_reader, full_name):
-    json_reader['authors[0].full_name'] = full_name
-    return json_reader
-
-
-def cook_abstract_summary(json_reader, summary):
-    json_reader['abstract.summary'] = summary
-    return json_reader
-
-
-def cook_record_id(json_reader, recid):
-    json_reader['recid'] = recid
-    return json_reader
-
-
-def cook_comment(json_reader, comment):
-    json_reader['comment'] = comment
-    return json_reader
-
-
-""" Cooks for the deposition files """
-
-
-def cook_files(json_reader, file_list):
-    """ @param file_json: list (as created in blueprints)
-                          containing dictionaries with files and their metadata
-    """
-
-    for file_json in file_list:
-        filename = file_json['name']
-        path = file_json['file']
-
-        json_reader['fft[n]'] = {'path': path,
-                                 'new_name': filename}
-    return json_reader
 
 
 def cook_icon(json_reader, icon_path):

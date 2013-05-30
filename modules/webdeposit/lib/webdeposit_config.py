@@ -20,12 +20,14 @@
 from invenio.webinterface_handler_flask_utils import _
 
 
-""" WebDeposit Configuration file
+"""
+WebDeposit Configuration
 
 Define here validators and autocomplete functions for fields
 to override the default ones.
 
 The structure must be in dictionaries as follows:
+
 Deposition name: Form type: 'fields': name of the field
 
 deposition:
@@ -58,6 +60,33 @@ fields:
         WTField widget.
 
 Deposition name: Form type: 'fields': name of the field
+
+deposition:
+    collection:
+        The collection that the deposition belongs.
+
+form:
+    title:
+        string, the title to be shown to the user above the form.
+    file_cook:
+        define here a function if you want different handling in json's transformation
+        for the files of the form.
+
+fields:
+    label:
+        string, the field's label
+    validators:
+        list with path strings to be imported with werkzeug's `import_string`.
+        The validators of the field.
+    autocomplete:
+        path string to be imported with werkzeug's `import_string`.
+        The function that autocompletes the field.
+    recjson_key:
+        the association with BibField. Define here a mapping with a BibField's field.
+    widget:
+        path string to be imported with werkzeug's `import_string`.
+        WTField widget.
+
 """
 
 config = {
@@ -67,13 +96,13 @@ config = {
                 'DOIField': {
                     'label': 'DOI',
                     'validators': ['invenio.webdeposit_validation_utils:datacite_doi_validate'],
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_publication_doi'
+                    'recjson_key': 'publication_info.DOI'
                 },
                 'PublisherField': {
                     'label': 'Publisher',
                     'autocomplete': 'invenio.webdeposit_autocomplete_utils:sherpa_romeo_publishers',
                     'validators': ['invenio.webdeposit_validation_utils:sherpa_romeo_publisher_validate'],
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_publisher_name'
+                    'recjson_key': 'imprint.publisher_name'
                 },
                 'JournalField': {
                     'label': 'Journal Title',
@@ -83,20 +112,20 @@ config = {
                 'ISSNField': {
                     'label': 'ISSN',
                     'validators': ['invenio.webdeposit_validation_utils:sherpa_romeo_issn_validate'],
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_issn'
+                    'recjson_key': 'issn'
                 },
                 'TitleField': {
                     'label': 'Document Title',
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_title'
+                    'recjson_key': 'title.title'
                 },
                 'AuthorField': {
                     'label': 'Author',
                     'autocomplete': 'invenio.webdeposit_autocomplete_utils:orcid_authors',
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_first_authors_full_name'
+                    'recjson_key': 'authors[0].full_name'
                 },
                 'AbstractField': {
                     'label': 'Abstract',
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_abstract_summary'
+                    'recjson_key': 'abstract.summary'
                 },
                 'PagesNumberField': {
                     'label': 'Number of Pages',
@@ -104,21 +133,22 @@ config = {
                 },
                 'LanguageField': {
                     'label': 'Language',
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_language'
+                    'recjson_key': 'invenio.webdeposit_cook_json_utils:cook_language'
                 },
                 'Date': {
                     'label': 'Date of Document',
                     'widget': 'invenio.webdeposit_field_widgets:date_widget',
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_date'
+                    'recjson_key': 'imprint.date'
                 },
                 'NotesField': {
                     'label': 'Notes or Comments',
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_comment'
+                    'recjson_key': 'comment'
                 },
                 'KeywordsField': {
                     'label': 'Keywords'
                 },
                 'FileUploadField': {
+                    # The files of a form are handled by the FFT field
                     'label': 'File',
                     'validators': ['invenio.webdeposit_validation_utils:number_validate'],
                     'widget': 'invenio.webdeposit_field_widgets:plupload_widget'
@@ -137,7 +167,7 @@ config = {
         'PhotoForm': {
             'fields': {
                 'NotesField': {
-                    'cook': 'invenio.webdeposit_cook_json_utils:cook_comment'
+                    'recjson_key': 'comment'
                 }
             },
             'file_cook': 'invenio.webdeposit_cook_json_utils:cook_picture'

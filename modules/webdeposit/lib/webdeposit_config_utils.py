@@ -22,8 +22,10 @@ from invenio.cache import cache
 from invenio.sqlalchemyutils import db
 from invenio.webuser_flask import current_user
 from invenio.webdeposit_model import WebDepositDraft
+from invenio.webdeposit_cook_json_utils import cook_to_recjson
 from invenio.bibworkflow_model import Workflow
 from invenio.webinterface_handler_flask_utils import _
+from invenio.webdeposit_cook_json_utils import cook_to_recjson
 
 
 class WebDepositConfiguration(object):
@@ -57,7 +59,7 @@ class WebDepositConfiguration(object):
         if self.deposition_type is None:
 
             self.runtime_deposition_type = cache.get(str(self.user_id) +
-                                                    ":current_deposition_type")
+                                                     ":current_deposition_type")
         else:
             self.runtime_deposition_type = None
 
@@ -65,11 +67,11 @@ class WebDepositConfiguration(object):
         self.uuid = cache.get(str(self.user_id) + ":current_uuid")
 
         if self.uuid is not None and self.form_type is None:
-            webdeposit_draft_query = db.session.query(WebDepositDraft).\
-                                     join(Workflow).\
-                                     filter(
-                                         Workflow.user_id == self.user_id,
-                                         WebDepositDraft.uuid == self.uuid)
+            webdeposit_draft_query = \
+                db.session.query(WebDepositDraft).\
+                join(Workflow).\
+                filter(Workflow.user_id == self.user_id,
+                       WebDepositDraft.uuid == self.uuid)
             # get the draft with the max step
             webdeposit_draft = max(webdeposit_draft_query.all(), key=lambda w: w.step)
 
@@ -82,13 +84,31 @@ class WebDepositConfiguration(object):
         return self.runtime_deposition_type or self.deposition_type
 
     def get_form_type(self):
-        if self.runtime_form_type is not None:
-            return self.runtime_form_type
-        else:
-            return self.form_type
+        return self.runtime_form_type or self.form_type
 
     def get_field_type(self):
         return self.field_type
+
+    def _parse_config(self, config_key, deposition_type=None, form_type=None,
+                      field_type=None):
+        if deposition_type in self.config:
+            deposition_config = self.config[deposition_type]
+            if form_type is None and config_key in deposition_config:
+                return deposition_config[config_key]
+
+            if form_type in deposition_config:
+                form_config = deposition_config[form_type]
+                if field_type is None and config_key in form_config:
+                    return form_config[config_key]
+
+                if field_type in form_config['fields']:
+                    field_config = form_config['fields'][field_type]
+                    if config_key in field_config:
+                        if config_key in field_config:
+                            return field_config[config_key]
+
+        return None
+
 
     def get_form_title(self, form_type=None):
         """ Returns the title of the form
@@ -101,14 +121,13 @@ class WebDepositConfiguration(object):
         deposition_type = self.get_deposition_type()
         form_type = self.get_form_type()
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if form_type in deposition_config:
-                form_config = deposition_config[form_type]
-                if 'title' in form_config:
-                    return _(form_config['title'])
-
-        return None
+        title = self._parse_config('title',
+                                   deposition_type=deposition_type,
+                                   form_type=form_type)
+        if title is not None:
+            return _(title)
+        else:
+            return None
 
     def get_label(self, field_type=None):
         """ Returns the label of the field
@@ -122,16 +141,15 @@ class WebDepositConfiguration(object):
         form_type = self.get_form_type()
         field_type = field_type or self.get_field_type()
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if form_type in deposition_config:
-                form_config = deposition_config[form_type]
-                if field_type in form_config['fields']:
-                    field_config = form_config['fields'][field_type]
-                    if 'label' in field_config:
-                        return _(field_config['label'])
-        else:
+        label = self._parse_config('label',
+                                  deposition_type=deposition_type,
+                                  form_type=form_type,
+                                  field_type=field_type)
+
+        if label is None:
             return None
+        else:
+            return _(label)
 
     def get_widget(self, field_type=None):
         """ Returns the widget of the field
@@ -145,16 +163,15 @@ class WebDepositConfiguration(object):
         form_type = self.get_form_type()
         field_type = field_type or self.get_field_type()
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if form_type in deposition_config:
-                form_config = deposition_config[form_type]
-                if field_type in form_config['fields']:
-                    field_config = form_config['fields'][field_type]
-                    if 'widget' in field_config:
-                        return import_string(_(field_config['widget']))
-        else:
+        widget = self._parse_config('widget',
+                                   deposition_type=deposition_type,
+                                   form_type=form_type,
+                                   field_type=field_type)
+
+        if widget is None:
             return None
+        else:
+            return import_string(widget)
 
     def get_autocomplete_function(self):
         """ Returns an autocomplete function of the field
@@ -163,53 +180,52 @@ class WebDepositConfiguration(object):
         form_type = self.get_form_type()
         field_type = self.get_field_type()
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if form_type in deposition_config:
-                form_config = deposition_config[form_type]
-                if field_type in form_config['fields']:
-                    field_config = form_config['fields'][field_type]
-                    if 'autocomplete' in field_config:
-                        return import_string(field_config['autocomplete'])
-        else:
-            return None
+        autocomplete = self._parse_config('autocomplete',
+                                          deposition_type=deposition_type,
+                                          form_type=form_type,
+                                          field_type=field_type)
 
-    def get_validators(self):
+        if autocomplete is None:
+            return None
+        else:
+            return import_string(autocomplete)
+
+    def get_validators(self, field_type=None):
         """ Returns validators function based of the field
         """
         deposition_type = self.get_deposition_type()
         form_type = self.get_form_type()
-        field_type = self.get_field_type()
+        field_type = field_type or self.get_field_type()
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if form_type in deposition_config:
-                form_config = deposition_config[form_type]
-                if field_type in form_config['fields']:
-                    field_config = form_config['fields'][field_type]
-                    if 'validators' in field_config:
-                        validators = []
-                        for validator in field_config['validators']:
-                            validators.append(import_string(validator))
-                        return validators
+        vals = self._parse_config('validators',
+                                  deposition_type=deposition_type,
+                                  form_type=form_type,
+                                  field_type=field_type)
+
+        validators = []
+        if vals is None:
+            return []
         else:
-            return None
+            for validator in vals:
+                validators.append(import_string(validator))
 
-    def get_cook_json_function(self, field_type=None):
+            return validators
+
+    def get_recjson_key(self, field_type=None):
         deposition_type = self.get_deposition_type()
         form_type = self.get_form_type()
         field_type = field_type or self.get_field_type()
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if form_type in deposition_config:
-                form_config = deposition_config[form_type]
-                if field_type in form_config['fields']:
-                    field_config = form_config['fields'][field_type]
-                    if 'cook' in field_config:
-                        return import_string(field_config['cook'])
-        else:
-            return None
+        return self._parse_config('recjson_key',
+                                  deposition_type=deposition_type,
+                                  form_type=form_type,
+                                  field_type=field_type)
+
+    def get_cook_json_function(self, field_type=None):
+        recjson_key = self.get_recjson_key(field_type)
+        if recjson_key is not None:
+            return cook_to_recjson(recjson_key)
+
 
     def get_template(self, form_type=None):
         deposition_type = self.get_deposition_type()
@@ -228,21 +244,17 @@ class WebDepositConfiguration(object):
         deposition_type = self.get_deposition_type()
         form_type = self.get_form_type() or form_type
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if form_type in deposition_config:
-                form_config = deposition_config[form_type]
-                if 'file_cook' in form_config:
-                    return import_string(form_config['file_cook'])
+        file_cook = self._parse_config('file_cook',
+                                       deposition_type=deposition_type,
+                                       form_type=form_type)
 
-        return None
+        if file_cook is None:
+            return None
+        else:
+            return import_string(file_cook)
 
     def get_collection(self, deposition_type=None):
         deposition_type = deposition_type or self.get_deposition_type()
 
-        if deposition_type in self.config:
-            deposition_config = self.config[deposition_type]
-            if 'collection' in deposition_config:
-                return deposition_config['collection']
-        else:
-            return None
+        return self._parse_config('collection',
+                                  deposition_type=deposition_type)
