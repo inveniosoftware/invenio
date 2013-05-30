@@ -4532,6 +4532,33 @@ class WebSearchAuthorCountQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=50%2B&f=authorcount&of=id',
                                                expected_text="[10, 17]"))
 
+class WebSearchItemCountQueryTest(unittest.TestCase):
+    """Test of queries using itemcount field/index"""
+
+    def test_itemcount_plus(self):
+        """websearch - item count, search for more than one item, using 'plus'"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + 'search?p=2%2B&f=itemcount&of=id',
+                                               expected_text="[31,32,34]"))
+
+    def test_itemcount_span(self):
+        """websearch - item count, search for more than one item, using 'span'"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + 'search?p=2->10&f=itemcount&of=id',
+                                               expected_text="[31,32,34]"))
+
+    def test_itemcount_phrase(self):
+        """websearch - item count, search for records with exactly two items, phrase"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%222%22&f=itemcount&of=id',
+                                               expected_text="[31,34]"))
+
+    def test_itemcount_records_with_two_items(self):
+        """websearch - item count, search for records with exactly two items"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + 'search?p=2&f=itemcount&of=id',
+                                               expected_text="[31,34]"))
+
 
 class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
     """Tests the perform request search API after refactoring."""

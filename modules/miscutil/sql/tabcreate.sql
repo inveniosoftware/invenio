@@ -2075,7 +2075,6 @@ CREATE TABLE IF NOT EXISTS idxWORD20R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
-
 CREATE TABLE IF NOT EXISTS idxWORD21F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(50) default NULL,
@@ -2115,6 +2114,21 @@ CREATE TABLE IF NOT EXISTS idxWORD23F (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD23R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD24F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD24R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -2466,6 +2480,21 @@ CREATE TABLE IF NOT EXISTS idxPAIR23R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPAIR24F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR24R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2751,7 +2780,6 @@ CREATE TABLE IF NOT EXISTS idxPHRASE19R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
-
 CREATE TABLE IF NOT EXISTS idxPHRASE20F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2812,6 +2840,20 @@ CREATE TABLE IF NOT EXISTS idxPHRASE23R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPHRASE24F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE24R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
 -- tables for ranking:
 
 CREATE TABLE IF NOT EXISTS rnkMETHOD (
@@ -4524,5 +4566,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_25_idxINDEX_html
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_28_idxINDEX_tokenizer',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_29_idxINDEX_stopwords_update',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_20_bibauthority_updates',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_new_index_itemcount',NOW());
 
 -- end of file

@@ -492,6 +492,46 @@ class BibIndexAuthorCountIndexTest(unittest.TestCase):
             num_orig = res[0][0]
         self.assertEqual(num_orig, num_test)
 
+
+class BibIndexItemCountIndexTest(unittest.TestCase):
+    """
+       Checks item count index. Checks a number of copies of books for records
+       as well as occurrences of particular number of copies in test data.
+    """
+
+    def test_occurrences_in_itemcount_index_two_copies(self):
+        """checks content of itemcount index for records with two copies of a book"""
+        word = '2'
+        query = "SELECT hitlist FROM idxWORD%02dF WHERE term='%s'" % (get_index_id_from_index_name('itemcount'), word)
+        res = run_sql(query)
+        ilist = []
+        if res:
+            iset = intbitset(res[0][0])
+            ilist = iset.tolist()
+        self.assertEqual([31, 34], ilist)
+
+    def test_records_for_number_of_copies_record1(self):
+        """checks content of itemcount index for record: 1"""
+        query = "SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=1" \
+                 % get_index_id_from_index_name('itemcount')
+        res = run_sql(query)
+        self.assertEqual(deserialize_via_marshal(res[0][0]),['0'])
+
+    def test_records_for_number_of_copies_record30(self):
+        """checks content of itemcount index for record: 30"""
+        query = "SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=30" \
+                 % get_index_id_from_index_name('itemcount')
+        res = run_sql(query)
+        self.assertEqual(deserialize_via_marshal(res[0][0]),['1'])
+
+    def test_records_for_number_of_copies_record32(self):
+        """checks content of itemcount index for record: 32"""
+        query = "SELECT termlist FROM idxWORD%02dR WHERE id_bibrec=32" \
+                 % get_index_id_from_index_name('itemcount')
+        res = run_sql(query)
+        self.assertEqual(deserialize_via_marshal(res[0][0]),['3'])
+
+
 class BibIndexJournalIndexTest(unittest.TestCase):
     """
         Checks journal index. Tests are diffrent than those inside WebSearch module because
@@ -652,6 +692,7 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveHtmlTest,
                              BibIndexYearIndexTest,
                              BibIndexAuthorCountIndexTest,
+                             BibIndexItemCountIndexTest,
                              BibIndexJournalIndexTest,
                              BibIndexCJKTokenizerTitleIndexTest,
                              BibIndexAuthorityRecordTest)

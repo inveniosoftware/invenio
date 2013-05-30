@@ -2400,7 +2400,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
         return intbitset() # word index f does not exist
 
     # wash 'word' argument and run query:
-    if f == 'authorcount' and word.endswith('+'):
+    if f.endswith('count') and word.endswith('+'):
         # field count query of the form N+ so transform N+ to N->99999:
         word = word[:-1] + '->99999'
     word = string.replace(word, '*', '%') # we now use '*' as the truncation character
@@ -2415,7 +2415,7 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
             word1 = stem(word1, stemming_language)
         word0_washed = wash_index_term(word0)
         word1_washed = wash_index_term(word1)
-        if f == 'authorcount':
+        if f.endswith('count'):
             # field count query; convert to integers in order
             # to have numerical behaviour for 'BETWEEN n1 AND n2' query
             try:
@@ -2592,7 +2592,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
     """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     # call word search method in some cases:
-    if f == 'authorcount':
+    if f.endswith('count'):
         return search_unit_in_bibwords(p, f, wl=wl)
     set = intbitset() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
@@ -2664,7 +2664,7 @@ def search_unit_in_bibxxx(p, f, type, wl=0):
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
 
     # call word search method in some cases:
-    if f == 'journal' or f == 'authorcount':
+    if f == 'journal' or f.endswith('count'):
         return search_unit_in_bibwords(p, f, wl=wl)
     p_orig = p # saving for eventual future 'no match' reporting
     limit_reached = 0 # flag for knowing if the query limit has been reached

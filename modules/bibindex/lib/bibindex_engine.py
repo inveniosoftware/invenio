@@ -68,6 +68,7 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
 from invenio.bibindex_engine_utils import get_all_index_names_and_column_values, \
     load_tokenizers
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibfield import get_record
 
 
 
@@ -872,8 +873,18 @@ class WordTable:
                     wlist[recID] = []
                 wlist[recID] = list_union(get_author_canonical_ids_for_recid(recID),
                                           wlist[recID])
+
+        # no-tag style of indexing for itemcount, filetype
+        if len(self.fields_to_index) == 0:
+            tokenizing_function = self.default_tokenizer_function
+            for recID in range(recID1, recID2 + 1):
+                record = get_record(recID)
+                new_words = tokenizing_function(record)
+                if not wlist.has_key(recID):
+                    wlist[recID] = []
+                wlist[recID] = list_union(new_words, wlist[recID])
         # case of special indexes:
-        if self.index_name in ('authorcount', 'journal'):
+        elif self.index_name in ('authorcount', 'journal'):
             for tag in self.fields_to_index:
                 tokenizing_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
                 for recID in range(recID1, recID2 + 1):
@@ -881,8 +892,8 @@ class WordTable:
                     if not wlist.has_key(recID):
                         wlist[recID] = []
                     wlist[recID] = list_union(new_words, wlist[recID])
+        # usual tag-by-tag indexing for the rest:
         else:
-            # usual tag-by-tag indexing:
             for tag in self.fields_to_index:
                 tokenizing_function = self.tag_to_words_fnc_map.get(tag, self.default_tokenizer_function)
                 phrases = self.get_phrases_for_tokenizing(tag, recID1, recID2)
@@ -892,6 +903,7 @@ class WordTable:
                         wlist[recID] = []
                     new_words = tokenizing_function(phrase)
                     wlist[recID] = list_union(new_words, wlist[recID])
+
 
         # lookup index-time synonyms:
         synonym_kbrs = get_all_synonym_knowledge_bases()
