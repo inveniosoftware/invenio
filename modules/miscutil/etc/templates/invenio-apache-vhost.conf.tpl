@@ -27,9 +27,12 @@ NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
 {{ '#' if not wsgi_socket_directive_needed }}WSGISocketPrefix {{ [config.CFG_PREFIX, 'var', 'run']|path_join }}
 {{ super() }}
 {%- endblock header -%}
-
+{%- set wsgi_processes = 5 -%}
+{%- if 'werkzeug-debugger' in config.CFG_DEVEL_TOOLS or 'winpdb' in config.CFG_DEVEL_TOOLS or 'pydev' in config.CFG_DEVEL_TOOLS -%}
+    {%- set wsgi_processes = 1 -%}
+{%- endif -%}
 {%- block wsgi %}
-        WSGIDaemonProcess invenio processes=5 threads=1 user={{ config.CFG_RUNNING_AS_USER }} display-name=%{GROUP} inactivity-timeout=3600 maximum-requests=10000
+        WSGIDaemonProcess invenio processes={{ wsgi_processes }} threads=1 user={{ config.CFG_RUNNING_AS_USER }} display-name=%{GROUP} inactivity-timeout=3600 maximum-requests=10000
         WSGIImportScript {{ config.CFG_WSGIDIR }}/invenio.wsgi process-group=invenio application-group=%{GLOBAL}
         {{ super() }}
 {%- endblock wsgi -%}
