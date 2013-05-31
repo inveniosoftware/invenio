@@ -124,8 +124,8 @@ function bindEditTemplateHandlers() {
     $('#lnkEditTemplateRecord_' + i).bind('click', function(event){
       var templateNo = this.id.split('_')[1];
       createReq({requestType: 'editTemplate',
-	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
-	  editTemplate(json['templateMARCXML']);
+ templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
+   editTemplate(json['templateMARCXML']);
       });
       event.preventDefault();
     });

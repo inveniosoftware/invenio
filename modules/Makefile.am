@@ -45,6 +45,7 @@ SUBDIRS = bibauthorid \
           webaccess \
           webalert \
           webauthorprofile \
+          webauthorlist \
           webbasket \
           webcomment \
           webhelp \

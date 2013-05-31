@@ -97,8 +97,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
                 # users (as it used to be with v0.99.0):
-                dummy_auth_code, auth_message = acc_authorize_action(req,
-                                                                     'runbibedit')
+                auth_code, auth_message = acc_authorize_action(req,
+                                                               'runbibedit')
                 referer = '/edit/'
                 if self.recid:
                     referer = '/%s/%s/edit/' % (CFG_SITE_RECORD, self.recid)
@@ -276,7 +276,6 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""
-
         if self.recid:
             redirect_to_url(req, '%s/%s/%s/edit/' % (CFG_SITE_SECURE_URL,
                                                          CFG_SITE_RECORD,

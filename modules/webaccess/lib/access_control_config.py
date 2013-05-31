@@ -484,6 +484,7 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              ('paperclaimviewers', 'Users who can view "claim my paper" facilities.', 'allow all'),
              ('paperattributionviewers', 'Users who can view "attribute this paper" facilities', 'allow all'),
              ('paperattributionlinkviewers', 'Users who can see attribution links in the search', 'allow all'),
+             ('authorlistusers', 'Users who can user Authorlist tools', 'deny all'),
              )
 
 # Demo site roles
@@ -517,7 +518,8 @@ DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('romeo.montague@cds.cern.ch', 'submit_DEMOJRN_*'),
                        ('juliet.capulet@cds.cern.ch', 'submit_DEMOJRN_*'),
                        ('balthasar.montague@cds.cern.ch', 'atlantiseditor'),
-                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'))
+                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'),
+                       ('jekyll@cds.cern.ch', 'authorlistusers'),)
 
 # users
 # list of e-mail addresses
@@ -556,6 +558,7 @@ DEF_ACTIONS = (
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
+               ('runauthorlist', 'run Authorlist tools', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ', 'yes'),
                ('submit', 'use webSubmit', 'doctype,act,categ', 'yes'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
@@ -602,6 +605,7 @@ DEF_AUTHS = (('basketusers', 'usebaskets', {}),
              ('messageusers', 'usemessages', {}),
              ('holdingsusers', 'viewholdings', {}),
              ('statisticsusers', 'viewstatistics', {}),
+             ('authorlistusers', 'runauthorlist', {}),
              ('claimpaperusers', 'claimpaper_view_pid_universe', {}),
              ('claimpaperoperators', 'claimpaper_view_pid_universe', {}),
              ('claimpaperusers', 'claimpaper_claim_own_papers', {}),

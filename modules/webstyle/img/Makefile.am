@@ -47,7 +47,19 @@ img_DATA = add-small.png \
            aid_to_other.png \
            aid_to_other_gray.png \
            ajax-loader.gif \
-           application_pdf.png \
+	         application_pdf.png \
+           authorlist_ui-bg_diagonals-thick_90_eeeeee_40x40.png \
+           authorlist_ui-bg_flat_100_6699cc_40x100.png \
+           authorlist_ui-bg_flat_100_bcc5d2_40x100.png \
+           authorlist_ui-bg_flat_100_d3dbe9_40x100.png \
+           authorlist_ui-bg_flat_100_ffcc99_40x100.png \
+           authorlist_ui-bg_flat_100_ffffff_40x100.png \
+           authorlist_ui-bg_highlight-hard_70_000000_1x100.png \
+           authorlist_ui-icons_000000_256x240.png \
+           authorlist_ui-icons_6699cc_256x240.png \
+           authorlist_ui-icons_27413e_256x240.png \
+           authorlist_ui-icons_cd0a0a_256x240.png \
+           authorlist_ui-icons_ffffff_256x240.png \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
            balloon_bottom_shadow.png \
@@ -68,6 +80,7 @@ img_DATA = add-small.png \
            bullet_toggle_plus.png \
            circle_green.png \
            circle_red.png \
+           colvis-button.png \
            cross_red.gif \
            delete-big.png \
            delete-small.png \
@@ -134,8 +147,6 @@ img_DATA = add-small.png \
            line-up-trans.gif \
            line.gif \
            loading.gif \
-           magnifying_minus.png \
-           magnifying_plus.png \
            mail-icon-12x8.gif \
            mainmenu.gif \
            merge-small.png \

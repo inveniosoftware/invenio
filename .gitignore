@@ -33,6 +33,7 @@ po/*.sed
 *.lib
 *.x86f
 modules/webauthorprofile/bin/webauthorprofile
+modules/webauthorlist/bin/webauthorlist
 modules/bibauthorid/bin/bibauthorid
 modules/bibcirculation/bin/bibcircd
 modules/bibclassify/bin/bibclassify

@@ -642,7 +642,23 @@ class InvenioWebTestCase(unittest.TestCase):
         except:
             raise InvenioWebTestCaseException(element=element_xpath)
 
-    def find_elements_by_class_name_with_timeout(self, element_class_name, timeout=30):
+    def find_elements_by_class_name_with_timeout(self, elements_class_name, timeout=30):
+        """ Find elements by class name. This waits up to 'timeout' seconds
+        before throwing an InvenioWebTestCaseException or if it finds the element
+        will return it in 0 - timeout seconds.
+        @param elements_class_name: class name of the elements to find
+        @type elements_class_name: string
+        @param timeout: time in seconds before throwing an exception
+        if the element is not found
+        @type timeout: int
+        """
+
+        try:
+            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_elements_by_class_name(elements_class_name))
+        except:
+            raise InvenioWebTestCaseException(element=elements_class_name)
+
+    def find_element_by_class_name_with_timeout(self, element_class_name, timeout=30):
         """ Find an element by class name. This waits up to 'timeout' seconds
         before throwing an InvenioWebTestCaseException or if it finds the element
         will return it in 0 - timeout seconds.
@@ -927,6 +943,7 @@ class InvenioWebTestCaseException(Exception):
     find_element_by_partial_link_text_with_timeout()
     find_element_by_id_with_timeout()
     find_element_by_xpath_with_timeout()
+    find_element_by_class_name_with_timeout()
     find_elements_by_class_name_with_timeout()
     find_page_source_with_timeout()
     """

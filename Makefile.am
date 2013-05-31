@@ -172,6 +172,8 @@ install-jquery-plugins:
 	wget http://labs.abeautifulsite.net/archived/jquery-fileTree/jquery.fileTree-1.01.zip && \
 	unzip jquery.fileTree-1.01.zip && \
 	rm jquery.fileTree-1.01.zip && \
+	wget http://www.datatables.net/download/build/ColVis.min.js && \
+	mv ColVis.min.js jquery.dataTables.ColVis.min.js && \
 	rm jquery.tablesorter.zip && \
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
@@ -226,6 +228,7 @@ uninstall-jquery-plugins:
 	rm -f jquery.dataTables.min.js && \
 	rm -f ui.core.js && \
 	rm -f jquery.bookmark.min.js && \
+		rm -f jquery.dataTables.ColVis.min.js && \
         rm -f jquery.hotkeys.js && \
         rm -f jquery.tablesorter.min.js && \
         rm -f jquery-ui-1.7.3.custom.min.js && \

@@ -4745,6 +4745,78 @@ CREATE TABLE IF NOT EXISTS goto (
   KEY (modification_date)
 ) ENGINE=MyISAM;
 
+-- tables for author list manager
+CREATE TABLE IF NOT EXISTS `aulPAPERS` (
+  `id` int(15) unsigned NOT NULL auto_increment,
+  `id_user` int(15) unsigned NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `collaboration` varchar(255) NOT NULL,
+  `experiment_number` varchar(255) NOT NULL,
+  `last_modified` int unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX(`id_user`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aulREFERENCES` (
+  `item` int(15) unsigned NOT NULL,
+  `reference` varchar(120) NOT NULL,
+  `paper_id` int(15) unsigned NOT NULL REFERENCES `aulPAPERS(id)`,
+  PRIMARY KEY (`item`, `paper_id`),
+  INDEX(`item`),
+  INDEX(`paper_id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aulAFFILIATIONS` (
+  `item` int(15) unsigned NOT NULL,
+  `acronym` varchar(120) NOT NULL,
+  `umbrella` varchar(120) NOT NULL,
+  `name_and_address` varchar(255) NOT NULL,
+  `domain` varchar(120) NOT NULL,
+  `member` boolean NOT NULL,
+  `spires_id` varchar(60) NOT NULL,
+  `paper_id` int(15) unsigned NOT NULL REFERENCES `aulPAPERS(id)`,
+  PRIMARY KEY (`item`, `paper_id`),
+  INDEX(`item`),
+  INDEX(`paper_id`),
+  INDEX (`acronym`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aulAUTHORS` (
+  `item` int(15) unsigned NOT NULL,
+  `family_name` varchar(255) NOT NULL,
+  `given_name` varchar(255) NOT NULL,
+  `name_on_paper` varchar(255) NOT NULL,
+  `status` varchar(30) NOT NULL,
+  `paper_id` int(15) unsigned NOT NULL REFERENCES `aulPAPERS(id)`,
+  PRIMARY KEY (`item`, `paper_id`),
+  INDEX(`item`),
+  INDEX(`paper_id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aulAUTHOR_AFFILIATIONS` (
+  `item` int(15) unsigned NOT NULL,
+  `affiliation_acronym` varchar(120) NOT NULL,
+  `affiliation_status` varchar(120) NOT NULL,
+  `author_item` int(15) unsigned NOT NULL,
+  `paper_id` int(15) unsigned NOT NULL REFERENCES `aulPAPERS(id)`,
+  PRIMARY KEY (`item`, `author_item`, `paper_id`),
+  INDEX(`item`),
+  INDEX(`author_item`),
+  INDEX(`paper_id`)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS `aulAUTHOR_IDENTIFIERS` (
+  `item` int(15) unsigned NOT NULL,
+  `identifier_number` varchar(120) NOT NULL,
+  `identifier_name` varchar(120) NOT NULL,
+  `author_item` int(15) unsigned NOT NULL,
+  `paper_id` int(15) unsigned NOT NULL REFERENCES `aulPAPERS(id)`,
+  PRIMARY KEY (`item`, `author_item`, `paper_id`),
+  INDEX(`item`),
+  INDEX(`author_item`),
+  INDEX(`paper_id`)
+) ENGINE=MyISAM;
+
 -- tables for invenio_upgrader
 CREATE TABLE IF NOT EXISTS upgrade (
   upgrade varchar(255) NOT NULL,
@@ -4795,5 +4867,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_24_new_bibsched_
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_02_new_bibARXIVPDF',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_05_oaiHARVEST_arguments_blob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_13_new_bibEDITCACHE',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_26_webauthorlist',NOW());
 
 -- end of file

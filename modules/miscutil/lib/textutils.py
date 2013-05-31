@@ -741,3 +741,25 @@ def transliterate_ala_lc(value):
         text = translate_to_ascii(value)
         text = text.pop()
     return text
+
+
+def escape_latex(text):
+    """
+    This function takes the given text and escapes characters
+    that have a special meaning in LaTeX: # $ % ^ & _ { } ~ \
+    """
+    text = unicode(text.decode('utf-8'))
+    CHARS = {
+        '&':  r'\&',
+        '%':  r'\%',
+        '$':  r'\$',
+        '#':  r'\#',
+        '_':  r'\_',
+        '{':  r'\{',
+        '}':  r'\}',
+        '~':  r'\~{}',
+        '^':  r'\^{}',
+        '\\': r'\textbackslash{}',
+    }
+    escaped = "".join([CHARS.get(char, char) for char in text])
+    return escaped.encode('utf-8')

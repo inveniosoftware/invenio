@@ -829,6 +829,9 @@ AC_CONFIG_FILES([config.nice  \
      modules/webalert/doc/hacking/Makefile \
      modules/webalert/lib/Makefile \
      modules/webalert/web/Makefile \
+     modules/webauthorlist/Makefile \
+     modules/webauthorlist/lib/Makefile \
+     modules/webauthorlist/web/Makefile \
      modules/webbasket/Makefile \
      modules/webbasket/doc/Makefile \
      modules/webbasket/doc/admin/Makefile \
