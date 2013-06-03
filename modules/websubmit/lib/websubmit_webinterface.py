@@ -44,6 +44,7 @@ from invenio.access_control_admin import acc_is_role
 from invenio.webpage import warning_page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, \
                             isGuestUser
+from invenio.search_engine import is_user_owner_of_record
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.messages import gettext_set_language
@@ -129,13 +130,23 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 except:
                     action = ""
 
+        try:
+            recid_fd = file(os.path.join(curdir, 'SN'))
+            recid = recid_fd.read()
+            recid_fd.close()
+        except:
+            recid = ''
+        user_is_owner = False
+        if recid:
+            user_is_owner = is_user_owner_of_record(user_info, recid)
+
         # Is user authorized to perform this action?
         (auth_code, auth_message) = acc_authorize_action(uid, "submit",
                                                          authorized_if_no_roles=not isGuestUser(uid),
                                                          verbose=0,
                                                          doctype=argd['doctype'],
                                                          act=action)
-        if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0:
+        if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0 and not user_is_owner:
             # User cannot submit
             raise apache.SERVER_RETURN(apache.HTTP_UNAUTHORIZED)
         else:
