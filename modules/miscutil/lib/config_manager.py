@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from flask.ext.script import Manager
-from invenio.inveniomanage import change_command_name
+from invenio.inveniomanage import change_command_name, generate_secret_key
 
 manager = Manager(usage="Perform configuration operations")
 
@@ -117,16 +117,18 @@ def secret_key(key=None):
         print ">>> No need to generate secret key."
     else:
         if key is None:
-            key = ''.join([random.choice(string.letters + string.digits)
-                          for dummy in range(0, 256)])
+            key = generate_secret_key()
         with open(invenio_local_path, 'a') as f:
             f.write('\nCFG_SITE_SECRET_KEY = %s\n' % (key, ))
         print ">>> CFG_SITE_SECRET_KEY appended to `%s`." % (invenio_local_path, )
 
 
 def main():
+    from invenio.config import CFG_SITE_SECRET_KEY
     from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    if not CFG_SITE_SECRET_KEY or CFG_SITE_SECRET_KEY == '':
+        CFG_SITE_SECRET_KEY = generate_secret_key()
+    app = create_invenio_flask_app(SECRET_KEY=CFG_SITE_SECRET_KEY)
     manager.app = app
     manager.run()
 

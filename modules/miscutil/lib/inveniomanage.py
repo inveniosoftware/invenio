@@ -19,10 +19,11 @@
 
 
 import os
+import sys
 from pprint import pformat
 from flask.ext.script import Manager
 from flask.ext.script.commands import ShowUrls  # , Clean
-from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
+from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR, CFG_SITE_SECRET_KEY
 from invenio.pluginutils import PluginContainer
 from invenio.sqlalchemyutils import db
 from invenio.webinterface_handler_flask import create_invenio_flask_app
@@ -34,6 +35,18 @@ def change_command_name(action, new_name):
         return action(f)
     return decorator
 
+
+def generate_secret_key():
+    import string
+    import random
+    return ''.join([random.choice(string.letters + string.digits)
+                    for dummy in range(0, 256)])
+
+# Fixes problems with empty secret key in config manager.
+if 'config' in sys.argv and \
+        (not CFG_SITE_SECRET_KEY or CFG_SITE_SECRET_KEY == ''):
+    create_invenio_flask_app = create_invenio_flask_app(
+        SECRET_KEY=generate_secret_key())
 
 manager = Manager(create_invenio_flask_app)
 
