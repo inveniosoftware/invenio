@@ -264,6 +264,31 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
             }
         });
     }
+
+    if (data.disabled_fields) {
+        $.each(data.disabled_fields, function(i, field){
+            $('#'+field).attr('disabled','disabled');
+        });
+    }
+
+    if (data.enabled_fields) {
+        $.each(data.enabled_fields, function(i, field){
+            $('#'+field).removeiAttr('disabled');
+        });
+    }
+
+    if (data.hidden_fields) {
+        $.each(data.hidden_fields, function(i, field){
+            $('#error-group-'+field).hide();
+        });
+    }
+
+    if (data.visible_fields) {
+        $.each(data.visible_fields, function(i, field){
+            $('#error-group-'+field).show();
+        });
+    }
+
   }
 
 function webdeposit_handle_new_value(name, value, url, required_fields) {
@@ -273,6 +298,7 @@ function webdeposit_handle_new_value(name, value, url, required_fields) {
       attribute: value
   }, function(data){
         webdeposit_handle_field_data(name, value, data, url, required_fields);
+        $('#status-indicator').html("Saved!");
   });
 }
 
@@ -280,11 +306,13 @@ function webdeposit_input_error_check(selector, url, required_fields) {
   $(selector).change( function() {
         name = this.name;
         value = this.value;
+        $('#status-indicator').html("Saving " + $("label[for="+this.name+"]").html() + "...");
         $.getJSON(url, {
             name: name,
             attribute: value
         }, function(data){
             webdeposit_handle_field_data(name, value, data, url, required_fields);
+            $('#status-indicator').html("Saved!");
         });
     return false;
   });

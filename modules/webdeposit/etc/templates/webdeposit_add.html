@@ -68,6 +68,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
   <h2>{{ form._title }}
   {% if form._drafting %}
     <small class="pull-right">
+      <small class="muted" id="status-indicator" style="font-size:12px; margin-right:10px;">Saved!</small>
 
       <a class="btn btn-info"
          href="{{ url_for('webdeposit.create_new', deposition_type=deposition_type) }}">
@@ -121,7 +122,6 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
     {% endif %}
 
     <div class="control-group {{ "error" if field.errors }}" id="error-group-{{ field.name }}">
-
       <div class="control-label {{ "error" if field.errors }}">
       {% if "submit" not in field.__html__() and "pluploader" not in field.__html__() %}
         {% set label_class = (' required' if field.required else '') %}
@@ -204,6 +204,12 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
             <div>
           {% endif %}
               {{ field(class_=field.short_name) }}
+
+              {% if field.description %}
+                  <div class="help-block" style="font-size:12px; width: 350px; white-space:normal; color:#999999;">
+                      {{ field.description }}
+                  </div>
+              {% endif %}
             </div>
 
           {% if field.errors %}
@@ -260,6 +266,8 @@ $(document).ready(function() {
 
   webdeposit_check_status('{{ url_for('webdeposit.check_status', uuid=uuid) }}');
 
+
+// Render autocomplete functions and ckeditor
 {% for field in form %}
     {% if field.autocomplete %}
         webdeposit_field_autocomplete('input[name="{{ field.name }}"]',

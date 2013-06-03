@@ -48,50 +48,38 @@ def WebDepositField(key=None):
 
                 @param json1: the first json
                 @param json2: the second json
-                @returns: a dictionary with info, success and error messages
+                @returns: a dictionary with info, success and error messages,
+                          fields to be hidden/shown/disabled/enabled,
                           and the dictionary with fields to be updated merged.
                           Be carefull with jsons that update the same field!
             """
 
             json = {}
-            if 'success' in json1 and json1['success'] == 1:
-                json['success'] = 1
-                json['success_message'] = json1['success_message']
-            else:
-                json['success'] = 0
-                json['success_message'] = ''
 
-            if 'success' in json2 and json2['success'] == 1:
-                json['success'] = 1
-                if json['success_message'] != '':
-                    json['success_message'] += '<br>'
-                json['success_message'] += json2['success_message']
+            # Merge the messages of 2 dicts if they exist
+            def merge_msg(msg_exists, key, json1, json2):
+                if (json1.get(msg_exists) == 1 or json2.get(msg_exists) == 1):
+                    msg1 = (json1.get(key) or '')
+                    msg2 = (json2.get(key) or '')
+                    if msg1 == '':
+                        msg = msg2
+                    elif msg2 == '':
+                        msg == msg1
+                    else:
+                        msg = msg1 + '<br>' + msg2
+                    return 1, msg
+                else:
+                    return 0, ''
 
-            if 'info' in json1 and json1['info'] == 1:
-                json['info'] = 1
-                json['info_message'] = json1['info_message']
-            else:
-                json['info'] = 0
-                json['info_message'] = ''
+            json['success'], json['success_message'] = \
+                merge_msg('success', 'success_message', json1, json2)
 
-            if 'info' in json2 and json2['info'] == 1:
-                json['info'] = 1
-                if json['info_message'] != '':
-                    json['info_message'] += '<br>'
-                json['info_message'] += json2['info_message']
+            json['info'], json['info_message'] = \
+                merge_msg('info', 'info_message', json1, json2)
 
-            if 'error' in json1 and json1['error'] == 1:
-                json['error'] = 1
-                json['error_message'] = json1['error_message']
-            else:
-                json['error'] = 0
-                json['error_message'] = ''
+            json['error'], json['error_message'] = \
+                merge_msg('error', 'error_message', json1, json2)
 
-            if 'error' in json2 and json2['error'] == 1:
-                json['error'] = 1
-                if json['error_message'] != '':
-                    json['error_message'] += '<br>'
-                json['error_message'] += json2['error_message']
 
             if 'fields' in json1 and 'fields' in json2:
                 """ Be carefull when the two validators change the
@@ -104,6 +92,22 @@ def WebDepositField(key=None):
             elif 'fields' in json2:
                 json['fields'] = json2['fields']
 
+            # Create the union of the lists that specify UI actions on fields
+            concat_values = lambda key, json1, json2: \
+                            [i for i in json1.get(key) or []] + \
+                            [i for i in json2.get(key) or []]
+
+            json['hidden_fields'] = concat_values('hidden_fields',
+                                                  json1, json2)
+
+            json['visible_fields'] = concat_values('visible_fields',
+                                                   json1, json2)
+
+            json['enabled_fields'] = concat_values('enabled_fields',
+                                                   json1, json2)
+
+            json['disabled_fields'] = concat_values('disabled_fields',
+                                                    json1, json2)
             return json
 
         def has_recjson_key(self):
