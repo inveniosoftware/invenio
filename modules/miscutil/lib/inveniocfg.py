@@ -755,7 +755,7 @@ def cli_cmd_create_secret_key(conf):
     warn('inveniocfg --create-secret-key is deprecated. Using instead: inveniomanage config create secret-key')
 
     sys_argv = sys.argv
-    sys.argv = 'config_manager.py config create secret-key'.split()
+    sys.argv = 'config_manager.py create secret-key'.split()
     main()
     sys.argv = sys_argv
 
