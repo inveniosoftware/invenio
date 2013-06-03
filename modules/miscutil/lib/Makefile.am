@@ -86,6 +86,8 @@ pylib_DATA = __init__.py \
              shellutils_unit_tests.py \
              sqlalchemyutils.py \
              sqlalchemyutils_mysql.py \
+             paginationutils.py \
+             paginationutils_unit_tests.py \
              pluginutils.py \
              pluginutils_unit_tests.py \
              plotextractor.py \
