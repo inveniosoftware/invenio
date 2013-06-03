@@ -16,9 +16,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- if request.args.of == 'id' -%}
-{{ recids }}
-{%- else -%}
 {% from "_formhelpers.html" import render_filter_form with context %}
 {% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, search_form_javascript, record_brief_links with context %}
 {% from "websearch_results.html" import render_search_results with context %}
@@ -478,6 +475,3 @@ body {
 {% endif %}
 {{ search_form_javascript(collection) }}
 {% endblock %}
-
-
-{%- endif -%}

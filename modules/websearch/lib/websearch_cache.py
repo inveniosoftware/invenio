@@ -21,6 +21,9 @@ from hashlib import md5
 from invenio.cache import cache
 from invenio.search_engine_config import CFG_SEARCH_RESULTS_CACHE_PREFIX
 
+search_results_cache = cache
+
+
 def get_search_query_id(**kwargs):
     """
     Returns unique query indentifier.
@@ -45,4 +48,10 @@ def get_search_results_cache_key_from_qid(qid):
     """
     return CFG_SEARCH_RESULTS_CACHE_PREFIX + qid
 
-search_results_cache = cache
+
+def get_collection_name_from_cache(qid):
+    """
+    Returns collection name from query identifier.
+    """
+    return search_results_cache.get(
+        get_search_results_cache_key_from_qid(qid) + '::cc')

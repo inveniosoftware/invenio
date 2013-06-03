@@ -25,6 +25,7 @@ WebSearch database models.
 import re
 from operator import itemgetter
 from flask import g
+from invenio.config import CFG_SITE_LANG
 from invenio.intbitset import intbitset
 #from invenio.search_engine_config import CFG_WEBSEARCH_SEARCH_WITHIN
 #from invenio.search_engine import collection_restricted_p
@@ -382,7 +383,6 @@ class Collection(db.Model):
             foreign_keys=lambda: CollectionPortalbox.id_collection,
             order_by=lambda: db.asc(CollectionPortalbox.score))
 
-
     #@db.hybrid_property
     #def externalcollections(self):
     #    return self._externalcollections
@@ -395,6 +395,24 @@ class Collection(db.Model):
     #                self._externalcollections[k] = v
     #    else:
     #        self._externalcollections = data
+
+    def breadcrumbs(self, builder=None, ln=CFG_SITE_LANG):
+        """Retunds breadcrumbs for collection."""
+        breadcrumbs = []
+        # Get breadcrumbs for most specific dad if it exists.
+        if self.most_specific_dad is not None:
+            breadcrumbs = self.most_specific_dad.breadcrumbs(builder=builder,
+                                                             ln=ln)
+
+        if builder is not None:
+            crumb = builder(self)
+        else:
+            crumb = (self.name_ln,
+                     'search.collection',
+                     dict(name=self.name))
+        breadcrumbs.append(crumb)
+        return breadcrumbs
+
 
 
 class Collectionname(db.Model):
@@ -580,6 +598,13 @@ class Format(db.Model):
     visibility = db.Column(db.TinyInteger(4), nullable=False,
                 server_default='1')
     last_updated = db.Column(db.DateTime, nullable=True)
+
+    @classmethod
+    def get_export_formats(cls):
+        return cls.query.filter(db.and_(
+            Format.content_type != 'text/html',
+            Format.visibility == 1)
+        ).order_by(Format.name).all()
 
 
 class CollectionFormat(db.Model):

@@ -28,22 +28,20 @@ from invenio.config import CFG_SITE_RECORD, CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \
     mail_cookie_create_authorize_action
+from invenio.bibformat import format_record
 from invenio.websearch_model import Collection
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
-                                  register_template_context_processor
+    register_template_context_processor
 from invenio.webuser_flask import current_user
 
 from invenio.search_engine import guess_primary_collection_of_a_record, \
-                                  check_user_can_view_record
+    check_user_can_view_record
 
 from invenio.webcomment import get_mini_reviews
 from invenio.websearchadminlib import get_detailed_page_tabs,\
                                       get_detailed_page_tabs_counts
-
-from invenio.websearch_blueprint import get_collection_breadcrumbs, \
-                                        cached_format_record
 from invenio.search_engine_utils import get_fieldvalues
 
 blueprint = InvenioBlueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
@@ -95,7 +93,7 @@ def request_record(f):
         title = get_fieldvalues(recid, '245__a')
         title = title[0] if len(title) > 0 else ''
 
-        b = get_collection_breadcrumbs(collection, [(_('Home'), '')])
+        b = [(_('Home'), '')] + collection.breadcrumbs()
         b += [(title, 'record.metadata', dict(recid=recid))]
         current_app.config['breadcrumbs_map'][request.endpoint] = b
         g.record_tab_keys = []
@@ -137,7 +135,10 @@ def request_record(f):
                         get_mini_reviews=lambda *args, **kwargs:
                         get_mini_reviews(*args, **kwargs).decode('utf8'),
                         collection=collection,
-                        format_record=cached_format_record
+                        format_record=lambda recID, of='hb', ln=g.ln: format_record(
+                            recID, of=of, ln=ln, verbose=0,
+                            search_pattern='',
+                            on_the_fly=False)
                         )
         return f(recid, *args, **kwargs)
     return decorated

@@ -18,11 +18,11 @@
 #}
 
 {% macro record_brief_links(recID, i) %}
-  {%- set rinfo = RecordInfo(recID) -%}
   <p>
+    {%- set record = get_record(recID) -%}
     {%- set similar = "recid:%d" % recID -%}
     {%- if config.CFG_WEBSEARCH_USE_ALEPH_SYSNOS -%}
-      {%- set alephsysnos = rinfo.get_fieldvalues("970__a") -%}
+      {%- set alephsysnos = record['system_number'] -%}
       {%- if len(alephsysnos) > 0 -%}
         {%- set recID = alephsysnos[0] -%}
         {%- set similar = "sysno:%d" % recID -%}
@@ -45,7 +45,7 @@
 
   {# Citations link #}
   {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
-    {%- set num_citations = rinfo.get_cited_by_count() -%}
+    {%- set num_citations = record['_cited_by_count'] -%}
     {%- if num_citations -%}
      -
     <a href="{{ url_for('.search', p="refersto:recid:%d" % recID) }}"
@@ -58,7 +58,7 @@
 
   {# Comments link #}
   {%- if config.CFG_WEBCOMMENT_ALLOW_COMMENTS and config.CFG_WEBSEARCH_SHOW_COMMENT_COUNT -%}
-    {%- set num_comments = rinfo.get_nb_comments() -%}
+    {%- set num_comments = record['_number_of_comments'] -%}
     {%- if num_comments -%}
      -
     <a href="{{ url_for('webcomment.comments', recid=recID) }}"
@@ -72,7 +72,7 @@
 
   {# Reviews link #}
   {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS and config.CFG_WEBSEARCH_SHOW_REVIEW_COUNT -%}
-    {%- set num_reviews = rinfo.get_nb_reviews() -%}
+    {%- set num_reviews = record['_number_of_reviews'] -%}
     {%- if num_reviews -%}
      -
     <a href="{{ url_for('webcomment.reviews', recid=recID) }}">
@@ -81,12 +81,7 @@
     </a>
     {%- endif -%}
   {%- endif -%}
-
-
   </p>
-
-
-
 {% endmacro %}
 
 
