@@ -35,8 +35,6 @@ from werkzeug.utils import secure_filename
 from uuid import uuid1 as new_uuid
 
 from invenio.cache import cache
-from invenio.sqlalchemyutils import db
-from invenio.webdeposit_model import WebDepositDraft
 from invenio.webdeposit_load_deposition_types import deposition_types, \
     deposition_metadata
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
@@ -59,7 +57,6 @@ from invenio.webdeposit_utils import get_current_form, \
     get_all_drafts
 from invenio.webuser_flask import current_user
 from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
-from invenio.bibworkflow_model import Workflow
 
 blueprint = InvenioBlueprint('webdeposit', __name__,
                              url_prefix='/deposit',
@@ -72,11 +69,35 @@ blueprint = InvenioBlueprint('webdeposit', __name__,
                                            'webdeposit.index_deposition_types')])
 
 
+@blueprint.route('/upload_from_url/<deposition_type>/<uuid>', methods=['POST'])
+@blueprint.invenio_authenticated
+def upload_from_url(deposition_type, uuid):
+    if request.method == 'POST':
+        url = request.form['url']
+
+        if "name" in request.form:
+            name = request.form['name']
+        else:
+            name = None
+
+        if "size" in request.form:
+            size = request.form['size']
+        else:
+            size = None
+
+        unique_filename = url_upload(current_user.get_id(),
+                                     deposition_type,
+                                     uuid, url, name, size)
+        return unique_filename
+
+
 @blueprint.route('/upload/<deposition_type>/<uuid>', methods=['POST'])
 @blueprint.invenio_authenticated
 def plupload(deposition_type, uuid):
     """ The file is splitted in chunks on the client-side
         and it is merged again on the server-side
+
+        @return: the path of the uploaded file
     """
     if request.method == 'POST':
         try:
@@ -323,15 +344,17 @@ def add(deposition_type, uuid):
             flash(_('Deposition with uuid `') + uuid + '` not found.', 'error')
             return redirect(url_for('.index_deposition_types'))
 
+    cache.delete_many(str(current_user.get_id()) + ":current_deposition_type",
+                      str(current_user.get_id()) + ":current_uuid")
+    cache.add(str(current_user.get_id()) + ":current_deposition_type", deposition_type)
+    cache.add(str(current_user.get_id()) + ":current_uuid", uuid)
+
     current_app.config['breadcrumbs_map'][request.endpoint] = [
         (_('Home'), '')] + blueprint.breadcrumbs + \
         [(deposition_type, 'webdeposit.index',
          {'deposition_type': deposition_type}),
          (uuid, 'webdeposit.add',
          {'deposition_type': deposition_type, 'uuid': uuid})]
-
-    cache.add(str(current_user.get_id()) + ":current_deposition_type", deposition_type)
-    cache.add(str(current_user.get_id()) + ":current_uuid", uuid)
 
     if request.method == 'POST':
         # Save the files

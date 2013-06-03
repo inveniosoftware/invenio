@@ -22,11 +22,11 @@
  * Plupload
  */
 
- function unique_ID(){
+function unique_ID() {
     return Math.round(new Date().getTime() + (Math.random() * 100));
- }
+}
 
-function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_files) {
+function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_files, dropbox_url) {
 
     uploader = new plupload.Uploader({
         // General settings
@@ -49,7 +49,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
     uploader.init();
 
     $(function() {
-        if (!jQuery.isEmptyObject(db_files)){
+        if (!jQuery.isEmptyObject(db_files)) {
             $('#file-table').show('slow');
 
             $.each(db_files, function(i, file) {
@@ -63,7 +63,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
                 // Dont touch it!
                 // For some reason the constructor doesn't initialize
                 // the data members
-                plfile.id = id,
+                plfile.id = id;
                 plfile.name = file.name;
                 plfile.size = file.size;
                 plfile.loaded = file.size;
@@ -80,7 +80,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
                         '<td><a id="' + plfile.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>' +
                     '</tr>');
                 $('#filelist #' + plfile.id).show('fast');
-                $("#" + plfile.id + "_rm").on("click", function(event){
+                $("#" + plfile.id + "_rm").on("click", function(event) {
                     uploader.removeFile(plfile);
                 });
             });
@@ -92,6 +92,26 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
         $('#uploadfiles').hide();
         $('#stopupload').show();
         e.preventDefault();
+
+        $.each(dropbox_files, function(i, file){
+            $.ajax({
+                type: 'POST',
+                url: dropbox_url,
+                data: $.param({
+                    name: file.name,
+                    size: file.size,
+                    url: file.url
+                })
+            }).done(function(data){
+                $('#' + file.id + " .progress").removeClass("progress-striped");
+                $('#' + file.id + " .bar").css('width', "100%");
+                $('#' + file.id + '_link').html('<a href="' + get_file_url + "?filename=" + data + '">' + file.name + '</a>');
+            });
+        });
+        dropbox_files = [];
+        $('#uploadfiles').addClass('disabled');
+        $('#stopupload').hide();
+        $('#uploadfiles').show();
     });
 
     $('#stopupload').click(function(d){
@@ -99,7 +119,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
         $('#stopupload').hide();
         $('#uploadfiles').show();
         $.each(uploader.files, function(i, file) {
-            if (file.loaded < file.size){
+            if (file.loaded < file.size) {
                 $("#" + file.id + "_rm").show();
                 $('#' + file.id + " .bar").css('width', "0%");
             }
@@ -109,7 +129,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
     uploader.bind('FilesRemoved', function(up, files) {
         $.each(files, function(i, file) {
             $('#filelist #' + file.id).hide('fast');
-            if (file.loaded == file.size) {
+            if (file.loaded === file.size) {
                 $.ajax({
                     type: "POST",
                     url: delete_url,
@@ -119,7 +139,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
                 });
             }
         });
-        if(uploader.files.length === 0){
+        if(uploader.files.length === 0) {
             $('#uploadfiles').addClass("disabled");
             $('#file-table').hide('slow');
         }
@@ -167,6 +187,7 @@ function webdeposit_init_plupload(selector, url, delete_url, get_file_url, db_fi
         $('#uploadfiles').show();
 
     });
+
 }
 
 
@@ -356,3 +377,35 @@ function webdeposit_check_status(url){
         });
     }, 10000);
 }
+
+
+var dropbox_files = new Array();
+
+document.getElementById("db-chooser").addEventListener("DbxChooserSuccess",
+    function(e) {
+        $('#file-table').show('slow');
+        $.each(e.files, function(i, file){
+            id = unique_ID();
+
+            dbfile = {
+                id: id,
+                name: file.name,
+                size: file.bytes,
+                url: file.link
+            };
+
+            $('#filelist').append(
+                '<tr id="' + id + '" style="display:none;">' +
+                    '<td id="' + id + '_link">' + file.name + '</td>' +
+                    '<td>' + plupload.formatSize(file.bytes) + '</td>' +
+                    '<td width="30%"><div class="progress active"><div class="bar" style="width: 0%;"></div></div></td>' +
+                    '<td><a id="' + id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>' +
+                '</tr>');
+            $('#filelist #' + id).show('fast');
+            $('#uploadfiles').removeClass("disabled");
+
+            dropbox_files.push(dbfile);
+        });
+    }, false);
+
+

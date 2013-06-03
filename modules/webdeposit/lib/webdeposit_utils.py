@@ -22,6 +22,9 @@ from datetime import datetime
 from sqlalchemy import desc
 from wtforms import FormField
 from sqlalchemy.orm.exc import NoResultFound
+from uuid import uuid1 as new_uuid
+from urllib2 import urlopen, URLError
+
 from invenio.sqlalchemyutils import db
 from invenio.webdeposit_model import WebDepositDraft
 from invenio.bibworkflow_model import Workflow
@@ -591,3 +594,30 @@ def decode_dict_from_unicode(unicode_input):
         return unicode_input.encode('utf-8')
     else:
         return unicode_input
+
+
+def url_upload(user_id, deposition_type, uuid, url, name=None, size=None):
+
+    try:
+        data = urlopen(url).read()
+    except URLError:
+        return "Error"
+
+    CFG_USER_WEBDEPOSIT_FOLDER = create_user_file_system(user_id,
+                                                         deposition_type,
+                                                         uuid)
+    unique_filename = str(new_uuid()) + name
+    file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
+                             unique_filename)
+    f = open(file_path, 'wb')
+    f.write(data)
+
+    if size is None:
+        size = os.path.getsize(file_path)
+    if name is None:
+        name = url.split('/')[-1]
+    file_metadata = dict(name=name, file=file_path, size=size)
+    draft_field_list_add(current_user.get_id(), uuid,
+                         "files", file_metadata)
+
+    return unique_filename

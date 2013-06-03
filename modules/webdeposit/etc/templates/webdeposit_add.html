@@ -19,7 +19,6 @@
 
 {% extends "page.html" %}
 
-
 {% block header %}
     {{ super() }}
     {% js 'js/jquery-ui.min.js', '20-jquery-ui' %}
@@ -238,6 +237,9 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
 
 {% block javascript %}
 {{ super() }}
+
+<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="your_app_key"></script>
+
 <!-- yahooapis is imported for pluploader -->
 <script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
 <script type="text/javascript">
@@ -249,7 +251,8 @@ $(document).ready(function() {
                             '{{ url_for('webdeposit.plupload', deposition_type=deposition_type, uuid=uuid) }}',
                             '{{ url_for('webdeposit.plupload_delete', uuid=uuid) }}',
                             '{{ url_for('webdeposit.plupload_get_file', uuid=uuid) }}',
-                            {{ form.files|safe }});
+                            {{ form.files|safe }},
+                            '{{ url_for('webdeposit.upload_from_url', deposition_type=deposition_type, uuid=uuid) }}');
 
   webdeposit_input_error_check('#submitForm input, #submitForm textarea, #submitForm select',
                                '{{ url_for("webdeposit.error_check", uuid=uuid) }}',

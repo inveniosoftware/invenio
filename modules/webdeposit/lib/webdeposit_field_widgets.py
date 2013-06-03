@@ -88,3 +88,32 @@ def ckeditor_widget(field, **kwargs):
     html = [u'<textarea %s ></textarea>'
             % html_params(id=field_id, name=field_id)]
     return HTMLString(u''.join(html))
+
+
+def dropbox_widget(field, **kwargs):
+    field_id = kwargs.pop('id', field.id)
+    html = [u'<input type="dropbox-chooser"\
+            name="fileurl"\
+            style="visibility: hidden;"\
+            data-link-type="direct"\
+            id="db-chooser"/></br> \
+        <div class="pluploader" %s > \
+            <table id="file-table" class="table table-striped table-bordered" style="display:none;">\
+                <thead>\
+                    <tr>\
+                    <th>Filename</th>\
+                    <th>Size</th>\
+                    <th>Status</th>\
+                    <td></td>\
+                    </tr>\
+                </thead>\
+                <tbody id="filelist">\
+                </tbody>\
+            </table>\
+            <a class="btn btn-success disabled" id="uploadfiles"> \
+                <i class="icon-upload icon-white"></i> Start upload</a>\
+            <a class="btn btn-danger" id="stopupload" style="display:none;">\
+                <i class="icon-stop icon-white"></i> Stop upload</a>\
+            <div id="upload-errors"></div>\
+        </div>' % html_params(id=field_id)]
+    return HTMLString(u''.join(html))

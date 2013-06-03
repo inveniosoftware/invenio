@@ -22,7 +22,7 @@ from wtforms.validators import Required
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
-                                             bootstrap_submit, ckeditor_widget
+                                             bootstrap_submit
 
 # Import custom fields
 from invenio.webdeposit_load_fields import fields
