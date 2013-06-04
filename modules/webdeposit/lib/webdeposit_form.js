@@ -252,15 +252,37 @@ function webdeposit_handle_field_data(name, value, data, url, required_fields) {
 
     if (data.fields) {
         $.each(data.fields, function(name, value) {
-            $('#error-' + name).hide('slow');
-            errors--;
-            old_value = $('[name=' + name + ']').val();
-            if (old_value != value) {
-                if (typeof ckeditor === 'undefined')
-                    $('[name=' + name + ']').val(value);
-                else if (ckeditor.name == name)
-                        ckeditor.setData(value);
-                webdeposit_handle_new_value(name, value, url, required_fields);
+            if (name == 'files'){
+                $.each(value, function(i, file){
+                    id = unique_ID();
+
+                    new_file = {
+                        id: id,
+                        name: file.name,
+                        size: file.size
+                    };
+
+                    $('#filelist').append(
+                        '<tr id="' + id + '" style="display:none;">' +
+                            '<td id="' + id + '_link">' + file.name + '</td>' +
+                            '<td>' + plupload.formatSize(file.size) + '</td>' +
+                            '<td width="30%"><div class="progress active"><div class="bar" style="width: 100%;"></div></div></td>' +
+                        '</tr>');
+                    $('#filelist #' + id).show('fast');
+                });
+                $('#file-table').show('slow');
+            }
+            else {
+                $('#error-' + name).hide('slow');
+                errors--;
+                old_value = $('[name=' + name + ']').val();
+                if (old_value != value) {
+                    if (typeof ckeditor === 'undefined')
+                        $('[name=' + name + ']').val(value);
+                    else if (ckeditor.name == name)
+                            ckeditor.setData(value);
+                    webdeposit_handle_new_value(name, value, url, required_fields);
+                }
             }
         });
     }
@@ -407,33 +429,35 @@ function webdeposit_check_status(url){
 }
 
 
-var dropbox_files = new Array();
+var dropbox_files = [];
 
-document.getElementById("db-chooser").addEventListener("DbxChooserSuccess",
-    function(e) {
-        $('#file-table').show('slow');
-        $.each(e.files, function(i, file){
-            id = unique_ID();
+if (document.getElementById("db-chooser") !== null) {
+    document.getElementById("db-chooser").addEventListener("DbxChooserSuccess",
+        function(e) {
+            $('#file-table').show('slow');
+            $.each(e.files, function(i, file){
+                id = unique_ID();
 
-            dbfile = {
-                id: id,
-                name: file.name,
-                size: file.bytes,
-                url: file.link
-            };
+                dbfile = {
+                    id: id,
+                    name: file.name,
+                    size: file.bytes,
+                    url: file.link
+                };
 
-            $('#filelist').append(
-                '<tr id="' + id + '" style="display:none;">' +
-                    '<td id="' + id + '_link">' + file.name + '</td>' +
-                    '<td>' + plupload.formatSize(file.bytes) + '</td>' +
-                    '<td width="30%"><div class="progress active"><div class="bar" style="width: 0%;"></div></div></td>' +
-                    '<td><a id="' + id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>' +
-                '</tr>');
-            $('#filelist #' + id).show('fast');
-            $('#uploadfiles').removeClass("disabled");
+                $('#filelist').append(
+                    '<tr id="' + id + '" style="display:none;">' +
+                        '<td id="' + id + '_link">' + file.name + '</td>' +
+                        '<td>' + plupload.formatSize(file.bytes) + '</td>' +
+                        '<td width="30%"><div class="progress active"><div class="bar" style="width: 0%;"></div></div></td>' +
+                        '<td><a id="' + id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td>' +
+                    '</tr>');
+                $('#filelist #' + id).show('fast');
+                $('#uploadfiles').removeClass("disabled");
 
-            dropbox_files.push(dbfile);
-        });
-    }, false);
+                dropbox_files.push(dbfile);
+            });
+        }, false);
+}
 
 

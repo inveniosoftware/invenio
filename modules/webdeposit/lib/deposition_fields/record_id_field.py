@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_validation_utils import number_validate
+from invenio.webdeposit_validation_utils import record_id_validate
 
 __all__ = ['RecordIDField']
 
@@ -29,6 +29,7 @@ class RecordIDField(WebDepositField(key='recid'), TextField):
 
     def __init__(self, **kwargs):
         super(RecordIDField, self).__init__(**kwargs)
+        self._icon_html = '<i class="icon-barcode"></i>'
 
     def pre_validate(self, form=None):
-        return number_validate(self)
+        return record_id_validate(self, form)

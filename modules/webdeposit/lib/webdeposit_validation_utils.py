@@ -19,13 +19,14 @@
 
 from invenio.dataciteutils import DataciteMetadata
 from invenio.sherpa_romeo import SherpaRomeoSearch
+from invenio.bibfield import get_record
 
 #FIXME: make the functions to return functions so that
 #       in the config file we can define parameters
 #       eg. length(5,10)
 
 
-def datacite_doi_validate(field):
+def datacite_doi_validate(field, dummy_form=None):
     value = field.data
     if value == "" or value.isspace():
         return dict()
@@ -41,7 +42,7 @@ def datacite_doi_validate(field):
                 success_message='Datacite.org metadata imported successfully')
 
 
-def sherpa_romeo_issn_validate(field):
+def sherpa_romeo_issn_validate(field, dummy_form=None):
     value = field.data
     if value == "" or value.isspace():
         return dict(error=0, error_message='')
@@ -65,7 +66,7 @@ def sherpa_romeo_issn_validate(field):
     return dict(info=1, info_message="Couldn't find Journal")
 
 
-def sherpa_romeo_publisher_validate(field):
+def sherpa_romeo_publisher_validate(field, dummy_form=None):
     value = field.data
     if value == "" or value.isspace():
         return dict(error=0, error_message='')
@@ -131,7 +132,7 @@ def sherpa_romeo_publisher_validate(field):
     return dict(error=0, error_message='')
 
 
-def sherpa_romeo_journal_validate(field):
+def sherpa_romeo_journal_validate(field, dummy_form=None):
     value = field.data
     if value == "" or value.isspace():
         return dict(error=0, error_message='')
@@ -158,7 +159,7 @@ def sherpa_romeo_journal_validate(field):
     return dict(error=0, error_message='')
 
 
-def number_validate(field, error_message='It must be a number!'):
+def number_validate(field, dummy_form=None, error_message='It must be a number!'):
     value = field.data
     if value == "" or value.isspace():
         return dict(error=0, error_message='')
@@ -180,3 +181,24 @@ def number_validate(field, error_message='It must be a number!'):
                     error_message=error_message)
     else:
         return dict(error=0, error_message='')
+
+
+def record_id_validate(field, form=None):
+    value = field.data
+    is_number = number_validate(field)['error'] == 0 \
+        and (value != "" or not value.isspace())
+
+    if is_number:
+        json_reader = get_record(value)
+    else:
+        return dict(error=1, error_message="Record id must be a number!")
+    if json_reader is not None:
+        webdeposit_json = form.uncook_json(json_reader, {}, value)
+        #FIXME: update current json
+
+        return dict(info=1,
+                    info_message='<a href="/record/"' + value +
+                                 '>Record</a> loaded successfully',
+                    fields=webdeposit_json)
+    else:
+        return dict(info=1, info_message="Record doesn't exist")
