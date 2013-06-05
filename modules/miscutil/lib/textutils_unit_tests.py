@@ -449,6 +449,7 @@ class TestStripping(InvenioTestCase):
                  ['a i U', 'Hoehne', 'Age Ost Vaer', 'normal']) ## unidecode >= 0.04.13
             )
             self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
+            self.assertEqual(translate_to_ascii("ß"), ["ss"])
             self.assertEqual(translate_to_ascii(None), None)
             self.assertEqual(translate_to_ascii([]), [])
             self.assertEqual(translate_to_ascii([None]), [None])
