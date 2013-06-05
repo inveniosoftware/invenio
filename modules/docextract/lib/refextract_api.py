@@ -235,7 +235,7 @@ def update_references(recid, overwrite=True):
     temp_file.close()
 
     # Update record
-    task_low_level_submission('bibupload', 'refextract', '-P', '5',
+    task_low_level_submission('bibupload', 'refextract', '-P', '4',
                               '-c', temp_path)
 
 
