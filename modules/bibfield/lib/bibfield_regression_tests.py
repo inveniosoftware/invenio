@@ -76,6 +76,7 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         run_sql("delete from crcITEM WHERE barcode='test'")
         record.update_field_cache('_number_of_copies')
         self.assertEqual(2, record['_number_of_copies'])
+        self.assertEqual(2, record['number_of_copies'])
 
     def test_get_using_format_string(self):
         """

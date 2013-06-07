@@ -57,7 +57,6 @@ class JsonReader(BibFieldDict):
         super(JsonReader, self).__init__()
         self.blob_wrapper = blob_wrapper
         self.rec_tree = None  # all record information represented as a tree (intermediate structure)
-        self.rec_json = {}  # bibfield recjson structure
 
         self._missing_cfg = []
         self._warning_messages = []
@@ -273,7 +272,7 @@ class JsonReader(BibFieldDict):
                 return False
             return all(self._apply_rule(field_name, rule_def['aliases'], rule) for rule in rules)
         else:
-            return self._apply_virtual_rule(field_name, rule_def['rules'], rule_def['type'])
+            return self._apply_virtual_rule(field_name, rule_def['aliases'], rule_def['rules'], rule_def['type'])
 
     def _apply_rule(self, field_name, aliases, rule):
         """docstring for _apply_rule"""
@@ -295,12 +294,12 @@ class JsonReader(BibFieldDict):
                     else:
                         self[field_name] = self._try_to_eval(rule['value'], value=elements)
             for alias in aliases:
-                self._aliases[alias] = field_name
+                self['__aliases'][alias] = field_name
             return True
         else:
             return False
 
-    def _apply_virtual_rule(self, field_name, rule, rule_type):
+    def _apply_virtual_rule(self, field_name, aliases, rule, rule_type):
         if rule['parse_first']:
             for json_id in self._try_to_eval(rule['parse_first']):
                 self._unpack_rule(json_id)
@@ -315,7 +314,10 @@ class JsonReader(BibFieldDict):
             self[field_name] = [self._try_to_eval(rule['value']), rule['value']]
 
         if rule['do_not_cache']:
-            self._do_not_cache.append(field_name)
+            self['__do_not_cache'].append(field_name)
+
+        for alias in aliases:
+            self['__aliases'][alias] = field_name
 
         return True
 

@@ -73,8 +73,8 @@ class BibFieldDict(object):
 
     def __init__(self):
         self.rec_json = {}
-        self._aliases = {}
-        self._do_not_cache = []
+        self.rec_json['__aliases'] = {}
+        self.rec_json['__do_not_cache'] = []
         self._init_fase = True
 
     def __getitem__(self, key):
@@ -117,10 +117,10 @@ class BibFieldDict(object):
                 for group in prepare_field_keys(key):
                     dict_part = self._get_intermediate_value(dict_part, group)
         except KeyError, err:
-            return self[key.replace(err.args[0], self._aliases[err.args[0]].replace('[n]', '[1:]'), 1)]
+            return self[key.replace(err.args[0], self.rec_json['__aliases'][err.args[0]].replace('[n]', '[1:]'), 1)]
 
         if re.search('^_[a-zA-Z0-9]', key):
-            if key in self._do_not_cache:
+            if key in self.rec_json['__do_not_cache']:
                 self.update_field_cache(key)
             dict_part = dict_part[0]
 
