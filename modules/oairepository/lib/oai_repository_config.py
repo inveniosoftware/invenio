@@ -18,7 +18,7 @@
 """OAI Repository Configuration."""
 
 ## Maximum number of records to put in a single bibupload
-CFG_OAI_REPOSITORY_MARCXML_SIZE = 100
+CFG_OAI_REPOSITORY_MARCXML_SIZE = 1000
 
 ## A magic value used to specify the global set (e.g. when the admin
 ## specify a set configuration without putting any setSpec)
