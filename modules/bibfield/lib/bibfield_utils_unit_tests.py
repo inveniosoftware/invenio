@@ -153,10 +153,10 @@ class BibFieldDictUnitTest(InvenioTestCase):
         d['_c'] = [1, "random.random()"]
         d['_cc'] = [1, "random.random()"]
 
-        d._do_not_cache.append('_cc')
-        d._aliases['aa'] = 'a'
+        d['__do_not_cache'].append('_cc')
+        d['__aliases']['aa'] = 'a'
 
-        self.assertTrue(len(d.keys()) == 4)
+        self.assertTrue(len(d.keys()) == 6)
         self.assertTrue('foo' in d)
         self.assertTrue('a.b' in d)
 

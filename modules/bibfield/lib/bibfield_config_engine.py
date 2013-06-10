@@ -369,6 +369,13 @@ class BibFieldParser(object):
                                     % (rule.json_id[0],))
 
         depends_on = only_if = parse_first = persistent_id = None
+
+        aliases = []
+        if rule.aliases:
+            aliases = rule.aliases.asList()
+        if re.search('^_[a-zA-Z0-9]', json_id):
+            aliases.append(json_id[1:])
+
         do_not_cache = False
         if rule.depends_on:
             depends_on = rule.depends_on[0]
@@ -384,6 +391,7 @@ class BibFieldParser(object):
         self.config_rules[json_id] = {'rules'        : {},
                                       'checker'      : [],
                                       'documentation': BibFieldDict(),
+                                      'aliases'      : aliases,
                                       'type'         : rule.type_field[0],
                                       'persistent_identifier' : persistent_id,
                                       'overwrite'    : False}
