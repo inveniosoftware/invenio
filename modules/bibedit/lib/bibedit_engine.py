@@ -77,7 +77,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     replace_references, merge_record_with_template, record_xml_output, \
     record_is_conference, add_record_cnum, get_xml_from_textmarc, \
     record_locked_by_user_details, crossref_process_template, \
-    modify_record_timestamp
+    modify_record_timestamp, get_affiliation_for_paper
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -87,7 +87,9 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields, record_get_field_instances, record_add_fields, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
-    record_strip_controlfields, record_order_subfields
+    record_strip_controlfields, record_order_subfields, \
+    field_add_subfield, field_get_subfield_values
+
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
@@ -458,6 +460,9 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
     elif request_type == "deactivateRecordCache":
         deactivate_cache(recid, uid)
         response.update({"cacheMTime": data['cacheMTime']})
+    elif request_type == "guessAffiliations":
+        response.update(perform_guess_affiliations(uid, data))
+
     return response
 
 def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
@@ -1779,3 +1784,40 @@ def perform_doi_search(doi):
 def check_hide_authors(record):
     """ Check if authors should be hidden by default in the user interface """
     return sum([len(record.get(tag, [])) for tag in CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS]) > CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD
+
+
+def perform_guess_affiliations(uid, data):
+    response = {}
+    recid = data["recID"]
+    record_revision, record, pending_changes, deactivated_hp_changes, \
+        undo_list, redo_list = get_cache_contents(recid, uid)[1:]
+
+    # Let's guess affiliations
+    result = {}
+    for tag in CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS:
+        result[tag] = {}
+        author_field_instances = record_get_field_instances(record, tag)
+        for field_pos, instance in enumerate(author_field_instances):
+            subfields_to_add = []
+            current_affilations = field_get_subfield_values(instance, code="u")
+            if not current_affilations or current_affilations[0].startswith("VOLATILE:"):
+                # This author does not have affiliation
+                try:
+                    author_name = field_get_subfield_values(instance, code="a")[0]
+                except IndexError:
+                    author_name = author_name[0]
+                aff_guess = get_affiliation_for_paper(recid, author_name)
+                if aff_guess:
+                    for aff in aff_guess:
+                        field_add_subfield(instance, code="u", value=aff)
+                        subfields_to_add.append(["u", aff])
+            if subfields_to_add:
+                result[tag][field_pos] = subfields_to_add
+
+    response['cacheMTime'] = update_cache_contents(recid, uid, record_revision,
+                                                   record, pending_changes,
+                                                   deactivated_hp_changes,
+                                                   undo_list, redo_list)
+    response['subfieldsToAdd'] = result
+
+    return response

@@ -6295,6 +6295,10 @@ function onEditableCellChange(value, th) {
         return value;
     }
 
+    if ($(th).hasClass("affiliation-guess")) {
+      $(th).removeClass("affiliation-guess");
+    }
+
     return escapeHTML(value);
 }
 
@@ -6320,6 +6324,7 @@ function onfocusreference(check_box) {
       $("tbody[id^='rowGroup_" + this + "']").hide();
     });
   }
+  reColorFields();
 }
 
 
@@ -6374,6 +6379,7 @@ function onfocusother(check_box) {
   else {
     $("tbody:[id^='rowGroup_']").not(myselector).hide();
   }
+  reColorFields();
 }
 
 function onfocuscurator(check_box) {
@@ -6479,4 +6485,53 @@ function displayAll() {
   onfocusreference();
   onfocusother();
   onfocusauthor();
+}
+
+
+/*************** Functions related to affiliation guess ***************/
+
+function onGuessAffiliations() {
+  var reqData = {
+              recID: gRecID,
+              requestType: 'guessAffiliations'
+              };
+
+  save_changes().done(function() {
+    createReq(reqData, function(json) {
+      var subfields_to_add = json['subfieldsToAdd'];
+      var new_affiliations = false;
+
+      if ( subfields_to_add['100'][0] && subfields_to_add['100'][0].length > 0 ) {
+        new_affiliations = true;
+        for ( field_pos in subfields_to_add['100'] ) {
+          for ( var subfield_index in subfields_to_add['100'][field_pos] ) {
+            gRecord['100'][field_pos][0].push(subfields_to_add['100'][field_pos][subfield_index]);
+          }
+          redrawFieldPosition('100', field_pos);
+          for (var i=0; i < subfields_to_add['100'][field_pos].length; i++ ) {
+            var field_selector = "#content_" + "100_" +  String(field_pos) + "_" + String(gRecord['100'][field_pos][0].length - i - 1);
+            $(field_selector).addClass('affiliation-guess');
+          }
+        }
+      }
+      if ( subfields_to_add['700'][0] && subfields_to_add['700'][0].length > 0 ) {
+        new_affiliations = true;
+        for ( field_pos in subfields_to_add['700'] ) {
+          for ( var subfield_index in subfields_to_add['700'][field_pos] ) {
+            gRecord['700'][field_pos][0].push(subfields_to_add['700'][field_pos][subfield_index]);
+          }
+          redrawFieldPosition('700', field_pos);
+          for (var i=0; i < subfields_to_add['700'][field_pos].length; i++ ) {
+            var field_selector = "#content_" + "700_" +  String(field_pos) + "_" + String(gRecord['700'][field_pos][0].length - i - 1);
+            $(field_selector).addClass('affiliation-guess');
+          }
+        }
+      }
+
+      if ( new_affiliations ) {
+        activateSubmitButton();
+        reColorFields();
+      }
+    });
+  });
 }

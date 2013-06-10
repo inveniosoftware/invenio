@@ -60,6 +60,11 @@ function initHotkeys() {
    */
   // New record.
 
+  $(document).bind('keydown', 'ctrl+shift+g', function(event) {
+      onGuessAffiliations();
+      event.preventDefault();
+  });
+
   $(document).bind('keydown', 'ctrl+c', function(event) {
       onPerformCopy();
       event.preventDefault();

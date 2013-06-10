@@ -1000,3 +1000,10 @@ label {
   font-size: small;
   font-style: italic;
 }
+
+.affiliation-guess {
+    background-color: rgb(226, 226, 97);
+    background-image: url('warning.png');
+    background-repeat: no-repeat;
+    background-position: 570px;
+}
