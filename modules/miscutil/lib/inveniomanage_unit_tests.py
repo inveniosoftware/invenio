@@ -111,6 +111,60 @@ class InveniomanageTest(InvenioTestCase):
                         "%s was not found in output %s" % (expected, lines))
 
 
+    def test_signals_usage(self):
+        """ Test signal handling. """
+        from invenio.signalutils import pre_command, post_command
+        from invenio.inveniomanage import main, version as im_version
+
+        def pre_handler_version(sender, *args, **kwargs):
+            print '>>> pre_handler_version'
+
+        def post_handler_version(sender, *args, **kwargs):
+            print '>>> post_handler_version'
+
+        # Bind only `inveniomanage version` command to pre/post handler.
+        pre_command.connect(pre_handler_version, sender=im_version)
+        post_command.connect(post_handler_version, sender=im_version)
+
+        def pre_handler_general_test(sender, *args, **kwargs):
+            print '>>> pre_handler_general'
+
+        def post_handler_general_test(sender, *args, **kwargs):
+            print '>>> post_handler_general'
+
+        # Bind all commands to pre/post general handler.
+        pre_command.connect(pre_handler_general_test)
+        pre_command.connect(post_handler_general_test)
+
+        # Expect both version and general handlers.
+        out, dummy_exit_code = run('inveniomanage version', main)
+
+        lines = out.split('\n')
+        expected = ['>>> pre_handler_version',
+                    '>>> post_handler_version',
+                    '>>> pre_handler_general',
+                    '>>> post_handler_general']
+        for line in expected:
+            self.assertTrue(line in lines,
+                            "%s was not found in output %s" % (line, lines))
+
+        # Expect only general handlers.
+        out, dummy_exit_code = run('inveniomanage database uri', main)
+
+        lines = out.split('\n')
+        expected = ['>>> pre_handler_general',
+                    '>>> post_handler_general']
+        for line in expected:
+            self.assertTrue(line in lines,
+                            "%s was not found in output %s" % (line, lines))
+
+        notexpected = ['>>> pre_handler_version',
+                       '>>> post_handler_version']
+        for line in notexpected:
+            self.assertFalse(line in lines,
+                             "%s was not expected in output %s" % (line, lines))
+
+
 TEST_SUITE = make_test_suite(InveniomanageTest)
 
 if __name__ == "__main__":

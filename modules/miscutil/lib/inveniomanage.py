@@ -21,10 +21,12 @@
 import os
 import sys
 from pprint import pformat
-from flask.ext.script import Manager
+from functools import wraps
+from flask.ext.script import Manager as FlaskExtManager
 from flask.ext.script.commands import ShowUrls  # , Clean
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR, CFG_SITE_SECRET_KEY
 from invenio.pluginutils import PluginContainer
+from invenio.signalutils import pre_command, post_command
 from invenio.sqlalchemyutils import db
 from invenio.webinterface_handler_flask import create_invenio_flask_app
 
@@ -48,6 +50,20 @@ if 'config' in sys.argv and \
     create_invenio_flask_app = create_invenio_flask_app(
         SECRET_KEY=generate_secret_key())
 
+
+class Manager(FlaskExtManager):
+    def add_command(self, name, command):
+        f = command.run
+
+        @wraps(f)
+        def wrapper(*args, **kwds):
+            pre_command.send(f, *args, **kwds)
+            result = f(*args, **kwds)
+            post_command.send(f, *args, **kwds)
+            return result
+        command.run = wrapper
+        return super(Manager, self).add_command(name, command)
+
 manager = Manager(create_invenio_flask_app)
 
 
@@ -64,7 +80,7 @@ def _invenio_manager_plugin_builder(plugin_name, plugin_code):
     """
     if 'manager' in dir(plugin_code):
         candidate = getattr(plugin_code, 'manager')
-        if isinstance(candidate, Manager):
+        if isinstance(candidate, FlaskExtManager):
             return candidate
     raise ValueError('%s is not a valid manager plugin' % plugin_name)
 

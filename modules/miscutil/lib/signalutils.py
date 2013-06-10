@@ -45,3 +45,37 @@ Example subscriber::
         current_app._get_current_object()
     )
 """
+
+pre_command = _signals.signal('pre-command')
+"""
+This signal is sent right before any inveniomanage command is executed.
+
+Example subscriber::
+
+    def backup_database(sender, *args, **kwargs):
+        pass
+
+    from invenio.signalutils import pre_command
+    from invenio.database_manager import drop
+    pre_command.connect(
+        backup_database,
+        sender=drop
+    )
+"""
+
+post_command = _signals.signal('post-command')
+"""
+This signal is sent right after any inveniomanage command is executed.
+
+Example subscriber::
+
+    def modify_demosite(sender, *args, **kwargs):
+        pass
+
+    from invenio.signalutils import post_command
+    from invenio.database_manager import demosite
+    pre_command.connect(
+        modify_demosite,
+        sender=demosite
+    )
+"""
