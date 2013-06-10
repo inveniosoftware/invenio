@@ -47,9 +47,11 @@ class BibFieldParserUnitTests(InvenioTestCase):
         self.assertEqual(self.config_rules['authors'], ['authors[0]', 'authors[n]'])
         self.assertTrue('authors[0]' in self.config_rules)
         self.assertTrue('authors[n]' in self.config_rules)
+        self.assertTrue(self.config_rules['doi']['persistent_identifier'])
         #Check if derived and calulated are well parserd
         self.assertTrue('dummy' in self.config_rules)
         self.assertTrue(self.config_rules['dummy']['type'] == 'derived')
+        self.assertTrue(self.config_rules['dummy']['persistent_identifier'])
         self.assertTrue(self.config_rules['_number_of_copies']['type'] == 'calculated')
         self.assertTrue(self.config_rules['authors[0]']['type'] == 'real')
         self.assertTrue(self.config_rules['_random']['rules']['do_not_cache'])

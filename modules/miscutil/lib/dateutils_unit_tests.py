@@ -135,9 +135,12 @@ class ParseRuntimeLimitTest(InvenioTestCase):
         day = datetime.date.today()
         now = datetime.time()
         while day.weekday() != calendar.SUNDAY:
-            day += datetime.timedelta(1)
+            day += datetime.timedelta(days=1)
         present_from = datetime.datetime.combine(day, now.replace(hour=8))
         present_to = datetime.datetime.combine(day, now.replace(hour=16))
+        if datetime.datetime.now() >= present_to:
+            present_from += datetime.timedelta(days=7)
+            present_to += datetime.timedelta(days=7)
         future_from = present_from + datetime.timedelta(days=7)
         future_to = present_to + datetime.timedelta(days=7)
         expected = (
@@ -156,6 +159,9 @@ class ParseRuntimeLimitTest(InvenioTestCase):
             day += datetime.timedelta(1)
         present_from = datetime.datetime.combine(day, now.replace(hour=18))
         present_to = datetime.datetime.combine(day, now.replace(hour=22))
+        if datetime.datetime.now() >= present_to:
+            present_from += datetime.timedelta(days=7)
+            present_to += datetime.timedelta(days=7)
         future_from = present_from + datetime.timedelta(days=7)
         future_to = present_to + datetime.timedelta(days=7)
         expected = (
@@ -174,6 +180,9 @@ class ParseRuntimeLimitTest(InvenioTestCase):
             day += datetime.timedelta(1)
         present_from = datetime.datetime.combine(day, now.replace(hour=0))
         present_to = present_from + datetime.timedelta(days=1)
+        if datetime.datetime.now() >= present_to:
+            present_from += datetime.timedelta(days=7)
+            present_to += datetime.timedelta(days=7)
         future_from = present_from + datetime.timedelta(days=7)
         future_to = present_to + datetime.timedelta(days=7)
         expected = (
@@ -190,7 +199,7 @@ class ParseRuntimeLimitTest(InvenioTestCase):
         now = datetime.time()
         present_from = datetime.datetime.combine(day, now.replace(hour=6))
         present_to = datetime.datetime.combine(day, now.replace(hour=18))
-        if present_to < datetime.datetime.now():
+        if present_to <= datetime.datetime.now():
             present_from += datetime.timedelta(days=1)
             present_to += datetime.timedelta(days=1)
         future_from = present_from + datetime.timedelta(days=1)
