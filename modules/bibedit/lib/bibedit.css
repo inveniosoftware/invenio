@@ -398,13 +398,17 @@
 }
 
 .bibEditRevHistoryEntryContent {
-    display: table-cell;
     font-size: 80%;
     cursor: pointer;
 }
 
 .bibEditRevHistoryEntryControls {
-    display: table-cell;
+}
+
+.bibEditRevHistoryAuthor {
+  font-size: 80%;
+  word-wrap:break-word;
+  word-break:break-all;
 }
 
 .bibEditRevHistoryLink {
@@ -415,6 +419,7 @@
 .bibEditRevHistoryLinkImg {
     border-width: 0px;
     border-style: none;
+    padding-bottom: 5px;
 }
 .bibEditRevHistoryMenuSection {
     max-height: 200px;

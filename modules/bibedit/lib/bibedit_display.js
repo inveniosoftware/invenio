@@ -1306,6 +1306,14 @@ function getRevisionDate(revisionTs) {
     return result;
 }
 
+function getRevisionAuthor(revisionTs) {
+    var result = "";
+    if ( gRecRevisionAuthors[revisionTs] != undefined ) {
+        result = gRecRevisionAuthors[revisionTs];
+    }
+    return result;
+}
+
 function formatDateTime(dt) {
     return dt.year + '.' + dt.month + '.' + dt.day + ' ' + dt.hour + ':' +
         dt.minute + ':' + dt.second;
@@ -1314,6 +1322,7 @@ function formatDateTime(dt) {
 function displayRevisionHistoryEntry(recId, revisionId) {
     var entryClass = (revisionId == gRecRev) ? "bibEditRevHistorySelectedEntry" : "bibEditRevHistoryEntry";
     var timeString = formatDateTime(getRevisionDate(revisionId));
+    var authorString = getRevisionAuthor(revisionId);
 
     /* Define icons per row */
     var mergeImgId = 'imgMergeWithNewest_' + revisionId;
@@ -1342,12 +1351,12 @@ function displayRevisionHistoryEntry(recId, revisionId) {
         '</a>';
 
     var resultHTML = '<div class="' + entryClass + '">\n' +
-        '<div class="bibEditRevHistoryEntryContent" id="bibEditRevHistoryEntry_' +
+        '<table><tr><td rowspan="2" class="bibEditRevHistoryEntryContent" id="bibEditRevHistoryEntry_' +
         revisionId + '">' + checkImg + timeString +
-        '</div><div class="bibEditRevHistoryEntryControls">' +
+        '</td><td class="bibEditRevHistoryEntryControls">' +
         '<div>' + mergeWithNewestControl +
         compareWithCurrentControl + revertToRevisionControl +
-        "</div></div></div>\n";
+        '</div></td><tr><td class="bibEditRevHistoryAuthor">' + authorString + '</td></tr></table></div>\n';
 
     return {
         "HTML": resultHTML,
