@@ -2694,7 +2694,7 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   id_user int(15) unsigned default NULL,
   id_bibdoc mediumint(9) unsigned default NULL,
   file_version smallint(2) unsigned default NULL,
-  file_format varchar(10) NULL default NULL,
+  file_format varchar(50) NULL default NULL,
   KEY download_time (download_time),
   KEY id_bibrec (id_bibrec)
 ) ENGINE=MyISAM;
