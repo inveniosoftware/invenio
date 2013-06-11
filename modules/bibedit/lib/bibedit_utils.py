@@ -51,7 +51,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
 from invenio.bibedit_dblayer import (get_record_last_modification_date,
     delete_hp_change, cache_exists, update_cache_post_date, get_cache,
     update_cache, get_cache_post_date, uids_with_active_caches,
-    delete_cache as _delete_cache)
+    get_record_revision_author, delete_cache as _delete_cache)
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
@@ -506,6 +506,19 @@ def get_record_revision_timestamps(recid):
     result = []
     for rev_id in rev_ids:
         result.append(rev_id.split(".")[1])
+    return result
+
+def get_record_revision_authors(recid):
+    """return dictionary of < timestamp : author > of all revisions
+     of a given record """
+    rev_ids = get_record_revision_ids(recid)
+    result = {}
+    for rev_id in rev_ids:
+        try:
+            revision = rev_id.split(".")[1]
+            result[revision] = get_record_revision_author(recid, timestamp_to_revision(revision))
+        except IndexError:
+            continue
     return result
 
 def get_record_revision_ids(recid):
