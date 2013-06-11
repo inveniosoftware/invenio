@@ -72,7 +72,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     record_locked_by_queue, save_xml_record, touch_cache, \
     update_cache_contents, get_field_templates, get_marcxml_of_revision, \
     revision_to_timestamp, timestamp_to_revision, \
-    get_record_revision_timestamps, record_revision_exists, \
+    get_record_revision_timestamps, get_record_revision_authors, record_revision_exists, \
     can_record_have_physical_copies, extend_record_with_template, \
     replace_references, merge_record_with_template, record_xml_output, \
     record_is_conference, add_record_cnum, get_xml_from_textmarc, \
@@ -761,6 +761,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             last_revision_ts = revision_to_timestamp(latest_revision)
 
             revisions_history = get_record_revision_timestamps(recid)
+            revisions_authors = get_record_revision_authors(recid)
             number_of_physical_copies = get_number_copies(recid)
             bibcirc_details_URL = create_item_details_url(recid, ln)
             can_have_copies = can_record_have_physical_copies(recid)
@@ -789,13 +790,14 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
                 response['revisionAuthor'], response['lastRevision'], \
-                response['revisionsHistory'], response['inReadOnlyMode'], \
-                response['pendingHpChanges'], response['disabledHpChanges'], \
-                response['undoList'], response['redoList'] = cache_dirty, \
+                response['revisionsHistory'], response['revisionsAuthors'], \
+                response['inReadOnlyMode'], response['pendingHpChanges'], \
+                response['disabledHpChanges'], response['undoList'], \
+                response['redoList'] = cache_dirty, \
                 record, mtime, revision_to_timestamp(record_revision), \
                 revision_author, last_revision_ts, revisions_history, \
-                read_only_mode, pending_changes, disabled_hp_changes, \
-                undo_list, redo_list
+                revisions_authors, read_only_mode, pending_changes, \
+                disabled_hp_changes, undo_list, redo_list
             response['numberOfCopies'] = number_of_physical_copies
             response['managed_DOIs'] = managed_DOIs
             response['bibCirculationUrl'] = bibcirc_details_URL
