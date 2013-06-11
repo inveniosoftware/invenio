@@ -179,7 +179,7 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
             if (autocomplete) {
                 cellContentTitle = 'title="Click to edit (complete values: ctrl-shift-a) " ';
             }
-            cellContentOnClick = 'onclick="onContentClick(this)" ';
+            cellContentOnClick = 'onclick="onContentClick(event, this)" ';
         }
     }
     cellContentAdditionalClass = "";
@@ -621,9 +621,11 @@ function createHoldingPenChangePreview(record) {
      *     record - A content of the record that should be previewed
      */
 
-    return createRecordPreview(record) +
-        "<br><button onClick=\"onToggleDetailsVisibility(" +
-            changesetNumber + ");\">Hide preview</button>";
+    return "<button onClick=\"onToggleDetailsVisibility(" +
+            changesetNumber + ");\">Hide preview</button><br>" +
+            createRecordPreview(record) +
+            "<button onClick=\"onToggleDetailsVisibility(" +
+            changesetNumber + ");\">Hide preview</button><br>";
 }
 
 

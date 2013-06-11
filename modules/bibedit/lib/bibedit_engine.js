@@ -487,7 +487,7 @@ function onBulkReqError(data) {
             console.log("Error while processing:");
             console.log(data);
             updateStatus("ready");
-          }
+          };
 }
 
 
@@ -972,6 +972,15 @@ function transformRecord(record){
    *
    * The data is enriched with the positions inside the record in a following manner:
    * each field consists of:
+   * New data structure is an object with the following levels:
+   * -Tag (Object)
+   *  -Indicators (Array)
+   *     -FieldIndex (Array)
+   *       -0-FieldContent (Array)
+   *         -SubfieldIndex (Array)
+   *           -0-SubfieldTag
+   *           -1-SubfieldContent
+   *       -1-FieldPosition
    * */
   result = {};
   for (fieldId in record){
@@ -1032,65 +1041,143 @@ function filterChanges(changeset){
 
 ///// Functions generating easy to display changes list
 
-function compareFields(fieldId, indicators, fieldPos, field1, field2){
+/**
+ * Function called when we want to find all the pairs of fields having the same content
+ * @param  {number} tag
+ * @param  {String} indicators
+ * @param  {Array} fields1 : fields that belong to the tag+indicator from gRecord
+ * @param  {Array} fields2 : fields that belong to the tag+indicator from HP record
+ * @return {Dictionary} : includes pairs of the field positions of the same fields found.
+ * Key is the position of the 1st field inside the fields1 set and
+ * value is the position of the 2nd field inside the fiels2 set.
+ */
+function findSameFields(tag, indicators, fields1, fields2) {
+  /* Iterates over fields1 and searches for same fields inside the 2nd set.
+   * In case of volatile fields we create a pair with -1.
+   * E.g if first field of fields1 has same structure and content with 3rd field of fields2
+   * then we add the pair '0 : 2' to the dictionary.
+   * If 2nd field of fields1 is volatile we add the pair '1 : -1' to the dictionary
+  */
+  var sameFields = {};
+
+  for (var fieldIndex1 in fields1) {
+      // check if field contains only volatile fields
+      var isVolatile = true;
+      for (var sfIndex in fields1[fieldIndex1][0]) {
+        if (fields1[fieldIndex1][0][sfIndex][1].substring(0,9) != "VOLATILE:"){
+          isVolatile = false;
+          break;
+        }
+      }
+      // In case of volatile fields we create a pair with -1, so that the volatile
+      // fields are ignored from the comparison algorithm.
+      if (isVolatile) {
+        sameFields[fieldIndex1] = -1;
+      }
+      else {
+          for (var fieldIndex2 in fields2) {
+              // check if field to compare with is already inside sameFields dictionary
+              for (var key in sameFields) {
+                if (sameFields[key] == fieldIndex2)
+                  continue;
+              }
+              var isSame = true;
+              // if fields have different amount of subfields are not same
+              if ( fields1[fieldIndex1][0].length != fields2[fieldIndex2][0].length ) {
+                isSame =false;
+                continue;
+              }
+              for (var sfPos1 in fields1[fieldIndex1][0]) {
+                      if (fields2[fieldIndex2][0][sfPos1][0] != fields1[fieldIndex1][0][sfPos1][0] ){
+                          isSame = false;
+                          break;
+                      }
+                      if (fields2[fieldIndex2][0][sfPos1][1].toLowerCase() != fields1[fieldIndex1][0][sfPos1][1].toLowerCase() ){
+                          isSame = false;
+                          break;
+                      }
+              }
+              if (isSame) {
+                sameFields[fieldIndex1] = fieldIndex2;
+                break;
+              }
+          }
+      }
+  }
+  return sameFields;
+}
+
+/**
+ * Function called when we want to compare two different fields
+ * @param  {number} tag
+ * @param  {String} indicators
+ * @param  {number} fieldIndex : the field index of the field1
+ * @param  {Array} field1 : field that belongs to gRecord
+ * @param  {Array} field2 : field that belongs to HP record
+ * @return {List of objects} : Objects repesent a change detected between the 2 records
+ */
+function compareFields(tag, indicators, fieldIndex, field1, field2){
+  /*
+   * Compares the structure and content of 2 fields.
+   */
   result = [];
-  for (sfPos in field2){
-    if (field1[sfPos] == undefined){
+  for (var sfIndex in field2){
+    if (field1[sfIndex] == undefined){
       //  adding the subfield at the end of the record can be treated in a more graceful manner
       result.push(
           {"change_type" : "subfield_added",
-           "tag" : fieldId,
+           "tag" : tag,
            "indicators" : indicators,
-           "field_position" : fieldPos,
-           "subfield_code" : field2[sfPos][0],
-           "subfield_content" : field2[sfPos][1]});
+           "field_position" : fieldIndex,
+           "subfield_code" : field2[sfIndex][0],
+           "subfield_content" : field2[sfIndex][1]});
     }
     else
     {
       // the subfield exists in both the records
-      if (field1[sfPos][0] != field2[sfPos][0]){
-      //  a structural change ... we replace the entire field
+      if (field1[sfIndex][0] != field2[sfIndex][0]){
+      //  Differrent subfield codes: a structural change ... we replace the entire field
         return [{"change_type" : "field_changed",
-           "tag" : fieldId,
+           "tag" : tag,
            "indicators" : indicators,
-           "field_position" : fieldPos,
+           "field_position" : fieldIndex,
            "field_content" : field2}];
       } else
       {
-        // in case where gRec subfield is normal and HP record's subfield is volatile ignore it
-        if ( (field1[sfPos][1].toLowerCase() != field2[sfPos][1].toLowerCase()) && (field2[sfPos][1].substring(0,9) != "VOLATILE:")){
+        // in case where gRecord's subfield is normal and HP record's subfield is volatile ignore it
+        if ( (field1[sfIndex][1].toLowerCase() != field2[sfIndex][1].toLowerCase()) && (field2[sfIndex][1].substring(0,9) != "VOLATILE:")){
           result.push({"change_type" : "subfield_changed",
-            "tag" : fieldId,
+            "tag" : tag,
             "indicators" : indicators,
-            "field_position" : fieldPos,
+            "field_position" : fieldIndex,
             "field_content" : field2,
-            "subfield_position" : sfPos,
-            "subfield_code" : field2[sfPos][0],
-            "subfield_content" : field2[sfPos][1]});
+            "subfield_position" : sfIndex,
+            "subfield_code" : field2[sfIndex][0],
+            "subfield_content" : field2[sfIndex][1]});
 
         }
-        // in case where both gRec and HP record's subfield is volatile ignore them
-        else if ( (field1[sfPos][1].toLowerCase() == field2[sfPos][1].toLowerCase()) && (field1[sfPos][1].substring(0,9) != "VOLATILE:")) {
+        // in case where both gRecord's and HP record's subfield is volatile ignore them
+        else if ( (field1[sfIndex][1].toLowerCase() == field2[sfIndex][1].toLowerCase()) && (field1[sfIndex][1].substring(0,9) != "VOLATILE:")) {
           result.push({"change_type" : "subfield_same",
-            "tag" : fieldId,
+            "tag" : tag,
             "indicators" : indicators,
-            "field_position" : fieldPos,
-            "subfield_position" : sfPos,
-            "subfield_code" : field2[sfPos][0],
-            "subfield_content" : field2[sfPos][1]});
+            "field_position" : fieldIndex,
+            "subfield_position" : sfIndex,
+            "subfield_code" : field2[sfIndex][0],
+            "subfield_content" : field2[sfIndex][1]});
         }
       }
     }
   }
 
   if ( gSHOW_HP_REMOVED_FIELDS == 1) {
-    for (sfPos in field1){
-      if (field2[sfPos] == undefined){
+    for (sfIndex in field1){
+      if (field2[sfIndex] == undefined){
         result.push({"change_type" : "subfield_removed",
-                  "tag" : fieldId,
+                  "tag" : tag,
                   "indicators" : indicators,
-                  "field_position" : fieldPos,
-                  "subfield_position" : sfPos});
+                  "field_position" : fieldIndex,
+                  "subfield_position" : sfIndex});
       }
     }
   }
@@ -1098,76 +1185,106 @@ function compareFields(fieldId, indicators, fieldPos, field1, field2){
   return result;
 }
 
-
-function compareIndicators(fieldId, indicators, fields1, fields2){
-   /*a helper function allowing to compare inside one indicator
-    * excluded from compareRecords for the code clarity reason*/
+/**
+ * Function called when we want to compare the contents of a tag contained in both records
+ * @param  {number} tag
+ * @param  {String} indicators
+ * @param  {Array} fields1 : fields that belong to the tag+indicator from gRecord
+ * @param  {Array} fields2 : fields that belong to the tag+indicator from HP record
+ * @return {List of objects} : Objects repesent a change detected between the 2 records
+ */
+function compareTag(tag, indicators, fields1, fields2){
+   /* It fully compares the given's tag+indicator's fields from 2 different records
+    */
   result = [];
-  for (fieldPos in fields2){
-    if (fields1[fieldPos] == undefined){
-      result.push({"change_type" : "field_added",
-                  "tag" : fieldId,
-                  "indicators" : indicators,
-                  "field_content" : fields2[fieldPos][0]});
-    } else { // comparing the content of the subfields
-      var isVolatile1 = true;
-      for (var sfPos in fields1[fieldPos][0]) {
-        if (fields1[fieldPos][0][sfPos][1].substring(0,9) != "VOLATILE:"){
-          isVolatile1 = false;
+
+  /* First we find all the pairs of fields containing the same content
+   * from the 2 sets of fields.
+   */
+
+  var sameFields = findSameFields(tag, indicators, fields1, fields2);
+
+  // Then we call compareFields for every pair of same fields in order to produce the
+  // 'same content' changes.
+  for (var key in sameFields) {
+          if (sameFields[key] != -1)
+            result = result.concat(compareFields(tag, indicators, fields1[key][1], fields1[key][0], fields2[sameFields[key]][0]));
+  }
+
+  // We iterate over the fields2.
+  // If the field is volatile we ignore it.
+  // If it is contained inside the sameFields dictionary we have to compare it with the
+  // related field from fields1
+  // If it is not, we iterate over the fields1 set until we find an available to be compared field
+  // (a field that is not contained in the sameFields) and we compare them.
+  // If we don't find an available field then we create a change with type "field_added"
+
+  for (var fieldIndex2 in fields2) {
+      var isVolatile = true;
+      for (var sfIndex in fields2[fieldIndex2][0]) {
+        if (fields2[fieldIndex2][0][sfIndex][1].substring(0,9) != "VOLATILE:"){
+          isVolatile = false;
           break;
         }
       }
-      var isVolatile2 = true;
-      for (var sfPos in fields2[fieldPos][0]) {
-        if (fields2[fieldPos][0][sfPos][1].substring(0,9) != "VOLATILE:"){
-          isVolatile2 = false;
-          break;
-        }
+      // if field is volatile ignore it
+      if (isVolatile)
+        continue;
+      var fieldIndex = -1;
+      for (var key in sameFields) {
+          if (sameFields[key] == fieldIndex2)
+            fieldIndex = key;
       }
-      // in case where gRec's field is volatile and HP's is not
-      if (isVolatile1 && !isVolatile2){
-      result.push({"change_type" : "field_added",
-                  "tag" : fieldId,
-                  "indicators" : indicators,
-                  "field_content" : fields2[fieldPos][0]});
+      // if field is contained as value in sameFields ignore it
+      if (fieldIndex != -1) {
+        continue;
       }
       else {
-        result = result.concat(compareFields(fieldId, indicators, fields1[fieldPos][1], fields1[fieldPos][0], fields2[fieldPos][0]));
+          // try to find an available field to be compared with
+          var isCompared = false;
+          for (var fieldIndex1 in fields1) {
+              if (sameFields[fieldIndex1] == undefined ) {
+                  result = result.concat(compareFields(tag, indicators, fields1[fieldIndex1][1], fields1[fieldIndex1][0], fields2[fieldIndex2][0]));
+                  isCompared = true;
+                  // add this pair to sameFields dictionary in order neither of these fields to be compared with another field in next steps
+                  sameFields[fieldIndex1] = fieldIndex2;
+                  break;
+              }
+          }
+          if (isCompared == false) {
+              result.push({"change_type" : "field_added",
+                    "tag" : tag,
+                    "indicators" : indicators,
+                    "field_content" : fields2[fieldIndex2][0]});
+          }
       }
-    }
-  }
-
-  if ( gSHOW_HP_REMOVED_FIELDS == 1) {
-    for (fieldPos in fields1){
-      if (fields2[fieldPos] == undefined){
-        fieldPosition = fields1[fieldPos][1];
-        result.push({"change_type" : "field_removed",
-               "tag" : fieldId,
-               "indicators" : indicators,
-               "field_position" : fieldPosition});
-      }
-    }
   }
   return result;
 }
 
-
+/**
+ * Function called when a HP change set is applied
+ * @param  {BibRecord} record1 : gRecord
+ * @param  {BibRecord} record2 : Holding Pen record
+ * @return {List of objects} : Objects repesent a change detected between the 2 records
+ */
 function compareRecords(record1, record2){
-  /*Compares two bibrecords, producing a list of atom changes that can be displayed
-   * to the user if for example applying the Holding Pen change*/
-   // 1) This is more convenient to have a different structure of the storage
-  r1 = transformRecord(record1);
-  r2 = transformRecord(record2);
+  /* Compares two bibrecords, producing a list of atom changes that can be displayed
+   * to the user if for example applying the Holding Pen change
+   * 1) This is more convenient to have a different structure of the storage
+   */
+  r1 = transformRecord(record1); // gRecord
+  r2 = transformRecord(record2); // Holding Pen record
   result = [];
 
-  for (fieldId in r2){
-    if (r1[fieldId] == undefined){
-      for (indicators in r2[fieldId]){
-        for (field in r2[fieldId][indicators]){
+  for (tag in r2){
+    if (r1[tag] == undefined){  // if this tag doesn't exist in r1
+      for (indicators in r2[tag]){
+        for (fieldIndex in r2[tag][indicators]){
           result.push({"change_type" : "field_added",
-                        "tag" : fieldId,
+                        "tag" : tag,
                         "indicators" : indicators,
-                        "field_content" : r2[fieldId][indicators][field][0]});
+                        "field_content" : r2[tag][indicators][fieldIndex][0]});
 
 
         }
@@ -1175,30 +1292,30 @@ function compareRecords(record1, record2){
     }
     else
     {
-      for (indicators in r2[fieldId]){
-        if (r1[fieldId][indicators] == undefined){
-          for (field in r2[fieldId][indicators]){
+      for (indicators in r2[tag]){
+        if (r1[tag][indicators] == undefined){
+          for (fieldIndex in r2[tag][indicators]){
             result.push({"change_type" : "field_added",
-                         "tag" : fieldId,
+                         "tag" : tag,
                          "indicators" : indicators,
-                         "field_content" : r2[fieldId][indicators][field][0]});
+                         "field_content" : r2[tag][indicators][fieldIndex][0]});
 
 
           }
         }
         else{
-          result = result.concat(compareIndicators(fieldId, indicators,
-              r1[fieldId][indicators], r2[fieldId][indicators]));
+          result = result.concat(compareTag(tag, indicators,
+              r1[tag][indicators], r2[tag][indicators]));
         }
       }
 
       if ( gSHOW_HP_REMOVED_FIELDS == 1) {
-        for (indicators in r1[fieldId]){
-          if (r2[fieldId][indicators] == undefined){
-            for (fieldInd in r1[fieldId][indicators]){
-              fieldPosition = r1[fieldId][indicators][fieldInd][1];
+        for (indicators in r1[tag]){
+          if (r2[tag][indicators] == undefined){
+            for (fieldIndex in r1[tag][indicators]){
+              fieldPosition = r1[tag][indicators][fieldIndex][1];
                result.push({"change_type" : "field_removed",
-                    "tag" : fieldId,
+                    "tag" : tag,
                     "field_position" : fieldPosition});
             }
 
@@ -1210,15 +1327,15 @@ function compareRecords(record1, record2){
   }
 
   if ( gSHOW_HP_REMOVED_FIELDS == 1) {
-    for (fieldId in r1){
-      if (r2[fieldId] == undefined){
-        for (indicators in r1[fieldId]){
-          for (field in r1[fieldId][indicators])
+    for (tag in r1){
+      if (r2[tag] == undefined){
+        for (indicators in r1[tag]){
+          for (fieldIndex in r1[tag][indicators])
           {
             // field position has to be calculated here !!!
-            fieldPosition = r1[fieldId][indicators][field][1]; // field position inside the mark
+            fieldPosition = r1[tag][indicators][fieldIndex][1]; // field position inside the mark
             result.push({"change_type" : "field_removed",
-                         "tag" : fieldId,
+                         "tag" : tag,
                          "field_position" : fieldPosition});
 
           }
@@ -1863,6 +1980,8 @@ function onTextMarcClick() {
           textmarc_box.addClass("bibedit_input");
           textmarc_box.html(json['textmarc']);
           $('#bibEditTable').remove();
+          $('#bibEditHoldingPenAddedFields').remove();
+          $('#bibeditHoldingPenGC').remove();
           $('#bibEditContentTable').append(textmarc_box);
 
           // Avoids having two different scrollbars
@@ -3364,7 +3483,7 @@ function convertFieldIntoEditable(cell, shouldSelect){
 }
 
 
-function onContentClick(cell) {
+function onContentClick(event, cell) {
   /*
    * Handle click on editable content fields.
    */
@@ -3384,7 +3503,10 @@ function onContentClick(cell) {
       $(cell).trigger('click');
     }
   }
-
+  if ( ($(event.target).parent().hasClass('bibeditHPCorrection') && !$(event.target).parent().hasClass('bibeditHPSame'))
+        || ($(event.target).hasClass('bibeditHPCorrection') && !$(event.target).hasClass('bibeditHPSame')) ) {
+    return false;
+  }
   if ($(".edit_area textarea").length > 0) {
     /* There is another textarea open, wait for it to close */
     $(".edit_area textarea").parent().submit(function() {

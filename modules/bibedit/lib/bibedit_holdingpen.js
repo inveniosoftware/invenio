@@ -1249,147 +1249,152 @@ function onAcceptAllChanges(){
   /** Applying all the changes visualised in the editor.
    */
 
-  /** Changes have to be ordered by their type. First we process the
-      modifications of the content and adding new fields and subfields.
-      Such changes do not modify the numeration of other fields/subfields
-      and so, the indices of fields/subfields stored in other changes
-      remain valid */
+  save_changes().done(function() {
 
-  var chNumbers = aggregateHoldingPenChanges();
+      /** Changes have to be ordered by their type. First we process the
+          modifications of the content and adding new fields and subfields.
+          Such changes do not modify the numeration of other fields/subfields
+          and so, the indices of fields/subfields stored in other changes
+          remain valid */
 
-  /** First we add the addField requests, as they do not change the numbers
-      of existing fields and subields. Subsequents field/subfield removals
-      will be possible. An opposite order (first removals and then adding,
-      would break the record structure */
+      var chNumbers = aggregateHoldingPenChanges();
 
-  var resAddUpdate = acceptAddModifyChanges(chNumbers.changesAddModify);
+      /** First we add the addField requests, as they do not change the numbers
+          of existing fields and subields. Subsequents field/subfield removals
+          will be possible. An opposite order (first removals and then adding,
+          would break the record structure */
 
-  /** Next we can proceed with the subfields removal. Application of such
-      changes implies modification of the subfield indices. Field positions
-      remain untouched  */
-  var resRemoveSubfields = acceptRemoveSubfieldChanges(
-        chNumbers.changesRemoveSubfield);
+      var resAddUpdate = acceptAddModifyChanges(chNumbers.changesAddModify);
 
-  /** Finally, we can proceed with removal of the fields. Doing so, changes
-      the field numbers */
-  var resRemoveFields = acceptRemoveFieldChanges(
-         chNumbers.changesRemoveField);
+      /** Next we can proceed with the subfields removal. Application of such
+          changes implies modification of the subfield indices. Field positions
+          remain untouched  */
+      var resRemoveSubfields = acceptRemoveSubfieldChanges(
+            chNumbers.changesRemoveSubfield);
 
-  /** Now we remove all the changes visulaized in the interface */
-  var removeAllChangesUndoHandler = prepareUndoHandlerRemoveAllHPChanges(
-                                  gHoldingPenChanges);
-  var removeAllChangesAjaxData = prepareRemoveAllAppliedChanges();
+      /** Finally, we can proceed with removal of the fields. Doing so, changes
+          the field numbers */
+      var resRemoveFields = acceptRemoveFieldChanges(
+             chNumbers.changesRemoveField);
 
-  /** updating the user interface after all the changes being finished in the
-      cliens side model */
-  var collectiveTagsToRedraw = {};
-  for (tag in resAddUpdate.tagsToRedraw){
-    collectiveTagsToRedraw[tag] = true;
-  }
-  for (tag in resRemoveFields.tagsToRedraw){
-    collectiveTagsToRedraw[tag] = true;
-  }
-  for (tag in resRemoveSubfields.tagsToRedraw){
-    collectiveTagsToRedraw[tag] = true;
-  }
-  for (tag in collectiveTagsToRedraw){
-    redrawFields(tag);
-  }
+      /** Now we remove all the changes visulaized in the interface */
+      var removeAllChangesUndoHandler = prepareUndoHandlerRemoveAllHPChanges(
+                                      gHoldingPenChanges);
+      var removeAllChangesAjaxData = prepareRemoveAllAppliedChanges();
 
-  adjustGeneralHPControlsVisibility();
-  reColorFields();
+      /** updating the user interface after all the changes being finished in the
+          cliens side model */
+      var collectiveTagsToRedraw = {};
+      for (tag in resAddUpdate.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in resRemoveFields.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in resRemoveSubfields.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in collectiveTagsToRedraw){
+        redrawFields(tag);
+      }
 
-  /** At this point, all the changes to the browser interface are finished.
-      The only remaining activity is combining the AJAX request into one big,
-      preparing the bulk undo/redo handler and passing the request to the
-      server side of BibEdit  */
+      adjustGeneralHPControlsVisibility();
+      reColorFields();
 
-  var collectiveAjaxData = resAddUpdate.ajaxData.concat(
-    resRemoveSubfields.ajaxData.concat(
-    resRemoveFields.ajaxData.concat(
-    [removeAllChangesAjaxData])));
+      /** At this point, all the changes to the browser interface are finished.
+          The only remaining activity is combining the AJAX request into one big,
+          preparing the bulk undo/redo handler and passing the request to the
+          server side of BibEdit  */
 
-  var collectiveUndoHandlers = resAddUpdate.undoHandlers.concat(
-    resRemoveSubfields.undoHandlers.concat(
-    resRemoveFields.undoHandlers.concat(
-      [removeAllChangesUndoHandler])));
-  collectiveUndoHandlers.reverse();
+      var collectiveAjaxData = resAddUpdate.ajaxData.concat(
+        resRemoveSubfields.ajaxData.concat(
+        resRemoveFields.ajaxData.concat(
+        [removeAllChangesAjaxData])));
 
-  var finalUndoHandler = prepareUndoHandlerBulkOperation(collectiveUndoHandlers,
-							 "apply all changes");
-  addUndoOperation(finalUndoHandler);
+      var collectiveUndoHandlers = resAddUpdate.undoHandlers.concat(
+        resRemoveSubfields.undoHandlers.concat(
+        resRemoveFields.undoHandlers.concat(
+          [removeAllChangesUndoHandler])));
+      collectiveUndoHandlers.reverse();
 
-  var optArgs = {
-      undoRedo: finalUndoHandler
-  };
+      var finalUndoHandler = prepareUndoHandlerBulkOperation(collectiveUndoHandlers,
+        "apply all changes");
+      addUndoOperation(finalUndoHandler);
 
-  createBulkReq(collectiveAjaxData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']])
-  }, optArgs);
+      var optArgs = {
+          undoRedo: finalUndoHandler
+      };
+
+      createBulkReq(collectiveAjaxData, function(json){
+        updateStatus('report', gRESULT_CODES[json['resultCode']])
+      }, optArgs);
+  });
 }
 
 function onAcceptAllReferences(){
   /** Applying all the changes visualised in the editor.
    */
 
-  /** Changes have to be ordered by their type. First we process the
-      modifications of the content and adding new fields and subfields.
-      Such changes do not modify the numeration of other fields/subfields
-      and so, the indices of fields/subfields stored in other changes
-      remain valid */
+  save_changes().done(function() {
+      /** Changes have to be ordered by their type. First we process the
+          modifications of the content and adding new fields and subfields.
+          Such changes do not modify the numeration of other fields/subfields
+          and so, the indices of fields/subfields stored in other changes
+          remain valid */
 
-  var chNumbers = aggregateHoldingPenReferenceChanges();
+      var chNumbers = aggregateHoldingPenReferenceChanges();
 
-  /** First we add the addField requests, as they do not change the numbers
-      of existing fields and subields. Subsequents field/subfield removals
-      will be possible. An opposite order (first removals and then adding,
-      would break the record structure */
+      /** First we add the addField requests, as they do not change the numbers
+          of existing fields and subields. Subsequents field/subfield removals
+          will be possible. An opposite order (first removals and then adding,
+          would break the record structure */
 
-  var resAddUpdate = acceptAddModifyChanges(chNumbers.changesAddModify);
+      var resAddUpdate = acceptAddModifyChanges(chNumbers.changesAddModify);
 
-  /** Now we remove all the changes visulaized in the interface */
-  var removeAllChangesUndoHandler = prepareUndoHandlerBulkOperation(resAddUpdate.undoHandlers,
-                                     'apply all references');
-  for (var i in chNumbers.changesAddModify) {
-    removeViewedChange(chNumbers.changesAddModify[i]);
-  }
-  /** updating the user interface after all the changes being finished in the
-      cliens side model */
-  var collectiveTagsToRedraw = {};
-  for (tag in resAddUpdate.tagsToRedraw){
-    collectiveTagsToRedraw[tag] = true;
-  }
-  for (tag in collectiveTagsToRedraw){
-    redrawFields(tag, true);
-  }
+      /** Now we remove all the changes visulaized in the interface */
+      var removeAllChangesUndoHandler = prepareUndoHandlerBulkOperation(resAddUpdate.undoHandlers,
+                                         'apply all references');
+      for (var i in chNumbers.changesAddModify) {
+        removeViewedChange(chNumbers.changesAddModify[i]);
+      }
+      /** updating the user interface after all the changes being finished in the
+          cliens side model */
+      var collectiveTagsToRedraw = {};
+      for (tag in resAddUpdate.tagsToRedraw){
+        collectiveTagsToRedraw[tag] = true;
+      }
+      for (tag in collectiveTagsToRedraw){
+        redrawFields(tag, true);
+      }
 
-  adjustGeneralHPControlsVisibility();
-  // adjustReferenceHPControlsVisibility();
-  reColorFields();
+      adjustGeneralHPControlsVisibility();
+      // adjustReferenceHPControlsVisibility();
+      reColorFields();
 
-  /** At this point, all the changes to the browser interface are finished.
-      The only remaining activity is combining the AJAX request into one big,
-      preparing the bulk undo/redo handler and passing the request to the
-      server side of BibEdit  */
+      /** At this point, all the changes to the browser interface are finished.
+          The only remaining activity is combining the AJAX request into one big,
+          preparing the bulk undo/redo handler and passing the request to the
+          server side of BibEdit  */
 
-  var collectiveAjaxData = resAddUpdate.ajaxData;
+      var collectiveAjaxData = resAddUpdate.ajaxData;
 
-  removeAllChangesUndoHandler.handlers.reverse();
-  var collectiveUndoHandlers = [removeAllChangesUndoHandler];
-  // var collectiveUndoHandlers = resAddUpdate.undoHandlers.concat([removeAllChangesUndoHandler]);
-  collectiveUndoHandlers.reverse();
+      removeAllChangesUndoHandler.handlers.reverse();
+      var collectiveUndoHandlers = [removeAllChangesUndoHandler];
+      // var collectiveUndoHandlers = resAddUpdate.undoHandlers.concat([removeAllChangesUndoHandler]);
+      collectiveUndoHandlers.reverse();
 
-  var finalUndoHandler = prepareUndoHandlerBulkOperation(collectiveUndoHandlers,
-               "apply all reference's changes");
-  addUndoOperation(finalUndoHandler);
+      var finalUndoHandler = prepareUndoHandlerBulkOperation(collectiveUndoHandlers,
+                   "apply all reference's changes");
+      addUndoOperation(finalUndoHandler);
 
-  var optArgs = {
-      undoRedo: finalUndoHandler
-  };
+      var optArgs = {
+          undoRedo: finalUndoHandler
+      };
 
-  createBulkReq(collectiveAjaxData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']])
-  }, optArgs);
+      createBulkReq(collectiveAjaxData, function(json){
+        updateStatus('report', gRESULT_CODES[json['resultCode']])
+      }, optArgs);
+  });
 }
 
 
@@ -1408,11 +1413,13 @@ function prepareRemoveAllAppliedChanges(){
 
 function onRejectAllChanges(){
   /** Rejecting all the considered changes*/
-  var undoHandler = prepareUndoHandlerRemoveAllHPChanges(gHoldingPenChanges);
-  addUndoOperation(undoHandler);
-  var ajaxData = prepareRemoveAllAppliedChanges();
-  ajaxData.undoRedo = undoHandler;
-  queue_request(ajaxData);
-  adjustGeneralHPControlsVisibility();
-  reColorFields();
+  save_changes().done(function() {
+      var undoHandler = prepareUndoHandlerRemoveAllHPChanges(gHoldingPenChanges);
+      addUndoOperation(undoHandler);
+      var ajaxData = prepareRemoveAllAppliedChanges();
+      ajaxData.undoRedo = undoHandler;
+      queue_request(ajaxData);
+      adjustGeneralHPControlsVisibility();
+      reColorFields();
+  });
 }
