@@ -296,7 +296,9 @@ class InvenioDB(SQLAlchemy):
         # Don't forget to apply hacks defined on parent object.
         super(InvenioDB, self).apply_driver_hacks(app, info, options)
         if info.drivername == 'mysql':
-            options.setdefault('execution_options', {'autocommit': True})
+            options.setdefault('execution_options', {'autocommit': True,
+                                                     'use_unicode': False  # , 'charset': 'utf8'
+                                                     })
             event.listen(Pool, 'checkin', autocommit_on_checkin)
 
 
