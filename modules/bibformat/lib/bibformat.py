@@ -538,6 +538,7 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
 
     context = dict(
         of=of, rg=rg, ln=ln,
+        facets={},
         time=time,
         recids=recIDs,
         get_record=get_record,

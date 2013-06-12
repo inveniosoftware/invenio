@@ -47,20 +47,17 @@ import inspect
 import traceback
 import zlib
 import cgi
+import types
 from flask import has_app_context
-from pprint import pformat
 from operator import itemgetter
 from werkzeug.utils import cached_property
 
 from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
-     CFG_SITE_LANG, \
-     CFG_PYLIBDIR, \
-     CFG_LOGDIR
+     CFG_SITE_LANG
 from invenio.errorlib import \
-     register_exception, \
-     get_tracestack
+     register_exception
 from invenio.bibrecord import \
      create_record, \
      record_get_field_instances, \
@@ -93,10 +90,10 @@ from invenio.htmlutils import \
      CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
 from invenio.webuser import collect_user_info
 from invenio.bibknowledge import get_kbr_values
+from invenio.importutils import autodiscover_modules
 from invenio.jinja2utils import render_template_to_string
 from HTMLParser import HTMLParseError
 from invenio.shellutils import escape_shell_arg
-from invenio.pluginutils import PluginContainer
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -222,21 +219,14 @@ class BfeElements(object):
     @cached_property
     def bibformat_elements(self):
         """Returns bibformat elements."""
+        modules = autodiscover_modules(['invenio.bibformat_elements'], 'bfe_.+')
 
-        def bfe_elements_plugin_builder(plugin_name, plugin_code):
-            if plugin_name == '__init__':
-                return
-            format_element = getattr(plugin_code, 'format_element')
-            return format_element
+        elem = {}
+        for m in modules:
+            register_func = getattr(m, 'format_element', None)
+            if register_func and isinstance(register_func, types.FunctionType):
+                elem[m.__name__.split('.')[-1]] = register_func
 
-        elem = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                            'bibformat_elements',
-                                            'bfe_*.py'),
-                               plugin_builder=bfe_elements_plugin_builder)
-
-        ## Let's report about broken plugins
-        open(os.path.join(CFG_LOGDIR, 'broken-bibformat-elements.log'), 'w').write(
-            pformat(elem.get_broken_plugins()))
         return elem
 
     @cached_property
@@ -554,10 +544,24 @@ def format_with_format_template(format_template_filename, bfo,
     elif format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         evaluated_format = '<!-- empty -->'
         try:
-            from inveino.bibfield import get_record as bibfield_get_record
+            from functools import wraps
+            from invenio.bibfield import get_record as bibfield_get_record
+            from invenio.webinterface_handler_flask_utils import unicodifier
+
+            # Fixes unicode problems in Jinja2 templates.
+            def encode_utf8(f):
+                @wraps(f)
+                def wrapper(*args, **kwds):
+                    return unicodifier(f(*args, **kwds))
+                return wrapper
+
+            record = bibfield_get_record(bfo.recID)
+            record.__getitem__ = encode_utf8(record.__getitem__)
+            record.get = encode_utf8(record.get)
+
             evaluated_format = render_template_to_string(
                 CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
-                record=bibfield_get_record(bfo.recID),
+                record=record,
                 bfo=bfo, **BFE_ELEMENTS.functions).encode('utf-8')
         except Exception:
             register_exception()
