@@ -75,7 +75,7 @@ class BibFieldDict(object):
         self.rec_json = {}
         self.rec_json['__aliases'] = {}
         self.rec_json['__do_not_cache'] = []
-        self._init_fase = True
+        self.is_init_phase = True
 
     def __getitem__(self, key):
         """
@@ -136,12 +136,12 @@ class BibFieldDict(object):
         and append the new one,
         dict['a'] = 'first value' -> {'a':'first value'}
         dict['a'] = 'second value' -> {'a':['first value', 'second value']}
-        There is one class variable self._init_fase for that matter.
+        There is one class variable self.is_init_phase for that matter.
 
         @param key: String containing the name of the field and subfield.
         @param value: The new value
         """
-        if self._init_fase:
+        if self.is_init_phase:
             if '.' not in key and '[' not in key:
                 if not key in self.rec_json:
                     self.rec_json[key] = value

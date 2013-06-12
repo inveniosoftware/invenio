@@ -2781,6 +2781,8 @@ class BibDoc(object):
         if docformat[:1] == '.':
             docformat = docformat[1:]
         docformat = docformat.upper()
+        if not version:
+            version = self.get_latest_version()
         return run_sql("INSERT DELAYED INTO rnkDOWNLOADS "
             "(id_bibrec,id_bibdoc,file_version,file_format,"
             "id_user,client_host,download_time) VALUES "
