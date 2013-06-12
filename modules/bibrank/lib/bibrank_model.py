@@ -111,7 +111,7 @@ class RnkDOWNLOADS(db.Model):
     id_bibdoc = db.Column(db.MediumInteger(9, unsigned=True),
                 db.ForeignKey(Bibdoc.id), nullable=True)
     file_version = db.Column(db.SmallInteger(2, unsigned=True), nullable=True)
-    file_format = db.Column(db.String(10), nullable=True)
+    file_format = db.Column(db.String(50), nullable=True)
     bibrec = db.relationship(Bibrec, backref='downloads')
     bibdoc = db.relationship(Bibdoc, backref='downloads')
     user = db.relationship(User, backref='downloads')
