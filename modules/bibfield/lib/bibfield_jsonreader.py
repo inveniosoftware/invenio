@@ -137,8 +137,8 @@ class JsonReader(BibFieldDict):
             from invenio.textutils import encode_for_xml
             return encode_for_xml(str(value))
 
-        formatstring_controlfield = "<controlfield tag='{tag}'>{content}</controlfield>"
-        formatstring_datafield = "<datafield tag='{tag}' ind1='{ind1}' ind2='{ind2}'>{content}</datafield>"
+        formatstring_controlfield = '<controlfield tag="{tag}">{content}</controlfield>'
+        formatstring_datafield = '<datafield tag="{tag}" ind1="{ind1}" ind2="{ind2}">{content}</datafield>'
 
         def create_marc_representation(key, value, legacy_rules):
             """
@@ -163,12 +163,12 @@ class JsonReader(BibFieldDict):
                         if legacy_rule[0] == '005':
                             #Especial format for date only for 005 tag
                             formatstring = "%Y%m%d%H%M%S.0"
-                        output += formatstring_controlfield.format(tag=legacy_rule[0],
-                                                                   content=self.get(key,
-                                                                                    default='',
-                                                                                    formatstring=formatstring,
-                                                                                    formatfunction=encode_for_marcxml)
-                                                                   )
+                        output += '<controlfield tag="%s">%s</controlfield>' % (legacy_rule[0],
+                                                                                self.get(key,
+                                                                                         default='',
+                                                                                         formatstring=formatstring,
+                                                                                         formatfunction=encode_for_marcxml)
+                                                                                )
                     elif len(legacy_rule[0]) == 6:
                         #Data Field
                         if not (tag == legacy_rule[0][:3] and ind1 == legacy_rule[0][3].replace('_', '') and ind2 == legacy_rule[0][4].replace('_', '')):
@@ -176,7 +176,7 @@ class JsonReader(BibFieldDict):
                             ind1 = legacy_rule[0][3].replace('_', '')
                             ind2 = legacy_rule[0][4].replace('_', '')
                             if content:
-                                output += "<datafield tag='%s' ind1='%s' ind2='%s'>%s</datafield>" % (tag, ind1, ind2, content)
+                                output += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>' % (tag, ind1, ind2, content)
                                 content = ''
                         try:
                             tmp = value.get(legacy_rule[-1])
@@ -187,9 +187,9 @@ class JsonReader(BibFieldDict):
                         except AttributeError:
                             tmp = encode_for_marcxml(value)
 
-                        content += "<subfield code='%s'>%s</subfield>" % (legacy_rule[0][5], tmp)
+                        content += '<subfield code="%s">%s</subfield>' % (legacy_rule[0][5], tmp)
             if content:
-                output += "<datafield tag='%s' ind1='%s' ind2='%s'>%s</datafield>" % (tag, ind1, ind2, content)
+                output += '<datafield tag="%s" ind1="%s" ind2="%s">%s</datafield>' % (tag, ind1, ind2, content)
             return output
 
         export = '<record>'
@@ -204,7 +204,7 @@ class JsonReader(BibFieldDict):
                 except (TypeError, KeyError):
                     break
 
-        export += "</record>"
+        export += '</record>'
         return export
 
     def get_legacy_recstruct(self):
