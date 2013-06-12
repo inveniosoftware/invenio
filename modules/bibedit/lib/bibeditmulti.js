@@ -42,14 +42,6 @@ var gOutputFormatTypes = {
 	marc : "hm"
 };
 
-// Defines different types of commands for manipulation of records
-var gCommandTypes = {
-	replaceTextInField : "replaceTextInField",
-	replaceFieldContent : "replaceFieldContent",
-	deleteField : "deleteField",
-	addField : "addField"
-};
-
 // current action
 var gActionToPerform = "";
 // ID of the record that will be displayed
@@ -58,8 +50,6 @@ var gCurrentRecordID = -1;
 var gCommands = {};
 var gCurrentCommandID = 0;
 var gPageToDiplay = 1;
-var gDeleteCommandIDPrefix = "deleteCommandID_";
-var gCommandDisplayTemplateIDPrefix = "commandDisplayTemplateID_";
 var gOutputFormat = gOutputFormatTypes.marc;
 var gOutputFormatDetails = gOutputFormatTypes.htmlDetailed;
 var gOutputFormatPreview = gOutputFormatTypes.marc;
@@ -91,14 +81,17 @@ var gFieldActionTypes = {
 
 function updateView() {
 	$("#displayTemplates").hide();
-        $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
+    $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
+
+
 function showLoading() {
     $('#preview_area').html('<span class="multiedit_loading">Loading...</span><br /><img src=/img/ajax-loader.gif>').css("text-align", "center");
 }
 
+
 function storeAdditionalValues() {
-    // this function is used to collect alle the additional variables for "replace substring"
+    // this function is used to collect all the additional variables for "replace substring"
     // and return them as an array
     var additionalValues = [];
     $.each($(".additionalValueParameters #textBoxValueDisplay"), function(){
@@ -166,12 +159,15 @@ function onButtonGoToNextPageClick(){
 function onButtonOutputFormatMarcXMLClick(){
 	setOutputFormat(gOutputFormatTypes.marcXML);
 }
+
 function onButtonOutputFormatHTMLBriefClick(){
 	setOutputFormat(gOutputFormatTypes.htmlBrief);
 }
+
 function onButtonOutputFormatHTMLDetailedClick(){
 	setOutputFormat(gOutputFormatTypes.htmlDetailed);
 }
+
 function onButtonOutputFormatMARCClick(){
 	setOutputFormat(gOutputFormatTypes.marc);
 }
@@ -183,9 +179,9 @@ function onButtonTestSearchClick() {
 	gActionToPerform = gActionTypes.testSearch;
 	gOutputFormat = gOutputFormatPreview;
 	gPageToDiplay = 1;
-        showLoading();
+    showLoading();
 	performAJAXRequest();
-        $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
+    $('#buttonSubmitChanges').attr('disabled', 'true').addClass('buttonDisabled');
 }
 
 function onButtonPreviewResultsClick() {
@@ -196,10 +192,11 @@ function onButtonPreviewResultsClick() {
 	gActionToPerform = gActionTypes.previewResults;
 	gOutputFormat = gOutputFormatPreview;
 	gPageToDiplay = 1;
-        gComputeModifications = 1;
-        showLoading();
-	performAJAXRequest();
+    gComputeModifications = 1;
+    showLoading();
+	performAJAXRequest().done(function() {
         $('#buttonSubmitChanges').removeAttr('disabled').removeClass('buttonDisabled');
+    });
 }
 
 function onButtonBackToResultsClick() {
@@ -220,6 +217,7 @@ function onButtonSubmitChangesClick(){
 	var confirmation = confirm('Are you sure you want to submit the changes?');
 	if (confirmation == true) {
 		gActionToPerform = gActionTypes.submitChanges;
+        showLoading();
 		performAJAXRequest();
 	}
 }
@@ -270,7 +268,6 @@ function onAjaxSuccess(json) {
         if (display_info_box === 1) {
             $("#info_area").html(info_html);
             gComputeModifications = 0;
-
         }
         $("#preview_area").css("text-align", "");
         $("#preview_area").html(search_html);
@@ -336,7 +333,7 @@ function performAJAXRequest() {
 	/*
 	 * Perform an AJAX request
 	 */
-	$.ajax( {
+	return $.ajax( {
 		cache : false,
 		type : "POST",
 		dataType : "json",

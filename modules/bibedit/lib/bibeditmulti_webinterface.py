@@ -147,7 +147,9 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
                                                     language,
                                                     output_tags,
                                                     collection,
-                                                    checked_records))
+                                                    compute_modifications,
+                                                    req=req,
+                                                    checked_records=checked_records))
             json_response['display_info_box'] = 1
             json_response['info_html'] = ""
             return json.dumps(json_response)

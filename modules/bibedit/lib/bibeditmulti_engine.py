@@ -437,11 +437,11 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     first_record_to_display = RECORDS_PER_PAGE * (page_to_display - 1)
     last_record_to_display = (RECORDS_PER_PAGE * page_to_display) - 1
 
-    if not compute_modifications:
-        record_IDs = record_IDs[first_record_to_display:last_record_to_display + 1]
+    displayed_records = record_IDs[first_record_to_display:last_record_to_display + 1]
 
-    # displayed_records is a list containing IDs of records that will be displayed on current page
-    displayed_records = record_IDs[:RECORDS_PER_PAGE]
+    if not compute_modifications:
+        record_IDs = displayed_records
+
     records_content = []
 
     record_modifications = 0
@@ -454,13 +454,14 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
                              output_format=output_format,
                              update_commands=update_commands,
                              language=language, outputTags=outputTags,
-                             run_diff=record_id in displayed_records,
-                             checked=record_id in checked_records)
+                             checked=record_id in checked_records,
+                             displayed_records=displayed_records)
         new_modifications = [current_command._modifications for current_command in update_commands]
         if new_modifications > current_modifications:
             record_modifications += 1
 
-        records_content.append((record_id, formated_record))
+        if formated_record:
+            records_content.append((record_id, formated_record))
     total_modifications = []
     if compute_modifications:
         field_modifications = 0
@@ -473,7 +474,6 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
             total_modifications.append(record_modifications)
             total_modifications.append(field_modifications)
             total_modifications.append(subfield_modifications)
-        records_content = records_content[first_record_to_display:last_record_to_display + 1]
 
     response['display_info_box'] = compute_modifications or locked_records
     response['info_html'] = multiedit_templates.info_box(language=language,
@@ -545,14 +545,19 @@ def _get_record_diff(record_textmarc, updated_record_textmarc, outputTags, recor
     result.append("</pre>")
     return '\n'.join(result)
 
-def _get_formated_record(record_id, output_format, update_commands, language, outputTags="", run_diff=True, checked=True):
+def _get_formated_record(record_id, output_format, update_commands, language, outputTags="",
+                         checked=True, displayed_records=None):
     """Returns a record in a given format
 
     @param record_id: the ID of record to format
     @param output_format: an output format code (or short identifier for the output format)
     @param update_commands: list of commands used to update record contents
     @param language: the language to use to format the record
-    @param run_diff: determines if we want to run _get_recodr_diff function, which sometimes takes too much time
+    @param outputTags: the tags to be shown to the user
+    @param checked: is the record checked by the user?
+    @param displayed_records: records to be displayed on a given page
+
+    @returns: record formated to be displayed or None
     """
     if update_commands and checked:
         # Modify the bibrecord object with the appropriate actions
@@ -562,10 +567,13 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
                         "delete-mode":0, "insert-mode":0, "replace-mode":0,
                         "text-marc":1}
 
+    if record_id not in displayed_records:
+        return
+
     old_record = search_engine.get_record(recid=record_id)
     old_record_textmarc = xmlmarc2textmarc.create_marc_record(old_record, sysno="", options=textmarc_options)
     if "hm" == output_format:
-        if update_commands and run_diff and checked:
+        if update_commands and checked:
             updated_record_textmarc = xmlmarc2textmarc.create_marc_record(updated_record, sysno="", options=textmarc_options)
             result = _get_record_diff(old_record_textmarc, updated_record_textmarc, outputTags, record_id)
         else:
@@ -671,16 +679,18 @@ def _upload_file_with_bibupload(file_path, upload_mode, num_records, req):
            3-no rights to upload
            and the upload file path
     """
+    user_info = collect_user_info(req)
+    user_name = user_info.get('nickname') or 'multiedit'
     if num_records < CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING:
-        task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '%s' % file_path)
+        task_low_level_submission('bibupload', user_name, '-N', 'multiedit', '-P', '5', upload_mode, '%s' % file_path)
         return (0, file_path)
     elif num_records < CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING:
-        task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '-L', CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME,'%s' % file_path)
+        task_low_level_submission('bibupload', user_name, '-N', 'multiedit', '-P', '5', upload_mode, '-L', CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME, '%s' % file_path)
         return (1, file_path)
     else:
         user_info = collect_user_info(req)
         if isUserSuperAdmin(user_info):
-            task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '-L', CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME, '%s' % file_path)
+            task_low_level_submission('bibupload', user_name, '-N', 'multiedit', '-P', '5', upload_mode, '-L', CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME, '%s' % file_path)
             return (2, file_path)
         return (3, file_path)
 
