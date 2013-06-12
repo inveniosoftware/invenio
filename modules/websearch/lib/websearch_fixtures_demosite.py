@@ -938,6 +938,12 @@ class CollectionCollectionData(DataSet):
         score = 1
         type = 'r'
 
+    class multimediaArts_videos:
+        dad = CollectionData.multimediaArts
+        son = CollectionData.videos
+        score = 2
+        type = 'r'
+
     class multimediaArts_atlantisTimes:
         dad = CollectionData.multimediaArts
         son = CollectionData.atlantisTimes
