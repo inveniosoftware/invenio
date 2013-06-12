@@ -2347,6 +2347,9 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif f == 'referstoexcludingselfcites':
         # we are doing search by the citation count
         hitset = search_unit_refersto_excluding_selfcites(p)
+    elif f == 'cataloguer':
+        # we are doing search by the cataloguer nickname
+        hitset = search_unit_in_record_history(p)
     elif f == 'rawref':
         from invenio.refextract_api import search_from_reference
         field, pattern = search_from_reference(p)
@@ -2871,6 +2874,40 @@ def search_unit_refersto_excluding_selfcites(query):
     else:
         return intbitset([])
 
+def search_unit_in_record_history(query):
+    """
+    Return hitset of recIDs that were modified by the given cataloguer
+    """
+    if query:
+        try:
+            cataloguer_name, modification_date = query.split(":")
+        except ValueError:
+            cataloguer_name = query
+            modification_date = ""
+
+        if modification_date:
+            spires_syntax_converter = SpiresToInvenioSyntaxConverter()
+            modification_date = spires_syntax_converter.convert_date(modification_date)
+            parts = modification_date.split('->', 1)
+
+            if len(parts) > 1:
+                start_date, end_date = parts
+
+                res = run_sql("SELECT id_bibrec FROM hstRECORD WHERE job_person=%s AND job_date>=%s AND job_date<=%s",
+                      (cataloguer_name, start_date, end_date))
+
+            else:
+                res = run_sql("SELECT id_bibrec FROM hstRECORD WHERE job_person=%s AND job_date LIKE %s",
+                      (cataloguer_name, modification_date + '%',))
+
+            return intbitset(res)
+        else:
+            sql = "SELECT id_bibrec FROM hstRECORD WHERE job_person=%s"
+            res = intbitset(run_sql(sql, (cataloguer_name,)))
+            return res
+    else:
+        return intbitset([])
+
 def search_unit_citedby(query):
     """
     Search for records satisfying the query (e.g. author:ellis) and
@@ -3142,6 +3179,8 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     # special indexes:
     if f == 'refersto' or f == 'referstoexcludingselfcites':
         return _("There are no records referring to %s.") % cgi.escape(p)
+    if f == 'cataloguer':
+        return _("There are no records modified by %s.") % cgi.escape(p)
     if f == 'citedby' or f == 'citedbyexcludingselfcites':
         return _("There are no records cited by %s.") % cgi.escape(p)
     # look for nearest terms:
