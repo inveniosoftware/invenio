@@ -127,6 +127,7 @@ try:
     import flask.ext.testing
     import wtforms
     import flask.ext.wtf
+    import flask.ext.admin
 
     ## Check Werkzeug version
     werkzeug_ver = werkzeug.__version__.split(".")
