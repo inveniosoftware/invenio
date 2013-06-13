@@ -25,7 +25,7 @@ from sqlalchemy.pool import Pool
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import class_mapper, properties
-from sqlalchemy.types import TypeDecorator, TEXT, BINARY
+from sqlalchemy.types import TypeDecorator, TEXT, LargeBinary
 from sqlalchemy.sql.expression import FunctionElement
 from invenio.intbitset import intbitset
 from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
@@ -135,7 +135,7 @@ class JSONEncodedTextDict(TypeDecorator):
 
 class MarshalBinary(TypeDecorator):
 
-    impl = BINARY
+    impl = LargeBinary
 
     def __init__(self, default_value, force_type=None, *args, **kwargs):
         super(MarshalBinary, self).__init__(*args, **kwargs)
