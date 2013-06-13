@@ -32,8 +32,10 @@ __all__ = ['ArticleForm']
 class ArticleForm(Form):
 
     doi = fields.DOIField(label=_('DOI'))
-    publisher = fields.PublisherField(label=_('Publisher'), validators=[Required()])
-    journal = fields.JournalField(label=_('Journal Title'), validators=[Required()])
+    publisher = fields.PublisherField(label=_('Publisher'),
+                                      validators=[Required()])
+    journal = fields.JournalField(label=_('Journal Title'),
+                                  validators=[Required()])
     issn = fields.ISSNField(label=_('ISSN'))
     title = fields.TitleField(label=_('Document Title'))
     author = fields.AuthorField(label=_('Author'))
@@ -55,17 +57,26 @@ class ArticleForm(Form):
                 ("swe", _("Swedish")),
                 ("fin", _("Finnish")),
                 ("rus", _("Russian"))]
-    language = fields.LanguageField(label=_('Language'),
-                                    choices=languages)
-    date = fields.Date(label=_('Date of Document'),
-                       widget=date_widget)
+    language = fields.LanguageField(label=_('Language'), choices=languages)
+    date = fields.Date(label=_('Date of Document'), widget=date_widget)
     keywords = fields.KeywordsField(label=_('Keywords'))
     notes = fields.NotesField(label=_('Notes'))
-    plupload_file = fields.FileUploadField(label=_('Files'),
-                                           widget=plupload_widget)
+    plupload_file = fields.FileUploadField(widget=plupload_widget)
     submit = SubmitField(label=_('Submit Article'),
                          widget=bootstrap_submit)
 
     """ Form Configuration variables """
     _title = _('Submit an Article')
     _drafting = True   # enable and disable drafting
+
+    # Group fields in categories
+
+    groups = [
+        ('Publisher/Journal',
+            ['doi', 'publisher', 'journal', 'issn'],
+            {'description': "Publisher and Journal fields are required.",
+             'indication': 'required'}),
+        ('Basic Information',
+            ['title', 'author', 'abstract', 'pagesnum']),
+        ('Other', ['language', 'date', 'keywords', 'notes'])
+    ]

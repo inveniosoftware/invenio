@@ -46,6 +46,17 @@ class WebDepositForm(Form):
             if custom_widget is not None:
                 setattr(field, 'widget', custom_widget)
 
+        self.groups_meta = {}
+        if hasattr(self, 'groups'):
+            for group in self.groups:
+                group_name = group[0]
+                fields = group[1]
+                for field in fields:
+                    setattr(self[field], 'group', group_name)
+                if len(group) == 3:  # If group has metadata
+                    group_meta = group[2]
+                    self.groups_meta[group_name] = group_meta
+
     def cook_json(self, json_reader):
         for field in self._fields.values():
             try:
@@ -63,7 +74,35 @@ class WebDepositForm(Form):
         for field in self._fields.values():
             if hasattr(field, 'uncook_json'):
                 # WTFields are not mapped with rec json
-                webdeposit_json = field.uncook_json(json_reader, webdeposit_json)
+                webdeposit_json = field.uncook_json(json_reader,
+                                                    webdeposit_json)
 
-        webdeposit_json = uncook_files(webdeposit_json, recid=recid, json_reader=json_reader)
+        webdeposit_json = uncook_files(webdeposit_json, recid=recid,
+                                       json_reader=json_reader)
         return webdeposit_json
+
+    def get_groups(self):
+        groups = [({"name": 'Rest'}, [])]
+        # Just a dict for optimization
+        groups_hash = {}
+        for field in self:
+            if hasattr(field, 'group') and field.group is not None:
+                if not field.group in groups_hash:
+                    groups_hash[field.group] = len(groups)
+                    # Append group to the list
+                    groups.append(({"name": field.group}, []))
+                # Append field to group's field list
+                groups[groups_hash[field.group]][1].append(field)
+
+                if field.group in self.groups_meta:
+                    # Add group's meta (description etc)
+                    groups[groups_hash[field.group]][0]['meta'] = \
+                        self.groups_meta[field.group]
+            else:
+                # Append to Rest
+                groups[0][1].append(field)
+
+        # Append rest fields in the end
+        rest = groups.pop(0)
+        groups.append(rest)
+        return groups

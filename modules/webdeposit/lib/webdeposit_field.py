@@ -38,6 +38,10 @@ def WebDepositField(key=None):
                 for v in kwargs.get("validators"):
                     if type(v) is Required:
                         self.required = True
+            if 'group' in kwargs:
+                self.group = kwargs.pop('group')
+            else:
+                self.group = None
 
             super(WebDepositFieldClass, self).__init__(**kwargs)
             self.config = WebDepositConfiguration(field_type=self.__class__.__name__)

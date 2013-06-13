@@ -88,7 +88,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
         </a>
         <ul class="dropdown-menu">
         {% for draft in drafts %}
-          <li> <a href="{{ url_for('webdeposit.add', deposition_type=draft.deposition_type, uuid=draft.uuid) }}">
+          <li> <a href="{{ url_for('webdeposit.add', deposition_type=draft.workflow.name, uuid=draft.uuid) }}">
             {{ '<strong>'|safe if uuid == draft.uuid }}
               {{ draft.workflow.name }}:
               {% if draft.form_values and draft.form_values.title %}
@@ -115,12 +115,41 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
       action="{{ url_for('webdeposit.add', deposition_type=deposition_type, uuid=uuid) }}">
   <fieldset>
 
-  {% for field in form %}
 
-    {% if field.form %}
-      <hr>
+    {% for group, fields in form.get_groups() %}
+
+    {% if loop.index == 1 %}
+    <div class="row">
+    <div id="webdeposit_form_accordion" class="offset1 span8 accordion">
     {% endif %}
 
+    {% if group.name != 'Rest' %}
+    <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse"
+               href="#collapse-{{ loop.index }}">
+               {{ group.name }} <b class="caret" style="margin-top: 8px;"></b>
+               {% if 'meta' in group and 'indication' in group.meta %}
+                   <span class="pull-right muted">{{ group.meta.indication }}</spani>
+               {% endif %}
+          </a>
+        </div>
+        <div id="collapse-{{ loop.index }}" class="accordion-body collapse in">
+          <div class="accordion-inner">
+    {% else %}
+        <br>
+    {% endif %}
+
+    {% if 'meta' in group and 'description' in group.meta%}
+        <p>{{ group.meta.description }}</p>
+    {% endif %}
+
+    {% for field in fields %}
+
+
+    {% if field.form %}
+
+    {% endif %}
     <div class="control-group {{ "error" if field.errors }}" id="error-group-{{ field.name }}">
       <div class="control-label {{ "error" if field.errors }}">
       {% if "submit" not in field.__html__() and "pluploader" not in field.__html__() %}
@@ -192,7 +221,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
 
     {% else %}
 
-    <div class="controls" id="field-{{ field.name }}">
+    <div {% if "pluploader" not in field.__html__() %} class="controls" {% endif %} id="field-{{ field.name }}">
           {% if field._icon_html and "pluploader" not in field.__html__() and not field.ckeditor %}
             <div class="input-prepend">
                 <span class="add-on">
@@ -231,12 +260,19 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
         {% endif %}
 
     {% endif %}
+    {% endfor %}
+    {% if group != 'Rest' %}
+        </div>
+        </div>
+        </div>
+    {% endif %}
+    {% endfor %}
+    <div class="alert alert-error offset1 span8" id="empty-fields-error" style="font-size:12px; display:none;"></div>
+    </div>
 
-  {% endfor %}
   </fieldset>
 </form>
 
-<div class="alert alert-error" id="empty-fields-error" style="font-size:12px; display:none;"></div>
 
 {% endblock %}
 
