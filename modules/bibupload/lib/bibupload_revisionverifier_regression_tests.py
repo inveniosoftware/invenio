@@ -721,6 +721,7 @@ class RevisionVerifierForDeletingFields(GenericBibUploadTest):
         self.rev_to_insert = self.rev_to_insert.replace('<controlfield tag="005">20110101000000.0</controlfield>','')
         rec = xml_marc_to_records(self.rev_to_insert)
         dummy_error, self.recid, dummy_msg = bibupload(rec[0], opt_mode='insert')
+        self.check_record_consistency(self.recid)
 
         self.rev1 = self.rev1.replace('123456789', str(self.recid))
         self.rev1_mod = self.rev1_mod.replace('123456789', str(self.recid))
@@ -829,6 +830,7 @@ class RevisionVerifierForInterchangedFields(GenericBibUploadTest):
         # --> Revision 1 submitted
         res = bibupload(recs[0], opt_mode='insert')
         self.recid = res[1]
+        self.check_record_consistency(self.recid)
 
         rec = get_record(self.recid)
         rev_tag = record_get_field_value(rec, '005', '', '')
@@ -1030,6 +1032,7 @@ class RevisionVerifierFromBibUpload(GenericBibUploadTest):
         recs = xml_marc_to_records(self.rev1)
         # --> Revision 1 submitted
         error, self.recid, dummy_msg = bibupload(recs[0], opt_mode='insert')
+        self.check_record_consistency(self.recid)
         record = get_record(self.recid)
         rev = record_get_field_value(record, '005', '', '')
         recs = xml_marc_to_records(self.rev1)
@@ -1043,6 +1046,7 @@ class RevisionVerifierFromBibUpload(GenericBibUploadTest):
         recs = xml_marc_to_records(self.rev2)
         # --> Revision 2 submitted
         error, self.recid, dummy_msg = bibupload(recs[0], opt_mode='replace')
+        self.check_record_consistency(self.recid)
         record = get_record(self.recid)
         self.rev2 = self.rev2.replace(rev, record_get_field_value(record, '005', '', ''))
         self.rev2_modified = self.rev2_modified.replace('123456789', str(self.recid))
@@ -1050,6 +1054,7 @@ class RevisionVerifierFromBibUpload(GenericBibUploadTest):
         # --> Revision 1 modified submitted
         recs = xml_marc_to_records(self.rev1_modified)
         error, self.recid, dummy_msg = bibupload(recs[0], opt_mode='replace')
+        self.check_record_consistency(self.recid)
         record = get_record(self.recid)
         rev = record_get_field_value(record, '005', '', '')
         self.final_xm = self.final_xm.replace('20110101000000.0', rev)
@@ -1057,6 +1062,7 @@ class RevisionVerifierFromBibUpload(GenericBibUploadTest):
         # --> Revision 2 modified submitted
         recs = xml_marc_to_records(self.rev2_modified)
         error, self.recid, dummy_msg = bibupload(recs[0], opt_mode='replace')
+        self.check_record_consistency(self.recid)
         self.assertEquals(error, 2)
 
 TEST_SUITE = make_test_suite(RevisionVerifierForCorrectAddition,

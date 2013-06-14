@@ -42,7 +42,6 @@ from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
 from invenio.bibedit_dblayer import get_marcxml_of_record_revision, \
                                     get_record_revisions
 
-
 class RevisionVerifier:
     """
     Class RevisionVerifier contains methods for Revision comparison
@@ -150,14 +149,21 @@ class RevisionVerifier:
                     # Any change in the order of fields or changes in subfields
                     # will cause the entire list of data_tuple for that ind_pair
                     # to be copied from record1(upload) to result.
-                    sf_rec1 = [data_tuple[0] for data_tuple in rec1_ind[ind_pair]]
-                    sf_rec2 = [data_tuple[0] for data_tuple in rec2_ind[ind_pair]]
-                    if sf_rec1 != sf_rec2:
-                        # change at subfield level/ re-oredered fields
-                        for data_tuple in com_ind[ind_pair]:
-                            # com_ind will have data_tuples of record1(upload) and not record2
-                            subfield_list = data_tuple[0]
-                            record_add_field(result, tag, ind_pair[0], ind_pair[1], '', subfields=subfield_list)
+                    if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
+                        cf_rec1 = [data_tuple[3] for data_tuple in rec1_ind[ind_pair]]
+                        cf_rec2 = [data_tuple[3] for data_tuple in rec2_ind[ind_pair]]
+                        if cf_rec1 != cf_rec2:
+                            for data_tuple in com_ind[ind_pair]:
+                                record_add_field(result, tag, controlfield_value=data_tuple[3])
+                    else:
+                        sf_rec1 = [data_tuple[0] for data_tuple in rec1_ind[ind_pair]]
+                        sf_rec2 = [data_tuple[0] for data_tuple in rec2_ind[ind_pair]]
+                        if sf_rec1 != sf_rec2:
+                            # change at subfield level/ re-oredered fields
+                            for data_tuple in com_ind[ind_pair]:
+                                # com_ind will have data_tuples of record1(upload) and not record2
+                                subfield_list = data_tuple[0]
+                                record_add_field(result, tag, ind_pair[0], ind_pair[1], '', subfields=subfield_list)
 
         return result
 
@@ -170,13 +176,12 @@ class RevisionVerifier:
 
         Returns a Tuple of Dictionaries(For modified/added/deleted tags).
         """
-
         def remove_control_tag(tag_list):
             """
             Returns the list of keys without any control tags
             """
 
-            cleaned_list = [item for item in tag_list \
+            cleaned_list = [item for item in tag_list
                     if item not in CFG_BIBUPLOAD_CONTROLFIELD_TAGS]
             return cleaned_list
 
@@ -188,8 +193,7 @@ class RevisionVerifier:
             rec1_keys = record1.keys()
             rec2_keys = record2.keys()
 
-            keys = [key for key in rec1_keys if key in rec2_keys]
-            com_tag_lst = remove_control_tag(keys)
+            com_tag_lst = [key for key in rec1_keys if key in rec2_keys]
             # tags in record2 not present in record1
             del_tag_lst = [key for key in rec2_keys if key not in rec1_keys]
             # additional tags in record1

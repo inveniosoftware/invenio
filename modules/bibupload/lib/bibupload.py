@@ -51,7 +51,6 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
      CFG_BIBCATALOG_CONFLICTING_REVISIONS_DEFAULT_QUEUE
 
-from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_SPECIAL_TAGS, \
@@ -79,6 +78,7 @@ from invenio.bibrecord import create_records, \
                               record_has_field,\
                               identical_records
 from invenio.search_engine import get_record
+from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibcatalog import bibcatalog_system
 from invenio.intbitset import intbitset
@@ -192,13 +192,17 @@ def bibupload_pending_recids():
 
 ### bibupload engine functions:
 def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=False,
-        tmp_ids = {}, tmp_vers = {}):
+        tmp_ids=None, tmp_vers=None):
     """Main function: process a record and fit it in the tables
     bibfmt, bibrec, bibrec_bibxxx, bibxxx with proper record
     metadata.
 
     Return (error_code, recID) of the processed record.
     """
+    if tmp_ids is None:
+        tmp_ids = {}
+    if tmp_vers is None:
+        tmp_vers = {}
     if opt_mode == 'reference':
         ## NOTE: reference mode has been deprecated in favour of 'correct'
         opt_mode = 'correct'
@@ -310,19 +314,19 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             except InvenioBibUploadConflictingRevisionsError, err:
                 msg = "     -ERROR: Conflicting Revisions - %s" % err
                 write_message(msg, verbose=1, stream=sys.stderr)
-                submit_ticket_for_holding_pen(rec_id, err, "Conflicting Revisions")
+                submit_ticket_for_holding_pen(rec_id, err, "Conflicting Revisions. Inserting record into holding pen.")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
             except InvenioBibUploadInvalidRevisionError, err:
                 msg = "     -ERROR: Invalid Revision - %s" % err
                 write_message(msg)
-                submit_ticket_for_holding_pen(rec_id, err, "Invalid Revisions")
+                submit_ticket_for_holding_pen(rec_id, err, "Invalid Revisions. Inserting record into holding pen.")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
             except InvenioBibUploadMissing005Error, err:
                 msg = "     -ERROR: Missing 005 - %s" % err
                 write_message(msg)
-                submit_ticket_for_holding_pen(rec_id, err, "Missing 005")
+                submit_ticket_for_holding_pen(rec_id, err, "Missing 005. Inserting record into holding pen.")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
         else:
@@ -377,7 +381,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     for item in existing_tags[tag]:
                         tag_to_add = item[0:3]
                         ind1, ind2 = item[3], item[4]
-                        if tag_to_add in affected_tags:
+                        if tag_to_add in affected_tags and (ind1, ind2) not in affected_tags[tag_to_add]:
                             affected_tags[tag_to_add].append((ind1, ind2))
                         else:
                             affected_tags[tag_to_add] = [(ind1, ind2)]
@@ -386,7 +390,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     for item in deleted:
                         tag_to_add = item[0:3]
                         ind1, ind2 = item[3], item[4]
-                        if tag_to_add in affected_tags:
+                        if tag_to_add in affected_tags and (ind1, ind2) not in affected_tags[tag_to_add]:
                             affected_tags[tag_to_add].append((ind1, ind2))
                         else:
                             affected_tags[tag_to_add] = [(ind1, ind2)]
@@ -405,8 +409,8 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         if record.has_key('005'):
             record_delete_field(record, '005')
             write_message("  Deleted the existing 005 tag.", verbose=2)
-        last_revision = run_sql("SELECT MAX(job_date) FROM hstRECORD WHERE id_bibrec=%s", (rec_id, ))
-        if last_revision and last_revision[0][0].strftime("%Y%m%d%H%M%S.0") == now.strftime("%Y%m%d%H%M%S.0"):
+        last_revision = run_sql("SELECT MAX(job_date) FROM hstRECORD WHERE id_bibrec=%s", (rec_id, ))[0][0]
+        if last_revision and last_revision.strftime("%Y%m%d%H%M%S.0") == now.strftime("%Y%m%d%H%M%S.0"):
             ## We are updating the same record within the same seconds! It's less than
             ## the minimal granularity. Let's pause for 1 more second to take a breath :-)
             time.sleep(1)
@@ -419,7 +423,6 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         else:
             error=None
             write_message(lambda: "   -Added tag 005: DONE. "+ str(record_get_field_value(record, '005', '', '')), verbose=2)
-
 
         # adding 005 to affected tags will delete the existing 005 entry
         # and update with the latest timestamp.
@@ -471,7 +474,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 if ('4', ' ') not in affected_tags.get('856', []):
                     if '856' not in affected_tags:
                         affected_tags['856'] = [('4', ' ')]
-                    else:
+                    elif ('4', ' ') not in affected_tags['856']:
                         affected_tags['856'].append(('4', ' '))
                 write_message("     -Modified field list updated with FFT details: %s" % str(affected_tags), verbose=2)
             except Exception, e:
@@ -560,7 +563,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         # Update the database MetaData
         write_message("Stage 5: Start (Update the database with the metadata).",
                     verbose=2)
-        if opt_mode == 'insert':
+        if insert_mode_p:
             update_database_with_metadata(record, rec_id, oai_rec_id, pretend=pretend)
         elif opt_mode in ('replace', 'replace_or_insert',
             'append', 'correct', 'delete') and updates_exist:
@@ -654,8 +657,8 @@ def find_record_ids_by_oai_id(oaiId):
     else:
         return intbitset()
 
-def bibupload_post_phase(record, mode = None, rec_id = "", pretend = False,
-                         tmp_ids = {}, tmp_vers = {}):
+def bibupload_post_phase(record, mode=None, rec_id="", pretend=False,
+                         tmp_ids=None, tmp_vers=None):
     def _elaborate_tag(record, tag, fun):
         if extract_tag_from_record(record, tag) is not None:
             try:
@@ -672,7 +675,10 @@ def bibupload_post_phase(record, mode = None, rec_id = "", pretend = False,
             write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED", verbose=2)
-
+    if tmp_ids is None:
+        tmp_ids = {}
+    if tmp_vers is None:
+        tmp_vers = {}
     _elaborate_tag(record, "BDR", lambda: elaborate_brt_tags(record, rec_id = rec_id,
                                                      mode = mode,
                                                      pretend = pretend,
@@ -726,7 +732,6 @@ BibUpload task information:
             "task_params": bibtask._TASK_PARAMS,
             "task_options": bibtask._OPTIONS}
         bibcatalog_system.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBCATALOG_CONFLICTING_REVISIONS_DEFAULT_QUEUE, owner=uid)
-
 
 def insert_record_into_holding_pen(record, oai_id, pretend=False):
     query = "INSERT INTO bibHOLDINGPEN (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"
@@ -881,7 +886,6 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
                     write_message('WARNING: Found recid %s for extoaiid="%s" that doesn\'t specify any provenance, while input record does.' % (id_bibrec, extoaiid), stream=sys.stderr)
                 if extoaisrc is None:
                     write_message('WARNING: Found recid %s for extoaiid="%s" that specify a provenance (%s), while input record does not have a provenance.' % (id_bibrec, extoaiid, this_extoaisrc), stream=sys.stderr)
-
     return ret
 
 def find_record_from_oaiid(oaiid):
@@ -2212,7 +2216,6 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             tmp_vers[bibdoc_tmpver] = brd.get_bibdoc(docname).get_latest_version()
                     else:
                         tmp_vers[bibdoc_tmpver] = version
-
     return record
 
 
@@ -2515,7 +2518,6 @@ def delete_tags_to_correct(record, rec_old):
 
     # browse through all the tags from the MARCXML file:
     for tag in record:
-        # do we have to delete only a special tag or any tag?
         # check if the tag exists in the old record too:
         if tag in rec_old and tag != '001':
             # the tag does exist, so delete all record's tag+ind1+ind2 combinations from rec_old
@@ -2537,7 +2539,7 @@ def delete_bibrec_bibxxx(record, id_bibrec, affected_tags={}, pretend=False):
     write_message(lambda: "delete_bibrec_bibxxx(record=%s, id_bibrec=%s, affected_tags=%s)" % (record, id_bibrec, affected_tags), verbose=9)
     for tag in affected_tags:
         # sanity check with record keys just to make sure its fine.
-        if tag in record.keys() and tag not in CFG_BIBUPLOAD_SPECIAL_TAGS:
+        if tag not in CFG_BIBUPLOAD_SPECIAL_TAGS:
             write_message("%s found in record"%tag, verbose=2)
             # for each name construct the bibrec_bibxxx table name
             table_name = 'bib'+tag[0:2]+'x'
@@ -2557,9 +2559,9 @@ def delete_bibrec_bibxxx(record, id_bibrec, affected_tags={}, pretend=False):
                 else:
                     tmp_ind_2 = ind_pair[1]
                 # need to escape incase of underscore so that mysql treats it as a char
-                tag_val = tag+"\\"+tmp_ind_1+"\\"+tmp_ind_2
+                tag_val = tag+"\\"+tmp_ind_1+"\\"+tmp_ind_2 + '%'
                 query = """DELETE br.* FROM `%s` br,`%s` b where br.id_bibrec=%%s and br.id_bibxxx=b.id and b.tag like %%s""" % (bibrec_table, table_name)
-                params = (id_bibrec, '%s%%' % tag_val)
+                params = (id_bibrec, tag_val)
                 write_message(query % params, verbose=9)
                 if not pretend:
                     run_sql(query, params)
@@ -2881,11 +2883,11 @@ def task_run_core():
 
         if recs is not None:
             # We proceed each record by record
-            bibupload_records(records = recs, opt_mode = task_get_option('mode'),
+            bibupload_records(records=recs, opt_mode=task_get_option('mode'),
                               opt_notimechange=task_get_option('notimechange'),
                               pretend=task_get_option('pretend'),
-                              callback_url = callback_url,
-                              results_for_callback = results_for_callback)
+                              callback_url=callback_url,
+                              results_for_callback=results_for_callback)
         else:
             write_message("   Error bibupload failed: No record found",
                         verbose=1, stream=sys.stderr)
