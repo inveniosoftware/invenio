@@ -406,7 +406,6 @@ class InvenioBibUploadUnchangedRecordError(Exception):
     """
 
     def __init__(self, recid, current_rev):
-        super(InvenioBibUploadUnchangedRecordError, self).__init__()
         self.cur_rev = current_rev
         self.recid = recid
 
@@ -421,7 +420,6 @@ class InvenioBibUploadConflictingRevisionsError(Exception):
     """
 
     def __init__(self, recid, tag_list, upload_rev, current_rev):
-        super(InvenioBibUploadConflictingRevisionsError, self).__init__()
         self.up_rev = upload_rev
         self.cur_rev = current_rev
         self.tags = tag_list
@@ -438,7 +436,6 @@ class InvenioBibUploadInvalidRevisionError(Exception):
     """
 
     def __init__(self, recid, upload_rev):
-        super(InvenioBibUploadInvalidRevisionError, self).__init__()
         self.upload_rev = upload_rev
         self.recid = recid
 
@@ -453,5 +450,4 @@ class InvenioBibUploadMissing005Error(Exception):
     """
 
     def __init__(self, recid):
-        super(InvenioBibUploadMissing005Error, self).__init__()
         self.recid = recid

@@ -21,8 +21,6 @@
 Contains Test Cases for Revision Verifier module used along with BibUpload.
 """
 
-import time
-
 from invenio.search_engine import get_record, print_record
 
 from invenio.bibupload import bibupload, \
@@ -136,7 +134,6 @@ def init_test_records():
     init_details['rev1'] = (rev1, rev_tag)
     old_rev_tag = rev_tag
 
-    time.sleep(1)
     # --> Revision 2 submitted
     recs = xml_marc_to_records(rev1_append)
     res = bibupload(recs[0], opt_mode='append')
@@ -148,7 +145,6 @@ def init_test_records():
 
     init_details['rev2'] = (rev2, rev_tag)
     old_rev_tag = rev_tag
-    time.sleep(1)
 
     # --> Revision 3 submitted
     recs = xml_marc_to_records(rev2_append)
@@ -1042,7 +1038,6 @@ class RevisionVerifierFromBibUpload(GenericBibUploadTest):
         self.rev1_modified = self.rev1_modified.replace('123456789', str(self.recid))
         self.rev1_modified = self.rev1_modified.replace('20110101000000.0', rev)
         self.final_xm = self.final_xm.replace('123456789', str(self.recid))
-        time.sleep(1)
 
         recs = xml_marc_to_records(self.rev1)
         recs = xml_marc_to_records(self.rev2)
@@ -1052,19 +1047,17 @@ class RevisionVerifierFromBibUpload(GenericBibUploadTest):
         self.rev2 = self.rev2.replace(rev, record_get_field_value(record, '005', '', ''))
         self.rev2_modified = self.rev2_modified.replace('123456789', str(self.recid))
         self.rev2_modified = self.rev2_modified.replace('20110101000000.0', record_get_field_value(record, '005', '', ''))
-        time.sleep(1)
         # --> Revision 1 modified submitted
         recs = xml_marc_to_records(self.rev1_modified)
         error, self.recid, dummy_msg = bibupload(recs[0], opt_mode='replace')
         record = get_record(self.recid)
         rev = record_get_field_value(record, '005', '', '')
         self.final_xm = self.final_xm.replace('20110101000000.0', rev)
-        time.sleep(2)
         self.assertEqual(compare_xmbuffers(self.final_xm, print_record(self.recid, 'xm')), '')
         # --> Revision 2 modified submitted
         recs = xml_marc_to_records(self.rev2_modified)
         error, self.recid, dummy_msg = bibupload(recs[0], opt_mode='replace')
-        self.assertEquals(error, 1)
+        self.assertEquals(error, 2)
 
 TEST_SUITE = make_test_suite(RevisionVerifierForCorrectAddition,
                             RevisionVerifierForCorrectModification,

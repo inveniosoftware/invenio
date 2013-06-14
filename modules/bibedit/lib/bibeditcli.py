@@ -37,7 +37,9 @@ Options to inspect record history::
                                           become current revision
     --check-revisions [recid]             check if revisions are not corrupted
                                           (* stands for all records)
-    --fix-revisions [recid]               fix revions that are corrupted
+    --fix-revisions [recid]               fix revisions that are corrupted
+                                          (* stands for all records)
+    --clean-revisions [recid]             clean duplicate revisions
                                           (* stands for all records)
 
 """
@@ -52,6 +54,7 @@ from invenio.bibedit_utils import get_marcxml_of_revision_id, \
     get_record_revision_ids, get_xml_comparison, record_locked_by_other_user, \
     record_locked_by_queue, revision_format_valid_p, save_xml_record, \
     split_revid, get_info_of_revision_id, get_record_revisions
+from invenio.bibrecord import create_record, identical_records
 
 def print_usage():
     """Print help."""
@@ -60,6 +63,37 @@ def print_usage():
 def print_version():
     """Print version information."""
     print __revision__
+
+def cli_clean_revisions(recid, dry_run=True, verbose=True):
+    """Clean revisions of the given recid, by removing duplicate revisions
+    that do not change the content of the record."""
+    if recid == '*':
+        recids = intbitset(run_sql("SELECT DISTINCT id_bibrec FROM hstRECORD"))
+    else:
+        try:
+            recids = [int(recid)]
+        except ValueError:
+            print 'ERROR: record ID must be integer, not %s.' % recid
+            sys.exit(1)
+    for recid in recids:
+        all_revisions = run_sql("SELECT marcxml, job_id, job_name, job_person, job_date FROM hstRECORD WHERE id_bibrec=%s ORDER BY job_date ASC", (recid,))
+        previous_rec = {}
+        deleted_revisions = 0
+        for marcxml, job_id, job_name, job_person, job_date in all_revisions:
+            try:
+                current_rec = create_record(zlib.decompress(marcxml))[0]
+            except Exception:
+                print >> sys.stderr, "ERROR: corrupted revisions found. Please run %s --fix-revisions '*'" % sys.argv[0]
+                sys.exit(1)
+            if identical_records(current_rec, previous_rec):
+                deleted_revisions += 1
+                if not dry_run:
+                    run_sql("DELETE FROM hstRECORD WHERE id_bibrec=%s AND job_id=%s AND job_name=%s AND job_person=%s AND job_date=%s", (recid, job_id, job_name, job_person, job_date))
+            previous_rec = current_rec
+        if verbose and deleted_revisions:
+            print "record %s: deleted %s duplicate revisions out of %s" % (recid, deleted_revisions, len(all_revisions))
+    if verbose:
+        print "DONE"
 
 def cli_list_revisions(recid, details=False):
     """Print list of all known record revisions (=RECID.REVDATE) for record
@@ -251,6 +285,12 @@ def main():
             except IndexError:
                 recid = '*'
             cli_fix_revisions(recid)
+        elif cmd == '--clean-revisions':
+            try:
+                recid = opts[0]
+            except IndexError:
+                recid = '*'
+            cli_clean_revisions(recid, dry_run=False)
         else:
             print "ERROR: Please specify a command.  Please see '--help'."
             sys.exit(1)

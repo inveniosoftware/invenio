@@ -52,13 +52,15 @@ from invenio.dbquery import run_sql, get_table_status_info
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 from invenio.bibtask import task_set_task_param, setup_loggers, task_low_level_submission
-from invenio.bibrecord import record_has_field,record_get_field_value
+from invenio.bibrecord import record_has_field,record_get_field_value, identical_records
 from invenio.shellutils import run_shell_command
 from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo
 import base64
 import cPickle
 
 # helper functions:
+
+RE_005 = re.compile(re.escape('tag="005"'))
 
 def remove_tag_001_from_xmbuffer(xmbuffer):
     """Remove tag 001 from MARCXML buffer.  Useful for testing two
@@ -85,6 +87,12 @@ def compare_xmbuffers(xmbuffer1, xmbuffer2):
     # remove whitespace:
     xmbuffer1 = remove_blanks_from_xmbuffer(xmbuffer1)
     xmbuffer2 = remove_blanks_from_xmbuffer(xmbuffer2)
+
+    if len(RE_005.findall(xmbuffer1)) > 1:
+        return "More than 1 005 tag has been found in the first XM: %s" % xmbuffer1
+    if len(RE_005.findall(xmbuffer2)) > 1:
+        return "More than 1 005 tag has been found in the second XM: %s" % xmbuffer2
+
 
     if xmbuffer1 != xmbuffer2:
         return "\n=" + xmbuffer1 + "=\n" + '!=' + "\n=" + xmbuffer2 + "=\n"
@@ -164,6 +172,10 @@ def wipe_out_record_from_all_tables(recid):
         run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s", (recid,))
         # delete from bibrec_bibdoc:
         run_sql("DELETE FROM bibrec_bibdoc WHERE id_bibrec=%s", (recid,))
+        # delete from holdingpen
+        run_sql("DELETE FROM bibHOLDINGPEN WHERE id_bibrec=%s", (recid,))
+        # delete from hstRECORD
+        run_sql("DELETE FROM hstRECORD WHERE id_bibrec=%s", (recid,))
     except Exception, err:
         print >> sys.stderr, "Exception captured while wiping records: %s" % err
 
@@ -204,6 +216,332 @@ class GenericBibUploadTest(unittest.TestCase):
     def tearDown(self):
         for recid in run_sql("SELECT id FROM bibrec WHERE id>%s", (self.last_recid,)):
             wipe_out_record_from_all_tables(recid[0])
+
+class BibUploadTypicalBibEditSessionTest(GenericBibUploadTest):
+    """Testing a typical BibEdit session"""
+
+    def setUp(self):
+        GenericBibUploadTest.setUp(self)
+        self.test = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+        </record>
+        """
+        recs = bibupload.xml_marc_to_records(self.test)
+        # We call the main function with the record as a parameter
+        _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='insert')[0]
+        # We retrieve the inserted xml
+        inserted_xm = print_record(self.recid, 'xm')
+        # Compare if the two MARCXML are the same
+        self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
+                                          self.test), '')
+        self.history = run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, )) # kwalitee: disable=sql
+        self.timestamp = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,))
+        self.tag005 = get_record(self.recid)['005'][0][3]
+
+    def test_simple_replace(self):
+        """BibUpload - test a simple replace as in BibEdit"""
+        marc_to_replace1 = """
+        <record>
+        <controlfield tag="001">%(recid)s</controlfield>
+        <controlfield tag="005">%(tag005)s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Foo</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+         <datafield tag="520" ind1=" " ind2=" ">
+          <subfield code="a">bla bla bla</subfield>
+         </datafield>
+        </record>
+        """ % {'recid': self.recid, 'tag005': self.tag005}
+        recs = bibupload.xml_marc_to_records(marc_to_replace1)
+        # We call the main function with the record as a parameter
+        _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
+        ## The change should have been applied!
+        self.failUnless(identical_records(recs[0], get_record(self.recid)))
+
+        marc_to_replace2 = """
+        <record>
+        <controlfield tag="001">%(recid)s</controlfield>
+        <controlfield tag="005">%(tag005)s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+         <datafield tag="700" ind1=" " ind2=" ">
+          <subfield code="a">Queen Elisabeth</subfield>
+          <subfield code="u">Great Britain</subfield>
+         </datafield>
+        </record>
+        """ % {'recid': self.recid, 'tag005': self.tag005}
+
+        expected_marc = """
+        <record>
+        <controlfield tag="001">%(recid)s</controlfield>
+        <controlfield tag="005">%(tag005)s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Foo</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+         <datafield tag="520" ind1=" " ind2=" ">
+          <subfield code="a">bla bla bla</subfield>
+         </datafield>
+         <datafield tag="700" ind1=" " ind2=" ">
+          <subfield code="a">Queen Elisabeth</subfield>
+          <subfield code="u">Great Britain</subfield>
+         </datafield>
+        </record>
+        """ % {'recid': self.recid, 'tag005': self.tag005}
+        recs = bibupload.xml_marc_to_records(marc_to_replace2)
+        # We call the main function with the record as a parameter
+        _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
+        ## The change should have been merged with the previous without conflict
+        self.failUnless(identical_records(bibupload.xml_marc_to_records(expected_marc)[0], get_record(self.recid)))
+
+    def test_replace_with_conflict(self):
+        """BibUpload - test a replace as in BibEdit that leads to conflicts"""
+        marc_to_replace1 = """
+        <record>
+        <controlfield tag="001">%(recid)s</controlfield>
+        <controlfield tag="005">%(tag005)s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Foo</subfield>
+          <subfield code="u">Test Institute2</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+         <datafield tag="520" ind1=" " ind2=" ">
+          <subfield code="a">bla bla bla</subfield>
+         </datafield>
+        </record>
+        """ % {'recid': self.recid, 'tag005': self.tag005}
+        recs = bibupload.xml_marc_to_records(marc_to_replace1)
+        # We call the main function with the record as a parameter
+        _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
+        ## The change should have been applied!
+        self.failUnless(identical_records(recs[0], get_record(self.recid)))
+
+        marc_to_replace2 = """
+        <record>
+        <controlfield tag="001">%(recid)s</controlfield>
+        <controlfield tag="005">%(tag005)s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Queen Elisabeth</subfield>
+          <subfield code="u">Great Britain</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">No more Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+         <datafield tag="520" ind1=" " ind2=" ">
+          <subfield code="a">bla bla bla</subfield>
+         </datafield>
+        </record>
+        """ % {'recid': self.recid, 'tag005': self.tag005}
+
+        recs = bibupload.xml_marc_to_records(marc_to_replace2)
+        # We call the main function with the record as a parameter
+        _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
+        ## The change should have been merged with the previous without conflict
+        self.failUnless(identical_records(bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)), "%s != %s" % (bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)))
+        self.failUnless(identical_records(bibupload.xml_marc_to_records(marc_to_replace2)[0], bibupload.xml_marc_to_records(run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid,))[0][0])[0]))
+
+class BibUploadNoUselessHistoryTest(GenericBibUploadTest):
+    """Testing generation of history only when necessary"""
+
+    def setUp(self):
+        GenericBibUploadTest.setUp(self)
+        self.test = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+        </record>
+        """
+        recs = bibupload.xml_marc_to_records(self.test)
+        # We call the main function with the record as a parameter
+        _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='insert')[0]
+        # We retrieve the inserted xml
+        inserted_xm = print_record(self.recid, 'xm')
+        # Compare if the two MARCXML are the same
+        self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
+                                          self.test), '')
+        self.history = run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, )) # kwalitee: disable=sql
+        self.timestamp = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,))
+
+    def test_replace_identical_record(self):
+        """bibupload - replace with identical record does not touch history"""
+        xml_to_upload = """
+        <record>
+        <controlfield tag="001">%s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="8">
+          <subfield code="a">Cool</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+        </record>
+        """ % self.recid
+        recs = bibupload.xml_marc_to_records(xml_to_upload)
+        # We call the main function with the record as a parameter
+        _, recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
+        self.assertEqual(self.recid, recid)
+        self.assertEqual(self.history, run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, ))) # kwalitee: disable=sql
+        self.assertEqual(self.timestamp, run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,)))
+
+    def test_correct_identical_correction(self):
+        """bibupload - correct with identical correction does not touch history"""
+        xml_to_upload = """
+        <record>
+        <controlfield tag="001">%s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+        </record>
+        """ % self.recid
+        recs = bibupload.xml_marc_to_records(xml_to_upload)
+        # We call the main function with the record as a parameter
+        _, recid, _ = bibupload.bibupload_records(recs, opt_mode='correct')[0]
+        self.assertEqual(self.recid, recid)
+        self.maxDiff = None
+        self.assertEqual(self.history, run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, ))) # kwalitee: disable=sql
+        self.assertEqual(self.timestamp, run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,)))
+
+
+    def test_replace_different_record(self):
+        """bibupload - replace with different records does indeed touch history"""
+        xml_to_upload = """
+        <record>
+        <controlfield tag="001">%s</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="100" ind1="4" ind2="7">
+          <subfield code="a">Test, Jim</subfield>
+          <subfield code="u">Test Laboratory</subfield>
+         </datafield>
+        </record>
+        """ % self.recid
+        recs = bibupload.xml_marc_to_records(xml_to_upload)
+        # We call the main function with the record as a parameter
+        _, recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
+        self.assertEqual(self.recid, recid)
+        self.assertNotEqual(self.history, run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, ))) # kwalitee: disable=sql
+        self.failUnless(len(self.history) == 1 and len(run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, ))) == 2) # kwalitee: disable=sql
+        self.assertNotEqual(self.timestamp, run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,)))
+
+    def test_correct_different_correction(self):
+        """bibupload - correct with different correction does indeed touch history"""
+        xml_to_upload = """
+        <record>
+        <controlfield tag="001">%s</controlfield>
+        <controlfield tag="003">FooBar</controlfield>
+        </record>
+        """ % self.recid
+        recs = bibupload.xml_marc_to_records(xml_to_upload)
+        # We call the main function with the record as a parameter
+        _, recid, _ = bibupload.bibupload_records(recs, opt_mode='correct')[0]
+        self.assertEqual(self.recid, recid)
+        self.assertNotEqual(self.history, run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, ))) # kwalitee: disable=sql
+        self.failUnless(len(self.history) == 1 and len(run_sql("SELECT * FROM hstRECORD WHERE id_bibrec=%s", (self.recid, ))) == 2) # kwalitee: disable=sql
+        self.assertNotEqual(self.timestamp, run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (self.recid,)))
+
 
 class BibUploadCallbackURLTest(GenericBibUploadTest):
     """Testing usage of CLI callback_url"""
@@ -5336,7 +5674,8 @@ allow any</subfield>
         self.assertEqual(test_web_page_content(testrec_expected_url, expected_text=['<em>04 May 2008, 03:02</em>']), [])
 
 
-TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,
+TEST_SUITE = make_test_suite(BibUploadNoUselessHistoryTest,
+                             BibUploadHoldingPenTest,
                              BibUploadInsertModeTest,
                              BibUploadAppendModeTest,
                              BibUploadCorrectModeTest,
@@ -5356,6 +5695,7 @@ TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,
                              BibUploadMoreInfoTest,
                              BibUploadBibRelationsTest,
                              BibUploadRecordsWithDOITest,
+                             BibUploadTypicalBibEditSessionTest,
                              )
 
 if __name__ == "__main__":
