@@ -18,31 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-import os
 import sys
-from pprint import pformat
-from functools import wraps
-from flask.ext.script import Manager as FlaskExtManager
-from flask.ext.script.commands import ShowUrls  # , Clean
-from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR, CFG_SITE_SECRET_KEY
-from invenio.pluginutils import PluginContainer
-from invenio.signalutils import pre_command, post_command
+from invenio.config import CFG_SITE_SECRET_KEY
+from invenio.scriptutils import Manager, change_command_name, \
+    generate_secret_key, register_manager
 from invenio.sqlalchemyutils import db
 from invenio.webinterface_handler_flask import create_invenio_flask_app
 
-
-def change_command_name(action, new_name):
-    def decorator(f):
-        f.__name__ = new_name
-        return action(f)
-    return decorator
-
-
-def generate_secret_key():
-    import string
-    import random
-    return ''.join([random.choice(string.letters + string.digits)
-                    for dummy in range(0, 256)])
 
 # Fixes problems with empty secret key in config manager.
 if 'config' in sys.argv and \
@@ -51,20 +33,8 @@ if 'config' in sys.argv and \
         SECRET_KEY=generate_secret_key())
 
 
-class Manager(FlaskExtManager):
-    def add_command(self, name, command):
-        f = command.run
-
-        @wraps(f)
-        def wrapper(*args, **kwds):
-            pre_command.send(f, *args, **kwds)
-            result = f(*args, **kwds)
-            post_command.send(f, *args, **kwds)
-            return result
-        command.run = wrapper
-        return super(Manager, self).add_command(name, command)
-
 manager = Manager(create_invenio_flask_app)
+register_manager(manager)
 
 
 @manager.shell
@@ -74,30 +44,6 @@ def make_shell_context():
     return dict(current_app=current_app, db=db)
 
 
-def _invenio_manager_plugin_builder(plugin_name, plugin_code):
-    """
-    Handy function to bridge pluginutils with (Invenio) blueprints.
-    """
-    if 'manager' in dir(plugin_code):
-        candidate = getattr(plugin_code, 'manager')
-        if isinstance(candidate, FlaskExtManager):
-            return candidate
-    raise ValueError('%s is not a valid manager plugin' % plugin_name)
-
-## Let's load all the managers that are composing this Invenio manage CLI
-_MANAGERS = PluginContainer(
-    os.path.join(CFG_PYLIBDIR, 'invenio', '*_manager.py'),
-    plugin_builder=_invenio_manager_plugin_builder)
-
-## Let's report about broken plugins
-open(os.path.join(CFG_LOGDIR, 'broken-managers.log'), 'w').write(
-    pformat(_MANAGERS.get_broken_plugins()))
-
-for manager_name, plugin in _MANAGERS.iteritems():
-    name = manager_name[:-len('_manager')]
-    manager.add_command(name, plugin)
-
-
 @manager.command
 def version():
     """ Get running version of Invenio """
@@ -105,7 +51,8 @@ def version():
     return CFG_VERSION
 
 
-@change_command_name(manager.command, 'detect-system-name')
+@manager.command
+@change_command_name
 def detect_system_details():
     """
     Detect and print system details such as Apache/Python/MySQL
@@ -142,11 +89,6 @@ def detect_system_details():
         print >> sys.stderr, '* Database manager could not be imported.'
 
     print ">>> System details detected successfully."
-
-
-#FIXME clean command is broken
-#manager.add_command("clean", Clean())
-manager.add_command("show-urls", ShowUrls())
 
 
 def main():

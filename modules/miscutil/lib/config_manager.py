@@ -17,8 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask.ext.script import Manager
-from invenio.inveniomanage import change_command_name, generate_secret_key
+from invenio.scriptutils import Manager, change_command_name, \
+    generate_secret_key
 
 manager = Manager(usage="Perform configuration operations")
 
@@ -92,14 +92,13 @@ config_create = Manager(usage="Creates variables in config file.")
 manager.add_command("create", config_create)
 
 
-@change_command_name(config_create.command, 'secret-key')
+@config_create.command
+@change_command_name
 def secret_key(key=None):
     """Generate and append CFG_SITE_SECRET_KEY to invenio-local.conf.
     Useful for the installation process."""
     import os
     import sys
-    import string
-    import random
     from invenio.inveniocfg import _grep_version_from_executable
     print ">>> Going to generate random CFG_SITE_SECRET_KEY..."
     try:

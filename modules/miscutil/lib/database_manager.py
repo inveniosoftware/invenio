@@ -22,7 +22,7 @@ import sys
 import shutil
 import datetime
 
-from flask.ext.script import Manager
+from invenio.scriptutils import Manager, change_command_name, print_progress
 
 manager = Manager(usage="Perform database operations")
 
@@ -34,12 +34,6 @@ option_default_data = manager.option('--no-data', action='store_false',
                                      help='do not populate tables with default data')
 
 
-def _print_progress(p, L=40, prefix='', suffix=''):
-    bricks = int(p * L)
-    print '\r', prefix,
-    print '[{0}{1}] {2}%'.format('#' * bricks, ' ' * (L - bricks),
-                                 int(p * 100)),
-    print suffix,
 
 
 @option_yes_i_know
@@ -99,7 +93,7 @@ def drop(yes_i_know=False):
 
     for i, table in enumerate(tables):
         try:
-            _print_progress(1.0 * i / N, prefix=prefix,
+            print_progress(1.0 * i / N, prefix=prefix,
                             suffix=str(datetime.timedelta(seconds=e()[0])))
             table.drop(bind=db.engine)
             dropped += 1
@@ -149,7 +143,7 @@ def create(default_data=True):
 
     for i, table in enumerate(tables):
         try:
-            _print_progress(1.0 * i / N, prefix=prefix,
+            print_progress(1.0 * i / N, prefix=prefix,
                             suffix=str(datetime.timedelta(seconds=e()[0])))
             table.create(bind=db.engine)
             created += 1
@@ -182,7 +176,6 @@ def uri():
     print current_app.config['SQLALCHEMY_DATABASE_URI']
 
 
-@manager.command
 def load_fixtures(suffix='', truncate_tables_first=False):
     from invenio.sqlalchemyutils import db
     from fixture import SQLAlchemyFixture
@@ -261,47 +254,6 @@ def populate(default_data=True):
     print ">>> Tables filled successfully."
 
 
-@manager.command
-def demosite(data='demosite'):
-    """Populate database with demo site data."""
-
-    from invenio.sqlalchemyutils import db
-    from invenio.config import CFG_PREFIX
-    from invenio.websession_model import User
-    from invenio.config_manager import get_conf
-
-    print ">>> Going to create demo site..."
-    db.session.execute("TRUNCATE schTASK")
-    db.session.execute("TRUNCATE session")
-    User.query.filter(User.email == '').delete()
-    db.session.commit()
-
-    load_fixtures(suffix=data, truncate_tables_first=True)
-
-    db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');")
-    db.session.commit()
-
-    conf = get_conf()
-
-    from invenio.inveniocfg import cli_cmd_reset_sitename, \
-        cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
-
-    cli_cmd_reset_sitename(conf)
-    cli_cmd_reset_siteadminemail(conf)
-    cli_cmd_reset_fieldnames(conf)  # needed for I18N demo ranking method names
-
-    for cmd in ["%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
-                "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 1" % CFG_PREFIX,
-                "%s/bin/bibsort -u admin --load-config" % CFG_PREFIX,
-                "%s/bin/bibsort 2" % CFG_PREFIX, ]:
-        if os.system(cmd):
-            print "ERROR: failed execution of", cmd
-            sys.exit(1)
-    print ">>> Demo site created successfully."
-
-
-@manager.command
 def version():
     """ Get running version of database driver."""
     from invenio.sqlalchemyutils import db
@@ -312,9 +264,10 @@ def version():
         return MySQLdb.__version__
 
 
-@manager.option('--verbose', action='store_true',
-                dest='verbose', help='Display more details.')
-def driver(verbose=False):
+@manager.option('-v', '--verbose', action='store_true', dest='verbose',
+                help='Display more details (driver version).')
+@change_command_name
+def driver_info(verbose=False):
     """ Get name of running database driver."""
     from invenio.sqlalchemyutils import db
     try:
@@ -325,8 +278,9 @@ def driver(verbose=False):
         return MySQLdb.__name__ + (('==' + version()) if verbose else '')
 
 
-@manager.option('-s', '--separator', dest='separator', default="\n")
 @manager.option('-l', '--line-format', dest='line_format', default="%s: %s")
+@manager.option('-s', '--separator', dest='separator', default="\n")
+@change_command_name
 def mysql_info(separator=None, line_format=None):
     """
     Detect and print MySQL details useful for debugging problems on various OS.

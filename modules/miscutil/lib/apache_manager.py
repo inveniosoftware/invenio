@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from flask.ext.script import Manager
+from invenio.scriptutils import Manager, change_command_name
 
 manager = Manager(usage="Perform Apache operations.")
 
@@ -44,6 +44,7 @@ def version(separator='\n'):
 
 @manager.option('-f', '--force', dest='force')
 @manager.option('--no-ssl', dest='no_ssl')
+@change_command_name
 def create_conf(force=False, no_ssl=True):
     """
     Create a apache configuration files.

@@ -36,6 +36,7 @@ pylib_DATA = __init__.py \
              celery_tasks.py \
              data_cacher.py \
              database_manager.py \
+             demosite_manager.py \
              dbdump.py \
              web_api_key.py \
              web_api_key_model.py \
@@ -79,6 +80,7 @@ pylib_DATA = __init__.py \
              inveniomanage.py \
              inveniomanage_unit_tests.py \
              inveniocfg_unit_tests.py \
+             scriptutils.py \
              settings.py \
              shellutils.py \
              shellutils_unit_tests.py \
@@ -110,7 +112,7 @@ pylib_DATA = __init__.py \
              remote_debugger_wsgi_reload.py \
              jsonutils.py \
              jsonutils_unit_tests.py \
-             sequtils_cnum.py \
+	     sequtils_cnum.py \
              sequtils.py \
              sequtils_model.py \
              sequtils_regression_tests.py \
