@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,6 +35,7 @@ def format_element(bfo, limit, separator=' ; ',
            interactive="no",
            highlight="no",
            link_author_pages="no",
+           link_mobile_pages="no",
            relator_code_pattern=None):
     """
     Prints the list of authors of a record.
@@ -48,6 +49,8 @@ def format_element(bfo, limit, separator=' ; ',
     @param affiliation_suffix: suffix printed after each affiliation
     @param interactive: if yes, enable user to show/hide authors when there are too many (html + javascript)
     @param highlight: highlights authors corresponding to search query if set to 'yes'
+    @param link_author_pages: should we link to author pages if print_links in on?
+    @param link_mobile_pages: should we link to mobile app pages if print_links in on?
     @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
     """
     _ = gettext_set_language(bfo.lang)    # load the right message language
@@ -77,16 +80,20 @@ def format_element(bfo, limit, separator=' ; ',
                                                         bfo.search_pattern)
 
             if print_links.lower() == "yes":
-                if link_author_pages == "no":
-                    author['a'] = '<a href="' + CFG_SITE_URL + \
-                                  '/search?f=author&amp;p=' + quote(author['a']) + \
-                                  '&amp;ln=' + bfo.lang + \
-                                  '">' + escape(author['a']) + '</a>'
-                else:
+                if link_author_pages == "yes":
                     author['a'] = '<a rel="author" href="' + CFG_SITE_URL + \
                                   '/author/' + quote(author['a']) + \
                                   '?recid=' +  bibrec_id + \
                                   '&ln=' + bfo.lang + \
+                                  '">' + escape(author['a']) + '</a>'
+                elif link_mobile_pages == 'yes':
+                    author['a'] = '<a rel="external" href="#page=search' + \
+                                  '&amp;f=author&amp;p=' + quote(author['a']) + \
+                                  '">' + escape(author['a']) + '</a>'
+                else:
+                    author['a'] = '<a href="' + CFG_SITE_URL + \
+                                  '/search?f=author&amp;p=' + quote(author['a']) + \
+                                  '&amp;ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
 
         if author.has_key('u'):

@@ -9,7 +9,7 @@ suffix='</div><hr/>'/>
 <div>
 <BFE_TITLE prefix="<div class='recordTitle'>" separator="<br /><br />" suffix="</div>" />
 <p align="center">
-<BFE_AUTHORS suffix="<br />" limit="5" interactive="yes" print_affiliations="yes" affiliation_prefix="<small> (" affiliation_suffix=")</small>"/>
+<BFE_AUTHORS suffix="<br />" limit="5" link_mobile_pages="yes" print_affiliations="yes" affiliation_prefix="<small> (" affiliation_suffix=")</small>"/>
 <BFE_ADDRESSES />
 <BFE_AFFILIATION />
 <BFE_DATE prefix="<br />" suffix="<br />"/>

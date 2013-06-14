@@ -6,7 +6,7 @@
 <BFE_TITLE />
 </div>
 <div class="L2">
-<BFE_AUTHORS limit="3" />
+<BFE_AUTHORS limit="3" print_links="no" />
 </div>
 <div class="L3">
 <div class="publi"><BFE_PUBLI_INFO  /></div>
