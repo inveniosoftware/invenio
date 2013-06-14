@@ -663,10 +663,16 @@ def write_messages(msgs, stream=None, verbose=1):
 
 def write_message(msg, stream=None, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
-    Useful for debugging stuff."""
+    Useful for debugging stuff.
+
+    @note: msg could be a callable with no parameters. In this case it is
+    been called in order to obtain the string to be printed.
+    """
     if stream is None:
         stream = sys.stdout
     if msg and _TASK_PARAMS['verbose'] >= verbose:
+        if callable(msg):
+            msg = msg()
         if stream == sys.stdout:
             logging.info(msg)
         elif stream == sys.stderr:
