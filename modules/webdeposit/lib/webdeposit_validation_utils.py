@@ -17,152 +17,134 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.dataciteutils import DataciteMetadata
-from invenio.sherpa_romeo import SherpaRomeoSearch
-from invenio.bibfield import get_record
+"""
+Validation functions
+"""
 
-#FIXME: make the functions to return functions so that
-#       in the config file we can define parameters
-#       eg. length(5,10)
+import re
+from wtforms.validators import ValidationError, StopValidation, Regexp
+from invenio.config import CFG_SITE_NAME
 
 
-def datacite_doi_validate(field, dummy_form=None):
-    value = field.data
+#
+# General purpose validators
+#
+class RequiredIf(object):
+    """
+    Require field if value of another field is set to a certain value.
+    """
+    def __init__(self, other_field_name, values, message=None):
+        self.other_field_name = other_field_name
+        self.values = values
+        self.message = message
+
+    def __call__(self, form, field):
+        try:
+            other_field = getattr(form, self.other_field_name)
+            other_val = other_field.data
+            if other_val in self.values:
+                if not field.data or isinstance(field.data, basestring) \
+                   and not field.data.strip():
+                    if self.message is None:
+                        self.message = 'This field is required.'
+                    field.errors[:] = []
+                    raise StopValidation(self.message % {
+                        'other_field': other_field.label.text,
+                        'value': other_val
+                    })
+        except AttributeError:
+            pass
+
+
+#
+# DOI-related validators
+#
+doi_syntax_validator = Regexp(
+    "(^$|(doi:)?10\.\d+(.\d+)*/.*)",
+    flags=re.I,
+    message="The provided DOI is invalid - it should look similar to "
+            "'10.1234/foo.bar'."
+)
+
+"""
+DOI syntax validator
+"""
+
+
+class InvalidDOIPrefix(object):
+    """
+    Validates if DOI
+    """
+    def __init__(self, prefix='10.5072', message=None,
+                 message_testing=None):
+        """
+        @param doi_prefix: DOI prefix, e.g. 10.5072
+        """
+        self.doi_prefix = prefix
+        # Remove trailing slash
+        if self.doi_prefix[-1] == '/':
+            self.doi_prefix = self.doi_prefix[:-1]
+
+        if not message_testing:
+            self.message_testing = "The prefix 10.5072 is invalid. The prefix" \
+                "is only used for testing purposes, and no DOIs with this " \
+                "prefix are attached to any meaningful content."
+        if not message:
+            self.message = 'The prefix %(prefix)s is ' \
+                'administered automatically by %(CFG_SITE_NAME)s.'
+
+        ctx = dict(
+            prefix=prefix,
+            CFG_SITE_NAME=CFG_SITE_NAME
+        )
+        self.message = self.message % ctx
+        self.message_testing = self.message_testing % ctx
+
+    def __call__(self, form, field):
+        value = field.data
+
+        # Defined prefix
+        if value:
+            if value.startswith("%s/" % self.doi_prefix):
+                raise ValidationError(self.message)
+
+            # Testing name space
+            if self.doi_prefix != "10.5072" and value.startswith("10.5072/"):
+                raise ValidationError(self.message_testing)
+
+
+class PreReservedDOI(object):
+    """
+    Validate that user did not edit pre-reserved DOI.
+    """
+    def __init__(self, field_name, message=None, prefix='10.5072'):
+        self.field_name = field_name
+        self.message = message or 'You are not allowed to edit a ' \
+                                  'pre-reserved DOI. Click the Pre-reserve ' \
+                                  'DOI button to resolve the problem.'
+        self.prefix = prefix
+
+    def __call__(self, form, field):
+        attr_value = getattr(form, self.field_name).data
+        if attr_value and field.data and field.data != attr_value and field.data.startswith("%s/" % self.prefix):
+            raise StopValidation(self.message)
+        # Stop further validation if DOI equals pre-reserved DOI.
+        if attr_value and field.data and field.data == attr_value:
+            raise StopValidation()
+
+
+#
+# Aliases
+#
+required_if = RequiredIf
+invalid_doi_prefix_validator = InvalidDOIPrefix
+pre_reserved_doi_validator = PreReservedDOI
+
+
+def number_validate(form, field, submit=False, error_message='It must be a number!'):
+    value = field.data or ''
     if value == "" or value.isspace():
-        return dict()
-    datacite = DataciteMetadata(value)
-    if datacite.error:
-        return dict(info=1, info_message="Couldn't retrieve doi metadata")
-
-    return dict(fields=dict(publisher=datacite.get_publisher(),
-                            title=datacite.get_titles(),
-                            date=datacite.get_dates(),
-                            abstract=datacite.get_description()),
-                success=1,
-                success_message='Datacite.org metadata imported successfully')
-
-
-def sherpa_romeo_issn_validate(field, dummy_form=None):
-    value = field.data
-    if value == "" or value.isspace():
-        return dict(error=0, error_message='')
-    s = SherpaRomeoSearch()
-    s.search_issn(value)
-    if s.error:
-        return dict(error=1, error_message=s.error_message)
-
-    if s.get_num_hits() == 1:
-        journal = s.parser.get_journals(attribute='jtitle')
-        journal = journal[0]
-        publisher = s.parser.get_publishers(journal=journal)
-        if publisher is not None and publisher != []:
-            return dict(error=0, error_message='',
-                        fields=dict(journal=journal,
-                                    publisher=publisher['name']))
-        else:
-            return dict(error=0, error_message='',
-                        fields=dict(journal=journal))
-
-    return dict(info=1, info_message="Couldn't find Journal")
-
-
-def sherpa_romeo_publisher_validate(field, dummy_form=None):
-    value = field.data
-    if value == "" or value.isspace():
-        return dict(error=0, error_message='')
-    s = SherpaRomeoSearch()
-    s.search_publisher(value)
-    if s.error:
-        return dict(info=1, info_message=s.error_message)
-
-    conditions = s.parser.get_publishers(attribute='conditions')
-    if conditions is not None and s.get_num_hits() == 1:
-        conditions = conditions[0]
-    else:
-        conditions = []
-    if conditions != []:
-        conditions_html = "<u>Conditions</u><br><ol>"
-        if isinstance(conditions['condition'], str):
-            conditions_html += "<li>" + conditions['condition'] + "</li>"
-        else:
-            for condition in conditions['condition']:
-                conditions_html += "<li>" + condition + "</li>"
-
-        copyright_links = s.parser.get_publishers(attribute='copyrightlinks')
-        if copyright_links is not None and copyright_links != []:
-            copyright_links = copyright_links[0]
-        else:
-            copyright_links = None
-
-        if isinstance(copyright_links, list):
-            copyright_links_html = ""
-            for copyright_link in copyright_links['copyrightlink']:
-                copyright_links_html += '<a href="' + copyright_link['copyrightlinkurl'] + \
-                                        '">' + copyright_link['copyrightlinktext'] + "</a><br>"
-        elif isinstance(copyright_links, dict):
-            if isinstance(copyright_links['copyrightlink'], list):
-                for copyright_link in copyright_links['copyrightlink']:
-                    copyright_links_html = '<a href="' + copyright_link['copyrightlinkurl'] + \
-                                           '">' + copyright_link['copyrightlinktext'] + "</a><br>"
-            else:
-                copyright_link = copyright_links['copyrightlink']
-                copyright_links_html = '<a href="' + copyright_link['copyrightlinkurl'] + \
-                                       '">' + copyright_link['copyrightlinktext'] + "</a><br>"
-
-        home_url = s.parser.get_publishers(attribute='homeurl')
-        if home_url is not None and home_url != []:
-            home_url = home_url[0]
-            home_url = '<a href="' + home_url + '">' + home_url + "</a>"
-        else:
-            home_url = None
-
-        info_html = ""
-        if home_url is not None:
-            info_html += "<p>" + home_url + "</p>"
-
-        if conditions is not None:
-            info_html += "<p>" + conditions_html + "</p>"
-
-        if copyright_links is not None:
-            info_html += "<p>" + copyright_links_html + "</p>"
-
-        if info_html != "":
-            return dict(error=0, error_message='',
-                        info=1, info_message=info_html)
-    return dict(error=0, error_message='')
-
-
-def sherpa_romeo_journal_validate(field, dummy_form=None):
-    value = field.data
-    if value == "" or value.isspace():
-        return dict(error=0, error_message='')
-
-    s = SherpaRomeoSearch()
-    s.search_journal(value, 'exact')
-    if s.error:
-        return dict(info=1, info_message=s.error_message)
-
-    if s.get_num_hits() == 1:
-        issn = s.parser.get_journals(attribute='issn')
-        if issn != [] and issn is not None:
-            issn = issn[0]
-            publisher = s.parser.get_publishers(journal=value)
-            if publisher is not None and publisher != []:
-                return dict(error=0, error_message='',
-                            fields=dict(issn=issn,
-                                        publisher=publisher['name']))
-            return dict(error=0, error_message='',
-                        info=1, info_message="Journal's Publisher not found",
-                        fields=dict(publisher="", issn=issn))
-        else:
-            return dict(info=1, info_message="Couldn't find ISSN")
-    return dict(error=0, error_message='')
-
-
-def number_validate(field, dummy_form=None, error_message='It must be a number!'):
-    value = field.data
-    if value == "" or value.isspace():
-        return dict(error=0, error_message='')
+        return
 
     def is_number(s):
         try:
@@ -177,28 +159,5 @@ def number_validate(field, dummy_form=None, error_message='It must be a number!'
         except AttributeError:
             field.errors = list(field.process_errors)
             field.errors.append(error_message)
-        return dict(error=1,
-                    error_message=error_message)
-    else:
-        return dict(error=0, error_message='')
-
-
-def record_id_validate(field, form=None):
-    value = field.data
-    is_number = number_validate(field)['error'] == 0 \
-        and (value != "" or not value.isspace())
-
-    if is_number:
-        json_reader = get_record(value)
-    else:
-        return dict(error=1, error_message="Record id must be a number!")
-    if json_reader is not None:
-        webdeposit_json = form.uncook_json(json_reader, {}, value)
-        #FIXME: update current json
-
-        return dict(info=1,
-                    info_message='<a href="/record/"' + value +
-                                 '>Record</a> loaded successfully',
-                    fields=webdeposit_json)
-    else:
-        return dict(info=1, info_message="Record doesn't exist")
+        field.add_message('error', error_message)
+        return

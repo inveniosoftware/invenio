@@ -1,0 +1,7 @@
+<div class="control-group {{ "error" if thisfield.errors }}" id="state-group-{{ thisfield.name }}">
+    {{ field_label(thisfield) }}
+</div>
+{% for subfield in thisfield.form %}
+    {{ field_display( subfield )}}
+{% endfor %}
+<hr />

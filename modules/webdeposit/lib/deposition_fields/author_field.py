@@ -24,19 +24,12 @@ from invenio.webdeposit_autocomplete_utils import orcid_authors
 __all__ = ['AuthorField']
 
 
-class AuthorField(WebDepositField(key='authors[0].full_name'), TextField):
-
+class AuthorField(WebDepositField, TextField):
     def __init__(self, **kwargs):
-        super(AuthorField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-user"></i>'
-
-    def pre_validate(self, form=None):
-        return dict(error=0, error_message='')
-
-    def autocomplete(self):
-        # Load custom autocompletion function
-        autocomplete = self.config.get_autocomplete_function()
-        if autocomplete is not None:
-            return autocomplete(self.data)
-
-        return orcid_authors(self.data)
+        defaults = dict(
+            icon='icon-user',
+            recjson_key='authors[0].full_name',
+            autocomplete=orcid_authors
+        )
+        defaults.update(kwargs)
+        super(AuthorField, self).__init__(**defaults)

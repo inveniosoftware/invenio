@@ -20,32 +20,47 @@
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_autocomplete_utils import sherpa_romeo_journals
-from invenio.webdeposit_validation_utils import sherpa_romeo_journal_validate
+from invenio.webdeposit_processor_utils import sherpa_romeo_journal_process
 
 __all__ = ['JournalField']
 
 
-class JournalField(WebDepositField(), TextField):
-
+class JournalField(WebDepositField, TextField):
     def __init__(self, **kwargs):
-        super(JournalField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-book"></i>'
+        defaults = dict(
+            icon='icon-book',
+            processors=[sherpa_romeo_journal_process],
+            autocomplete=sherpa_romeo_journals,
+        )
+        defaults.update(kwargs)
+        super(JournalField, self).__init__(**defaults)
 
-    def pre_validate(self, form=None):
-        # Load custom validation
-        validators = self.config.get_validators()
-        if validators is not [] and validators is not None:
-            validation_json = {}
-            for validator in validators:
-                json = validator(self)
-                validation_json = self.merge_validation_json(validation_json, json)
 
-            return validation_json
-        return sherpa_romeo_journal_validate(self)
 
-    def autocomplete(self):
-        # Load custom autocompletion function
-        autocomplete = self.config.get_autocomplete_function()
-        if autocomplete is not None:
-            return autocomplete(self.data)
-        return sherpa_romeo_journals(self.data)
+# from wtforms import TextField
+# from invenio.bibknowledge import get_kb_mappings
+# from invenio.webdeposit_field import WebDepositField
+
+# __all__ = ['JournalField']
+
+
+# def _kb_transform(val):
+#     ret = {}
+#     ret['value'] = val['key']
+#     ret['label'] = val['key']
+#     return ret
+
+
+# class JournalField(WebDepositField, TextField):
+
+#     def __init__(self, **kwargs):
+#         self._icon_html = ''
+#         super(JournalField, self).__init__(**kwargs)
+
+#     def pre_validate(self, form):
+#         return dict(error=0, error_message='')
+
+#     def autocomplete(self, term, limit):
+#         if not term:
+#             term = ''
+#         return map(_kb_transform, get_kb_mappings('journal_name', '', term)[:limit])

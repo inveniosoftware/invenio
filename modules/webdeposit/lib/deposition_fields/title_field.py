@@ -17,38 +17,30 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from wtforms import TextField
+from wtforms import TextField, ValidationError
 from invenio.webdeposit_field import WebDepositField
 
 __all__ = ['TitleField']
 
 
-class TitleField(WebDepositField(key='title.title'), TextField):
+def validate_title(form, field):
+    value = field.data or ''
+    # Empty string allowed (required validator may be defined on per-field basis)
+    if value == "" or value.isspace():
+        return
 
+    error_message = ''
+    if len(value) <= 4:
+        raise ValidationError("This field must have at least 4 characters")
+
+
+class TitleField(WebDepositField, TextField):
     def __init__(self, **kwargs):
-        super(TitleField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-book"></i>'
+        defaults = dict(
+            icon='icon-book',
+            recjson_key='title.title',
+            #FIXMEvalidators=[validate_title]
 
-    def pre_validate(self, form=None):
-        # Load custom validation
-        validators = self.config.get_validators()
-        if validators is not [] and validators is not None:
-            validation_json = {}
-            for validator in validators:
-                json = validator(self)
-                validation_json = self.merge_validation_json(validation_json, json)
-            return validation_json
-
-        value = self.data
-        if value == "" or value.isspace():
-            return dict(error=0, error_message='')
-        error_message = 'Document Title must have at least 4 characters'
-        if len(str(value)) < 4:
-            try:
-                self.errors.append(error_message)
-            except AttributeError:
-                self.errors = list(self.process_errors)
-                self.errors.append(error_message)
-            return dict(error=1,
-                        error_message=error_message)
-        return dict(error=0, error_message='')
+        )
+        defaults.update(kwargs)
+        super(TitleField, self).__init__(**defaults)

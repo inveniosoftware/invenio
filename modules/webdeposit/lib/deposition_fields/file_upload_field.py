@@ -23,11 +23,8 @@ from invenio.webdeposit_field import WebDepositField
 __all__ = ['FileUploadField']
 
 
-class FileUploadField(WebDepositField(), FileField):
-
+class FileUploadField(WebDepositField, FileField):
     def __init__(self, **kwargs):
-        super(FileUploadField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-file"></i>'
-
-    def pre_validate(self, form=None):
-        return dict(error=0, error_message='')
+        defaults = dict(icon='icon-file')
+        defaults.update(kwargs)
+        super(FileUploadField, self).__init__(**defaults)

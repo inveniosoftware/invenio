@@ -1,26 +1,55 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+#
+# This file is part of Invenio.
+# Copyright (C) 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from wtforms import Label
 from invenio.wtforms_utils import InvenioForm as Form
-from invenio.webdeposit_config_utils import WebDepositConfiguration
 from invenio.webdeposit_cook_json_utils import cook_files, uncook_files
+
+CFG_GROUPS_META = {
+    'classes': None,
+    'indication': None,
+    'description': None
+}
+"""
+Default group metadata.
+"""
+
+CFG_FIELD_FLAGS = [
+    'hidden',
+    'disabled'
+]
+"""
+List of WTForm field flags to be saved in draft.
+
+See more about WTForm field flags on:
+http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field.flags
+"""
+
+"""
+Form customization
+
+you can customize the following for the form
+
+_title: str, the title to be rendered on top of the form
+_subtitle: str/html. explanatory text to be shown under the title.
+_drafting: bool, show or hide the drafts at the right of the form
+
+"""
 
 
 class WebDepositForm(Form):
@@ -29,33 +58,41 @@ class WebDepositForm(Form):
 
     def __init__(self, **kwargs):
         super(WebDepositForm, self).__init__(**kwargs)
-
-        # Load and apply configuration from config file
-        self.config = WebDepositConfiguration(form_type=self.__class__.__name__)
-
-        custom_title = self.config.get_form_title(self.__class__.__name__)
-        if custom_title is not None:
-            self._title = custom_title
-
-        for field in self._fields.values():
-            custom_label = self.config.get_label(field.__class__.__name__)
-            if custom_label is not None:
-                setattr(field, 'label', Label(field.id, custom_label))
-
-            custom_widget = self.config.get_widget(field.__class__.__name__)
-            if custom_widget is not None:
-                setattr(field, 'widget', custom_widget)
+        self._messages = None
 
         self.groups_meta = {}
         if hasattr(self, 'groups'):
-            for group in self.groups:
+            for idx, group in enumerate(self.groups):
                 group_name = group[0]
                 fields = group[1]
                 for field in fields:
                     setattr(self[field], 'group', group_name)
+
+                self.groups_meta[group_name] = CFG_GROUPS_META.copy()
                 if len(group) == 3:  # If group has metadata
-                    group_meta = group[2]
-                    self.groups_meta[group_name] = group_meta
+                    self.groups_meta[group_name].update(group[2])
+
+        if not hasattr(self, 'template'):
+            self.template = 'webdeposit_add.html'
+
+        if not hasattr(self, '_drafting'):
+            self._drafting = True
+
+        self.type = self.__class__.__name__
+
+    def reset_field_data(self, exclude=[]):
+        """
+        Reset the fields.data value to that of field.object_data.
+
+        Useful after initializing a form with both formdata and draftdata where
+        the formdata is missing field values (usually because we are saving a
+        single field).
+
+        @param exclude: List of field names to exclude.
+        """
+        for name, field in self._fields.items():
+            if name not in exclude:
+                field.data = field.object_data
 
     def cook_json(self, json_reader):
         for field in self._fields.values():
@@ -65,8 +102,7 @@ class WebDepositForm(Form):
                 # Some fields (eg. SubmitField) don't have a cook json function
                 pass
 
-        cook_files_function = self.config.get_files_cook_function() or cook_files
-        json_reader = cook_files_function(json_reader, self.files)
+        json_reader = cook_files(json_reader, self.files)
 
         return json_reader
 
@@ -82,27 +118,143 @@ class WebDepositForm(Form):
         return webdeposit_json
 
     def get_groups(self):
-        groups = [({"name": 'Rest'}, [])]
-        # Just a dict for optimization
-        groups_hash = {}
+        """
+        Get a list of the (group metadata, list of fields)-tuples
+
+        The last element of the list has no group metadata (i.e. None),
+        and contains the list of fields not assigned to any group.
+        """
+        fields_included = set()
+        field_groups = []
+
+        if hasattr(self, 'groups'):
+            for group in self.groups:
+                group_obj = {
+                    'name': group[0],
+                    'meta': CFG_GROUPS_META.copy(),
+                }
+
+                fields = []
+                for field_name in group[1]:
+                    fields.append(self[field_name])
+                    fields_included.add(field_name)
+
+                if len(group) == 3:
+                    group_obj['meta'].update(group[2])
+
+                field_groups.append((group_obj, fields))
+
+        # Append missing fields not defined in groups
+        rest_fields = []
         for field in self:
-            if hasattr(field, 'group') and field.group is not None:
-                if not field.group in groups_hash:
-                    groups_hash[field.group] = len(groups)
-                    # Append group to the list
-                    groups.append(({"name": field.group}, []))
-                # Append field to group's field list
-                groups[groups_hash[field.group]][1].append(field)
+            if field.name not in fields_included:
+                rest_fields.append(field)
+        if rest_fields:
+            field_groups.append((None, rest_fields))
 
-                if field.group in self.groups_meta:
-                    # Add group's meta (description etc)
-                    groups[groups_hash[field.group]][0]['meta'] = \
-                        self.groups_meta[field.group]
-            else:
-                # Append to Rest
-                groups[0][1].append(field)
+        return field_groups
 
-        # Append rest fields in the end
-        rest = groups.pop(0)
-        groups.append(rest)
-        return groups
+    @property
+    def json_data(self):
+        """
+        Return form data in a format suitable for the standard JSON encoder, by
+        calling Field.json_data() on each field if it exists, otherwise is uses
+        the value of Field.data.
+        """
+        return dict(
+            (name, f.json_data() if getattr(f, 'json_data', None) else f.data)
+            for name, f in self._fields.items()
+        )
+
+    def get_template(self):
+        """
+        Get template to render this form.
+        Define a data member `template` to customize which template to use.
+
+        By default, it will render the template `webdeposit_add.html`
+
+        """
+
+        return [self.template]
+
+    def post_process(self, fields=[], submit=False):
+        """
+        Run form post-processing by calling `post_process` on each field,
+        passing any extra `Form.post_process_<fieldname>` processors to the
+        field.
+
+        If ``fields'' are specified, only the given fields' processors will be
+        run (which may touch all fields of the form).
+
+        The post processing allows the form to alter other fields in the form,
+        via e.g. contacting external services (e.g a DOI field could retrieve
+        title, authors from CrossRef/DataCite).
+        """
+        for name, field, in self._fields.items():
+            if not fields or name in fields:
+                inline = getattr(
+                    self.__class__, 'post_process_%s' % name, None)
+                if inline is not None:
+                    extra = [inline]
+                else:
+                    extra = []
+                field.post_process(self, extra_processors=extra, submit=False)
+
+    def autocomplete(self, field_name, term, limit=50):
+        """
+        Auto complete a form field.
+
+        Assumes that formdata has already been loaded by into the form, so that
+        the search term can be access by field.data.
+        """
+        if field_name in self._fields:
+            return self._fields[field_name].perform_autocomplete(
+                self,
+                term,
+                limit=limit,
+            )[:limit]
+        return []
+
+    @property
+    def messages(self):
+        """
+        Return a dictionary of form messages.
+        """
+        _messages = dict(
+            (
+                name,
+                {
+                    'state': f.message_state
+                             if hasattr(f, 'message_state') and f.message_state
+                             else '',
+                    'messages': f.messages,
+                }
+            ) for name, f in self._fields.items()
+        )
+
+        if self.errors:
+            _messages.update(dict(
+                (
+                    name,
+                    {
+                        'state': 'error',
+                        'messages': messages,
+                    }
+                ) for name, messages in self.errors.items()
+
+            ))
+        return _messages
+
+    @property
+    def flags(self):
+        """
+        Return dictionary of fields and their set flags
+
+        Note only flags from CFG_FIELD_FLAGS that is set to True are returned.
+        """
+        return dict(
+            (
+                name,
+                filter(lambda flag: getattr(f.flags, flag), CFG_FIELD_FLAGS)
+            ) for name, f in self._fields.items()
+        )

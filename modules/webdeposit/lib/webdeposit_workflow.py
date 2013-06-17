@@ -84,9 +84,14 @@ class DepositionWorkflow(object):
         self.obj['steps_num'] = self.steps_num
 
     def set_object(self):
-        self.db_workflow_obj = \
-            WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid()). \
-            first()
+        db_workflow_objects = \
+            WfeObject.query.filter(WfeObject.workflow_id == self.get_uuid())
+        try:
+            self.db_workflow_obj = max(db_workflow_objects.all(),
+                                       key=lambda w: w.id)
+        except ValueError:
+            self.db_workflow_obj = None
+
         if self.db_workflow_obj is None:
             self.bib_obj = BibWorkflowObject(data=self.obj,
                                              workflow_id=self.get_uuid(),
@@ -131,16 +136,29 @@ class DepositionWorkflow(object):
 
         return status
 
-    def get_output(self, form_validation=None):
+    def get_data(self, key):
+        if key in self.bib_obj.data:
+            return self.bib_obj.data[key]
+        else:
+            self.set_object()  # refresh the current object and check again
+            if key in self.bib_obj.data:
+                return self.bib_obj.data[key]
+            return None
+
+    def get_output(self, form=None, form_validation=False):
         """ Returns a representation of the current state of the workflow
             (a dict with the variables to fill the jinja template)
         """
+        from invenio.webdeposit_utils import get_form, \
+            draft_field_get_all
+
         user_id = self.user_id
         uuid = self.get_uuid()
 
-        from invenio.webdeposit_utils import get_form, \
-            draft_field_get_all
-        form = get_form(user_id, uuid)
+        if form is None:
+            form = get_form(
+                user_id, uuid, validate_draft=not form_validation
+            )
 
         deposition_type = self.obj['deposition_type']
         drafts = draft_field_get_all(user_id, deposition_type)
@@ -148,8 +166,8 @@ class DepositionWorkflow(object):
         if form_validation:
             form.validate()
 
-        # Get the template from configuration for this form
-        template = form.config.get_template() or 'webdeposit_add.html'
+        # Get the template for this form
+        template = form.get_template()
 
         return dict(template_name_or_list=template,
                     workflow=self,
@@ -209,9 +227,3 @@ class DepositionWorkflow(object):
                 pass
 
         return json_reader
-
-    def get_data(self, key):
-        if key in self.bib_obj.data:
-            return  self.bib_obj.data[key]
-        else:
-            return None

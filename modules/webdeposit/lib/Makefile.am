@@ -20,27 +20,30 @@ SUBDIRS = deposition_forms deposition_fields deposition_types
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = __init__.py \
+             webdeposit_autocomplete_utils.py \
+			 webdeposit_api_blueprint.py \
              webdeposit_blueprint.py \
-             webdeposit_utils.py \
+             webdeposit_cook_json_utils.py \
+             webdeposit_field.py \
+             webdeposit_field_widgets.py \
+             webdeposit_filter_utils.py \
+             webdeposit_form.py \
+             webdeposit_load_deposition_types.py \
              webdeposit_load_fields.py \
              webdeposit_load_forms.py \
-             webdeposit_load_deposition_types.py \
-             webdeposit_field_widgets.py \
              webdeposit_model.py \
+             webdeposit_processor_utils.py \
+             webdeposit_regression_tests.py \
+             webdeposit_utils.py \
+             webdeposit_validation_utils.py \
              webdeposit_workflow.py \
              webdeposit_workflow_utils.py \
-             webdeposit_field.py \
-             webdeposit_autocomplete_utils.py \
-             webdeposit_validation_utils.py \
-             webdeposit_config.py \
-             webdeposit_config_utils.py \
-             webdeposit_form.py \
-             webdeposit_cook_json_utils.py \
-             webdeposit_regression_tests.py
+			 webdeposit_api_regression_tests.py
 
 jsdir=$(localstatedir)/www/js
 
-js_DATA = webdeposit_form.js
+js_DATA = webdeposit_form.js \
+          webdeposit_templates.js
 
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)

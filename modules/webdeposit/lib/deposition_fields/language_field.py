@@ -19,15 +19,15 @@
 
 from wtforms import SelectField
 from invenio.webdeposit_field import WebDepositField
+from wtforms.validators import optional
 
 __all__ = ['LanguageField']
 
 
-class LanguageField(WebDepositField(key='language'), SelectField):
-
+class LanguageField(WebDepositField, SelectField):
     def __init__(self, **kwargs):
-        super(LanguageField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-flag"></i>'
-
-    def pre_validate(self, form=None):
-        return dict(error=0, error_message='')
+        defaults = dict(icon='icon-flag',
+                        recjson_key='language',
+                        validators=[optional()])
+        defaults.update(kwargs)
+        super(LanguageField, self).__init__(**defaults)

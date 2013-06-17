@@ -17,11 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from wtforms import TextField, SubmitField
 from wtforms.validators import Required
 from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_field_widgets import date_widget, bootstrap_submit
+from invenio.webdeposit_field_widgets import plupload_widget, date_widget, \
+                                             bootstrap_submit
 
 # Import custom fields
 from invenio.webdeposit_load_fields import fields
@@ -34,28 +34,28 @@ class PreprintForm(Form):
     subject_category = fields.TitleField(label=_('Subject category'),
                                                 validators=[Required()])
     note = fields.NotesField(label=_('Note'))
-    institution = TextField(label=_('Institution'))
-    languages = [("en", _("English")), \
-                ("fre", _("French")), \
-                ("ger", _("German")), \
-                ("dut", _("Dutch")), \
-                ("ita", _("Italian")), \
-                ("spa", _("Spanish")), \
-                ("por", _("Portuguese")), \
-                ("gre", _("Greek")), \
-                ("slo", _("Slovak")), \
-                ("cze", _("Czech")), \
-                ("hun", _("Hungarian")), \
-                ("pol", _("Polish")), \
-                ("nor", _("Norwegian")), \
-                ("swe", _("Swedish")), \
-                ("fin", _("Finnish")), \
-                ("rus", _("Russian"))]
+    institution = fields.TextField(label=_('Institution'))
+    languages = [("en", _("English")),
+                 ("fre", _("French")),
+                 ("ger", _("German")),
+                 ("dut", _("Dutch")),
+                 ("ita", _("Italian")),
+                 ("spa", _("Spanish")),
+                 ("por", _("Portuguese")),
+                 ("gre", _("Greek")),
+                 ("slo", _("Slovak")),
+                 ("cze", _("Czech")),
+                 ("hun", _("Hungarian")),
+                 ("pol", _("Polish")),
+                 ("nor", _("Norwegian")),
+                 ("swe", _("Swedish")),
+                 ("fin", _("Finnish")),
+                 ("rus", _("Russian"))]
     language = fields.LanguageField(label=_("Language"), choices=languages)
     date = fields.Date(label=_('Date'), widget=date_widget)
-    file_field = fields.FileUploadField(label=_('File'))
-    submit = SubmitField(label=_('Submit Preprint'), widget=bootstrap_submit)
+    file_field = fields.FileUploadField(widget=plupload_widget)
+    submit = fields.SubmitField(label=_('Submit Preprint'), widget=bootstrap_submit)
 
     """ Form Configuration variables """
     _title = _("Submit a Preprint")
-    _drafting = True  #enable and disable drafting
+    _drafting = True  # enable and disable drafting

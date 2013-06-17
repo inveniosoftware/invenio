@@ -17,7 +17,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from wtforms import SubmitField
 from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webinterface_handler_flask_utils import _
 # Import custom fields
@@ -35,10 +34,10 @@ class PhotoForm(Form):
     date = fields.Date(label=_('Photo Date'),
                        widget=date_widget)
     keywords = fields.KeywordsField(label=_('Keywords'))
-    notes = fields.NotesField(label=_('Comments or Notes'))
+    notes = fields.NotesField(label=_('Description'))
     plupload_file = fields.FileUploadField(label=_('Files'),
                                            widget=plupload_widget)
-    submit = SubmitField(label=_('Submit Photo'), widget=bootstrap_submit)
+    submit = fields.SubmitField(label=_('Submit Photo'), widget=bootstrap_submit)
 
     #configuration variables
     _title = _("Submit a Photo")

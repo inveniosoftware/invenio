@@ -19,15 +19,14 @@
 
 import os
 import time
-from sqlalchemy import func
+from datetime import datetime
 from invenio.sqlalchemyutils import db
-from invenio.webdeposit_config_utils import WebDepositConfiguration
-from invenio.webdeposit_model import WebDepositDraft
 from invenio.bibworkflow_model import Workflow
 from invenio.bibfield_jsonreader import JsonReader
 from tempfile import mkstemp
 from invenio.bibtask import task_low_level_submission
-from invenio.config import CFG_TMPSHAREDDIR
+from invenio.config import CFG_TMPSHAREDDIR, CFG_PREFIX
+from invenio.dbquery import run_sql
 
 """
     Functions to implement workflows
@@ -51,21 +50,59 @@ def authorize_user(user_id=None):
     return user_auth
 
 
+def populate_form_data(form_data):
+    """ Pass a json to initialize the values of the forms.
+        If two forms use the same name for a field,
+        the value is passed to the one that is rendered first."""
+    def populate(obj, eng):
+        obj.data['form_values'] = form_data
+    return populate
+
+
 def render_form(form):
     def render(obj, eng):
+        from invenio.webdeposit_utils import get_last_step, CFG_DRAFT_STATUS, \
+            add_draft,  get_preingested_form_data, preingest_form_data
+
         uuid = eng.uuid
-        # TODO: get the current step from the object
-        step = max(obj.db_obj.task_counter)  # data['step']
+        user_id = obj.data['user_id']
+        #TODO: create out of the getCurrTaskId() which is a list
+        # an incremental key that represents also steps in complex workflows.
+        step = get_last_step(eng.getCurrTaskId())
         form_type = form.__name__
-        from invenio.webdeposit_utils import CFG_DRAFT_STATUS
-        webdeposit_draft = WebDepositDraft(uuid=uuid,
-                                           form_type=form_type,
-                                           form_values={},
-                                           step=step,
-                                           status=CFG_DRAFT_STATUS['unfinished'],
-                                           timestamp=func.current_timestamp())
-        db.session.add(webdeposit_draft)
-        db.session.commit()
+
+        if obj.data.has_key('form_values') and obj.data['form_values'] is not None:
+            form_values = obj.data['form_values']
+        else:
+            form_values = {}
+        # Prefill the form from cache
+        cached_form = get_preingested_form_data(user_id, cached_data=True)
+
+        # Check for preingested data from webdeposit API
+        preingested_form_data = get_preingested_form_data(user_id, uuid)
+        if preingested_form_data != {} and preingested_form_data is not None:
+            form_data = preingested_form_data
+        elif cached_form is not None:
+            form_data = cached_form
+            # Clear cache
+            preingest_form_data(user_id, None, cached_data=True)
+        else:
+            form_data = {}
+
+        # Filter the form_data to match the current form
+        for field in form():
+            if field.name in form_data:
+                form_values[field.name] = form_data[field.name]
+
+        draft = dict(form_type=form_type,
+                     form_values=form_values,
+                     status=CFG_DRAFT_STATUS['unfinished'],
+                     timestamp=str(datetime.now()),
+                     step=step)
+
+        Workflow.set_extra_data(user_id=user_id, uuid=uuid,
+                                setter=add_draft(draft))
+    render.__form_type__ = form.__name__
     return render
 
 
@@ -85,6 +122,7 @@ def wait_for_submission():
 
 
 def export_marc_from_json():
+    """ Exports marc from json using BibField """
     def export(obj, eng):
         user_id = obj.data['user_id']
         uuid = eng.uuid
@@ -92,10 +130,30 @@ def export_marc_from_json():
 
         from invenio.webdeposit_utils import get_form
         json_reader = JsonReader()
+
+        try:
+            pop_obj = Workflow.get_extra_data(user_id=user_id, uuid=uuid,
+                                              key='pop_obj')
+        except KeyError:
+            pop_obj = None
+
+        form_data = {}
+        if 'form_values' in obj.data or pop_obj is not None:
+
+            # copy the form values to be able to
+            # delete the fields in the workflow object during iteration
+            form_data = pop_obj or obj.data['form_values']
+
+        # Populate the form with data
         for step in range(steps_num):
             form = get_form(user_id, uuid, step)
+
             # Insert the fields' values in bibfield's rec_json dictionary
             if form is not None:  # some steps don't have any form ...
+                # Populate preingested data
+                for field in form:
+                    if field.name in form_data:
+                        field.data = form_data.pop(field.name)
                 json_reader = form.cook_json(json_reader)
 
         deposition_type = \
@@ -105,21 +163,35 @@ def export_marc_from_json():
             one()[0]
 
         # Get the collection from configuration
-        deposition_conf = WebDepositConfiguration(deposition_type=deposition_type)
-        # or if it's not there, name the collection after the deposition type
-        json_reader['collection.primary'] = \
-            deposition_conf.get_collection() or deposition_type
+        # FIXME: Collection should be fully configurable.
+        json_reader['collection.primary'] = deposition_type
 
-        if 'recid' in json_reader or 'record ID' in json_reader:
-            obj.data['update_record'] = True
+        if 'recid' not in json_reader or 'record ID' not in json_reader:
+            # Record is new, reserve record id
+            recid = run_sql("INSERT INTO bibrec (creation_date, modification_date) VALUES (NOW(), NOW())")
+            json_reader['recid'] = recid
+            obj.data['recid'] = recid
         else:
-            obj.data['update_record'] = False
+            obj.data['recid'] = json_reader['recid']
+            obj.data['title'] = json_reader['title.title']
+
+        workflow = Workflow.query.filter(Workflow.uuid == uuid).one()
+        workflow.extra_data['recid'] = obj.data['recid']
+        Workflow.query.\
+            filter(Workflow.uuid == uuid).\
+            update({'extra_data': workflow.extra_data})
+
         marc = json_reader.legacy_export_as_marc()
         obj.data['marc'] = marc
     return export
 
 
 def create_record_from_marc():
+    """ Generates the record from marc.
+    The function requires the marc to be generated,
+    so the function export_marc_from_json must have been called successfully
+    before
+    """
     def create(obj, dummy_eng):
         marc = obj.data['marc']
         tmp_file_fd, tmp_file_name = mkstemp(suffix='.marcxml',
@@ -130,12 +202,27 @@ def create_record_from_marc():
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0644)
 
-        if obj.data['update_record']:
-            obj.data['task_id'] = task_low_level_submission('bibupload',
-                                                            'webdeposit', '-r',
-                                                            tmp_file_name)
-        else:
-            obj.data['task_id'] = task_low_level_submission('bibupload',
-                                                            'webdeposit', '-i',
-                                                            tmp_file_name)
+        obj.data['task_id'] = task_low_level_submission('bibupload',
+                                                        'webdeposit', '-r',
+                                                        tmp_file_name)
     return create
+
+
+def bibindex():
+    """ Runs BibIndex """
+    def bibindex_task(obj, eng):
+        cmd = "%s/bin/bibindex -u admin" % CFG_PREFIX
+        if os.system(cmd):
+            eng.log.error("BibIndex task failed.")
+
+    return bibindex_task
+
+
+def webcoll():
+    """ Runs WebColl """
+    def webcoll_task(obj, eng):
+        cmd = "%s/bin/webcoll -u admin" % CFG_PREFIX
+        if os.system(cmd):
+            eng.log.error("WebColl task failed.")
+
+    return webcoll_task

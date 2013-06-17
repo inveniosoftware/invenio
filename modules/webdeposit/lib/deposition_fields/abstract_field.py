@@ -20,15 +20,15 @@
 from wtforms import TextAreaField
 from invenio.webdeposit_field import WebDepositField
 
+
 __all__ = ['AbstractField']
 
 
-class AbstractField(WebDepositField(key='abstract.summary'), TextAreaField):
-
+class AbstractField(WebDepositField, TextAreaField):
     def __init__(self, **kwargs):
-        super(AbstractField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-pencil"></i>'
-
-    def pre_validate(self, form=None):
-        return dict(error=0, error_message='')
-
+        defaults = dict(
+            icon='icon-pencil',
+            recjson_key='abstract.summary'
+        )
+        defaults.update(kwargs)
+        super(AbstractField, self).__init__(**defaults)

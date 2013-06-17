@@ -19,25 +19,41 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_validation_utils import datacite_doi_validate
+from invenio.webdeposit_validation_utils import doi_syntax_validator
+from invenio.webdeposit_filter_utils import strip_prefixes, strip_string
+from invenio.webdeposit_processor_utils import datacite_lookup
 
 __all__ = ['DOIField']
 
 
-class DOIField(WebDepositField(key='publication_info.DOI'), TextField):
+def missing_doi_warning(dummy_form, field, dummy_submit=False):
+    """
+    Field processor, checking for existence of a DOI, and otherwise
+    asking people to provide it.
+    """
+    if not field.errors and not field.data:
+        field.message_state = "warning"
+        field.messages.append("Please provide a DOI if possible.")
+        raise StopIteration()
 
+
+class DOIField(WebDepositField, TextField):
     def __init__(self, **kwargs):
-        super(DOIField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-barcode"></i>'
-
-    def pre_validate(self, form=None):
-        # Load custom validation
-        validators = self.config.get_validators()
-        if validators is not [] and validators is not None:
-            validation_json = {}
-            for validator in validators:
-                json = validator(self)
-                validation_json = self.merge_validation_json(validation_json, json)
-
-            return validation_json
-        return datacite_doi_validate(self)
+        defaults = dict(
+            icon='icon-barcode',
+            recjson_key='publication_info.DOI',
+            validators=[
+                doi_syntax_validator,
+            ],
+            filters=[
+                strip_string,
+                strip_prefixes("doi:", "http://dx.doi.org/"),
+            ],
+            processors=[
+                missing_doi_warning,
+                datacite_lookup(display_info=True),
+            ],
+            placeholder="e.g. 10.1234/foo.bar...",
+        )
+        defaults.update(kwargs)
+        super(DOIField, self).__init__(**defaults)

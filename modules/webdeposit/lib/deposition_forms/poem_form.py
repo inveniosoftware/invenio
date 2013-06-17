@@ -17,7 +17,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from wtforms import SubmitField
 from wtforms.validators import Required
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_form import WebDepositForm as Form
@@ -53,7 +52,7 @@ class PoemForm(Form):
                                     validators=[Required()])
     year = fields.Date(label=_('Year'), validators=[Required()])
     poem_text = fields.AbstractField(label='Poem Text', validators=[Required()])
-    submit = SubmitField(label=_('Submit Poem'),
+    submit = fields.SubmitField(label=_('Submit Poem'),
                          widget=bootstrap_submit)
 
     """ Form Configuration variables """

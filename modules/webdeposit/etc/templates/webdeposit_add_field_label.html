@@ -1,0 +1,14 @@
+{% if thisfield.widget.__name__ not in ['plupload_widget'] and not 'button' in thisfield.__html__()|lower %}
+    {% if thisfield.label.text %}
+        {% if thisfield.form %}
+            <h5>{{ thisfield.label.text }}</h5>
+        {% else %}
+            <label class="control-label{{' required' if thisfield.flags.required}}{{ ' error' if thisfield.errors }}" for="{{thisfield.label.field_id}}">
+                {%- if thisfield.icon %}
+                    <span class="" style="margin-right: 5px; margin-top: 5px;"><i class={{ thisfield.icon}}></i></span>
+                {%- endif %}
+                {{ thisfield.label.text }}
+            </label>
+        {% endif %}
+    {% endif %}
+{% endif %}

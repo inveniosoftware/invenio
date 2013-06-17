@@ -21,23 +21,34 @@ from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.orcid import OrcidSearch
 
 
-def sherpa_romeo_publishers(value):
-    sherpa_romeo = SherpaRomeoSearch()
-    publishers = sherpa_romeo.search_publisher(value)
-    if publishers is None:
-        return []
-    return publishers
+def sherpa_romeo_publishers(dummy_form, term, limit=50):
+    if term:
+        sherpa_romeo = SherpaRomeoSearch()
+        publishers = sherpa_romeo.search_publisher(term)
+        if publishers is None:
+            return []
+        return publishers
+    return []
 
 
-def sherpa_romeo_journals(value):
-    s = SherpaRomeoSearch()
-    journals = s.search_journal(value)
-    if journals is None:
-        return []
-    return journals
+def sherpa_romeo_journals(dummy_form, term, limit=50):
+    """
+    Search SHERPA/RoMEO for journal name
+    """
+    if term:
+        # SherpaRomeoSearch doesnt' like unicode
+        if isinstance(term, unicode):
+            term = term.encode('utf8')
+        s = SherpaRomeoSearch()
+        journals = s.search_journal(term)
+        if journals is not None:
+            return journals[:limit]
+    return []
 
 
-def orcid_authors(value):
-    orcid = OrcidSearch()
-    orcid.search_authors(value)
-    return orcid.get_authors_names()
+def orcid_authors(dummy_form, term, limit=50):
+    if term:
+        orcid = OrcidSearch()
+        orcid.search_authors(term)
+        return orcid.get_authors_names()
+    return []

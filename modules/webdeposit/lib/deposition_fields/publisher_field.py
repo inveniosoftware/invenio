@@ -19,32 +19,29 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_validation_utils import sherpa_romeo_publisher_validate
+from invenio.webdeposit_processor_utils import sherpa_romeo_publisher_process
 from invenio.webdeposit_autocomplete_utils import sherpa_romeo_publishers
 
 __all__ = ['PublisherField']
 
 
-class PublisherField(WebDepositField(), TextField):
-
+class PublisherField(WebDepositField, TextField):
     def __init__(self, **kwargs):
-        super(PublisherField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-certificate"></i>'
+        defaults = dict(
+            icon='icon-certificate',
+            processors=[sherpa_romeo_publisher_process],
+            autocomplete=sherpa_romeo_publishers
+        )
+        defaults.update(kwargs)
+        super(PublisherField, self).__init__(**defaults)
 
-    def pre_validate(self, form=None):
-        # Load custom validation
-        validators = self.config.get_validators()
-        if validators is not [] and validators is not None:
-            validation_json = {}
-            for validator in validators:
-                json = validator(self)
-                validation_json = self.merge_validation_json(validation_json, json)
-            return validation_json
-        return sherpa_romeo_publisher_validate(self)
+    # def post_process(self, form, extra_processors=[]):
+    #     sherpa_romeo_publisher_validate(self, form) #FIXME
+    #     super(PublisherField, self).post_process(form, extra_processors=extra_processors)
 
-    def autocomplete(self):
-        # Load custom autocompletion function
-        autocomplete = self.config.get_autocomplete_function()
-        if autocomplete is not None:
-            return autocomplete(self.data)
-        return sherpa_romeo_publishers(self.data)
+    # def autocomplete(self, term, limit): #FIXME
+    #      # Load custom auto complete function
+    #     autocomplete = self.config.get_autocomplete_function()
+    #     if autocomplete is not None:
+    #         return autocomplete(self.data)
+    #     return sherpa_romeo_publishers(self.data)

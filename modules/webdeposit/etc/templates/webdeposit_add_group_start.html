@@ -1,0 +1,9 @@
+<div class="accordion-group">
+    <div class="accordion-heading">
+        {% if group.meta.indication %}
+            <span class="accordion-toggle muted pull-right">{{ group.meta.indication }}</span>
+        {% endif %}
+        <a class="accordion-toggle" data-toggle="collapse" href="#collapse-{{ idx }}"> {{ group.name }} <b class="caret" style="margin-top: 8px;"></b></a>
+    </div>
+    <div id="collapse-{{ idx }}" class="accordion-body collapse {{ 'in' if group.meta.classes is none else group.meta.classes }}">
+    <div class="accordion-inner">

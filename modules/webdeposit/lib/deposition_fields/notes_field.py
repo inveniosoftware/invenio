@@ -23,11 +23,10 @@ from invenio.webdeposit_field import WebDepositField
 __all__ = ['NotesField']
 
 
-class NotesField(WebDepositField(), TextAreaField):
-
+class NotesField(WebDepositField, TextAreaField):
     def __init__(self, **kwargs):
-        super(NotesField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-list"></i>'
-
-    def pre_validate(self, form=None):
-        return dict(error=0, error_message='')
+        defaults = dict(
+            icon='icon-list',
+        )
+        defaults.update(kwargs)
+        super(NotesField, self).__init__(**defaults)

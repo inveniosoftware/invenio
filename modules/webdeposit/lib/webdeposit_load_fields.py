@@ -28,11 +28,13 @@ def plugin_builder(plugin_name, plugin_code):
     if plugin_name == '__init__':
         return
     try:
+        candidates = []
         all = getattr(plugin_code, '__all__')
         for name in all:
             candidate = getattr(plugin_code, name)
             if issubclass(candidate, Field):
-                return candidate
+                candidates.append(candidate)
+        return candidates
     except AttributeError:
         pass
 
@@ -41,16 +43,16 @@ CFG_FIELDS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
                                           '*_field.py'),
                              plugin_builder=plugin_builder)
 
-
 class Fields(object):
     pass
 
 fields = Fields()
 
-for field in CFG_FIELDS.itervalues():
-    ## Change the names of the fields from the file names to the class names.
-    if field is not None:
-        fields.__setattr__(field.__name__, field)
+for field_list in CFG_FIELDS.itervalues():
+    for field in field_list:
+        ## Change the names of the fields from the file names to the class names.
+        if field is not None:
+            fields.__setattr__(field.__name__, field)
 
 ## Let's report about broken plugins
 open(os.path.join(CFG_LOGDIR, 'broken-deposition-fields.log'), 'w').write(

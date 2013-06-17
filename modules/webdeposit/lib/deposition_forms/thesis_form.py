@@ -17,11 +17,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from wtforms import SelectField, SubmitField
 from wtforms.validators import Required
 from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_field_widgets import date_widget, plupload_widget, bootstrap_submit
+from invenio.webdeposit_cook_json_utils import add_author
+from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
+                                             bootstrap_submit
 
 # Import custom fields
 from invenio.webdeposit_load_fields import fields
@@ -32,39 +33,39 @@ class ThesisForm(Form):
 
     title = fields.TitleField(label=_('Original Thesis Title'),
                               validators=[Required()])
-    subtitle = fields.TitleField(label=_('Original Thesis Subtitle'))
-    alternative_title = fields.TitleField(label=_('Alternative Title'))
-    author = fields.AuthorField(label=_('Author'))
+    subtitle = fields.TitleField(label=_('Original Thesis Subtitle'),
+                                 recjson_key='title.subtitle')
+    author = fields.AuthorField(label=_('Author'),
+                                cook_function=add_author)
     supervisor = fields.AuthorField(label=_('Thesis Supervisor'))
     abstract = fields.AbstractField(label=_('Abstract'))
-    subject = fields.TitleField(label=_('Subject'))
 
-    languages = [("en", _("English")), \
-                ("fre", _("French")), \
-                ("ger", _("German")), \
-                ("dut", _("Dutch")), \
-                ("ita", _("Italian")), \
-                ("spa", _("Spanish")), \
-                ("por", _("Portuguese")), \
-                ("gre", _("Greek")), \
-                ("slo", _("Slovak")), \
-                ("cze", _("Czech")), \
-                ("hun", _("Hungarian")), \
-                ("pol", _("Polish")), \
-                ("nor", _("Norwegian")), \
-                ("swe", _("Swedish")), \
-                ("fin", _("Finnish")), \
-                ("rus", _("Russian"))]
+    languages = [("en", _("English")),
+                 ("fre", _("French")),
+                 ("ger", _("German")),
+                 ("dut", _("Dutch")),
+                 ("ita", _("Italian")),
+                 ("spa", _("Spanish")),
+                 ("por", _("Portuguese")),
+                 ("gre", _("Greek")),
+                 ("slo", _("Slovak")),
+                 ("cze", _("Czech")),
+                 ("hun", _("Hungarian")),
+                 ("pol", _("Polish")),
+                 ("nor", _("Norwegian")),
+                 ("swe", _("Swedish")),
+                 ("fin", _("Finnish")),
+                 ("rus", _("Russian"))]
     language = fields.LanguageField(label=_("Language"), choices=languages)
     publisher = fields.PublisherField(label=_('Thesis Publisher'))
     defence_date = fields.Date(label=_('Date of Defence'), widget=date_widget)
 
     funded_choices = [("yes", _("Yes")), ("no", _("No"))]
-    funded = SelectField(label=_("Has your thesis been funded by the CERN Doctoral Student Program?"),
-                                  choices=funded_choices)
+    funded = fields.SelectField(label=_("Has your thesis been funded by the CERN Doctoral Student Program?"),
+                                choices=funded_choices)
 
-    file_field = fields.FileUploadField(label=_('File'), widget=plupload_widget)
-    submit = SubmitField(label=_('Submit Thesis'), widget=bootstrap_submit)
+    file_field = fields.FileUploadField(widget=plupload_widget)
+    submit = fields.SubmitField(label=_('Submit Thesis'), widget=bootstrap_submit)
 
     """ Form Configuration variables """
     _title = _("Submit a Thesis")

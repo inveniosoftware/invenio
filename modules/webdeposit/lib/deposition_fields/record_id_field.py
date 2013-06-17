@@ -19,17 +19,19 @@
 
 from wtforms import TextField
 from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_validation_utils import record_id_validate
+from invenio.webdeposit_processor_utils import record_id_process
 
 __all__ = ['RecordIDField']
 
 
-class RecordIDField(WebDepositField(key='recid'), TextField):
+class RecordIDField(WebDepositField, TextField):
     """ Used to update existing records """
 
     def __init__(self, **kwargs):
-        super(RecordIDField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-barcode"></i>'
-
-    def pre_validate(self, form=None):
-        return record_id_validate(self, form)
+        defaults = dict(
+            icon='icon-barcode',
+            recjson_key='recid',
+            processors=[record_id_process]
+        )
+        defaults.update(kwargs)
+        super(RecordIDField, self).__init__(**defaults)

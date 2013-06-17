@@ -23,11 +23,13 @@ from invenio.webdeposit_field import WebDepositField
 __all__ = ['KeywordsField']
 
 
-class KeywordsField(WebDepositField(), TextField):
+class KeywordsField(WebDepositField, TextField):
 
     def __init__(self, **kwargs):
-        super(KeywordsField, self).__init__(**kwargs)
-        self._icon_html = '<i class="icon-tags"></i>'
-
-    def pre_validate(self, form=None):
-        return dict(error=0, error_message='')
+        defaults = dict(
+            icon='icon-tags',
+            #validators=[sherpa_romeo_journal_validate], #FIXME
+            #autocomplete=sherpa_romeo_journals,
+        )
+        defaults.update(kwargs)
+        super(KeywordsField, self).__init__(**defaults)

@@ -33,6 +33,12 @@ def cook_to_recjson(key):
     return cook
 
 
+def add_author(json_reader, value):
+    if 'authors' in json_reader:
+        json_reader['authors'].append({'full_name': value})
+    else:
+        json_reader['authors[0].full_name'] = value
+
 """ Cooks for the deposition files """
 
 from invenio.bibdocfile import BibRecDocs

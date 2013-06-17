@@ -59,4 +59,35 @@
   {% endif %}
 </div>
 
+{% if past_depositions %}
+
+<div class="row" style="margin-top: 22px;">
+  <ul class="nav nav-list">
+  <li class="divider" style="overflow: visible;"></li>
+</ul>
+
+  <h4 class="offset2"style="margin-top: 25px;">Past depositions</h4>
+
+   <ul class="nav nav-tabs nav-stacked offset3 span6">
+       {% for dep in past_depositions %}
+      {% if dep.extra_data.recid %}
+          <li> <a href="/record/{{ dep.extra_data.recid }}">
+           <i class="icon-chevron-right pull-right"></i>
+            {{ dep.name }}:
+            {% if dep.extra_data.title %}
+                {{ dep.extra_data.title }}
+            {% else %}
+                {{ _('Untitled') }}
+            {% endif %}
+         </a>
+         </li>
+     {% endif %}
+  {% endfor %}
+  </ul>
+
+
+</div>
+
+{% endif %}
+
 {% endblock %}
