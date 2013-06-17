@@ -30,9 +30,12 @@ try:
 except:
     import pickle
 
-from invenio.config import CFG_PYLIBDIR
+from pprint import pformat
+
+from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.dbquery import run_sql
 from invenio.pluginutils import PluginContainer
+from invenio.signalutils import record_after_update
 
 from invenio.bibfield_jsonreader import JsonReader
 from invenio.bibfield_utils import BlobWrapper
@@ -48,13 +51,21 @@ def plugin_builder(plugin_name, plugin_code):
                 return candidate
         except:
             pass
-    raise ValueError('%s is not a valid external authentication plugin' % plugin_name)
+    raise ValueError('%s is not a valid BibField reader plugin' % plugin_name)
 
 CFG_BIBFIELD_READERS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
                                                     'bibfield_*reader.py'),
                                        plugin_builder=plugin_builder)
 
+open(os.path.join(CFG_LOGDIR, 'broken-bibfield-readers.log'), 'w').\
+    write(pformat(CFG_BIBFIELD_READERS.get_broken_plugins()))
+
 # end Plug-in utils
+
+
+@record_after_update.connect
+def delete_record_cache(sender, recid=None, **kwargs):
+    get_record(recid, reset_cache=True)
 
 
 def create_record(blob, master_format='marc', verbose=0, **aditional_info):

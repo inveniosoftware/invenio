@@ -70,6 +70,7 @@ def request_record(f):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
                 'collection': guess_primary_collection_of_a_record(recid)})
             url_args = {'action': cookie, 'ln': g.ln, 'referer': request.referrer}
+            flash(_("Authorization failure"), 'error')
             return redirect(url_for('webaccount.login', **url_args))
         elif auth_code:
             flash(auth_msg, 'error')

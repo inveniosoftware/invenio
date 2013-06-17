@@ -64,7 +64,7 @@ $(document).ready(function() {
                 </td>
                 <td>
                   <a href="{{ url_for('webcomment.comments', recid=s.id_bibrec) }}">
-                  {{ get_title(s.id_bibrec)|safe }}
+                  {{ get_record(s.id_bibrec).get('title.title', '#%d'|format(s.id_bibrec))|safe }}
                   </a>
                 </td>
                 <td>{{ s.creation_time }}</td>

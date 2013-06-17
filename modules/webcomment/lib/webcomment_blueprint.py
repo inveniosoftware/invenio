@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,41 +22,35 @@
 from datetime import datetime
 import socket
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
-from invenio.cache import cache
-from invenio.intbitset import intbitset as HitSet
+from flask import g, render_template, request, flash, redirect, url_for, \
+    current_app, abort
 from invenio.sqlalchemyutils import db
-from invenio.websearch_model import Collection, CollectionCollection
 from invenio.webmessage_mailutils import email_quote_txt
-from invenio.websession_model import User
 from invenio.webcomment_model import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
                                      CmtACTIONHISTORY
 from invenio.webcomment_forms import AddCmtRECORDCOMMENTForm, \
                                      AddCmtRECORDCOMMENTFormReview
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
-                                     register_template_context_processor
+from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.webuser_flask import current_user
 from invenio.config import CFG_PREFIX, \
-     CFG_SITE_LANG, \
-     CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
-     CFG_SITE_SUPPORT_EMAIL,\
-     CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
-     CFG_SITE_URL,\
-     CFG_SITE_NAME,\
-     CFG_SITE_RECORD, \
-     CFG_WEBCOMMENT_ALLOW_REVIEWS,\
-     CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
-     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-     CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
-     CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
-     CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
-     CFG_WEBCOMMENT_DEFAULT_MODERATOR, \
-     CFG_SITE_RECORD, \
-     CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
-     CFG_WEBCOMMENT_ROUND_DATAFIELD, \
-     CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
-     CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
+    CFG_SITE_LANG, \
+    CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
+    CFG_SITE_SUPPORT_EMAIL,\
+    CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
+    CFG_SITE_URL,\
+    CFG_SITE_NAME,\
+    CFG_SITE_RECORD, \
+    CFG_WEBCOMMENT_ALLOW_REVIEWS,\
+    CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
+    CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+    CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
+    CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
+    CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
+    CFG_WEBCOMMENT_DEFAULT_MODERATOR, \
+    CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
+    CFG_WEBCOMMENT_ROUND_DATAFIELD, \
+    CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
+    CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
 from invenio.access_control_engine import acc_authorize_action
 
@@ -85,29 +79,29 @@ def log_comment_action(action_code, id, recid, uid=None):
 
 
 class CommentRights(object):
-    def __init__(self, comment, uid = None):
+
+    def __init__(self, comment, uid=None):
         self.id = comment
         self.uid = uid or current_user.get_id()
-        self.id_collection = 0#FIXME
+        self.id_collection = 0  # FIXME
 
     def can_perform_action(self, action=None):
         cond = CmtACTIONHISTORY.id_user == self.uid \
-               if self.uid>0 else \
-               CmtACTIONHISTORY.client_host == socket.inet_aton(request.remote_addr)
+            if self.uid > 0 else \
+            CmtACTIONHISTORY.client_host == socket.inet_aton(request.remote_addr)
 
         if action in CFG_WEBCOMMENT_ACTION_CODE:
-            cond = db.and_(cond, CmtACTIONHISTORY.action_code == \
-                CFG_WEBCOMMENT_ACTION_CODE[action])
+            cond = db.and_(cond, CmtACTIONHISTORY.action_code ==
+                           CFG_WEBCOMMENT_ACTION_CODE[action])
 
         return CmtACTIONHISTORY.query.filter(
-            CmtACTIONHISTORY.id_cmtRECORDCOMMENT==self.id, cond).\
+            CmtACTIONHISTORY.id_cmtRECORDCOMMENT == self.id, cond).\
             count() == 0
-
 
     def can_view_restricted_comment(self, restriction):
         #restriction =  self.comment.restriction
         if restriction == "":
-            return  (0, '')
+            return (0, '')
         return acc_authorize_action(
             self.uid,
             'viewrestrcomment',
@@ -130,7 +124,6 @@ class CommentRights(object):
 
 @blueprint.route('/<int:recid>/comments/add', methods=['GET', 'POST'])
 @request_record
-#@blueprint.invenio_authentificated
 @blueprint.invenio_authorized('sendcomment',
                               authorized_if_no_roles=True,
                               collection=lambda: g.collection.id)
@@ -139,6 +132,10 @@ def add_comment(recid):
     in_reply = request.args.get('in_reply', type=int)
     if in_reply is not None:
         comment = CmtRECORDCOMMENT.query.get(in_reply)
+
+        if comment.id_bibrec != recid or comment.is_deleted:
+            abort(401)
+
         if comment is not None:
             c = CmtRECORDCOMMENT()
             c.title = _('Re: ') + comment.title
@@ -168,7 +165,6 @@ def add_comment(recid):
 
 @blueprint.route('/<int:recid>/reviews/add', methods=['GET', 'POST'])
 @request_record
-#@blueprint.invenio_authenticated
 @blueprint.invenio_authorized('sendcomment',
                               authorized_if_no_roles=True,
                               collection=lambda: g.collection.id)
@@ -195,25 +191,53 @@ def add_review(recid):
 @blueprint.route('/<int:recid>/comments', methods=['GET', 'POST'])
 @request_record
 def comments(recid):
-    uid = current_user.get_id()
+    from invenio.access_control_config import VIEWRESTRCOLL
+    from invenio.access_control_mailcookie import \
+        mail_cookie_create_authorize_action
+    from invenio.webcomment import check_user_can_view_comments
+    auth_code, auth_msg = check_user_can_view_comments(current_user, recid)
+    if auth_code and current_user.is_guest:
+        cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
+            'collection': g.collection})
+        url_args = {'action': cookie, 'ln': g.ln, 'referer': request.referrer}
+        flash(_("Authorization failure"), 'error')
+        return redirect(url_for('webaccount.login', **url_args))
+    elif auth_code:
+        flash(auth_msg, 'error')
+        abort(401)
+
+    # FIXME check restricted discussion
     comments = CmtRECORDCOMMENT.query.filter(db.and_(
         CmtRECORDCOMMENT.id_bibrec == recid,
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score == 0
-        )).all()
+    )).all()
     return render_template('webcomment_comments.html', comments=comments)
 
 
 @blueprint.route('/<int:recid>/reviews', methods=['GET', 'POST'])
-#@blueprint.invenio_templated('webcomment_display.html')
 @request_record
 def reviews(recid):
-    uid = current_user.get_id()
+    from invenio.access_control_config import VIEWRESTRCOLL
+    from invenio.access_control_mailcookie import \
+        mail_cookie_create_authorize_action
+    from invenio.webcomment import check_user_can_view_comments
+    auth_code, auth_msg = check_user_can_view_comments(current_user, recid)
+    if auth_code and current_user.is_guest:
+        cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
+            'collection': g.collection})
+        url_args = {'action': cookie, 'ln': g.ln, 'referer': request.referrer}
+        flash(_("Authorization failure"), 'error')
+        return redirect(url_for('webaccount.login', **url_args))
+    elif auth_code:
+        flash(auth_msg, 'error')
+        abort(401)
+
     comments = CmtRECORDCOMMENT.query.filter(db.and_(
         CmtRECORDCOMMENT.id_bibrec == recid,
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score > 0
-        )).all()
+    )).all()
     return render_template('webcomment_reviews.html', comments=comments)
 
 
@@ -253,10 +277,7 @@ def vote(recid, id, value):
     return redirect(url_for('webcomment.comments', recid=recid))
 
 
-@blueprint.route('/<int:recid>/toggle/<int:id>',
-#                 methods=['GET', 'POST'])
-#@blueprint.route('/<int:recid>/toggle/<int:id>/<int:show>',
-                 methods=['GET', 'POST'])
+@blueprint.route('/<int:recid>/toggle/<int:id>', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @request_record
 def toggle(recid, id, show=None):
@@ -284,7 +305,7 @@ def toggle(recid, id, show=None):
 def subscribe(recid):
     uid = current_user.get_id()
     subscription = CmtSUBSCRIPTION(id_bibrec=recid, id_user=uid,
-                                  creation_time=datetime.now())
+                                   creation_time=datetime.now())
     try:
         db.session.add(subscription)
         db.session.commit()
@@ -307,7 +328,8 @@ def unsubscribe(recid=None):
     try:
         db.session.query(CmtSUBSCRIPTION).filter(db.and_(
             CmtSUBSCRIPTION.id_bibrec.in_(recid),
-            CmtSUBSCRIPTION.id_user==uid)).delete(synchronize_session=False)
+            CmtSUBSCRIPTION.id_user == uid
+        )).delete(synchronize_session=False)
         db.session.commit()
         flash(_('You have been successfully unsubscribed'), 'success')
     except:
@@ -317,19 +339,13 @@ def unsubscribe(recid=None):
     else:
         return redirect(url_for('.subscriptions'))
 
-#FIXME replace by Record `get title` when available
-from invenio.search_engine_utils import get_fieldvalues
 
 @blueprint.invenio_set_breadcrumb(_("Your comment subscriptions"))
 @blueprint.route('/comments/subscriptions', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
+@blueprint.invenio_templated('webcomment_subscriptions.html')
 def subscriptions():
     uid = current_user.get_id()
-    subscriptions = CmtSUBSCRIPTION.query.filter(CmtSUBSCRIPTION.id_user==uid).all()
-    @register_template_context_processor
-    def get_title():
-        return dict(get_title = lambda r: get_fieldvalues(r, '245__a')[0])
-    return render_template('webcomment_subscriptions.html',
-                           subscriptions=subscriptions)
-
-
+    subscriptions = CmtSUBSCRIPTION.query.filter(
+        CmtSUBSCRIPTION.id_user == uid).all()
+    return dict(subscriptions=subscriptions)

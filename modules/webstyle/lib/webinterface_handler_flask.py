@@ -228,8 +228,8 @@ def create_invenio_flask_app(**kwargs_config):
     def do_login_first(error):
         """Displays login page when user is not authorised."""
         if request.is_xhr:
-            return 'You need to be authorised', 401
-        flash(_('You need to be authorised.'), 'error')
+            return _("Authorization failure"), 401
+        flash(_("Authorization failure"), 'error')
         return redirect(url_for('webaccount.login', referer=request.referrer))
 
     @_app.endpoint('static')
