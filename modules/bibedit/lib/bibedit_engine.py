@@ -1322,8 +1322,12 @@ def perform_request_bibcatalog(request_type, uid, data):
                     date_string = ticket_info['created']
                     date_splitted = date_string.split(" ")
                     # convert date to readable format
-                    t_date = date_splitted[2] + ' ' + date_splitted[1] + " " + date_splitted[4] +\
+                    try:
+                        t_date = date_splitted[2] + ' ' + date_splitted[1] + " " + date_splitted[4] +\
                              " " + date_splitted[3].split(":")[0] + ":" + date_splitted[3].split(":")[1]
+                    except IndexError:
+                        t_date = date_string
+
                     ticket = { "id": str(t_id), "queue": t_queue, "date": t_date, "url": t_url,
                                "close_url": t_close_url, "subject": t_subject, "text": t_text }
                     tickets.append(ticket)
