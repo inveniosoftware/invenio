@@ -46,9 +46,10 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBUPLOAD_DELETE_FORMATS, \
-     CFG_SITE_URL, CFG_SITE_RECORD, \
+     CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, \
      CFG_OAI_PROVENANCE_ALTERED_SUBFIELD, \
-     CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS
+     CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
+     CFG_BIBCATALOG_CONFLICTING_REVISIONS_DEFAULT_QUEUE
 
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
@@ -79,6 +80,7 @@ from invenio.bibrecord import create_records, \
                               identical_records
 from invenio.search_engine import get_record
 from invenio.errorlib import register_exception
+from invenio.bibcatalog import bibcatalog_system
 from invenio.intbitset import intbitset
 from invenio.urlutils import make_user_agent_string
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
@@ -112,6 +114,24 @@ _WRITING_RIGHTS = None
 
 CFG_BIBUPLOAD_ALLOWED_SPECIAL_TREATMENTS = ('oracle', )
 
+CFG_HAS_BIBCATALOG = "UNKNOWN"
+def check_bibcatalog():
+    """
+    Return True if bibcatalog is available.
+    """
+    global CFG_HAS_BIBCATALOG # pylint: disable=W0603
+    if CFG_HAS_BIBCATALOG != "UNKNOWN":
+        return CFG_HAS_BIBCATALOG
+    CFG_HAS_BIBCATALOG = True
+    if bibcatalog_system is not None:
+        bibcatalog_response = bibcatalog_system.check_system()
+    else:
+        bibcatalog_response = "No ticket system configured"
+    if bibcatalog_response != "":
+        write_message("BibCatalog error: %s\n" % (bibcatalog_response,))
+        CFG_HAS_BIBCATALOG = False
+    return CFG_HAS_BIBCATALOG
+
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
 
@@ -138,8 +158,6 @@ def resolve_identifier(tmps, identifier):
         return int(tmps[tmp_id])
     else:
         return int(identifier)
-
-
 
 _re_find_001 = re.compile('<controlfield\\s+tag=("001"|\'001\')\\s*>\\s*(\\d*)\\s*</controlfield>', re.S)
 def bibupload_pending_recids():
@@ -260,9 +278,6 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         # Also save a copy to restore previous situation in case of errors
         original_record = get_record(rec_id)
 
-        #if original_record.has_key('005'):
-        #    record_delete_field(original_record, '005')
-
         if rec_old is None:
             msg = "   Failed during the creation of the old record!"
             write_message(msg, verbose=1, stream=sys.stderr)
@@ -293,18 +308,21 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 write_message(msg, verbose=1, stream=sys.stderr)
                 write_message(msg, "     Continuing anyway in case there are FFT or other tags")
             except InvenioBibUploadConflictingRevisionsError, err:
-                msg = "     -ERROR: Conflicting Revisions -  %s" % err
+                msg = "     -ERROR: Conflicting Revisions - %s" % err
                 write_message(msg, verbose=1, stream=sys.stderr)
+                submit_ticket_for_holding_pen(rec_id, err, "Conflicting Revisions")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
             except InvenioBibUploadInvalidRevisionError, err:
                 msg = "     -ERROR: Invalid Revision - %s" % err
                 write_message(msg)
+                submit_ticket_for_holding_pen(rec_id, err, "Invalid Revisions")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
             except InvenioBibUploadMissing005Error, err:
                 msg = "     -ERROR: Missing 005 - %s" % err
                 write_message(msg)
+                submit_ticket_for_holding_pen(rec_id, err, "Missing 005")
                 insert_record_into_holding_pen(record, str(rec_id))
                 return (2, int(rec_id), msg)
         else:
@@ -336,9 +354,6 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                 for tag, fields in record.iteritems():
                     if tag not in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
                         affected_tags[tag]=[(field[1], field[2]) for field in fields]
-
-        #if rec_old.has_key('005'):
-        #    record_delete_field(rec_old, '005')
 
         # In Replace mode, take over old strong tags if applicable:
         if opt_mode == 'replace' or \
@@ -670,6 +685,48 @@ def bibupload_post_phase(record, mode = None, rec_id = "", pretend = False,
                                                      pretend = pretend,
                                                      tmp_ids = tmp_ids,
                                                      tmp_vers = tmp_vers))
+
+def submit_ticket_for_holding_pen(rec_id, err, msg):
+    """
+    Submit a ticket via BibCatalog to report about a record that has been put
+    into the Holding Pen.
+    @rec_id: the affected record
+    @err: the corresponding Exception
+    msg: verbose message
+    """
+    from invenio import bibtask
+    from invenio.webuser import get_email_from_username, get_uid_from_email
+    user = task_get_task_param("user")
+    uid = None
+    if user:
+        try:
+            uid = get_uid_from_email(get_email_from_username(user))
+        except Exception, err:
+            write_message("WARNING: can't reliably retrieve uid for user %s: %s" % (user, err), stream=sys.stderr)
+
+    if check_bibcatalog():
+        text = """
+%(msg)s found for record %(rec_id)s: %(err)s
+
+See: <%(siteurl)s/record/edit/#state=edit&recid=%(rec_id)s>
+
+BibUpload task information:
+    task_id: %(task_id)s
+    task_specific_name: %(task_specific_name)s
+    user: %(user)s
+    task_params: %(task_params)s
+    task_options: %(task_options)s""" % {
+            "msg": msg,
+            "rec_id": rec_id,
+            "err": err,
+            "siteurl": CFG_SITE_SECURE_URL,
+            "task_id": task_get_task_param("task_id"),
+            "task_specific_name": task_get_task_param("task_specific_name"),
+            "user": user,
+            "task_params": bibtask._TASK_PARAMS,
+            "task_options": bibtask._OPTIONS}
+        bibcatalog_system.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBCATALOG_CONFLICTING_REVISIONS_DEFAULT_QUEUE, owner=uid)
+
 
 def insert_record_into_holding_pen(record, oai_id, pretend=False):
     query = "INSERT INTO bibHOLDINGPEN (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"
