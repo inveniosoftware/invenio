@@ -79,3 +79,28 @@ Example subscriber::
         sender=demosite
     )
 """
+
+# Record related signals
+record_before_create = _signals.signal(
+    'record-before-create')
+"""
+This signal is sent before record is created.
+"""
+
+record_after_create = _signals.signal(
+    'record-after-create')
+"""
+This signal is sent after record is created.
+"""
+
+record_before_update = _signals.signal(
+    'record-before-update')
+"""
+This signal is sent before record is updated.
+"""
+
+record_after_update = _signals.signal(
+    'record-after-update')
+"""
+This signal is sent after record is updated.
+"""
