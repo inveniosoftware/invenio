@@ -33,7 +33,7 @@ from invenio.webaccount_forms import ChangeUserEmailSettingsForm
 
 class DashboardSettings(Settings):
 
-    keys = ['order']
+    keys = ['orderLeft', 'orderMiddle', 'orderRight']
     storage_builder = UserSettingsAttributeStorage('dashboard_settings')
     widget = None
     def __init__(self):

@@ -232,15 +232,44 @@ open(os.path.join(CFG_LOGDIR, 'broken-user-settings.log'), 'w').write(
 @blueprint.invenio_authenticated
 def index():
     # load plugins
-    plugins = [a for a in [s() for (k, s) in _USER_SETTINGS.items()]
-               if a.is_authorized]
+    plugins = [a for a in [s() for (dummy, s) in _USER_SETTINGS.items() if s] \
+               if a.is_authorized and a.widget]
+
+    closed_plugins = []
+
+    plugin_sort = (lambda w, x: x.index(w.__class__.__name__)
+                       if w.__class__.__name__ in x else len(x))
 
     dashboard_settings = current_user.get('dashboard_settings', {})
-    order = dashboard_settings.get('order', [])
-    plugins = sorted(plugins, key=lambda w: order.index(w.__class__.__name__)
-                     if w.__class__.__name__ in order else len(order))
 
-    return render_template('webaccount_index.html', plugins=plugins)
+    if dashboard_settings:
+        order_left = dashboard_settings.get('orderLeft', []) or []
+        order_middle = dashboard_settings.get('orderMiddle', []) or []
+        order_right = dashboard_settings.get('orderRight', []) or []
+
+        extract_plugins = lambda x: [p for p in plugins if p.__class__.__name__ in x if p]
+
+        plugins_left = sorted(extract_plugins(order_left),
+                              key=lambda w: plugin_sort(w, order_left))
+        plugins_middle = sorted(extract_plugins(order_middle),
+                                key=lambda w: plugin_sort(w, order_middle))
+        plugins_right = sorted(extract_plugins(order_right),
+                               key=lambda w: plugin_sort(w, order_right))
+        closed_plugins = [p for p in plugins if not p in plugins_left and
+                                                not p in plugins_middle and
+                                                not p in plugins_right]
+    else:
+        slc = len(plugins) / 3 + 1 if len(plugins) % 3 else len(plugins)
+        plugins = sorted(plugins, key=lambda w: plugin_sort(w, plugins))
+        plugins_left = plugins[0:slc]
+        plugins_middle = plugins[slc:slc * 2]
+        plugins_right = plugins[slc * 2:]
+
+    return render_template('webaccount_display.html',
+                           plugins=[plugins_left,
+                                    plugins_middle,
+                                    plugins_right],
+                           closed_plugins=closed_plugins)
 
 
 @blueprint.route('/edit/<name>', methods=['GET', 'POST'])
@@ -273,3 +302,17 @@ def edit(name):
 
     return render_template(getattr(plugin, 'edit_template', '') or
                            'webaccount_edit.html', plugin=plugin, form=form)
+
+
+@blueprint.route('/loadwidget/<widget_name>', methods=['GET'])
+def loadwidget(widget_name):
+    if not widget_name:
+        return "1"
+
+    # @todo: get plugin more effectively
+    widget = [a for a in [s() for (dummy, s) in _USER_SETTINGS.items() if s] if a.is_authorized and a.widget and a.__class__.__name__ == widget_name]
+
+    if widget:
+        return render_template('webaccount_widget.html', widget=widget[0])
+    else:
+        return "2"

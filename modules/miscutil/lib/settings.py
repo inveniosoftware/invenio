@@ -92,10 +92,17 @@ class UserSettingsStorage(Storage):
             values.update(self.load())
             data[self._attr] = values
 
-        self._user.settings = data
-        db.session.merge(self._user)
+        self._user.settings = None
         db.session.commit()
+
+        self._user.settings = data
+        db.session.commit()
+
         current_user.reload()
+
+    def store(self, data):
+        self._data = {}
+        super(UserSettingsStorage, self).store(data)
 
 
 def UserSettingsAttributeStorage(attr):

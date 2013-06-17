@@ -17,6 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {% from "_formhelpers.html" import render_field with context %}
+{% from "webaccount_widget.html" import display_widget %}
 {% extends "page.html" %}
 {% set title = _('Your Account') %}
 
@@ -42,45 +43,36 @@
 
 <div class="container">
   <div class="row">
+    <div class="span12" id="closed-list-bar">
+	  <ul id="closed-list">
+		{%- for p in closed_plugins -%}
+			<li id="{{ p.__class__.__name__}}" class="label label-success display-widget">{{p.title}} <i class="icon-plus"></i></li>
+		{%- endfor -%}
+	  </ul>
+    </div>
     <div class="span12">
     <ul id="widgets" class="thumbnails">
-    {%- for p in plugins if p.widget -%}
-      <li id="{{ p.__class__.__name__}}" class="widget span{{ p.widget.size }}">
-        <div class="thumbnail">
-          <div class="caption">
-            <h4>
-            {%- if p.icon -%}
-              <small><i
-                style="margin-top: 0px;"
-                class="icon-{{ p.icon|safe }}"></i>&nbsp;
-              </small>
-            {%- endif -%}
-
-            {%- if p.view -%}
-            <a class=""
-               href="{{ p.view|safe }}">{{ p.title|safe }}</a>
-            {%- else -%}
-              {{ p.title|safe }}
-            {%- endif -%}
-            <small>
-              {%- if p.edit -%}
-              &nbsp;<a class="edit" href="{{ p.edit|safe }}"><i class="icon-wrench"></i></a>
-              {%- endif -%}
-              <button type="button" class="close">&nbsp;&times;</button>
-            </small>
-            </h4>
-            <div style="
-              overflow: hidden;
-              width: 90%;
-              height: 80px;
-              text-overflow: ellipsis;">
-              {{ p.widget()|safe }}
-            </div>
-          </div>
-        </div>
-      </li>
-    {%- endfor -%}
-
+	    <li id="leftColumn" class="widgetColumn">
+	    	<ul id="widgetsLeft" class="connectedWidgets">
+		    	{%- for p in plugins[0] if p.widget -%}
+			      {{display_widget(p)}}
+			    {%- endfor -%}
+	    	</ul>
+	    </li>
+	    <li id="middleColumn" class="widgetColumn">
+	    	<ul id="widgetsMiddle" class="connectedWidgets">
+	    		{%- for p in plugins[1] if p.widget -%}
+			      {{display_widget(p)}}
+			    {%- endfor -%}
+	    	</ul>
+	    </li>
+	    <li id="rightColumn" class="widgetColumn">
+	    	<ul id="widgetsRight" class="connectedWidgets">
+	    		{%- for p in plugins[2] if p.widget -%}
+			      {{display_widget(p)}}
+			    {%- endfor -%}
+	    	</ul>
+	    </li>
     </ul>
     </div>
   </div>
@@ -91,19 +83,143 @@
   background: white;
 }
 
-#widgets li.ui-sortable-placeholder {
-  background: #CCC;
-  height: 120px;
-  display: block;
-  float: left;
-  visibility: visible!important;
+.widget {
+	margin-bottom: 10px;
+	margin-left: -20px;
 }
+
+.thumbnail {
+	cursor: move;
+}
+
+.thumbnails > li {
+	float: left;
+    width: 30%;
+}
+
+.thumbnails li {
+	list-style-type: none;
+}
+
+.connectedWidgets {
+	min-height: 100px;
+}
+
+.placeholder {
+	border: 2px dashed #999;
+	margin-left: -20px;
+	margin-bottom: 10px;
+    border-radius: 5px;
+    display: block;
+    visibility: visible!important;
+    float: left;
+}
+
+.widgetColumn {
+  visibility: visible!important;
+  display: block!important;
+}
+
+#closed-list li {
+	float: left;
+	list-style-type: none;
+	margin: 5px;
+	cursor: pointer;
+}
+
+#closed-list-bar {
+	margin-top: -15px;
+	margin-bottom: 10px;
+}
+
 </style>
 
 {% endblock %}
 
 {% block javascript %}
 <script>
+
+  function saveWidgets() {
+	  var newOrderLeft = $("#widgetsLeft").sortable('toArray');
+      var newOrderMiddle = $("#widgetsMiddle").sortable('toArray');
+      var newOrderRight= $("#widgetsRight").sortable('toArray');
+
+      $.ajax({
+        url: '{{ url_for('webaccount.edit', name='dashboard_user_settings') }}'
+      , type: 'POST'
+      , data: $.param({
+          orderLeft: newOrderLeft,
+          orderMiddle: newOrderMiddle,
+          orderRight: newOrderRight
+        }, true)
+      });
+  }
+
+  function addToClosedList(title, id) {
+	  $("#closed-list").append("<li id='" +
+			  id +
+			  "' class='label label-success display-widget'>" +
+			  title +
+			  "<i class='icon-plus'></i></li>");
+	  bindDisplayWidgetEvents();
+  }
+
+  function displayWidget(widgetName) {
+	  $.ajax({
+        url: '{{ url_for('webaccount.loadwidget') }}',
+        type: 'GET',
+        data: $.param({
+          widget_name: widgetName
+        }, true),
+        dataType: "html",
+        success: function(r) {
+        	$("#" + widgetName).remove();
+
+        	var len = $("#widgetsLeft").children().length;
+        	var shortestList = "#widgetsLeft";
+        	if (len > $("#widgetsMiddle").children().length) {
+        		len = $("#widgetsMiddle").children().length;
+        		shortestList = "#widgetsMiddle";
+        	}
+        	if (len > $("#widgetsRight").children().length) {
+        		len = $("#widgetsRight").children().length;
+        		shortestList = "#widgetsRight";
+        	}
+        	$(shortestList).append(r);
+
+        	saveWidgets();
+        	bindWidgetEvents();
+        }
+      });
+  }
+
+  function bindDisplayWidgetEvents() {
+	  $(".display-widget").die();
+	  $(".display-widget").live("click", function() {
+		  displayWidget(this.id);
+	  });
+  }
+
+  function bindWidgetEvents() {
+	$(".widget").die();
+	$(".widget").live('mouseenter', function() {
+		$(this).find(".close.hide").removeClass("hide");
+	});
+
+	$(".widget").live('mouseleave', function() {
+		$(this).find(".close").addClass("hide");
+	});
+
+	$(".close").die();
+	$(".close").live('click', function() {
+		var title = $(this).closest("h4").text().replace("×", " ").trim();
+		var id = $(this).closest(".widget").attr("id");
+		addToClosedList(title, id);
+		$(this).closest("li").remove();
+		saveWidgets();
+	});
+  }
+
   $(function() {
     $('input[name=widget]').keyup(function(e) {
       var filter = $(this).val()
@@ -132,19 +248,20 @@
       })
     })
 
-    $( "#widgets" ).sortable({
-      update: function(event, ui) {
-        var newOrder = $(this).sortable('toArray');
-        $.ajax({
-          url: '{{ url_for('webaccount.edit', name='dashboard_user_settings') }}'
-        , type: 'POST'
-        , data: $.param({
-            order: newOrder
-          }, true)
-        });
+    $( "#widgetsLeft, #widgetsMiddle, #widgetsRight" ).sortable({
+      connectWith: ".connectedWidgets",
+      cursor: "move",
+      placeholder: "placeholder",
+      forcePlaceholderSize: true,
+      forceHelperSize : true,
+      stop: function(event, ui) {
+        saveWidgets();
       }
-    });
-    $( "#widgets" ).disableSelection();
+    }).disableSelection();
+
+    bindDisplayWidgetEvents();
+    bindWidgetEvents();
+
   });
 </script>
 {% endblock %}

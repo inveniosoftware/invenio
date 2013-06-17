@@ -1,0 +1,38 @@
+{% macro display_widget(p) %}
+<li id="{{ p.__class__.__name__}}" class="widget span4">
+  <div class="thumbnail">
+    <div class="caption">
+      <h4>
+      {%- if p.icon -%}
+        <small><i
+          style="margin-top: 0px;"
+          class="icon-{{ p.icon|safe }}"></i>&nbsp;
+        </small>
+      {%- endif -%}
+
+      {%- if p.view -%}
+      <a class=""
+         href="{{ p.view|safe }}">{{ p.title|safe }}</a>
+      {%- else -%}
+        {{ p.title|safe }}
+      {%- endif -%}
+      <small>
+        {%- if p.edit -%}
+        &nbsp;<a class="edit" href="{{ p.edit|safe }}"><i class="icon-wrench"></i></a>
+        {%- endif -%}
+        <span class="close hide">&nbsp;&times;</span>
+      </small>
+      </h4>
+      <div style="
+        width: 90%;
+        min-height: 80px;">
+        {{ p.widget()|safe }}
+      </div>
+    </div>
+  </div>
+</li>
+{% endmacro %}
+
+{%- if widget -%}
+	{{display_widget(widget)}}
+{%- endif -%}
