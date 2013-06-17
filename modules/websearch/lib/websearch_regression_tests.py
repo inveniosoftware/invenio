@@ -1001,13 +1001,14 @@ class WebSearchNearestTermsTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellisz&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=fabbro&f=author",
-                                               expected_link_label='fabbro'))
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=eisenhandler&f=author",
+                                               expected_link_label='eisenhandler'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3Afabbro",
-                                               expected_link_label='fabbro'))
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3Aeisenhandler",
+                                               expected_link_label='eisenhandler'))
+
 
     def test_nearest_terms_box_in_query_with_invalid_index(self):
         """ websearch - nearest terms box for queries with invalid indexes specified """
@@ -1174,12 +1175,12 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
 
     def test_search_engine_python_api_for_successful_query(self):
         """websearch - search engine Python API for successful query"""
-        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
+        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47, 118],
                          perform_request_search(p='ellis'))
 
     def test_search_engine_python_api_ignore_paging_parameter(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
-        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
+        self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47, 118],
                          perform_request_search(p='ellis', rg=5, jrec=3))
 
     def test_search_engine_python_api_respect_sorting_parameter(self):
@@ -1893,6 +1894,12 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
 
 </collection>""")
 
+
+    def test_search_engine_python_api_long_author_with_quotes(self):
+        """websearch - search engine Python API for p=author:"Abbot, R B"'""" \
+        """this test was written along with a bug report, needs fixing."""
+        self.assertEqual([16], perform_request_search(p='author:"Abbott, R B"'))
+
 class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     """Check typical search engine Web API calls on the demo data."""
 
@@ -1907,13 +1914,13 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
-                                               expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
+                                               expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47, 118]"))
 
     def test_search_engine_web_api_ignore_paging_parameter(self):
         """websearch - search engine Web API for successful query, ignore paging parameters"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id&rg=5&jrec=3',
-                                               expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
+                                               expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47, 118]"))
 
     def test_search_engine_web_api_respect_sorting_parameter(self):
         """websearch - search engine Web API for successful query, respect sorting parameters"""
@@ -3752,7 +3759,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
     def test_sort_results_default(self):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=3',
                                                expected_text="CMS animation of the high-energy collisions"))
 
     def test_sort_results_ascending(self):
@@ -4279,7 +4286,7 @@ class WebSearchSpanQueryTest(unittest.TestCase):
         """websearch - span query in special author index"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis,%20K%22-%3E%22Ellis,%20RZ%22&of=id&ap=0',
-                                               expected_text='[8, 11, 13, 17, 47]'))
+                                               expected_text='[8, 9, 11, 12, 13, 14, 17, 18, 47]'))
 
 
 class WebSearchReferstoCitedbyTest(unittest.TestCase):
@@ -4354,7 +4361,7 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
             'websearch - find a ellis, j and not a enqvist'
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
-                                                   expected_text='[9, 12, 14, 47]'))
+                                                   expected_text='[9, 12, 14, 47, 118]'))
 
     if DATEUTIL_AVAILABLE:
         def test_dadd_search(self):
@@ -4363,7 +4370,7 @@ class WebSearchSPIRESSyntaxTest(unittest.TestCase):
             # should return every document in the system
             self.assertEqual([],
                              test_web_page_content(CFG_SITE_URL +'/search?ln=en&p=find+da+%3E+today+-+3650&f=&of=id',
-                                                   expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113]'))
+                                                  expected_text='[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 99, 100, 101, 102, 103, 104, 107, 108, 113, 114, 115, 116, 117, 118, 120, 121, 122, 123, 124, 125, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141]'))
 
 
 class WebSearchDateQueryTest(unittest.TestCase):
@@ -4473,13 +4480,14 @@ class WebSearchAuthorCountQueryTest(unittest.TestCase):
         """websearch - author count, span query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=authorcount%3A9-%3E16&of=id',
-                                               expected_text="[69, 71]"))
+                                               expected_text="[69, 71, 127]"))
 
     def test_journal_authorcount_plus(self):
         """websearch - author count, plus query"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=50%2B&f=authorcount&of=id',
                                                expected_text="[10, 17]"))
+
 
 class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
     """Tests the perform request search API after refactoring."""
@@ -4514,21 +4522,21 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
     def test_queries(self):
         """websearch - testing p_r_s standard arguments and their combinations"""
 
-        self._run_test('p=ellis;f=author;action=Search', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p=ellis;f=author;action=Search', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 118])
 
-        self._run_test('p=ellis;f=author;sf=title;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;action=Search', [118, 8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self._run_test('p=ellis;f=author;sf=title;wl=5;action=Search', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;action=Search', [118, 8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self._run_test('p=ellis;f=author;sf=title;wl=5;so=a', [13, 47, 10, 12, 18, 17, 11, 9, 14, 16, 8])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;so=a', [118, 13, 47, 10, 12, 18, 17, 11, 9, 14, 16, 8])
 
-        self._run_test('p=ellis;f=author;sf=title;wl=5;so=d', [8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ellis;f=author;sf=title;wl=5;so=d', [118, 8, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
-        self._run_test('p=ell*;sf=title;wl=5', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ell*;sf=title;wl=5', [118, 8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
         self._run_test('p=ell*;sf=title;wl=1', [10])
 
-        self._run_test('p=ell*;sf=title;wl=100', [8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
+        self._run_test('p=ell*;sf=title;wl=100', [118, 8, 15, 16, 14, 9, 11, 17, 18, 12, 10, 47, 13])
 
         self._run_test('p=muon OR kaon;f=author;sf=title;wl=5;action=Search', [])
 
@@ -4544,36 +4552,36 @@ class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
         # self._run_test('p=el*;rm=citation', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 92, 97, 100, 103, 18, 74, 91, 94, 81])
 
         if not get_external_word_similarity_ranker():
-            self._run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109])
+            self._run_test('p=el*;rm=wrd', [2, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 23, 30, 32, 34, 47, 48, 51, 52, 54, 56, 58, 59, 74, 81, 91, 92, 94, 97, 100, 103, 109, 118, 123, 127, 128])
 
-        self._run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 58, 2, 14, 9, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
+        self._run_test('p=el*;sf=title', [118, 123, 100, 32, 8, 15, 16, 81, 97, 34, 23, 127, 58, 2, 14, 9, 128, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
 
         self._run_test('p=boson;rm=citation', [1, 47, 50, 107, 108, 77, 95])
 
         if not get_external_word_similarity_ranker():
             self._run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [9, 12, 14, 18, 118])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=a;p2=john;f2=author;m2=o', [9, 12, 14, 18, 118])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=a;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=o;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 118])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=o;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47, 118])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=o;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=a;op1=n;p2=john;f2=author;m2=a', [8, 10, 11, 13, 16, 17, 47])
 
-        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 47])
+        self._run_test('p1=ellis;f1=author;m1=o;op1=n;p2=john;f2=author;m2=o', [8, 10, 11, 13, 16, 17, 47])
 
         self._run_test('p1=ellis;f1=author;m1=e;op1=n;p2=john;f2=author;m2=e', [])
 
-        self._run_test('p=Ellis, J;ap=1', [9, 10, 11, 12, 14, 17, 18, 47])
+        self._run_test('p=Ellis, J;ap=1', [9, 10, 11, 12, 14, 17, 18, 47, 118])
 
-        self._run_test('p=Ellis, J;ap=0', [9, 10, 11, 12, 14, 17, 18, 47])
+        self._run_test('p=Ellis, J;ap=0', [9, 10, 11, 12, 14, 17, 18, 47, 118])
 
         self._run_test('p=recid:148x', [])
 

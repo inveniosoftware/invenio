@@ -21,17 +21,47 @@
 __revision__ = "$Id$"
 
 import cgi
+from invenio.config import \
+    CFG_SITE_URL, CFG_SITE_NAME
+from invenio.bibauthority_config import \
+    CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME
+    
+from invenio.bibauthority_engine import \
+    get_low_level_recIDs_from_control_no
 
 def format_element(bfo):
     """
     HTML Affiliation display
     """
-    affiliations = bfo.fields('909C1u')
-    if len(affiliations) > 0:
-        out =  "<br/>"
-        for affiliation in affiliations:
-            out += cgi.escape(affiliation) +"       "
-        return out
+    affiliations = bfo.fields('909C1', repeatable_subfields_p=True)
+    out = ""
+    for affiliation_dict in affiliations:
+        if 'u' in affiliation_dict:
+            recIDs = []
+            affiliation = affiliation_dict['u'][0]
+            control_nos = affiliation_dict.get('0')
+            for control_no in control_nos or []:
+                recIDs.extend(get_low_level_recIDs_from_control_no(control_no))
+            affiliation = cgi.escape(affiliation)
+            if len(recIDs) == 1:
+                affiliation = '<a href="' + CFG_SITE_URL + \
+                              '/record/' + str(recIDs[0]) + \
+                              '?ln=' + bfo.lang + \
+                              '">' + affiliation + '</a>'
+            elif len(recIDs) > 1:
+                affiliation = '<a href="' + CFG_SITE_URL + \
+                              '/search?' + \
+                              'p=recid:' +  " or recid:".join([str(_id) for _id in recIDs]) + \
+                              '&amp;c=' + CFG_SITE_NAME + \
+                              '&amp;c=' + CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME + \
+                              '&amp;ln=' + bfo.lang + \
+                              '">' + affiliation + '</a>'
+
+            out += affiliation + "       "
+
+    if out:
+        return "<br/>" + out
+
 
 def escape_values(bfo):
     """

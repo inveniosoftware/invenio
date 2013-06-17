@@ -2196,8 +2196,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
         text += """</table></td></tr>
         """
         tables = tables - 1
-    text += """</table>
-        """
+    text += """</table>"""
 
     return text
 

@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import re
 import sys
 import time
+import fnmatch
 
 
 from invenio.config import CFG_SOLR_URL
@@ -33,14 +34,23 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_MYSQL_THREAD_TIMEOUT, \
      CFG_CHECK_MYSQL_THREADS, \
      CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
-     CFG_BIBINDEX_INDEX_TABLE_TYPE
+     CFG_BIBINDEX_INDEX_TABLE_TYPE, \
+     CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR
+from invenio.bibauthority_config import \
+     CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC, \
+     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD, \
+     CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE
+from invenio.bibauthority_engine import get_index_strings_by_control_no,\
+     get_control_nos_from_recID
 from invenio.bibindexadminlib import get_idx_remove_html_markup, \
                                      get_idx_remove_latex_markup, \
                                      get_idx_remove_stopwords
 from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine import perform_request_search, \
      get_index_stemming_language, \
-     get_synonym_terms
+     get_synonym_terms, \
+     search_pattern, \
+     search_unit_in_bibrec
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
 from invenio.bibindex_engine_washer import wash_index_term
@@ -57,6 +67,7 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 from invenio.bibindex_engine_utils import get_all_index_names_and_column_values, \
     load_tokenizers
+from invenio.search_engine_utils import get_fieldvalues
 
 
 
@@ -88,6 +99,13 @@ def list_union(list1, list2):
     for e in list2:
         union_dict[e] = 1
     return union_dict.keys()
+
+def list_unique(_list):
+    """Returns a _list with duplicates removed."""
+    _dict = {}
+    for e in _list:
+        _dict[e] = 1
+    return _dict.keys()
 
 ## safety function for killing slow DB threads:
 def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=CFG_MYSQL_THREAD_TIMEOUT):
@@ -727,7 +745,7 @@ class WordTable:
                         solr_commit()
                     raise
 
-                write_message("%s adding records #%d-#%d started" % \
+                write_message(CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR % \
                         (self.tablename, i_low, i_high))
                 if CFG_CHECK_MYSQL_THREADS:
                     kill_sleepy_mysql_threads()
@@ -738,7 +756,7 @@ class WordTable:
                 flush_count = flush_count + i_high - i_low + 1
                 chunksize_count = chunksize_count + i_high - i_low + 1
                 records_done = records_done + just_processed
-                write_message("%s adding records #%d-#%d ended  " % \
+                write_message(CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR % \
                         (self.tablename, i_low, i_high))
 
                 if chunksize_count >= chunksize:
@@ -810,6 +828,37 @@ class WordTable:
                 write_message("No new records added by author canonical IDs. %s is up to date" % self.tablename)
             else:
                 self.add_recIDs(alist, opt_flush)
+        # special case of authority controlled indexes where we need to re-index
+        # those records that were affected by changed Authority Records:
+        res = intbitset()
+        for tag in self.fields_to_index:
+            pattern = tag.replace('%', '*')
+            matches = fnmatch.filter(CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
+            if not len(matches):
+                continue
+            for tag_match in matches:
+                # get the type of authority record associated with this field
+                auth_type = CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.get(tag_match)
+                # find updated authority records of this type
+                # dates[1] is ignored, needs dates[0] to find res
+                auth_recIDs = search_pattern(p='980__a:' + auth_type) \
+                    & search_unit_in_bibrec(str(dates[0]), 'now()', type='m')
+                # now find dependent bibliographic records
+                for auth_recID in auth_recIDs:
+                    # get the fix authority identifier of this authority record
+                    control_nos = get_control_nos_from_recID(auth_recID)
+                    # there may be multiple control number entries! (the '035' field is repeatable!)
+                    for control_no in control_nos:
+                        # get the bibrec IDs that refer to AUTHORITY_ID in TAG
+                        tag_0 = tag_match[:5] + '0' # possibly do the same for '4' subfields ?
+                        fieldvalue = '"' + control_no + '"'
+                        res |= search_pattern(p=tag_0 + ':' + fieldvalue)
+        authority_list = create_range_list(list(res))
+        if not authority_list:
+            write_message("No new authority records added. %s is up to date" % self.tablename)
+        else:
+            write_message(CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE)
+            self.add_recIDs(authority_list, opt_flush)
 
     def add_recID_range(self, recID1, recID2):
         """Add records from RECID1 to RECID2."""
@@ -855,6 +904,21 @@ class WordTable:
                         wlist[recID] = []
                     new_words = get_words_function(phrase)
                     wlist[recID] = list_union(new_words, wlist[recID])
+
+                #authority records
+                pattern = tag.replace('%', '*')
+                matches = fnmatch.filter(CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
+                if not len(matches):
+                    continue
+                for tag_match in matches:
+                    authority_tag = tag_match[0:3] + "__0"
+                    for recID in xrange(int(recID1), int(recID2) + 1):
+                        control_nos = get_fieldvalues(recID, authority_tag)
+                        for control_no in control_nos:
+                            new_strings = get_index_strings_by_control_no(control_no)
+                            for string_value in new_strings:
+                                new_words = get_words_function(string_value)
+                                wlist[recID] = list_union(new_words, wlist[recID])
 
         # lookup index-time synonyms:
         synonym_kbrs = get_all_synonym_knowledge_bases()

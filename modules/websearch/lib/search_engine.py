@@ -801,7 +801,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         if f and p[0] == '"' and p[-1] == '"':
             ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
             opfts.append(['+', p[1:-1], f, 'a'])
-        elif f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor') and author_name_requires_phrase_search(p):
+        elif f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor', 'authorityauthor') and author_name_requires_phrase_search(p):
             ## B1 - do we search in author, and does 'p' contain space/comma/dot/etc?
             ## => doing washed ACC search
             opfts.append(['+', p, f, 'a'])
@@ -2623,7 +2623,7 @@ def search_unit_in_idxphrases(p, f, type, wl=0):
                 query_params = (p,)
 
     # special washing for fuzzy author index:
-    if f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+    if f in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor', 'authorityauthor'):
         query_params_washed = ()
         for query_param in query_params:
             query_params_washed += (wash_author_name(query_param),)
@@ -4446,9 +4446,47 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        from invenio import bibclassify_webinterface
+                        from invenio.bibclassify_webinterface import \
+                            record_get_keywords, write_keywords_body, \
+                            generate_keywords
+                        from invenio.webinterface_handler import wash_urlargd
+                        form = req.form
+                        argd = wash_urlargd(form, {
+                            'generate': (str, 'no'),
+                            'sort': (str, 'occurrences'),
+                            'type': (str, 'tagcloud'),
+                            'numbering': (str, 'off'),
+                            })
                         recid = recIDs[irec]
-                        bibclassify_webinterface.main_page(req, recid, tabs, ln, webstyle_templates)
+
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
+                                                                                   tabs,
+                                                                                   ln))
+                        content = websearch_templates.tmpl_record_plots(recID=recid,
+                                                                         ln=ln)
+                        req.write(content)
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
+                                                                                      tabs,
+                                                                                      ln))
+
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
+                            tabs, ln, citationnum=citedbynum, referencenum=references))
+
+                        if argd['generate'] == 'yes':
+                            # The user asked to generate the keywords.
+                            keywords = generate_keywords(req, recid, argd)
+                        else:
+                            # Get the keywords contained in the MARC.
+                            keywords = record_get_keywords(recid, argd)
+
+                        if argd['sort'] == 'related' and not keywords:
+                            req.write('You may want to run BibIndex.')
+
+                        # Output the keywords or the generate button.
+                        write_keywords_body(keywords, req, recid, argd)
+
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
+                            tabs, ln))
                     elif tab == 'plots':
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
                                                                                    tabs,

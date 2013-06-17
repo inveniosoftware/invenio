@@ -22,12 +22,28 @@
 __revision__ = "$Id$"
 
 import unittest
+import os
 
+from invenio.bibauthority_config import CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE
+from invenio.bibindex_engine_config import CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
+    CFG_BIBINDEX_INDEX_TABLE_TYPE
+from invenio.bibtask import task_low_level_submission
+from invenio.config import CFG_BINDIR, CFG_LOGDIR
 from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio.dbquery import run_sql, deserialize_via_marshal
 from invenio.bibindex_engine import WordTable, get_index_id_from_index_name, get_index_tags
 from invenio.intbitset import intbitset
-from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
+from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibauthority_engine import get_index_strings_by_control_no, get_control_nos_from_recID
+
+
+def reindex_for_type_with_bibsched(_type):
+    """runs bibindex for the index '_type' and returns the task_id"""
+    program = os.path.join(CFG_BINDIR, 'bibindex')
+    task_id = task_low_level_submission('bibindex', 'bibindex_regression_tests', '-w', _type, '-u', 'admin')
+    COMMAND = "%s %s > /dev/null 2> /dev/null" % (program, str(task_id))
+    os.system(COMMAND)
+    return task_id
 
 
 def prepare_for_index_update(index_id, remove_stopwords = '',
@@ -571,6 +587,65 @@ class BibIndexCJKTokenizerTitleIndexTest(unittest.TestCase):
         self.assertEqual(iset, ['\xe6\x95\xac', '\xe7\x8d\xa8', '\xe4\xba\xad', '\xe5\x9d\x90'])
 
 
+class BibIndexAuthorityRecordTest(unittest.TestCase):
+    """Test if BibIndex correctly knows when to update the index for a
+    bibliographic record if it is dependent upon an authority record changed
+    within the given date range"""
+
+    def test_authority_record_recently_updated(self):
+        """bibindex - reindexing after recently changed authority record"""
+
+        authRecID = 118
+        bibRecID = 9
+        index_name = 'author'
+        table = "idxWORD%02dF" % get_index_id_from_index_name(index_name)
+        reindex_for_type_with_bibsched(index_name)
+        run_sql("UPDATE bibrec SET modification_date = now() WHERE id = %s", (authRecID,))
+        # run bibindex again
+        task_id = reindex_for_type_with_bibsched(index_name)
+
+        filename = os.path.join(CFG_LOGDIR, 'bibsched_task_' + str(task_id) + '.log')
+        _file = open(filename)
+        text = _file.read() # small file
+        _file.close()
+        self.assertTrue(text.find(CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE) >= 0)
+        self.assertTrue(text.find(CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR % (table, bibRecID, bibRecID)) >= 0)
+
+    def test_authority_record_enriched_index(self):
+        """bibindex - test whether reverse index for bibliographic record
+        contains words from referenced authority records"""
+        bibRecID = 9
+        authority_string = 'jonathan'
+        index_name = 'author'
+        table = "idxWORD%02dR" % get_index_id_from_index_name(index_name)
+
+        reindex_for_type_with_bibsched(index_name)
+        self.assertTrue(
+            authority_string in deserialize_via_marshal(
+                run_sql("SELECT termlist FROM %s WHERE id_bibrec = %s" % (table, bibRecID))[0][0]
+            )
+        )
+
+    def test_indexing_of_deleted_authority_record(self):
+        """bibindex - no info for indexing from deleted authority record"""
+        recID = 119 # deleted record
+        control_nos = get_control_nos_from_recID(recID)
+        info = get_index_strings_by_control_no(control_nos[0])
+        self.assertEqual([], info)
+
+    def test_authority_record_get_values_by_bibrecID_from_tag(self):
+        """bibindex - find authors in authority records for given bibrecID"""
+        tags = ['100__a']
+        bibRecID = 9
+        values = []
+        for tag in tags:
+            authority_tag = tag[0:3] + "__0"
+            control_nos = get_fieldvalues(bibRecID, authority_tag)
+            for control_no in control_nos:
+                new_strings = get_index_strings_by_control_no(control_no)
+                values.extend(new_strings)
+        self.assertTrue('Ellis, Jonathan Richard' in values)
+
 
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
@@ -578,7 +653,8 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexYearIndexTest,
                              BibIndexAuthorCountIndexTest,
                              BibIndexJournalIndexTest,
-                             BibIndexCJKTokenizerTitleIndexTest)
+                             BibIndexCJKTokenizerTitleIndexTest,
+                             BibIndexAuthorityRecordTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

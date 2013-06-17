@@ -204,7 +204,7 @@ class BibknowledgeRegressionTests(unittest.TestCase):
     def test_kb_for_bibedit(self):
         """bibknowledge - test a bibedit-style *very* dynamic kb"""
         myvalues = get_kbd_values_for_bibedit("100__a", searchwith="Ellis", expression="100__a:*%*")
-        self.assertEqual(1, len(myvalues))
+        self.assertEqual(2, len(myvalues))
 
     def test_kb_attribute_update(self):
         """bibknowledge - attribute modifications persist in database"""

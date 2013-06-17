@@ -1,3 +1,19 @@
+<!--
+Layout of this file:
+
+1. BIBLIOGRAPHIC records (containing only few references to authority records)
+2. AUTHORITY records
+-       AUTHOR Authority Records
+-       INSTITUTION Authority Records
+-       SUBJECT Authority Records
+3. linked BIBLIOGRAPHIC and AUTHORITY data from juelich
+-->
+
+<!------------------------------>
+<!-- 1. BIBLIOGRAPHIC records -->
+<!------------------------------>
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
@@ -824,6 +840,7 @@
     </datafield>
     <datafield tag="100" ind1=" " ind2=" ">
       <subfield code="a">Ellis, J</subfield>
+      <subfield code="0">AUTHOR|(SzGeCERN)aaa0005</subfield>
       <subfield code="u">University of Oxford</subfield>
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
@@ -2422,6 +2439,7 @@
     <datafield tag="100" ind1=" " ind2=" ">
       <subfield code="a">Mangano, M L</subfield>
       <subfield code="u">CERN</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">Physics at the front-end of a neutrino factory : a quantitative appraisal</subfield>
@@ -2430,6 +2448,7 @@
       <subfield code="a">Geneva</subfield>
       <subfield code="b">CERN</subfield>
       <subfield code="c">16 May 2001</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="300" ind1=" " ind2=" ">
       <subfield code="a">1 p</subfield>
@@ -2467,6 +2486,7 @@
     </datafield>
     <datafield tag="700" ind1=" " ind2=" ">
       <subfield code="a">Ellis, J</subfield>
+      <subfield code="0">AUTHOR|(SzGeCERN)aaa0005</subfield>
     </datafield>
     <datafield tag="700" ind1=" " ind2=" ">
       <subfield code="a">Forte, S</subfield>
@@ -2518,6 +2538,7 @@
     </datafield>
     <datafield tag="909" ind1="C" ind2="1">
       <subfield code="u">CERN</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="1">
       <subfield code="u">nuDIS Working group of the ECFA-CERN Neutrino-Factory Study Group</subfield>
@@ -5173,7 +5194,9 @@
     </datafield>
     <datafield tag="100" ind1=" " ind2=" ">
       <subfield code="a">Ellis, J</subfield>
+      <subfield code="0">AUTHOR|(SzGeCERN)aaa0005</subfield>
       <subfield code="u">CERN</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">From the standard model to grand unification</subfield>
@@ -6010,6 +6033,7 @@
     <datafield tag="100" ind1=" " ind2=" ">
       <subfield code="a">Albajar, C</subfield>
       <subfield code="u">CERN</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">Multifractal analysis of minimum bias events in \Sqrt s = 630 GeV $\overline{p}$p collisions</subfield>
@@ -6352,7 +6376,9 @@
     </datafield>
     <datafield tag="100" ind1=" " ind2=" ">
       <subfield code="a">Ellis, J</subfield>
+      <subfield code="0">AUTHOR|(SzGeCERN)aaa0005</subfield>
       <subfield code="u">CERN</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">Non-compact supergravity solves problems</subfield>
@@ -7918,6 +7944,7 @@
     <datafield tag="100" ind1=" " ind2=" ">
       <subfield code="a">Bento, M C</subfield>
       <subfield code="u">CERN</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">Supergravity Inflation on the Brane</subfield>
@@ -11608,6 +11635,7 @@
     <datafield tag="100" ind1=" " ind2=" ">
       <subfield code="a">Aglietti, U</subfield>
       <subfield code="u">CERN</subfield>
+      <subfield code="0">INSTITUTION|(SzGeCERN)iii0002</subfield>
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">A new model-independent way of extracting |V_ub/V_cb|</subfield>
@@ -24575,4 +24603,1683 @@ Only the mountain and I.
       <subfield code="z">SMALLTHUMB</subfield>
     </datafield>
   </record>
+
+
+  <!------------------------------>
+<!-- 2. AUTHORITY records     -->
+<!------------------------------>
+
+  <!------------------------------------
+      AUTHOR Authority Records 
+  ------------------------------------->
+  <record>
+    <controlfield tag="003">DLC</controlfield>
+    <controlfield tag="005">19951121053638.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">(OCoLC)oca00230701 </subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(SzGeCERN)aaa0001</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Mann, Thomas</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Man, Tomas</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Mann, Tomas</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Mān, Tūmās</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Mann, Paul Thomas</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Thomas, Paul</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Mani, Tʿomas</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Man, Tʿomasŭ</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Mann, Tomasz</subfield>
+      <subfield code="d">1875-1955</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">His Königliche Hoheit, 1909.</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Volgina, A.A. Tomas Mann--biobibliogr. ukazatelʹ, 1979:</subfield>
+      <subfield code="b">t.p. (Tomas Mann)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Najīb, N. Qiṣṣat al-ajyāl bayna Tūmās Mān wa-Najīb Maħfūẓ, 1982:</subfield>
+      <subfield code="b">t.p. (Tūmās Mān)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Vaget, H.R. Thomas Mann-Kommentar zu sämtlichen Erzählungen, c1984:</subfield>
+      <subfield code="b">t.p. (Thomas Mann) p. 13, etc. (b. 6-6-1875 in Lübeck as Paul Thomas Mann; used pseud. Paul Thomas as co-editor of student newspaper in 1893; d. 8-12-1955)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Kakabadze, N. Tomas Mann, 1985:</subfield>
+      <subfield code="b">t.p. (Tomas Mann) added t.p. (Tʿomas Mani)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Chʿoe, S.B. Tʿomasŭ Man yŏnʾgu, 1981:</subfield>
+      <subfield code="b">t.p. (Tʿomasŭ Man)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Łukosz, J. Terapia jako duchowa forma życia, 1990:</subfield>
+      <subfield code="b">t.p. (Tomasza Manna)</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR</subfield>
+    </datafield>
+</record>
+<record>
+    <!-- this record is used by INVENIO (regression) tests -->
+  <controlfield tag="003">DLC</controlfield>
+  <controlfield tag="005">19991204070327.0</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">AUTHOR|(OCoLC)oca00955355</subfield>
+  </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(SzGeCERN)aaa0002</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Es erhub sich ein Streit</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">See how fiercely they fight</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">There uprose a great strife</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Cantatas,</subfield>
+      <subfield code="n">BWV 19</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Cantatas,</subfield>
+      <subfield code="n">no. 19</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">There arose a great strife</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Kantate am Michaelisfest</subfield>
+      <subfield code="n">BWV 19</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Festo Michaelis</subfield>
+      <subfield code="n">BWV 19</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Kantate zum Michaelistag</subfield>
+      <subfield code="n">BWV 19</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Cantata for Michaelmas Day</subfield>
+      <subfield code="n">BWV 19</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Cantate am Michaelisfeste</subfield>
+      <subfield code="n">BWV 19</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Bach, J.S. BWV 19, Es erhub sich ein Streit [SR] p1988:</subfield>
+      <subfield code="b">label (BWV 19, Es erhub sich ein Streit = There arose a great strife)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Schmieder, 1990</subfield>
+      <subfield code="b">(19. Es erhub sich ein Streit; Kantate am Michaelisfest (Festo Michaelis))</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR</subfield>
+    </datafield>
+  </record>
+  <record>
+    <!-- this record is used by INVENIO (regression) tests -->
+    <controlfield tag="003">DLC</controlfield>
+    <controlfield tag="005">19850502074119.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(SzGeCERN)aaa0003</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Keyboard music.</subfield>
+      <subfield code="k">Selections (Bach Guild)</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Historical anthology of music.</subfield>
+      <subfield code="n">V,</subfield>
+      <subfield code="p">Baroque (late).</subfield>
+      <subfield code="n">F,</subfield>
+      <subfield code="p">Johann Sebastian Bach.</subfield>
+      <subfield code="n">1,</subfield>
+      <subfield code="p">Works for keyboard</subfield>
+    </datafield>
+    <datafield tag="430" ind1=" " ind2=" ">
+      <subfield code="a">Historical anthology of music.</subfield>
+      <subfield code="n">V,</subfield>
+      <subfield code="p">Baroque (late).</subfield>
+      <subfield code="n">F,</subfield>
+      <subfield code="p">Johann Sebastian Bach.</subfield>
+      <subfield code="n">1,</subfield>
+      <subfield code="p">Works for keyboard</subfield>
+    </datafield>
+    <datafield tag="430" ind1=" " ind2=" ">
+      <subfield code="w">nnaa</subfield>
+      <subfield code="a">Historical anthology of music</subfield>
+      <subfield code="n">period V,</subfield>
+      <subfield code="n">category F,</subfield>
+      <subfield code="n">sub-category 1</subfield>
+    </datafield>
+    <datafield tag="430" ind1=" " ind2=" ">
+      <subfield code="a">Johann Sebastian Bach.</subfield>
+      <subfield code="n">1</subfield>
+      <subfield code="p">Works for keyboard</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Johann Sebastian Bach.</subfield>
+      <subfield code="n">1,</subfield>
+      <subfield code="p">Works for keyboard</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Bach, Johann Sebastian</subfield>
+      <subfield code="d">1685-1750.</subfield>
+      <subfield code="t">Works for keyboard</subfield>
+    </datafield>
+    <datafield tag="643" ind1=" " ind2=" ">
+      <subfield code="a">New York, NY</subfield>
+      <subfield code="b">Bach Guild</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Bach, J.S. Organ works [SR] c1981.</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="005">19960528091722.0</controlfield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Solar energy technology handbook, c1980- (a.e.)</subfield>
+      <subfield code="b">v. 1, t.p. (William C. Dickinson) pub. info sheet (William Clarence Dickinson, b. 3/15/22)</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Dickinson, William C.</subfield>
+      <subfield code="d">1922-</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(DLC)n 80007472</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(SzGeCERN)aaa0004</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR</subfield>
+    </datafield>
+  </record>
+  <record>
+    <!-- this record is used by INVENIO (regression) tests as recID #109 -->
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Europhysics Study Conference on Unification of the Fundamental Particle Interactions, Erice, Italy, 1980. Unification of the fundamental particle interactions, 1980 (a.e.)</subfield>
+      <subfield code="b">t.p. (John Ellis)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Supersymmetry and supergravity, c1986:</subfield>
+      <subfield code="b">CIP t.p. (J. Ellis)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Quantum reflections, 2000:</subfield>
+      <subfield code="b">CIP t.p. (John Ellis) data sht. (b. July 1, 1946) pub. info. (Jonathan Richard Ellis)</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Ellis, J.</subfield>
+      <subfield code="d">1946-</subfield>
+      <subfield code="q">(John),</subfield>
+    </datafield>
+    <datafield tag="400" ind1=" " ind2=" ">
+      <subfield code="a">Ellis, Jonathan Richard</subfield>
+      <subfield code="d">1946-</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Ellis, John</subfield>
+      <subfield code="d">1946-</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(DLC)n 80141717</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(SzGeCERN)aaa0005</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR</subfield>
+    </datafield>
+  </record>
+  <record>
+    <!-- this 'DELETED' record is used by INVENIO (regression) tests -->
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">EllisDeleted, JohnDeleted</subfield>
+      <subfield code="d">1946-</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR|(SzGeCERN)aaa0006</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHOR</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="c">DELETED</subfield>
+    </datafield>
+  </record>
+  <!------------------------------------
+      INSTITUTION Authority Records 
+  ------------------------------------->
+  <record> 
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Stanford Linear Accelerator Center</subfield>
+      <subfield code="u">SLAC</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">SLAC STANFORD</subfield>
+      <subfield code="9">DESY_AFF</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="b">DOE</subfield>
+      <subfield code="b">HEP200</subfield>
+      <subfield code="b">LABLIST</subfield>
+      <subfield code="b">PDGLIST</subfield>
+      <subfield code="b">PPF</subfield>
+      <subfield code="b">SLUO</subfield>
+      <subfield code="b">TOP050</subfield>
+      <subfield code="b">TOP100</subfield>
+      <subfield code="b">TOP200</subfield>
+      <subfield code="b">TOP500</subfield>
+      <subfield code="b">WEB</subfield>
+    </datafield>
+    <datafield tag="856" ind1="4" ind2=" ">
+      <subfield code="u">http://www.slac.stanford.edu/</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+      <subfield code="c">2011-01-21</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+      <subfield code="x">1989-07-18</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">INST-6300</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="g">Accel. Ctr. Stanford Linear Center</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">SLAC Stanford</subfield>
+      <subfield code="9">DESY</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+      <subfield code="a">CORE</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(SzGeCERN)iii0001</subfield>
+    </datafield>
+    <datafield tag="371" ind1=" " ind2=" ">
+      <subfield code="e">94025 </subfield>
+      <subfield code="g">US</subfield>
+      <subfield code="a">SLAC National Accelerator Laboratory</subfield>
+      <subfield code="f">SLAC National Accelerator Laboratory</subfield>
+      <subfield code="a">2575 Sand Hill Road</subfield>
+      <subfield code="f">2575 Sand Hill Road</subfield>
+      <subfield code="a">Menlo Park, CA 94025-7090</subfield>
+      <subfield code="f">Menlo Park, CA 94025-7090</subfield>
+      <subfield code="a">USA</subfield>
+      <subfield code="f">USA</subfield>
+      <subfield code="c">CA</subfield>
+      <subfield code="b">Menlo Park</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="856" ind1="4" ind2=" ">
+      <subfield code="u">http://www.cern.ch</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+      <subfield code="c">2011-01-21</subfield>
+    </datafield>
+    <datafield tag="961" ind1=" " ind2=" ">
+      <subfield code="x">1989-07-16</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">INST-1147</subfield>
+    </datafield>
+    <datafield tag="678" ind1="1" ind2=" ">
+      <subfield code="a">Conseil européen pour la Recherche Nucléaire (1952-1954)</subfield>
+      <subfield code="a">Organisation européenne pour la Recherche nucléaire (1954-now)</subfield>
+      <subfield code="a">Sub title: Laboratoire européen pour la Physique des Particules (1984-now)</subfield>
+      <subfield code="a">Sub title: European Laboratory for Particle Physics (1984-now)</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="b">HEP200</subfield>
+      <subfield code="b">LABLIST</subfield>
+      <subfield code="b">PDGLIST</subfield>
+      <subfield code="b">PPF</subfield>
+      <subfield code="b">SLUO</subfield>
+      <subfield code="b">TOP050</subfield>
+      <subfield code="b">TOP100</subfield>
+      <subfield code="b">TOP200</subfield>
+      <subfield code="b">TOP500</subfield>
+      <subfield code="b">WEB</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="9">DESY</subfield>
+      <subfield code="a">CERN Geneva</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">Centre Européen de Recherches Nucléaires</subfield>
+      <subfield code="g">center</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">European Organization for Nuclear Research</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">CERN</subfield>
+      <subfield code="t">CERN</subfield>
+      <subfield code="u">CERN</subfield>
+    </datafield>
+    <datafield tag="371" ind1=" " ind2=" ">
+      <subfield code="a">CH-1211 Genève 23</subfield>
+      <subfield code="b">Geneva</subfield>
+      <subfield code="d">Switzerland</subfield>
+      <subfield code="e">1211</subfield>
+      <subfield code="g">CH</subfield>
+    </datafield>
+    <datafield tag="372" ind1=" " ind2=" ">
+      <subfield code="a">Research centre</subfield>
+    </datafield>
+    <datafield tag="680" ind1=" " ind2=" ">
+      <subfield code="i">2nd address: Organisation Européenne pour la Recherche Nucléaire (CERN), F-01631 Prévessin Cedex, France</subfield>
+    </datafield>
+    <datafield tag="690" ind1="C" ind2=" ">
+      <subfield code="a">CORE</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(SzGeCERN)iii0002</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+  </record>
+  <!------------------------------------
+      SUBJECT Authority Records 
+  ------------------------------------->
+  <record>
+    <controlfield tag="005">19891121083347.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT|(DLC)sh 85101653</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT|(SzGeCERN)sss0001</subfield>
+    </datafield>
+    <datafield tag="150" ind1=" " ind2=" ">
+      <subfield code="a">Physics</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Natural philosophy</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Philosophy, Natural</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="w">g</subfield>
+      <subfield code="a">Physical sciences</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="a">Dynamics</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">DLC</controlfield>
+    <controlfield tag="005">20010904160459.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT|(SzGeCERN)sss0003</subfield>
+    </datafield>
+    <datafield tag="150" ind1=" " ind2=" ">
+      <subfield code="a">Computer crimes</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Computer fraud</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Computers</subfield>
+      <subfield code="x">Law and legislation</subfield>
+      <subfield code="x">Criminal provisions</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Computers and crime</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Cyber crimes</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Cybercrimes</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Electronic crimes (Computer crimes)</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="w">g</subfield>
+      <subfield code="a">Crime</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="a">Privacy, Right of</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">00351496: Adamski, A. Prawo kame komputerowe, c2000.</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Excite WWW directory of subjects, July 10, 2001</subfield>
+      <subfield code="b">(cybercrimes; subcategory under Criminal, Branches of law, Law, Education)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Electronic crime needs assessment for state and local law enforcement, 2001:</subfield>
+      <subfield code="b">glossary, p. 41 (electronic crime includes but is not limited to fraud, theft, forgery, child pornography or exploitation, stalking, traditional white-collar crimes, privacy violations, illegal drug transactions, espionage, computer intrusions; no synonyms given)</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">DLC</controlfield>
+    <controlfield tag="005">20010904162409.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT|(SzGeCERN)sss0004</subfield>
+    </datafield>
+    <datafield tag="150" ind1=" " ind2=" ">
+      <subfield code="a">Embellishment (Music)</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Diminution (Music)</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Ornamentation (Music)</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Ornaments (Music)</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="w">g</subfield>
+      <subfield code="a">Music</subfield>
+      <subfield code="x">Performance</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="w">g</subfield>
+      <subfield code="a">Performance practice (Music)</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="a">Musical notation</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="a">Variation (Music)</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Heim, N.M. Ornamentation for the clarinetist, c1993.</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Massin. De la variation, c2000.</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT</subfield>
+    </datafield>
+  </record>
+  <record>
+    <controlfield tag="003">DLC</controlfield>
+    <controlfield tag="005">20010904162503.0</controlfield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT|(SzGeCERN)sss0005</subfield>
+    </datafield>
+    <datafield tag="150" ind1=" " ind2=" ">
+      <subfield code="a">Embellishment (Vocal music)</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Colorature</subfield>
+    </datafield>
+    <datafield tag="450" ind1=" " ind2=" ">
+      <subfield code="a">Fioriture</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="w">g</subfield>
+      <subfield code="a">Embellishment (Music)</subfield>
+    </datafield>
+    <datafield tag="550" ind1=" " ind2=" ">
+      <subfield code="w">g</subfield>
+      <subfield code="a">Vocal music</subfield>
+      <subfield code="x">History and criticism</subfield>
+    </datafield>
+    <datafield tag="670" ind1=" " ind2=" ">
+      <subfield code="a">Massin. De la variation, c2000.</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">SUBJECT</subfield>
+    </datafield>
+  </record>
+
+<!------------------------------------------------------------------->
+<!-- 3. Linked BIBLIOGRAPHIC AND AUTHORITY records from Jülich     -->
+<!------------------------------------------------------------------->
+
+  <!----------------------------
+       BIBLIOGRAPHIC records
+  ----------------------------->
+  <record>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="0">PER:749</subfield>
+      <subfield code="a">Kilian, K.</subfield>
+      <subfield code="b">0</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Other ways to make polarized antiproton beams</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="c">2010</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">107</subfield>
+    </datafield>
+    <datafield tag="440" ind1=" " ind2="0">
+      <subfield code="0">6697</subfield>
+      <subfield code="a">Verhandlungen der Deutschen Physikalischen Gesellschaft (Reihe 06)</subfield>
+      <subfield code="v">2</subfield>
+    </datafield>
+    <datafield tag="500" ind1=" " ind2=" ">
+      <subfield code="3">Journal Article</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:513</subfield>
+      <subfield code="a">Grzonka, D.</subfield>
+      <subfield code="b">1</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:1182</subfield>
+      <subfield code="a">Oelert, W.</subfield>
+      <subfield code="b">2</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="0">--NOT MATCHED--</subfield>
+      <subfield code="g">Vol. 2</subfield>
+      <subfield code="q">2:&lt;</subfield>
+      <subfield code="v">2</subfield>
+      <subfield code="y">2010</subfield>
+    </datafield>
+    <datafield tag="913" ind1=" " ind2=" ">
+      <subfield code="0">GRANT:413</subfield>
+      <subfield code="k">P53</subfield>
+      <subfield code="s">Struktur der Materie der Materie</subfield>
+      <subfield code="v">Physik der Hadronen und Kerne</subfield>
+    </datafield>
+    <datafield tag="914" ind1=" " ind2=" ">
+      <subfield code="y">2010</subfield>
+    </datafield>
+    <datafield tag="920" ind1=" " ind2=" ">
+      <subfield code="0">INSTITUTION|(DE-Juel1)795</subfield>
+      <subfield code="g">IKP</subfield>
+      <subfield code="k">IKP-1</subfield>
+      <subfield code="v">Experimentelle Hadronstruktur</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">VDB:126525</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">VDB</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">DOI</subfield>
+      <subfield code="a">10.1063/1.2737136</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">VDB</subfield>
+      <subfield code="a">VDB:88636</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">WOS</subfield>
+      <subfield code="a">WOS:000246413400056</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">ISSN</subfield>
+      <subfield code="a">0003-6951</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">inh:9498831</subfield>
+      <subfield code="2">inh</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">English</subfield>
+    </datafield>
+    <datafield tag="084" ind1=" " ind2=" ">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Atom-, molecule-, and ion-surface impact and interactions</subfield>
+    </datafield>
+    <datafield tag="084" ind1=" " ind2=" ">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Pulsed laser deposition</subfield>
+    </datafield>
+    <datafield tag="084" ind1=" " ind2=" ">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Stoichiometry and homogeneity</subfield>
+    </datafield>
+    <datafield tag="084" ind1=" " ind2=" ">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Thin film growth, structure, and epitaxy</subfield>
+    </datafield>
+    <datafield tag="084" ind1=" " ind2=" ">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Vacuum deposition</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="0">39744</subfield>
+      <subfield code="a">Heeg, T.</subfield>
+      <subfield code="b">0</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Epitaxially stabilized growth of orthorhombic LuScO3 thin films</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="c">2007</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a">192901-1 - 192901-3</subfield>
+    </datafield>
+    <datafield tag="440" ind1=" " ind2="0">
+      <subfield code="0">562</subfield>
+      <subfield code="a">Applied Physics Letters</subfield>
+      <subfield code="v">90</subfield>
+      <subfield code="x">0003-6951</subfield>
+    </datafield>
+    <datafield tag="500" ind1=" " ind2=" ">
+      <subfield code="3">Journal Article</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="a">Metastable lutetium scandate (LuScO3) thin films with an orthorhombic perovskite structure have been prepared by molecular-beam epitaxy and pulsed-laser deposition on NdGaO3(110) and DyScO3(110) substrates. Stoichiometry and crystallinity were investigated using Rutherford backscattering spectrometry/channeling, x-ray diffraction, and transmission electron microscopy. The results indicate that LuScO3, which normally only exists as a solid solution of Sc2O3 and Lu2O3 with the cubic bixbyite structure, can be grown in the orthorhombically distorted perovskite structure. Rocking curves as narrow as 0.05deg were achieved. A critical film thickness of approximately 200 nm for the epitaxially stabilized perovskite polymorph of LuScO3 on NdGaO3(110) substrates was determined.</subfield>
+    </datafield>
+    <datafield tag="588" ind1=" " ind2=" ">
+      <subfield code="a">Enriched from Web of Science, Inspec</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">DyScO3</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">DyScO3(110) substrates</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Fuel cells</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">LuScO3</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">NdGaO3</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">NdGaO3(110) substrates</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Rutherford backscattering</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Rutherford backscattering channeling</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Rutherford backscattering spectrometry</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">X-ray diffraction</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">critical film thickness</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">crystallinity</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">epitaxial layers</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">epitaxially stabilized growth</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">epitaxially stabilized perovskite polymorph</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">lutetium compounds</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">metastable lutetium scandate thin films</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">molecular beam epitaxial growth</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">molecular beam epitaxy</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">orthorhombically distorted perovskite structure</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">polymorphism</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">pulsed laser deposition</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">rocking curves</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">stoichiometry</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">transmission electron microscopy</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:64142</subfield>
+      <subfield code="a">Roeckerath, M.</subfield>
+      <subfield code="b">1</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:5409</subfield>
+      <subfield code="a">Schubert, J.</subfield>
+      <subfield code="b">2</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:5482</subfield>
+      <subfield code="a">Zander, W.</subfield>
+      <subfield code="b">3</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:14557</subfield>
+      <subfield code="a">Buchal, Ch.</subfield>
+      <subfield code="b">4</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:60616</subfield>
+      <subfield code="a">Chen, H. Y.</subfield>
+      <subfield code="b">5</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:5020</subfield>
+      <subfield code="a">Jia, C. L.</subfield>
+      <subfield code="b">6</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:45799</subfield>
+      <subfield code="a">Jia, Y.</subfield>
+      <subfield code="b">7</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:65921</subfield>
+      <subfield code="a">Adamo, C.</subfield>
+      <subfield code="b">8</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:15220</subfield>
+      <subfield code="a">Schlom, D. G.</subfield>
+      <subfield code="b">9</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="0">ZDBID:2265524-4</subfield>
+      <subfield code="a">10.1063/1.2737136</subfield>
+      <subfield code="g">Vol. 90, no. 19, p. 192901</subfield>
+      <subfield code="n">19</subfield>
+      <subfield code="q">90:19&lt;192901</subfield>
+      <subfield code="t">Applied physics reviews</subfield>
+      <subfield code="v">90</subfield>
+      <subfield code="x">0003-6951</subfield>
+      <subfield code="y">2007</subfield>
+    </datafield>
+    <datafield tag="856" ind1="7" ind2=" ">
+      <subfield code="u">http://dx.doi.org/10.1063/1.2737136</subfield>
+    </datafield>
+    <datafield tag="913" ind1=" " ind2=" ">
+      <subfield code="0">GRANT:412</subfield>
+      <subfield code="k">P42</subfield>
+      <subfield code="s">Schlüsseltechnologien</subfield>
+      <subfield code="v">Grundlagen für zukünftige Informationstechnologien</subfield>
+    </datafield>
+    <datafield tag="914" ind1=" " ind2=" ">
+      <subfield code="y">2007</subfield>
+    </datafield>
+    <datafield tag="920" ind1=" " ind2=" ">
+      <subfield code="0">INSTITUTION|(DE-Juel1)381</subfield>
+      <subfield code="d">14.09.2008</subfield>
+      <subfield code="g">CNI</subfield>
+      <subfield code="k">CNI</subfield>
+      <subfield code="v">Center of Nanoelectronic Systems for Information Technology</subfield>
+      <subfield code="z">Zusammenschluss der am FE-Vorhaben I01 beteiligtenute: IFF-TH-I, IFF-TH-II, IFF-IEM, IFF-IMF, IFF-IEE, ISG-1, ISG-2, ISG-3</subfield>
+    </datafield>
+    <datafield tag="920" ind1=" " ind2=" ">
+      <subfield code="0">INSTITUTION|(DE-Juel1)788</subfield>
+      <subfield code="g">IFF</subfield>
+      <subfield code="k">IFF-8</subfield>
+      <subfield code="v">Mikrostrukturforschung</subfield>
+    </datafield>
+    <datafield tag="920" ind1=" " ind2=" ">
+      <subfield code="0">INSTITUTION|(DE-Juel1)799</subfield>
+      <subfield code="g">IBN</subfield>
+      <subfield code="k">IBN-1</subfield>
+      <subfield code="v">Halbleiter-Nanoelektronik</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">VDB:88636</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">VDB</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ARTICLE</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">DOI</subfield>
+      <subfield code="a">10.4028/www.scientific.net/MSF.638-642.1098</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">VDB</subfield>
+      <subfield code="a">VDB:125298</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">ISSN</subfield>
+      <subfield code="a">0255-5476</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">inh:11707323</subfield>
+      <subfield code="2">inh</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">English</subfield>
+    </datafield>
+    <datafield tag="084" ind1=" " ind2=" ">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">Fuel cells</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="0">PER:96536</subfield>
+      <subfield code="a">Menzler, N.H.</subfield>
+      <subfield code="b">0</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Influence of processing parameters on the manufacturing of anode-supported solid oxide fuel cells by different wet chemical routes</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="c">2010</subfield>
+    </datafield>
+    <datafield tag="300" ind1=" " ind2=" ">
+      <subfield code="a"></subfield>
+    </datafield>
+    <datafield tag="440" ind1=" " ind2="0">
+      <subfield code="0">4206</subfield>
+      <subfield code="a">Materials Science Forum</subfield>
+      <subfield code="v">638-642</subfield>
+      <subfield code="x">0255-5476</subfield>
+      <subfield code="y">1098 - 1105</subfield>
+    </datafield>
+    <datafield tag="500" ind1=" " ind2=" ">
+      <subfield code="3">Journal Article</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="a">Anode-supported solid oxide fuel cells (SOFC) are manufactured at Forschungszentrum Jülich by different wet chemical powder processes and subsequent sintering at high temperatures. Recently, the warm pressing of Coat-Mix powders has been replaced by tape casting as the shaping technology for the NiO/8YSZ-containing substrate in order to decrease the demand for raw materials due to lower substrate thickness and in order to increase reproducibility and fabrication capacities (scalable process). Different processing routes for the substrates require the adjustment of process parameters for further coating with functional layers. Therefore, mainly thermal treatment steps have to be adapted to the properties of the new substrate types in order to obtain high-performance cells with minimum curvature (for stack assembly). In this presentation, the influence of selected process parameters during cell manufacturing will be characterized with respect to the resulting physical parameters such as slurry viscosity, green tape thickness, relative density, substrate strength, electrical conductivity, and shrinkage of the different newly developed substrate types. The influencing factors during manufacturing and the resulting characteristics will be presented and possible applications for the various substrates identified.</subfield>
+    </datafield>
+    <datafield tag="588" ind1=" " ind2=" ">
+      <subfield code="a">Enriched from Inspec</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">anode-supported solid oxide fuel cells</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">coating</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">electrical conductivity</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">green tape thickness</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">powders</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">processing parameters</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">shrinkage</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">sintering</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">slurry viscosity</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">solid oxide fuel cells</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">tape casting</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">thermal treatment</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">viscosity</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">warm pressing</subfield>
+    </datafield>
+    <datafield tag="650" ind1=" " ind2="7">
+      <subfield code="2">Inspec</subfield>
+      <subfield code="a">wet chemical powder processes</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:76694</subfield>
+      <subfield code="a">Schafbauer, W.</subfield>
+      <subfield code="b">1</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="0">PER:96316</subfield>
+      <subfield code="a">Buchkremer, H.P.</subfield>
+      <subfield code="b">2</subfield>
+      <subfield code="g">fzj</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="0">ZDBID:2047372-2</subfield>
+      <subfield code="a">10.4028/www.scientific.net/MSF.638-642.1098</subfield>
+      <subfield code="g">Vol. 638-642, p. 1098 - 1105</subfield>
+      <subfield code="q">638-642:&lt;1098 - 1105</subfield>
+      <subfield code="t">Materials science forum</subfield>
+      <subfield code="v">638-642</subfield>
+      <subfield code="x">0255-5476</subfield>
+      <subfield code="y">2010</subfield>
+    </datafield>
+    <datafield tag="856" ind1="7" ind2=" ">
+      <subfield code="u">http://dx.doi.org/10.4028/www.scientific.net/MSF.638-642.1098</subfield>
+    </datafield>
+    <datafield tag="913" ind1=" " ind2=" ">
+      <subfield code="0">GRANT:402</subfield>
+      <subfield code="k">P12</subfield>
+      <subfield code="s">Energie</subfield>
+      <subfield code="v">Rationelle Energieumwandlung</subfield>
+    </datafield>
+    <datafield tag="914" ind1=" " ind2=" ">
+      <subfield code="y">2010</subfield>
+    </datafield>
+    <datafield tag="920" ind1=" " ind2=" ">
+      <subfield code="0">INSTITUTION|(DE-Juel1)1130</subfield>
+      <subfield code="g">IEK</subfield>
+      <subfield code="k">IEK-1</subfield>
+      <subfield code="v">Werkstoffsynthese und Herstellverfahren</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">VDB:125298</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">VDB</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ARTICLE</subfield>
+    </datafield>
+  </record>
+
+  <!----------------------------
+       AUTHORITY records
+  ----------------------------->
+
+  <record>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)5008462-8</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Forschungszentrum Jülich</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">Energieforschungszentrum Jülich</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">KFA</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">Research Centre Jülich</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">KFA Jülich</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">FZJ</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="w">a</subfield>
+      <subfield code="a">Kernforschungsanlage Jülich</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">INSTITUTION|(DE-Juel1)301</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)301</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Institut für Kernphysik</subfield>
+    </datafield>
+    <datafield tag="148" ind1=" " ind2=" ">
+      <subfield code="a">31.12.2000</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IKP</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)5008462-8</subfield>
+      <subfield code="2">GND</subfield>
+      <subfield code="a">Forschungszentrum Jülich</subfield>
+      <subfield code="w">t</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)301</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IKP</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)301</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)795</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)795</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Experimentelle Hadronstruktur</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IKP-1</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)301</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IKP</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)221</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Institut 1 (Experimentelle Kernphysik I)</subfield>
+      <subfield code="w">a</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)795</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)241</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)241</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Institut für Festkörperforschung</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IFF</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)5008462-8</subfield>
+      <subfield code="2">GND</subfield>
+      <subfield code="a">Forschungszentrum Jülich</subfield>
+      <subfield code="w">t</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)241</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IFF</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)241</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)1107</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)1107</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Institut für Bio- und Nanosysteme</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IBN</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)5008462-8</subfield>
+      <subfield code="2">GND</subfield>
+      <subfield code="a">Forschungszentrum Jülich</subfield>
+      <subfield code="w">t</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1107</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IBN</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)1107</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)1125</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)1125</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Institut für Energie- und Klimaforschung</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IEK</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)5008462-8</subfield>
+
+      <subfield code="2">GND</subfield>
+      <subfield code="a">Forschungszentrum Jülich</subfield>
+      <subfield code="w">t</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1125</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IEK</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)1125</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)1115</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)1115</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Institut für Energieforschung</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IEF</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)5008462-8</subfield>
+      <subfield code="2">GND</subfield>
+      <subfield code="a">Forschungszentrum Jülich</subfield>
+      <subfield code="w">t</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1115</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IEF</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)1115</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)381</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)381</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Center of Nanoelectronic Systems for Information Technology</subfield>
+    </datafield>
+    <datafield tag="148" ind1=" " ind2=" ">
+      <subfield code="a">14.09.2008</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">CNI</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)5008462-8</subfield>
+      <subfield code="2">GND</subfield>
+      <subfield code="a">Forschungszentrum Jülich</subfield>
+      <subfield code="w">t</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)381</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">CNI</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)381</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)788</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)788</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Mikrostrukturforschung</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IFF-8</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)241</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IFF</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)37</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Mikrostrukturforschung</subfield>
+      <subfield code="w">a</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)788</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)861</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)861</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Institut für Halbleiterschichten und Bauelemente</subfield>
+    </datafield>
+    <datafield tag="148" ind1=" " ind2=" ">
+      <subfield code="a">30.09.2007</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IBN-1</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1107</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IBN</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)41</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Institut für Halbleiterschichten und Bauelemente</subfield>
+      <subfield code="w">a</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)799</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Halbleiter-Nanoelektronik</subfield>
+      <subfield code="w">b</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)861</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)799</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)799</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Halbleiter-Nanoelektronik</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IBN-1</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1107</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IBN</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)861</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Institut für Halbleiterschichten und Bauelemente</subfield>
+      <subfield code="w">a</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)799</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)1130</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)1130</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Werkstoffsynthese und Herstellverfahren</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IEK-1</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1125</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IEK</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)809</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Werkstoffsynthese und Herstellungsverfahren</subfield>
+      <subfield code="w">a</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)1130</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
+  <record>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="0">(DE-Juel1)809</subfield>
+      <subfield code="2">INST</subfield>
+    </datafield>
+    <datafield tag="035" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION|(DE-Juel1)809</subfield>
+    </datafield>
+    <datafield tag="110" ind1=" " ind2=" ">
+      <subfield code="a">Werkstoffsynthese und Herstellungsverfahren</subfield>
+    </datafield>
+    <datafield tag="148" ind1=" " ind2=" ">
+      <subfield code="a">30.09.2010</subfield>
+    </datafield>
+    <datafield tag="410" ind1=" " ind2=" ">
+      <subfield code="a">IEF-1</subfield>
+      <subfield code="w">d</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1115</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">IEF</subfield>
+      <subfield code="w">g</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)5</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Werkstoffsynthese und Herstellungsverfahren</subfield>
+      <subfield code="w">a</subfield>
+    </datafield>
+    <datafield tag="510" ind1=" " ind2=" ">
+      <subfield code="4">INSTITUTION|(DE-Juel1)1130</subfield>
+      <subfield code="2">INST</subfield>
+      <subfield code="a">Werkstoffsynthese und Herstellverfahren</subfield>
+      <subfield code="w">b</subfield>
+    </datafield>
+    <datafield tag="970" ind1=" " ind2=" ">
+      <subfield code="a">(DE-Juel1)809</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">INSTITUTION</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">AUTHORITY</subfield>
+    </datafield>
+  </record>
+
 </collection>

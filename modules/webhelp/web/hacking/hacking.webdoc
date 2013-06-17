@@ -64,6 +64,10 @@ wiki</a>.</p>
 <dd>Describes information useful to understand how BibAuthorID works.
 </dd>
 
+<dt><a href="bibauthority-internals">BibAuthority Internals</a></dt>
+<dd>Describes information useful to understand how BibAuthority works.
+</dd>
+
 <dt><a href="bibclassify-internals">BibClassify Internals</a></dt>
 <dd>Describes information useful to understand how BibClassify works,
 the taxonomy extensions we use, how the keyword extraction algorithm works.

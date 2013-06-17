@@ -22,13 +22,21 @@
 __revision__ = "$Id$"
 
 import unittest
+import re
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_URL, \
+                           CFG_SITE_LANG, \
+                           CFG_SITE_RECORD, \
+                           CFG_SITE_NAME
 from invenio.testutils import make_test_suite, \
                               run_test_suite, \
-                              test_web_page_content
+                              test_web_page_content, \
+                              get_authenticated_mechanize_browser, \
+                              make_url
 from invenio.bibformat import format_record
 from invenio.bibformat_engine import BibFormatObject
+from invenio.bibformat_elements import bfe_authority_author
+
 
 class BibFormatAPITest(unittest.TestCase):
     """Check BibFormat API"""
@@ -313,6 +321,7 @@ class BibFormatMARCXMLTest(unittest.TestCase):
   </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Ellis, J</subfield>
+    <subfield code="0">AUTHOR|(SzGeCERN)aaa0005</subfield>
     <subfield code="u">University of Oxford</subfield>
   </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
@@ -468,6 +477,126 @@ class BibFormatPublInfoFormattingTest(unittest.TestCase):
           test_web_page_content(CFG_SITE_URL + '/%s/84' % CFG_SITE_RECORD,
             expected_text="Nucl. Phys. B: 656 (2003) pp. 23-36"))
 
+
+class BibFormatAuthorityRecordsTest(unittest.TestCase):
+    """Check authority record related functions"""
+
+    def test_brief_output(self):
+        """bibformat - brief authority record format outputs something"""
+        self.assertEqual([],
+          test_web_page_content(CFG_SITE_URL + '/search?cc=Authority+Records&rg=100',
+            expected_text="Ellis, John, 1946-"))
+
+    def test_detailed_output(self):
+        """bibformat - brief authority record format outputs some basic information"""
+        self.assertEqual([],
+          test_web_page_content(CFG_SITE_URL + '/record/118',
+            expected_text=["Ellis, Jonathan Richard, 1946-", "Control Number"]))
+
+    def test_empty_string(self):
+        """bibformat - no empty strings output for variant (4xx) fields"""
+        class BFO:
+            lang = 'en'
+            def fields(self, afield):
+                if '400' in afield: return [{'a':'A'},{},{'a':'B'}]
+                else: afield; return []
+
+        bfo = BFO()
+        self.assertTrue("Variant" in bfe_authority_author.format_element(bfo, detail='yes'))
+        self.assertTrue(", , " not in bfe_authority_author.format_element(bfo, detail='yes'))
+
+
+class BibFormatAuthorityRecordsBrowsingTest(unittest.TestCase):
+    """Tests authority records browsing pre and successor"""
+
+    def setUp(self):
+        self.re_institution = re.compile(r"Werkstoffsynthese und Herstellverfahren")
+        self.re_non_compact = re.compile(r"Non-compact supergravity")
+        self.re_cern_control_number = re.compile(r"INSTITUTION|(SzGeCERN)")
+        self.re_institution_energy = re.compile(r"Institut für Energieforschung")
+
+    def test_format_authority_browsing_pre_and_successor(self):
+        """bibformat - test format authority browsing pre and successor"""
+        base = "/record/140/"
+        parameters = {}
+        url = make_url(base, **parameters)
+
+        error_messages = []
+        browser = get_authenticated_mechanize_browser("admin", "")
+        browser.open(url)
+        link = browser.find_link(text_regex=re.compile("2 dependent records"))
+        resp = browser.follow_link(link)
+        link = browser.find_link(text_regex=re.compile("Detailed record"), nr=1)
+        resp = browser.follow_link(link)
+        found = self.re_institution.search(resp.read())
+        if not found:
+            error_messages.append("There is no 'Werkstoffsynthese und Herstellverfahren' in html response.")
+        link = browser.find_link(text_regex=re.compile("1 dependent record"))
+        resp = browser.follow_link(link)
+        found = self.re_institution.search(resp.read())
+        if not found:
+            error_messages.append("There is no 'Werkstoffsynthese und Herstellverfahren' in html response.")
+        self.assertEqual([], error_messages)
+
+
+    def test_format_authority_browsing_ellis(self):
+        """bibformat - test format authority browsing Ellis authority record"""
+        base = "/record/12/"
+        parameters = {}
+        url = make_url(base, **parameters)
+
+        error_messages = []
+        browser = get_authenticated_mechanize_browser("admin", "")
+        browser.open(url)
+        link = browser.find_link(text_regex=re.compile("Ellis, J"))
+        resp = browser.follow_link(link)
+        link = browser.find_link(text_regex=re.compile("Detailed record"), nr=0)
+        resp = browser.follow_link(link)
+        link = browser.find_link(text_regex=re.compile("4 dependent records"))
+        resp = browser.follow_link(link)
+        found = self.re_non_compact.search(resp.read())
+        if not found:
+            error_messages.append("There is no 'Non-compact supergravity' in html response.")
+        self.assertEqual([], error_messages)
+
+
+    def test_format_authority_browsing_cern(self):
+        """bibformat - test format authority browsing cern authority record"""
+        base = "/record/12/"
+        parameters = {}
+        url = make_url(base, **parameters)
+
+        error_messages = []
+        browser = get_authenticated_mechanize_browser("admin", "")
+        browser.open(url)
+        link = browser.find_link(text_regex=re.compile("CERN"))
+        resp = browser.follow_link(link)
+        found = self.re_cern_control_number.search(resp.read())
+        if not found:
+            error_messages.append("There is no CERN control number in html response.")
+        self.assertEqual([], error_messages)
+
+    def test_format_authority_browsing_parent_child(self):
+        """bibformat - test format authority browsing parent child"""
+        base = "/record/129/"
+        parameters = {}
+        url = make_url(base, **parameters)
+
+        error_messages = []
+        browser = get_authenticated_mechanize_browser("admin", "")
+        browser.open(url)
+        link = browser.find_link(text_regex=re.compile("Institut für Kernphysik"))
+        resp = browser.follow_link(link)
+        link = browser.find_link(text_regex=re.compile("Forschungszentrum Jülich"))
+        resp = browser.follow_link(link)
+        link = browser.find_link(text_regex=re.compile("6 dependent records"))
+        resp = browser.follow_link(link)
+        found = self.re_institution_energy.search(resp.read())
+        if not found:
+            error_messages.append("There is no 'Institut für Energieforschung' in html response.")
+        self.assertEqual([], error_messages)
+
+
 TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatDetailedHTMLTest,
                              BibFormatBriefHTMLTest,
@@ -478,7 +607,9 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatObjectAPITest,
                              BibFormatTitleFormattingTest,
                              BibFormatISBNFormattingTest,
-                             BibFormatPublInfoFormattingTest)
+                             BibFormatPublInfoFormattingTest,
+                             BibFormatAuthorityRecordsTest,
+                             BibFormatAuthorityRecordsBrowsingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

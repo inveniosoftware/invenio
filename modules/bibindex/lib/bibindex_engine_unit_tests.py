@@ -42,6 +42,12 @@ class TestListSetOperations(unittest.TestCase):
                          bibindex_engine.list_union([1, 2, 3],
                                                     [1, 3, 4]))
 
+    def test_list_unique(self):
+        """bibindex engine - list unique"""
+        self.assertEqual([1, 2, 3],
+                         bibindex_engine.list_unique([1, 2, 3, 3, 1, 2]))
+
+
 
 class TestWashIndexTerm(unittest.TestCase):
     """Tests for washing index terms, useful for both searching and indexing."""

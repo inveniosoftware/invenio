@@ -57,6 +57,10 @@ INSERT INTO field VALUES (29,'exact first author','exactfirstauthor');
 INSERT INTO field VALUES (30,'author count','authorcount');
 INSERT INTO field VALUES (31,'reference to','rawref');
 INSERT INTO field VALUES (32,'exact title','exacttitle');
+INSERT INTO field VALUES (33,'authority author','authorityauthor');
+INSERT INTO field VALUES (34,'authority institution','authorityinstitution');
+INSERT INTO field VALUES (35,'authority journal','authorityjournal');
+INSERT INTO field VALUES (36,'authority subject','authoritysubject');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
@@ -200,6 +204,20 @@ INSERT INTO field_tag VALUES (30,1,100);
 INSERT INTO field_tag VALUES (30,2,90);
 INSERT INTO field_tag VALUES (32,3,100);
 INSERT INTO field_tag VALUES (32,4,90);
+
+INSERT INTO field_tag VALUES (33,1,100);
+INSERT INTO field_tag VALUES (33,146,100);
+INSERT INTO field_tag VALUES (33,140,100);
+INSERT INTO field_tag VALUES (34,148,100);
+INSERT INTO field_tag VALUES (34,149,100);
+INSERT INTO field_tag VALUES (34,150,100);
+INSERT INTO field_tag VALUES (35,151,100);
+INSERT INTO field_tag VALUES (35,152,100);
+INSERT INTO field_tag VALUES (35,153,100);
+INSERT INTO field_tag VALUES (36,154,100);
+INSERT INTO field_tag VALUES (36,155,100);
+INSERT INTO field_tag VALUES (36,156,100);
+
 
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format (id,name,code,description,content_type,visibility) VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -374,6 +392,18 @@ INSERT INTO tag VALUES (141,'title','245__a');
 INSERT INTO tag VALUES (142,'main abstract','245__a');
 INSERT INTO tag VALUES (143,'internal notes','595__a');
 INSERT INTO tag VALUES (144,'other relationship entry', '787%');
+-- INSERT INTO tag VALUES (145,'authority: main personal name','100__a'); -- already exists under a different name ('first author name')
+INSERT INTO tag VALUES (146,'authority: alternative personal name','400__a');
+-- INSERT INTO tag VALUES (147,'authority: personal name from other record','500__a'); -- already exists under a different name ('comment')
+INSERT INTO tag VALUES (148,'authority: organization main name','110__a');
+INSERT INTO tag VALUES (149,'organization alternative name','410__a');
+INSERT INTO tag VALUES (150,'organization main from other record','510__a');
+INSERT INTO tag VALUES (151,'authority: uniform title','130__a');
+INSERT INTO tag VALUES (152,'authority: uniform title alternatives','430__a');
+INSERT INTO tag VALUES (153,'authority: uniform title from other record','530__a');
+INSERT INTO tag VALUES (154,'authority: subject from other record','150__a');
+INSERT INTO tag VALUES (155,'authority: subject alternative name','450__a');
+INSERT INTO tag VALUES (156,'authority: subject main name','550__a');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '', 'native', 'INDEX-SYNONYM-TITLE,exact','No','No','No','BibIndexDefaultTokenizer');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
@@ -394,6 +424,11 @@ INSERT INTO idxINDEX VALUES (16,'firstauthor','This index contains fuzzy words/p
 INSERT INTO idxINDEX VALUES (17,'exactfirstauthor','This index contains exact words/phrases from first author field.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexExactAuthorTokenizer');
 INSERT INTO idxINDEX VALUES (18,'authorcount','This index contains number of authors of the record.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorCountTokenizer');
 INSERT INTO idxINDEX VALUES (19,'exacttitle','This index contains exact words/phrases from title fields.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
+INSERT INTO idxINDEX VALUES (20,'authorityauthor','This index contains words/phrases from author authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexAuthorTokenizer');
+INSERT INTO idxINDEX VALUES (21,'authorityinstitution','This index contains words/phrases from institution authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
+INSERT INTO idxINDEX VALUES (22,'authorityjournal','This index contains words/phrases from journal authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
+INSERT INTO idxINDEX VALUES (23,'authoritysubject','This index contains words/phrases from subject authority records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexDefaultTokenizer');
+
 
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
@@ -415,6 +450,10 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (16,28);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (17,29);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (18,30);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (19,32);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (20,33);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (21,34);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (22,35);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (23,36);
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');

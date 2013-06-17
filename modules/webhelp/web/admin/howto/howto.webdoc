@@ -46,6 +46,11 @@ care of its normal operation day by day.
 
 <dd>Describes how to manipulate fulltext files within your Invenio
 installation.
+
+<dt><a href="howto-authority">_(HOWTO Manage Authority Records)_</a>
+
+<dd>Describes how to manage Authority Records within your Invenio installation.
+
 </dl>
 </blockquote>
 

@@ -109,7 +109,7 @@ class BibFieldCreateRecordTests(unittest.TestCase):
 
     def test_records_created(self):
         """ bibfield - demo file how many records are created """
-        self.assertEqual(113, len(self.recs))
+        self.assertEqual(141, len(self.recs))
 
     def test_create_record_with_collection_tag(self):
         """ bibfield - create_record() for single record in collection"""

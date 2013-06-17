@@ -21,6 +21,16 @@
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">Admin Area</a> &gt; <a class="navtrail" href="howto">Admin HOWTOs</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
+<h2>Overview</h2>
+
+<p>This HOWTO guide intends to explain how to use the MARC 21
+format for bibliographic records in Invenio.</p>
+
+<p><i>For an explanation of how to use MARC in authority records, 
+please read <a href="howto-authority#howto-marc" target="_blank">How to MARC 
+authority records</a></i>
+</p>
+
 <h2>Why to MARC at all?</h2>
 
 <p>All the bibliographic data in the Invenio system are

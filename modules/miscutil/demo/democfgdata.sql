@@ -62,6 +62,11 @@ INSERT INTO collection VALUES (30, 'ISOLDE Papers', '980:"ISOLDEPAPER"', NULL, N
 INSERT INTO collection VALUES (31, 'ISOLDE Internal Notes', '980:"ISOLDENOTE"', NULL, NULL);
 INSERT INTO collection VALUES (32, 'Drafts', '980:"DRAFT"', NULL, NULL);
 INSERT INTO collection VALUES (33,'Videos','980:"VIDEO"',NULL,NULL);
+INSERT INTO collection VALUES (34, 'Authority Records', 'collection:AUTHORITY', null, null);
+INSERT INTO collection VALUES (35, 'Authority Author', 'collection:AUTHOR', null, null);
+INSERT INTO collection VALUES (36, 'Authority Institution', 'collection:INSTITUTION', null, null);
+INSERT INTO collection VALUES (37, 'Authority Journal', 'collection:JOURNAL', null, null);
+INSERT INTO collection VALUES (38, 'Authority Subject', 'collection:SUBJECT', null, null);
 
 INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
@@ -577,6 +582,27 @@ INSERT INTO collectionname VALUES (33,'en','ln','Videos');
 INSERT INTO collectionname VALUES (33,'fr','ln','Vidéos');
 INSERT INTO collectionname VALUES (33,'it','ln','Filmati');
 
+INSERT INTO collectionname VALUES (34,'en','ln','Authority Records');
+INSERT INTO collectionname VALUES (34,'fr','ln','Notices d''autorité');
+INSERT INTO collectionname VALUES (34,'pl','ln','Rekordy kontrolne');
+
+INSERT INTO collectionname VALUES (35,'en','ln','Authors');
+INSERT INTO collectionname VALUES (35,'fr','ln','Auteurs');
+INSERT INTO collectionname VALUES (35,'pl','ln','Autorzy');
+
+INSERT INTO collectionname VALUES (36,'en','ln','Institutions');
+INSERT INTO collectionname VALUES (36,'fr','ln','Institutions');
+INSERT INTO collectionname VALUES (36,'pl','ln','Instytucje');
+
+INSERT INTO collectionname VALUES (37,'en','ln','Journals');
+INSERT INTO collectionname VALUES (37,'fr','ln','Journals');
+INSERT INTO collectionname VALUES (37,'pl','ln','Czasopisma');
+
+INSERT INTO collectionname VALUES (38,'en','ln','Subjects');
+INSERT INTO collectionname VALUES (38,'fr','ln','Sujets');
+INSERT INTO collectionname VALUES (38,'pl','ln','Tematy');
+
+
 
 
 INSERT INTO collection_collection VALUES (1,15,'r',60);
@@ -609,6 +635,12 @@ INSERT INTO collection_collection VALUES (13,30,'r',20);
 INSERT INTO collection_collection VALUES (14,27,'r',20);
 INSERT INTO collection_collection VALUES (14,28,'r',10);
 INSERT INTO collection_collection VALUES (14,29,'r',10);
+INSERT INTO collection_collection VALUES (1,34,'r',25);
+INSERT INTO collection_collection VALUES (34,35,'r',4);
+INSERT INTO collection_collection VALUES (34,36,'r',3);
+INSERT INTO collection_collection VALUES (34,37,'r',2);
+INSERT INTO collection_collection VALUES (34,38,'r',1);
+
 
 
 
@@ -783,6 +815,14 @@ INSERT INTO collection_field_fieldvalue VALUES (3,2,NULL,'soo',40,0);
 INSERT INTO collection_field_fieldvalue VALUES (3,3,NULL,'soo',30,0);
 INSERT INTO collection_field_fieldvalue VALUES (3,15,NULL,'soo',20,0);
 INSERT INTO collection_field_fieldvalue VALUES (3,12,NULL,'soo',10,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,33,NULL,'sew',4,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,34,NULL,'sew',3,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,35,NULL,'sew',2,0);
+INSERT INTO collection_field_fieldvalue VALUES (34,36,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (35,33,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (36,34,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (37,35,NULL,'sew',1,0);
+INSERT INTO collection_field_fieldvalue VALUES (38,36,NULL,'sew',1,0);
 
 INSERT INTO collection_format VALUES (6,1,100);
 INSERT INTO collection_format VALUES (6,2,90);
