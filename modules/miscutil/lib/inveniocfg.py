@@ -944,10 +944,10 @@ def cli_cmd_create_apache_conf(conf):
     """
     from invenio.apache_manager import main
 
-    warn('inveniocfg --create-apache-conf is deprecated. Using instead: inveniomanage apache create-conf')
+    warn('inveniocfg --create-apache-conf is deprecated. Using instead: inveniomanage apache create-config')
 
     sys_argv = sys.argv
-    sys.argv = 'apache_manager.py create-conf'.split()
+    sys.argv = 'apache_manager.py create-config'.split()
     main()
     sys.argv = sys_argv
 

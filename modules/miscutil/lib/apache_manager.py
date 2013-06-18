@@ -45,9 +45,10 @@ def version(separator='\n'):
 @manager.option('-f', '--force', dest='force')
 @manager.option('--no-ssl', dest='no_ssl')
 @change_command_name
-def create_conf(force=False, no_ssl=True):
+def create_config(force=False, no_ssl=True):
     """
-    Create a apache configuration files.
+    Create Apache configuration files for this site, keeping previous
+    files in a backup copy.
     """
     import os
     import pwd
