@@ -21,6 +21,7 @@ pylib_DATA = __init__.py \
              article_metadata.py \
              photo_metadata.py \
              preprint_metadata.py \
-             thesis_metadata.py
+             thesis_metadata.py \
+             poetry_metadata.py
 
 CLEANFILES = *~ *.tmp *.pyc

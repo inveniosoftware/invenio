@@ -21,6 +21,6 @@ pylib_DATA = __init__.py \
              article_form.py \
              photo_form.py \
              preprint_form.py \
-             thesis_form.py
-
+             thesis_form.py \
+             poem_form.py
 CLEANFILES = *~ *.tmp *.pyc
