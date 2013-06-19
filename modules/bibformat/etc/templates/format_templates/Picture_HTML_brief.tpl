@@ -15,19 +15,21 @@
 {% block record_content %}
 <div class="media" style="margin-bottom: 10px;">
     <span class="pull-left">
-        {{ bfe_photo_resources_brief(bfo, ) }}
+        {% for resource in record['url'] if resource.get('nonpublic_note') == 'icon' %}
+        <a class="thumbnail" href="{{ url_for('record.metadata', recid=record['recid']) }}">
+            <img src="{{ resource.get("url", "").replace(" ","") }}"
+                 alt="" border="0" style="max-width: 80px;"/>
+        </a>
+        {% endfor %}
     </span>
     <span class="pull-right">
 
     </span>
 
     <div class="media-body">
-        <p>
-            {{ bfe_abstract(bfo, limit="1", prefix='<p>', prefix_en="<i>Abstract</i>: ", prefix_fr="<br/><i>Résumé</i>: ", suffix="</p>", highlight="no", print_lang='en') }}
-
-            {{ bfe_field(bfo, tag="909CPt", prefix="<br/><I>Available picture(s)</i>: ") }}
+        <p class="record-abstract">
+          {{ record.get('abstract.summary', '')|sentences(1) }}
         </p>
-
         <p class="record-info">
           {{ record_info() }}
         </p>

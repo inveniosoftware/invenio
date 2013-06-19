@@ -20,7 +20,7 @@
 
       |
       {% endif %}
-      <i class="icon-calendar"></i> {{ bfe_creation_date(bfo, date_format="%d %M %Y") }}
+      <i class="icon-calendar"></i> {{ record['creation_date']|invenio_format_date() }}
       {# Citations link #}
       {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
         {%- set num_citations = record['_cited_by_count'] -%}
@@ -56,8 +56,15 @@
         </a>
         {%- endif -%}
       {%- endif -%}
-      {{ bfe_keywords(bfo, prefix='| <i class="icon-tags"></i> <span class="label">', suffix='</span>',
-                      separator='</span> <span class="label">') }}
+      {% if record['keywords']|length %} | <i class="icon-tags"></i>
+      {% for keyword in record['keywords'] %}
+      <span class="label">
+        <a href="{{ url_for('search.search', p='keyword:' + keyword['term']) }}">
+          {{ keyword['term'] }}
+        </a>
+      </span>
+      {% endfor %}
+      {% endif %}
     </p>
     {% if record.get('number_of_authors', 0) > number_of_displayed_authors %}
     {% set sep = joiner("; ") %}
@@ -78,17 +85,19 @@
 {% endmacro %}
 
 {% macro record_info() %}
-  {{ bfe_primary_report_number(bfo, prefix='<span class="muted">', suffix='</span>') }}
-  {{ bfe_additional_report_numbers(bfo, prefix='<span class="muted">', suffix="</span>",
-                                 separator='</span> <span class="muted">') }}
+  {{ bfe_primary_report_number(bfo, prefix='<i class="icon-qrcode"></i> ') }}
+  {{ bfe_additional_report_numbers(bfo, prefix='<i class="icon-qrcode"></i> ',
+                                   separator=' <i class="icon-qrcode"></i> ') }}
 
   {{ bfe_publi_info(bfo, prefix='| <i class="icon-book"></i> ') }}
   {{ bfe_doi(bfo, prefix='| <i class="icon-barcode"></i> ') }}
+  {# '<a href="http://dx.doi.org/%(doi)s" title="DOI" target="_blank"><i class="icon-barcode"></i> %(doi)s</a>'|format(doi=record['doi']) if record.get('doi') #}
+
 {% endmacro %}
 
 {% block record_brief %}
 <div class="htmlbrief">
-    {{ bfe_fulltext(bfo, show_icons="yes", prefix='<ul class="nav nav-pills pull-right" style="margin-top: -10px;"><li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-download-alt"></i><span class="caret"></span></a>', suffix='</li></ul>', focus_on_main_file="yes") }}
+    {{ bfe_fulltext(bfo, show_icons="yes", prefix='<ul class="nav nav-pills pull-right" style="margin-top: -10px;"><li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" title="Download" href="#"><i class="icon-download-alt"></i><span class="caret"></span></a>', suffix='</li></ul>', focus_on_main_file="yes") }}
     {% block record_header %}
     <h4 class="media-heading">
         <a href="{{ url_for('record.metadata', recid=record['recid']) }}">
@@ -99,7 +108,7 @@
     {% block record_content %}
     <div>
         <p class="record-abstract">
-          {{ record.get('abstract.summary', '')|truncate(150) }}
+          {{ record.get('abstract.summary', '')|sentences(3) }}
         </p>
 
         <p class="record-info">

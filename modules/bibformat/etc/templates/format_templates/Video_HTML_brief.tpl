@@ -32,19 +32,21 @@
 </style>
 <div class="media">
     <span class="pull-left">
-        <a class="thumbnail mejs-overlay"
-           href="{{ url_for('record.metadata', recid=record['recid']) }}">
-            {{ bfe_video_bigthumb(bfo, ) }}
+        {% for resource in record['url'] if resource.get('public_note') == 'POSTER' %}
+        <a class="thumbnail mejs-overlay" href="{{ url_for('record.metadata', recid=record['recid']) }}">
+            <img src="{{ resource.get("url", "").replace(" ","") }}"
+                 alt="{{ resource.get("caption", "") }}" border="0"/>
             <div class="mejs-overlay-button"></div>
         </a>
+        {% endfor %}
     </span>
     <span class="pull-right">
 
     </span>
 
     <div class="media-body">
-        <p>
-            {{ bfe_abstract(bfo, limit="1", prefix='<p>', prefix_en="<i>Abstract</i>: ", prefix_fr="<br/><i>Résumé</i>: ", suffix="</p>", highlight="no", print_lang='en') }}
+        <p class="record-abstract">
+          {{ record.get('abstract.summary', '')|sentences(3) }}
         </p>
     </div>
 </div>
