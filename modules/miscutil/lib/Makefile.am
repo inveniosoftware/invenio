@@ -22,7 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = __init__.py \
              adminutils.py \
              apache_manager.py \
-	     cache.py \
+             cache.py \
              errorlib.py \
              errorlib_unit_tests.py \
              errorlib_model.py \
@@ -49,6 +49,8 @@ pylib_DATA = __init__.py \
              logicutils.py \
              logicutils_unit_tests.py \
              mailutils.py \
+             mailutils_backend_adminonly.py \
+             mailutils_unit_tests.py \
              miscutil_config.py \
              miscutil_model.py \
              messages.py \
@@ -116,7 +118,7 @@ pylib_DATA = __init__.py \
              remote_debugger_wsgi_reload.py \
              jsonutils.py \
              jsonutils_unit_tests.py \
-	     sequtils_cnum.py \
+             sequtils_cnum.py \
              sequtils.py \
              sequtils_model.py \
              sequtils_regression_tests.py \

@@ -1,3 +1,4 @@
+{#
 ## This file is part of Invenio.
 ## Copyright (C) 2013 CERN.
 ##
@@ -14,15 +15,28 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-templatesdir = $(sysconfdir)/templates
-templates_DATA = admin_base.html \
-                 mail_html.tpl \
-                 mail_text.tpl \
-                 invenio-apache-vhost.tpl \
-                 invenio-apache-vhost.conf.tpl \
-                 invenio-apache-vhost-ssl.conf.tpl
-
-EXTRA_DIST = $(templates_DATA)
-
-CLEANFILES = *~ *.tmp
+#}
+{%- block mail_header -%}
+{% if header %}{{ header }}{% else %}{{ _("Hello:") }}<br/>{% endif %}
+{%- endblock %}
+{% block mail_content %}
+{{ content }}
+{% endblock -%}
+{%- block mail_footer %}
+{% if footer %}{{ footer }}{% else %}
+<br/>
+<br/>
+<em>{{ _("Best regards") }}</em>
+<hr />
+<a href="{{ config.CFG_SITE_URL }}">
+    <strong>
+        {{ config.CFG_SITE_NAME_INTL.get(g.ln, config.CFG_SITE_NAME) }}
+    </strong>
+</a>
+<br />
+{{ _("Need human intervention?  Contact") }}
+<a href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}">
+    {{ config.CFG_SITE_SUPPORT_EMAIL }}
+</a>
+{% endif %}
+{% endblock -%}

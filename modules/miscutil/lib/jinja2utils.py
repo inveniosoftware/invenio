@@ -19,7 +19,7 @@
 from operator import itemgetter
 from jinja2 import nodes
 from jinja2.ext import Extension
-from flask import _request_ctx_stack
+from flask import g, _request_ctx_stack
 
 try:
     from MarkupSafe import Markup as jinja2_Markup, escape as jinja2_escape
@@ -251,9 +251,6 @@ def render_template_to_string(input, _from_string=False, **context):
         template = ctx.app.jinja_env.get_or_select_template(input)
     return template.render(context)
 
-from flask import g
-from invenio.bibformat_engine import filter_languages
-
 
 class LangExtension(Extension):
     tags = set(['lang'])
@@ -267,6 +264,7 @@ class LangExtension(Extension):
                                [], [], body).set_lineno(lineno)
 
     def _lang(self,  caller):
+        from invenio.bibformat_engine import filter_languages
         return filter_languages('<lang>' + caller() + '</lang>', g.ln)
 
 

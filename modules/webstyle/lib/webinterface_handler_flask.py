@@ -174,6 +174,9 @@ def create_invenio_flask_app(**kwargs_config):
         from flask_debugtoolbar import DebugToolbarExtension
         DebugToolbarExtension(_app)
 
+    # Set email backend for Flask-Email plugin
+    from invenio.mailutils import initialize_email_backend
+    initialize_email_backend(_app)
 
     if CFG_HAS_HTTPS_SUPPORT:
         # Makes request always run over HTTPS.
