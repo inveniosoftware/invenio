@@ -1110,11 +1110,12 @@ class WordTable:
 
     def check_bad_words(self):
         """
-        Finds bad words in reverse tables. Returns the number of bad words.
+        Finds bad words in reverse tables. Returns True in case of bad words.
         """
-        query = """SELECT count(1) FROM %sR WHERE type IN ('TEMPORARY','FUTURE')""" % (self.tablename[:-1])
+        query = """SELECT 1 FROM %sR WHERE type IN ('TEMPORARY','FUTURE') LIMIT 1""" \
+                % (self.tablename[:-1],)
         res = run_sql(query)
-        return res[0][0]
+        return bool(res)
 
     def report_on_table_consistency(self):
         """Check reverse words index tables (e.g. idxWORD01R) for
@@ -1122,7 +1123,7 @@ class WordTable:
         Prints small report (no of words, no of bad words).
         """
         # find number of words:
-        query = """SELECT COUNT(*) FROM %s""" % (self.tablename)
+        query = """SELECT COUNT(1) FROM %s""" % (self.tablename)
         res = run_sql(query, None, 1)
         if res:
             nb_words = res[0][0]
@@ -1133,17 +1134,16 @@ class WordTable:
         write_message("%s contains %d words" % (self.tablename, nb_words))
 
         # find possible bad states in reverse tables:
-        nb_bad_words = self.check_bad_words()
-        if nb_bad_words:
-            write_message("EMERGENCY: %s needs to repair %d of %d index records" %
-                          (self.tablename, nb_bad_words, nb_words))
+        if self.check_bad_words():
+            write_message("EMERGENCY: %s needs to be repaired" %
+                          (self.tablename, ))
         else:
             write_message("%s is in consistent state" % (self.tablename))
 
     def repair(self, opt_flush):
         """Repair the whole table"""
         # find possible bad states in reverse tables:
-        if self.check_bad_words() == 0:
+        if not self.check_bad_words():
             return
 
         query = """SELECT id_bibrec FROM %sR WHERE type IN ('TEMPORARY','FUTURE')""" \
