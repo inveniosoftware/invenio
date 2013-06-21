@@ -186,6 +186,16 @@ class InvenioTestCase(TestCase):
         app.testing = True
         return app
 
+    def login(self, username, password):
+        from flask import request
+        return self.client.post('/youraccount/login',
+                                base_url=rewrite_to_secure_url(request.base_url),
+                                data=dict(nickname=username, password=password),
+                                follow_redirects=True)
+
+    def logout(self):
+        return self.client.get('/youraccount/logout', follow_redirects=True)
+
 
 class FlaskSQLAlchemyTest(InvenioTestCase):
 
@@ -198,16 +208,6 @@ class FlaskSQLAlchemyTest(InvenioTestCase):
         db.session.expunge_all()
         db.session.rollback()
         db.drop_all()
-
-    def login(self, username, password):
-        from flask import request
-        return self.client.post('/youraccount/login',
-                                base_url=rewrite_to_secure_url(request.base_url),
-                                data=dict(nickname=username, password=password),
-                                follow_redirects=True)
-
-    def logout(self):
-        return self.client.get('/youraccount/logout', follow_redirects=True)
 
 
 @nottest
