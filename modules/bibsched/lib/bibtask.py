@@ -83,6 +83,7 @@ from invenio.shellutils import escape_shell_arg
 from invenio.mailutils import send_email
 from invenio.bibsched import bibsched_set_host, \
                              bibsched_get_host
+from invenio.intbitset import intbitset
 
 
 # Global _TASK_PARAMS dictionary.
@@ -799,6 +800,17 @@ def task_sleep_now_if_required(can_stop_too=False):
                 write_message("stopped (outside runtime limit)")
                 task_update_status("STOPPED")
                 sys.exit(0)
+
+def get_modified_records_since(modification_date):
+    """
+    Return the set of modified record since the given
+    modification_date.
+    @param modification_date: Return records modified after this date
+    @type modification_date datetime
+    """
+    results = run_sql("SELECT id FROM bibrec WHERE modification_date >= %s",
+                      (modification_date,))
+    return intbitset(results)
 
 def authenticate(user, authorization_action, authorization_msg=""):
     """Authenticate the user against the user database.

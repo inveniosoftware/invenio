@@ -22,6 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = \
 	bibsched.py \
 	bibtask.py \
+	bibtask_regression_tests.py \
 	bibtaskex.py \
 	bibtask_config.py \
 	bibtasklet.py \

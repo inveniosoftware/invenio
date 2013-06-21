@@ -49,6 +49,7 @@ from invenio.bibauthorid_general_utils import bibauthor_print
 from invenio.bibauthorid_general_utils import update_status \
                                     , update_status_final
 from invenio.dbquery import run_sql
+from invenio import bibtask
 
 try:
     from collections import defaultdict
@@ -1236,10 +1237,7 @@ def get_recently_modified_record_ids(date):
     Returns the bibrecs with modification date more recent then date.
     @param date: date
     '''
-    touched_papers = frozenset(p[0] for p in run_sql(
-            "select id from bibrec "
-            "where modification_date > %s"
-            , (date,)))
+    touched_papers = frozenset(bibtask.get_modified_records_since(date))
     return touched_papers & frozenset(get_all_valid_bibrecs())
 
 

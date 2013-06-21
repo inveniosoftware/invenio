@@ -144,8 +144,7 @@ def _get_recids_foreach_ontology(recids=None, collections=None, taxonomy=None):
                     collection, stream=sys.stderr, verbose=3)
                 modified_records = intbitset(run_sql("SELECT id FROM bibrec"))
             else:
-                modified_records = intbitset(run_sql("SELECT id FROM bibrec "
-                    "WHERE modification_date >= %s", (date_last_run, )))
+                modified_records = bibtask.get_modified_records_since(date_last_run)
 
             records &= modified_records
             if records:
