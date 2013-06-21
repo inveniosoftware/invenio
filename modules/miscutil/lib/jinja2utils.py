@@ -389,6 +389,27 @@ def extend_application_template_filters(app):
         """
         return nice_size(value)
 
+    test_not_empty = lambda v: v is not None and v != ''
+
+    @app.template_filter('prefix')
+    def _prefix(value, prefix=''):
+        return prefix + value if test_not_empty(value) else ''
+
+    @app.template_filter('suffix')
+    def _suffix(value, suffix=''):
+        return value + suffix if test_not_empty(value) else ''
+
+    @app.template_filter('wrap')
+    def _wrap(value, prefix='', suffix=''):
+        return prefix + value + suffix if test_not_empty(value) else ''
+
+    @app.template_filter('sentences')
+    def _sentences(value, limit, separator='. '):
+        """
+        Returns first `limit` number of sentences ending by `separator`.
+        """
+        return separator.join(value.split(separator)[:limit])
+
     @app.template_filter('path_join')
     def _os_path_join(d):
         """Shortcut for `os.path.join`."""
