@@ -53,8 +53,6 @@ from invenio.mailutils import send_email
 from invenio.search_engine import perform_request_search, record_exists
 from invenio.urlutils import create_html_link, create_url, redirect_to_url
 from invenio.messages import gettext_set_language
-from invenio.webstat import register_customevent
-from invenio.errorlib import register_exception
 from invenio.config import \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_LOAN, \
     CFG_BIBCIRCULATION_ITEM_STATUS_ON_ORDER, \
