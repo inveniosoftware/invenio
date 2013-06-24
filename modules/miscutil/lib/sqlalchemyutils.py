@@ -121,6 +121,8 @@ def compile(element, compiler, **kw):
     return "BINARY %s" % compiler.process(element.clauses)
 
 
+from sqlalchemy.ext.mutable import MutableDict
+@MutableDict.as_mutable
 class JSONEncodedTextDict(TypeDecorator):
     """
     Represents an immutable structure as a json-encoded string.
