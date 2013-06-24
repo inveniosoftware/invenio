@@ -38,17 +38,14 @@ class OaiHARVEST(db.Model):
     baseurl = db.Column(db.String(255), nullable=False, server_default='')
     metadataprefix = db.Column(db.String(255), nullable=False,
                 server_default='oai_dc')
-    arguments = db.Column(db.Text, nullable=True)
+    arguments = db.Column(db.LargeBinary, nullable=True)
     comment = db.Column(db.Text, nullable=True)
-    bibconvertcfgfile = db.Column(db.String(255), nullable=True)
     name = db.Column(db.String(255), nullable=False)
     lastrun = db.Column(db.DateTime, nullable=True)
     frequency = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     postprocess = db.Column(db.String(20), nullable=False,
                 server_default='h')
-    bibfilterprogram = db.Column(db.String(255), nullable=False,
-                server_default='')
     setspecs = db.Column(db.Text, nullable=False)
 
 
