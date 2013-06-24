@@ -59,7 +59,12 @@ re_pos = compute_pos_patterns(re_pos_patterns)
 # arxiv 9910-1234v9 [physics.ins-det]
 re_arxiv = re.compile(ur"""
     ARXIV[\s:-]*(?P<year>\d{2})-?(?P<month>\d{2})
-    [\s.-]*(?P<num>\d{4})(?:[\s-]*V(?P<version>\d))?
+    [\s.-]*(?P<num>\d{4})(?!\d)(?:[\s-]*V(?P<version>\d))?
+    \s*(?P<suffix>\[[A-Z.-]+\])? """, re.VERBOSE | re.UNICODE | re.IGNORECASE)
+
+re_arxiv_5digits = re.compile(ur"""
+    ARXIV[\s:-]*(?P<year>(1[3-9]|[2-8][0-9]))-?(?P<month>(0[1-9]|1[0-2]))
+    [\s.-]*(?P<num>\d{5})(?!\d)(?:[\s-]*V(?P<version>\d))?
     \s*(?P<suffix>\[[A-Z.-]+\])? """, re.VERBOSE | re.UNICODE | re.IGNORECASE)
 
 # Pattern for arxiv numbers catchup
@@ -206,10 +211,11 @@ def compute_arxiv_re(report_pattern, report_number):
 RE_OLD_ARXIV = [compute_arxiv_re(*i) for i in old_arxiv.iteritems()]
 
 
-def compute_years():
+def compute_years(start_year=1991):
     current_year = datetime.now().year
-    return '|'.join(str(y)[2:] for y in xrange(1991, current_year + 1))
+    return '|'.join(str(y)[2:] for y in xrange(start_year, current_year + 1))
 arxiv_years = compute_years()
+arxiv_years_5digits = compute_years(2013)
 
 
 def compute_months():
@@ -217,12 +223,18 @@ def compute_months():
 arxiv_months = compute_months()
 
 re_new_arxiv = re.compile(ur""" # 9910.1234v9 [physics.ins-det]
-    (?<!ARXIV:)
+    (?<!ARXIV:)(?<!\d)
     (?P<year>%(arxiv_years)s)
-    (?P<month>%(arxiv_months)s)
-    \.(?P<num>\d{4})(?:[\s-]*V(?P<version>\d))?
-    \s*(?P<suffix>\[[A-Z.-]+\])? """ % {'arxiv_years': arxiv_years,
-        'arxiv_months': arxiv_months}, re.VERBOSE | re.UNICODE | re.IGNORECASE)
+    (?P<month>(0[1-9]|1[0-2]))
+    \.(?P<num>\d{4})(?:[\s-]*V(?P<version>\d))?(?!\d)
+    \s*(?P<suffix>\[[A-Z.-]+\])? """ % {'arxiv_years': arxiv_years}, re.VERBOSE | re.UNICODE | re.IGNORECASE)
+
+re_new_arxiv_5digits = re.compile(ur""" # 9910.1234v9 [physics.ins-det]
+    (?<!ARXIV:)(?<!\d)
+    (?P<year>%(arxiv_years)s)
+    (?P<month>(0[1-9]|1[0-2]))
+    \.(?P<num>\d{5})(?:[\s-]*V(?P<version>\d))?(?!\d)
+    \s*(?P<suffix>\[[A-Z.-]+\])? """ % {'arxiv_years': arxiv_years_5digits}, re.VERBOSE | re.UNICODE | re.IGNORECASE)
 
 # Pattern to recognize quoted text:
 re_quoted = re.compile(ur'"(?P<title>[^"]+)"', re.UNICODE)

@@ -63,7 +63,9 @@ from invenio.refextract_re import \
     re_quoted, \
     re_isbn, \
     re_arxiv, \
+    re_arxiv_5digits, \
     re_new_arxiv, \
+    re_new_arxiv_5digits, \
     re_pos, \
     re_pos_year_num, \
     re_series_from_numeration_after_volume, \
@@ -367,7 +369,9 @@ def tag_arxiv(line):
             u'%(month)s.%(num)s%(suffix)s' \
             u'</cds.REPORTNUMBER>' % groups
 
+    line = re_arxiv_5digits.sub(tagger, line)
     line = re_arxiv.sub(tagger, line)
+    line = re_new_arxiv_5digits.sub(tagger, line)
     line = re_new_arxiv.sub(tagger, line)
     return line
 

@@ -29,9 +29,12 @@ import re
 from invenio.testutils import make_test_suite, run_test_suite
 # Import the minimal necessary methods and variables needed to run Refextract
 from invenio.docextract_utils import setup_loggers
+
 from invenio.refextract_tag import identify_ibids, \
                                    find_numeration, \
                                    find_numeration_more
+
+from invenio.refextract_tag import identify_ibids, tag_arxiv
 from invenio import refextract_re
 from invenio.refextract_find import get_reference_section_beginning
 from invenio.refextract_api import search_from_reference
@@ -296,6 +299,101 @@ class RebuildReferencesTest(unittest.TestCase):
             u"[2] foo",
         ])
         print 'rebuilt_refs', repr(rebuilt_refs)
+
+
+class tagArxivTest(unittest.TestCase):
+    def setUp(self):
+        setup_loggers(verbosity=1)
+
+    def test_4_digits(self):
+        ref_line = u"""{any prefix}arXiv:1003.1111{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1003.1111</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix(self):
+        ref_line = u"""{any prefix}arXiv:1104.2222 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1104.2222 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits(self):
+        ref_line = u"""{any prefix}arXiv:1303.33333{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1303.33333</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_2012(self):
+        ref_line = u"""{any prefix}arXiv:1203.33333{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}arXiv:1203.33333{any postfix}")
+
+    def test_5_digits_suffix(self):
+        ref_line = u"""{any prefix}arXiv:1304.44444 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1304.44444 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_version(self):
+        ref_line = u"""{any prefix}arXiv:1003.1111v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1003.1111</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix_version(self):
+        ref_line = u"""{any prefix}arXiv:1104.2222v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1104.2222 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_version(self):
+        ref_line = u"""{any prefix}arXiv:1303.33333v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1303.33333</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_version(self):
+        ref_line = u"""{any prefix}arXiv:1304.44444v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1304.44444 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_new(self):
+        ref_line = u"""{any prefix}9910.1234{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix_new(self):
+        ref_line = u"""{any prefix}9910.1234 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_new(self):
+        ref_line = u"""{any prefix}1310.12345{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_new(self):
+        ref_line = u"""{any prefix}1310.12345 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_version_new(self):
+        ref_line = u"""{any prefix}9910.1234v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234</cds.REPORTNUMBER>{any postfix}")
+
+    def test_4_digits_suffix_version_new(self):
+        ref_line = u"""{any prefix}9910.1234v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:9910.1234 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_version_new(self):
+        ref_line = u"""{any prefix}1310.12345v9{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_version_new(self):
+        ref_line = u"""{any prefix}1310.12345v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}<cds.REPORTNUMBER>arXiv:1310.12345 [physics.ins-det]</cds.REPORTNUMBER>{any postfix}")
+
+    def test_5_digits_suffix_version_new_2012(self):
+        ref_line = u"""{any prefix}1210.12345v9 [physics.ins-det]{any postfix}"""
+        r = tag_arxiv(ref_line)
+        self.assertEqual(r.strip(': '), u"{any prefix}1210.12345v9 [physics.ins-det]{any postfix}")
 
 
 TEST_SUITE = make_test_suite(ReTest,
