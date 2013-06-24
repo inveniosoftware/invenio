@@ -41,7 +41,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
                 break
         except HaltProcessing as e:
             # Processing was halted. Lets save current object and continue.
-            wfe.log.info("Processing halted!")
+            wfe.log_info(message="Processing halted!")
             wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED, wfe.getCurrTaskId(), workflow_id=wfe.uuid)
             wfe.save(CFG_WORKFLOW_STATUS.HALTED)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
@@ -49,9 +49,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
                 break
         except Exception as e:
             # Processing generated an exception. We print the stacktrace, save the object and continue
-            wfe.log.info("Processing error!")
-            wfe.log.info(str(e))
-            wfe.log.info(traceback.format_exc())
+            wfe.log_info(message="Processing error! %s" % str(e), error_msg=traceback.format_exc())
             # Changing counter should be moved to wfe object together with default exception handling
             wfe.increaseCounterError()
             wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED, wfe.getCurrTaskId(), workflow_id=wfe.uuid)
@@ -61,30 +59,30 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
                 raise e
 
 
-def restart_workflow(wfe, data, restart_point, stop_on_halt=False, stop_on_error=False):
+def continue_execution(wfe, data, restart_point="restart_task", stop_on_halt=False, stop_on_error=False):
     """
-    Restart a given workflow engine object (wfe), using given data at point "restart_point".
+    Continue execution of workflow for given object (wfe) from "restart_point".
 
     You can use stop_on_error to raise exception's and stop the processing.
     Use stop_on_halt to stop processing the workflow if HaltProcessing is raised.
     """
-    wfe.log.info("bibw_client.restart_workflow::restart_point: " + str(restart_point))
+    wfe.log_info("bibw_client.continue_workflow::restart_point: " + str(restart_point))
     objects = []
-    for o in data:
-        objects.append(o)
+    objects = data
+    pos = objects[0].getCurrentTask()
 
-    if restart_point == "beginning":
-        wfe.setPosition(wfe.db_obj.current_object, [0])
-    elif restart_point == "next":
-        current_task_id = wfe.getCurrTaskId()
-        current_task_id[-1] += 1
-        wfe.setPosition(wfe.db_obj.current_object, current_task_id)
-    elif restart_point == "current":
-        pass
+    if restart_point == "restart_prev":
+
+        pos[-1] = pos[-1] - 1
+        wfe.setPosition(wfe.db_obj.current_object, pos)
+    elif restart_point == "continue_next":
+        pos[-1] = pos[-1] + 1
+        wfe.setPosition(wfe.db_obj.current_object, pos)
+    #restart_task
     else:
-        wfe.setPosition(wfe.db_obj.current_object, restart_point)
-    wfe._unpickled = True
+        wfe.setPosition(wfe.db_obj.current_object, pos)
 
+    wfe._unpickled = True
     initial_run = True
 
     wfe._objects = objects
@@ -102,7 +100,7 @@ def restart_workflow(wfe, data, restart_point, stop_on_halt=False, stop_on_error
                 break
         except HaltProcessing:
             # Processing was halted. Lets save current object and continue.
-            wfe.log.info("Processing halted!")
+            wfe.log_info("Processing halted!")
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
             wfe.save(CFG_WORKFLOW_STATUS.HALTED)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
@@ -110,9 +108,9 @@ def restart_workflow(wfe, data, restart_point, stop_on_halt=False, stop_on_error
                 break
         except Exception as e:
             # Processing generated an exception. We print the stacktrace, save the object and continue
-            wfe.log.info("Processing error!")
-            wfe.log.info(str(e))
-            wfe.log.info(traceback.format_exc())
+            wfe.log_error("Processing error!")
+            wfe.log_error(str(e))
+            wfe.log_error(traceback.format_exc())
             # Changing counter should be moved to wfe object together with default exception handling
             wfe.increaseCounterError()
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())

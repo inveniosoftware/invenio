@@ -21,12 +21,13 @@ import re
 from invenio.bibrecord import create_record
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR
+from invenio.errorlib import register_exception
 
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
 
 
 def create_objects(path_to_file):
-    from invenio.bibworkflow_object import BibWorkflowObject
+    from invenio.bibworkflow_model import BibWorkflowObject
 
     list_of_bwo = []
     f = open(path_to_file, "r")
@@ -50,6 +51,26 @@ def getWorkflowDefinition(name):
     workflows = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibworkflow', 'workflows', '*.py'))
     return workflows.get_enabled_plugins()[name]().get_definition()
 
+def determineDataType(data):
+    # If data is a dictionary and contains type key,
+    # we can directly derive the data_type
+    if isinstance(data, dict):
+        if data.has_key('type'):
+            data_type = data['type']
+        else:
+            data_type = 'dict'
+    else:
+        from magic import Magic
+        mime_checker = Magic(mime=True)
+
+        # If data is not a dictionary, we try to guess MIME type
+        # by using magic library
+        try:
+            data_type = mime_checker.from_buffer(data)
+        except:
+            register_exception(stream="warning", prefix="BibWorkflowObject.determineDataType: Impossible to resolve data type.")
+            data_type = ""
+    return data_type
 
 ## TODO special thanks to http://code.activestate.com/recipes/440514-dictproperty-properties-for-dictionary-attributes/
 class dictproperty(object):
@@ -72,7 +93,7 @@ class dictproperty(object):
             try:
                 self._fset(self._obj, key, value)
             except TypeError:
-                print "can't set item"
+                print "can't set item %s: %s" % (str(key), str(value),)
 
         def __delitem__(self, key):
             try:

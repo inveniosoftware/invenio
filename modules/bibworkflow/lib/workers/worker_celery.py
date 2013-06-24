@@ -19,7 +19,7 @@ import os
 
 from invenio.bibworkflow_config import add_log, \
     CFG_BIBWORKFLOW_WORKERS_LOGDIR
-from invenio.bibworkflow_worker_engine import runit, restartit
+from invenio.bibworkflow_worker_engine import runit, restartit, continueit
 from invenio.celery import celery
 
 
@@ -53,3 +53,17 @@ class worker_celery(object):
         Restarts the workflow with Celery
         """
         restartit(wid, data, restart_point, external_save=external_save)
+
+    def continue(self, oid, restart_point, external_save=None):
+        """
+        Helper function to get celery task
+        decorators to worker_celery
+        """
+        return self.celery_continueit.delay(oid, restart_point, external_save)
+
+    @celery.task(name='invenio.bibworkflow.workers.worker_celery.restartit')
+    def celery_continueit(oid, restart_point="beginning", external_save=None):
+        """
+        Restarts the workflow with Celery
+        """
+        continueit(oid, restart_point, external_save=external_save)

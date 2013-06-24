@@ -52,11 +52,6 @@ def run(wname, data, task_queue=USE_TASK_QUEUE, external_save=None):
         return WORKER().run(wname, data, external_save=external_save)
     else:
         return runit(wname, data, external_save=external_save)
-# Will run workflow with specified wid from beginning.
-# Objects will be automatically or it will use objects specified in data.
-# start_point="beginning" -> take initial objects
-# start_point=[?,?] -> take last version of objects
-# data - do not pass WfeObjects!!
 
 
 def run_by_wid(wid, data=None, start_point="beginning",
@@ -71,76 +66,18 @@ def run_by_wid(wid, data=None, start_point="beginning",
     if task_queue:
         return WORKER().restart(wid, data, start_point, external_save=external_save)
     else:
-        return restartit(wid, data, start_point, external_save=external_save)
+        return restartit(wid, external_save=external_save)
 
 
-def run_by_wobject(workflow, data=None, start_point="beginning",
-                   task_queue=USE_TASK_QUEUE, external_save=None):
+def continue_oid(oid, start_point="beginning", task_queue=USE_TASK_QUEUE, external_save=None):
     """
-    Runs workflow by given workflow object. If object doesn't have its id
-    (a new workflow object) it will save it automatically. It can start from
-    beginning, prev, next and continue. Data variable can be list of object ids
-    or list of objects.
-    """
-    from invenio.bibworkflow_worker_engine import restartit
-
-    if workflow.uuid is None:
-        workflow.save()
-    if task_queue:
-        return WORKER().restart(workflow.id, data, start_point, external_save=external_save)
-    else:
-        return restartit(workflow.id, data, start_point, external_save=external_save)
-
-
-def run_by_oid(oid, start_point="beginning", task_queue=USE_TASK_QUEUE, external_save=None):
-    """
-    Runs workflow asociated with object given by object id (oid). It can start
+    Continue workflow asociated with object given by object id (oid). It can start
     from beginning, prev, next and continue.
     """
-    from invenio.bibworkflow_model import WfeObject
-    from invenio.bibworkflow_worker_engine import restartit
-
-    wf_object = WfeObject.query.filter(WfeObject.id == oid).first()
-    if start_point == "beginning":
-        restart_point = "beginning"
-
-        # restarting from beginning for error and halted objects
-        # always choose initial object
-        if wf_object.parent_id is not None:
-            oid = wf_object.parent_id
-    if start_point == "continue":
-        restart_point = cPickle.loads(wf_object.task_counter)
-    if start_point == "next":
-        restart_point = cPickle.loads(wf_object.task_counter)
-        restart_point[-1] += 1
-    if start_point == "prev":
-        restart_point = cPickle.loads(wf_object.task_counter)
-        restart_point[-1] -= 1
+    from invenio.bibworkflow_worker_engine import continueit
 
     if task_queue:
-        return WORKER().restart(wf_object.workflow_id, [oid],
-                                restart_point, external_save=external_save)
+        return WORKER().continueit(oid, start_point,
+                                   external_save=external_save)
     else:
-        return restartit(wf_object.workflow_id, [oid],
-                         restart_point, external_save=external_save)
-
-
-def run_by_object(wf_object, start_point="beginning",
-                  task_queue=USE_TASK_QUEUE, external_save=None):
-    """
-    Runs workflow asociated with object given. If object doens't have id it
-    will save it automatically. It can start from beginning, prev, next and
-    continue.
-    """
-    from invenio.bibworkflow_object import BibWorkflowObject
-    from invenio.bibworkflow_worker_engine import restartit
-
-    if isinstance(wf_object, BibWorkflowObject):
-        if wf_object.id is None:
-            wf_object.save()
-    if task_queue:
-        return WORKER().restart(wf_object.workflow_id, [wf_object.id],
-                                start_point, external_save=external_save)
-    else:
-        return restartit(wf_object.workflow_id, [wf_object.id], start_point,
-                         external_save=external_save)
+        return continueit(oid, start_point, external_save=external_save)

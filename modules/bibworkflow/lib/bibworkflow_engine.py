@@ -15,10 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os
+import sys
 import cPickle
 
-from invenio.bibworkflow_model import Workflow
+from invenio.bibworkflow_model import Workflow, WorkflowLogging
 from workflow.engine import GenericWorkflowEngine, \
     ContinueNextToken, \
     HaltProcessing, \
@@ -36,7 +36,8 @@ from invenio.bibworkflow_utils import dictproperty
 from invenio.bibworkflow_config import add_log, \
     CFG_BIBWORKFLOW_WORKFLOWS_LOGDIR, \
     CFG_WORKFLOW_STATUS, \
-    CFG_OBJECT_VERSION
+    CFG_OBJECT_VERSION, \
+    CFG_LOG_TYPE
 DEBUG = CFG_DEVEL_SITE > 0
 
 
@@ -62,12 +63,39 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                 self._create_db_obj()
 
         super(BibWorkflowEngine, self).__init__()
-        self.add_log()
+        ### Old logging
+        #self.add_log()
 
     def add_log(self):
-        self.log = add_log(os.path.join(CFG_BIBWORKFLOW_WORKFLOWS_LOGDIR,
-                           "workflow_%s.log" % (self.db_obj.uuid, )),
-                           'workflow.%s' % self.db_obj.uuid)
+        pass
+        ### Old logging
+        #self.log = add_log(os.path.join(CFG_BIBWORKFLOW_WORKFLOWS_LOGDIR,
+        #                   "workflow_%s.log" % (self.db_obj.uuid, )),
+        #                   'workflow.%s' % self.db_obj.uuid)
+
+    def log_info(self, message, error_msg=""):
+        log_obj = WorkflowLogging(workflow_id=self.db_obj.uuid,
+                                  type=CFG_LOG_TYPE.INFO,
+                                  message=message,
+                                  error_msg=error_msg,
+                                  extra_data=self.db_obj.extra_data)
+        db.session.add(log_obj)
+
+    def log_error(self, message, error_msg=""):
+        log_obj = WorkflowLogging(workflow_id=self.db_obj.uuid,
+                                  type=CFG_LOG_TYPE.ERROR,
+                                  message=message,
+                                  error_msg=error_msg,
+                                  extra_data=self.db_obj.extra_data)
+        db.session.add(log_obj)
+
+    def log_debug(self, message, error_msg=""):
+        log_obj = WorkflowLogging(workflow_id=self.db_obj.uuid,
+                                  type=CFG_LOG_TYPE.DEBUG,
+                                  message=message,
+                                  error_msg=error_msg,
+                                  extra_data=self.db_obj.extra_data)
+        db.session.add(log_obj)
 
     def extra_data_get(self, key):
         if key not in self.db_obj.extra_data.keys():
@@ -107,10 +135,19 @@ class BibWorkflowEngine(GenericWorkflowEngine):
             raise cPickle.PickleError("The workflow instance inconsistent state, "
                                       "too few objects")
         self.__dict__ = state
-        self.add_log()
+        ### Old logging
+        #self.add_log()
 
     def __repr__(self):
         return "<BibWorkflow_engine(%s)>" % (self.db_obj.name,)
+
+    def __str__(self, log=False):
+        return """-------------------------------
+BibWorkflowEngine
+-------------------------------
+    %s
+-------------------------------
+""" % (self.db_obj.__str__(),)
 
     @staticmethod
     def before_processing(objects, self):
@@ -120,26 +157,24 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         # 1. Save workflow (ourselves).
         if not self.db_obj.uuid:
             self.save()
-        self.setCounterInitial(objects)
-        self.log.info("[%s], %s has been started" % (str(datetime.now()),
-                      str(self.db_obj.name)))
+        self.setCounterInitial(len(objects))
+        self.log_info("Workflow has been started")
         # 2. We want to save all the objects as version 0.
         for o in objects:
             same_workflow = \
-                o.db_obj.workflow_id and \
-                o.db_obj.workflow_id == self.db_obj.uuid
-            if o.db_obj.id and same_workflow:
+                o.workflow_id and \
+                o.workflow_id == self.db_obj.uuid
+            if o.id and same_workflow:
                 # If object exists and we are running the same workflow,
                 # do nothing
                 continue
             # Set the current workflow id in the object
-
-            if o.db_obj.version == CFG_OBJECT_VERSION.INITIAL \
-               and o.db_obj.workflow_id is not None:
-                pass
+            if o.version == CFG_OBJECT_VERSION.INITIAL \
+              and o.workflow_id is not None:
+               pass
             else:
-                o.db_obj.workflow_id = self.db_obj.uuid
-            o.save(CFG_OBJECT_VERSION.INITIAL)
+                o.workflow_id = self.uuid
+            o.save(o.version)
         GenericWorkflowEngine.before_processing(objects, self)
 
     @staticmethod
@@ -150,9 +185,11 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     def _create_db_obj(self):
         db.session.add(self.db_obj)
         db.session.commit()
+        self.log_info("Workflow saved to db as new object.")
 
     def _update_db(self):
         db.session.commit()
+        self.log_info("Workflow saved to db.")
 
     def save(self, status=CFG_WORKFLOW_STATUS.NEW):
         """
@@ -178,20 +215,16 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         self.external_save = external_save
         super(BibWorkflowEngine, self).process(objects)
 
-    def restart(self, obj, task, objects=None, external_save=None):
+    def restart(self, obj, task, external_save=None):
         """Restart the workflow engine after it was deserialized
 
         """
-
-        if self._unpickled is not True:
-            raise Exception("You can call this method only after loading serialized engine")
-        if len(self.getCallbacks(key=None)) == 0:
-            raise Exception("The callbacks are empty, did you set workflows?")
+        self.log_info("Restarting workflow from %s object and %s task" % (str(obj), str(task),))
 
         # set the point from which to start processing
-        if obj == 'prev': # start with the previous object
-            self._i[0] -= 2 #TODO: check if there is any object there
-        elif obj == 'current': # continue with the current object
+        if obj == 'prev':# start with the previous object
+            self._i[0] -= 2#TODO: check if there is any object there
+        elif obj == 'current':# continue with the current object
             self._i[0] -= 1
         elif obj == 'next':
             pass
@@ -208,11 +241,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         else:
             raise Exception('Unknown start pointfor task: %s' % obj)
 
-        if objects:
-            self.process(objects, external_save=external_save)
-        else:
-            self.process(self._objects, external_save=external_save)
-
+        self.process(self._objects, external_save=external_save)
         self._unpickled = False
 
     @staticmethod
@@ -251,39 +280,42 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                     i[1] = [0]  # reset the callbacks pointer
                 except StopProcessing:
                     if DEBUG:
-                        self.log.debug("Processing was stopped: '%s' "
-                                       "(object: %s)" %
-                                       (str(callbacks), repr(obj)))
+                        self.log_info("Processing was stopped: '%s' "
+                                      "(object: %s)" %
+                                      (str(callbacks), repr(obj)))
                         obj.get_log().info("Processing has stopped")
                     break
                 except JumpTokenBack, step:
                     if step.args[0] > 0:
                         raise WorkflowError("JumpTokenBack cannot be positive number")
                     if DEBUG:
-                        self.log.debug('Warning, we go back [%s] objects' %
-                                       step.args[0])
+                        self.log_info('Warning, we go back [%s] objects' %
+                                      step.args[0])
                     i[0] = max(-1, i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
                 except JumpTokenForward, step:
                     if step.args[0] < 0:
                         raise WorkflowError("JumpTokenForward cannot be negative number")
                     if DEBUG:
-                        self.log.debug('We skip [%s] objects' % step.args[0])
+                        self.log_info('We skip [%s] objects' % step.args[0])
                     i[0] = min(len(objects), i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
                 except ContinueNextToken:
                     if DEBUG:
-                        self.log.debug('Stop processing for this object, '
-                                       'continue with next')
+                        self.log_info('Stop processing for this object, '
+                                      'continue with next')
                     i[1] = [0]  # reset the callbacks pointer
                     continue
                 except HaltProcessing:
                     self.increaseCounterHalted()
                     if DEBUG:
-                        self.log.debug('Processing was halted at step: %s' % i)
+                        self.log_info('Processing was halted at step: %s' % i)
                         # reraise the exception,
                         #this is the only case when a WFE can be completely
                         # stopped
+                    raise
+                except Exception:
+                    self.log_info("Unexpected error:", sys.exc_info()[0])
                     raise
             # We save the object once it is fully run through
             obj.save(CFG_OBJECT_VERSION.FINAL)
@@ -292,18 +324,18 @@ class BibWorkflowEngine(GenericWorkflowEngine):
             ##### Update the workflow
             ####self.save()
 
-            obj.get_log().info('Success!')
-            self.log.debug("Done saving object in: %s" % (self,))
-
+            #obj.get_log().info('Success!')
+            self.log_info("Done saving object: %i" % (obj.id, ))
         self.after_processing(objects, self)
 
     def halt(self, msg):
         """Halt the workflow (stop also any parent wfe)"""
+        self.log_debug("Processing halted at task %s with message: %s" % (self.getCurrTaskId(), msg, ))
         raise HaltProcessing("Processing halted at task %s with message: %s" %
                              (self.getCurrTaskId(), msg, ))
 
-    def setCounterInitial(self, obj_list):
-        self.db_obj.counter_initial = len(obj_list)
+    def setCounterInitial(self, obj_count):
+        self.db_obj.counter_initial = obj_count
         self.db_obj.counter_halted = 0
         self.db_obj.counter_error = 0
         self.db_obj.counter_finished = 0

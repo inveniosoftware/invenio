@@ -18,8 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.bibworkflow_engine import BibWorkflowEngine
-from invenio.bibworkflow_object import BibWorkflowObject
-from invenio.bibworkflow_model import Workflow, WfeObject
+from invenio.bibworkflow_model import Workflow, BibWorkflowObject
 from invenio.bibworkflow_client import restart_workflow
 from invenio.bibfield_jsonreader import JsonReader
 from uuid import uuid1 as new_uuid

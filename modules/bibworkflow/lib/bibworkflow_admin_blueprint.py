@@ -22,7 +22,7 @@ __lastupdated__ = """$Date$"""
 
 from flask import render_template
 from pprint import pformat
-from invenio.bibworkflow_model import Workflow, WfeObject
+from invenio.bibworkflow_model import Workflow, BibWorkflowObject
 from invenio.bibworkflow_api import run
 import os
 from invenio.pluginutils import PluginContainer
@@ -62,15 +62,17 @@ def entry_details(entry_id):
     """
     Dispalys entry details.
     """
-    wfe_object = WfeObject.query.filter(WfeObject.id == entry_id).first()
-    try:
-        #object_210_w_18
-        f = open(CFG_LOGDIR + "/object_" + str(wfe_object.id) + "_w_" +
-                 str(wfe_object.workflow_id) + ".log", "r")
-        logtext = f.read()
-    except IOError:
-        # no file
-        logtext = ""
+    wfe_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == entry_id).first()
+    
+    ### Old logging
+    #try:
+    #    #object_210_w_18
+    #    f = open(CFG_LOGDIR + "/object_" + str(wfe_object.id) + "_w_" +
+    #             str(wfe_object.workflow_id) + ".log", "r")
+    #    logtext = f.read()
+    #except IOError:
+    #    # no file
+    #   logtext = ""
 
     return render_template('bibworkflow_entry_details.html',
                            entry=wfe_object, log=logtext,
@@ -84,12 +86,13 @@ def entry_details(entry_id):
 def workflow_details(workflow_id):
     w_metadata = Workflow.query.filter(Workflow.uuid == workflow_id).first()
 
-    try:
-        f = open(CFG_LOGDIR + "/workflow_" + str(workflow_id) + ".log", "r")
-        logtext = f.read()
-    except IOError:
-        # no file
-        logtext = ""
+    ### Old logging
+    #try:
+    #    f = open(CFG_LOGDIR + "/workflow_" + str(workflow_id) + ".log", "r")
+    #    logtext = f.read()
+    #except IOError:
+    #    # no file
+    #    logtext = ""
 
     return render_template('bibworkflow_workflow_details.html',
                            workflow_metadata=w_metadata,
@@ -113,7 +116,7 @@ def workflows():
 @blueprint.route('/run_workflow', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_wash_urlargd({'workflow_name': (unicode, "")})
-def run_workflow(workflow_name, data=10):
+def run_workflow(workflow_name, data={"data":10}):
     try:
         data = [{'data': data}]
         external_save = None
@@ -128,7 +131,7 @@ def run_workflow(workflow_name, data=10):
 @blueprint.invenio_wash_urlargd({'oid': (int, 0),
                                 'of': (unicode, 'default')})
 def entry_data_preview(oid, of):
-    workflow_object = WfeObject.query.filter(WfeObject.id == oid).first()
+    workflow_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == oid).first()
     return _entry_data_preview(workflow_object.data, of)
 
 
