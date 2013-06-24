@@ -380,7 +380,7 @@ def guess_format_from_url(url):
     Different method will be used, including HTTP HEAD query,
     downloading the resource and using mime
 
-    @param url: the URL for which the extension shuld be guessed.
+    @param url: the URL for which the extension should be guessed.
     @type url: string
     @return: the recognized extension or '.bin' if it's impossible to
         recognize it.
