@@ -180,7 +180,8 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_REFEXTRACT_KBS_OVERRIDE',
                        'CFG_OPENID_CONFIGURATIONS',
                        'CFG_OAUTH1_CONFIGURATIONS',
-                       'CFG_OAUTH2_CONFIGURATIONS',]:
+                       'CFG_OAUTH2_CONFIGURATIONS',
+                       'CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES',]:
         try:
             option_value = option_value[1:-1]
         except TypeError:
