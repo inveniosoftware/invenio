@@ -92,6 +92,7 @@ modules/websubmit/bin/websubmitadmin
 modules/bibcirculation/bin/bibcircd
 modules/bibcatalog/bin/bibcatalog
 modules/pdfchecker/bin/arxiv-pdf-checker
+modules/bibcheck/bin/bibcheck
 tags
 config.status.lineno
 configure.lineno

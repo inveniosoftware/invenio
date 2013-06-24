@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,10 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibcheck
+""" Bibcheck plugin to check fields against a regular expression """
 
-etc_DATA = rules.cfg
+import re
 
-EXTRA_DIST = $(etc_DATA)
+def check_record(record, regexps):
+    """
+    Checks the record against a set of regular expressions.
+    @param regexps: A dict {field: regexp}
+    """
+    for field, regexp in regexps.items():
+        for position, value in record.iterfield(field):
+            if not re.match(regexp, value):
+                record.set_invalid("Field %s doesn't match regexp %s" %
+                        (position[0], regexp))
 
-CLEANFILES = *~ *.tmp

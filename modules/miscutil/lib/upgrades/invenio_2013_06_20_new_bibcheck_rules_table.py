@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,10 +17,23 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibcheck
+from invenio.dbquery import run_sql
 
-etc_DATA = rules.cfg
+depends_on = ['invenio_release_1_1_0']
 
-EXTRA_DIST = $(etc_DATA)
+def info():
+    return "New bibcheck_rules table"
 
-CLEANFILES = *~ *.tmp
+def do_upgrade():
+    run_sql("""
+CREATE TABLE IF NOT EXISTS bibcheck_rules (
+  name varchar(150) NOT NULL,
+  last_run datetime NOT NULL default '0000-00-00',
+  PRIMARY KEY (name)
+) ENGINE=MyISAM;
+""")
+
+def estimate():
+    """  Estimate running time of upgrade in seconds (optional). """
+    return 1
+

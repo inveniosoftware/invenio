@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -9,16 +11,21 @@
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webappdir = $(localstatedir)/www/admin/bibcheck
+""" Plugin for valid utf-8 checking """
 
-webapp_DATA = bibcheckadmin.py
+def check_record(record, fields=["%%%%%%", "%%%%%_"]):
+    """
+    Check that the value of the specified fields can be encoded as utf-8
+    """
+    for position, value in record.iterfields(fields):
+        try:
+            value.decode("utf-8")
+        except UnicodeDecodeError:
+            record.set_invalid("Invalid utf-8 value in field %s" % (position[0]))
 
-EXTRA_DIST =  $(webapp_DATA)
-
-CLEANFILES = *~ *.tmp

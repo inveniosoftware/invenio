@@ -83,7 +83,7 @@ class TexkeySeq(SequenceGenerator):
     """
     seq_name = 'texkey'
 
-    def _next_value(self, recid=None, xml_record=None):
+    def _next_value(self, recid=None, xml_record=None, bibrecord=None):
         """
         Returns the next texkey for the given recid
 
@@ -101,7 +101,7 @@ class TexkeySeq(SequenceGenerator):
         """
         if recid is None and xml_record is not None:
             bibrecord = create_record(xml_record)[0]
-        else:
+        elif bibrecord is None:
             bibrecord = get_bibrecord(recid)
 
         main_author = record_get_field_value(bibrecord,
@@ -231,7 +231,6 @@ def wait_for_task(task_id):
     while run_sql(sql, [task_id])[0][0] not in ('DONE', 'ACK', 'ACK DONE'):
         task_sleep_now_if_required(True)
         time.sleep(5)
-
 
 def process_chunk(to_process, sequence_id):
     """ submit bibupload task and wait for it to finish

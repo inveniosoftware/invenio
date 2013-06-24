@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,10 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibcheck
+""" Bibcheck plugin to fix leading/trailing spaces """
 
-etc_DATA = rules.cfg
+import re
 
-EXTRA_DIST = $(etc_DATA)
+def check_record(record, fields, strip=True, normalize_spaces=True):
+    """
+    Removes the trailing spaces (with strip=True) from the specified field's
+    values, and changes multiple spaces into only one (with
+    normalize_spaces=True)
+    """
+    for position, value in record.iterfields(fields):
+        if strip:
+            value = value.strip()
+        if normalize_spaces:
+            value = re.sub("[ ]+", " ", value)
+        record.amend_field(position, value)
 
-CLEANFILES = *~ *.tmp

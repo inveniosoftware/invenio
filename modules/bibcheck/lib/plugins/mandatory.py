@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,10 +17,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdoclibdir = $(libdir)/webdoc/invenio/admin
+""" Bibcheck plugin to enforce mandatory fields """
 
-webdoclib_DATA = bibcheck-admin-guide.webdoc
+def check_record(record, fields):
+    """
+    Mark record as invalid if it doesn't contain all the specified fields
+    """
+    for field in fields:
+        if len(list(record.iterfield(field))) == 0:
+            record.set_invalid("Missing mandatory field %s" % field)
 
-EXTRA_DIST = $(webdoclib_DATA)
-
-CLEANFILES = *~ *.tmp

@@ -4745,6 +4745,13 @@ CREATE TABLE IF NOT EXISTS goto (
   KEY (modification_date)
 ) ENGINE=MyISAM;
 
+-- tables for bibcheck
+CREATE TABLE IF NOT EXISTS bibcheck_rules (
+  name varchar(150) NOT NULL,
+  last_run datetime NOT NULL default '0000-00-00',
+  PRIMARY KEY (name)
+) ENGINE=MyISAM;
+
 -- tables for author list manager
 CREATE TABLE IF NOT EXISTS `aulPAPERS` (
   `id` int(15) unsigned NOT NULL auto_increment,
@@ -4869,4 +4876,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_05_oaiHARVEST_ar
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_13_new_bibEDITCACHE',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_26_webauthorlist',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_11_bibHOLDINGPEN_longblob',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_20_new_bibcheck_rules_table',NOW());
+
 -- end of file

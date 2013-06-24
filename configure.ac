@@ -588,11 +588,12 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibcatalog/lib/ticket_templates/Makefile \
      modules/bibcheck/Makefile \
      modules/bibcheck/doc/Makefile \
-     modules/bibcheck/doc/admin/Makefile \
      modules/bibcheck/doc/hacking/Makefile \
      modules/bibcheck/etc/Makefile \
-     modules/bibcheck/web/Makefile \
-     modules/bibcheck/web/admin/Makefile \
+     modules/bibcheck/bin/Makefile \
+     modules/bibcheck/lib/Makefile \
+     modules/bibcheck/lib/plugins/Makefile \
+     modules/bibcheck/bin/bibcheck \
      modules/bibcirculation/Makefile \
      modules/bibcirculation/bin/Makefile \
      modules/bibcirculation/bin/bibcircd \

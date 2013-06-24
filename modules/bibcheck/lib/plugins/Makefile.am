@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,10 +15,24 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibcheck
+pylibdir=$(libdir)/python/invenio/bibcheck_plugins
 
-etc_DATA = rules.cfg
+pylib_DATA = __init__.py \
+    trailing_space.py \
+    mandatory.py \
+    regexp.py \
+    regexp_replace.py \
+    rename_tag.py \
+    rename_subfield.py \
+    utf8.py \
+    files.py \
+    enum.py \
+    dates.py \
+    texkey.py \
+    doi.py \
+    crossref_checker.py \
+    url.py
 
-EXTRA_DIST = $(etc_DATA)
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc
