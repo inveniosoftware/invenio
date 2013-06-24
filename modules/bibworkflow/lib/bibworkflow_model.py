@@ -19,6 +19,8 @@ import os
 import tempfile
 import json
 
+from sqlalchemy import desc
+from sqlalchemy.orm.exc import NoResultFound
 from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
@@ -176,7 +178,7 @@ class Workflow(db.Model):
         @param getter: a callable that takes a dict as param and returns a
         value
         """
-        extra_data = cls.get(Workflow.user_id == user_id,
+        extra_data = cls.get(Workflow.id_user == user_id,
                              Workflow.uuid == uuid).one().extra_data
 
         if key is not None:
@@ -196,7 +198,7 @@ class Workflow(db.Model):
         @param value: the new value
         @param setter: a callable that takes a dict as param and modifies it
         """
-        extra_data = cls.get(Workflow.user_id == user_id,
+        extra_data = cls.get(Workflow.id_user == user_id,
                              Workflow.uuid == uuid).one().extra_data
 
         if key is not None and value is not None:
