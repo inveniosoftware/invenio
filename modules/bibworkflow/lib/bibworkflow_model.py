@@ -15,8 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from sqlalchemy import desc
 from invenio.sqlalchemyutils import db
 from datetime import datetime
+from sqlalchemy.orm.exc import NoResultFound
 
 
 class TaskLogging(db.Model):
@@ -76,7 +78,8 @@ class Workflow(db.Model):
     uuid = db.Column(db.String(36), primary_key=True, nullable=False)
     name = db.Column(db.String(255), default="Default workflow", nullable=False)
     created = db.Column(db.DateTime, default=datetime.now(), nullable=False)
-    modified = db.Column(db.DateTime, default=datetime.now(), nullable=False)
+    modified = db.Column(db.DateTime, default=datetime.now(),
+                         nullable=False,  index=True)
     user_id = db.Column(db.Integer, default=0, nullable=False)
     extra_data = db.Column(db.JSON, default={})
     status = db.Column(db.Integer, default=0, nullable=False)
@@ -96,6 +99,89 @@ class Workflow(db.Model):
              str(self.modified),
              str(self.user_id),
              str(self.status))
+
+    @classmethod
+    def get(cls, *criteria, **filters):
+        """ A wrapper for the filter and filter_by functions of sqlalchemy.
+        Define a dict with which columns should be filtered by which values.
+
+        e.g. Workflow.get(uuid=uuid)
+             Workflow.get(Workflow.uuid != uuid)
+
+        The function supports also "hybrid" arguments.
+        e.g. Workflow.get(Workflow.module_name != 'i_hate_this_module',
+                          user_id=user_id)
+
+        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        """
+        return cls.query.filter(*criteria).filter_by(**filters)
+
+    @classmethod
+    def get_status(cls, uuid=None):
+        """ Returns the status of the workflow """
+        return cls.get(Workflow.uuid == uuid).one().status
+
+    @classmethod
+    def get_most_recent(cls, *criteria, **filters):
+        """ Returns the most recently modified workflow. """
+
+        most_recent = cls.get(*criteria, **filters).\
+                          order_by(desc(Workflow.modified)).first()
+        if most_recent is None:
+            raise NoResultFound
+        else:
+            return most_recent
+
+    @classmethod
+    def get_objects(cls, uuid=None):
+        """ Returns the objects of the workflow """
+        return cls.get(Workflow.uuid == uuid).one().objects
+
+    @classmethod
+    def get_extra_data(cls, user_id=None, uuid=None, key=None, getter=None):
+        """Returns a json of the column extra_data or
+        if any of the other arguments are defined,
+        a specific value.
+        You can define either the key or the getter function.
+
+        @param key: the key to access the desirable value
+        @param getter: a callable that takes a dict as param and returns a
+        value
+        """
+        extra_data = cls.get(Workflow.user_id == user_id,
+                             Workflow.uuid == uuid).one().extra_data
+
+        if key is not None:
+            return extra_data[key]
+        elif callable(getter):
+            return getter(extra_data)
+
+    @classmethod
+    def set_extra_data(cls, user_id=None, uuid=None,
+                       key=None, value=None, setter=None):
+        """Modifies the json of the column extra_data or
+        if any of the other arguments are defined,
+        a specific value.
+        You can define either the key, value or the setter function.
+
+        @param key: the key to access the desirable value
+        @param value: the new value
+        @param setter: a callable that takes a dict as param and modifies it
+        """
+        extra_data = cls.get(Workflow.user_id == user_id,
+                             Workflow.uuid == uuid).one().extra_data
+
+        if key is not None and value is not None:
+            extra_data[key] = value
+        elif callable(setter):
+            setter(extra_data)
+
+        cls.get(Workflow.uuid == uuid).update({'extra_data': extra_data})
+
+    @classmethod
+    def delete(cls, uuid=None):
+        cls.get(Workflow.uuid == uuid).delete()
+        db.session.commit()
 
 
 class WfeObject(db.Model):
