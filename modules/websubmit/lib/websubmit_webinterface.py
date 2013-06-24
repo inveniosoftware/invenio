@@ -866,6 +866,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 auth_args['act'] = act
             uid = getUid(req)
 
+            if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+                return page_not_authorized(req, "direct",
+                                            navmenuid='submit')
+
             if CFG_CERN_SITE:
                 ## HACK BEGIN: this is a hack for CMS and ATLAS draft
                 user_info = collect_user_info(req)

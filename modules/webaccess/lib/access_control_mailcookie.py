@@ -67,6 +67,9 @@ def mail_cookie_create_common(kind, params, cookie_timeout=timedelta(days=1), on
     cookie_id = run_sql('INSERT INTO accMAILCOOKIE (data,expiration,kind,onetime) VALUES '
         '(AES_ENCRYPT(%s, %s),%s,%s,%s)',
         (dumps(data), password, expiration.strftime(_datetime_format), kind, onetime))
+    if cookie_id is None:
+        ## Database in read-only-mode?
+        cookie_id = 0
     cookie = password[:16]+hex(cookie_id)[2:-1]+password[-16:]
     return cookie
 
