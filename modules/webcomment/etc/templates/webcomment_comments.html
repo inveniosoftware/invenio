@@ -30,9 +30,15 @@
     <h4>
       {{ _("Comments") }}
       <small>
-      <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid) }}">
-        <i class="icon-pencil"></i> {{ _('write comment') }}
-      </a>
+        {% if current_user.is_guest %}
+          <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+            <i class="icon-pencil"></i> {{ _('write comment') }}
+          </a>
+        {% else %}
+          <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid) }}">
+            <i class="icon-pencil"></i> {{ _('write comment') }}
+          </a>
+        {% endif %}
       </small>
     </h4>
   </div>
@@ -132,9 +138,15 @@
   {%- endfor -%}
   </ul>
 
-  <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid) }}">
-    <i class="icon-pencil"></i> {{ _('write comment') }}
-  </a>
+  {% if current_user.is_guest %}
+    <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+      <i class="icon-pencil"></i> {{ _('write comment') }}
+    </a>
+  {% else %}
+    <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid) }}">
+      <i class="icon-pencil"></i> {{ _('write comment') }}
+    </a>
+  {% endif %}
 
   {%- else -%}
   <div class="alert alert-info">
