@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@ from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 search_engine = lazy_import('invenio.search_engine')
-
+CFG_CERN_SITE = lazy_import('invenio.config:CFG_CERN_SITE')
 
 class TestMiscUtilityFunctions(InvenioTestCase):
     """Test whatever non-data-specific utility functions are essential."""
@@ -198,10 +198,11 @@ class TestQueryParser(InvenioTestCase):
         self._check("title:muon", '', None,
                     [['+', 'muon', 'title', 'w']])
 
-    def test_parsing_structured_query_existing_field(self):
-        "search engine - parsing structured query, existing field, but no word index"
-        self._check("experiment:LHC", '', None,
-                    [['+', 'LHC', 'experiment', 'a']])
+    if not CFG_CERN_SITE:
+        def test_parsing_structured_query_existing_field(self):
+            "search engine - parsing structured query, existing field, but no word index"
+            self._check("experiment:LHC", '', None,
+                        [['+', 'LHC', 'experiment', 'a']])
 
     def test_parsing_structured_query_nonexisting(self):
         "search engine - parsing structured query, non-existing index"
