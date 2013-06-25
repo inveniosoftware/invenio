@@ -186,6 +186,11 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBSCHED_INCOMPATIBLE_TASKS']:
         try:
             option_value = option_value[1:-1]
+            if option_name == "CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE" and option_value.strip().startswith("{"):
+                print >> sys.stderr, ("""ERROR: CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
+now accepts only a list of tuples, not a dictionary. Check invenio.conf for an example.
+Please, update your invenio-local.conf file accordingly.""")
+                sys.exit(1)
         except TypeError:
             if option_name in ('CFG_WEBSEARCH_FULLTEXT_SNIPPETS',):
                 print >> sys.stderr, """WARNING: CFG_WEBSEARCH_FULLTEXT_SNIPPETS
@@ -274,6 +279,7 @@ You may want to customise your invenio-local.conf configuration accordingly."""
         print >> sys.stderr, ("""ERROR: CFG_BATCHUPLOADER_WEB_ROBOT_AGENT has been dropped in favour of
 CFG_BATCHUPLOADER_WEB_ROBOT_AGENTS.
 Please, update your invenio-local.conf file accordingly.""")
+        sys.exit(1)
         option_value = option_value[1:-1]
     elif option_name in ['CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_DOCTYPES',
                           'CFG_WEBSUBMIT_DOCUMENT_FILE_MANAGER_RESTRICTIONS',

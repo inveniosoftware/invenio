@@ -787,9 +787,10 @@ def extend_record_with_template(recid):
     """
     rec_collections = get_record_collections(recid)
 
-    for collection in rec_collections:
-        if collection in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE:
-            return CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE[collection]
+    for collection in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE:
+        if collection[0] in rec_collections:
+            return collection[1]
+
     return False
 
 
