@@ -64,15 +64,17 @@ def run_by_wid(wid, data=None, start_point="beginning",
     from invenio.bibworkflow_worker_engine import restartit
 
     if task_queue:
-        return WORKER().restart(wid, data, start_point, external_save=external_save)
+        return WORKER().restart(wid, data, start_point,
+                                external_save=external_save)
     else:
         return restartit(wid, external_save=external_save)
 
 
-def continue_oid(oid, start_point="beginning", task_queue=USE_TASK_QUEUE, external_save=None):
+def continue_oid(oid, start_point="beginning",
+                 task_queue=USE_TASK_QUEUE, external_save=None):
     """
-    Continue workflow asociated with object given by object id (oid). It can start
-    from beginning, prev, next and continue.
+    Continue workflow asociated with object given by object id (oid).
+    It can start from beginning, prev, next and continue.
     """
     from invenio.bibworkflow_worker_engine import continueit
 

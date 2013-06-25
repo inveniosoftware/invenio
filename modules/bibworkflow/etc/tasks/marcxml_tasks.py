@@ -16,6 +16,24 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
+def approve_record(obj, eng):
+    """
+    Will add the approval widget to the record
+    """
+    obj.extra_data["last_task_name"] = 'Record Approval'
+    try:
+        eng.log_info("Adding the approval widget to %s" % (obj.id))
+        obj.extra_data['widget'] = 'approval_widget'
+        eng.halt("Record needs approval")
+    except KeyError:
+        # Log the error
+        obj.extra_data["error_msg"] = 'Could not assign widget'
+        eng.log.error("Error: %s" % (obj.extra_data["error_msg"],))
+
+approve_record.__title__ = "Record Approval"
+approve_record.__description__ = "This task assigns the approval widget to a record."
+
+
 def convert_record(stylesheet="oaiarxiv2marcxml.xsl"):
     def _convert_record(obj, eng):
         """
@@ -23,21 +41,18 @@ def convert_record(stylesheet="oaiarxiv2marcxml.xsl"):
         """
         from invenio.bibconvert_xslt_engine import convert
 
-        obj.extra_data["last_task_name"] = 'convert_record'
+        obj.extra_data["last_task_name"] = 'Convert Record'
         eng.log_info("Starting conversion using %s stylesheet" %
                      (stylesheet,))
         eng.log_info("Type of data: %s" % (obj.data_type,))
-        if obj.data_type == "text/xml":
-            try:
-                obj.data['data'] = convert(obj.data['data'], stylesheet)
-            except:
-                obj.extra_data["error_msg"] = 'Could not convert record'
-                eng.log_error("Error: %s" % (obj.extra_data["error_msg"],))
-                raise
-        else:
-            eng.halt("Data type not valid text/xml")
+        try:
+            obj.data['data'] = convert(obj.data['data'], stylesheet)
+        except:
+            obj.extra_data["error_msg"] = 'Could not convert record'
+            eng.log_error("Error: %s" % (obj.extra_data["error_msg"],))
+            raise
 
-    _convert_record.__title__ = "Record conversion"
+    _convert_record.__title__ = "Convert Record"
     _convert_record.__description__ = "This task converts a XML record."
     return _convert_record
 
@@ -48,7 +63,7 @@ def download_fulltext(obj, eng):
     """
     from invenio.bibdocfile import download_url
 
-    obj.extra_data["last_task_name"] = 'download_fulltext'
+    obj.extra_data["last_task_name"] = 'Download Fulltext'
     try:
         eng.log_info("Starting download of %s" % (obj.data['url']))
         url = download_url(obj.data['url'])
@@ -58,7 +73,7 @@ def download_fulltext(obj, eng):
         obj.extra_data["error_msg"] = 'Record does not include url'
         eng.log.error("Error: %s" % (obj.extra_data["error_msg"],))
 
-download_fulltext.__title__ = "Record conversion"
+download_fulltext.__title__ = "Fulltext Download"
 download_fulltext.__description__ = "This task downloads fulltext."
 
 
@@ -69,7 +84,7 @@ def match_record(obj, eng):
     from invenio.bibrecord import create_record
     from invenio.bibmatch_engine import match_records
 
-    obj.extra_data["last_task_name"] = 'match_record'
+    obj.extra_data["last_task_name"] = 'Bibmatch Record'
     rec = create_record(obj.data['data'])
     matches = match_records(records=[rec],
                             qrystrs=[("title", "[245__a]")])
@@ -83,8 +98,9 @@ def match_record(obj, eng):
     else:
         results = matches[1][0][1]
         eng.log_info("Matching: existing record %s" % (results,))
+    obj.extra_data['widget'] = 'bibmatch_widget'
 
-match_record.__title__ = "Record matching"
+match_record.__title__ = "Bibmatch Record"
 match_record.__description__ = "This task matches a XML record."
 
 
@@ -98,6 +114,8 @@ print_record.__description__ = "Prints the record data to engine log"
 def upload_record(mode="ir"):
     def _upload_record(obj, eng):
         from invenio.bibtask import task_low_level_submission
+
+        obj.extra_data["last_task_name"] = 'Upload Record'
 
         eng.log_info("Saving data to temporary file for upload")
         filename = obj.save_to_file()

@@ -31,7 +31,7 @@
          <div class="span3">
             Workflow definition:
             <div class="well">
-                {{ utils.function_display(workflow_func, entry.task_counter) }}
+                {{ utils.function_display(workflow_func, entry.extra_data['task_counter']) }}
             </div>
          </div>
          <div class="span4">
@@ -59,6 +59,7 @@
     </div>
 </div>
 <div class="modal-footer">
+    <a class="btn btn-primary" href="{{ url_for('bibholdingpen.details', hpcontainerid=entry.id)}}" >Open in HoldingPen <i class="icon-white icon-wrench"></i></a>
     <button class="btn btn-success">Apply <i class="icon-ok icon-white"></i></button>
     <button class="btn btn-danger">Delete <i class="icon-remove icon-white"></i></button>
     <button class="btn">Edit <i class="icon-edit"></i></button>

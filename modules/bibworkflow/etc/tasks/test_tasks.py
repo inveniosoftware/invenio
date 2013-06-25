@@ -24,8 +24,7 @@ from invenio.bibworkflow_config import CFG_OBJECT_STATUS
 def task_a(a):
     def _task_a(obj, eng):
         """Function task_a docstring"""
-        print "executing task a " + str(a)
-        eng.log_info("executing task a " + str(a))
+        eng.log.info("executing task a " + str(a))
         obj.data['data'] += a
         #obj.add_metadata("foo", "bar")
     return _task_a
@@ -33,19 +32,18 @@ def task_a(a):
 
 def task_b(obj, eng):
     """Function task_b docstring"""
-    print "executing task b"
-    eng.log_info("executing task b")
+    eng.log.info("executing task b")
     if obj.data['data'] < 20:
         obj.changeStatus(CFG_OBJECT_STATUS.ERROR)
-        eng.log_info("Object status %s" % (obj.status,))
-        eng.log_info("data < 20")
+        eng.log.info("Object status %s" % (obj.db_obj.status,))
+        eng.log.info("data < 20")
         obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c': 14})
         eng.halt("Value of filed: data in object is too small.")
 
 
 def add_metadata():
     def _add_metadata(obj, eng):
-        eng.log_info("executing task add_metadata on obj.type %s" %
+        eng.log.info("executing task add_metadata on obj.type %s" %
                      (obj.content_type,))
         if(obj['content_type'] == 'book'):
             obj.add_field("meta1", "elefant")
@@ -57,7 +55,7 @@ def add_metadata():
 def simple_task(times):
     def _simple_task(obj, eng):
         a = times
-        eng.log_info("Running simple task %i times" % (times,))
+        eng.log.info("Running simple task %i times" % (times,))
         while a > 0:
             obj.data['data'] -= 1
             a -= 1
@@ -66,23 +64,23 @@ def simple_task(times):
 
 def sleep_task(t):
     def _sleep_task(dummy_obj, eng):
-        eng.log_info("Going to sleep...")
+        eng.log.info("Going to sleep...")
         time.sleep(t)
-        eng.log_info("I've woken up :)")
+        eng.log.info("I've woken up :)")
     return _sleep_task
 
 
 def lower_than_20(obj, eng):
     """Function checks if variable is lower than 20"""
     if obj.data['data'] < 20:
-        eng.log_info("data < 20")
+        eng.log.info("data < 20")
         eng.halt("Value of filed: a in object is lower than 20.")
 
 
 def higher_than_20(obj, eng):
     """Function checks if variable is higher than 20"""
     if obj.data['data'] > 20:
-        eng.log_info("data > 20")
+        eng.log.info("data > 20")
         eng.halt("Value of filed: a in object is higher than 20.")
 
 

@@ -1,0 +1,48 @@
+{% extends "bibholdingpen_layout.html" %}
+{% block body2 %}
+    
+{%- js 'js/jquery.dataTables.min.js' -%}
+{%- js 'js/DT_bootstrap.js' -%}
+{%- js 'js/bibholdingpen.js' -%}
+
+    <style type="text/css" title="currentStyle">
+        @import "../../css/DT_bootstrap.css";
+    </style>
+
+    <h1>Records in Holding Pen</h1>
+    
+    <div class="container">
+        <div class="row-fluid">
+            <table id="example" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Title</th>
+                        <th>Source</th>
+                        <th>Category</th>
+                        <th>Workflow ID</th>
+                        <th>Owner</th>
+                        <th>Created</th>
+                        <th>Version</th>
+                        <th>Details</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

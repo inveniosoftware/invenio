@@ -224,6 +224,37 @@ distances from it.
         self.assertEqual(obj_init.workflow_id, "253")
         self.assertEqual(obj_final.workflow_id, "253")
 
+    def test_logging_for_workflow_objects_without_workflow(self):
+        """This test run a virtual object out of a workflow for
+        test purpose, this object will log several things"""
+
+        from invenio.bibworkflow_model import BibWorkflowObject
+        from invenio.bibworkflow_model import BibWorkflowObjectLogging
+        initial_data = {'data': 20}
+        obj_init = BibWorkflowObject(data=initial_data,
+                                     workflow_id=11,
+                                     version=CFG_OBJECT_VERSION.INITIAL)
+        obj_init._update_db()
+        obj_init.save()
+        obj_init.log_info("I am a test object")
+        obj_init.log_error("This is an error message")
+        obj_init.log_debug("This is a debug message")
+        obj_init._update_db()
+        obj_test = BibWorkflowObjectLogging.query.filter(BibWorkflowObjectLogging.bibworkflowobject_id == obj_init.id).all()
+
+        messages_found = 0
+        for current_obj in obj_test:
+            if current_obj.message == "I am a test object" \
+                    and messages_found == 0:
+                messages_found += 1
+            elif current_obj.message == "This is an error message" \
+                    and messages_found == 1:
+                messages_found += 1
+            elif current_obj.message == "This is a debug message" \
+                    and messages_found == 2:
+                messages_found += 1
+        self.assertEqual(messages_found, 3)
+
     def test_workflow_for_running_object(self):
         """Test starting workflow with running object given"""
         from invenio.bibworkflow_model import BibWorkflowObject
@@ -309,8 +340,7 @@ distances from it.
 
     def test_restart_workflow(self):
         """Tests restarting workflow for given workflow id"""
-        from invenio.bibworkflow_model import BibWorkflowObject, WorkflowLogging
-        from invenio.bibworkflow_api import continue_oid
+        from invenio.bibworkflow_model import BibWorkflowObject
 
         initial_data = {'data': 1}
 

@@ -18,19 +18,12 @@
 """Implements an example of a typical ingestion workflow for MARCXML records"""
 
 
-from invenio.bibworkflow.tasks.marcxml_tasks import \
-    print_record, \
-    convert_record, \
-    download_fulltext, \
-    match_record
+from invenio.bibworkflow.tasks.marcxml_tasks import match_record, \
+    approve_record
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
 
 
 class marcxml_workflow(WorkflowDefinition):
     def __init__(self):
         super(marcxml_workflow, self).__init__()
-        self.definition = [print_record,
-                           convert_record("oaiarxiv2marcxml.xsl"),
-                           print_record,
-                           download_fulltext,
-                           match_record]
+        self.definition = [match_record]

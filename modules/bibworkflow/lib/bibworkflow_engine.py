@@ -33,9 +33,7 @@ from invenio.config import CFG_DEVEL_SITE
 from invenio.bibworkflow_utils import getWorkflowDefinition
 from uuid import uuid1 as new_uuid
 from invenio.bibworkflow_utils import dictproperty
-from invenio.bibworkflow_config import add_log, \
-    CFG_BIBWORKFLOW_WORKFLOWS_LOGDIR, \
-    CFG_WORKFLOW_STATUS, \
+from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS, \
     CFG_OBJECT_VERSION, \
     CFG_LOG_TYPE
 DEBUG = CFG_DEVEL_SITE > 0
@@ -63,15 +61,6 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                 self._create_db_obj()
 
         super(BibWorkflowEngine, self).__init__()
-        ### Old logging
-        #self.add_log()
-
-    def add_log(self):
-        pass
-        ### Old logging
-        #self.log = add_log(os.path.join(CFG_BIBWORKFLOW_WORKFLOWS_LOGDIR,
-        #                   "workflow_%s.log" % (self.db_obj.uuid, )),
-        #                   'workflow.%s' % self.db_obj.uuid)
 
     def log_info(self, message, error_msg=""):
         log_obj = WorkflowLogging(workflow_id=self.db_obj.uuid,
@@ -132,11 +121,10 @@ class BibWorkflowEngine(GenericWorkflowEngine):
 
     def __setstate__(self, state):
         if len(self._objects) < self._i[0]:
-            raise cPickle.PickleError("The workflow instance inconsistent state, "
+            raise cPickle.PickleError("The workflow instance "
+                                      "inconsistent state, "
                                       "too few objects")
         self.__dict__ = state
-        ### Old logging
-        #self.add_log()
 
     def __repr__(self):
         return "<BibWorkflow_engine(%s)>" % (self.db_obj.name,)
@@ -167,11 +155,13 @@ BibWorkflowEngine
             if o.id and same_workflow:
                 # If object exists and we are running the same workflow,
                 # do nothing
+                o.log_info("object saving process : was already existing")
                 continue
             # Set the current workflow id in the object
             if o.version == CFG_OBJECT_VERSION.INITIAL \
-              and o.workflow_id is not None:
-               pass
+                    and o.workflow_id is not None:
+                o.log_info("object saving process : was already existing")
+                pass
             else:
                 o.workflow_id = self.uuid
             o.save(o.version)
@@ -205,7 +195,8 @@ BibWorkflowEngine
             self._create_db_obj()
         else:
             # This workflow continues a previous execution.
-            if status in (CFG_WORKFLOW_STATUS.FINISHED, CFG_WORKFLOW_STATUS.HALTED):
+            if status in (CFG_WORKFLOW_STATUS.FINISHED,
+                          CFG_WORKFLOW_STATUS.HALTED):
                 self.db_obj.current_object = 0
             self.db_obj.modified = datetime.now()
             self.db_obj.status = status
@@ -219,12 +210,16 @@ BibWorkflowEngine
         """Restart the workflow engine after it was deserialized
 
         """
-        self.log_info("Restarting workflow from %s object and %s task" % (str(obj), str(task),))
+        self.log_info("Restarting workflow from %s object and %s task" %
+                      (str(obj), str(task),))
 
         # set the point from which to start processing
-        if obj == 'prev':# start with the previous object
-            self._i[0] -= 2#TODO: check if there is any object there
-        elif obj == 'current':# continue with the current object
+        if obj == 'prev':
+            # start with the previous object
+            self._i[0] -= 2
+            #TODO: check if there is any object there
+        elif obj == 'current':
+            # continue with the current object
             self._i[0] -= 1
         elif obj == 'next':
             pass
@@ -232,11 +227,14 @@ BibWorkflowEngine
             raise Exception('Unknown start point for object: %s' % obj)
 
         # set the task that will be executed first
-        if task == 'prev': # the previous
+        if task == 'prev':
+            # the previous
             self._i[1][-1] -= 1
-        elif task == 'current': # restart the task again
+        elif task == 'current':
+            # restart the task again
             self._i[1][-1] -= 0
-        elif task == 'next': # continue with the next task
+        elif task == 'next':
+            # continue with the next task
             self._i[1][-1] += 1
         else:
             raise Exception('Unknown start pointfor task: %s' % obj)
@@ -273,6 +271,7 @@ BibWorkflowEngine
         while i[0] < len(objects) - 1 and i[0] >= -1:
             i[0] += 1
             obj = objects[i[0]]
+            obj.log_info("Object is selected for processing")
             callbacks = self.callback_chooser(obj, self)
             if callbacks:
                 try:
@@ -280,30 +279,35 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
                 except StopProcessing:
                     if DEBUG:
-                        self.log_info("Processing was stopped: '%s' "
-                                      "(object: %s)" %
+                        self.log_debug("Processing was stopped: '%s' "
+                                       "(object: %s)" %
                                       (str(callbacks), repr(obj)))
-                        obj.get_log().info("Processing has stopped")
+                        obj.log_debug("Processing has stopped")
                     break
                 except JumpTokenBack, step:
                     if step.args[0] > 0:
-                        raise WorkflowError("JumpTokenBack cannot be positive number")
+                        raise WorkflowError("JumpTokenBack cannot"
+                                            " be positive number")
                     if DEBUG:
-                        self.log_info('Warning, we go back [%s] objects' %
-                                      step.args[0])
+                        self.log_debug('Warning, we go back [%s] objects' %
+                                       step.args[0])
+                        obj.log_debug("Object preempted")
                     i[0] = max(-1, i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
                 except JumpTokenForward, step:
                     if step.args[0] < 0:
-                        raise WorkflowError("JumpTokenForward cannot be negative number")
+                        raise WorkflowError("JumpTokenForward cannot"
+                                            " be negative number")
                     if DEBUG:
-                        self.log_info('We skip [%s] objects' % step.args[0])
+                        self.log_debug('We skip [%s] objects' % step.args[0])
+                        obj.log_debug("Object preempted")
                     i[0] = min(len(objects), i[0] - 1 + step.args[0])
                     i[1] = [0]  # reset the callbacks pointer
                 except ContinueNextToken:
                     if DEBUG:
-                        self.log_info('Stop processing for this object, '
-                                      'continue with next')
+                        self.log_debug('Stop processing for this object, '
+                                       'continue with next')
+                        obj.log_debug("Object preempted")
                     i[1] = [0]  # reset the callbacks pointer
                     continue
                 except HaltProcessing:
@@ -313,12 +317,16 @@ BibWorkflowEngine
                         # reraise the exception,
                         #this is the only case when a WFE can be completely
                         # stopped
+                        obj.log_info("Object proccesing is halted")
                     raise
                 except Exception:
                     self.log_info("Unexpected error:", sys.exc_info()[0])
+                    obj.log_error("Something terribly wrong"
+                                  " happen to this object")
                     raise
             # We save the object once it is fully run through
             obj.save(CFG_OBJECT_VERSION.FINAL)
+            obj.log_info("Object proccesing is finished")
             self.increaseCounterFinished()
 
             ##### Update the workflow
@@ -330,7 +338,8 @@ BibWorkflowEngine
 
     def halt(self, msg):
         """Halt the workflow (stop also any parent wfe)"""
-        self.log_debug("Processing halted at task %s with message: %s" % (self.getCurrTaskId(), msg, ))
+        self.log_debug("Processing halted at task %s with message: %s" %
+                      (self.getCurrTaskId(), msg, ))
         raise HaltProcessing("Processing halted at task %s with message: %s" %
                              (self.getCurrTaskId(), msg, ))
 
