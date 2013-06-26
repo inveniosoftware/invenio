@@ -19,45 +19,48 @@ from invenio.bibworkflow_worker_engine import runit, restartit, continueit
 from invenio.celery import celery
 
 
+@celery.task(name='invenio.bibworkflow.workers.worker_celery.runit')
+def celery_runit(wname, data, external_save=None):
+    """
+    Runs the workflow with Celery
+    """
+    runit(wname, data, external_save=external_save)
+
+
+@celery.task(name='invenio.bibworkflow.workers.worker_celery.restartit')
+def celery_restartit(wid, external_save=None):
+    """
+    Restarts the workflow with Celery
+    """
+    restartit(wid, external_save=external_save)
+
+
+@celery.task(name='invenio.bibworkflow.workers.worker_celery.continueit')
+def celery_continueit(oid, restart_point="beginning", external_save=None):
+    """
+    Restarts the workflow with Celery
+    """
+    continueit(oid, restart_point, external_save=external_save)
+
+
 class worker_celery(object):
     def run(self, wname, data, external_save=None):
         """
         Helper function to get celery task
         decorators to worker_celery
         """
-        return self.celery_runit.delay(wname, data, external_save)
-
-    @celery.task(name='invenio.bibworkflow.workers.worker_celery.runit')
-    def celery_runit(wname, data, external_save=None):
-        """
-        Runs the workflow with Celery
-        """
-        runit(wname, data, external_save=external_save)
+        return celery_runit.delay(wname, data, external_save)
 
     def restart(self, wid, external_save=None):
         """
         Helper function to get celery task
         decorators to worker_celery
         """
-        return self.celery_restartit.delay(wid, external_save)
-
-    @celery.task(name='invenio.bibworkflow.workers.worker_celery.restartit')
-    def celery_restartit(wid, external_save=None):
-        """
-        Restarts the workflow with Celery
-        """
-        restartit(wid, external_save=external_save)
+        return celery_restartit.delay(wid, external_save)
 
     def continueit(self, oid, restart_point, external_save=None):
         """
         Helper function to get celery task
         decorators to worker_celery
         """
-        return self.celery_continueit.delay(oid, restart_point, external_save)
-
-    @celery.task(name='invenio.bibworkflow.workers.worker_celery.continueit')
-    def celery_continueit(oid, restart_point="beginning", external_save=None):
-        """
-        Restarts the workflow with Celery
-        """
-        continueit(oid, restart_point, external_save=external_save)
+        return celery_continueit.delay(oid, restart_point, external_save)

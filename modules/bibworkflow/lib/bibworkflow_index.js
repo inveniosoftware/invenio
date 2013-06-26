@@ -2,7 +2,7 @@ $(document).ready(function(){
             $("tbody > tr.workflow").bind('click', function(){
                             hp_id = $(this).attr('name');
                             jQuery.ajax({
-                                url: "/admin/bibworkflow/workflow_details?workflow_id=" + hp_id,
+                                url: "/admin/bibworkflow/workflow_details?id_workflow=" + hp_id,
                                 success: function(json){
                                     $("#myModal").html(json);
                                     $('#myModal').modal('show');}
@@ -11,7 +11,7 @@ $(document).ready(function(){
             $("tbody > tr.object").bind('click', function(){
                             hp_id = $(this).attr('name');
                             jQuery.ajax({
-                                url: "/admin/bibworkflow/entry_details?entry_id=" + hp_id,
+                                url: "/admin/bibworkflow/entry_details?id_entry=" + hp_id,
                                 success: function(json){
                                     $("#myModal").html(json);
                                     $('#myModal').modal('show');}

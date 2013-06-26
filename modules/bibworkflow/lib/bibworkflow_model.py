@@ -17,6 +17,7 @@
 
 import os
 import tempfile
+import json
 
 from datetime import datetime
 from sqlalchemy import desc
@@ -28,55 +29,48 @@ from invenio.config import CFG_TMPSHAREDDIR
 from invenio.bibworkflow_utils import determineDataType
 
 
-class TaskLogging(db.Model):
-    __tablename__ = "bwlTASKLOGGING"
-    id = db.Column(db.Integer, primary_key=True)
-    task_name = db.Column(db.String(255), nullable=False)
-    data = db.Column(db.String(255), nullable=False)
-    created = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    workflow_name = db.Column(db.String(255), nullable=False)
-
-    def __init__(self, task_name, data, created, workflow_name):
-        self.task_name = task_name
-        self.data = data
-        self.created = created
-        self.workflow_name = workflow_name
-
-    def __repr__(self):
-        return "<Task(%i, %s, %s, %s, %s)>" % (self.id, self.task_name,
-                                               self.data, self.created,
-                                               self.workflow_name)
-
-
-class AuditLogging(db.Model):
-    __tablename__ = "bwlAUDITLOGGING"
-    id = db.Column(db.Integer, primary_key=True)
-    action = db.Column(db.String(255), nullable=False)
-    created = db.Column(db.DateTime, default=datetime.now, nullable=False)
-    user = db.Column(db.String(255), nullable=False)
-
-    def __init__(self, action, time, user):
-        self.action = action
-        self.time = time
-        self.user = user
-
-    def __repr__(self):
-        return "<Task(%s, %s, %s)>" % (self.action, self.time, self.user)
-
-
 class WorkflowLogging(db.Model):
     __tablename__ = "bwlWORKFLOWLOGGING"
     id = db.Column(db.Integer, primary_key=True)
-    workflow_id = db.Column(db.String(255), nullable=False)
-    type = db.Column(db.Integer, default=0, nullable=False)
+    id_workflow = db.Column(db.String(255), nullable=False)
+    log_type = db.Column(db.Integer, default=0, nullable=False)
     created = db.Column(db.DateTime, default=datetime.now)
     message = db.Column(db.String(500), default="", nullable=False)
     error_msg = db.Column(db.TEXT, default="", nullable=False)
     extra_data = db.Column(db.JSON, default={})
 
     def __repr__(self):
-        return "Workflow log: %i, %s, %s, %s" % \
-               (self.id, self.workflow_id, self.message, self.created)
+        return "<WorkflowLog(%i, %s, %s, %s)>" % \
+               (self.id, self.id_workflow, self.message, self.created)
+
+
+class BibWorkflowObjectLogging(db.Model):
+    """
+    This class represent a record of a log emit by an object
+    into the database the object must be saved before using
+    this class. Indeed it needs the id of the object into
+    the database.
+    """
+    #db table definition
+    __tablename__ = 'bwlOBJECTLOGGING'
+    id = db.Column(db.Integer, primary_key=True)
+    id_bibworkflowobject = db.Column(db.Integer(255),
+                                     db.ForeignKey('bwlOBJECT.id'),
+                                     nullable=False)
+    log_type = db.Column(db.Integer, default=0, nullable=False)
+    created = db.Column(db.DateTime, default=datetime.now)
+    message = db.Column(db.String(500), default="", nullable=False)
+    error_msg = db.Column(db.TEXT, default="", nullable=False)
+    extra_data = db.Column(db.JSON, default={})
+
+    ###
+    #This function should be use only for debug purpose
+    #Normal log acces should be done throught the database
+    #That's all
+    ###
+    def __repr__(self):
+        return "<ObjectLog(%i, %s, %s, %s)>" % \
+               (self.id, self.id_bibworkflowobject, self.message, self.created)
 
 
 class Workflow(db.Model):
@@ -87,7 +81,7 @@ class Workflow(db.Model):
     created = db.Column(db.DateTime, default=datetime.now, nullable=False)
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
-    user_id = db.Column(db.Integer, default=0, nullable=False)
+    id_user = db.Column(db.Integer, default=0, nullable=False)
     extra_data = db.Column(db.JSON, default={})
     status = db.Column(db.Integer, default=0, nullable=False)
     current_object = db.Column(db.Integer, default="0", nullable=False)
@@ -100,12 +94,12 @@ class Workflow(db.Model):
 
     def __repr__(self):
         return "<Workflow(name: %s, module: %s, cre: %s, mod: %s," \
-               "user_id: %s, status: %s)>" % \
+               "id_user: %s, status: %s)>" % \
             (str(self.name),
              str(self.module_name),
              str(self.created),
              str(self.modified),
-             str(self.user_id),
+             str(self.id_user),
              str(self.status))
 
     def __str__(self):
@@ -122,7 +116,7 @@ class Workflow(db.Model):
         Counters: initial=%s, halted=%s, error=%s, finished=%s
         Extra data: %s""" % (str(self.uuid),
                              str(self.name),
-                             str(self.user_id),
+                             str(self.id_user),
                              str(self.module_name),
                              str(self.created),
                              str(self.modified),
@@ -218,40 +212,11 @@ class Workflow(db.Model):
         db.session.commit()
 
 
-class BibWorkflowObjectLogging(db.Model):
-    """
-    This class represent a record of a log emit by an object
-    into the database the object must be saved before using
-    this class. Indeed it needs the id of the object into
-    the database.
-    """
-    #db table definition
-    __tablename__ = 'bwlOBJECTLOGGING'
-    id = db.Column(db.Integer, primary_key=True)
-    bibworkflowobject_id = db.Column(db.Integer(255),
-                                     db.ForeignKey('bwlOBJECT.id'),
-                                     nullable=False)
-    type = db.Column(db.Integer, default=0, nullable=False)
-    created = db.Column(db.DateTime, default=datetime.now)
-    message = db.Column(db.String(500), default="", nullable=False)
-    error_msg = db.Column(db.TEXT, default="", nullable=False)
-    extra_data = db.Column(db.JSON, default={})
-
-    ###
-    #This function should be use only for debug purpose
-    #Normal log acces should be done throught the database
-    #That's all
-    ###
-    def __repr__(self):
-        return "<Object(%i, %s, %s, %s)>" % \
-               (self.id, self.bibworkflowobject_id, self.message, self.created)
-
-
 class BibWorkflowObject(db.Model):
     # db table definition
     __tablename__ = "bwlOBJECT"
     id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.JSON, nullable=False)
+    _data = db.Column(db.JSON, nullable=False)
     extra_data = db.Column(db.JSON,
                            nullable=False, default={"tasks_results": {},
                                                     "owner": {},
@@ -259,14 +224,14 @@ class BibWorkflowObject(db.Model):
                                                     "error_msg": "",
                                                     "last_task_name": "",
                                                     "latest_object": -1})
-    workflow_id = db.Column(db.String(36),
+    id_workflow = db.Column(db.String(36),
                             db.ForeignKey("bwlWORKFLOW.uuid"), nullable=False)
     version = db.Column(db.Integer(3),
                         default=CFG_OBJECT_VERSION.RUNNING, nullable=False)
-    parent_id = db.Column(db.Integer,
-                          db.ForeignKey("bwlOBJECT.id"), default=None)
+    id_parent = db.Column(db.Integer, db.ForeignKey("bwlOBJECT.id"),
+                          default=None)
     child_objects = db.relationship("BibWorkflowObject",
-                                    remote_side=[parent_id])
+                                    remote_side=[id_parent])
     created = db.Column(db.DateTime, default=datetime.now, nullable=False)
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
@@ -275,29 +240,38 @@ class BibWorkflowObject(db.Model):
                           nullable=False)
     uri = db.Column(db.String(500), default="")
     child_logs = db.relationship("BibWorkflowObjectLogging")
+    _old_data = None
 
     def get_data_by_id(self, id):
         return self.query.filter(BibWorkflowObject.id == id).first()
 
+    @property
+    def data(self):
+        return self._data['data']
+
+    @data.setter
+    def data(self, data):
+        self._data = {'data': data}
+
     def log_info(self, message, error_msg=""):
-        log_obj = BibWorkflowObjectLogging(bibworkflowobject_id=self.id,
-                                           type=CFG_LOG_TYPE.INFO,
+        log_obj = BibWorkflowObjectLogging(id_bibworkflowobject=self.id,
+                                           log_type=CFG_LOG_TYPE.INFO,
                                            message=message,
                                            error_msg=error_msg,
                                            extra_data=self.extra_data)
         db.session.add(log_obj)
 
     def log_error(self, message, error_msg=""):
-        log_obj = BibWorkflowObjectLogging(bibworkflowobject_id=self.id,
-                                           type=CFG_LOG_TYPE.ERROR,
+        log_obj = BibWorkflowObjectLogging(id_bibworkflowobject=self.id,
+                                           log_type=CFG_LOG_TYPE.ERROR,
                                            message=message,
                                            error_msg=error_msg,
                                            extra_data=self.extra_data)
         db.session.add(log_obj)
 
     def log_debug(self, message, error_msg=""):
-        log_obj = BibWorkflowObjectLogging(bibworkflowobject_id=self.id,
-                                           type=CFG_LOG_TYPE.DEBUG,
+        log_obj = BibWorkflowObjectLogging(id_bibworkflowobject=self.id,
+                                           log_type=CFG_LOG_TYPE.DEBUG,
                                            message=message,
                                            error_msg=error_msg,
                                            extra_data=self.extra_data)
@@ -311,10 +285,10 @@ class BibWorkflowObject(db.Model):
         #    extra_obj.save()
 
     def __repr__(self):
-        repr = "<BibWorkflowObject(id = %s, data = %s, workflow_id = %s, " \
-               "version = %s, parent_id = %s, created = %s, extra_data = %s)" \
-               % (str(self.id), str(self.data), str(self.workflow_id),
-                  str(self.version), str(self.parent_id), str(self.created),
+        repr = "<BibWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
+               "version = %s, id_parent = %s, created = %s, extra_data = %s)" \
+               % (str(self.id), str(self.data), str(self.id_workflow),
+                  str(self.version), str(self.id_parent), str(self.created),
                   str(self.extra_data))
         return repr
 
@@ -342,8 +316,8 @@ BibWorkflowObject
 -------------------------------
 """ % (str(self.status),
        str(self.id),
-       str(self.parent_id),
-       str(self.workflow_id),
+       str(self.id_parent),
+       str(self.id_workflow),
        str(self.created),
        str(self.modified),
        str(self.version),
@@ -358,9 +332,9 @@ BibWorkflowObject
         if isinstance(other, BibWorkflowObject):
             if self.data == other.data and \
                     self.extra_data == other.extra_data and \
-                    self.workflow_id == other.workflow_id and \
+                    self.id_workflow == other.id_workflow and \
                     self.version == other.version and \
-                    self.parent_id == other.parent_id and \
+                    self.id_parent == other.id_parent and \
                     isinstance(self.created, datetime) and \
                     isinstance(self.modified, datetime):
                 return True
@@ -372,9 +346,9 @@ BibWorkflowObject
         if isinstance(other, BibWorkflowObject):
             if self.data == other.data and \
                     self.extra_data == other.extra_data and \
-                    self.workflow_id == other.workflow_id and \
+                    self.id_workflow == other.id_workflow and \
                     self.version == other.version and \
-                    self.parent_id == other.parent_id and \
+                    self.id_parent == other.id_parent and \
                     isinstance(self.created, datetime) and \
                     isinstance(self.modified, datetime):
                 return False
@@ -394,23 +368,27 @@ BibWorkflowObject
     def getCurrentTask(self):
         return self.extra_data["task_counter"]
 
-    def _create_version_obj(self, workflow_id, version, parent_id=None,
+    def _create_version_obj(self, id_workflow, version, id_parent=None,
                             no_update=False):
         obj = BibWorkflowObject(data=self.data,
-                                workflow_id=workflow_id,
+                                id_workflow=id_workflow,
                                 version=version,
-                                parent_id=parent_id,
+                                id_parent=id_parent,
                                 extra_data=self.extra_data,
                                 status=self.status,
                                 data_type=self.data_type)
         db.session.add(obj)
         db.session.commit()
         if version is CFG_OBJECT_VERSION.INITIAL and not no_update:
-            self.parent_id = obj.id
+            self.id_parent = obj.id
             db.session.commit()
         return obj.id
 
     def _update_db(self):
+        new_data = hash(json.dumps(self._data))
+        if self._old_data != new_data:
+            self._old_data = new_data
+            self._data.changed()
         db.session.add(self)
         db.session.commit()
         self.log_info("Object saved")
@@ -419,7 +397,7 @@ BibWorkflowObject
         #    extra_obj = self.extra_object_class(self)
         #    extra_obj.update()
 
-    def save(self, version=None, task_counter=[0], workflow_id=None):
+    def save(self, version=None, task_counter=[0], id_workflow=None):
         """
         Saved object
         """
@@ -428,8 +406,8 @@ BibWorkflowObject
             db.session.commit()
         self.extra_data["task_counter"] = task_counter
 
-        if not workflow_id:
-            workflow_id = self.workflow_id
+        if not id_workflow:
+            id_workflow = self.id_workflow
 
         if version:
             self.version = version
@@ -444,7 +422,7 @@ BibWorkflowObject
 
         Warning: Currently assumes non-binary content.
         """
-        if "data" in self.db_obj.data:
+        if "data" in self.data:
             tmp_fd, filename = tempfile.mkstemp(dir=directory,
                                                 prefix=prefix,
                                                 suffix=suffix)
@@ -454,9 +432,9 @@ BibWorkflowObject
 
     def __getstate__(self):
         return {"data": self.data,
-                "workflow_id": self.workflow_id,
+                "id_workflow": self.id_workflow,
                 "version": self.version,
-                "parent_id": self.parent_id,
+                "id_parent": self.id_parent,
                 "created": self.created,
                 "modified": self.modified,
                 "status": self.status,
@@ -466,9 +444,9 @@ BibWorkflowObject
 
     def __setstate__(self, state):
         self.data = state["data"]
-        self.workflow_id = state["workflow_id"]
+        self.id_workflow = state["id_workflow"]
         self.version = state["version"]
-        self.parent_id = state["parent_id"]
+        self.id_parent = state["id_parent"]
         self.created = state["created"]
         self.modified = state["modified"]
         self.extra_data = state["extra_data"]
@@ -477,17 +455,27 @@ BibWorkflowObject
         self.uri = state["uri"]
 
     def copy(self, other):
-        """Copies data and metadata except id and workflow_id"""
+        """Copies data and metadata except id and id_workflow"""
         self.data = other.data
         self.extra_data = other.extra_data
         self.version = other.version
-        self.parent_id = other.parent_id
+        self.id_parent = other.id_parent
         self.created = other.created
         self.modified = datetime.now()
         self.owner = other.owner
         self.status = other.status
         self.data_type = other.data_type
         self.uri = other.uri
+
+
+def load_a(*args, **kwargs):
+    args[0]._old_data = json.dumps(args[0]._data)
+    pass
+
+from sqlalchemy import event
+from sqlalchemy.orm.events import InstanceEvents
+event.listen(BibWorkflowObject, 'load', load_a)
+
 
 __all__ = ['Workflow', 'BibWorkflowObject', 'WorkflowLogging',
            'AuditLogging', 'TaskLogging', 'BibWorkflowObjectLogging']

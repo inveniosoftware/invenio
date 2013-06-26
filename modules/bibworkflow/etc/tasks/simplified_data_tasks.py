@@ -15,17 +15,26 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Implements an example of a typical ingestion workflow for MARCXML records"""
+"""Basic simplified data test functions - NOT FOR XML """
+
+from invenio.bibworkflow_config import CFG_OBJECT_STATUS
 
 
-from invenio.bibworkflow.tasks.marcxml_tasks import (match_record,
-                                                     approve_record,
-                                                     convert_record)
-from invenio.bibworkflow_workflow_definition import WorkflowDefinition
+def task_a(a):
+    def _task_a(obj, eng):
+        """Function task_a docstring"""
+        eng.log.info("executing task a " + str(a))
+        obj.data += a
+        #obj.add_metadata("foo", "bar")
+    return _task_a
 
 
-class marcxml_workflow(WorkflowDefinition):
-    def __init__(self):
-        super(marcxml_workflow, self).__init__()
-        self.definition = [convert_record,
-                           match_record]
+def task_b(obj, eng):
+    """Function task_b docstring"""
+    eng.log.info("executing task b")
+    if obj.data < 20:
+        obj.changeStatus(CFG_OBJECT_STATUS.ERROR)
+        eng.log.info("Object status %s" % (obj.db_obj.status,))
+        eng.log.info("data < 20")
+        obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c': 14})
+        eng.halt("Value of filed: data in object is too small.")

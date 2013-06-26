@@ -44,7 +44,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
             wfe.log_info(message="Processing halted!")
             wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED,
                                                   wfe.getCurrTaskId(),
-                                                  workflow_id=wfe.uuid)
+                                                  id_workflow=wfe.uuid)
             wfe.save(CFG_WORKFLOW_STATUS.HALTED)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             if stop_on_halt:
@@ -59,7 +59,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False):
             wfe.increaseCounterError()
             wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED,
                                                   wfe.getCurrTaskId(),
-                                                  workflow_id=wfe.uuid)
+                                                  id_workflow=wfe.uuid)
             wfe.save(CFG_WORKFLOW_STATUS.ERROR)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             if stop_on_halt or stop_on_error:

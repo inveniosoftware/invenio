@@ -25,7 +25,7 @@ from invenio.bibworkflow_model import BibWorkflowObject, Workflow
 from invenio.config import CFG_LOGDIR
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.bibworkflow_utils import getWorkflowDefinition
-from invenio.bibworkflow_api import continue_oid, run
+from invenio.bibworkflow_api import continue_oid, start
 from invenio.bibworkflow_hp_load_widgets import widgets
 from invenio.bibworkflow_model import Workflow
 
@@ -102,7 +102,7 @@ def load_table():
              None,
              None,
              None,
-             str(container.initial.workflow_id),
+             str(container.initial.id_workflow),
              str(container.current.extra_data['owner']),
              str(container.initial.created),
              str(container.version),
@@ -145,8 +145,8 @@ def details(hpcontainerid):
     # search for parents
     bwobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                               hpcontainerid).first()
-    if bwobject.parent_id:
-        hpcontainerid = bwobject.parent_id
+    if bwobject.id_parent:
+        hpcontainerid = bwobject.id_parent
 
     # search in the containers for our hpcontainerid
     for hpc in containers:
@@ -163,11 +163,11 @@ def details(hpcontainerid):
             pass
 
     w_metadata = Workflow.query.filter(Workflow.uuid ==
-                                       hpcontainer.initial.workflow_id).first()
+                                       hpcontainer.initial.id_workflow).first()
     # read the logtext from the file system
     try:
         f = open(CFG_LOGDIR + "/object_" + str(hpcontainer.initial.id)
-                 + "_w_" + str(hpcontainer.initial.workflow_id) + ".log", "r")
+                 + "_w_" + str(hpcontainer.initial.id_workflow) + ".log", "r")
         logtext = f.read()
     except IOError:
         logtext = ""
@@ -187,10 +187,10 @@ def restart_record(hpcontainerid, start_point='beginning'):
     """
     Restarts the initial object in its workflow
     """
-    workflow_id = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id == hpcontainerid).first().workflow_id
-    wname = Workflow.query.filter(Workflow.uuid == workflow_id).first().name
-    run(wname, [{'id': hpcontainerid}])
+    id_workflow = BibWorkflowObject.query.filter(
+        BibWorkflowObject.id == hpcontainerid).first().id_workflow
+    wname = Workflow.query.filter(Workflow.uuid == id_workflow).first().name
+    start(wname, [{'id': hpcontainerid}])
     flash('Record Restarted')
     return "Record restarted"
 
@@ -263,7 +263,7 @@ def show_widget(hpcontainerid, widget):
             matches = bwobject.extra_data['tasks_results']['match_record']
         except:
             bwobject = BibWorkflowObject.query.filter(
-                BibWorkflowObject.parent_id == bwobject.id).first()
+                BibWorkflowObject.id_parent == bwobject.id).first()
             matches = bwobject.extra_data['tasks_results']['match_record']
 
         print matches
@@ -309,9 +309,9 @@ def get_info(hpobject):
     info = {}
     info['version'] = hpobject.version
     info['owner'] = hpobject.extra_data['owner']
-    info['parent id'] = hpobject.parent_id
+    info['parent id'] = hpobject.id_parent
     info['task counter'] = hpobject.extra_data['task_counter']
-    info['workflow id'] = hpobject.workflow_id
+    info['workflow id'] = hpobject.id_workflow
     info['object id'] = hpobject.id
     info['last task name'] = hpobject.extra_data['last_task_name']
     info['widget'] = hpobject.extra_data['widget']

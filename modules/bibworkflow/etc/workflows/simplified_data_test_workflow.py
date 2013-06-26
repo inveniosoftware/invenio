@@ -15,17 +15,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Implements an example of a typical ingestion workflow for MARCXML records"""
+""" Implements a workflow for testing """
 
-
-from invenio.bibworkflow.tasks.marcxml_tasks import (match_record,
-                                                     approve_record,
-                                                     convert_record)
+from invenio.bibworkflow.tasks.simplified_data_tasks import task_a, task_b
 from invenio.bibworkflow_workflow_definition import WorkflowDefinition
 
 
-class marcxml_workflow(WorkflowDefinition):
+class simplified_data_test_workflow(WorkflowDefinition):
     def __init__(self):
-        super(marcxml_workflow, self).__init__()
-        self.definition = [convert_record,
-                           match_record]
+        super(simplified_data_test_workflow, self).__init__()
+        self.definition = [task_a(1),
+                           task_b,
+                           task_a(1),
+                           task_a(4),
+                           task_a(1),
+                           task_a(1),
+                           task_b,
+                           task_a(13)]

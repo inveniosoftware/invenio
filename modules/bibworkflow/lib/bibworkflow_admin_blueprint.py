@@ -23,7 +23,7 @@ __lastupdated__ = """$Date$"""
 from flask import render_template
 from pprint import pformat
 from invenio.bibworkflow_model import Workflow, BibWorkflowObject
-from invenio.bibworkflow_api import run
+from invenio.bibworkflow_api import start
 import os
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
@@ -57,12 +57,12 @@ def index():
 
 @blueprint.route('/entry_details', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'entry_id': (int, 0)})
-def entry_details(entry_id):
+@blueprint.invenio_wash_urlargd({'id_entry': (int, 0)})
+def entry_details(id_entry):
     """
     Displays entry details.
     """
-    wfe_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == entry_id).first()
+    wfe_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == id_entry).first()
 
     return render_template('bibworkflow_entry_details.html',
                            entry=wfe_object, log="",
@@ -72,9 +72,9 @@ def entry_details(entry_id):
 
 @blueprint.route('/workflow_details', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'workflow_id': (unicode, "")})
-def workflow_details(workflow_id):
-    w_metadata = Workflow.query.filter(Workflow.uuid == workflow_id).first()
+@blueprint.invenio_wash_urlargd({'id_workflow': (unicode, "")})
+def workflow_details(id_workflow):
+    w_metadata = Workflow.query.filter(Workflow.uuid == id_workflow).first()
 
     return render_template('bibworkflow_workflow_details.html',
                            workflow_metadata=w_metadata,
@@ -106,7 +106,7 @@ def run_workflow(workflow_name, data={"data": 10}):
         external_save = None
         print workflow_name
         print 'Ready to run workflow'
-        run(workflow_name, data, external_save=external_save)
+        start(workflow_name, data, external_save=external_save)
     except:
         traceback.print_exc()
     return "Workflow has been started."

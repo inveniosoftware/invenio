@@ -42,7 +42,7 @@ DEBUG = CFG_DEVEL_SITE > 0
 class BibWorkflowEngine(GenericWorkflowEngine):
 
     def __init__(self, name="Default workflow", uuid=None, curr_obj=0,
-                 workflow_object=None, user_id=0, module_name="Unknown"):
+                 workflow_object=None, id_user=0, module_name="Unknown"):
         self.db_obj = None
         if isinstance(workflow_object, Workflow):
             self.db_obj = workflow_object
@@ -55,7 +55,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                 uuid = new_uuid()
 
             if self.db_obj is None:
-                self.db_obj = Workflow(name=name, user_id=user_id,
+                self.db_obj = Workflow(name=name, id_user=id_user,
                                        current_object=curr_obj,
                                        module_name=module_name, uuid=uuid)
                 self._create_db_obj()
@@ -63,24 +63,24 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         super(BibWorkflowEngine, self).__init__()
 
     def log_info(self, message, error_msg=""):
-        log_obj = WorkflowLogging(workflow_id=self.db_obj.uuid,
-                                  type=CFG_LOG_TYPE.INFO,
+        log_obj = WorkflowLogging(id_workflow=self.db_obj.uuid,
+                                  log_type=CFG_LOG_TYPE.INFO,
                                   message=message,
                                   error_msg=error_msg,
                                   extra_data=self.db_obj.extra_data)
         db.session.add(log_obj)
 
     def log_error(self, message, error_msg=""):
-        log_obj = WorkflowLogging(workflow_id=self.db_obj.uuid,
-                                  type=CFG_LOG_TYPE.ERROR,
+        log_obj = WorkflowLogging(id_workflow=self.db_obj.uuid,
+                                  log_type=CFG_LOG_TYPE.ERROR,
                                   message=message,
                                   error_msg=error_msg,
                                   extra_data=self.db_obj.extra_data)
         db.session.add(log_obj)
 
     def log_debug(self, message, error_msg=""):
-        log_obj = WorkflowLogging(workflow_id=self.db_obj.uuid,
-                                  type=CFG_LOG_TYPE.DEBUG,
+        log_obj = WorkflowLogging(id_workflow=self.db_obj.uuid,
+                                  log_type=CFG_LOG_TYPE.DEBUG,
                                   message=message,
                                   error_msg=error_msg,
                                   extra_data=self.db_obj.extra_data)
@@ -150,8 +150,8 @@ BibWorkflowEngine
         # 2. We want to save all the objects as version 0.
         for o in objects:
             same_workflow = \
-                o.workflow_id and \
-                o.workflow_id == self.db_obj.uuid
+                o.id_workflow and \
+                o.id_workflow == self.db_obj.uuid
             if o.id and same_workflow:
                 # If object exists and we are running the same workflow,
                 # do nothing
@@ -159,11 +159,11 @@ BibWorkflowEngine
                 continue
             # Set the current workflow id in the object
             if o.version == CFG_OBJECT_VERSION.INITIAL \
-                    and o.workflow_id is not None:
+                    and o.id_workflow is not None:
                 o.log_info("object saving process : was already existing")
                 pass
             else:
-                o.workflow_id = self.uuid
+                o.id_workflow = self.uuid
             o.save(o.version)
         GenericWorkflowEngine.before_processing(objects, self)
 
