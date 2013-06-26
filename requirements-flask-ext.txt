@@ -1,5 +1,5 @@
 Flask-Assets==0.7
-Flask-Cache==0.11.1
+Flask-Cache==0.12
 Flask-DebugToolbar==0.7.1
 Flask-Email==1.4.4
 Flask-Gravatar==0.2.3

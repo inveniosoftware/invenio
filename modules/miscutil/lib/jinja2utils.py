@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ from jinja2.ext import Extension
 from flask import g, _request_ctx_stack
 
 try:
-    from MarkupSafe import Markup as jinja2_Markup, escape as jinja2_escape
+    from markupsafe import Markup as jinja2_Markup, escape as jinja2_escape
 except ImportError:
     from jinja2._markupsafe import Markup as jinja2_Markup, \
         escape as jinja2_escape
@@ -302,7 +302,10 @@ def hack_jinja2_utf8decoding():
     import jinja2.compiler
 
     # Escape function replacement in Jinja2 library
-    jinja2._markupsafe.escape = utf8escape
+    try:
+        jinja2._markupsafe.escape = utf8escape
+    except:
+        pass
     jinja2.runtime.escape = utf8escape
     jinja2.utils.escape = utf8escape
     jinja2.filters.escape = utf8escape
@@ -310,7 +313,10 @@ def hack_jinja2_utf8decoding():
     jinja2.escape = utf8escape
 
     # Markup class replacement in Jinja2 library
-    jinja2._markupsafe.Markup = Markup
+    try:
+        jinja2._markupsafe.Markup = Markup
+    except:
+        pass
     jinja2.runtime.Markup = Markup
     jinja2.utils.Markup = Markup
     jinja2.filters.Markup = Markup
@@ -321,12 +327,13 @@ def hack_jinja2_utf8decoding():
     jinja2.environment.Markup = Markup
 
     # Escape/Markup replacement in MarkupSafe library.
-    try:
-        import MarkupSafe
-        MarkupSafe.escape = utf8escape
-        MarkupSafe.Markup = Markup
-    except ImportError:
-        pass
+    ## FIXME causes recursive calls in `Markup.__new__` and `escape`
+    #try:
+    #    import markupsafe
+    #    markupsafe.escape = utf8escape
+    #    #markupsafe.Markup = Markup
+    #except ImportError:
+    #    pass
 
 
 def utf8escape(s):
@@ -374,18 +381,9 @@ def extend_application_template_filters(app):
     """
     import os
     from datetime import datetime
-    from invenio.textutils import nice_size
     from invenio.dateutils import convert_datetext_to_dategui, \
         convert_datestruct_to_dategui, pretty_date
     from invenio.webmessage_mailutils import email_quoted_txt2html
-
-    @app.template_filter('filesizeformat')
-    def _filesizeformat_filter(value):
-        """
-        Jinja2 filesizeformat filters is broken in Jinja2 up to v2.7, so
-        let's implement our own.
-        """
-        return nice_size(value)
 
     test_not_empty = lambda v: v is not None and v != ''
 
