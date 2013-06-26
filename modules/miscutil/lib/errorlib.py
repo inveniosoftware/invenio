@@ -122,12 +122,14 @@ def register_emergency(msg, recipients=None):
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES
     """
     from invenio.mailutils import send_email
+    from socket import gethostname
     if not recipients:
         recipients = get_emergency_recipients()
     recipients = set(recipients)
     recipients.add(CFG_SITE_ADMIN_EMAIL)
+    subject = "Emergency notification from " + gethostname() + " at " + CFG_SITE_URL
     for address_str in recipients:
-        send_email(CFG_SITE_SUPPORT_EMAIL, address_str, "Emergency notification", msg)
+        send_email(CFG_SITE_SUPPORT_EMAIL, address_str, subject, msg)
 
 def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
     """Parse a list of appropriate emergency email recipients from
