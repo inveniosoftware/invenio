@@ -77,6 +77,7 @@ from invenio.bibedit_utils import record_find_matching_fields
 from invenio.bibcatalog import bibcatalog_system
 import invenio.template
 oaiharvest_templates = invenio.template.load('oai_harvest')
+from invenio.webinterface_handler_flask import with_app_context
 
 ## precompile some often-used regexp for speed reasons:
 REGEXP_OAI_ID = re.compile("<identifier.*?>(.*?)<\/identifier>", re.DOTALL)
@@ -1422,6 +1423,7 @@ def usage(exitcode=0, msg=""):
         sys.stderr.write(msg + "\n")
     sys.exit(exitcode)
 
+@with_app_context
 def main():
     """Starts the tool.
 
