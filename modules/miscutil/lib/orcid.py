@@ -26,11 +26,9 @@ class OrcidSearch:
         query = query.replace(" ", "+")
         """
         FIXME: Don't create a process to do this!
-               Also the devsandbox will be deprecated
-               check: http://sandbox-1.orcid.org
         """
         p = subprocess.Popen("curl -H 'Accept: application/orcid+json' \
-                             'http://devsandbox.orcid.org/search/orcid-bio?q=" + \
+                             'http://pub.sandbox-1.orcid.org/search/orcid-bio?q=" + \
                              query + "&start=0&rows=10'", \
                              shell=True, \
                              stdout=subprocess.PIPE, \
