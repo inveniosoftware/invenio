@@ -124,6 +124,7 @@ class CommentRights(object):
 
 @blueprint.route('/<int:recid>/comments/add', methods=['GET', 'POST'])
 @request_record
+@blueprint.invenio_authenticated
 @blueprint.invenio_authorized('sendcomment',
                               authorized_if_no_roles=True,
                               collection=lambda: g.collection.id)
@@ -165,6 +166,7 @@ def add_comment(recid):
 
 @blueprint.route('/<int:recid>/reviews/add', methods=['GET', 'POST'])
 @request_record
+@blueprint.invenio_authenticated
 @blueprint.invenio_authorized('sendcomment',
                               authorized_if_no_roles=True,
                               collection=lambda: g.collection.id)
