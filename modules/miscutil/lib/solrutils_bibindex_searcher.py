@@ -27,7 +27,9 @@ import mimetools
 from invenio import intbitset
 from invenio.urlutils import make_invenio_opener
 from invenio.jsonutils import json
-from invenio.config import CFG_SOLR_URL
+from invenio.config import CFG_SOLR_URL, \
+                           CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
+                           CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS
 
 
 if CFG_SOLR_URL:
@@ -73,3 +75,29 @@ def solr_get_bitset(index, query):
     data = u.read()
     bitset.fastload(data)
     return bitset
+
+
+def solr_get_snippet(keywords, recid, nb_chars, max_snippets, field='fulltext',
+                     prefix_tag='<strong>', suffix_tag='</strong>'):
+    query_parts = []
+    for keyword in keywords:
+        # Treads phrases properly
+        if ' ' in keyword:
+            query_parts.append('"%s"' % keyword)
+        else:
+            query_parts.append(keyword)
+
+    res = SOLR_CONNECTION.query(q=' '.join(query_parts), fq='id:(%s)' % recid, fields=['fulltext'],
+                                          highlight=True, hl_fragsize=nb_chars, hl_snippets=max_snippets,
+                                          hl_simple_pre=prefix_tag, hl_simple_post=suffix_tag,
+                                          hl_mergeContiguous='true')
+
+    out = ''
+    try:
+        for snippet in res.highlighting[str(recid)][field]:
+            if out:
+                out += " ... "
+            out += snippet
+    except KeyError:
+        pass
+    return out.replace('\n', ' ').encode('utf-8')
