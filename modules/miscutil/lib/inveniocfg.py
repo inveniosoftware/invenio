@@ -558,7 +558,7 @@ def cli_cmd_reset_recjson_cache(conf):
     """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
     will adapt the database to either store or not store the recjson
     format."""
-    from invenio.database_manager import main
+    from invenio.bibfield_manager import main
 
     warn('inveniocfg --reset-recjson-cache is deprecated. Using instead: inveniomanage bibfield reset')
 
