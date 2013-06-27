@@ -53,12 +53,12 @@ def calculate_citation_history_coordinates(recid):
     dbg = ""
     initial_result= get_initial_result(calculate_citation_graphe_x_coordinates(recid))
     citlist = calculate_cited_by_list(recid)
-    for rec_id, cit_weight in citlist:
-        cit_year = get_field_values(rec_id,'773__y')
+    for rec_id, _ in citlist:
+        cit_year = get_field_values(rec_id, '269__c')
+        if not cit_year:
+            cit_year = get_field_values(rec_id, '773__y')
         if not cit_year:
             cit_year = get_field_values(rec_id, '260__c')
-            if not cit_year:
-                cit_year = get_field_values(rec_id, '269__c')
         #some records simlpy do not have these fields
         if cit_year:
             #maybe cit_year[0][0:4] has a typo and cannot
