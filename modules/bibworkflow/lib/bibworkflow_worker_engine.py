@@ -33,13 +33,11 @@ def run_worker(wname, data, **kwargs):
     Data can be specified as list of objects or
     single id of WfeObject/BibWorkflowObjects.
     """
-    wfe = BibWorkflowEngine(wname)
-    wfe.set_workflow_by_name(wname)
-    wfe.set_extra_data_params(**kwargs)
-    wfe.set_counter_initial(len(data))
+    wfe = BibWorkflowEngine(wname, **kwargs)
     wfe.save()
 
-    run_workflow(wfe=wfe, data=prepare_objects(data, wfe))
+    objects = prepare_objects(data, wfe)
+    run_workflow(wfe=wfe, data=objects, **kwargs)
     return wfe
 
 
@@ -57,19 +55,11 @@ def restart_worker(wid, **kwargs):
 
     workflow = Workflow.query.filter(Workflow.uuid == wid).first()
 
-    wfe = BibWorkflowEngine(workflow.name)
-    wfe.set_workflow_by_name(workflow.name)
-    wfe.set_extra_data_params(**kwargs)
-    wfe.set_counter_initial(len(data))
+    wfe = BibWorkflowEngine(workflow.name, **kwargs)
     wfe.save()
 
-    obj = prepare_objects(data, wfe)
-
-    try:
-        run_workflow(wfe, obj)
-    except:
-        wfe.log_debug("error in worker engine")
-        raise
+    objects = prepare_objects(data, wfe)
+    run_workflow(wfe=wfe, data=objects, **kwargs)
     return wfe
 
 
@@ -88,14 +78,11 @@ def continue_worker(oid, restart_point="continue_next", **kwargs):
 
     workflow = Workflow.query.filter(Workflow.uuid ==
                                      data[0].id_workflow).first()
-    wfe = BibWorkflowEngine(None, uuid=None, id_user=0,
-                            workflow_object=workflow)
-    wfe.set_workflow_by_name(workflow.name)
-    wfe.set_extra_data_params(**kwargs)
-    wfe.set_counter_initial(len(data))
+    wfe = BibWorkflowEngine(workflow.name, uuid=None, id_user=0,
+                            workflow_object=workflow, **kwargs)
     wfe.save()
 
-    continue_execution(wfe, data, restart_point)
+    continue_execution(wfe, data, restart_point, **kwargs)
     return wfe
 
 
@@ -103,24 +90,27 @@ def prepare_objects(data, workflow_object):
     objects = []
     for d in data:
         if isinstance(d, BibWorkflowObject):
+            # The data item is a BibWorkflow object
             if d.id:
                 d.log_debug("Object found for process")
                 objects.append(_prepare_objects_helper(d, workflow_object))
             else:
                 objects.append(d)
         else:
+            # First we create an initial object for each data item
             new_initial = \
-                BibWorkflowObject(data=d,
-                                  id_workflow=workflow_object.uuid,
+                BibWorkflowObject(id_workflow=workflow_object.uuid,
                                   version=CFG_OBJECT_VERSION.INITIAL
                                   )
+            new_initial.set_data(d)
             new_initial._update_db()
-            objects.append(
-                BibWorkflowObject(data=d,
-                                  id_workflow=workflow_object.uuid,
-                                  version=CFG_OBJECT_VERSION.RUNNING,
-                                  id_parent=new_initial.id
-                                  ))
+
+            # Then we create another object to actually work on
+            current_obj = BibWorkflowObject(id_workflow=workflow_object.uuid,
+                                            version=CFG_OBJECT_VERSION.RUNNING,
+                                            id_parent=new_initial.id)
+            current_obj.set_data(d)
+            objects.append(current_obj)
 
     return objects
 

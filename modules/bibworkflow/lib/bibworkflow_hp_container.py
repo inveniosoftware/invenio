@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-class HoldingPenContainer():
+class HoldingPenContainer(object):
     """
     Class containing three HPItems of a single record plus metadata for
     the record
@@ -33,6 +33,8 @@ class HoldingPenContainer():
             self.current = self.final
         elif self.error:
             self.current = self.error
+        else:
+            self.current = self.initial
         self.owner = owner
         self.description = description
         self.ISBN = ISBN

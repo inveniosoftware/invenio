@@ -26,7 +26,10 @@ def task_a(a):
         """Function task_a docstring"""
         eng.log.info("executing task a " + str(a))
         obj.data['data'] += a
-        #obj.add_metadata("foo", "bar")
+        if a > 5:
+            obj.extra_data['redis_search']['publisher'] = "CERN"
+        else:
+            obj.extra_data['redis_search']['publisher'] = "Desy"
     return _task_a
 
 
@@ -34,11 +37,14 @@ def task_b(obj, eng):
     """Function task_b docstring"""
     eng.log.info("executing task b")
     if obj.data['data'] < 20:
-        obj.changeStatus(CFG_OBJECT_STATUS.ERROR)
-        eng.log.info("Object status %s" % (obj.db_obj.status,))
+        obj.change_status(CFG_OBJECT_STATUS.ERROR)
+        eng.log.info("Object status %s" % (obj.status,))
         eng.log.info("data < 20")
         obj.add_task_result("task_b", {'a': 12, 'b': 13, 'c': 14})
+        obj.extra_data['redis_search']['category'] = "lower_than_20"
         eng.halt("Value of filed: data in object is too small.")
+    else:
+        obj.extra_data['redis_search']['category'] = "higher_than_20"
 
 
 def add_metadata():

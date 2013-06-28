@@ -13,4 +13,13 @@ $(document).ready(function() {
             $(this).remove(); 
         });
     }, 5000);
+
+    $('#refresh_button').on('click', function() {
+        jQuery.ajax({
+            url: "/admin/holdingpen/refresh",
+            success: function(json){
+                bootstrap_alert('Objects refreshed');
+            }
+        })
+    });
 });

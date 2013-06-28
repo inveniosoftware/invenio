@@ -24,14 +24,14 @@ from invenio.bibworkflow_tasks.test_tasks import \
     higher_than_20, \
     sleep_task, \
     simple_task
-from invenio.bibworkflow_workflow_definition import WorkflowDefinition
 
 
-class test_workflow_2(WorkflowDefinition):
-    def __init__(self):
-        super(test_workflow_2, self).__init__()
-        self.definition = [higher_than_20,
-                           add(20),
-                           lower_than_20,
-                           sleep_task(4),
-                           simple_task(2)]
+class test_workflow_2(object):
+    """
+    A second test workflow for unit-tests.
+    """
+    workflow = [higher_than_20,
+                add(20),
+                lower_than_20,
+                sleep_task(4),
+                simple_task(2)]

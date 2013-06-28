@@ -41,7 +41,7 @@ pylib_DATA = bibworkflow_admin_blueprint.py \
 			 bibworkflow_unit_tests.py \
 			 bibworkflow_utils.py \
 			 bibworkflow_worker_engine.py \
-			 bibworkflow_workflow_definition.py \
+			 bibworkflow_load_workflows.py \
 			 bibworkflow_containers.py
 
 EXTRA_DIST = $(pylib_DATA) \

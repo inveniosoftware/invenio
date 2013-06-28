@@ -29,11 +29,13 @@ from invenio.bibworkflow_utils import get_workflow_definition
 from invenio.bibworkflow_api import continue_oid_delayed
 from invenio.bibworkflow_hp_load_widgets import widgets
 from invenio.bibworkflow_model import Workflow
+from invenio.bibworkflow_config import CFG_OBJECT_VERSION
 
 from flask import redirect, url_for, flash
 from invenio.bibformat_engine import format_record
 
 from invenio.bibworkflow_utils import create_hp_containers
+# from invenio.bibworkflow_containers import bwolist
 
 blueprint = InvenioBlueprint('holdingpen', __name__,
                              url_prefix="/admin/holdingpen",
@@ -52,8 +54,16 @@ def index():
     """
     Displays main interface of BibHoldingpen.
     """
-    containers = create_hp_containers()
-    return dict(hpcontainers=containers)
+    bwolist = create_hp_containers()
+    return dict(hpcontainers=bwolist)
+
+
+@blueprint.route('/refresh', methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+def refresh():
+    import invenio.bibworkflow_containers
+    reload(invenio.bibworkflow_containers)
+    return 'Records Refreshed'
 
 
 @blueprint.route('/load_table', methods=['GET', 'POST'])
@@ -65,13 +75,14 @@ def load_table():
     """
     from flask import request
 
+    from invenio.bibworkflow_containers import bwolist
+
     iDisplayStart = request.args.get('iDisplayStart')
     iDisplayLength = request.args.get('iDisplayLength')
     # sSearch will be used for searching later
     # sSearch = request.args.get('sSearch')
     iSortCol_0 = request.args.get('iSortCol_0')
     sSortDir_0 = request.args.get('sSortDir_0')
-    containers = create_hp_containers(iSortCol_0, sSortDir_0)
 
     iDisplayStart = int(request.args.get('iDisplayStart'))
     iDisplayLength = int(request.args.get('iDisplayLength'))
@@ -80,38 +91,42 @@ def load_table():
         "aaData": []
     }
 
-    for container in containers[iDisplayStart:iDisplayStart+iDisplayLength]:
+    for bwo in bwolist[iDisplayStart:iDisplayStart+iDisplayLength]:
         table_data['sEcho'] = int(request.args.get('sEcho')) + 1
-        table_data['iTotalRecords'] = len(containers)
-        table_data['iTotalDisplayRecords'] = len(containers)
-        if container.final:
-            container.version = \
+        table_data['iTotalRecords'] = len(bwolist)
+        table_data['iTotalDisplayRecords'] = len(bwolist)
+
+        if bwo.version == CFG_OBJECT_VERSION.FINAL:
+            bwo_version = \
                 '<span class="label label-success">Final</span>'
-        elif container.error:
-            container.version = \
+        elif bwo.version == CFG_OBJECT_VERSION.HALTED:
+            bwo_version = \
                 '<span class="label label-warning">Halted</span>'
-        if container.widget:
+        else:
+            bwo_version = \
+                '<span class="label label-success">Running</span>'
+        if bwo.extra_data['widget'] is not None:
             widget_link = '<a class="btn btn-info"' + \
                           'href="/admin/holdingpen/widget?widget=' + \
-                          container.widget + \
-                          '&hpcontainerid=' + \
-                          str(container.id) + \
+                          bwo.extra_data['widget'] + \
+                          '&bwobject_id=' + \
+                          str(bwo.id) + \
                           '"><i class="icon-wrench"></i></a>'
         else:
             widget_link = None
         table_data['aaData'].append(
-            [str(container.initial.id),
+            [str(bwo.id),
              None,
              None,
              None,
-             str(container.initial.id_workflow),
-             str(container.current.extra_data['owner']),
-             str(container.initial.created),
-             str(container.version),
+             str(bwo.id_workflow),
+             str(bwo.extra_data['owner']),
+             str(bwo.created),
+             bwo_version,
              '<a id="info_button" ' +
              'class="btn btn-info pull-center text-center"' +
-             'href="/admin/holdingpen/details?hpcontainerid=' +
-             str(container.id) +
+             'href="/admin/holdingpen/details?bwobject_id=' +
+             str(bwo.id) +
              '"><i class="icon-white icon-zoom-in"></i></a>',
              widget_link,
              ])
@@ -119,140 +134,123 @@ def load_table():
 
 
 @blueprint.route('/resolve_approval', methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({'hpcontainerid': (int, 0)})
-def resolve_approval(hpcontainerid):
+@blueprint.invenio_wash_urlargd({'bwobject_id': (int, 0)})
+def resolve_approval(bwobject_id):
     """
     Resolves the action taken in the approval widget
     """
     from flask import request
     if request.form['submitButton'] == 'Accept':
-        continue_oid_delayed(hpcontainerid)
+        continue_oid_delayed(bwobject_id)
         flash('Record Accepted')
     elif request.form['submitButton'] == 'Reject':
-        _delete_from_db(hpcontainerid)
+        _delete_from_db(bwobject_id)
         flash('Record Rejected')
     return redirect(url_for('holdingpen.index'))
 
 
 @blueprint.route('/details', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'hpcontainerid': (int, 0)})
-def details(hpcontainerid):
+@blueprint.invenio_wash_urlargd({'bwobject_id': (int, 0)})
+def details(bwobject_id):
     """
     Displays info about the hpcontainer, and presents the data
     of all available versions of the object. (Initial, Error, Final)
     """
-    containers = create_hp_containers()
-
     # search for parents
     bwobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                              hpcontainerid).first()
-    if bwobject.id_parent:
-        hpcontainerid = bwobject.id_parent
+                                              bwobject_id).first()
 
-    # search in the containers for our hpcontainerid
-    for hpc in containers:
-        if hpc.id == int(hpcontainerid):
-            hpcontainer = hpc
+    bwparent = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
+                                              bwobject.id_parent).first()
 
-    info = get_info(hpcontainer.current)
+    info = get_info(bwobject)
     try:
-        info['widget'] = hpcontainer.error.extra_data['widget']
+        info['widget'] = bwobject.extra_data['widget']
     except (KeyError, AttributeError):
-        try:
-            info['widget'] = hpcontainer.final.extra_data['widget']
-        except (KeyError, AttributeError):
-            pass
+        pass
 
     w_metadata = Workflow.query.filter(Workflow.uuid ==
-                                       hpcontainer.initial.id_workflow).first()
+                                       bwobject.id_workflow).first()
     # read the logtext from the file system
     try:
-        f = open(CFG_LOGDIR + "/object_" + str(hpcontainer.initial.id)
-                 + "_w_" + str(hpcontainer.initial.id_workflow) + ".log", "r")
+        f = open(CFG_LOGDIR + "/object_" + str(bwobject.id)
+                 + "_w_" + str(bwobject.id_workflow) + ".log", "r")
         logtext = f.read()
     except IOError:
         logtext = ""
+
+    print bwobject.get_data()
+    print _entry_data_preview(bwobject.get_data())
+
     return render_template('bibworkflow_hp_details.html',
-                           hpcontainer=hpcontainer,
+                           bwobject=bwobject,
+                           bwparent=bwparent,
                            info=info, log=logtext,
                            data_preview=_entry_data_preview(
-                               hpcontainer.initial.data),
+                               bwobject.get_data()),
                            workflow_func=get_workflow_definition(
-                               w_metadata.name))
+                               w_metadata.name).workflow)
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'hpcontainerid': (int, 0)})
-def restart_record(hpcontainerid, start_point='continue_next'):
+@blueprint.invenio_wash_urlargd({'bwobject_id': (int, 0)})
+def restart_record(bwobject_id, start_point='continue_next'):
     """
     Restarts the initial object in its workflow
     """
-    continue_oid_delayed(oid=hpcontainerid, start_point=start_point)
-    flash('Record Restarted')
+    continue_oid_delayed(oid=bwobject_id, start_point=start_point)
+    return 'Record Restarted'
 
 
 @blueprint.route('/restart_record_prev', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'hpcontainerid': (int, 0)})
-def restart_record_prev(hpcontainerid):
+@blueprint.invenio_wash_urlargd({'bwobject_id': (int, 0)})
+def restart_record_prev(bwobject_id):
     """
     Restarts the initial object in its workflow from the current task
     """
-    continue_oid_delayed(hpcontainerid, "restart_task")
-    flash("Record restarted from previous task")
+    continue_oid_delayed(oid=bwobject_id, start_point="restart_task")
+    print "Record restarted from previous task"
 
 
 @blueprint.route('/delete_from_db', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'hpcontainerid': (int, 0)})
-def delete_from_db(hpcontainerid):
+@blueprint.invenio_wash_urlargd({'bwobject_id': (int, 0)})
+def delete_from_db(bwobject_id):
     """
     Deletes all available versions of the object from the db
     """
-    _delete_from_db(hpcontainerid)
+    import invenio.bibworkflow_containers
+    _delete_from_db(bwobject_id)
+    reload(invenio.bibworkflow_containers)
     flash('Record Deleted')
     return redirect(url_for('holdingpen.index'))
 
 
-def _delete_from_db(hpcontainerid):
+def _delete_from_db(bwobject_id):
     from invenio.sqlalchemyutils import db
-    containers = create_hp_containers()
-
-    for hpc in containers:
-        if hpc.id == int(hpcontainerid):
-            hpcontainer = hpc
 
     # delete every BibWorkflowObject version from the db
     BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                   hpcontainer.id).delete()
-    if hpcontainer.error:
-        BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                       hpcontainer.error.id).delete()
-    if hpcontainer.final:
-        BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                       hpcontainer.final.id).delete()
-
+                                   bwobject_id).delete()
     db.session.commit()
 
 
 @blueprint.route('/widget', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'hpcontainerid': (int, 0),
+@blueprint.invenio_wash_urlargd({'bwobject_id': (int, 0),
                                  'widget': (unicode, ' ')})
-def show_widget(hpcontainerid, widget):
+def show_widget(bwobject_id, widget):
     """
     Renders the bibmatch widget for a specific record
     """
     bwobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                              hpcontainerid).first()
-    containers = create_hp_containers()
+                                              bwobject_id).first()
+    bwparent = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
+                                              bwobject.id_parent).first()
 
-    for hpc in containers:
-        if hpc.id == int(hpcontainerid):
-            hpcontainer = hpc
-    # set the WTForm of the widget
     widget_form = widgets[widget]
 
     if widget == 'bibmatch_widget':
@@ -260,29 +258,29 @@ def show_widget(hpcontainerid, widget):
         try:
             matches = bwobject.extra_data['tasks_results']['match_record']
         except:
-            bwobject = BibWorkflowObject.query.filter(
-                BibWorkflowObject.id_parent == bwobject.id).first()
-            matches = bwobject.extra_data['tasks_results']['match_record']
+            pass
 
         match_preview = []
         # adding dummy matches
         match_preview.append(BibWorkflowObject.query.filter(
-            BibWorkflowObject.id == hpcontainerid).first())
+            BibWorkflowObject.id == bwobject_id).first())
         match_preview.append(BibWorkflowObject.query.filter(
-            BibWorkflowObject.id == hpcontainerid).first())
-        data_preview = _entry_data_preview(bwobject.data['data'])
+            BibWorkflowObject.id == bwobject_id).first())
+
+        data_preview = _entry_data_preview(bwobject.get_data())
 
         return render_template('bibworkflow_hp_'+widget+'.html',
-                               hpcontainer=hpcontainer,
+                               bwobject=bwobject,
                                widget=widget_form,
                                match_preview=match_preview, matches=matches,
                                data_preview=data_preview)
 
     elif widget == 'approval_widget':
         # setting up approval widget
-        data_preview = _entry_data_preview(bwobject.data['data'])
+        data_preview = _entry_data_preview(bwobject.get_data())
         return render_template('bibworkflow_hp_approval_widget.html',
-                               hpcontainer=hpcontainer,
+                               bwobject=bwobject,
+                               bwparent=bwparent,
                                widget=widget_form, data_preview=data_preview)
 
 
@@ -294,24 +292,24 @@ def entry_data_preview(oid, recformat):
     """
     Presents the data in a human readble form or in xml code
     """
-    hpobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
+    bwobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                               int(oid)).first()
-    return _entry_data_preview(hpobject.data, recformat)
+    return _entry_data_preview(bwobject.get_data(), recformat)
 
 
-def get_info(hpobject):
+def get_info(bwobject):
     """
     Parses the hpobject and extracts its info to a dictionary
     """
     info = {}
-    info['version'] = hpobject.version
-    info['owner'] = hpobject.extra_data['owner']
-    info['parent id'] = hpobject.id_parent
-    info['task counter'] = hpobject.extra_data['task_counter']
-    info['workflow id'] = hpobject.id_workflow
-    info['object id'] = hpobject.id
-    info['last task name'] = hpobject.extra_data['last_task_name']
-    info['widget'] = hpobject.extra_data['widget']
+    info['version'] = bwobject.version
+    info['owner'] = bwobject.extra_data['owner']
+    info['parent id'] = bwobject.id_parent
+    info['task counter'] = bwobject.extra_data['task_counter']
+    info['workflow id'] = bwobject.id_workflow
+    info['object id'] = bwobject.id
+    info['last task name'] = bwobject.extra_data['last_task_name']
+    info['widget'] = bwobject.extra_data['widget']
     return info
 
 
@@ -321,11 +319,14 @@ def _entry_data_preview(data, recformat='hd'):
     """
     if recformat == 'hd' or recformat == 'xm':
         try:
-            data['data'] = format_record(recID=None, of=recformat,
-                                         xml_record=data['data'])
+            data = format_record(recID=None, of=recformat,
+                                 xml_record=data)
         except:
             print "This is not a XML string"
-    try:
-        return data['data']
-    except:
-        return data
+
+    if data is "" or data is None:
+        print 'NAI EINAI ADEIO'
+        data = 'Could not render data'
+    else:
+        pass
+    return data

@@ -8,6 +8,23 @@
       only and are not working as expected.
     </div>
     <h1>Workflows list</h1>
+    <form>
+        <fieldset>
+            <legend>Filter</legend>
+            <label>Available fields
+                <select id="search_key_1">
+                {% for key in filter_keys %}
+                    <option>{{ key }}</option>
+                {% endfor %}
+                </select>
+                <select id="search_key_2" disabled>
+                </select>
+            </label>
+            <span class="btn" id="search_button">Add filter</span>
+        </fieldset>
+    </form>
+    <div class="well" id="search_tags">
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>

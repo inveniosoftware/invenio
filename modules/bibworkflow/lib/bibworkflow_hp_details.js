@@ -5,10 +5,10 @@ $(document).ready(function(){
     }
 
     $('#restart_button').on('click', function() {
-        hpo_id = $(this).attr('name');
-        console.log(hpo_id);
+        bwo_id = $(this).attr('name');
+        console.log(bwo_id);
         jQuery.ajax({
-            url: "/admin/holdingpen/restart_record?hpcontainerid=" + hpo_id,
+            url: "/admin/holdingpen/restart_record?bwobject_id=" + bwo_id,
             success: function(json){
                 bootstrap_alert('Object restarted');
             }
@@ -16,10 +16,10 @@ $(document).ready(function(){
     });
 
     $('#restart_button_prev').on('click', function() {
-        hpo_id = $(this).attr('name');
-        console.log(hpo_id);
+        bwo_id = $(this).attr('name');
+        console.log(bwo_id);
         jQuery.ajax({
-            url: "/admin/holdingpen/restart_record_prev?hpcontainerid=" + hpo_id,
+            url: "/admin/holdingpen/restart_record_prev?bwobject_id=" + bwo_id,
             success: function(json){
                 bootstrap_alert('Object restarted from previous task');        
             }
@@ -31,12 +31,12 @@ $(document).ready(function(){
         });
     }, 2000);
 
-    var hpid = "{{ hpcontainer.id }}";
+    var bwoid = "{{ bwobject.id }}";
     var datapreview = "hd";
 
     window.data_preview = function(format){
         jQuery.ajax({
-            url: "/admin/holdingpen/entry_data_preview?oid="+hpid+"&recformat="+format,
+            url: "/admin/holdingpen/entry_data_preview?oid="+bwoid+"&recformat="+format,
             success: function(json){
                 if(format == 'xm' || format == 'marcxml'){
                     if( json == ""){
@@ -62,8 +62,8 @@ $(document).ready(function(){
         })
     }
 
-    window.setHpid = function(id){
-        hpid = id;
+    window.setbwoid = function(id){
+        bwoid = id;
         data_preview(datapreview);
     }
 

@@ -15,12 +15,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import datetime
+
 
 def add_data(a):
     """ Task using closure to allow parameters """
     def _add_data(obj, eng):
         """Function task_a docstring"""
-        obj.data = obj.data + a
+        obj.data = datetime.datetime.now()
     return _add_data
 
 
@@ -32,7 +34,7 @@ def check_data(obj, eng):
 
 def print_data(obj, eng):
     """ Static task with no parameters """
-    print obj.data
+    print obj.data + datetime.timedelta(days=2)
 
 
 def set_data(obj, eng):

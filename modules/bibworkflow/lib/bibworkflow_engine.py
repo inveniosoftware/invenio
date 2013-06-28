@@ -18,15 +18,19 @@
 
 import sys
 import cPickle
+import traceback
+import logging
 
-from invenio.bibworkflow_model import Workflow, WorkflowLogging
-from workflow.engine import GenericWorkflowEngine, \
-    ContinueNextToken, \
-    HaltProcessing, \
-    StopProcessing, \
-    JumpTokenBack, \
-    JumpTokenForward, \
-    WorkflowError
+from invenio.bibworkflow_model import (Workflow,
+                                       WorkflowLogging,
+                                       BibWorkflowObject)
+from workflow.engine import (GenericWorkflowEngine,
+                             ContinueNextToken,
+                             HaltProcessing,
+                             StopProcessing,
+                             JumpTokenBack,
+                             JumpTokenForward,
+                             WorkflowError)
 from datetime import datetime
 
 from invenio.sqlalchemyutils import db
@@ -34,16 +38,18 @@ from invenio.config import CFG_DEVEL_SITE
 from invenio.bibworkflow_utils import get_workflow_definition
 from uuid import uuid1 as new_uuid
 from invenio.bibworkflow_utils import dictproperty
-from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS, \
-    CFG_OBJECT_VERSION, \
-    CFG_LOG_TYPE
+from invenio.bibworkflow_config import (CFG_WORKFLOW_STATUS,
+                                        CFG_OBJECT_VERSION,
+                                        CFG_LOG_TYPE)
 DEBUG = CFG_DEVEL_SITE > 0
 
 
 class BibWorkflowEngine(GenericWorkflowEngine):
 
-    def __init__(self, name="Default workflow", uuid=None, curr_obj=0,
-                 workflow_object=None, id_user=0, module_name="Unknown"):
+    def __init__(self, name=None, uuid=None, curr_obj=0,
+                 workflow_object=None, id_user=0, module_name="Unknown",
+                 **kwargs):
+        super(BibWorkflowEngine, self).__init__()
         self.db_obj = None
         if isinstance(workflow_object, Workflow):
             self.db_obj = workflow_object
@@ -51,7 +57,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
             # If uuid is defined we try to get the db object from DB.
             if uuid is not None:
                 self.db_obj = \
-                    Workflow.query.filter(Workflow.uuid == uuid).first()
+                    Workflow.get(Workflow.uuid == uuid).first()
             else:
                 uuid = new_uuid()
 
@@ -61,9 +67,11 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                                        module_name=module_name, uuid=uuid)
                 self._create_db_obj()
 
-        super(BibWorkflowEngine, self).__init__()
+        self.set_workflow_by_name(self.name)
+        self.set_extra_data_params(**kwargs)
 
     def log_info(self, message, error_msg=""):
+        self.log.info(message + "\n" + error_msg)
         log_obj = WorkflowLogging(id_workflow=self.db_obj.uuid,
                                   log_type=CFG_LOG_TYPE.INFO,
                                   message=message,
@@ -72,6 +80,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         db.session.add(log_obj)
 
     def log_error(self, message, error_msg=""):
+        self.log.error(message + "\n" + error_msg)
         log_obj = WorkflowLogging(id_workflow=self.db_obj.uuid,
                                   log_type=CFG_LOG_TYPE.ERROR,
                                   message=message,
@@ -80,6 +89,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         db.session.add(log_obj)
 
     def log_debug(self, message, error_msg=""):
+        self.log.debug(message + "\n" + error_msg)
         log_obj = WorkflowLogging(id_workflow=self.db_obj.uuid,
                                   log_type=CFG_LOG_TYPE.DEBUG,
                                   message=message,
@@ -108,6 +118,22 @@ class BibWorkflowEngine(GenericWorkflowEngine):
     def uuid(self):
         return self.db_obj.uuid
 
+    @property
+    def id_user(self):
+        return self.db_obj.id_user
+
+    @property
+    def module_name(self):
+        return self.db_obj.module_name
+
+    @property
+    def name(self):
+        return self.db_obj.name
+
+    @property
+    def status(self):
+        return self.db_obj.status
+
     def __getstate__(self):
         if not self._picklable_safe:
             raise cPickle.PickleError("The instance of the workflow engine "
@@ -125,6 +151,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
             raise cPickle.PickleError("The workflow instance "
                                       "inconsistent state, "
                                       "too few objects")
+        self.log = logging.getLogger("workflow.%s" % self.__class__) # default logging
         self.__dict__ = state
 
     def __repr__(self):
@@ -170,8 +197,11 @@ BibWorkflowEngine
 
     @staticmethod
     def after_processing(objects, self):
-        GenericWorkflowEngine.after_processing(objects, self)
-        self.save(CFG_WORKFLOW_STATUS.FINISHED)
+        self._i = [-1, [0]]
+        if self.has_completed():
+            self.save(CFG_WORKFLOW_STATUS.COMPLETED)
+        else:
+            self.save(CFG_WORKFLOW_STATUS.FINISHED)
 
     def _create_db_obj(self):
         db.session.add(self.db_obj)
@@ -181,6 +211,18 @@ BibWorkflowEngine
     def _update_db(self):
         db.session.commit()
         self.log_info("Workflow saved to db.")
+
+    def has_completed(self):
+        """
+        Returns True of workflow is fully completed meaning
+        that all associated objects are in FINAL state.
+        """
+        number_of_objects = BibWorkflowObject.query.filter(
+            BibWorkflowObject.id_workflow == self.uuid,
+            BibWorkflowObject.version.in_([CFG_OBJECT_VERSION.HALTED,
+                                           CFG_OBJECT_VERSION.RUNNING])
+        ).count()
+        return number_of_objects == 0
 
     def save(self, status=CFG_WORKFLOW_STATUS.NEW):
         """
@@ -319,8 +361,9 @@ BibWorkflowEngine
                         # stopped
                         obj.log_info("Object proccesing is halted")
                     raise
-                except Exception:
-                    self.log_info("Unexpected error:", sys.exc_info()[0])
+                except Exception, e:
+                    self.log_info(message="Unexpected error: %r" % (e,),
+                                  error_msg=traceback.format_exc())
                     obj.log_error("Something terribly wrong"
                                   " happen to this object")
                     raise
@@ -335,6 +378,14 @@ BibWorkflowEngine
             #obj.get_log().info('Success!')
             self.log_info("Done saving object: %i" % (obj.id, ))
         self.after_processing(objects, self)
+
+    def execute_callback(self, callback, obj):
+        """Executes the callback - override this method to implement logging"""
+        obj.data = obj.get_data()
+        try:
+            callback(obj, self)
+        finally:
+            obj.set_data(obj.data)
 
     def halt(self, msg):
         """Halt the workflow (stop also any parent wfe)"""
@@ -360,8 +411,9 @@ BibWorkflowEngine
 
     def set_workflow_by_name(self, workflow_name):
         workflow = get_workflow_definition(workflow_name)
-        self.setWorkflow(workflow)
+        self.workflow_definition = workflow
+        self.setWorkflow(self.workflow_definition.workflow)
 
     def set_extra_data_params(self, **kwargs):
         for key, value in kwargs.iteritems():
-            self.extra_data_set(key=key, value=value)
+            self.extra_data[key] = value

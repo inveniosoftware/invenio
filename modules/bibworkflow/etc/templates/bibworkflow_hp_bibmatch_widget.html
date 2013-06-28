@@ -23,11 +23,13 @@
                         {% if match %}
                         
                         <strong>Match {{i+1}} </strong>
-                        <pre class="prettyprint">
-                            {{ match.data['data'] }}
-                        </pre>
+                        <div id="match_preview">
+                            <pre class="prettyprint">
+                                {{ match.get_data() }}
+                            </pre>
+                        </div>
                         {{ widget.accept }}
-                        </br>   
+                        </br>
 
                         {% set i = i+1 %}
                         {% endif %}

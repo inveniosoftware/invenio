@@ -46,7 +46,7 @@ def convert_record(stylesheet="oaiarxiv2marcxml.xsl"):
                      (stylesheet,))
         eng.log_info("Type of data: %s" % (obj.data_type,))
         try:
-            obj.data['data'] = convert(obj.data['data'], stylesheet)
+            obj.data = convert(obj.data, stylesheet)
         except:
             obj.extra_data["error_msg"] = 'Could not convert record'
             eng.log_error("Error: %s" % (obj.extra_data["error_msg"],))
@@ -85,7 +85,7 @@ def match_record(obj, eng):
     from invenio.bibmatch_engine import match_records
 
     obj.extra_data["last_task_name"] = 'Bibmatch Record'
-    rec = create_record(obj.data['data'])
+    rec = create_record(obj.data)
     matches = match_records(records=[rec],
                             qrystrs=[("title", "[245__a]")])
     obj.extra_data['tasks_results']['match_record'] = matches
@@ -105,7 +105,7 @@ match_record.__description__ = "This task matches a XML record."
 
 
 def print_record(obj, eng):
-    eng.log_info(obj.data['data'])
+    eng.log_info(obj.get_data())
 
 print_record.__title__ = "Print Record"
 print_record.__description__ = "Prints the record data to engine log"
