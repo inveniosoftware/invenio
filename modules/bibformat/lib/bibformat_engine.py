@@ -543,28 +543,29 @@ def format_with_format_template(format_template_filename, bfo,
                                                          verbose)
     elif format_template_filename.endswith("." + CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION):
         evaluated_format = '<!-- empty -->'
-        try:
-            from functools import wraps
-            from invenio.bibfield import get_record as bibfield_get_record
-            from invenio.webinterface_handler_flask_utils import unicodifier
+        #try:
+        from functools import wraps
+        from invenio.bibfield import get_record as bibfield_get_record
+        from invenio.webinterface_handler_flask_utils import unicodifier
 
-            # Fixes unicode problems in Jinja2 templates.
-            def encode_utf8(f):
-                @wraps(f)
-                def wrapper(*args, **kwds):
-                    return unicodifier(f(*args, **kwds))
-                return wrapper
+        # Fixes unicode problems in Jinja2 templates.
+        def encode_utf8(f):
+            @wraps(f)
+            def wrapper(*args, **kwds):
+                return unicodifier(f(*args, **kwds))
+            return wrapper
 
-            record = bibfield_get_record(bfo.recID)
-            record.__getitem__ = encode_utf8(record.__getitem__)
-            record.get = encode_utf8(record.get)
+        record = bibfield_get_record(bfo.recID)
+        record.__getitem__ = encode_utf8(record.__getitem__)
+        record.get = encode_utf8(record.get)
 
-            evaluated_format = render_template_to_string(
-                CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
-                record=record,
-                bfo=bfo, **BFE_ELEMENTS.functions).encode('utf-8')
-        except Exception:
-            register_exception()
+        evaluated_format = render_template_to_string(
+            CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
+            recid=bfo.recID,
+            record=record,
+            bfo=bfo, **BFE_ELEMENTS.functions).encode('utf-8')
+        #except Exception:
+        #    register_exception()
 
     else:
         #.xsl

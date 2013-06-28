@@ -93,6 +93,44 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
     #if old_versions:
         #versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/CFG_SITE_RECORD/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
+    out = []
+    if main_urls:
+        main_urls_keys = sort_alphanumerically(main_urls.keys())
+        for descr in main_urls_keys:
+            urls = main_urls[descr]
+            if re.match(r'^\d+\s', descr) and urls[0][2] == 'png':
+                # FIXME: we have probably hit a Plot (as link
+                # description looks like '0001 This is Caption'), so
+                # do not take it.  This test is not ideal, we should
+                # rather study doc type, and base ourselves on
+                # Main/Additional/Plot etc.
+                continue
+            out += ['<li class="nav-header"><strong>%s:</strong></li>' % descr]
+            urls_dict = {}
+            for url, name, url_format in urls:
+                if name not in urls_dict:
+                    urls_dict[name] = [(url, url_format)]
+                else:
+                    urls_dict[name].append((url, url_format))
+            for name, urls_and_format in urls_dict.items():
+                if len(urls_dict) > 1:
+                    print_name = "<em>%s</em>" % name
+                    url_list = ['<li class="nav-header">' + print_name + "</li>"]
+                else:
+                    url_list = []
+                for url, url_format in urls_and_format:
+                    if CFG_CERN_SITE and url_format == 'ps.gz' and len(urls_and_format) > 1:
+                        ## We skip old PS.GZ files
+                        continue
+                    url_list.append('<li><a %(style)s href="%(url)s">%(file_icon)s %(url_format)s</a></li>' % {
+                        'style': style,
+                        'url': escape(url, True),
+                        'file_icon': file_icon,
+                        'url_format': escape(url_format.upper())
+                    })
+                out += url_list
+        return '<ul class="dropdown-menu pull-right">' + "\n".join(out) + '</ul>'
+
     if main_urls:
         main_urls_keys = sort_alphanumerically(main_urls.keys())
         for descr in main_urls_keys:

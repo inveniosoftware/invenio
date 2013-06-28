@@ -93,7 +93,7 @@ def request_record(f):
         title = get_fieldvalues(recid, '245__a')
         title = title[0] if len(title) > 0 else ''
 
-        b = [(_('Home'), '')] + collection.breadcrumbs()
+        b = [(_('Home'), '')] + collection.breadcrumbs()[1:]
         b += [(title, 'record.metadata', dict(recid=recid))]
         current_app.config['breadcrumbs_map'][request.endpoint] = b
         g.record_tab_keys = []

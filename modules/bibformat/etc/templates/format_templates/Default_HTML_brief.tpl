@@ -1,61 +1,117 @@
-<div class="media htmlbrief">
-    <span class="pull-left">
-        {# <BFE_ICON />} #}
-    </span>
-    <span class="pull-right">
-        {# {{ bfe_altmetric(badgetype='donut', popover='left', no_script='1', prefix="<br>") }} #}
-    </span>
-    <div class="media-body">
-        <p>
-            <span class="label label-info">{{ bfe_creation_date(bfo, date_format="%d %M %Y") }}</span>
-            {{ bfe_doi(bfo, prefix='<span class="label label-warning">', suffix='</span>') }}
-            {{ bfe_primary_report_number(bfo, prefix='<span class="label label-important">', suffix='</span>') }}
-            {{ bfe_additional_report_numbers(bfo, prefix='<span class="label label-inverse">', suffix="</span>",
-                                             separator='</span> <span class="label label-inverse">', link="no") }}
+{% macro render_record_footer(number_of_displayed_authors) %}
+    <p>
+      {% if record.get('number_of_authors', 0) > 0 %}
+      <i class="icon-user"></i> by
+        {% set authors = record.get('authors[:].full_name', []) %}
+        {% set sep = joiner("; ") %}
+        {% for full_name in authors[0:number_of_displayed_authors] %} {{ sep() }}
+          <a href="{{ url_for('search.search', p='author:"' + full_name + '"') }}">
+            {{ full_name }}
+          </a>
+        {% endfor %}
+        {% if record.get('number_of_authors', 0) > number_of_displayed_authors %}
+        {{ sep() }}
+        <a href="#authors_{{ record['recid'] }}"
+           class="muted" data-toggle="modal"
+           data-target="#authors_{{ record['recid'] }}">
+            <em>{{ _(' et al') }}</em>
+        </a>
+        {% endif %}
+
+      |
+      {% endif %}
+      <i class="icon-calendar"></i> {{ bfe_creation_date(bfo, date_format="%d %M %Y") }}
+      {# Citations link #}
+      {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
+        {%- set num_citations = record['_cited_by_count'] -%}
+        {%- if num_citations -%}
+         |
+        <a href="{{ url_for('.search', p="refersto:recid:%d" % recid) }}">
+           <i class="icon-share"></i>
+          {{ _("%i citations") % num_citations if num_citations > 1 else _("1 citation") }}
+        </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {# Comments link #}
+      {%- if config.CFG_WEBCOMMENT_ALLOW_COMMENTS and config.CFG_WEBSEARCH_SHOW_COMMENT_COUNT -%}
+        {%- set num_comments = record['_number_of_comments'] -%}
+        {%- if num_comments -%}
+         |
+        <a href="{{ url_for('webcomment.comments', recid=recid) }}">
+          <i class="icon-comment"></i>
+          {{ _("%i comments") % num_comments if num_comments > 1 else _("1 comment") }}
+        </a>
+        {%- endif -%}
+      {%- endif -%}
+
+      {# Reviews link #}
+      {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS and config.CFG_WEBSEARCH_SHOW_REVIEW_COUNT -%}
+        {%- set num_reviews = record['_number_of_reviews'] -%}
+        {%- if num_reviews -%}
+         |
+        <a href="{{ url_for('webcomment.reviews', recid=recid) }}">
+          <i class="icon-eye-open"></i>
+          {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
+        </a>
+        {%- endif -%}
+      {%- endif -%}
+      {{ bfe_keywords(bfo, prefix='| <i class="icon-tags"></i> <span class="label">', suffix='</span>',
+                      separator='</span> <span class="label">') }}
+    </p>
+    {% if record.get('number_of_authors', 0) > number_of_displayed_authors %}
+    {% set sep = joiner("; ") %}
+    <div id="authors_{{ record['recid'] }}" class="modal hide fade">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>{{ _('Authors') }}</h3>
+      </div>
+      <div class="modal-body">
+        {% for full_name in authors %} {{ sep() }}
+          <a href="{{ url_for('search.search', p='author:"' + full_name + '"') }}">
+            {{ full_name }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro record_info() %}
+  {{ bfe_primary_report_number(bfo, prefix='<span class="muted">', suffix='</span>') }}
+  {{ bfe_additional_report_numbers(bfo, prefix='<span class="muted">', suffix="</span>",
+                                 separator='</span> <span class="muted">') }}
+
+  {{ bfe_publi_info(bfo, prefix='| <i class="icon-book"></i> ') }}
+  {{ bfe_doi(bfo, prefix='| <i class="icon-barcode"></i> ') }}
+{% endmacro %}
+
+{% block record_brief %}
+<div class="htmlbrief">
+    {{ bfe_fulltext(bfo, show_icons="yes", prefix='<ul class="nav nav-pills pull-right" style="margin-top: -10px;"><li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-download-alt"></i><span class="caret"></span></a>', suffix='</li></ul>', focus_on_main_file="yes") }}
+    {% block record_header %}
+    <h4 class="media-heading">
+        <a href="{{ url_for('record.metadata', recid=record['recid']) }}">
+            {{ record.get('title.title', '') }}
+        </a>
+    </h4>
+    {% endblock %}
+    {% block record_content %}
+    <div>
+        <p class="record-abstract">
+          {{ record.get('abstract.summary', '')|truncate(150) }}
         </p>
 
-        <h4 class="media-heading muted_a">
-            <a href="{{ url_for('record.metadata', recid=record['recid']) }}">
-                {{ record.get('title.title', '') }}
-            </a>
-        </h4>
-
-        <p>
-            {% set authors = record.get('authors[:].full_name', []) %}
-            {% set sep = joiner("; ") %}
-            {% for full_name in authors[0:4] %} {{ sep() }}
-              <a href="{{ url_for('search.search', p='author:"' + full_name + '"') }}">
-                {{ full_name }}
-              </a>
-            {% endfor %}
-            {% if record.get('number_of_authors', 0) > 4 %}
-            {{ sep() }}
-            <a href="#authors_{{ record['recid'] }}"
-               class="muted" data-toggle="collapse"
-               data-target="#authors_{{ record['recid'] }}">
-                <em>{{ _(' et al') }}</em>
-            </a>
-            {% endif %}
-            <div id="authors_{{ record['recid'] }}" class="collapse" style="height: 0px; display: block-inline;">
-            {% for full_name in authors[4:] %} {{ sep() }}
-              <a href="{{ url_for('search.search', p='author:"' + full_name + '"') }}">
-                {{ full_name }}
-              </a>
-            {% endfor %}
-            </div>
-        </p>
-
-        <p>
-            {{ record.get('abstract.summary', '')|truncate(150) }}
-        </p>
-        <p>
-            {{ bfe_publi_info(bfo, prefix="<br /><small>Published in <strong>", suffix="</strong></small>") }}
-        </p>
-
-        <p>
-            {{ bfe_fulltext(bfo, prefix='<br /><small>', style="note",
-                            show_icons="yes", suffix="</small>",
-                            focus_on_main_file="yes") }}
+        <p class="record-info">
+          {{ record_info() }}
         </p>
     </div>
+    {% endblock %}
+
+    <div class="clearfix"></div>
+
+    {% block record_footer %}
+        {{ render_record_footer(4) }}
+    {% endblock %}
 </div>
+{% endblock %}
