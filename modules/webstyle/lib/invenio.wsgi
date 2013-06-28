@@ -24,7 +24,7 @@ from invenio import config
 
 # Start remote debugger if appropriate:
 try:
-    from inveni.remote_debugger_config import CFG_REMOTE_DEBUGGER_ENABLED, \
+    from invenio.remote_debugger_config import CFG_REMOTE_DEBUGGER_ENABLED, \
         CFG_REMOTE_DEBUGGER_WSGI_LOADING
 
     if CFG_REMOTE_DEBUGGER_ENABLED:
