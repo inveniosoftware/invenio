@@ -3374,85 +3374,10 @@ class Template:
 
           - 'recID' *int* - The record id
         """
-        from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
-
-        # load the right message language
-        _ = gettext_set_language(ln)
-
-        out = '<div class="moreinfo">'
-        if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
-            alephsysnos = get_fieldvalues(recID, "970__a")
-            if len(alephsysnos) > 0:
-                alephsysno = alephsysnos[0]
-                out += '<span class="moreinfo">%s</span>' % \
-                    create_html_link(self.build_search_url(recid=alephsysno,
-                                                           ln=ln),
-                                     {}, _("Detailed record"),
-                                     {'class': "moreinfo"})
-            else:
-                out += '<span class="moreinfo">%s</span>' % \
-                    create_html_link(self.build_search_url(recid=recID, ln=ln),
-                                     {},
-                                     _("Detailed record"),
-                                     {'class': "moreinfo"})
-        else:
-            out += '<span class="moreinfo">%s</span>' % \
-                   create_html_link(self.build_search_url(recid=recID, ln=ln),
-                                    {}, _("Detailed record"),
-                                    {'class': "moreinfo"})
-
-            out += '<span class="moreinfo"> - %s</span>' % \
-                   create_html_link(self.build_search_url(p="recid:%d" % recID,
-                                                     rm="wrd",
-                                                     ln=ln),
-                                    {}, _("Similar records"),
-                                    {'class': "moreinfo"})
-
-        if CFG_BIBRANK_SHOW_CITATION_LINKS:
-            num_timescited = get_cited_by_count(recID)
-            if num_timescited:
-                out += '<span class="moreinfo"> - %s</span>' % \
-                       create_html_link(self.build_search_url(p="refersto:recid:%d" % recID,
-                                                              sf=sf,
-                                                              so=so,
-                                                              sp=sp,
-                                                              rm=rm,
-                                                              ln=ln),
-                                        {}, num_timescited > 1 and _("Cited by %i records") % num_timescited
-                                        or _("Cited by 1 record"),
-                                        {'class': "moreinfo"})
-            else:
-                out += "<!--not showing citations links-->"
-        if display_claim_link: #Maybe we want not to show the link to who cannot use id?
-            out += '<span class="moreinfo"> - %s</span>' % \
-                create_html_link(CFG_SITE_URL + '/person/action', {'claim':'True', 'selection':str(recID)},
-                                                                        'Attribute this paper',
-                                                                        {'class': "moreinfo"})
-
-        if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
-            num_comments = get_nb_comments(recID, count_deleted=False)
-            if num_comments:
-                out += '<span class="moreinfo"> - %s</span>' % \
-                        create_html_link(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID)
-                        + '/comments?ln=%s' % ln, {}, num_comments > 1 and _("%i comments")
-                        % (num_comments) or _("1 comment"),
-                        {'class': "moreinfo"})
-            else:
-                out += "<!--not showing reviews links-->"
-
-        if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:
-            num_reviews = get_nb_reviews(recID, count_deleted=False)
-            if num_reviews:
-                out += '<span class="moreinfo"> - %s</span>' % \
-                        create_html_link(CFG_SITE_URL + '/' + CFG_SITE_RECORD + '/' + str(recID)
-                        + '/reviews?ln=%s' % ln, {}, num_reviews > 1 and _("%i reviews")
-                        % (num_reviews) or _("1 review"), {'class': "moreinfo"})
-            else:
-                out += "<!--not showing reviews links-->"
-
-
-        out += '</div>'
-        return out
+        from invenio.jinja2utils import render_template_to_string
+        tpl = """{%- from "websearch_helpers.html" import record_brief_links with context -%}
+        {{ record_brief_links(get_record(recid)) }}"""
+        return render_template_to_string(tpl, recid=recID, _from_string=True).encode('utf-8')
 
     def tmpl_xml_rss_prologue(self, current_url=None,
                               previous_url=None, next_url=None,

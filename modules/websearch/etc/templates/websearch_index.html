@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -105,26 +105,16 @@
         <strong>{{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
       {% else %}
         {% if collection.reclist %}
+        <div class="page-header">
+          <h3>{{ _("Latest additions:") }}</h3>
+        </div>
+        {%- set of = request.values.get('of', 'hb') -%}
         {% for recid in collection.reclist[-10:]|reverse %}
-          <div class="row-fluid">
-            <div class="span1">
-              <small style="font-size:70%;">
-                {{ get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")|safe }}
-              </small>
-            </div>
-            <div class="span11">
-              {{ format_record(recid, 'hb', ln=g.ln)|safe }}
-                <p>
-                  <a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">
-                    {{ _("Detailed record") }}
-                  </a>
-                   -
-                  <a href="{{ url_for('.search', p="recid:%d" % recid, rm='wrd', ln=ln) }}">
-                    {{ _("Similar records") }}
-                  </a>
-                </p>
-             </div>
+        <div class="row-fluid">
+          <div class="span12">
+            {{ format_record(recid, of, ln=g.ln) }}
           </div>
+        </div>
         {% endfor %}
         {% if collection.reclist|length > 10 %}
           <a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}"
@@ -148,7 +138,7 @@
       </div>
   {% endif %}
 
-  {% if portalboxes.lt %}
+  {% if collection.externalcollections_2 %}
     {{ portalbox_sidebar(portalboxes.rt, class="span2") }}
   {% else %}
     {{ portalbox_sidebar(portalboxes.rt, class="offset2 span2") }}

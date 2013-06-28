@@ -499,6 +499,10 @@ def create_invenio_flask_app(**kwargs_config):
             request.environ['PATH_INFO'])
         alternate_urls = dict((ln.replace('_', '-'), alternate_url)
                               for ln, alternate_url in alternate_urls.iteritems())
+
+        _guess_language()
+
+        from invenio.bibfield import get_record  # should not be global due to bibfield_config
         return dict(_=lambda *args, **kwargs: g._(*args, **kwargs),
                     current_user=user,
                     get_css_bundle=_app.jinja_env.get_css_bundle,
@@ -506,6 +510,7 @@ def create_invenio_flask_app(**kwargs_config):
                     is_language_rtl=is_language_rtl,
                     canonical_url=canonical_url,
                     alternate_urls=alternate_urls,
+                    get_record=get_record,
                     url_for=invenio_url_for,
                     breadcrumbs=breadcrumbs,
                     )

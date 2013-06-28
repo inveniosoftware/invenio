@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,10 +17,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% macro record_brief_links(recID, i) %}
+{% macro record_brief_links(record) %}
   <p>
-    {%- set record = get_record(recID) -%}
-    {%- set similar = "recid:%d" % recID -%}
+    {%- set recID = record['recid'] -%}
+    {%- set i = recID %}
+    {%- set similar = "recid:%s" % recID -%}
     {%- if config.CFG_WEBSEARCH_USE_ALEPH_SYSNOS -%}
       {%- set alephsysnos = record['system_number'] -%}
       {%- if len(alephsysnos) > 0 -%}
@@ -129,7 +130,7 @@
 
 {% macro search_also(externalcollections) %}
   {% if externalcollections %}
-    <h4>{{ _("Search also") }}</h4>
+    <h4>{{ _("Search also:") }}</h4>
     <ul>
     {% for ex in externalcollections %}
       <li>{{ ex.name }} <a href="{{ ex.engine.base_url}}">

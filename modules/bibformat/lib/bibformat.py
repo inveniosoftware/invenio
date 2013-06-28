@@ -526,7 +526,7 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     import time
     from math import ceil
     from flask import request
-    from invenio.bibfield import get_record
+    from invenio.search_engine import print_record
     from invenio.websearch_model import Format
     from invenio.paginationutils import Pagination
 
@@ -541,14 +541,10 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
         facets={},
         time=time,
         recids=recIDs,
-        get_record=get_record,
         pagination=Pagination(pages, rg, ctx.get('records', len(recIDs))),
         verbose=verbose,
         export_formats=Format.get_export_formats(),
-        format_record=lambda recID, of=of, ln=ln: format_record(
-            recID, of=of, ln=ln, verbose=verbose,
-            search_pattern=search_pattern,
-            on_the_fly=on_the_fly or verbose > 0)
+        format_record=print_record
     )
     context.update(ctx)
 

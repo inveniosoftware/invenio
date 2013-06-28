@@ -17,8 +17,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% from "websearch_helpers.html" import record_brief_links with context %}
-
 {% macro render_search_pagination(pagination) %}
   {%- set args = request.args.copy().to_dict() -%}
   {%- set form_args = request.form.copy().to_dict() -%}
@@ -158,7 +156,6 @@
               </div>
               <div class="span11">
                 {{ format_record(recid, of, ln=g.ln)|safe }}
-                {{ record_brief_links(recid, loop.index+(pagination.page-1)*rg) }}
               </div>
             </div>
           {%- else -%}
