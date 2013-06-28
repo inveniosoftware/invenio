@@ -23,6 +23,7 @@ pylib_DATA = __init__.py \
              adminutils.py \
              apache_manager.py \
              cache.py \
+             cache_manager.py \
              errorlib.py \
              errorlib_unit_tests.py \
              errorlib_model.py \

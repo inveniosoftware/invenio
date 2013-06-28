@@ -19,6 +19,7 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibrecord_config.py \
              bibrecord.py \
+             bibrecord_manager.py \
              bibrecord_unit_tests.py \
              xmlmarc2textmarc.py \
              textmarc2xmlmarc.py

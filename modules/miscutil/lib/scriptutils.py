@@ -69,9 +69,10 @@ def register_manager(manager):
     """
     Register all manager plugins and default commands with the manager.
     """
-
-    from flask.ext.script.commands import ShowUrls  # , Clean
+    from urlparse import urlparse
+    from flask.ext.script.commands import Shell, Server, ShowUrls  # , Clean
     #from invenio.errorlib import register_exception
+    from invenio.config import CFG_SITE_URL
     from invenio.importutils import autodiscover_modules
 
     # Call add_command() in inveniomanage module to register managers.
@@ -87,3 +88,8 @@ def register_manager(manager):
     #FIXME clean command is broken
     #manager.add_command("clean", Clean())
     manager.add_command("show-urls", ShowUrls())
+    manager.add_command("shell", Shell())
+    parsed_url=  urlparse(CFG_SITE_URL)
+    port = parsed_url.port or 80
+    host = parsed_url.hostname or '127.0.0.1'
+    manager.add_command("runserver", Server(host=host, port=port))

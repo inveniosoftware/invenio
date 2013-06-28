@@ -19,32 +19,32 @@
 
 from invenio.scriptutils import Manager
 
-manager = Manager(usage="Perform BibField operations")
+manager = Manager(usage="Perform BibRecord operations")
 
-# Define sub-managers
-bibfield_config = Manager(usage="Manipulates BibField config.")
-bibfield_cache = Manager(usage="Manipulates BibField cache.")
+# Define sub-manager
+bibrecord_cache = Manager(usage="Manipulates BibRecord cache.")
 
-# Add sub-managers
-manager.add_command("config", bibfield_config)
-manager.add_command("cache", bibfield_cache)
+# Add sub-manager
+manager.add_command("cache", bibrecord_cache)
 
 
-@bibfield_config.command
-def load():
-    """Loads BibField config."""
-    print ">>> Going to load BibField config..."
-    from invenio.bibfield_config_engine import BibFieldParser
-    BibFieldParser().write_to_file()
-    print ">>> BibField config load successfully."
-
-
-@bibfield_cache.command
+@bibrecord_cache.command
 def reset(split_by=1000):
-    """Reset record json structure cache."""
-    from invenio.bibfield import get_record
+    """Reset bibrecord structure cache."""
+    from invenio.bibedit_model import Bibfmt
     from invenio.cache_manager import reset_rec_cache
-    reset_rec_cache('recjson', get_record, split_by=split_by)
+    from invenio.dbquery import run_sql, serialize_via_marshal
+    from invenio.search_engine import get_record
+    from invenio.sqlalchemyutils import db
+
+    def get_recstruct_record(recid):
+        value = serialize_via_marshal(get_record(recid))
+        b = Bibfmt(id_bibrec=recid, format='recstruct',
+                   last_updated=db.func.now(), value=value)
+        db.session.add(b)
+        db.session.commit()
+
+    reset_rec_cache('recstruct', get_recstruct_record, split_by=split_by)
 
 
 def main():

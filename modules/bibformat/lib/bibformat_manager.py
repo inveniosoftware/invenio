@@ -234,6 +234,26 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
     print '    $ bibreformat -oHB,HD -a'
 
 
+@manager.option('-o', '--output-format', dest='output_format',
+                default="HB", help="Specify output format/s (default HB)")
+def expunge(output_format="HB"):
+    """Remove static output formats from cache."""
+    from invenio.sqlalchemyutils import db
+    from invenio.bibedit_model import Bibfmt
+
+    # Make it uppercased as it is stored in database.
+    output_format = output_format.upper()
+    print ">>> Cleaning %s cache..." % (output_format, )
+    # Prepare where expression.
+    filter_format = Bibfmt.format == output_format \
+            if ',' not in output_format else \
+            Bibfmt.format.in_(map(lambda x: x.strip(),
+                                  output_format.split(',')))
+
+    Bibfmt.query.filter(filter_format).delete(synchronize_session=False)
+    db.session.commit()
+
+
 def main():
     from invenio.webinterface_handler_flask import create_invenio_flask_app
     app = create_invenio_flask_app()

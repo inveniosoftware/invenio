@@ -33,7 +33,7 @@ if 'config' in sys.argv and \
         SECRET_KEY=generate_secret_key())
 
 
-manager = Manager(create_invenio_flask_app)
+manager = Manager(create_invenio_flask_app, with_default_commands=False)
 register_manager(manager)
 
 
