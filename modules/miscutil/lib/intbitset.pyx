@@ -39,6 +39,8 @@ have to manually regenerate intbitset.c by running:
 and then commit generated intbitset.c to CVS.
 """
 
+#cython: infer_types=True
+
 import zlib
 import sys
 from array import array
@@ -193,10 +195,10 @@ cdef class intbitset:
                 except Exception, msg:
                     raise ValueError("rhs is corrupted: %s" % msg)
             elif hasattr(rhs, '__iter__'):
-                tuple_of_tuples = rhs and hasattr(rhs[0], '__getitem__')
+                tuple_of_tuples = rhs and hasattr(rhs, '__getitem__') and hasattr(rhs[0], '__getitem__')
                 try:
                     if preallocate < 0:
-                        if rhs and type(rhs[0]) is int:
+                        if rhs and (not hasattr(rhs, '__getitem__') or type(rhs[0]) is int):
                             preallocate = max(rhs)
                         else:
                             preallocate = 0
@@ -380,7 +382,7 @@ cdef class intbitset:
         """Return the intersection of two intbitsets as a new set.
         (i.e. all elements that are in both intbitsets.)
         """
-        ret = intbitset(no_allocate=1)
+        cdef intbitset ret = intbitset(no_allocate=1)
         (<intbitset>ret).bitset = intBitSetIntersection((<intbitset> self).bitset, rhs.bitset)
         return ret
 
@@ -585,12 +587,6 @@ cdef class intbitset:
                 raise OverflowError("Element must be <= %s" % maxelem)
         intBitSetDelElem(self.bitset, elem)
 
-    difference = __sub__
-    difference_update = __isub__
-    intersection = __and__
-    intersection_update = __iand__
-    union = __or__
-    union_update = __ior__
     symmetric_difference = __xor__
     symmetric_difference_update = __ixor__
 
@@ -679,6 +675,54 @@ cdef class intbitset:
             ret.append('0'*(i-last)+'1')
             last = i+1
         return ''.join(ret)
+
+    def update(self, *args):
+        """Update the intbitset, adding elements from all others."""
+        cdef intbitset arg
+        for arg in args:
+            intBitSetIUnion(self.bitset, arg.bitset)
+
+    union_update = update
+
+    def intersection_update(self, *args):
+        """Update the intbitset, keeping only elements found in it and all others."""
+        cdef intbitset arg
+        for arg in args:
+            intBitSetIIntersection(self.bitset, arg.bitset)
+
+    def difference_update(self, *args):
+        """Update the intbitset, removing elements found in others."""
+        cdef intbitset arg
+        for arg in args:
+            intBitSetISub(self.bitset, arg.bitset)
+
+    def union(self, *args):
+        """Return a new intbitset with elements from the intbitset and all others."""
+        cdef intbitset ret = intbitset(self)
+        cdef intbitset arg
+        for arg in args:
+            intBitSetIUnion(ret.bitset, arg.bitset)
+        return ret
+
+    def intersection(self, *args):
+        """Return a new intbitset with elements common to the intbitset and all others."""
+        cdef intbitset ret = intbitset(self)
+        cdef intbitset arg
+        for arg in args:
+            intBitSetIIntersection(ret.bitset, arg.bitset)
+        return ret
+
+    def difference(self, *args):
+        """Return a new intbitset with elements from the intbitset that are not in the others."""
+        cdef intbitset ret = intbitset(self)
+        cdef intbitset arg
+        for arg in args:
+            intBitSetISub(ret.bitset, arg.bitset)
+        return ret
+
+    def isdisjoint(self, intbitset rhs not None):
+        """Return True if two intbitsets have a null intersection."""
+        return bool(self & rhs)
 
     def update_with_signs(self, rhs):
         """Given a dictionary rhs whose keys are integers, remove all the integers
