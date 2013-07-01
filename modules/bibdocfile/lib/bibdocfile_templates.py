@@ -101,12 +101,14 @@ class Template:
                            }
                 for bibdoc in bibdocs:
                     if mytype == bibdoc.get_type():
-                        fulltype['content'].append(
-                            self.tmpl_display_bibdoc(bibdoc, version,
+                        bibdoc_display = self.tmpl_display_bibdoc(bibdoc, version,
                                                      ln=ln, display_hidden=display_hidden,
                                                      recid=bibrecdocs.id, docname=bibrecdocs.get_docname(bibdoc.id),
-                                                     status=bibdoc.status))
-                fulltypes.append(fulltype)
+                                                     status=bibdoc.status)
+                        if bibdoc_display:
+                            fulltype['content'].append(bibdoc_display)
+                if fulltype['content']:
+                    fulltypes.append(fulltype)
 
             if verbose >= 9:
                 verbose_files = str(bibrecdocs)

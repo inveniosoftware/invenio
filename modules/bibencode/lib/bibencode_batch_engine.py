@@ -591,7 +591,7 @@ def process_batch_job(batch_job_file):
                     bibdoc_video.set_comment(getval(job, 'bibdoc_comment'),
                                               bibdoc_video_format)
                 if getval(job, 'bibdoc_description'):
-                    bibdoc_video.set_description(getval(job, 'bibdoc_comment'),
+                    bibdoc_video.set_description(getval(job, 'bibdoc_description'),
                                                  bibdoc_video_format)
 
         #------------#

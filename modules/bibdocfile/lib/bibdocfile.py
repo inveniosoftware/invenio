@@ -2686,8 +2686,9 @@ class BibDoc(object):
                                     fileversion, docformat,
                                     self.id, self.status, checksum,
                                     self.more_info, human_readable=self.human_readable, bibdoc=self))
-                        except Exception, dummy:
+                        except Exception, e:
                             register_exception()
+                            raise InvenioBibDocFileError, e
         if context in ('init', 'init_from_disk'):
             return
         else:
