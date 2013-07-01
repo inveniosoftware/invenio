@@ -131,7 +131,8 @@ class SimulatedModPythonRequest(object):
     def get_post_form(self):
         """ Returns only POST form. """
         self.__tainted = True
-        return request.values.to_dict(flat=True)
+        return dict(map(lambda (k, x): (k, x if len(x) > 1 else x[0]),
+                        request.values.to_dict(flat=False).iteritems()))
 
     def get_response_sent_p(self):
         return self.__response_sent_p
@@ -555,11 +556,8 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## the req.form must be casted to dict because of Python 2.4 and earlier
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
-        from flask import request
         form = dict()
-        for k, v in request.values.to_dict(flat=False).iteritems():
-            form[k] = v if len(v) > 1 else v[0]
-        for key, value in form.items():
+        for key, value in req.form.items():
             ## FIXME: this is a backward compatibility workaround
             ## because most of the old administration web handler
             ## expect parameters to be of type str.
