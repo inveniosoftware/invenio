@@ -1562,10 +1562,10 @@ class ExampleData(DataSet):
 
 class CollectionExampleData(DataSet):
 
-    class CollectionExample_15_0:
-        id_example = None
-        score = 27
-        id_collection = CollectionData.articlesPreprints.ref('id')
+    #class CollectionExample_15_0:
+    #    id_example = None
+    #    score = 27
+    #    id_collection = CollectionData.articlesPreprints.ref('id')
 
     class CollectionExample_15_1:
         id_example = ExampleData.Example_1.ref('id')
@@ -1857,10 +1857,10 @@ class CollectionExampleData(DataSet):
         score = 3
         id_collection = CollectionData.reports.ref('id')
 
-    class CollectionExample_6_0:
-        id_example = None
-        score = 27
-        id_collection = CollectionData.articles.ref('id')
+    #class CollectionExample_6_0:
+    #    id_example = None
+    #    score = 27
+    #    id_collection = CollectionData.articles.ref('id')
 
     class CollectionExample_6_1:
         id_example = ExampleData.Example_1.ref('id')
