@@ -1,6 +1,7 @@
 .version
 Makefile
 Makefile.in
+compile
 configure
 config.cache
 config.log
@@ -91,6 +92,7 @@ configure.lineno
 *.kdevelop
 *.kdevses
 .project
+.noseids
 .settings
 .pydevproject
 org.eclipse.core.resources.prefs
