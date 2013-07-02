@@ -501,6 +501,33 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", " ", " ", "a"),
                          ['val4a'])
 
+    def test_get_field_values_filtering_exact(self):
+        """bibrecord - getting field values and exact filtering"""
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "%", 'a', 'val7a'),
+                         ['val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "a", 'a', 'val7a'),
+                         ['val7a'])
+
+    def test_get_field_values_filtering_substring(self):
+        """bibrecord - getting field values and substring filtering"""
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "%", 'a', '7a', 's'),
+                         ['val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "b", 'a', '7a', 's'),
+                         ['val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "%", 'b', 'val', 's'),
+                         ['val4a', 'val4b', 'val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", " ", 'b', 'val', 's'),
+                         [])
+
+    def test_get_field_values_filtering_regexp(self):
+        """bibrecord - getting field values and regexp filtering"""
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "%", 'b', r'al', 'r'),
+                         [])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "%", 'a', r'.*al[6,7]', 'r'),
+                         ['val6', 'val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "a", 'a', r'.*al[6,7]', 'r'),
+                         ['val6', 'val7a'])
+
     def test_get_field_value_via_wildcard(self):
         """bibrecord - getting first field value via wildcards"""
         self.assertEqual(bibrecord.record_get_field_value(self.rec, "100", " ", " ", " "),
