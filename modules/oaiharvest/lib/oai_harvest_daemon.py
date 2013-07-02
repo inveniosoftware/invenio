@@ -1017,7 +1017,7 @@ def authorlist_extract(tarball_path, identifier, downloaded_files):
         xml_file_fd.close()
         match = REGEXP_AUTHLIST.findall(xml_content)
         if match != []:
-            tempfile_fd, temp_authorlist_path = tempfile.mkstemp(suffix=".xml", prefix="authorlist_temp")
+            tempfile_fd, temp_authorlist_path = tempfile.mkstemp(suffix=".xml", prefix="authorlist_temp", dir=CFG_TMPDIR)
             os.write(tempfile_fd, match[0])
             os.close(tempfile_fd)
             # Generate file to store conversion results
