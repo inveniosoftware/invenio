@@ -1,0 +1,15 @@
+<name>Default Mobile brief</name>
+<description>Default Mobile brief.</description>
+<div class="infos">
+<div class="rec"><BFE_RECORD_ID /></div>
+<div class="L1">
+<BFE_TITLE />
+</div>
+<div class="L2">
+<BFE_AUTHORS limit="3" print_links="no" />
+</div>
+<div class="L3">
+<div class="publi"><BFE_PUBLI_INFO  /></div>
+<div class="report"><BFE_REPORT_NUMBERS/></div>
+</div>
+</div>

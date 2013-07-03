@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@ etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo \
 	   XE.bfo XE8X.bfo XN.bfo XR.bfo XW.bfo \
 	   XOAIDC.bfo XO.bfo XOAIMARC.bfo \
 	   HDREF.bfo HDFILE.bfo HDACT.bfo XP.bfo BSR.bfo WAPAFF.bfo \
-	   HDM.bfo DCITE.bfo
+	   HDM.bfo DCITE.bfo MOBB.bfo MOBD.bfo
 
 tmpdir = $(prefix)/var/tmp
 

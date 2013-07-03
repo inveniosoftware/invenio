@@ -6352,7 +6352,7 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
                 kwargs['selected_external_collections_infos'] = print_external_results_overview(req, cc, [p, p1, p2, p3],
                                         f, ec, verbose, ln, print_overview=em == "" or EM_REPOSITORY["overview"] in em)
         # print number of hits found for XML outputs:
-        if of.startswith("x"):
+        if of.startswith("x") or of == 'mobb':
             req.write("<!-- Search-Engine-Total-Number-Of-Results: %s -->\n" % kwargs['results_final_nb_total'])
         # print records:
         if of in ['hcs', 'hcs2']:

@@ -1151,6 +1151,24 @@ class FormatData(DataSet):
         visibility = 0
         name = u'DataCite'
 
+    class Format_27:
+        code = u'mobb'
+        last_updated = None
+        description = u'Mobile brief format.'
+        content_type = u'text/html'
+        id = 27
+        visibility = 0
+        name = u'Mobile brief'
+
+    class Format_28:
+        code = u'mobd'
+        last_updated = None
+        description = u'Mobile detailed format.'
+        content_type = u'text/html'
+        id = 28
+        visibility = 0
+        name = u'Mobile detailed'
+
 
 class FieldTagData(DataSet):
 
