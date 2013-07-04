@@ -314,7 +314,7 @@ class InvenioBlueprint(Blueprint):
                         action,
                         **dict((k,v() if callable(v) else v) \
                             for (k,v) in params.iteritems()))
-                    if auth == 1:
+                    if auth != 0:
                         current_app.logger.info(message)
                         abort(401)
                 except:
