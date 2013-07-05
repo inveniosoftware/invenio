@@ -1187,9 +1187,10 @@ def get_journal_article_cache_path(journal_name, issue):
     """
     # We must make sure we don't try to read outside of webjournal
     # cache dir
-    cache_path = os.path.abspath("%s/webjournal/%s/%s_articles_cache.dat" % \
+    issue_number, year = issue.replace('/', '_').split('_', 1)
+    cache_path = os.path.abspath("%s/webjournal/%s/%s/%s/articles_cache.dat" % \
                                   (CFG_CACHEDIR, journal_name,
-                                   issue.replace('/', '_')))
+                                   year, issue_number))
     if cache_path.startswith(CFG_CACHEDIR + '/webjournal/'):
         return cache_path
     else:
@@ -1500,17 +1501,18 @@ def cache_index_page(html, journal_name, category, issue, ln):
     (right hand menu cannot be cached)
     """
     issue = issue.replace("/", "_")
+    issue_number, year = issue.split("_", 1)
     category = category.replace(" ", "")
 
-    cache_path = os.path.abspath('%s/webjournal/%s/%s_index_%s_%s.html' % \
+    cache_path = os.path.abspath('%s/webjournal/%s/%s/%s/index_%s_%s.html' % \
                                   (CFG_CACHEDIR, journal_name,
-                                   issue, category,
+                                   year, issue_number, category,
                                    ln))
     if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
         # Mmh, not accessing correct path. Stop caching
         return False
 
-    cache_path_dir = '%s/webjournal/%s' % (CFG_CACHEDIR, journal_name)
+    cache_path_dir = os.path.dirname(cache_path)
     if not os.path.isdir(cache_path_dir):
         os.makedirs(cache_path_dir)
     cached_file = open(cache_path, "w")
@@ -1523,11 +1525,12 @@ def get_index_page_from_cache(journal_name, category, issue, ln):
     False if not in cache.
     """
     issue = issue.replace("/", "_")
+    issue_number, year = issue.split("_", 1)
     category = category.replace(" ", "")
 
-    cache_path = os.path.abspath('%s/webjournal/%s/%s_index_%s_%s.html' % \
+    cache_path = os.path.abspath('%s/webjournal/%s/%s/%s/index_%s_%s.html' % \
                                   (CFG_CACHEDIR, journal_name,
-                                   issue, category, ln))
+                                   year, issue_number, category, ln))
     if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
         # Mmh, not accessing correct path. Stop reading cache
         return False
@@ -1543,14 +1546,16 @@ def cache_article_page(html, journal_name, category, recid, issue, ln):
     Caches an article view of a journal.
     """
     issue = issue.replace("/", "_")
+    issue_number, year = issue.split("_", 1)
     category = category.replace(" ", "")
-    cache_path = os.path.abspath('%s/webjournal/%s/%s_article_%s_%s_%s.html' % \
+    cache_path = os.path.abspath('%s/webjournal/%s/%s/%s/article_%s_%s_%s.html' % \
                                   (CFG_CACHEDIR, journal_name,
-                                   issue, category, recid, ln))
+                                   year, issue_number, category, recid, ln))
     if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
         # Mmh, not accessing correct path. Stop caching
-        return
-    cache_path_dir = '%s/webjournal/%s' % (CFG_CACHEDIR, journal_name)
+        return (None, 'Trying to cache at wrong location: %s' % cache_path)
+
+    cache_path_dir = os.path.dirname(cache_path)
     if not os.path.isdir(cache_path_dir):
         os.makedirs(cache_path_dir)
     cached_file = open(cache_path, "w")
@@ -1564,11 +1569,12 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln, bfo=No
     False if not in cache.
     """
     issue = issue.replace("/", "_")
+    issue_number, year = issue.split("_", 1)
     category = category.replace(" ", "")
 
-    cache_path = os.path.abspath('%s/webjournal/%s/%s_article_%s_%s_%s.html' % \
+    cache_path = os.path.abspath('%s/webjournal/%s/%s/%s/article_%s_%s_%s.html' % \
                                   (CFG_CACHEDIR, journal_name,
-                                   issue, category, recid, ln))
+                                   year, issue_number, category, recid, ln))
     if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
         # Mmh, not accessing correct path. Stop reading cache
         return False
@@ -1592,6 +1598,7 @@ def clear_cache_for_article(journal_name, category, recid, issue):
     modified)
     """
     issue = issue.replace("/", "_")
+    issue_number, year = issue.split("_", 1)
     category = category.replace(" ", "")
 
     cache_path = os.path.abspath('%s/webjournal/%s/' %
@@ -1602,24 +1609,24 @@ def clear_cache_for_article(journal_name, category, recid, issue):
 
     # try to delete the article cached file
     try:
-        os.remove('%s/webjournal/%s/%s_article_%s_%s_en.html' %
-                  (CFG_CACHEDIR, journal_name, issue, category, recid))
+        os.remove('%s/webjournal/%s/%s/%s/article_%s_%s_en.html' %
+                  (CFG_CACHEDIR, journal_name, year, issue_number, category, recid))
     except:
         pass
     try:
-        os.remove('%s/webjournal/%s/%s_article_%s_%s_fr.html' %
-                  (CFG_CACHEDIR, journal_name, issue, category, recid))
+        os.remove('%s/webjournal/%s/%s/%s/article_%s_%s_fr.html' %
+                  (CFG_CACHEDIR, journal_name, year, issue_number, category, recid))
     except:
         pass
     # delete the index page for the category
     try:
-        os.remove('%s/webjournal/%s/%s_index_%s_en.html'
-                  % (CFG_CACHEDIR, journal_name, issue, category))
+        os.remove('%s/webjournal/%s/%s/%s/index_%s_en.html'
+                  % (CFG_CACHEDIR, journal_name, year, issue_number, category))
     except:
         pass
     try:
-        os.remove('%s/webjournal/%s/%s_index_%s_fr.html'
-                  % (CFG_CACHEDIR, journal_name, issue, category))
+        os.remove('%s/webjournal/%s/%s/%s/index_%s_fr.html'
+                  % (CFG_CACHEDIR, journal_name, year, issue_number, category))
     except:
         pass
 
@@ -1636,22 +1643,21 @@ def clear_cache_for_issue(journal_name, issue):
     clears the cache of a whole issue.
     """
     issue = issue.replace("/", "_")
-    cache_path_dir = os.path.abspath('%s/webjournal/%s' % \
-                                      (CFG_CACHEDIR, journal_name))
+    issue_number, year = issue.split("_", 1)
+
+    cache_path_dir = os.path.abspath('%s/webjournal/%s/%s/%s/' % \
+                                      (CFG_CACHEDIR, journal_name,
+                                       year, issue_number))
     if not cache_path_dir.startswith(CFG_CACHEDIR + '/webjournal'):
         # Mmh, not accessing correct path. Stop deleting cache
         return False
 
     all_cached_files = os.listdir(cache_path_dir)
-    non_deleted = []
     for cached_file in all_cached_files:
-        if cached_file.startswith(issue.replace('/', '_')):
-            try:
-                os.remove(cache_path_dir + '/' + cached_file)
-            except:
-                return False
-        else:
-            non_deleted.append(cached_file)
+        try:
+            os.remove(cache_path_dir + '/' + cached_file)
+        except:
+            return False
 
     return True
 
