@@ -588,7 +588,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                               'icon-file-format'     : os.path.splitext(uploaded_file_name)[1][1:] or 'gif',
                               'multipage-icon'       : False,
                               'multipage-icon-delay' : 100,
-                              'icon-scale'           : "300>", # Resize only if width > 300
+                              'icon-scale'           : "700>", # Resize only if width > 700
                               'verbosity'            : 0,
                               })
 
