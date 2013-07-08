@@ -1499,6 +1499,7 @@ def cache_index_page(html, journal_name, category, issue, ln):
     """
     Caches the index page main area of a Bulletin
     (right hand menu cannot be cached)
+    @return: tuple (path to cache file (or None), message)
     """
     issue = issue.replace("/", "_")
     issue_number, year = issue.split("_", 1)
@@ -1510,14 +1511,22 @@ def cache_index_page(html, journal_name, category, issue, ln):
                                    ln))
     if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
         # Mmh, not accessing correct path. Stop caching
-        return False
+        return (None, 'Trying to cache at wrong location: %s' % cache_path)
 
     cache_path_dir = os.path.dirname(cache_path)
-    if not os.path.isdir(cache_path_dir):
-        os.makedirs(cache_path_dir)
-    cached_file = open(cache_path, "w")
-    cached_file.write(html)
-    cached_file.close()
+    try:
+        if not os.path.isdir(cache_path_dir):
+            os.makedirs(cache_path_dir)
+        cached_file = open(cache_path, "w")
+        cached_file.write(html)
+        cached_file.close()
+    except Exception, e:
+        register_exception(req=None,
+                           prefix="Could not store index page cache",
+                           alert_admin=True)
+        return (None, e)
+
+    return (cache_path, '')
 
 def get_index_page_from_cache(journal_name, category, issue, ln):
     """
@@ -1544,6 +1553,9 @@ def get_index_page_from_cache(journal_name, category, issue, ln):
 def cache_article_page(html, journal_name, category, recid, issue, ln):
     """
     Caches an article view of a journal.
+
+    If cache cannot be written, a warning is reported to the admin.
+    @return: tuple (path to cache file (or None), message)
     """
     issue = issue.replace("/", "_")
     issue_number, year = issue.split("_", 1)
@@ -1556,11 +1568,19 @@ def cache_article_page(html, journal_name, category, recid, issue, ln):
         return (None, 'Trying to cache at wrong location: %s' % cache_path)
 
     cache_path_dir = os.path.dirname(cache_path)
-    if not os.path.isdir(cache_path_dir):
-        os.makedirs(cache_path_dir)
-    cached_file = open(cache_path, "w")
-    cached_file.write(html)
-    cached_file.close()
+    try:
+        if not os.path.isdir(cache_path_dir):
+            os.makedirs(cache_path_dir)
+        cached_file = open(cache_path, "w")
+        cached_file.write(html)
+        cached_file.close()
+    except Exception, e:
+        register_exception(req=None,
+                           prefix="Could not store article cache",
+                           alert_admin=True)
+        return (None, e)
+
+    return (cache_path_dir, '')
 
 NOT_FOR_ALERT_COMMENTS_RE = re.compile('<!--\s*START_NOT_FOR_ALERT\s*-->.*?<!--\s*END_NOT_FOR_ALERT\s*-->', re.IGNORECASE | re.DOTALL)
 def get_article_page_from_cache(journal_name, category, recid, issue, ln, bfo=None):
