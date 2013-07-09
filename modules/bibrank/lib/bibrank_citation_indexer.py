@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,17 +41,7 @@ from invenio.bibtask import write_message, task_get_option, \
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset
 from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
-
-class memoise:
-    def __init__(self, function):
-        self.memo = {}
-        self.function = function
-    def __call__(self, *args):
-        if self.memo.has_key(args):
-            return self.memo[args]
-        else:
-            object = self.memo[args] = self.function(*args)
-            return object
+from invenio.memoiseutils import Memoise
 
 INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')
 
@@ -61,7 +51,7 @@ def get_recids_matching_query(pvalue, fvalue):
     """Return list of recIDs matching query for PVALUE and FVALUE."""
     rec_id = list(search_pattern(p=pvalue, f=fvalue, m='e') - INTBITSET_OF_DELETED_RECORDS)
     return rec_id
-get_recids_matching_query = memoise(get_recids_matching_query)
+get_recids_matching_query = Memoise(get_recids_matching_query)
 
 def get_citation_weight(rank_method_code, config):
     """return a dictionary which is used by bibrank daemon for generating
