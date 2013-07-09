@@ -173,7 +173,7 @@ def _create_ticket(recid, bibcatalog_system, queue):
         # Do not create tickets for old records
         creation_date = run_sql("""SELECT creation_date FROM bibrec
                                    WHERE id = %s""", [recid])[0][0]
-        if creation_date < datetime.now() - timedelta(days=365*2):
+        if creation_date < datetime.now() - timedelta(days=30*4):
             return
 
         for report_tag in record_get_field_instances(record, "037"):
