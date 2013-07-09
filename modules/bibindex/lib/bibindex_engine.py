@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1062,7 +1062,8 @@ class WordTable:
                 for word in wlist[recID]:
                     word_synonyms = get_synonym_terms(word,
                                                       CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][0],
-                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][1])
+                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][1],
+                                                      use_memoise=True)
                     if word_synonyms:
                         wlist[recID] = list_union(word_synonyms, wlist[recID])
 
