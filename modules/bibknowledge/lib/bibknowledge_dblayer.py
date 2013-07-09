@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@ __revision__ = "$Id$"
 
 
 from invenio.dbquery import run_sql
+from invenio.memoiseutils import Memoise
 
 def get_kbs_info(kbtypeparam="", searchkbname=""):
     """Returns all kbs as list of dictionaries {id, name, description, kbtype}
@@ -67,6 +68,8 @@ def get_kb_id(kb_name):
         return res[0][0]
     else:
         return None
+
+get_kb_id_memoised = Memoise(get_kb_id)
 
 def get_kb_name(kb_id):
     """Returns the name of the kb with given id
@@ -363,10 +366,10 @@ def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
                         AND id_knwKB = %s""",
                   (searchvalue, searchkey, k_id))
 
-def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s'):
+def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s', use_memoise=False):
     """Returns values from a knowledge base
 
-       Note the intentional asymmetry between searchkey and searchvalue: 
+       Note the intentional asymmetry between searchkey and searchvalue:
        If searchkey is unspecified or empty for substring, it matches anything,
        but if it is empty for exact, it matches nothing.
        If searchvalue is unspecified or empty, it matches anything in all cases.
@@ -375,9 +378,14 @@ def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s'):
        @param searchkey search using this key
        @param searchvalue search using this value
        @param searchtype s=substring, e=exact, sw=startswith
+       @param use_memoise: can we memoise while doing lookups?
+       @type use_memoise: bool
        @return a list of values
     """
-    k_id = get_kb_id(kb_name)
+    if use_memoise:
+        k_id = get_kb_id_memoised(kb_name)
+    else:
+        k_id = get_kb_id(kb_name)
     if searchtype == 's':
         searchkey = '%'+searchkey+'%'
     if searchtype == 's' and searchvalue:
@@ -391,6 +399,8 @@ def get_kbr_values(kb_name, searchkey="%", searchvalue="", searchtype='s'):
                       AND m_key LIKE %s
                         AND id_knwKB = %s""",
                   (searchvalue, searchkey, k_id))
+
+get_kbr_values_memoised = Memoise(get_kbr_values)
 
 def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
     """Returns dicts of 'key' and 'value' from a knowledge base

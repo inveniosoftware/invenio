@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -305,7 +305,8 @@ def get_kbr_keys(kb_name, searchkey="", searchvalue="", searchtype='s'):
     return bibknowledge_dblayer.get_kbr_keys(kb_name, searchkey,
                                              searchvalue, searchtype)
 
-def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s'):
+def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s',
+                   use_memoise=False):
     """
     Return a tuple of values from key-value mapping kb.
 
@@ -313,9 +314,17 @@ def get_kbr_values(kb_name, searchkey="", searchvalue="", searchtype='s'):
     @param searchkey:   search using this key
     @param searchvalue: search using this value
     @param searchtype:  s=substring; e=exact
+    @param use_memoise: can we memoise while doing lookups?
+    @type use_memoise:  bool
    """
-    return bibknowledge_dblayer.get_kbr_values(kb_name, searchkey,
-                                               searchvalue, searchtype)
+    if use_memoise:
+        return bibknowledge_dblayer.get_kbr_values_memoised(kb_name, searchkey,
+                                                            searchvalue, searchtype,
+                                                            use_memoise)
+    else:
+        return bibknowledge_dblayer.get_kbr_values(kb_name, searchkey,
+                                                   searchvalue, searchtype,
+                                                   use_memoise)
 
 def get_kbr_items(kb_name, searchkey="", searchvalue="", searchtype='s'):
     """
