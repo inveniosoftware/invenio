@@ -413,7 +413,7 @@ def oairepositoryupdater_task():
             oai_out.close()
             write_message("Wrote to file %s" % filename)
             if not no_upload:
-                task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n')
+                task_low_level_submission('bibupload', 'oairepository', '-c', filename)
             # Prepare to save results in a tmp file
             (fd, filename) = mkstemp(dir=CFG_TMPDIR,
                                         prefix='oairepository_' + \
