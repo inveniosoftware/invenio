@@ -464,6 +464,7 @@ def find_numeration_more(line):
                     'series': series,
                     'volume': info['vol_num'],
                     'page': info['page'],
+                    'page_end': info['page_end'],
                     'len': len(info['aftertitle'])}
 
     return None
@@ -560,7 +561,10 @@ def create_numeration_tag(info):
     numeration_tags = u' <cds.VOL>%s</cds.VOL>' % series_and_volume
     if info.get('year', False):
         numeration_tags += u' <cds.YR>(%(year)s)</cds.YR>' % info
-    numeration_tags += u' <cds.PG>%(page)s</cds.PG>' % info
+    if info.get('page_end', False):
+        numeration_tags += u' <cds.PG>%(page)s-%(page_end)s</cds.PG>' % info
+    else:
+        numeration_tags += u' <cds.PG>%(page)s</cds.PG>' % info
     return numeration_tags
 
 
@@ -1098,6 +1102,7 @@ def find_numeration(line):
                     'series': series,
                     'volume': info['vol_num'],
                     'page': info['page'],
+                    'page_end': info['page_end'],
                     'len': match.end()}
 
     return None

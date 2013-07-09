@@ -89,7 +89,7 @@ class RefextractInvenioTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">2</subfield>
       <subfield code="h">S. Weinberg, A Model of Leptons</subfield>
-      <subfield code="s">Phys. Rev. Lett. 19 (1967) 1264</subfield>
+      <subfield code="s">Phys. Rev. Lett. 19 (1967) 1264-1266</subfield>
       <subfield code="y">1967</subfield>
    </datafield>
 </record>""")
@@ -101,7 +101,7 @@ class RefextractInvenioTest(InvenioXmlTestCase):
       <subfield code="o">137</subfield>
       <subfield code="h">M. Papakyriacou, H. Mayer, C. Pypen, H. P. Jr., and S. Stanzl-Tschegg</subfield>
       <subfield code="t">Influence of loading frequency on high cycle fatigue properties of b.c.c. and h.c.p. metals</subfield>
-      <subfield code="s">Mat.Sci.Eng. A308 (2001) 143</subfield>
+      <subfield code="s">Mat.Sci.Eng. A308 (2001) 143-152</subfield>
       <subfield code="y">2001</subfield>
    </datafield>
 </record>""")
@@ -114,7 +114,7 @@ class RefextractInvenioTest(InvenioXmlTestCase):
       <subfield code="o">138</subfield>
       <subfield code="h">Y.-B. Park, R. Mnig, and C. A. Volkert</subfield>
       <subfield code="t">Frequency effect on thermal fatigue damage in Cu interconnects</subfield>
-      <subfield code="s">Thin Solid Films 515 (2007) 3253</subfield>
+      <subfield code="s">Thin Solid Films 515 (2007) 3253-3258</subfield>
       <subfield code="y">2007</subfield>
    </datafield>
 </record>""")
@@ -890,7 +890,7 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">44</subfield>
       <subfield code="h">N. Nekrasov, A. Schwarz</subfield>
-      <subfield code="s">Commun.Math.Phys.,198,689</subfield>
+      <subfield code="s">Commun.Math.Phys.,198,689-703</subfield>
       <subfield code="y">1998</subfield>
    </datafield>
 </record>""")
@@ -901,7 +901,7 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">42</subfield>
       <subfield code="h">S.M. Donaldson</subfield>
-      <subfield code="s">Commun.Math.Phys.,93,453</subfield>
+      <subfield code="s">Commun.Math.Phys.,93,453-460</subfield>
       <subfield code="y">1984</subfield>
    </datafield>
 </record>""")
@@ -1256,7 +1256,7 @@ class RefextractTest(InvenioXmlTestCase):
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">64</subfield>
       <subfield code="h">Bourrely C, Soffer J and Buccella F</subfield>
-      <subfield code="s">Eur.Phys.J.,C23,487</subfield>
+      <subfield code="s">Eur.Phys.J.,C23,487-501</subfield>
       <subfield code="y">2002</subfield>
    </datafield>
 </record>""")
@@ -1435,7 +1435,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="o">130</subfield>
       <subfield code="h">A. Kuper, H. Letaw, L. Slifkin, E-Sonder, and C. T. Tomizuka</subfield>
       <subfield code="t">Self- diffusion in copper</subfield>
-      <subfield code="s">Phys.Rev.,96,1224</subfield>
+      <subfield code="s">Phys.Rev.,96,1224-1225</subfield>
       <subfield code="y">1954</subfield>
    </datafield>
 </record>""")
@@ -1470,7 +1470,7 @@ Rev. D 80 034030 1-25"""
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">8</subfield>
       <subfield code="h">S. Horvat, D. Khartchenko, O. Kortner, S. Kotov, H. Kroha, A. Manz, S. Mohrdieck-Mock, K. Nikolaev, R. Richter, W. Stiller, C. Valderanis, J. Dubbert, F. Rauscher, and A. Staude</subfield>
-      <subfield code="s">IEEE Trans.Nucl.Sci.,53,562</subfield>
+      <subfield code="s">IEEE Trans.Nucl.Sci.,53,562-566</subfield>
       <subfield code="y">2006</subfield>
    </datafield>
 </record>""")
@@ -1481,7 +1481,7 @@ Rev. D 80 034030 1-25"""
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">33</subfield>
       <subfield code="h">A. Moraes, C. Buttar, and I. Dawson</subfield>
-      <subfield code="s">Eur.Phys.J.,C50,435</subfield>
+      <subfield code="s">Eur.Phys.J.,C50,435-466</subfield>
       <subfield code="y">2007</subfield>
    </datafield>
 </record>""")
@@ -1561,7 +1561,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="o">128</subfield>
       <subfield code="h">D. P. Pritzkau and R. H. Siemann</subfield>
       <subfield code="t">Experimental study of rf pulsed heat- ing on oxygen free electronic copper</subfield>
-      <subfield code="s">Phys.Rev.ST Accel.Beams,5,1</subfield>
+      <subfield code="s">Phys.Rev.ST Accel.Beams,5,1-22</subfield>
       <subfield code="y">2002</subfield>
    </datafield>
 </record>""")
@@ -1615,7 +1615,7 @@ Rev. D 80 034030 1-25"""
       <subfield code="o">37</subfield>
       <subfield code="h">L. Lu, Y. Shen, X. Chen, L. Qian, and K. Lu</subfield>
       <subfield code="t">Ultrahigh strength and high electrical conductivity in copper</subfield>
-      <subfield code="s">Science,304,422</subfield>
+      <subfield code="s">Science,304,422-426</subfield>
       <subfield code="y">2004</subfield>
    </datafield>
 </record>""")
@@ -1638,7 +1638,7 @@ Rev. D 80 034030 1-25"""
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">2</subfield>
       <subfield code="h">C. Rubbia</subfield>
-      <subfield code="s">Rev.Mod.Phys.,57,699</subfield>
+      <subfield code="s">Rev.Mod.Phys.,57,699-722</subfield>
       <subfield code="y">1985</subfield>
    </datafield>
 </record>""")
@@ -1907,7 +1907,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">18</subfield>
       <subfield code="h">A. Taliotis</subfield>
       <subfield code="t">DIS from the AdS/CFT correspondence</subfield>
-      <subfield code="s">Nucl.Phys.,A830,299C</subfield>
+      <subfield code="s">Nucl.Phys.,A830,299C-302C</subfield>
       <subfield code="r">arXiv:0907.4204</subfield>
       <subfield code="y">2009</subfield>
    </datafield>
@@ -2075,7 +2075,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="o">27</subfield>
       <subfield code="h">B. Feng, Y. -H. He, P. Fre'</subfield>
       <subfield code="t">On correspondences between toric singularities and (p,q) webs</subfield>
-      <subfield code="s">Nucl.Phys.,B701,334</subfield>
+      <subfield code="s">Nucl.Phys.,B701,334-356</subfield>
       <subfield code="r">hep-th/0403133</subfield>
       <subfield code="y">2004</subfield>
    </datafield>
@@ -2174,7 +2174,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">39</subfield>
       <subfield code="h">Dan V. Schroeder</subfield>
-      <subfield code="s">Dokl.Akad.Nauk Ser.Fiz.,B701,334</subfield>
+      <subfield code="s">Dokl.Akad.Nauk Ser.Fiz.,B701,334-356</subfield>
       <subfield code="y">2004</subfield>
    </datafield>
 </record>""")
@@ -2195,7 +2195,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">77</subfield>
       <subfield code="h">J. M. Butterworth et al.</subfield>
-      <subfield code="s">Z.Phys.,C72,637</subfield>
+      <subfield code="s">Z.Phys.,C72,637-646</subfield>
       <subfield code="y">1996</subfield>
    </datafield>
 </record>""")
@@ -2206,7 +2206,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">1</subfield>
       <subfield code="h">I.M. Gregor et al.</subfield>
-      <subfield code="s">Z.Phys.,465,131</subfield>
+      <subfield code="s">Z.Phys.,465,131-134</subfield>
       <subfield code="y">2001</subfield>
    </datafield>
 </record>""")
@@ -2216,7 +2216,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
         _reference_test(self, ref_line, u"""<record>
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">1</subfield>
-      <subfield code="s">Phys.Rev.,56,569</subfield>
+      <subfield code="s">Phys.Rev.,56,569-628</subfield>
       <subfield code="y">2006</subfield>
    </datafield>
 </record>""")
@@ -2279,7 +2279,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
    <datafield tag="999" ind1="C" ind2="5">
       <subfield code="o">6</subfield>
       <subfield code="h">Sivers D. W.</subfield>
-      <subfield code="s">Nucl.Phys.Proc.Suppl.,21,334</subfield>
+      <subfield code="s">Nucl.Phys.Proc.Suppl.,21,334-356</subfield>
       <subfield code="y">2004</subfield>
    </datafield>
 </record>""")
@@ -2466,7 +2466,7 @@ and C. Tomei et al., Astropart. Phys. 33 (2010) 169 [arXiv:0912.0452 [physics.in
       <subfield code="c">LEP Collaboration</subfield>
       <subfield code="h">G. Alexander et al.</subfield>
       <subfield code="t">Electroweak parameters of the Z0 resonance and the Standard Model: the LEP Collaborations</subfield>
-      <subfield code="s">Phys.Lett.,B276,247</subfield>
+      <subfield code="s">Phys.Lett.,B276,247-253</subfield>
       <subfield code="y">1992</subfield>
    </datafield>
 </record>""")

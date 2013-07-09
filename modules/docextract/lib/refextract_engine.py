@@ -28,39 +28,38 @@ import os
 import subprocess
 from itertools import chain
 
-from invenio.refextract_config import \
-            CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM, \
-            CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL, \
-            CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND, \
-            CFG_REFEXTRACT_MARKER_CLOSING_VOLUME, \
-            CFG_REFEXTRACT_MARKER_CLOSING_YEAR, \
-            CFG_REFEXTRACT_MARKER_CLOSING_PAGE, \
-            CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID, \
-            CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL, \
-            CFG_REFEXTRACT_MARKER_CLOSING_TITLE, \
-            CFG_REFEXTRACT_MARKER_CLOSING_SERIES
+from invenio.refextract_config import (CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_INCL,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_STND,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_VOLUME,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_YEAR,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_PAGE,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_TITLE_IBID,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_AUTHOR_ETAL,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_TITLE,
+                                       CFG_REFEXTRACT_MARKER_CLOSING_SERIES)
 
 # make refextract runnable without requiring the full Invenio installation:
 from invenio.config import CFG_PATH_GFILE
 
-from invenio.refextract_tag import tag_reference_line, \
-                                   sum_2_dictionaries, \
-                                   identify_and_tag_DOI, \
-                                   identify_and_tag_URLs, \
-                                   find_numeration, \
-                                   extract_series_from_volume
-from invenio.refextract_record import build_record, \
-                                      build_references
+from invenio.refextract_tag import (tag_reference_line,
+                                    sum_2_dictionaries,
+                                    identify_and_tag_DOI,
+                                    identify_and_tag_URLs,
+                                    find_numeration,
+                                    extract_series_from_volume)
+from invenio.refextract_record import (build_record,
+                                       build_references)
 from invenio.docextract_pdf import convert_PDF_to_plaintext
 from invenio.docextract_utils import write_message
 from invenio.refextract_kbs import get_kbs
 from invenio.refextract_linker import find_referenced_recid
-from invenio.refextract_re import get_reference_line_numeration_marker_patterns, \
-                                  regex_match_list, \
-                                  re_tagged_citation, \
-                                  re_numeration_no_ibid_txt, \
-                                  re_roman_numbers, \
-                                  re_recognised_numeration_for_title_plus_series
+from invenio.refextract_re import (get_reference_line_numeration_marker_patterns,
+                                   regex_match_list,
+                                   re_tagged_citation,
+                                   re_numeration_no_ibid_txt,
+                                   re_roman_numbers,
+                                   re_recognised_numeration_for_title_plus_series)
 
 
 description = """
@@ -506,6 +505,7 @@ def look_for_implied_ibids(splitted_citations):
                                    'volume'     : volume,
                                    'year'       : numeration['year'],
                                    'page'       : numeration['page'],
+                                   'page_end'   : numeration['page_end'],
                                    'is_ibid'    : True,
                                    'extra_ibids': []}
                         citation.append(ibid_el)
