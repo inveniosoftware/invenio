@@ -61,6 +61,7 @@
  *   - onNewRecordClick
  *   - getRecord
  *   - onGetRecordSuccess
+ *   - initAutoComplete
  *   - onSubmitClick
  *   - onPreviewClick
  *   - onCancelClick
@@ -69,7 +70,7 @@
  *   - onMergeClick
  *   - bindNewRecordHandlers
  *   - cleanUp
- *   - addHandler_autocompleteAffiliations
+ *   - addHandler_autocomplete
  *
  * 7. Editor UI
  *   - colorFields
@@ -167,9 +168,11 @@ var gBibCircUrl = null;
 
 var gDisplayBibCircPanel = false;
 
+// Autocomplete related variables
+var gPrimaryCollection = null;
 // KB related variables
 var gKBSubject = null;
-var gKBInstitution = null;
+var gLoadedKBs = {};
 
 // Does the record have a PDF attached?
 var gRecordHasPDF = false;
@@ -340,7 +343,7 @@ function initMisc(){
 function initJeditable(){
   /*
    * Overwrite Jeditable plugin function to add the autocomplete handler
-   * to textboxes corresponding to fields in gTagsToAutocomplete
+   * to textboxes corresponding to fields in gAutocomplete
    */
 
    $.editable.types['textarea'].element = function(settings, original) {
@@ -379,13 +382,11 @@ function initJeditable(){
     cell_id_split[0] = 'subfieldTag';
     var subfield_id = cell_id_split.join('_');
 
-    /* Add autocomplete handler to fields in gTagsToAutocomplete */
-    var fieldInfo = $(original).parents("tr").siblings().eq(0).children().eq(1).html();
-    if ($.inArray(fieldInfo + $(original).siblings('#' + subfield_id).text(), gTagsToAutocomplete) != -1) {
-        addHandler_autocompleteAffiliations(textarea);
-    }
-
+    /* Add autocomplete handler to fields in gAutocomplete */
+    var fieldInfo = $(original).parents("tr").siblings().andSelf().eq(0).children().eq(1).html();
+    addHandler_autocomplete(fieldInfo + $(original).siblings('#' + subfield_id).text(), textarea);
     initInputHotkeys(textarea, original);
+
     return(textarea);
   };
 
@@ -1784,7 +1785,7 @@ function onGetRecordSuccess(json){
 
   // Get KB information
   gKBSubject = json['KBSubject'];
-  gKBInstitution = json['KBInstitution'];
+  gPrimaryCollection = json['primaryCollection']
   var revDt = formatDateTime(getRevisionDate(gRecRev));
   var recordRevInfo = "record revision: " + revDt;
   var revAuthorString = gRecRevAuthor;
@@ -1854,12 +1855,51 @@ function onGetRecordSuccess(json){
   adjustGeneralHPControlsVisibility();
   $("#loadingTickets").show();
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
+  initAutoComplete();
 
   // Refresh top toolbar
   updateToolbar(false);
   updateToolbar(true);
 }
 
+function initAutoComplete(){
+  /*
+   * Loads asynchronously KBs with preloaded setting
+   * Loads only needed KBs according to record's collection
+   */
+   if (typeof gAutoComplete == "undefined")
+        return
+
+  /*
+   * Look first at the common autocomplete rules
+   */
+   for (var tag in gAutoComplete['COMMON']) {
+        var tagObj = gAutoComplete['COMMON'][tag];
+        // check if KB is already loaded
+        if ( tagObj.preload && !(tagObj.kb in gLoadedKBs) ) {
+            var onSuccess = onGetKBContent(tagObj.kb);
+            $.getJSON("/kb/export",
+                { kbname: tagObj.kb, format: 'json'},
+                  onSuccess);
+        }
+     }
+
+  /*
+   * And now we apply the rules of the collection the record belongs to
+   */
+   var recordCollection = gAutoComplete[gPrimaryCollection];
+   if ( recordCollection != undefined ) {
+     for (var tag in recordCollection ) {
+        var tagObj = recordCollection[tag];
+        if ( tagObj.preload && !(tagObj.kb in gLoadedKBs) ) {
+            var onSuccess = onGetKBContent(tagObj.kb);
+            $.getJSON("/kb/export",
+                { kbname: tagObj.kb, format: 'json'},
+                  onSuccess);
+        }
+     }
+   }
+}
 
 function onGetTemplateSuccess(json) {
   onGetRecordSuccess(json);
@@ -2505,28 +2545,136 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gManagedDOIs = [];
 }
 
-
-function addHandler_autocompleteAffiliations(tg) {
+function addHandler_autocomplete(tag, cell) {
     /*
-     * Add autocomplete handler to a given cell
+     * Add autocomplete handler to a given cell according to the given tag
      */
-    /* If gKBInstitution is not defined in the system, do nothing */
-    if ($.inArray(gKBInstitution,gAVAILABLE_KBS) == -1)
+    /* If gAutoComplete is not defined in the system, do nothing */
+    if (typeof gAutoComplete == "undefined")
         return
-    $(tg).autocomplete({
-    source: function( request, response ) {
-                $.getJSON("/kb/export",
-                { kbname: gKBInstitution, format: 'jquery', term: request.term},
-                response);
-    },
-    search: function() {
-                var term = this.value;
-                if (term.length < 3) {
-                    return false;
-                }
-                return true;
+    var tagInRecordCollection = false;
+    if ( gPrimaryCollection != undefined ) {
+      var recordCollection = gAutoComplete[gPrimaryCollection];
+      if ( recordCollection != undefined )
+        tagInRecordCollection = tag in recordCollection;
     }
+    if ( (gAutoComplete.hasOwnProperty('COMMON') && tag in gAutoComplete['COMMON'] ) || tagInRecordCollection ){
+        if (tagInRecordCollection) {
+          var tagObject = gAutoComplete[gPrimaryCollection][tag];
+        }
+        else {
+           var tagObject = gAutoComplete['COMMON'][tag];
+        }
+        var callBack = getKBContents(tagObject);
+        $(cell).autocomplete({
+        source: callBack,
+        minLength: tagObject.searchChars,
+        select: function(event, ui) {
+                    $(cell).val(ui.item.label || ui.item);
+                    event.preventDefault();
+        },
+        focus: function(event, ui) {
+                    event.preventDefault();
+                    var value = ui.item.label || ui.item;
+                    $(cell).val(value);
+                    if ( tagObject.fixed ) {
+                        $(cell).attr('maxlength',value.length);
+                    }
+        },
+        open: function(event, ui) {
+          if ( tagObject.fixed ) {
+              var end = $(this).val().length;
+              $(this).selectRange(end);
+          }
+        }
+        }).focus(function() {
+          if ( tagObject.fixed ) {
+              if($(this).val() != ""){
+                $( this ).autocomplete( "option", "autoFocus", false );
+              } else {
+                $( this ).autocomplete( "option", "autoFocus", true );
+              }
+              $(this).autocomplete("search", "");
+          }
+          else{
+          var end = $(this).val().length;
+          $(this).selectRange(end);
+          }
+        });
+    }
+}
+
+$.fn.selectRange = function(start, end) {
+  /*
+   * Moves the cursor to the end of text area
+   */
+    if(!end) end = start;
+    return this.each(function() {
+        if (this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if (this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
     });
+};
+
+function getKBContents(tagObj){
+  /*
+   * Handles how data will be retrieved for every search,
+   * depending on tag's settings.
+   */
+    var callback = function(request, response) {
+        // preload case
+        if ( tagObj.preload && (tagObj.kb in gLoadedKBs) ) {
+            if (tagObj.fixed) {
+                response(gLoadedKBs[tagObj.kb]);
+            }
+            else {
+                var searchMethod = "";
+                if (tagObj.searchMethod == "startsWith")
+                  searchMethod = "^";
+                var matcher = new RegExp( searchMethod + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+                response( $.grep( gLoadedKBs[tagObj.kb], function( item ){
+                    return matcher.test( item.label || item);
+                }));
+            }
+        }
+        // fetch case
+        else {
+            $.getJSON( "/kb/export",
+                       { kbname: tagObj.kb, format: 'json', term: request.term},
+                       function(json) {
+                          // case where preload didn't succeed
+                          if (tagObj.preload)
+                            gLoadedKBs[tagObj.kb] = json;
+                          response(json);
+                       })
+                       .error(function(jqxhr, textStatus, error) {
+                          var err = textStatus + ", " + error;
+                          if (jqxhr.responseText.indexOf('There is no knowledge base with that name') != -1 ) {
+                            err = 'There is no knowledge base with that name';
+                          }
+                          console.log( "Request Failed: " + err );
+                          response(null);
+                       });
+        }
+    }
+    return callback;
+}
+
+function onGetKBContent(kbName) {
+  /*
+   * Stores retrieved data of a Knowledge Base in a dict.
+   */
+  var callback = function(json) {
+      gLoadedKBs[kbName] = json;
+  };
+  return callback;
 }
 
 /*
@@ -3117,9 +3265,7 @@ function onAddFieldChange(event) {
             if (fieldInd2 == '') {
                 fieldInd2 = '_';
             }
-            if ($.inArray(fieldTag +  fieldInd1 + fieldInd2 + this.value, gTagsToAutocomplete) != -1) {
-                addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
-            }
+            addHandler_autocomplete(fieldTag +  fieldInd1 + fieldInd2 + this.value, $(this).parent().next().children('input'));
 	    $(this).parent().next().children('input').focus();
 	    break;
 	  default:
@@ -3398,11 +3544,9 @@ function onAddSubfieldsChange(event){
         $(this).removeClass('bibEditInputError');
       }
       if (event.keyCode != 9 && event.keyCode != 16){
-        /* If we are creating a new field present in gTagsToAutocomplete, add autocomplete handler */
+        /* If we are creating a new field present in gAutocomplete, add autocomplete handler */
         var fieldInfo = $(this).parents("tr").siblings().eq(0).children().eq(1).html();
-        if ($.inArray(fieldInfo + this.value, gTagsToAutocomplete) != -1) {
-          addHandler_autocompleteAffiliations($(this).parent().next().children('input'));
-        }
+        addHandler_autocomplete(fieldInfo + this.value , $(this).parent().next().children('input'));
         $(this).parent().next().children('input').focus();
       }
     }
