@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1724,6 +1724,7 @@ def perform_request_add(uid,
                         successful_add=False,
                         copy=False,
                         wait=False,
+                        move_from_basket=0,
                         referer='',
                         ln=CFG_SITE_LANG):
     """Add records to baskets
@@ -1735,6 +1736,9 @@ def perform_request_add(uid,
     @param es_title: the title of the external source
     @param es_desc: the description of the external source
     @param es_url: the url of the external source
+    @param move_from_basket: instead of creating a new item, move the item with
+                             the specified recid from another basket
+
     @param referer: URL of the referring page
     @param ln: language"""
 
@@ -1899,6 +1903,19 @@ def perform_request_add(uid,
                             #warnings.append(exc.message)
                         #warnings.append('WRN_WEBBASKET_NO_RIGHTS')
                         warnings_html += webbasket_templates.tmpl_warnings(exc.message, ln)
+
+                    # To move an item, user needs add and delete permissions
+                    if move_from_basket > 0 and not(__check_user_can_perform_action(uid,
+                                                    move_from_basket,
+                                                    CFG_WEBBASKET_SHARE_LEVELS['DELITM'])):
+                        try:
+                            raise InvenioWebBasketWarning(_('Sorry, you do not have sufficient rights on this basket.'))
+                        except InvenioWebBasketWarning, exc:
+                            register_exception(stream='warning')
+                            #warnings.append(exc.message)
+                        #warnings.append('WRN_WEBBASKET_NO_RIGHTS')
+                        warnings_html += webbasket_templates.tmpl_warnings(exc.message, ln)
+
         if not warnings_html:
             if ( colid >= 0 and not validated_recids ) or ( colid == -1 and ( not es_title or not es_desc or not es_url ) ):
                 try:
@@ -1910,8 +1927,14 @@ def perform_request_add(uid,
                 if colid == -1:
                     es_title = es_title
                     es_desc = nl2br(es_desc)
-                added_items = db.add_to_basket(uid, validated_recids, colid, bskid, es_title, es_desc, es_url)
+
+                if move_from_basket > 0:
+                    added_items = db.move_to_basket(uid, validated_recids, move_from_basket, bskid)
+                else:
+                    added_items = db.add_to_basket(uid, validated_recids, colid, bskid, es_title, es_desc, es_url)
+
                 if added_items:
+
                     if (note_body and editor_type != 'ckeditor') or \
                            (editor_type == 'ckeditor' and \
                             remove_html_markup(note_body, '').replace('\n', '').replace('\r', '').strip()):
@@ -1984,6 +2007,7 @@ def perform_request_add(uid,
                                         personal_basket_list=personal_basket_list,
                                         group_basket_list=group_basket_list,
                                         copy=copy,
+                                        move_from_basket=move_from_basket,
                                         referer=referer,
                                         ln=ln)
 

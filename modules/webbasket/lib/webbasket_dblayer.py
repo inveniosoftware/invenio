@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -703,7 +703,7 @@ def get_basket_item_title_and_URL(recid):
             title = ""
         url = '%s/record/%i' % (CFG_SITE_URL, recid)
     elif recid < 0:
-        # This is an external record or item, use 
+        # This is an external record or item, use
         title = "This is an external record or item."
         url = '%s' % (CFG_SITE_URL,)
 
@@ -916,6 +916,42 @@ def add_to_basket(uid,
         run_sql(query_update, params_update)
         return recids
     return 0
+
+
+def move_to_basket(uid,
+                   recids=None,
+                   old_bskid=0,
+                   new_bskid=0,
+                   update_date_modification=True):
+    """ Move items (recids) from basket (old_bskid) to basket (new_bskid) """
+    if (recids is not None) and len(recids) > 0:
+
+        for recid in recids:
+            # Change the item's pointer to basket
+            query = """ UPDATE  bskREC
+                        SET     id_bskBASKET=%s,
+                                id_user_who_added_item=%s
+                        WHERE   id_bskBASKET=%s
+                                AND id_bibrec_or_bskEXTREC=%s
+                    """
+
+            params = (int(new_bskid), int(uid), int(old_bskid), int(recid))
+
+            res = run_sql(query, params)
+
+        # Update 'modification date'
+        if update_date_modification and res:
+            now = convert_datestruct_to_datetext(localtime())
+            query = "UPDATE bskBASKET SET date_modification=%s WHERE id=%s"
+
+            params = (now, int(old_bskid))
+            run_sql(query, params)
+
+            params = (now, int(new_bskid))
+            run_sql(query, params)
+
+    return recids
+
 
 def add_to_many_baskets(uid, recids=[], colid=0, bskids=[], es_title="", es_desc="", es_url=""):
     """Add items recids to every basket in bskids list."""

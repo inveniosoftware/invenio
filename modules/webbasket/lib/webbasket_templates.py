@@ -25,6 +25,7 @@ import urllib
 from invenio.messages import gettext_set_language
 from invenio.webbasket_config import \
                        CFG_WEBBASKET_CATEGORIES, \
+                       CFG_WEBBASKET_ACTIONS, \
                        CFG_WEBBASKET_SHARE_LEVELS, \
                        CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS
 from invenio.webmessage_mailutils import email_quoted_txt2html, \
@@ -1627,6 +1628,7 @@ class Template:
                  group_basket_list=(),
                  successful_add=False,
                  copy=False,
+                 move_from_basket=0,
                  referer='',
                  ln=CFG_SITE_LANG):
         """Template for addding items to baskets."""
@@ -1754,6 +1756,7 @@ class Template:
         <input type="hidden" name="colid" value="%(colid)s" />
         <input type="hidden" name="copy" value="%(copy)i" />
         <input type="hidden" name="referer" value="%(referer)s" />
+        <input type="hidden" name="move_from_basket" value="%(move_from_basket)s" />
         <input type="submit" class="formbutton" value="%(add_label)s" />
         <input type="button" class="nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='/'" />
       </td>
@@ -1776,6 +1779,7 @@ class Template:
                                      'x_url_close': '</a>',
                                      'x_fmt_open': '<br /><small>',
                                      'x_fmt_close': '</small>'},
+               'move_from_basket': move_from_basket,
                'note_label': len(recids) > 1 and _('Optionally, add a note to each one of these items') \
                or _('Optionally, add a note to this item'),
                'note_editor': note_editor,
@@ -2623,6 +2627,24 @@ class Template:
         else:
             copy = ""
 
+        # Move = copy + delete, so we can use their config
+        if copy_item and delete_item:
+            move_url = "%(siteurl)s/yourbaskets/modify?action=%(action)s&amp;bskid=%(bskid)i&amp;recid=%(recid)i"\
+                       "&amp;category=%(category)s&amp;topic=%(topic)s&amp;group_id=%(group)i&amp;ln=%(ln)s" % \
+                       {'siteurl': CFG_SITE_URL,
+                        'action': CFG_WEBBASKET_ACTIONS['MOVE'],
+                        'bskid': bskid,
+                        'recid': recid,
+                        'category': selected_category,
+                        'topic': urllib.quote(selected_topic),
+                        'group': selected_group,
+                        'ln': ln}
+            move_img = "%s/img/move.png" % (CFG_SITE_URL,)
+            move = """<a href="%s"><img src="%s" alt="%s" />%s</a>""" % \
+                   (move_url, move_img, _("Move item"), _("Move item"))
+        else:
+            move = ""
+
         if delete_item:
             remove_url = "%(siteurl)s/yourbaskets/modify?action=delete&amp;bskid=%(bskid)i&amp;recid=%(recid)i"\
                          "&amp;category=%(category)s&amp;topic=%(topic)s&amp;group=%(group)i&amp;ln=%(ln)s" % \
@@ -2697,6 +2719,8 @@ class Template:
             <td class="bskbasketheaderoptions">
             %(copy)s
             &nbsp;
+            %(move)s
+            &nbsp;
             %(remove)s
             </td>
           </tr>
@@ -2722,6 +2746,7 @@ class Template:
                      'topic': urllib.quote(selected_topic),
                      'group': selected_group,
                      'copy': copy,
+                     'move': move,
                      'remove': remove,
                      'ln': ln}
         return out
