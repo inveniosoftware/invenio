@@ -56,7 +56,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
 
 from invenio.config import (CFG_SITE_LANG,
     CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
-    CFG_BIBCATALOG_SYSTEM)
+    CFG_BIBCATALOG_SYSTEM, CFG_BIBEDIT_AUTOCOMPLETE)
 
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
@@ -97,7 +97,8 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
     CFG_INSPIRE_SITE, CFG_BIBUPLOAD_INTERNAL_DOI_PATTERN, \
     CFG_BIBEDIT_INTERNAL_DOI_PROTECTION_LEVEL
-from invenio.search_engine import record_exists, perform_request_search
+from invenio.search_engine import record_exists, perform_request_search, \
+    guess_primary_collection_of_a_record
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibcatalog_system import get_bibcat_from_prefs
@@ -268,7 +269,8 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gDisplayAuthorTags': CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS,
             'gExcludeCuratorTags': CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS,
             'gSHOW_HP_REMOVED_FIELDS': CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
-            'gBIBCATALOG_SYSTEM_RT_URL': repr(CFG_BIBCATALOG_SYSTEM_RT_URL)
+            'gBIBCATALOG_SYSTEM_RT_URL': repr(CFG_BIBCATALOG_SYSTEM_RT_URL),
+            'gAutoComplete': json.dumps(CFG_BIBEDIT_AUTOCOMPLETE)
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -808,7 +810,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             response['tagFormat'] = tagformat
             # KB information
             response['KBSubject'] = CFG_BIBEDIT_KB_SUBJECTS
-            response['KBInstitution'] = CFG_BIBEDIT_KB_INSTITUTIONS
+            # Autocomplete information
+            response['primaryCollection'] = guess_primary_collection_of_a_record(recid)
 
     elif request_type == 'submit':
         # Submit the record. Possible error situations:
