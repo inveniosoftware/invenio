@@ -447,7 +447,7 @@ def get_time_estimator(total):
         return t3, t3 + t1
     return estimate_needed_time
 
-def pretty_date(time=False, ln=CFG_SITE_LANG):
+def pretty_date(ugly_time=False, ln=CFG_SITE_LANG):
     """
     Get a datetime object or a int() Epoch timestamp and return a
     pretty string like 'an hour ago', 'Yesterday', '3 months ago',
@@ -457,11 +457,27 @@ def pretty_date(time=False, ln=CFG_SITE_LANG):
     _ = gettext_set_language(ln)
 
     now = real_datetime.now()
-    if type(time) is int:
-        diff = now - real_datetime.fromtimestamp(time)
-    elif isinstance(time, real_datetime):
-        diff = now - time
-    elif not time:
+
+    if isinstance(ugly_time, basestring):
+        #try to convert it to epoch timestamp
+        date_format = '%Y-%m-%d %H:%M:%S.%f'
+        try:
+            ugly_time = time.strptime(ugly_time, date_format)
+            ugly_time = int(time.mktime(ugly_time))
+        except ValueError:
+            # doesn't match format, let's try to guess
+            try:
+                ugly_time = int(guess_datetime(ugly_time))
+            except ValueError:
+                return ugly_time
+            ugly_time = int(time.mktime(ugly_time))
+
+    # Initialize the time period difference
+    if isinstance(ugly_time, int):
+        diff = now - real_datetime.fromtimestamp(ugly_time)
+    elif isinstance(ugly_time, real_datetime):
+        diff = now - ugly_time
+    elif not ugly_time:
         diff = now - now
     second_diff = diff.seconds
     day_diff = diff.days

@@ -508,7 +508,7 @@ def extend_application_template_filters(app):
         This is a special Jinja2 filter that will call
         pretty_date to print a human friendly timestamp.
         """
-        if isinstance(date, datetime):
+        if isinstance(date, datetime) or isinstance(date, basestring):
             return pretty_date(date, ln=g.ln)
         return date
 
