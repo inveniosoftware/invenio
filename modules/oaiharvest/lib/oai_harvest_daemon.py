@@ -42,14 +42,13 @@ import traceback
 from invenio.config import \
      CFG_BINDIR, \
      CFG_TMPSHAREDDIR, \
-     CFG_ETCDIR, \
      CFG_INSPIRE_SITE, \
      CFG_PLOTEXTRACTOR_DOWNLOAD_TIMEOUT, \
      CFG_SITE_URL, \
      CFG_OAI_FAILED_HARVESTING_STOP_QUEUE, \
      CFG_OAI_FAILED_HARVESTING_EMAILS_ADMIN, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_LOGDIR
+     CFG_TMPDIR
 from invenio.oai_harvest_config import InvenioOAIHarvestWarning
 from invenio.dbquery import deserialize_via_marshal
 from invenio.bibtask import \
