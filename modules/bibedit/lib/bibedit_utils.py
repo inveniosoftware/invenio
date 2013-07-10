@@ -763,7 +763,7 @@ def can_record_have_physical_copies(recid):
     return collections["holdings"]["visible"] == True
 
 
-def get_record_collections(recid):
+def get_record_collections(recid=0, recstruct=None):
     """ Returns all collections of a record, field 980
     @param recid: record id to get collections from
     @type: string
@@ -771,7 +771,8 @@ def get_record_collections(recid):
     @return: list of collections
     @rtype: list
     """
-    recstruct = get_record(recid)
+    if not recstruct:
+        recstruct = get_record(recid)
     return [collection for collection in record_get_field_values(recstruct,
                                                             tag="980",
                                                             ind1=" ",
@@ -779,13 +780,13 @@ def get_record_collections(recid):
                                                             code="a")]
 
 
-def extend_record_with_template(recid):
+def extend_record_with_template(recid=0, recstruct=None):
     """ Determine if the record has to be extended with the content
     of a template as defined in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
     @return: template name to be applied to record or False if no template
     has to be applied
     """
-    rec_collections = get_record_collections(recid)
+    rec_collections = get_record_collections(recid, recstruct)
 
     for collection in CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE:
         if collection[0] in rec_collections:
@@ -923,7 +924,7 @@ def add_record_cnum(recid, uid):
         return new_cnum
 
 
-def get_xml_from_textmarc(recid, textmarc_record):
+def get_xml_from_textmarc(recid, textmarc_record, uid=None):
     """
     Convert textmarc to marcxml and return the result of the conversion
 
@@ -946,6 +947,13 @@ def get_xml_from_textmarc(recid, textmarc_record):
     # Create temp file with textmarc to be converted by textmarc2xmlmarc
     (file_descriptor, file_name) = tempfile.mkstemp()
     f = os.fdopen(file_descriptor, "w")
+
+    # If there is a cache file, add the controlfields
+    if cache_exists(recid, uid):
+        record = get_cache_file_contents(recid, uid)[2]
+        for tag in record:
+            if tag.startswith("00") and tag != "001":  # It is a controlfield
+                f.write("%09d %s %s\n" % (recid, tag + "__", record_get_field_value(record, tag)))
 
     # Write content appending sysno at beginning
     for line in textmarc_record.splitlines():

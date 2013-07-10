@@ -1035,7 +1035,8 @@ function displayNewRecordScreen() {
    * Display options for creating a new record: An empty record or a template
    * selected from a list of templates.
    */
-  var msg = '<ul><li style="padding-bottom: 20px;">' +
+  var msg = '<div style="margin-top:25px">Create a new record selecting one of the options below:</div>';
+  msg += '<ul><li style="padding-bottom: 20px;">' +
     '<a href="#" id="lnkNewEmptyRecord"><b>Empty record</b></a></li>' +
     '<li style="padding-bottom: 10px;">Use record template:' +
     '<table>';
@@ -1059,7 +1060,7 @@ function displayNewRecordScreen() {
     '<td style="padding-left: 10px; padding-right: 10px;">' +
     '<a href="#" id="lnkNewTemplateRecordImport_crossref"><b>Crossref</b></a></td>' +
     '<td style="padding-left: 10px; padding-right: 10px;">' +
-    '<td><input id="doi_crossref" style="width:200px" type="text" placeholder="Input the DOI of the publication" /></td></tr>' +
+    '<td><input id="doi_crossref" style="width:200px" type="text" placeholder="Input the DOI of the publication" /><div style="display:inline;" id="doi_crossref_help"></div></td></tr>' +
     '</table></li>';
   $('#bibEditContentTable').html(msg);
 }

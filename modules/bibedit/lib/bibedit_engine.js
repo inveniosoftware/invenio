@@ -1963,11 +1963,12 @@ function onTextMarcClick() {
   * 3) Activate flag to know we are in text marc mode (for submission)
   */
 
-  /* Save the content in all textareas that are currently opened before changing
-  view mode
-  */
+  $("#img_textmarc").off("click");
 
   save_changes().done(function() {
+    /* Save the content in all textareas that are currently opened before changing
+    view mode
+    */
     $(".edit_area textarea").trigger($.Event( 'keydown', {which:$.ui.keyCode.ENTER, keyCode:$.ui.keyCode.ENTER}));
 
     createReq({recID: gRecID, requestType: 'getTextMarc'
@@ -2022,7 +2023,6 @@ function onTextMarcClick() {
           $("#img_textmarc").attr('id', 'img_tableview');
           $("#img_tableview").off("click").on("click", onTableViewClick);
          });
-
   });
 }
 
@@ -2244,17 +2244,17 @@ function bindNewRecordHandlers(){
     });
   //binding import function
   $('#lnkNewTemplateRecordImport_crossref').bind('click', function(event){
-      var doiElement = $('#doi_crossref');
+      var doiElement = $("#doi_crossref");
       if (!doiElement.val()) {
         //if no DOI specified
-        errorDoi(117, doiElement)
+        errorDoi(117)
       } else {
         updateStatus('updating');
         createReq({requestType: 'newRecord', newType: 'import', doi: doiElement.val()},function(json){
         if (json['resultCode'] == 7) {
           getRecord(json['newRecID'], 0, onGetTemplateSuccess); // recRev = 0 -> current revision
         } else {
-          errorDoi(json['resultCode'], doiElement);
+          errorDoi(json['resultCode']);
           updateStatus('error', 'Error !');
         }
         }, false);
@@ -2267,9 +2267,12 @@ function bindNewRecordHandlers(){
       $('#lnkNewTemplateRecordImport_crossref').click();
     }
   });
+  $('#doi_crossref').one('input propertychange', function (e) {
+    $('#doi_crossref_help').html("<span class='help-text'>&nbsp;Press 'Enter' key to import</span>");
+  });
 }
 
-function errorDoi(code, element){
+function errorDoi(code){
   /*
   * Displays a warning message in the import from crossref textbox
   */
@@ -2291,8 +2294,7 @@ function errorDoi(code, element){
       msg = "Error while importing data";
   }
   var warning = '<span class="doiWarning" style="padding-left: 5px; color: #ff0000;">' + msg + '</span>'
-  $(".doiWarning").remove();
-  element.after(warning);
+  $("#doi_crossref_help").empty().html(warning);
 }
 
 

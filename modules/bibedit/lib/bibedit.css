@@ -994,3 +994,9 @@ label {
     display: block;
     width: 70px!important;
 }
+
+.help-text {
+  color: grey;
+  font-size: small;
+  font-style: italic;
+}
