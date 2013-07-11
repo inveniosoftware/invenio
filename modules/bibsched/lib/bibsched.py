@@ -738,11 +738,12 @@ class BibSched(object):
             except IndexError:
                 pass
             else:
-                resume_after = datetime(*(time.strptime(date_string, "%Y-%m-%d %H:%M:%S")[0:6]))
-                if datetime.now() > resume_after:
-                    run_sql('UPDATE schSTATUS SET value = "" WHERE name = "resume_after"')
-                    run_sql('UPDATE schSTATUS SET value = "1" WHERE name = "auto_mode"')
-                    status = 1
+                if date_string:
+                    resume_after = datetime(*(time.strptime(date_string, "%Y-%m-%d %H:%M:%S")[0:6]))
+                    if datetime.now() > resume_after:
+                        run_sql('UPDATE schSTATUS SET value = "" WHERE name = "resume_after"')
+                        run_sql('UPDATE schSTATUS SET value = "1" WHERE name = "auto_mode"')
+                        status = 1
 
         return status
 
