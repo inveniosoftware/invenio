@@ -1596,7 +1596,7 @@ class BibDoc(object):
         self.bibrec_types = [(r[0], r[1], r[2]) for r in res2 ] # just in case the result was behaving like tuples but was something else
         if not res2:
             # fake attachment
-            self.bibrec_types = [0, None, "fake_name_for_unattached_document"]
+            self.bibrec_types = [(0, None, "fake_name_for_unattached_document")]
 
         if initial_data is None:
             initial_data = BibDoc._retrieve_data(docid)

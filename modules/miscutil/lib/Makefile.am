@@ -118,6 +118,8 @@ pylib_DATA = __init__.py \
              sequtils.py \
              sequtils_model.py \
              sequtils_regression_tests.py \
+             memoiseutils.py \
+             memoiseutils_unit_tests.py \
              crossrefutils.py \
              flaskshell.py \
              wtforms_utils.py \

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -42,20 +42,9 @@ from invenio.bibindex_engine import get_field_tags
 from invenio.bibindex_engine import CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 
 
-class memoise:
-    def __init__(self, function):
-        self.memo = {}
-        self.function = function
-
-    def __call__(self, *args):
-        if args not in self.memo:
-            self.memo[args] = self.function(*args)
-        return self.memo[args]
-
 INTBITSET_OF_DELETED_RECORDS = search_unit(p='DELETED', f='980', m='a')
 
 re_CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK = re.compile(CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK)
-
 
 def get_recids_matching_query(p, f, m='e'):
     """Return set of recIDs matching query for pattern p in field f."""
