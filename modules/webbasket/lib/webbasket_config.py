@@ -48,7 +48,8 @@ CFG_WEBBASKET_CATEGORIES = {'PRIVATE':      'P',
 CFG_WEBBASKET_ACTIONS = {'DELETE':  'delete',
                          'UP':      'moveup',
                          'DOWN':    'movedown',
-                         'COPY':    'copy'}
+                         'COPY':    'copy',
+                         'MOVE':    'move'}
 
 # Specify how many levels of indentation discussions can be.  This can
 # be used to ensure that discussions will not go into deep levels of

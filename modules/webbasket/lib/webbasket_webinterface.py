@@ -679,7 +679,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'copy': (int, 0),
                                    'wait': (int, 0),
                                    'referer': (str, ""),
-                                   "of" : (str, ''),
+                                   'of': (str, ''),
+                                   'move_from_basket': (int, 0),
                                    'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
@@ -721,6 +722,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                b=argd['b'],
                                                copy=argd['copy'],
                                                wait=argd['wait'],
+                                               move_from_basket=argd['move_from_basket'],
                                                referer=argd['referer'],
                                                ln=argd['ln'])
 
@@ -882,13 +884,22 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         elif argd['action'] == CFG_WEBBASKET_ACTIONS['DOWN']:
             move_record(uid, argd['bskid'], argd['recid'], argd['action'])
             redirect_to_url(req, url)
-        elif argd['action'] == CFG_WEBBASKET_ACTIONS['COPY']:
-            title = _("Copy record to basket")
+        elif argd['action'] == CFG_WEBBASKET_ACTIONS['COPY'] or \
+                argd['action'] == CFG_WEBBASKET_ACTIONS['MOVE']:
+
+            if(argd['action'] == CFG_WEBBASKET_ACTIONS['MOVE']):
+                title = _("Move record to basket")
+                from_bsk = argd['bskid']
+            else:
+                title = _("Copy record to basket")
+                from_bsk = 0
+
             referer = get_referer(req)
             (body, navtrail) = perform_request_add(uid=uid,
                                                    recids=argd['recid'],
                                                    copy=True,
                                                    referer=referer,
+                                                   move_from_basket=from_bsk,
                                                    ln=argd['ln'])
             if isGuestUser(uid):
                 body = create_guest_warning_box(argd['ln']) + body
