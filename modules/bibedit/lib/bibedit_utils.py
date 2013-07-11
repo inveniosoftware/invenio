@@ -262,7 +262,11 @@ def touch_cache(recid, uid):
 def get_bibrecord(recid):
     """Return record in BibRecord wrapping."""
     if record_exists(recid):
-        return create_record(print_record(recid, 'xm'))[0]
+        record_revision_ids = get_record_revision_ids(recid)
+        if record_revision_ids:
+            return create_record(get_marcxml_of_revision_id(max(record_revision_ids)))[0]
+        else:
+            return get_record(recid)
 
 def get_cache_contents(recid, uid):
     """Return the contents of a BibEdit cache into the database."""
