@@ -26,10 +26,10 @@ import mechanize
 import re
 
 from invenio.config import CFG_SITE_URL, CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase, \
                               test_web_page_content, make_url, make_surl, merge_error_messages
 
-class WebBasketWebPagesAvailabilityTest(unittest.TestCase):
+class WebBasketWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebBasket web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
@@ -55,7 +55,7 @@ class WebBasketWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebBasketRecordsAdditionTest(unittest.TestCase):
+class WebBasketRecordsAdditionTest(InvenioTestCase):
     """Test addition of records to webbasket"""
 
     def _login(self, browser, user, password):
@@ -63,8 +63,8 @@ class WebBasketRecordsAdditionTest(unittest.TestCase):
 
         browser.open(make_surl('/youraccount/login'))
         browser.select_form(nr=0)
-        browser['p_un'] = user
-        browser['p_pw'] = password
+        browser['nickname'] = user
+        browser['password'] = password
         browser.submit()
 
     def _perform_search(self, browser, search_criteria):

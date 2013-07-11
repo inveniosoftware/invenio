@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -41,9 +41,30 @@ from invenio.config import \
      CFG_SITE_RECORD
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
-from invenio.webbasket_dblayer import get_basket_item_title_and_URL, \
-                                      get_basket_ids_and_names
-from invenio.bibformat import format_record
+from invenio.webbasket_dblayer import get_basket_ids_and_names
+
+ICON_BACK = 'icon-arrow-left'
+ICON_CREATE_BASKET = 'icon-plus'
+ICON_EDIT_BASKET = 'icon-wrench'
+ICON_DELETE_BASKET = 'icon-trash'
+
+ICON_ADD_ITEM = 'icon-plus'
+ICON_MOVE_ITEM = 'icon-share-alt'
+ICON_COPY_ITEM = 'icon-plus-sign'
+ICON_REMOVE_ITEM = 'icon-trash'
+
+ICON_MOVE_UP = 'icon-arrow-up'
+ICON_MOVE_UP_MUTED = 'icon-arrow-up muted'
+ICON_MOVE_DOWN = 'icon-arrow-down'
+ICON_MOVE_DOWN_MUTED = 'icon-arrow-down muted'
+ICON_NEXT_ITEM = 'icon-arrow-right'
+ICON_NEXT_ITEM_MUTED = 'icon-arrow-right muted'
+ICON_PREVIOUS_ITEM = 'icon-arrow-left'
+ICON_PREVIOUS_ITEM_MUTED = 'icon-arrow-left muted'
+
+ICON_NOTES = 'icon-file'
+ICON_ADD_NOTE = 'icon-pencil'
+
 
 class Template:
     """Templating class for webbasket module"""
@@ -110,38 +131,39 @@ class Template:
                               'topic': urllib.quote(topic),
                               'ln': ln,
                               'label': cgi.escape(topic, True)}
-                go_back_link = """<a href="%(url)s/yourbaskets/display?ln=%(ln)s"><img src="%(url)s/img/%(img)s" />%(label)s</a>""" % \
+                go_back_link = """<a href="%(url)s/yourbaskets/display?ln=%(ln)s"><i class="icon %(icon)s"></i> %(label)s</a>""" % \
                                {'url': CFG_SITE_URL,
                                 'ln': ln,
-                                'img': 'wb-go-back.png',
+                                'icon': ICON_BACK,
                                 'label': _('Back to Your Baskets')}
-                create_basket_link = """<a href="%(url)s/yourbaskets/create_basket?topic=%(topic)s&amp;ln=%(ln)s"><img src="%(url)s/img/%(img)s" />%(label)s</a>""" % \
+                create_basket_link = """<a href="%(url)s/yourbaskets/create_basket?topic=%(topic)s&amp;ln=%(ln)s"><i class="icon %(icon)s"></i> %(label)s</a>""" % \
                                      {'url': CFG_SITE_URL,
                                       'topic': urllib.quote(topic),
                                       'ln': ln,
-                                      'img': 'wb-create-basket.png',
+                                      'icon': ICON_CREATE_BASKET,
                                       'label': _('Create basket')}
-                edit_topic_link = """<a href="%(url)s/yourbaskets/edit_topic?topic=%(topic)s&amp;ln=%(ln)s"><img src="%(url)s/img/%(img)s" />%(label)s</a>""" % \
+                edit_topic_link = """<a href="%(url)s/yourbaskets/edit_topic?topic=%(topic)s&amp;ln=%(ln)s"><i class="icon %(icon)s"></i> %(label)s</a>""" % \
                                   {'url': CFG_SITE_URL,
                                    'topic': urllib.quote(topic),
                                    'ln': ln,
-                                   'img': 'wb-edit-topic.png',
+                                   'icon': ICON_EDIT_BASKET,
                                    'label': _('Edit topic')}
                 personal_tab = """
-              <td class="bsk_directory_box_nav_tab_content">
-              %(personalbaskets_link)s&nbsp;&gt;&nbsp;%(topic_link)s
-              </td>
-              <td class="bsk_directory_box_nav_tab_options">
-              %(go_back)s
-              &nbsp;&nbsp;
-              %(create_basket)s
-              &nbsp;&nbsp;
-              %(edit_topic)s
-              </td>""" % {'topic_link': topic_link,
-                          'personalbaskets_link': personalbaskets_link,
-                          'go_back': go_back_link,
-                          'create_basket': create_basket_link,
-                          'edit_topic': edit_topic_link}
+              <div class="row-fluid">
+                <div class="span7 bsk_directory_box_nav_tab_content">
+                  %(personalbaskets_link)s&nbsp;&gt;&nbsp;%(topic_link)s
+                </div>
+                <div class="span5 pagination-right bsk_directory_box_nav_tab_options">
+                  %(go_back)s
+                  &nbsp;&nbsp;
+                  %(create_basket)s
+                  &nbsp;&nbsp;
+                  %(edit_topic)s
+                </div>""" % {'topic_link': topic_link,
+                             'personalbaskets_link': personalbaskets_link,
+                             'go_back': go_back_link,
+                             'create_basket': create_basket_link,
+                             'edit_topic': edit_topic_link}
             ## If no specific topic is selected display the personal baskets tab.
             else:
                 personal_tab = """
@@ -176,10 +198,10 @@ class Template:
                               'grpid': grpid,
                               'ln': ln,
                               'label': cgi.escape(group_name, True)}
-                go_back_link = """<a href="%(url)s/yourbaskets/display?ln=%(ln)s"><img src="%(url)s/img/%(img)s" />%(label)s</a>""" % \
+                go_back_link = """<a href="%(url)s/yourbaskets/display?ln=%(ln)s"><i class="icon %(icon)s"></i> %(label)s</a>""" % \
                                {'url': CFG_SITE_URL,
                                 'ln': ln,
-                                'img': 'wb-go-back.png',
+                                'icon': ICON_BACK,
                                 'label': _('Back to Your Baskets')}
                 group_tab = """
               <td class="bsk_directory_box_nav_tab_content">
@@ -230,46 +252,40 @@ class Template:
 
         ## If a specific topic is selected display the name of the topic
         ## and the options on it.
+
+        tabs = """<div class="row-fluid well bsk_directory_box_tabs">"""
+
         if personal_baskets_info:
-            tabs = """
-          <table cellspacing="0px" cellpadding="0px" class="bsk_directory_box_tabs">
-            <tr>%s
-            </tr>
-          </table>""" % (personal_tab,)
+            tabs += """
+            <div class="span12">
+              %s
+            </div>""" % (personal_tab,)
+
         ## If a specific group is selected display the name of the group
         ## and the options on it.
         elif group_baskets_info:
-            tabs = """
-          <table cellspacing="0px" cellpadding="0px" class="bsk_directory_box_tabs">
-            <tr>
+            tabs += """
+            <div class="span12">
               %s
-            </tr>
-          </table>""" % (group_tab,)
+            </div>""" % (group_tab,)
         ## If only a sepcific category is selected (or eveb none) display
         ## all the available tabs (selected, normal, inactive).
         else:
-            tabs = """
-          <table cellspacing="0px" cellpadding="0px" class="bsk_directory_box_tabs">
-            <tr>
-              <td class="bsk_directory_box_tab_separator">
-              &nbsp;
-              </td>
-              %(personal_tab)s
-              <td class="bsk_directory_box_tab_separator">
-              &nbsp;
-              </td>
-              %(group_tab)s
-              <td class="bsk_directory_box_tab_separator">
-              &nbsp;
-              </td>
-              %(public_tab)s
-              <td class="bsk_directory_box_tab_separator_end">
-              &nbsp;
-              </td>
-            </tr>
-          </table>""" % {'personal_tab': personal_tab,
+            tabs += """
+
+            <div class="span4">
+                %(personal_tab)s
+            </div>
+            <div class="span4">
+                %(group_tab)s
+            </div>
+            <div class="span4">
+                %(public_tab)s
+            </div>""" % {'personal_tab': personal_tab,
                          'group_tab': group_tab,
                          'public_tab': public_tab}
+
+        tabs += """</div>"""
 
         ## Secondly, create the content.
         if personal_info and category==CFG_WEBBASKET_CATEGORIES['PRIVATE']:
@@ -340,8 +356,10 @@ class Template:
             nb_items = len(content_list)
             content_list.reverse()
             content = """
-                <table cellspacing="0px" cellpadding="0px" align="center" width="100%">
-                  <tr>"""
+                <div class="row-fluid">
+                    <div class="span12">
+                        <table cellspacing="0px" cellpadding="0px" align="center" width="100%">
+                          <tr>"""
             for i in range(nb_cells):
                 content += """
                     <td class="bsk_directory_box_content_list_cell" width="%s%%">""" % \
@@ -354,22 +372,23 @@ class Template:
                 content += """
                     </td>"""
             content += """
-                  </tr>"""
+                  </tr>
+                        </table>
+                    </div>
+                </div>"""
             if not personal_baskets_info:
-                create_basket_link = """<a href="%(url)s/yourbaskets/create_basket?topic=%(topic)s&amp;ln=%(ln)s"><img src="%(url)s/img/%(img)s" />%(label)s</a>""" % \
+                create_basket_link = """<a href="%(url)s/yourbaskets/create_basket?topic=%(topic)s&amp;ln=%(ln)s"><i class="icon %(icon)s"></i> %(label)s</a>""" % \
                                      {'url': CFG_SITE_URL,
                                       'topic': urllib.quote(topic),
                                       'ln': ln,
-                                      'img': 'wb-create-basket.png',
+                                      'icon': ICON_CREATE_BASKET,
                                       'label': _('Create basket')}
                 content += """
-                      <tr>
-                        <td class="bsk_directory_box_nav_extra_options" text-align: right;" colspan="%s">
+                <div class="row-fluid well">
+                    <div class="span5 offset7 pagination-right bsk_directory_box_nav_extra_options">
                         %s
-                        </td>
-                      </tr>""" % (str(nb_cells), create_basket_link)
-            content += """
-                    </table>"""
+                    </div>
+                </div>""" % (create_basket_link,)
 
         elif group_info and category==CFG_WEBBASKET_CATEGORIES['GROUP']:
             content_list = []
@@ -440,11 +459,12 @@ class Template:
             nb_items = len(content_list)
             content_list.reverse()
             content = """
-                <table cellspacing="0px" cellpadding="0px" align="center" width="100%">
-                  <tr>"""
+            <div class="row-fluid">
+              <table cellspacing="0px" cellpadding="0px" align="center" width="100%">
+                <tr>"""
             for i in range(nb_cells):
                 content += """
-                    <td class="bsk_directory_box_content_list_cell" width="%s%%">""" % \
+                  <td class="bsk_directory_box_content_list_cell" width="%s%%">""" % \
                               (100/nb_cells,)
                 nb_lines = (nb_items/nb_cells) + ((nb_items%nb_cells) > i and 1 or 0)
                 for j in range(nb_lines):
@@ -453,10 +473,11 @@ class Template:
                         #content += "<br /><br />"
                         content += group_baskets_info and "<br />" or "<br /><br />"
                 content += """
-                    </td>"""
+                  </td>"""
             content += """
-                  </tr>
-                </table>"""
+                </tr>
+              </table>
+            </div>"""
 
         elif public_info and category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             content_list = []
@@ -498,29 +519,21 @@ class Template:
                 </table>"""
 
         out = """
-    <table cellspacing="0px" cellpadding="0px" class="bsk_directory_box">
-      <tr>
-        <td width="100%%">
+    <div class="bsk_directory_box">
+      <div class="row-fluid">
         %(tabs)s
-        </td>
-      </tr>
-      <tr>
-        <td width="100%%">
-          <table cellspacing="0px" cellpadding="0px" class="bsk_directory_box_content">
-            <tr>
-              <td class="%(class)s">
-              %(content)s
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>""" % {'class': ((category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and topic) or \
-                             (category == CFG_WEBBASKET_CATEGORIES['GROUP'] and grpid)) and \
-                             "bsk_directory_box_content_list_baskets" or \
-                             "bsk_directory_box_content_list_topics_groups",
-                   'tabs': tabs,
-                   'content': content}
+      </div>
+      <div class="row-fluid bsk_directory_box_content">
+        <div class="span12 %(class)s">
+          %(content)s
+        </div>
+      </div>
+    </div>""" % {'class': ((category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and topic) or \
+                          (category == CFG_WEBBASKET_CATEGORIES['GROUP'] and grpid)) and \
+                          "bsk_directory_box_content_list_baskets" or \
+                          "bsk_directory_box_content_list_topics_groups",
+                 'tabs': tabs,
+                 'content': content}
         return out
 
     def tmpl_create_search_box(self,
@@ -570,7 +583,7 @@ class Template:
           </select>
           </td>
           <td>
-          <input class="formbutton" type="submit" value="%(search_label)s" />
+          <input class="btn btn-primary formbutton" type="submit" value="%(search_label)s" />
           </td>
         </tr>
         <tr>
@@ -745,7 +758,7 @@ class Template:
                                       'notes_action': number_of_notes and 'display' or 'write_note',
                                       'notes_inline_anchor': not number_of_notes and '#note' or '',
                                       'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -769,7 +782,7 @@ class Template:
                                       'notes_action': number_of_notes and 'display' or 'write_note',
                                       'notes_inline_anchor': not number_of_notes and '#note' or '',
                                       'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -778,7 +791,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info':  notes_html}
-                        
+
                 out += """
           </ol>
         </td>
@@ -854,7 +867,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display' or 'write_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -880,7 +893,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display' or 'write_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -888,7 +901,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info': share_rights_notes and '<br />' + notes_html or ''}
-                        
+
                 out += """
           </ol>
         </td>
@@ -959,7 +972,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -984,7 +997,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -992,7 +1005,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info': share_rights_notes and '<br />' + notes_html or ''}
-                        
+
                 out += """
           </ol>
         </td>
@@ -1062,7 +1075,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -1087,7 +1100,7 @@ class Template:
                                           'notes_action': number_of_notes and 'display_public' or 'write_public_note',
                                           'notes_inline_anchor': not number_of_notes and '#note' or '',
                                           'notes_label': number_of_notes and _('Notes') + ' (' + str(number_of_notes) + ')' or _('Add a note...')}
-                        
+
                         out += """
                         <li>
                         %(record_html)s
@@ -1095,7 +1108,7 @@ class Template:
                         </li>""" % \
                         {'record_html': record_html,
                          'more_info': share_rights_notes and '<br />' + notes_html or ''}
-                        
+
                 out += """
           </ol>
         </td>
@@ -1407,27 +1420,20 @@ class Template:
     def __tmpl_basket_box(self, img='', title='&nbsp;', subtitle='&nbsp;', body=''):
         """ private function, display a basket/topic selection box """
         out = """
-<table class="bskbasket">
-  <thead class="bskbasketheader">
-    <tr>
-      <td class="bskactions">
-        <img src="%(logo)s" alt="%(label)s" />
-      </td>
-      <td class="bsktitle">
-        <b>%(label)s</b><br />
-        %(count)s
-      </td>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td colspan="2">
-        <table>%(basket_list)s
-        </table>
-      </td>
-    </tr>
-  </tbody>
-</table>"""
+<div class="bskbasket">
+    <div class="row-fluid bskbasketheader">
+        <div class="span1 bskactions">
+            <img src="%(logo)s" alt="%(label)s" />
+        </div>
+        <div class="span11 bsktitle">
+            <b>%(label)s</b><br />
+            %(count)s
+        </div>
+    </div>
+    <div class="row-fluid">
+        %(basket_list)s
+    </div>
+</div>"""
         out %= {'logo': img,
               'label': title, 'count': subtitle,
               'basket_list': body}
@@ -1455,15 +1461,15 @@ class Template:
             topics_html = self.__create_select_menu('create_in_topic', topics, selected_topic)
         create_html = """
 <tr>
-  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 5;"><label>%s</label></td>
   <td style="padding: 10 5 0 0;">%s</td>
 </tr>
 <tr>
-  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 5;"><label>%s</label></td>
   <td style="padding: 10 5 0 0;"><input type="text" name="new_topic_name" value="%s"/></td>
 </tr>
 <tr>
-  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 5;"><label>%s</label></td>
   <td style="padding: 10 5 0 0;">
     <input type="text" name="new_basket_name" value="%s"/>
   </td>
@@ -1511,7 +1517,7 @@ class Template:
     <input type="hidden" name="copy" value="%(copy)i" />
     <input type="hidden" name="referer" value="%(referer)s" />
     <input type="hidden" name="move_from_basket" value="%(move_from_basket)s" />
-    <input type="submit" value="%(label)s" class="formbutton"/>
+    <input type="submit" value="%(label)s" class="btn btn-primary formbutton"/>
   </div>
 </form>""" % {'action': CFG_SITE_URL + '/yourbaskets/create_basket',
               'ln': ln,
@@ -1559,7 +1565,7 @@ class Template:
         #                                   height="100px",
         #                                   enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
         #                                   toolbar_set="WebComment")
-        desc_editor = """<textarea name="es_desc" style="width: 640px; height: 100px;">%(value)s</textarea>""" % \
+        desc_editor = """<textarea name="es_desc" style="width: 600px; height: 100px;">%(value)s</textarea>""" % \
                       {'value': cgi.escape(desc, True)}
 
         out = """
@@ -1666,33 +1672,31 @@ class Template:
         #(having no recids specified is just like having a colid equal -1)
         if len(recids) == 0:
         #if colid == -1:
+
             out += """
-    <table class="bskbasket">
-      <thead class="bskbasketheader">
-        <tr>
-          <td class="bskactions">
-            <img src="%(logo)s" alt="%(label)s" />
-          </td>
-          <td class="bsktitle">
-            <b>Adding items to your basket</b><br />
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td colspan="2">
-            <table>
-            To add internal items to your basket please select them through the  <a href="%(search_link)s">search page</a>
-            and use the "Add to basket" functionality. For any external resource please use the
-            "External item" form below.
-            </table>
-          </td>
-        </tr>
-      </tbody>
-    </table>"""
-            out %= {'logo': "%s/img/tick.gif"% (CFG_SITE_URL,),
-                  'label':"tick",
-                  'search_link':"%s"%(CFG_SITE_URL,) }
+    <div class="bskbasket">
+        <div class="well bskbasketheader">
+            <div class="row-fluid bskactions">
+                <div class="span1 bskactions">
+                    <img src="%(logo)s" alt="%(label)s" />
+                </div>
+                <div class="span11 bsktitle">
+                    <b>Adding items to your basket</b>
+                </div>
+            </div>
+            <div class="row-fluid bskbasketheader bskactions">
+                <div class="span12">
+                    To add internal items to your basket please select them
+                    through the  <a href="%(search_link)s">search page</a>
+                    and use the "Add to basket" functionality.
+                    For any external resource please use the
+                    "External item" form below.
+                </div>
+            </div>
+        </div>"""
+            out %= {'logo': "%s/img/tick.gif" % (CFG_SITE_URL,),
+                    'label': "tick",
+                    'search_link': "%s" % (CFG_SITE_URL, )}
 
         note_editor = get_html_text_editor(name="note_body",
                                            content=note_body,
@@ -1722,50 +1726,31 @@ class Template:
             out += self.tmpl_external_source_add_box(es_title, es_desc, es_url, ln)
 
         out += """
-<table class="bskbasket" width="100%%">
-  <thead>
-    <tr>
-      <td class="bskbasketheader">
-        <table>
-          <tr>
-            <td class="bskbasketheadertitle">
-              <strong>
-              %(header_label)s
-              </strong>
-            </td>
-        </table>
-      </td>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="padding: 10px;">
-      %(create_new_basket)s
-        <br />
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 10px;">
-        <p align="left">
-        <small>%(note_label)s:</small>
-        <br />
+<div class="row-fluid">
+    <div class="span12 well bskbasketheader bskbasketheadertitle">
+        <strong>
+            %(header_label)s
+        </strong>
+    </div>
+</div>
+<div class="row-fluid">
+    %(create_new_basket)s
+</div>
+<div class="row-fluid">
+    <fieldset>
+        <label><small>%(note_label)s:</small></label>
         %(note_editor)s
-        </p>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding: 10px;">
-        %(hidden_recids)s
-        <input type="hidden" name="colid" value="%(colid)s" />
-        <input type="hidden" name="copy" value="%(copy)i" />
-        <input type="hidden" name="referer" value="%(referer)s" />
-        <input type="hidden" name="move_from_basket" value="%(move_from_basket)s" />
-        <input type="submit" class="formbutton" value="%(add_label)s" />
-        <input type="button" class="nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='/'" />
-      </td>
-    </tr>
-  </tbody>
-</table>""" % {'header_label': _("Adding %i items to your baskets") % (colid == -1 and 1 or len(recids)),
+    </fieldset>
+</div>
+<div class="row-fluid">
+    %(hidden_recids)s
+    <input type="hidden" name="colid" value="%(colid)s" />
+    <input type="hidden" name="copy" value="%(copy)i" />
+    <input type="hidden" name="referer" value="%(referer)s" />
+	<input type="hidden" name="move_from_basket" value="%(move_from_basket)s" />
+	<input type="submit" class="btn btn-primary formbutton" value="%(add_label)s" />
+    <input type="button" class="btn nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='/'" />
+</div>"""   % {'header_label': _("Adding %i items to your baskets") % (colid == -1 and 1 or len(recids)),
                'create_new_basket': _("Please choose a basket: %(x_basket_selection_box)s %(x_fmt_open)s(or %(x_url_open)screate a new one%(x_url_close)s first)%(x_fmt_close)s") % \
                                     {'x_basket_selection_box': '&nbsp;<select name="b">%s</select>' % select_options,
                                      'x_url_open': colid == -1 and ('''<a href="%s/yourbaskets/create_basket?colid=-1" onClick="this.href+= \
@@ -1838,7 +1823,7 @@ class Template:
         <input type="hidden" name="topic" value="%(topic)s" />
         <input type="hidden" name="ln" value="%(ln)s" />
         <input type="hidden" name="bskid" value="%(bskid)i" />
-        <input type="submit" value="%(yes_label)s" class="formbutton" />
+        <input type="submit" value="%(yes_label)s" class="btn btn-primary formbutton" />
       </form>
     </td>
     <td>
@@ -1847,7 +1832,7 @@ class Template:
         <input type="hidden" name="group" value="%(group)i" />
         <input type="hidden" name="topic" value="%(topic)s" />
         <input type="hidden" name="ln" value="%(ln)s" />
-        <input type="submit" value="%(no_label)s" class="formbutton" />
+        <input type="submit" value="%(no_label)s" class="btn btn-primary formbutton" />
       </form>
     </td>
   </tr>
@@ -1909,7 +1894,7 @@ class Template:
             groups_body += """
 <tr>
   <td colspan="2">
-    <input type="submit" name="add_group" class="nonsubmitbutton" value="%s"/>
+    <input type="submit" name="add_group" class="btn nonsubmitbutton" value="%s"/>
   </td>
 </tr>""" % _("Add group")
         else:
@@ -1932,7 +1917,7 @@ class Template:
                                               body=external_body)
         delete_button = ''
         if display_delete:
-            delete_button = '<input type="submit" class="nonsubmitbutton" name="delete" value="%s" />'
+            delete_button = '<input type="submit" class="btn nonsubmitbutton" name="delete" value="%s" />'
             delete_button %=  _("Delete basket")
         out = """
 <form name="edit" action="%(action)s" method="post">
@@ -1951,8 +1936,8 @@ class Template:
       <td colspan="3">%(external)s</td>
     </tr>
     <tr>
-      <td><input type="submit" class="formbutton" name="submit" value="%(submit_label)s" /></td>
-      <td><input type="submit" class="nonsubmitbutton" name="cancel" value="%(cancel_label)s" /></td>
+      <td><input type="submit" class="btn btn-primary formbutton" name="submit" value="%(submit_label)s" /></td>
+      <td><input type="submit" class="btn nonsubmitbutton" name="cancel" value="%(cancel_label)s" /></td>
       <td>%(delete_button)s</td>
     </tr>
   </table>
@@ -1998,7 +1983,7 @@ class Template:
         delete_button = ''
         display_delete = False
         if display_delete:
-            delete_button = '<input type="submit" class="nonsubmitbutton" name="delete" value="%s" />'
+            delete_button = '<input type="submit" class="btn nonsubmitbutton" name="delete" value="%s" />'
             delete_button %=  _("Delete basket")
         out = """
 <form name="edit" action="%(action)s" method="post">
@@ -2010,8 +1995,8 @@ class Template:
       <td colspan="3">%(general)s</td>
     </tr>
     <tr>
-      <td><input type="submit" class="formbutton" name="submit" value="%(submit_label)s" /></td>
-      <td><input type="submit" class="nonsubmitbutton" name="cancel" value="%(cancel_label)s" /></td>
+      <td><input type="submit" class="btn btn-primary formbutton" name="submit" value="%(submit_label)s" /></td>
+      <td><input type="submit" class="btn nonsubmitbutton" name="cancel" value="%(cancel_label)s" /></td>
       <td>%(delete_button)s</td>
     </tr>
   </table>
@@ -2101,8 +2086,8 @@ class Template:
     </tr>
     <tr>
       <td colspan="2">
-        <input type="submit" class="formbutton" name="group_cancel" value="%(cancel_label)s" />
-        <input type="submit" class="formbutton" name="add_group" value="%(submit_label)s" />
+        <input type="submit" class="btn formbutton" name="group_cancel" value="%(cancel_label)s" />
+        <input type="submit" class="btn btn-primary formbutton" name="add_group" value="%(submit_label)s" />
       </td>
     </tr>
   </table>
@@ -2277,17 +2262,6 @@ class Template:
                                            share_level,
                                            ln)
 
-        if not of.startswith('x'):
-            out += self.tmpl_basket_footer(bskid,
-                                           nb_items,
-                                           (user_can_view_content,
-                                            user_can_add_item,
-                                            user_can_edit_basket),
-                                           selected_category,
-                                           selected_topic,
-                                           share_level,
-                                           ln)
-
         out += self.tmpl_basket_content(bskid,
                                         (user_can_view_content,
                                          user_can_view_notes,
@@ -2300,6 +2274,18 @@ class Template:
                                         items,
                                         of,
                                         ln)
+
+        # Moved footer after content - a footer should be last anyway?
+        if not of.startswith('x'):
+            out += self.tmpl_basket_footer(bskid,
+                                           nb_items,
+                                           (user_can_view_content,
+                                            user_can_add_item,
+                                            user_can_edit_basket),
+                                           selected_category,
+                                           selected_topic,
+                                           share_level,
+                                           ln)
 
         if not of.startswith('x'):
             out += """
@@ -2351,49 +2337,48 @@ class Template:
 
         if user_can_add_item:
             add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i&amp;wait=1""" % (CFG_SITE_URL,selected_category,bskid,)
-            add_ext_resource_logo = """<img src="%s/img/wb-create-basket.png" />""" % (CFG_SITE_URL,)
+            add_ext_resource_logo = """<i class="icon %s"></i> """ % (ICON_ADD_ITEM,)
             add_ext_resource = """<a href="%s">%s%s</a>""" % (add_ext_resource_url, add_ext_resource_logo, _("Add item"))
-        
+
         if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
-            edit_basket_logo = """<img src="%s/img/wb-edit-basket.png" />""" % (CFG_SITE_URL,)
+            edit_basket_logo = """<i class="icon %s"></i> """ % (ICON_EDIT_BASKET,)
             edit_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
             delete_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;delete=1&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
-            delete_basket_logo = """<img src="%s/img/wb-delete-basket.png" />""" % (CFG_SITE_URL,)
+            delete_basket_logo = """<i class="icon %s"></i> """ % (ICON_DELETE_BASKET,)
             delete_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
 
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
+            unsubscribe_logo = """<i class="icon %s"></i> """ % (ICON_UNSUBSCRIBE,)
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
         else:
             unsubscribe = ""
 
         out = """
-  <thead>
-    <tr>
-      <td class="bskbasketheader"%(optional_colspan)s>
-        <table width="100%%">
-          <tr>
-            <td class="bskbasketheadertitle">
-              <strong>
-              %(name)s
-              </strong>
-              <small>
-              %(records_field)s%(comments_field)s%(subscribers_field)s
-              %(last_update_field)s
-              </small>
-            </td>
-            <td class="bskbasketheaderoptions">
-              %(add_ext_resource)s
-              %(edit_basket)s
-              %(delete_basket)s
-              %(unsubscribe)s
-            </td>
-        </table>
-      </td>
-    </tr>
-  </thead>"""
+
+    <div class="row-fluid well" %(optional_colspan)s>
+      <!-- bskbasketheadertitle -->
+      <div class="span4">
+        <strong>
+          %(name)s
+        </strong>
+        <small>
+          %(records_field)s%(comments_field)s%(subscribers_field)s
+          %(last_update_field)s
+        </small>
+      </div>
+
+      <!-- bskbasketheaderoptions -->
+      <div class="span5 offset3 pagination-right">
+        %(add_ext_resource)s
+        %(edit_basket)s
+        %(delete_basket)s
+        %(unsubscribe)s
+      </div>
+    </div>
+
+  """
 
         out %= {'optional_colspan': optional_colspan,
                 'name': cgi.escape(name, True),
@@ -2406,7 +2391,7 @@ class Template:
                 'edit_basket': edit_basket,
                 'delete_basket': delete_basket,
                 'unsubscribe': unsubscribe,
-        }
+                }
 
         return out
 
@@ -2424,8 +2409,6 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        optional_colspan = nb_items and user_can_view_content and ' colspan="3"' or ''
-
         ## By default we assume the user has no rights on the basket
         edit_basket = ""
         delete_basket = ""
@@ -2433,20 +2416,20 @@ class Template:
 
         if user_can_add_item:
             add_ext_resource_url = """%s/yourbaskets/add?category=%s&amp;bskid=%i&amp;wait=1""" % (CFG_SITE_URL,selected_category,bskid,)
-            add_ext_resource_logo = """<img src="%s/img/wb-create-basket.png" />""" % (CFG_SITE_URL,)
+            add_ext_resource_logo = """<i class="icon %s"></i> """ % (ICON_ADD_ITEM,)
             add_ext_resource = """<a href="%s">%s%s</a>""" % (add_ext_resource_url, add_ext_resource_logo, _("Add item"))
 
         if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
-            edit_basket_logo = """<img src="%s/img/wb-edit-basket.png" />""" % (CFG_SITE_URL,)
+            edit_basket_logo = """<i class="icon %s"></i> """ % (ICON_EDIT_BASKET)
             edit_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
             delete_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;delete=1&amp;ln=%s""" % (CFG_SITE_URL, bskid, urllib.quote(selected_topic), ln)
-            delete_basket_logo = """<img src="%s/img/wb-delete-basket.png" />""" % (CFG_SITE_URL,)
+            delete_basket_logo = """<i class="icon %s"></i> """ % (ICON_DELETE_BASKET,)
             delete_basket = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
 
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
+            unsubscribe_logo = """<i class="icon %s"></i> """ % (ICON_UNSUBSCRIBE,)
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
         else:
             unsubscribe = ""
@@ -2456,31 +2439,23 @@ class Template:
             display_public = """%s<br /><a href="%s">%s</a>""" % (display_public_text, display_public_url, display_public_url)
         else:
             display_public = ""
-        out = """
-  <tfoot>
-    <tr>
-      <td class="bskbasketfooter"%(optional_colspan)s>
-        <table width="100%%">
-          <tr>
-            <td class="bskbasketfootertitle">
-              <small>
-              %(display_public)s
-              </small>
-            </td>
-            <td class="bskbasketfooteroptions">
-              %(add_ext_resource)s
-              %(edit_basket)s
-              %(delete_basket)s
-              %(unsubscribe)s
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </tfoot>"""
 
-        out %= {'optional_colspan': optional_colspan,
-                'display_public': display_public,
+        out = """
+        <div class="row-fluid well">
+            <div class="span4 bskbasketfootertitle">
+                <small>
+                %(display_public)s
+                </small>
+            </div>
+            <div class="span5 offset3 pagination-right bskbasketfooteroptions">
+                %(add_ext_resource)s
+                %(edit_basket)s
+                %(delete_basket)s
+                %(unsubscribe)s
+            </div>
+        </div>"""
+
+        out %= {'display_public': display_public,
                 'add_ext_resource': add_ext_resource,
                 'edit_basket': edit_basket,
                 'delete_basket': delete_basket,
@@ -2589,13 +2564,13 @@ class Template:
                           'topic': urllib.quote(selected_topic),
                           'group': selected_group,
                           'ln': ln}
-            moveup_img = "%s/img/wb-move-item-up.png" % (CFG_SITE_URL,)
-            moveup = """<a href="%s"><img src="%s" alt="%s" /></a>""" % \
-                       (moveup_url, moveup_img, _("Move item up"))
+            moveup_icon = ICON_MOVE_UP
+            moveup = """<a href="%s"><i class="icon %s" alt="%s"></i></a>""" % \
+                       (moveup_url, moveup_icon, _("Move item up"))
         else:
-            moveup_img = "%s/img/wb-move-item-up-disabled.png" % (CFG_SITE_URL,)
-            moveup = """<img src="%s" alt="%s" />""" % \
-                       (moveup_img, _("You cannot move this item up"))
+            moveup_icon = ICON_MOVE_UP_MUTED
+            moveup = """<i class="icon %s" alt="%s"></i>""" % \
+                       (moveup_icon, _("You cannot move this item up"))
 
         if downarrow:
             movedown_url = "%(siteurl)s/yourbaskets/modify?action=movedown&amp;bskid=%(bskid)i&amp;recid=%(recid)i"\
@@ -2607,13 +2582,13 @@ class Template:
                           'topic': urllib.quote(selected_topic),
                           'group': selected_group,
                           'ln': ln}
-            movedown_img = "%s/img/wb-move-item-down.png" % (CFG_SITE_URL,)
-            movedown = """<a href="%s"><img src="%s" alt="%s" /></a>""" % \
-                       (movedown_url, movedown_img, _("Move item down"))
+            movedown_icon = ICON_MOVE_DOWN
+            movedown = """<a href="%s"><i class="icon %s" alt="%s"></i></a>""" % \
+                       (movedown_url, movedown_icon, _("Move item down"))
         else:
-            movedown_img = "%s/img/wb-move-item-down-disabled.png" % (CFG_SITE_URL,)
-            movedown = """<img src="%s" alt="%s" />""" % \
-                       (movedown_img, _("You cannot move this item down"))
+            movedown_icon = ICON_MOVE_DOWN_MUTED
+            movedown = """<i class="icon %s" alt="%s"></i>""" % \
+                       (movedown_icon, _("You cannot move this item down"))
 
         if copy_item:
             copy_url = "%(siteurl)s/yourbaskets/modify?action=copy&amp;bskid=%(bskid)i&amp;recid=%(recid)i"\
@@ -2625,9 +2600,9 @@ class Template:
                         'topic': urllib.quote(selected_topic),
                         'group': selected_group,
                         'ln': ln}
-            copy_img = "%s/img/wb-copy-item.png" % (CFG_SITE_URL,)
-            copy = """<a href="%s"><img src="%s" alt="%s" />%s</a>""" % \
-                       (copy_url, copy_img, _("Copy item"), _("Copy item"))
+            copy_icon = ICON_COPY_ITEM
+            copy = """<a href="%s"><i class="icon %s" alt="%s"></i> %s</a>""" % \
+                       (copy_url, copy_icon, _("Copy item"), _("Copy item"))
         else:
             copy = ""
 
@@ -2643,9 +2618,9 @@ class Template:
                         'topic': urllib.quote(selected_topic),
                         'group': selected_group,
                         'ln': ln}
-            move_img = "%s/img/move.png" % (CFG_SITE_URL,)
-            move = """<a href="%s"><img src="%s" alt="%s" />%s</a>""" % \
-                   (move_url, move_img, _("Move item"), _("Move item"))
+            move_icon = ICON_MOVE_ITEM
+            move = """<a href="%s"><i class="icon %s" alt="%s"></i> %s</a>""" % \
+                   (move_url, move_icon, _("Move item"), _("Move item"))
         else:
             move = ""
 
@@ -2659,9 +2634,9 @@ class Template:
                           'topic': urllib.quote(selected_topic),
                           'group': selected_group,
                           'ln': ln}
-            remove_img = "%s/img/wb-delete-item.png" % (CFG_SITE_URL,)
-            remove = """<a href="%s"><img src="%s" alt="%s" />%s</a>""" % \
-                       (remove_url, remove_img, _("Remove item"), _("Remove item"))
+            remove_icon = ICON_REMOVE_ITEM
+            remove = """<a href="%s"><i class="icon %s" alt="%s"></i> %s</a>""" % \
+                   (remove_url, remove_icon, _("Remove item"), _("Remove item"))
         else:
             remove = ""
 
@@ -2672,23 +2647,21 @@ class Template:
             external_item_img = ''
 
         out = """
-    <tr>
-      <td class="webbasket_basket_content_item_cell">
-        <table>
-          <tr>
-            <td class="bskcontentcount">
-            %(count)i.
-            </td>
-            <td class="bskcontentcol" colspan="2">
-            %(icon)s%(content)s
-            </td>
-          </tr>
-          <tr>
-            <td class="bskcontentoptions">
-            %(moveup)s%(movedown)s
-            </td>
-            <td>
-              <span class="moreinfo">"""
+
+    <div class="row-fluid">
+      <div class="span1 bskcontentcount">
+        %(count)i.
+      </div>
+      <div class="span11 bskcontentcol">
+        %(icon)s%(content)s
+      </div>
+    </div>
+
+    <div class="row-fluid">
+      <div class="span1 bskcontentoptions">
+        %(moveup)s%(movedown)s
+      </div>
+      <div class="span4 moreinfo">"""
 
         if item[0] > 0:
             detailed_record = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)s">%(detailed_record_label)s</a>"""
@@ -2718,19 +2691,16 @@ class Template:
             out += notes
 
         out += """
-              </span>
-            </td>
-            <td class="bskbasketheaderoptions">
-            %(copy)s
-            &nbsp;
-            %(move)s
-            &nbsp;
-            %(remove)s
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>"""
+      </div>
+      <div class="span5 offset2 pagination-right bskbasketheaderoptions">
+        %(copy)s
+        &nbsp;
+        %(move)s
+        &nbsp;
+        %(remove)s
+      </div>
+    </div>"""
+
         out = out % {'moveup': moveup,
                      'movedown': movedown,
                      'count': count,
@@ -2863,10 +2833,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM_MUTED,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -2878,10 +2848,10 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
+            next_item_logo = """<i class="icon %s"></i> """ % (ICON_NEXT_ITEM,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
+            next_item_logo ="""<i class="icon %s"></i> """ % (ICON_NEXT_ITEM_MUTED,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;ln=%s""" % \
@@ -2891,7 +2861,7 @@ class Template:
                        selected_group,
                        bskid,
                        ln)
-        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
+        go_back_logo = """<i class="icon %s"></i> """ % (ICON_BACK,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -2950,10 +2920,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM_MUTED,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -2965,10 +2935,10 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
+            next_item_logo = """<i class="icon %s"></i> """ % (ICON_NEXT_ITEM,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
+            next_item_logo = """<i class="icon %s"></i> """ % (ICON_NEXT_ITEM_MUTED,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;ln=%s""" % \
@@ -2978,7 +2948,7 @@ class Template:
                        selected_group,
                        bskid,
                        ln)
-        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
+        go_back_logo = """<i class="icon %s"></i> """ % (ICON_BACK,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -3195,8 +3165,8 @@ class Template:
                             </p>
                             <input type="hidden" name="reply_to" value="%(reply_to)s" />
                             <p align="left">
-                            <input type="submit" class="formbutton" value="%(submit_label)s" />
-                            <input type="button" class="nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='%(cancel)s'" />
+                            <input type="submit" class="btn btn-primary formbutton" value="%(submit_label)s" />
+                            <input type="button" class="btn nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='%(cancel)s'" />
                             </p>
                           </form>
                         </td>
@@ -3211,12 +3181,13 @@ class Template:
                                    'submit_label': _('Add note'),
                                    'reply_to': optional_params.get("Reply to")}
 
-        notes_icon = '<img src="%s/img/wb-notes.png" style="vertical-align: top;" />&nbsp;' % (CFG_SITE_URL,)
+        notes_icon = '<i class="icon %s"></i> &nbsp;' % (ICON_NOTES,)
+        #notes_icon = '<img src="%s/img/wb-notes.png" style="vertical-align: top;" />&nbsp;' % (CFG_SITE_URL,)
 
         if user_can_add_notes and not add_note_p:
             add_note_url = """%s/yourbaskets/write_note?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;recid=%i&amp;ln=%s%s""" % \
                            (CFG_SITE_URL, selected_category, urllib.quote(selected_topic), selected_group, bskid, recid, ln, '#note')
-            add_note_logo = """<img src="%s/img/wb-add-note.png" />""" % (CFG_SITE_URL,)
+            add_note_logo = """<i class="icon %s"></i> """ % (ICON_ADD_NOTE,)
             add_note = """<a href="%s">%s%s</a>""" % (add_note_url, add_note_logo, _("Add a note"))
         else:
             add_note = ""
@@ -3395,10 +3366,10 @@ class Template:
 
         if subscription_status:
             subscribe_url = """%s/yourbaskets/subscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            subscribe_logo = """<img src="%s/img/wb-subscribe.png" />""" % (CFG_SITE_URL,)
+            subscribe_logo = """<i class="icon %s"></i> ;""" % (ICON_SUBSCRIBE,)
             subscribe = """<a href="%s">%s%s</a>""" % (subscribe_url, subscribe_logo, _("Subscribe to basket"))
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
+            unsubscribe_logo = """<i class="icon %s"></i> ;""" % (ICON_UNSUBSCRIBE,)
             unsubscribe = """<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
 
         out = """
@@ -3448,10 +3419,10 @@ class Template:
 
         if subscription_status:
             subscribe_url = """%s/yourbaskets/subscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            subscribe_logo = """<img src="%s/img/wb-subscribe.png" />""" % (CFG_SITE_URL,)
+            subscribe_logo = """<i class="icon %s"></i> ;""" % (ICON_SUBSCRIBE,)
             subscribe = """<a href="%s">%s%s</a>""" % (subscribe_url, subscribe_logo, _("Subscribe to basket"))
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
+            unsubscribe_logo = """<i class="icon %s"></i> ;""" % (ICON_UNSUBSCRIBE,)
             unsubscribe = """<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
             (uid, nickname, display_name) = get_user_info(id_owner)
             display_owner_url = """%s/yourmessages/write?msg_to=%s""" % (CFG_SITE_URL, nickname or str(uid))
@@ -3541,9 +3512,9 @@ class Template:
                     'bskid': bskid,
                     'recid': recid,
                     'ln': ln}
-        copy_img = "%s/img/wb-copy-item.png" % (CFG_SITE_URL,)
-        copy = """<a href="%s"><img src="%s" alt="%s" />%s</a>""" % \
-               (copy_url, copy_img, _("Copy item"), _("Copy item"))
+        copy_icon = ICON_COPY_ITEM
+        copy = """<a href="%s"><i class="icon %s"></i> %s</a>""" % \
+               (copy_url, copy_icon, _("Copy item"))
 
         if recid < 0:
             external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
@@ -3704,10 +3675,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM_MUTED,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -3716,17 +3687,17 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
+            next_item_logo = """<i class="icon %s"></i> """ % (ICON_NEXT_ITEM,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
+            next_item_logo = """<i class="icon %s"></i> """ % (ICON_NEXT_ITEM_MUTED,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display_public?bskid=%i&amp;ln=%s""" % \
                       (CFG_SITE_URL,
                        bskid,
                        ln)
-        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
+        go_back_logo = """<i class="icon %s"></i> """ % (ICON_BACK,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -3779,10 +3750,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
+            previous_item_logo = """<i class="icon %s"></i> """ % (ICON_PREVIOUS_ITEM_MUTED,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -3791,17 +3762,17 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
+            next_item_logo = """<i class="icon %s"></i> """ % (ICON_NEXT_ITEM,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
+            next_item_logo = """<i class="icon %s"></i> """ % (ICON_NEXT_ITEM_MUTED,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display_public?bskid=%i&amp;ln=%s""" % \
                       (CFG_SITE_URL,
                        bskid,
                        ln)
-        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
+        go_back_logo = """<i class="icon %s"></i> """ % (ICON_BACK,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -3998,8 +3969,8 @@ class Template:
                             </p>
                             <input type="hidden" name="reply_to" value="%(reply_to)s" />
                             <p align="right">
-                            <input type="submit" class="formbutton" value="%(submit_label)s" />
-                            <input type="button" class="nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='%(cancel)s'" />
+                            <input type="submit" class="btn btn-primary formbutton" value="%(submit_label)s" />
+                            <input type="button" class="btn nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='%(cancel)s'" />
                             </p>
                           </form>
                         </td>
@@ -4014,12 +3985,13 @@ class Template:
                                    'submit_label': _('Add note'),
                                    'reply_to': optional_params.get("Reply to")}
 
-        notes_icon = '<img src="%s/img/wb-notes.png" style="vertical-align: top;" />&nbsp;' % (CFG_SITE_URL,)
+        go_back_logo = """<i class="icon %s"></i> &nbsp;""" % (ICON_NOTES,)
+        #notes_icon = '<img src="%s/img/wb-notes.png" style="vertical-align: top;" />' % (CFG_SITE_URL,)
 
         if user_can_add_notes and not add_note_p:
             add_note_url = """%s/yourbaskets/write_public_note?bskid=%i&amp;recid=%i&amp;ln=%s%s""" % \
                            (CFG_SITE_URL, bskid, recid, ln, '#note')
-            add_note_logo = """<img src="%s/img/wb-add-note.png" />""" % (CFG_SITE_URL,)
+            add_note_logo = """<i class="icon %s"></i> """ % (ICON_ADD_NOTE,)
             add_note = """<a href="%s">%s%s</a>""" % (add_note_url, add_note_logo, _("Add a note"))
         else:
             add_note = ""

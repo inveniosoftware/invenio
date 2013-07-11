@@ -477,6 +477,18 @@ def dispatch():
     if action == 'export':
         return redirect(url_for('.export', **request.values.to_dict(flat=False)))
 
+    if action == 'addtobasket':
+        recids = request.values.getlist('recid', type=int)
+        lang = (request.values.get('ln') or 'en')
+        new_url = '/yourbaskets/add?ln={ln}&'.format(ln=lang)
+        new_url += '&'.join(['recid=' + str(r) for r in recids])
+        return redirect(new_url)
+
+        # ERROR: parser of GET arguments in 'next' does not parse lists
+        # only the first element of a list is passed to webbasket.add
+        # (however, this url works in 'master' with the same webbasket module)
+
+
     flash("Not implemented action " + action, 'error')
     return redirect(request.referrer)
 

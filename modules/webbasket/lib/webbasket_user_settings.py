@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,17 +19,12 @@
 
 """WebBasket User Settings"""
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
 from invenio.webinterface_handler_flask_utils import _
-from invenio.sqlalchemyutils import db
 from invenio.jinja2utils import render_template_to_string
 from invenio.webuser_flask import current_user
-from invenio.jinja2utils import render_template_to_string
-from invenio.settings import Settings, UserSettingsStorage, \
-                             ModelSettingsStorageBuilder
-from invenio.websession_model import User
-from invenio.webaccount_forms import ChangeUserEmailSettingsForm
+from invenio.settings import Settings, UserSettingsStorage
+from invenio.webbasket_dblayer import get_all_personal_baskets_names
+
 
 class WebBasketSettings(Settings):
 
@@ -40,13 +35,21 @@ class WebBasketSettings(Settings):
     def __init__(self):
         super(WebBasketSettings, self).__init__()
         self.icon = 'shopping-cart'
-        self.title = _('Baskets WIP')
-        #self.view = url_for('webaccount.index')
+        self.title = _('Baskets')
+        self.view = '/yourbaskets'
         #self.edit = url_for('webaccount.edit', name=self.name)
 
     def widget(self):
         uid = current_user.get_id()
-        baskets = [] #FIXME add loading baskets
+
+        baskets = []
+
+        if(uid is not None and uid != 0):
+            # list of tuples: (bskid, bsk_name, topic)
+            bsk_from_db = get_all_personal_baskets_names(uid)
+
+            baskets = [{'name': name, 'bskid': bskid}
+                       for (bskid, name, dummy_topic) in bsk_from_db]
 
         template = """
 {{ _('You have') }}
@@ -59,13 +62,18 @@ class WebBasketSettings(Settings):
   <ul class="dropdown-menu">
   {%- for b in baskets -%}
     <li>
-        <a href="#">
+        <a href="/yourbaskets/display?bskid={{ b.bskid }}">
             {{ b.name }}
         </a>
     </li>
   {%- endfor -%}
   </ul>
 </div>"""
+
+        # If the list is too long ( >= 2 items! ),
+        # it will not be properlt displayed
+        # (it appears that the list cannot be displayed outside the
+        #  box, so the rest is cut off)
 
         return render_template_to_string(template, _from_string=True,
                                          baskets=baskets)
