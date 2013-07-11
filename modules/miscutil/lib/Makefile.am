@@ -91,6 +91,8 @@ pylib_DATA = __init__.py \
              sequtils_cnum.py \
              sequtils.py \
              sequtils_regression_tests.py \
+             memoiseutils.py \
+             memoiseutils_unit_tests.py \
              crossrefutils.py \
              containerutils.py
 

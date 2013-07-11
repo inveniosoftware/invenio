@@ -1543,7 +1543,7 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
 
     return (cc, colls_out_for_display, colls_out, hosted_colls_out, debug)
 
-def get_synonym_terms(term, kbr_name, match_type):
+def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
     """
     Return list of synonyms for TERM by looking in KBR_NAME in
     MATCH_TYPE style.
@@ -1556,6 +1556,8 @@ def get_synonym_terms(term, kbr_name, match_type):
         before doing the lookup.  Could be `exact' (default),
         'leading_to_comma', `leading_to_number'.
     @type match_type: str
+    @param use_memoise: can we memoise while doing lookups?
+    @type use_memoise: bool
     @return: list of term synonyms
     @rtype: list of strings
     """
@@ -1580,7 +1582,8 @@ def get_synonym_terms(term, kbr_name, match_type):
     ## OK, now find synonyms:
     for kbr_values in get_kbr_values(kbr_name,
                                      searchkey=term_for_lookup,
-                                     searchtype='e'):
+                                     searchtype='e',
+                                     use_memoise=use_memoise):
         for kbr_value in kbr_values:
             dterms[kbr_value + term_remainder] = 1
     ## return list of term synonyms:

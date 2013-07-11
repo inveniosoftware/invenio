@@ -1063,7 +1063,8 @@ class WordTable:
                 for word in wlist[recID]:
                     word_synonyms = get_synonym_terms(word,
                                                       CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][0],
-                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][1])
+                                                      CFG_BIBINDEX_SYNONYM_KBRS[self.index_name][1],
+                                                      use_memoise=True)
                     if word_synonyms:
                         wlist[recID] = list_union(word_synonyms, wlist[recID])
 
