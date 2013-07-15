@@ -20,8 +20,26 @@
 """
 Invenio utilities to perform a REST like authentication.
 """
+import re
+
+try:
+    from uuid import uuid4
+except ImportError:
+    import random
+
+    def uuid4():
+        return "%x" % random.getrandbits(16*8)
+
+from functools import wraps
+from flask import request, abort
+from invenio.config import CFG_WEB_API_KEY_ALLOWED_URL
 from invenio.access_control_config import CFG_WEB_API_KEY_STATUS
 from invenio.web_api_key_model import WebAPIKey
+
+_CFG_WEB_API_KEY_ALLOWED_URL = [(re.compile(_url), _authorized_time,
+                                _need_timestamp)
+                                for _url, _authorized_time, _need_timestamp
+                                in CFG_WEB_API_KEY_ALLOWED_URL]
 
 
 def create_new_web_api_key(uid, key_description=None):
@@ -121,3 +139,22 @@ def build_web_request(path, params=None, uid=-1, api_key=None, timestamp=True):
     """
 
     return WebAPIKey.build_web_request(path, params, uid, api_key, timestamp)
+
+
+def api_key_required(f):
+    """
+    Decorator: This requires request to contain a valid api_key in order to
+    authenticate user. Otherwise it returns error 401.
+    """
+    @wraps(f)
+    def auth_key(*args, **kwargs):
+        if 'apikey' in request.values:
+            from invenio.webuser_flask import login_user
+            user_id = WebAPIKey.acc_get_uid_from_request()
+            if user_id == -1:
+                abort(401)
+            login_user(user_id)
+        else:
+            abort(401)
+        return f(*args, **kwargs)
+    return auth_key

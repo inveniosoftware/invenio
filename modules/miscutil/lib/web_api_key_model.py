@@ -21,14 +21,20 @@
 Web API Key database models.
 """
 # General imports.
+from urlparse import parse_qs, urlparse, urlunparse
+from invenio.sqlalchemyutils import db
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound
+
+import sys
+if sys.version_info < (2, 5):
+    import sha as sha1
+else:
+    from hashlib import sha1
 import hmac
 import time
 import re
 
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm.exc import NoResultFound
-from urlparse import parse_qs, urlparse, urlunparse
-from urllib import urlencode, basejoin
 try:
     from uuid import uuid4
 except ImportError:
@@ -36,11 +42,14 @@ except ImportError:
 
     def uuid4():
         return "%x" % random.getrandbits(16*8)
+from urllib import urlencode, basejoin
 
-from invenio.access_control_config import CFG_WEB_API_KEY_STATUS
 from invenio.config import CFG_WEB_API_KEY_ALLOWED_URL
-from invenio.hashutils import sha1
-from invenio.sqlalchemyutils import db
+from invenio.access_control_config import CFG_WEB_API_KEY_STATUS
+
+
+_CFG_WEB_API_KEY_ALLOWED_URL = [(re.compile(_url), _authorized_time, _need_timestamp)
+                                for _url, _authorized_time, _need_timestamp in CFG_WEB_API_KEY_ALLOWED_URL]
 
 _CFG_WEB_API_KEY_ALLOWED_URL = [(re.compile(_url), _authorized_time, _need_timestamp)
                                 for _url, _authorized_time, _need_timestamp in CFG_WEB_API_KEY_ALLOWED_URL]
@@ -165,6 +174,7 @@ class WebAPIKey(db.Model):
         from flask import request
         api_key = signature = timestamp = None
 
+        # Get the params from the GET/POST request
         if 'apikey' in request.values:
             api_key = request.values['apikey']
 
@@ -229,6 +239,7 @@ class WebAPIKey(db.Model):
             register_customevent("apikeyusage", [uid, api_key, path, url_req])
             return uid
         else:
+            print 'wrong signature'
             return -1
 
     @classmethod
@@ -261,7 +272,9 @@ class WebAPIKey(db.Model):
 
         @return: Signed request string or, in case of error, ''
         """
-        from flask import request
+
+        if params is None:
+            params = {}
 
         if params is None:
             params = {}
