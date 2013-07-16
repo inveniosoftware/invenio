@@ -141,12 +141,12 @@ def handle_special_journals(citation_elements, kbs):
     """
     for el in citation_elements:
         if el['type'] == 'JOURNAL' and el['title'] in kbs['special_journals'] \
-                and re.match('\d{1,2}$', el['volume']):
+                and re.match(r'\d{1,2}$', el['volume']):
 
             # Sometimes the page is omitted and the year is written in its place
             # We can never be sure but it's very likely that page > 1900 is
             # actually a year, so we skip this reference
-            if el['year'] == '' and re.match('(19|20)\d{2}$', el['page']):
+            if el['year'] == '' and re.match(r'(19|20)\d{2}$', el['page']):
                 el['type'] = 'MISC'
                 el['misc_txt'] = "%s,%s,%s" \
                                      % (el['title'], el['volume'], el['page'])
@@ -337,7 +337,7 @@ def split_citations(citation_elements):
     for el in citation_elements:
         try:
             el_recid = el['recid']
-        except IndexError:
+        except KeyError:
             el_recid = None
 
         if current_recid and el_recid and current_recid == el_recid:
@@ -355,12 +355,16 @@ def split_citations(citation_elements):
                 new_elements.append({'type': 'MISC',
                                      'misc_txt': misc_txt})
             start_new_citation()
+            # In case el['recid'] is None, we want to reset it
+            # because we are starting a new reference
+            current_recid = el_recid
             while ';' in el['misc_txt']:
                 misc_txt, el['misc_txt'] = el['misc_txt'].split(';', 1)
                 if misc_txt:
                     new_elements.append({'type': 'MISC',
                                          'misc_txt': misc_txt})
                     start_new_citation()
+                    current_recid = None
 
         if el_recid:
             current_recid = el_recid
@@ -401,7 +405,7 @@ def remove_invalid_references(splitted_citations):
         else:
             el['misc_txt'] += " " + txt
 
-    splitted_citations = [citation for citation in splitted_citations \
+    splitted_citations = [citation for citation in splitted_citations
                                                                    if citation]
 
     # We merge some elements in here which means it only makes sense when
@@ -421,7 +425,7 @@ def remove_invalid_references(splitted_citations):
 
             previous_citation = citation
 
-    return [citation for citation in splitted_citations \
+    return [citation for citation in splitted_citations
                                                    if valid_citation(citation)]
 
 
@@ -432,7 +436,7 @@ def merge_invalid_references(splitted_citations):
         else:
             el['misc_txt'] += " " + txt
 
-    splitted_citations = [citation for citation in splitted_citations \
+    splitted_citations = [citation for citation in splitted_citations
                                                                    if citation]
 
     # We merge some elements in here which means it only makes sense when
@@ -451,7 +455,7 @@ def merge_invalid_references(splitted_citations):
             previous_citation = citation
             previous_citation_valid = current_citation_valid
 
-    return [citation for citation in splitted_citations \
+    return [citation for citation in splitted_citations
                                                    if valid_citation(citation)]
 
 

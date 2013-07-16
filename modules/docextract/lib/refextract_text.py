@@ -178,6 +178,8 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
        @return: (list) of strings - the rebuilt reference section. Each string
         in the list represents a complete reference line.
     """
+    indentation_splitting = False
+
     # This should be moved the function detecting the pattern!
     if not ref_line_marker_ptn:
         if test_for_blank_lines_separating_reference_lines(ref_sectn):
@@ -191,6 +193,7 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
             # Reference2
             #      etc
             # We split when there's no identation
+            indentation_splitting = True
             ref_line_marker_ptn = ur'^[^\s]'
 
     write_message('* references separator %s' % ref_line_marker_ptn, verbose=2)
@@ -211,6 +214,9 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
         working_line = working_line.rstrip()
         return wash_and_repair_reference_line(working_line)
 
+    lower_case_start = re.compile(ur'[a-z]')
+    continuing_line_markers = re.compile(ur'[,&-]$')
+
     for line in ref_sectn:
         # Can't find a good way to distinguish between
         # pagination and the page number of a journal numeration that
@@ -227,7 +233,18 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
                 marknum = int(m_ref_line_marker.group('marknum'))
             except IndexError:
                 marknum = None
+
+            new_line_detected = False
             if marknum is None or current_ref + 1 == marknum:
+                new_line_detected = True
+            if indentation_splitting:
+                if lower_case_start.match(line.strip()):
+                    new_line_detected = False
+                if working_ref and \
+                       continuing_line_markers.search(working_ref[-1].strip()):
+                    new_line_detected = False
+
+            if new_line_detected:
                 # Reference line marker found! : Append this reference to the
                 # list of fixed references and reset the working_line to 'blank'
                 start = m_ref_line_marker.start()
