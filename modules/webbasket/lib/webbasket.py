@@ -1965,7 +1965,10 @@ def perform_request_add(uid,
                                                referer=referer)
                 else:
                     try:
-                        raise InvenioWebBasketWarning(_('Cannot add items to the selected basket. Invalid parameters.'))
+                        if move_from_basket > 0 and len(validated_recids) > len(added_items):
+                            raise InvenioWebBasketWarning(_('Some items could not be moved. The destination basket already contains those items.'))
+                        else:
+                            raise InvenioWebBasketWarning(_('Cannot add items to the selected basket. Invalid parameters.'))
                     except InvenioWebBasketWarning, exc:
                         register_exception(stream='warning')
                         #warnings.append(exc.message)
@@ -2224,6 +2227,7 @@ def perform_request_create_basket(req, uid,
                                   es_desc='',
                                   es_url='',
                                   copy = False,
+                                  move_from_basket=0,
                                   referer = '',
                                   ln=CFG_SITE_LANG):
     """if new_basket_name and topic infos are given create a basket and return topic number,
@@ -2281,6 +2285,7 @@ def perform_request_create_basket(req, uid,
                                                       es_desc,
                                                       es_url,
                                                       copy,
+                                                      move_from_basket,
                                                       referer,
                                                       ln)
         if warnings:

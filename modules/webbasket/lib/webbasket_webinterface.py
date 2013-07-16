@@ -677,10 +677,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'editor_type': (str, ""),
                                    'b': (str, ""),
                                    'copy': (int, 0),
+                                   'move_from_basket': (int, 0),
                                    'wait': (int, 0),
                                    'referer': (str, ""),
                                    'of': (str, ''),
-                                   'move_from_basket': (int, 0),
                                    'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
@@ -721,8 +721,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                category=argd['category'],
                                                b=argd['b'],
                                                copy=argd['copy'],
-                                               wait=argd['wait'],
                                                move_from_basket=argd['move_from_basket'],
+                                               wait=argd['wait'],
                                                referer=argd['referer'],
                                                ln=argd['ln'])
 
@@ -898,8 +898,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             (body, navtrail) = perform_request_add(uid=uid,
                                                    recids=argd['recid'],
                                                    copy=True,
-                                                   referer=referer,
                                                    move_from_basket=from_bsk,
+                                                   referer=referer,
                                                    ln=argd['ln'])
             if isGuestUser(uid):
                 body = create_guest_warning_box(argd['ln']) + body
@@ -1171,6 +1171,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'es_desc'        : (str, ''),
                                    'es_url'         : (str, ''),
                                    'copy'           : (int, 0),
+                                   'move_from_basket':(int, 0),
                                    'referer'        : (str, ''),
                                    'of'             : (str, ''),
                                    'ln'             : (str, CFG_SITE_LANG)})
@@ -1210,6 +1211,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                 es_desc=argd['es_desc'],
                                 es_url=argd['es_url'],
                                 copy=argd['copy'],
+                                move_from_basket=argd['move_from_basket'],
                                 referer=argd['referer'],
                                 ln=argd['ln'])
 
@@ -1225,15 +1227,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
             if ( argd['recid'] and argd['colid'] >= 0 ):
-                url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&copy=%i&referer=%s&bskid=%i&colid=%i&recid=%s&wait=1&ln=%s'
+                url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&copy=%i&referer=%s&bskid=%i&colid=%i&move_from_basket=%i&recid=%s&wait=1&ln=%s'
                 url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                         argd['copy'],
                         urllib.quote(argd['referer']),
                         bskid,
                         argd['colid'],
+                        argd['move_from_basket'],
                         '&recid='.join(str(recid) for recid in argd['recid']),
                         argd['ln'])
             elif ( argd['es_title'] and argd['es_desc'] and argd['es_url'] and argd['colid'] == -1 ):
+                # Adding NEW external record - this does not need 'move_from_basket' data
                 url = CFG_SITE_SECURE_URL + '/yourbaskets/add?category=%s&bskid=%i&colid=%i&es_title=%s&es_desc=%s&es_url=%s&wait=1&ln=%s'
                 url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                         bskid,
@@ -1261,6 +1265,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                  es_desc=argd['es_desc'],
                                                  es_url=argd['es_url'],
                                                  copy=argd['copy'],
+                                                 move_from_basket=argd['move_from_basket'],
                                                  referer=argd['referer'],
                                                  ln=argd['ln'])
             navtrail = '<a class="navtrail" href="%s/youraccount/'\
