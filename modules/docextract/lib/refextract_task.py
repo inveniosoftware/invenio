@@ -159,6 +159,11 @@ def _create_ticket(recid, bibcatalog_system, queue):
             for collection in field_get_subfield_values(collection_tag, 'a'):
                 if collection == 'CORE':
                     in_core = True
+                if collection == 'arXiv':
+                    # Do not create tickets for arxiv papers
+                    # Tickets for arxiv papers are created in bibcatelog
+                    write_message("arXiv paper", verbose=1)
+                    return
 
         # Only create tickets for HEP
         if not in_core:
