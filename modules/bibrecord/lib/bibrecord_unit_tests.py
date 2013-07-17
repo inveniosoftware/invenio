@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -341,6 +341,14 @@ class BibRecordGettingFieldValuesTest(InvenioTestCase):
         <datafield tag="245" ind1=" " ind2="2">
         <subfield code="a">On the foo and bar2</subfield>
         </datafield>
+        <datafield tag="700" ind1=" " ind2="2">
+        <subfield code="a">Penrose, Roger</subfield>
+        <subfield code="u">University College London</subfield>
+        </datafield>
+        <datafield tag="700" ind1=" " ind2="2">
+        <subfield code="a">Messi, Lionel</subfield>
+        <subfield code="u">FC Barcelona</subfield>
+        </datafield>
         </record>
         """
         self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
@@ -350,7 +358,7 @@ class BibRecordGettingFieldValuesTest(InvenioTestCase):
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "100", " ", " "),
                          [([('a', 'Doe1, John')], " ", " ", "", 3), ([('a', 'Doe2, John'), ('b', 'editor')], " ", " ", "", 4)])
         self.assertEqual(bibrecord.record_get_field_instances(self.rec, "", " ", " "),
-                        [('245', [([('a', 'On the foo and bar1')], " ", '1', "", 5), ([('a', 'On the foo and bar2')], " ", '2', "", 6)]), ('001', [([], " ", " ", '33', 1)]), ('100', [([('a', 'Doe1, John')], " ", " ", "", 3), ([('a', 'Doe2, John'), ('b', 'editor')], " ", " ", "", 4)]), ('041', [([('a', 'eng')], " ", " ", "", 2)])])
+                        [('245', [([('a', 'On the foo and bar1')], " ", '1', "", 5), ([('a', 'On the foo and bar2')], " ", '2', "", 6)]), ('001', [([], " ", " ", '33', 1)]), ('700', [([('a', 'Penrose, Roger'), ('u', "University College London")], ' ', '2', '', 7), ([('a', 'Messi, Lionel'), ('u', 'FC Barcelona')], ' ', '2', '', 8)]), ('100', [([('a', 'Doe1, John')], " ", " ", "", 3), ([('a', 'Doe2, John'), ('b', 'editor')], " ", " ", "", 4)]), ('041', [([('a', 'eng')], " ", " ", "", 2)]),])
 
     def test_get_field_values(self):
         """bibrecord - getting field values"""
@@ -371,6 +379,22 @@ class BibRecordGettingFieldValuesTest(InvenioTestCase):
         fi1, fi2 = bibrecord.record_get_field_instances(self.rec, "100", " ", " ")
         self.assertEqual(bibrecord.field_get_subfield_values(fi1, "b"), [])
         self.assertEqual(bibrecord.field_get_subfield_values(fi2, "b"), ["editor"])
+
+    def test_filter_field(self):
+        """bibrecord - filter field instances"""
+        field_instances = bibrecord.record_get_field_instances(self.rec, "700", "%", "%")
+        out = bibrecord.filter_field_instances(field_instances, "u", "University College London", 'e')
+        self.assertEqual(out, [([('a', 'Penrose, Roger'), ('u', "University College London")], ' ', '2', '', 7)])
+        out = bibrecord.filter_field_instances(field_instances, "u", "Bar", "s")
+        self.assertEqual(out, [([('a', 'Messi, Lionel'), ('u', 'FC Barcelona')], ' ', '2', '', 8)])
+        out = bibrecord.filter_field_instances(field_instances, "u", "on", "s")
+        self.assertEqual(out, [([('a', 'Penrose, Roger'), ('u', "University College London")], ' ', '2', '', 7),
+                               ([('a', 'Messi, Lionel'), ('u', 'FC Barcelona')], ' ', '2', '', 8)])
+        out = bibrecord.filter_field_instances(field_instances, "u", r".*\scoll", "r")
+        self.assertEqual(out,[])
+        out = bibrecord.filter_field_instances(field_instances, "u", r"[FC]{2}\s.*", "r")
+        self.assertEqual(out, [([('a', 'Messi, Lionel'), ('u', 'FC Barcelona')], ' ', '2', '', 8)])
+
 
 class BibRecordGettingFieldValuesViaWildcardsTest(InvenioTestCase):
     """ bibrecord - testing for getting field/subfield values via wildcards """
@@ -476,6 +500,33 @@ class BibRecordGettingFieldValuesViaWildcardsTest(InvenioTestCase):
                          ['val2', 'val3', 'val4a', 'val5', 'val6', 'val7a'])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", " ", " ", "a"),
                          ['val4a'])
+
+    def test_get_field_values_filtering_exact(self):
+        """bibrecord - getting field values and exact filtering"""
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "%", 'a', 'val7a'),
+                         ['val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "a", 'a', 'val7a'),
+                         ['val7a'])
+
+    def test_get_field_values_filtering_substring(self):
+        """bibrecord - getting field values and substring filtering"""
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "%", 'a', '7a', 's'),
+                         ['val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "556", "%", "%", "b", 'a', '7a', 's'),
+                         ['val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "%", 'b', 'val', 's'),
+                         ['val4a', 'val4b', 'val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", " ", 'b', 'val', 's'),
+                         [])
+
+    def test_get_field_values_filtering_regexp(self):
+        """bibrecord - getting field values and regexp filtering"""
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "%", 'b', r'al', 'r'),
+                         [])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "%", 'a', r'.*al[6,7]', 'r'),
+                         ['val6', 'val7a', 'val7b'])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "55%", "%", "%", "a", 'a', r'.*al[6,7]', 'r'),
+                         ['val6', 'val7a'])
 
     def test_get_field_value_via_wildcard(self):
         """bibrecord - getting first field value via wildcards"""

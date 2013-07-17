@@ -1488,6 +1488,7 @@ class Template:
                            es_desc='',
                            es_url='',
                            copy=False,
+                           move_from_basket=0,
                            referer='',
                            ln=CFG_SITE_LANG):
         """Template for basket creation
@@ -1509,6 +1510,7 @@ class Template:
     <input type="hidden" name="colid" value="%(colid)s" />
     <input type="hidden" name="copy" value="%(copy)i" />
     <input type="hidden" name="referer" value="%(referer)s" />
+    <input type="hidden" name="move_from_basket" value="%(move_from_basket)s" />
     <input type="submit" value="%(label)s" class="formbutton"/>
   </div>
 </form>""" % {'action': CFG_SITE_URL + '/yourbaskets/create_basket',
@@ -1532,6 +1534,7 @@ class Template:
               'colid': colid,
               'copy': copy and 1 or 0,
               'referer': referer,
+              'move_from_basket': move_from_basket,
               'label': _("Create new basket")}
         return out
 
@@ -1770,11 +1773,12 @@ class Template:
                                                                         '&amp;es_url=' + encodeURIComponent(document.add_to_basket.es_url.value) + \
                                                                         '&amp;es_desc=' + encodeURIComponent(document.add_to_basket.es_desc.value);">''' % \
                                                                     (CFG_SITE_URL,))
-                                                                or ('<a href="%s/yourbaskets/create_basket?copy=%i&amp;referer=%s&amp;colid=%i&amp;recid=%s">' % \
+                                                                or ('<a href="%s/yourbaskets/create_basket?copy=%i&amp;referer=%s&amp;colid=%i&amp;move_from_basket=%i&amp;recid=%s">' % \
                                                                     (CFG_SITE_URL,
                                                                      copy and 1 or 0,
                                                                      urllib.quote(referer),
                                                                      colid,
+                                                                     int(move_from_basket),
                                                                      '&amp;recid='.join(str(recid) for recid in recids))),
                                      'x_url_close': '</a>',
                                      'x_fmt_open': '<br /><small>',

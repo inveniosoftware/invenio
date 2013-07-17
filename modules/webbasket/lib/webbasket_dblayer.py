@@ -926,21 +926,36 @@ def move_to_basket(uid,
     """ Move items (recids) from basket (old_bskid) to basket (new_bskid) """
     if (recids is not None) and len(recids) > 0:
 
-        for recid in recids:
-            # Change the item's pointer to basket
-            query = """ UPDATE  bskREC
-                        SET     id_bskBASKET=%s,
-                                id_user_who_added_item=%s
-                        WHERE   id_bskBASKET=%s
-                                AND id_bibrec_or_bskEXTREC=%s
-                    """
+        moved_recids = []
 
-            params = (int(new_bskid), int(uid), int(old_bskid), int(recid))
+        for recid in recids:
+            # Prevent duplication of items
+            query = """ SELECT  '1'
+                        FROM    bskREC
+                        WHERE   id_bskBASKET=%s
+                                AND
+                                id_bibrec_or_bskEXTREC=%s
+                    """
+            params = (int(new_bskid), int(recid))
 
             res = run_sql(query, params)
 
+            if len(res) == 0:
+                # Change the item's pointer to basket
+                query = """ UPDATE  bskREC
+                            SET     id_bskBASKET=%s,
+                                    id_user_who_added_item=%s
+                            WHERE   id_bskBASKET=%s
+                                    AND id_bibrec_or_bskEXTREC=%s
+                        """
+
+                params = (int(new_bskid), int(uid), int(old_bskid), int(recid))
+                res = run_sql(query, params)
+
+                moved_recids.append(int(recid))
+
         # Update 'modification date'
-        if update_date_modification and res:
+        if len(moved_recids) > 0 and update_date_modification:
             now = convert_datestruct_to_datetext(localtime())
             query = "UPDATE bskBASKET SET date_modification=%s WHERE id=%s"
 
@@ -950,7 +965,7 @@ def move_to_basket(uid,
             params = (now, int(new_bskid))
             run_sql(query, params)
 
-    return recids
+    return moved_recids
 
 
 def add_to_many_baskets(uid, recids=[], colid=0, bskids=[], es_title="", es_desc="", es_url=""):

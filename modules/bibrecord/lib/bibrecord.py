@@ -201,6 +201,52 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
 
     return (rec, int(not errs), errs)
 
+
+def filter_field_instances(field_instances, filter_subcode, filter_value, filter_mode = 'e'):
+    """ Filters given field and returns only that field instances
+        that contain filter_subcode with given filter_value.
+        As an input for search function accepts output from
+        record_get_field_instances function.
+        Function can be run in three modes:
+        'e' - looking for exact match in subfield value
+        's' - looking for substring in subfield value
+        'r' - looking for regular expression in subfield value
+
+        Example:
+        record_filter_field(record_get_field_instances(rec, '999', '%', '%'), 'y', '2001')
+        In this case filter_subcode is 'y' and
+        filter_value is '2001'.
+        @param field_instances: output from record_get_field_instances
+        @param filter_subcode: name of the subfield
+        @type filter_subcode: string
+        @param filter_value: value of the subfield
+        @type filter_value: string
+        @param filter_mode: 'e','s' or 'r'
+    """
+    matched = []
+    if filter_mode == 'e':
+        to_match = (filter_subcode, filter_value)
+        for instance in field_instances:
+            if to_match in instance[0]:
+                matched.append(instance)
+    elif filter_mode == 's':
+        for instance in field_instances:
+            for subfield in instance[0]:
+                if subfield[0] == filter_subcode and \
+                   subfield[1].find(filter_value) > -1:
+                    matched.append(instance)
+                    break
+    elif filter_mode == 'r':
+        reg_exp = re.compile(filter_value)
+        for instance in field_instances:
+            for subfield in instance[0]:
+                if subfield[0] == filter_subcode and \
+                   reg_exp.match(subfield[1]) is not None:
+                    matched.append(instance)
+                    break
+    return matched
+
+
 def record_get_field_instances(rec, tag="", ind1=" ", ind2=" "):
     """Returns the list of field instances for the specified tag and
     indicators of the record (rec).
@@ -240,6 +286,7 @@ def record_get_field_instances(rec, tag="", ind1=" ", ind2=" "):
                     ind2 in ('%', possible_field_instance[2])):
                     out.append(possible_field_instance)
         return out
+
 
 def record_add_field(rec, tag, ind1=' ', ind2=' ', controlfield_value='',
     subfields=None, field_position_global=None, field_position_local=None):
@@ -816,11 +863,23 @@ def record_get_field_value(rec, tag, ind1=" ", ind2=" ", code=""):
     # Nothing was found
     return ""
 
-def record_get_field_values(rec, tag, ind1=" ", ind2=" ", code=""):
+
+def record_get_field_values(rec, tag, ind1=" ", ind2=" ", code="",
+                            filter_subfield_code="",
+                            filter_subfield_value="",
+                            filter_subfield_mode="e"):
     """Returns the list of (string) values for the specified field
     (tag, ind1, ind2, code) of the record (rec).
 
-    Returns empty list if not found.
+    List can be filtered. Use filter_subfield_code
+    and filter_subfield_value to search
+    only in fields that have these values inside them as a subfield.
+    filter_subfield_mode can have 3 different values:
+    'e' for exact search
+    's' for substring search
+    'r' for regexp search
+
+    Returns empty list if nothing was found.
 
     Parameters (tag, ind1, ind2, code) can contain wildcard %.
 
@@ -834,56 +893,76 @@ def record_get_field_values(rec, tag, ind1=" ", ind2=" ", code=""):
 
     ind1, ind2 = _wash_indicators(ind1, ind2)
 
+    if filter_subfield_code and filter_subfield_mode == "r":
+        reg_exp = re.compile(filter_subfield_value)
+
+    tags = []
     if '%' in tag:
         # Wild card in tag. Must find all corresponding tags and fields
         tags = [k for k in rec if _tag_matches_pattern(k, tag)]
-        if code == '':
-            # Code not specified. Consider field value (without subfields)
-            for tag in tags:
-                for field in rec[tag]:
-                    if (ind1 in ('%', field[1]) and ind2 in ('%', field[2]) and
-                        field[3]):
-                        tmp.append(field[3])
-        elif code == '%':
-            # Code is wildcard. Consider all subfields
-            for tag in tags:
-                for field in rec[tag]:
-                    if ind1 in ('%', field[1]) and ind2 in ('%', field[2]):
+    elif rec and tag in rec:
+        tags = [tag]
+
+    if code == '':
+        # Code not specified. Consider field value (without subfields)
+        for tag in tags:
+            for field in rec[tag]:
+                if (ind1 in ('%', field[1]) and ind2 in ('%', field[2]) and
+                    field[3]):
+                    tmp.append(field[3])
+    elif code == '%':
+        # Code is wildcard. Consider all subfields
+        for tag in tags:
+            for field in rec[tag]:
+                if ind1 in ('%', field[1]) and ind2 in ('%', field[2]):
+                    if filter_subfield_code:
+                        if filter_subfield_mode == "e":
+                            subfield_to_match = (filter_subfield_code, filter_subfield_value)
+                            if subfield_to_match in field[0]:
+                                for subfield in field[0]:
+                                    tmp.append(subfield[1])
+                        elif filter_subfield_mode == "s":
+                            if (dict(field[0]).get(filter_subfield_code, '')).find(filter_subfield_value) > -1:
+                                for subfield in field[0]:
+                                    tmp.append(subfield[1])
+                        elif filter_subfield_mode == "r":
+                            if reg_exp.match(dict(field[0]).get(filter_subfield_code, '')):
+                                for subfield in field[0]:
+                                    tmp.append(subfield[1])
+                    else:
                         for subfield in field[0]:
                             tmp.append(subfield[1])
-        else:
-            # Code is specified. Consider all corresponding subfields
-            for tag in tags:
-                for field in rec[tag]:
-                    if ind1 in ('%', field[1]) and ind2 in ('%', field[2]):
-                        for subfield in field[0]:
-                            if subfield[0] == code:
-                                tmp.append(subfield[1])
     else:
-        # Tag is completely specified. Use tag as dict key
-        if rec and tag in rec:
-            if code == '':
-                # Code not specified. Consider field value (without subfields)
-                for field in rec[tag]:
-                    if (ind1 in ('%', field[1]) and ind2 in ('%', field[2]) and
-                        field[3]):
-                        tmp.append(field[3])
-            elif code == '%':
-                # Code is wildcard. Consider all subfields
-                for field in rec[tag]:
-                    if ind1 in ('%', field[1]) and ind2 in ('%', field[2]):
-                        for subfield in field[0]:
-                            tmp.append(subfield[1])
-            else:
-                # Code is specified. Take corresponding one
-                for field in rec[tag]:
-                    if ind1 in ('%', field[1]) and ind2 in ('%', field[2]):
+        # Code is specified. Consider all corresponding subfields
+        for tag in tags:
+            for field in rec[tag]:
+                if ind1 in ('%', field[1]) and ind2 in ('%', field[2]):
+                    if filter_subfield_code:
+                        if filter_subfield_mode == "e":
+                            subfield_to_match = (filter_subfield_code, filter_subfield_value)
+                            if subfield_to_match in field[0]:
+                                for subfield in field[0]:
+                                    if subfield[0] == code:
+                                        tmp.append(subfield[1])
+                        elif filter_subfield_mode == "s":
+                            if (dict(field[0]).get(filter_subfield_code, '')).find(filter_subfield_value) > -1:
+                                for subfield in field[0]:
+                                    if subfield[0] == code:
+                                        tmp.append(subfield[1])
+                        elif filter_subfield_mode == "r":
+                            if reg_exp.match(dict(field[0]).get(filter_subfield_code, '')):
+                                for subfield in field[0]:
+                                    if subfield[0] == code:
+                                        tmp.append(subfield[1])
+                    else:
                         for subfield in field[0]:
                             if subfield[0] == code:
                                 tmp.append(subfield[1])
 
+
     # If tmp was not set, nothing was found
     return tmp
+
 
 def record_xml_output(rec, tags=None, order_fn=None):
     """Generates the XML for record 'rec' and returns it as a string
