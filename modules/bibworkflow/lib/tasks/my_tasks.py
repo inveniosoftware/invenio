@@ -15,22 +15,26 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Implements a workflow for testing """
 
-from invenio.bibworkflow.tasks.test_tasks import \
-    lower_than_20, \
-    add, \
-    higher_than_20, \
-    sleep_task, \
-    simple_task
-from invenio.bibworkflow_workflow_definition import WorkflowDefinition
+def add_data(a):
+    """ Task using closure to allow parameters """
+    def _add_data(obj, eng):
+        """Function task_a docstring"""
+        obj.data = obj.data + a
+    return _add_data
 
 
-class test_workflow_2(WorkflowDefinition):
-    def __init__(self):
-        super(test_workflow_2, self).__init__()
-        self.definition = [higher_than_20,
-                           add(20),
-                           lower_than_20,
-                           sleep_task(4),
-                           simple_task(2)]
+def check_data(obj, eng):
+    """ Static task with no parameters """
+    if obj.data < 5:
+        eng.haltProcessing("Value of data is too small.")
+
+
+def print_data(obj, eng):
+    """ Static task with no parameters """
+    print obj.data
+
+
+def set_data(obj, eng):
+    """ Static task with no parameters """
+    obj.data = 124

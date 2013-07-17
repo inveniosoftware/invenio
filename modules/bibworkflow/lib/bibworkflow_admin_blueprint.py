@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,12 +24,12 @@ __lastupdated__ = """$Date$"""
 from flask import render_template
 from pprint import pformat
 from invenio.bibworkflow_model import Workflow, BibWorkflowObject
-from invenio.bibworkflow_api import start
+from invenio.bibworkflow_api import start_delayed
 import os
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.bibworkflow_utils import getWorkflowDefinition
+from invenio.bibworkflow_utils import get_workflow_definition
 
 import traceback
 
@@ -67,7 +68,7 @@ def entry_details(id_entry):
     return render_template('bibworkflow_entry_details.html',
                            entry=wfe_object, log="",
                            data_preview=_entry_data_preview(wfe_object.data, 'hd'),
-                           workflow_func=getWorkflowDefinition(wfe_object.bwlWORKFLOW.name))
+                           workflow_func=get_workflow_definition(wfe_object.bwlWORKFLOW.name))
 
 
 @blueprint.route('/workflow_details', methods=['GET', 'POST'])
@@ -79,7 +80,7 @@ def workflow_details(id_workflow):
     return render_template('bibworkflow_workflow_details.html',
                            workflow_metadata=w_metadata,
                            log="",
-                           workflow_func=getWorkflowDefinition(w_metadata.name))
+                           workflow_func=get_workflow_definition(w_metadata.name))
 
 
 @blueprint.route('/workflows', methods=['GET', 'POST'])
@@ -87,7 +88,7 @@ def workflow_details(id_workflow):
 @blueprint.invenio_templated('bibworkflow_workflows.html')
 def workflows():
     loaded_workflows = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                       'bibworkflow', 'workflows', '*.py'))
+                                       'bibworkflow_workflows', '*.py'))
     open(os.path.join(CFG_LOGDIR, 'broken-bibworkflow-workflows.log'), 'w').\
         write(pformat(loaded_workflows.get_broken_plugins()))
 
@@ -100,13 +101,8 @@ def workflows():
 @blueprint.invenio_wash_urlargd({'workflow_name': (unicode, "")})
 def run_workflow(workflow_name, data={"data": 10}):
     try:
-        # data = open('input2.xml').read()
-        data = [{'data': data}]
-        print data
-        external_save = None
-        print workflow_name
-        print 'Ready to run workflow'
-        start(workflow_name, data, external_save=external_save)
+        print "Starting workflow '%s'" % (workflow_name,)
+        start_delayed(workflow_name, data)
     except:
         traceback.print_exc()
     return "Workflow has been started."

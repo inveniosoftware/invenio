@@ -18,14 +18,7 @@
 templatesdir = $(sysconfdir)/templates
 templates_DATA = *.html
 
-jsdir=$(localstatedir)/www/js
-
-js_DATA = bibholdingpen.js \
-          bibholdingpen_approval_widget.js \
-          bibholdingpen_details.js
-
-EXTRA_DIST = $(templates_DATA) \
-			 $(js_DATA)
+EXTRA_DIST = $(templates_DATA)
 
 CLEANFILES = *~ *.tmp
 

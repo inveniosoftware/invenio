@@ -15,8 +15,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio/bibholdingpen_widgets
+pylibdir = $(libdir)/python/invenio/bibworkflow_widgets
 
 pylib_DATA = *.py
+
+jsdir=$(localstatedir)/www/js/bibworkflow_widgets
+
+js_DATA = *.js
 
 CLEANFILES = *~ *.tmp *.pyc

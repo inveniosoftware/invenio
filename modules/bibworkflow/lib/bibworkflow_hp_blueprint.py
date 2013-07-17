@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,8 +25,8 @@ from flask import render_template
 from invenio.bibworkflow_model import BibWorkflowObject, Workflow
 from invenio.config import CFG_LOGDIR
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.bibworkflow_utils import getWorkflowDefinition
-from invenio.bibworkflow_api import continue_oid, start
+from invenio.bibworkflow_utils import get_workflow_definition
+from invenio.bibworkflow_api import continue_oid_delayed
 from invenio.bibworkflow_hp_load_widgets import widgets
 from invenio.bibworkflow_model import Workflow
 
@@ -34,19 +35,19 @@ from invenio.bibformat_engine import format_record
 
 from invenio.bibworkflow_utils import create_hp_containers
 
-blueprint = InvenioBlueprint('bibholdingpen', __name__,
-                             url_prefix="/admin/bibholdingpen",
-                             menubuilder=[('main.admin.bibholdingpen',
+blueprint = InvenioBlueprint('holdingpen', __name__,
+                             url_prefix="/admin/holdingpen",
+                             menubuilder=[('main.admin.holdingpen',
                                           _('Holdingpen'),
-                                           'bibholdingpen.index')],
+                                           'holdingpen.index')],
                              breadcrumbs=[(_('Administration'), 'help.admin'),
                                           (_('Holdingpen'),
-                                           'bibholdingpen.index')])
+                                           'holdingpen.index')])
 
 
 @blueprint.route('/index', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_templated('bibholdingpen_index.html')
+@blueprint.invenio_templated('bibworkflow_hp_index.html')
 def index():
     """
     Displays main interface of BibHoldingpen.
@@ -57,7 +58,7 @@ def index():
 
 @blueprint.route('/load_table', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-@blueprint.invenio_templated('bibholdingpen_index.html')
+@blueprint.invenio_templated('bibworkflow_hp_index.html')
 def load_table():
     """
     Function used for the passing of JSON data to the DataTable
@@ -66,10 +67,11 @@ def load_table():
 
     iDisplayStart = request.args.get('iDisplayStart')
     iDisplayLength = request.args.get('iDisplayLength')
-    sSearch = request.args.get('sSearch')
+    # sSearch will be used for searching later
+    # sSearch = request.args.get('sSearch')
     iSortCol_0 = request.args.get('iSortCol_0')
     sSortDir_0 = request.args.get('sSortDir_0')
-    containers = create_hp_containers(iSortCol_0, sSortDir_0, sSearch)
+    containers = create_hp_containers(iSortCol_0, sSortDir_0)
 
     iDisplayStart = int(request.args.get('iDisplayStart'))
     iDisplayLength = int(request.args.get('iDisplayLength'))
@@ -90,7 +92,7 @@ def load_table():
                 '<span class="label label-warning">Halted</span>'
         if container.widget:
             widget_link = '<a class="btn btn-info"' + \
-                          'href="/admin/bibholdingpen/widget?widget=' + \
+                          'href="/admin/holdingpen/widget?widget=' + \
                           container.widget + \
                           '&hpcontainerid=' + \
                           str(container.id) + \
@@ -108,7 +110,7 @@ def load_table():
              str(container.version),
              '<a id="info_button" ' +
              'class="btn btn-info pull-center text-center"' +
-             'href="/admin/bibholdingpen/details?hpcontainerid=' +
+             'href="/admin/holdingpen/details?hpcontainerid=' +
              str(container.id) +
              '"><i class="icon-white icon-zoom-in"></i></a>',
              widget_link,
@@ -124,12 +126,12 @@ def resolve_approval(hpcontainerid):
     """
     from flask import request
     if request.form['submitButton'] == 'Accept':
-        continue_oid(hpcontainerid)
+        continue_oid_delayed(hpcontainerid)
         flash('Record Accepted')
     elif request.form['submitButton'] == 'Reject':
         _delete_from_db(hpcontainerid)
         flash('Record Rejected')
-    return redirect(url_for('bibholdingpen.index'))
+    return redirect(url_for('holdingpen.index'))
 
 
 @blueprint.route('/details', methods=['GET', 'POST'])
@@ -156,10 +158,10 @@ def details(hpcontainerid):
     info = get_info(hpcontainer.current)
     try:
         info['widget'] = hpcontainer.error.extra_data['widget']
-    except:
+    except (KeyError, AttributeError):
         try:
             info['widget'] = hpcontainer.final.extra_data['widget']
-        except:
+        except (KeyError, AttributeError):
             pass
 
     w_metadata = Workflow.query.filter(Workflow.uuid ==
@@ -171,28 +173,24 @@ def details(hpcontainerid):
         logtext = f.read()
     except IOError:
         logtext = ""
-    return render_template('bibholdingpen_details.html',
+    return render_template('bibworkflow_hp_details.html',
                            hpcontainer=hpcontainer,
                            info=info, log=logtext,
                            data_preview=_entry_data_preview(
-                               hpcontainer.initial.data['data']),
-                           workflow_func=getWorkflowDefinition(
+                               hpcontainer.initial.data),
+                           workflow_func=get_workflow_definition(
                                w_metadata.name))
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_wash_urlargd({'hpcontainerid': (int, 0)})
-def restart_record(hpcontainerid, start_point='beginning'):
+def restart_record(hpcontainerid, start_point='continue_next'):
     """
     Restarts the initial object in its workflow
     """
-    id_workflow = BibWorkflowObject.query.filter(
-        BibWorkflowObject.id == hpcontainerid).first().id_workflow
-    wname = Workflow.query.filter(Workflow.uuid == id_workflow).first().name
-    start(wname, [{'id': hpcontainerid}])
+    continue_oid_delayed(oid=hpcontainerid, start_point=start_point)
     flash('Record Restarted')
-    return "Record restarted"
 
 
 @blueprint.route('/restart_record_prev', methods=['GET', 'POST'])
@@ -202,8 +200,8 @@ def restart_record_prev(hpcontainerid):
     """
     Restarts the initial object in its workflow from the current task
     """
-    continue_oid(hpcontainerid, "restart_task")
-    return "Record restarted from previous task"
+    continue_oid_delayed(hpcontainerid, "restart_task")
+    flash("Record restarted from previous task")
 
 
 @blueprint.route('/delete_from_db', methods=['GET', 'POST'])
@@ -215,7 +213,7 @@ def delete_from_db(hpcontainerid):
     """
     _delete_from_db(hpcontainerid)
     flash('Record Deleted')
-    return redirect(url_for('bibholdingpen.index'))
+    return redirect(url_for('holdingpen.index'))
 
 
 def _delete_from_db(hpcontainerid):
@@ -266,7 +264,6 @@ def show_widget(hpcontainerid, widget):
                 BibWorkflowObject.id_parent == bwobject.id).first()
             matches = bwobject.extra_data['tasks_results']['match_record']
 
-        print matches
         match_preview = []
         # adding dummy matches
         match_preview.append(BibWorkflowObject.query.filter(
@@ -275,7 +272,7 @@ def show_widget(hpcontainerid, widget):
             BibWorkflowObject.id == hpcontainerid).first())
         data_preview = _entry_data_preview(bwobject.data['data'])
 
-        return render_template('bibholdingpen_'+widget+'.html',
+        return render_template('bibworkflow_hp_'+widget+'.html',
                                hpcontainer=hpcontainer,
                                widget=widget_form,
                                match_preview=match_preview, matches=matches,
@@ -284,7 +281,7 @@ def show_widget(hpcontainerid, widget):
     elif widget == 'approval_widget':
         # setting up approval widget
         data_preview = _entry_data_preview(bwobject.data['data'])
-        return render_template('bibholdingpen_approval_widget.html',
+        return render_template('bibworkflow_hp_approval_widget.html',
                                hpcontainer=hpcontainer,
                                widget=widget_form, data_preview=data_preview)
 

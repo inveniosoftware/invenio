@@ -15,52 +15,69 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.bibworkflow_worker_engine import runit, restartit, continueit
+from invenio.bibworkflow_worker_engine import (run_worker,
+                                               restart_worker,
+                                               continue_worker)
 from invenio.celery import celery
 
 
-@celery.task(name='invenio.bibworkflow.workers.worker_celery.runit')
-def celery_runit(wname, data, external_save=None):
+@celery.task(name='invenio.bibworkflow_workers.worker_celery.run_worker')
+def celery_run(workflow_name, data, **kwargs):
     """
     Runs the workflow with Celery
     """
-    runit(wname, data, external_save=external_save)
+    run_worker(workflow_name, data, **kwargs)
 
 
-@celery.task(name='invenio.bibworkflow.workers.worker_celery.restartit')
-def celery_restartit(wid, external_save=None):
+@celery.task(name='invenio.bibworkflow_workers.worker_celery.restart_worker')
+def celery_restart(wid, **kwargs):
     """
     Restarts the workflow with Celery
     """
-    restartit(wid, external_save=external_save)
+    restart_worker(wid, **kwargs)
 
 
-@celery.task(name='invenio.bibworkflow.workers.worker_celery.continueit')
-def celery_continueit(oid, restart_point="beginning", external_save=None):
+@celery.task(name='invenio.bibworkflow_workers.worker_celery.continue_worker')
+def celery_continue(oid, restart_point, **kwargs):
     """
     Restarts the workflow with Celery
     """
-    continueit(oid, restart_point, external_save=external_save)
+    continue_worker(oid, restart_point, **kwargs)
 
 
 class worker_celery(object):
-    def run(self, wname, data, external_save=None):
+    def run_worker(self, workflow_name, data, **kwargs):
         """
         Helper function to get celery task
         decorators to worker_celery
-        """
-        return celery_runit.delay(wname, data, external_save)
 
-    def restart(self, wid, external_save=None):
-        """
-        Helper function to get celery task
-        decorators to worker_celery
-        """
-        return celery_restartit.delay(wid, external_save)
+        @param workflow_name: name of the workflow to be run
+        @type workflow_name: string
 
-    def continueit(self, oid, restart_point, external_save=None):
+        @param data: list of objects for the workflow
+        @type data: list
+        """
+        return celery_run.delay(workflow_name, data, **kwargs)
+
+    def restart_worker(self, wid, **kwargs):
         """
         Helper function to get celery task
         decorators to worker_celery
+
+        @param wid: uuid of the workflow to be run
+        @type wid: string
         """
-        return celery_continueit.delay(oid, restart_point, external_save)
+        return celery_restart.delay(wid, **kwargs)
+
+    def continue_worker(self, oid, restart_point, **kwargs):
+        """
+        Helper function to get celery task
+        decorators to worker_celery
+
+        @param oid: uuid of the object to be started
+        @type oid: string
+
+        @param restart_point: sets the start point
+        @type restart_point: string
+        """
+        return celery_continue.delay(oid, restart_point, **kwargs)

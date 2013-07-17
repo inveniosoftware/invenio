@@ -1,11 +1,11 @@
-{% extends "bibholdingpen_layout.html" %}
-{% import 'bibholdingpen_utils.html' as utils %}
+{% extends "bibworkflow_hp_layout.html" %}
+{% import 'bibworkflow_hp_utils.html' as utils %}
 {%- js 'js/prettify.js' -%}
-{%- js 'js/bibholdingpen_details.js' -%}
+{%- js 'js/bibworkflow_hp_details.js' -%}
 {% block body2 %}
 
     <h1>Record Details</h1>
-    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=desert"></script> 
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&amp;skin=desert"></script> 
     <link href="../../js/google-code-prettify/src/prettify.css" type="text/css" rel="stylesheet"/>
 
     <div id = "alert_placeholder"></div>
@@ -43,7 +43,7 @@
                     <b>Actions</b>
                     <div class="row-fluid">
                         <div class="span6">
-                            <a class="btn btn-info" href="{{ url_for('bibholdingpen.show_widget', hpcontainerid=hpcontainer.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i></a></br>
+                            <a class="btn btn-info" href="{{ url_for('holdingpen.show_widget', hpcontainerid=hpcontainer.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i></a></br>
                         </div>
 
                         <div id="static-actions" class="span6">
@@ -61,7 +61,7 @@
                               </div>
                               <div class="modal-footer">
                                 <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-                                <a class="btn btn-danger" href="{{ url_for('bibholdingpen.delete_from_db', hpcontainerid=hpcontainer.id) }}" >Delete Record</a>
+                                <a class="btn btn-danger" href="{{ url_for('holdingpen.delete_from_db', hpcontainerid=hpcontainer.id) }}" >Delete Record</a>
                               </div>
                             </div>
                         </div>

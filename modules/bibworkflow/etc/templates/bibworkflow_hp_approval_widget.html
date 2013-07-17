@@ -1,10 +1,10 @@
-{% extends "bibholdingpen_layout.html" %}
-{%- js 'js/bibholdingpen_approval_widget.js' -%}
+{% extends "bibworkflow_hp_layout.html" %}
+{%- js 'js/bibworkflow_widgets/approval_widget.js' -%}
 {% block body2 %}
     <h1>Approval Widget</h1>
 
     <link href="../../js/google-code-prettify/src/prettify.css" type="text/css" rel="stylesheet"/>
-    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&skin=desert"></script> 
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&amp;skin=desert"></script> 
 
     <div class="container-fluid">
         <div class="row-fluid">
@@ -35,7 +35,7 @@
             </div>
         </div>
         <div id="decision-btns" class="row-fluid">
-            <form method="POST" action="{{ url_for('bibholdingpen.resolve_approval', hpcontainerid=hpcontainer.id) }}" method="get">
+            <form method="POST" action="{{ url_for('holdingpen.resolve_approval', hpcontainerid=hpcontainer.id) }}" method="get">
                 {% set widget = widget() %}
                 {% for field in widget %}
                     {{ field }}

@@ -4,7 +4,7 @@ $(document).ready(function(){
 
     window.data_preview = function(format){
         jQuery.ajax({
-            url: "/admin/bibholdingpen/entry_data_preview?oid="+hpid+"&recformat="+format,
+            url: "/admin/holdingpen/entry_data_preview?oid="+hpid+"&recformat="+format,
             success: function(json){
                 if(format == 'xm' || format == 'marcxml'){
                     if( json == ""){

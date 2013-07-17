@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013 CERN.
 ##
@@ -16,9 +17,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Invenio BibWorkflow config."""
-
-import os
-from invenio.config import CFG_LOGDIR
 
 
 def enum(**enums):

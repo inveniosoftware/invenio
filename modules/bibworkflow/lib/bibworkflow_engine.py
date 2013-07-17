@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013 CERN.
 ##
@@ -30,7 +31,7 @@ from datetime import datetime
 
 from invenio.sqlalchemyutils import db
 from invenio.config import CFG_DEVEL_SITE
-from invenio.bibworkflow_utils import getWorkflowDefinition
+from invenio.bibworkflow_utils import get_workflow_definition
 from uuid import uuid1 as new_uuid
 from invenio.bibworkflow_utils import dictproperty
 from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS, \
@@ -145,7 +146,7 @@ BibWorkflowEngine
         # 1. Save workflow (ourselves).
         if not self.db_obj.uuid:
             self.save()
-        self.setCounterInitial(len(objects))
+        self.set_counter_initial(len(objects))
         self.log_info("Workflow has been started")
         # 2. We want to save all the objects as version 0.
         for o in objects:
@@ -202,11 +203,10 @@ BibWorkflowEngine
             self.db_obj.status = status
             self._update_db()
 
-    def process(self, objects, external_save=None):
-        self.external_save = external_save
+    def process(self, objects):
         super(BibWorkflowEngine, self).process(objects)
 
-    def restart(self, obj, task, external_save=None):
+    def restart(self, obj, task):
         """Restart the workflow engine after it was deserialized
 
         """
@@ -239,7 +239,7 @@ BibWorkflowEngine
         else:
             raise Exception('Unknown start pointfor task: %s' % obj)
 
-        self.process(self._objects, external_save=external_save)
+        self.process(self._objects)
         self._unpickled = False
 
     @staticmethod
@@ -311,7 +311,7 @@ BibWorkflowEngine
                     i[1] = [0]  # reset the callbacks pointer
                     continue
                 except HaltProcessing:
-                    self.increaseCounterHalted()
+                    self.increase_counter_halted()
                     if DEBUG:
                         self.log_info('Processing was halted at step: %s' % i)
                         # reraise the exception,
@@ -327,7 +327,7 @@ BibWorkflowEngine
             # We save the object once it is fully run through
             obj.save(CFG_OBJECT_VERSION.FINAL)
             obj.log_info("Object proccesing is finished")
-            self.increaseCounterFinished()
+            self.increase_counter_finished()
 
             ##### Update the workflow
             ####self.save()
@@ -343,21 +343,25 @@ BibWorkflowEngine
         raise HaltProcessing("Processing halted at task %s with message: %s" %
                              (self.getCurrTaskId(), msg, ))
 
-    def setCounterInitial(self, obj_count):
+    def set_counter_initial(self, obj_count):
         self.db_obj.counter_initial = obj_count
         self.db_obj.counter_halted = 0
         self.db_obj.counter_error = 0
         self.db_obj.counter_finished = 0
 
-    def increaseCounterHalted(self):
+    def increase_counter_halted(self):
         self.db_obj.counter_halted += 1
 
-    def increaseCounterError(self):
+    def increase_counter_error(self):
         self.db_obj.counter_error += 1
 
-    def increaseCounterFinished(self):
+    def increase_counter_finished(self):
         self.db_obj.counter_finished += 1
 
-    def setWorkflowByName(self, workflow_name):
-        workflow = getWorkflowDefinition(workflow_name)
+    def set_workflow_by_name(self, workflow_name):
+        workflow = get_workflow_definition(workflow_name)
         self.setWorkflow(workflow)
+
+    def set_extra_data_params(self, **kwargs):
+        for key, value in kwargs.iteritems():
+            self.extra_data_set(key=key, value=value)

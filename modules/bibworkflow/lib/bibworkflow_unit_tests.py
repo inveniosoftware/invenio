@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013 CERN.
 ##
@@ -19,10 +20,10 @@
 BibWorkflow Unit tests - functions to test workflows
 """
 
-from invenio.testutils import make_flask_test_suite, run_test_suite, \
-    FlaskSQLAlchemyTest
-from invenio.bibworkflow_api import start, start_by_wid, continue_oid, start_by_oids
 from invenio.inveniomanage import db
+from invenio.testutils import (make_flask_test_suite,
+                               run_test_suite,
+                               FlaskSQLAlchemyTest)
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION
 
 
@@ -79,15 +80,14 @@ distances from it.
     def test_workflow_basic_run(self):
         """Tests running workflow with one data object"""
         from invenio.bibworkflow_model import BibWorkflowObject
-
+        from invenio.bibworkflow_api import start
         self.test_data = {'data': 20}
-        initial_data = {'data': self.test_data}
+        initial_data = self.test_data
         final_data = {'data': 41}
 
 
         workflow = start(workflow_name="test_workflow",
-                       data=[self.test_data],
-                       task_queue=False)
+                         data=[self.test_data])
 
         # Keep id for cleanup after
         self.id_workflows.append(workflow.uuid)
@@ -101,19 +101,19 @@ distances from it.
 
         # There should only be 2 objects (initial, final)
         self.assertEqual(all_objects.count(), 2)
-        self._check_workflow_execution(workflow, initial_object,
-                                       self.test_data, final_data)
+        self._check_workflow_execution(initial_object,
+                                       initial_data, final_data)
 
     def test_workflow_complex_run(self):
         """Tests running workflow with several data objects"""
         from invenio.bibworkflow_model import BibWorkflowObject
+        from invenio.bibworkflow_api import start
 
         self.test_data = [{'data': {'data': 1}}, {'data':{'data': "wwww"}}, {'data':{'data': 20}}]
         final_data = [{'data': 19}, {'data': "wwww"}, {'data': 38}]
 
         workflow = start(workflow_name="test_workflow_2",
-                       data=self.test_data,
-                       task_queue=False)
+                         data=self.test_data)
 
         # Keep id for cleanup after
         self.id_workflows.append(workflow.uuid)
@@ -143,12 +143,11 @@ distances from it.
     def test_workflow_recordxml(self):
         """Tests runnning a record ingestion workflow"""
         from invenio.bibworkflow_model import BibWorkflowObject
+        from invenio.bibworkflow_api import start
 
         initial_data = {'data': self.recxml, 'type': "text/xml"}
         workflow = start(workflow_name="marcxml_workflow",
-                       data=[initial_data],
-                       task_queue=False)
-
+                         data=[initial_data])
         # Keep id for cleanup after
         self.id_workflows.append(workflow.uuid)
 
@@ -162,12 +161,13 @@ distances from it.
         self.assertEqual(all_objects.count(), 2)
 
         print map(lambda x: x, objects)
-        self._check_workflow_execution(workflow, objects,
+        self._check_workflow_execution(objects,
                                        initial_data, None)
 
     def test_workflow_for_halted_object(self):
         """Test starting workflow with halted object given"""
         from invenio.bibworkflow_model import BibWorkflowObject
+        from invenio.bibworkflow_api import start_by_oids
         initial_data = {'data': 1}
         obj_init = BibWorkflowObject(data=initial_data,
                                      id_workflow=123,
@@ -181,8 +181,7 @@ distances from it.
         obj_halted._update_db()
 
         workflow = start_by_oids('test_workflow',
-                                 [obj_halted.id],
-                                 task_queue=False)
+                                 [obj_halted.id])
 
         final_data = {'data': 2}
         objects = BibWorkflowObject.query.filter(
@@ -194,8 +193,7 @@ distances from it.
         self.assertEqual(all_objects.count(), 2)
 
         # Check the workflow execution
-        self._check_workflow_execution(workflow,
-                                       objects,
+        self._check_workflow_execution(objects,
                                        halted_data,
                                        final_data)
 
@@ -209,6 +207,7 @@ distances from it.
     def test_workflow_for_finished_object(self):
         """Test starting workflow with finished object given"""
         from invenio.bibworkflow_model import BibWorkflowObject
+        from invenio.bibworkflow_api import start_by_oids
         initial_data = {'data': 20}
         obj_init = BibWorkflowObject(data=initial_data,
                                      id_workflow=253,
@@ -222,8 +221,7 @@ distances from it.
         obj_final._update_db()
 
         workflow = start_by_oids('test_workflow',
-                                 [obj_final.id],
-                                 task_queue=False)
+                                 [obj_final.id])
 
         final_data = {u'data': 62}
         objects = BibWorkflowObject.query.filter(
@@ -235,8 +233,7 @@ distances from it.
         self.assertEqual(all_objects.count(), 2)
 
         # Check the workflow execution
-        self._check_workflow_execution(workflow,
-                                       objects,
+        self._check_workflow_execution(objects,
                                        first_final_data,
                                        final_data)
 
@@ -282,6 +279,7 @@ distances from it.
     def test_workflow_for_running_object(self):
         """Test starting workflow with running object given"""
         from invenio.bibworkflow_model import BibWorkflowObject
+        from invenio.bibworkflow_api import start_by_oids
         initial_data = {'data': 20}
         obj_init = BibWorkflowObject(data=initial_data,
                                      id_workflow=11,
@@ -294,8 +292,7 @@ distances from it.
                                         version=CFG_OBJECT_VERSION.RUNNING)
         obj_running._update_db()
         workflow = start_by_oids('test_workflow',
-                                 [obj_running.id],
-                                 task_queue=False)
+                                 [obj_running.id])
 
         final_data = {u'data': 41}
         objects = BibWorkflowObject.query.filter(
@@ -307,8 +304,7 @@ distances from it.
         self.assertEqual(all_objects.count(), 2)
 
         # Check the workflow execution
-        self._check_workflow_execution(workflow,
-                                       objects,
+        self._check_workflow_execution(objects,
                                        initial_data,
                                        final_data)
 
@@ -325,7 +321,8 @@ distances from it.
         """Tests continuing execution of workflow for object
         given object from prev, current and next task"""
         from invenio.bibworkflow_model import BibWorkflowObject
-
+        from invenio.bibworkflow_api import (start,
+                                             continue_oid)
         initial_data = {'data': 1}
         final_data_prev = {'data': 3}
         final_data_curr = {'data': 2}
@@ -333,16 +330,14 @@ distances from it.
 
         # testing restarting from previous task
         init_workflow = start("test_workflow",
-                            data=[initial_data],
-                            task_queue=False)
+                              data=[initial_data])
 
         obj_halted = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow.uuid,
             BibWorkflowObject.version == CFG_OBJECT_VERSION.HALTED).first()
 
         workflow = continue_oid(oid=obj_halted.id,
-                                start_point="restart_prev",
-                                task_queue=False)
+                                start_point="restart_prev")
 
         new_object = BibWorkflowObject.query.filter(
             BibWorkflowObject.id == obj_halted.id)
@@ -355,15 +350,13 @@ distances from it.
 
         # testing restarting from current task
         init_workflow2 = start(workflow_name="test_workflow",
-                             data=[initial_data],
-                             task_queue=False)
+                               data=[initial_data])
 
         obj_halted2 = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow2.uuid,
             BibWorkflowObject.version == CFG_OBJECT_VERSION.HALTED).first()
         workflow2 = continue_oid(oid=obj_halted.id,
-                                 start_point="restart_task",
-                                 task_queue=False)
+                                 start_point="restart_task")
         object2 = BibWorkflowObject.query.filter(
             BibWorkflowObject.id == obj_halted2.id)
         self.assertEqual(object2.count(), 1)
@@ -375,15 +368,13 @@ distances from it.
 
         # testing continuing from next task
         init_workflow3 = start(workflow_name="test_workflow",
-                             data=[initial_data],
-                             task_queue=False)
+                               data=[initial_data])
 
         obj_halted3 = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow3.uuid,
             BibWorkflowObject.version == CFG_OBJECT_VERSION.HALTED).first()
         workflow3 = continue_oid(oid=obj_halted3.id,
-                                 start_point="continue_next",
-                                 task_queue=False)
+                                 start_point="continue_next")
         object3 = BibWorkflowObject.query.filter(
             BibWorkflowObject.id == obj_halted3.id)
         self.assertEqual(object3.count(), 1)
@@ -396,17 +387,17 @@ distances from it.
     def test_restart_workflow(self):
         """Tests restarting workflow for given workflow id"""
         from invenio.bibworkflow_model import BibWorkflowObject
+        from invenio.bibworkflow_api import (start, start_by_wid)
 
         initial_data = {'data': 1}
 
         # testing restarting from previous task
         init_workflow = start(workflow_name="test_workflow",
-                            data=[initial_data],
-                            task_queue=False)
+                              data=[initial_data])
         init_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == init_workflow.uuid)
 
-        restarted_workflow = start_by_wid(init_workflow.uuid, task_queue=False)
+        restarted_workflow = start_by_wid(init_workflow.uuid)
         restarted_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == restarted_workflow.uuid)
 
@@ -419,14 +410,13 @@ distances from it.
     def test_simplified_data(self):
         """Tests running workflow with simplified data."""
         from invenio.bibworkflow_model import BibWorkflowObject
-
+        from invenio.bibworkflow_api import start
         self.test_data = 20
         initial_data = self.test_data
         final_data = 41
 
         workflow = start(workflow_name="simplified_data_test_workflow",
-                       data=[self.test_data],
-                       task_queue=False)
+                         data=[self.test_data])
 
         # Keep id for cleanup after
         self.id_workflows.append(workflow.uuid)
@@ -439,11 +429,10 @@ distances from it.
         all_objects = BibWorkflowObject.query.filter(
             BibWorkflowObject.id_workflow == workflow.uuid)
         self.assertEqual(all_objects.count(), 2)
-        self._check_workflow_execution(workflow, objects,
+        self._check_workflow_execution(objects,
                                        initial_data, final_data)
 
-    def _check_workflow_execution(self, workflow, objects,
-                                  initial_data, final_data):
+    def _check_workflow_execution(self, objects, initial_data, final_data):
         # Let's check that we found anything. There should only be one object
         self.assertEqual(objects.count(), 1)
 

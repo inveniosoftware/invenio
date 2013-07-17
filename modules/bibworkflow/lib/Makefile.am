@@ -15,7 +15,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = workers widgets
+SUBDIRS = workers widgets tasks workflows
 
 pylibdir = $(libdir)/python/invenio
 
@@ -23,7 +23,10 @@ jsdir=$(localstatedir)/www/js
 
 js_DATA = bibworkflow_workflows.js \
           bibworkflow_index.js \
-          bibworkflow_entry_details.js
+          bibworkflow_entry_details.js \
+          bibworkflow_hp_index.js \
+          bibworkflow_hp_details.js
+
 
 pylib_DATA = bibworkflow_admin_blueprint.py \
 			 bibworkflow_hp_blueprint.py \
@@ -38,7 +41,7 @@ pylib_DATA = bibworkflow_admin_blueprint.py \
 			 bibworkflow_unit_tests.py \
 			 bibworkflow_utils.py \
 			 bibworkflow_worker_engine.py \
-			 bibworkflow_workflow_definition.py \ 
+			 bibworkflow_workflow_definition.py \
 			 bibworkflow_containers.py
 
 EXTRA_DIST = $(pylib_DATA) \

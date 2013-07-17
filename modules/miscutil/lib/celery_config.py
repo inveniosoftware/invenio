@@ -26,7 +26,7 @@ BROKER_URL = getattr(config, "CFG_BROKER_URL", "amqp://guest:guest@localhost:567
 # Extra modules with tasks which should be loaded
 # The Invenio Celery loader automatically takes care of loading tasks defined
 # in *_tasks.py files in 'invenio' package.
-CELERY_INCLUDE = ["invenio.bibworkflow.workers.worker_celery"]
+CELERY_INCLUDE = ["invenio.bibworkflow_workers.worker_celery"]
 
 ## Result backend
 ## --------------

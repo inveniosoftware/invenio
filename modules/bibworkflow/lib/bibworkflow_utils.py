@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -52,9 +53,9 @@ def create_objects(path_to_file):
     return list_of_bwo
 
 
-def getWorkflowDefinition(name):
+def get_workflow_definition(name):
     workflows = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                'bibworkflow', 'workflows', '*.py'))
+                                'bibworkflow_workflows', '*.py'))
     return workflows.get_enabled_plugins()[name]().get_definition()
 
 
@@ -73,7 +74,7 @@ def determineDataType(data):
         # If data is not a dictionary, we try to guess MIME type
         # by using magic library
         try:
-            data_type = mime_checker.from_buffer(data)
+            data_type = mime_checker.from_buffer(data)  # noqa
         except:
             register_exception(stream="warning", prefix=
                                "BibWorkflowObject.determineDataType:" +
@@ -123,7 +124,7 @@ class dictproperty(object):
         return self._proxy(obj, self._fget, self._fset, self._fdel)
 
 
-def create_hp_containers(iSortCol_0=None, sSortDir_0=None, sSearch=None):
+def create_hp_containers(iSortCol_0=None, sSortDir_0=None):
     """
     Looks for related HPItems and groups them together in HPContainers
 
@@ -134,16 +135,13 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None, sSearch=None):
 
     hpcontainers = []
 
-    redis_server = set_up_redis()
-    print 'Sorting by column:', iSortCol_0
-    print 'Type of sortcol:', type(iSortCol_0)
+    redis_server = redis.Redis()
 
     if iSortCol_0:
         iSortCol_0 = int(iSortCol_0)
 
     if iSortCol_0 == 6:
         column = 'created'
-        print 'Sortarw twra'
         if sSortDir_0 == 'desc':
             bwobject_list = BibWorkflowObject.query.order_by(
                 db.desc(column)).all()

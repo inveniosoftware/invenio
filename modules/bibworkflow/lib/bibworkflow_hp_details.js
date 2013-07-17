@@ -8,7 +8,7 @@ $(document).ready(function(){
         hpo_id = $(this).attr('name');
         console.log(hpo_id);
         jQuery.ajax({
-            url: "/admin/bibholdingpen/restart_record?hpcontainerid=" + hpo_id,
+            url: "/admin/holdingpen/restart_record?hpcontainerid=" + hpo_id,
             success: function(json){
                 bootstrap_alert('Object restarted');
             }
@@ -19,7 +19,7 @@ $(document).ready(function(){
         hpo_id = $(this).attr('name');
         console.log(hpo_id);
         jQuery.ajax({
-            url: "/admin/bibholdingpen/restart_record_prev?hpcontainerid=" + hpo_id,
+            url: "/admin/holdingpen/restart_record_prev?hpcontainerid=" + hpo_id,
             success: function(json){
                 bootstrap_alert('Object restarted from previous task');        
             }
@@ -36,7 +36,7 @@ $(document).ready(function(){
 
     window.data_preview = function(format){
         jQuery.ajax({
-            url: "/admin/bibholdingpen/entry_data_preview?oid="+hpid+"&recformat="+format,
+            url: "/admin/holdingpen/entry_data_preview?oid="+hpid+"&recformat="+format,
             success: function(json){
                 if(format == 'xm' || format == 'marcxml'){
                     if( json == ""){

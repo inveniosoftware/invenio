@@ -1,5 +1,6 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,31 +16,34 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from invenio.sqlalchemyutils import db
 from invenio.bibworkflow_client import run_workflow, continue_execution
 from invenio.bibworkflow_engine import BibWorkflowEngine
 from invenio.bibworkflow_model import BibWorkflowObject, Workflow
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION
-from invenio.errorlib import register_exception
-from invenio.sqlalchemyutils import db
-from invenio.bibworkflow_utils import determineDataType
 
 
-def runit(wname, data, external_save=None):
+class InvenioBibWorkflowValueError(Exception):
+    pass
+
+
+def run_worker(wname, data, **kwargs):
     """
     Runs workflow with given name and given data.
     Data can be specified as list of objects or
     single id of WfeObject/BibWorkflowObjects.
     """
-    wfe = BibWorkflowEngine(wname, id_user=0, module_name="aa")
-    wfe.setWorkflowByName(wname)
-    wfe.setCounterInitial(len(data))
+    wfe = BibWorkflowEngine(wname)
+    wfe.set_workflow_by_name(wname)
+    wfe.set_extra_data_params(**kwargs)
+    wfe.set_counter_initial(len(data))
     wfe.save()
 
     run_workflow(wfe=wfe, data=prepare_objects(data, wfe))
     return wfe
 
 
-def restartit(wid, external_save=None):
+def restart_worker(wid, **kwargs):
     """
     Restarts workflow with given id (wid) and given data. If data are not
     specified then it will load all initial data for workflow.
@@ -54,8 +58,9 @@ def restartit(wid, external_save=None):
     workflow = Workflow.query.filter(Workflow.uuid == wid).first()
 
     wfe = BibWorkflowEngine(workflow.name)
-    wfe.setWorkflowByName(workflow.name)
-    wfe.setCounterInitial(len(data))
+    wfe.set_workflow_by_name(workflow.name)
+    wfe.set_extra_data_params(**kwargs)
+    wfe.set_counter_initial(len(data))
     wfe.save()
 
     obj = prepare_objects(data, wfe)
@@ -68,11 +73,15 @@ def restartit(wid, external_save=None):
     return wfe
 
 
-def continueit(oid, restart_point="next_task", external_save=None):
+def continue_worker(oid, restart_point="continue_next", **kwargs):
     """
-    Restarts workflow with given id (wid) and given data. If data are not
-    specified then it will load all initial data for workflow. Depending on
-    restart_point function can load initial or current objects.
+    Restarts workflow with given id (wid) at given point.
+
+    restart_point can be one of:
+
+    * restart_prev: will restart from the previous task
+    * continue_next: will continue to the next task
+    * restart_task: will restart the current task
     """
     data = [BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                            oid).first()]
@@ -80,15 +89,15 @@ def continueit(oid, restart_point="next_task", external_save=None):
     workflow = Workflow.query.filter(Workflow.uuid ==
                                      data[0].id_workflow).first()
     wfe = BibWorkflowEngine(None, uuid=None, id_user=0,
-                            workflow_object=workflow,
-                            module_name="module")
-    wfe.setWorkflowByName(workflow.name)
-
-    wfe.setCounterInitial(len(data))
+                            workflow_object=workflow)
+    wfe.set_workflow_by_name(workflow.name)
+    wfe.set_extra_data_params(**kwargs)
+    wfe.set_counter_initial(len(data))
     wfe.save()
 
     continue_execution(wfe, data, restart_point)
     return wfe
+
 
 def prepare_objects(data, workflow_object):
     objects = []
@@ -159,12 +168,10 @@ and RUNNING object will be deleted.""")
             version=CFG_OBJECT_VERSION.RUNNING,
             id_parent=new_initial,
             no_update=True)
-        tmp_obj = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                                 new_id).first()
         db.session.delete(obj)
 
         return BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                               new_id).first()
     else:
-        from Exception import ValueError
-        raise ValueError
+        raise InvenioBibWorkflowValueError("Object version is unknown: %s" %
+                                           (obj.version,))

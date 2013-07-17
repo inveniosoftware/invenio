@@ -15,8 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = tasks templates workflows
+SUBDIRS = templates
 
-pylibdir = $(libdir)/python/invenio/bibworkflow
-
-pylib_DATA = __init__.py
+CLEANFILES = *~

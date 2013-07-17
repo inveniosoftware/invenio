@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## This file is part of Invenio.
 ## Copyright (C) 2012, 2013 CERN.
 ##
@@ -14,6 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 
 import os
 import tempfile
@@ -156,7 +158,7 @@ class Workflow(db.Model):
         """ Returns the most recently modified workflow. """
 
         most_recent = cls.get(*criteria, **filters).\
-                          order_by(desc(Workflow.modified)).first()
+            order_by(desc(Workflow.modified)).first()
         if most_recent is None:
             raise NoResultFound
         else:
@@ -225,7 +227,8 @@ class BibWorkflowObject(db.Model):
                                                     "task_counter": {},
                                                     "error_msg": "",
                                                     "last_task_name": "",
-                                                    "latest_object": -1})
+                                                    "latest_object": -1,
+                                                    "widget": None})
     id_workflow = db.Column(db.String(36),
                             db.ForeignKey("bwlWORKFLOW.uuid"), nullable=False)
     version = db.Column(db.Integer(3),
@@ -241,11 +244,12 @@ class BibWorkflowObject(db.Model):
     data_type = db.Column(db.String(50), default=determineDataType,
                           nullable=False)
     uri = db.Column(db.String(500), default="")
+    id_user = db.Column(db.Integer, default=0, nullable=False)
     child_logs = db.relationship("BibWorkflowObjectLogging")
     _old_data = None
 
-    def get_data_by_id(self, id):
-        return self.query.filter(BibWorkflowObject.id == id).first()
+    def get_data_by_id(self, oid):
+        return self.query.filter(BibWorkflowObject.id == oid).first()
 
     @property
     def data(self):
@@ -287,12 +291,11 @@ class BibWorkflowObject(db.Model):
         #    extra_obj.save()
 
     def __repr__(self):
-        repr = "<BibWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
+        return "<BibWorkflowObject(id = %s, data = %s, id_workflow = %s, " \
                "version = %s, id_parent = %s, created = %s, extra_data = %s)" \
                % (str(self.id), str(self.data), str(self.id_workflow),
                   str(self.version), str(self.id_parent), str(self.created),
                   str(self.extra_data))
-        return repr
 
     def __str__(self, log=False):
         return """
@@ -433,7 +436,7 @@ BibWorkflowObject
         return filename
 
     def __getstate__(self):
-        return {"data": self.data,
+        return {"_data": self._data,
                 "id_workflow": self.id_workflow,
                 "version": self.version,
                 "id_parent": self.id_parent,
@@ -445,7 +448,7 @@ BibWorkflowObject
                 "extra_data": self.extra_data}
 
     def __setstate__(self, state):
-        self.data = state["data"]
+        self._data = state["_data"]
         self.id_workflow = state["id_workflow"]
         self.version = state["version"]
         self.id_parent = state["id_parent"]
@@ -458,7 +461,7 @@ BibWorkflowObject
 
     def copy(self, other):
         """Copies data and metadata except id and id_workflow"""
-        self.data = other.data
+        self._data = other._data
         self.extra_data = other.extra_data
         self.version = other.version
         self.id_parent = other.id_parent
@@ -480,4 +483,4 @@ event.listen(BibWorkflowObject, 'load', load_a)
 
 
 __all__ = ['Workflow', 'BibWorkflowObject', 'WorkflowLogging',
-           'AuditLogging', 'TaskLogging', 'BibWorkflowObjectLogging']
+           'BibWorkflowObjectLogging']

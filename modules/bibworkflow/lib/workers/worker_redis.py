@@ -17,36 +17,50 @@
 
 from redis import Redis
 from rq.decorators import job
-from invenio.bibworkflow_worker_engine import runit, restartit
+from invenio.bibworkflow_worker_engine import (run_worker,
+                                               restart_worker,
+                                               continue_worker)
 
 #FIXME: add configuration variables
 redis_conn = Redis()
 
 
 class worker_redis(object):
-    def run(self, wname, data, external_save=None):
+    def run_worker(self, workflow_name, data, **kwargs):
         """
-        Registers runit function as a new task in RQ
+        Registers run_worker function as a new task in RQ
         The delay method executes it asynchronously
 
-        @wname: str, name of the workflow to be run
-        @data: list of dictionaries, objects for the workflow
-        """
-        return job(queue='default', connection=redis_conn)(runit). \
-            delay(wname, data, external_save=external_save)
+        @param workflow_name: name of the workflow to be run
+        @type workflow_name: string
 
-    def restart(self, wid, data=None, restart_point="beginning",
-                external_save=None):
+        @param data: list of objects for the workflow
+        @type data: list
         """
-        Registers restartit as a new task in RQ
+        return job(queue='default', connection=redis_conn)(run_worker). \
+            delay(workflow_name, data, **kwargs)
+
+    def restart_worker(self, wid, **kwargs):
+        """
+        Registers restart_worker as a new task in RQ
         The delay method executes it asynchronously
 
-        @wname: str, name of the workflow to be run
-        @data:  set to None if not given. In this case they are retrieved
-        from the db
-        list of dictionaries, objects for the workflow
-        @restart_point: str, sets the restart point
+        @param wid: uuid of the workflow to be run
+        @type wid: string
         """
-        return job(queue='default', connection=redis_conn)(restartit).\
-            delay(wid, data=data, restart_point=restart_point,
-                  external_save=external_save)
+        return job(queue='default', connection=redis_conn)(restart_worker).\
+            delay(wid, **kwargs)
+
+    def continue_worker(self, oid, restart_point, **kwargs):
+        """
+        Registers continue_worker as a new task in RQ
+        The delay method executes it asynchronously
+
+        @param oid: uuid of the object to be started
+        @type oid: string
+
+        @param restart_point: sets the start point
+        @type restart_point: string
+        """
+        return job(queue='default', connection=redis_conn)(continue_worker). \
+            delay(oid, restart_point, **kwargs)

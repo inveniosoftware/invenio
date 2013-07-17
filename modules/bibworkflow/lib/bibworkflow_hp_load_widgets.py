@@ -41,7 +41,7 @@ def plugin_builder(plugin_name, plugin_code):
         pass
 
 CFG_WIDGETS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                           'bibholdingpen_widgets',
+                                           'bibworkflow_widgets',
                                            '*_widget.py'),
                               plugin_builder=plugin_builder)
 
