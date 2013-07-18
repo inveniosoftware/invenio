@@ -18,11 +18,11 @@
 # pylint: disable=C0103
 """Invenio BibSched live view engine implementation"""
 
-from invenio.config import CFG_SITE_URL, CFG_BINDIR, CFG_PREFIX
+from invenio.config import CFG_SITE_URL
 from invenio.dbquery import run_sql
+from invenio.bibsched import CFG_MOTD_PATH
 
 import os
-import subprocess
 import time
 
 
@@ -95,25 +95,20 @@ def get_bibsched_mode():
     """
     Gets bibsched running mode: AUTOMATIC or MANUAL
     """
-    process = subprocess.Popen([os.path.join(CFG_BINDIR, 'bibsched'), 'status'], stdout=subprocess.PIPE)
-    output = process.communicate()[0]
+    r = run_sql('SELECT value FROM schSTATUS WHERE name = "auto_mode"')
     try:
-        status = output.split('\n')[1].split()[-1]
-        if status in ['MANUAL', 'AUTOMATIC']:
-            return status
-        else:
-            return 'Unknown'
-    except IndexError:
-        return 'Unknown'
+        mode = bool(int(r[0][0]))
+    except (ValueError, IndexError):
+        mode = True
+
+    return mode and 'AUTOMATIC' or 'MANUAL'
 
 def get_motd_msg():
     """
     Gets content from motd file
     """
-    from invenio.bibsched_monitor import CFG_MOTD_PATH
-    motd_path = os.path.join(CFG_PREFIX, "var", "run", "bibsched.motd")
     try:
-        motd_msg = open(motd_path).read().strip()
+        motd_msg = open(CFG_MOTD_PATH).read().strip()
     except IOError:
         return ""
     if len(motd_msg) > 0:

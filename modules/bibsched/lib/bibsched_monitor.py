@@ -34,6 +34,7 @@ from invenio.bibtask_config import \
 from invenio.config import \
      CFG_BIBSCHED_REFRESHTIME, \
      CFG_BINDIR, \
+     CFG_LOGDIR, \
      CFG_TMPSHAREDDIR, \
      CFG_BIBSCHED_GC_TASKS_OLDER_THAN, \
      CFG_BIBSCHED_GC_TASKS_TO_REMOVE, \
@@ -56,10 +57,23 @@ from invenio.bibsched import bibsched_get_status, \
                              server_pid, \
                              redirect_stdout_and_stderr, \
                              restore_stdout_and_stderr, \
-                             get_task_pid
+                             get_task_pid, \
+                             fetch_debug_mode
+from invenio.bibtask import get_sleeptime, task_get_options
 
 
 CFG_MOTD_PATH = os.path.join(CFG_TMPSHAREDDIR, "bibsched.motd")
+
+
+def get_user():
+    return os.environ.get('SUDO_USER', None)
+
+
+def log(message, debug=None):
+    user = get_user()
+    if user:
+        message = "%s by %s" % (message, user)
+    return Log(message, debug)
 
 
 def get_pager():
@@ -126,8 +140,8 @@ class Manager(object):
         self.curses = curses
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
-        self.footer_auto_mode = "Automatic Mode [A Manual] [1/2/3 Display] [P Purge] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
-        self.footer_manual_mode = "Manual Mode%s [A Automatic] [1/2/3 Display Type] [P Purge] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
+        self.footer_auto_mode = "Automatic Mode [A Manual] [1/2/3 Display] [H Help] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
+        self.footer_manual_mode = "Manual Mode%s [A Automatic] [1/2/3 Display Type] [H help] [l/L Log] [O Opts] [E Edit motd] [Q Quit]"
         self.footer_waiting_item = "[R Run] [D Delete] [N Priority]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
         self.footer_stopped_item = "[I Initialise] [D Delete] [K Acknowledge]"
@@ -172,7 +186,9 @@ class Manager(object):
                                            ord("q"), ord("Q"), ord("a"),
                                            ord("A"), ord("1"), ord("2"), ord("3"),
                                            ord("p"), ord("P"), ord("o"), ord("O"),
-                                           ord("l"), ord("L"), ord("e"), ord("E"))):
+                                           ord("l"), ord("L"), ord("e"), ord("E"),
+                                           ord("z"), ord("Z"), ord("b"), ord("B"),
+                                           ord("h"), ord("H"), ord("D"))):
             self.display_in_footer("in automatic mode")
         else:
             status = self.currentrow and self.currentrow[5] or None
@@ -186,11 +202,11 @@ class Manager(object):
                 self.repaint()
             elif char == self.curses.KEY_DOWN:
                 self.selected_line = min(self.selected_line + 1,
-                                         len(self.rows) + self.header_lines - 1)
+                                        len(self.rows) + self.header_lines - 1)
                 self.repaint()
             elif char == self.curses.KEY_NPAGE:
                 self.selected_line = min(self.selected_line + 10,
-                                         len(self.rows) + self.header_lines - 1)
+                                        len(self.rows) + self.header_lines - 1)
                 self.repaint()
             elif char == self.curses.KEY_HOME:
                 self.first_visible_line = 0
@@ -204,33 +220,41 @@ class Manager(object):
             elif char in (ord("a"), ord("A")):
                 self.display_change_queue_mode_box()
             elif char == ord("l"):
-                self.openlog()
+                self.open_task_log()
             elif char == ord("L"):
-                self.openlog(err=True)
+                self.open_task_log(err=True)
             elif char in (ord("w"), ord("W")):
-                self.wakeup()
+                self.wakeup_task()
             elif char in (ord("n"), ord("N")):
-                self.change_priority()
+                self.change_task_priority()
             elif char in (ord("r"), ord("R")):
                 if status in ('WAITING', 'SCHEDULED'):
-                    self.run()
+                    self.run_task()
             elif char in (ord("s"), ord("S")):
-                self.sleep()
+                self.sleep_task()
             elif char in (ord("k"), ord("K")):
                 if status in ('ERROR', 'DONE WITH ERRORS', 'ERRORS REPORTED'):
-                    self.acknowledge()
+                    self.acknowledge_task()
                 elif status is not None:
-                    self.kill()
+                    self.kill_task()
             elif char in (ord("t"), ord("T")):
-                self.stop()
-            elif char in (ord("d"), ord("D")):
-                self.delete()
+                self.stop_task()
+            elif char == ord("d"):
+                self.delete_task()
+            elif char == ord("D"):
+                self.debug_task()
             elif char in (ord("i"), ord("I")):
-                self.init()
+                self.init_task()
             elif char in (ord("p"), ord("P")):
                 self.purge_done()
             elif char in (ord("o"), ord("O")):
                 self.display_task_options()
+            elif char in (ord("z"), ord("Z")):
+                self.toggle_debug_mode()
+            elif char in (ord("b"), ord("B")):
+                self.open_bibsched_log()
+            elif char in (ord("h"), ord("H")):
+                self.display_help()
             elif char in (ord("e"), ord("E")):
                 self.edit_motd()
                 self.read_motd()
@@ -266,12 +290,37 @@ class Manager(object):
                     self.running = 0
                     return
 
-    def openlog(self, err=False):
-        task_id = self.currentrow[0]
-        if err:
-            logname = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % task_id)
-        else:
-            logname = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % task_id)
+    def display_help(self):
+        msg = """Help
+====
+Q - Quit
+b - View bibsched log
+P - Purge
+e - Edit motd
+1 - View completed tasks
+2 - View running/waiting tasks
+3 - View archived tasks
+z - Toggle debug mode
+a - Toggle automatic mode
+g - Go to the beginning of the task list
+G - Go to the end of the task list
+\t
+Shortcuts that act on the selected task:
+l - View task log
+o - Display task options
+i - Reinitialize task
+d - Delete task
+t - Stop task
+k - Acknowledge task
+s - Sleep task
+r - Run task
+n - Change task priority
+w - Wake up task
+D - Debug mode for remote task
+"""
+        self._display_message_box(msg)
+
+    def openlog(self, logname):
         if os.path.exists(logname):
             pager = get_pager()
             if os.path.exists(pager):
@@ -286,6 +335,18 @@ class Manager(object):
             else:
                 self._display_message_box("No pager was found")
 
+    def open_task_log(self, err=False):
+        task_id = self.currentrow[0]
+        if err:
+            logname = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.err' % task_id)
+        else:
+            logname = os.path.join(CFG_BIBSCHED_LOGDIR, 'bibsched_task_%d.log' % task_id)
+        self.openlog(logname)
+
+    def open_bibsched_log(self):
+        logname = os.path.join(CFG_LOGDIR, 'bibsched.log')
+        self.openlog(logname)
+
     def edit_motd(self):
         """Add, delete or change the motd message that will be shown when the
         bibsched monitor starts."""
@@ -295,9 +356,27 @@ class Manager(object):
             self.curses.endwin()
             if not os.path.isfile(CFG_MOTD_PATH) or not open(CFG_MOTD_PATH).read():
                 f = open(CFG_MOTD_PATH, 'w')
-                f.write('<user>, <reason>')
-                f.close()
+                try:
+                    f.write('<reason>')
+                finally:
+                    f.close()
             os.system("%s %s" % (editor, CFG_MOTD_PATH))
+
+            # Add the user in front of the motd:
+            # <user>, <reason>
+            user = get_user()
+            if user:
+                f = open(CFG_MOTD_PATH, 'r')
+                try:
+                    new_motd = f.read()
+                finally:
+                    f.close()
+                if new_motd.strip():
+                    f = open(CFG_MOTD_PATH, 'w')
+                    try:
+                        f.write('%s, %s' % (user, new_motd))
+                    finally:
+                        f.close()
 
             # We need to redraw the MOTD part
             self.read_motd()
@@ -305,22 +384,22 @@ class Manager(object):
 
             if previous[24:] != self.motd[24:]:
                 if len(previous) == 0:
-                    Log('motd set to "%s"' % self.motd.replace("\n", "|"))
+                    log('motd set to "%s"' % self.motd.replace("\n", "|"))
                     self.selected_line += 1
                     self.header_lines += 1
                 elif len(self.motd) == 0:
-                    Log('motd deleted')
+                    log('motd deleted')
                     self.selected_line -= 1
                     self.header_lines -= 1
                 else:
-                    Log('motd changed to "%s"' % self.motd.replace("\n", "|"))
+                    log('motd changed to "%s"' % self.motd.replace("\n", "|"))
         else:
             self._display_message_box("No editor was found")
 
     def display_task_options(self):
         """Nicely display information about current process."""
         msg = '        id: %i\n\n' % self.currentrow[0]
-        pid = get_task_pid(self.currentrow[1], self.currentrow[0], True)
+        pid = get_task_pid(self.currentrow[0])
         if pid is not None:
             msg += '       pid: %s\n\n' % pid
         msg += '  priority: %s\n\n' % self.currentrow[8]
@@ -336,9 +415,12 @@ class Manager(object):
             msg += '   options : %s\n\n' % arguments
         else:
             msg += 'executable : %s\n\n' % arguments[0]
-            msg += ' arguments : %s\n\n' % ' '.join(arguments[1:])
+            args_str = ' '.join(arguments[1:])
+            if len(args_str) > 500:
+                args_str = args_str[:500] + '...'
+            msg += ' arguments : %s\n\n' % args_str
         msg += '\n\nPress q to quit this panel...'
-        msg = wrap_text_in_a_box(msg, style='no_border')
+        msg = wrap_text_in_a_box(msg, style='no_border', break_long=True)
         rows = msg.split('\n')
         height = len(rows) + 2
         width = max([len(row) for row in rows]) + 4
@@ -373,7 +455,7 @@ class Manager(object):
             pass
         return out
 
-    def change_priority(self):
+    def change_task_priority(self):
         task_id = self.currentrow[0]
         priority = self.currentrow[8]
         new_priority = self._display_ask_number_box("Insert the desired \
@@ -394,14 +476,18 @@ order to let this task run. The current priority is %s. New value:"
         # We need to update the priority number next to the task
         self.repaint()
 
-    def wakeup(self):
+    def wakeup_task(self):
+        if not self.currentrow:
+            self.display_in_footer("no task selected")
+            return
+
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
         #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             #self.display_in_footer("a process is already running!")
         if status == "SLEEPING":
-            if not bibsched_send_signal(process, task_id, signal.SIGCONT):
+            if not bibsched_send_signal(task_id, signal.SIGCONT):
                 bibsched_set_status(task_id, "ERROR", "SLEEPING")
             self.update_rows()
             self.repaint()
@@ -596,7 +682,7 @@ order to let this task run. The current priority is %s. New value:"
             self.repaint()
             self.display_in_footer("DONE processes purged")
 
-    def run(self):
+    def run_task(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
@@ -609,7 +695,7 @@ order to let this task run. The current priority is %s. New value:"
                     program = os.path.join(CFG_BINDIR, process)
                     command = "%s %s" % (program, str(task_id))
                     spawn_task(command)
-                    Log("manually running task #%d (%s)" % (task_id, process))
+                    log("manually running task #%d (%s)" % (task_id, process))
                     # We changed the status of one of our tasks
                     self.update_rows()
                     self.repaint()
@@ -621,16 +707,25 @@ order to let this task run. The current priority is %s. New value:"
         else:
             self.display_in_footer("Process status should be SCHEDULED or WAITING!")
 
-    def acknowledge(self):
+    def acknowledge_task(self):
         task_id = self.currentrow[0]
+        task_name = self.currentrow[1]
         status = self.currentrow[5]
         if status in ('ERROR', 'DONE WITH ERRORS', 'ERRORS REPORTED'):
-            bibsched_set_status(task_id, 'ACK ' + status, status)
-            self.update_rows()
-            self.repaint()
-            self.display_in_footer("Acknowledged error")
+            argv = task_get_options(task_id, task_name)
+            sleeptime = get_sleeptime(argv)
+            if not sleeptime or self._display_YN_box("WARNING! This is a periodic task.\n\nAre you sure you want to acknowledge the %s process %s?" % (task_name, task_id)):
+                bibsched_set_status(task_id, 'ACK ' + status, status)
+                self.update_rows()
+                self.repaint()
+                self.display_in_footer("Acknowledged error")
 
-    def sleep(self):
+    def debug_task(self):
+        task_id = self.currentrow[0]
+        bibsched_send_signal(task_id, signal.SIGUSR2)
+        self.display_in_footer("Task set in debug mode")
+
+    def sleep_task(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING'):
@@ -641,13 +736,13 @@ order to let this task run. The current priority is %s. New value:"
         else:
             self.display_in_footer("Cannot put to sleep non-running processes")
 
-    def kill(self):
+    def kill_task(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING'):
             if self._display_YN_box("Are you sure you want to kill the %s process %s?" % (process, task_id)):
-                bibsched_send_signal(process, task_id, signal.SIGKILL)
+                bibsched_send_signal(task_id, signal.SIGKILL)
                 bibsched_set_status(task_id, 'KILLED')
                 self.update_rows()
                 self.repaint()
@@ -655,14 +750,14 @@ order to let this task run. The current priority is %s. New value:"
         else:
             self.display_in_footer("Cannot kill non-running processes")
 
-    def stop(self):
+    def stop_task(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING', 'ABOUT TO SLEEP', 'SLEEPING'):
             if status == 'SLEEPING':
                 bibsched_set_status(task_id, 'NOW STOP', 'SLEEPING')
-                bibsched_send_signal(process, task_id, signal.SIGCONT)
+                bibsched_send_signal(task_id, signal.SIGCONT)
                 count = 10
                 while bibsched_get_status(task_id) == 'NOW STOP':
                     if count <= 0:
@@ -681,18 +776,21 @@ order to let this task run. The current priority is %s. New value:"
         else:
             self.display_in_footer("Cannot stop non-running processes")
 
-    def delete(self):
+    def delete_task(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
-        if status not in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP'):
-            bibsched_set_status(task_id, "%s_DELETED" % status, status)
-            self.display_in_footer("process deleted")
-            self.update_rows()
-            self.repaint()
+        if status not in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED',
+                          'ABOUT TO STOP', 'ABOUT TO SLEEP'):
+            msg = 'Are you sure you want to delete this task?'
+            if self._display_YN_box(msg):
+                bibsched_set_status(task_id, "%s_DELETED" % status, status)
+                self.display_in_footer("process deleted")
+                self.update_rows()
+                self.repaint()
         else:
             self.display_in_footer("Cannot delete running processes")
 
-    def init(self):
+    def init_task(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
         if status not in ('RUNNING', 'CONTINUING', 'SLEEPING'):
@@ -734,6 +832,7 @@ order to let this task run. The current priority is %s. New value:"
         if new_mode:
             run_sql('UPDATE schSTATUS SET value = "" WHERE name = "resume_after"')
             run_sql('UPDATE schSTATUS SET value = "1" WHERE name = "auto_mode"')
+            log('queue changed to automatic mode')
         # Enable manual mode
         else:
             run_sql('UPDATE schSTATUS SET value = "0" WHERE name = "auto_mode"')
@@ -743,10 +842,30 @@ order to let this task run. The current priority is %s. New value:"
             else:
                 resume_after = ""
             run_sql('REPLACE INTO schSTATUS (name, value) VALUES ("resume_after", %s)', [resume_after])
+            if duration:
+                log('queue changed to manual mode for %ss' % duration)
+            else:
+                log('queue changed to manual mode')
 
         self.auto_mode = not self.auto_mode
+
         # We need to refresh the color of the header and footer
         self.repaint()
+
+    def toggle_debug_mode(self):
+        if self.debug_mode:
+            self.display_in_footer("Deactivating debug mode")
+            self.debug_mode = 0
+            value = "0"
+        else:
+            self.display_in_footer("Activating debug mode")
+            self.debug_mode = 1
+            value = "1"
+
+        run_sql('UPDATE schSTATUS SET value = %s WHERE name = "debug_mode"',
+                [value])
+
+
 
     def put_line(self, row, header=False, motd=False):
         ## ROW: (id,proc,user,runtime,sleeptime,status,progress,arguments,priority,host)
@@ -839,6 +958,9 @@ order to let this task run. The current priority is %s. New value:"
     def tick(self):
         self.update_rows()
         self.repaint()
+
+        self.debug_mode = fetch_debug_mode()
+
         if self.manual_mode_time_left and self.manual_mode_time_left.seconds < 10:
             self.display_change_queue_mode_box(extend_time=True)
 
@@ -860,14 +982,21 @@ order to let this task run. The current priority is %s. New value:"
         for row in self.rows[self.first_visible_line:self.first_visible_line+maxy-2]:
             self.put_line(row)
         self.y = self.stdscr.getmaxyx()[0] - 1
+        if self.debug_mode:
+            debug_footer = "DEBUG MODE!! "
+        else:
+            debug_footer = ""
         if self.auto_mode:
-            self.display_in_footer(self.footer_auto_mode, print_time_p=1)
+            self.display_in_footer(debug_footer + self.footer_auto_mode,
+                                   print_time_p=1)
         else:
             if self.manual_mode_time_left:
                 time_left = " %02d:%02d remaining" % (self.manual_mode_time_left.seconds / 60, self.manual_mode_time_left.seconds % 60)
             else:
                 time_left = ""
-            self.display_in_footer(self.footer_manual_mode % time_left, print_time_p=1)
+            footer = self.footer_manual_mode % time_left
+            self.display_in_footer(debug_footer + footer,
+                                   print_time_p=1)
             footer2 = ""
             if self.item_status.find("DONE") > -1 or self.item_status in ("ERROR", "STOPPED", "KILLED", "ERRORS REPORTED"):
                 footer2 += self.footer_stopped_item
@@ -903,7 +1032,7 @@ order to let this task run. The current priority is %s. New value:"
             limit = "LIMIT %s" % CFG_BIBSCHED_MAX_ARCHIVED_ROWS_DISPLAY
         elif self.display == 2:
             table = "schTASK"
-            where = "status IN ('RUNNING', 'CONTINUING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING', 'WAITING', 'ERRORS REPORTED', 'DONE WITH ERRORS', 'ERROR', 'CERROR')"
+            where = "status IN ('RUNNING', 'CONTINUING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING', 'WAITING', 'ERRORS REPORTED', 'DONE WITH ERRORS', 'ERROR', 'CERROR', 'KILLED', 'STOPPED')"
             order = "runtime ASC"
             limit = ""
         else:
@@ -948,6 +1077,7 @@ order to let this task run. The current priority is %s. New value:"
         self.height, self.width = stdscr.getmaxyx()
         self.stdscr.erase()
         self.check_auto_mode()
+        self.debug_mode = fetch_debug_mode()
         ring = 4
         if len(self.motd) > 0:
             self._display_message_box(self.motd + "\nPress any key to close")
