@@ -154,6 +154,10 @@ Contents
           - (optional) libhdf5-7, libhdf5-dev, python-h5py, in order to
              run author disambiguation.
              <https://code.google.com/p/h5py/>
+          - (optional) Nydus, redis consistent hashing connector
+             <https://github.com/disqus/nydus>
+          - (optional) redis, redis connector
+             <https://pypi.python.org/pypi/redis/>
 
         Note that if you are using pip to install and manage your
         Python dependencies, then you can run:

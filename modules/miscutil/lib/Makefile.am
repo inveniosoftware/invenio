@@ -64,6 +64,7 @@ pylib_DATA = __init__.py \
              shellutils_unit_tests.py \
              pluginutils.py \
              pluginutils_unit_tests.py \
+             redisutils.py \
              plotextractor.py \
              plotextractor_converter.py \
              plotextractor_getter.py \
