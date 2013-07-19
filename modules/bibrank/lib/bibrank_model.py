@@ -39,7 +39,7 @@ class RnkMETHOD(db.Model):
     name = db.Column(db.String(20), unique=True, nullable=False,
                      server_default='')
     last_updated = db.Column(db.DateTime, nullable=False,
-                             server_default='0001-01-01 00:00:00')
+                             server_default='1900-01-01 00:00:00')
 
 
 class RnkMETHODDATA(db.Model):
@@ -68,7 +68,7 @@ class RnkCITATIONDATA(db.Model):
     object_name = db.Column(db.String(20), unique=True, nullable=False)
     object_value = db.Column(db.iLargeBinary, nullable=True)
     last_updated = db.Column(db.DateTime, nullable=False,
-                             server_default='0001-01-01 00:00:00')
+                             server_default='1900-01-01 00:00:00')
 
 
 class RnkCITATIONDATAERR(db.Model):
@@ -104,7 +104,7 @@ class RnkDOWNLOADS(db.Model):
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=True)
     download_time = db.Column(db.DateTime, nullable=True,
-                server_default='0001-01-01 00:00:00')
+                server_default='1900-01-01 00:00:00')
     client_host = db.Column(db.Integer(10, unsigned=True), nullable=True)
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
                 nullable=True)
@@ -128,7 +128,7 @@ class RnkPAGEVIEWS(db.Model):
                 server_default='0', primary_key=True)
     client_host = db.Column(db.Integer(10, unsigned=True), nullable=True)
     view_time = db.Column(db.DateTime, primary_key=True,
-                server_default='0001-01-01 00:00:00')
+                server_default='1900-01-01 00:00:00')
     bibrec = db.relationship(Bibrec, backref='pageviews')
     user = db.relationship(User, backref='pageviews')
 

@@ -47,7 +47,7 @@ class CmtRECORDCOMMENT(db.Model):
     title = db.Column(db.String(255), nullable=False, server_default='')
     body = db.Column(db.Text, nullable=False)
     date_creation = db.Column(db.DateTime, nullable=False,
-                              server_default='0001-01-01 00:00:00')
+                              server_default='1900-01-01 00:00:00')
     star_score = db.Column(db.TinyInteger(5, unsigned=True), nullable=False,
                            server_default='0')
     nb_votes_yes = db.Column(db.Integer(10), nullable=False, server_default='0')
@@ -135,7 +135,7 @@ class CmtACTIONHISTORY(db.Model):
                         nullable=True, primary_key=True)
     client_host = db.Column(db.Integer(10, unsigned=True), nullable=True)
     action_time = db.Column(db.DateTime, nullable=False,
-                            server_default='0001-01-01 00:00:00')
+                            server_default='1900-01-01 00:00:00')
     action_code = db.Column(db.Char(1), nullable=False, index=True)
     recordcomment = db.relationship(CmtRECORDCOMMENT, backref='actionhistory')
     bibrec = db.relationship(Bibrec)
@@ -152,7 +152,7 @@ class CmtSUBSCRIPTION(db.Model):
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
                         nullable=False, primary_key=True)
     creation_time = db.Column(db.DateTime, nullable=False,
-                              server_default='0001-01-01 00:00:00')
+                              server_default='1900-01-01 00:00:00')
 
     bibrec = db.relationship(Bibrec)
     user = db.relationship(User, backref='comment_subscriptions')

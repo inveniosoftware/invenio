@@ -49,7 +49,7 @@ class UserQueryBasket(db.Model):
                 primary_key=True)
     date_creation = db.Column(db.Date, nullable=True)
     date_lastrun = db.Column(db.Date, nullable=True,
-                server_default='0001-01-01')
+                server_default='1900-01-01')
     alert_name = db.Column(db.String(30), nullable=False,
                 server_default='', index=True)
     alert_desc = db.Column(db.Text)

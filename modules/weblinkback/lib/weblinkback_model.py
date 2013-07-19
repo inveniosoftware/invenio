@@ -50,7 +50,7 @@ class LnkENTRY(db.Model):
     type = db.Column(db.String(30), nullable=False, index=True)
     status = db.Column(db.String(30), nullable=False, server_default='PENDING',
                 index=True)
-    insert_time = db.Column(db.DateTime, server_default='0001-01-01 00:00:00',
+    insert_time = db.Column(db.DateTime, server_default='1900-01-01 00:00:00',
                 index=True)
 
     @property
@@ -86,7 +86,7 @@ class LnkLOG(db.Model):
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True, nullable=False)
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id))
     action = db.Column(db.String(30), nullable=False, index=True)
-    log_time = db.Column(db.DateTime, server_default='0001-01-01 00:00:00',
+    log_time = db.Column(db.DateTime, server_default='1900-01-01 00:00:00',
                 index=True)
 
 

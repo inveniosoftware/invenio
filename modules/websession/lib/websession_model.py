@@ -57,7 +57,7 @@ class User(db.Model):
     nickname = db.Column(db.String(255), nullable=False, server_default='',
                          index=True)
     last_login = db.Column(db.DateTime, nullable=False,
-                           server_default='0001-01-01 00:00:00')
+                           server_default='1900-01-01 00:00:00')
 
     #TODO re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
@@ -134,7 +134,7 @@ class UserUsergroup(db.Model):
     user_status = db.Column(db.CHAR(1), nullable=False,
                 server_default='')
     user_status_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                server_default='1900-01-01 00:00:00')
     user = db.relationship(User, backref='usergroups')
     usergroup = db.relationship(Usergroup, backref='users')
 
@@ -145,7 +145,7 @@ class Session(db.Model):
     session_key = db.Column(db.String(32), nullable=False,
                 server_default='', primary_key=True)
     session_expiry = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00', index=True)
+                server_default='1900-01-01 00:00:00', index=True)
     session_object = db.Column(db.LargeBinary, nullable=True)
     uid = db.Column(db.Integer(15, unsigned=True),
                 nullable=False, index=True)

@@ -36,10 +36,10 @@ class Bibrec(db.Model):
                 nullable=False,
                 autoincrement=True)
     creation_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00',
+                server_default='1900-01-01 00:00:00',
                 index=True)
     modification_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00',
+                server_default='1900-01-01 00:00:00',
                 index=True)
     master_format = db.Column(db.String(16), nullable=False,
                               server_default='marc')
@@ -55,7 +55,7 @@ class Bibfmt(db.Model):
     format = db.Column(db.String(10), nullable=False,
                 server_default='', primary_key=True, index=True)
     last_updated = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00', index=True)
+                server_default='1900-01-01 00:00:00', index=True)
     value = db.Column(db.iLargeBinary)
     bibrec = db.relationship(Bibrec, backref='bibfmt')
 
@@ -67,7 +67,7 @@ class BibHOLDINGPEN(db.Model):
     changeset_id = db.Column(db.Integer(11), primary_key=True,
                 autoincrement=True)
     changeset_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00', index=True)
+                server_default='1900-01-01 00:00:00', index=True)
     changeset_xml = db.Column(db.Text, nullable=False)
     oai_id = db.Column(db.String(40), nullable=False,
                 server_default='')
@@ -84,11 +84,11 @@ class Bibdoc(db.Model):
     docname = db.Column(db.String(250), nullable=True,  # collation='utf8_bin'
                 server_default='file', index=True)
     creation_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00', index=True)
+                server_default='1900-01-01 00:00:00', index=True)
     modification_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00', index=True)
+                server_default='1900-01-01 00:00:00', index=True)
     text_extraction_date = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                server_default='1900-01-01 00:00:00')
     doctype = db.Column(db.String(255))
 
 class BibdocBibdoc(db.Model):

@@ -52,9 +52,9 @@ class MsgMESSAGE(db.Model):
     subject = db.Column(db.Text, nullable=False)
     body = db.Column(db.Text, nullable=True)
     sent_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00') # db.func.now() -> 'NOW()'
+        server_default='1900-01-01 00:00:00') # db.func.now() -> 'NOW()'
     received_date = db.Column(db.DateTime,
-        server_default='0001-01-01 00:00:00')
+        server_default='1900-01-01 00:00:00')
     user_from = db.relationship(User, backref='sent_messages')
     #recipients = db.relationship(User,
     #                             secondary=lambda: UserMsgMESSAGE.__table__,

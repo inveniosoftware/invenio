@@ -92,10 +92,10 @@ class OaiHARVESTLOG(db.Model):
     oai_id = db.Column(db.String(40), nullable=False, server_default='',
                 primary_key=True)
     date_harvested = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00',
+                server_default='1900-01-01 00:00:00',
                 primary_key=True)
     date_inserted = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+        server_default='1900-01-01 00:00:00')
     inserted_to_db = db.Column(db.Char(1), nullable=False,
                 server_default='P')
     bibrec = db.relationship(Bibrec, backref='harvestlogs')

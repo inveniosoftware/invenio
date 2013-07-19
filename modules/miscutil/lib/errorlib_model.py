@@ -35,9 +35,9 @@ class HstEXCEPTION(db.Model):
     filename = db.Column(db.String(255), nullable=True)
     line = db.Column(db.Integer(9), nullable=True)
     last_seen = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00', index=True)
+                server_default='1900-01-01 00:00:00', index=True)
     last_notified = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00', index=True)
+                server_default='1900-01-01 00:00:00', index=True)
     counter = db.Column(db.Integer(15), nullable=False,
                 server_default='0')
     total = db.Column(db.Integer(15), nullable=False,

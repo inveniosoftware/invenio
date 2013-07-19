@@ -42,7 +42,7 @@ class ExpJOB(db.Model):
     deleted = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     lastrun = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                server_default='1900-01-01 00:00:00')
     output_directory = db.Column(db.Text, nullable=True)
     #users = db.relationship(User, secondary=UserExpJOB.__table__,
     #            backref='jobs')
@@ -67,7 +67,7 @@ class ExpJOBRESULT(db.Model):
                 db.ForeignKey(ExpJOB.id),
                 nullable=False)
     execution_time = db.Column(db.DateTime, nullable=False,
-                server_default='0001-01-01 00:00:00')
+                server_default='1900-01-01 00:00:00')
     status = db.Column(db.MediumInteger(12), nullable=False,
                 server_default='0')
     status_message = db.Column(db.Text, nullable=False)

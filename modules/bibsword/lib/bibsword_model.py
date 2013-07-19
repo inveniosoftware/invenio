@@ -76,11 +76,11 @@ class SwrCLIENTDATA(db.Model):
     xml_metadata_submit = db.Column(db.LargeBinary,
                 nullable=False)
     submission_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+        server_default='1900-01-01 00:00:00')
     publication_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+        server_default='1900-01-01 00:00:00')
     removal_date = db.Column(db.DateTime, nullable=False,
-        server_default='0001-01-01 00:00:00')
+        server_default='1900-01-01 00:00:00')
     link_medias = db.Column(db.String(150), nullable=False)
     link_metadata = db.Column(db.String(150), nullable=False)
     link_status = db.Column(db.String(150), nullable=False)

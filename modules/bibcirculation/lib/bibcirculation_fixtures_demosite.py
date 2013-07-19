@@ -302,7 +302,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_1:
         name = u'Admin'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'20003'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'admin@cds.cern.ch'
@@ -314,7 +314,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_2:
         name = u'Jekyll'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'01234'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'jekyll@cds.cern.ch'
@@ -326,7 +326,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_3:
         name = u'Hyde'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'01574'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'Hyde@cds.cern.ch'
@@ -338,7 +338,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_4:
         name = u'Dorian Gray'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'33234'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'dorian.gray@cds.cern.ch'
@@ -350,7 +350,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_5:
         name = u'Romeo Montague'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'93844'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'romeo.montague@cds.cern.ch'
@@ -362,7 +362,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_6:
         name = u'Juliet Capulet'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'99874'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'juliet.capulet@cds.cern.ch'
@@ -374,7 +374,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_7:
         name = u'Benvolio Montague'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'32354'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'benvolio.montague@cds.cern.ch'
@@ -386,7 +386,7 @@ class CrcBORROWERData(DataSet):
     class CrcBORROWER_8:
         name = u'Balthasar Montague'
         notes = u''
-        borrower_until = datetime(1, 1, 1, 0, 0)
+        borrower_until = datetime(1900, 1, 1, 0, 0)
         phone = u'78644'
         borrower_since = datetime(2008, 7, 21, 0, 0)
         email = u'balthasar.montague@cds.cern.ch'
@@ -402,7 +402,7 @@ class CrcLOANData(DataSet):
         status = u'on loan'
         due_date = datetime.now() + timedelta(days=30)
         id_bibrec = None
-        overdue_letter_date = datetime(1, 1, 1, 0, 0)
+        overdue_letter_date = datetime(1900, 1, 1, 0, 0)
         notes = u''
         barcode = CrcITEMData.CrcITEM_bc33001.ref('barcode')
         id_crcBORROWER = CrcBORROWERData.CrcBORROWER_4.ref('id')
@@ -417,7 +417,7 @@ class CrcLOANData(DataSet):
         status = u'on loan'
         due_date = datetime.now() + timedelta(days=7)
         id_bibrec = None
-        overdue_letter_date = datetime(1, 1, 1, 0, 0)
+        overdue_letter_date = datetime(1900, 1, 1, 0, 0)
         notes = u''
         barcode = CrcITEMData.CrcITEM_bc31001.ref('barcode')
         id_crcBORROWER = CrcBORROWERData.CrcBORROWER_5.ref('id')
@@ -432,7 +432,7 @@ class CrcLOANData(DataSet):
         status = u'on loan'
         due_date = datetime.now() + timedelta(days=30)
         id_bibrec = None
-        overdue_letter_date = datetime(1, 1, 1, 0, 0)
+        overdue_letter_date = datetime(1900, 1, 1, 0, 0)
         notes = u''
         barcode = CrcITEMData.CrcITEM_bc25001.ref('barcode')
         id_crcBORROWER = CrcBORROWERData.CrcBORROWER_5.ref('id')
