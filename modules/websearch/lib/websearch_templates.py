@@ -796,7 +796,7 @@ class Template:
         <!--/create_searchfor_light()-->
         ''' % {'ln' : ln,
                'sizepattern' : CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH,
-               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+               'langlink': '?ln=' + ln,
                'siteurl' : CFG_SITE_URL,
                'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
                'header' : header,
@@ -873,7 +873,7 @@ class Template:
         <!--/create_searchfor_simple()-->
         ''' % {'ln' : ln,
                'sizepattern' : CFG_WEBSEARCH_SIMPLESEARCH_PATTERN_BOX_WIDTH,
-               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+               'langlink': '?ln=' + ln,
                'siteurl' : CFG_SITE_URL,
                'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
                'header' : header,
@@ -985,7 +985,7 @@ class Template:
         <!-- @todo - more imports -->
         ''' % {'ln' : ln,
                'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
-               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+               'langlink': '?ln=' + ln,
                'siteurl' : CFG_SITE_URL,
                'ssearch' : create_html_link(ssearchurl, {}, _("Simple Search")),
                'header' : header,
@@ -2054,7 +2054,7 @@ class Template:
               'browse' : _("Browse"),
               'siteurl' : CFG_SITE_URL,
               'ln' : ln,
-              'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+              'langlink': '?ln=' + ln,
               'search_tips': _("Search Tips")
             }
         elif aas == 0:
@@ -2111,7 +2111,7 @@ class Template:
               'browse' : _("Browse"),
               'siteurl' : CFG_SITE_URL,
               'ln' : ln,
-              'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+              'langlink': '?ln=' + ln,
               'search_tips': _("Search Tips")
             }
         else:
@@ -2168,7 +2168,7 @@ class Template:
               'browse' : _("Browse"),
               'siteurl' : CFG_SITE_URL,
               'ln' : ln,
-              'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+              'langlink': '?ln=' + ln,
               'search_tips': _("Search Tips"),
               'search_in': search_in
             }
