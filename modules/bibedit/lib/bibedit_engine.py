@@ -105,7 +105,10 @@ from invenio.batchuploader_engine import perform_upload_check
 from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
 
-from invenio.refextract_api import FullTextNotAvailable, record_has_fulltext
+from invenio.refextract_api import FullTextNotAvailable, \
+                                   get_pdf_doc, \
+                                   record_has_fulltext
+
 from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 
@@ -1585,18 +1588,10 @@ def perform_request_get_pdf_url(recid):
     """ Handle request to get the URL of the attached PDF
     """
     response = {}
-    rec_info = BibRecDocs(recid)
-    docs = rec_info.list_bibdocs()
-    doc_pdf_url = ""
-    for doc in docs:
-        try:
-            doc_pdf_url = doc.get_file('pdf').get_url()
-        except InvenioBibDocFileError:
-            continue
-        if doc_pdf_url:
-            response['pdf_url'] = doc_pdf_url
-            break
-    if not doc_pdf_url:
+    doc = get_pdf_doc(recid)
+    if doc:
+        response['pdf_url'] = doc.get_url()
+    else:
         response['pdf_url'] = ""
     return response
 
