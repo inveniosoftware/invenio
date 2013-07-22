@@ -2091,7 +2091,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             write_warning("Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset), req=req)
         if len(basic_search_unit_hitset) > 0 or \
            ap<1 or \
-           bsu_o=="|" or \
+           bsu_o in ("|", "-") or \
            ((idx_unit+1)<len(basic_search_units) and basic_search_units[idx_unit+1][0]=="|"):
             # stage 2-1: this basic search unit is retained, since
             # either the hitset is non-empty, or the approximate
