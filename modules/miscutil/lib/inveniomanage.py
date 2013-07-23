@@ -53,6 +53,20 @@ def version():
 
 @manager.command
 @change_command_name
+def check_for_software_updates():
+    from flask import get_flashed_messages
+    from invenio.scriptutils import check_for_software_updates
+    print ">>> Going to check software updates ..."
+    result = check_for_software_updates()
+    messages = list(get_flashed_messages(with_categories=True))
+    if len(messages) > 0:
+        print '\n'.join(map(lambda t, msg: '[%s]: %s' % (t.upper(), msg),
+                            messages))
+    print '>>> ' + ('Invenio is up to date.' if result else
+        'Please consider updating your Invenio installation.')
+
+@manager.command
+@change_command_name
 def detect_system_details():
     """
     Detect and print system details such as Apache/Python/MySQL

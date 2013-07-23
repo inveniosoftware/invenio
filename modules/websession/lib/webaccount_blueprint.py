@@ -232,6 +232,11 @@ def index():
 
     dashboard_settings = current_user.get('dashboard_settings', {})
 
+    if current_user.is_super_admin:
+        # Check for a new release of Invenio
+        from invenio.scriptutils import check_for_software_updates
+        check_for_software_updates(flash_message=True)
+
     if dashboard_settings:
         order_left = dashboard_settings.get('orderLeft', []) or []
         order_middle = dashboard_settings.get('orderMiddle', []) or []

@@ -18,8 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
+import re
+import urllib
 import functools
 from functools import wraps
+from flask import flash
 from flask.ext.script import Manager as FlaskExtManager
 from invenio.signalutils import pre_command, post_command
 
@@ -49,6 +52,66 @@ def print_progress(p, L=40, prefix='', suffix=''):
     print '[{0}{1}] {2}%'.format('#' * bricks, ' ' * (L - bricks),
                                  int(p * 100)),
     print suffix,
+
+
+def check_for_software_updates(flash_message=False):
+    """Check for a new release of Invenio.
+
+    @return: True if you have latest version, else False if you need to upgrade,
+             or None if server was not reachable.
+    """
+    from invenio.config import CFG_VERSION
+    from invenio.webinterface_handler_flask_utils import _
+    try:
+        find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?'
+                          ' is released')
+
+        webFile = urllib.urlopen("http://invenio-software.org/repo"
+                                 "/invenio/tree/RELEASE-NOTES")
+
+        temp = ""
+        version = ""
+        version1 = ""
+        while 1:
+            temp = webFile.readline()
+            match1 = find.match(temp)
+            try:
+                version = match1.group()
+                break
+            except:
+                pass
+            if not temp:
+                break
+
+        webFile.close()
+        submatch = re.compile('[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?')
+        version1 = submatch.search(version)
+        web_version = version1.group().split(".")
+
+        local_version = CFG_VERSION.split(".")
+
+        if (web_version[0] > local_version[0] or
+            web_version[0] == local_version[0] and
+            web_version[1] > local_version[1] or
+            web_version[0] == local_version[0] and
+            web_version[1] == local_version[1] and
+            web_version[2] > local_version[2]):
+            if flash_message:
+                flash(_('A newer version of Invenio is available for '
+                        'download. You may want to visit %s') %
+                      ('<a href=\"http://invenio-software.org/wiki'
+                       '/Installation/Download\">http://invenio-software.org'
+                       '/wiki/Installation/Download</a>'), 'warning')
+
+            return False
+    except Exception as e:
+        print e
+        if flash_message:
+            flash(_('Cannot download or parse release notes from http://'
+                    'invenio-software.org/repo/invenio/tree/RELEASE-NOTES'),
+                  'error')
+        return None
+    return True
 
 
 class Manager(FlaskExtManager):
