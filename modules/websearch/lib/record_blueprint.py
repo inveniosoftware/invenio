@@ -43,6 +43,7 @@ from invenio.webcomment import get_mini_reviews
 from invenio.websearchadminlib import get_detailed_page_tabs,\
                                       get_detailed_page_tabs_counts
 from invenio.search_engine_utils import get_fieldvalues
+from invenio.bibrank_downloads_similarity import register_page_view_event
 
 blueprint = InvenioBlueprint('record', __name__, url_prefix="/"+CFG_SITE_RECORD,
                              config='invenio.search_engine_config',
@@ -150,6 +151,7 @@ def request_record(f):
 @blueprint.route('/<int:recid>', methods=['GET', 'POST'])
 @request_record
 def metadata(recid):
+    register_page_view_event(recid, current_user.get_id(), str(request.remote_addr))
     return render_template('record_metadata.html')
 
 

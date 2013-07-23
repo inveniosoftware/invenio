@@ -26,19 +26,41 @@
   </div>
 
   {%- if viewsimilarity -%}
+  <div class="span6">
   <h4>{{ _("People who viewed this page also viewed:") }}</h4>
   <ul class="unstyled">
   {%- for c in viewsimilarity -%}
   <li>
-    <span class="badge">{{ c[1] }}</span>
+    <span class="badge">{{ c[1] }}</span> &nbsp;
     {{ format_record(c[0], 'hs', ln=g.ln)|safe }}
   </li>
   {%- endfor -%}
+  <hr/>
+  </div>
   </ul>
   {%- endif -%}
 
-  {#
-   # FIXME download similarity & graphs
-   #}
+  {%- if downloadsimilarity -%}
+  <div class="span5">
+  <h4>{{ _("People who downloaded files from this page also viewed:") }}</h4>
+  <ul class="unstyled">
+  {%- for c in downloadsimilarity -%}
+  <li>
+    <span class="badge">{{ c[1] }}</span> &nbsp;
+    {{ format_record(c[0], 'hs', ln=g.ln)|safe }}
+  </li>
+  {%- endfor -%}
+  <hr/>
+  </div>
+  </ul>
+  {%- endif -%}
+
+  {%- if downloadgraph -%}
+  <div class="span5">
+  <h4>{{ _("Download history graph") }}</h4>
+  <ul class="unstyled">
+  {{ downloadgraph|safe }}
+  </ul>
+  {%- endif -%}
 
 {% endblock %}

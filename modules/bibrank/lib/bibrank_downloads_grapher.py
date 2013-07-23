@@ -80,10 +80,8 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
                 if os.path.exists(file_to_close_history):
                     os.unlink(file_to_close_history)
         if html_content != "":
-            out += """<br/><br/><table><tr><td class="blocknote">
-                      %s</td></tr><tr><td>
-                      <table border="0" cellspacing="1" cellpadding="1">""" % _("Download history:")
-            out += html_content + "</table></td></tr></table>"
+            out += """<table border="0" cellspacing="1" cellpadding="1">"""
+            out += html_content + "</table>"
 
     if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION:
         # do we show also user IP repartition?
