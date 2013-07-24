@@ -28,6 +28,7 @@ import sys
 import time
 import fnmatch
 from datetime import datetime
+from time import strptime
 
 from invenio.config import CFG_SOLR_URL
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
@@ -35,11 +36,11 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_CHECK_MYSQL_THREADS, \
      CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
      CFG_BIBINDEX_INDEX_TABLE_TYPE, \
-     CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR
+     CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
+     CFG_BIBINDEX_UPDATE_MESSAGE
 from invenio.bibauthority_config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC, \
-     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD, \
-     CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE
+     CFG_BIBAUTHORITY_RECORD_CONTROL_NUMBER_FIELD
 from invenio.bibauthority_engine import get_index_strings_by_control_no,\
      get_control_nos_from_recID
 from invenio.bibindexadminlib import get_idx_remove_html_markup, \
@@ -70,7 +71,7 @@ from invenio.bibindex_engine_utils import get_all_index_names_and_column_values,
     run_sql_drop_silently
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibfield import get_record
-
+from invenio.memoiseutils import Memoise
 
 
 if sys.hexversion < 0x2040000:
@@ -262,12 +263,12 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                         PRIMARY KEY  (id_bibrec,type)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
-    run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
 
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
     return re_subfields.sub(' ', s)
+
 
 def get_index_id_from_index_name(index_name):
     """Returns the words/phrase index id for INDEXNAME.
@@ -303,6 +304,44 @@ def get_index_tags(indexname):
     for row in res:
         out.extend(get_field_tags(row[0]))
     return out
+
+def get_tag_indexes(tag):
+    """Returns indexes names and ids corresponding to the given tag"""
+    tag2 = tag[0:2] + "%" #for tags in the form: 10%
+    tag3 = tag[:-1] + "%" #for tags in the form: 100__%
+    query = """SELECT w.id,w.name FROM idxINDEX AS w,
+                                       idxINDEX_field AS wf,
+                                       field_tag AS ft,
+                                       tag as t
+               WHERE (t.value=%%s OR
+                      t.value=%%s OR
+                      %s) AND
+                     t.id=ft.id_tag AND
+                     ft.id_field=wf.id_field AND
+                     wf.id_idxINDEX=w.id"""
+    if tag[-1] == "%":
+        missing_piece = "t.value LIKE %s"
+    elif tag[-1] != "%" and len(tag) == 3:
+        missing_piece = "t.value LIKE %s"
+        tag3 = tag + "%" #for all tags which start from 'tag'
+    else:
+        missing_piece = "t.value=%s"
+    query = query % missing_piece
+    res = run_sql(query, (tag, tag2, tag3))
+    if res:
+        return res
+    return None
+
+def get_field_indexes(field):
+    """Returns indexes names and ids corresponding to the given field"""
+    if field[0:3].isdigit():
+        #field is actually a tag
+        return get_tag_indexes(field)
+    else:
+        #future implemeptation for fields
+        return []
+
+get_field_indexes_memoised = Memoise(get_field_indexes)
 
 def get_all_indexes():
     """Returns the list of the names of all defined words indexes.
@@ -383,6 +422,13 @@ def get_index_tokenizer(index_id):
     return out
 
 
+def get_last_updated_all_indexes():
+    """Returns last modification date for all defined indexes"""
+    query= """SELECT name, last_updated FROM idxINDEX"""
+    res = run_sql(query)
+    return res
+
+
 def split_ranges(parse_string):
     """Parse a string a return the list or ranges."""
     recIDs = []
@@ -403,20 +449,15 @@ def split_ranges(parse_string):
 def get_word_tables(tables):
     """ Given a list of table names it return a list of tuples
     (index_id, index_name, index_tags).
-    If tables is empty it returns the whole list."""
+    """
     wordTables = []
     if tables:
-        indexes = tables.split(",")
-        for index in indexes:
+        for index in tables:
             index_id = get_index_id_from_index_name(index)
             if index_id:
                 wordTables.append((index_id, index, get_index_tags(index)))
             else:
                 write_message("Error: There is no %s words table." % index, sys.stderr)
-    else:
-        for index in get_all_indexes():
-            index_id = get_index_id_from_index_name(index)
-            wordTables.append((index_id, index, get_index_tags(index)))
     return wordTables
 
 def get_date_range(var):
@@ -466,6 +507,7 @@ def beautify_range_list(range_list):
 
     return ret_list
 
+
 def truncate_index_table(index_name):
     """Properly truncate the given index."""
     index_id = get_index_id_from_index_name(index_name)
@@ -487,6 +529,7 @@ def update_index_last_updated(index_id, starting_time=None):
     return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
                     (starting_time, index_id,))
 
+
 def get_percentage_completed(num_done, num_total):
     """ Return a string containing the approx. percentage completed """
     percentage_remaining = 100.0 * float(num_done) / float(num_total)
@@ -496,6 +539,84 @@ def get_percentage_completed(num_done, num_total):
         percentage_display = ""
     return percentage_display
 
+def _fill_dict_of_indexes_with_empty_sets():
+    """find_affected_records internal function.
+       Creates dict: {'index_name1':set([]), ...}
+    """
+    index_dict = {}
+    tmp_all_indexes = get_all_indexes()
+    for index in tmp_all_indexes:
+        index_dict[index] = set([])
+    return index_dict
+
+def find_affected_records_for_index(indexes=[], recIDs=[], force_all_indexes=False):
+    """
+        Function checks which records need to be changed/reindexed
+        for given index/indexes.
+        Makes use of hstRECORD table where different revisions of record
+        are kept.
+        If parameter force_all_indexes is set function will assign all recIDs to all indexes.
+        @param indexes: names of indexes for reindexation separated by coma
+        @param recIDs: recIDs for reindexation in form: [[range1_down, range1_up],[range2_down, range2_up]..]
+        @param force_all_indexes: should we index all indexes?
+    """
+
+    tmp_dates = dict(get_last_updated_all_indexes())
+    modification_dates = dict([(date, tmp_dates[date] or datetime(1000,1,1,1,1,1)) for date in tmp_dates])
+    tmp_all_indexes = get_all_indexes()
+
+    if not indexes:
+        indexes = tmp_all_indexes
+    else:
+        indexes = indexes.split(",")
+
+    def _should_reindex_for_revision(index_name, revision_date):
+        try:
+            if modification_dates[index_name] < revision_date and index_name in indexes:
+                return True
+            return False
+        except KeyError:
+            return False
+
+    if force_all_indexes:
+        records_for_indexes = {}
+        all_recIDs = []
+        for recIDs_range in recIDs:
+            all_recIDs.extend(range(recIDs_range[0], recIDs_range[1]+1))
+        for index in indexes:
+            records_for_indexes[index] = all_recIDs
+        return records_for_indexes
+
+    indexes_to_change = _fill_dict_of_indexes_with_empty_sets()
+    recIDs_info = []
+    for recIDs_range in recIDs:
+        query = """SELECT id_bibrec,job_date,affected_fields FROM hstRECORD WHERE
+                   id_bibrec BETWEEN %s AND %s""" % (recIDs_range[0], recIDs_range[1])
+        res = run_sql(query)
+        if res:
+            recIDs_info.extend(res)
+
+    for recID_info in recIDs_info:
+        recID, revision, affected_fields  = recID_info
+        affected_fields = affected_fields.split(",")
+        indexes_for_recID = set()
+        for field in affected_fields:
+            if field:
+                field_indexes = get_field_indexes_memoised(field) or []
+                indexes_names = set([idx[1] for idx in field_indexes])
+                indexes_for_recID |= indexes_names
+            else:
+                #record was inserted, all fields were changed, no specific affected fields
+                indexes_for_recID |= set(tmp_all_indexes)
+        indexes_for_recID_filtered = [ind for ind in indexes_for_recID if _should_reindex_for_revision(ind, revision)]
+        for index in indexes_for_recID_filtered:
+            indexes_to_change[index].add(recID)
+
+    indexes_to_change = dict((k, list(sorted(v))) for k, v in indexes_to_change.iteritems() if v)
+
+    return indexes_to_change
+
+
 #def update_text_extraction_date(first_recid, last_recid):
     #"""for all the bibdoc connected to the specified recid, set
     #the text_extraction_date to the task_starting_time."""
@@ -504,7 +625,7 @@ def get_percentage_completed(num_done, num_total):
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, index_name, index_id, fields_to_index, table_name_pattern, wordtable_type, tag_to_tokenizer_map, wash_index_terms=50, is_fulltext_index=False):
+    def __init__(self, index_name, index_id, fields_to_index, table_name_pattern, wordtable_type, tag_to_tokenizer_map, wash_index_terms=50):
         """Creates words table instance.
         @param index_name: the index name
         @param index_id: the index integer identificator
@@ -533,7 +654,6 @@ class WordTable:
                                                        self.remove_html_markup,
                                                        self.remove_latex_markup)
         self.default_tokenizer_function = self.tokenizer.get_tokenizing_function(wordtable_type)
-        self.is_fulltext_index = is_fulltext_index
         self.wash_index_terms = wash_index_terms
 
         # tagToTokenizer mapping. It offers an indirection level necessary for
@@ -780,89 +900,6 @@ class WordTable:
                 solr_commit()
             self.log_progress(time_started, records_done, records_to_go)
 
-    def add_recIDs_by_date(self, dates, opt_flush):
-        """Add records that were modified between DATES[0] and DATES[1].
-           If DATES is not set, then add records that were modified since
-           the last update of the index.
-        """
-        if not dates:
-            table_id = self.tablename[-3:-1]
-            query = """SELECT last_updated FROM idxINDEX WHERE id=%s"""
-            res = run_sql(query, (table_id,))
-            if not res:
-                return
-            if not res[0][0]:
-                dates = ("0000-00-00", None)
-            else:
-                dates = (res[0][0], None)
-        if dates[1] is None:
-            res = intbitset(run_sql("""SELECT b.id FROM bibrec AS b
-                              WHERE b.modification_date >= %s""",
-                          (dates[0],)))
-            if self.is_fulltext_index:
-                res |= intbitset(run_sql("""SELECT id_bibrec FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id WHERE text_extraction_date <= modification_date AND modification_date >= %s AND status<>'DELETED'""", (dates[0],)))
-        elif dates[0] is None:
-            res = intbitset(run_sql("""SELECT b.id FROM bibrec AS b
-                              WHERE b.modification_date <= %s""",
-                          (dates[1],)))
-            if self.is_fulltext_index:
-                res |= intbitset(run_sql("""SELECT id_bibrec FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id WHERE text_extraction_date <= modification_date AND modification_date <= %s AND status<>'DELETED'""", (dates[1],)))
-        else:
-            res = intbitset(run_sql("""SELECT b.id FROM bibrec AS b
-                              WHERE b.modification_date >= %s AND
-                                    b.modification_date <= %s""",
-                          (dates[0], dates[1])))
-            if self.is_fulltext_index:
-                res |= intbitset(run_sql("""SELECT id_bibrec FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id WHERE text_extraction_date <= modification_date AND modification_date >= %s AND modification_date <= %s AND status<>'DELETED'""", (dates[0], dates[1],)))
-        alist = create_range_list(list(res))
-        if not alist:
-            write_message("No new records added. %s is up to date" % self.tablename)
-        else:
-            self.add_recIDs(alist, opt_flush)
-        # special case of author indexes where we need to re-index
-        # those records that were affected by changed BibAuthorID
-        # attributions:
-        if self.index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
-            from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
-            # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
-            alist = create_range_list(get_recids_affected_since(dates[0]))
-            if not alist:
-                write_message("No new records added by author canonical IDs. %s is up to date" % self.tablename)
-            else:
-                self.add_recIDs(alist, opt_flush)
-        # special case of authority controlled indexes where we need to re-index
-        # those records that were affected by changed Authority Records:
-        res = intbitset()
-        for tag in self.fields_to_index:
-            pattern = tag.replace('%', '*')
-            matches = fnmatch.filter(CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
-            if not len(matches):
-                continue
-            for tag_match in matches:
-                # get the type of authority record associated with this field
-                auth_type = CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.get(tag_match)
-                # find updated authority records of this type
-                # dates[1] is ignored, needs dates[0] to find res
-                now = datetime.now()
-                auth_recIDs = search_pattern(p='980__a:' + auth_type) \
-                    & search_unit_in_bibrec(str(dates[0]), str(now), type='m')
-                # now find dependent bibliographic records
-                for auth_recID in auth_recIDs:
-                    # get the fix authority identifier of this authority record
-                    control_nos = get_control_nos_from_recID(auth_recID)
-                    # there may be multiple control number entries! (the '035' field is repeatable!)
-                    for control_no in control_nos:
-                        # get the bibrec IDs that refer to AUTHORITY_ID in TAG
-                        tag_0 = tag_match[:5] + '0' # possibly do the same for '4' subfields ?
-                        fieldvalue = '"' + control_no + '"'
-                        res |= search_pattern(p=tag_0 + ':' + fieldvalue)
-        authority_list = create_range_list(list(res))
-        if not authority_list:
-            write_message("No new authority records added. %s is up to date" % self.tablename)
-        else:
-            write_message(CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE)
-            self.add_recIDs(authority_list, opt_flush)
-
     def add_recID_range(self, recID1, recID2):
         """Add records from RECID1 to RECID2."""
         wlist = {}
@@ -948,7 +985,6 @@ class WordTable:
         for recID in recIDs:
             for w in wlist[recID]:
                 put(recID, w, 1)
-
         return len(recIDs)
 
 
@@ -1050,6 +1086,7 @@ class WordTable:
                 self.put(recID, word, -1)
         write_message("%s fetching existing words for records #%d-#%d ended" % \
                 (self.tablename, low, high), verbose=3)
+
 
     def report_on_table_consistency(self):
         """Check reverse words index tables (e.g. idxWORD01R) for
@@ -1258,9 +1295,10 @@ def main():
   -w, --windex=w1[,w2]\tword/phrase indexes to consider (all)
   -M, --maxmem=XXX\tmaximum memory usage in kB (no limit)
   -f, --flush=NNN\t\tfull consistent table flush after NNN records (10000)
+  --force\tforce indexing of all records for provided indexes
 """,
             version=__revision__,
-            specific_params=("adi:m:c:w:krRM:f:", [
+            specific_params=("adi:m:c:w:krRM:f:o", [
                 "add",
                 "del",
                 "id=",
@@ -1272,6 +1310,7 @@ def main():
                 "reindex",
                 "maxmem=",
                 "flush=",
+                "force",
             ]),
             task_stop_helper_fnc=task_stop_table_close_fnc,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
@@ -1324,6 +1363,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
                 (base_process_size + 1000))
     elif key in ("-f", "--flush"):
         task_set_option("flush", int(value))
+    elif key in ("-o", "--force"):
+        task_set_option("force", True)
     else:
         return False
     return True
@@ -1334,6 +1375,158 @@ def task_stop_table_close_fnc():
     if _last_word_table:
         _last_word_table.put_into_db()
 
+
+def get_recIDs_by_date_bibliographic(dates, index_name):
+    """ Finds records that were modified between DATES[0] and DATES[1]
+        for given index.
+        If DATES is not set, then finds records that were modified since
+        the last update of the index.
+        @param wordtable_type: can be 'Words', 'Pairs' or 'Phrases'
+    """
+    index_id = get_index_id_from_index_name(index_name)
+    if not dates:
+        query = """SELECT last_updated FROM idxINDEX WHERE id=%s"""
+        res = run_sql(query, (index_id,))
+        if not res:
+            return set([])
+        if not res[0][0]:
+            dates = ("0000-00-00", None)
+        else:
+            dates = (res[0][0], None)
+    if dates[1] is None:
+        res = intbitset(run_sql("""SELECT b.id FROM bibrec AS b WHERE b.modification_date >= %s""",
+                                   (dates[0],)))
+        if index_name == 'fulltext':
+            res |= intbitset(run_sql("""SELECT id_bibrec FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id
+                                        WHERE text_extraction_date <= modification_date AND
+                                        modification_date >= %s
+                                        AND status<>'DELETED'""",
+                                        (dates[0],)))
+    elif dates[0] is None:
+        res = intbitset(run_sql("""SELECT b.id FROM bibrec AS b WHERE b.modification_date <= %s""",
+                                   (dates[1],)))
+        if index_name == 'fulltext':
+            res |= intbitset(run_sql("""SELECT id_bibrec FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id
+                                        WHERE text_extraction_date <= modification_date
+                                        AND modification_date <= %s
+                                        AND status<>'DELETED'""",
+                                        (dates[1],)))
+    else:
+        res = intbitset(run_sql("""SELECT b.id FROM bibrec AS b
+                                   WHERE b.modification_date >= %s AND
+                                   b.modification_date <= %s""",
+                                   (dates[0], dates[1])))
+        if index_name == 'fulltext':
+            res |= intbitset(run_sql("""SELECT id_bibrec FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id
+                                        WHERE text_extraction_date <= modification_date AND
+                                        modification_date >= %s AND
+                                        modification_date <= %s AND
+                                        status<>'DELETED'""",
+                                        (dates[0], dates[1],)))
+    # special case of author indexes where we need to re-index
+    # those records that were affected by changed BibAuthorID attributions:
+    if index_name in ('author', 'firstauthor', 'exactauthor', 'exactfirstauthor'):
+        from invenio.bibauthorid_personid_maintenance import get_recids_affected_since
+        # dates[1] is ignored, since BibAuthorID API does not offer upper limit search
+        rec_list_author = intbitset(get_recids_affected_since(dates[0]))
+        res = res | rec_list_author
+    return set(res)
+
+
+def get_recIDs_by_date_authority(dates, index_name):
+    """ Finds records that were modified between DATES[0] and DATES[1]
+        for given index.
+        If DATES is not set, then finds records that were modified since
+        the last update of the index.
+        Searches for bibliographic records connected to authority records
+        that have been changed.
+    """
+    index_id = get_index_id_from_index_name(index_name)
+    index_tags = get_index_tags(index_name)
+    if not dates:
+        query = """SELECT last_updated FROM idxINDEX WHERE id=%s"""
+        res = run_sql(query, (index_id,))
+        if not res:
+            return set([])
+        if not res[0][0]:
+            dates = ("0000-00-00", None)
+        else:
+            dates = (res[0][0], None)
+    res = intbitset()
+    for tag in index_tags:
+        pattern = tag.replace('%', '*')
+        matches = fnmatch.filter(CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.keys(), pattern)
+        if not len(matches):
+            continue
+        for tag_match in matches:
+            # get the type of authority record associated with this field
+            auth_type = CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.get(tag_match)
+            # find updated authority records of this type
+            # dates[1] is ignored, needs dates[0] to find res
+            now = datetime.now()
+            auth_recIDs = search_pattern(p='980__a:' + auth_type) \
+                & search_unit_in_bibrec(str(dates[0]), str(now), type='m')
+            # now find dependent bibliographic records
+            for auth_recID in auth_recIDs:
+                # get the fix authority identifier of this authority record
+                control_nos = get_control_nos_from_recID(auth_recID)
+                # there may be multiple control number entries! (the '035' field is repeatable!)
+                for control_no in control_nos:
+                    # get the bibrec IDs that refer to AUTHORITY_ID in TAG
+                    tag_0 = tag_match[:5] + '0' # possibly do the same for '4' subfields ?
+                    fieldvalue = '"' + control_no + '"'
+                    res |= search_pattern(p=tag_0 + ':' + fieldvalue)
+    return set(res)
+
+
+def get_not_updated_recIDs(modified_dates, indexes):
+    """Finds not updated recIDs in database for indexes.
+       @param modified_dates: between this dates we should look for modified records
+       @type modified_dates: [date_old, date_new]
+       @param indexes: list of indexes
+       @type indexes: string separated by coma
+    """
+    found_recIDs = set()
+    write_message(CFG_BIBINDEX_UPDATE_MESSAGE)
+    for index in indexes:
+        found_recIDs |= get_recIDs_by_date_bibliographic(modified_dates, index)
+        found_recIDs |= get_recIDs_by_date_authority(modified_dates, index)
+    return list(sorted(found_recIDs))
+
+
+def get_recIDs_from_cli():
+    """
+        Gets recIDs ranges from CLI for indexing when
+        user specified 'id' or 'collection' option or
+        search for modified recIDs when they're not specified.
+    """
+    indexes = task_get_option("windex")
+    if not indexes:
+        indexes = get_all_indexes()
+    else:
+        indexes = indexes.split(",")
+    # need to first update idxINDEX table to find proper recIDs for reindexing
+    if task_get_option("reindex"):
+        for index_name in indexes:
+            run_sql("""UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00'
+                       WHERE name=%s""", (index_name,))
+
+    if task_get_option("id"):
+        return task_get_option("id")
+    elif task_get_option("collection"):
+        l_of_colls = task_get_option("collection").split(",")
+        recIDs = perform_request_search(c=l_of_colls)
+        recIDs_range = []
+        for recID in recIDs:
+            recIDs_range.append([recID, recID])
+        return recIDs_range
+    elif task_get_option("cmd") == "add":
+        recs = get_not_updated_recIDs(task_get_option("modified"),
+                                      indexes)
+        recIDs_range = beautify_range_list(create_range_list(recs))
+        return recIDs_range
+    return []
+
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.  This is
     what BibSched will be invoking via daemon call.
@@ -1343,7 +1536,8 @@ def task_run_core():
     global _last_word_table
 
     if task_get_option("cmd") == "check":
-        wordTables = get_word_tables(task_get_option("windex"))
+        indexes = task_get_option("windex") and task_get_option("windex").split(",") or get_all_indexes()
+        wordTables = get_word_tables(indexes)
         for index_id, index_name, index_tags in wordTables:
             wordTable = WordTable(index_name=index_name,
                                   index_id=index_id,
@@ -1382,10 +1576,19 @@ def task_run_core():
         _last_word_table = None
         return True
 
+    #initialization for Words,Pairs,Phrases
+    recIDs_range = get_recIDs_from_cli()
+    recIDs_for_index = find_affected_records_for_index(task_get_option("windex"),
+                                                       recIDs_range,
+                                                       (task_get_option("force") or \
+                                                       task_get_option("reindex") or \
+                                                       task_get_option("cmd") == "del"))
+    wordTables = get_word_tables(recIDs_for_index.keys())
+    if not wordTables:
+        write_message("Selected indexes/recIDs are up to date.")
+
     # Let's work on single words!
-    wordTables = get_word_tables(task_get_option("windex"))
     for index_id, index_name, index_tags in wordTables:
-        is_fulltext_index = index_name == 'fulltext'
         reindex_prefix = ""
         if task_get_option("reindex"):
             reindex_prefix = "tmp_"
@@ -1397,21 +1600,12 @@ def task_run_core():
                               table_name_pattern=reindex_prefix + 'idxWORD%02dF',
                               wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                               tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"},
-                              is_fulltext_index=is_fulltext_index,
                               wash_index_terms=50)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
             if task_get_option("cmd") == "del":
-                if task_get_option("id"):
-                    wordTable.del_recIDs(task_get_option("id"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID, recID])
+                if task_get_option("id") or task_get_option("collection"):
                     wordTable.del_recIDs(recIDs_range)
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
@@ -1420,22 +1614,9 @@ def task_run_core():
                     write_message(error_message, stream=sys.stderr)
                     raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
-                if task_get_option("id"):
-                    wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID, recID])
-                    wordTable.add_recIDs(recIDs_range, task_get_option("flush"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                else:
-                    wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
-                    ## here we used to update last_updated info, if run via automatic mode;
-                    ## but do not update here anymore, since idxPHRASE will be acted upon later
-                    task_sleep_now_if_required(can_stop_too=True)
+                final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
+                wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
+                task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
@@ -1466,15 +1647,7 @@ def task_run_core():
         wordTable.report_on_table_consistency()
         try:
             if task_get_option("cmd") == "del":
-                if task_get_option("id"):
-                    wordTable.del_recIDs(task_get_option("id"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID, recID])
+                if task_get_option("id") or task_get_option("collection"):
                     wordTable.del_recIDs(recIDs_range)
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
@@ -1483,21 +1656,9 @@ def task_run_core():
                     write_message(error_message, stream=sys.stderr)
                     raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
-                if task_get_option("id"):
-                    wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID, recID])
-                    wordTable.add_recIDs(recIDs_range, task_get_option("flush"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                else:
-                    wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
-                    # let us update last_updated timestamp info, if run via automatic mode:
-                    task_sleep_now_if_required(can_stop_too=True)
+                final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
+                wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
+                task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
@@ -1528,15 +1689,7 @@ def task_run_core():
         wordTable.report_on_table_consistency()
         try:
             if task_get_option("cmd") == "del":
-                if task_get_option("id"):
-                    wordTable.del_recIDs(task_get_option("id"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID, recID])
+                if task_get_option("id") or task_get_option("collection"):
                     wordTable.del_recIDs(recIDs_range)
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
@@ -1545,22 +1698,12 @@ def task_run_core():
                     write_message(error_message, stream=sys.stderr)
                     raise StandardError(error_message)
             elif task_get_option("cmd") == "add":
-                if task_get_option("id"):
-                    wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID, recID])
-                    wordTable.add_recIDs(recIDs_range, task_get_option("flush"))
-                    task_sleep_now_if_required(can_stop_too=True)
-                else:
-                    wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
+                final_recIDs = beautify_range_list(create_range_list(recIDs_for_index[index_name]))
+                wordTable.add_recIDs(final_recIDs, task_get_option("flush"))
+                if not task_get_option("id") and not task_get_option("collection"):
                     # let us update last_updated timestamp info, if run via automatic mode:
                     update_index_last_updated(index_id, task_get_task_param('task_starting_time'))
-                    task_sleep_now_if_required(can_stop_too=True)
+                task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)

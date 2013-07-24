@@ -882,20 +882,23 @@ class WebSearchCJKTokenizedSearchTest(unittest.TestCase):
     @classmethod
     def setUp(self):
         if not self.reindexed:
-            reindex_word_tables_into_testtables('title',
-                                                recids=[[104,104]],
-                                                prefix = False,
-                                                tokenizer = 'BibIndexCJKTokenizer')
+            self.last_updated = reindex_word_tables_into_testtables('title',
+                                                                [[104,104]],
+                                                                      False,
+                                        {'tokenizer':'BibIndexCJKTokenizer',
+                                         'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
     @classmethod
     def tearDown(self):
         self.test_counter += 1
         if self.test_counter == 2:
-            reindex_word_tables_into_testtables('title',
-                                                recids=[[104,104]],
-                                                prefix = False,
-                                                tokenizer = 'BibIndexDefaultTokenizer')
+            reindex_word_tables_into_testtables(
+                'title',
+                [[104,104]],
+                False,
+                {'tokenizer':'BibIndexDefaultTokenizer',
+                 'last_updated':self.last_updated})
 
 
     def test_title_cjk_tokenized_two_characters(self):

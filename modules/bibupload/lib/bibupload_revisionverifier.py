@@ -208,7 +208,6 @@ class RevisionVerifier:
         result = {}
 
         (common_tags, added_tags, deleted_tags) = group_record_tags()
-
         if common_tags:
             mod_patch = self.find_modified_tags(common_tags, record1, record2)
 

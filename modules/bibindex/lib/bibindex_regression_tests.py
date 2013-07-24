@@ -16,44 +16,67 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """BibIndex Regression Test Suite."""
 
 __revision__ = "$Id$"
 
 import unittest
 import os
+import re
+from datetime import datetime, timedelta
 
-from invenio.bibauthority_config import CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE
+from invenio.bibindex_engine import WordTable, \
+    get_index_id_from_index_name, \
+    get_index_tags, \
+    get_all_indexes, \
+    get_word_tables, \
+    find_affected_records_for_index, \
+    get_recIDs_by_date_authority, \
+    get_recIDs_by_date_bibliographic, \
+    create_range_list, \
+    beautify_range_list, \
+    get_last_updated_all_indexes
 from invenio.bibindex_engine_config import CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
-    CFG_BIBINDEX_INDEX_TABLE_TYPE
+    CFG_BIBINDEX_INDEX_TABLE_TYPE, \
+    CFG_BIBINDEX_UPDATE_MESSAGE
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BINDIR, CFG_LOGDIR
 from invenio.testutils import make_test_suite, run_test_suite, nottest
 from invenio.dbquery import run_sql, deserialize_via_marshal
-from invenio.bibindex_engine import WordTable, get_index_id_from_index_name, get_index_tags
 from invenio.intbitset import intbitset
+from invenio.search_engine import get_record
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthority_engine import get_index_strings_by_control_no, get_control_nos_from_recID
 from invenio.bibindex_engine_utils import run_sql_drop_silently
 
+from invenio.bibupload import bibupload, \
+    xml_marc_to_records
+from invenio.bibupload_regression_tests import wipe_out_record_from_all_tables
+from invenio.bibrecord import record_get_field_value, \
+    record_xml_output
+from invenio.bibsort_engine import get_max_recid
 
-def reindex_for_type_with_bibsched(_type):
-    """runs bibindex for the index '_type' and returns the task_id"""
+
+def reindex_for_type_with_bibsched(index_name, force_all=False):
+    """Runs bibindex for the specified index and returns the task_id.
+       @param index_name: name of the index to reindex
+       @param force_all: if it's True function will reindex all records
+       not just affected ones
+    """
     program = os.path.join(CFG_BINDIR, 'bibindex')
-    task_id = task_low_level_submission('bibindex', 'bibindex_regression_tests', '-w', _type, '-u', 'admin')
+    args = ['bibindex', 'bibindex_regression_tests', '-w', index_name, '-u', 'admin']
+    if force_all:
+        args.append("--force")
+    task_id = task_low_level_submission(*args)
     COMMAND = "%s %s > /dev/null 2> /dev/null" % (program, str(task_id))
     os.system(COMMAND)
     return task_id
 
 
-def prepare_for_index_update(index_id, remove_stopwords = '',
-                                       remove_html_markup = '',
-                                       remove_latex_markup = '',
-                                       tokenizer=''):
-    """ Prepares SQL query for an update of a index in the idxINDEX table. Takes
-        into account remove_stopwords, remove_html_markup, remove_latex_markup
-        as parameters to change.
+def prepare_for_index_update(index_id, parameters={}):
+    """ Prepares SQL query for an update of an index in the idxINDEX table.
+        Takes into account remove_stopwords, remove_html_markup, remove_latex_markup,
+        tokenizer and last_updated as parameters to change.
         remove_html_markup and remove_latex_markup accepts these values:
                                         '' to leave it unchanged
                                         'Yes' to change it to 'Yes'
@@ -61,53 +84,39 @@ def prepare_for_index_update(index_id, remove_stopwords = '',
         For remove_stopwords instead of 'Yes' one must give the name of the file (for example: 'stopwords.kb')
         from CFG_ETCDIR/bibrank/ directory pointing at stopwords knowledge base.
         For tokenizer please specify the name of the tokenizer.
+        For last_updated provide a date in format: '2013-01-31 00:00:00'
         @param index_id: id of the index to change
+        @param parameters: dict with names of parameters and their new values
     """
-
-
-    if remove_stopwords == '' and remove_html_markup == '' and remove_latex_markup == '' and tokenizer == '':
+    if len(parameters) == 0:
         return ''
 
     parameter_set = False
     query_update = "UPDATE idxINDEX SET "
-    params = {'remove_stopwords':remove_stopwords,
-              'remove_html_markup':remove_html_markup,
-              'remove_latex_markup':remove_latex_markup,
-              'tokenizer':tokenizer}
-    for key in params:
-        if params[key]:
+    for key in parameters:
+        if parameters[key]:
             query_update += parameter_set and ", " or ""
-            query_update += "%s='%s'" % (key, params[key])
+            query_update += "%s='%s'" % (key, parameters[key])
             parameter_set = True
     query_update += " WHERE id=%s" % index_id
     return query_update
 
 
 @nottest
-def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'test', remove_stopwords = '',
-                                                                                    remove_html_markup = '',
-                                                                                    remove_latex_markup = '',
-                                                                                    tokenizer = ''):
+def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'test', parameters={}):
     """Function for setting up a test enviroment. Reindexes an index with a given name to a
-       new temporary table with a given prefix. During the reindexation it changes some parameters
-       of chosen index. It's useful for conducting tests concerning the reindexation.
+       new temporary table with a given prefix. During the reindexing it changes some parameters
+       of chosen index. It's useful for conducting tests concerning the reindexing process.
        Reindexes only idxWORDxxx tables.
        @param index_name: name of the index we want to reindex
-       @param prefix: prefix for the new tabels
        @param recids: None means reindexing all records, set ids of the records to update only part of them
        @param prefix: prefix for the new tabels, if it's set to boolean False function will reindex to original table
-       @param remove_stopwords: name of the stopwords knowledge base, 'No' to set it to 'No'
-       @param remove_html_markup: 'Yes' to set remove_html_markup to 'Yes', 'No' to set it to 'No'
-       @param remove_latex_markup: 'Yes' to set remove_latex_markup to 'Yes', 'No' to set it to 'No'
-       @param tokenizer: name of the tokenizer
+       @param parameters: dict with parameters and their new values, for more specific
+       description take a look at  'prepare_for_index_update' function.
     """
     index_id = get_index_id_from_index_name(index_name)
-    query_update = prepare_for_index_update(index_id, remove_stopwords,
-                                                      remove_html_markup,
-                                                      remove_latex_markup,
-                                                      tokenizer)
-
-    query_last_updated = "UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s" % index_id
+    query_update = prepare_for_index_update(index_id, parameters)
+    last_updated = run_sql("""SELECT last_updated FROM idxINDEX WHERE id=%s""" % index_id)[0][0]
 
     test_tablename = "%s_idxWORD%02d" % (prefix, index_id)
     query_drop_forward_index_table = """DROP TABLE IF EXISTS %sF""" % test_tablename
@@ -133,7 +142,6 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
     run_sql(query_create_reversed_index_table)
     if query_update:
         run_sql(query_update)
-    run_sql(query_last_updated)
 
     pattern = 'idxWORD'
     if prefix:
@@ -144,12 +152,20 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                           table_name_pattern= pattern + '%02dF',
                           wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
                           tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
-                          is_fulltext_index=False,
                           wash_index_terms=50)
     if recids:
         wordTable.add_recIDs(recids, 10000)
     else:
-        wordTable.add_recIDs_by_date([],10000)
+        recIDs_for_index = find_affected_records_for_index(index_name,
+                                               [[1, get_max_recid()]],
+                                                                 True)
+        bib_recIDs = get_recIDs_by_date_bibliographic([], index_name)
+        auth_recIDs = get_recIDs_by_date_authority([], index_name)
+        final_recIDs = bib_recIDs | auth_recIDs
+        final_recIDs = set(final_recIDs) & set(recIDs_for_index[index_name])
+        final_recIDs = beautify_range_list(create_range_list(list(final_recIDs)))
+        wordTable.add_recIDs(final_recIDs, 10000)
+    return last_updated
 
 
 @nottest
@@ -180,7 +196,10 @@ class BibIndexRemoveStopwordsTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('title', remove_stopwords = 'stopwords.kb')
+            self.last_updated = reindex_word_tables_into_testtables(
+                'title',
+                parameters = {'remove_stopwords':'stopwords.kb',
+                              'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
     @classmethod
@@ -189,7 +208,10 @@ class BibIndexRemoveStopwordsTest(unittest.TestCase):
         self.test_counter += 1
         if self.test_counter == 4:
             remove_reindexed_word_testtables('title')
-            reverse_changes = prepare_for_index_update(get_index_id_from_index_name('title'), remove_stopwords = 'No')
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('title'),
+                parameters = {'remove_stopwords':'No',
+                              'last_updated':self.last_updated})
             run_sql(reverse_changes)
 
     def test_check_occurrences_of_stopwords_in_testable_word_of(self):
@@ -252,7 +274,10 @@ class BibIndexRemoveLatexTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('abstract', remove_latex_markup = 'Yes')
+            self.last_updated = reindex_word_tables_into_testtables(
+                'abstract',
+                parameters = {'remove_latex_markup':'Yes',
+                              'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
     @classmethod
@@ -261,7 +286,10 @@ class BibIndexRemoveLatexTest(unittest.TestCase):
         self.test_counter += 1
         if self.test_counter == 4:
             remove_reindexed_word_testtables('abstract')
-            reverse_changes = prepare_for_index_update(get_index_id_from_index_name('abstract'), remove_latex_markup = 'No')
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('abstract'),
+                parameters = {'remove_latex_markup':'No',
+                              'last_updated':self.last_updated})
             run_sql(reverse_changes)
 
 
@@ -333,7 +361,10 @@ class BibIndexRemoveHtmlTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('abstract', remove_html_markup = 'Yes')
+            self.last_updated = reindex_word_tables_into_testtables(
+                'abstract',
+                parameters = {'remove_html_markup':'Yes',
+                              'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
     @classmethod
@@ -342,7 +373,10 @@ class BibIndexRemoveHtmlTest(unittest.TestCase):
         self.test_counter += 1
         if self.test_counter == 2:
             remove_reindexed_word_testtables('abstract')
-            reverse_changes = prepare_for_index_update(get_index_id_from_index_name('abstract'), remove_html_markup = 'No')
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('abstract'),
+                parameters = {'remove_html_markup':'No',
+                              'last_updated':self.last_updated})
             run_sql(reverse_changes)
 
 
@@ -391,7 +425,9 @@ class BibIndexYearIndexTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('year')
+            self.last_updated = reindex_word_tables_into_testtables(
+                'year',
+                parameters = {'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
 
@@ -401,6 +437,10 @@ class BibIndexYearIndexTest(unittest.TestCase):
         self.test_counter += 1
         if self.test_counter == 3:
             remove_reindexed_word_testtables('year')
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('year'),
+                parameters = {'last_updated':self.last_updated})
+            run_sql(reverse_changes)
 
 
     def test_occurrences_in_year_index_1973(self):
@@ -456,7 +496,9 @@ class BibIndexAuthorCountIndexTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('authorcount')
+            self.last_updated = reindex_word_tables_into_testtables(
+                'authorcount',
+                parameters = {'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
     @classmethod
@@ -465,6 +507,10 @@ class BibIndexAuthorCountIndexTest(unittest.TestCase):
         self.test_counter += 1
         if self.test_counter == 2:
             remove_reindexed_word_testtables('authorcount')
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('authorcount'),
+                parameters = {'last_updated':self.last_updated})
+            run_sql(reverse_changes)
 
 
     def test_occurrences_in_authorcount_index(self):
@@ -576,7 +622,9 @@ class BibIndexJournalIndexTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('journal')
+            self.last_updated = reindex_word_tables_into_testtables(
+                'journal',
+                parameters = {'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
     @classmethod
@@ -585,7 +633,10 @@ class BibIndexJournalIndexTest(unittest.TestCase):
         self.test_counter += 1
         if self.test_counter == 2:
             remove_reindexed_word_testtables('journal')
-
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('journal'),
+                parameters = {'last_updated':self.last_updated})
+            run_sql(reverse_changes)
 
 
     def test_occurrences_in_journal_index(self):
@@ -626,7 +677,10 @@ class BibIndexCJKTokenizerTitleIndexTest(unittest.TestCase):
     def setUp(self):
         """reindexation to new table"""
         if not self.reindexed:
-            reindex_word_tables_into_testtables('title', tokenizer = 'BibIndexCJKTokenizer')
+            self.last_updated = reindex_word_tables_into_testtables(
+                'title',
+                parameters = {'tokenizer':'BibIndexCJKTokenizer',
+                              'last_updated':'0000-00-00 00:00:00'})
             self.reindexed = True
 
     @classmethod
@@ -635,7 +689,10 @@ class BibIndexCJKTokenizerTitleIndexTest(unittest.TestCase):
         self.test_counter += 1
         if self.test_counter == 2:
             remove_reindexed_word_testtables('title')
-            reverse_changes = prepare_for_index_update(get_index_id_from_index_name('title'), tokenizer = 'BibIndexDefaultTokenizer')
+            reverse_changes = prepare_for_index_update(
+                get_index_id_from_index_name('title'),
+                parameters = {'tokenizer':'BibIndexDefaultTokenizer',
+                              'last_updated':self.last_updated})
             run_sql(reverse_changes)
 
 
@@ -674,13 +731,13 @@ class BibIndexAuthorityRecordTest(unittest.TestCase):
         reindex_for_type_with_bibsched(index_name)
         run_sql("UPDATE bibrec SET modification_date = now() WHERE id = %s", (authRecID,))
         # run bibindex again
-        task_id = reindex_for_type_with_bibsched(index_name)
+        task_id = reindex_for_type_with_bibsched(index_name, force_all=True)
 
         filename = os.path.join(CFG_LOGDIR, 'bibsched_task_' + str(task_id) + '.log')
         _file = open(filename)
         text = _file.read() # small file
         _file.close()
-        self.assertTrue(text.find(CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE) >= 0)
+        self.assertTrue(text.find(CFG_BIBINDEX_UPDATE_MESSAGE) >= 0)
         self.assertTrue(text.find(CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR % (table, bibRecID, bibRecID)) >= 0)
 
     def test_authority_record_enriched_index(self):
@@ -691,7 +748,7 @@ class BibIndexAuthorityRecordTest(unittest.TestCase):
         index_name = 'author'
         table = "idxWORD%02dR" % get_index_id_from_index_name(index_name)
 
-        reindex_for_type_with_bibsched(index_name)
+        reindex_for_type_with_bibsched(index_name, force_all=True)
         self.assertTrue(
             authority_string in deserialize_via_marshal(
                 run_sql("SELECT termlist FROM %s WHERE id_bibrec = %s" % (table, bibRecID))[0][0]
@@ -719,6 +776,258 @@ class BibIndexAuthorityRecordTest(unittest.TestCase):
         self.assertTrue('Ellis, Jonathan Richard' in values)
 
 
+def insert_record_one_and_second_revision():
+    """Inserts test record no. 1 and a second revision for that record"""
+
+    rev1 = """<record>
+              <controlfield tag="001">123456789</controlfield>
+              <controlfield tag="005">20110101000000.0</controlfield>
+              <datafield tag ="100" ind1=" " ind2=" ">
+                <subfield code="a">Close, John</subfield>
+                <subfield code="u">DESY</subfield>
+              </datafield>
+              <datafield tag="245" ind1=" " ind2=" ">
+                <subfield code="a">Particles world</subfield>
+              </datafield>
+            </record>"""
+    rev1_final = rev1.replace('<controlfield tag="001">123456789</controlfield>','')
+    rev1_final = rev1_final.replace('<controlfield tag="005">20110101000000.0</controlfield>','')
+
+    rev2 = rev1.replace('<subfield code="a">Close, John</subfield>', '<subfield code="a">Dawkins, Richard</subfield>')
+    rev2 = rev2.replace('Particles world', 'Particles universe')
+
+    rec1 = xml_marc_to_records(rev1_final)
+    res = bibupload(rec1[0], opt_mode='insert')
+    _id = res[1]
+    rec = get_record(_id)
+    _rev = record_get_field_value(rec, '005', '', '')
+
+    #need to index for the first time
+    indexes = get_all_indexes()
+    wtabs = get_word_tables(indexes)
+    for index_id, index_name, index_tags in wtabs:
+        wordTable = WordTable(index_name=index_name,
+                              index_id=index_id,
+                              fields_to_index=index_tags,
+                              table_name_pattern='idxWORD%02dF',
+                              wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                              wash_index_terms=50)
+        wordTable.add_recIDs([[_id, _id]], 10000)
+
+    #upload the second revision, but don't index
+    rev2_final = rev2.replace('123456789', str(_id))
+    rev2_final = rev2_final.replace('20110101000000.0', _rev)
+    rec2 = xml_marc_to_records(rev2_final)
+    res = bibupload(rec2[0], opt_mode='correct')
+
+    return _id
+
+
+def insert_record_two_and_second_revision():
+    """Inserts test record no. 2 and a revision for that record"""
+
+    rev1 = """<record>
+              <controlfield tag="001">123456789</controlfield>
+              <controlfield tag="005">20110101000000.0</controlfield>
+              <datafield tag ="100" ind1=" " ind2=" ">
+                <subfield code="a">Locke, John</subfield>
+                <subfield code="u">UNITRA</subfield>
+              </datafield>
+              <datafield tag="245" ind1=" " ind2=" ">
+                <subfield code="a">Collision course</subfield>
+              </datafield>
+            </record>"""
+    rev1_final = rev1.replace('<controlfield tag="001">123456789</controlfield>','')
+    rev1_final = rev1_final.replace('<controlfield tag="005">20110101000000.0</controlfield>','')
+
+    rev2 = rev1.replace('Collision course', 'Course of collision')
+
+    rec1 = xml_marc_to_records(rev1_final)
+    res = bibupload(rec1[0], opt_mode='insert')
+    id_bibrec = res[1]
+    rec = get_record(id_bibrec)
+    _rev = record_get_field_value(rec, '005', '', '')
+
+    #need to index for the first time
+    indexes = get_all_indexes()
+    wtabs = get_word_tables(indexes)
+    for index_id, index_name, index_tags in wtabs:
+        wordTable = WordTable(index_name=index_name,
+                              index_id=index_id,
+                              fields_to_index=index_tags,
+                              table_name_pattern='idxWORD%02dF',
+                              wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                              tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                              wash_index_terms=50)
+        wordTable.add_recIDs([[id_bibrec, id_bibrec]], 10000)
+
+    #upload the second revision, but don't index
+    rev2_final = rev2.replace('123456789', str(id_bibrec))
+    rev2_final = rev2_final.replace('20110101000000.0', _rev)
+    rec2 = xml_marc_to_records(rev2_final)
+    res = bibupload(rec2[0], opt_mode='correct')
+
+    return id_bibrec
+
+
+class BibIndexFindingAffectedIndexes(unittest.TestCase):
+    """
+    Checks if function 'find_affected_records_for_index'
+    works correctly.
+    """
+
+    counter = 0
+    indexes = ['global', 'fulltext', 'caption', 'journal', 'reportnumber', 'year']
+
+    @classmethod
+    def setUp(self):
+        if self.counter == 0:
+            self.last_updated = dict(get_last_updated_all_indexes())
+            res = run_sql("SELECT job_date FROM hstRECORD WHERE id_bibrec=10 AND affected_fields<>''")
+            self.hst_date = res[0][0]
+            date_to_set = self.hst_date - timedelta(seconds=1)
+            for index in self.indexes:
+                run_sql("""UPDATE idxINDEX SET last_updated=%s
+                           WHERE name=%s""", (str(date_to_set), index))
+
+    @classmethod
+    def tearDown(self):
+        self.counter += 1
+        if self.counter >= 8:
+            for index in self.indexes:
+                run_sql("""UPDATE idxINDEX SET last_updated=%s
+                           WHERE name=%s""", (self.last_updated[index], index))
+
+    def test_find_proper_indexes(self):
+        """bibindex - checks if affected indexes are found correctly"""
+        records_for_indexes = find_affected_records_for_index("", [[1,20]])
+        self.assertEqual(sorted(['global', 'fulltext', 'caption', 'journal', 'reportnumber', 'year']),
+                         sorted(records_for_indexes.keys()))
+
+    def test_find_proper_recrods_for_global_index(self):
+        """bibindex - checks if affected recids are found correctly for global index"""
+        records_for_indexes = find_affected_records_for_index("", [[1,20]])
+        self.assertEqual(records_for_indexes['global'], [10,12])
+
+    def test_find_proper_records_for_year_index(self):
+        """bibindex - checks if affected recids are found correctly for year index"""
+        records_for_indexes = find_affected_records_for_index("", [[1,20]])
+        self.assertEqual(records_for_indexes['year'], [10,12])
+
+    def test_find_proper_records_for_caption_index(self):
+        """bibindex - checks if affected recids are found correctly for caption index"""
+        records_for_indexes = find_affected_records_for_index("", [[1,100]])
+        self.assertEqual(records_for_indexes['caption'], [10,12, 55, 98])
+
+    def test_find_proper_records_for_journal_index(self):
+        """bibindex - checks if affected recids are found correctly for journal index"""
+        records_for_indexes = find_affected_records_for_index("", [[1,100]])
+        self.assertEqual(records_for_indexes['journal'], [10])
+
+    def test_find_proper_records_specified_only_year(self):
+        """bibindex - checks if affected recids are found correctly for year index if we specify only year index as input"""
+        records_for_indexes = find_affected_records_for_index("year", [[1, 100]])
+        self.assertEqual(records_for_indexes["year"], [10, 12, 55])
+
+    def test_find_proper_records_force_all(self):
+        """bibindex - checks if all recids will be assigned to all specified indexes"""
+        records_for_indexes = find_affected_records_for_index("year,title", [[10, 15]], True)
+        self.assertEqual(records_for_indexes["year"], records_for_indexes["title"])
+        self.assertEqual(records_for_indexes["year"], [10, 11, 12, 13, 14, 15])
+
+    def test_find_proper_records_nothing_for_title_index(self):
+        """bibindex - checks if nothing was found for title index in range of records: 1 - 20"""
+        records_for_indexes = find_affected_records_for_index("title", [[1, 20]])
+        self.assertRaises(KeyError, lambda :records_for_indexes["title"])
+
+
+
+
+class BibIndexIndexingAffectedIndexes(unittest.TestCase):
+
+    started = False
+    records = []
+    counter = 0
+
+    @classmethod
+    def setUp(self):
+        self.counter += 1
+        if not self.started:
+            self.records.append(insert_record_one_and_second_revision())
+            self.records.append(insert_record_two_and_second_revision())
+            records_for_indexes = find_affected_records_for_index([], [self.records])
+            wtabs = get_word_tables(records_for_indexes.keys())
+            for index_id, index_name, index_tags in wtabs:
+                wordTable = WordTable(index_name=index_name,
+                                      index_id=index_id,
+                                      fields_to_index=index_tags,
+                                      table_name_pattern='idxWORD%02dF',
+                                      wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                      tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                                      wash_index_terms=50)
+                wordTable.add_recIDs([self.records], 10000)
+            self.started = True
+
+    @classmethod
+    def tearDown(self):
+        if self.counter == 3:
+            for rec in self.records:
+                wipe_out_record_from_all_tables(rec)
+            indexes = get_all_indexes()
+            wtabs = get_word_tables(indexes)
+            for index_id, index_name, index_tags in wtabs:
+                wordTable = WordTable(index_name=index_name,
+                                      index_id=index_id,
+                                      fields_to_index=index_tags,
+                                      table_name_pattern='idxWORD%02dF',
+                                      wordtable_type = CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"],
+                                      tag_to_tokenizer_map={'8564_u': "BibIndexEmptyTokenizer"},
+                                      wash_index_terms=50)
+                wordTable.del_recIDs([self.records])
+
+
+
+    def test_proper_content_in_title_index(self):
+        """bibindex - checks reindexation of title index for test records.."""
+        index_id = get_index_id_from_index_name('title')
+        query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec IN (""" % (index_id,)
+        query = query + ", ".join(map(str, self.records)) + ")"
+        resp = run_sql(query)
+        affiliation_rec1 = deserialize_via_marshal(resp[0][0])
+        affiliation_rec2 = deserialize_via_marshal(resp[1][0])
+        self.assertEqual(['univers', 'particl'], affiliation_rec1)
+        self.assertEqual(['of', 'cours', 'collis'], affiliation_rec2)
+
+
+    def test_proper_content_in_author_index(self):
+        """bibindex - checks reindexation of author index for test records.."""
+        index_id = get_index_id_from_index_name('author')
+        query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec IN (""" % (index_id,)
+        query = query + ", ".join(map(str, self.records)) + ")"
+        resp = run_sql(query)
+        author_rec1 = deserialize_via_marshal(resp[0][0])
+        author_rec2 = deserialize_via_marshal(resp[1][0])
+        self.assertEqual(['dawkins', 'richard', ], author_rec1)
+        self.assertEqual(['john', 'locke'], author_rec2)
+
+
+    def test_proper_content_in_global_index(self):
+        """bibindex - checks reindexation of global index for test records.."""
+        index_id = get_index_id_from_index_name('global')
+        query = """SELECT termlist FROM idxWORD%02dR WHERE id_bibrec IN (""" % (index_id,)
+        query = query + ", ".join(map(str, self.records)) + ")"
+        resp = run_sql(query)
+        global_rec1 = deserialize_via_marshal(resp[0][0])
+        global_rec2 = deserialize_via_marshal(resp[1][0])
+        self.assertEqual(True, 'dawkin' in global_rec1)
+        self.assertEqual(True, 'univers' in global_rec1)
+        self.assertEqual(True, 'john' in global_rec2)
+        self.assertEqual(False, 'john' in global_rec1)
+
+
+
+
 TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexRemoveLatexTest,
                              BibIndexRemoveHtmlTest,
@@ -728,7 +1037,11 @@ TEST_SUITE = make_test_suite(BibIndexRemoveStopwordsTest,
                              BibIndexFiletypeIndexTest,
                              BibIndexJournalIndexTest,
                              BibIndexCJKTokenizerTitleIndexTest,
-                             BibIndexAuthorityRecordTest)
+                             BibIndexAuthorityRecordTest,
+                             BibIndexFindingAffectedIndexes,
+                             BibIndexIndexingAffectedIndexes)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
+
+

@@ -30,10 +30,6 @@ CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_IDENTIFIER = 'AUTHORITY'
 # This is needed for searching within the authority record collection.
 CFG_BIBAUTHORITY_AUTHORITY_COLLECTION_NAME = 'Authority Records'
 
-# used in log file and regression tests
-CFG_BIBAUTHORITY_BIBINDEX_UPDATE_MESSAGE = \
-    "Indexing records dependent on modified authority records"
-
 # CFG_BIBAUTHORITY_TYPE_NAMES
 # Some administrators may want to be able to change the names used for the
 # authority types. Although the keys of this dictionary are hard-coded into

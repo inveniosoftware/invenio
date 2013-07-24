@@ -52,5 +52,5 @@ CFG_BIBINDEX_TOKENIZERS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibindex_t
 
 CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR = "%s adding records #%d-#%d started"
 
-
+CFG_BIBINDEX_UPDATE_MESSAGE = "Searching for records which should be reindexed..."
 
