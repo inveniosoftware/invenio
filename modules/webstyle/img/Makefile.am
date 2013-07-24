@@ -323,7 +323,13 @@ img_DATA = add-small.png \
            yahoo_icon_24.png \
            yahoo_icon_48.png \
            yammer_icon_24.png \
-           yammer_icon_48.png
+           yammer_icon_48.png \
+           yoursearches_alert.png \
+           yoursearches_alert_edit.png \
+           yoursearches_search.png \
+           youralerts_alert.png \
+           youralerts_alert_delete.png \
+           youralerts_alert_edit.png
 
 tmpdir=$(localstatedir)/tmp
 
