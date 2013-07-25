@@ -44,3 +44,6 @@ The words CERN Photo must be quoted for each use. </small>
 </tr>
 </table>
 </div>
+
+{# WebTags #}
+{{ bfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('<hr />') }}

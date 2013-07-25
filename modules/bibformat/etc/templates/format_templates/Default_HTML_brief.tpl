@@ -56,7 +56,7 @@
         </a>
         {%- endif -%}
       {%- endif -%}
-      {% if record['keywords']|length %} | <i class="icon-tags"></i>
+      {% if record['keywords']|length %} | <i class="icon-tag"></i>
       {% for keyword in record['keywords'] %}
       <span class="label">
         <a href="{{ url_for('search.search', p='keyword:' + keyword['term']) }}">
@@ -65,6 +65,9 @@
       </span>
       {% endfor %}
       {% endif %}
+
+      {# WebTags #}
+      {{ bfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('|') }}
     </p>
     {% if record.get('number_of_authors', 0) > number_of_displayed_authors %}
     {% set sep = joiner("; ") %}

@@ -50,3 +50,6 @@
 
 		<!-- Elements that are only evaluated by JavaScript -->
 		{{ bfe_video_platform_downloads(bfo, ) }}
+
+{# WebTags #}
+{{ bfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('<hr />') }}

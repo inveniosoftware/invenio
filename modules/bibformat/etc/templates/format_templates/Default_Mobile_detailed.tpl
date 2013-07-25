@@ -41,3 +41,6 @@
 </div>
 </div>
 </div>
+
+{# WebTags #}
+{{ bfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('<hr />') }}

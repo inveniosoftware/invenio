@@ -29,3 +29,6 @@
 </div>
 
 {{ bfe_appears_in_collections(bfo, prefix="<p style='margin-left: 10px;'><em>The record appears in these collections:</em><br />", suffix="</p>") }}
+
+{# WebTags #}
+{{ bfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('<hr />') }}
