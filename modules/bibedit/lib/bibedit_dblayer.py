@@ -20,7 +20,16 @@
 
 __revision__ = "$Id$"
 
+try:
+    import cPickle as Pickle
+except ImportError:
+    import Pickle
+
+from datetime import datetime, timedelta
+
 from invenio.dbquery import run_sql
+from invenio.config import CFG_BIBEDIT_TIMEOUT
+
 
 def get_name_tags_all():
     """Return a dictionary of all MARC tag's textual names."""
@@ -70,7 +79,7 @@ def get_record_last_modification_date(recid):
     """Return last modification date, as timetuple, of record RECID."""
     sql_res = run_sql('SELECT max(job_date) FROM  hstRECORD WHERE id_bibrec=%s',
                       (recid, ))
-    if sql_res[0][0] == None:
+    if sql_res[0][0] is None:
         return None
     else:
         return sql_res[0][0].timetuple()
@@ -125,3 +134,58 @@ def get_record_revision_author(recid, td):
         return result[0]
     else:
         return ""
+
+
+# Cache Related functions
+
+def cache_exists(recid, uid):
+    """Check if the BibEdit cache file exists."""
+    r = run_sql("""SELECT 1 FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+    return bool(r)
+
+def update_cache_post_date(recid, uid):
+    """Touch a BibEdit cache file. This should be used to indicate that the
+    user has again accessed the record, so that locking will work correctly.
+
+    """
+    run_sql("""UPDATE bibEDITCACHE SET post_date = NOW()
+               WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+
+def get_cache(recid, uid):
+    """Return a BibEdit cache object from the database."""
+    r = run_sql("""SELECT data FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+    if r:
+        return Pickle.loads(r[0][0])
+
+def update_cache(recid, uid, data):
+    data_str = Pickle.dumps(data)
+    r = run_sql("""INSERT INTO bibEDITCACHE (id_bibrec, uid, data, post_date)
+                   VALUES (%s, %s, %s, NOW())
+                   ON DUPLICATE KEY UPDATE data = %s, post_date = NOW()""",
+                   (recid, uid, data_str, data_str))
+
+def get_cache_post_date(recid, uid):
+    r = run_sql("""SELECT post_date FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+    if r:
+        return r[0][0]
+
+def delete_cache(recid, uid):
+    run_sql("""DELETE FROM bibEDITCACHE
+               WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+
+def uids_with_active_caches(recid):
+    """Return list of uids with active caches for record RECID. Active caches
+    are caches that have been modified a number of seconds ago that is less than
+    the one given by CFG_BIBEDIT_TIMEOUT.
+
+    """
+    datecut = datetime.now() - timedelta(seconds=CFG_BIBEDIT_TIMEOUT)
+    rows = run_sql("""SELECT uid FROM bibEDITCACHE
+                      WHERE id_bibrec = %s AND post_date > %s""",
+                      (recid, datecut))
+    return [int(row[0]) for row in rows]
+
+# End of cache related functions

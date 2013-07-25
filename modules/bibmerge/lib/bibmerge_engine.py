@@ -29,10 +29,10 @@ from invenio.search_engine import print_record, perform_request_search, \
         record_exists
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibedit_utils import cache_exists, cache_expired, \
-    create_cache_file, delete_cache_file, get_cache_file_contents, \
+    create_cache, delete_cache, get_cache_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
-    record_locked_by_queue, save_xml_record, touch_cache_file, \
-    update_cache_file_contents, _get_file_path, \
+    record_locked_by_queue, save_xml_record, touch_cache, \
+    update_cache_contents, _get_file_path, \
     get_record_revision_ids, revision_format_valid_p, split_revid, \
     get_marcxml_of_revision_id
 from invenio.htmlutils import remove_html_markup
@@ -164,13 +164,13 @@ def perform_request_record(requestType, uid, data):
 
         # Delete cache file if it exists
         if cache_exists(recid1, uid):
-            delete_cache_file(recid1, uid)
+            delete_cache(recid1, uid)
 
         result['resultText'] = 'Record submitted'
         return result
 
     elif requestType == 'cancel':
-        delete_cache_file(recid1, uid)
+        delete_cache(recid1, uid)
         result['resultText'] = 'Cancelled'
         return result
 
@@ -214,7 +214,7 @@ def perform_request_update_record(requestType, uid, data):
         }
     recid1 = data["recID1"]
     recid2 = data["recID2"]
-    record_content = get_cache_file_contents(recid1, uid)
+    record_content = get_cache_contents(recid1, uid)
     cache_dirty = record_content[0]
     rec_revision = record_content[1]
     record1 = record_content[2]
@@ -286,7 +286,7 @@ def perform_request_update_record(requestType, uid, data):
 
     result['resultHtml'] = bibmerge_templates.BM_html_field_group(record1, record2, data['fieldTag'])
     result['resultText'] = resultText
-    update_cache_file_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, undo_list, redo_list)
+    update_cache_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, undo_list, redo_list)
     return result
 
 def perform_small_request_update_record(requestType, uid, data):
@@ -300,7 +300,7 @@ def perform_small_request_update_record(requestType, uid, data):
         }
     recid1 = data["recID1"]
     recid2 = data["recID2"]
-    cache_content = get_cache_file_contents(recid1, uid) #TODO: check mtime, existence
+    cache_content = get_cache_contents(recid1, uid) #TODO: check mtime, existence
     cache_dirty = cache_content[0]
     rec_revision = cache_content[1]
     record1 = cache_content[2]
@@ -331,7 +331,7 @@ def perform_small_request_update_record(requestType, uid, data):
         result['resultHtml'] = bibmerge_templates.BM_html_subfield_row_diffed(record1, record2, fnum, findex1, findex2, sfindex1, sfindex2)
         result['resultText'] = 'Subfields diffed'
 
-    update_cache_file_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, [], [])
+    update_cache_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes, [], [])
     return result
 
 def _get_record(recid, uid, result, fresh_record=False):
@@ -355,16 +355,16 @@ def _get_record(recid, uid, result, fresh_record=False):
         result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
     else:
         if fresh_record:
-            delete_cache_file(recid, uid)
+            delete_cache(recid, uid)
             existing_cache = False
         if not existing_cache:
-            record_revision, record = create_cache_file(recid, uid)
+            record_revision, record = create_cache(recid, uid)
             mtime = get_cache_mtime(recid, uid)
             cache_dirty = False
         else:
-            tmpRes = get_cache_file_contents(recid, uid)
+            tmpRes = get_cache_contents(recid, uid)
             cache_dirty, record_revision, record = tmpRes[0], tmpRes[1], tmpRes[2]
-            touch_cache_file(recid, uid)
+            touch_cache(recid, uid)
             mtime = get_cache_mtime(recid, uid)
             if not latest_record_revision(recid, record_revision):
                 result['cacheOutdated'] = True
@@ -437,4 +437,3 @@ def _fieldtagNum_and_indicators(fieldTag):
     if ind2 == '_':
         ind2 = ' '
     return (fnum, ind1, ind2)
-

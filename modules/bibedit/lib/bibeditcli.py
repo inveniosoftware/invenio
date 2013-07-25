@@ -122,7 +122,7 @@ def cli_get_revision(revid):
         print 'ERROR: revision %s is invalid; ' \
               'must be NNN.YYYYMMDDhhmmss.' % revid
         sys.exit(1)
-    out =  get_marcxml_of_revision_id(revid)
+    out = get_marcxml_of_revision_id(revid)
     if out:
         print out
     else:

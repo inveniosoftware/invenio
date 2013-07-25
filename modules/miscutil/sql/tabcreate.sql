@@ -4664,6 +4664,16 @@ CREATE TABLE IF NOT EXISTS `wapCACHE` (
   INDEX `status-b` (`object_status`)
 ) ENGINE=MyISAM;
 
+-- table for bibedit cache
+CREATE TABLE IF NOT EXISTS `bibEDITCACHE` (
+  `id_bibrec` mediumint(8) unsigned NOT NULL,
+  `uid` int(15) unsigned NOT NULL,
+  `data` LONGBLOB,
+  `post_date` datetime NOT NULL,
+  PRIMARY KEY (`id_bibrec`, `uid`),
+  INDEX `post_date` (`post_date`)
+) ENGINE=MyISAM;
+
 -- tables for goto:
 CREATE TABLE IF NOT EXISTS goto (
   label varchar(150) NOT NULL,

@@ -26,7 +26,6 @@ by both the web and CLI interfaces.
 
 __revision__ = "$Id$"
 
-import cPickle
 import difflib
 import fnmatch
 import marshal
@@ -36,7 +35,7 @@ import time
 import zlib
 import tempfile
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 try:
     from cStringIO import StringIO
@@ -47,8 +46,10 @@ from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
     CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_CACHEDIR
-from invenio.bibedit_dblayer import get_record_last_modification_date, \
-    delete_hp_change
+from invenio.bibedit_dblayer import (get_record_last_modification_date,
+    delete_hp_change, cache_exists, update_cache_post_date, get_cache,
+    update_cache, get_cache_post_date, uids_with_active_caches,
+    delete_cache as _delete_cache)
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
@@ -116,7 +117,7 @@ def user_can_edit_record_collection(req, recid):
     uid = getUid(req)
     # In case we are creating a new record
     if cache_exists(recid, uid):
-        dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+        record = get_cache_contents(recid, uid)[2]
         values = record_get_field_values(record, '980', code="a")
         record_collections.extend([remove_volatile(v) for v in values])
 
@@ -201,19 +202,20 @@ def record_find_matching_fields(key, rec, tag="", ind1=" ", ind2=" ",
     return matching_field_instances
 
 # Operations on the BibEdit cache file
-def cache_exists(recid, uid):
-    """Check if the BibEdit cache file exists."""
-    return os.path.isfile('%s.tmp' % _get_file_path(recid, uid))
-
 def get_cache_mtime(recid, uid):
     """Get the last modified time of the BibEdit cache file. Check that the
     cache exists before calling this function.
 
     """
-    try:
-        return int(os.path.getmtime('%s.tmp' % _get_file_path(recid, uid)))
-    except OSError:
-        pass
+    post_date = get_cache_post_date(recid, uid)
+    if not post_date:
+        return
+    # In python 3.3 we can call .timestamp() on datetimes
+    # In python 2.7 we can call .total_seconds() on timedeltas
+    # In python 2.4 we have this
+    # It think it is beautiful
+    td = (post_date - datetime(1970, 1, 1))
+    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
 
 def cache_expired(recid, uid):
     """Has it been longer than the number of seconds given by
@@ -223,7 +225,8 @@ def cache_expired(recid, uid):
     """
     return get_cache_mtime(recid, uid) < int(time.time()) - CFG_BIBEDIT_TIMEOUT
 
-def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=[], disabled_hp_changes={}, undo_list=[], redo_list=[]):
+def create_cache(recid, uid, record='', cache_dirty=False, pending_changes=[],
+                 disabled_hp_changes={}, undo_list=[], redo_list=[]):
     """Create a BibEdit cache file, and return revision and record. This will
     overwrite any existing cache the user has for this record.
     datetime.
@@ -234,64 +237,66 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
         if not record:
             return
 
-    file_path = '%s.tmp' % _get_file_path(recid, uid)
     record_revision = get_record_last_modification_date(recid)
     if record_revision is None:
         record_revision = datetime.now().timetuple()
 
-    cache_file = open(file_path, 'w')
     assert_undo_redo_lists_correctness(undo_list, redo_list)
 
     # Order subfields alphabetically after loading the record
     record_order_subfields(record)
 
-    cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
-    cache_file.close()
+    data = [cache_dirty, record_revision, record, pending_changes,
+            disabled_hp_changes, undo_list, redo_list]
+    update_cache(recid, uid, data)
     return record_revision, record
 
-def touch_cache_file(recid, uid):
+def touch_cache(recid, uid):
     """Touch a BibEdit cache file. This should be used to indicate that the
     user has again accessed the record, so that locking will work correctly.
 
     """
-    if cache_exists(recid, uid):
-        os.system('touch %s.tmp' % _get_file_path(recid, uid))
+    update_cache_post_date(recid, uid)
 
 def get_bibrecord(recid):
     """Return record in BibRecord wrapping."""
     if record_exists(recid):
         return create_record(print_record(recid, 'xm'))[0]
 
-def get_cache_file_contents(recid, uid):
-    """Return the contents of a BibEdit cache file."""
-    cache_file = _get_cache_file(recid, uid, 'r')
-    if cache_file:
-        cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list = cPickle.load(cache_file)
-        cache_file.close()
+def get_cache_contents(recid, uid):
+    """Return the contents of a BibEdit cache into the database."""
+    cache = get_cache(recid, uid)
+    if cache:
+        cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list = cache
         assert_undo_redo_lists_correctness(undo_list, redo_list)
 
         return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list
 
-def update_cache_file_contents(recid, uid, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list):
+def update_cache_contents(recid, uid, record_revision, record, pending_changes,
+                          disabled_hp_changes, undo_list, redo_list):
     """Save updates to the record in BibEdit cache. Return file modificaton
     time.
 
     """
-    cache_file = _get_cache_file(recid, uid, 'w')
-    if cache_file:
-        assert_undo_redo_lists_correctness(undo_list, redo_list)
-        cPickle.dump([True, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
-        cache_file.close()
-        return get_cache_mtime(recid, uid)
+    data = [True, record_revision, record, pending_changes,
+            disabled_hp_changes, undo_list, redo_list]
+    update_cache(recid, uid, data)
+    return get_cache_mtime(recid, uid)
 
-def delete_cache_file(recid, uid):
-    """Delete a BibEdit cache file."""
-    try:
-        os.remove('%s.tmp' % _get_file_path(recid, uid))
-    except OSError:
-        # File was probably already removed
-        pass
+def delete_cache(recid, uid):
+    """Delete a BibEdit cache entry in the database."""
+    _delete_cache(recid, uid)
 
+def _get_file_path(recid, uid, filename=''):
+    """Return the file path to a BibEdit file (excluding suffix).
+    If filename is specified this replaces the config default.
+
+    """
+    if not filename:
+        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, CFG_BIBEDIT_FILENAME,
+                                 recid, uid)
+    else:
+        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, filename, recid, uid)
 
 def delete_disabled_changes(used_changes):
     for change_id in used_changes:
@@ -309,12 +314,12 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     """
     if not xml_record:
         # Read record from cache file.
-        cache = get_cache_file_contents(recid, uid)
+        cache = get_cache_contents(recid, uid)
         if cache:
             record = cache[2]
             used_changes = cache[4]
             xml_record = record_xml_output(record)
-            delete_cache_file(recid, uid)
+            delete_cache(recid, uid)
             delete_disabled_changes(used_changes)
     else:
         record = create_record(xml_record)[0]
@@ -358,7 +363,7 @@ def record_locked_by_other_user(recid, uid):
     RECID.
 
     """
-    active_uids = _uids_with_active_caches(recid)
+    active_uids = uids_with_active_caches(recid)
     try:
         active_uids.remove(uid)
     except ValueError:
@@ -369,15 +374,12 @@ def record_locked_by_other_user(recid, uid):
 def get_record_locked_since(recid, uid):
     """ Get modification time for the given recid and uid
     """
-    filename = "%s_%s_%s.tmp" % (CFG_BIBEDIT_FILENAME,
-                                recid,
-                                uid)
-    locked_since  = ""
-    try:
-        locked_since = time.ctime(os.path.getmtime('%s%s%s' % (
-                        CFG_BIBEDIT_CACHEDIR, os.sep, filename)))
-    except OSError:
-        pass
+    mtime = get_cache_post_date(recid, uid)
+    if mtime:
+        locked_since = mtime.strftime('%b %d, %H:%M')
+    else:
+        locked_since = ""
+
     return locked_since
 
 
@@ -387,7 +389,7 @@ def record_locked_by_user_details(recid, uid):
     @return: user details and time when record was locked
     @rtype: tuple
     """
-    active_uids = _uids_with_active_caches(recid)
+    active_uids = uids_with_active_caches(recid)
     try:
         active_uids.remove(uid)
     except ValueError:
@@ -404,7 +406,7 @@ def record_locked_by_user_details(recid, uid):
     return record_blocked_by_nickname, record_blocked_by_email, locked_since
 
 
-def record_locked_by_queue(recid):
+def record_locked_by_queue(recid, uid=None):
     """Check if record should be locked for editing because of the current state
     of the BibUpload queue. The level of checking is based on
     CFG_BIBEDIT_LOCKLEVEL.
@@ -628,40 +630,6 @@ def get_record_template(name):
 
 
 # Private functions
-def _get_cache_file(recid, uid, mode):
-    """Return a BibEdit cache file object."""
-    if cache_exists(recid, uid):
-        return open('%s.tmp' % _get_file_path(recid, uid), mode)
-
-def _get_file_path(recid, uid, filename=''):
-    """Return the file path to a BibEdit file (excluding suffix).
-    If filename is specified this replaces the config default.
-
-    """
-    if not filename:
-        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, CFG_BIBEDIT_FILENAME,
-                                 recid, uid)
-    else:
-        return '%s%s%s_%s_%s' % (CFG_BIBEDIT_CACHEDIR, os.sep, filename, recid, uid)
-
-def _uids_with_active_caches(recid):
-    """Return list of uids with active caches for record RECID. Active caches
-    are caches that have been modified a number of seconds ago that is less than
-    the one given by CFG_BIBEDIT_TIMEOUT.
-
-    """
-    re_tmpfilename = re.compile('%s_%s_(\d+)\.tmp' % (CFG_BIBEDIT_FILENAME,
-                                                      recid))
-    tmpfiles = fnmatch.filter(os.listdir(CFG_BIBEDIT_CACHEDIR), '%s*.tmp' %
-                              CFG_BIBEDIT_FILENAME)
-    expire_time = int(time.time()) - CFG_BIBEDIT_TIMEOUT
-    active_uids = []
-    for tmpfile in tmpfiles:
-        mo = re_tmpfilename.match(tmpfile)
-        if mo and int(os.path.getmtime('%s%s%s' % (
-                    CFG_BIBEDIT_CACHEDIR, os.sep, tmpfile))) > expire_time:
-            active_uids.append(int(mo.group(1)))
-    return active_uids
 
 def _get_bibupload_task_ids():
     """Return list of all BibUpload task IDs.
@@ -842,7 +810,7 @@ def replace_references(recid, uid=None, txt=None, url=None):
         references_xml = extract_references_from_record_xml(recid)
     references = create_record(references_xml)
 
-    dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_file_contents(recid, uid)
+    dummy1, dummy2, record, dummy3, dummy4, dummy5, dummy6 = get_cache_contents(recid, uid)
     out_xml = None
 
     references_to_add = record_get_field_instances(references[0],
@@ -902,7 +870,7 @@ def add_record_cnum(recid, uid):
     from invenio.sequtils_cnum import CnumSeq, ConferenceNoStartDateError
 
     record_revision, record, pending_changes, deactivated_hp_changes, \
-    undo_list, redo_list = get_cache_file_contents(recid, uid)[1:]
+    undo_list, redo_list = get_cache_contents(recid, uid)[1:]
 
     record_strip_empty_volatile_subfields(record)
 
@@ -917,7 +885,7 @@ def add_record_cnum(recid, uid):
         except ConferenceNoStartDateError:
             return None
         field_add_subfield(record['111'][0], 'g', new_cnum)
-        update_cache_file_contents(recid, uid, record_revision,
+        update_cache_contents(recid, uid, record_revision,
                                    record,
                                    pending_changes,
                                    deactivated_hp_changes,
@@ -951,7 +919,7 @@ def get_xml_from_textmarc(recid, textmarc_record, uid=None):
 
     # If there is a cache file, add the controlfields
     if cache_exists(recid, uid):
-        record = get_cache_file_contents(recid, uid)[2]
+        record = get_cache_contents(recid, uid)[2]
         for tag in record:
             if tag.startswith("00") and tag != "001":  # It is a controlfield
                 f.write("%09d %s %s\n" % (recid, tag + "__", record_get_field_value(record, tag)))
