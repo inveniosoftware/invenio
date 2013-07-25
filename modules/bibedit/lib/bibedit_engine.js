@@ -3173,7 +3173,7 @@ function onDOISearchClick(button){
   createReq({doi: doi, requestType: 'DOISearch'}, function(json)
   {
     if (json['doi_url'] !== undefined) {
-      window.open(json['doi_url']);
+      openCenteredPopup(json['doi_url'], "", 768, 768);
     } else {
       alert("DOI not found !");
     }
