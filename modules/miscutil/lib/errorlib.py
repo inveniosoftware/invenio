@@ -35,7 +35,8 @@ from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, \
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, \
     CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
-    CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER
+    CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER, \
+    CFG_PROPAGATE_EXCEPTIONS
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -371,7 +372,8 @@ def register_exception(stream='error',
 
     @return: 1 if successfully wrote to stream, 0 if not
     """
-
+    if CFG_PROPAGATE_EXCEPTIONS:
+        raise
 
     try:
         ## Let's extract exception information

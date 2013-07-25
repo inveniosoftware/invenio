@@ -130,7 +130,7 @@ Please, update your invenio-local.conf file accordingly.""" % (option_name, new_
                        'CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG',
                        'CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG',
                        'CFG_BIBUPLOAD_STRONG_TAGS',
-                       'CFG_BIBFORMAT_HIDDEN_TAGS',]:
+                       'CFG_BIBFORMAT_HIDDEN_TAGS']:
         # some options are supposed be string even when they look like
         # numeric
         option_value = '"' + option_value + '"'
