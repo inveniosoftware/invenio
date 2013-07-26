@@ -19,6 +19,8 @@
 
 """WebAccount Flask Blueprint"""
 
+import os
+from pprint import pformat
 from werkzeug.urls import url_unquote
 from flask import render_template, request, flash, redirect, url_for, g
 from invenio.sqlalchemyutils import db
@@ -26,6 +28,8 @@ from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.config import \
     CFG_SITE_URL, \
+    CFG_PYLIBDIR, \
+    CFG_LOGDIR, \
     CFG_SITE_SECURE_URL, \
     CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
@@ -38,7 +42,7 @@ from invenio import webuser
 from invenio.access_control_mailcookie import \
     InvenioWebAccessMailCookieError, \
     mail_cookie_check_authorize_action
-
+from invenio.pluginutils import PluginContainer
 from invenio.webaccount_forms import LoginForm, RegisterForm
 from invenio.webuser_flask import login_user, logout_user, current_user
 from invenio.websession_webinterface import wash_login_method
@@ -216,13 +220,13 @@ def _invenio_settings_plugin_builder(plugin_name, plugin_code):
     raise ValueError('%s is not a valid settings plugin' % plugin_name)
 
 
-import os
-from invenio.config import CFG_PYLIBDIR
-from invenio.pluginutils import PluginContainer
 _USER_SETTINGS = PluginContainer(
     os.path.join(CFG_PYLIBDIR, 'invenio', '*_user_settings.py'),
     plugin_builder=_invenio_settings_plugin_builder)
 
+## Let's report about broken plugins
+open(os.path.join(CFG_LOGDIR, 'broken-user-settings.log'), 'w').write(
+    pformat(_USER_SETTINGS.get_broken_plugins()))
 
 @blueprint.route('/display', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
