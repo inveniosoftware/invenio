@@ -55,6 +55,8 @@ AVAILABLE_PARSERS = []
 # has been deleted.
 CFG_BIBRECORD_KEEP_SINGLETONS = True
 
+CONTROL_TAGS = ('001', '003', '005', '006', '007', '008')
+
 try:
     import pyRXP
     if 'pyrxp' in CFG_BIBRECORD_PARSERS_AVAILABLE:
@@ -1464,6 +1466,85 @@ def _validate_record_field_positions_global(record):
             if field[4] in all_fields:
                 return ("Duplicate global field position '%d' in tag '%s'" %
                     (field[4], tag))
+
+def get_marc_tag_extended_with_wildcards(tag):
+    """
+    Adds wildcards to a non-control field tag, identifiers and subfieldcode and returns it.
+    Example:
+        001     -> 001
+        595     -> 595%%%
+        5955    -> 5955%%
+        59555   -> 59555%
+        59555a  -> 59555a
+    """
+    length = len(tag)
+    if length == 3 and tag not in CONTROL_TAGS:
+            return '%s%%%%%%' % tag
+    if length == 4:
+            return '%s%%%%' % tag
+    if length == 5:
+            return '%s%%' % tag
+    return tag
+
+def get_filtered_record(rec, marc_codes):
+    """
+    Filters a record based on MARC code and returns a new filtered record.
+    Supports wildcards in ind1, ind2, subfieldcode.
+    Returns entire record if filter list is empty.
+    """
+    if not marc_codes:
+        return rec
+
+    res = {}
+    split_tags = map(_get_split_marc_code, marc_codes)
+
+    for tag, ind1, ind2, subfieldcode in split_tags:
+        # Tag must exist
+        if tag in rec:
+            # Control field
+            if tag in CONTROL_TAGS:
+                value = record_get_field_value(rec, tag)
+                record_add_field(res, tag, ind1, ind2, controlfield_value=value)
+            # Simple subfield
+            elif '%' not in (ind1, ind2, subfieldcode):
+                values = record_get_field_values(rec, tag, ind1, ind2, subfieldcode)
+                for value in values:
+                    record_add_field(res, tag, ind1, ind2, subfields=[(subfieldcode, value)])
+            # Wildcard in ind1, ind2 or subfield
+            elif '%' in (ind1, ind2, subfieldcode):
+                field_instances = record_get_field_instances(rec, tag, ind1, ind2)
+                for entity in field_instances:
+                    subfields = []
+                    if subfieldcode == '%':
+                        subfields = entity[0]
+                    else:
+                        for subfield in entity[0]:
+                            if subfield[0] == subfieldcode:
+                                subfields.append(subfield)
+                    if len(subfields):
+                        record_add_field(res, tag, entity[1], entity[2], subfields=subfields)
+
+    return res
+
+def _get_split_marc_code(marc_code):
+    """
+    Splits a MARC code into tag, ind1 ind2, and subfieldcode.
+    Accepts '_' values which are converted to ' '.
+    """
+    tag, ind1, ind2, subfieldcode = '', '', '', ''
+
+    length = len(marc_code)
+
+    if length >= 3:
+        tag = marc_code[0:3]
+    if length >= 4:
+        ind1 = marc_code[3].replace('_', '')
+    if length >= 5:
+        ind2 = marc_code[4].replace('_', '')
+    if length == 6:
+        subfieldcode = marc_code[5].replace('_', '')
+    return tag, ind1, ind2, subfieldcode
+
 
 def _record_sort_by_indicators(record):
     """Sorts the fields inside the record by indicators."""

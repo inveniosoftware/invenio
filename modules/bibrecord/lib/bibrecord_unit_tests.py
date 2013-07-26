@@ -18,15 +18,18 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-The BibRecord test suite.
+The BibRecord unit test suite.
 """
 
 from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_TMPDIR, \
-     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+     CFG_SITE_URL, \
+     CFG_SITE_RECORD
 from invenio import bibrecord, bibrecord_config
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.search_engine import get_record
 
 try:
     import pyRXP
@@ -1770,6 +1773,38 @@ class BibRecordExtractIdentifiersTest(InvenioTestCase):
                          'oai:atlantis:1')
 
 
+class BibRecordSplitMARCCodeTest(InvenioTestCase):
+    """ bibrecord - testing for MARC code spliting"""
+
+    def test_split_tag(self):
+        """bibrecord - splitting MARC code"""
+        self.assertEqual(bibrecord._get_split_marc_code('001'), ('001', '', '', ''))
+        self.assertEqual(bibrecord._get_split_marc_code('65017a'), ('650', '1', '7', 'a'))
+        self.assertEqual(bibrecord._get_split_marc_code('037__a'), ('037', '', '', 'a'))
+        self.assertEqual(bibrecord._get_split_marc_code('8560_f'), ('856', '0', '', 'f'))
+        self.assertEqual(bibrecord._get_split_marc_code('909C1'), ('909', 'C', '1', ''))
+        self.assertEqual(bibrecord._get_split_marc_code('650'), ('650', '', '', ''))
+        self.assertEqual(bibrecord._get_split_marc_code('650__%'), ('650', '', '', '%'))
+        self.assertEqual(bibrecord._get_split_marc_code('650%'), ('650', '%', '', ''))
+
+
+class BibRecordExtensionWithWildcardsTagTest(InvenioTestCase):
+    """ bibrecord - testing for MARC tag extension with wildcards"""
+
+    def test_split_tag(self):
+        """bibrecord - extending MARC tag with wildcards"""
+        # No valid tag
+        self.assertEqual(bibrecord.get_marc_tag_extended_with_wildcards('01'), '01')
+        # Control tag
+        self.assertEqual(bibrecord.get_marc_tag_extended_with_wildcards('001'), '001')
+        # Extending tag
+        self.assertEqual(bibrecord.get_marc_tag_extended_with_wildcards('595'), '595%%%')
+        # Extending tag and identifier(s)
+        self.assertEqual(bibrecord.get_marc_tag_extended_with_wildcards('0001'), '0001%%')
+        self.assertEqual(bibrecord.get_marc_tag_extended_with_wildcards('00012'), '00012%')
+        self.assertEqual(bibrecord.get_marc_tag_extended_with_wildcards('00012a'), '00012a')
+
+
 TEST_SUITE = make_test_suite(
     BibRecordSuccessTest,
     BibRecordParsersTest,
@@ -1795,7 +1830,9 @@ TEST_SUITE = make_test_suite(
     BibRecordSingletonTest,
     BibRecordNumCharRefTest,
     BibRecordExtractIdentifiersTest,
-    BibRecordDropDuplicateFieldsTest
+    BibRecordDropDuplicateFieldsTest,
+    BibRecordSplitMARCCodeTest,
+    BibRecordExtensionWithWildcardsTagTest,
     )
 
 if __name__ == '__main__':
