@@ -24,14 +24,27 @@ def format_element(bfo, type='xml', encodeForXML='yes'):
     """
     Prints the complete current record as XML.
 
-    @param type: the type of xml. Can be 'xml', 'oai_dc', 'marcxml', 'xd'
+    @param type: the type of xml. Can be 'xml', 'oai_dc', 'marcxml', 'xd', 'xmf'
     @param encodeForXML: if 'yes', replace all < > and & with html corresponding escaped characters.
     """
     from invenio.bibformat_utils import record_get_xml
+    from invenio.bibrecord import get_filtered_record, record_xml_output, get_marc_tag_extended_with_wildcards
     from invenio.textutils import encode_for_xml
+    from invenio.search_engine import get_record
     #Can be used to output various xml flavours.
 
-    out = record_get_xml(bfo.recID, format=type, on_the_fly=True)
+    out = ''
+    if type == 'xmf':
+        tags = bfo.ot
+        if tags != ['']:
+            filter_tags = map(get_marc_tag_extended_with_wildcards, tags)
+        else:
+            filter_tags = []
+        record = get_record(bfo.recID)
+        filtered_record = get_filtered_record(record, filter_tags)
+        out = record_xml_output(filtered_record)
+    else:
+        out = record_get_xml(bfo.recID, format=type, on_the_fly=True)
 
     if encodeForXML.lower() == 'yes':
         return encode_for_xml(out)

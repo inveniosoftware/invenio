@@ -52,7 +52,7 @@ import sys
 ##
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False,
-                  save_missing=True, force_2nd_pass=False):
+                  save_missing=True, force_2nd_pass=False, ot=''):
     """
     Returns the formatted record with id 'recID' and format 'of'
 
@@ -80,6 +80,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     @param recID: the id of the record to fetch
     @param of: the output format code
+    @param ot: output only these MARC tags (e.g. ['100', '999']), only supported for 'xmf' format
+    @type ot: list
     @return: formatted record as String, or '' if it does not exist
     """
     out, needs_2nd_pass = bibformat_engine.format_record_1st_pass(
@@ -91,7 +93,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                                         xml_record=xml_record,
                                         user_info=user_info,
                                         on_the_fly=on_the_fly,
-                                        save_missing=save_missing)
+                                        save_missing=save_missing,
+                                        ot=ot)
     if needs_2nd_pass or force_2nd_pass:
         out = bibformat_engine.format_record_2nd_pass(
                                     recID=recID,
@@ -101,7 +104,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                                     verbose=verbose,
                                     search_pattern=search_pattern,
                                     xml_record=xml_record,
-                                    user_info=user_info)
+                                    user_info=user_info,
+                                    ot=ot)
 
     return out
 
@@ -138,7 +142,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                    xml_records=None, user_info=None, record_prefix=None,
                    record_separator=None, record_suffix=None, prologue="",
-                   epilogue="", req=None, on_the_fly=False):
+                   epilogue="", req=None, on_the_fly=False, ot=''):
     """
     Format records given by a list of record IDs or a list of records
     as xml.  Adds a prefix before each record, a suffix after each
@@ -195,11 +199,12 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     @param req: an optional request object where to print records
     @param on_the_fly: if False, try to return an already preformatted version of the record in the database
     @type on_the_fly: boolean
+    @param ot: output only these MARC tags (e.g. "100,700,909C0b"), only supported for 'xmf' format
+    @type ot: string
     @rtype: string
     """
     if req is not None:
         req.write(prologue)
-
     formatted_records = ''
 
     #Fill one of the lists with Nones
@@ -229,7 +234,7 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
         #Print formatted record
         formatted_record = format_record(recIDs[i], of, ln, verbose,
                                          search_pattern, xml_records[i],
-                                         user_info, on_the_fly)
+                                         user_info, on_the_fly, ot=ot)
         formatted_records += formatted_record
         if req is not None:
             req.write(formatted_record)

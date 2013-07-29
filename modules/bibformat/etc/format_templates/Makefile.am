@@ -51,6 +51,7 @@ etc_DATA = Default_HTML_captions.bft \
            DataCite.xsl \
            Default_Mobile_brief.bft \
            Default_Mobile_detailed.bft \
+           MARCXML_FIELDED.bft \
            Authority_HTML_brief.bft \
 	   People_HTML_detailed.bft \
 	   People_HTML_brief.bft \
