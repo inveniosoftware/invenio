@@ -144,12 +144,27 @@ def cache_exists(recid, uid):
                    WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
     return bool(r)
 
+
+def cache_active(recid, uid):
+    """Check if the BibEdit cache is active (an editor is opened)."""
+    r = run_sql("""SELECT 1 FROM bibEDITCACHE
+                   WHERE id_bibrec = %s AND uid = %s
+                   AND is_active = 1""", (recid, uid))
+    return bool(r)
+
+
+def deactivate_cache(recid, uid):
+    """Mark BibEdit cache as non active."""
+    return run_sql("""UPDATE bibEDITCACHE SET is_active = 0
+                      WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
+
+
 def update_cache_post_date(recid, uid):
     """Touch a BibEdit cache file. This should be used to indicate that the
     user has again accessed the record, so that locking will work correctly.
 
     """
-    run_sql("""UPDATE bibEDITCACHE SET post_date = NOW()
+    run_sql("""UPDATE bibEDITCACHE SET post_date = NOW(), is_active = 1
                WHERE id_bibrec = %s AND uid = %s""", (recid, uid))
 
 def get_cache(recid, uid):
@@ -163,7 +178,7 @@ def update_cache(recid, uid, data):
     data_str = Pickle.dumps(data)
     r = run_sql("""INSERT INTO bibEDITCACHE (id_bibrec, uid, data, post_date)
                    VALUES (%s, %s, %s, NOW())
-                   ON DUPLICATE KEY UPDATE data = %s, post_date = NOW()""",
+                   ON DUPLICATE KEY UPDATE data = %s, post_date = NOW(), is_active = 1""",
                    (recid, uid, data_str, data_str))
 
 def get_cache_post_date(recid, uid):

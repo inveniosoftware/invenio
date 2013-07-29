@@ -31,8 +31,7 @@ try:
     from invenio.dbquery import run_sql, wash_table_column_name
     from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
          CFG_TMPSHAREDDIR, CFG_WEBSEARCH_RSS_TTL, CFG_PREFIX, \
-         CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS, \
-         CFG_BIBEDIT_TIMEOUT
+         CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
          write_message, write_messages
     from invenio.bibtask_config import CFG_BIBSCHED_LOGDIR
@@ -347,7 +346,7 @@ def clean_sessions():
 
 def clean_bibedit_cache():
     """Deletes experied bibedit cache entries"""
-    datecut = datetime.datetime.now() - datetime.timedelta(seconds=CFG_BIBEDIT_TIMEOUT)
+    datecut = datetime.datetime.now() - datetime.timedelta(days=CFG_MAX_ATIME_BIBEDIT_TMP)
     datecut_str = datecut.strftime("%Y-%m-%d %H:%M:%S")
     run_sql("DELETE FROM bibEDITCACHE WHERE post_date < %s", [datecut_str])
 

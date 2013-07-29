@@ -61,7 +61,8 @@ from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
     get_record_last_modification_date, get_record_revision_author, \
     get_marcxml_of_record_revision, delete_related_holdingpen_changes, \
-    get_record_revisions, get_info_of_record_revision
+    get_record_revisions, get_info_of_record_revision, cache_active, \
+    deactivate_cache
 
 from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache, delete_cache, get_bibrecord, \
@@ -449,13 +450,17 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         response.update(perform_request_get_tableview(recid, uid, data))
     elif request_type == "DOISearch":
         response.update(perform_doi_search(data['doi']))
-
+    elif request_type == "deactivateRecordCache":
+        deactivate_cache(recid, uid)
+        response.update({"cacheMTime": data['cacheMTime']})
     return response
 
 def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
     """ An AJAX handler used when treating bulk updates """
     lastResult = {}
     lastTime = cacheMTime
+    if get_cache_mtime(recid, uid) != cacheMTime:
+        return {"resultCode": 107}
     isFirst = True
     for data in reqsData:
         assert data is not None
@@ -466,11 +471,9 @@ def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
             data['undoRedo'] = undoRedo
             isFirst = False
         lastResult = perform_request_ajax(req, recid, uid, data, isBulk=True)
-        # now we have to update the cacheMtime in next request !
-#        if lastResult.has_key('cacheMTime'):
         try:
             lastTime = lastResult['cacheMTime']
-        except:
+        except KeyError:
             raise Exception(str(lastResult))
     return lastResult
 
@@ -574,6 +577,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                     record_add_field(record, '001',
                                      controlfield_value=str(new_recid))
                     create_cache(new_recid, uid, record, True)
+                    response['cacheMTime'] = get_cache_mtime(new_recid, uid)
                     response['resultCode'], response['newRecID'] = 7, new_recid
 
         elif new_type == 'import':
@@ -603,7 +607,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                                 record = merged_record
 
                         create_cache(new_recid, uid, record, True)
-                        mtime = get_cache_mtime(recid, uid)
+                        response['cacheMTime'] = get_cache_mtime(new_recid, uid)
                         response['resultCode'], response['newRecID'] = 7, new_recid
         elif new_type == 'clone':
             # Clone an existing record (from the users cache).
@@ -638,6 +642,12 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         if "inReadOnlyMode" in data:
             read_only_mode = data['inReadOnlyMode']
 
+        if data.get('deleteRecordCache'):
+            delete_cache(recid, uid)
+            existing_cache = False
+            pending_changes = []
+            disabled_hp_changes = {}
+
         if record_status == 0:
             response['resultCode'] = 102
         elif not read_only_mode and not existing_cache and \
@@ -654,11 +664,6 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         elif not read_only_mode and record_locked_by_queue(recid):
             response['resultCode'] = 105
         else:
-            if data.get('deleteRecordCache'):
-                delete_cache(recid, uid)
-                existing_cache = False
-                pending_changes = []
-                disabled_hp_changes = {}
             if read_only_mode:
                 if 'recordRevision' in data and data['recordRevision'] != 'sampleValue':
                     record_revision_ts = data['recordRevision']
@@ -680,24 +685,21 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 mtime = 0
                 undo_list = []
                 redo_list = []
-            elif not existing_cache:
-                record_revision, record = create_cache(recid, uid)
-                mtime = get_cache_mtime(recid, uid)
-                pending_changes = []
-                disabled_hp_changes = {}
-                undo_list = []
-                redo_list = []
-                cache_dirty = False
             else:
-                #TODO: This try except should be replaced with something nicer,
-                #      like an argument indicating if a new cache file is to
-                #      be created
                 try:
                     cache_dirty, record_revision, record, pending_changes, \
                         disabled_hp_changes, undo_list, redo_list = \
                         get_cache_contents(recid, uid)
+                except TypeError:
+                    # No cache found in the DB
+                    record_revision, record = create_cache(recid, uid)
+                    pending_changes = []
+                    disabled_hp_changes = {}
+                    cache_dirty = False
+                    undo_list = []
+                    redo_list = []
+                else:
                     touch_cache(recid, uid)
-                    mtime = get_cache_mtime(recid, uid)
                     if not latest_record_revision(recid, record_revision) and \
                             get_record_revisions(recid) != ():
                         # This sould prevent from using old cache in case of
@@ -706,14 +708,8 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                         # is a new record
                         response['cacheOutdated'] = True
 
-                except:
-                    record_revision, record = create_cache(recid, uid)
-                    mtime = get_cache_mtime(recid, uid)
-                    pending_changes = []
-                    disabled_hp_changes = {}
-                    cache_dirty = False
-                    undo_list = []
-                    redo_list = []
+                mtime = get_cache_mtime(recid, uid)
+
             if data.get('clonedRecord', ''):
                 response['resultCode'] = 9
             else:
@@ -731,12 +727,14 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
 
             # For some collections, merge template with record
             template_to_merge = extend_record_with_template(recid)
-            if template_to_merge:
+            if template_to_merge and not read_only_mode:
                 merged_record = merge_record_with_template(record, template_to_merge)
                 if merged_record:
                     record = merged_record
-                    create_cache(recid, uid, record, True)
-                    mtime = get_cache_mtime(recid, uid)
+                    mtime = update_cache_contents(recid, uid, record_revision,
+                                                  record, pending_changes,
+                                                  disabled_hp_changes,
+                                                  undo_list, redo_list)
 
             if record_status == -1:
                 # The record was deleted
@@ -976,7 +974,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data,
     response = {}
     if not cache_exists(recid, uid):
         response['resultCode'] = 106
-    elif not get_cache_mtime(recid, uid) == cacheMTime and isBulk is False:
+    elif get_cache_mtime(recid, uid) != cacheMTime and isBulk is False:
         # In case of a bulk request, the changes are deliberately performed
         # immediately one after another
         response['resultCode'] = 107
@@ -1620,6 +1618,8 @@ def perform_request_get_tableview(recid, uid, data):
     """
     response = {}
     textmarc_record = data['textmarc']
+    if not textmarc_record:
+        response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['tableview_change_success']
     xml_conversion_status = get_xml_from_textmarc(recid, textmarc_record, uid)
     response.update(xml_conversion_status)
 
@@ -1629,6 +1629,7 @@ def perform_request_get_tableview(recid, uid, data):
         create_cache(recid, uid,
             create_record(xml_conversion_status['resultXML'])[0], data['recordDirty'])
         response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['tableview_change_success']
+        response['cacheMTime'] = get_cache_mtime(recid, uid)
     return response
 
 
@@ -1653,12 +1654,12 @@ def _get_formated_record(record, new_window):
                          }
         result += get_mathjax_header(True) + '<body>'
         result += "<h2> Brief format preview </h2><br />"
-        result += bibformat.format_record(recID=None,
+        result += bibformat.format_record(0,
                                           of="hb",
                                           xml_record=xml_record) + "<br />"
 
     result += "<br /><h2> Detailed format preview </h2><br />"
-    result += bibformat.format_record(recID=None,
+    result += bibformat.format_record(0,
                                       of="hd",
                                       xml_record=xml_record)
     #Preview references

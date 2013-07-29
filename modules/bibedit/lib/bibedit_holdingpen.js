@@ -108,6 +108,7 @@ function holdingPenPanelSetChanges(data){
     for (var i = 0, n=data['changes'].length; i < n; i++) {
       holdingPenPanelAddEntry(data['changes'][i]);
     }
+    adjustHPChangesetsActivity();
   }
 }
 

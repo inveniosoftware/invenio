@@ -4670,6 +4670,7 @@ CREATE TABLE IF NOT EXISTS `bibEDITCACHE` (
   `uid` int(15) unsigned NOT NULL,
   `data` LONGBLOB,
   `post_date` datetime NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id_bibrec`, `uid`),
   INDEX `post_date` (`post_date`)
 ) ENGINE=MyISAM;

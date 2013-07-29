@@ -148,37 +148,39 @@ function disableRecordBrowser(){
   }
 }
 
-function onSearchClick(event){
+function onSearchClick(event) {
   /*
    * Handle 'Search' button (search for records).
    */
   updateStatus('updating');
+
   var searchPattern = $('#txtSearchPattern').val();
   var searchType = $('#sctSearchType').val();
-  if (searchType == 'recID'){
+
+  if ( searchType == 'recID' ) {
     // Record ID - do some basic validation.
     var searchPatternParts = searchPattern.split(".");
-    var recID = parseInt(searchPatternParts[0]);
+    var recID = parseInt(searchPatternParts[0], 10);
     var recRev = searchPatternParts[1];
 
-    if (gRecID == recID && recRev == gRecRev){
-      // We are already editing this record.
-      updateStatus('ready');
-      return;
+    if ( gRecID == recID ) {
+      if ( !recRev || ( recRev == gRecRev ) ) {
+        // We are already editing this record.
+        updateStatus('ready');
+        return;
+      }
     }
-    if (gRecordDirty && gReadOnlyMode == false){
+
+    if ( gRecordDirty || gReqQueue.length > 0 ) {
       // Warn of unsubmitted changes.
       if (!displayAlert('confirmLeavingChangedRecord')){
         updateStatus('ready');
         return;
       }
     }
-    else if (gRecID && gReadOnlyMode == false)
-      // If the record is unchanged, delete the cache.
-      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
 
     gNavigatingRecordSet = false;
-    if (isNaN(recID)){
+    if ( isNaN(recID) ) {
       // Invalid record ID.
       changeAndSerializeHash({state: 'edit', recid: searchPattern});
       cleanUp(true, null, null, true);
@@ -186,30 +188,28 @@ function onSearchClick(event){
       updateToolbar(false);
       displayMessage(102);
     }
-    else{
+    else {
       // Get the record.
-      if (recRev == undefined){
+      if (recRev == undefined) {
         $('#txtSearchPattern').val(recID);
         getRecord(recID);
-      } else {
+      }
+      else {
         recRev = recRev.replace(/\s+$/, '');
         $('#txtSearchPattern').val(recID + "." + recRev);
         getRecord(recID, recRev);
       }
     }
   }
-  else if (searchPattern.replace(/\s*/g, '')){
+  else if (searchPattern.replace(/\s*/g, '')) {
     // Custom search.
-    if (gRecordDirty){
+    if ( gRecordDirty || gReqQueue.length > 0 ) {
       // Warn of unsubmitted changes.
       if (!displayAlert('confirmLeavingChangedRecord')){
         updateStatus('ready');
         return;
       }
     }
-    else if (gRecID)
-      // If the record is unchanged, delete the cache.
-      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
     gNavigatingRecordSet = false;
     createReq({requestType: 'searchForRecord', searchType: searchType,
       searchPattern: searchPattern}, onSearchForRecordSuccess);
@@ -221,10 +221,10 @@ function onSearchForRecordSuccess(json){
    * Handle successfull 'searchForRecord' requests (custom search).
    */
   gResultSet = json['resultSet'];
-  if (gResultSet.length == 0){
+  if (gResultSet.length == 0) {
+    cleanUp(true, null, null, true, true);
     // Search yielded no results.
     changeAndSerializeHash({state: 'edit'});
-    cleanUp(true, null, null, true, true);
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
     displayMessage(-1);
   }

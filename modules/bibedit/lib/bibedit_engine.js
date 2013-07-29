@@ -176,11 +176,11 @@ var gRecordHasPDF = false;
 // queue with all requests to be sent to server
 var gReqQueue = [];
 
-// count number of requests since last save
-var gReqCounter = 0;
-
 // last checkbox checked
 var gLastChecked = null;
+
+// last time a bulk request completed
+var gLastRequestCompleted = new Date();
 
 /*
  * **************************** 2. Initialization ******************************
@@ -296,12 +296,25 @@ function initMisc(){
 
   // Warn user if BibEdit is being closed while a record is open.
   window.onbeforeunload = function() {
-    if (gRecID && gRecordDirty){
-      return '******************** WARNING ********************\n' +
-             '                  You have unsubmitted changes.\n\n' +
-             'You should go back to the page and click either:\n' +
-             ' * Submit (to save your changes permanently)\n      or\n' +
-             ' * Cancel (to discard your changes)';
+    if (gRecID && ( gRecordDirty || gReqQueue.length > 0 )) {
+      var data = {
+        recID: gRecID,
+        requestType: 'deactivateRecordCache',
+      };
+
+      $.ajaxSetup({async:false});
+      queue_request(data);
+      save_changes();
+      $.ajaxSetup({async:true});
+
+      msg = '******************** WARNING ********************\n' +
+            '                  You have unsubmitted changes.\n\n' +
+            'You may:\n' +
+            ' * Submit (to save your changes permanently)\n      or\n' +
+            ' * Cancel (to discard your changes)\n      or\n' +
+            ' * Leave (your changes are saved)\n';
+
+      //return msg;
     }
     else {
       createReq({recID: gRecID, requestType: 'deleteRecordCache'},
@@ -429,10 +442,6 @@ function createReq(data, onSuccess, asynchronous, deferred, onError) {
   /*
    * Create Ajax request.
    */
-  if (typeof asynchronous === "undefined") {
-    asynchronous = true;
-  }
-
   if (typeof onError === "undefined") {
     onError = onAjaxError;
   }
@@ -447,17 +456,21 @@ function createReq(data, onSuccess, asynchronous, deferred, onError) {
     data.cacheMTime = gCacheMTime;
   }
 
+  var ajax_options = {data: { jsondata: JSON.stringify(data) },
+                      success: function(json) {
+                          onAjaxSuccess(json, onSuccess);
+                          if (deferred !== undefined) {
+                            deferred.resolve(json);
+                          }
+                      },
+                      error: onError};
+
+  if (typeof asynchronous !== "undefined") {
+    ajax_options.async = asynchronous;
+  }
+
   // Send the request.
-  $.ajax({data: {jsondata: JSON.stringify(data)},
-           success: function(json){
-                      onAjaxSuccess(json, onSuccess);
-                      if (deferred !== undefined) {
-                        deferred.resolve(json);
-                      }
-                    },
-           error: onError,
-           async: asynchronous})
-  .done(function(){
+  $.ajax(ajax_options).done(function() {
     createReqAjaxDone(data);
   });
 }
@@ -484,6 +497,7 @@ function createReqAjaxDone(data){
  */
 function onBulkReqError(data) {
   return function (XHR, textStatus, errorThrown) {
+            gLastRequestCompleted = new Date();
             console.log("Error while processing:");
             console.log(data);
             updateStatus("ready");
@@ -541,16 +555,15 @@ function onAjaxSuccess(json, onSuccess){
     return;
   }
   else if ($.inArray(resCode, [101, 102, 104, 105, 106, 107, 108, 109]) != -1) {
-    cleanUp(!gNavigatingRecordSet, null, null, true, true);
+    cleanUp(!gNavigatingRecordSet, null, null, true, true, false);
     args = [];
     if (resCode == 104) {
       args = json["locked_details"];
     }
     displayMessage(resCode, false, args);
     if (resCode == 107) {
-      //return;
       $('#lnkGetRecord').bind('click', function(event){
-        getRecord(recID);
+        getRecord(recID, undefined, undefined);
         event.preventDefault();
       });
     }
@@ -614,11 +627,12 @@ function queue_request(data) {
   by other requests */
   gReqQueue.push(jQuery.extend(true, {}, data));
 
-  /* Update counter of requests to save */
-  gReqCounter++;
-  if (gReqCounter === gREQUESTS_UNTIL_SAVE) {
+  var currentDate = new Date();
+  var dateDiff = (currentDate - gLastRequestCompleted) / 1000;
+
+  /* Only save the changes if the last request completed more than 5 sec ago */
+  if ( gLastRequestCompleted && dateDiff > 5 ) {
     save_changes();
-    gReqCounter = 0;
   }
 }
 
@@ -631,7 +645,9 @@ function save_changes() {
 
   if (gReqQueue.length > 0) {
     updateStatus('saving');
-    createBulkReq(gReqQueue, function(json){
+    gLastRequestCompleted = null;
+    createBulkReq(gReqQueue, function(json) {
+      gLastRequestCompleted = new Date();
       updateStatus('report', gRESULT_CODES[json['resultCode']]);
       updateStatus('ready');
       saveChangesPromise.resolve();
@@ -1539,25 +1555,28 @@ function onNewRecordClick(event){
    * Handle 'New' button (new record).
    */
   updateStatus('updating');
-  if (gRecordDirty){
+  if ( gRecordDirty || gReqQueue.length > 0 ) {
     if (!displayAlert('confirmLeavingChangedRecord')){
       updateStatus('ready');
       event.preventDefault();
       return;
     }
   }
-  else
+  else {
     // If the record is unchanged, erase the cache.
-    if (gReadOnlyMode == false){
+    if (gReadOnlyMode == false) {
       createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
                 true, undefined, onDeleteRecordCacheError);
+    }
   }
+
   changeAndSerializeHash({state: 'newRecord'});
   cleanUp(true, '');
   displayNewRecordScreen();
   bindNewRecordHandlers();
   updateStatus('ready');
   updateToolbar(false);
+
   event.preventDefault();
 }
 
@@ -1581,7 +1600,7 @@ function onGetRecordError() {
 }
 
 
-function getRecord(recID, recRev, onSuccess){
+function getRecord(recID, recRev, onSuccess, args){
   /* A function retrieving the bibliographic record, using an AJAX request.
    *
    * recID : the identifier of a record to be retrieved from the server
@@ -1617,10 +1636,11 @@ function getRecord(recID, recRev, onSuccess){
 
   reqData = {recID: recID,
              requestType: 'getRecord',
-             deleteRecordCache:
-             getRecord.deleteRecordCache,
+             deleteRecordCache: getRecord.deleteRecordCache,
              clonedRecord: getRecord.clonedRecord,
              inReadOnlyMode: gReadOnlyMode};
+
+  $.extend(reqData, args);
 
   if (recRev != undefined && recRev != 0) {
     reqData.recordRevision = recRev;
@@ -1697,7 +1717,6 @@ function onGetRecordSuccess(json){
   gDisabledHpEntries = json['disabledHpChanges'];
   gHoldingPenLoadedChanges = {};
 
-  adjustHPChangesetsActivity();
   updateBibCirculationPanel();
 
   // updating the undo/redo lists
@@ -2129,7 +2148,7 @@ function onCancelClick(){
           state: 'cancel',
           recid: gRecID
         });
-        cleanUp(!gNavigatingRecordSet, '', null, true, true);
+        cleanUp(!gNavigatingRecordSet, '', null, true, true, false);
         updateStatus('report', gRESULT_CODES[json['resultCode']]);
       }, false);
       holdingPenPanelRemoveEntries();
@@ -2153,7 +2172,7 @@ function onCancelClick(){
 }
 
 
-function onCloneRecordClick(){
+function onCloneRecordClick() {
   /*
    * Handle 'Clone' button (clone record).
    */
@@ -2162,10 +2181,13 @@ function onCloneRecordClick(){
     updateStatus('ready');
     return;
   }
-  else if (!gRecordDirty) {
+  else if ( !gRecordDirty && gReqQueue.length === 0 ) {
     // If the record is unchanged, erase the cache.
     createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
               true, undefined, onDeleteRecordCacheError);
+  }
+  else {
+    save_changes();
   }
   createReq({requestType: 'newRecord', newType: 'clone', recID: gRecID},
     function(json){
@@ -2238,7 +2260,7 @@ function bindNewRecordHandlers(){
       var templateNo = this.id.split('_')[1];
       createReq({requestType: 'newRecord', newType: 'template',
 	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
-	  getRecord(json['newRecID'], 0, onGetTemplateSuccess); // recRev = 0 -> current revision
+	     getRecord(json['newRecID'], 0, onGetTemplateSuccess); // recRev = 0 -> current revision
       }, false);
       event.preventDefault();
     });
@@ -2299,10 +2321,32 @@ function errorDoi(code){
 
 
 function cleanUp(disableRecBrowser, searchPattern, searchType,
-     focusOnSearchBox, resetHeadline){
+     focusOnSearchBox, resetHeadline, updateCache){
   /*
    * Clean up display and data.
    */
+
+   if (typeof updateCache === "undefined") {
+    updateCache = true;
+   }
+
+  if ( gRecID && updateCache ) {
+    if ( gRecordDirty || gReqQueue.length > 0 ) {
+      var data = {
+          recID: gRecID,
+          requestType: 'deactivateRecordCache',
+        };
+      $.ajaxSetup({async:false});
+      queue_request(data);
+      save_changes();
+      $.ajaxSetup({async:true});
+    }
+    else {
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'},
+          function() {}, false, undefined, onDeleteRecordCacheError);
+    }
+  }
+
   // Deactivate controls.
   deactivateRecordMenu();
   if (disableRecBrowser){

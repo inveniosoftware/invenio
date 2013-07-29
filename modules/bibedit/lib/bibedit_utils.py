@@ -358,6 +358,7 @@ def latest_record_revision(recid, revision_time):
     # this can be none if the record is new
     return latest is None or revision_time == latest
 
+
 def record_locked_by_other_user(recid, uid):
     """Return true if any other user than UID has active caches for record
     RECID.
@@ -945,7 +946,8 @@ def get_xml_from_textmarc(recid, textmarc_record, uid=None):
             response['parse_error'] = [e.lineno, " ".join(e.linecontent.split()[1:]), e.message]
     finally:
         sys.stdout = old_stdout
-        return response
+
+    return response
 
 
 #################### crossref utils ####################

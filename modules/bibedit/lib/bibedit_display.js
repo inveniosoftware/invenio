@@ -979,9 +979,9 @@ function displayMessage(msgCode, keepContent, args) {
     case 107:
         msg = 'It appears that you have opened this record in another editor, ' +
             'perhaps in a different window or on a different computer. ' +
-            'A record can only be edited in one place at the time.<br />' +
+            'A record can only be edited in one place at the time.<br /><br />' +
             'Do you want to ' +
-            '<b><a href="#"id="lnkGetRecord">reopen the record</a></b> here?';
+            '<b><a href="#"id="lnkGetRecord">reopen the record</a></b> here? ';
         break;
     case 108:
         msg = 'Could not find record template file. Please notify your ' +
@@ -1157,10 +1157,10 @@ function displayAlert(msgType, args) {
     case 'confirmLeavingChangedRecord':
         msg = '******************** WARNING ********************\n' +
             '                  You have unsubmitted changes.\n\n' +
-            'You should go back to the record and click either:\n' +
+            'You may:\n' +
             ' * Submit (to save your changes permanently)\n      or\n' +
-            ' * Cancel (to discard your changes)\n\n' +
-            'Press OK to continue, or Cancel to stay on the current record.';
+            ' * Cancel (to discard your changes)\n      or\n' +
+            ' * Leave (your changes are saved)\n';
         popUpType = 'confirm';
         break;
     case 'alertCriticalInput':
