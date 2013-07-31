@@ -35,7 +35,9 @@
 {%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
 {%- css 'css/token-input.css', '00-invenio' -%}
 {%- css 'css/token-input-facebook.css', '00-invenio' -%}
-{# FIXME CFG_WEBSTYLE_TEMPLATE_SKIN #}
+{%- if config.CFG_WEBSTYLE_TEMPLATE_SKIN %}
+{%- css 'css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN, '00-invenio' -%}
+{%- endif %}
 
 {# Global Javascript files #}
 {%- js 'js/jquery.min.js', '00-invenio' -%}
