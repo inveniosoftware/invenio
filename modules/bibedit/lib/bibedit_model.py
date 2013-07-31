@@ -24,6 +24,11 @@ BibEdit database models.
 
 # General imports.
 from invenio.sqlalchemyutils import db
+from invenio.search_engine_utils import get_fieldvalues
+from werkzeug import cached_property
+
+from invenio.config import \
+     CFG_CERN_SITE
 
 # Create your models here.
 
@@ -43,6 +48,59 @@ class Bibrec(db.Model):
                 index=True)
     master_format = db.Column(db.String(16), nullable=False,
                               server_default='marc')
+
+    @property
+    def deleted(self):
+        """
+           Return True if record is marked as deleted.
+        """
+
+        # record exists; now check whether it isn't marked as deleted:
+        dbcollids = get_fieldvalues(self.id, "980__%")
+
+        return ("DELETED" in dbcollids) or \
+               (CFG_CERN_SITE and "DUMMY" in dbcollids)
+
+    @staticmethod
+    def _next_merged_recid(recid):
+        """ Returns the ID of record merged with record with ID = recid """
+        merged_recid = None
+        for val in get_fieldvalues(recid, "970__d"):
+            try:
+                merged_recid = int(val)
+                break
+            except ValueError:
+                pass
+
+        if not merged_recid:
+            return None
+        else:
+            return merged_recid
+
+    @cached_property
+    def merged_recid(self):
+        """ Return the record object with
+        which the given record has been merged.
+        @param recID: deleted record recID
+        @type recID: int
+        @return: merged record recID
+        @rtype: int or None
+        """
+        return Bibrec._next_merged_recid(self.id)
+
+    @property
+    def merged_recid_final(self):
+        """ Returns the last record from hierarchy of
+            records merged with this one """
+
+        cur_id = self.id
+        next_id = Bibrec._next_merged_recid(cur_id)
+
+        while next_id:
+            cur_id = next_id
+            next_id = Bibrec._next_merged_recid(cur_id)
+
+        return cur_id
 
 class Bibfmt(db.Model):
     """Represents a Bibfmt record."""
