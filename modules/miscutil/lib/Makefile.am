@@ -80,6 +80,8 @@ pylib_DATA = __init__.py \
              memoiseutils_unit_tests.py \
              messages.py \
              messages_unit_tests.py \
+             mimetypeutils.py \
+             mimetypeutils_unit_tests.py \
              miscutil_config.py \
              miscutil_model.py \
              orcid.py \
