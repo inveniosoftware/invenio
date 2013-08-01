@@ -30,11 +30,6 @@ import hmac
 import time
 import base64
 
-if sys.hexversion < 0x2050000:
-    import sha as sha1
-else:
-    from hashlib import sha1
-
 from cPickle import dumps
 from zlib import decompress, compress
 
@@ -42,6 +37,7 @@ from invenio.jsonutils import json, json_unicode_to_utf8
 from invenio.shellutils import mymkdir
 from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
+from invenio.hashutils import sha1
 
 CFG_ROBOT_EMAIL_ATTRIBUTE_NAME = 'email'
 CFG_ROBOT_NICKNAME_ATTRIBUTE_NAME = 'nickname'

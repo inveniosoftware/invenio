@@ -20,11 +20,6 @@
 """
     Invenio utilities to perform a REST like authentication
 """
-import sys
-if sys.version_info < (2, 5):
-    import sha as sha1
-else:
-    from hashlib import sha1
 import hmac
 import time
 from cgi import parse_qsl
@@ -41,7 +36,7 @@ except ImportError:
 from invenio.dbquery import run_sql, IntegrityError
 from invenio.config import CFG_WEB_API_KEY_ALLOWED_URL
 from invenio.access_control_config import CFG_WEB_API_KEY_STATUS
-
+from invenio.hashutils import sha1
 
 _CFG_WEB_API_KEY_ALLOWED_URL = [(re.compile(_url), _authorized_time, _need_timestamp)
         for _url, _authorized_time, _need_timestamp in CFG_WEB_API_KEY_ALLOWED_URL]

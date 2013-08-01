@@ -32,10 +32,6 @@ import sys
 from urllib import urlencode
 from urllib2 import urlopen
 import pprint
-if sys.hexversion < 0x2060000:
-    from md5 import md5
-else:
-    from hashlib import md5 # pylint: disable=E0611
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
@@ -55,6 +51,7 @@ from invenio.bibtask import task_set_task_param, setup_loggers, task_low_level_s
 from invenio.bibrecord import record_has_field,record_get_field_value
 from invenio.shellutils import run_shell_command
 from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo
+from invenio.hashutils import md5
 import base64
 import cPickle
 

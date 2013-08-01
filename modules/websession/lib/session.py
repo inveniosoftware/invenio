@@ -35,10 +35,6 @@ import os
 import time
 from datetime import datetime, timedelta
 from uuid import uuid4
-if sys.hexversion < 0x2060000:
-    from md5 import md5
-else:
-    from hashlib import md5
 
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.dbquery import run_sql, blob_to_string
@@ -50,6 +46,7 @@ from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
 from invenio.session_flask import InvenioSession as FlaskInvenioSession
+from invenio.hashutils import md5
 
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 

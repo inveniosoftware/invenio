@@ -235,11 +235,8 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             3 - File already exists
     """
     import sys
-    if sys.hexversion < 0x2060000:
-        from md5 import md5
-    else:
-        from hashlib import md5
     from invenio.bibdocfile import BibRecDocs, file_strip_ext
+    from invenio.hashutils import md5
     import shutil
     from invenio.search_engine import perform_request_search, \
                                       search_pattern, \

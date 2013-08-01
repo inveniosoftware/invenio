@@ -21,12 +21,6 @@ import re
 import sys
 import csv
 
-try:
-    import hashlib
-    md5 = hashlib.md5
-except ImportError:
-    from md5 import new as md5
-
 from invenio.refextract_config import CFG_REFEXTRACT_KBS
 from invenio.bibknowledge import get_kbr_items
 from invenio.config import CFG_REFEXTRACT_KBS_OVERRIDE
@@ -38,7 +32,7 @@ from invenio.refextract_re import re_kb_line, \
                                   re_punctuation
 from invenio.docextract_utils import write_message
 from invenio.docextract_text import re_group_captured_multiple_space
-
+from invenio.hashutils import md5
 
 def get_kbs(custom_kbs_files=None, cache=None):
     """Load kbs (with caching)

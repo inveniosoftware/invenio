@@ -30,13 +30,10 @@ derive from the base class and add specific bits.
 """
 
 import sys
-if sys.hexversion < 0x2060000:
-    from md5 import md5
-else:
-    from hashlib import md5
 
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_get_role_id, acc_add_user_role
+from invenio.hashutils import md5
 from datetime import datetime, timedelta
 from random import random
 from cPickle import dumps, loads

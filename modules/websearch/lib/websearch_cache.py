@@ -17,9 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from hashlib import md5
 from invenio.cache import cache
 from invenio.search_engine_config import CFG_SEARCH_RESULTS_CACHE_PREFIX
+from invenio.hashutils import md5
 
 search_results_cache = cache
 

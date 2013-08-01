@@ -43,12 +43,7 @@ try:
 except ImportError:
     BEAUTIFUL_SOUP_IMPORTED = False
 
-try:
-    from hashlib import sha256, sha1, md5
-    HASHLIB_IMPORTED = True
-except ImportError:
-    from md5 import md5
-    HASHLIB_IMPORTED = False
+from invenio.hashutils import sha1, md5, HASHLIB_IMPORTED
 
 from invenio import webinterface_handler_config as apache
 from invenio.config import \
@@ -820,9 +815,13 @@ class _MyHashlibAlgo(object):
         else:
             return setattr(self._obj, name, value)
 
-class _MySHA256(_MyHashlibAlgo):
-    "A _MyHashlibAlgo subsclass for sha256"
-    new = lambda d = '': sha256()
+if HASHLIB_IMPORTED:
+    from invenio.hashutils import sha256
+
+
+    class _MySHA256(_MyHashlibAlgo):
+        "A _MyHashlibAlgo subsclass for sha256"
+        new = lambda d = '': sha256()
 
 
 class _MySHA1(_MyHashlibAlgo):

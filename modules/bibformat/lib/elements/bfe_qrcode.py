@@ -20,21 +20,14 @@
 """BibFormat element - QR code generator """
 
 from invenio.config import CFG_SITE_SECURE_URL, CFG_WEBDIR, CFG_SITE_RECORD
+from invenio.hashutils import md5
 import os
-
 try:
     import qrcode
     from PIL import Image
     HAS_QR = True
 except ImportError:
     HAS_QR = False
-
-try:
-    import hashlib
-    HAS_HASHLIB = True
-except ImportError:
-    import md5
-    HAS_HASHLIB = False
 
 if not HAS_QR:
     from warnings import warn
@@ -48,12 +41,7 @@ def _get_record_hash(link):
     Generate a record hash including CFG_SITE_URL so that
     if CFG_SITE_URL is updated, the QR-code image is invalidated.
     """
-    if HAS_HASHLIB:
-        m = hashlib.md5()
-    else:
-        m = md5.new()
-    m.update(link)
-    return m.hexdigest()[:8].lower()
+    return md5(link).hexdigest()[:8].lower()
 
 
 def format_element(bfo, width="100"):

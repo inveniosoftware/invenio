@@ -59,11 +59,6 @@ import binascii
 import cgi
 import sys
 
-if sys.hexversion < 0x2060000:
-    from md5 import md5
-else:
-    from hashlib import md5 # pylint: disable=E0611
-
 try:
     import magic
     if hasattr(magic, "open"):
@@ -78,7 +73,6 @@ from mimetypes import MimeTypes
 from thread import get_ident
 
 from invenio import webinterface_handler_config as apache
-
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
 
@@ -117,6 +111,7 @@ from invenio.config import CFG_SITE_URL, \
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.pluginutils import PluginContainer
+from invenio.hashutils import md5
 
 import invenio.template
 

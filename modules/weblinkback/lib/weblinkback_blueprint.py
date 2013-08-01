@@ -24,11 +24,11 @@ import pprint
 from functools import wraps
 from string import rfind, strip
 from datetime import datetime
-from hashlib import md5
 
 from flask import Blueprint, session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app
 from invenio.cache import cache
+from invenio.hashutils import md5
 from invenio.intbitset import intbitset as HitSet
 from invenio.sqlalchemyutils import db
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint

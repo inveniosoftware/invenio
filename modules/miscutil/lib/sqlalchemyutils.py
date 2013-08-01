@@ -29,6 +29,7 @@ from sqlalchemy.types import TypeDecorator, TEXT, LargeBinary
 from sqlalchemy.sql.expression import FunctionElement
 from invenio.intbitset import intbitset
 from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
+from invenio.hashutils import md5
 
 try:
     from flask.ext.sqlalchemy import SQLAlchemy
@@ -241,8 +242,7 @@ class PasswordComparator(Comparator):
 
     def hash(self, password):
         if db.engine.name != 'mysql':
-            import hashlib
-            return hashlib.md5(password).digest()
+            return md5(password).digest()
         email = self.__clause_element__().table.columns.email
         return db.func.aes_encrypt(email, password)
 
