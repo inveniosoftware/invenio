@@ -320,3 +320,10 @@ def calculate_co_cited_with_list(record_id, sort_order="d"):
     reverse = sort_order == "d"
     result.sort(key=itemgetter(1), reverse=reverse)
     return result
+
+
+def get_citers_log(recid):
+    return run_sql("""SELECT citer, type, action_date
+                      FROM rnkCITATIONLOG
+                      WHERE citee = %s
+                      ORDER BY action_date DESC""", [recid])

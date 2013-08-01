@@ -17,24 +17,44 @@
 
 etcdir = $(sysconfdir)/bibformat/format_templates
 
-etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
-           Default_HTML_detailed.bft Default_HTML_portfolio.bft \
-           Picture_HTML_detailed.bft Default_HTML_brief.bft \
-           BibTeX.bft MARCXML.bft Excel.bft \
-           Default_HTML_similarity.bft NLM.xsl \
-           OAI_DC.xsl OAI_MARC.bft DC.xsl EndNote.xsl \
-           RSS.xsl RefWorks.xsl MODS.xsl \
-           Default_HTML_references.bft Default_HTML_files.bft \
-           Default_HTML_actions.bft Journal_HTML_detailed.bft \
+etc_DATA = Default_HTML_captions.bft \
+           Picture_HTML_brief.bft \
+           Default_HTML_detailed.bft \
+           Default_HTML_portfolio.bft \
+           Picture_HTML_detailed.bft \
+           Default_HTML_brief.bft \
+           BibTeX.bft MARCXML.bft \
+           Excel.bft \
+           Default_HTML_similarity.bft \
+           NLM.xsl \
+           OAI_DC.xsl \
+           OAI_MARC.bft \
+           DC.xsl \
+           EndNote.xsl \
+           RSS.xsl \
+           RefWorks.xsl \
+           MODS.xsl \
+           Default_HTML_references.bft \
+           Default_HTML_files.bft \
+           Default_HTML_actions.bft \
+           Journal_HTML_detailed.bft \
            Journal_HTML_brief.bft \
-           Poetry_HTML_brief.bft Poetry_HTML_detailed.bft \
-           AID_HTML_very_brief.bft Podcast.xsl \
-           Video_HTML_brief.bft Video_HTML_detailed.bft \
-           Basket_Search_Result.bft Default_HTML_meta.bft \
-           WebAuthorProfile_affiliations_helper.bft DataCite.xsl \
-           Default_Mobile_brief.bft Default_Mobile_detailed.bft \
-           Authority_HTML_brief.bft Authority_HTML_detailed.bft \
-           Detailed_HEPDATA_dataset.bft
+           Poetry_HTML_brief.bft \
+           Poetry_HTML_detailed.bft \
+           AID_HTML_very_brief.bft \
+           Podcast.xsl \
+           Video_HTML_brief.bft \
+           Video_HTML_detailed.bft \
+           Basket_Search_Result.bft \
+           Default_HTML_meta.bft \
+           WebAuthorProfile_affiliations_helper.bft \
+           DataCite.xsl \
+           Default_Mobile_brief.bft \
+           Default_Mobile_detailed.bft \
+           Authority_HTML_brief.bft \
+           Authority_HTML_detailed.bft \
+           Detailed_HEPDATA_dataset.bft \
+           Default_HTML_citation_log.bft
 
 tmpdir = $(prefix)/var/tmp
 

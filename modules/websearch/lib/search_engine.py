@@ -128,7 +128,7 @@ webcomment_templates = invenio.template.load('webcomment')
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, \
     get_refersto_hitset, get_citedby_hitset, get_cited_by_list, \
-    get_refers_to_list
+    get_refers_to_list, get_citers_log
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 from invenio.bibrank_selfcites_searcher import get_self_cited_by_list, \
                                                get_self_cited_by, \
@@ -4480,9 +4480,16 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             citationhistory = create_citation_history_graph_and_box(recid, ln)
                         #debug
                         if verbose > 3:
-                            write_warning("Citation graph debug: " + \
+                            write_warning("Citation graph debug: " +
                                           str(len(citationhistory)), req=req)
-                        req.write(websearch_templates.tmpl_detailed_record_citations_citation_history(recid, ln, citationhistory))
+
+                        req.write(websearch_templates.tmpl_detailed_record_citations_citation_history(ln, citationhistory))
+
+                        # Citation log
+                        entries = get_citers_log(recid)
+                        req.write(websearch_templates.tmpl_detailed_record_citations_citation_log(ln, entries))
+
+
                         req.write(websearch_templates.tmpl_detailed_record_citations_epilogue(recid, ln))
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,

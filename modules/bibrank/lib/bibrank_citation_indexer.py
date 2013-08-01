@@ -953,11 +953,16 @@ def replace_cites(recid, new_cites):
         now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         run_sql("""INSERT INTO rnkCITATIONDICT (citee, citer, last_updated)
                    VALUES (%s, %s, %s)""", (recid, cite, now))
+        run_sql("""INSERT INTO rnkCITATIONLOG (citee, citer, type, action_date)
+                   VALUES (%s, %s, %s, %s)""", (recid, cite, 'added', now))
 
     for cite in cites_to_delete:
         write_message('deleting cite %s %s' % (recid, cite), verbose=1)
+        now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         run_sql("""DELETE FROM rnkCITATIONDICT
                    WHERE citee = %s and citer = %s""", (recid, cite))
+        run_sql("""INSERT INTO rnkCITATIONLOG (citee, citer, type, action_date)
+                   VALUES (%s, %s, %s, %s)""", (recid, cite, 'removed', now))
 
 
 def insert_into_missing(recid, report):

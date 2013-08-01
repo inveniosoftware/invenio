@@ -85,8 +85,7 @@ from invenio.websearch_external_collections import external_collection_get_state
 from invenio.websearch_external_collections_utils import get_collection_id
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.search_engine_utils import get_fieldvalues
-
-import sys
+from invenio.bibformat import format_record
 
 from invenio import hepdatadisplayutils
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
@@ -4141,8 +4140,8 @@ class Template:
                 'similar': similar}
         return out
 
-    def tmpl_detailed_record_citations_citation_history(self, recID, ln,
-                                                        citationhistory):
+    def tmpl_detailed_record_citations_citation_history(self, ln,
+                                                              citationhistory):
         """Returns the citations history graph of this record
 
         Parameters:
@@ -4169,6 +4168,37 @@ class Template:
             else:
                 out += "no citationhistory -->"
         return out
+
+    def tmpl_detailed_record_citations_citation_log(self, ln, log_entries):
+        """Returns the citations history graph of this record
+
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+
+          - citationhistory *string* - citationhistory box
+
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = []
+        if log_entries:
+            out.append('<style>td.citationlogdate { width: 5.4em; }</style>')
+            out.append('<table><tr><td class="blocknote">Citation Log: </td></tr><tr><td><a id="citationlogshow" class="moreinfo" style="text-decoration: underline; " onclick="$(\'#citationlog\').show(); $(\'#citationlogshow\').hide();">show</a></td></tr></table>')
+            out.append('<table id="citationlog" style="display: none;">')
+            for recid, action_type, action_date in log_entries:
+                record_str = format_record(recid, 'HS2')
+                out.append("""<tr>
+  <td>%s</td>
+  <td class="citationlogdate">%s</td>
+  <td>%s</td>
+</tr>""" % (action_type, action_date.strftime('%Y-%m-%d'), record_str))
+            out.append('</table>')
+
+        return '\n'.join(out)
 
     def tmpl_detailed_record_citations_co_citing(self, recID, ln,
                                                  cociting):
