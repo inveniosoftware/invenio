@@ -58,6 +58,8 @@ pylib_DATA = __init__.py \
              textutils_unit_tests.py \
              dateutils.py \
              dateutils_unit_tests.py \
+             hashutils.py \
+             hashutils_unit_tests.py \
              htmlutils.py \
              htmlutils_unit_tests.py \
              testutils.py \
