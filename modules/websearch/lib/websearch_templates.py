@@ -1159,7 +1159,7 @@ class Template:
         return out
 
 
-    def create_addtosearch_box(self, ln, p, p1, searchwithin, header, adv_search_link):
+    def create_addtosearch_box(self, ln, p, p1, searchwithin, header, adv_search_link, f=''):
         """
         Creates the Search  and the Add-to-Search box.
 
@@ -1249,6 +1249,8 @@ class Template:
             <input type="text" name="p1" size="%(sizepattern)d" class="advancedsearchfield"/>
             %(searchwithin1)s
             <input class="formbutton" type="submit" name="action_asearch" value="%(add_to_search)s"/>
+            <br>
+            %(fulltext)s
         </div>
         </td></tr>
         </table>
@@ -1262,8 +1264,9 @@ class Template:
             'matchbox1' : self.tmpl_matchtype_box('m1', '', ln=ln),
             'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
             'searchwithin1' : searchwithin,
-            'add_to_search' : _("Add to Search")
-            }
+            'add_to_search' : _("Add to Search"),
+            'fulltext': self.tmpl_fulltext(f, ln='en'),
+        }
         return out
 
 
@@ -1347,6 +1350,26 @@ class Template:
                'seln' : self.tmpl_is_selected('n', value), 'optn' : _("AND NOT")
               }
         return out
+
+    def tmpl_fulltext(self, f, ln='en'):
+        """
+          Returns HTML code for the search in fulltext checkbox.
+
+          Parameters:
+
+            - 'f' *string* - The value of the f paramater
+
+            - 'ln' *string* - the language to display
+        """
+
+        _ = gettext_set_language(ln)
+
+        checked = 'unchecked'
+        if f == 'fulltext':
+            checked = 'checked'
+
+        return """<small><input type="checkbox" name="f" value="fulltext" %(checked)s> %(text)s</small>""" % {'checked': checked,
+                                                                                                              'text': _('Search also in the full-text of all documents')}
 
     def tmpl_inputdate(self, name, ln, sy=0, sm=0, sd=0):
         """
@@ -2167,10 +2190,11 @@ class Template:
                                   selected = '',
                                   values = self._add_mark_to_field(value=f1, fields=fieldslist, ln=ln)
                                 )
+
             adv_search_link = create_html_link(self.build_search_url(rm=rm, aas=1, cc=cc, jrec=jrec, ln=ln, rg=rg),
                                                {}, _("Advanced Search"))
 
-            out += self.create_addtosearch_box(ln, p, p1, searchwithin, '', adv_search_link)
+            out += self.create_addtosearch_box(ln, p, p1, searchwithin, '', adv_search_link, f)
 
         elif aas == 1:
             # print Advanced Search form:

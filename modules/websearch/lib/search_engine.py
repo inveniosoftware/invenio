@@ -6254,9 +6254,28 @@ def prs_simple_search(results_in_any_collection, kwargs=None, req=None, of=None,
             # recommendations when there are results only in the hosted collections. Also added the if clause to avoid
             # searching in case we know we only have actual or potential hosted collections results
             if not only_hosted_colls_actual_or_potential_results_p:
-                results_in_any_collection.union_update(search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln,
+                # Full-text by default in add to search
+                if kwargs['aas'] == 2 and f=='fulltext':
+                    # Displays nearest terms box only for the latter part to avoid display of box for metadata in case
+                    # there are only results in the fulltext
+                    results_in_any_collection.union_update(search_pattern_parenthesised(req, p, '', ap=ap, of=of, verbose=verbose, ln=ln,
+                                                                                        display_nearest_terms_box=False,
+                                                                                        wl=wl))
+                    # Change pattern to get results from fulltext per term
+                    p_no_fields = re.sub('[a-z]*:', '', p)
+                    p_no_fields = p_no_fields.replace('+', '|')
+                    p_no_fields = p_no_fields.replace('AND', 'OR')
+                    if verbose:
+                        write_warning('Search stage 3: p is "%s"' % p, req=req)
+                        write_warning('Search stage 3: p without fields for fulltext by default search is "%s"' % p_no_fields, req=req)
+                    results_in_any_collection.union_update(search_pattern_parenthesised(req, p_no_fields, 'fulltext', ap=ap, of=of, verbose=verbose, ln=ln,
+                                                                                        display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p,
+                                                                                        wl=wl))
+                else:
+                    results_in_any_collection.union_update(search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln,
                                                                                     display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p,
                                                                                     wl=wl))
+
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
