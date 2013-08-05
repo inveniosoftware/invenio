@@ -331,6 +331,7 @@ Contents
       $ make
       $ make install
       $ make install-bootstrap
+      $ make install-hogan-plugin
       $ make install-mathjax-plugin    ## optional
       $ make install-jquery-plugins    ## optional
       $ make install-jquery-tokeninput ## optional

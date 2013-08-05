@@ -55,6 +55,9 @@ dist-hook:
 # Bootstrap version
 BOOTSTRAPV = 2.2.1
 
+# Hogan.js version
+HOGANVER = 2.0.0
+
 check-upgrade:
 	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg_upgrader.py $(top_srcdir) --upgrade-check
 
@@ -332,6 +335,26 @@ uninstall-bootstrap:
 	@echo "** The Twitter Bootstrap was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
+install-hogan-plugin:
+	@echo "***********************************************************"
+	@echo "** Installing Hogan.js, please wait...                   **"
+	@echo "***********************************************************"
+	rm -rf /tmp/hogan
+	mkdir /tmp/hogan
+	(cd /tmp/hogan && \
+	wget -O hogan-${HOGANVER}.js 'http://twitter.github.com/hogan.js/builds/${HOGANVER}/hogan-${HOGANVER}.js' && \
+	cp hogan-${HOGANVER}.js ${prefix}/var/www/js/hogan.js && \
+	rm -fr /tmp/hogan )
+	@echo "***********************************************************"
+	@echo "** Hogan.js was successfully installed.                  **"
+	@echo "***********************************************************"
+
+uninstall-hogan-plugin:
+	rm ${prefix}/var/www/js/hogan.js
+	@echo "***********************************************************"
+	@echo "** Hogan.js was successfully uninstalled.                **"
+	@echo "***********************************************************"
+
 install-jquery-tokeninput:
 	@echo "***********************************************************"
 	@echo "** Installing JQuery Tokeninput, please wait...          **"
@@ -392,7 +415,6 @@ uninstall-plupload-plugin:
 	@echo "***********************************************************"
 	@echo "** The Plupload was successfully uninstalled.            **"
 	@echo "***********************************************************"
-
 
 uninstall-pdfa-helper-files:
 	rm -f ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
