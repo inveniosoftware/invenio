@@ -82,30 +82,11 @@ class BibCatalogTicket(object):
         @return bool: True if created, False if not.
         """
         if not self.exists():
-            comment = False
-            if "\n" in self.body:
-                # The RT client does not support newlines in the initial body
-                # We need to add the ticket then add a comment.
-                comment = True
-                res = bibcatalog_system.ticket_submit(subject=self.subject,
-                                                      queue=self.queue,
-                                                      recordid=self.recid)
-            else:
-                res = bibcatalog_system.ticket_submit(subject=self.subject,
-                                                      queue=self.queue,
-                                                      text=self.body,
-                                                      recordid=self.recid)
-            try:
-                # The BibCatalog API returns int if successful or
-                # a string explaining the error if unsuccessful.
-                self.ticketid = int(res)
-            except ValueError:
-                # Not a number. Must be an error string
-                raise Exception(res)
-            if comment:
-                bibcatalog_system.ticket_comment(uid=None,
-                                                 ticketid=self.ticketid,
-                                                 comment=self.body)
+            self.ticketid = bibcatalog_system.ticket_submit(
+                                                  subject=self.subject,
+                                                  queue=self.queue,
+                                                  text=self.body,
+                                                  recordid=self.recid)
             return True
         return False
 

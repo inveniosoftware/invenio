@@ -26,6 +26,7 @@ pylib_DATA = bibcatalog.py \
              bibcatalog_system_rt_unit_tests.py \
              bibcatalog_system_email.py \
              bibcatalog_system_email_unit_tests.py \
+             bibcatalog_system_dummy.py \
              bibcatalog_task.py \
              bibcatalog_dblayer.py \
              bibcatalog_utils.py \

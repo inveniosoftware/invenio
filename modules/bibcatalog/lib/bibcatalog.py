@@ -25,10 +25,43 @@ or returns None if no ticket system is configured.
 """
 from invenio.config import CFG_BIBCATALOG_SYSTEM
 
-bibcatalog_system = None
 if CFG_BIBCATALOG_SYSTEM == 'RT':
     from invenio.bibcatalog_system_rt import BibCatalogSystemRT
     bibcatalog_system = BibCatalogSystemRT()
 elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
     from invenio.bibcatalog_system_email import BibCatalogSystemEmail
     bibcatalog_system = BibCatalogSystemEmail()
+else:
+    from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
+
+
+def get_bibcatalog_system():
+    if CFG_BIBCATALOG_SYSTEM == 'RT':
+        bibcatalog_system = BibCatalogSystemRT()
+    else:
+        bibcatalog_system = BibCatalogSystemDummy()
+
+    return bibcatalog_system
+
+
+class BibCatalogProxy(object):
+    def __init__(self):
+        self._bibcatalog_system = None
+
+    def _init(self):
+        self._bibcatalog_system = get_bibcatalog_system()
+
+    def __getattr__(self, *args):
+        if not self._bibcatalog_system:
+            self._init()
+
+        return getattr(self._bibcatalog_system, *args)
+
+    def __repr__(self):
+        if self._bibcatalog_system:
+            return "BibCatalogProxy for %s" % repr(self._bibcatalog_system)
+        else:
+            return object.__repr__(self)
+
+
+bibcatalog_system = BibCatalogProxy()

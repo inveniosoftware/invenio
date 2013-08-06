@@ -49,10 +49,10 @@ from invenio.docextract_task import task_run_core_wrapper, \
                                     split_ids
 from invenio.docextract_utils import setup_loggers
 from invenio.docextract_record import print_records
-from invenio.bibcatalog_system_rt import BibCatalogSystemRT
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
+from invenio.bibcatalog import bibcatalog_system
 
 
 def check_options():
@@ -241,11 +241,6 @@ def submit_bibupload(bibcatalog_system=None, records=None):
 
 def main():
     """Constructs the refextract bibtask."""
-    if CFG_BIBCATALOG_SYSTEM == 'RT':
-        bibcatalog_system = BibCatalogSystemRT()
-    else:
-        bibcatalog_system = None
-
     extra_vars = {'bibcatalog_system': bibcatalog_system, 'records': []}
     # Build and submit the task
     task_init(authorization_action='runrefextract',

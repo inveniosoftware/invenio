@@ -35,9 +35,10 @@ from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD, \
                            CFG_BIBEDIT_ADD_TICKET_RT_QUEUES
 
+
 class BibCatalogSystemRT(BibCatalogSystem):
 
-    BIBCATALOG_RT_SERVER = "" #construct this by http://user:password@RT_URL
+    BIBCATALOG_RT_SERVER = "" # construct this by http://user:password@RT_URL
 
     def check_system(self, uid=None):
         """return an error string if there are problems"""
@@ -92,47 +93,48 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return CFG_BIBCATALOG_SYSTEM_RT_CLI + " returned " + myout + " instead of 'matching' or '1'"
         return ""
 
-    def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
-                      date_from="", date_until="", status="", priority="", queue=""):
+    def ticket_search(self, uid, recordid=-1, subject="", text="", creator="",
+                      owner="", date_from="", date_until="", status="",
+                      priority="", queue=""):
         """returns a list of ticket ID's related to this record or by
            matching the subject, creator or owner of the ticket."""
 
-        search_atoms = [] #the search expression will be made by and'ing these
+        search_atoms = [] # the search expression will be made by and'ing these
         if (recordid > -1):
             #search by recid
             search_atoms.append("CF.{RecordID} = " + escape_shell_arg(str(recordid)))
-        if (len(subject) > 0):
+        if subject:
             #search by subject
             search_atoms.append("Subject like " + escape_shell_arg(str(subject)))
-        if (len(text) > 0):
+        if text:
             search_atoms.append("Content like " + escape_shell_arg(str(text)))
-        if (len(str(creator)) > 0):
+        if str(creator):
             #search for this person's bibcatalog_username in preferences
             creatorprefs = invenio.webuser.get_user_preferences(creator)
             creator = "Nobody can Have This Kind of Name"
-            if creatorprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" in creatorprefs:
                 creator = creatorprefs["bibcatalog_username"]
             search_atoms.append("Creator = " + escape_shell_arg(str(creator)))
-        if (len(str(owner)) > 0):
+        if str(owner):
             ownerprefs = invenio.webuser.get_user_preferences(owner)
             owner = "Nobody can Have This Kind of Name"
-            if ownerprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" in ownerprefs:
                 owner = ownerprefs["bibcatalog_username"]
             search_atoms.append("Owner = " + escape_shell_arg(str(owner)))
-        if (len(date_from) > 0):
+        if date_from:
             search_atoms.append("Created >= " + escape_shell_arg(str(date_from)))
-        if (len(date_until) > 0):
+        if date_until:
             search_atoms.append("Created <= " + escape_shell_arg(str(date_until)))
-        if (len(str(status)) > 0) and (type(status) == type("this is a string")):
+        if str(status) and isinstance(status, type("this is a string")):
             search_atoms.append("Status = " + escape_shell_arg(str(status)))
-        if (len(str(priority)) > 0):
-            #try to convert to int
+        if str(priority):
+            # Try to convert to int
             intpri = -1
             try:
                 intpri = int(priority)
-            except:
+            except ValueError:
                 pass
-            if (intpri > -1):
+            if intpri > -1:
                 search_atoms.append("Priority = " + str(intpri))
         if queue:
             search_atoms.append("Queue = " + escape_shell_arg(queue))
@@ -145,35 +147,67 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls -l \"" + searchexp + "\""
         command_out = self._run_rt_command(command, uid)
-        if command_out == None:
+        if command_out is None:
             return tickets
 
         statuses = []
         for line in command_out.split("\n"):
             #if there are matching lines they will look like NUM:subj.. so pick num
-            if (line.count('id: ticket/') > 0):
-                dummy, tnum = line.split('/') #get the ticket id
+            if line.count('id: ticket/') > 0:
+                dummy, tnum = line.split('/') # get the ticket id
                 try:
                     dummy = int(tnum)
                     tickets.append(tnum)
                 except:
                     pass
-            if (line.count('Status: ') > 0):
+            if line.count('Status: ') > 0:
                 dummy, tstatus = line.split('Status: ')
                 statuses.append(tstatus)
-        if (type(status) == type([])):
+        if isinstance(status, list):
             #take only those tickets whose status matches with one of the status list
             alltickets = tickets
             tickets = []
             for i in range(len(alltickets)):
                 tstatus = statuses[i]
                 tnum = alltickets[i]
-                if (status.count(tstatus) > 0): #match
+                if status.count(tstatus) > 0: # match
                     tickets.append(tnum)
         return tickets
 
-    def ticket_submit(self, uid=None, subject="", recordid=-1, text="", queue="",
-        priority="", owner="", requestor=""):
+    def ticket_submit(self, uid=None, subject="", recordid=-1, text="",
+                      queue="", priority="", owner="", requestor=""):
+        comment = False
+        if "\n" in text:
+            # The RT client does not support newlines in the initial body
+            # We need to add the ticket then add a comment.
+            comment = True
+            res = self._ticket_submit(subject=subject,
+                                      queue=queue,
+                                      recordid=recordid)
+        else:
+            res = self._ticket_submit(subject=subject,
+                                      queue=queue,
+                                      text=text,
+                                      recordid=recordid)
+
+        try:
+            # The BibCatalog API returns int if successful or
+            # a string explaining the error if unsuccessful.
+            ticketid = int(res)
+        except ValueError:
+            # Not a number. Must be an error string
+            raise Exception(res)
+
+        if comment:
+            self.ticket_comment(uid=None,
+                                ticketid=ticketid,
+                                comment=text)
+
+        return ticketid
+
+
+    def _ticket_submit(self, uid=None, subject="", recordid=-1, text="",
+                       queue="", priority="", owner="", requestor=""):
         """creates a ticket. return ticket num on success, otherwise None"""
         queueset = ""
         textset = ""
@@ -193,20 +227,20 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if owner:
             #get the owner name from prefs
             ownerprefs = invenio.webuser.get_user_preferences(owner)
-            if ownerprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" in ownerprefs:
                 owner = ownerprefs["bibcatalog_username"]
                 ownerset = " owner=" + escape_shell_arg(owner)
         if text:
             if '\n' in text:
                 # contains newlines (\n) return with error
-                return "Newlines are not allowed in text parameter. Use ticket_comment() instead."
+                raise Exception("Newlines are not allowed in text parameter. Use ticket_comment() instead.")
             else:
                 textset = " text=" + escape_shell_arg(text)
         # make a command.. note that all set 'set' parts have been escaped
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " create -t ticket set " + subjectset + recidset + \
                   queueset + textset + priorityset + ownerset + requestorset
         command_out = self._run_rt_command(command, uid)
-        if command_out == None:
+        if command_out is None:
             return None
         inum = -1
         for line in command_out.split("\n"):
@@ -214,7 +248,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
                 stuff = line.split(' ')
                 try:
                     inum = int(stuff[2])
-                except:
+                except ValueError:
                     pass
         if inum > 0:
             return inum
@@ -222,10 +256,11 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
     def ticket_comment(self, uid, ticketid, comment):
         """comment on a given ticket. Returns 1 on success, 0 on failure"""
-        command = '%s comment -m %s %s' % (CFG_BIBCATALOG_SYSTEM_RT_CLI, \
-                                           escape_shell_arg(comment), str(ticketid))
+        command = '%s comment -m %s %s' % (CFG_BIBCATALOG_SYSTEM_RT_CLI,
+                                           escape_shell_arg(comment),
+                                           str(ticketid))
         command_out = self._run_rt_command(command, uid)
-        if command_out == None:
+        if command_out is None:
             return None
         return 1
 
@@ -237,7 +272,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         """steal a ticket from an RT user. Returns 1 on success, 0 on failure"""
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " steal " + str(ticketid)
         command_out = self._run_rt_command(command, uid)
-        if command_out == None:
+        if command_out is None:
             return 0
         return 1
 
@@ -251,40 +286,40 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return 0
         #check attribute
         setme = ""
-        if (attribute == 'priority'):
+        if attribute == 'priority':
             try:
                 dummy = int(new_value)
-            except:
+            except ValueError:
                 return 0
             setme = "set Priority=" + str(new_value)
-        if (attribute == 'subject'):
+        if attribute == 'subject':
             subject = escape_shell_arg(new_value)
-            setme = "set Subject='" + subject +"'"
+            setme = "set Subject='" + subject + "'"
 
-        if (attribute == 'owner'):
+        if attribute == 'owner':
             #convert from invenio to RT
             ownerprefs = invenio.webuser.get_user_preferences(new_value)
-            if not ownerprefs.has_key("bibcatalog_username"):
+            if "bibcatalog_username" not in ownerprefs:
                 return 0
             else:
                 owner = escape_shell_arg(ownerprefs["bibcatalog_username"])
-            setme = " set owner='" + owner +"'"
+            setme = " set owner='" + owner + "'"
 
-        if (attribute == 'status'):
-            setme = " set status='" + escape_shell_arg(new_value) +"'"
+        if attribute == 'status':
+            setme = " set status='" + escape_shell_arg(new_value) + "'"
 
-        if (attribute == 'queue'):
-            setme = " set queue='" + escape_shell_arg(new_value) +"'"
+        if attribute == 'queue':
+            setme = " set queue='" + escape_shell_arg(new_value) + "'"
 
         #make sure ticketid is numeric
         try:
             dummy = int(ticketid)
-        except:
+        except ValueError:
             return 0
 
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " edit ticket/" + str(ticketid) + setme
         command_out = self._run_rt_command(command, uid)
-        if command_out == None:
+        if command_out is None:
             return 0
         mylines = command_out.split("\n")
         for line in mylines:
@@ -295,7 +330,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
     def ticket_get_attribute(self, uid, ticketid, attribute):
         """return an attribute of a ticket"""
         ticinfo = self.ticket_get_info(uid, ticketid, [attribute])
-        if ticinfo.has_key(attribute):
+        if attribute in ticinfo:
             return ticinfo[attribute]
         return None
 
@@ -303,17 +338,17 @@ class BibCatalogSystemRT(BibCatalogSystem):
         """return ticket info as a dictionary of pre-defined attribute names.
            Or just those listed in attrlist.
            Returns None on failure"""
-        #make sure ticketid is numeric
+        # Make sure ticketid is numeric
         try:
             dummy = int(ticketid)
-        except:
+        except ValueError:
             return 0
         if attributes is None:
             attributes = []
 
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid)
         command_out = self._run_rt_command(command, uid)
-        if command_out == None:
+        if command_out is None:
             return 0
 
         tdict = {}
@@ -323,10 +358,10 @@ class BibCatalogSystemRT(BibCatalogSystem):
                 tvalue = tvaluen.rstrip()
                 tdict[tattr] = tvalue
 
-        #query again to get attachments -> Contents
+        # Query again to get attachments -> Contents
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/"
         command_out = self._run_rt_command(command, uid)
-        if command_out == None:
+        if command_out is None:
             return 0
 
         attachments = []
@@ -335,47 +370,47 @@ class BibCatalogSystemRT(BibCatalogSystem):
             for match in regex.findall(line):
                 attachments.append(match.split(":")[0])
 
-        #query again for each attachment
+        # Query again for each attachment
         for att in attachments:
             command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " show ticket/" + str(ticketid) + "/attachments/" + att
             command_out = self._run_rt_command(command, uid)
-            if command_out == None:
+            if command_out is None:
                 return 0
-            #get the contents line
+            # Get the contents line
             for line in command_out.split("\n"):
                 if line.count("Content: ") > 0:
                     cstuff = line.split("Content: ")
                     tdict['Text'] = cstuff[1].rstrip()
 
         if (len(tdict) > 0):
-            #iterate over TICKET_ATTRIBUTES to make a canonical ticket
+            # Iterate over TICKET_ATTRIBUTES to make a canonical ticket
             candict = {}
             for f in BibCatalogSystem.TICKET_ATTRIBUTES:
                 tcased = f.title()
-                if tdict.has_key(tcased):
+                if tcased in tdict:
                     candict[f] = tdict[tcased]
-            if tdict.has_key('CF.{RecordID}'):
+            if 'CF.{RecordID}' in tdict:
                 candict['recordid'] = tdict['CF.{RecordID}']
-            if tdict.has_key('id'):
+            if 'id' in tdict:
                 candict['ticketid'] = tdict['id']
-            #make specific URL attributes:
-            url_display = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Display.html?id="+str(ticketid)
+            # Make specific URL attributes:
+            url_display = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Display.html?id=" + str(ticketid)
             candict['url_display'] = url_display
-            url_close = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Update.html?Action=Comment&DefaultStatus=resolved&id="+str(ticketid)
+            url_close = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Update.html?Action=Comment&DefaultStatus=resolved&id=" + str(ticketid)
             candict['url_close'] = url_close
-            url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/ModifyAll.html?id="+str(ticketid)
+            url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/ModifyAll.html?id=" + str(ticketid)
             candict['url_modify'] = url_modify
-            #change the ticket owner into invenio UID
-            if tdict.has_key('owner'):
+            # Change the ticket owner into invenio UID
+            if 'owner' in tdict:
                 rt_owner = tdict["owner"]
                 uid = invenio.webuser.get_uid_based_on_pref("bibcatalog_username", rt_owner)
                 candict['owner'] = uid
-            if len(attributes) == 0: #return all fields
+            if len(attributes) == 0: # return all fields
                 return candict
-            else: #return only the fields that were requested
+            else: # return only the fields that were requested
                 tdict = {}
                 for myatt in attributes:
-                    if candict.has_key(myatt):
+                    if myatt in candict:
                         tdict[myatt] = candict[myatt]
                 return tdict
         else:
@@ -389,13 +424,13 @@ class BibCatalogSystemRT(BibCatalogSystem):
         command_out = self._run_rt_command(command, uid)
         spl = command_out.split("\n")
         queues = []
-        for i,line in enumerate(spl):
+        for i, line in enumerate(spl):
             if 'id' in line:
-                id = line.split("/")[1]
+                _id = line.split("/")[1]
                 # name is on the next line after id
                 name = spl[i+1].split(": ")[1]
                 if name in CFG_BIBEDIT_ADD_TICKET_RT_QUEUES:
-                    queue = {'id': id, 'name': name}
+                    queue = {'id': _id, 'name': name}
                     queues.append(queue)
         return queues
 
@@ -429,7 +464,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         os.environ["RTUSER"] = username
         os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
         passwd = escape_shell_arg(passwd)
-        error_code, myout, dummyerr = run_shell_command("echo "+passwd+" | " + command)
+        error_code, myout, dummyerr = run_shell_command("echo " + passwd + " | " + command)
         if error_code > 0:
-            raise ValueError, 'Problem running "%s": %d' % (command, error_code)
+            raise ValueError('Problem running "%s": %d' % (command, error_code))
         return myout
