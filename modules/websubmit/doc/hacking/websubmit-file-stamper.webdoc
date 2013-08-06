@@ -53,6 +53,8 @@ def stamp_file(options):
                     - "foreground": stamp applied to the foreground layer;
            + verbosity: (integer) - the verbosity level under which the program
               is to run;
+           + skip-metadata: (boolean) - whether to skip copying the metadata
+              or not;
         So, an example of the returned dictionary would be something like:
               { 'latex-template'      : "demo-stamp-left.tex",
                 'latex-template-var'  : { "REPORTNUMBER" : "TEST-2008-001",
@@ -63,6 +65,7 @@ def stamp_file(options):
                 'stamp'               : "first",
                 'layer'               : "background",
                 'verbosity'           : 0,
+                'skip-metadata'       : False,
               }
 
        @return: (tuple) - consisting of two strings:
