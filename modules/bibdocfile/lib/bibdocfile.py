@@ -115,8 +115,9 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS, \
     CFG_BIBDOCFILE_ENABLE_BIBDOCFSINFO_CACHE, \
     CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
-    CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES
-
+    CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
+    CFG_BIBCATALOG_SYSTEM
+from invenio.bibcatalog import bibcatalog_system
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.pluginutils import PluginContainer
@@ -2505,7 +2506,8 @@ class BibDoc(object):
         for docfile in docfiles:
             if get_superformat_from_format(docfile.get_format()) == superformat:
                 return docfile
-        raise InvenioBibDocFileError, "No file for doc %i of format '%s', version '%s'" % (self.id, docformat, version)
+
+        raise InvenioBibDocFileError("No file for doc %i of format '%s', version '%s'" % (self.id, docformat, version))
 
     def list_versions(self):
         """

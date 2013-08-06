@@ -38,7 +38,7 @@ from invenio.solrutils_bibindex_indexer import solr_add_fulltext
 from invenio.xapianutils_bibindex_indexer import xapian_add
 from invenio.bibdocfile import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, download_url, \
-     BibRecDocs
+     BibRecDocs, InvenioBibDocFileError
 from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibtask import write_message
 from invenio.errorlib import register_exception
@@ -89,7 +89,11 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
         try:
             if bibdocfile_url_p(url_direct_or_indirect):
                 write_message("... %s is an internal document" % url_direct_or_indirect, verbose=2)
-                bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
+                try:
+                    bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
+                except InvenioBibDocFileError:
+                    # Outdated 8564 tag
+                    return []
                 indexer = get_idx_indexer('fulltext')
                 if indexer != 'native':
                     # A document might belong to multiple records
@@ -98,7 +102,11 @@ class BibIndexFulltextTokenizer(BibIndexDefaultTokenizer):
                         # Adds fulltexts of all files once per records
                         if not recid in fulltext_added:
                             bibrecdocs = BibRecDocs(recid)
-                            text = bibrecdocs.get_text()
+                            try:
+                                text = bibrecdocs.get_text()
+                            except InvenioBibDocFileError:
+                                # Invalid PDF
+                                continue
                             if indexer == 'SOLR' and CFG_SOLR_URL:
                                 solr_add_fulltext(recid, text)
                             elif indexer == 'XAPIAN' and CFG_XAPIAN_ENABLED:

@@ -189,7 +189,6 @@ def get_author_canonical_ids_for_recid(recID):
             lwords.append(author_canonical_id)
     return lwords
 
-
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Atomically swap reindexed temporary table with the original one.
     Delete the now-old one."""
