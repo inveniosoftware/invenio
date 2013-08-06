@@ -212,9 +212,20 @@ sub_non_alnum = re.compile('[^0-9a-zA-Z]+')
 fix_tag_name = lambda s: sub_non_alnum.sub('_', s.lower())
 
 
-class BfeElements(object):
+class LazyTemplateContextFunctionsCache(object):
     """Loads bibformat elements using plugin builder and caches results."""
 
+    @cached_property
+    def template_context_functions(self):
+        """Returns template context functions"""
+        modules = autodiscover_modules(['invenio.template_context_functions'], 'bfn_.+')
+        elem = {}
+        for m in modules:
+            register_func = getattr(m, 'template_context_function', None)
+            if register_func and isinstance(register_func, types.FunctionType):
+                 elem[m.__name__.split('.')[-1]] = register_func
+
+        return elem
 
     @cached_property
     def bibformat_elements(self):
@@ -245,8 +256,11 @@ class BfeElements(object):
                 return out.decode('utf-8')
             return _bfe_element
 
-        bfe_from_files = dict((name.lower(), insert(name.lower()))
+        # Old bibformat templates
+        bfn_from_files = dict((name.lower(), insert(name.lower()))
                               for name in self.bibformat_elements.keys())
+        # Update with new template context functions
+        bfn_from_files.update(self.template_context_functions)
 
         bfe_from_tags = {}
         if has_app_context():
@@ -260,10 +274,10 @@ class BfeElements(object):
                                                  db.session.query(Tag.name).all()))
 
         # overwrite functions from tag table with functions from files
-        bfe_from_tags.update(bfe_from_files)
+        bfe_from_tags.update(bfn_from_files)
         return bfe_from_tags
 
-BFE_ELEMENTS = BfeElements()
+TEMPLATE_CONTEXT_FUNCTIONS_CACHE = LazyTemplateContextFunctionsCache()
 
 
 def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
@@ -563,7 +577,7 @@ def format_with_format_template(format_template_filename, bfo,
             CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
             recid=bfo.recID,
             record=record,
-            bfo=bfo, **BFE_ELEMENTS.functions).encode('utf-8')
+            bfo=bfo, **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions).encode('utf-8')
         #except Exception:
         #    register_exception()
 

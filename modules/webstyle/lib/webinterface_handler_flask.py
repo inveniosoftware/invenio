@@ -398,6 +398,14 @@ def create_invenio_flask_app(**kwargs_config):
                     force_lower=False)
     del _gravatar
 
+    # Let's set the user language
+    from invenio.webinterface_handler_flask_utils import guess_language
+    _app.before_request(guess_language)
+
+    # Let's extend application with more custom templete filters
+    from invenio.jinja2utils import inject_utils
+    _app.context_processor(inject_utils)
+
     @_login_manager.user_loader
     def _load_user(uid):
         """
@@ -419,106 +427,6 @@ def create_invenio_flask_app(**kwargs_config):
         for func in g._template_context_processor:
             context.update(func())
         return context
-
-    @_app.before_request
-    def _guess_language():
-        """
-        Before every request being handled, let's compute the language needed to
-        return the answer to the client.
-
-        This information will then be available in the session['ln'] and in g.ln.
-
-        Additionally under g._ an already configured internationalization function
-        will be available (configured to return unicode objects).
-        """
-        required_ln = None
-        try:
-            values = request.values
-        except:
-            values = {}
-        if "ln" in values:
-            ## If ln is specified explictly as a GET or POST argument
-            ## let's take it!
-            passed_ln = str(values["ln"])
-            required_ln = wash_language(passed_ln)
-            if passed_ln != required_ln:
-                ## But only if it was a valid language
-                required_ln = None
-        if required_ln:
-            ## Ok it was. We store it in the session.
-            session["ln"] = required_ln
-        if not "ln" in session:
-            ## If there is no language saved into the session...
-            if "user_info" in session and session["user_info"].get("language"):
-                ## ... and the user is logged in, we try to take it from its
-                ## settings.
-                session["ln"] = session["user_info"]["language"]
-            else:
-                ## Otherwise we try to guess it from its request headers
-                for value, quality in request.accept_languages:
-                    value = str(value)
-                    ln = wash_language(value)
-                    if ln == value or ln[:2] == value[:2]:
-                        session["ln"] = ln
-                        break
-                else:
-                    ## Too bad! We stick to the default :-)
-                    session["ln"] = CFG_SITE_LANG
-        ## Well, let's make it global now
-        g.ln = session["ln"]
-        g._ = gettext_set_language(g.ln, use_unicode=True)
-
-    @_app.context_processor
-    def _inject_utils():
-        """
-        This will add some more variables and functions to the Jinja2 to execution
-        context. In particular it will add:
-
-        - `url_for`: an Invenio specific wrapper of Flask url_for, that will let you
-                     obtain URLs for non Flask-native handlers (i.e. not yet ported
-                     Invenio URLs)
-        - `breadcrumbs`: this will be a list of three-elements tuples, containing
-                     the hierarchy of Label -> URLs of navtrails/breadcrumbs.
-        - `_`: this can be used to automatically translate a given string.
-        - `is_language_rtl`: is True if the chosen language should be read right to left
-        """
-        def invenio_url_for(endpoint, **values):
-            try:
-                return url_for(endpoint, **values)
-            except BuildError:
-                if endpoint.startswith('http://') or endpoint.startswith('https://'):
-                    return endpoint
-                if endpoint.startswith('.'):
-                    endpoint = request.blueprint + endpoint
-                return create_url('/' + '/'.join(endpoint.split('.')), values, False).decode('utf-8')
-
-        if request.endpoint in current_app.config['breadcrumbs_map']:
-            breadcrumbs = current_app.config['breadcrumbs_map'][request.endpoint]
-        elif request.endpoint:
-            breadcrumbs = [(_('Home'), '')] + current_app.config['breadcrumbs_map'].get(request.endpoint.split('.')[0], [])
-        else:
-            breadcrumbs = [(_('Home'), '')]
-
-        user = current_user._get_current_object()
-        canonical_url, alternate_urls = get_canonical_and_alternates_urls(
-            request.environ['PATH_INFO'])
-        alternate_urls = dict((ln.replace('_', '-'), alternate_url)
-                              for ln, alternate_url in alternate_urls.iteritems())
-
-        _guess_language()
-
-        from invenio.bibfield import get_record  # should not be global due to bibfield_config
-        return dict(_=lambda *args, **kwargs: g._(*args, **kwargs),
-                    current_user=user,
-                    get_css_bundle=_app.jinja_env.get_css_bundle,
-                    get_js_bundle=_app.jinja_env.get_js_bundle,
-                    is_language_rtl=is_language_rtl,
-                    canonical_url=canonical_url,
-                    alternate_urls=alternate_urls,
-                    get_record=get_record,
-                    url_for=invenio_url_for,
-                    breadcrumbs=breadcrumbs,
-                    )
 
     def _invenio_blueprint_plugin_builder(plugin_name, plugin_code):
         """

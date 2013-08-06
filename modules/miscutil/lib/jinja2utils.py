@@ -19,13 +19,15 @@
 from operator import itemgetter
 from jinja2 import nodes
 from jinja2.ext import Extension
-from flask import g, _request_ctx_stack
+from flask import g, request, current_app, _request_ctx_stack, url_for
 
 try:
     from markupsafe import Markup as jinja2_Markup, escape as jinja2_escape
 except ImportError:
     from jinja2._markupsafe import Markup as jinja2_Markup, \
         escape as jinja2_escape
+
+from invenio.datastructures import LazyDict
 
 ENV_PREFIX = '_collected_'
 
@@ -365,6 +367,78 @@ class Markup(jinja2_Markup):
         return jinja2_Markup.__new__(cls, base=base, encoding=encoding,
                                      errors=errors)
 
+def load_template_context_filters():
+    from invenio.importutils import autodiscover_modules
+    modules = autodiscover_modules(['invenio.template_context_filters'],
+                                   'tfi_.+')
+    filters = {}
+    for m in modules:
+        register_func = getattr(m, 'template_context_filter', None)
+        if register_func and isinstance(register_func, types.FunctionType):
+            filters[m.__name__.split('.')[-1]] = register_func
+    return output
+
+TEMPLATE_CONTEXT_FILTERS = LazyDict(load_template_context_filters)
+
+
+def inject_utils():
+    """
+    This will add some more variables and functions to the Jinja2 to execution
+    context. In particular it will add:
+
+    - `url_for`: an Invenio specific wrapper of Flask url_for, that will let you
+                 obtain URLs for non Flask-native handlers (i.e. not yet ported
+                 Invenio URLs)
+    - `breadcrumbs`: this will be a list of three-elements tuples, containing
+                 the hierarchy of Label -> URLs of navtrails/breadcrumbs.
+    - `_`: this can be used to automatically translate a given string.
+    - `is_language_rtl`: is True if the chosen language should be read right to left
+    """
+    from werkzeug.routing import BuildError
+
+    from invenio.messages import is_language_rtl
+    from invenio.webinterface_handler_flask_utils import _, guess_language
+    from invenio.webuser_flask import current_user
+    from invenio.urlutils import create_url, get_canonical_and_alternates_urls
+
+    def invenio_url_for(endpoint, **values):
+        try:
+            return url_for(endpoint, **values)
+        except BuildError:
+            if endpoint.startswith('http://') or endpoint.startswith('https://'):
+                return endpoint
+            if endpoint.startswith('.'):
+                endpoint = request.blueprint + endpoint
+            return create_url('/' + '/'.join(endpoint.split('.')), values, False).decode('utf-8')
+
+    if request.endpoint in current_app.config['breadcrumbs_map']:
+        breadcrumbs = current_app.config['breadcrumbs_map'][request.endpoint]
+    elif request.endpoint:
+        breadcrumbs = [(_('Home'), '')] + current_app.config['breadcrumbs_map'].get(request.endpoint.split('.')[0], [])
+    else:
+        breadcrumbs = [(_('Home'), '')]
+
+    user = current_user._get_current_object()
+    canonical_url, alternate_urls = get_canonical_and_alternates_urls(
+        request.environ['PATH_INFO'])
+    alternate_urls = dict((ln.replace('_', '-'), alternate_url)
+                          for ln, alternate_url in alternate_urls.iteritems())
+
+    guess_language()
+
+    from invenio.bibfield import get_record  # should not be global due to bibfield_config
+    return dict(_=lambda *args, **kwargs: g._(*args, **kwargs),
+                current_user=user,
+                get_css_bundle=current_app.jinja_env.get_css_bundle,
+                get_js_bundle=current_app.jinja_env.get_js_bundle,
+                is_language_rtl=is_language_rtl,
+                canonical_url=canonical_url,
+                alternate_urls=alternate_urls,
+                get_record=get_record,
+                url_for=invenio_url_for,
+                breadcrumbs=breadcrumbs,
+                **TEMPLATE_CONTEXT_FILTERS
+                )
 
 def extend_application_template_filters(app):
     """
@@ -384,6 +458,8 @@ def extend_application_template_filters(app):
     from invenio.dateutils import convert_datetext_to_dategui, \
         convert_datestruct_to_dategui, pretty_date
     from invenio.webmessage_mailutils import email_quoted_txt2html
+    from invenio.config import CFG_PYLIBDIR
+    from invenio.pluginutils import PluginContainer
 
     test_not_empty = lambda v: v is not None and v != ''
 

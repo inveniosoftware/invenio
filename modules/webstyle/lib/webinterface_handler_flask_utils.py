@@ -25,11 +25,14 @@ from functools import wraps
 from flask import Blueprint, current_app, request, session, redirect, abort, g, \
                   render_template, jsonify, get_flashed_messages, flash, \
                   Response, _request_ctx_stack, stream_with_context, Request
-from invenio.webuser_flask import current_user, login_required
-from invenio.urlutils import create_url
-from invenio.sqlalchemyutils import db
-from invenio.cache import cache
 from sqlalchemy.sql import operators
+
+from invenio.cache import cache
+from invenio.config import CFG_SITE_LANG
+from invenio.messages import wash_language, gettext_set_language
+from invenio.sqlalchemyutils import db
+from invenio.urlutils import create_url
+from invenio.webuser_flask import current_user, login_required
 
 ## Placemark for the i18n function
 _ = lambda x: x
@@ -434,3 +437,51 @@ def wash_urlargd(form, content):
             raise ValueError('cannot cast form value %s of type %r into type %r' % (value, src_type, dst_type))
 
     return result
+
+
+def guess_language():
+    """
+    Computes the language needed to return the answer to the client.
+
+    This information will then be available in the session['ln'] and in g.ln.
+
+    Additionally under g._ an already configured internationalization function
+    will be available (configured to return unicode objects).
+    """
+    required_ln = None
+    try:
+        values = request.values
+    except:
+        values = {}
+    if "ln" in values:
+        ## If ln is specified explictly as a GET or POST argument
+        ## let's take it!
+        passed_ln = str(values["ln"])
+        required_ln = wash_language(passed_ln)
+        if passed_ln != required_ln:
+            ## But only if it was a valid language
+            required_ln = None
+    if required_ln:
+        ## Ok it was. We store it in the session.
+        session["ln"] = required_ln
+    if not "ln" in session:
+        ## If there is no language saved into the session...
+        if "user_info" in session and session["user_info"].get("language"):
+            ## ... and the user is logged in, we try to take it from its
+            ## settings.
+            session["ln"] = session["user_info"]["language"]
+        else:
+            ## Otherwise we try to guess it from its request headers
+            for value, quality in request.accept_languages:
+                value = str(value)
+                ln = wash_language(value)
+                if ln == value or ln[:2] == value[:2]:
+                    session["ln"] = ln
+                    break
+            else:
+                ## Too bad! We stick to the default :-)
+                session["ln"] = CFG_SITE_LANG
+    ## Well, let's make it global now
+    g.ln = session["ln"]
+    g._ = gettext_set_language(g.ln, use_unicode=True)
+
