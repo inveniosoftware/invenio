@@ -287,6 +287,11 @@ def search(collection, p, of, so, rm):
     argd = argd_orig = wash_search_urlargd(request.args)
     argd['of'] = 'id'
 
+    # update search arguments with the search user preferences
+    if 'rg' not in request.values and current_user.get('rg'):
+        argd['rg'] = current_user.get('rg')
+    rg = int(argd['rg'])
+
     collection_breadcrumbs(collection)
 
     qid = get_search_query_id(**argd)
@@ -297,7 +302,7 @@ def search(collection, p, of, so, rm):
 
     ctx = dict(facets=FACETS.config(collection=collection, qid=qid),
                records=len(get_current_user_records_that_can_be_displayed(qid)),
-               qid=qid,
+               qid=qid, rg=rg,
                create_nearest_terms_box=lambda: _create_neareset_term_box(argd_orig),
                easy_search_form=EasySearchForm(csrf_enabled=False))
 

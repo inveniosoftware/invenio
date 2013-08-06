@@ -32,7 +32,7 @@ from invenio.settings import Settings, UserSettingsStorage, \
 
 class WebSearchSettings(Settings):
 
-    keys = ['of', 'websearch_hotkeys']
+    keys = ['rg', 'websearch_hotkeys', 'c']
     form_builder = WebSearchUserSettingsForm
     storage_builder = UserSettingsStorage
 

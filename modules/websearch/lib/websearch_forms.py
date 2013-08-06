@@ -27,7 +27,8 @@ from invenio.wtforms_utils import InvenioBaseForm, AutocompleteField, \
 from wtforms import TextField
 from wtforms import FormField, SelectField
 from wtforms import Form as WTFormDefault
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField, \
+    QuerySelectMultipleField
 
 
 class JournalForm(WTFormDefault):
@@ -55,8 +56,17 @@ class EasySearchForm(InvenioBaseForm):
     journal = FormField(JournalForm, widget=RowWidget())
 
 
+def get_collection():
+    from invenio.websearch_model import Collection
+    collections = Collection.query.all()
+    return [coll for coll in collections if not coll.is_restricted]
+
+
 class WebSearchUserSettingsForm(InvenioBaseForm):
-    of = SelectField(_('Results per page'),
+    rg = SelectField(_('Results per page'),
                     choices=[('10', '10'), ('25', '25'), ('50', '50'), ('100', '100')])
     websearch_hotkeys = SelectField(_('Hotkeys'), choices=[('0', _('Disable')),
-                                                          ('1', _('Enable'))])
+                                                           ('1', _('Enable'))])
+    c = QuerySelectMultipleField(_('Collections'), query_factory=get_collection,
+                                 get_pk=lambda c: c.name,
+                                 get_label=lambda c: c.name_ln)
