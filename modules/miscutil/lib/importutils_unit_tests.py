@@ -38,6 +38,12 @@ class TestImportUtils(unittest.TestCase):
         modules = autodiscover_modules(['invenio'], related_name_re='(.+)_config\.py')
         assert(len(modules) > 10)
         assert(None not in modules)
+        modules = autodiscover_modules(['invenio.not_an_existing_folder'], related_name_re='foo_.+\.py')
+        assert(len(modules) == 0)
+        assert(None not in modules)
+        modules = autodiscover_modules(['invenio.bibformat_elements'], related_name_re='not_an_existing_file_name_.+\.yp')
+        assert(len(modules) == 0)
+        assert(None not in modules)
 
 
 TEST_SUITE = make_test_suite(TestImportUtils,)

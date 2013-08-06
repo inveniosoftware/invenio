@@ -47,7 +47,7 @@ def autodiscover_modules(packages, related_name_re='*.py'):
     global _RACE_PROTECTION
 
     if _RACE_PROTECTION:
-        return
+        return []
     _RACE_PROTECTION = True
     modules = []
     try:
@@ -77,7 +77,7 @@ def find_related_modules(package, related_name_re='(.+)\.py'):
             pkg = __import__(package_elements[0], globals(), locals(), [])
         pkg_path = pkg.__path__
     except AttributeError:
-        return
+        return []
 
     # Find all modules named according to related_name
     p = re.compile(related_name_re)
@@ -92,8 +92,6 @@ def find_related_modules(package, related_name_re='(.+)\.py'):
     for related_name in candidates:
         modules.append(import_related_module(package, pkg_path, related_name))
 
-    if not modules:
-        return
     return modules
 
 
