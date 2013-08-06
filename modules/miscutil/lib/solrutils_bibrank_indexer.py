@@ -44,20 +44,29 @@ if CFG_SOLR_URL:
     SOLR_CONNECTION = solr.SolrConnection(CFG_SOLR_URL) # pylint: disable=E1101
 
 
-def solr_add_all(lower_recid, upper_recid):
-    range_length = upper_recid - lower_recid + 1
+def solr_add_ranges(id_ranges):
     sub_range_length = task_get_option("flush")
+    id_ranges_to_index = []
+    for id_range in id_ranges:
+        lower_recid = id_range[0]
+        upper_recid = id_range[1]
+        i_low = lower_recid
+        while i_low <= upper_recid:
+            i_up = min(i_low + sub_range_length - 1, upper_recid)
+            id_ranges_to_index.append((i_low, i_up))
+            i_low += sub_range_length
 
-    processed_amount = 0
-    i_low = lower_recid
-    while i_low <= upper_recid:
-        i_up = min(i_low + sub_range_length - 1, upper_recid)
-        processed_amount += i_up - i_low + 1
-        solr_add_range(i_low, i_up)
-        status_msg = "......processed %s/%s records" % (processed_amount, range_length)
+    # Indexes latest records first by reversing
+    # This allows the ranker to return better results during long indexing
+    # runs as the ranker cuts the hitset using latest records
+    id_ranges_to_index.reverse()
+    for id_range_to_index in id_ranges_to_index:
+        lower_recid = id_range_to_index[0]
+        upper_recid = id_range_to_index[1]
+        status_msg = "Solr ranking indexer called for %s-%s" % (lower_recid, upper_recid)
         write_message(status_msg)
         task_update_progress(status_msg)
-        i_low += sub_range_length
+        solr_add_range(lower_recid, upper_recid)
 
 
 def solr_add_range(lower_recid, upper_recid):
@@ -143,27 +152,19 @@ def word_index(run): # pylint: disable=W0613
     """
     Runs the indexing task.
     """
+    # Explicitly set ids
     id_option = task_get_option("id")
-    # Indexes passed ids and id ranges
     if len(id_option):
-        for id_elem in id_option:
-            lower_recid= id_elem[0]
-            upper_recid = id_elem[1]
-            write_message("Solr ranking indexer called for %s-%s" % (lower_recid, upper_recid))
-            solr_add_all(lower_recid, upper_recid)
+        solr_add_ranges([(id_elem[0], id_elem[1]) for id_elem in id_option])
 
     # Indexes modified ids since last run
     else:
         starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         id_ranges = get_recIDs_by_date()
-        if not id_ranges:
-            write_message("No new records. Solr index is up to date")
-        else:
-            for ids_range in id_ranges:
-                lower_recid= ids_range[0]
-                upper_recid = ids_range[1]
-                write_message("Solr ranking indexer called for %s-%s" % (lower_recid, upper_recid))
-                solr_add_all(lower_recid, upper_recid)
+        if id_ranges:
+            solr_add_ranges([(id_range[0], id_range[1]) for id_range in id_ranges])
             run_sql('UPDATE rnkMETHOD SET last_updated=%s WHERE name="wrd"', (starting_time, ))
+        else:
+            write_message("No new records. Solr index is up to date")
 
     write_message("Solr ranking indexer completed")
