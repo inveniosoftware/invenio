@@ -43,6 +43,9 @@ solrdirname = apache-solr-3.1.0
 solrdir = $(prefix)/lib/$(solrdirname)
 solrutils_dir=$(CURDIR)/modules/miscutil/lib/solrutils
 
+# for recline.js
+RECLINEVER=master
+
 CLASSPATH=.:${solrdir}/dist/solrj-lib/commons-io-1.4.jar:${solrdir}/dist/apache-solr-core-*jar:${solrdir}/contrib/jzlib-1.0.7.jar:${solrdir}/dist/apache-solr-solrj-3.1.0.jar:${solrdir}/dist/solrj-lib/slf4j-api-1.5.5.jar:${solrdir}/dist/*:${solrdir}/contrib/basic-lucene-libs/*:${solrdir}/contrib/analysis-extras/lucene-libs/*:${solrdir}/dist/solrj-lib/*
 
 # git-version-get stuff:
@@ -411,6 +414,35 @@ uninstall-typeahead-plugin:
 	rm ${prefix}/var/www/js/typeahead.min.js
 	@echo "***********************************************************"
 	@echo "** typeahead.js was successfully uninstalled.            **"
+
+install-recline:
+	@echo "***********************************************************"
+	@echo "** Installing Recline JS, please wait...          **"
+	@echo "***********************************************************"
+	rm -rf /tmp/invenio-recline
+	mkdir /tmp/invenio-recline
+	(cd /tmp/invenio-recline && \
+	wget -O recline.zip 'https://github.com/okfn/recline/archive/${RECLINEVER}.zip' && \
+	unzip -u recline.zip && \
+	rm recline.zip && \
+	mv *recline* recline && \
+	mkdir -p ${prefix}/var/www/js/recline/css && \
+	mkdir -p ${prefix}/var/www/js/recline/dist && \
+	mkdir -p ${prefix}/var/www/js/recline/src && \
+	mkdir -p ${prefix}/var/www/js/recline/vendor && \
+	cp -R recline/css ${prefix}/var/www/js/recline/ && \
+	cp -R recline/src ${prefix}/var/www/js/recline/ && \
+	cp -R recline/dist ${prefix}/var/www/js/recline/ && \
+	cp -R recline/vendor ${prefix}/var/www/js/recline/ && \
+	rm -rf /tmp/invenio-recline )
+	@echo "***********************************************************"
+	@echo "** The Recline JS was successfully installed.     **"
+	@echo "***********************************************************"
+
+uninstall-recline:
+	rm -Rf ${prefix}/var/www/js/recline
+	@echo "***********************************************************"
+	@echo "** The Recline JS was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
 install-jquery-tokeninput:
