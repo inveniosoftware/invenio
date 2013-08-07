@@ -72,7 +72,7 @@ from invenio.plotextractor_converter import untar
 from invenio.plotextractor import process_single, get_defaults
 from invenio.shellutils import run_shell_command, Timeout
 from invenio.bibedit_utils import record_find_matching_fields
-from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.oai_harvest_dblayer import get_oai_src_by_name, \
                                         get_all_oai_src, \
                                         update_lastrun, \
@@ -1239,8 +1239,8 @@ def create_ticket(queue, subject, text=""):
     @rtype: int or None
     """
     # Initialize BibCatalog connection as default user, if possible
-    if bibcatalog_system is not None:
-        bibcatalog_response = bibcatalog_system.check_system()
+    if BIBCATALOG_SYSTEM is not None:
+        bibcatalog_response = BIBCATALOG_SYSTEM.check_system()
     else:
         bibcatalog_response = "No ticket system configured"
     if bibcatalog_response != "":
@@ -1248,13 +1248,13 @@ def create_ticket(queue, subject, text=""):
         return None
 
     try:
-        ticketid = bibcatalog_system.ticket_submit(subject=subject, queue=queue)
+        ticketid = BIBCATALOG_SYSTEM.ticket_submit(subject=subject, queue=queue)
     except ValueError, e:
         write_message("Error creating ticket: %s" % (str(e),))
         return None
     if text:
         try:
-            bibcatalog_system.ticket_comment(None, ticketid, text)
+            BIBCATALOG_SYSTEM.ticket_comment(None, ticketid, text)
         except ValueError, e:
             write_message("Error commenting on ticket %s: %s" % (str(ticketid), str(e)))
             return None

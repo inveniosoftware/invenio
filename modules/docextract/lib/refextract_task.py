@@ -32,9 +32,9 @@ from invenio.bibtask import task_init, task_set_option, \
                             task_get_option, write_message
 from invenio.config import CFG_VERSION, \
                            CFG_SITE_SECURE_URL, \
-                           CFG_BIBCATALOG_SYSTEM, \
                            CFG_REFEXTRACT_TICKET_QUEUE, \
-                           CFG_INSPIRE_SITE
+                           CFG_INSPIRE_SITE, \
+                           CFG_TMPSHAREDDIR
 from invenio.dbquery import run_sql
 from invenio.search_engine import perform_request_search
 # Help message is the usage() print out of how to use Refextract
@@ -43,7 +43,6 @@ from invenio.refextract_api import extract_references_from_record, \
                                    FullTextNotAvailable, \
                                    check_record_for_refextract
 from invenio.refextract_config import CFG_REFEXTRACT_FILENAME
-from invenio.config import CFG_TMPSHAREDDIR
 from invenio.bibtask import task_low_level_submission
 from invenio.docextract_task import task_run_core_wrapper, \
                                     split_ids
@@ -52,7 +51,7 @@ from invenio.docextract_record import print_records
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
-from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 
 
 def check_options():
@@ -224,7 +223,7 @@ def task_run_core(recid, records, bibcatalog_system=None, _arxiv=False):
         write_message("No full text available for %s" % recid)
 
 
-def submit_bibupload(bibcatalog_system=None, records=None):
+def cb_submit_bibupload(bibcatalog_system=None, records=None):
     if records:
         references_xml = print_records(records)
 
@@ -241,7 +240,7 @@ def submit_bibupload(bibcatalog_system=None, records=None):
 
 def main():
     """Constructs the refextract bibtask."""
-    extra_vars = {'bibcatalog_system': bibcatalog_system, 'records': []}
+    extra_vars = {'bibcatalog_system': BIBCATALOG_SYSTEM, 'records': []}
     # Build and submit the task
     task_init(authorization_action='runrefextract',
         authorization_msg="Refextract Task Submission",
@@ -294,4 +293,4 @@ def main():
         task_run_fnc=task_run_core_wrapper('refextract',
                                            task_run_core,
                                            extra_vars=extra_vars,
-                                           post_process=submit_bibupload))
+                                           post_process=cb_submit_bibupload))

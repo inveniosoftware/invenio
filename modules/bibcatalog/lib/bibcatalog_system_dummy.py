@@ -23,17 +23,19 @@ Please see the help/hacking/bibcatalog-api page for details.
 This is a dummy class that does not nothing. This is used when
 not ticketing system is set.
 """
+# pylint: disable=W0613
+# pylint: disable=R0201
 
 class BibCatalogSystemDummy(object):
     """ A dummy class for ticket support."""
 
     def check_system(self, uid=None):
-        pass
+        return ""
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="",
                       owner="", date_from="", date_until="", status="",
                       priority="", queue=""):
-        pass
+        return []
 
     def ticket_submit(self, uid=None, subject="", recordid=-1, text="",
                       queue="", priority="", owner="", requestor=""):
@@ -59,3 +61,5 @@ class BibCatalogSystemDummy(object):
 
     def ticket_comment(self, uid, ticketid, comment):
         pass
+
+# pylint: enable=W0613

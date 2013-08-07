@@ -25,7 +25,7 @@ This is a base class that cannot be instantiated.
 
 from invenio.webuser import get_user_preferences
 
-class BibCatalogSystem:
+class BibCatalogSystem(object):
     """ A template class for ticket support."""
 
     TICKET_ATTRIBUTES = ['ticketid', 'priority', 'recordid', 'subject', 'text', 'creator', 'owner', 'date', 'status', 'queue', 'url_display', 'url_modify', 'url_close', 'created']

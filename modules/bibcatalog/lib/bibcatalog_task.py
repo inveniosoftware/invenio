@@ -43,7 +43,7 @@ from invenio.docextract_task import \
 from invenio.search_engine import \
     get_collection_reclist, \
     perform_request_search
-from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibcatalog_utils import record_id_from_record
 from invenio.bibcatalog_dblayer import \
     get_all_new_records, \
@@ -82,7 +82,7 @@ class BibCatalogTicket(object):
         @return bool: True if created, False if not.
         """
         if not self.exists():
-            self.ticketid = bibcatalog_system.ticket_submit(
+            self.ticketid = BIBCATALOG_SYSTEM.ticket_submit(
                                                   subject=self.subject,
                                                   queue=self.queue,
                                                   text=self.body,
@@ -96,7 +96,7 @@ class BibCatalogTicket(object):
 
         @return results: Evaluates to True if it exists, False if not.
         """
-        results = bibcatalog_system.ticket_search(None,
+        results = BIBCATALOG_SYSTEM.ticket_search(None,
                                                   recordid=self.recid,
                                                   queue=self.queue,
                                                   subject=self.subject)
@@ -141,11 +141,11 @@ def task_check_options():
 
     task_set_option('tickets', ticket_plugins)
 
-    if not bibcatalog_system:
+    if not BIBCATALOG_SYSTEM:
         print >>sys.stderr, 'Error: no cataloging system defined'
         return False
 
-    res = bibcatalog_system.check_system()
+    res = BIBCATALOG_SYSTEM.check_system()
     if res:
         print >>sys.stderr, 'Error while checking cataloging system: %s' % \
             (res,)
@@ -262,7 +262,7 @@ def load_ticket_plugins():
 
     Returns a tuple of plugin_object, list of errors.
     """
-    #TODO add to configfile
+    # TODO add to configfile
     CFG_BIBCATALOG_PLUGIN_DIR = os.path.join(CFG_PYLIBDIR,
                                              "invenio",
                                              "bibcatalog_ticket_templates",
@@ -402,7 +402,6 @@ def main():
         opts, dummy = getopt.getopt(sys.argv[1:], "l", ["list-tickets"])
     except getopt.GetoptError:
         opts = []
-        pass
 
     for opt, dummy in opts:
         if opt in ["-l", "--list-tickets"]:

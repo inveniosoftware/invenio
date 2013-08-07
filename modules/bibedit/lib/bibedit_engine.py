@@ -53,8 +53,9 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS, \
     CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS, CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD
 
-from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE, \
-    CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS
+from invenio.config import (CFG_SITE_LANG, CFG_DEVEL_SITE,
+    CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
+    CFG_BIBCATALOG_SYSTEM)
 
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
@@ -92,7 +93,7 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_INSPIRE_SITE
 from invenio.search_engine import record_exists, perform_request_search
 from invenio.webuser import session_param_get, session_param_set
-from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibcatalog_system import get_bibcat_from_prefs
 from invenio.webpage import page
 from invenio.htmlutils import get_mathjax_header
@@ -360,11 +361,11 @@ def perform_request_newticket(recid, uid):
     """
     t_url = ""
     errmsg = ""
-    if bibcatalog_system is not None:
-        t_id = bibcatalog_system.ticket_submit(uid, "", recid, "")
+    if CFG_BIBCATALOG_SYSTEM is not None:
+        t_id = BIBCATALOG_SYSTEM.ticket_submit(uid, "", recid, "")
         if t_id:
             #get the ticket's URL
-            t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_modify')
+            t_url = BIBCATALOG_SYSTEM.ticket_get_attribute(uid, t_id, 'url_modify')
         else:
             errmsg = "ticket_submit failed"
     else:
@@ -1318,16 +1319,16 @@ def perform_request_bibcatalog(request_type, uid, data):
 
     if request_type == 'getTickets':
         # Insert the tickets data in the response, if possible
-        if bibcatalog_system is None:
+        if not CFG_BIBCATALOG_SYSTEM:
             response['tickets'] = "<!--No ticket system configured-->"
-        elif bibcatalog_system and uid:
-            bibcat_resp = bibcatalog_system.check_system(uid)
+        elif uid:
+            bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
             if bibcat_resp == "":
-                tickets_found = bibcatalog_system.ticket_search(uid,
+                tickets_found = BIBCATALOG_SYSTEM.ticket_search(uid,
                     status=['new', 'open'], recordid=data['recID'])
                 tickets = []
                 for t_id in tickets_found:
-                    ticket_info = bibcatalog_system.ticket_get_info(
+                    ticket_info = BIBCATALOG_SYSTEM.ticket_get_info(
                         uid, t_id, ['url_display', 'url_close', 'subject', 'text', 'queue', 'created'])
                     t_url = ticket_info['url_display']
                     t_close_url = ticket_info['url_close']
@@ -1348,7 +1349,7 @@ def perform_request_bibcatalog(request_type, uid, data):
                     tickets.append(ticket)
                 response['tickets'] = tickets
                 # add available queues
-                response['queues'] = bibcatalog_system.get_queues(uid)
+                response['queues'] = BIBCATALOG_SYSTEM.get_queues(uid)
                 response['resultCode'] = 31
             else:
                 # put something in the tickets container, for debug
@@ -1356,16 +1357,16 @@ def perform_request_bibcatalog(request_type, uid, data):
                 response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
     # closeTicket usecase
     elif request_type == 'closeTicket':
-        if bibcatalog_system is None:
+        if not CFG_BIBCATALOG_SYSTEM:
             response['ticket_closed_description'] = "<!--No ticket system configured-->"
             response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_closed']
-        elif bibcatalog_system and uid:
-            bibcat_resp = bibcatalog_system.check_system(uid)
+        elif uid:
+            bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
             if bibcat_resp == "":
                 un, pw = get_bibcat_from_prefs(uid)
                 if un and pw:
-                    ticket_assigned = bibcatalog_system.ticket_steal(uid, data['ticketid'])
-                    ticket_closed = bibcatalog_system.ticket_set_attribute(uid, data['ticketid'], 'status', 'resolved')
+                    ticket_assigned = BIBCATALOG_SYSTEM.ticket_steal(uid, data['ticketid'])
+                    ticket_closed = BIBCATALOG_SYSTEM.ticket_set_attribute(uid, data['ticketid'], 'status', 'resolved')
                     if ticket_closed == 1:
                         response['ticket_closed_description'] = 'Ticket resolved'
                         response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['ticket_closed']
@@ -1381,15 +1382,15 @@ def perform_request_bibcatalog(request_type, uid, data):
                 response['ticket_closed_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rt_connection']
         response['ticketid'] = data['ticketid']
     elif request_type == 'openTicket':
-        if bibcatalog_system is None:
+        if not CFG_BIBCATALOG_SYSTEM:
             response['ticket_opened_description'] = "<!--No ticket system configured-->"
             response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_ticket_opened']
-        elif bibcatalog_system and uid:
-            bibcat_resp = bibcatalog_system.check_system(uid)
+        elif uid:
+            bibcat_resp = BIBCATALOG_SYSTEM.check_system(uid)
             if bibcat_resp == "":
                 un, pw = get_bibcat_from_prefs(uid)
                 if un and pw:
-                    ticket_opened = bibcatalog_system.ticket_set_attribute(uid, data['ticketid'], 'status', 'open')
+                    ticket_opened = BIBCATALOG_SYSTEM.ticket_set_attribute(uid, data['ticketid'], 'status', 'open')
                     if ticket_opened == 1:
                         response['ticket_opened_description'] = 'Ticket opened'
                         response['ticket_opened_code'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['ticket_opened']

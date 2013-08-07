@@ -75,18 +75,18 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return "CFG_BIBCATALOG__SYSTEM_RT_URL does not start with 'http://' or 'https://'"
         httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
         # Assemble by http://user:password@RT_URL
-        BIBCATALOG_RT_SERVER = httppart + "//" + rtuid + ":" + rtpw + "@" + siteandpath
+        bibcatalog_rt_server = httppart + "//" + rtuid + ":" + rtpw + "@" + siteandpath
 
         #set as env var
         os.environ["RTUSER"] = rtuid
-        os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
+        os.environ["RTSERVER"] = bibcatalog_rt_server
 
         #try to talk to RT server
         #this is a safe call since rtpw is the only variable in it, and it is escaped
         rtpw = escape_shell_arg(rtpw)
         dummy, myout, myerr = run_shell_command("echo "+rtpw+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls \"Subject like 'F00'\"")
         if len(myerr) > 0:
-            return "could not connect to " + BIBCATALOG_RT_SERVER + " " + myerr
+            return "could not connect to " + bibcatalog_rt_server + " " + myerr
         #finally, check that there is some sane output like tickets or 'No matching result'
         saneoutput = (myout.count('matching') > 0) or (myout.count('1') > 0)
         if not saneoutput:
@@ -157,9 +157,11 @@ class BibCatalogSystemRT(BibCatalogSystem):
                 dummy, tnum = line.split('/') # get the ticket id
                 try:
                     dummy = int(tnum)
-                    tickets.append(tnum)
-                except:
+                except ValueError:
                     pass
+                else:
+                    tickets.append(tnum)
+
             if line.count('Status: ') > 0:
                 dummy, tstatus = line.split('Status: ')
                 statuses.append(tstatus)
@@ -242,17 +244,15 @@ class BibCatalogSystemRT(BibCatalogSystem):
         command_out = self._run_rt_command(command, uid)
         if command_out is None:
             return None
-        inum = -1
+
+        ticket_id = None
+        ticket_created_re = re.compile(r'Ticket (\d+) created')
         for line in command_out.split("\n"):
-            if line.count(' ') > 0:
-                stuff = line.split(' ')
-                try:
-                    inum = int(stuff[2])
-                except ValueError:
-                    pass
-        if inum > 0:
-            return inum
-        return None
+            matches = ticket_created_re.search(line)
+            if matches:
+                ticket_id = int(matches.groups()[0])
+
+        return ticket_id
 
     def ticket_comment(self, uid, ticketid, comment):
         """comment on a given ticket. Returns 1 on success, 0 on failure"""
@@ -365,7 +365,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             return 0
 
         attachments = []
-        regex = re.compile("[0-9]*:\s{2}[(]")  # attachment's format: 557408:  (text/plain / 131b)
+        regex = re.compile(r"[0-9]*:\s{2}[(]")  # attachment's format: 557408:  (text/plain / 131b)
         for line in command_out.split("\n"):
             for match in regex.findall(line):
                 attachments.append(match.split(":")[0])
@@ -459,10 +459,10 @@ class BibCatalogSystemRT(BibCatalogSystem):
             username = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_USER
             passwd = CFG_BIBCATALOG_SYSTEM_RT_DEFAULT_PWD
         httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
-        BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
+        bibcatalog_rt_server = httppart + "//" + username + ":" + passwd + "@" + siteandpath
         #set as env var
         os.environ["RTUSER"] = username
-        os.environ["RTSERVER"] = BIBCATALOG_RT_SERVER
+        os.environ["RTSERVER"] = bibcatalog_rt_server
         passwd = escape_shell_arg(passwd)
         error_code, myout, dummyerr = run_shell_command("echo " + passwd + " | " + command)
         if error_code > 0:

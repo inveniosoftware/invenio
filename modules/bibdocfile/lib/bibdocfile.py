@@ -117,7 +117,7 @@ from invenio.config import CFG_SITE_URL, \
     CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
     CFG_BIBDOCFILE_ADDITIONAL_KNOWN_MIMETYPES, \
     CFG_BIBCATALOG_SYSTEM
-from invenio.bibcatalog import bibcatalog_system
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.pluginutils import PluginContainer
@@ -1884,16 +1884,17 @@ class BibDoc(object):
         @trype string
         """
 
-        return  "%s%s;%i" % (BibDoc.get_fileprefix(self.basedir, self.storagename),  docformat, version)
+        return "%s%s;%i" % (BibDoc.get_fileprefix(self.basedir, self.storagename),  docformat, version)
 
     def get_docname(self):
         """Obsolete !! (will return empty String for new format documents"""
         return self.storagename
+
     def get_doctype(self, recid):
         """Retrieves the type of this document in the scope of a given recid"""
-        link_types = [attachement["doctype"] for attachement in \
-                          filter(lambda x: str(x["recid"]) == str(recid), \
-                                 self.bibrec_links)]
+        link_types = [attachement["doctype"] for attachement in
+                      self.bibrec_links
+                      if str(attachement["recid"]) == str(recid)]
         if link_types:
             return link_types[0]
         return ""
@@ -1979,7 +1980,7 @@ class BibDoc(object):
                         update_modification_date_of_file(destination, modification_date)
                 except Exception, e:
                     register_exception()
-                    raise InvenioBibDocFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
+                    raise InvenioBibDocFileError("Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e))
                 self.more_info.set_description(description, docformat, myversion)
                 self.more_info.set_comment(comment, docformat, myversion)
                 if flags is None:
@@ -1996,7 +1997,7 @@ class BibDoc(object):
                     else:
                         self.more_info.set_flag(flag, docformat, myversion)
             else:
-                raise InvenioBibDocFileError, "'%s' does not exists!" % filename
+                raise InvenioBibDocFileError("'%s' does not exists!" % filename)
         finally:
             self.touch()
             Md5Folder(self.basedir).update()

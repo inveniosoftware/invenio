@@ -37,11 +37,11 @@ else:
 
 def get_bibcatalog_system():
     if CFG_BIBCATALOG_SYSTEM == 'RT':
-        bibcatalog_system = BibCatalogSystemRT()
+        bc_system = BibCatalogSystemRT()
     else:
-        bibcatalog_system = BibCatalogSystemDummy()
+        bc_system = BibCatalogSystemDummy()
 
-    return bibcatalog_system
+    return bc_system
 
 
 class BibCatalogProxy(object):
@@ -64,4 +64,4 @@ class BibCatalogProxy(object):
             return object.__repr__(self)
 
 
-bibcatalog_system = BibCatalogProxy()
+BIBCATALOG_SYSTEM = BibCatalogProxy()
