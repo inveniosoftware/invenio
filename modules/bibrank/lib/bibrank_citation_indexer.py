@@ -36,7 +36,6 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
 from invenio.search_engine import search_pattern, \
                                   search_unit, \
                                   get_collection_reclist
-from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat_utils import parse_tag
 from invenio.bibknowledge import get_kb_mappings
 from invenio.bibtask import write_message, task_get_option, \
@@ -72,7 +71,19 @@ def deleted_recids_cache(cache={}):
 
 
 def get_recids_matching_query(p, f, config, m='e'):
-    """Return set of recIDs matching query for pattern p in field f."""
+    """Return set of recIDs matching query for pattern p in field f.
+
+    @param p: pattern to search for
+    @type recID: unicode string
+    @param f: field to search in
+    @type recID: unicode string
+    @param config: bibrank configuration
+    @type recID: dict
+    @param m: type of matching (usually 'e' for exact or 'r' for regexp)
+    @type recID: string
+    """
+    p = p.encode('utf-8')
+    f = f.encode('utf-8')
     function = config.get("rank_method", "function")
     collections = config.get(function, 'collections')
     if collections:
@@ -303,6 +314,24 @@ def get_tags_config(config):
     else:
         tags['refs_doi'] = tagify(parse_tag(tag))
 
+    # 999C50. this is in the reference list, refers to other records.
+    # Looks like: 1205
+    try:
+        tag = config.get(function, "reference_via_record_id")
+    except ConfigParser.NoOptionError:
+        tags['refs_record_id'] = None
+    else:
+        tags['refs_record_id'] = tagify(parse_tag(tag))
+
+    # 999C5i. this is in the reference list, refers to other records.
+    # Looks like: 9781439520031
+    try:
+        tag = config.get(function, "reference_via_isbn")
+    except ConfigParser.NoOptionError:
+        tags['refs_isbn'] = None
+    else:
+        tags['refs_isbn'] = tagify(parse_tag(tag))
+
     # Fields needed to construct the journals for this record
     try:
         tag = {
@@ -324,6 +353,9 @@ def get_tags_config(config):
     # Fields needed to lookup the DOIs
     tags['doi'] = get_field_tags('doi')
 
+    # Fields needed to lookup the ISBN
+    tags['isbn'] = get_field_tags('isbn')
+
     # 999C5s. A standardized way of writing a reference in the reference list.
     # Like: Nucl. Phys. B 710 (2000) 371
     try:
@@ -338,11 +370,10 @@ def get_tags_config(config):
     return tags
 
 
-def get_journal_info(recid, tags):
-    """Fetch journal info for given recid"""
+def get_journal_info(record, tags):
+    """Fetch journal info from given record"""
     record_info = []
 
-    record = get_record(recid)
     journals_fields = record.find_fields(tags['publication']['journal'][:5])
     for field in journals_fields:
         # we store the tags and their values here
@@ -442,19 +473,24 @@ def get_citation_informations(recid_list, tags, config,
         'report-numbers': {},
         'journals': {},
         'doi': {},
+        'hdl': {},
+        'isbn': {},
     }
 
     references_info = {
         'report-numbers': {},
         'journals': {},
         'doi': {},
+        'record_id': {},
+        'isbn': {},
+        'hdl': {},
     }
 
     # perform quick check to see if there are some records with
     # reference tags, because otherwise get.cit.inf would be slow even
     # if there is nothing to index:
-    done = 0  # for status reporting
-    for recid in recid_list:
+
+    for done, recid in enumerate(recid_list):
         if done % 10 == 0:
             task_sleep_now_if_required()
 
@@ -463,7 +499,7 @@ def get_citation_informations(recid_list, tags, config,
             write_message(mesg)
             task_update_progress(mesg)
 
-        done += 1
+        record = get_record(recid)
 
         function = config.get("rank_method", "function")
         if config.get(function, 'collections'):
@@ -471,32 +507,27 @@ def get_citation_informations(recid_list, tags, config,
                 # do not treat this record since it is not in the collections
                 # we want to process
                 continue
-        else:
-            if recid in deleted_recids_cache():
-                # do not treat this record since it was deleted; we
-                # skip it like this in case it was only soft-deleted
-                # e.g. via bibedit (i.e. when collection tag 980 is
-                # DELETED but other tags like report number or journal
-                # publication info remained the same, so the calls to
-                # get_fieldvalues() below would return old values)
-                continue
+        elif recid in deleted_recids_cache():
+            # do not treat this record since it was deleted; we
+            # skip it like this in case it was only soft-deleted
+            # e.g. via bibedit (i.e. when collection tag 980 is
+            # DELETED but other tags like report number or journal
+            # publication info remained the same, so the calls to
+            # get_fieldvalues() below would return old values)
+            continue
 
         if tags['refs_report_number']:
-            references_info['report-numbers'][recid] \
-                    = get_fieldvalues(recid,
-                                      tags['refs_report_number'],
-                                      sort=False)
+            references_info['report-numbers'][recid] = [t.value for t in
+                             record.find_subfields(tags['refs_report_number'])]
             msg = "references_info['report-numbers'][%s] = %r" \
                         % (recid, references_info['report-numbers'][recid])
             write_message(msg, verbose=9)
         if tags['refs_journal']:
             references_info['journals'][recid] = []
-            for ref in get_fieldvalues(recid,
-                                       tags['refs_journal'],
-                                       sort=False):
+            for ref in record.find_subfields(tags['refs_journal']):
                 try:
                     # Inspire specific parsing
-                    journal, volume, page = ref.split(',')
+                    journal, volume, page = ref.value.split(',')
                 except ValueError:
                     pass
                 else:
@@ -504,15 +535,42 @@ def get_citation_informations(recid_list, tags, config,
                     if alt_volume:
                         alt_ref = ','.join([journal, alt_volume, page])
                         references_info['journals'][recid] += [alt_ref]
-                references_info['journals'][recid] += [ref]
+                references_info['journals'][recid] += [ref.value]
             msg = "references_info['journals'][%s] = %r" \
                               % (recid, references_info['journals'][recid])
             write_message(msg, verbose=9)
         if tags['refs_doi']:
-            references_info['doi'][recid] \
-                    = get_fieldvalues(recid, tags['refs_doi'], sort=False)
-            msg = "references_info['doi'][%s] = %r" \
-                                   % (recid, references_info['doi'][recid])
+            references = [t.value for t in
+                                       record.find_subfields(tags['refs_doi'])]
+            dois = []
+            hdls = []
+            for ref in references:
+                if ref.startswith("hdl:"):
+                    hdls.append(ref[4:])
+                elif ref.startswith("doi:"):
+                    dois.append(ref[4:])
+                else:
+                    dois.append(ref)
+            references_info['doi'][recid] = dois
+            references_info['hdl'][recid] = hdls
+
+            msg = "references_info['doi'][%s] = %r" % (recid, dois)
+            write_message(msg, verbose=9)
+            msg = "references_info['hdl'][%s] = %r" % (recid, hdls)
+            write_message(msg, verbose=9)
+
+
+        if tags['refs_record_id']:
+            references_info['record_id'][recid] = [t.value for t in
+                                 record.find_subfields(tags['refs_record_id'])]
+            msg = "references_info['record_id'][%s] = %r" \
+                                   % (recid, references_info['record_id'][recid])
+            write_message(msg, verbose=9)
+        if tags['refs_isbn']:
+            references_info['isbn'][recid] = [t.value for t in
+                                      record.find_subfields(tags['refs_isbn'])]
+            msg = "references_info['isbn'][%s] = %r" \
+                                   % (recid, references_info['isbn'][recid])
             write_message(msg, verbose=9)
 
         if not fetch_catchup_info:
@@ -523,15 +581,12 @@ def get_citation_informations(recid_list, tags, config,
             records_info['report-numbers'][recid] = []
 
             if tags['record_pri_number']:
-                records_info['report-numbers'][recid] \
-                    += get_fieldvalues(recid,
-                                       tags['record_pri_number'],
-                                       sort=False)
+                records_info['report-numbers'][recid] += [t.value for t in
+                            record.find_subfields(tags['record_pri_number'])]
+
             if tags['record_add_number']:
-                records_info['report-numbers'][recid] \
-                    += get_fieldvalues(recid,
-                                       tags['record_add_number'],
-                                       sort=False)
+                records_info['report-numbers'][recid] += [t.value for t in
+                            record.find_subfields(tags['record_add_number'])]
 
             msg = "records_info[%s]['report-numbers'] = %r" \
                         % (recid, records_info['report-numbers'][recid])
@@ -539,18 +594,37 @@ def get_citation_informations(recid_list, tags, config,
 
         if tags['doi']:
             records_info['doi'][recid] = []
+            records_info['hdl'][recid] = []
             for tag in tags['doi']:
-                records_info['doi'][recid] += get_fieldvalues(recid,
-                                                              tag,
-                                                              sort=False)
+                for field in record.find_fields(tag[:5]):
+                    if 'DOI' in field.get_subfield_values('2'):
+                        dois = field.get_subfield_values('a')
+                        records_info['doi'][recid].extend(dois)
+                    elif 'HDL' in field.get_subfield_values('2'):
+                        hdls = field.get_subfield_values('a')
+                        records_info['hdl'][recid].extend(hdls)
+
             msg = "records_info[%s]['doi'] = %r" \
                                       % (recid, records_info['doi'][recid])
+            write_message(msg, verbose=9)
+            msg = "records_info[%s]['hdl'] = %r" \
+                                      % (recid, records_info['hdl'][recid])
+            write_message(msg, verbose=9)
+
+        if tags['isbn']:
+            records_info['isbn'][recid] = []
+            for tag in tags['isbn']:
+                values = [t.value for t in record.find_subfields(tag)]
+                records_info['isbn'][recid] += values
+
+            msg = "records_info[%s]['isbn'] = %r" \
+                                      % (recid, records_info['isbn'][recid])
             write_message(msg, verbose=9)
 
         # get a combination of
         # journal vol (year) pages
         if tags['publication']:
-            records_info['journals'][recid] = get_journal_info(recid, tags)
+            records_info['journals'][recid] = get_journal_info(record, tags)
             msg = "records_info[%s]['journals'] = %r" \
                                  % (recid, records_info['journals'][recid])
             write_message(msg, verbose=9)
@@ -754,8 +828,104 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
 
     t4 = os.times()[4]
 
+    # Try to find references based on 999C5a (hdl references)
+    # e.g. 4263537/4000
+    write_message("Phase 4: HDL references")
+    done = 0
+    for thisrecid, refs in references_info['hdl'].iteritems():
+        step("HDL references", thisrecid, done, len(references_info['hdl']))
+        done += 1
+
+        for reference in (r for r in refs if r):
+            p = reference
+            field = 'hdl'
+
+            recids = get_recids_matching_query(p=p,
+                                               f=field,
+                                               config=config)
+            write_message("These match searching %s in %s: %s"
+                                 % (reference, field, list(recids)), verbose=9)
+
+            if not recids:
+                insert_into_missing(thisrecid, p)
+            else:
+                remove_from_missing(p)
+
+            if len(recids) > 1:
+                store_citation_warning('multiple-matches', p)
+                msg = "Whoops: record '%d' HDL value '%s' " \
+                      "matches many records; taking only the first one. %s" % \
+                      (thisrecid, p, repr(recids))
+                write_message(msg, stream=sys.stderr)
+
+            for recid in list(recids)[:1]:  # take only the first one
+                add_to_refs(thisrecid, recid)
+
+    mesg = "done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
+    t5 = os.times()[4]
+
+    # Try to find references based on 999C50
+    # e.g. 1244
+    write_message("Phase 5: Record ID references")
+    done = 0
+    for thisrecid, refs in references_info['record_id'].iteritems():
+        step("Record ID references", thisrecid, done, len(references_info['record_id']))
+        done += 1
+        for recid in (r for r in refs if r):
+            valid = get_recids_matching_query(p=recid, f="001", config=config)
+            if valid:
+                add_to_refs(thisrecid, recid)
+
+    mesg = "done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
+    t6 = os.times()[4]
+
+    # Try to find references based on 999C5i
+    # e.g. 978-3-942171-73-1
+    write_message("Phase 6: ISBN references")
+    done = 0
+    for thisrecid, refs in references_info['isbn'].iteritems():
+        step("ISBN references", thisrecid, done, len(references_info['isbn']))
+        done += 1
+
+        for reference in (r for r in refs if r):
+            p = reference
+            field = 'isbn'
+
+            recids = get_recids_matching_query(p=p,
+                                               f=field,
+                                               config=config)
+            write_message("These match searching %s in %s: %s"
+                                 % (reference, field, list(recids)), verbose=9)
+
+            if not recids:
+                insert_into_missing(thisrecid, p)
+            else:
+                remove_from_missing(p)
+
+            if len(recids) > 1:
+                store_citation_warning('multiple-matches', p)
+                msg = "Whoops: record '%d' ISBN value '%s' " \
+                      "matches many records; taking only the first one. %s" % \
+                      (thisrecid, p, repr(recids))
+                write_message(msg, stream=sys.stderr)
+
+            for recid in list(recids)[:1]:  # take only the first one
+                add_to_refs(thisrecid, recid)
+
+    mesg = "done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
+    t7 = os.times()[4]
+
     # Search for stuff like CERN-TH-4859/87 in list of refs
-    write_message("Phase 4: report numbers catchup")
+    write_message("Phase 7: report numbers catchup")
     done = 0
     for thisrecid, reportcodes in records_info['report-numbers'].iteritems():
         step("Report numbers catchup", thisrecid, done,
@@ -783,9 +953,9 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
     task_update_progress(mesg)
 
     # Find this record's pubinfo in other records' bibliography
-    write_message("Phase 5: journals catchup")
+    write_message("Phase 8: journals catchup")
     done = 0
-    t5 = os.times()[4]
+    t8 = os.times()[4]
     for thisrecid, rec_journals in records_info['journals'].iteritems():
         step("Journals catchup", thisrecid, done,
                                                  len(records_info['journals']))
@@ -808,21 +978,61 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
     write_message(mesg)
     task_update_progress(mesg)
 
-    write_message("Phase 6: DOI catchup")
+    write_message("Phase 9: DOI catchup")
     done = 0
-    t6 = os.times()[4]
+    t9 = os.times()[4]
     for thisrecid, dois in records_info['doi'].iteritems():
         step("DOI catchup", thisrecid, done, len(records_info['doi']))
         done += 1
 
         for doi in dois:
-            # Search the publication string like
-            # Phys. Lett., B 482 (2000) 417 in 999C5a
             recids = get_recids_matching_query(p=doi,
                                                f=tags['refs_doi'],
                                                config=config)
             write_message("These records match %s in %s: %s"
                             % (doi, tags['refs_doi'], list(recids)), verbose=9)
+
+            for recid in recids:
+                add_to_cites(recid, thisrecid)
+
+    mesg = "done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
+    write_message("Phase 10: HDL catchup")
+    done = 0
+    t10 = os.times()[4]
+    for thisrecid, hdls in records_info['hdl'].iteritems():
+        step("HDL catchup", thisrecid, done, len(records_info['hdl']))
+        done += 1
+
+        for hdl in hdls:
+            recids = get_recids_matching_query(p=hdl,
+                                               f=tags['refs_doi'],
+                                               config=config)
+            write_message("These records match %s in %s: %s"
+                            % (hdl, tags['refs_doi'], list(recids)), verbose=9)
+
+            for recid in recids:
+                add_to_cites(recid, thisrecid)
+
+    mesg = "done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
+    write_message("Phase 11: ISBN catchup")
+    done = 0
+    t11 = os.times()[4]
+    for thisrecid, isbns in records_info['isbn'].iteritems():
+        step("ISBN catchup", thisrecid, done, len(records_info['isbn']))
+        done += 1
+
+        for isbn in isbns:
+            recids = get_recids_matching_query(p=isbn,
+                                               f=tags['refs_isbn'],
+                                               config=config)
+            write_message("These records match %s in %s: %s"
+                            % (isbn, tags['refs_isbn'], list(recids)), verbose=9)
 
             for recid in recids:
                 add_to_cites(recid, thisrecid)
@@ -840,17 +1050,22 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         write_message(dict(islice(references.iteritems(), 10)))
         write_message("size: %s" % len(references))
 
-    t7 = os.times()[4]
+    t12 = os.times()[4]
 
     write_message("Execution time for analyzing the citation information "
                   "generating the dictionary:")
     write_message("... checking ref report numbers: %.2f sec" % (t2-t1))
     write_message("... checking ref journals: %.2f sec" % (t3-t2))
     write_message("... checking ref DOI: %.2f sec" % (t4-t3))
-    write_message("... checking rec report numbers: %.2f sec" % (t5-t4))
-    write_message("... checking rec journals: %.2f sec" % (t6-t5))
-    write_message("... checking rec DOI: %.2f sec" % (t7-t6))
-    write_message("... total time of ref_analyze: %.2f sec" % (t7-t1))
+    write_message("... checking ref HDL: %.2f sec" % (t5-t4))
+    write_message("... checking ref Record ID: %.2f sec" % (t6-t5))
+    write_message("... checking ref ISBN: %.2f sec" % (t7-t6))
+    write_message("... checking rec report numbers: %.2f sec" % (t8-t7))
+    write_message("... checking rec journals: %.2f sec" % (t9-t8))
+    write_message("... checking rec DOI: %.2f sec" % (t10-t9))
+    write_message("... checking rec HDL: %.2f sec" % (t11-t10))
+    write_message("... checking rec ISBN: %.2f sec" % (t12-t11))
+    write_message("... total time of ref_analyze: %.2f sec" % (t12-t1))
 
     return citations, references
 
