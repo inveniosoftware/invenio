@@ -1111,7 +1111,7 @@ def cli_hide(options):
     """Hide the matched versions of documents."""
     documents_to_be_hidden = {}
     to_be_fixed = intbitset()
-    versions = getattr(options, 'versions', 'all')
+    versions = getattr(options, 'version', 'all')
     if versions != 'all':
         try:
             versions = ranges2ids(versions)
@@ -1145,7 +1145,7 @@ def cli_unhide(options):
     """Unhide the matched versions of documents."""
     documents_to_be_unhidden = {}
     to_be_fixed = intbitset()
-    versions = getattr(options, 'versions', 'all')
+    versions = getattr(options, 'version', 'all')
     if versions != 'all':
         try:
             versions = ranges2ids(versions)
