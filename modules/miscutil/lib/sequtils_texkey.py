@@ -30,9 +30,11 @@ from invenio.config import CFG_TMPSHAREDDIR, CFG_VERSION
 from invenio.bibtask import task_init, write_message, \
     task_low_level_submission, task_update_progress, \
     task_sleep_now_if_required
+from invenio.dbquery import run_sql
 
 import string
 import random
+import time
 import os
 from unidecode import unidecode
 from tempfile import mkstemp
@@ -224,6 +226,13 @@ def submit_bibindex_task(to_update, sequence_id):
                                       '-i', ','.join(recids))
 
 
+def wait_for_task(task_id):
+    sql = 'select status from schTASK where id = %s'
+    while run_sql(sql, [task_id])[0][0] not in ('DONE', 'ACK', 'ACK DONE'):
+        task_sleep_now_if_required(True)
+        time.sleep(5)
+
+
 def process_chunk(to_process, sequence_id):
     """ submit bibupload task and wait for it to finish
 
@@ -231,7 +240,7 @@ def process_chunk(to_process, sequence_id):
     @type: list
     """
     task_id = submit_task(to_process, 'a', sequence_id)
-    return task_id
+    return wait_for_task(task_id)
 
 
 def create_xml(recid, texkey):
