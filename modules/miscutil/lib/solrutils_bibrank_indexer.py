@@ -27,16 +27,12 @@ from invenio.config import CFG_SOLR_URL
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
                             task_sleep_now_if_required
 from invenio.dbquery import run_sql
-from invenio.search_engine import get_fieldvalues, record_exists
+from invenio.search_engine import record_exists
 from invenio.bibdocfile import BibRecDocs
-from invenio.bibrank_bridge_config import CFG_MARC_ABSTRACT, \
-                                          CFG_MARC_AUTHOR_NAME, \
-                                          CFG_MARC_ADDITIONAL_AUTHOR_NAME, \
-                                          CFG_MARC_TITLE, \
-                                          CFG_MARC_KEYWORD
 from invenio.solrutils_bibindex_indexer import replace_invalid_solr_characters
 from invenio.bibindex_engine import create_range_list
 from invenio.errorlib import register_exception
+from invenio.bibrank_bridge_utils import get_tags, get_field_content_in_utf8
 
 
 if CFG_SOLR_URL:
@@ -56,6 +52,7 @@ def solr_add_ranges(id_ranges):
             id_ranges_to_index.append((i_low, i_up))
             i_low += sub_range_length
 
+    tags_to_index = get_tags()
     # Indexes latest records first by reversing
     # This allows the ranker to return better results during long indexing
     # runs as the ranker cuts the hitset using latest records
@@ -66,39 +63,26 @@ def solr_add_ranges(id_ranges):
         status_msg = "Solr ranking indexer called for %s-%s" % (lower_recid, upper_recid)
         write_message(status_msg)
         task_update_progress(status_msg)
-        solr_add_range(lower_recid, upper_recid)
+        solr_add_range(lower_recid, upper_recid, tags_to_index)
 
 
-def solr_add_range(lower_recid, upper_recid):
+def solr_add_range(lower_recid, upper_recid, tags_to_index):
     """
     Adds the regarding field values of all records from the lower recid to the upper one to Solr.
     It preserves the fulltext information.
     """
     for recid in range(lower_recid, upper_recid + 1):
         if record_exists(recid):
+            abstract        = get_field_content_in_utf8(recid, 'abstract', tags_to_index)
+            author          = get_field_content_in_utf8(recid, 'author', tags_to_index)
+            keyword         = get_field_content_in_utf8(recid, 'keyword', tags_to_index)
+            title           = get_field_content_in_utf8(recid, 'title', tags_to_index)
             try:
-                abstract = unicode(get_fieldvalues(recid, CFG_MARC_ABSTRACT)[0], 'utf-8')
+                bibrecdocs  = BibRecDocs(recid)
+                fulltext    = unicode(bibrecdocs.get_text(), 'utf-8')
             except:
-                abstract = ""
-            try:
-                first_author = get_fieldvalues(recid, CFG_MARC_AUTHOR_NAME)[0]
-                additional_authors = reduce(lambda x, y: x + " " + y, get_fieldvalues(recid, CFG_MARC_ADDITIONAL_AUTHOR_NAME), '')
-                author = unicode(first_author + " " + additional_authors, 'utf-8')
-            except:
-                author = ""
-            try:
-                bibrecdocs = BibRecDocs(recid)
-                fulltext = unicode(bibrecdocs.get_text(), 'utf-8')
-            except:
-                fulltext = ""
-            try:
-                keyword = unicode(reduce(lambda x, y: x + " " + y, get_fieldvalues(recid, CFG_MARC_KEYWORD), ''), 'utf-8')
-            except:
-                keyword = ""
-            try:
-                title = unicode(get_fieldvalues(recid, CFG_MARC_TITLE)[0], 'utf-8')
-            except:
-                title = ""
+                fulltext    = ''
+
             solr_add(recid, abstract, author, fulltext, keyword, title)
 
     SOLR_CONNECTION.commit()
