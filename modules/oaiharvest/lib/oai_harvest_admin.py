@@ -37,6 +37,7 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_LOGDIR, \
      CFG_SITE_RECORD
+
 from invenio.oai_harvest_config import CFG_OAI_POSSIBLE_POSTMODES
 from invenio.bibrankadminlib import \
      write_outcome, \
@@ -62,6 +63,7 @@ from invenio.bibrecord import create_record
 from invenio.urlutils import create_html_link
 from invenio.bibtask import task_low_level_submission
 from invenio.webuser import get_user_info, get_email
+from invenio.bibtask_config import CFG_BIBSCHED_LOGDIR
 
 webstyle_templates = invenio.template.load('webstyle')
 oaiharvest_templates = invenio.template.load('oai_harvest')
@@ -622,7 +624,8 @@ def does_logfile_exist(task_id):
     """
        returns logfile name if exists. None otherwise
     """
-    name = CFG_LOGDIR + "/bibsched_task_" + str(task_id) + ".log"
+    name = os.path.join(CFG_BIBSCHED_LOGDIR,
+                        "bibsched_task_" + str(task_id) + ".log")
     if os.path.exists(name):
         return name
     else:
@@ -632,7 +635,8 @@ def does_errfile_exist(task_id):
     """
        returns logfile name if exists. None otherwise
     """
-    name = CFG_LOGDIR + "/bibsched_task_" + str(task_id) + ".err"
+    name = os.path.join(CFG_BIBSCHED_LOGDIR,
+                        "bibsched_task_" + str(task_id) + ".err")
     if os.path.exists(name):
         return name
     else:
@@ -664,7 +668,7 @@ def perform_request_viewtasklogs(ln, task_id):
         content = file_fd.read(-1)
         file_fd.close()
         result += oaiharvest_templates.tmpl_print_brs(ln, 2)
-        result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Log file : " + \
+        result += oaiharvest_templates.tmpl_draw_titlebar(ln, "Error-log file : " + \
                                                               err_name, guideurl)
         result += oaiharvest_templates.tmpl_output_scrollable_frame(\
             oaiharvest_templates.tmpl_output_preformatted(content))
@@ -1122,7 +1126,7 @@ def perform_request_harvest_record(oai_src_id=None, ln=CFG_SITE_LANG, record_id=
     else:
         enable_reporting = True
 
-    form_text = "<p><small>Enter one OAI ID per line. Ex: oai:arXiv.org:hep-th/9901001</small></p>"
+    form_text = "<p><small>Enter one OAI ID per line. Ex: oai:arXiv.org:hep-th/9901001 or arXiv:1308.1234 or hep-th/9901001</small></p>"
     form_text += oaiharvest_templates.tmpl_admin_w200_textarea(ln=ln, title="", \
                                                               name="record_id", value=record_str)
     form_text += oaiharvest_templates.tmpl_admin_checkboxes(ln=ln, \

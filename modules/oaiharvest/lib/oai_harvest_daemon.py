@@ -1019,11 +1019,7 @@ def call_authorlist_extract(active_file, extracted_file, harvested_identifier_li
                     additional_authors = record_get_field_instances(authorlist_record, '700')
                     record_add_fields(existing_record, '100', first_author)
                     record_add_fields(existing_record, '700', additional_authors)
-                    if CFG_INSPIRE_SITE and 'arXiv' in identifier:
-                        # If INSPIRE, then append the arXiv id to the file of records having authorlists
-                        # extracted
-                        filepath = "/afs/cern.ch/project/inspire/info/hep/misc/has_authorlist.txt"
-                        append_arxiv_id_to_file(filepath, identifier)
+
         updated_xml.append(record_xml_output(existing_record))
     updated_xml.append('</collection>')
     # Write to file
@@ -1404,7 +1400,19 @@ def get_dates(dates):
 def get_identifier_names(identifier):
     if identifier:
         # Let's see if the user had a comma-separated list of OAI ids.
-        return [ident.strip() for ident in identifier.split(',')]
+        stripped_idents = []
+        for ident in identifier.split(","):
+            if not ident.startswith("oai:arXiv.org"):
+                if "oai:arxiv.org" in ident.lower():
+                    ident = ident.replace("oai:arxiv.org", "oai:arXiv.org")
+                elif "arXiv" in ident:
+                    # New style arXiv ID
+                    ident = ident.replace("arXiv", "oai:arXiv.org")
+                elif "/" in ident:
+                    # Old style arXiv ID?
+                    ident = "%s%s" % ("oai:arXiv.org:", ident)
+            stripped_idents.append(ident.strip())
+        return stripped_idents
 
 
 def get_repository_names(repositories):
@@ -1646,20 +1654,6 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         return False
     return True
 
-def append_arxiv_id_to_file(filepath, identifier):
-    """
-    Used by INSPIRE site only, to append an arXiv id to a file used
-    to list all arXiv records having their authorlist extracted.
-
-    Only a temporary function until SPIRES shutoff.
-    """
-    id_arxiv = "arXiv:%s" % (re.findall('[a-zA-Z\\-]+/\\d+|\\d+\\.\\d+', identifier)[0],)
-    try:
-        fd_authorlist = open(filepath, 'a')
-        fd_authorlist.write("%s\n" % (id_arxiv,))
-        fd_authorlist.close()
-    except IOError:
-        pass
 ### okay, here we go:
 if __name__ == '__main__':
     main()
