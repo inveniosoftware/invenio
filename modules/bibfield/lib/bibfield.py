@@ -31,36 +31,29 @@ except:
     import pickle
 
 from pprint import pformat
+from werkzeug import import_string
 
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
+from invenio.datastructures import LaziestDict
 from invenio.dbquery import run_sql
-from invenio.pluginutils import PluginContainer
+from invenio.errorlib import register_exception
 from invenio.signalutils import record_after_update
 
 from invenio.bibfield_jsonreader import JsonReader
 from invenio.bibfield_utils import BlobWrapper
 
-# Plug-in utils
+# Lazy loader of bibfield readers
 
+def reader_discover(key):
+    try:
+        candidate = import_string('invenio.bibfield_%sreader:readers' % (key, ))
+        if issubclass(candidate, JsonReader):
+            return candidate
+    except:
+        register_exception()
+    raise KeyError(key)
 
-def plugin_builder(plugin_name, plugin_code):
-    if 'readers' in dir(plugin_code):
-        candidate = getattr(plugin_code, 'readers')
-        try:
-            if issubclass(candidate, JsonReader):
-                return candidate
-        except:
-            pass
-    raise ValueError('%s is not a valid BibField reader plugin' % plugin_name)
-
-CFG_BIBFIELD_READERS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                                    'bibfield_*reader.py'),
-                                       plugin_builder=plugin_builder)
-
-open(os.path.join(CFG_LOGDIR, 'broken-bibfield-readers.log'), 'w').\
-    write(pformat(CFG_BIBFIELD_READERS.get_broken_plugins()))
-
-# end Plug-in utils
+CFG_BIBFIELD_READERS = LaziestDict(reader_discover)
 
 
 @record_after_update.connect
@@ -77,7 +70,7 @@ def create_record(blob, master_format='marc', verbose=0, **aditional_info):
     """
     blob_wrapper = BlobWrapper(blob=blob, master_format=master_format, **aditional_info)
 
-    return CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)](blob_wrapper)
+    return CFG_BIBFIELD_READERS[master_format](blob_wrapper)
 
 
 def create_records(blob, master_format='marc', verbose=0, **aditional_info):
@@ -89,7 +82,7 @@ def create_records(blob, master_format='marc', verbose=0, **aditional_info):
 
     @return List of record objects initiated by the functions create_record()
     """
-    record_blods = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)].split_blob(blob)
+    record_blods = CFG_BIBFIELD_READERS[master_format].split_blob(blob)
 
     return [create_record(record_blob, master_format, verbose=verbose, **aditional_info) for record_blob in record_blods]
 
@@ -116,8 +109,7 @@ def get_record(recid, reset_cache=False):
     blob_wrapper = _build_wrapper(recid)
     if not blob_wrapper:
         return None
-    record = \
-        CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (blob_wrapper.master_format,)](blob_wrapper)
+    record = CFG_BIBFIELD_READERS[blob_wrapper.master_format](blob_wrapper)
 
     #Update bibfmt for future uses
     run_sql("REPLACE INTO bibfmt(id_bibrec, format, last_updated, value) VALUES (%s, 'recjson', NOW(), %s)",

@@ -376,7 +376,7 @@ def load_template_context_filters():
         register_func = getattr(m, 'template_context_filter', None)
         if register_func and isinstance(register_func, types.FunctionType):
             filters[m.__name__.split('.')[-1]] = register_func
-    return output
+    return filters
 
 TEMPLATE_CONTEXT_FILTERS = LazyDict(load_template_context_filters)
 

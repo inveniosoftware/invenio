@@ -17,6 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from werkzeug.utils import import_string
+from invenio.datastructures import LaziestDict
+
+CFG_BIBFIELD_TYPES = LaziestDict(lambda key: import_string('invenio.bibfield_functions.%s:%s' % (key, key)))
+
 
 def check_field_type(record, field, field_type, subfield=None):
     """
@@ -38,13 +43,8 @@ def check_field_type(record, field, field_type, subfield=None):
     if not key in record:
         return
 
-    import os
-    from invenio.config import CFG_PYLIBDIR
-    from invenio.pluginutils import PluginContainer
-    CFG_BIBFIELD_TYPES = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibfield_functions', 'is_type_*.py'))
-
     from invenio.bibfield_utils import BibFieldCheckerException
-    new_type = 'is_type_%s' % (field_type,)
+    new_type = 'is_type_%s' % (field_type, )
 
     if new_type in CFG_BIBFIELD_TYPES:
         globals()[new_type] = CFG_BIBFIELD_TYPES[new_type]

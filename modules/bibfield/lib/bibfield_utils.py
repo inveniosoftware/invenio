@@ -29,11 +29,12 @@ __revision__ = "$Id$"
 
 import os
 import datetime
+from werkzeug.utils import import_string
 
 from invenio.config import CFG_PYLIBDIR
-from invenio.pluginutils import PluginContainer
+from invenio.datastructures import LaziestDict
 
-CFG_BIBFIELD_FUNCTIONS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibfield_functions', '*.py'))
+CFG_BIBFIELD_FUNCTIONS = LaziestDict(lambda key: import_string('invenio.bibfield_functions.%s:%s' % (key, key)))
 
 
 class BibFieldException(Exception):
