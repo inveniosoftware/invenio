@@ -23,7 +23,6 @@ __revision__ = "$Id"
 from datetime import datetime
 
 import re
-import difflib
 import zlib
 import copy
 import urllib
@@ -61,7 +60,7 @@ from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
     get_record_last_modification_date, get_record_revision_author, \
     get_marcxml_of_record_revision, delete_related_holdingpen_changes, \
-    get_record_revisions, get_info_of_record_revision, cache_active, \
+    get_record_revisions, get_info_of_record_revision, \
     deactivate_cache
 
 from invenio.bibedit_utils import cache_exists, cache_expired, \
@@ -86,7 +85,7 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_modify_controlfield, record_get_field_values, \
     record_get_subfields, record_get_field_instances, record_add_fields, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
-    record_strip_controlfields, record_order_subfields, field_xml_output
+    record_strip_controlfields, record_order_subfields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL, CFG_SITE_RECORD, CFG_BIBEDIT_KB_SUBJECTS, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
@@ -111,14 +110,12 @@ from invenio.refextract_api import FullTextNotAvailable, \
                                    record_has_fulltext
 
 from invenio import xmlmarc2textmarc as xmlmarc2textmarc
-from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
-
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
 
-re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
+re_revdate_split = re.compile(r'^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 def get_empty_fields_templates():
     """
@@ -530,17 +527,21 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         assert(changeId is not None)
         hpContent = get_hp_update_xml(changeId)
         holdingPenRecord = create_record(hpContent[0], "xm")[0]
-        template_to_merge = extend_record_with_template(recId)
-        if template_to_merge:
-            merged_record = merge_record_with_template(holdingPenRecord, template_to_merge)
-            if merged_record:
-                holdingPenRecord = merged_record
+        if not holdingPenRecord:
+            response['resultCode'] = 107
+        else:
+            template_to_merge = extend_record_with_template(recId)
+            if template_to_merge:
+                merged_record = merge_record_with_template(holdingPenRecord,
+                                                           template_to_merge)
+                if merged_record:
+                    holdingPenRecord = merged_record
 
-        # order subfields alphabetically
-        record_order_subfields(holdingPenRecord)
-#        databaseRecord = get_record(hpContent[1])
-        response['record'] = holdingPenRecord
-        response['changeset_number'] = changeId
+            # order subfields alphabetically
+            record_order_subfields(holdingPenRecord)
+    #        databaseRecord = get_record(hpContent[1])
+            response['record'] = holdingPenRecord
+            response['changeset_number'] = changeId
     elif request_type == 'deleteHoldingPenChangeset':
         assert(changeId is not None)
         delete_hp_change(changeId)
@@ -613,9 +614,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
             # Clone an existing record (from the users cache).
             existing_cache = cache_exists(recid, uid)
             if existing_cache:
-                try:
-                    record = get_cache_contents(recid, uid)[2]
-                except:
+                cache = get_cache_contents(recid, uid)
+                if cache:
+                    record = cache[2]
+                else:
                     # if, for example, the cache format was wrong (outdated)
                     record = get_bibrecord(recid)
             else:
@@ -693,6 +695,9 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 except TypeError:
                     # No cache found in the DB
                     record_revision, record = create_cache(recid, uid)
+                    if not record:
+                        response['resultCode'] = 103
+                        return response
                     pending_changes = []
                     disabled_hp_changes = {}
                     cache_dirty = False
@@ -891,7 +896,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         # modified in another editor.
         if 'cacheMTime' in data:
             if cache_exists(recid, uid) and get_cache_mtime(recid, uid) == \
-                data['cacheMTime']:
+                                                            data['cacheMTime']:
                 delete_cache(recid, uid)
         response['resultCode'] = 11
     elif request_type == 'updateCacheRef':

@@ -35,7 +35,7 @@ import time
 import zlib
 import tempfile
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 
 try:
     from cStringIO import StringIO
@@ -44,8 +44,7 @@ except ImportError:
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
-    CFG_BIBEDIT_CACHEDIR
+    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_CACHEDIR
 from invenio.bibedit_dblayer import (get_record_last_modification_date,
     delete_hp_change, cache_exists, update_cache_post_date, get_cache,
     update_cache, get_cache_post_date, uids_with_active_caches,
@@ -63,13 +62,13 @@ from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
-    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, CFG_INSPIRE_SITE
+    CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.textutils import wash_for_xml
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
-from invenio.search_engine import print_record, record_exists, get_colID, \
+from invenio.search_engine import record_exists, get_colID, \
      guess_primary_collection_of_a_record, get_record, \
      get_all_collections_of_a_record
 from invenio.search_engine_utils import get_fieldvalues
@@ -87,10 +86,10 @@ from invenio.bibknowledge import get_kbr_values
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_BIBEDIT_CACHEDIR)
-re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
-re_revid_split = re.compile('^(\d+)\.(\d{14})$')
-re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
-re_taskid = re.compile('ID="(\d+)"')
+re_xmlfilename_suffix = re.compile(r'_(\d+)_\d+\.xml$')
+re_revid_split = re.compile(r'^(\d+)\.(\d{14})$')
+re_revdate_split = re.compile(r'^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
+re_taskid = re.compile(r'ID="(\d+)"')
 re_tmpl_name = re.compile('<!-- BibEdit-Template-Name: (.*) -->')
 re_tmpl_description = re.compile('<!-- BibEdit-Template-Description: (.*) -->')
 re_ftmpl_name = re.compile('<!-- BibEdit-Field-Template-Name: (.*) -->')
@@ -131,14 +130,16 @@ def user_can_edit_record_collection(req, recid):
             normalized_collections.append(res[0][0])
     if not normalized_collections:
         # Check if user has access to all collections
-        auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
-                                                       collection='')
+        auth_code, dummy_message = acc_authorize_action(req,
+                                                        'runbibedit',
+                                                        collection='')
         if auth_code == 0:
             return True
     else:
         for collection in normalized_collections:
-            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
-                                                           collection=collection)
+            auth_code, dummy_message = acc_authorize_action(req,
+                                                            'runbibedit',
+                                                            collection=collection)
             if auth_code == 0:
                 return True
     return False
@@ -189,7 +190,7 @@ def record_find_matching_fields(key, rec, tag="", ind1=" ", ind2=" ",
         for field_instance in field_instances:
             # Get values to match: controlfield_value + subfield values
             values_to_match = [field_instance[3]] + \
-                              [val for code, val in field_instance[0]]
+                              [val for dummy_code, val in field_instance[0]]
             if exact_match and key in values_to_match:
                 found_fields.append(field_instance)
             else:
@@ -235,7 +236,7 @@ def create_cache(recid, uid, record='', cache_dirty=False, pending_changes=[],
     if not record:
         record = get_bibrecord(recid)
         if not record:
-            return
+            return (None, None)
 
     record_revision = get_record_last_modification_date(recid)
     if record_revision is None:
@@ -407,7 +408,7 @@ def record_locked_by_user_details(recid, uid):
     return record_blocked_by_nickname, record_blocked_by_email, locked_since
 
 
-def record_locked_by_queue(recid, uid=None):
+def record_locked_by_queue(recid):
     """Check if record should be locked for editing because of the current state
     of the BibUpload queue. The level of checking is based on
     CFG_BIBEDIT_LOCKLEVEL.
@@ -602,7 +603,7 @@ def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent=Fals
                 # If the template was correct
                 templates.append([fname_stripped, name, description, parsedTemplate])
             else:
-                raise "Problem when parsing the template %s" % (fname, )
+                raise Exception("Problem when parsing the template %s" % (fname, ))
         else:
             templates.append([fname_stripped, name, description, date_modified])
 
@@ -670,8 +671,8 @@ def _record_in_files_p(recid, filenames):
             if CFG_BIBEDIT_QUEUE_CHECK_METHOD == 'regexp':
                 # check via regexp: this is fast, but may not be precise
                 re_match_001 = re.compile('<controlfield tag="001">%s</controlfield>' % (recid))
-                re_match_oaiid = re.compile('<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (OAIID_TAG[0:3], rec_oaiid))
-                re_match_sysno = re.compile('<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], rec_sysno))
+                re_match_oaiid = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (OAIID_TAG[0:3], rec_oaiid))
+                re_match_sysno = re.compile(r'<datafield tag="%s" ind1=" " ind2=" ">(\s*<subfield code="a">\s*|\s*<subfield code="9">\s*.*\s*</subfield>\s*<subfield code="a">\s*)%s' % (SYSNO_TAG[0:3], rec_sysno))
                 file_content = open(filename).read()
                 if re_match_001.search(file_content):
                     return True
@@ -927,7 +928,7 @@ def get_xml_from_textmarc(recid, textmarc_record, uid=None):
 
     # Write content appending sysno at beginning
     for line in textmarc_record.splitlines():
-        f.write("%09d %s\n" % (recid, re.sub("\s+", " ", line.strip())))
+        f.write("%09d %s\n" % (recid, re.sub(r"\s+", " ", line.strip())))
     f.close()
 
     old_stdout = sys.stdout
@@ -1002,7 +1003,7 @@ def crossref_normalize_name(record):
         # remove spaces between initials
         # two iterations are required
         for _ in range(2):
-            new_author = re.sub(pattern_initials, '\g<1>\g<2>', new_author)
+            new_author = re.sub(pattern_initials, r'\g<1>\g<2>', new_author)
         position = field[4]
         record_modify_subfield(rec=record, tag='100', subfield_code='a',
         value=new_author, subfield_position=0, field_position_global=position)
@@ -1012,7 +1013,7 @@ def crossref_normalize_name(record):
         author = field[0][0][1]
         new_author = create_normalized_name(split_name_parts(author))
         for _ in range(2):
-            new_author = re.sub(pattern_initials, '\g<1>\g<2>', new_author)
+            new_author = re.sub(pattern_initials, r'\g<1>\g<2>', new_author)
         position = field[4]
         record_modify_subfield(rec=record, tag='700', subfield_code='a',
             value=new_author, subfield_position=0, field_position_global=position)
