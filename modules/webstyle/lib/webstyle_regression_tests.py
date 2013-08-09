@@ -21,17 +21,15 @@
 
 __revision__ = "$Id$"
 
-import unittest
 import httplib
 import os
 import urlparse
 import mechanize
+from flask import url_for
 from urllib2 import urlopen, HTTPError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_DEVEL_SITE
-from invenio.bibdocfile import calculate_md5
-from invenio.testutils import make_test_suite, run_test_suite, nottest
-from invenio.goto_engine import CFG_GOTO_PLUGINS, register_redirection, drop_redirection, update_redirection
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite, nottest
 
 def get_final_url(url):
     """Perform a GET request to the given URL, discarding the result and return
@@ -40,7 +38,7 @@ def get_final_url(url):
     response.read()
     return response.url
 
-class WebStyleWSGIUtilsTests(unittest.TestCase):
+class WebStyleWSGIUtilsTests(InvenioTestCase):
     """Test WSGI Utils."""
 
     if CFG_DEVEL_SITE:
@@ -59,6 +57,7 @@ class WebStyleWSGIUtilsTests(unittest.TestCase):
     if CFG_DEVEL_SITE:
         def test_posting_file(self):
             """webstyle - direct posting of a file"""
+            from invenio.bibdocfile import calculate_md5
             path = os.path.join(CFG_PREFIX, 'lib', 'webtest', 'invenio', 'test.gif')
             body = open(path).read()
             md5 = calculate_md5(path)
@@ -70,9 +69,10 @@ class WebStyleWSGIUtilsTests(unittest.TestCase):
             self.assertEqual(body, body2, "Body sent differs from body received")
 
 
-class WebStyleGotoTests(unittest.TestCase):
+class WebStyleGotoTests(InvenioTestCase):
     """Test the goto framework"""
     def tearDown(self):
+        from invenio.goto_engine import drop_redirection
         drop_redirection('first_record')
         drop_redirection('invalid_external')
         drop_redirection('latest_article')
@@ -80,6 +80,7 @@ class WebStyleGotoTests(unittest.TestCase):
 
     def test_plugin_availability(self):
         """webstyle - test GOTO plugin availability"""
+        from invenio.goto_engine import CFG_GOTO_PLUGINS
         self.failUnless('goto_plugin_simple' in CFG_GOTO_PLUGINS)
         self.failUnless('goto_plugin_latest_record' in CFG_GOTO_PLUGINS)
         self.failUnless('goto_plugin_cern_hr_documents' in CFG_GOTO_PLUGINS)
@@ -87,49 +88,77 @@ class WebStyleGotoTests(unittest.TestCase):
 
     def test_simple_relative_redirection(self):
         """webstyle - test simple relative redirection via goto_plugin_simple"""
+        from invenio.goto_engine import register_redirection
         register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/1'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/1')
 
     def test_simple_absolute_redirection(self):
         """webstyle - test simple absolute redirection via goto_plugin_simple"""
+        from invenio.goto_engine import register_redirection
         register_redirection('first_record', 'goto_plugin_simple', parameters={'url': CFG_SITE_URL + '/record/1'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/1')
 
     def test_simple_absolute_redirection_https(self):
         """webstyle - test simple absolute redirection to https via goto_plugin_simple"""
+        from invenio.goto_engine import register_redirection
         register_redirection('first_record', 'goto_plugin_simple', parameters={'url': CFG_SITE_SECURE_URL + '/record/1'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_SECURE_URL + '/record/1')
 
     def test_invalid_external_redirection(self):
         """webstyle - test simple absolute redirection to https via goto_plugin_simple"""
+        from invenio.goto_engine import register_redirection
         register_redirection('invalid_external', 'goto_plugin_simple', parameters={'url': 'http://www.google.com'})
         self.assertRaises(HTTPError, get_final_url, CFG_SITE_URL + '/goto/google')
 
     def test_latest_article_redirection(self):
         """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
+        from invenio.goto_engine import register_redirection
         register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article'), CFG_SITE_URL + '/record/108')
 
     @nottest
     def FIXME_TICKET_1293_test_latest_pdf_article_redirection(self):
         """webstyle - test redirecting to latest article via goto_plugin_latest_record"""
+        from invenio.goto_engine import register_redirection
         register_redirection('latest_pdf_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles', 'format': '.pdf'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_pdf_article'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
 
     @nottest
     def FIXME_TICKET_1293_test_URL_argument_in_redirection(self):
         """webstyle - test redirecting while passing arguments on the URL"""
+        from invenio.goto_engine import register_redirection
         register_redirection('latest_article', 'goto_plugin_latest_record', parameters={'cc': 'Articles'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/latest_article?format=.pdf'), CFG_SITE_URL + '/record/97/files/0002060.pdf')
 
     def test_updating_redirection(self):
         """webstyle - test updating redirection"""
+        from invenio.goto_engine import register_redirection, update_redirection
         register_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/1'})
         update_redirection('first_record', 'goto_plugin_simple', parameters={'url': '/record/2'})
         self.assertEqual(get_final_url(CFG_SITE_URL + '/goto/first_record'), CFG_SITE_URL + '/record/2')
 
 
-TEST_SUITE = make_test_suite(WebStyleWSGIUtilsTests, WebStyleGotoTests)
+class WebInterfaceHandlerFlaskTest(InvenioTestCase):
+    """Test webinterface handlers."""
+    def test_authenticated_decorator(self):
+        response = self.client.get(url_for('webmessage.index'),
+                                   follow_redirects=True)
+        self.assert401(response)
+
+        self.login('admin', '')
+        response = self.client.get(url_for('webmessage.index'),
+                                   follow_redirects=True)
+        self.assert200(response)
+
+        self.logout()
+        response = self.client.get(url_for('webmessage.index'),
+                                   follow_redirects=True)
+        self.assert401(response)
+
+
+TEST_SUITE = make_test_suite(WebStyleWSGIUtilsTests,
+                             WebStyleGotoTests,
+                             WebInterfaceHandlerFlaskTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

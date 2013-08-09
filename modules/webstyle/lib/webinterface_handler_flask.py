@@ -225,12 +225,13 @@ def create_invenio_flask_app(**kwargs_config):
             return render_template("404.html"), 404
 
     @_app.errorhandler(401)
-    def do_login_first(error):
+    def do_login_first(error=401):
         """Displays login page when user is not authorised."""
         if request.is_xhr:
             return _("Authorization failure"), 401
         flash(_("Authorization failure"), 'error')
-        return redirect(url_for('webaccount.login', referer=request.referrer))
+        from invenio.webaccount_blueprint import login
+        return login(referer=request.referrer), 401
 
     @_app.endpoint('static')
     @_app.route(_app.static_url_path + '/<path:filename>', methods=['POST'])
@@ -342,8 +343,9 @@ def create_invenio_flask_app(**kwargs_config):
     _login_manager = InvenioLoginManager()
     _login_manager.login_view = 'webaccount.login'
     _login_manager.setup_app(_app)
+    _login_manager.unauthorized_handler(do_login_first)
 
-    # Let's create main menu.
+        # Let's create main menu.
     class Menu(object):
         def __init__(self, id='', title='', url='', order=None, children=None,
                      display=lambda: True):
