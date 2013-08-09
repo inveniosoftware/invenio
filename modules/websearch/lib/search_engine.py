@@ -3442,6 +3442,7 @@ def guess_primary_collection_of_a_record(recID):
             out = res[0][0]
             break
     if CFG_CERN_SITE:
+        recID = int(recID)
         # dirty hack for ATLAS collections at CERN:
         if out in ('ATLAS Communications', 'ATLAS Internal Notes'):
             for alternative_collection in ('ATLAS Communications Physics',
