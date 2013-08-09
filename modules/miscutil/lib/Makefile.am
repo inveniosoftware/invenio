@@ -85,6 +85,8 @@ pylib_DATA = __init__.py \
              orcid.py \
              paginationutils.py \
              paginationutils_unit_tests.py \
+             pidutils.py \
+             pidutils_unit_tests.py \
              plotextractor.py \
              plotextractor_config.py \
              plotextractor_converter.py \
