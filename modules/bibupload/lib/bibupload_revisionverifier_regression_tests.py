@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -40,6 +40,8 @@ from invenio.bibupload_regression_tests import GenericBibUploadTest, \
                                                compare_xmbuffers
 
 from invenio.testutils import make_test_suite, run_test_suite, nottest
+
+from invenio.dbquery import run_sql
 
 @nottest
 def init_test_records():
@@ -1065,13 +1067,48 @@ class RevisionVerifierFromBibUpload(GenericBibUploadTest):
         self.check_record_consistency(self.recid)
         self.assertEquals(error, 2)
 
+
+
+class RevisionVerifierHistoryOfAffectedFields(GenericBibUploadTest):
+    """Checks if column 'affected fields' from hstRECORD table
+       is filled correctly"""
+
+    def setUp(self):
+        GenericBibUploadTest.setUp(self)
+        self.data = init_test_records()
+
+    def test_inserted_record_with_no_affected_tags_in_hst(self):
+        """Checks if inserted record has affected fields in hstRECORD table"""
+        query = "SELECT affected_fields from hstRECORD where id_bibrec=5 ORDER BY job_date DESC"
+        res = run_sql(query)
+        self.assertEqual(res[0][0], "")
+
+    def test_corrected_record_affected_tags(self):
+        """Checks if corrected record has affected fields in hstRECORD table"""
+        query = "SELECT affected_fields from hstRECORD where id_bibrec=12 ORDER BY job_date DESC"
+        res = run_sql(query)
+        self.assertEqual(res[0][0], "005__%,8564_%,909C0%,909C1%,909C5%,909CO%,909CS%")
+
+
+    def test_append_to_record_affected_tags(self):
+        """Checks if record with appended parts has proper affected fields in hstRECORD table"""
+        query = """SELECT affected_fields from hstRECORD where id_bibrec=%s
+                   ORDER BY job_date DESC""" % self.data["id"][0]
+        res = run_sql(query)
+        self.assertEqual(res[0][0], '005__%,888__%')
+        self.assertEqual(res[1][0], '005__%,970__%')
+        self.assertEqual(res[2][0], '')
+
+
 TEST_SUITE = make_test_suite(RevisionVerifierForCorrectAddition,
                             RevisionVerifierForCorrectModification,
                             RevisionVerifierForInterchangedFields,
                             RevisionVerifierForDeletingFields,
                             RevisionVerifierForConflictingAddition,
                             RevisionVerifierForConflictingModification,
-                            RevisionVerifierForCommonCases)
+                            RevisionVerifierForCommonCases,
+                            RevisionVerifierHistoryOfAffectedFields)
+
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE, warn_user=True)

@@ -4048,6 +4048,7 @@ CREATE TABLE IF NOT EXISTS hstRECORD (
   job_person varchar(255) NOT NULL,
   job_date datetime NOT NULL,
   job_details blob NOT NULL,
+  affected_fields text NOT NULL default '',
   KEY (id_bibrec),
   KEY (job_id),
   KEY (job_name),
@@ -4616,5 +4617,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_new_index_ite
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_crcLIBRARY_type',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_new_index_filetype',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_delete_recjson_cache',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_hstRECORD_affected_fields',NOW());
 
 -- end of file

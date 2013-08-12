@@ -474,12 +474,13 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             try:
                 record = synchronize_8564(rec_id, record, record_had_FFT, pretend=pretend)
                 # in case if FFT is in affected list make appropriate changes
-                if ('4', ' ') not in affected_tags.get('856', []):
-                    if '856' not in affected_tags:
-                        affected_tags['856'] = [('4', ' ')]
-                    elif ('4', ' ') not in affected_tags['856']:
-                        affected_tags['856'].append(('4', ' '))
-                write_message("     -Modified field list updated with FFT details: %s" % str(affected_tags), verbose=2)
+                if opt_mode is not 'insert': # because for insert, all tags are affected
+                    if ('4', ' ') not in affected_tags.get('856', []):
+                        if '856' not in affected_tags:
+                            affected_tags['856'] = [('4', ' ')]
+                        elif ('4', ' ') not in affected_tags['856']:
+                            affected_tags['856'].append(('4', ' '))
+                    write_message("     -Modified field list updated with FFT details: %s" % str(affected_tags), verbose=2)
             except Exception, e:
                 register_exception(alert_admin=True)
                 msg = "   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e
@@ -545,7 +546,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     return (1, int(rec_id), msg)
             if not CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS:
                 # archive MARCXML format of this record for version history purposes:
-                error = archive_marcxml_for_history(rec_id, pretend=pretend)
+                error = archive_marcxml_for_history(rec_id, affected_fields=affected_tags, pretend=pretend)
                 if error == 1:
                     msg = "   Failed to archive MARCXML for history"
                     write_message(msg, verbose=1, stream=sys.stderr)
@@ -2288,7 +2289,8 @@ def delete_bibfmt_format(id_bibrec, format_name, pretend=False):
         run_sql("DELETE LOW_PRIORITY FROM bibfmt WHERE id_bibrec=%s and format=%s", (id_bibrec, format_name))
     return 0
 
-def archive_marcxml_for_history(recID, pretend=False):
+
+def archive_marcxml_for_history(recID, affected_fields, pretend=False):
     """
     Archive current MARCXML format of record RECID from BIBFMT table
     into hstRECORD table.  Useful to keep MARCXML history of records.
@@ -2297,11 +2299,25 @@ def archive_marcxml_for_history(recID, pretend=False):
     """
     res = run_sql("SELECT id_bibrec, value, last_updated FROM bibfmt WHERE format='xm' AND id_bibrec=%s",
                     (recID,))
+
+    db_affected_fields = ""
+    if affected_fields:
+        tmp_affected_fields = {}
+        for field in affected_fields:
+            if field.isdigit(): #hack for tags from RevisionVerifier
+                for ind in affected_fields[field]:
+                    tmp_affected_fields[(field + ind[0] + ind[1] + "%").replace(" ", "_")] = 1
+            else:
+                pass #future implementation for fields
+        tmp_affected_fields = tmp_affected_fields.keys()
+        tmp_affected_fields.sort()
+        db_affected_fields = ",".join(tmp_affected_fields)
     if res and not pretend:
-        run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details)
-                                    VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+        run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details, affected_fields)
+                                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (res[0][0], res[0][1], task_get_task_param('task_id', 0), 'bibupload', task_get_task_param('user', 'UNKNOWN'), res[0][2],
-                    'mode: ' + task_get_option('mode', 'UNKNOWN') + '; file: ' + task_get_option('file_path', 'UNKNOWN') + '.'))
+                    'mode: ' + task_get_option('mode', 'UNKNOWN') + '; file: ' + task_get_option('file_path', 'UNKNOWN') + '.',
+                db_affected_fields))
     return 0
 
 def update_database_with_metadata(record, rec_id, oai_rec_id="oai", affected_tags=None, pretend=False):
