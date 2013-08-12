@@ -76,8 +76,32 @@ def create_invenio_flask_app(**kwargs_config):
        request with a 404 error.
     """
 
+    def decorate_build(f):
+        @wraps(f)
+        def decorator(*args, **kwargs):
+            scheme_url = {
+                'http': current_app.config['CFG_SITE_URL'],
+                'https': current_app.config['CFG_SITE_SECURE_URL']
+            }
+            force_external = kwargs.get('force_external', False)
+            url_scheme = getattr(f.im_self, 'url_scheme', 'http')
+            kwargs['force_external'] = False
+            url = f(*args, **kwargs)
+            if force_external:
+                url = scheme_url.get(url_scheme) + url
+            return url
+        return decorator
+
+    class InvenioFlask(Flask):
+
+        def create_url_adapter(self, request):
+            url_adapter = super(InvenioFlask, self).create_url_adapter(request)
+            if url_adapter is not None and hasattr(url_adapter, 'build'):
+                url_adapter.build = decorate_build(url_adapter.build)
+            return url_adapter
+
     ## The Flask application instance
-    _app = Flask(__name__,
+    _app = InvenioFlask(__name__,
         ## Static files are usually handled directly by the webserver (e.g. Apache)
         ## However in case WSGI is required to handle static files too (such
         ## as when running simple server), then this flag can be
