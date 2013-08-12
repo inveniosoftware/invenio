@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -783,6 +783,73 @@ def cli_cmd_create_apache_conf(conf):
     from invenio.textutils import wrap_text_in_a_box
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
+    if guess_apache_24():
+        directory_www_directive = """
+        # Uncomment the following on Apache < 2.4
+        # <Directory %(webdir)s>
+        #    Options FollowSymLinks MultiViews
+        #    AllowOverride None
+        #    Order allow,deny
+        #    Allow from all
+        # </Directory>
+        # Comment the following on Apache < 2.4
+        <Directory %(webdir)s>
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Require all granted
+        </Directory>""" % {'webdir': conf.get('Invenio', 'CFG_WEBDIR')}
+        directory_wsgi_directive = """
+        # Uncomment the following on Apache < 2.4
+        # <Directory %(wsgidir)s>
+        #    WSGIProcessGroup invenio
+        #    WSGIApplicationGroup %%{GLOBAL}
+        #    Options FollowSymLinks MultiViews
+        #    AllowOverride None
+        #    Order allow,deny
+        #    Allow from all
+        # </Directory>
+        # Comment the following on Apache < 2.4
+        <Directory %(wsgidir)s>
+           WSGIProcessGroup invenio
+           WSGIApplicationGroup %%{GLOBAL}
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Require all granted
+        </Directory>""" % {'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi')}
+    else:
+        directory_www_directive = """
+        # Comment the following on Apache >= 2.4
+        <Directory %(webdir)s>
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           Allow from all
+        </Directory>
+        # Uncomment the following on Apache >= 2.4
+        # <Directory %(webdir)s>
+        #    Options FollowSymLinks MultiViews
+        #    AllowOverride None
+        #    Require all granted
+        # </Directory>""" % {'webdir': conf.get('Invenio', 'CFG_WEBDIR')}
+        directory_wsgi_directive = """
+        # Comment the following on Apache >= 2.4
+        <Directory %(wsgidir)s>
+           WSGIProcessGroup invenio
+           WSGIApplicationGroup %%{GLOBAL}
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           Allow from all
+        </Directory>
+        # Uncomment the following on Apache >= 2.4
+        # <Directory %(wsgidir)s>
+        #    WSGIProcessGroup invenio
+        #    WSGIApplicationGroup %%{GLOBAL}
+        #    Options FollowSymLinks MultiViews
+        #    AllowOverride None
+        #    Require all granted
+        # </Directory>""" % {'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi')}
+
     xsendfile_directive_needed = int(conf.get("Invenio", 'CFG_BIBDOCFILE_USE_XSENDFILE')) != 0
     ## Apache vhost conf file is distro specific, so analyze needs:
     # Gentoo (and generic defaults):
@@ -831,12 +898,7 @@ WSGIRestrictStdout Off
         ServerAlias %(serveralias)s
         ServerAdmin %(serveradmin)s
         DocumentRoot %(webdir)s
-        <Directory %(webdir)s>
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
+        %(directory_www_directive)s
         ErrorLog %(logdir)s/apache.err
         LogLevel warn
         CustomLog %(logdir)s/apache.log combined
@@ -855,14 +917,7 @@ WSGIRestrictStdout Off
         WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
-        <Directory %(wsgidir)s>
-           WSGIProcessGroup invenio
-           WSGIApplicationGroup %%{GLOBAL}
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
+        %(directory_wsgi_directive)s
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "").split('.')[0],
@@ -879,6 +934,8 @@ WSGIRestrictStdout Off
        'xsendfile_directive' : xsendfile_directive_needed and \
                                "XSendFile On\nXSendFileAllowAbove On" or \
                                "#XSendFile On\n#XSendFileAllowAbove On",
+       'directory_www_directive': directory_www_directive,
+       'directory_wsgi_directive': directory_wsgi_directive,
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
@@ -902,12 +959,7 @@ WSGIRestrictStdout Off
         ServerAdmin %(serveradmin)s
         SSLEngine on
         DocumentRoot %(webdir)s
-        <Directory %(webdir)s>
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
+        %(directory_www_directive)s
         ErrorLog %(logdir)s/apache-ssl.err
         LogLevel warn
         CustomLog %(logdir)s/apache-ssl.log combined
@@ -924,14 +976,7 @@ WSGIRestrictStdout Off
         Alias /favicon.ico %(webdir)s/favicon.ico
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
-        <Directory %(wsgidir)s>
-           WSGIProcessGroup invenio
-           WSGIApplicationGroup %%{GLOBAL}
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
+        %(directory_wsgi_directive)s
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "").split('.')[0],
@@ -954,6 +999,8 @@ WSGIRestrictStdout Off
        'xsendfile_directive' : xsendfile_directive_needed and \
                                "XSendFile On\nXSendFileAllowAbove On" or \
                                "#XSendFile On\n#XSendFileAllowAbove On",
+       'directory_www_directive': directory_www_directive,
+       'directory_wsgi_directive': directory_wsgi_directive,
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
@@ -1036,6 +1083,25 @@ def _grep_version_from_executable(path_to_exec, version_regexp):
                     # the longest the better
                     exec_version = cmd2_out_line
     return exec_version
+
+_RE_APACHE_MAJOR_VERSION = re.compile(r"Apache/(\d+\.\d+)")
+def guess_apache_24(apache_versions=None):
+    """
+    Returns True if it looks like the system is running Apache 2.4 or later.
+    """
+    if apache_versions is None:
+        apache_versions = detect_apache_version()
+    for apache_version in apache_versions:
+        g = _RE_APACHE_MAJOR_VERSION.search(apache_version)
+        if g:
+            try:
+                version = float(g.group(1))
+            except ValueError:
+                continue
+            if version >= 2.4:
+                return True
+    return False
+
 
 def detect_apache_version():
     """
