@@ -50,6 +50,11 @@ CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT = 10
 # interfaces (0=simple, 1=advanced, 2=add-to-search):
 CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0,1,2]
 
+# CFG_WEBSEARCH_BLACKLISTED_FORMATS -- list of formats that will be refused
+# by perform_request_search:
+# * recstruct is an internal format thus should not be exposed
+CFG_WEBSEARCH_BLACKLISTED_FORMATS = ["recstruct", "wapaff", "wapdat"]
+
 
 class InvenioWebSearchUnknownCollectionError(Exception):
     """Exception for bad collection."""
