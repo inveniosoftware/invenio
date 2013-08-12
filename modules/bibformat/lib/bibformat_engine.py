@@ -520,6 +520,7 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
         try:
             format_element = get_format_element(function_name, verbose)
         except Exception, e:
+            format_element = None
             if verbose >= 5:
                 return '<b><span style="color: rgb(255, 0, 0);">' + \
                        cgi.escape(str(e)).replace('\n', '<br/>') + \
