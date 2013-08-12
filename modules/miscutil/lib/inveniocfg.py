@@ -244,7 +244,8 @@ You may want to customise your invenio-local.conf configuration accordingly."""
                        'CFG_OAUTH2_PROVIDERS',
                        'CFG_BIBFORMAT_CACHED_FORMATS',
                        'CFG_BIBEDIT_ADD_TICKET_RT_QUEUES',
-                       'CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS',]:
+                       'CFG_BIBAUTHORID_ENABLED_REMOTE_LOGIN_SYSTEMS',
+                       'CFG_WEBSEARCH_BLACKLISTED_FORMATS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
