@@ -86,7 +86,8 @@ from invenio.config import \
      CFG_BIBSORT_ENABLED, \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
-     CFG_BASE_URL
+     CFG_BASE_URL, \
+     CFG_WEBSEARCH_BLACKLISTED_FORMATS
 
 from invenio.search_engine_config import \
      InvenioWebSearchUnknownCollectionError, \
@@ -1656,13 +1657,19 @@ def get_synonym_terms(term, kbr_name, match_type, use_memoise=False):
     return dterms.keys()
 
 
-def wash_output_format(ouput_format):
+def wash_output_format(ouput_format, verbose=False, req=None):
     """Wash output format FORMAT.  Currently only prevents input like
     'of=9' for backwards-compatible format that prints certain fields
     only.  (for this task, 'of=tm' is preferred)"""
     if str(ouput_format[0:3]).isdigit() and len(ouput_format) != 6:
         # asked to print MARC tags, but not enough digits,
         # so let's switch back to HTML brief default
+        return 'hb'
+    elif format in CFG_WEBSEARCH_BLACKLISTED_FORMATS:
+        if verbose:
+            write_warning("Selected format is not available through perform_request_search", req=req)
+            # Returning an empty list seems dangerous because you wouldn't know
+            # right away that the list is not supposed to be empty.
         return 'hb'
     else:
         return ouput_format
@@ -5624,7 +5631,7 @@ def prs_wash_arguments(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WE
     """
 
     # wash output format:
-    of = wash_output_format(of)
+    of = wash_output_format(of, verbose=verbose, req=req)
 
     # wash all arguments requiring special care
     p = wash_pattern(p)
