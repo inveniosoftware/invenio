@@ -94,7 +94,7 @@ class WebInterfaceAPIDocExtract(WebInterfaceDirectory):
         if 'pdf' not in form:
             return 'No PDF file uploaded'
 
-        return extract_from_pdf_string(form['pdf'].file.read())
+        return extract_from_pdf_string(form['pdf'].stream.read())
 
     def extract_references_pdf_url(self, req, form):
         """Extract references from the pdf pointed by the passed url"""
@@ -117,7 +117,7 @@ class WebInterfaceAPIDocExtract(WebInterfaceDirectory):
         if 'txt' not in form:
             return 'No text specified'
 
-        txt = form['txt']
+        txt = form['txt'].stream.read()
 
         return extract_references_from_string_xml(txt)
 

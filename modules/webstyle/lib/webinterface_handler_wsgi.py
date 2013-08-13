@@ -131,8 +131,11 @@ class SimulatedModPythonRequest(object):
     def get_post_form(self):
         """ Returns only POST form. """
         self.__tainted = True
-        return dict(map(lambda (k, x): (k, x if len(x) > 1 else x[0]),
+        form = dict(map(lambda (k, x): (k, x if len(x) > 1 else x[0]),
                         request.values.to_dict(flat=False).iteritems()))
+        if request.files:
+            form.update(request.files.to_dict())
+        return form
 
     def get_response_sent_p(self):
         return self.__response_sent_p
