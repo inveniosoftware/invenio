@@ -3868,15 +3868,10 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
         """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -3887,17 +3882,11 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self.failUnless(try_url_download(testrec_expected_url))
 
     def test_fft_insert_with_valid_embargo(self):
@@ -3930,15 +3919,10 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
         """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -3949,17 +3933,11 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         result = urlopen(testrec_expected_url).read()
         self.failUnless("This file is restricted." in result, result)
 
@@ -3996,19 +3974,13 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="980" ind1=" " ind2=" ">
           <subfield code="a">ARTICLE</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
-        980__ $$aARTICLE
         """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -4019,17 +3991,11 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         result = urlopen(testrec_expected_url).read()
         self.failIf("If you already have an account, please login using the form below." in result, result)
         self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
@@ -4084,6 +4050,7 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+         <subfield code="s">4</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test.ps.Z</subfield>
          </datafield>
         </record>
@@ -4094,18 +4061,6 @@ allow any</subfield>
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
             'email_code': email_code}
 
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test.ps.Z
-        """ % {'siteurl': CFG_SITE_URL,
-            'CFG_SITE_RECORD': CFG_SITE_RECORD,
-            'email_tag': email_tag,
-            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
-            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
-            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test.ps.Z" \
                % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url2 = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/test?format=ps.Z" \
@@ -4119,8 +4074,6 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         testrec_expected_url2 = testrec_expected_url.replace('123456789',
@@ -4130,11 +4083,7 @@ allow any</subfield>
         self.check_record_consistency(recid)
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self.assertEqual(test_web_page_content(testrec_expected_url, 'jekyll', 'j123ekyll', expected_text='TEST'), [])
         self.assertEqual(test_web_page_content(testrec_expected_url2, 'jekyll', 'j123ekyll', expected_text='TEST'), [])
 
@@ -4210,23 +4159,18 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.gif</subfield>
           <subfield code="y">This is a description</subfield>
           <subfield code="z">This is a comment</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">530</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.jpeg</subfield>
           <subfield code="y">This is a description</subfield>
           <subfield code="z">This is a second comment</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.gif$$yThis is a description$$zThis is a comment
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.jpeg$$yThis is a description$$zThis is a second comment
         """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url1 = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.gif" % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url2 = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/CIDIESSE.jpeg" % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -4237,19 +4181,13 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url1 = testrec_expected_url1.replace('123456789',
                                                           str(recid))
         testrec_expected_url2 = testrec_expected_url1.replace('123456789',
                                                           str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self.failUnless(try_url_download(testrec_expected_url1))
         self.failUnless(try_url_download(testrec_expected_url2))
 
@@ -4298,9 +4236,11 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">79</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
@@ -4315,20 +4255,6 @@ allow any</subfield>
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
             'email_code': email_code}
 
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon$$xicon
-        980__ $$aARTICLE
-        """ % {'siteurl': CFG_SITE_URL,
-            'CFG_SITE_RECORD': CFG_SITE_RECORD,
-            'email_tag': email_tag,
-            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
-            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
-            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_icon = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon" \
@@ -4340,20 +4266,13 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         testrec_expected_icon = testrec_expected_icon.replace('123456789',
                                                           str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self.assertEqual(test_web_page_content(testrec_expected_icon, 'jekyll', 'j123ekyll', expected_text=urlopen('%(siteurl)s/img/sb.gif' % {
             'siteurl': CFG_SITE_URL
         }).read()), [])
@@ -4391,20 +4310,15 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">79</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon$$xicon
         """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -4417,19 +4331,13 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         testrec_expected_icon = testrec_expected_icon.replace('123456789',
                                                           str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
 
         self.failUnless(try_url_download(testrec_expected_url))
         self.failUnless(try_url_download(testrec_expected_icon))
@@ -4471,28 +4379,23 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">295078</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/9809057.pdf</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">%(sizeofdemobibdata)s</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/demobibdata.xml</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">208</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/9809057.pdf
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/demobibdata.xml
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD, 'sizeofdemobibdata': os.path.getsize(os.path.join(CFG_TMPDIR, "demobibdata.xml"))}
         # insert test record:
         testrec_expected_urls = []
         for files in ('site_logo.gif', 'head.gif', '9809057.pdf', 'demobibdata.xml'):
@@ -4503,19 +4406,14 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_urls = []
         for files in ('site_logo.gif', 'head.gif', '9809057.pdf', 'demobibdata.xml'):
             testrec_expected_urls.append('%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)s/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD, 'files' : files, 'recid' : recid})
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
 
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
+
         for url in testrec_expected_urls:
             self.failUnless(try_url_download(url))
 
@@ -4562,15 +4460,10 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">79</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -4580,8 +4473,6 @@ allow any</subfield>
         self.check_record_consistency(recid)
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -4594,13 +4485,8 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self._test_bibdoc_status(recid, 'site_logo', '')
 
     def test_fft_correct_already_exists(self):
@@ -4673,33 +4559,28 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">35</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/line.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">626</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/line.png</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">432</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/rss.png</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">a second description</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">786</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.png</subfield>
           <subfield code="y">another second description</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/line.gif
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/line.png
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/rss.png
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif$$ya second description
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.png$$yanother second description
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -4717,8 +4598,6 @@ allow any</subfield>
         self.check_record_consistency(recid)
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -4739,17 +4618,12 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
         self.failUnless(try_url_download(testrec_expected_url2))
         self.failUnless(try_url_download(testrec_expected_url3))
         self.failUnless(try_url_download(testrec_expected_url4))
         self.failUnless(try_url_download(testrec_expected_url5))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         bibrecdocs = BibRecDocs(recid)
         self.failUnless(bibrecdocs.get_bibdoc('rss').list_versions(), [1, 2])
         self.failUnless(bibrecdocs.get_bibdoc('site_logo').list_versions(), [1])
@@ -4784,6 +4658,7 @@ allow any</subfield>
         <controlfield tag="001">123456789</controlfield>
         <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">a description</subfield>
          </datafield>
@@ -4804,8 +4679,7 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
 
         bibrecdocs = BibRecDocs(recid)
         self.failUnless(bibrecdocs.get_bibdoc('site_logo').doctype, 'TEST2')
@@ -4854,21 +4728,16 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">a description</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">786</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.png</subfield>
           <subfield code="y">another second description</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif$$ya description
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.png$$yanother second description
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -4881,8 +4750,6 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         test_to_append = test_to_append.replace('123456789',
@@ -4894,14 +4761,9 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
         self.failUnless(try_url_download(testrec_expected_url2))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
 
     def test_fft_implicit_fix_marc(self):
         """bibupload - FFT implicit FIX-MARC"""
@@ -4954,15 +4816,6 @@ allow any</subfield>
         """ % {
             'siteurl': CFG_SITE_URL
         }
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8560_ $$ffoo@bar.com
-        8564_ $$u%(siteurl)s/img/site_logo.gif
-        """ % {
-            'siteurl': CFG_SITE_URL
-        }
         recs = bibupload.xml_marc_to_records(test_to_upload)
         dummy, recid, dummy = bibupload.bibupload_records(recs, opt_mode='insert')[0]
         self.check_record_consistency(recid)
@@ -4971,19 +4824,13 @@ allow any</subfield>
                                                           str(recid))
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         # correct test record with implicit FIX-MARC:
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload_records(recs, opt_mode='correct')[0]
         self.check_record_consistency(recid)
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
 
     def test_fft_vs_bibedit(self):
         """bibupload - FFT Vs. BibEdit compatibility"""
@@ -5014,6 +4861,7 @@ allow any</subfield>
           <subfield code="u">http://www.google.com/</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="z">BibEdit Comment</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
           <subfield code="y">BibEdit Description</subfield>
@@ -5026,14 +4874,6 @@ allow any</subfield>
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         testrec_expected_xm = str(test_to_replace)
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$uhttp://www.google.com/
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif$$x01$$yBibEdit Description$$zBibEdit Comment
-        8564_ $$uhttp://cern.ch/
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
@@ -5042,8 +4882,6 @@ allow any</subfield>
         self.check_record_consistency(recid)
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5056,13 +4894,8 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self._test_bibdoc_status(recid, 'site_logo', '')
 
         bibrecdocs = BibRecDocs(recid)
@@ -5116,18 +4949,14 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">208</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
           <subfield code="y">Next Try</subfield>
           <subfield code="z">Comment</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif$$yNext Try$$zComment
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
@@ -5139,8 +4968,6 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
 
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5154,15 +4981,9 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
 
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '', "buffers not equal: %s and %s" % (inserted_xm, testrec_expected_xm))
-
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '', "buffers not equal: %s and %s" % (inserted_hm, testrec_expected_hm))
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self._test_bibdoc_status(recid, 'patata', '')
 
     def test_no_url_fft_correct(self):
@@ -5206,17 +5027,12 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
           <subfield code="y">Try</subfield>
           <subfield code="z">Next Comment</subfield>
          </datafield>
         </record>
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif$$yTry$$zNext Comment
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -5228,8 +5044,6 @@ allow any</subfield>
 
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5243,14 +5057,9 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
 
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self._test_bibdoc_status(recid, 'patata', '')
 
     def test_new_icon_fft_append(self):
@@ -5286,20 +5095,15 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon$$xicon
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif?subformat=icon" \
-            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         dummy, recid, dummy = bibupload.bibupload_records(recs, opt_mode='insert')[0]
@@ -5307,8 +5111,6 @@ allow any</subfield>
 
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5322,14 +5124,8 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
         self._test_bibdoc_status(recid, 'site_logo', '')
 
 
@@ -5385,16 +5181,12 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">9427</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
+
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/patata.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
@@ -5405,8 +5197,6 @@ allow any</subfield>
 
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5420,13 +5210,10 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
 
         self.failUnless("This file is restricted." in urlopen(testrec_expected_url).read())
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
+
 
         self._test_bibdoc_status(recid, 'patata', 'New restricted')
 
@@ -5481,30 +5268,23 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
+          <subfield code="s">2032</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
+          <subfield code="s">208</subfield>
+          <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
         </record>
         """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
-        """ % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-
+        testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
+            % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         # insert test record:
         recs = bibupload.xml_marc_to_records(test_to_upload)
         dummy, recid, dummy = bibupload.bibupload_records(recs, opt_mode='insert')[0]
         self.check_record_consistency(recid)
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5525,13 +5305,8 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
-
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self._test_bibdoc_status(recid, 'site_logo', '')
         self._test_bibdoc_status(recid, 'head', '')
 
@@ -5595,6 +5370,7 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">171</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
         </record>
@@ -5604,18 +5380,6 @@ allow any</subfield>
             'email_ind1': email_ind1 == '_' and ' ' or email_ind1,
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
             'email_code': email_code}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
-        """ % {'siteurl': CFG_SITE_URL,
-            'CFG_SITE_RECORD': CFG_SITE_RECORD,
-            'email_tag': email_tag,
-            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
-            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
-            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
@@ -5624,8 +5388,6 @@ allow any</subfield>
         self.check_record_consistency(recid)
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5646,12 +5408,8 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
 
         self._test_bibdoc_status(recid, 'site_logo', '')
 
@@ -5725,6 +5483,7 @@ allow any</subfield>
           <subfield code="%(email_code)s">jekyll@cds.cern.ch</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">208</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif</subfield>
          </datafield>
         </record>
@@ -5736,19 +5495,6 @@ allow any</subfield>
             'email_ind2': email_ind2 == '_' and ' ' or email_ind2,
             'email_code': email_code}
 
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        %(email_tag)s%(email_ind1)s%(email_ind2)s $$%(email_code)sjekyll@cds.cern.ch
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif
-        """ % {
-            'siteurl': CFG_SITE_URL,
-            'CFG_SITE_RECORD': CFG_SITE_RECORD,
-            'email_tag': email_tag,
-            'email_ind1': email_ind1 == ' ' and '_' or email_ind1,
-            'email_ind2': email_ind2 == ' ' and '_' or email_ind2,
-            'email_code': email_code}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/head.gif" % { 'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
 
         # insert test record:
@@ -5757,8 +5503,6 @@ allow any</subfield>
         self.check_record_consistency(recid)
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
-                                                          str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
                                                           str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
@@ -5771,12 +5515,8 @@ allow any</subfield>
 
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
 
         expected_content_version = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
 
@@ -5814,19 +5554,13 @@ allow any</subfield>
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="s">2032</subfield>
           <subfield code="u">%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif</subfield>
          </datafield>
          <datafield tag="980" ind1=" " ind2=" ">
           <subfield code="a">ARTICLE</subfield>
          </datafield>
         </record>
-        """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
-        testrec_expected_hm = """
-        001__ 123456789
-        003__ SzGeCERN
-        100__ $$aTest, John$$uTest University
-        8564_ $$u%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif
-        980__ $$aARTICLE
         """ % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
         testrec_expected_url = "%(siteurl)s/%(CFG_SITE_RECORD)s/123456789/files/site_logo.gif" \
             % {'siteurl': CFG_SITE_URL, 'CFG_SITE_RECORD': CFG_SITE_RECORD}
@@ -5839,19 +5573,13 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_xm = testrec_expected_xm.replace('123456789',
                                                           str(recid))
-        testrec_expected_hm = testrec_expected_hm.replace('123456789',
-                                                          str(recid))
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
         testrec_expected_url2 = testrec_expected_url2.replace('123456789',
                                                           str(recid))
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
-        inserted_hm = print_record(recid, 'hm')
-        self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '')
-        self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '')
+        self.failUnless(records_identical(create_record(inserted_xm)[0], create_record(testrec_expected_xm)[0], ignore_subfield_order=True, ignore_field_order=True))
         self.failUnless(try_url_download(testrec_expected_url))
         self.force_webcoll(recid)
         self.tear_down = True

@@ -1437,12 +1437,14 @@ def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
             description = afile.get_description()
             comment = afile.get_comment()
             subformat = afile.get_subformat()
+            size = afile.get_size()
             if description:
                 ret[url]['y'] = description
             if comment:
                 ret[url]['z'] = comment
             if subformat:
                 ret[url]['x'] = subformat
+            ret[url]['s'] = str(size)
 
         return ret
 
