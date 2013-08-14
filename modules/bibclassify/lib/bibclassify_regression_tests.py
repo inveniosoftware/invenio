@@ -24,27 +24,16 @@ import sys
 import os
 from warnings import warn
 
+from invenio.bibclassify_unit_tests import BibClassifyTestCase
 from invenio.config import CFG_SITE_URL
+from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, \
     test_web_page_content
 
-from invenio.bibclassify_unit_tests import BibClassifyTestCase, suite
-
-from invenio import bibclassify_config as bconfig
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio import config
-from invenio import bibclassify_engine
-from invenio import bibclassify_cli
-from invenio import bibclassify_ontology_reader
-
-log = bconfig.get_logger("bibclassify.regression_tests")
-
-# do this only if not in STANDALONE mode
-bibclassify_daemon = dbquery = None
-if not bconfig.STANDALONE:
-    from invenio import dbquery
-    from invenio import bibclassify_daemon
-    from invenio import bibdocfile
+bconfig = lazy_import('invenio.bibclassify_config')
+bibclassify_cli = lazy_import('invenio.bibclassify_cli')
+bibclassify_engine = lazy_import('invenio.bibclassify_engine')
+bibclassify_ontology_reader = lazy_import('invenio.bibclassify_ontology_reader')
 
 
 class BibClassifyRegressionTest(BibClassifyTestCase):
@@ -104,6 +93,8 @@ class BibClassifyRegressionTest(BibClassifyTestCase):
         """bibclassify  - extracting data from database (using recID to find fulltext)"""
 
         if not bconfig.STANDALONE:
+            from invenio import dbquery
+            from invenio import bibclassify_daemon
             bibtask = bibclassify_daemon.bibtask
             #first test if the record exists in the database
             record = dbquery.run_sql("SELECT * FROM bibrec WHERE id=94")
@@ -672,6 +663,7 @@ def check_pdf(result, output, output_bad_pdftotext=""):
 
 
 if 'custom' in sys.argv:
+    from unittest import suite
     TEST_SUITE = suite(BibClassifyRegressionTest)
 else:
     TEST_SUITE = make_test_suite(BibClassifyRegressionTest)
