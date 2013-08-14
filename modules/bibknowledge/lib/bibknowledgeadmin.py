@@ -136,7 +136,7 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
         #if we are here we can try to write
         #get the name and the file..
         fn = str(kb_id)+".rdf"
-        open(uploaddir+"/"+fn, 'w').write(fileitem.file.read())
+        open(uploaddir+"/"+fn, 'w').write(fileitem.read())
         body = (_("File %s uploaded.") % ('kbfiles/' + cgi.escape(fn)))
         body += " <a href='"+CFG_SITE_SECURE_URL+"/kb'>%s</a>" % _("Back")
         return(page(title=_("File uploaded"),
