@@ -40,7 +40,7 @@
     <a class="text-success"
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}s"
-       href="{{ url_for('.search', p=similar, rm='wrd') }}">
+       href="{{ url_for('search.search', p=similar, rm='wrd') }}">
       {{ _("Similar records") }}
     </a>
 
@@ -49,7 +49,7 @@
     {%- set num_citations = record['_cited_by_count'] -%}
     {%- if num_citations -%}
      -
-    <a href="{{ url_for('.search', p="refersto:recid:%d" % recID) }}"
+    <a href="{{ url_for('search.search', p="refersto:recid:%d" % recID) }}"
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}r">
       {{ _("Cited by %i records") % num_citations if num_citations > 1 else _("Cited by 1 record") }}
@@ -324,7 +324,7 @@
          style="margin-bottom: 20px; margin-left: -9px; margin-right: -9px;">
       <div class="row">
 
-        <form action="{{ url_for('.search') }}" name="settings" method="get"
+        <form action="{{ url_for('search.search') }}" name="settings" method="get"
               style="margin-bottom: 0px; position: relative; z-index: 1;"
               class="pull-right form-inline">
           <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
@@ -438,7 +438,7 @@
 
 
 
-        <form action="{{ url_for('.search') }}"
+        <form action="{{ url_for('search.search') }}"
               name="search"
               method="get"
               style="margin-bottom: 0px;"

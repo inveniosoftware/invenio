@@ -241,7 +241,7 @@ body {
       }
     };
     setTimeout(modalShow, 100);
-    $.ajax('{{ url_for('.results', qid=qid) }}', {
+    $.ajax('{{ url_for('search.results', qid=qid) }}', {
       type: 'POST',
       data: $.extend( {},
       {{ request.args.to_dict()|tojson|safe }}
