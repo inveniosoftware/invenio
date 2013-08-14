@@ -429,6 +429,9 @@ def test_web_page_content(url,
         browser.close()
     except UnboundLocalError:
         pass
+    except mechanize.HTTPError:
+        # Raises 401 if you were not logged in before.
+        pass
 
     if CFG_TESTUTILS_VERBOSE >= 9:
         print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \
