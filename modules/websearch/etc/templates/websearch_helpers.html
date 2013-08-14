@@ -96,9 +96,10 @@
     <input type="checkbox" name="c" value="{{ collection.name }}" checked/>
     {% endif %}
     #}
-    <a href="{{ url_for(".collection", name=collection.name) }}">
-      {{ collection.name_ln }}&nbsp;<small class="muted">({{ collection.nbrecs }})</small>&nbsp;
+    <a href="{{ url_for(".collection", name=collection.name, ln=g.ln, _external=True) }}">
+      {{ collection.name_ln }}
     </a>
+    <small class="muted">({{ collection.nbrecs }})</small>&nbsp;
   {% if collection.collection_children and idxs|length < limit %}
     {%- do idxs.append(loop.index) -%}
     <ul {{ kwargs|xmlattr }}>

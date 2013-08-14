@@ -28,7 +28,7 @@ CFG_TESTUTILS_VERBOSE = 1
 import os
 import sys
 import time
-
+import unittest2
 import cgi
 import subprocess
 
@@ -163,7 +163,7 @@ class InvenioFixture(object):
         return dictate
 
 
-class InvenioTestCase(TestCase):
+class InvenioTestCase(TestCase, unittest2.TestCase):
 
     engine = CFG_DATABASE_TYPE
     username = CFG_DATABASE_USER
@@ -295,8 +295,7 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     browser.submit()
     username_account_page_body = browser.response().read()
     try:
-        #username_account_page_body.index("You are logged in as %s." % username)
-        username_account_page_body.index(username)
+        username_account_page_body.index("You are logged in as %s." % username)
     except ValueError:
         raise InvenioTestUtilsBrowserException('ERROR: Cannot login as %s.' % username)
     return browser

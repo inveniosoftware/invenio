@@ -1,6 +1,6 @@
 {#-
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,6 +18,6 @@
 -#}
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 {% for recid in recids -%}
-  {{ format_record(recid) }}
+  {{ format_record(recid, 'xm')|safe }}
 {%- endfor %}
 </collection>
