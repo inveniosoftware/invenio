@@ -280,7 +280,7 @@ def task_low_level_submission(name, user, *argv):
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
             runtime,sleeptime,status,progress,arguments,priority,sequenceid)
             VALUES (%s,%s,%s,%s,'WAITING',%s,%s,%s,%s)""",
-            (name, user, runtime, sleeptime, verbose_argv, marshal.dumps(argv), priority, sequenceid))
+            (name, user, runtime, sleeptime, verbose_argv[:254], marshal.dumps(argv), priority, sequenceid))
 
     except Exception:
         register_exception(alert_admin=True)
