@@ -188,6 +188,7 @@ def register():
                 # Errors [-2, (1), 2, 3, 4] taken care of by form validation
                 messages.append(_("Internal error %s") % ruid)
     elif request.method == 'POST':
+        title = _("Registration failure")
         state = "warning"
 
     return render_template('webaccount_register.html', form=form, title=title,

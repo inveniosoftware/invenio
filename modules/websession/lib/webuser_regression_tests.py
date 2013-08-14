@@ -24,16 +24,16 @@
 __revision__ = \
     "$Id$"
 
-import unittest
-
 from mechanize import Browser
 
 from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio import webuser
+from invenio.importutils import lazy_import
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
-class IsUserSuperAdminTests(unittest.TestCase):
+webuser = lazy_import('invenio.webuser')
+
+class IsUserSuperAdminTests(InvenioTestCase):
     """Test functions related to the isUserSuperAdmin function."""
     def setUp(self):
         self.id_admin = run_sql('SELECT id FROM user WHERE nickname="admin"')[0][0]
@@ -47,7 +47,8 @@ class IsUserSuperAdminTests(unittest.TestCase):
         """webuser - isUserSuperAdmin with hyde"""
         self.failIf(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_hyde)))
 
-class WebSessionYourSettingsTests(unittest.TestCase):
+
+class WebSessionYourSettingsTests(InvenioTestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def tearDown(self):
@@ -59,8 +60,8 @@ class WebSessionYourSettingsTests(unittest.TestCase):
         browser = Browser()
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
-        browser['p_un'] = 'admin'
-        browser['p_pw'] = ''
+        browser['nickname'] = 'admin'
+        browser['password'] = ''
         browser.submit()
 
         expected_response = "You are logged in as admin"
@@ -136,10 +137,10 @@ class WebSessionYourSettingsTests(unittest.TestCase):
         browser = Browser()
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
         browser.select_form(nr=0)
-        browser['p_email'] = 'foo@cds.cern.ch'
-        browser['p_nickname'] = 'foobar'
-        browser['p_pw'] = ''
-        browser['p_pw2'] = ''
+        browser['email'] = 'foo@cds.cern.ch'
+        browser['nickname'] = 'foobar'
+        browser['password'] = '123456'
+        browser['password2'] = '123456'
         browser.submit()
 
         expected_response = "Account created"
@@ -154,10 +155,10 @@ class WebSessionYourSettingsTests(unittest.TestCase):
         browser = Browser()
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
         browser.select_form(nr=0)
-        browser['p_email'] = 'foo@cds.cern.ch'
-        browser['p_nickname'] = 'foobar2'
-        browser['p_pw'] = ''
-        browser['p_pw2'] = ''
+        browser['email'] = 'foo@cds.cern.ch'
+        browser['nickname'] = 'foobar2'
+        browser['password'] = '123456'
+        browser['password2'] = '123456'
         browser.submit()
 
         expected_response = "Registration failure"
@@ -171,10 +172,10 @@ class WebSessionYourSettingsTests(unittest.TestCase):
         browser = Browser()
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
         browser.select_form(nr=0)
-        browser['p_email'] = 'FOO@cds.cern.ch'
-        browser['p_nickname'] = 'foobar2'
-        browser['p_pw'] = ''
-        browser['p_pw2'] = ''
+        browser['email'] = 'FOO@cds.cern.ch'
+        browser['nickname'] = 'foobar2'
+        browser['password'] = '123456'
+        browser['password2'] = '123456'
         browser.submit()
 
         expected_response = "Registration failure"
@@ -192,8 +193,8 @@ class WebSessionYourSettingsTests(unittest.TestCase):
         browser = Browser()
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
-        browser['p_un'] = 'admin'
-        browser['p_pw'] = ''
+        browser['nickname'] = 'admin'
+        browser['password'] = ''
         browser.submit()
 
         expected_response = "You are logged in as admin"
@@ -257,8 +258,8 @@ class WebSessionYourSettingsTests(unittest.TestCase):
         # Logging in again
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
-        browser['p_un'] = 'admin'
-        browser['p_pw'] = ''
+        browser['nickname'] = 'admin'
+        browser['password'] = ''
         browser.submit()
 
         expected_response = "You are logged in as admin"

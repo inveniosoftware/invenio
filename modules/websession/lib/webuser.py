@@ -466,8 +466,9 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
                 ip_address = req.remote_ip
             try:
                 if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-                                  tmpl.tmpl_account_address_activation_email_body(email,
-                                                  address_activation_key, ip_address, ln)):
+                                  tmpl.tmpl_account_address_activation_email_body(
+                                      email, address_activation_key,
+                                      ip_address, ln)):
                     return 1
             except (smtplib.SMTPException, socket.error):
                 return 6

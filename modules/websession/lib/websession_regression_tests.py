@@ -24,15 +24,14 @@
 __revision__ = \
     "$Id$"
 
-import unittest
-
 from mechanize import Browser
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
 from invenio.dbquery import run_sql
 
-class WebSessionWebPagesAvailabilityTest(unittest.TestCase):
+class WebSessionWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def test_your_account_pages_availability(self):
@@ -65,7 +64,7 @@ class WebSessionWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebSessionLostYourPasswordTest(unittest.TestCase):
+class WebSessionLostYourPasswordTest(InvenioTestCase):
     """Test Lost Your Passwords functionality."""
 
     def test_lost_your_password_for_internal_accounts(self):

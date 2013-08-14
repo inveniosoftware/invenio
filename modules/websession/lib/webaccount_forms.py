@@ -121,8 +121,11 @@ class RegisterForm(Form):
             pass
 
     def validate_password(self, field):
-        if len(field.data) <= 6:
-            raise validators.ValidationError(_("Password must be at least 6 characters long."))
+        CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
+        if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
+            raise validators.ValidationError(
+                _("Password must be at least %d characters long." % (
+                    CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
 
     def validate_password2(self, field):
         if field.data != self.password.data:

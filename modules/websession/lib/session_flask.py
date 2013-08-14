@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,7 +32,7 @@ from uuid import uuid4
 from werkzeug.datastructures import CallbackDict
 from werkzeug.exceptions import BadRequest
 from flask.sessions import SessionInterface, SessionMixin
-from flask import g, current_app, request
+from flask import g, current_app, request, get_flashed_messages, flash
 from warnings import warn
 
 from invenio.sqlalchemyutils import db
@@ -280,6 +280,7 @@ class InvenioSessionInterface(SessionInterface):
         if session.logging_in:
             ## The user just logged in, better change the session ID
             sid = self.generate_sid()
+            flashes = get_flashed_messages(with_categories=True)
             ## And remove the cookie that has been set
             self.storage.delete(session.sid)
             session.clear()
@@ -287,6 +288,8 @@ class InvenioSessionInterface(SessionInterface):
             response.delete_cookie(app.session_cookie_name + 'stub',
                                    domain=domain)
             session.sid = sid
+            # Fixes problem with lost flashes after login.
+            map(lambda (cat, msg): flash(msg, cat), flashes)
         session['_uid'] = uid
         self.storage.set(sid,
                          self.serializer.dumps(dict(session)),
