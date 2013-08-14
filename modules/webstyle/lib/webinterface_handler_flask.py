@@ -258,7 +258,7 @@ def create_invenio_flask_app(**kwargs_config):
             return _("Authorization failure"), 401
         flash(_("Authorization failure"), 'error')
         from invenio.webaccount_blueprint import login
-        return login(referer=request.referrer), 401
+        return login(referer=request.url), 401
 
     @_app.endpoint('static')
     @_app.route(_app.static_url_path + '/<path:filename>', methods=['POST', 'PUT'])

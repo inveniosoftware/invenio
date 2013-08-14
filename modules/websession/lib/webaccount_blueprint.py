@@ -21,8 +21,10 @@
 
 import os
 from pprint import pformat
-from werkzeug.urls import url_unquote
-from flask import render_template, request, flash, redirect, url_for, g
+from flask import render_template, request, flash, redirect, url_for, g, abort
+from werkzeug.datastructures import CombinedMultiDict, ImmutableMultiDict, \
+    MultiDict
+
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
@@ -33,8 +35,7 @@ from invenio.config import \
     CFG_SITE_SECURE_URL, \
     CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-    CFG_OPENAIRE_SITE
+    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
 from invenio.access_control_config import \
     CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTH_LOGOUT_SSO
@@ -46,14 +47,7 @@ from invenio.pluginutils import PluginContainer
 from invenio.webaccount_forms import LoginForm, RegisterForm
 from invenio.webuser_flask import login_user, logout_user, current_user
 from invenio.websession_webinterface import wash_login_method
-from invenio.webstat import register_customevent
-from invenio.errorlib import register_exception
 
-from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
-    mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
-    mail_cookie_create_pw_reset, mail_cookie_check_role, \
-    mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
-    InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
 
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
@@ -75,7 +69,7 @@ def update_login(nickname, password=None, remember_me=False):
     return user
 
 
-@blueprint.route('/login', methods=['GET', 'POST'])
+@blueprint.route('/login/', methods=['GET', 'POST'])
 @blueprint.invenio_wash_urlargd({'nickname': (unicode, None),
                                  'password': (unicode, None),
                                  'login_method': (wash_login_method, 'Local'),
@@ -95,8 +89,10 @@ def login(nickname=None, password=None, login_method=None, action='',
             action, arguments = mail_cookie_check_authorize_action(action)
         except InvenioWebAccessMailCookieError:
             pass
-
-    form = LoginForm(request.values, csrf_enabled=False)
+    form = LoginForm(CombinedMultiDict([ImmutableMultiDict({'referer': referer}
+                                        if referer else {}),
+                                        request.values]),
+                     csrf_enabled=False)
     try:
         user = None
         if not CFG_EXTERNAL_AUTH_USING_SSO:
@@ -106,7 +102,9 @@ def login(nickname=None, password=None, login_method=None, action='',
             elif login_method in ['openid', 'oauth1', 'oauth2']:
                 pass
                 req = request.get_legacy_request()
-                (iden, nickname, password, msgcode) = webuser.loginUser(req, nickname, password, login_method)
+                (iden, nickname, password, msgcode) = webuser.loginUser(req, nickname,
+                                                                        password,
+                                                                        login_method)
                 if iden:
                     user = update_login(nickname)
             else:
@@ -228,6 +226,7 @@ _USER_SETTINGS = PluginContainer(
 ## Let's report about broken plugins
 open(os.path.join(CFG_LOGDIR, 'broken-user-settings.log'), 'w').write(
     pformat(_USER_SETTINGS.get_broken_plugins()))
+
 
 @blueprint.route('/display', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated

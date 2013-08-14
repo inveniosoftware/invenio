@@ -333,8 +333,8 @@ class InvenioBlueprint(Blueprint):
             @wraps(f)
             def decorator(*args, **kwargs):
                 argd = wash_urlargd(request.values, config)
-                kwargs.update(argd)
-                return f(*args, **kwargs)
+                argd.update(kwargs)
+                return f(*args, **argd)
             return decorator
         return _invenio_wash_urlargd
 

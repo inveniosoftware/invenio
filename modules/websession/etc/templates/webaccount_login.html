@@ -39,7 +39,7 @@
 <div class="row">
   <div class="span4 offset{{ '2' if activated_providers else '4' }}">
     <legend>{{ _('Please Sign In') }}</legend>
-    <form action="{{ url_for('.login') }}" method="POST">
+    <form action="{{ url_for('webaccount.login') }}" method="POST">
     {{ form.referer }}
     {{ form.nickname(placeholder=_('Username or email'), class_="span4") }}
     {{ form.password(placeholder=_('Password'), class_="span4") }}

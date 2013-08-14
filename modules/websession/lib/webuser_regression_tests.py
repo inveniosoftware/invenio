@@ -206,12 +206,12 @@ class WebSessionYourSettingsTests(InvenioTestCase):
                       (expected_response, login_response_body))
 
         # Going to edit page and setting records per group to 20
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
-        browser.select_form(name="edit_websearch_settings")
-        browser['group_records'] = ["25"]
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit/websearch_user_settings")
+        browser.select_form(nr=0)
+        browser['rg'] = ["25"]
         browser.submit()
 
-        expected_response = "User settings saved correctly"
+        expected_response = "Data has been saved."
         changed_settings_body = browser.response().read()
         try:
             changed_settings_body.index(expected_response)
@@ -221,9 +221,9 @@ class WebSessionYourSettingsTests(InvenioTestCase):
 
         # Going to the search page, making an empty search
         browser.open(CFG_SITE_SECURE_URL)
-        browser.select_form(nr=0)
+        browser.select_form(name="search")
         browser.submit()
-        expected_response = "1 - 25"
+        expected_response = "1 to 25"
         records_found_body = browser.response().read()
         try:
             records_found_body.index(expected_response)
@@ -232,12 +232,12 @@ class WebSessionYourSettingsTests(InvenioTestCase):
                       (expected_response, records_found_body))
 
         # Going again to edit and setting records per group back to 10
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
-        browser.select_form(name="edit_websearch_settings")
-        browser['group_records'] = ["10"]
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit/websearch_user_settings")
+        browser.select_form(name="edit")
+        browser['rg'] = ["10"]
         browser.submit()
 
-        expected_response = "User settings saved correctly"
+        expected_response = "Data has been saved."
         changed_settings_body = browser.response().read()
         try:
             changed_settings_body.index(expected_response)
@@ -272,9 +272,9 @@ class WebSessionYourSettingsTests(InvenioTestCase):
 
         # Let's go to search and check that the setting is still there
         browser.open(CFG_SITE_SECURE_URL)
-        browser.select_form(nr=0)
+        browser.select_form(name="search")
         browser.submit()
-        expected_response = "1 - 10"
+        expected_response = "1 to 10"
         records_found_body = browser.response().read()
         try:
             records_found_body.index(expected_response)
