@@ -504,8 +504,7 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     @param tag: name of tag whose content
     @param searchwith: a term to search with
     """
-    import libxml2
-    import libxslt
+    from lxml import etree
     #get the actual file based on the kbt name
     kb_id = get_kb_id(kbtname)
     if not kb_id:
@@ -515,7 +514,7 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
     if not os.path.exists(rdfname):
         return []
     #parse the doc with static xslt
-    styledoc = libxml2.parseDoc("""
+    styledoc = etree.XML("""
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -540,13 +539,9 @@ def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
 
 </xsl:stylesheet>
     """)
-    style = libxslt.parseStylesheetDoc(styledoc)
-    doc = libxml2.parseFile(rdfname)
-    result = style.applyStylesheet(doc, None)
-    strres = style.saveResultToString(result)
-    style.freeStylesheet()
-    doc.freeDoc()
-    result.freeDoc()
+    style = etree.XSLT(styledoc)
+    doc = etree.parse(open(rdfname, 'r'))
+    strres = str(style(doc))
     ritems = []
     if len(strres) == 0:
         return []
