@@ -261,7 +261,7 @@ def create_invenio_flask_app(**kwargs_config):
         return login(referer=request.referrer), 401
 
     @_app.endpoint('static')
-    @_app.route(_app.static_url_path + '/<path:filename>', methods=['POST'])
+    @_app.route(_app.static_url_path + '/<path:filename>', methods=['POST', 'PUT'])
     def static_handler_with_legacy_publisher(*args, **kwargs):
         """
         Adds support for legacy publisher.
@@ -291,7 +291,7 @@ def create_invenio_flask_app(**kwargs_config):
             abort(404)
         else:
             static_file_response = _app.send_static_file(*args, **kwargs)
-            if request.method == 'POST':
+            if request.method in ['POST', 'PUT']:
                 abort(405)
             else:
                 return static_file_response

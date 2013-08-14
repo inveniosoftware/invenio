@@ -850,9 +850,9 @@ def handle_file_post(req, allowed_mimetypes=None):
     if g:
         dummy, prefix, suffix = decompose_file(g.group("filename"))
     ## Let's optionally accept an MD5 hash (and use it later for comparison)
-    #cmd5 = req.headers_in["Content-MD5"]
-    #if cmd5:
-    #    the_md5 = md5()
+    cmd5 = req.headers_in.get("Content-MD5")
+    if cmd5:
+        the_md5 = md5()
 
     ## Ok. We can initialize the file
     fd, path = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=CFG_TMPDIR)

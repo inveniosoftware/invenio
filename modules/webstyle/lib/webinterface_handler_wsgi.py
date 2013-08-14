@@ -339,19 +339,19 @@ class SimulatedModPythonRequest(object):
 
     def readline(self, hint=None):
         try:
-            return self.__environ['wsgi.input'].readline(hint)
+            return request.stream.readline(hint)
         except TypeError:
             ## the hint param is not part of wsgi pep, although
             ## it's great to exploit it in when reading FORM
             ## with large files, in order to avoid filling up the memory
             ## Too bad it's not there :-(
-            return self.__environ['wsgi.input'].readline()
+            return request.stream.readline()
 
     def readlines(self, hint=None):
-        return self.__environ['wsgi.input'].readlines(hint)
+        return request.stream.readlines(hint)
 
     def read(self, hint=None):
-        return self.__environ['wsgi.input'].read(hint)
+        return request.stream.read(hint)
 
     def register_cleanup(self, callback, data=None):
         @after_this_request
