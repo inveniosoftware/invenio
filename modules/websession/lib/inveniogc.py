@@ -226,10 +226,12 @@ def clean_cache():
 
     write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES STARTED""")
     webjournal_cache_dir = "%s/webjournal/" % CFG_CACHEDIR
+    filenames = []
     try:
-        filenames = os.listdir(webjournal_cache_dir)
+        for root, dummy, files in os.walk(webjournal_cache_dir):
+            filenames.extend(os.path.join(root, filename) for filename in files)
     except OSError:
-        filenames = []
+        pass
     count = 0
     for filename in filenames:
         filename = os.path.join(webjournal_cache_dir, filename)
