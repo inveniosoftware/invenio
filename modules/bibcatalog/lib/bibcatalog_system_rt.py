@@ -183,11 +183,11 @@ class BibCatalogSystemRT(BibCatalogSystem):
             # The RT client does not support newlines in the initial body
             # We need to add the ticket then add a comment.
             comment = True
-            res = self._ticket_submit(subject=subject,
+            res = self._ticket_submit(uid=uid, subject=subject,
                                       queue=queue,
                                       recordid=recordid)
         else:
-            res = self._ticket_submit(subject=subject,
+            res = self._ticket_submit(uid=uid, subject=subject,
                                       queue=queue,
                                       text=text,
                                       recordid=recordid)
@@ -201,7 +201,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             raise Exception(res)
 
         if comment:
-            self.ticket_comment(uid=None,
+            self.ticket_comment(uid=uid,
                                 ticketid=ticketid,
                                 comment=text)
 
