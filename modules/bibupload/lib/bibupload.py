@@ -2356,7 +2356,7 @@ def copy_strong_tags_from_old_record(record, rec_old):
     modifies RECORD structure on the spot.
     """
     for strong_tag in CFG_BIBUPLOAD_STRONG_TAGS:
-        if not record_get_field_instances(record, strong_tag):
+        if not record_get_field_instances(record, strong_tag, strong_tag[3:4] or '%', strong_tag[4:5] or '%'):
             strong_tag_old_field_instances = record_get_field_instances(rec_old, strong_tag)
             if strong_tag_old_field_instances:
                 for strong_tag_old_field_instance in strong_tag_old_field_instances:

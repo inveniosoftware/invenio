@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -131,6 +131,9 @@ descriptions, etc.)</b>
     <li>8.2&nbsp;&nbsp;<a href="#terminologycurdir">8.2 The submission directory (<code>curdir</code>)</a></li>
   </ul>
 </li>
+<li><strong>9. <a href="#load_dump_cli">Load/dump Submissions</a></strong>
+</li>
+
 </ul>
 
 &nbsp;&nbsp;&nbsp;&nbsp;(Check out the <a href="#oldwebsubmitguide">old WebSubmit admin guide</a>)<br/>
@@ -1585,7 +1588,6 @@ For an action that must deal with a specific record (eg. MBI, APP) one can alrea
 
 <p>In such cases you have to make sure that you provide all the information requested by the submission at each of the steps/pages until the provided step/page. Depending on how your submission is built it might be simply not possible to do that. This would be especially true when advancing steps, as functions netween the steps would not be run &mdash; most probably advancing directly to step 1 will be a maximum one can easily support &mdash; while controlling "<code>curpage</code>" parameter might be easier.</p>
 
-
 <a name="terminology"></a><h2>8. Terminology</h2>
 <a name="terminologydocumenttype"></a><h3>8.1 The document type of a file (<code>doctype</code>)</h3>
 
@@ -1647,6 +1649,43 @@ is <code>ARTICLE-2010-001</code>. Some other functions will move the
 submission directory to other places, and some functions will even let
 you configure where to move it.</p>
 
+<a name="load_dump_cli"></a><h2>9. Load/dump Submissions</h2>
+
+<p>Use <code>websubmitadmin</code> to dump a given submission
+configuration from the database to a file. For example:
+<pre>
+$ /opt/invenio/bin/websubmitadmin --dump=DEMOART > DEMOART_db_dump.sql
+</pre>
+</p>
+
+<p>
+The submission dumper tool relies on the fact that submission-specific
+elements and functions are prefixed with the submission doctype (for
+example <code>DEMOART</code>), and will only dump those. Functions,
+elements, etc. without prefix are considered "shared", and not dumped by
+default, in order to eliminate duplicates). See also
+option <code>--method</code> to change that behaviour.
+</p>
+
+<p><code>websubmitadmin</code> can also help you "diff" between
+different submission versions (for eg. between a dump file and the
+database). This tool will optionally hide differences solely due to
+ordering of statements in the dump, or different modification
+dates. For example:
+<pre>
+$ /opt/invenio/bin/websubmitadmin --diff=DEMOART --ignore=d,o < DEMOART_db_dump.sql
+</pre>
+</p>
+
+<p>Run <code>/opt/invenio/bin/websubmitadmin --help</code> for more
+info and more examples.</p>
+
+<p>Use <code>dbexec</code> to load a submission dumped
+with <code>websubmitadmin</code>. For example:
+<pre>
+$ /opt/invenio/bin/dbexec < DEMOART_db_dump.sql
+</pre>
+</p>
 
 <code>- End of new WebSubmit admin guide -</code>
 <hr/>
