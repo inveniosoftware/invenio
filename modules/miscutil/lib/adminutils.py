@@ -203,6 +203,11 @@ def register_admin(app):
     from invenio.importutils import autodiscover_modules
 
     # Initialize app
+    admin = Admin(
+        name="Invenio",
+        index_view=InvenioAdminIndexView(),
+        base_template="admin_base.html"
+    )
     admin.init_app(app)
 
     # Call register() in admin module to register views.
@@ -215,9 +220,3 @@ def register_admin(app):
                 register_func(app, admin)
             except Exception:
                 register_exception()
-
-
-#
-# Flask-Admin instance
-#
-admin = Admin(name="Invenio", index_view=InvenioAdminIndexView(), base_template="admin_base.html")
