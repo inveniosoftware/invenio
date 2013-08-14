@@ -135,7 +135,7 @@ class UserInfo(CombinedMultiDict):
             data['remote_host'] = request.environ.get('REMOTE_HOST', '')
             data['referer'] = request.referrer
             data['uri'] = request.environ['PATH_INFO'] or ''
-            data['agent'] = request.user_agent or 'N/A'
+            data['agent'] = request.headers.get('User-Agent', 'N/A')
             #data['session'] = session.sid
         return data
 
