@@ -23,15 +23,16 @@
 
 __revision__ = "$Id$"
 
-import re
-import unittest
+import base64
+import cPickle
 import datetime
 import os
-import time
+import pprint
+import re
 import sys
+import time
 from urllib import urlencode
 from urllib2 import urlopen
-import pprint
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
@@ -40,20 +41,20 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDI
      CFG_BINDIR, \
      CFG_SITE_RECORD, \
      CFG_DEVEL_SITE
-from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
-from invenio import bibupload
-from invenio.search_engine import print_record, get_record
 from invenio.jsonutils import json
 from invenio.dbquery import run_sql, get_table_status_info
-from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
-from invenio.bibtask import task_set_task_param, setup_loggers, task_low_level_submission
-from invenio.bibrecord import record_has_field,record_get_field_value
-from invenio.shellutils import run_shell_command
-from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite, test_web_page_content
+
+from invenio.importutils import lazy_import
 from invenio.hashutils import md5
-import base64
-import cPickle
+from invenio.shellutils import run_shell_command
+
+BibRecDocs = lazy_import('invenio.bibdocfile:BibRecDocs')
+BibRelation = lazy_import('invenio.bibdocfile:BibRelation')
+MoreInfo = lazy_import('invenio.bibdocfile:MoreInfo')
+bibupload = lazy_import('invenio.bibupload')
+print_record = lazy_import('invenio.search_engine:print_record')
+get_record = lazy_import('invenio.search_engine:get_record')
 
 # helper functions:
 
@@ -185,11 +186,12 @@ def force_webcoll(recid):
     c.calculate_reclist()
     c.update_reclist()
 
-class GenericBibUploadTest(unittest.TestCase):
+class GenericBibUploadTest(InvenioTestCase):
     """Generic BibUpload testing class with predefined
     setUp and tearDown methods.
     """
     def setUp(self):
+        from invenio.bibtask import task_set_task_param, setup_loggers
         self.verbose = 0
         setup_loggers()
         task_set_task_param('verbose', self.verbose)
@@ -261,7 +263,7 @@ class BibUploadCallbackURLTest(GenericBibUploadTest):
     if CFG_DEVEL_SITE:
         def test_simple_insert_callback_url(self):
             """bibupload - --callback-url with simple insert"""
-#
+            from invenio.bibtask import task_low_level_submission
             taskid = task_low_level_submission('bibupload', 'test', '-i', self.testfile_path, '--callback-url', CFG_SITE_URL + '/httptest/post2?%s' % urlencode({"save": self.resultfile_path}), '-v0')
             run_shell_command(CFG_BINDIR + '/bibupload %s', [str(taskid)])
             results = json.loads(open(self.resultfile_path).read())
@@ -937,6 +939,7 @@ class BibUploadInsertModeTest(GenericBibUploadTest):
     def test_retrieve_005_tag(self):
         """bibupload - insert mode, verifying insertion of 005 control field for record """
         # Convert marc xml into record structure
+        from invenio.bibrecord import record_has_field, record_get_field_value
         recs = bibupload.xml_marc_to_records(self.test)
         dummy, recid, dummy = bibupload.bibupload(recs[0], opt_mode='insert')
         # Retrive the inserted record based on the record id
@@ -1023,6 +1026,7 @@ class BibUploadAppendModeTest(GenericBibUploadTest):
 
     def test_update_modification_record_date(self):
         """bibupload - append mode, checking the update of the modification date"""
+        from invenio.dateutils import convert_datestruct_to_datetext
         # Initialize the global variable
         # We create create the record out of the xml marc
         recs = bibupload.xml_marc_to_records(self.test_existing)
@@ -1056,6 +1060,7 @@ class BibUploadAppendModeTest(GenericBibUploadTest):
 
     def test_retrieve_updated_005_tag(self):
         """bibupload - append mode, updating 005 control tag after modifiction """
+        from invenio.bibrecord import record_get_field_value
         recs = bibupload.xml_marc_to_records(self.test_to_append)
         _, recid, _ = bibupload.bibupload(recs[0], opt_mode='append')
         rec = get_record(recid)
@@ -3321,12 +3326,14 @@ class BibUploadPretendTest(GenericBibUploadTest):
     Testing bibupload --pretend correctness.
     """
     def setUp(self):
+        from invenio.bibtask import task_set_task_param
         GenericBibUploadTest.setUp(self)
         self.demo_data = bibupload.xml_marc_to_records(open(os.path.join(CFG_TMPDIR, 'demobibdata.xml')).read())[0]
         self.before = self._get_tables_fingerprint()
         task_set_task_param('pretend', True)
 
     def tearDown(self):
+        from invenio.bibtask import task_set_task_param
         task_set_task_param('pretend', False)
 
     def _get_tables_fingerprint():
@@ -3401,6 +3408,7 @@ class BibUploadHoldingPenTest(GenericBibUploadTest):
     Testing the Holding Pen usage.
     """
     def setUp(self):
+        from invenio.bibtask import task_set_task_param, setup_loggers
         GenericBibUploadTest.setUp(self)
         self.verbose = 9
         setup_loggers()
@@ -3680,6 +3688,7 @@ allow any</subfield>
     def test_exotic_format_fft_append(self):
         """bibupload - exotic format FFT append"""
         # define the test case:
+        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         testfile = os.path.join(CFG_TMPDIR, 'test.ps.Z')
         open(testfile, 'w').write('TEST')
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
@@ -3892,6 +3901,7 @@ allow any</subfield>
     def test_simple_fft_insert_with_restriction(self):
         """bibupload - simple FFT insert with restriction"""
         # define the test case:
+        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
         email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
         email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
@@ -5149,6 +5159,7 @@ allow any</subfield>
     def test_revert_fft_correct(self):
         """bibupload - revert FFT correct"""
         # define the test case:
+        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
         email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
         email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]
@@ -5275,6 +5286,7 @@ allow any</subfield>
     def test_simple_fft_replace(self):
         """bibupload - simple FFT replace"""
         # define the test case:
+        from invenio.access_control_config import CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
         email_tag = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][0:3]
         email_ind1 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][3]
         email_ind2 = CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS[0][4]

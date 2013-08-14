@@ -37,7 +37,6 @@ from invenio.bibsched import get_last_taskid, delete_task
 from invenio.shellutils import run_shell_command
 from invenio.bibupload_regression_tests import GenericBibUploadTest
 from invenio.urlutils import make_user_agent_string
-from invenio.search_engine import get_record
 
 CFG_HAS_CURL = os.path.exists("/usr/bin/curl")
 
@@ -123,6 +122,7 @@ class BatchUploaderRobotUploadTests(GenericBibUploadTest):
     if CFG_LOCALHOST_OK:
         def test_simple_insert(self):
             """batchuploader - robotupload simple insert"""
+            from invenio.search_engine import get_record
             result = urllib2.urlopen(self.req).read()
             self.failUnless("[INFO]" in result)
             current_task = get_last_taskid()
