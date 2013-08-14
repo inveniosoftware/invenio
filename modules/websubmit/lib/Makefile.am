@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,7 +34,8 @@ pylib_DATA = websubmit_config.py websubmit_engine.py \
              websubmit_file_converter.py \
              hocrlib.py \
              websubmit_file_metadata.py \
-             websubmit_web_tests.py
+             websubmit_web_tests.py \
+             websubmitadmincli.py
 
 metadataplugindir = $(libdir)/python/invenio/websubmit_file_metadata_plugins
 metadataplugin_DATA = __init__.py \
