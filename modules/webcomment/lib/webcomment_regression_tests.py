@@ -45,7 +45,7 @@ def prepare_attachments():
     must be called again.
     """
     shutil.copy(CFG_WEBDIR + '/img/journal_water_dog.gif', CFG_TMPDIR)
-    shutil.copy(CFG_WEBDIR + '/img/invenio.css', CFG_TMPDIR)
+    shutil.copy(CFG_WEBDIR + '/css/invenio.css', CFG_TMPDIR)
 
 
 class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
