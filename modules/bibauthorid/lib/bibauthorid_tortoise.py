@@ -31,7 +31,10 @@ import numpy as np
 import sys
 sys.setcheckinterval(1000000)
 
-from collections import defaultdict
+try:
+    from collections import defaultdict
+except:
+    from invenio.containerutils import defaultdict
 
 from itertools import groupby, chain, repeat
 from invenio.bibauthorid_general_utils import update_status, update_status_final, override_stdout_config
