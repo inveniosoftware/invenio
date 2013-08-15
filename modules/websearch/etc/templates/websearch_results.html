@@ -143,7 +143,6 @@
 
         <hr/>
 
-        {%- set of = request.values.get('of', 'hb') -%}
         {%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
           {%- if of[0] == 'h' -%}
             <div class="row-fluid">

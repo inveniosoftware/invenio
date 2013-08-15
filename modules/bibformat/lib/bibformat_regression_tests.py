@@ -21,16 +21,15 @@
 
 __revision__ = "$Id$"
 
-import unittest
-
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD
-from invenio.testutils import make_test_suite, \
-                              run_test_suite, \
-                              test_web_page_content
-from invenio.bibformat import format_record
-from invenio.bibformat_engine import BibFormatObject
+from invenio.importutils import lazy_import
+from invenio.testutils import InvenioTestCase, make_test_suite, \
+    run_test_suite, test_web_page_content
 
-class BibFormatAPITest(unittest.TestCase):
+format_record = lazy_import('invenio.bibformat:format_record')
+BibFormatObject = lazy_import('invenio.bibformat_engine:BibFormatObject')
+
+class BibFormatAPITest(InvenioTestCase):
     """Check BibFormat API"""
 
     def test_basic_formatting(self):
@@ -48,13 +47,13 @@ class BibFormatAPITest(unittest.TestCase):
         result = test_web_page_content(pageurl,
                                        expected_text=result)
 
-class BibFormatObjectAPITest(unittest.TestCase):
+class BibFormatObjectAPITest(InvenioTestCase):
     """Check BibFormatObject (bfo) APIs"""
-
-    bfo_test_1 = BibFormatObject(12)
 
     def test_knowledge_base(self):
         """bibformat - Checking BibFormatObject KB bridge"""
+        self.bfo_test_1 = BibFormatObject(12)
+
         self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', 'THESIS'),
                          'phdthesis')
 
@@ -73,7 +72,7 @@ class BibFormatObjectAPITest(unittest.TestCase):
         self.assertEqual(self.bfo_test_1.kb('DBCOLLID2BIBTEX', '', 'bar'),
                          'bar')
 
-class BibFormatBibTeXTest(unittest.TestCase):
+class BibFormatBibTeXTest(InvenioTestCase):
     """Check output produced by BibFormat for BibTeX output for
     various records"""
 
@@ -100,7 +99,7 @@ class BibFormatBibTeXTest(unittest.TestCase):
                                        expected_text=self.record_74_hx)
         self.assertEqual([], result)
 
-class BibFormatDetailedHTMLTest(unittest.TestCase):
+class BibFormatDetailedHTMLTest(InvenioTestCase):
     """Check output produced by BibFormat for detailed HTML ouput for
     various records"""
 
@@ -202,7 +201,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
                                                       "Could not"])
         self.assertNotEqual([], result)
 
-class BibFormatNLMTest(unittest.TestCase):
+class BibFormatNLMTest(InvenioTestCase):
     """Check output produced by BibFormat for NLM output for various
     records"""
 
@@ -263,7 +262,7 @@ class BibFormatNLMTest(unittest.TestCase):
                                            expected_text=self.record_70_xn.replace('<fpage/>', '<fpage></fpage>').replace('<lpage/>', '<lpage></lpage>'))
             self.assertEqual([], result)
 
-class BibFormatBriefHTMLTest(unittest.TestCase):
+class BibFormatBriefHTMLTest(InvenioTestCase):
     """Check output produced by BibFormat for brief HTML ouput for
     various records"""
 
@@ -290,7 +289,7 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
                                        expected_text=self.record_76_hb)
         self.assertEqual([], result)
 
-class BibFormatMARCXMLTest(unittest.TestCase):
+class BibFormatMARCXMLTest(InvenioTestCase):
     """Check output produced by BibFormat for MARCXML ouput for various records"""
 
     def setUp(self):
@@ -373,7 +372,7 @@ class BibFormatMARCXMLTest(unittest.TestCase):
                                                       self.record_9_xm_end])
         self.assertEqual([], result)
 
-class BibFormatMARCTest(unittest.TestCase):
+class BibFormatMARCTest(InvenioTestCase):
     """Check output produced by BibFormat for MARC ouput for various
     records"""
 
@@ -405,7 +404,7 @@ class BibFormatMARCTest(unittest.TestCase):
                                                       self.record_29_hm_end])
         self.assertEqual([], result)
 
-class BibFormatTitleFormattingTest(unittest.TestCase):
+class BibFormatTitleFormattingTest(InvenioTestCase):
     """Check title formatting produced by BibFormat."""
 
     def test_subtitle_in_html_brief(self):
@@ -444,7 +443,7 @@ class BibFormatTitleFormattingTest(unittest.TestCase):
           test_web_page_content(CFG_SITE_URL + '/search?p=analyse+informatique&of=HD',
             expected_text="Analyse informatique, t.2: L'accomplissement"))
 
-class BibFormatISBNFormattingTest(unittest.TestCase):
+class BibFormatISBNFormattingTest(InvenioTestCase):
     """Check ISBN formatting produced by BibFormat."""
 
     def test_isbn_in_html_detailed(self):
@@ -453,7 +452,7 @@ class BibFormatISBNFormattingTest(unittest.TestCase):
           test_web_page_content(CFG_SITE_URL + '/search?p=analyse+informatique&of=HD',
             expected_text="ISBN: 2225350574"))
 
-class BibFormatPublInfoFormattingTest(unittest.TestCase):
+class BibFormatPublInfoFormattingTest(InvenioTestCase):
     """Check publication reference info formatting produced by BibFormat."""
 
     def test_publinfo_in_html_brief(self):

@@ -530,7 +530,7 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     from invenio.websearch_model import Format
     from invenio.paginationutils import Pagination
 
-    of = request.values.get('of', of)
+    of = request.values.get('of', str(of)).lower()
     rg = request.values.get('rg', ctx.get('rg', 10), type=int)
     ln = request.values.get('ln', ln)
     page = request.values.get('jrec', 1, type=int)
