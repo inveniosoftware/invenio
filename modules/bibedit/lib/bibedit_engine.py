@@ -31,6 +31,7 @@ import cookielib
 
 from invenio import bibformat
 
+from invenio.errorlib import register_exception
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.urlutils import auto_version_url
 from invenio.xmlmarc2textmarc import create_marc_record
@@ -825,6 +826,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                     save_xml_record(recid, uid)
                     response['resultCode'] = 4
             except Exception, e:
+                register_exception()
                 response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
                     'error_wrong_cache_file_format']
                 if CFG_DEVEL_SITE: # return debug information in the request
@@ -995,6 +997,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data,
             record_revision, record, pending_changes, deactivated_hp_changes, \
                 undo_list, redo_list = get_cache_contents(recid, uid)[1:]
         except:
+            register_exception()
             response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
                 'error_wrong_cache_file_format']
             return response

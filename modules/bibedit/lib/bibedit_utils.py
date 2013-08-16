@@ -341,13 +341,18 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False,
 
     # Write XML file.
     if not to_merge:
-        file_path = '%s.xml' % _get_file_path(recid, uid)
+        fd, file_path = tempfile.mkstemp(dir=CFG_BIBEDIT_CACHEDIR,
+                                         prefix="%s_" % CFG_BIBEDIT_FILENAME,
+                                         suffix="_%s_%s.xml" % (recid, uid))
+        f = os.fdopen(fd, 'w')
+        f.write(xml_to_write)
+        f.close()
     else:
         file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
                                    CFG_BIBEDIT_TO_MERGE_SUFFIX)
-    xml_file = open(file_path, 'w')
-    xml_file.write(xml_to_write)
-    xml_file.close()
+        xml_file = open(file_path, 'w')
+        xml_file.write(xml_to_write)
+        xml_file.close()
 
     user_name = get_user_info(uid)[1]
     if to_upload:
