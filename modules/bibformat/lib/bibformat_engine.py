@@ -559,7 +559,10 @@ def format_with_format_template(format_template_filename, bfo,
         evaluated_format = '<!-- empty -->'
         #try:
         from functools import wraps
-        from invenio.bibfield import get_record as bibfield_get_record
+        from invenio.bibfield import \
+            create_record as bibfield_create_record, \
+            get_record as bibfield_get_record
+        from invenio.search_engine import print_record
         from invenio.webinterface_handler_flask_utils import unicodifier
 
         # Fixes unicode problems in Jinja2 templates.
@@ -569,14 +572,17 @@ def format_with_format_template(format_template_filename, bfo,
                 return unicodifier(f(*args, **kwds))
             return wrapper
 
-        record = bibfield_get_record(bfo.recID)
+        if bfo.recID is not None:
+            record = bibfield_get_record(bfo.recID)
+        else:
+            record = bibfield_create_record(bfo.xml_record, master_format='marc')
+            bfo.recID = bfo.recID if bfo.recID is not None else 0
         record.__getitem__ = encode_utf8(record.__getitem__)
         record.get = encode_utf8(record.get)
-
         evaluated_format = render_template_to_string(
             CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
             recid=bfo.recID,
-            record=record,
+            record=record, format_record=print_record,
             bfo=bfo, **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions).encode('utf-8')
         #except Exception:
         #    register_exception()
