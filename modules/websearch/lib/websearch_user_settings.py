@@ -40,8 +40,8 @@ class WebSearchSettings(Settings):
         super(WebSearchSettings, self).__init__()
         self.icon = 'search'
         self.title = _('Searches')
-        self.view = url_for('webaccount.index')
-        self.edit = url_for('webaccount.edit', name=__name__.split('.')[-1])
+        self.view = '/youralerts/display' # FIXME url_for('youralerts.index')
+        self.edit = url_for('webaccount.edit', name=self.name)
 
     def widget(self):
         uid = current_user.get_id()

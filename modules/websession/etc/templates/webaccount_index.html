@@ -24,13 +24,11 @@
 {% block title %}
 <div class="page-header">
   <h1>{{ title }}
-  <small class="clearfix">
-    <div class="pull-right">
-      <input placeholder="{{ _('Filter widgets') }}"
-             type="text"
-             name="widget"
-             autofocus />
-    </div>
+  <small class="clearfix pull-right">
+    <input placeholder="{{ _('Filter widgets') }}"
+           type="text"
+           name="widget"
+           autofocus />
   </small>
   </h1>
 </div>
@@ -43,37 +41,43 @@
 
 <div class="container">
   <div class="row">
-    <div class="span12" id="closed-list-bar">
-	  <ul id="closed-list">
-		{%- for p in closed_plugins -%}
-			<li id="{{ p.__class__.__name__}}" class="label label-success display-widget">{{p.title}} <i class="icon-plus"></i></li>
-		{%- endfor -%}
-	  </ul>
-    </div>
-    <div class="span12">
+   <div class="span12">
     <ul id="widgets" class="thumbnails">
-	    <li id="leftColumn" class="widgetColumn">
-	    	<ul id="widgetsLeft" class="connectedWidgets">
-		    	{%- for p in plugins[0] if p.widget -%}
-			      {{display_widget(p)}}
-			    {%- endfor -%}
-	    	</ul>
-	    </li>
-	    <li id="middleColumn" class="widgetColumn">
-	    	<ul id="widgetsMiddle" class="connectedWidgets">
-	    		{%- for p in plugins[1] if p.widget -%}
-			      {{display_widget(p)}}
-			    {%- endfor -%}
-	    	</ul>
-	    </li>
-	    <li id="rightColumn" class="widgetColumn">
-	    	<ul id="widgetsRight" class="connectedWidgets">
-	    		{%- for p in plugins[2] if p.widget -%}
-			      {{display_widget(p)}}
-			    {%- endfor -%}
-	    	</ul>
-	    </li>
+      <li id="leftColumn" class="widgetColumn">
+        <ul id="widgetsLeft" class="connectedWidgets">
+          {%- for p in plugins[0] -%}
+            {{display_widget(p)}}
+          {%- endfor -%}
+        </ul>
+      </li>
+      <li id="middleColumn" class="widgetColumn">
+        <ul id="widgetsMiddle" class="connectedWidgets">
+          {%- for p in plugins[1] -%}
+            {{display_widget(p)}}
+          {%- endfor -%}
+        </ul>
+      </li>
+      <li id="rightColumn" class="widgetColumn">
+        <ul id="widgetsRight" class="connectedWidgets">
+          {%- for p in plugins[2] -%}
+            {{display_widget(p)}}
+          {%- endfor -%}
+        </ul>
+      </li>
     </ul>
+    </div>
+  </div>
+
+  <hr/>
+
+  <div class="row">
+    <div class="span12" id="closed-list-bar">
+      <h5>{{ _('Closed Widgets') }} <small>{{ _('can be re-opened by clicking on folloing button(s)') }}</small></h5>
+      <ul id="closed-list">
+      {%- for p in closed_plugins -%}
+        <li id="{{ p.name}}" class="btn display-widget">{{p.title}} <i class="icon-plus"></i></li>
+      {%- endfor -%}
+      </ul>
     </div>
   </div>
 </div>
@@ -84,35 +88,35 @@
 }
 
 .widget {
-	margin-bottom: 10px;
-	margin-left: -20px;
+  margin-bottom: 10px;
+  margin-left: -20px;
 }
 
 .thumbnail {
-	cursor: move;
+  cursor: move;
 }
 
 .thumbnails > li {
-	float: left;
-    width: 30%;
+  float: left;
+  width: 30%;
 }
 
 .thumbnails li {
-	list-style-type: none;
+  list-style-type: none;
 }
 
 .connectedWidgets {
-	min-height: 100px;
+  min-height: 100px;
 }
 
 .placeholder {
-	border: 2px dashed #999;
-	margin-left: -20px;
-	margin-bottom: 10px;
-    border-radius: 5px;
-    display: block;
-    visibility: visible!important;
-    float: left;
+  border: 2px dashed #999;
+  margin-left: -20px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  display: block;
+  visibility: visible!important;
+  float: left;
 }
 
 .widgetColumn {
@@ -120,104 +124,93 @@
   display: block!important;
 }
 
+#closed-list {
+  margin: 0px;
+}
+
 #closed-list li {
-	float: left;
-	list-style-type: none;
-	margin: 5px;
-	cursor: pointer;
+  margin-right: 10px;
 }
-
-#closed-list-bar {
-	margin-top: -15px;
-	margin-bottom: 10px;
-}
-
 </style>
 
 {% endblock %}
 
 {% block javascript %}
 <script>
-
   function saveWidgets() {
-	  var newOrderLeft = $("#widgetsLeft").sortable('toArray');
-      var newOrderMiddle = $("#widgetsMiddle").sortable('toArray');
-      var newOrderRight= $("#widgetsRight").sortable('toArray');
+    var newOrderLeft = $("#widgetsLeft").sortable('toArray');
+    var newOrderMiddle = $("#widgetsMiddle").sortable('toArray');
+    var newOrderRight= $("#widgetsRight").sortable('toArray');
 
-      $.ajax({
-        url: '{{ url_for('webaccount.edit', name='dashboard_user_settings') }}'
-      , type: 'POST'
-      , data: $.param({
-          orderLeft: newOrderLeft,
-          orderMiddle: newOrderMiddle,
-          orderRight: newOrderRight
-        }, true)
-      });
+    $.ajax({
+      url: '{{ url_for('webaccount.edit', name='DashboardSettings') }}'
+    , type: 'POST'
+    , data: $.param({
+        orderLeft: newOrderLeft,
+        orderMiddle: newOrderMiddle,
+        orderRight: newOrderRight
+      }, true)
+    });
   }
 
   function addToClosedList(title, id) {
-	  $("#closed-list").append("<li id='" +
-			  id +
-			  "' class='label label-success display-widget'>" +
-			  title +
-			  "<i class='icon-plus'></i></li>");
-	  bindDisplayWidgetEvents();
+    $("#closed-list").append("<li id='" + id +
+        "' class='btn display-widget'>" +
+        title + "<i class='icon-plus'></i></li>");
+    bindDisplayWidgetEvents();
   }
 
   function displayWidget(widgetName) {
-	  $.ajax({
-        url: '{{ url_for('webaccount.loadwidget') }}',
-        type: 'GET',
-        data: $.param({
-          widget_name: widgetName
-        }, true),
-        dataType: "html",
-        success: function(r) {
-        	$("#" + widgetName).remove();
+    $.ajax({
+      url: '{{ url_for('webaccount.view') }}',
+      type: 'GET',
+      data: $.param({
+        name: widgetName
+      }, true),
+      dataType: "html",
+      success: function(r) {
+        $("#" + widgetName).remove();
+        // Find widgetColumn with least children
+        var $lists = $('.widgetColumn > ul').toArray()
+          , elem = $lists[
+            $lists.map(function(item, idx) {
+              return [$(item).children().length, idx]
+            }).reduce(function(pv, cv) {
+              return cv[0] < pv[0] ? cv : pv;
+            })[1]];
 
-        	var len = $("#widgetsLeft").children().length;
-        	var shortestList = "#widgetsLeft";
-        	if (len > $("#widgetsMiddle").children().length) {
-        		len = $("#widgetsMiddle").children().length;
-        		shortestList = "#widgetsMiddle";
-        	}
-        	if (len > $("#widgetsRight").children().length) {
-        		len = $("#widgetsRight").children().length;
-        		shortestList = "#widgetsRight";
-        	}
-        	$(shortestList).append(r);
-
-        	saveWidgets();
-        	bindWidgetEvents();
-        }
-      });
+        $(elem).append(r);
+        saveWidgets();
+        bindWidgetEvents();
+      }
+    });
   }
 
   function bindDisplayWidgetEvents() {
-	  $(".display-widget").die();
-	  $(".display-widget").live("click", function() {
-		  displayWidget(this.id);
-	  });
+    $(".display-widget").die();
+    $(".display-widget").live("click", function() {
+      displayWidget(this.id);
+    });
   }
 
   function bindWidgetEvents() {
-	$(".widget").die();
-	$(".widget").live('mouseenter', function() {
-		$(this).find(".close.hide").removeClass("hide");
-	});
+    $(".widget").die();
+    $(".widget").live('mouseenter', function() {
+      $(this).find(".close.hide").removeClass("hide");
+    });
 
-	$(".widget").live('mouseleave', function() {
-		$(this).find(".close").addClass("hide");
-	});
+    $(".widget").live('mouseleave', function() {
+      $(this).find(".close").addClass("hide");
+    });
 
-	$(".close").die();
-	$(".close").live('click', function() {
-		var title = $(this).closest("h4").text().replace("×", " ").trim();
-		var id = $(this).closest(".widget").attr("id");
-		addToClosedList(title, id);
-		$(this).closest("li").remove();
-		saveWidgets();
-	});
+    $(".close").die();
+    $(".close").live('click', function() {
+      var title = $(this).closest("h4").text().replace("×", " ").trim();
+      var id = $(this).closest(".widget").attr("id");
+      addToClosedList(title, id);
+      $(this).closest("li").remove();
+      saveWidgets();
+    });
   }
 
   $(function() {

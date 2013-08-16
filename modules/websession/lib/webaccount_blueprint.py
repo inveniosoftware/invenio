@@ -19,34 +19,32 @@
 
 """WebAccount Flask Blueprint"""
 
-import os
-from pprint import pformat
-from flask import render_template, request, flash, redirect, url_for, g, abort
-from werkzeug.datastructures import CombinedMultiDict, ImmutableMultiDict, \
-    MultiDict
+from werkzeug import CombinedMultiDict, ImmutableMultiDict, MultiDict
+from flask import render_template, request, flash, redirect, url_for, \
+    g, abort, current_app
 
-from invenio.sqlalchemyutils import db
-from invenio.websession_model import User
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio import websession_config
+from invenio import webuser
+from invenio.access_control_config import \
+    CFG_EXTERNAL_AUTH_USING_SSO, \
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO
+from invenio.access_control_mailcookie import \
+    InvenioWebAccessMailCookieError, \
+    mail_cookie_check_authorize_action
 from invenio.config import \
     CFG_SITE_URL, \
-    CFG_PYLIBDIR, \
-    CFG_LOGDIR, \
     CFG_SITE_SECURE_URL, \
     CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
-from invenio.access_control_config import \
-    CFG_EXTERNAL_AUTH_USING_SSO, \
-    CFG_EXTERNAL_AUTH_LOGOUT_SSO
-from invenio import webuser
-from invenio.access_control_mailcookie import \
-    InvenioWebAccessMailCookieError, \
-    mail_cookie_check_authorize_action
-from invenio.pluginutils import PluginContainer
+from invenio.datastructures import LazyDict
+from invenio.importutils import autodiscover_modules
+from invenio.sqlalchemyutils import db
 from invenio.webaccount_forms import LoginForm, RegisterForm
-from invenio.webuser_flask import login_user, logout_user, current_user
+from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio.websession_model import User
 from invenio.websession_webinterface import wash_login_method
+from invenio.webuser_flask import login_user, logout_user, current_user
 
 
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
@@ -126,8 +124,6 @@ def login(nickname=None, password=None, login_method=None, action='',
     except:
         flash(_("Problem with login."), "error")
 
-    from invenio import websession_config
-    from flask import current_app
     current_app.config.update(dict((k, v) for k, v in
                               vars(websession_config).iteritems()
                               if "CFG_" == k[:4]))
@@ -207,38 +203,32 @@ def logout():
                            logout_sso=CFG_EXTERNAL_AUTH_LOGOUT_SSO)
 
 
-def _invenio_settings_plugin_builder(plugin_name, plugin_code):
+def load_user_settings():
     """
-    Handy function to bridge pluginutils with (Invenio) user settings.
+    Handy function to populate LazyDic with user settings.
     """
     from invenio.settings import Settings
-    if 'settings' in dir(plugin_code):
-        candidate = getattr(plugin_code, 'settings')
-        if issubclass(candidate, Settings):
-            return candidate
-    raise ValueError('%s is not a valid settings plugin' % plugin_name)
+    modules = autodiscover_modules(['invenio'],
+                                   related_name_re='.+_user_settings\.py')
+    user_settings = {}
+    for module in modules:
+        candidate = getattr(module, 'settings')
+        if candidate is not None and issubclass(candidate, Settings):
+            user_settings[candidate.__name__] = candidate
+    return user_settings
+
+_USER_SETTINGS = LazyDict(load_user_settings)
 
 
-_USER_SETTINGS = PluginContainer(
-    os.path.join(CFG_PYLIBDIR, 'invenio', '*_user_settings.py'),
-    plugin_builder=_invenio_settings_plugin_builder)
-
-## Let's report about broken plugins
-open(os.path.join(CFG_LOGDIR, 'broken-user-settings.log'), 'w').write(
-    pformat(_USER_SETTINGS.get_broken_plugins()))
-
-
+@blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/display', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 def index():
     # load plugins
-    plugins = [a for a in [s() for (dummy, s) in _USER_SETTINGS.items() if s] \
-               if a.is_authorized and a.widget]
-
+    plugins = filter(lambda x: x.is_authorized and x.widget,
+                     map(lambda x: x(), _USER_SETTINGS.values()))
     closed_plugins = []
-
-    plugin_sort = (lambda w, x: x.index(w.__class__.__name__)
-                       if w.__class__.__name__ in x else len(x))
+    plugin_sort = (lambda w, x: x.index(w.name) if w.name in x else len(x))
 
     dashboard_settings = current_user.get('dashboard_settings', {})
 
@@ -247,7 +237,7 @@ def index():
         order_middle = dashboard_settings.get('orderMiddle', []) or []
         order_right = dashboard_settings.get('orderRight', []) or []
 
-        extract_plugins = lambda x: [p for p in plugins if p.__class__.__name__ in x if p]
+        extract_plugins = lambda x: [p for p in plugins if p.name in x if p]
 
         plugins_left = sorted(extract_plugins(order_left),
                               key=lambda w: plugin_sort(w, order_left))
@@ -258,18 +248,12 @@ def index():
         closed_plugins = [p for p in plugins if not p in plugins_left and
                                                 not p in plugins_middle and
                                                 not p in plugins_right]
+        plugins = [plugins_left, plugins_middle, plugins_right]
     else:
-        slc = len(plugins) / 3 + 1 if len(plugins) % 3 else len(plugins)
         plugins = sorted(plugins, key=lambda w: plugin_sort(w, plugins))
-        plugins_left = plugins[0:slc]
-        plugins_middle = plugins[slc:slc * 2]
-        plugins_right = plugins[slc * 2:]
-
-    return render_template('webaccount_display.html',
-                           plugins=[plugins_left,
-                                    plugins_middle,
-                                    plugins_right],
-                           closed_plugins=closed_plugins)
+        plugins = [plugins[i:i+3] for i in range(0, len(plugins), 3)]
+    return render_template('webaccount_index.html',
+                           plugins=plugins, closed_plugins=closed_plugins)
 
 
 @blueprint.route('/edit/<name>', methods=['GET', 'POST'])
@@ -297,22 +281,21 @@ def edit(name):
 
     # get post data or load data from settings
     if not form and plugin.form_builder:
-        from werkzeug.datastructures import MultiDict
         form = plugin.form_builder(MultiDict(plugin.load()))
 
     return render_template(getattr(plugin, 'edit_template', '') or
                            'webaccount_edit.html', plugin=plugin, form=form)
 
 
-@blueprint.route('/loadwidget/<widget_name>', methods=['GET'])
-def loadwidget(widget_name):
-    if not widget_name:
-        return "1"
+@blueprint.route('/view', methods=['GET'])
+@blueprint.invenio_authenticated
+@blueprint.invenio_wash_urlargd({'name': (unicode, "")})
+def view(name):
+    if name not in _USER_SETTINGS:
+        return "1", 406
 
-    # @todo: get plugin more effectively
-    widget = [a for a in [s() for (dummy, s) in _USER_SETTINGS.items() if s] if a.is_authorized and a.widget and a.__class__.__name__ == widget_name]
-
-    if widget:
-        return render_template('webaccount_widget.html', widget=widget[0])
+    widget = _USER_SETTINGS[name]()
+    if widget.is_authorized and widget.widget:
+        return render_template('webaccount_widget.html', widget=widget)
     else:
-        return "2"
+        return "2", 406

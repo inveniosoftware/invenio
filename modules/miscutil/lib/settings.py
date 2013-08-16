@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,6 +20,7 @@
 """
 Invenio utilities to settings manipulation.
 """
+from werkzeug.utils import cached_property
 
 from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
@@ -145,6 +146,10 @@ class Settings(object):
     def __init__(self):
         ## initializes storage system
         self.storage = self.storage_builder(self.keys)
+
+    @cached_property
+    def name(self):
+        return self.__class__.__name__
 
     def load(self):
         """
