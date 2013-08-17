@@ -54,7 +54,11 @@ class InveniocfgTest(InvenioTestCase):
         # At shutdown, they try to close their stream so we close them here
         # in order to not leave them which a closed stream they will fail to
         # close
-        logging.shutdown()
+        try:
+            logging.shutdown()
+        except:
+            # No loggers are open?
+            pass
 
         if self.output:
             self.output.close()
