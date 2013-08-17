@@ -6,9 +6,9 @@
    Tables depicting a data set
 */
 .hepdataTable{
-    background: none repeat scroll 0 0 #F9F9F3;
+    background: none repeat scroll 0 0 #FFFFFF;
     border-collapse: collapse;
-    border-color: #333333 #CCCCCC;
+    border-color: #CCCCCC;
     border-style: solid;
     border-widht: 2px 0px;
     font-size: 0.8em;
@@ -16,6 +16,8 @@
     border-spacing: 0px;
     margin-left: auto;
     margin-right: auto;
+    min-width: 200px;
+    min-height: 100px;
 }
 
 .hepdataTableQualifierCell{

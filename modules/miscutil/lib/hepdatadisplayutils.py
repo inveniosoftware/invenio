@@ -21,9 +21,12 @@
 
 #symbols replacement dictionary
 
-from invenio.config import CFG_HEPDATA_URL, CFG_HEPDATA_PLOTSIZE, CFG_LOGDIR, CFG_BASE_URL
+from invenio.config import (CFG_HEPDATA_URL,
+                            CFG_HEPDATA_PLOTSIZE,
+                            CFG_LOGDIR,
+                            CFG_SITE_URL)
+
 import re
-import urllib2
 import os
 import datetime
 
@@ -634,156 +637,252 @@ def render_hepdata_dataset_html(dataset, recid, seq, display_link=True):
 
     # rendering the HTML code
 
-    c.append("<div style=\"background-color: #ecece0; padding:10px;\">")
-    baseurl = get_hepdata_link(recid)
-    c.append("<h3><a href=\"%s/d%i\">%s</a></h3>" % (baseurl, seq, dataset.name, ))
+    c.append("<div style=\"background-color: #ececec; padding:10px;\">")
+    # baseurl = get_hepdata_link(recid)
+    # c.append("<h3><a href=\"%s/d%i\">%s</a></h3>" % (baseurl, seq, dataset.name, ))
     for fmt in dataset.additional_files:
         c.append("<a href=\"%s/%s\">%s</a>" % (CFG_HEPDATA_URL, fmt[0], fmt[1]))
 
-    if dataset.comments.strip():
-        c.append("<br>")
-        c.append("<b>Comments: </b> " + dataset.comments + "<br>")
-        c.append("<br>")
+    dataset.comments.strip()
+    c.append("<br />")
+    c.append("<b>Description: </b> " + dataset.comments + "<br />")
+    c.append("<br />")
 
-    record_doi = get_fieldvalues(dataset.recid, '0247_a')
-    if record_doi:
-        link_txt = "DOI: %s" % record_doi[0]
-    else:
-        link_txt = "Go to the record"
+    publisher = get_fieldvalues(dataset.recid, '520__9')
 
+    link_txt = "Go to the record"
     if display_link:
         c.append("<a href=\"%s/record/%s\">%s</a>" % (CFG_BASE_URL, str(dataset.recid), link_txt))
-    else:
-        if record_doi:
-            c.append("%s" % link_txt)
 
-    c.append("<div class=\"hepdataTablePlaceholder\">")
-    c.append("<table cellpadding=\"0\" cellspacing=\"0\" class=\"hepdataTable\">")
+    temporary = get_fieldvalues(dataset.recid, '500__a')
+    if temporary:
+        temporary = temporary[0]
 
+    if publisher[0] == 'HEPDATA' and temporary !="* Temporary entry *" :
+        c.append("<div class=\"hepdataTablePlaceholder\">")
+        c.append("<table cellpadding=\"0\" cellspacing=\"0\" class=\"hepdataTable\">")
 
-    # rendering files links
-    plain_file_url = "%s/record/%s/files/Data.txt" % ( CFG_BASE_URL, str(dataset.recid))
-    c.append("<tr><td colspan=\"%(colspan)s\" style=\"text-align: left;\"><a href=\"%(plain_file_url)s\"><img src=\"%(base_url)s/img/file-icon-text-15x20.gif\"></img><br>Plain</td>" % {
-        "base_url" : CFG_BASE_URL,
-        "plain_file_url" : plain_file_url,
-        "colspan" : str(dataset.num_columns)
-        })
+        # rendering files links
+        plain_file_url = get_fieldvalues(dataset.recid, '8564_u')
+        if plain_file_url:
+            c.append("<tr><td colspan=\"%(colspan)s\" style=\"text-align: left;\"> <a href=\"%(plain_file_url)s\"> <img src=\"%(site_url)s/img/file-icon-text-15x20.gif\"></img><br> Plain</td>" % {
+                "site_url" : CFG_BASE_URL,
+                "plain_file_url" : plain_file_url[0],
+                "colspan" : str(dataset.num_columns)
+                })
 
-    c.append("""<td rowspan="%(rowspan)i" class="expanderTableCell masterPlotExpanderTableCell">""" \
-                 % {"rowspan" :  len(dataset.data_qualifiers) + 3})
-    if multiplot_url:
-        c.append("""<p class="expander masterPlotExpander" onclick="%(onclick_code_masterplot_expand)s" id="%(masterplot_expander_id)s"><a>%(expand_message_masterplot)s</a></p>""" \
-        	         % args)
-    c.append("</td>")
-    c.append("<td class=\"masterplot_cell\" rowspan=\"%(masterplot_rowspan)s\"><div class=\"%(masterplot_layer_class)s\" style=\"display:none;\">" % args)
-    if multiplot_url:
-        c.append("<div><img src=\"%(multiplot_url)s\" alt=\"The plot is not available\" class=\"hepdataimg\"></img></div>" % args)
+            c.append("""<td rowspan="%(rowspan)i" class="expanderTableCell masterPlotExpanderTableCell">""" \
+                         % {"rowspan" :  len(dataset.data_qualifiers) + 3})
+            if multiplot_url:
+                c.append("""<p class="expander masterPlotExpander" onclick="%(onclick_code_masterplot_expand)s" id="%(masterplot_expander_id)s"><a>%(expand_message_masterplot)s</a></p>""" \
+                             % args)
+            c.append("</td>")
+            c.append("<td class=\"masterplot_cell\" rowspan=\"%(masterplot_rowspan)s\"><div class=\"%(masterplot_layer_class)s\" style=\"display:none;\">" % args)
+            if multiplot_url:
+                c.append("<div><img src=\"%(multiplot_url)s\" alt=\"The plot is not available\" class=\"hepdataimg\"></img></div>" % args)
 
-    c.append("</div></td>" % args)
-    c.append("</tr>")
+            c.append("</div></td>" % args)
+            c.append("</tr>")
+        else:
+            from invenio.hepdatautils import create_hepdata_ticket
+            create_hepdata_ticket(dataset.recid, 'Data missing in 8564_u')
 
-
-    # rendering column titles
-    c.append("<tr>")
-    for title in dataset.column_titles:
-        title_str = ""
-
-        strip_str = html_strip(title["content"])
-        if strip_str == ":":
-            strip_str = ""
-        additional_class = "hepdataTableTitleLayer"
-        try:
-            title_str = "$" + data_qualifier_to_LateX(strip_str) + "$"
-        except:
-            title_str = strip_str
-        if title_str in ("", "$$"):
-            title_str = ""
-            additional_class = "hepdataTableEmptyTitleLayer"
-
-
-        c.append("<th colspan=\"%i\" class=\"hepdataColumnHeader\"><div class=\"%s\">%s</div></th>" % (title["colspan"], additional_class, title_str))
-
-    c.append("</tr>")
-
-    for data_line in dataset.data_qualifiers:
+        # rendering column titles
         c.append("<tr>")
-        for data in data_line:
-            qualifier_string = ""
+        for title in dataset.column_titles:
+            title_str = ""
 
-            # stripping from spaces and single strings having only ":" sign
-            strip_str = html_strip(data["content"])
+            strip_str = html_strip(title["content"])
             if strip_str == ":":
                 strip_str = ""
-            additional_class = "hepdataQualifierLayer"
+            additional_class = "hepdataTableTitleLayer"
             try:
-                qualifier_string = "$" + data_qualifier_to_LateX(strip_str) + "$"
-
-            except Exception, e:
-                qualifier_string = strip_str
-
-            if qualifier_string in ("", "$$"):
-                qualifier_string = ""
-                additional_class = "hepdataEmptyQualifierLayer"
-            c.append("<td colspan=\"%i\" class=\"hepdataTableQualifierCell\"><div class=\"%s\">%s</div></td>" % ( \
-                    data["colspan"],
-                    additional_class,
-                    qualifier_string, ))
+                title_str = "$" + data_qualifier_to_LateX(strip_str) + "$"
+            except:
+                title_str = strip_str
+            if title_str in ("", "$$"):
+                title_str = ""
+                additional_class = "hepdataTableEmptyTitleLayer"
+            c.append("<th colspan=\"%i\" class=\"hepdataColumnHeader\"><div class=\"%s\">%s</div></th>" % (title["colspan"], additional_class, title_str))
         c.append("</tr>")
 
-    c.append("</td>")
-    c.append("</tr>")
+        for data_line in dataset.data_qualifiers:
+            c.append("<tr>")
+            for data in data_line:
+                qualifier_string = ""
+
+                # stripping from spaces and single strings having only ":" sign
+                strip_str = html_strip(data["content"])
+                if strip_str == ":":
+                    strip_str = ""
+                additional_class = "hepdataQualifierLayer"
+                try:
+                    qualifier_string = "$" + data_qualifier_to_LateX(strip_str) + "$"
+
+                except Exception, e:
+                    qualifier_string = strip_str
+
+                if qualifier_string in ("", "$$"):
+                    qualifier_string = ""
+                    additional_class = "hepdataEmptyQualifierLayer"
+                c.append("<td colspan=\"%i\" class=\"hepdataTableQualifierCell\"><div class=\"%s\">%s</div></td>" % ( \
+                        data["colspan"],
+                        additional_class,
+                        qualifier_string, ))
+            c.append("</tr>")
+        c.append("</td>")
+        c.append("</tr>")
 
 
-    c.append("<tr>")
-    for header in dataset.column_headers:
-        header_str = ""
-        try:
-            header_str = "$" + data_qualifier_to_LateX(header["content"]) + "$"
-        except Exception, e:
-            header_str = header["content"]
-
-        c.append("<th colspan=\"%i\" class=\"hepdataColumnHeader\"><div class=\"hepdataTableHeaderLayer\">%s</div></th>" % (header["colspan"],
-                                                 header_str))
-    c.append("</tr>")
-    if should_expand_table:
-        c.append(("<tr class=\"expander_row\"><td colspan=\"%(expander_colspan)i\" class=" + \
-                  "\"expanderTableCell detailedDataExpanderTableCell\">" + \
-                  "<p onclick=\"%(onclick_code_moredata_expand)s\" " + \
-                  "id=\"%(data_expander_id)s\" "  + \
-                  "class=\"expander detailedDataExpander\">" +\
-                  "<a>%(expand_message_moredata)s</a></p></td></tr>") % args)
-
-    isFirst = True
-    for line in dataset.data:
         c.append("<tr>")
-        column_num = -1
-        for datap in line:
-            column_num += 1
-            args["data_column_class"] = \
-                get_hepdata_column_class(seq, column_num)
-            args["colspan"] = datap["colspan"]
+        for header in dataset.column_headers:
+            header_str = ""
+            try:
+                header_str = "$" + data_qualifier_to_LateX(header["content"]) + "$"
+            except Exception, e:
+                header_str = header["content"]
 
-            c.append(("<td class=\"hepdataDataCell " + \
-                          "%(data_column_class)s\" colspan=\"%(colspan)s\"><div class=\"" + \
-                          "%(data_layer_class)s hepdataDataLayer\" style=\"display:" + \
-                          "none;\">") % args)
+            c.append("<th colspan=\"%i\" class=\"hepdataColumnHeader\"><div class=\"hepdataTableHeaderLayer\">%s</div></th>" % (header["colspan"],
+                                                     header_str))
 
-            if len(datap["content"].strip()) > 0 and datap["content"].strip()[0] != "-":
-                # we are trying to put all the minus characters before any number
-                c.append("&nbsp;")
+        c.append("</tr>")
+        if should_expand_table:
+            c.append(("<tr class=\"expander_row\"><td colspan=\"%(expander_colspan)i\" class=" + \
+                      "\"expanderTableCell detailedDataExpanderTableCell\">" + \
+                      "<p onclick=\"%(onclick_code_moredata_expand)s\" " + \
+                      "id=\"%(data_expander_id)s\" "  + \
+                      "class=\"expander detailedDataExpander\">" +\
+                      "<a>%(expand_message_moredata)s</a></p></td></tr>") % args)
 
-            c.append(datap["content"])
+        isFirst = True
+        for line in dataset.data:
+            c.append("<tr>")
+            column_num = -1
+            for datap in line:
+                column_num += 1
+                args["data_column_class"] = \
+                    get_hepdata_column_class(seq, column_num)
+                args["colspan"] = datap["colspan"]
 
-            c.append("</div></td>")
-        c.append("<td></td>") # an empty column
-        if isFirst:
-            c.append("<td rowspan=\"%(plots_rowspan)i\"><div class=\"%(plots_layer_class)s\" style=\"display:none;\">%(plots_code)s</div></td>" % args)
-        isFirst = False
-    c.append("</table>")
-    c.append("</div>")
+                c.append(("<td class=\"hepdataDataCell " + \
+                              "%(data_column_class)s\" colspan=\"%(colspan)s\"><div class=\"" + \
+                              "%(data_layer_class)s hepdataDataLayer\" style=\"display:" + \
+                              "none;\">") % args)
+
+                if len(datap["content"].strip()) > 0 and datap["content"].strip()[0] != "-":
+                    # we are trying to put all the minus characters before any number
+                    c.append("&nbsp;")
+
+                c.append(datap["content"])
+
+                c.append("</div></td>")
+            c.append("<td></td>") # an empty column
+            if isFirst:
+                c.append("<td rowspan=\"%(plots_rowspan)i\"><div class=\"%(plots_layer_class)s\" style=\"display:none;\">%(plots_code)s</div></td>" % args)
+            isFirst = False
+        c.append("</table>")
+        c.append("</div>")
+
+    # Dirty hack to show pre-HEPData harvested records
+    # Remove when possible
+    if temporary == "* Temporary entry *" and display_link== False:
+        c.append("<div class=\"hepdataTablePlaceholder\">")
+        c.append("<table cellpadding=\"0\" cellspacing=\"0\" class=\"hepdataTable\">")
+        c.append("<tr><td style=\"text-align: center;\">Preview not available</td>")
+        c.append("</tr>")
+        c.append("</table>")
+        c.append("</div>")
+
     c.append("</div>")
     return "\n".join(c)
 
+def render_dataverse_dataset_html(recid, display_link = True):
+    """ Rendering a single Dataverse dataset, both for the tab and the record
+    @param display_link Indicates if a link to the data record should be displayed
+    @type display_link boolean
+    """
+    from invenio.search_engine import get_fieldvalues
+
+    # rendering the HTML code
+
+    c = [] #collecting parts of the output
+    c.append("<div style=\"background-color: #ececec; padding:10px;\">")
+
+    comments = get_fieldvalues(recid, '520__h')[0]
+    publisher = get_fieldvalues(recid, '520__9')
+
+    c.append("<br />")
+    c.append("<b>Description: </b> " + comments + "<br />")
+    c.append("<br />")
+
+    link_txt = "Go to the record"
+    if display_link:
+        c.append("<a href=\"%s/record/%s\">%s</a>" % (CFG_SITE_URL, str(recid), link_txt))
+
+    c.append("<br /><br />")
+    if publisher[0] == 'Dataverse' and display_link == False:
+        c.append("<div class=\"hepdataTablePlaceholder\">")
+        c.append("<table cellpadding=\"0\" cellspacing=\"0\" class=\"hepdataTable\">")
+        c.append("<tr><td style=\"text-align: center;\">Preview not available</td>")
+        c.append("</tr>")
+        c.append("</table>")
+        c.append("</div>")
+        c.append("<br /><br />")
+
+    c.append("</div>")
+    return "\n".join(c)
+
+def render_inspire_dataset_html(recid, display_link = True):
+    """ Rendering a single Dataverse dataset, both for the tab and the record
+    @param display_link Indicates if a link to the data record should be displayed
+    @type display_link boolean
+    """
+    from invenio.search_engine import get_fieldvalues
+
+    # rendering the HTML code
+
+    c = [] #collecting parts of the output
+    c.append("<div style=\"background-color: #ececec; padding:10px;\">")
+
+    comments = get_fieldvalues(recid, '520__h')[0]
+
+    c.append("<br />")
+    c.append("<b>Description: </b> " + comments + "<br />")
+    c.append("<br />")
+
+    link_txt = "Go to the record"
+    if display_link:
+        c.append("<a href=\"%s/record/%s\">%s</a>" % (CFG_SITE_URL, str(recid), link_txt))
+
+    c.append("<br /><br />")
+    c.append("</div>")
+    return "\n".join(c)
+
+def render_other_dataset_html(recid, display_link = True):
+    """ Try to render the basic content of an unknown dataset, both for the tab and the record
+    @param display_link Indicates if a link to the data record should be displayed
+    @type display_link boolean
+    """
+    from invenio.search_engine import get_fieldvalues
+
+    c = [] #collecting parts of the output
+    c.append("<div style=\"background-color: #ececec; padding:10px;\">")
+
+    comments = get_fieldvalues(recid, '520__h')
+    if comments:
+        comments = comments[0]
+
+    c.append("<br />")
+    c.append("<b>Description: </b> " + comments + "<br />")
+    c.append("<br />")
+
+    link_txt = "Go to the record"
+    if display_link:
+        c.append("<a href=\"%s/record/%s\">%s</a>" % (CFG_SITE_URL, str(recid), link_txt))
+
+    c.append("<br /><br />")
+    c.append("</div>")
+    return "\n".join(c)
 
 def render_plots_page(dataset, recid, seq):
     """

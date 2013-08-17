@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,36 +16,29 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Prints aprents of a current HEPData dataset
+"""BibFormat element - Prints the list of papers containing the dataset
 """
 __revision__ = "$Id$"
 
-from invenio.search_engine import get_record
-from invenio.bibrecord import record_get_field, field_get_subfield_values
-from invenio.config import CFG_BASE_URL
 
 def format_element(bfo):
     """
-    Prints HEPData table encoded in the record
+    Prints the list of papers containing the dataset by title.
     """
-    parent_recids = bfo.fields("786__w")
-    results = []
-    a = results.append
+    
+    from invenio.bibformat_engine import BibFormatObject
+    from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
 
-    a("<h3>This dataset has been included in the following publications: </h3>")
+    parent_recid = bfo.field("786__w")
+    bfo_parent = BibFormatObject(parent_recid)
+    
+    title = bfo_parent.field("245__a")
+    url = CFG_BASE_URL + '/' + CFG_SITE_RECORD + '/' + str(bfo_parent.recID) 
 
-    for recid in parent_recids:
-        try:
-            rec = get_record(str(recid))
-            field = record_get_field(rec , "245", field_position_local=0)
-
-            publication_title = field_get_subfield_values(field , "a")[0]
-        except:
-            publication_title = ""
-
-        a("<a href=\"%s/record/%s\"><b>%s</b></a>" % (CFG_BASE_URL, str(recid), publication_title))
-
-    return "\n".join(results)
+    out = "This dataset complements the following publication: <br />"
+    out += "<a href=\"" + url + "\">" + title + "</a>" 
+    
+    return out
 
 def escape_values(bfo):
     """

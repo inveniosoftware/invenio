@@ -26,14 +26,19 @@ def format_element(bfo):
     """
     Prints HEPData table encoded in the record
     """
-
-    recid = bfo.recID
-    parent_recid = int(bfo.fields("786__w")[0])
-    seq = int(bfo.fields("786__q")[0])
-
-    dataset = hepdatautils.get_hepdata_by_recid(parent_recid, recid)
-
-    return hepdatadisplayutils.render_hepdata_dataset_html(dataset, parent_recid, seq, display_link=False)
+    publisher = bfo.fields("520__9")[0]
+    if publisher == "HEPDATA":
+        recid = bfo.recID
+        parent_recid = int(bfo.fields("786__w")[0])
+        seq = int(bfo.fields("786__q")[0])
+        dataset = hepdatautils.get_hepdata_by_recid(parent_recid, recid)
+        return hepdatadisplayutils.render_hepdata_dataset_html(dataset, parent_recid, seq, display_link = False)
+    elif publisher == "Dataverse":
+        return hepdatadisplayutils.render_dataverse_dataset_html(bfo.recID, display_link = False)
+    elif publisher == "INSPIRE":
+        return hepdatadisplayutils.render_inspire_dataset_html(bfo.recID, display_link = False)
+    else:
+        return hepdatadisplayutils.render_other_dataset_html(bfo.recID, display_link = False)
 
 def escape_values(bfo):
     """

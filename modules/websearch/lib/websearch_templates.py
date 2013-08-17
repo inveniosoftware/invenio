@@ -89,6 +89,7 @@ from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat import format_record
 
 from invenio import hepdatadisplayutils
+
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
 
@@ -3923,17 +3924,45 @@ class Template:
     def tmpl_record_hepdata(self, data, recid, isLong=True):
         """ Generate a page for HepData records
         """
-        c = []
+        from invenio import hepdatautils
+        from invenio.search_engine import get_fieldvalues
 
-        c.append("<div style=\"background-color: #ecece0;\">")
+        c = []
         c.append("<div style=\"background-color: #ececec;\">")
-        c.append("<h3>This data comes from the <a href=\"%s\">Durham HepData project</a></h3>" % ("http://hepdata.cedar.ac.uk/view/ins%s" % (str(recid), ), ));
-        c.append("<h3>Summary:</h3>")
-        c.append("""<div class="hepdataSummary">%s</div>""" % (data.comment, ))
+
+        flag_hepdata = 0
+        flag_dataverse = 0
+        for dataset in data.datasets:
+            try:
+                publisher = get_fieldvalues(dataset.recid, '520__9')[0]
+            except IndexError:
+                from invenio.hepdatautils import create_hepdata_ticket
+                create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
+                continue
+            if publisher == "HEPDATA" and flag_hepdata == 0:
+                c.append('<a href="http://hepdata.cedar.ac.uk/view/ins%s" target="_blank"> Durham HepData project </a>' % (recid))
+                flag_hepdata = 1
+            elif publisher == "Dataverse":
+                flag_dataverse = 1
+
+        if flag_hepdata == 1 or flag_dataverse == 1:
+            c.append("<h3> This data comes from ")
+            if flag_hepdata == 1:
+                c.append(hepdata_text)
+            if flag_hepdata == 1 and flag_dataverse == 1:
+                c.append(' and ')
+            if flag_dataverse == 1:
+                c.append('<a href="http://thedata.harvard.edu/"> Dataverse </a>')
+            c.append('</h3>')
+
+        c.append("<div style=\"background-color: #ececec;\">")
+        if data.comment:
+            c.append("<h3> Summary:</h3>")
+            c.append("""<div class="hepdataSummary">%s</div>""" % (data.comment, ))
 
         if data.systematics and data.systematics.strip() != "":
             c.append("<h3>Systematic data: </h3>")
-            c.append(data.systematics)
+            c.append(data.systematics) 
             c.append("</div>")
 
         if data.additional_data_links:
@@ -3942,11 +3971,26 @@ class Template:
                 if "href" in link and "description" in link:
                     c.append("<a href=\"%s/%s\">%s</a><br>" % (CFG_HEPDATA_URL, link["href"], link["description"]))
 
+        c.append("<h3> Datasets:</h3>")
+
         seq = 0
 
         for dataset in data.datasets:
             seq += 1
-            c.append(hepdatadisplayutils.render_hepdata_dataset_html(dataset, recid, seq))
+            try:
+                publisher = get_fieldvalues(dataset.recid, '520__9')[0]
+            except IndexError:
+                from invenio.hepdatautils import create_hepdata_ticket
+                create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
+                continue
+            if publisher == "HEPDATA":
+                c.append(hepdatadisplayutils.render_hepdata_dataset_html(dataset, recid, seq))
+            elif publisher == "Dataverse":
+                c.append(hepdatadisplayutils.render_dataverse_dataset_html(dataset.recid))
+            elif publisher == "INSPIRE":
+                c.append(hepdatadisplayutils.render_inspire_dataset_html(dataset.recid))
+            else:
+                c.append(hepdatadisplayutils.render_other_dataset_html(dataset.recid))
 
         c.append("</div>")
 
