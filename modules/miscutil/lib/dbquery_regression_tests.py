@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,19 +21,17 @@
 
 __revision__ = "$Id$"
 
-import unittest
-
 from invenio import dbquery
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
-class RunSqlReturnListOfDictionaries(unittest.TestCase):
+class RunSqlReturnListOfDictionaries(InvenioTestCase):
     """Test run_sql behavior when with_dict parameter is provided"""
 
     def test_select_simple_columns_query(self):
         """dbquery - select simple columns query"""
         res = dbquery.run_sql("SELECT id,name,dbquery FROM collection WHERE id<3", with_dict=True)
         self.assertEqual(res, ([{'dbquery': None, 'id': 1, 'name': 'Atlantis Institute of Fictive Science'},
-                                {'dbquery': '980:"PREPRINT"', 'id': 2, 'name': 'Preprints'}]))
+                                {'dbquery': 'collection:PREPRINT', 'id': 2, 'name': 'Preprints'}]))
 
     def test_select_date_format_column_query(self):
         """dbquery - select date format column query"""
@@ -53,7 +51,7 @@ class RunSqlReturnListOfDictionaries(unittest.TestCase):
     def test_select_all_columns_query(self):
         """dbquery - select all columns query"""
         res = dbquery.run_sql("SELECT * FROM collection WHERE id=2", with_dict=True) # kwalitee: disable=sql
-        self.assertEqual(res, ([{'dbquery': '980:"PREPRINT"',
+        self.assertEqual(res, ([{'dbquery': 'collection:PREPRINT',
                                   'id': 2,
                                   'name': 'Preprints',
                                   'nbrecs': 37L,
