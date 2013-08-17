@@ -27,13 +27,20 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
 from invenio.textutils import xml_entities_to_utf8
 
 
-def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME["ASC"], linkback_type=None):
+def get_all_linkbacks(recid=None,
+                      status=None,
+                      order=CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME["ASC"],
+                      linkback_type=None,
+                      limit=None,
+                      full_count_only=False):
     """
     Get all linkbacks
     @param recid: of one record, of all if None
     @param status: with a certain status, of all if None
     @param order: order by insertion time either "ASC" or "DESC"
     @param linkback_type: of a certain type, of all if None
+    @param limit: maximum result count, all if None
+    @param full_count_only: return only full result count (does not consider "limit"), result set if False
     @return [(linkback_id,
               origin_url,
               recid,
@@ -41,7 +48,9 @@ def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_IN
               linkback_type,
               linkback_status,
               insert_time)]
-              in order by id
+              in order by id, up to "limited" results
+
+            OR integer if count_only
     """
 
     header_sql = """SELECT id,
@@ -52,9 +61,10 @@ def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_IN
                             status,
                             insert_time
                      FROM lnkENTRY"""
-    conditions = []
-    order_sql = "ORDER by id %s" % order
+    if full_count_only:
+        header_sql = 'SELECT count(id) FROM lnkENTRY'
 
+    conditions = []
     params = []
 
     def add_condition(column, value):
@@ -69,7 +79,17 @@ def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_IN
     add_condition('status', status)
     add_condition('type', linkback_type)
 
-    return run_sql(header_sql + ' ' + ' '.join(conditions) + ' ' + order_sql, tuple(params))
+    order_sql = 'ORDER by id %s' % order
+
+    limit_sql = ''
+    if limit:
+        limit_sql = 'LIMIT %s' % limit
+
+    res = run_sql('%s %s %s %s' % (header_sql, ' '.join(conditions), order_sql, limit_sql), tuple(params))
+    if full_count_only:
+        return int(res[0][0])
+    else:
+        return res
 
 
 def approve_linkback(linkbackid, user_info):

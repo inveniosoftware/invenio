@@ -157,20 +157,25 @@ def send_pending_linkbacks_notification(linkback_type):
     Send notification emails to all linkback moderators for all pending linkbacks
     @param linkback_type: of CFG_WEBLINKBACK_LIST_TYPE
     """
-    pending_linkbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'], status=CFG_WEBLINKBACK_STATUS['PENDING'])
+    pending_linkbacks = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'],
+                                          status=CFG_WEBLINKBACK_STATUS['PENDING'],
+                                          limit=CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL)
 
     if pending_linkbacks:
-        pending_count = len(pending_linkbacks)
+        pending_count = get_all_linkbacks(linkback_type=CFG_WEBLINKBACK_TYPE['TRACKBACK'],
+                                          status=CFG_WEBLINKBACK_STATUS['PENDING'],
+                                          full_count_only=True)
+
         cutoff_text = ''
         if pending_count > CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL:
-            cutoff_text = ' (Printing only the first %s requests)' % CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL
+            cutoff_text = '(Printing only the first %s requests)' % CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL
 
-        content = """There are %(count)s new %(linkback_type)s requests which you should approve or reject%(cutoff)s:
+        content = """There are %(count)s new %(linkback_type)s requests which you should approve or reject %(cutoff)s:
                   """ % {'count': pending_count,
                          'linkback_type': linkback_type,
                          'cutoff': cutoff_text}
 
-        for pending_linkback in pending_linkbacks[0:CFG_WEBLINKBACK_MAX_LINKBACKS_IN_EMAIL]:
+        for pending_linkback in pending_linkbacks:
             content += """
                        For %(recordURL)s from %(origin_url)s.
                        """ % {'recordURL': generate_redirect_url(pending_linkback[2]),
