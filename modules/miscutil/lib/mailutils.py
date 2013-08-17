@@ -78,10 +78,10 @@ def initialize_email_backend(app):
     app.config['MANAGERS'] = (CFG_SITE_SUPPORT_EMAIL, )
 
     if app.config.get('EMAIL_BACKEND') is None:
-        if CFG_MISCUTIL_SMTP_HOST and CFG_MISCUTIL_SMTP_PORT:
-            app.config['EMAIL_BACKEND'] = 'flask.ext.email.backends.smtp.Mail'
-        elif app.config.get('CFG_EMAIL_BACKEND'):
+        if app.config.get('CFG_EMAIL_BACKEND'):
             app.config['EMAIL_BACKEND'] = app.config.get('CFG_EMAIL_BACKEND')
+        elif CFG_MISCUTIL_SMTP_HOST and CFG_MISCUTIL_SMTP_PORT:
+            app.config['EMAIL_BACKEND'] = 'flask.ext.email.backends.smtp.Mail'
     # Defaults to 'flask.ext.email.backends.locmem.Mail'
 
     app.config['EMAIL_HOST'] = CFG_MISCUTIL_SMTP_HOST
