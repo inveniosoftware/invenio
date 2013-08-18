@@ -185,15 +185,14 @@ def send_pending_linkbacks_notification(linkback_type):
             send_email(CFG_SITE_ADMIN_EMAIL, email, 'Pending ' + linkback_type + ' requests', content)
 
 
-def infix_exists_for_url_in_list(url, list_type):
+def infix_exists_for_url_in_list(url, url_list):
     """
     Check if an infix of a url exists in a list
     @param url
-    @param list_type, of CFG_WEBLINKBACK_LIST_TYPE
+    @param url_list
     @return True, False
     """
-    urls = get_url_list(list_type)
-    for current_url in urls:
+    for current_url in url_list:
         if current_url in url:
             return True
     return False
@@ -262,8 +261,8 @@ def perform_sendtrackback(req, recid, url, title, excerpt, blog_name, blog_id, s
                              <message>%s</message>
                          """
 
-    blacklist_match = infix_exists_for_url_in_list(url, CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'])
-    whitelist_match = infix_exists_for_url_in_list(url, CFG_WEBLINKBACK_LIST_TYPE['WHITELIST'])
+    blacklist_match = infix_exists_for_url_in_list(url, get_url_list(CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST']))
+    whitelist_match = infix_exists_for_url_in_list(url, get_url_list(CFG_WEBLINKBACK_LIST_TYPE['WHITELIST']))
 
     # faulty request, url argument not set
     if url in (CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME, None, ''):
@@ -341,6 +340,7 @@ def delete_linkbacks_on_blacklist():
     linkbacks.extend(list(get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['REJECTED'])))
     linkbacks.extend(list(get_all_linkbacks(status=CFG_WEBLINKBACK_STATUS['BROKEN'])))
 
+    blacklist = get_url_list(CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST'])
     for linkback in linkbacks:
-        if infix_exists_for_url_in_list(linkback[1], CFG_WEBLINKBACK_LIST_TYPE['BLACKLIST']):
+        if infix_exists_for_url_in_list(linkback[1], blacklist):
             remove_linkback(linkback[0])
