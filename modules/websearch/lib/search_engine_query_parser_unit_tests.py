@@ -23,19 +23,15 @@
 import datetime
 
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
+from invenio.dateutils import GOT_DATEUTIL as DATEUTIL_AVAILABLE
+if DATEUTIL_AVAILABLE:
+    from invenio.dateutils import dateutil, du_delta
 from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 search_engine_query_parser = lazy_import('invenio.search_engine_query_parser')
 create_basic_search_units = lazy_import('invenio.search_engine:create_basic_search_units')
 perform_request_search = lazy_import('invenio.search_engine:perform_request_search')
-
-if search_engine_query_parser.GOT_DATEUTIL:
-    import dateutil
-    from dateutil.relativedelta import relativedelta as du_delta
-    DATEUTIL_AVAILABLE = True
-else:
-    DATEUTIL_AVAILABLE = False
 
 
 class TestParserUtilityFunctions(InvenioTestCase):
