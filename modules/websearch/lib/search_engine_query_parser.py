@@ -25,23 +25,10 @@ import re
 import string
 from datetime import datetime
 
-try:
-    import dateutil
-    if not hasattr(dateutil, '__version__') or dateutil.__version__ != '2.0':
-        from dateutil import parser as du_parser
-        from dateutil.relativedelta import relativedelta as du_delta
-        from dateutil import relativedelta
-        GOT_DATEUTIL = True
-    else:
-        from warnings import warn
-        warn("Not using dateutil module because the version %s is not compatible with Python-2.x" % dateutil.__version__)
-        GOT_DATEUTIL = False
-except ImportError:
-    # Ok, no date parsing is possible, but continue anyway,
-    # since this package is only recommended, not mandatory.
-    GOT_DATEUTIL = False
-
 from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
+from invenio.dateutils import GOT_DATEUTIL
+if GOT_DATEUTIL:
+    from invenio.dateutils import du_parser, du_delta, relativedelta
 from invenio.logicutils import to_cnf
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
 from invenio.dateutils import strptime

@@ -56,6 +56,22 @@ try:
 except ImportError:
     CFG_HAS_EGENIX_DATETIME = False
 
+try:
+    import dateutil
+    if not hasattr(dateutil, '__version__') or dateutil.__version__ != '2.0':
+        from dateutil import parser as du_parser
+        from dateutil.relativedelta import relativedelta as du_delta
+        from dateutil import relativedelta
+        GOT_DATEUTIL = True
+    else:
+        from warnings import warn
+        warn("Not using dateutil module because the version %s is not compatible with Python-2.x" % dateutil.__version__)
+        GOT_DATEUTIL = False
+except ImportError:
+    # Ok, no date parsing is possible, but continue anyway,
+    # since this package is only recommended, not mandatory.
+    GOT_DATEUTIL = False
+
 datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
