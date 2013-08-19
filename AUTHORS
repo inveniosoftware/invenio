@@ -31,16 +31,15 @@ The CERN development group currently consists of:
  - Ludmila Marian <ludmila.marian@gmail.com>
      Fixes to several modules.
 
- - Chris Montarbaud <christiane.montarbaud@cern.ch>
-     Multimedia and photo management.
-
- - Marko Niinimaki <manzikki@gmail.com>
-     Contributions to the BibRank citation module and WebSearch
-     summary output formats.
-
  - Piotr Praczyk <piotr.praczyk@gmail.com>
      OAI harvesting from arXiv.  Test harvesting interface, for
      BibHarvest.  Record comparison library functions, for BibRecord.
+
+ - Jiri Kuncar <jiri.kuncar@cern.ch>
+     Fix for demo site installation.
+
+ - Alessio Deiana <alessio.deiana@cern.ch>
+     Fix for BibFormat element initialisation.
 
 The EPFL development group currently consists of:
 
@@ -48,14 +47,19 @@ The EPFL development group currently consists of:
      Rewrite of WebBasket.  WebMessage.  Improvements to WebComment.
      Other contributions and improvements.
 
-The SLAC development group currently consists of:
+Many former group members (mostly CERN staff and fellows, technical
+students, diploma students, summer students) contributed to the
+project.  In an approximate decreasing chronological order:
+
+ - Chris Montarbaud <christiane.montarbaud@cern.ch>
+     Multimedia and photo management.
 
  - Travis C. Brooks <travis@slac.stanford.edu>
      Support for SPIRES search syntax.
 
-Many former group members (CERN and EPFL staff and fellows, technical
-students, diploma students, summer students) contributed to the
-project.  In an approximate decreasing chronological order:
+ - Marko Niinimaki <manzikki@gmail.com>
+     Contributions to the BibRank citation module and WebSearch
+     summary output formats.
 
  - Benoit Thiell  <benoit.thiell@cern.ch>
      Improvements to BibClassify.

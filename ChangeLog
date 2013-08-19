@@ -1,3 +1,69 @@
+CDS Invenio v0.99.7 (released 2013-08-19)
+=========================================
+
+2013-08-19  Tibor Simko  <tibor.simko@cern.ch>
+
+	I18N: PO file update for the release of v0.99.8
+
+2013-08-12  Alessio Deiana  <alessio.deiana@cern.ch>
+
+	BibFormat: format_element initialisation fix
+	Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
+
+2013-05-06  Jiri Kuncar  <jiri.kuncar@cern.ch>
+
+	installation: fix collectiondetailedrecordpagetabs
+	* Moves data to fill collectiondetailedrecordpagetabs table from
+	  tabfill.sql to democfgdata.sql.  (closes #1496)
+
+	Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
+
+2013-05-02  Jerome Caffaro  <jerome.caffaro@cern.ch>
+
+	BibFormat: fix CLI call to old PHP-based formatter
+	* Escapes output format in shell when calling old PHP-based BibFormat.
+
+	Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
+
+2013-04-04  Jerome Caffaro  <jerome.caffaro@cern.ch>
+
+	BibClassify: escape keywords in tag cloud and MARCXML
+	* Escape keywords in HTML output (tag cloud), as well as
+	  MARCXML output.
+
+	Reported-by: Friedrich Hust <Friedrich.Hust@rwth-aachen.de>
+	Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
+
+2013-04-04  Jerome Caffaro  <jerome.caffaro@cern.ch>
+
+	WebComment: escape review "title"
+	* Escape title of a review when displaying, including when showing
+	  the review form with some initial value.
+
+	Reported-by: Friedrich Hust <Friedrich.Hust@rwth-aachen.de>
+	Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
+
+2013-03-15  Samuele Kaplun  <samuele.kaplun@cern.ch>
+
+	BibIndex: better wording for stemming in admin UI
+	* Improves the wording of the configuration form for the stemming
+	  setting, in order to better clarify how the system is affected
+	  by changing the stemming setting of an index.
+
+	Reviewed-by: Tibor Simko <tibor.simko@cern.ch>
+
+2013-01-07  Samuele Kaplun  <samuele.kaplun@cern.ch>
+
+	WebAccess: IP-based rules and offline user fix
+	* Correctly handles a corner case of
+	  access_control_firerole.acc_firerole_check_user() where, when
+	  checking a guest user created with collect_user_info(None) (hence
+	  having the 'remote_ip' key set to '') against an IP-based FireRole
+	  rule, would have raised an unhandled exception. (closes #1233)
+
+	* Introduces a new register_exception() statement in order to early
+	  discover troubles with acc_firerole_check_user().
+
 CDS Invenio v0.99.7 (released 2012-12-18)
 =========================================
 
