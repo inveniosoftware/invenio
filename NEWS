@@ -6,6 +6,22 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+CDS Invenio v0.99.8 -- released 2013-08-19
+------------------------------------------
+
+ *) escape keywords in tag cloud and MARCXML (BibClassify)
+
+ *) fix CLI call to old PHP-based formatter; fix format_element
+    initialisation (BibFormat)
+
+ *) better wording for stemming in admin UI (BibIndex)
+
+ *) IP-based rules and offline user fix (WebAccess)
+
+ *) escape review "title" (WebComment)
+
+ *) fix collectiondetailedrecordpagetabs (installation)
+
 Invenio v1.1.1 -- released 2012-12-21
 -------------------------------------
 
