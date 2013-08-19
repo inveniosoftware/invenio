@@ -1,31 +1,54 @@
 --------------------------------------------------------------------
-Invenio v1.0.4 is released
-December 21, 2012
+Invenio v1.0.5 is released
+August 19, 2013
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-Invenio v1.0.4 was released on December 21, 2012.
+Invenio v1.0.5 was released on August 19, 2013.
 
-This release fixes notably an installation problem in v1.0.3 that
-ommitted a file from the release tarball.  The release also introduces
-two minor improvements.  The release is recommended to all Invenio
-sites using v1.0.2 or previous versions.
+This is a bugfix release update for Invenio v1.0 release series.  It
+is recommended to all Invenio sites using v1.0.4 or previous releases.
 
 What's new:
 -----------
 
- *) installation: inclusion of JS quicktags in tarball
+ *) BibClassify: escape keywords in tag cloud and MARCXML
 
- *) bibdocfile: better error report for unknown format
+ *) BibDocFile: support new magic library
 
- *) WebAccess: admin interface usability improvement
+ *) BibFormat: additional fulltext file display in HB; fix CLI call to
+    old PHP-based formatter; format_element initialisation fix
+
+ *) BibIndex: better wording for stemming in admin UI
+
+ *) BibKnowledge: /kb/export 500 error fix
+
+ *) BibUpload: FMT regression test case fix; indicators in strong tags
+
+ *) errorlib: hiding bibcatalog info in exception body
+
+ *) global: test suite nosification
+
+ *) installation: fix collectiondetailedrecordpagetabs; support for
+    Apache-2.4
+
+ *) WebAccess: IP-based rules and offline user fix; replacement of CDS
+    Invenio by InveniO
+
+ *) WebComment: escape review "title"
+
+ *) WebSearch: respect default `rg` in Advanced Search
+
+ *) WebSession: fix for list of admin activities; login_method changes
+
+ *) WebSubmit: new websubmitadmin CLI
 
 Download:
 ---------
 
-  <http://invenio-software.org/download/invenio-1.0.4.tar.gz>
-  <http://invenio-software.org/download/invenio-1.0.4.tar.gz.md5>
-  <http://invenio-software.org/download/invenio-1.0.4.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-1.0.5.tar.gz>
+  <http://invenio-software.org/download/invenio-1.0.5.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-1.0.5.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -35,29 +58,26 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from Invenio v1.0.2, then:
+If you are upgrading from Invenio v1.0.4, then:
 
  a) Stop your bibsched queue and your Apache server.
 
  b) Install the update:
 
-     $ tar xvfz invenio-1.0.4.tar.gz
-     $ cd invenio-1.0.4
+     $ tar xvfz invenio-1.0.5.tar.gz
+     $ cd invenio-1.0.5
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
      $ make check-custom-templates
-     $ make update-v1.0.2-tables
+     $ make update-v1.0.4-tables
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
-                  /opt/invenio/etc/
+         --exclude bibformat/format_templates/Default_HTML_brief.bft \
+         /opt/invenio/etc/
 
- c) Update your jQuery tablesorter library:
-
-     $ sudo -u www-data make install-jquery-plugins
-
- d) Restart your Apache server and your bibsched queue.
+ c) Restart your Apache server and your bibsched queue.
 
 If you are upgrading from a previous Invenio release (notably from
 v0.99 release series), then please see a dedicated Invenio Upgrade

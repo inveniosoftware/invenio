@@ -6,6 +6,40 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.5 -- released 2013-08-19
+-------------------------------------
+
+ *) BibClassify: escape keywords in tag cloud and MARCXML
+
+ *) BibDocFile: support new magic library
+
+ *) BibFormat: additional fulltext file display in HB; fix CLI call to
+    old PHP-based formatter; format_element initialisation fix
+
+ *) BibIndex: better wording for stemming in admin UI
+
+ *) BibKnowledge: /kb/export 500 error fix
+
+ *) BibUpload: FMT regression test case fix; indicators in strong tags
+
+ *) errorlib: hiding bibcatalog info in exception body
+
+ *) global: test suite nosification
+
+ *) installation: fix collectiondetailedrecordpagetabs; support for
+    Apache-2.4
+
+ *) WebAccess: IP-based rules and offline user fix; replacement of CDS
+    Invenio by InveniO
+
+ *) WebComment: escape review "title"
+
+ *) WebSearch: respect default `rg` in Advanced Search
+
+ *) WebSession: fix for list of admin activities; login_method changes
+
+ *) WebSubmit: new websubmitadmin CLI
+
 CDS Invenio v0.99.8 -- released 2013-08-19
 ------------------------------------------
 

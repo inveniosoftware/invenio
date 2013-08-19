@@ -533,4 +533,7 @@ update-v1.0.2-tables: # from v1.0.2 to v1.0.3
 update-v1.0.3-tables: # from v1.0.3 to v1.0.4
 	@echo "Nothing to do; table structure did not change between v1.0.3 and v1.0.4."
 
+update-v1.0.4-tables: # from v1.0.4 to v1.0.5
+	@echo "Nothing to do; table structure did not change between v1.0.4 and v1.0.5."
+
 CLEANFILES = *~ *.pyc *.tmp
