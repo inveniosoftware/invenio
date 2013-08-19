@@ -104,8 +104,8 @@ def display_cloud():
 @blueprint.route('/display/list', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_templated('webtag_display_list.html')
-@blueprint.invenio_wash_urlargd({'sort_by': (unicode, 'name')})
-@blueprint.invenio_wash_urlargd({'order': (unicode, '')})
+@blueprint.invenio_wash_urlargd({'sort_by': (unicode, 'name'),
+                                 'order': (unicode, '')})
 def display_list(sort_by, order):
     """ List of user's private/group/public tags """
     tags = User.query.get(current_user.get_id()).tags_query
@@ -178,7 +178,7 @@ def tokenize(id_bibrec, q):
 
     response_tags = []
     for tag in tags.all():
-        tag_json = tag.serializable_fields({'id', 'name'})
+        tag_json = tag.serializable_fields(['id', 'name'])
         response_tags.append(tag_json)
 
         # Check if it matches the search name
@@ -204,7 +204,7 @@ def editor(id_bibrec):
 
     tags_json = []
     for tag in tags.all():
-        fields = tag.serializable_fields({'id', 'name'})
+        fields = tag.serializable_fields(['id', 'name'])
         fields['can_remove'] = True
         tags_json.append(fields)
 

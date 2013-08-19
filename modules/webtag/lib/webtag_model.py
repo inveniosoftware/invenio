@@ -94,7 +94,7 @@ class Serializable(object):
 class WtgTAG(db.Model, Serializable):
     """ Represents a Tag """
     __tablename__ = 'wtgTAG'
-    __public__ = {'id', 'name', 'id_owner'}
+    __public__ = ['id', 'name', 'id_owner']
 
     # Primary key
     id = db.Column(db.Integer(15, unsigned=True),
@@ -206,7 +206,7 @@ class WtgTAGRecord(db.Model, Serializable):
     """ Represents a connection between Tag and Record """
 
     __tablename__ = 'wtgTAG_bibrec'
-    __public__ = {'id_tag', 'id_bibrec', 'date_added'}
+    __public__ = ['id_tag', 'id_bibrec', 'date_added']
 
     # tagTAG.id
     id_tag = db.Column(db.Integer(15, unsigned=True),
@@ -257,7 +257,7 @@ class WtgTAGUsergroup(db.Model, Serializable):
     """ Represents access rights of the group concerning the tag """
 
     __tablename__ = 'wtgTAG_usergroup'
-    __public__ = {'id_tag', 'id_usergroup', 'group_access_rights'}
+    __public__ = ['id_tag', 'id_usergroup', 'group_access_rights']
 
     # tagTAG.id
     id_tag = db.Column(db.Integer(15, unsigned=True),
