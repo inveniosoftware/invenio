@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.4\n"
+"Project-Id-Version: Invenio 1.0.5\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-12-21 10:37+0100\n"
+"POT-Creation-Date: 2013-08-19 17:24+0200\n"
 "PO-Revision-Date: 2008-02-29 15:40+0100\n"
 "Last-Translator: Kam-ming Ku <kmku@hkusua.hku.hk>\n"
 "Language-Team: ZH_TW <info@invenio-software.org>\n"
@@ -1110,7 +1110,7 @@ msgstr "提交幫助"
 #: modules/websearch/lib/search_engine.py:956
 #: modules/websearch/lib/search_engine.py:1111
 #: modules/websearch/lib/websearch_templates.py:1162
-#: modules/websearch/lib/websearch_webcoll.py:587
+#: modules/websearch/lib/websearch_webcoll.py:588
 msgid "OR"
 msgstr "或"
 
@@ -1537,9 +1537,9 @@ msgstr "名稱"
 #: modules/bibformat/lib/bibformat_templates.py:930
 #: modules/bibformat/lib/bibformat_templates.py:1055
 #: modules/webbasket/lib/webbasket_templates.py:1247
-#: modules/websession/lib/websession_templates.py:1509
-#: modules/websession/lib/websession_templates.py:1583
-#: modules/websession/lib/websession_templates.py:1646
+#: modules/websession/lib/websession_templates.py:1510
+#: modules/websession/lib/websession_templates.py:1584
+#: modules/websession/lib/websession_templates.py:1647
 #: modules/websubmit/lib/websubmit_managedocfiles.py:372
 #: modules/bibcirculation/lib/bibcirculation_templates.py:291
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2868
@@ -1871,10 +1871,10 @@ msgstr "刪除輸出格式"
 #: modules/webbasket/lib/webbasket_templates.py:1733
 #: modules/webbasket/lib/webbasket_templates.py:2803
 #: modules/webbasket/lib/webbasket_templates.py:3607
-#: modules/websession/lib/websession_templates.py:1786
-#: modules/websession/lib/websession_templates.py:1894
-#: modules/websession/lib/websession_templates.py:2096
-#: modules/websession/lib/websession_templates.py:2179
+#: modules/websession/lib/websession_templates.py:1787
+#: modules/websession/lib/websession_templates.py:1895
+#: modules/websession/lib/websession_templates.py:2097
+#: modules/websession/lib/websession_templates.py:2180
 #: modules/websubmit/lib/websubmit_managedocfiles.py:846
 #: modules/websubmit/lib/websubmit_templates.py:2526
 #: modules/websubmit/lib/websubmit_templates.py:2589
@@ -2623,7 +2623,7 @@ msgid "Run BibSword client"
 msgstr "執行 BibEdit"
 
 #: modules/webaccess/lib/access_control_config.py:267
-#: modules/websession/lib/websession_templates.py:1100
+#: modules/websession/lib/websession_templates.py:1101
 #, fuzzy
 msgid "Configure BibKnowledge"
 msgstr "設定 BibIndex"
@@ -2634,49 +2634,49 @@ msgid "Configure BibFormat"
 msgstr "設定 BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:269
-#: modules/websession/lib/websession_templates.py:1102
+#: modules/websession/lib/websession_templates.py:1103
 #, fuzzy
 msgid "Configure OAI Harvest"
 msgstr "設定 BibHarvest"
 
 #: modules/webaccess/lib/access_control_config.py:270
-#: modules/websession/lib/websession_templates.py:1104
+#: modules/websession/lib/websession_templates.py:1105
 #, fuzzy
 msgid "Configure OAI Repository"
 msgstr "設定 BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:271
-#: modules/websession/lib/websession_templates.py:1106
+#: modules/websession/lib/websession_templates.py:1107
 msgid "Configure BibIndex"
 msgstr "設定 BibIndex"
 
 #: modules/webaccess/lib/access_control_config.py:272
-#: modules/websession/lib/websession_templates.py:1108
+#: modules/websession/lib/websession_templates.py:1109
 msgid "Configure BibRank"
 msgstr "設定 BibRank"
 
 #: modules/webaccess/lib/access_control_config.py:273
-#: modules/websession/lib/websession_templates.py:1110
+#: modules/websession/lib/websession_templates.py:1111
 msgid "Configure WebAccess"
 msgstr "設定 WebAccess"
 
 #: modules/webaccess/lib/access_control_config.py:274
-#: modules/websession/lib/websession_templates.py:1112
+#: modules/websession/lib/websession_templates.py:1113
 msgid "Configure WebComment"
 msgstr "設定 WebComment"
 
 #: modules/webaccess/lib/access_control_config.py:275
-#: modules/websession/lib/websession_templates.py:1116
+#: modules/websession/lib/websession_templates.py:1117
 msgid "Configure WebSearch"
 msgstr "設定 WebSearch"
 
 #: modules/webaccess/lib/access_control_config.py:276
-#: modules/websession/lib/websession_templates.py:1118
+#: modules/websession/lib/websession_templates.py:1119
 msgid "Configure WebSubmit"
 msgstr "設定 WebSubmit"
 
 #: modules/webaccess/lib/access_control_config.py:277
-#: modules/websession/lib/websession_templates.py:1114
+#: modules/websession/lib/websession_templates.py:1115
 #, fuzzy
 msgid "Configure WebJournal"
 msgstr "設定 WebComment"
@@ -2965,8 +2965,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:509
-#: modules/websession/lib/websession_templates.py:2220
-#: modules/websession/lib/websession_templates.py:2260
+#: modules/websession/lib/websession_templates.py:2221
+#: modules/websession/lib/websession_templates.py:2261
 msgid "No"
 msgstr "否"
 
@@ -3096,7 +3096,7 @@ msgstr "您的搜尋結果"
 #: modules/webbasket/lib/webbasket_webinterface.py:1220
 #: modules/webmessage/lib/webmessage_templates.py:466
 #: modules/websession/lib/websession_templates.py:602
-#: modules/websession/lib/websession_templates.py:2333
+#: modules/websession/lib/websession_templates.py:2334
 #: modules/websession/lib/websession_webinterface.py:215
 #: modules/websession/lib/websession_webinterface.py:237
 #: modules/websession/lib/websession_webinterface.py:279
@@ -3550,8 +3550,8 @@ msgstr "您的收藏籃已設有 %i 條警報。"
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:508
-#: modules/websession/lib/websession_templates.py:2219
-#: modules/websession/lib/websession_templates.py:2259
+#: modules/websession/lib/websession_templates.py:2220
+#: modules/websession/lib/websession_templates.py:2260
 msgid "Yes"
 msgstr "是"
 
@@ -4972,7 +4972,7 @@ msgid "No matching user"
 msgstr "找尋不到用戶"
 
 #: modules/webmessage/lib/webmessage_templates.py:624
-#: modules/websession/lib/websession_templates.py:1824
+#: modules/websession/lib/websession_templates.py:1825
 msgid "No matching group"
 msgstr "找尋不到組別"
 
@@ -5045,7 +5045,7 @@ msgid "add another collection"
 msgstr "新增專輯"
 
 #: modules/websearch/lib/search_engine.py:956
-#: modules/websearch/lib/websearch_webcoll.py:587
+#: modules/websearch/lib/websearch_webcoll.py:588
 msgid "rank by"
 msgstr "排列"
 
@@ -5054,7 +5054,7 @@ msgid "HTML brief"
 msgstr "簡短的HTML"
 
 #: modules/websearch/lib/search_engine.py:1089
-#: modules/websearch/lib/websearch_webcoll.py:557
+#: modules/websearch/lib/websearch_webcoll.py:558
 msgid "latest first"
 msgstr "時間"
 
@@ -5397,27 +5397,27 @@ msgid "Limit to:"
 msgstr "只在："
 
 #: modules/websearch/lib/websearch_templates.py:2266
-#: modules/websearch/lib/websearch_webcoll.py:605
+#: modules/websearch/lib/websearch_webcoll.py:606
 msgid "results"
 msgstr "結果"
 
 #: modules/websearch/lib/websearch_templates.py:2302
-#: modules/websearch/lib/websearch_webcoll.py:575
+#: modules/websearch/lib/websearch_webcoll.py:576
 msgid "asc."
 msgstr "順序排列"
 
 #: modules/websearch/lib/websearch_templates.py:2305
-#: modules/websearch/lib/websearch_webcoll.py:576
+#: modules/websearch/lib/websearch_webcoll.py:577
 msgid "desc."
 msgstr "降序排列"
 
 #: modules/websearch/lib/websearch_templates.py:2311
-#: modules/websearch/lib/websearch_webcoll.py:619
+#: modules/websearch/lib/websearch_webcoll.py:621
 msgid "single list"
 msgstr "單一列表"
 
 #: modules/websearch/lib/websearch_templates.py:2314
-#: modules/websearch/lib/websearch_webcoll.py:618
+#: modules/websearch/lib/websearch_webcoll.py:620
 msgid "split by collection"
 msgstr "以專輯分類"
 
@@ -5694,7 +5694,7 @@ msgstr "找到 %s 記錄"
 msgid "%s seconds"
 msgstr "%s 秒"
 
-#: modules/websearch/lib/websearch_webcoll.py:640
+#: modules/websearch/lib/websearch_webcoll.py:642
 msgid "brief"
 msgstr "摘要"
 
@@ -6002,7 +6002,7 @@ msgid ""
 msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的組別名單。"
 
 #: modules/websession/lib/websession_templates.py:622
-#: modules/websession/lib/websession_templates.py:2331
+#: modules/websession/lib/websession_templates.py:2332
 #: modules/websession/lib/websession_webinterface.py:1019
 msgid "Your Groups"
 msgstr "組別"
@@ -6147,7 +6147,7 @@ msgid "Remember login on this computer."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:900
-#: modules/websession/lib/websession_templates.py:1177
+#: modules/websession/lib/websession_templates.py:1178
 #: modules/websession/lib/websession_webinterface.py:102
 #: modules/websession/lib/websession_webinterface.py:197
 #: modules/websession/lib/websession_webinterface.py:754
@@ -6249,235 +6249,235 @@ msgstr "您是以下組別的成員："
 msgid "Run BibSword Client"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1120
+#: modules/websession/lib/websession_templates.py:1121
 msgid "Here are some interesting web admin links for you:"
 msgstr "以下是一些有用的連結："
 
-#: modules/websession/lib/websession_templates.py:1122
+#: modules/websession/lib/websession_templates.py:1123
 #, python-format
 msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
 "%(x_url_close)s."
 msgstr "請到%(x_url_open)s管理區%(x_url_close)s以便使用更多管理功能。"
 
-#: modules/websession/lib/websession_templates.py:1175
+#: modules/websession/lib/websession_templates.py:1176
 msgid "guest"
 msgstr "遊客"
 
-#: modules/websession/lib/websession_templates.py:1189
+#: modules/websession/lib/websession_templates.py:1190
 msgid "logout"
 msgstr "登出"
 
-#: modules/websession/lib/websession_templates.py:1237
+#: modules/websession/lib/websession_templates.py:1238
 #: modules/webstyle/lib/webstyle_templates.py:433
 #: modules/webstyle/lib/webstyle_templates.py:501
 msgid "Personalize"
 msgstr "個人化"
 
-#: modules/websession/lib/websession_templates.py:1245
+#: modules/websession/lib/websession_templates.py:1246
 #, fuzzy
 msgid "Your account"
 msgstr "帳戶"
 
-#: modules/websession/lib/websession_templates.py:1251
+#: modules/websession/lib/websession_templates.py:1252
 #, fuzzy
 msgid "Your alerts"
 msgstr "警報"
 
-#: modules/websession/lib/websession_templates.py:1257
+#: modules/websession/lib/websession_templates.py:1258
 #, fuzzy
 msgid "Your approvals"
 msgstr "批核"
 
-#: modules/websession/lib/websession_templates.py:1263
+#: modules/websession/lib/websession_templates.py:1264
 #, fuzzy
 msgid "Your baskets"
 msgstr "收藏"
 
-#: modules/websession/lib/websession_templates.py:1269
+#: modules/websession/lib/websession_templates.py:1270
 #, fuzzy
 msgid "Your groups"
 msgstr "組別"
 
-#: modules/websession/lib/websession_templates.py:1275
+#: modules/websession/lib/websession_templates.py:1276
 #, fuzzy
 msgid "Your loans"
 msgstr "外借"
 
-#: modules/websession/lib/websession_templates.py:1281
+#: modules/websession/lib/websession_templates.py:1282
 #, fuzzy
 msgid "Your messages"
 msgstr "訊息"
 
-#: modules/websession/lib/websession_templates.py:1287
+#: modules/websession/lib/websession_templates.py:1288
 #, fuzzy
 msgid "Your submissions"
 msgstr "提交"
 
-#: modules/websession/lib/websession_templates.py:1293
+#: modules/websession/lib/websession_templates.py:1294
 #, fuzzy
 msgid "Your searches"
 msgstr "您的搜尋結果"
 
-#: modules/websession/lib/websession_templates.py:1346
+#: modules/websession/lib/websession_templates.py:1347
 #, fuzzy
 msgid "Administration"
 msgstr "管理"
 
-#: modules/websession/lib/websession_templates.py:1362
+#: modules/websession/lib/websession_templates.py:1363
 #, fuzzy
 msgid "Statistics"
 msgstr "狀態"
 
-#: modules/websession/lib/websession_templates.py:1489
+#: modules/websession/lib/websession_templates.py:1490
 msgid "You are an administrator of the following groups:"
 msgstr "您是以下組別的管理人："
 
-#: modules/websession/lib/websession_templates.py:1509
-#: modules/websession/lib/websession_templates.py:1583
-#: modules/websession/lib/websession_templates.py:1646
+#: modules/websession/lib/websession_templates.py:1510
+#: modules/websession/lib/websession_templates.py:1584
+#: modules/websession/lib/websession_templates.py:1647
 #: modules/websubmit/lib/websubmit_templates.py:3003
 #: modules/websubmit/lib/websubmit_templates.py:3009
 msgid "Group"
 msgstr "組別"
 
-#: modules/websession/lib/websession_templates.py:1516
+#: modules/websession/lib/websession_templates.py:1517
 msgid "You are not an administrator of any groups."
 msgstr "您不是以下組別的管理人："
 
-#: modules/websession/lib/websession_templates.py:1523
+#: modules/websession/lib/websession_templates.py:1524
 msgid "Edit group"
 msgstr "編輯組別"
 
-#: modules/websession/lib/websession_templates.py:1530
+#: modules/websession/lib/websession_templates.py:1531
 #, python-format
 msgid "Edit %s members"
 msgstr "編輯 %s 成員"
 
-#: modules/websession/lib/websession_templates.py:1553
-#: modules/websession/lib/websession_templates.py:1693
-#: modules/websession/lib/websession_templates.py:1695
+#: modules/websession/lib/websession_templates.py:1554
+#: modules/websession/lib/websession_templates.py:1694
+#: modules/websession/lib/websession_templates.py:1696
 #: modules/websession/lib/websession_webinterface.py:1079
 msgid "Create new group"
 msgstr "新增組別"
 
-#: modules/websession/lib/websession_templates.py:1567
+#: modules/websession/lib/websession_templates.py:1568
 msgid "You are a member of the following groups:"
 msgstr "您是以下組別的成員："
 
-#: modules/websession/lib/websession_templates.py:1590
+#: modules/websession/lib/websession_templates.py:1591
 msgid "You are not a member of any groups."
 msgstr "您不是以下組別的成員："
 
-#: modules/websession/lib/websession_templates.py:1614
+#: modules/websession/lib/websession_templates.py:1615
 msgid "Join new group"
 msgstr "加入組別"
 
-#: modules/websession/lib/websession_templates.py:1615
-#: modules/websession/lib/websession_templates.py:2167
-#: modules/websession/lib/websession_templates.py:2178
+#: modules/websession/lib/websession_templates.py:1616
+#: modules/websession/lib/websession_templates.py:2168
+#: modules/websession/lib/websession_templates.py:2179
 msgid "Leave group"
 msgstr "脫離組別"
 
-#: modules/websession/lib/websession_templates.py:1630
+#: modules/websession/lib/websession_templates.py:1631
 msgid "You are a member of the following external groups:"
 msgstr "您是以下外部組別的成員："
 
-#: modules/websession/lib/websession_templates.py:1653
+#: modules/websession/lib/websession_templates.py:1654
 msgid "You are not a member of any external groups."
 msgstr "您不是以下外部組別的成員："
 
-#: modules/websession/lib/websession_templates.py:1701
+#: modules/websession/lib/websession_templates.py:1702
 msgid "Update group"
 msgstr "更新組別"
 
-#: modules/websession/lib/websession_templates.py:1703
+#: modules/websession/lib/websession_templates.py:1704
 #, python-format
 msgid "Edit group %s"
 msgstr "編輯組別 %s"
 
-#: modules/websession/lib/websession_templates.py:1705
+#: modules/websession/lib/websession_templates.py:1706
 msgid "Delete group"
 msgstr "刪除組別名稱"
 
-#: modules/websession/lib/websession_templates.py:1778
+#: modules/websession/lib/websession_templates.py:1779
 msgid "Group name:"
 msgstr "組別:"
 
-#: modules/websession/lib/websession_templates.py:1780
+#: modules/websession/lib/websession_templates.py:1781
 msgid "Group description:"
 msgstr "組別描述"
 
-#: modules/websession/lib/websession_templates.py:1781
+#: modules/websession/lib/websession_templates.py:1782
 msgid "Group join policy:"
 msgstr "加入組別條件："
 
-#: modules/websession/lib/websession_templates.py:1822
-#: modules/websession/lib/websession_templates.py:1895
-#: modules/websession/lib/websession_templates.py:2036
-#: modules/websession/lib/websession_templates.py:2045
-#: modules/websession/lib/websession_templates.py:2165
-#: modules/websession/lib/websession_templates.py:2277
+#: modules/websession/lib/websession_templates.py:1823
+#: modules/websession/lib/websession_templates.py:1896
+#: modules/websession/lib/websession_templates.py:2037
+#: modules/websession/lib/websession_templates.py:2046
+#: modules/websession/lib/websession_templates.py:2166
+#: modules/websession/lib/websession_templates.py:2278
 msgid "Please select:"
 msgstr "請選擇:"
 
-#: modules/websession/lib/websession_templates.py:1888
+#: modules/websession/lib/websession_templates.py:1889
 msgid "Join group"
 msgstr "加入組別"
 
-#: modules/websession/lib/websession_templates.py:1890
+#: modules/websession/lib/websession_templates.py:1891
 msgid "or find it"
 msgstr "找尋"
 
-#: modules/websession/lib/websession_templates.py:1891
+#: modules/websession/lib/websession_templates.py:1892
 msgid "Choose group:"
 msgstr "選擇組別"
 
-#: modules/websession/lib/websession_templates.py:1893
+#: modules/websession/lib/websession_templates.py:1894
 msgid "Find group"
 msgstr "找尋組別"
 
-#: modules/websession/lib/websession_templates.py:2041
+#: modules/websession/lib/websession_templates.py:2042
 msgid "Remove member"
 msgstr "移除成員"
 
-#: modules/websession/lib/websession_templates.py:2043
+#: modules/websession/lib/websession_templates.py:2044
 msgid "No members."
 msgstr "沒有成員"
 
-#: modules/websession/lib/websession_templates.py:2053
+#: modules/websession/lib/websession_templates.py:2054
 msgid "Accept member"
 msgstr "接受成員"
 
-#: modules/websession/lib/websession_templates.py:2053
+#: modules/websession/lib/websession_templates.py:2054
 msgid "Reject member"
 msgstr "拒絕成員"
 
-#: modules/websession/lib/websession_templates.py:2055
+#: modules/websession/lib/websession_templates.py:2056
 msgid "No members awaiting approval."
 msgstr "沒有等待審批的成員"
 
-#: modules/websession/lib/websession_templates.py:2057
-#: modules/websession/lib/websession_templates.py:2091
+#: modules/websession/lib/websession_templates.py:2058
+#: modules/websession/lib/websession_templates.py:2092
 msgid "Current members"
 msgstr "現在成員"
 
-#: modules/websession/lib/websession_templates.py:2058
-#: modules/websession/lib/websession_templates.py:2092
+#: modules/websession/lib/websession_templates.py:2059
+#: modules/websession/lib/websession_templates.py:2093
 msgid "Members awaiting approval"
 msgstr "等待審批的成員"
 
-#: modules/websession/lib/websession_templates.py:2059
-#: modules/websession/lib/websession_templates.py:2093
+#: modules/websession/lib/websession_templates.py:2060
+#: modules/websession/lib/websession_templates.py:2094
 msgid "Invite new members"
 msgstr "邀請成員"
 
-#: modules/websession/lib/websession_templates.py:2064
+#: modules/websession/lib/websession_templates.py:2065
 #, python-format
 msgid "Invitation to join \"%s\" group"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2065
+#: modules/websession/lib/websession_templates.py:2066
 #, python-format
 msgid ""
 "Hello:\n"
@@ -6488,95 +6488,95 @@ msgid ""
 "Best regards.\n"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2079
+#: modules/websession/lib/websession_templates.py:2080
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the "
 "%(x_url_open)sweb message%(x_url_close)s system."
 msgstr "請使用%(x_url_open)s訊息%(x_url_close)s來邀請成員加入組別。"
 
-#: modules/websession/lib/websession_templates.py:2083
+#: modules/websession/lib/websession_templates.py:2084
 #, python-format
 msgid "Group: %s"
 msgstr "組別: %s"
 
-#: modules/websession/lib/websession_templates.py:2166
+#: modules/websession/lib/websession_templates.py:2167
 msgid "Group list"
 msgstr "組別名單"
 
-#: modules/websession/lib/websession_templates.py:2169
+#: modules/websession/lib/websession_templates.py:2170
 msgid "You are not member of any group."
 msgstr "您沒有加入任何組別。"
 
-#: modules/websession/lib/websession_templates.py:2217
+#: modules/websession/lib/websession_templates.py:2218
 msgid "Are you sure you want to delete this group?"
 msgstr "您是否決定刪除這組別？"
 
-#: modules/websession/lib/websession_templates.py:2257
+#: modules/websession/lib/websession_templates.py:2258
 msgid "Are you sure you want to leave this group?"
 msgstr "您是否決定離開這組別？"
 
-#: modules/websession/lib/websession_templates.py:2273
+#: modules/websession/lib/websession_templates.py:2274
 msgid "Visible and open for new members"
 msgstr "開放給新用戶"
 
-#: modules/websession/lib/websession_templates.py:2275
+#: modules/websession/lib/websession_templates.py:2276
 msgid "Visible but new members need approval"
 msgstr "審批後開放給新用戶"
 
-#: modules/websession/lib/websession_templates.py:2360
+#: modules/websession/lib/websession_templates.py:2361
 #, python-format
 msgid "Group %s: New membership request"
 msgstr "組別 %s：新用戶要求加入"
 
-#: modules/websession/lib/websession_templates.py:2364
+#: modules/websession/lib/websession_templates.py:2365
 #, python-format
 msgid "A user wants to join the group %s."
 msgstr "用戶要求加入組別 %s。"
 
-#: modules/websession/lib/websession_templates.py:2365
+#: modules/websession/lib/websession_templates.py:2366
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr "請%(x_url_open)s接納或拒絕%(x_url_close)s用戶要求。"
 
-#: modules/websession/lib/websession_templates.py:2382
+#: modules/websession/lib/websession_templates.py:2383
 #, python-format
 msgid "Group %s: Join request has been accepted"
 msgstr "組別 %s：用戶加入要求已被接納"
 
-#: modules/websession/lib/websession_templates.py:2383
+#: modules/websession/lib/websession_templates.py:2384
 #, python-format
 msgid "Your request for joining group %s has been accepted."
 msgstr "您加入組別 %s的要求已被接納。"
 
-#: modules/websession/lib/websession_templates.py:2385
+#: modules/websession/lib/websession_templates.py:2386
 #, python-format
 msgid "Group %s: Join request has been rejected"
 msgstr "組別 %s：用戶加入要求已被拒絕"
 
-#: modules/websession/lib/websession_templates.py:2386
+#: modules/websession/lib/websession_templates.py:2387
 #, python-format
 msgid "Your request for joining group %s has been rejected."
 msgstr "您加入組別 %s的要求已被拒絕。"
 
-#: modules/websession/lib/websession_templates.py:2389
-#: modules/websession/lib/websession_templates.py:2407
+#: modules/websession/lib/websession_templates.py:2390
+#: modules/websession/lib/websession_templates.py:2408
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的組別名單。"
 
-#: modules/websession/lib/websession_templates.py:2403
+#: modules/websession/lib/websession_templates.py:2404
 #, python-format
 msgid "Group %s has been deleted"
 msgstr "組別 %s 已被刪除"
 
-#: modules/websession/lib/websession_templates.py:2405
+#: modules/websession/lib/websession_templates.py:2406
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr "組別 %s 已被管理員刪除。"
 
-#: modules/websession/lib/websession_templates.py:2422
+#: modules/websession/lib/websession_templates.py:2423
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
@@ -6586,37 +6586,37 @@ msgstr ""
 "您可直接在%(x_url_open)s這裡%(x_url_close)s咨詢您的%(x_nb_total)i組別給"
 "(%(x_nb_member)i) or 管理 (%(x_nb_admin)i)名單。"
 
-#: modules/websession/lib/websession_templates.py:2441
+#: modules/websession/lib/websession_templates.py:2442
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
 "Invenio password. For security purposes, you may want to change the password."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2447
+#: modules/websession/lib/websession_templates.py:2448
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
 "shipped default. For security purposes, you may want to change the password."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2453
+#: modules/websession/lib/websession_templates.py:2454
 msgid ""
 "Warning: The password set for the Invenio admin user is currently empty. For "
 "security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2459
+#: modules/websession/lib/websession_templates.py:2460
 msgid ""
 "Warning: The email address set for support email is currently set to "
 "info@invenio-software.org. It is recommended that you change this to your "
 "own address."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2465
+#: modules/websession/lib/websession_templates.py:2466
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2472
+#: modules/websession/lib/websession_templates.py:2473
 msgid ""
 "Cannot download or parse release notes from http://invenio-software.org/repo/"
 "invenio/tree/RELEASE-NOTES"
@@ -10942,7 +10942,9 @@ msgid "Printable format"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15526
-msgid "Check if the book already exists on Invenio,"
+#: modules/bibcirculation/lib/bibcirculation_templates.py:15684
+msgid ""
+"Check if the book already exists on Invenio, before to send your ILL request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15550
@@ -10953,11 +10955,6 @@ msgstr "沒有找到。"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15618
 msgid "Proceed anyway"
-msgstr ""
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15684
-msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15861
@@ -11852,8 +11849,8 @@ msgstr ""
 #~ msgstr "刪除某一意見/評論 (按照ID)"
 
 #~ msgid ""
-#~ "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)"
-#~ "s first."
+#~ "Before you add your comment, you need to %(x_url_open)slogin"
+#~ "%(x_url_close)s first."
 #~ msgstr "請先%(x_url_open)s登入%(x_url_close)s才發表意見"
 
 #~ msgid "session"
@@ -11944,8 +11941,8 @@ msgstr ""
 #~ msgstr "或創建"
 
 #~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface"
+#~ "%(x_url_close)s."
 #~ msgstr "返回%(x_url_open)sBibEdit 管理介面%(x_url_close)s。"
 
 #, fuzzy

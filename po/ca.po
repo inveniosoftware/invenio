@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: Invenio 1.0.4\n"
+"Project-Id-Version: Invenio 1.0.5\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2012-12-21 10:37+0100\n"
+"POT-Creation-Date: 2013-08-19 17:24+0200\n"
 "PO-Revision-Date: 2012-02-02 20:07+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
@@ -1106,7 +1106,7 @@ msgstr "Ajuda per als lliuraments"
 #: modules/websearch/lib/search_engine.py:956
 #: modules/websearch/lib/search_engine.py:1111
 #: modules/websearch/lib/websearch_templates.py:1162
-#: modules/websearch/lib/websearch_webcoll.py:587
+#: modules/websearch/lib/websearch_webcoll.py:588
 msgid "OR"
 msgstr "O"
 
@@ -1530,9 +1530,9 @@ msgstr "Nom"
 #: modules/bibformat/lib/bibformat_templates.py:930
 #: modules/bibformat/lib/bibformat_templates.py:1055
 #: modules/webbasket/lib/webbasket_templates.py:1247
-#: modules/websession/lib/websession_templates.py:1509
-#: modules/websession/lib/websession_templates.py:1583
-#: modules/websession/lib/websession_templates.py:1646
+#: modules/websession/lib/websession_templates.py:1510
+#: modules/websession/lib/websession_templates.py:1584
+#: modules/websession/lib/websession_templates.py:1647
 #: modules/websubmit/lib/websubmit_managedocfiles.py:372
 #: modules/bibcirculation/lib/bibcirculation_templates.py:291
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2868
@@ -1862,10 +1862,10 @@ msgstr "Suprimeix el format de sortida"
 #: modules/webbasket/lib/webbasket_templates.py:1733
 #: modules/webbasket/lib/webbasket_templates.py:2803
 #: modules/webbasket/lib/webbasket_templates.py:3607
-#: modules/websession/lib/websession_templates.py:1786
-#: modules/websession/lib/websession_templates.py:1894
-#: modules/websession/lib/websession_templates.py:2096
-#: modules/websession/lib/websession_templates.py:2179
+#: modules/websession/lib/websession_templates.py:1787
+#: modules/websession/lib/websession_templates.py:1895
+#: modules/websession/lib/websession_templates.py:2097
+#: modules/websession/lib/websession_templates.py:2180
 #: modules/websubmit/lib/websubmit_managedocfiles.py:846
 #: modules/websubmit/lib/websubmit_templates.py:2526
 #: modules/websubmit/lib/websubmit_templates.py:2589
@@ -2592,7 +2592,7 @@ msgid "Run BibSword client"
 msgstr "Executar el client BibSword"
 
 #: modules/webaccess/lib/access_control_config.py:267
-#: modules/websession/lib/websession_templates.py:1100
+#: modules/websession/lib/websession_templates.py:1101
 msgid "Configure BibKnowledge"
 msgstr "Configurar BibKnowledge"
 
@@ -2602,47 +2602,47 @@ msgid "Configure BibFormat"
 msgstr "Configurar BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:269
-#: modules/websession/lib/websession_templates.py:1102
+#: modules/websession/lib/websession_templates.py:1103
 msgid "Configure OAI Harvest"
 msgstr "Configurar OAI Harvest"
 
 #: modules/webaccess/lib/access_control_config.py:270
-#: modules/websession/lib/websession_templates.py:1104
+#: modules/websession/lib/websession_templates.py:1105
 msgid "Configure OAI Repository"
 msgstr "Configurar OAI Repository"
 
 #: modules/webaccess/lib/access_control_config.py:271
-#: modules/websession/lib/websession_templates.py:1106
+#: modules/websession/lib/websession_templates.py:1107
 msgid "Configure BibIndex"
 msgstr "Configurar BibIndex"
 
 #: modules/webaccess/lib/access_control_config.py:272
-#: modules/websession/lib/websession_templates.py:1108
+#: modules/websession/lib/websession_templates.py:1109
 msgid "Configure BibRank"
 msgstr "Configurar BibRank"
 
 #: modules/webaccess/lib/access_control_config.py:273
-#: modules/websession/lib/websession_templates.py:1110
+#: modules/websession/lib/websession_templates.py:1111
 msgid "Configure WebAccess"
 msgstr "Configurar WebAccess"
 
 #: modules/webaccess/lib/access_control_config.py:274
-#: modules/websession/lib/websession_templates.py:1112
+#: modules/websession/lib/websession_templates.py:1113
 msgid "Configure WebComment"
 msgstr "Configurar WebComment"
 
 #: modules/webaccess/lib/access_control_config.py:275
-#: modules/websession/lib/websession_templates.py:1116
+#: modules/websession/lib/websession_templates.py:1117
 msgid "Configure WebSearch"
 msgstr "Configurar WebSearch"
 
 #: modules/webaccess/lib/access_control_config.py:276
-#: modules/websession/lib/websession_templates.py:1118
+#: modules/websession/lib/websession_templates.py:1119
 msgid "Configure WebSubmit"
 msgstr "Configurar WebSubmit"
 
 #: modules/webaccess/lib/access_control_config.py:277
-#: modules/websession/lib/websession_templates.py:1114
+#: modules/websession/lib/websession_templates.py:1115
 msgid "Configure WebJournal"
 msgstr "Configurar WebJournal"
 
@@ -2934,8 +2934,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:509
-#: modules/websession/lib/websession_templates.py:2220
-#: modules/websession/lib/websession_templates.py:2260
+#: modules/websession/lib/websession_templates.py:2221
+#: modules/websession/lib/websession_templates.py:2261
 msgid "No"
 msgstr "No"
 
@@ -3067,7 +3067,7 @@ msgstr "Les vostres cerques"
 #: modules/webbasket/lib/webbasket_webinterface.py:1220
 #: modules/webmessage/lib/webmessage_templates.py:466
 #: modules/websession/lib/websession_templates.py:602
-#: modules/websession/lib/websession_templates.py:2333
+#: modules/websession/lib/websession_templates.py:2334
 #: modules/websession/lib/websession_webinterface.py:215
 #: modules/websession/lib/websession_webinterface.py:237
 #: modules/websession/lib/websession_webinterface.py:279
@@ -3514,8 +3514,8 @@ msgstr "Hi heu posat %i alertes en aquest cistell."
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 #: modules/webmessage/lib/webmessage_templates.py:508
-#: modules/websession/lib/websession_templates.py:2219
-#: modules/websession/lib/websession_templates.py:2259
+#: modules/websession/lib/websession_templates.py:2220
+#: modules/websession/lib/websession_templates.py:2260
 msgid "Yes"
 msgstr "Sí"
 
@@ -4909,7 +4909,7 @@ msgid "No matching user"
 msgstr "No s'ha trobat cap usuari que coincideixi"
 
 #: modules/webmessage/lib/webmessage_templates.py:624
-#: modules/websession/lib/websession_templates.py:1824
+#: modules/websession/lib/websession_templates.py:1825
 msgid "No matching group"
 msgstr "No s'ha trobat cap grup que coincideixi"
 
@@ -4979,7 +4979,7 @@ msgid "add another collection"
 msgstr "afegir una altra col·lecció"
 
 #: modules/websearch/lib/search_engine.py:956
-#: modules/websearch/lib/websearch_webcoll.py:587
+#: modules/websearch/lib/websearch_webcoll.py:588
 msgid "rank by"
 msgstr "prioritzar per"
 
@@ -4988,7 +4988,7 @@ msgid "HTML brief"
 msgstr "HTML breu"
 
 #: modules/websearch/lib/search_engine.py:1089
-#: modules/websearch/lib/websearch_webcoll.py:557
+#: modules/websearch/lib/websearch_webcoll.py:558
 msgid "latest first"
 msgstr "el darrer primer"
 
@@ -5349,27 +5349,27 @@ msgid "Limit to:"
 msgstr "Limitar a:"
 
 #: modules/websearch/lib/websearch_templates.py:2266
-#: modules/websearch/lib/websearch_webcoll.py:605
+#: modules/websearch/lib/websearch_webcoll.py:606
 msgid "results"
 msgstr "resultats"
 
 #: modules/websearch/lib/websearch_templates.py:2302
-#: modules/websearch/lib/websearch_webcoll.py:575
+#: modules/websearch/lib/websearch_webcoll.py:576
 msgid "asc."
 msgstr "asc."
 
 #: modules/websearch/lib/websearch_templates.py:2305
-#: modules/websearch/lib/websearch_webcoll.py:576
+#: modules/websearch/lib/websearch_webcoll.py:577
 msgid "desc."
 msgstr "desc."
 
 #: modules/websearch/lib/websearch_templates.py:2311
-#: modules/websearch/lib/websearch_webcoll.py:619
+#: modules/websearch/lib/websearch_webcoll.py:621
 msgid "single list"
 msgstr "llista única"
 
 #: modules/websearch/lib/websearch_templates.py:2314
-#: modules/websearch/lib/websearch_webcoll.py:618
+#: modules/websearch/lib/websearch_webcoll.py:620
 msgid "split by collection"
 msgstr "dividit per col·lecció"
 
@@ -5637,7 +5637,7 @@ msgstr "S'han trobat %s resultats."
 msgid "%s seconds"
 msgstr "%s segons"
 
-#: modules/websearch/lib/websearch_webcoll.py:640
+#: modules/websearch/lib/websearch_webcoll.py:642
 msgid "brief"
 msgstr "breu"
 
@@ -5990,7 +5990,7 @@ msgstr ""
 "administreu o en sou membre."
 
 #: modules/websession/lib/websession_templates.py:622
-#: modules/websession/lib/websession_templates.py:2331
+#: modules/websession/lib/websession_templates.py:2332
 #: modules/websession/lib/websession_webinterface.py:1019
 msgid "Your Groups"
 msgstr "Els vostres grups"
@@ -6156,7 +6156,7 @@ msgid "Remember login on this computer."
 msgstr "Recorda la identificació en aquest ordinador."
 
 #: modules/websession/lib/websession_templates.py:900
-#: modules/websession/lib/websession_templates.py:1177
+#: modules/websession/lib/websession_templates.py:1178
 #: modules/websession/lib/websession_webinterface.py:102
 #: modules/websession/lib/websession_webinterface.py:197
 #: modules/websession/lib/websession_webinterface.py:754
@@ -6269,11 +6269,11 @@ msgstr "Teniu activats els següents rols: %(x_role)s."
 msgid "Run BibSword Client"
 msgstr "Executar el client BibSword"
 
-#: modules/websession/lib/websession_templates.py:1120
+#: modules/websession/lib/websession_templates.py:1121
 msgid "Here are some interesting web admin links for you:"
 msgstr "Aquí teniu alguns enllaços d'administració interessants:"
 
-#: modules/websession/lib/websession_templates.py:1122
+#: modules/websession/lib/websession_templates.py:1123
 #, python-format
 msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
@@ -6282,213 +6282,213 @@ msgstr ""
 "Per a més activitats administratives, vegeu tota la %(x_url_open)sZona "
 "d'administració%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:1175
+#: modules/websession/lib/websession_templates.py:1176
 msgid "guest"
 msgstr "visitant"
 
-#: modules/websession/lib/websession_templates.py:1189
+#: modules/websession/lib/websession_templates.py:1190
 msgid "logout"
 msgstr "sortir"
 
-#: modules/websession/lib/websession_templates.py:1237
+#: modules/websession/lib/websession_templates.py:1238
 #: modules/webstyle/lib/webstyle_templates.py:433
 #: modules/webstyle/lib/webstyle_templates.py:501
 msgid "Personalize"
 msgstr "Personalitza"
 
-#: modules/websession/lib/websession_templates.py:1245
+#: modules/websession/lib/websession_templates.py:1246
 msgid "Your account"
 msgstr "El vostre compte"
 
-#: modules/websession/lib/websession_templates.py:1251
+#: modules/websession/lib/websession_templates.py:1252
 msgid "Your alerts"
 msgstr "Les vostres alertes"
 
-#: modules/websession/lib/websession_templates.py:1257
+#: modules/websession/lib/websession_templates.py:1258
 msgid "Your approvals"
 msgstr "Les vostres aprovacions"
 
-#: modules/websession/lib/websession_templates.py:1263
+#: modules/websession/lib/websession_templates.py:1264
 msgid "Your baskets"
 msgstr "Els vostres cistells"
 
-#: modules/websession/lib/websession_templates.py:1269
+#: modules/websession/lib/websession_templates.py:1270
 msgid "Your groups"
 msgstr "Els vostres grups"
 
-#: modules/websession/lib/websession_templates.py:1275
+#: modules/websession/lib/websession_templates.py:1276
 msgid "Your loans"
 msgstr "Els vostres préstecs"
 
-#: modules/websession/lib/websession_templates.py:1281
+#: modules/websession/lib/websession_templates.py:1282
 msgid "Your messages"
 msgstr "Els vostres missatges"
 
-#: modules/websession/lib/websession_templates.py:1287
+#: modules/websession/lib/websession_templates.py:1288
 msgid "Your submissions"
 msgstr "Els vostres lliuraments"
 
-#: modules/websession/lib/websession_templates.py:1293
+#: modules/websession/lib/websession_templates.py:1294
 msgid "Your searches"
 msgstr "Les vostres cerques"
 
-#: modules/websession/lib/websession_templates.py:1346
+#: modules/websession/lib/websession_templates.py:1347
 msgid "Administration"
 msgstr "Administració"
 
-#: modules/websession/lib/websession_templates.py:1362
+#: modules/websession/lib/websession_templates.py:1363
 msgid "Statistics"
 msgstr "Estadístiques"
 
-#: modules/websession/lib/websession_templates.py:1489
+#: modules/websession/lib/websession_templates.py:1490
 msgid "You are an administrator of the following groups:"
 msgstr "Sou administrador d'aquests grups:"
 
-#: modules/websession/lib/websession_templates.py:1509
-#: modules/websession/lib/websession_templates.py:1583
-#: modules/websession/lib/websession_templates.py:1646
+#: modules/websession/lib/websession_templates.py:1510
+#: modules/websession/lib/websession_templates.py:1584
+#: modules/websession/lib/websession_templates.py:1647
 #: modules/websubmit/lib/websubmit_templates.py:3003
 #: modules/websubmit/lib/websubmit_templates.py:3009
 msgid "Group"
 msgstr "Grup"
 
-#: modules/websession/lib/websession_templates.py:1516
+#: modules/websession/lib/websession_templates.py:1517
 msgid "You are not an administrator of any groups."
 msgstr "No sou administrador de cap grup."
 
-#: modules/websession/lib/websession_templates.py:1523
+#: modules/websession/lib/websession_templates.py:1524
 msgid "Edit group"
 msgstr "Edita el grup"
 
-#: modules/websession/lib/websession_templates.py:1530
+#: modules/websession/lib/websession_templates.py:1531
 #, python-format
 msgid "Edit %s members"
 msgstr "Edita els %s membres del grup"
 
-#: modules/websession/lib/websession_templates.py:1553
-#: modules/websession/lib/websession_templates.py:1693
-#: modules/websession/lib/websession_templates.py:1695
+#: modules/websession/lib/websession_templates.py:1554
+#: modules/websession/lib/websession_templates.py:1694
+#: modules/websession/lib/websession_templates.py:1696
 #: modules/websession/lib/websession_webinterface.py:1079
 msgid "Create new group"
 msgstr "Crear un nou grup"
 
-#: modules/websession/lib/websession_templates.py:1567
+#: modules/websession/lib/websession_templates.py:1568
 msgid "You are a member of the following groups:"
 msgstr "Sou membre d'aquests grups:"
 
-#: modules/websession/lib/websession_templates.py:1590
+#: modules/websession/lib/websession_templates.py:1591
 msgid "You are not a member of any groups."
 msgstr "No sou membre de cap grup."
 
-#: modules/websession/lib/websession_templates.py:1614
+#: modules/websession/lib/websession_templates.py:1615
 msgid "Join new group"
 msgstr "Afegir-se a un nou grup"
 
-#: modules/websession/lib/websession_templates.py:1615
-#: modules/websession/lib/websession_templates.py:2167
-#: modules/websession/lib/websession_templates.py:2178
+#: modules/websession/lib/websession_templates.py:1616
+#: modules/websession/lib/websession_templates.py:2168
+#: modules/websession/lib/websession_templates.py:2179
 msgid "Leave group"
 msgstr "Deixar el grup"
 
-#: modules/websession/lib/websession_templates.py:1630
+#: modules/websession/lib/websession_templates.py:1631
 msgid "You are a member of the following external groups:"
 msgstr "Sou membre d'aquests grups externs:"
 
-#: modules/websession/lib/websession_templates.py:1653
+#: modules/websession/lib/websession_templates.py:1654
 msgid "You are not a member of any external groups."
 msgstr "No sou membre de cap grup extern."
 
-#: modules/websession/lib/websession_templates.py:1701
+#: modules/websession/lib/websession_templates.py:1702
 msgid "Update group"
 msgstr "Actualitzar grup"
 
-#: modules/websession/lib/websession_templates.py:1703
+#: modules/websession/lib/websession_templates.py:1704
 #, python-format
 msgid "Edit group %s"
 msgstr "Editar el grup %s"
 
-#: modules/websession/lib/websession_templates.py:1705
+#: modules/websession/lib/websession_templates.py:1706
 msgid "Delete group"
 msgstr "Suprimeix el grup"
 
-#: modules/websession/lib/websession_templates.py:1778
+#: modules/websession/lib/websession_templates.py:1779
 msgid "Group name:"
 msgstr "Nom del grup:"
 
-#: modules/websession/lib/websession_templates.py:1780
+#: modules/websession/lib/websession_templates.py:1781
 msgid "Group description:"
 msgstr "Descripció del grup:"
 
-#: modules/websession/lib/websession_templates.py:1781
+#: modules/websession/lib/websession_templates.py:1782
 msgid "Group join policy:"
 msgstr "Política per a unir-se al grup:"
 
-#: modules/websession/lib/websession_templates.py:1822
-#: modules/websession/lib/websession_templates.py:1895
-#: modules/websession/lib/websession_templates.py:2036
-#: modules/websession/lib/websession_templates.py:2045
-#: modules/websession/lib/websession_templates.py:2165
-#: modules/websession/lib/websession_templates.py:2277
+#: modules/websession/lib/websession_templates.py:1823
+#: modules/websession/lib/websession_templates.py:1896
+#: modules/websession/lib/websession_templates.py:2037
+#: modules/websession/lib/websession_templates.py:2046
+#: modules/websession/lib/websession_templates.py:2166
+#: modules/websession/lib/websession_templates.py:2278
 msgid "Please select:"
 msgstr "Seleccioneu:"
 
-#: modules/websession/lib/websession_templates.py:1888
+#: modules/websession/lib/websession_templates.py:1889
 msgid "Join group"
 msgstr "Unir-se a un grup"
 
-#: modules/websession/lib/websession_templates.py:1890
+#: modules/websession/lib/websession_templates.py:1891
 msgid "or find it"
 msgstr "o cercar-lo: "
 
-#: modules/websession/lib/websession_templates.py:1891
+#: modules/websession/lib/websession_templates.py:1892
 msgid "Choose group:"
 msgstr "Escolliu grup:"
 
-#: modules/websession/lib/websession_templates.py:1893
+#: modules/websession/lib/websession_templates.py:1894
 msgid "Find group"
 msgstr "Trobar un grup"
 
-#: modules/websession/lib/websession_templates.py:2041
+#: modules/websession/lib/websession_templates.py:2042
 msgid "Remove member"
 msgstr "Eliminar el membre"
 
-#: modules/websession/lib/websession_templates.py:2043
+#: modules/websession/lib/websession_templates.py:2044
 msgid "No members."
 msgstr "Sense membres."
 
-#: modules/websession/lib/websession_templates.py:2053
+#: modules/websession/lib/websession_templates.py:2054
 msgid "Accept member"
 msgstr "Acceptar membre"
 
-#: modules/websession/lib/websession_templates.py:2053
+#: modules/websession/lib/websession_templates.py:2054
 msgid "Reject member"
 msgstr "Rebutjar membre"
 
-#: modules/websession/lib/websession_templates.py:2055
+#: modules/websession/lib/websession_templates.py:2056
 msgid "No members awaiting approval."
 msgstr "No hi ha cap membre esperant aprovació"
 
-#: modules/websession/lib/websession_templates.py:2057
-#: modules/websession/lib/websession_templates.py:2091
+#: modules/websession/lib/websession_templates.py:2058
+#: modules/websession/lib/websession_templates.py:2092
 msgid "Current members"
 msgstr "Membres actuals"
 
-#: modules/websession/lib/websession_templates.py:2058
-#: modules/websession/lib/websession_templates.py:2092
+#: modules/websession/lib/websession_templates.py:2059
+#: modules/websession/lib/websession_templates.py:2093
 msgid "Members awaiting approval"
 msgstr "Membres pendents d'aprobació"
 
-#: modules/websession/lib/websession_templates.py:2059
-#: modules/websession/lib/websession_templates.py:2093
+#: modules/websession/lib/websession_templates.py:2060
+#: modules/websession/lib/websession_templates.py:2094
 msgid "Invite new members"
 msgstr "Convidar nous membres"
 
-#: modules/websession/lib/websession_templates.py:2064
+#: modules/websession/lib/websession_templates.py:2065
 #, python-format
 msgid "Invitation to join \"%s\" group"
 msgstr "Invitació a unir-se al grup \"%s\""
 
-#: modules/websession/lib/websession_templates.py:2065
+#: modules/websession/lib/websession_templates.py:2066
 #, python-format
 msgid ""
 "Hello:\n"
@@ -6505,7 +6505,7 @@ msgstr ""
 "\n"
 "Ben cordialment,\n"
 
-#: modules/websession/lib/websession_templates.py:2079
+#: modules/websession/lib/websession_templates.py:2080
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the "
@@ -6514,46 +6514,46 @@ msgstr ""
 "Si voleu convidar nous membres a formar part del vostre grup, useu el "
 "%(x_url_open)ssistema de missatgeria interna%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:2083
+#: modules/websession/lib/websession_templates.py:2084
 #, python-format
 msgid "Group: %s"
 msgstr "Grup: %s"
 
-#: modules/websession/lib/websession_templates.py:2166
+#: modules/websession/lib/websession_templates.py:2167
 msgid "Group list"
 msgstr "Llista dels grups"
 
-#: modules/websession/lib/websession_templates.py:2169
+#: modules/websession/lib/websession_templates.py:2170
 msgid "You are not member of any group."
 msgstr "No sou membre de cap grup"
 
-#: modules/websession/lib/websession_templates.py:2217
+#: modules/websession/lib/websession_templates.py:2218
 msgid "Are you sure you want to delete this group?"
 msgstr "Esteu segur que voleu suprimir aquest grup?"
 
-#: modules/websession/lib/websession_templates.py:2257
+#: modules/websession/lib/websession_templates.py:2258
 msgid "Are you sure you want to leave this group?"
 msgstr "Esteu segur que voleu deixar aquest grup?"
 
-#: modules/websession/lib/websession_templates.py:2273
+#: modules/websession/lib/websession_templates.py:2274
 msgid "Visible and open for new members"
 msgstr "Visible i obert per a nous membres"
 
-#: modules/websession/lib/websession_templates.py:2275
+#: modules/websession/lib/websession_templates.py:2276
 msgid "Visible but new members need approval"
 msgstr "Visible però els nous membres necessiten una aprovació"
 
-#: modules/websession/lib/websession_templates.py:2360
+#: modules/websession/lib/websession_templates.py:2361
 #, python-format
 msgid "Group %s: New membership request"
 msgstr "Grup %s: nova petició d'ingrés"
 
-#: modules/websession/lib/websession_templates.py:2364
+#: modules/websession/lib/websession_templates.py:2365
 #, python-format
 msgid "A user wants to join the group %s."
 msgstr "Un usuari vol unir-se al grup %s."
 
-#: modules/websession/lib/websession_templates.py:2365
+#: modules/websession/lib/websession_templates.py:2366
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
@@ -6561,44 +6561,44 @@ msgstr ""
 "Haurieu d'%(x_url_open)sacceptar o rebutjar%(x_url_close)s la petició "
 "d'aquest usuari."
 
-#: modules/websession/lib/websession_templates.py:2382
+#: modules/websession/lib/websession_templates.py:2383
 #, python-format
 msgid "Group %s: Join request has been accepted"
 msgstr "Grup %s: la petició d'ingrés ha estat acceptada"
 
-#: modules/websession/lib/websession_templates.py:2383
+#: modules/websession/lib/websession_templates.py:2384
 #, python-format
 msgid "Your request for joining group %s has been accepted."
 msgstr "La vostra petició d'ingressar al grup %s ha estat acceptada."
 
-#: modules/websession/lib/websession_templates.py:2385
+#: modules/websession/lib/websession_templates.py:2386
 #, python-format
 msgid "Group %s: Join request has been rejected"
 msgstr "Grup %s: la petició d'ingrés ha estat rebutjada"
 
-#: modules/websession/lib/websession_templates.py:2386
+#: modules/websession/lib/websession_templates.py:2387
 #, python-format
 msgid "Your request for joining group %s has been rejected."
 msgstr "La vostra petició d'ingressar al grup %s ha estat rebutjada."
 
-#: modules/websession/lib/websession_templates.py:2389
-#: modules/websession/lib/websession_templates.py:2407
+#: modules/websession/lib/websession_templates.py:2390
+#: modules/websession/lib/websession_templates.py:2408
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr ""
 "Podeu consultar la llista dels %(x_url_open)svostres grups%(x_url_close)s."
 
-#: modules/websession/lib/websession_templates.py:2403
+#: modules/websession/lib/websession_templates.py:2404
 #, python-format
 msgid "Group %s has been deleted"
 msgstr "El grup %s ha estat suprimit."
 
-#: modules/websession/lib/websession_templates.py:2405
+#: modules/websession/lib/websession_templates.py:2406
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr "El grup %s ha estat suprimit pel seu administrador."
 
-#: modules/websession/lib/websession_templates.py:2422
+#: modules/websession/lib/websession_templates.py:2423
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
@@ -6606,10 +6606,10 @@ msgid ""
 "(%(x_nb_admin)i)."
 msgstr ""
 "Podeu consultar la llista dels %(x_url_open)s%(x_nb_total)i grups"
-"%(x_url_close)s dels que sou membre (%(x_nb_member)i) o administrador"
-"(%(x_nb_admin)i)."
+"%(x_url_close)s dels que sou membre (%(x_nb_member)i) o "
+"administrador(%(x_nb_admin)i)."
 
-#: modules/websession/lib/websession_templates.py:2441
+#: modules/websession/lib/websession_templates.py:2442
 msgid ""
 "Warning: The password set for MySQL root user is the same as the default "
 "Invenio password. For security purposes, you may want to change the password."
@@ -6618,7 +6618,7 @@ msgstr ""
 "mateixa que la de porta Invenio per defecte.  Per motius de seguretat, us "
 "convindria canviar-la."
 
-#: modules/websession/lib/websession_templates.py:2447
+#: modules/websession/lib/websession_templates.py:2448
 msgid ""
 "Warning: The password set for the Invenio MySQL user is the same as the "
 "shipped default. For security purposes, you may want to change the password."
@@ -6627,7 +6627,7 @@ msgstr ""
 "mateixa que porta per defecte l'aplicació.  Per motius de seguretat, us "
 "convindria canviar-la"
 
-#: modules/websession/lib/websession_templates.py:2453
+#: modules/websession/lib/websession_templates.py:2454
 msgid ""
 "Warning: The password set for the Invenio admin user is currently empty. For "
 "security purposes, it is strongly recommended that you add a password."
@@ -6635,7 +6635,7 @@ msgstr ""
 "Atenció: la contrasenya per a l'usuari admin d'Invenio és buida. Per motius "
 "de seguretat, cal que en poseu una."
 
-#: modules/websession/lib/websession_templates.py:2459
+#: modules/websession/lib/websession_templates.py:2460
 msgid ""
 "Warning: The email address set for support email is currently set to "
 "info@invenio-software.org. It is recommended that you change this to your "
@@ -6644,12 +6644,12 @@ msgstr ""
 "Atenció: l'adreça configurada per suport electrònic es info@invenio-software."
 "org. Val la pena canviar-la a la vostra adreça particular."
 
-#: modules/websession/lib/websession_templates.py:2465
+#: modules/websession/lib/websession_templates.py:2466
 msgid ""
 "A newer version of Invenio is available for download. You may want to visit  "
 msgstr "Puede bajarse una versión más reciente de Invenio.  Visite "
 
-#: modules/websession/lib/websession_templates.py:2472
+#: modules/websession/lib/websession_templates.py:2473
 msgid ""
 "Cannot download or parse release notes from http://invenio-software.org/repo/"
 "invenio/tree/RELEASE-NOTES"
@@ -10855,8 +10855,12 @@ msgid "Printable format"
 msgstr "Format imprimible"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15526
-msgid "Check if the book already exists on Invenio,"
-msgstr "Comproveu si el llibre existeix en Invenio,"
+#: modules/bibcirculation/lib/bibcirculation_templates.py:15684
+msgid ""
+"Check if the book already exists on Invenio, before to send your ILL request."
+msgstr ""
+"Comproveu si el llibre existeix en Invenio abans de sol·licitar una petició "
+"de PI."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15550
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15713
@@ -10866,13 +10870,6 @@ msgstr "No s'han trobat items."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15618
 msgid "Proceed anyway"
 msgstr "Continuar de tota manera"
-
-#: modules/bibcirculation/lib/bibcirculation_templates.py:15684
-msgid ""
-"Check if the book already exists on Invenio, before to send your ILL request."
-msgstr ""
-"Comproveu si el llibre existeix en Invenio abans de sol·licitar una petició "
-"de PI."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15861
 msgid "Book does not exists on Invenio. Please fill the following form."
@@ -11433,6 +11430,9 @@ msgid ""
 msgstr ""
 "L'usuari «%(x_user)s» no està autoritzat a modificar la col·lecció "
 "«%(x_coll)s»"
+
+#~ msgid "Check if the book already exists on Invenio,"
+#~ msgstr "Comproveu si el llibre existeix en Invenio,"
 
 #~ msgid "No fulltext"
 #~ msgstr "Sense text complet"
@@ -13029,8 +13029,8 @@ msgstr ""
 #~ msgstr "Suprimir un comentari/ressenya específic (per número)"
 
 #~ msgid ""
-#~ "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)"
-#~ "s first."
+#~ "Before you add your comment, you need to %(x_url_open)slogin"
+#~ "%(x_url_close)s first."
 #~ msgstr ""
 #~ "Abans d'afegir el vostre comentari, us heu d'%(x_url_open)sidentificar"
 #~ "%(x_url_close)s."
@@ -13143,8 +13143,8 @@ msgstr ""
 #~ msgstr "o creeu-ne un de nou"
 
 #~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface"
+#~ "%(x_url_close)s."
 #~ msgstr ""
 #~ "Podeu tornar a %(x_url_open)sl'interfície d'administració de BibEdit"
 #~ "%(x_url_close)s."
@@ -13451,8 +13451,8 @@ msgstr ""
 #~ msgstr "Feu clic aquí"
 
 #~ msgid ""
-#~ "It has first been sent to approval on: <strong class=\"headline\">%(date)"
-#~ "s</strong>"
+#~ "It has first been sent to approval on: <strong class=\"headline\">"
+#~ "%(date)s</strong>"
 #~ msgstr ""
 #~ "Ha estat enviar per aprovació el primer cop el: <strong class=\"headline"
 #~ "\">%(date)s</strong>"
