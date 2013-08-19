@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.7\n"
+"Project-Id-Version: CDS-Invenio 0.99.8\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2012-10-18 16:35+0200\n"
+"POT-Creation-Date: 2013-08-19 14:20+0200\n"
 "PO-Revision-Date: 2008-06-06 15:55+0100\n"
 "Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: SV <cds.support@cern.ch>\n"
@@ -1411,8 +1411,8 @@ msgstr "Aktion"
 #: modules/bibedit/lib/bibedit_templates.py:154
 #: modules/bibedit/lib/bibedit_templates.py:170
 #: modules/bibedit/web/admin/bibeditadmin.py:74
-#: modules/webcomment/lib/webcomment_templates.py:598
-#: modules/webcomment/lib/webcomment_templates.py:1188
+#: modules/webcomment/lib/webcomment_templates.py:600
+#: modules/webcomment/lib/webcomment_templates.py:1190
 #: modules/websearch/lib/websearch_templates.py:482
 #: modules/websearch/lib/websearch_templates.py:484
 msgid "Record"
@@ -1521,10 +1521,10 @@ msgstr "Vill du verkligen ta bort den här journalen?"
 #: modules/bibedit/lib/bibedit_templates.py:558
 #: modules/bibedit/lib/bibedit_templates.py:591
 #: modules/webbasket/lib/webbasket_templates.py:1241
-#: modules/webcomment/lib/webcomment_templates.py:207
-#: modules/webcomment/lib/webcomment_templates.py:469
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:209
+#: modules/webcomment/lib/webcomment_templates.py:471
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:509
 #: modules/websession/lib/websession_templates.py:1962
 #: modules/websession/lib/websession_templates.py:2001
@@ -1534,10 +1534,10 @@ msgstr "Ja"
 #: modules/bibedit/lib/bibedit_templates.py:559
 #: modules/bibedit/lib/bibedit_templates.py:592
 #: modules/webalert/lib/webalert_templates.py:318
-#: modules/webcomment/lib/webcomment_templates.py:208
-#: modules/webcomment/lib/webcomment_templates.py:471
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:210
+#: modules/webcomment/lib/webcomment_templates.py:473
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:510
 #: modules/websession/lib/websession_templates.py:1963
 #: modules/websession/lib/websession_templates.py:2002
@@ -1619,7 +1619,7 @@ msgstr "Redigera journal %(x_recid)s, fält %(x_field)s"
 #: modules/bibformat/lib/bibformat_templates.py:1886
 #: modules/bibformat/lib/bibformat_templates.py:2048
 #: modules/bibformat/lib/bibformat_templates.py:2116
-#: modules/webcomment/lib/webcomment_templates.py:1036
+#: modules/webcomment/lib/webcomment_templates.py:1038
 #: modules/webjournal/lib/webjournal_templates.py:165
 #: modules/webjournal/lib/webjournal_templates.py:503
 #: modules/webjournal/lib/webjournal_templates.py:642
@@ -3083,8 +3083,8 @@ msgid "Date"
 msgstr "Datum"
 
 #: modules/webbasket/lib/webbasket_templates.py:774
-#: modules/webcomment/lib/webcomment_templates.py:444
-#: modules/webcomment/lib/webcomment_templates.py:454
+#: modules/webcomment/lib/webcomment_templates.py:446
+#: modules/webcomment/lib/webcomment_templates.py:456
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
@@ -3098,8 +3098,8 @@ msgstr "Det finns totalt %i kommentarer"
 
 #: modules/webbasket/lib/webbasket_templates.py:777
 #: modules/webbasket/lib/webbasket_webinterface.py:218
-#: modules/webcomment/lib/webcomment_templates.py:90
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:92
+#: modules/webcomment/lib/webcomment_templates.py:576
 #: modules/websubmit/lib/websubmit_templates.py:2578
 msgid "Write a comment"
 msgstr "Skriv en kommentar"
@@ -3119,7 +3119,7 @@ msgid "on"
 msgstr "på"
 
 #: modules/webbasket/lib/webbasket_templates.py:875
-#: modules/webcomment/lib/webcomment_templates.py:320
+#: modules/webcomment/lib/webcomment_templates.py:322
 #: modules/webmessage/lib/webmessage_templates.py:112
 msgid "Reply"
 msgstr "Svara"
@@ -3137,10 +3137,10 @@ msgid "Add Comment"
 msgstr "Lägg till kommentar"
 
 #: modules/webbasket/lib/webbasket_templates.py:932
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:807
-#: modules/webcomment/lib/webcomment_templates.py:1191
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:809
+#: modules/webcomment/lib/webcomment_templates.py:1193
+#: modules/webcomment/lib/webcomment_templates.py:1259
 #: modules/websubmit/lib/websubmit_templates.py:2631
 msgid "Comment"
 msgstr "Kommentar"
@@ -3351,7 +3351,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "Denna funktionalitet är förbjuden för gästanvändare"
 
 #: modules/webbasket/lib/webbasket_templates.py:1546
-#: modules/webcomment/lib/webcomment_templates.py:599
+#: modules/webcomment/lib/webcomment_templates.py:601
 msgid "Back to search results"
 msgstr "Tillbaka till sökresultat"
 
@@ -3393,161 +3393,161 @@ msgid "List of public baskets"
 msgstr "Listning av publika korgar"
 
 #: modules/webcomment/lib/webcomment.py:830
-#: modules/webcomment/lib/webcomment_templates.py:316
+#: modules/webcomment/lib/webcomment_templates.py:318
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
 msgstr "%(x_name)s skrev den %(x_date)s:"
 
-#: modules/webcomment/lib/webcomment_templates.py:98
+#: modules/webcomment/lib/webcomment_templates.py:100
 #, python-format
 msgid "Showing the latest %i comments:"
 msgstr "Visar de %i senaste kommentarerna:"
 
-#: modules/webcomment/lib/webcomment_templates.py:114
-#: modules/webcomment/lib/webcomment_templates.py:139
+#: modules/webcomment/lib/webcomment_templates.py:116
+#: modules/webcomment/lib/webcomment_templates.py:141
 msgid "Discuss this document"
 msgstr "Diskutera det här dokumentet"
 
-#: modules/webcomment/lib/webcomment_templates.py:140
-#: modules/webcomment/lib/webcomment_templates.py:584
+#: modules/webcomment/lib/webcomment_templates.py:142
+#: modules/webcomment/lib/webcomment_templates.py:586
 msgid "Start a discussion about any aspect of this document."
 msgstr "Starta en diskussion kring det här dokumentet."
 
-#: modules/webcomment/lib/webcomment_templates.py:156
+#: modules/webcomment/lib/webcomment_templates.py:158
 #, python-format
 msgid "Sorry, the record %s does not seem to exist."
 msgstr "Tyvärr verkar inte dokumentet %s existera."
 
-#: modules/webcomment/lib/webcomment_templates.py:158
+#: modules/webcomment/lib/webcomment_templates.py:160
 #, python-format
 msgid "Sorry, %s is not a valid ID value."
 msgstr "%s är inte ett fungerande ID."
 
-#: modules/webcomment/lib/webcomment_templates.py:160
+#: modules/webcomment/lib/webcomment_templates.py:162
 msgid "Sorry, no record ID was provided."
 msgstr "Inget ID angavs"
 
-#: modules/webcomment/lib/webcomment_templates.py:164
+#: modules/webcomment/lib/webcomment_templates.py:166
 #, python-format
 msgid "You may want to start browsing from %s"
 msgstr "Du vill antagligen börja browsa på %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:232
-#: modules/webcomment/lib/webcomment_templates.py:506
+#: modules/webcomment/lib/webcomment_templates.py:234
+#: modules/webcomment/lib/webcomment_templates.py:508
 msgid "Was this review helpful?"
 msgstr "Var den här recensionen hjälpfull?"
 
-#: modules/webcomment/lib/webcomment_templates.py:241
-#: modules/webcomment/lib/webcomment_templates.py:278
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:243
+#: modules/webcomment/lib/webcomment_templates.py:280
+#: modules/webcomment/lib/webcomment_templates.py:576
 msgid "Write a review"
 msgstr "Skriv en recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:248
-#: modules/webcomment/lib/webcomment_templates.py:562
-#: modules/webcomment/lib/webcomment_templates.py:1371
+#: modules/webcomment/lib/webcomment_templates.py:250
+#: modules/webcomment/lib/webcomment_templates.py:564
+#: modules/webcomment/lib/webcomment_templates.py:1373
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr ""
 "Genomsnittlig recensionspoäng: %(x_nb_score)s baserad på %(x_nb_reviews)s "
 "recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:251
+#: modules/webcomment/lib/webcomment_templates.py:253
 #, python-format
 msgid "Readers found the following %s reviews to be most helpful."
 msgstr "Läsare fann de följande %s recensionerna hjälpfulla"
 
-#: modules/webcomment/lib/webcomment_templates.py:254
-#: modules/webcomment/lib/webcomment_templates.py:277
+#: modules/webcomment/lib/webcomment_templates.py:256
+#: modules/webcomment/lib/webcomment_templates.py:279
 #, python-format
 msgid "View all %s reviews"
 msgstr "Visa alla %s recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:273
-#: modules/webcomment/lib/webcomment_templates.py:295
-#: modules/webcomment/lib/webcomment_templates.py:1412
+#: modules/webcomment/lib/webcomment_templates.py:275
+#: modules/webcomment/lib/webcomment_templates.py:297
+#: modules/webcomment/lib/webcomment_templates.py:1414
 msgid "Rate this document"
 msgstr "Betygsätt det här dokumentet"
 
-#: modules/webcomment/lib/webcomment_templates.py:296
-#: modules/webcomment/lib/webcomment_templates.py:586
+#: modules/webcomment/lib/webcomment_templates.py:298
+#: modules/webcomment/lib/webcomment_templates.py:588
 msgid "Be the first to review this document."
 msgstr "Bli först att skriva recensionen till det här dokumentet"
 
-#: modules/webcomment/lib/webcomment_templates.py:324
-#: modules/webcomment/lib/webcomment_templates.py:366
-#: modules/webcomment/lib/webcomment_templates.py:507
+#: modules/webcomment/lib/webcomment_templates.py:326
+#: modules/webcomment/lib/webcomment_templates.py:368
+#: modules/webcomment/lib/webcomment_templates.py:509
 msgid "Report abuse"
 msgstr "Rapportera missbruk"
 
-#: modules/webcomment/lib/webcomment_templates.py:361
+#: modules/webcomment/lib/webcomment_templates.py:363
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Recenserad av %(x_nickname)s den %(x_date)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:362
+#: modules/webcomment/lib/webcomment_templates.py:364
 #, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
 msgstr ""
 "%(x_nb_people)i av totalt %(x_nb_total)i fann den här recensionen hjälpfull"
 
-#: modules/webcomment/lib/webcomment_templates.py:445
-#: modules/webcomment/lib/webcomment_templates.py:455
+#: modules/webcomment/lib/webcomment_templates.py:447
+#: modules/webcomment/lib/webcomment_templates.py:457
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 msgid "Reviews"
 msgstr "Recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:537
+#: modules/webcomment/lib/webcomment_templates.py:539
 msgid "Previous"
 msgstr "Föregående"
 
-#: modules/webcomment/lib/webcomment_templates.py:553
+#: modules/webcomment/lib/webcomment_templates.py:555
 msgid "Next"
 msgstr "Nästa"
 
-#: modules/webcomment/lib/webcomment_templates.py:577
+#: modules/webcomment/lib/webcomment_templates.py:579
 #, python-format
 msgid "There is a total of %s reviews"
 msgstr "Det finns totalt %s recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:579
+#: modules/webcomment/lib/webcomment_templates.py:581
 #, python-format
 msgid "There is a total of %s comments"
 msgstr "Det finns totalt %s kommentarer"
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "review"
 msgstr "recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "comment"
 msgstr "Kommentar"
 
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:1259
 msgid "Review"
 msgstr "Recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:662
+#: modules/webcomment/lib/webcomment_templates.py:664
 msgid "Viewing"
 msgstr "Visning"
 
-#: modules/webcomment/lib/webcomment_templates.py:663
+#: modules/webcomment/lib/webcomment_templates.py:665
 msgid "Page:"
 msgstr "Sida:"
 
-#: modules/webcomment/lib/webcomment_templates.py:784
+#: modules/webcomment/lib/webcomment_templates.py:786
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr ""
 "OBS att ditt smeknamn, %s, kommer att visas som författaren till det här "
 "dokumentet"
 
-#: modules/webcomment/lib/webcomment_templates.py:788
-#: modules/webcomment/lib/webcomment_templates.py:843
+#: modules/webcomment/lib/webcomment_templates.py:790
+#: modules/webcomment/lib/webcomment_templates.py:845
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -3556,17 +3556,17 @@ msgstr ""
 "OBS att du inte har %(x_url_open)sdefinierat ditt smeknamn%(x_url_close)s. "
 "%(x_nickname)s kommer att visas som författare till det här dokumentet."
 
-#: modules/webcomment/lib/webcomment_templates.py:806
-#: modules/webcomment/lib/webcomment_templates.py:899
+#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:901
 msgid "Article"
 msgstr "Artikel"
 
-#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:810
 #, fuzzy
 msgid "Add comment"
 msgstr "Lägg till kommentar"
 
-#: modules/webcomment/lib/webcomment_templates.py:838
+#: modules/webcomment/lib/webcomment_templates.py:840
 #, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
@@ -3574,70 +3574,70 @@ msgstr ""
 "OBS att ditt smeknamn, %s, kommer att visas som författare av den här "
 "recensionen."
 
-#: modules/webcomment/lib/webcomment_templates.py:900
+#: modules/webcomment/lib/webcomment_templates.py:902
 msgid "Rate this article"
 msgstr "Betygsätt den här artikeln"
 
-#: modules/webcomment/lib/webcomment_templates.py:901
+#: modules/webcomment/lib/webcomment_templates.py:903
 msgid "Select a score"
 msgstr "Välj en poäng"
 
-#: modules/webcomment/lib/webcomment_templates.py:902
+#: modules/webcomment/lib/webcomment_templates.py:904
 msgid "Give a title to your review"
 msgstr "Ange en titel till din recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:903
+#: modules/webcomment/lib/webcomment_templates.py:905
 msgid "Write your review"
 msgstr "Skriv en recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:908
+#: modules/webcomment/lib/webcomment_templates.py:910
 #, fuzzy
 msgid "Add review"
 msgstr "Lägg till recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:917
+#: modules/webcomment/lib/webcomment_templates.py:919
 #: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr "Lägg till recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:938
+#: modules/webcomment/lib/webcomment_templates.py:940
 msgid "Your review was successfully added."
 msgstr "Din recension lades till."
 
-#: modules/webcomment/lib/webcomment_templates.py:940
+#: modules/webcomment/lib/webcomment_templates.py:942
 msgid "Your comment was successfully added."
 msgstr "Din kommentar lades till."
 
-#: modules/webcomment/lib/webcomment_templates.py:942
+#: modules/webcomment/lib/webcomment_templates.py:944
 msgid "Back to record"
 msgstr "Tillbaka till journal"
 
-#: modules/webcomment/lib/webcomment_templates.py:1019
+#: modules/webcomment/lib/webcomment_templates.py:1021
 #: modules/webcomment/web/admin/webcommentadmin.py:134
 msgid "View all reported comments"
 msgstr "Visa alla rapporterade kommentarer"
 
-#: modules/webcomment/lib/webcomment_templates.py:1022
+#: modules/webcomment/lib/webcomment_templates.py:1024
 msgid "View all reported reviews"
 msgstr "Visa alla rapporterade recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:1028
+#: modules/webcomment/lib/webcomment_templates.py:1030
 msgid "Delete a specific comment/review (by ID)"
 msgstr "Visa en specifik kommentar/recension"
 
-#: modules/webcomment/lib/webcomment_templates.py:1029
+#: modules/webcomment/lib/webcomment_templates.py:1031
 msgid "View all users who have been reported"
 msgstr "Den här journalen har rapporterats"
 
-#: modules/webcomment/lib/webcomment_templates.py:1031
+#: modules/webcomment/lib/webcomment_templates.py:1033
 msgid "Guide"
 msgstr "Guide"
 
-#: modules/webcomment/lib/webcomment_templates.py:1033
+#: modules/webcomment/lib/webcomment_templates.py:1035
 msgid "Comments and reviews are disabled"
 msgstr "Möjligheten att kommentera och recensera är avstängd"
 
-#: modules/webcomment/lib/webcomment_templates.py:1051
+#: modules/webcomment/lib/webcomment_templates.py:1053
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -3645,29 +3645,29 @@ msgstr ""
 "Var god ange ID:et för kommentaren/recensionen för att granska den innan du "
 "avgör om den skall tas bort eller ej"
 
-#: modules/webcomment/lib/webcomment_templates.py:1063
+#: modules/webcomment/lib/webcomment_templates.py:1065
 msgid "Comment ID:"
 msgstr "Kommentarsid:"
 
-#: modules/webcomment/lib/webcomment_templates.py:1065
+#: modules/webcomment/lib/webcomment_templates.py:1067
 msgid "View Comment"
 msgstr "Visa kommentar"
 
-#: modules/webcomment/lib/webcomment_templates.py:1086
+#: modules/webcomment/lib/webcomment_templates.py:1088
 msgid "There have been no reports so far."
 msgstr "Inga rapporter hittills."
 
-#: modules/webcomment/lib/webcomment_templates.py:1090
+#: modules/webcomment/lib/webcomment_templates.py:1092
 #, python-format
 msgid "View all %s reported comments"
 msgstr "Visa alla %s rapporterade kommentarer"
 
-#: modules/webcomment/lib/webcomment_templates.py:1093
+#: modules/webcomment/lib/webcomment_templates.py:1095
 #, python-format
 msgid "View all %s reported reviews"
 msgstr "Visa alla % rapporterade recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:1130
+#: modules/webcomment/lib/webcomment_templates.py:1132
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
@@ -3675,124 +3675,124 @@ msgstr ""
 "Listning, sorterad på mängd rapporter, av alla användare som har ådragit sig "
 "en kommentarsrapport åtminstone en gång."
 
-#: modules/webcomment/lib/webcomment_templates.py:1138
-#: modules/webcomment/lib/webcomment_templates.py:1167
+#: modules/webcomment/lib/webcomment_templates.py:1140
+#: modules/webcomment/lib/webcomment_templates.py:1169
 #: modules/websession/lib/websession_templates.py:162
 #: modules/websession/lib/websession_templates.py:969
 msgid "Nickname"
 msgstr "Smeknamn"
 
-#: modules/webcomment/lib/webcomment_templates.py:1139
-#: modules/webcomment/lib/webcomment_templates.py:1171
+#: modules/webcomment/lib/webcomment_templates.py:1141
+#: modules/webcomment/lib/webcomment_templates.py:1173
 msgid "Email"
 msgstr "Epost"
 
-#: modules/webcomment/lib/webcomment_templates.py:1140
-#: modules/webcomment/lib/webcomment_templates.py:1169
+#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1171
 msgid "User ID"
 msgstr "Användarid"
 
-#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1144
 msgid "Number positive votes"
 msgstr "Antal positiva betyg"
 
-#: modules/webcomment/lib/webcomment_templates.py:1143
+#: modules/webcomment/lib/webcomment_templates.py:1145
 msgid "Number negative votes"
 msgstr "Antal negativa betyg"
 
-#: modules/webcomment/lib/webcomment_templates.py:1144
+#: modules/webcomment/lib/webcomment_templates.py:1146
 msgid "Total number votes"
 msgstr "Totalt antal betyg"
 
-#: modules/webcomment/lib/webcomment_templates.py:1145
+#: modules/webcomment/lib/webcomment_templates.py:1147
 msgid "Total number of reports"
 msgstr "Totalt antal rapporter"
 
-#: modules/webcomment/lib/webcomment_templates.py:1146
+#: modules/webcomment/lib/webcomment_templates.py:1148
 msgid "View all user's reported comments/reviews"
 msgstr "Visa alla användares rapporterade kommentarer/recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:1179
+#: modules/webcomment/lib/webcomment_templates.py:1181
 #, python-format
 msgid "This review has been reported %i times"
 msgstr "Den här recensioner har rapporterats %i gånger"
 
-#: modules/webcomment/lib/webcomment_templates.py:1181
+#: modules/webcomment/lib/webcomment_templates.py:1183
 #, python-format
 msgid "This comment has been reported %i times"
 msgstr "Den här kommentaren har rapporterats %i gånger"
 
-#: modules/webcomment/lib/webcomment_templates.py:1258
+#: modules/webcomment/lib/webcomment_templates.py:1260
 msgid "Written by"
 msgstr "Författad av"
 
-#: modules/webcomment/lib/webcomment_templates.py:1259
+#: modules/webcomment/lib/webcomment_templates.py:1261
 msgid "General informations"
 msgstr "Allmän information"
 
-#: modules/webcomment/lib/webcomment_templates.py:1260
+#: modules/webcomment/lib/webcomment_templates.py:1262
 msgid "Select"
 msgstr "Välj"
 
-#: modules/webcomment/lib/webcomment_templates.py:1274
+#: modules/webcomment/lib/webcomment_templates.py:1276
 msgid "Delete selected reviews"
 msgstr "Radera valda recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:1275
-#: modules/webcomment/lib/webcomment_templates.py:1280
+#: modules/webcomment/lib/webcomment_templates.py:1277
+#: modules/webcomment/lib/webcomment_templates.py:1282
 msgid "Suppress selected abuse report"
 msgstr "Radera valda missbruksrapporter"
 
-#: modules/webcomment/lib/webcomment_templates.py:1279
+#: modules/webcomment/lib/webcomment_templates.py:1281
 msgid "Delete selected comments"
 msgstr "Radera valda kommentarer"
 
-#: modules/webcomment/lib/webcomment_templates.py:1288
+#: modules/webcomment/lib/webcomment_templates.py:1290
 msgid "OK"
 msgstr "OK"
 
-#: modules/webcomment/lib/webcomment_templates.py:1294
+#: modules/webcomment/lib/webcomment_templates.py:1296
 #, python-format
 msgid "Here are the reported reviews of user %s"
 msgstr "Här visas användare %s rapporterade recensioner"
 
-#: modules/webcomment/lib/webcomment_templates.py:1296
+#: modules/webcomment/lib/webcomment_templates.py:1298
 #, python-format
 msgid "Here are the reported comments of user %s"
 msgstr "Här visas användare %s rapporterade kommentarer"
 
-#: modules/webcomment/lib/webcomment_templates.py:1299
+#: modules/webcomment/lib/webcomment_templates.py:1301
 #, python-format
 msgid "Here is comment/review %s"
 msgstr "Kommentar/recension %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1301
+#: modules/webcomment/lib/webcomment_templates.py:1303
 #, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
 msgstr "Kommentar/recension %(x_cmtID)s författad av användare %(x_user)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1306
+#: modules/webcomment/lib/webcomment_templates.py:1308
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "Samtliga rapporterade recensioner sorterad efter flest rapporter"
 
-#: modules/webcomment/lib/webcomment_templates.py:1308
+#: modules/webcomment/lib/webcomment_templates.py:1310
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "Samtliga rapporterade kommentarer sorterad efter flest rapporter"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1335
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "comment ID"
 msgstr "kommentarsid"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
+#: modules/webcomment/lib/webcomment_templates.py:1335
 msgid "successfully deleted"
 msgstr "raderad"
 
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "successfully suppressed abuse report"
 msgstr "raderade missbruksrapport"
 
-#: modules/webcomment/lib/webcomment_templates.py:1375
+#: modules/webcomment/lib/webcomment_templates.py:1377
 #, fuzzy
 msgid "Not yet reviewed"
 msgstr "Skriv en recension"
@@ -7238,8 +7238,8 @@ msgstr "Ändra inställningar"
 #~ msgstr "eller skapa ett nytt"
 
 #~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface"
+#~ "%(x_url_close)s."
 #~ msgstr ""
 #~ "Du kan nu gå tillbaka till %(x_url_open)sBibEdit's "
 #~ "administratörsgränssnitt%(x_url_close)s."

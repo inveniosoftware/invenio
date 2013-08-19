@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.7\n"
+"Project-Id-Version: CDS-Invenio 0.99.8\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2012-10-18 16:35+0200\n"
+"POT-Creation-Date: 2013-08-19 14:20+0200\n"
 "PO-Revision-Date: 2008-02-29 15:34+0100\n"
 "Last-Translator: Alen Vodopijevec <alen@irb.hr>\n"
 "Language-Team: HR <cds.support@cern.ch>\n"
@@ -1414,8 +1414,8 @@ msgstr "Akcija"
 #: modules/bibedit/lib/bibedit_templates.py:154
 #: modules/bibedit/lib/bibedit_templates.py:170
 #: modules/bibedit/web/admin/bibeditadmin.py:74
-#: modules/webcomment/lib/webcomment_templates.py:598
-#: modules/webcomment/lib/webcomment_templates.py:1188
+#: modules/webcomment/lib/webcomment_templates.py:600
+#: modules/webcomment/lib/webcomment_templates.py:1190
 #: modules/websearch/lib/websearch_templates.py:482
 #: modules/websearch/lib/websearch_templates.py:484
 msgid "Record"
@@ -1525,10 +1525,10 @@ msgstr "Želite li stvarno izbrisati ovaj zapis?"
 #: modules/bibedit/lib/bibedit_templates.py:558
 #: modules/bibedit/lib/bibedit_templates.py:591
 #: modules/webbasket/lib/webbasket_templates.py:1241
-#: modules/webcomment/lib/webcomment_templates.py:207
-#: modules/webcomment/lib/webcomment_templates.py:469
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:209
+#: modules/webcomment/lib/webcomment_templates.py:471
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:509
 #: modules/websession/lib/websession_templates.py:1962
 #: modules/websession/lib/websession_templates.py:2001
@@ -1538,10 +1538,10 @@ msgstr "Da"
 #: modules/bibedit/lib/bibedit_templates.py:559
 #: modules/bibedit/lib/bibedit_templates.py:592
 #: modules/webalert/lib/webalert_templates.py:318
-#: modules/webcomment/lib/webcomment_templates.py:208
-#: modules/webcomment/lib/webcomment_templates.py:471
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:210
+#: modules/webcomment/lib/webcomment_templates.py:473
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:510
 #: modules/websession/lib/websession_templates.py:1963
 #: modules/websession/lib/websession_templates.py:2002
@@ -1622,7 +1622,7 @@ msgstr "Uredi unos %(x_recid)s, polje %(x_field)s"
 #: modules/bibformat/lib/bibformat_templates.py:1886
 #: modules/bibformat/lib/bibformat_templates.py:2048
 #: modules/bibformat/lib/bibformat_templates.py:2116
-#: modules/webcomment/lib/webcomment_templates.py:1036
+#: modules/webcomment/lib/webcomment_templates.py:1038
 #: modules/webjournal/lib/webjournal_templates.py:165
 #: modules/webjournal/lib/webjournal_templates.py:503
 #: modules/webjournal/lib/webjournal_templates.py:642
@@ -3090,8 +3090,8 @@ msgid "Date"
 msgstr "Datum"
 
 #: modules/webbasket/lib/webbasket_templates.py:774
-#: modules/webcomment/lib/webcomment_templates.py:444
-#: modules/webcomment/lib/webcomment_templates.py:454
+#: modules/webcomment/lib/webcomment_templates.py:446
+#: modules/webcomment/lib/webcomment_templates.py:456
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
@@ -3105,8 +3105,8 @@ msgstr "Ukupno ima %i komentara"
 
 #: modules/webbasket/lib/webbasket_templates.py:777
 #: modules/webbasket/lib/webbasket_webinterface.py:218
-#: modules/webcomment/lib/webcomment_templates.py:90
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:92
+#: modules/webcomment/lib/webcomment_templates.py:576
 #: modules/websubmit/lib/websubmit_templates.py:2578
 msgid "Write a comment"
 msgstr "Unesi komentar"
@@ -3126,7 +3126,7 @@ msgid "on"
 msgstr "na"
 
 #: modules/webbasket/lib/webbasket_templates.py:875
-#: modules/webcomment/lib/webcomment_templates.py:320
+#: modules/webcomment/lib/webcomment_templates.py:322
 #: modules/webmessage/lib/webmessage_templates.py:112
 msgid "Reply"
 msgstr "Odgovor"
@@ -3144,10 +3144,10 @@ msgid "Add Comment"
 msgstr "Dodaj komentar"
 
 #: modules/webbasket/lib/webbasket_templates.py:932
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:807
-#: modules/webcomment/lib/webcomment_templates.py:1191
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:809
+#: modules/webcomment/lib/webcomment_templates.py:1193
+#: modules/webcomment/lib/webcomment_templates.py:1259
 #: modules/websubmit/lib/websubmit_templates.py:2631
 msgid "Comment"
 msgstr "Komentar"
@@ -3358,7 +3358,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "Ova funkcionalnost nije dostupna za goste."
 
 #: modules/webbasket/lib/webbasket_templates.py:1546
-#: modules/webcomment/lib/webcomment_templates.py:599
+#: modules/webcomment/lib/webcomment_templates.py:601
 msgid "Back to search results"
 msgstr "Natrag na rezultate pretrage"
 
@@ -3400,160 +3400,160 @@ msgid "List of public baskets"
 msgstr "Lista javnih košarica"
 
 #: modules/webcomment/lib/webcomment.py:830
-#: modules/webcomment/lib/webcomment_templates.py:316
+#: modules/webcomment/lib/webcomment_templates.py:318
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
 msgstr "%(x_name)s je napisao/la datuma %(x_date)s:"
 
-#: modules/webcomment/lib/webcomment_templates.py:98
+#: modules/webcomment/lib/webcomment_templates.py:100
 #, python-format
 msgid "Showing the latest %i comments:"
 msgstr "Prikaz poslijednjih %i komentara:"
 
-#: modules/webcomment/lib/webcomment_templates.py:114
-#: modules/webcomment/lib/webcomment_templates.py:139
+#: modules/webcomment/lib/webcomment_templates.py:116
+#: modules/webcomment/lib/webcomment_templates.py:141
 msgid "Discuss this document"
 msgstr "Raspravi o ovom dokumentu"
 
-#: modules/webcomment/lib/webcomment_templates.py:140
-#: modules/webcomment/lib/webcomment_templates.py:584
+#: modules/webcomment/lib/webcomment_templates.py:142
+#: modules/webcomment/lib/webcomment_templates.py:586
 msgid "Start a discussion about any aspect of this document."
 msgstr "Započni raspravu vezanu uz ovaj dokument."
 
-#: modules/webcomment/lib/webcomment_templates.py:156
+#: modules/webcomment/lib/webcomment_templates.py:158
 #, python-format
 msgid "Sorry, the record %s does not seem to exist."
 msgstr "Nažalost, zapis %s ne postoji."
 
-#: modules/webcomment/lib/webcomment_templates.py:158
+#: modules/webcomment/lib/webcomment_templates.py:160
 #, python-format
 msgid "Sorry, %s is not a valid ID value."
 msgstr "Nažalost, %s nije ispravan ID."
 
-#: modules/webcomment/lib/webcomment_templates.py:160
+#: modules/webcomment/lib/webcomment_templates.py:162
 msgid "Sorry, no record ID was provided."
 msgstr "Nažalost, nije upisan ID zapisa."
 
-#: modules/webcomment/lib/webcomment_templates.py:164
+#: modules/webcomment/lib/webcomment_templates.py:166
 #, python-format
 msgid "You may want to start browsing from %s"
 msgstr "Započnite pregledavanje od %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:232
-#: modules/webcomment/lib/webcomment_templates.py:506
+#: modules/webcomment/lib/webcomment_templates.py:234
+#: modules/webcomment/lib/webcomment_templates.py:508
 msgid "Was this review helpful?"
 msgstr "Da lije ovo izvješće bilo korisno?"
 
-#: modules/webcomment/lib/webcomment_templates.py:241
-#: modules/webcomment/lib/webcomment_templates.py:278
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:243
+#: modules/webcomment/lib/webcomment_templates.py:280
+#: modules/webcomment/lib/webcomment_templates.py:576
 msgid "Write a review"
 msgstr "Napiši izvješće"
 
-#: modules/webcomment/lib/webcomment_templates.py:248
-#: modules/webcomment/lib/webcomment_templates.py:562
-#: modules/webcomment/lib/webcomment_templates.py:1371
+#: modules/webcomment/lib/webcomment_templates.py:250
+#: modules/webcomment/lib/webcomment_templates.py:564
+#: modules/webcomment/lib/webcomment_templates.py:1373
 #, fuzzy, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr ""
 "Prosječna ocjena izvješća: %(x_nb_score)s bazirana na %(x_nb_reviews)s "
 "izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:251
+#: modules/webcomment/lib/webcomment_templates.py:253
 #, python-format
 msgid "Readers found the following %s reviews to be most helpful."
 msgstr "Čitatelji su slijedećih %s izvješća ocijenili kao najkorisnije."
 
-#: modules/webcomment/lib/webcomment_templates.py:254
-#: modules/webcomment/lib/webcomment_templates.py:277
+#: modules/webcomment/lib/webcomment_templates.py:256
+#: modules/webcomment/lib/webcomment_templates.py:279
 #, python-format
 msgid "View all %s reviews"
 msgstr "Pogledajte svih %s izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:273
-#: modules/webcomment/lib/webcomment_templates.py:295
-#: modules/webcomment/lib/webcomment_templates.py:1412
+#: modules/webcomment/lib/webcomment_templates.py:275
+#: modules/webcomment/lib/webcomment_templates.py:297
+#: modules/webcomment/lib/webcomment_templates.py:1414
 msgid "Rate this document"
 msgstr "Ocijeni ovaj dokument"
 
-#: modules/webcomment/lib/webcomment_templates.py:296
-#: modules/webcomment/lib/webcomment_templates.py:586
+#: modules/webcomment/lib/webcomment_templates.py:298
+#: modules/webcomment/lib/webcomment_templates.py:588
 msgid "Be the first to review this document."
 msgstr "Prvi izvjestite o ovom dokumentu"
 
-#: modules/webcomment/lib/webcomment_templates.py:324
-#: modules/webcomment/lib/webcomment_templates.py:366
-#: modules/webcomment/lib/webcomment_templates.py:507
+#: modules/webcomment/lib/webcomment_templates.py:326
+#: modules/webcomment/lib/webcomment_templates.py:368
+#: modules/webcomment/lib/webcomment_templates.py:509
 msgid "Report abuse"
 msgstr "Prijavi zloupotrebu"
 
-#: modules/webcomment/lib/webcomment_templates.py:361
+#: modules/webcomment/lib/webcomment_templates.py:363
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Pregledao/la %(x_nickname)s datuma %(x_date)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:362
+#: modules/webcomment/lib/webcomment_templates.py:364
 #, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
 msgstr ""
 "%(x_nb_people)i od %(x_nb_total)i korisnika smatra ovo izvješće korisnim"
 
-#: modules/webcomment/lib/webcomment_templates.py:445
-#: modules/webcomment/lib/webcomment_templates.py:455
+#: modules/webcomment/lib/webcomment_templates.py:447
+#: modules/webcomment/lib/webcomment_templates.py:457
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 msgid "Reviews"
 msgstr "Pregledi (#)"
 
-#: modules/webcomment/lib/webcomment_templates.py:537
+#: modules/webcomment/lib/webcomment_templates.py:539
 msgid "Previous"
 msgstr "Prethodni"
 
-#: modules/webcomment/lib/webcomment_templates.py:553
+#: modules/webcomment/lib/webcomment_templates.py:555
 msgid "Next"
 msgstr "Slijedeći"
 
-#: modules/webcomment/lib/webcomment_templates.py:577
+#: modules/webcomment/lib/webcomment_templates.py:579
 #, python-format
 msgid "There is a total of %s reviews"
 msgstr "Ukupno ima %s izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:579
+#: modules/webcomment/lib/webcomment_templates.py:581
 #, python-format
 msgid "There is a total of %s comments"
 msgstr "Ukupno ima %s komentara"
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "review"
 msgstr "izvješće"
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "comment"
 msgstr "komentar"
 
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:1259
 msgid "Review"
 msgstr "Izvješće"
 
-#: modules/webcomment/lib/webcomment_templates.py:662
+#: modules/webcomment/lib/webcomment_templates.py:664
 #, fuzzy
 msgid "Viewing"
 msgstr "Pregled"
 
-#: modules/webcomment/lib/webcomment_templates.py:663
+#: modules/webcomment/lib/webcomment_templates.py:665
 msgid "Page:"
 msgstr "Stranica:"
 
-#: modules/webcomment/lib/webcomment_templates.py:784
+#: modules/webcomment/lib/webcomment_templates.py:786
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr "Napomena: Vaš nadimak, %s, bit će prikazan kao autor ovog komentara"
 
-#: modules/webcomment/lib/webcomment_templates.py:788
-#: modules/webcomment/lib/webcomment_templates.py:843
+#: modules/webcomment/lib/webcomment_templates.py:790
+#: modules/webcomment/lib/webcomment_templates.py:845
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -3562,87 +3562,87 @@ msgstr ""
 "Napomena: niste %(x_url_open)sdefinirali svoj nadimak%(x_url_close)s. "
 "%(x_nickname)s ćebiti prikazano kao autor ovog komentara."
 
-#: modules/webcomment/lib/webcomment_templates.py:806
-#: modules/webcomment/lib/webcomment_templates.py:899
+#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:901
 msgid "Article"
 msgstr "Članak"
 
-#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:810
 #, fuzzy
 msgid "Add comment"
 msgstr "Dodaj komentar"
 
-#: modules/webcomment/lib/webcomment_templates.py:838
+#: modules/webcomment/lib/webcomment_templates.py:840
 #, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr "Napomena: Vaš nadimak, %s, bit će prikazan kao autor ovog izvješća."
 
-#: modules/webcomment/lib/webcomment_templates.py:900
+#: modules/webcomment/lib/webcomment_templates.py:902
 msgid "Rate this article"
 msgstr "Ocijeni ovaj članak"
 
-#: modules/webcomment/lib/webcomment_templates.py:901
+#: modules/webcomment/lib/webcomment_templates.py:903
 #, fuzzy
 msgid "Select a score"
 msgstr "Izaberi ocjenu"
 
-#: modules/webcomment/lib/webcomment_templates.py:902
+#: modules/webcomment/lib/webcomment_templates.py:904
 msgid "Give a title to your review"
 msgstr "Unesi naslov svog izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:903
+#: modules/webcomment/lib/webcomment_templates.py:905
 msgid "Write your review"
 msgstr "Upiši svoje izvješće"
 
-#: modules/webcomment/lib/webcomment_templates.py:908
+#: modules/webcomment/lib/webcomment_templates.py:910
 #, fuzzy
 msgid "Add review"
 msgstr "Dodaj izvješće"
 
-#: modules/webcomment/lib/webcomment_templates.py:917
+#: modules/webcomment/lib/webcomment_templates.py:919
 #: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr "Dodaj izvješće"
 
-#: modules/webcomment/lib/webcomment_templates.py:938
+#: modules/webcomment/lib/webcomment_templates.py:940
 msgid "Your review was successfully added."
 msgstr "Vaše izvješće je uspješno dodano."
 
-#: modules/webcomment/lib/webcomment_templates.py:940
+#: modules/webcomment/lib/webcomment_templates.py:942
 msgid "Your comment was successfully added."
 msgstr "Vaš komentar je uspješno dodan."
 
-#: modules/webcomment/lib/webcomment_templates.py:942
+#: modules/webcomment/lib/webcomment_templates.py:944
 msgid "Back to record"
 msgstr "Natrag na zapis"
 
-#: modules/webcomment/lib/webcomment_templates.py:1019
+#: modules/webcomment/lib/webcomment_templates.py:1021
 #: modules/webcomment/web/admin/webcommentadmin.py:134
 msgid "View all reported comments"
 msgstr "Pogledaj sve prijavljene komentare"
 
-#: modules/webcomment/lib/webcomment_templates.py:1022
+#: modules/webcomment/lib/webcomment_templates.py:1024
 msgid "View all reported reviews"
 msgstr "Pogledaj sva prijavljena izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:1028
+#: modules/webcomment/lib/webcomment_templates.py:1030
 msgid "Delete a specific comment/review (by ID)"
 msgstr "Obriši komentar/izvješće (prema ID-u)"
 
-#: modules/webcomment/lib/webcomment_templates.py:1029
+#: modules/webcomment/lib/webcomment_templates.py:1031
 msgid "View all users who have been reported"
 msgstr "Pogledaj sve prijavljene korisnike"
 
-#: modules/webcomment/lib/webcomment_templates.py:1031
+#: modules/webcomment/lib/webcomment_templates.py:1033
 msgid "Guide"
 msgstr "Vodič"
 
-#: modules/webcomment/lib/webcomment_templates.py:1033
+#: modules/webcomment/lib/webcomment_templates.py:1035
 msgid "Comments and reviews are disabled"
 msgstr "Komentari i izvješća su isključeni"
 
-#: modules/webcomment/lib/webcomment_templates.py:1051
+#: modules/webcomment/lib/webcomment_templates.py:1053
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -3650,29 +3650,29 @@ msgstr ""
 "Unesite ID komentara/izvješća kako biste ih mogli pogledati prije nego što "
 "odlučite hoćete li ih obrisati"
 
-#: modules/webcomment/lib/webcomment_templates.py:1063
+#: modules/webcomment/lib/webcomment_templates.py:1065
 msgid "Comment ID:"
 msgstr "ID komentara:"
 
-#: modules/webcomment/lib/webcomment_templates.py:1065
+#: modules/webcomment/lib/webcomment_templates.py:1067
 msgid "View Comment"
 msgstr "Pogledaj komentar"
 
-#: modules/webcomment/lib/webcomment_templates.py:1086
+#: modules/webcomment/lib/webcomment_templates.py:1088
 msgid "There have been no reports so far."
 msgstr "Za sada nema izvještaja."
 
-#: modules/webcomment/lib/webcomment_templates.py:1090
+#: modules/webcomment/lib/webcomment_templates.py:1092
 #, python-format
 msgid "View all %s reported comments"
 msgstr "Pogledaj svih %s komentara"
 
-#: modules/webcomment/lib/webcomment_templates.py:1093
+#: modules/webcomment/lib/webcomment_templates.py:1095
 #, python-format
 msgid "View all %s reported reviews"
 msgstr "Pogledaj svih %s izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:1130
+#: modules/webcomment/lib/webcomment_templates.py:1132
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
@@ -3680,124 +3680,124 @@ msgstr ""
 "Ovdje je lista, sortirana prema ukupnom broju prijava, svih korisnika koji "
 "imaju prijavljen barem jedan komentar."
 
-#: modules/webcomment/lib/webcomment_templates.py:1138
-#: modules/webcomment/lib/webcomment_templates.py:1167
+#: modules/webcomment/lib/webcomment_templates.py:1140
+#: modules/webcomment/lib/webcomment_templates.py:1169
 #: modules/websession/lib/websession_templates.py:162
 #: modules/websession/lib/websession_templates.py:969
 msgid "Nickname"
 msgstr "Nadimak"
 
-#: modules/webcomment/lib/webcomment_templates.py:1139
-#: modules/webcomment/lib/webcomment_templates.py:1171
+#: modules/webcomment/lib/webcomment_templates.py:1141
+#: modules/webcomment/lib/webcomment_templates.py:1173
 msgid "Email"
 msgstr "Email"
 
-#: modules/webcomment/lib/webcomment_templates.py:1140
-#: modules/webcomment/lib/webcomment_templates.py:1169
+#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1171
 msgid "User ID"
 msgstr "Korisničko ime"
 
-#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1144
 msgid "Number positive votes"
 msgstr "Broj pozitivnih glasova"
 
-#: modules/webcomment/lib/webcomment_templates.py:1143
+#: modules/webcomment/lib/webcomment_templates.py:1145
 msgid "Number negative votes"
 msgstr "Broj negativnih glasova"
 
-#: modules/webcomment/lib/webcomment_templates.py:1144
+#: modules/webcomment/lib/webcomment_templates.py:1146
 msgid "Total number votes"
 msgstr "Ukupan broj glasova"
 
-#: modules/webcomment/lib/webcomment_templates.py:1145
+#: modules/webcomment/lib/webcomment_templates.py:1147
 msgid "Total number of reports"
 msgstr "Ukupan broj prijava"
 
-#: modules/webcomment/lib/webcomment_templates.py:1146
+#: modules/webcomment/lib/webcomment_templates.py:1148
 msgid "View all user's reported comments/reviews"
 msgstr "Pogledaj sve korisnikove komentare/izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:1179
+#: modules/webcomment/lib/webcomment_templates.py:1181
 #, python-format
 msgid "This review has been reported %i times"
 msgstr "Ovo izvješće je prijavljeno %i puta"
 
-#: modules/webcomment/lib/webcomment_templates.py:1181
+#: modules/webcomment/lib/webcomment_templates.py:1183
 #, python-format
 msgid "This comment has been reported %i times"
 msgstr "Ovaj komentar je prijavljen %i puta"
 
-#: modules/webcomment/lib/webcomment_templates.py:1258
+#: modules/webcomment/lib/webcomment_templates.py:1260
 msgid "Written by"
 msgstr "Napisao/la"
 
-#: modules/webcomment/lib/webcomment_templates.py:1259
+#: modules/webcomment/lib/webcomment_templates.py:1261
 msgid "General informations"
 msgstr "Opći podaci"
 
-#: modules/webcomment/lib/webcomment_templates.py:1260
+#: modules/webcomment/lib/webcomment_templates.py:1262
 msgid "Select"
 msgstr "Odaberi"
 
-#: modules/webcomment/lib/webcomment_templates.py:1274
+#: modules/webcomment/lib/webcomment_templates.py:1276
 msgid "Delete selected reviews"
 msgstr "Obriši odabrana izvješća"
 
-#: modules/webcomment/lib/webcomment_templates.py:1275
-#: modules/webcomment/lib/webcomment_templates.py:1280
+#: modules/webcomment/lib/webcomment_templates.py:1277
+#: modules/webcomment/lib/webcomment_templates.py:1282
 msgid "Suppress selected abuse report"
 msgstr "Izostavi označene izvještaje o zloupotrebi"
 
-#: modules/webcomment/lib/webcomment_templates.py:1279
+#: modules/webcomment/lib/webcomment_templates.py:1281
 msgid "Delete selected comments"
 msgstr "Briši označene komentare"
 
-#: modules/webcomment/lib/webcomment_templates.py:1288
+#: modules/webcomment/lib/webcomment_templates.py:1290
 msgid "OK"
 msgstr "OK"
 
-#: modules/webcomment/lib/webcomment_templates.py:1294
+#: modules/webcomment/lib/webcomment_templates.py:1296
 #, python-format
 msgid "Here are the reported reviews of user %s"
 msgstr "Ovdje su izvješća korisnika %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1296
+#: modules/webcomment/lib/webcomment_templates.py:1298
 #, python-format
 msgid "Here are the reported comments of user %s"
 msgstr "Ovdje su komentari korisnika %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1299
+#: modules/webcomment/lib/webcomment_templates.py:1301
 #, python-format
 msgid "Here is comment/review %s"
 msgstr "Ovdje je komentar/pregled %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1301
+#: modules/webcomment/lib/webcomment_templates.py:1303
 #, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
 msgstr "Ovdje je komentar/pregled koji je %(x_cmtID)s napisao/la %(x_user)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1306
+#: modules/webcomment/lib/webcomment_templates.py:1308
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "Sva prijavljena izvješća sortirana prema učastalosti prijave"
 
-#: modules/webcomment/lib/webcomment_templates.py:1308
+#: modules/webcomment/lib/webcomment_templates.py:1310
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "Svi prijavljeni komentari sortirani prema učastalosti prijave"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1335
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "comment ID"
 msgstr "ID komentara"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
+#: modules/webcomment/lib/webcomment_templates.py:1335
 msgid "successfully deleted"
 msgstr "uspješno izbrisano"
 
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "successfully suppressed abuse report"
 msgstr "uspješno onemogućeno izvještavanje o zloupotrebi"
 
-#: modules/webcomment/lib/webcomment_templates.py:1375
+#: modules/webcomment/lib/webcomment_templates.py:1377
 #, fuzzy
 msgid "Not yet reviewed"
 msgstr "Upiši svoje izvješće"
@@ -7243,8 +7243,8 @@ msgstr "Uredi postavke"
 #~ msgstr "ili kreiraj novu"
 
 #~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface"
+#~ "%(x_url_close)s."
 #~ msgstr ""
 #~ "Sada se možete vratiti na %(x_url_open)sadministracijsko sučelje"
 #~ "%(x_url_close)s."

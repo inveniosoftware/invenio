@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.7\n"
+"Project-Id-Version: CDS-Invenio 0.99.8\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2012-10-18 16:35+0200\n"
+"POT-Creation-Date: 2013-08-19 14:20+0200\n"
 "PO-Revision-Date: 2008-02-29 15:40+0100\n"
 "Last-Translator: Kam-ming Ku <kmku@hkusua.hku.hk>\n"
 "Language-Team: ZH_TW <cds.support@cern.ch>\n"
@@ -1412,8 +1412,8 @@ msgstr "行動"
 #: modules/bibedit/lib/bibedit_templates.py:154
 #: modules/bibedit/lib/bibedit_templates.py:170
 #: modules/bibedit/web/admin/bibeditadmin.py:74
-#: modules/webcomment/lib/webcomment_templates.py:598
-#: modules/webcomment/lib/webcomment_templates.py:1188
+#: modules/webcomment/lib/webcomment_templates.py:600
+#: modules/webcomment/lib/webcomment_templates.py:1190
 #: modules/websearch/lib/websearch_templates.py:482
 #: modules/websearch/lib/websearch_templates.py:484
 msgid "Record"
@@ -1520,10 +1520,10 @@ msgstr "您是否確定要刪除這筆紀錄？"
 #: modules/bibedit/lib/bibedit_templates.py:558
 #: modules/bibedit/lib/bibedit_templates.py:591
 #: modules/webbasket/lib/webbasket_templates.py:1241
-#: modules/webcomment/lib/webcomment_templates.py:207
-#: modules/webcomment/lib/webcomment_templates.py:469
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:209
+#: modules/webcomment/lib/webcomment_templates.py:471
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:509
 #: modules/websession/lib/websession_templates.py:1962
 #: modules/websession/lib/websession_templates.py:2001
@@ -1533,10 +1533,10 @@ msgstr "是"
 #: modules/bibedit/lib/bibedit_templates.py:559
 #: modules/bibedit/lib/bibedit_templates.py:592
 #: modules/webalert/lib/webalert_templates.py:318
-#: modules/webcomment/lib/webcomment_templates.py:208
-#: modules/webcomment/lib/webcomment_templates.py:471
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:210
+#: modules/webcomment/lib/webcomment_templates.py:473
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:510
 #: modules/websession/lib/websession_templates.py:1963
 #: modules/websession/lib/websession_templates.py:2002
@@ -1617,7 +1617,7 @@ msgstr "編輯記錄 %(x_recid)s, 欄位 %(x_field)s"
 #: modules/bibformat/lib/bibformat_templates.py:1886
 #: modules/bibformat/lib/bibformat_templates.py:2048
 #: modules/bibformat/lib/bibformat_templates.py:2116
-#: modules/webcomment/lib/webcomment_templates.py:1036
+#: modules/webcomment/lib/webcomment_templates.py:1038
 #: modules/webjournal/lib/webjournal_templates.py:165
 #: modules/webjournal/lib/webjournal_templates.py:503
 #: modules/webjournal/lib/webjournal_templates.py:642
@@ -3070,8 +3070,8 @@ msgid "Date"
 msgstr "日期"
 
 #: modules/webbasket/lib/webbasket_templates.py:774
-#: modules/webcomment/lib/webcomment_templates.py:444
-#: modules/webcomment/lib/webcomment_templates.py:454
+#: modules/webcomment/lib/webcomment_templates.py:446
+#: modules/webcomment/lib/webcomment_templates.py:456
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
@@ -3085,8 +3085,8 @@ msgstr "總共有 %i 意見"
 
 #: modules/webbasket/lib/webbasket_templates.py:777
 #: modules/webbasket/lib/webbasket_webinterface.py:218
-#: modules/webcomment/lib/webcomment_templates.py:90
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:92
+#: modules/webcomment/lib/webcomment_templates.py:576
 #: modules/websubmit/lib/websubmit_templates.py:2578
 msgid "Write a comment"
 msgstr "撰寫意見"
@@ -3106,7 +3106,7 @@ msgid "on"
 msgstr "在"
 
 #: modules/webbasket/lib/webbasket_templates.py:875
-#: modules/webcomment/lib/webcomment_templates.py:320
+#: modules/webcomment/lib/webcomment_templates.py:322
 #: modules/webmessage/lib/webmessage_templates.py:112
 msgid "Reply"
 msgstr "回復"
@@ -3124,10 +3124,10 @@ msgid "Add Comment"
 msgstr "新增評論"
 
 #: modules/webbasket/lib/webbasket_templates.py:932
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:807
-#: modules/webcomment/lib/webcomment_templates.py:1191
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:809
+#: modules/webcomment/lib/webcomment_templates.py:1193
+#: modules/webcomment/lib/webcomment_templates.py:1259
 #: modules/websubmit/lib/websubmit_templates.py:2631
 msgid "Comment"
 msgstr "意見"
@@ -3336,7 +3336,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "遊客是被禁止使用這功能。"
 
 #: modules/webbasket/lib/webbasket_templates.py:1546
-#: modules/webcomment/lib/webcomment_templates.py:599
+#: modules/webcomment/lib/webcomment_templates.py:601
 msgid "Back to search results"
 msgstr "返回檢索結果頁"
 
@@ -3378,156 +3378,156 @@ msgid "List of public baskets"
 msgstr "共享收藏籃列表"
 
 #: modules/webcomment/lib/webcomment.py:830
-#: modules/webcomment/lib/webcomment_templates.py:316
+#: modules/webcomment/lib/webcomment_templates.py:318
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
 msgstr "%(x_name)s 在 %(x_date)s 寫："
 
-#: modules/webcomment/lib/webcomment_templates.py:98
+#: modules/webcomment/lib/webcomment_templates.py:100
 #, python-format
 msgid "Showing the latest %i comments:"
 msgstr "顯示最後的 %i 意見："
 
-#: modules/webcomment/lib/webcomment_templates.py:114
-#: modules/webcomment/lib/webcomment_templates.py:139
+#: modules/webcomment/lib/webcomment_templates.py:116
+#: modules/webcomment/lib/webcomment_templates.py:141
 msgid "Discuss this document"
 msgstr "討論這評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:140
-#: modules/webcomment/lib/webcomment_templates.py:584
+#: modules/webcomment/lib/webcomment_templates.py:142
+#: modules/webcomment/lib/webcomment_templates.py:586
 msgid "Start a discussion about any aspect of this document."
 msgstr "討論這文件。"
 
-#: modules/webcomment/lib/webcomment_templates.py:156
+#: modules/webcomment/lib/webcomment_templates.py:158
 #, python-format
 msgid "Sorry, the record %s does not seem to exist."
 msgstr "對不起，記錄 %s 並不存在。"
 
-#: modules/webcomment/lib/webcomment_templates.py:158
+#: modules/webcomment/lib/webcomment_templates.py:160
 #, python-format
 msgid "Sorry, %s is not a valid ID value."
 msgstr "對不起，%s 不是一有效數值。"
 
-#: modules/webcomment/lib/webcomment_templates.py:160
+#: modules/webcomment/lib/webcomment_templates.py:162
 msgid "Sorry, no record ID was provided."
 msgstr "對不起，並沒有提供記錄ID。"
 
-#: modules/webcomment/lib/webcomment_templates.py:164
+#: modules/webcomment/lib/webcomment_templates.py:166
 #, python-format
 msgid "You may want to start browsing from %s"
 msgstr "您可以從%s開始瀏覽 "
 
-#: modules/webcomment/lib/webcomment_templates.py:232
-#: modules/webcomment/lib/webcomment_templates.py:506
+#: modules/webcomment/lib/webcomment_templates.py:234
+#: modules/webcomment/lib/webcomment_templates.py:508
 msgid "Was this review helpful?"
 msgstr "這評論有用嗎？"
 
-#: modules/webcomment/lib/webcomment_templates.py:241
-#: modules/webcomment/lib/webcomment_templates.py:278
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:243
+#: modules/webcomment/lib/webcomment_templates.py:280
+#: modules/webcomment/lib/webcomment_templates.py:576
 msgid "Write a review"
 msgstr "撰寫評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:248
-#: modules/webcomment/lib/webcomment_templates.py:562
-#: modules/webcomment/lib/webcomment_templates.py:1371
+#: modules/webcomment/lib/webcomment_templates.py:250
+#: modules/webcomment/lib/webcomment_templates.py:564
+#: modules/webcomment/lib/webcomment_templates.py:1373
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr "平均評論得分：%(x_nb_score)s 基於 %(x_nb_reviews)s 條評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:251
+#: modules/webcomment/lib/webcomment_templates.py:253
 #, python-format
 msgid "Readers found the following %s reviews to be most helpful."
 msgstr "讀者覺得以下 %s 評論是有用的。"
 
-#: modules/webcomment/lib/webcomment_templates.py:254
-#: modules/webcomment/lib/webcomment_templates.py:277
+#: modules/webcomment/lib/webcomment_templates.py:256
+#: modules/webcomment/lib/webcomment_templates.py:279
 #, python-format
 msgid "View all %s reviews"
 msgstr "閱讀全部%s評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:273
-#: modules/webcomment/lib/webcomment_templates.py:295
-#: modules/webcomment/lib/webcomment_templates.py:1412
+#: modules/webcomment/lib/webcomment_templates.py:275
+#: modules/webcomment/lib/webcomment_templates.py:297
+#: modules/webcomment/lib/webcomment_templates.py:1414
 msgid "Rate this document"
 msgstr "評價這文件"
 
-#: modules/webcomment/lib/webcomment_templates.py:296
-#: modules/webcomment/lib/webcomment_templates.py:586
+#: modules/webcomment/lib/webcomment_templates.py:298
+#: modules/webcomment/lib/webcomment_templates.py:588
 msgid "Be the first to review this document."
 msgstr "成為第一個讀者去評論這文件。"
 
-#: modules/webcomment/lib/webcomment_templates.py:324
-#: modules/webcomment/lib/webcomment_templates.py:366
-#: modules/webcomment/lib/webcomment_templates.py:507
+#: modules/webcomment/lib/webcomment_templates.py:326
+#: modules/webcomment/lib/webcomment_templates.py:368
+#: modules/webcomment/lib/webcomment_templates.py:509
 msgid "Report abuse"
 msgstr "舉報濫用"
 
-#: modules/webcomment/lib/webcomment_templates.py:361
+#: modules/webcomment/lib/webcomment_templates.py:363
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "%(x_nickname)s 在 %(x_date)s 評論這文件"
 
-#: modules/webcomment/lib/webcomment_templates.py:362
+#: modules/webcomment/lib/webcomment_templates.py:364
 #, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
 msgstr "%(x_nb_people)i/%(x_nb_total)i個讀者評價這評論是有用的"
 
-#: modules/webcomment/lib/webcomment_templates.py:445
-#: modules/webcomment/lib/webcomment_templates.py:455
+#: modules/webcomment/lib/webcomment_templates.py:447
+#: modules/webcomment/lib/webcomment_templates.py:457
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 msgid "Reviews"
 msgstr "評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:537
+#: modules/webcomment/lib/webcomment_templates.py:539
 msgid "Previous"
 msgstr "前一個"
 
-#: modules/webcomment/lib/webcomment_templates.py:553
+#: modules/webcomment/lib/webcomment_templates.py:555
 msgid "Next"
 msgstr "下一個"
 
-#: modules/webcomment/lib/webcomment_templates.py:577
+#: modules/webcomment/lib/webcomment_templates.py:579
 #, python-format
 msgid "There is a total of %s reviews"
 msgstr "總共有 %s 評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:579
+#: modules/webcomment/lib/webcomment_templates.py:581
 #, python-format
 msgid "There is a total of %s comments"
 msgstr "總共有 %s "
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "review"
 msgstr "評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "comment"
 msgstr "意見"
 
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:1259
 msgid "Review"
 msgstr "評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:662
+#: modules/webcomment/lib/webcomment_templates.py:664
 msgid "Viewing"
 msgstr "閱讀"
 
-#: modules/webcomment/lib/webcomment_templates.py:663
+#: modules/webcomment/lib/webcomment_templates.py:665
 msgid "Page:"
 msgstr "頁:"
 
-#: modules/webcomment/lib/webcomment_templates.py:784
+#: modules/webcomment/lib/webcomment_templates.py:786
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr "注意：您的諢號 - %s - 將會成顯示為文件的作者名稱。"
 
-#: modules/webcomment/lib/webcomment_templates.py:788
-#: modules/webcomment/lib/webcomment_templates.py:843
+#: modules/webcomment/lib/webcomment_templates.py:790
+#: modules/webcomment/lib/webcomment_templates.py:845
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -3536,237 +3536,237 @@ msgstr ""
 "注意：您並未%(x_url_open)s定義您的諢號%(x_url_close)s。%(x_nickname)s 是會成"
 "顯示為文件的作者名稱。"
 
-#: modules/webcomment/lib/webcomment_templates.py:806
-#: modules/webcomment/lib/webcomment_templates.py:899
+#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:901
 msgid "Article"
 msgstr "文章"
 
-#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:810
 #, fuzzy
 msgid "Add comment"
 msgstr "新增評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:838
+#: modules/webcomment/lib/webcomment_templates.py:840
 #, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr "您的諢號 - %s - 將會成顯示為評論的作者名稱。"
 
-#: modules/webcomment/lib/webcomment_templates.py:900
+#: modules/webcomment/lib/webcomment_templates.py:902
 msgid "Rate this article"
 msgstr "評價這文章"
 
-#: modules/webcomment/lib/webcomment_templates.py:901
+#: modules/webcomment/lib/webcomment_templates.py:903
 msgid "Select a score"
 msgstr "選擇評分"
 
-#: modules/webcomment/lib/webcomment_templates.py:902
+#: modules/webcomment/lib/webcomment_templates.py:904
 msgid "Give a title to your review"
 msgstr "輸入評論標題"
 
-#: modules/webcomment/lib/webcomment_templates.py:903
+#: modules/webcomment/lib/webcomment_templates.py:905
 msgid "Write your review"
 msgstr "撰寫評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:908
+#: modules/webcomment/lib/webcomment_templates.py:910
 #, fuzzy
 msgid "Add review"
 msgstr "新增評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:917
+#: modules/webcomment/lib/webcomment_templates.py:919
 #: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr "新增評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:938
+#: modules/webcomment/lib/webcomment_templates.py:940
 msgid "Your review was successfully added."
 msgstr "您的評論已被接受。"
 
-#: modules/webcomment/lib/webcomment_templates.py:940
+#: modules/webcomment/lib/webcomment_templates.py:942
 msgid "Your comment was successfully added."
 msgstr "您的意見已被接受。"
 
-#: modules/webcomment/lib/webcomment_templates.py:942
+#: modules/webcomment/lib/webcomment_templates.py:944
 msgid "Back to record"
 msgstr "返回記錄"
 
-#: modules/webcomment/lib/webcomment_templates.py:1019
+#: modules/webcomment/lib/webcomment_templates.py:1021
 #: modules/webcomment/web/admin/webcommentadmin.py:134
 msgid "View all reported comments"
 msgstr "閱讀所有意見"
 
-#: modules/webcomment/lib/webcomment_templates.py:1022
+#: modules/webcomment/lib/webcomment_templates.py:1024
 msgid "View all reported reviews"
 msgstr "閱讀所有評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:1028
+#: modules/webcomment/lib/webcomment_templates.py:1030
 msgid "Delete a specific comment/review (by ID)"
 msgstr "刪除某一意見/評論 (按照ID)"
 
-#: modules/webcomment/lib/webcomment_templates.py:1029
+#: modules/webcomment/lib/webcomment_templates.py:1031
 msgid "View all users who have been reported"
 msgstr "查閱全部曾給予意見/評論的用戶"
 
-#: modules/webcomment/lib/webcomment_templates.py:1031
+#: modules/webcomment/lib/webcomment_templates.py:1033
 msgid "Guide"
 msgstr "指南"
 
-#: modules/webcomment/lib/webcomment_templates.py:1033
+#: modules/webcomment/lib/webcomment_templates.py:1035
 msgid "Comments and reviews are disabled"
 msgstr "意見和評論已被禁止"
 
-#: modules/webcomment/lib/webcomment_templates.py:1051
+#: modules/webcomment/lib/webcomment_templates.py:1053
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
 msgstr "請輸入意見/評論ID以便查閱，之後您可以決定是否刪除它。"
 
-#: modules/webcomment/lib/webcomment_templates.py:1063
+#: modules/webcomment/lib/webcomment_templates.py:1065
 msgid "Comment ID:"
 msgstr "意見ID："
 
-#: modules/webcomment/lib/webcomment_templates.py:1065
+#: modules/webcomment/lib/webcomment_templates.py:1067
 msgid "View Comment"
 msgstr "查閱意見"
 
-#: modules/webcomment/lib/webcomment_templates.py:1086
+#: modules/webcomment/lib/webcomment_templates.py:1088
 msgid "There have been no reports so far."
 msgstr "沒有任何報告記錄。"
 
-#: modules/webcomment/lib/webcomment_templates.py:1090
+#: modules/webcomment/lib/webcomment_templates.py:1092
 #, python-format
 msgid "View all %s reported comments"
 msgstr "查閱全部 %s 意見"
 
-#: modules/webcomment/lib/webcomment_templates.py:1093
+#: modules/webcomment/lib/webcomment_templates.py:1095
 #, python-format
 msgid "View all %s reported reviews"
 msgstr "查閱全部 %s 評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:1130
+#: modules/webcomment/lib/webcomment_templates.py:1132
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
 msgstr "這名單列出全部曾提交意見或評論的用戶。"
 
-#: modules/webcomment/lib/webcomment_templates.py:1138
-#: modules/webcomment/lib/webcomment_templates.py:1167
+#: modules/webcomment/lib/webcomment_templates.py:1140
+#: modules/webcomment/lib/webcomment_templates.py:1169
 #: modules/websession/lib/websession_templates.py:162
 #: modules/websession/lib/websession_templates.py:969
 msgid "Nickname"
 msgstr "諢號"
 
-#: modules/webcomment/lib/webcomment_templates.py:1139
-#: modules/webcomment/lib/webcomment_templates.py:1171
+#: modules/webcomment/lib/webcomment_templates.py:1141
+#: modules/webcomment/lib/webcomment_templates.py:1173
 msgid "Email"
 msgstr "電郵"
 
-#: modules/webcomment/lib/webcomment_templates.py:1140
-#: modules/webcomment/lib/webcomment_templates.py:1169
+#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1171
 msgid "User ID"
 msgstr "用戶ID"
 
-#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1144
 msgid "Number positive votes"
 msgstr "正面的投票"
 
-#: modules/webcomment/lib/webcomment_templates.py:1143
+#: modules/webcomment/lib/webcomment_templates.py:1145
 msgid "Number negative votes"
 msgstr "負面的投票"
 
-#: modules/webcomment/lib/webcomment_templates.py:1144
+#: modules/webcomment/lib/webcomment_templates.py:1146
 msgid "Total number votes"
 msgstr "全部投票數目"
 
-#: modules/webcomment/lib/webcomment_templates.py:1145
+#: modules/webcomment/lib/webcomment_templates.py:1147
 msgid "Total number of reports"
 msgstr "報告數目"
 
-#: modules/webcomment/lib/webcomment_templates.py:1146
+#: modules/webcomment/lib/webcomment_templates.py:1148
 msgid "View all user's reported comments/reviews"
 msgstr "查閱全部用戶的意見和評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:1179
+#: modules/webcomment/lib/webcomment_templates.py:1181
 #, python-format
 msgid "This review has been reported %i times"
 msgstr "這評論已被報告了%i次"
 
-#: modules/webcomment/lib/webcomment_templates.py:1181
+#: modules/webcomment/lib/webcomment_templates.py:1183
 #, python-format
 msgid "This comment has been reported %i times"
 msgstr "這意見已被報告了%i次"
 
-#: modules/webcomment/lib/webcomment_templates.py:1258
+#: modules/webcomment/lib/webcomment_templates.py:1260
 msgid "Written by"
 msgstr "作者："
 
-#: modules/webcomment/lib/webcomment_templates.py:1259
+#: modules/webcomment/lib/webcomment_templates.py:1261
 msgid "General informations"
 msgstr "一般資料"
 
-#: modules/webcomment/lib/webcomment_templates.py:1260
+#: modules/webcomment/lib/webcomment_templates.py:1262
 msgid "Select"
 msgstr "選擇"
 
-#: modules/webcomment/lib/webcomment_templates.py:1274
+#: modules/webcomment/lib/webcomment_templates.py:1276
 msgid "Delete selected reviews"
 msgstr "刪除已選擇的評論"
 
-#: modules/webcomment/lib/webcomment_templates.py:1275
-#: modules/webcomment/lib/webcomment_templates.py:1280
+#: modules/webcomment/lib/webcomment_templates.py:1277
+#: modules/webcomment/lib/webcomment_templates.py:1282
 msgid "Suppress selected abuse report"
 msgstr "查禁已選擇的濫用報告"
 
-#: modules/webcomment/lib/webcomment_templates.py:1279
+#: modules/webcomment/lib/webcomment_templates.py:1281
 msgid "Delete selected comments"
 msgstr "刪除已選擇的意見"
 
-#: modules/webcomment/lib/webcomment_templates.py:1288
+#: modules/webcomment/lib/webcomment_templates.py:1290
 msgid "OK"
 msgstr "是"
 
-#: modules/webcomment/lib/webcomment_templates.py:1294
+#: modules/webcomment/lib/webcomment_templates.py:1296
 #, python-format
 msgid "Here are the reported reviews of user %s"
 msgstr "用戶 %s 的評論："
 
-#: modules/webcomment/lib/webcomment_templates.py:1296
+#: modules/webcomment/lib/webcomment_templates.py:1298
 #, python-format
 msgid "Here are the reported comments of user %s"
 msgstr "用戶 %s 的意見："
 
-#: modules/webcomment/lib/webcomment_templates.py:1299
+#: modules/webcomment/lib/webcomment_templates.py:1301
 #, python-format
 msgid "Here is comment/review %s"
 msgstr "評論/意見 %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1301
+#: modules/webcomment/lib/webcomment_templates.py:1303
 #, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
 msgstr "用戶 %(x_user)s 的評論/意見 %(x_cmtID)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1306
+#: modules/webcomment/lib/webcomment_templates.py:1308
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "全部評論 (以最多提供評論者排序)"
 
-#: modules/webcomment/lib/webcomment_templates.py:1308
+#: modules/webcomment/lib/webcomment_templates.py:1310
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "全部意見 (以最多提供意見者排序)"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1335
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "comment ID"
 msgstr "意見ID"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
+#: modules/webcomment/lib/webcomment_templates.py:1335
 msgid "successfully deleted"
 msgstr "成功刪除"
 
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "successfully suppressed abuse report"
 msgstr "成功查禁濫用報告"
 
-#: modules/webcomment/lib/webcomment_templates.py:1375
+#: modules/webcomment/lib/webcomment_templates.py:1377
 #, fuzzy
 msgid "Not yet reviewed"
 msgstr "撰寫評論"
@@ -7084,8 +7084,8 @@ msgstr "修改設定"
 #~ msgstr "或創建"
 
 #~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface"
+#~ "%(x_url_close)s."
 #~ msgstr "返回%(x_url_open)sBibEdit 管理介面%(x_url_close)s。"
 
 #, fuzzy

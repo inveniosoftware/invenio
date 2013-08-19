@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.7\n"
+"Project-Id-Version: CDS-Invenio 0.99.8\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2012-10-18 16:35+0200\n"
+"POT-Creation-Date: 2013-08-19 14:20+0200\n"
 "PO-Revision-Date: 2008-07-10 13:37+0200\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
@@ -1405,8 +1405,8 @@ msgstr "Action"
 #: modules/bibedit/lib/bibedit_templates.py:154
 #: modules/bibedit/lib/bibedit_templates.py:170
 #: modules/bibedit/web/admin/bibeditadmin.py:74
-#: modules/webcomment/lib/webcomment_templates.py:598
-#: modules/webcomment/lib/webcomment_templates.py:1188
+#: modules/webcomment/lib/webcomment_templates.py:600
+#: modules/webcomment/lib/webcomment_templates.py:1190
 #: modules/websearch/lib/websearch_templates.py:482
 #: modules/websearch/lib/websearch_templates.py:484
 msgid "Record"
@@ -1515,10 +1515,10 @@ msgstr "Voulez-vous vraiment supprimer cette notice?"
 #: modules/bibedit/lib/bibedit_templates.py:558
 #: modules/bibedit/lib/bibedit_templates.py:591
 #: modules/webbasket/lib/webbasket_templates.py:1241
-#: modules/webcomment/lib/webcomment_templates.py:207
-#: modules/webcomment/lib/webcomment_templates.py:469
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:209
+#: modules/webcomment/lib/webcomment_templates.py:471
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:509
 #: modules/websession/lib/websession_templates.py:1962
 #: modules/websession/lib/websession_templates.py:2001
@@ -1528,10 +1528,10 @@ msgstr "Oui"
 #: modules/bibedit/lib/bibedit_templates.py:559
 #: modules/bibedit/lib/bibedit_templates.py:592
 #: modules/webalert/lib/webalert_templates.py:318
-#: modules/webcomment/lib/webcomment_templates.py:208
-#: modules/webcomment/lib/webcomment_templates.py:471
-#: modules/webcomment/lib/webcomment_templates.py:1325
-#: modules/webcomment/lib/webcomment_templates.py:1350
+#: modules/webcomment/lib/webcomment_templates.py:210
+#: modules/webcomment/lib/webcomment_templates.py:473
+#: modules/webcomment/lib/webcomment_templates.py:1327
+#: modules/webcomment/lib/webcomment_templates.py:1352
 #: modules/webmessage/lib/webmessage_templates.py:510
 #: modules/websession/lib/websession_templates.py:1963
 #: modules/websession/lib/websession_templates.py:2002
@@ -1616,7 +1616,7 @@ msgstr "Édition de la notice #%(recid)s, révision %(revdate)s"
 #: modules/bibformat/lib/bibformat_templates.py:1886
 #: modules/bibformat/lib/bibformat_templates.py:2048
 #: modules/bibformat/lib/bibformat_templates.py:2116
-#: modules/webcomment/lib/webcomment_templates.py:1036
+#: modules/webcomment/lib/webcomment_templates.py:1038
 #: modules/webjournal/lib/webjournal_templates.py:165
 #: modules/webjournal/lib/webjournal_templates.py:503
 #: modules/webjournal/lib/webjournal_templates.py:642
@@ -3072,8 +3072,8 @@ msgid "Date"
 msgstr "Date"
 
 #: modules/webbasket/lib/webbasket_templates.py:774
-#: modules/webcomment/lib/webcomment_templates.py:444
-#: modules/webcomment/lib/webcomment_templates.py:454
+#: modules/webcomment/lib/webcomment_templates.py:446
+#: modules/webcomment/lib/webcomment_templates.py:456
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 #: modules/websubmit/lib/websubmit_templates.py:2576
@@ -3087,8 +3087,8 @@ msgstr "Il y a un total de %i commentaires"
 
 #: modules/webbasket/lib/webbasket_templates.py:777
 #: modules/webbasket/lib/webbasket_webinterface.py:218
-#: modules/webcomment/lib/webcomment_templates.py:90
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:92
+#: modules/webcomment/lib/webcomment_templates.py:576
 #: modules/websubmit/lib/websubmit_templates.py:2578
 msgid "Write a comment"
 msgstr "Écrire un commentaire"
@@ -3108,7 +3108,7 @@ msgid "on"
 msgstr "sur"
 
 #: modules/webbasket/lib/webbasket_templates.py:875
-#: modules/webcomment/lib/webcomment_templates.py:320
+#: modules/webcomment/lib/webcomment_templates.py:322
 #: modules/webmessage/lib/webmessage_templates.py:112
 msgid "Reply"
 msgstr "Répondre"
@@ -3126,10 +3126,10 @@ msgid "Add Comment"
 msgstr "Ajouter un commentaire"
 
 #: modules/webbasket/lib/webbasket_templates.py:932
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:807
-#: modules/webcomment/lib/webcomment_templates.py:1191
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:809
+#: modules/webcomment/lib/webcomment_templates.py:1193
+#: modules/webcomment/lib/webcomment_templates.py:1259
 #: modules/websubmit/lib/websubmit_templates.py:2631
 msgid "Comment"
 msgstr "Commentaire"
@@ -3342,7 +3342,7 @@ msgid "This functionality is forbidden to guest users."
 msgstr "Cette fonctionnalité est indisponible pour les invités."
 
 #: modules/webbasket/lib/webbasket_templates.py:1546
-#: modules/webcomment/lib/webcomment_templates.py:599
+#: modules/webcomment/lib/webcomment_templates.py:601
 msgid "Back to search results"
 msgstr "Retour aux résultats de recherche"
 
@@ -3384,160 +3384,160 @@ msgid "List of public baskets"
 msgstr "Liste des paniers publics"
 
 #: modules/webcomment/lib/webcomment.py:830
-#: modules/webcomment/lib/webcomment_templates.py:316
+#: modules/webcomment/lib/webcomment_templates.py:318
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
 msgstr "%(x_name)s a écrit le %(x_date)s:"
 
-#: modules/webcomment/lib/webcomment_templates.py:98
+#: modules/webcomment/lib/webcomment_templates.py:100
 #, python-format
 msgid "Showing the latest %i comments:"
 msgstr "Affichage des derniers %i commentaires:"
 
-#: modules/webcomment/lib/webcomment_templates.py:114
-#: modules/webcomment/lib/webcomment_templates.py:139
+#: modules/webcomment/lib/webcomment_templates.py:116
+#: modules/webcomment/lib/webcomment_templates.py:141
 msgid "Discuss this document"
 msgstr "Discuter ce document"
 
-#: modules/webcomment/lib/webcomment_templates.py:140
-#: modules/webcomment/lib/webcomment_templates.py:584
+#: modules/webcomment/lib/webcomment_templates.py:142
+#: modules/webcomment/lib/webcomment_templates.py:586
 msgid "Start a discussion about any aspect of this document."
 msgstr "Commencer la discussion sur n'importe quel aspect de ce document."
 
-#: modules/webcomment/lib/webcomment_templates.py:156
+#: modules/webcomment/lib/webcomment_templates.py:158
 #, python-format
 msgid "Sorry, the record %s does not seem to exist."
 msgstr "Désolé, la notice %s n'existe pas."
 
-#: modules/webcomment/lib/webcomment_templates.py:158
+#: modules/webcomment/lib/webcomment_templates.py:160
 #, python-format
 msgid "Sorry, %s is not a valid ID value."
 msgstr "Désolé, %s n'est pas un identifiant valide."
 
-#: modules/webcomment/lib/webcomment_templates.py:160
+#: modules/webcomment/lib/webcomment_templates.py:162
 msgid "Sorry, no record ID was provided."
 msgstr "Désolé, aucun identifiant de notice n'a été fourni."
 
-#: modules/webcomment/lib/webcomment_templates.py:164
+#: modules/webcomment/lib/webcomment_templates.py:166
 #, python-format
 msgid "You may want to start browsing from %s"
 msgstr "Vous pouvez recommencer à chercher depuis %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:232
-#: modules/webcomment/lib/webcomment_templates.py:506
+#: modules/webcomment/lib/webcomment_templates.py:234
+#: modules/webcomment/lib/webcomment_templates.py:508
 msgid "Was this review helpful?"
 msgstr "Est-ce que cette évaluation a été utile?"
 
-#: modules/webcomment/lib/webcomment_templates.py:241
-#: modules/webcomment/lib/webcomment_templates.py:278
-#: modules/webcomment/lib/webcomment_templates.py:574
+#: modules/webcomment/lib/webcomment_templates.py:243
+#: modules/webcomment/lib/webcomment_templates.py:280
+#: modules/webcomment/lib/webcomment_templates.py:576
 msgid "Write a review"
 msgstr "Écrire une évaluation"
 
-#: modules/webcomment/lib/webcomment_templates.py:248
-#: modules/webcomment/lib/webcomment_templates.py:562
-#: modules/webcomment/lib/webcomment_templates.py:1371
+#: modules/webcomment/lib/webcomment_templates.py:250
+#: modules/webcomment/lib/webcomment_templates.py:564
+#: modules/webcomment/lib/webcomment_templates.py:1373
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
 msgstr "Note moyenne: %(x_nb_score)s basée sur %(x_nb_reviews)s évaluations"
 
-#: modules/webcomment/lib/webcomment_templates.py:251
+#: modules/webcomment/lib/webcomment_templates.py:253
 #, python-format
 msgid "Readers found the following %s reviews to be most helpful."
 msgstr "Les lecteurs ont trouvé les %s évaluations suivantes les plus utiles."
 
-#: modules/webcomment/lib/webcomment_templates.py:254
-#: modules/webcomment/lib/webcomment_templates.py:277
+#: modules/webcomment/lib/webcomment_templates.py:256
+#: modules/webcomment/lib/webcomment_templates.py:279
 #, python-format
 msgid "View all %s reviews"
 msgstr "Visualiser toutes les %s évaluations"
 
-#: modules/webcomment/lib/webcomment_templates.py:273
-#: modules/webcomment/lib/webcomment_templates.py:295
-#: modules/webcomment/lib/webcomment_templates.py:1412
+#: modules/webcomment/lib/webcomment_templates.py:275
+#: modules/webcomment/lib/webcomment_templates.py:297
+#: modules/webcomment/lib/webcomment_templates.py:1414
 msgid "Rate this document"
 msgstr "Évaluer ce document"
 
-#: modules/webcomment/lib/webcomment_templates.py:296
-#: modules/webcomment/lib/webcomment_templates.py:586
+#: modules/webcomment/lib/webcomment_templates.py:298
+#: modules/webcomment/lib/webcomment_templates.py:588
 msgid "Be the first to review this document."
 msgstr "Soyez le premier à évaluer ce document."
 
-#: modules/webcomment/lib/webcomment_templates.py:324
-#: modules/webcomment/lib/webcomment_templates.py:366
-#: modules/webcomment/lib/webcomment_templates.py:507
+#: modules/webcomment/lib/webcomment_templates.py:326
+#: modules/webcomment/lib/webcomment_templates.py:368
+#: modules/webcomment/lib/webcomment_templates.py:509
 msgid "Report abuse"
 msgstr "Signaler un abus"
 
-#: modules/webcomment/lib/webcomment_templates.py:361
+#: modules/webcomment/lib/webcomment_templates.py:363
 #, python-format
 msgid "Reviewed by %(x_nickname)s on %(x_date)s"
 msgstr "Évalué par %(x_nickname)s le %(x_date)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:362
+#: modules/webcomment/lib/webcomment_templates.py:364
 #, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
 msgstr ""
 "%(x_nb_people)i sur %(x_nb_total)i utilisateurs ont trouvé cette évaluation "
 "utile"
 
-#: modules/webcomment/lib/webcomment_templates.py:445
-#: modules/webcomment/lib/webcomment_templates.py:455
+#: modules/webcomment/lib/webcomment_templates.py:447
+#: modules/webcomment/lib/webcomment_templates.py:457
 #: modules/webcomment/lib/webcomment_webinterface.py:162
 #: modules/webcomment/lib/webcomment_webinterface.py:251
 msgid "Reviews"
 msgstr "Évaluations"
 
-#: modules/webcomment/lib/webcomment_templates.py:537
+#: modules/webcomment/lib/webcomment_templates.py:539
 msgid "Previous"
 msgstr "Précédent"
 
-#: modules/webcomment/lib/webcomment_templates.py:553
+#: modules/webcomment/lib/webcomment_templates.py:555
 msgid "Next"
 msgstr "Suivant"
 
-#: modules/webcomment/lib/webcomment_templates.py:577
+#: modules/webcomment/lib/webcomment_templates.py:579
 #, python-format
 msgid "There is a total of %s reviews"
 msgstr "Il y a un total de %s évaluations"
 
-#: modules/webcomment/lib/webcomment_templates.py:579
+#: modules/webcomment/lib/webcomment_templates.py:581
 #, python-format
 msgid "There is a total of %s comments"
 msgstr "Il y a un total de %s commentaires"
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "review"
 msgstr "évaluation"
 
-#: modules/webcomment/lib/webcomment_templates.py:605
-#: modules/webcomment/lib/webcomment_templates.py:664
+#: modules/webcomment/lib/webcomment_templates.py:607
+#: modules/webcomment/lib/webcomment_templates.py:666
 msgid "comment"
 msgstr "commentaire"
 
-#: modules/webcomment/lib/webcomment_templates.py:606
-#: modules/webcomment/lib/webcomment_templates.py:1257
+#: modules/webcomment/lib/webcomment_templates.py:608
+#: modules/webcomment/lib/webcomment_templates.py:1259
 msgid "Review"
 msgstr "Évaluation"
 
-#: modules/webcomment/lib/webcomment_templates.py:662
+#: modules/webcomment/lib/webcomment_templates.py:664
 msgid "Viewing"
 msgstr "Affichage"
 
-#: modules/webcomment/lib/webcomment_templates.py:663
+#: modules/webcomment/lib/webcomment_templates.py:665
 msgid "Page:"
 msgstr "Page:"
 
-#: modules/webcomment/lib/webcomment_templates.py:784
+#: modules/webcomment/lib/webcomment_templates.py:786
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr ""
 "Note: Votre pseudonyme, %s, sera affiché en temps qu'auteur de ce "
 "commentaire "
 
-#: modules/webcomment/lib/webcomment_templates.py:788
-#: modules/webcomment/lib/webcomment_templates.py:843
+#: modules/webcomment/lib/webcomment_templates.py:790
+#: modules/webcomment/lib/webcomment_templates.py:845
 #, python-format
 msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
@@ -3546,16 +3546,16 @@ msgstr ""
 "Note: Vous n'avez pas %(x_url_open)sdéfini de pseudonyme%(x_url_close)s. "
 "%(x_nickname)s sera affiché en temps qu'auteur de ce commentaire."
 
-#: modules/webcomment/lib/webcomment_templates.py:806
-#: modules/webcomment/lib/webcomment_templates.py:899
+#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:901
 msgid "Article"
 msgstr "Article"
 
-#: modules/webcomment/lib/webcomment_templates.py:808
+#: modules/webcomment/lib/webcomment_templates.py:810
 msgid "Add comment"
 msgstr "Ajouter un commentaire"
 
-#: modules/webcomment/lib/webcomment_templates.py:838
+#: modules/webcomment/lib/webcomment_templates.py:840
 #, python-format
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
@@ -3563,69 +3563,69 @@ msgstr ""
 "Note: Votre pseudonyme, %s, sera affiché en temps qu'auteur de cette "
 "évaluation."
 
-#: modules/webcomment/lib/webcomment_templates.py:900
+#: modules/webcomment/lib/webcomment_templates.py:902
 msgid "Rate this article"
 msgstr "Évaluer ce document"
 
-#: modules/webcomment/lib/webcomment_templates.py:901
+#: modules/webcomment/lib/webcomment_templates.py:903
 msgid "Select a score"
 msgstr "Choisir une note"
 
-#: modules/webcomment/lib/webcomment_templates.py:902
+#: modules/webcomment/lib/webcomment_templates.py:904
 msgid "Give a title to your review"
 msgstr "Donner un titre à cette évaluation"
 
-#: modules/webcomment/lib/webcomment_templates.py:903
+#: modules/webcomment/lib/webcomment_templates.py:905
 msgid "Write your review"
 msgstr "Ecrire votre évaluation"
 
-#: modules/webcomment/lib/webcomment_templates.py:908
+#: modules/webcomment/lib/webcomment_templates.py:910
 msgid "Add review"
 msgstr "Ajouter une évaluation"
 
-#: modules/webcomment/lib/webcomment_templates.py:917
+#: modules/webcomment/lib/webcomment_templates.py:919
 #: modules/webcomment/lib/webcomment_webinterface.py:295
 msgid "Add Review"
 msgstr "Ajouter une évaluation"
 
-#: modules/webcomment/lib/webcomment_templates.py:938
+#: modules/webcomment/lib/webcomment_templates.py:940
 msgid "Your review was successfully added."
 msgstr "Votre évaluation à été ajoutée."
 
-#: modules/webcomment/lib/webcomment_templates.py:940
+#: modules/webcomment/lib/webcomment_templates.py:942
 msgid "Your comment was successfully added."
 msgstr "Votre commentaire à été ajouté."
 
-#: modules/webcomment/lib/webcomment_templates.py:942
+#: modules/webcomment/lib/webcomment_templates.py:944
 msgid "Back to record"
 msgstr "Revenir à la notice"
 
-#: modules/webcomment/lib/webcomment_templates.py:1019
+#: modules/webcomment/lib/webcomment_templates.py:1021
 #: modules/webcomment/web/admin/webcommentadmin.py:134
 msgid "View all reported comments"
 msgstr "Voir tous les commentaires signalés"
 
-#: modules/webcomment/lib/webcomment_templates.py:1022
+#: modules/webcomment/lib/webcomment_templates.py:1024
 msgid "View all reported reviews"
 msgstr "Voir toutes les évaluations signalées"
 
-#: modules/webcomment/lib/webcomment_templates.py:1028
+#: modules/webcomment/lib/webcomment_templates.py:1030
 msgid "Delete a specific comment/review (by ID)"
 msgstr "Supprimer un/une commentaire/évaluation (par identifiant)"
 
-#: modules/webcomment/lib/webcomment_templates.py:1029
+#: modules/webcomment/lib/webcomment_templates.py:1031
 msgid "View all users who have been reported"
 msgstr "Voir tous les utilisateurs qui ont été signalés"
 
-#: modules/webcomment/lib/webcomment_templates.py:1031
+#: modules/webcomment/lib/webcomment_templates.py:1033
 msgid "Guide"
 msgstr "Guide"
 
-#: modules/webcomment/lib/webcomment_templates.py:1033
+#: modules/webcomment/lib/webcomment_templates.py:1035
 msgid "Comments and reviews are disabled"
 msgstr "Les commentaires et évaluations sont désactivés"
 
-#: modules/webcomment/lib/webcomment_templates.py:1051
+#: modules/webcomment/lib/webcomment_templates.py:1053
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
@@ -3633,29 +3633,29 @@ msgstr ""
 "Veuillez entrer l'identifiant du commentaire ou de l'évaluation pour le voir "
 "avant de le supprimer"
 
-#: modules/webcomment/lib/webcomment_templates.py:1063
+#: modules/webcomment/lib/webcomment_templates.py:1065
 msgid "Comment ID:"
 msgstr "Identifiant du commentaire:"
 
-#: modules/webcomment/lib/webcomment_templates.py:1065
+#: modules/webcomment/lib/webcomment_templates.py:1067
 msgid "View Comment"
 msgstr "Afficher le commentaire"
 
-#: modules/webcomment/lib/webcomment_templates.py:1086
+#: modules/webcomment/lib/webcomment_templates.py:1088
 msgid "There have been no reports so far."
 msgstr "Aucun commentaire n'a, jusqu'à maintenant, été signalé."
 
-#: modules/webcomment/lib/webcomment_templates.py:1090
+#: modules/webcomment/lib/webcomment_templates.py:1092
 #, python-format
 msgid "View all %s reported comments"
 msgstr "Afficher tous les %s commentaires signalés"
 
-#: modules/webcomment/lib/webcomment_templates.py:1093
+#: modules/webcomment/lib/webcomment_templates.py:1095
 #, python-format
 msgid "View all %s reported reviews"
 msgstr "Afficher toutes les %s évaluations signalées"
 
-#: modules/webcomment/lib/webcomment_templates.py:1130
+#: modules/webcomment/lib/webcomment_templates.py:1132
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
@@ -3663,124 +3663,124 @@ msgstr ""
 "Liste des utilisateurs ayant été signalés au moins une fois. Cette liste est "
 "triée par nombre de signalement d'abus."
 
-#: modules/webcomment/lib/webcomment_templates.py:1138
-#: modules/webcomment/lib/webcomment_templates.py:1167
+#: modules/webcomment/lib/webcomment_templates.py:1140
+#: modules/webcomment/lib/webcomment_templates.py:1169
 #: modules/websession/lib/websession_templates.py:162
 #: modules/websession/lib/websession_templates.py:969
 msgid "Nickname"
 msgstr "Pseudonyme"
 
-#: modules/webcomment/lib/webcomment_templates.py:1139
-#: modules/webcomment/lib/webcomment_templates.py:1171
+#: modules/webcomment/lib/webcomment_templates.py:1141
+#: modules/webcomment/lib/webcomment_templates.py:1173
 msgid "Email"
 msgstr "Email"
 
-#: modules/webcomment/lib/webcomment_templates.py:1140
-#: modules/webcomment/lib/webcomment_templates.py:1169
+#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1171
 msgid "User ID"
 msgstr "Identifiant d'utilisateur"
 
-#: modules/webcomment/lib/webcomment_templates.py:1142
+#: modules/webcomment/lib/webcomment_templates.py:1144
 msgid "Number positive votes"
 msgstr "Nombre de votes positifs"
 
-#: modules/webcomment/lib/webcomment_templates.py:1143
+#: modules/webcomment/lib/webcomment_templates.py:1145
 msgid "Number negative votes"
 msgstr "Nombre de votes négatifs"
 
-#: modules/webcomment/lib/webcomment_templates.py:1144
+#: modules/webcomment/lib/webcomment_templates.py:1146
 msgid "Total number votes"
 msgstr "Nombre total de votes"
 
-#: modules/webcomment/lib/webcomment_templates.py:1145
+#: modules/webcomment/lib/webcomment_templates.py:1147
 msgid "Total number of reports"
 msgstr "Nombre total de signalements"
 
-#: modules/webcomment/lib/webcomment_templates.py:1146
+#: modules/webcomment/lib/webcomment_templates.py:1148
 msgid "View all user's reported comments/reviews"
 msgstr "Afficher tous les commentaires/évaluations signalés de cet utilisateur"
 
-#: modules/webcomment/lib/webcomment_templates.py:1179
+#: modules/webcomment/lib/webcomment_templates.py:1181
 #, python-format
 msgid "This review has been reported %i times"
 msgstr "Cette évaluation a été signalée %i fois"
 
-#: modules/webcomment/lib/webcomment_templates.py:1181
+#: modules/webcomment/lib/webcomment_templates.py:1183
 #, python-format
 msgid "This comment has been reported %i times"
 msgstr "Ce commentaire a été signalé %i fois"
 
-#: modules/webcomment/lib/webcomment_templates.py:1258
+#: modules/webcomment/lib/webcomment_templates.py:1260
 msgid "Written by"
 msgstr "Écrit par"
 
-#: modules/webcomment/lib/webcomment_templates.py:1259
+#: modules/webcomment/lib/webcomment_templates.py:1261
 msgid "General informations"
 msgstr "Informations générales"
 
-#: modules/webcomment/lib/webcomment_templates.py:1260
+#: modules/webcomment/lib/webcomment_templates.py:1262
 msgid "Select"
 msgstr "Choisir"
 
-#: modules/webcomment/lib/webcomment_templates.py:1274
+#: modules/webcomment/lib/webcomment_templates.py:1276
 msgid "Delete selected reviews"
 msgstr "Effacer les évaluations sélectionnées"
 
-#: modules/webcomment/lib/webcomment_templates.py:1275
-#: modules/webcomment/lib/webcomment_templates.py:1280
+#: modules/webcomment/lib/webcomment_templates.py:1277
+#: modules/webcomment/lib/webcomment_templates.py:1282
 msgid "Suppress selected abuse report"
 msgstr "Supprimer les signalements d'abus sélectionnés"
 
-#: modules/webcomment/lib/webcomment_templates.py:1279
+#: modules/webcomment/lib/webcomment_templates.py:1281
 msgid "Delete selected comments"
 msgstr "Effacer les commentaires sélectionnés"
 
-#: modules/webcomment/lib/webcomment_templates.py:1288
+#: modules/webcomment/lib/webcomment_templates.py:1290
 msgid "OK"
 msgstr "OK"
 
-#: modules/webcomment/lib/webcomment_templates.py:1294
+#: modules/webcomment/lib/webcomment_templates.py:1296
 #, python-format
 msgid "Here are the reported reviews of user %s"
 msgstr "Évaluations signalées de l'utilisateur %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1296
+#: modules/webcomment/lib/webcomment_templates.py:1298
 #, python-format
 msgid "Here are the reported comments of user %s"
 msgstr "Commentaires signalés de l'utilisateur %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1299
+#: modules/webcomment/lib/webcomment_templates.py:1301
 #, python-format
 msgid "Here is comment/review %s"
 msgstr "Commentaire/Évaluation %s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1301
+#: modules/webcomment/lib/webcomment_templates.py:1303
 #, python-format
 msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
 msgstr "Commentaire/Évaluation %(x_cmtID)s écrit par l'utilisateur %(x_user)s"
 
-#: modules/webcomment/lib/webcomment_templates.py:1306
+#: modules/webcomment/lib/webcomment_templates.py:1308
 msgid "Here are all reported reviews sorted by the most reported"
 msgstr "Toutes les évaluations signalées triées par ordre décroissant"
 
-#: modules/webcomment/lib/webcomment_templates.py:1308
+#: modules/webcomment/lib/webcomment_templates.py:1310
 msgid "Here are all reported comments sorted by the most reported"
 msgstr "Tous les commentaires signalés triés par ordre décroissant"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1335
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "comment ID"
 msgstr "Identifiant du commentaire"
 
-#: modules/webcomment/lib/webcomment_templates.py:1333
+#: modules/webcomment/lib/webcomment_templates.py:1335
 msgid "successfully deleted"
 msgstr "supprimé"
 
-#: modules/webcomment/lib/webcomment_templates.py:1358
+#: modules/webcomment/lib/webcomment_templates.py:1360
 msgid "successfully suppressed abuse report"
 msgstr "signalement d'abus supprimé"
 
-#: modules/webcomment/lib/webcomment_templates.py:1375
+#: modules/webcomment/lib/webcomment_templates.py:1377
 msgid "Not yet reviewed"
 msgstr "Pas encore évalué"
 
@@ -5530,8 +5530,8 @@ msgid ""
 "(%(x_nb_admin)i)."
 msgstr ""
 "Vous pouvez consulter la liste des %(x_url_open)s%(x_nb_total)i groupes"
-"%(x_url_close)s dont vous êtes membre (%(x_nb_member)i) ou administrateur"
-"(%(x_nb_admin)i)."
+"%(x_url_close)s dont vous êtes membre (%(x_nb_member)i) ou "
+"administrateur(%(x_nb_admin)i)."
 
 #: modules/websession/lib/webuser.py:153
 msgid "Database problem"
@@ -7246,8 +7246,8 @@ msgstr "Modifier les réglages"
 #~ msgstr "ou en créer un nouveau"
 
 #~ msgid ""
-#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
-#~ "s."
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface"
+#~ "%(x_url_close)s."
 #~ msgstr ""
 #~ "Vous pouvez retoruner à %(x_url_open)sl'interface d'administration de "
 #~ "BibEdit%(x_url_close)s."
