@@ -32,9 +32,6 @@ The CERN development team currently consists of:
  - Ludmila Marian <ludmila.marian@gmail.com>
      Citerank family of ranking methods.  Fixes to numerous modules.
 
- - Chris Montarbaud <christiane.montarbaud@cern.ch>
-     Multimedia and photo management.
-
  - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
      Improvements to the BibCirculation module.
 
@@ -42,7 +39,8 @@ The CERN development team currently consists of:
      Contributions to the Italian translation.
 
  - Jiri Kuncar <jiri.kuncar@cern.ch>
-     Contributions to the Czech translation.
+     Fix for demo site installation.  Contributions to the Czech
+     translation.
 
  - Jan Aage Lavik <jan.age.lavik@cern.ch>
      Improvements to BibMatch with remote matching capabilities,
@@ -60,7 +58,8 @@ The CERN development team currently consists of:
      baskets.
 
  - Alessio Deiana <alessio.deiana@cern.ch>
-     Improvements to data cacher and cite summary.
+     Fix for BibFormat element initialisation.  Improvements to data
+     cacher and cite summary.
 
  - Annette Holtkamp <annette.holtkamp@cern.ch>
      Updates to `Howto MARC' guide.
@@ -98,6 +97,9 @@ Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Chris Montarbaud <christiane.montarbaud@cern.ch>
+     Multimedia and photo management.
 
  - Joe Blaylock <jrbl@slac.stanford.edu>
      Rewrite of SPIRES query syntax parser, support for nested
