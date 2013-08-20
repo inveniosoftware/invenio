@@ -57,16 +57,38 @@ def solr_add_ranges(id_ranges):
     # This allows the ranker to return better results during long indexing
     # runs as the ranker cuts the hitset using latest records
     id_ranges_to_index.reverse()
+    next_commit_counter = 0
     for id_range_to_index in id_ranges_to_index:
         lower_recid = id_range_to_index[0]
         upper_recid = id_range_to_index[1]
         status_msg = "Solr ranking indexer called for %s-%s" % (lower_recid, upper_recid)
         write_message(status_msg)
         task_update_progress(status_msg)
-        solr_add_range(lower_recid, upper_recid, tags_to_index)
+        next_commit_counter = solr_add_range(lower_recid, upper_recid, tags_to_index, next_commit_counter)
+
+    solr_commit_if_necessary(next_commit_counter, final_commit=True)
 
 
-def solr_add_range(lower_recid, upper_recid, tags_to_index):
+def solr_commit_if_necessary(next_commit_counter, final_commit=False, recid=None):
+    # Counter full or final commit if counter set
+    if next_commit_counter == task_get_option("flush") - 1 or (final_commit and next_commit_counter > 0):
+        recid_info = ''
+        if recid:
+            recid_info = ' for recid=%s' % recid
+        status_msg = 'Solr ranking indexer COMMITTING' + recid_info
+        write_message(status_msg)
+        task_update_progress(status_msg)
+
+        SOLR_CONNECTION.commit()
+        next_commit_counter = 0
+
+        task_sleep_now_if_required(can_stop_too=True)
+    else:
+        next_commit_counter = next_commit_counter + 1
+    return next_commit_counter
+
+
+def solr_add_range(lower_recid, upper_recid, tags_to_index, next_commit_counter):
     """
     Adds the regarding field values of all records from the lower recid to the upper one to Solr.
     It preserves the fulltext information.
@@ -84,9 +106,9 @@ def solr_add_range(lower_recid, upper_recid, tags_to_index):
                 fulltext    = ''
 
             solr_add(recid, abstract, author, fulltext, keyword, title)
+            next_commit_counter = solr_commit_if_necessary(next_commit_counter,recid=recid)
 
-    SOLR_CONNECTION.commit()
-    task_sleep_now_if_required(can_stop_too=True)
+    return next_commit_counter
 
 
 def solr_add(recid, abstract, author, fulltext, keyword, title):
