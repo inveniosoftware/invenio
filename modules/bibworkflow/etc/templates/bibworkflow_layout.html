@@ -11,8 +11,8 @@
                         {% endif %}>
                         Running workflows
                     </a></li>
-                    <li><a href="{{ url_for('bibworkflow.workflows') }}"
-                    {% if request.path == url_for('bibworkflow.workflows') %}
+                    <li><a href="{{ url_for('bibworkflow.show_workflows') }}"
+                    {% if request.path == url_for('bibworkflow.show_workflows') %}
                         class="active"
                     {% endif %}>
                         Defined workflows

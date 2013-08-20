@@ -38,7 +38,7 @@ pylib_DATA = bibworkflow_admin_blueprint.py \
 			 bibworkflow_hp_field_widgets.py \
 			 bibworkflow_hp_load_widgets.py \
 			 bibworkflow_model.py \
-			 bibworkflow_unit_tests.py \
+			 bibworkflow_regression_tests.py \
 			 bibworkflow_utils.py \
 			 bibworkflow_worker_engine.py \
 			 bibworkflow_load_workflows.py \

@@ -22,17 +22,13 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 from flask import render_template
-from pprint import pformat
 from invenio.bibworkflow_model import Workflow, BibWorkflowObject
 from invenio.bibworkflow_api import start_delayed
-import os
-from invenio.pluginutils import PluginContainer
-from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
+from invenio.bibworkflow_load_workflows import loaded_workflows, workflows
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.bibworkflow_utils import (get_workflow_definition,
                                        get_redis_keys as utils_get_redis_keys,
                                        filter_holdingpen_results)
-from flask import jsonify
 
 import traceback
 
@@ -90,13 +86,8 @@ def workflow_details(id_workflow):
 @blueprint.route('/workflows', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_templated('bibworkflow_workflows.html')
-def workflows():
-    loaded_workflows = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                       'bibworkflow_workflows', '*.py'))
-    open(os.path.join(CFG_LOGDIR, 'broken-bibworkflow-workflows.log'), 'w').\
-        write(pformat(loaded_workflows.get_broken_plugins()))
-
-    return dict(workflows=loaded_workflows.get_enabled_plugins(),
+def show_workflows():
+    return dict(workflows=workflows,
                 broken_workflows=loaded_workflows.get_broken_plugins())
 
 
@@ -132,6 +123,7 @@ def get_redis_keys(key):
         options += "<option>%s</option>" % (key,)
     return options
 
+
 @blueprint.route('/get_redis_values', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
 @blueprint.invenio_wash_urlargd({'key': (unicode, "")})
@@ -140,6 +132,7 @@ def get_redis_values(key):
     print keys
     values = filter_holdingpen_results(*keys)
     return str(values)
+
 
 def _entry_data_preview(data, of='default'):
     if format == 'hd' or format == 'xm':

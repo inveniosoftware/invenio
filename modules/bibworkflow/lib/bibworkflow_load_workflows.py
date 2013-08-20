@@ -26,11 +26,30 @@ from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
 from invenio.pluginutils import PluginContainer
 
 
-workflows = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                         '*_workflows', '*.py'))
+def plugin_builder(plugin_name, plugin_code):
+    if plugin_name == '__init__':
+        return
+
+    plugin_candidate = getattr(plugin_code, plugin_name, None)
+    if plugin_candidate is None:
+        all_plugins = getattr(plugin_code, '__all__')
+        for name in all_plugins:
+            candidate = getattr(plugin_code, name)
+            return candidate
+    else:
+        return plugin_candidate
+
+loaded_workflows = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
+                                   '*_workflows', '*.py'),
+                                   plugin_builder=plugin_builder)
+
+workflows = {}
+for workflow in loaded_workflows.values():
+    if workflow is not None:
+        workflows[workflow.__name__] = workflow
 
 # Let's report about broken plugins
 open(os.path.join(CFG_LOGDIR, 'broken-workflows.log'), 'w').write(
-    pformat(workflows.get_broken_plugins()))
+    pformat(loaded_workflows.get_broken_plugins()))
 
 __all__ = ['workflows']

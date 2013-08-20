@@ -21,7 +21,7 @@ BibWorkflow Unit tests - functions to test workflows
 """
 
 from invenio.inveniomanage import db
-from invenio.testutils import (make_flask_test_suite,
+from invenio.testutils import (make_test_suite,
                                run_test_suite,
                                FlaskSQLAlchemyTest)
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION
@@ -501,7 +501,7 @@ distances from it.
             self.assertEqual(final_object.get_data(), final_data)
 
 
-TEST_SUITE = make_flask_test_suite(TestWorkflowStart)
+TEST_SUITE = make_test_suite(TestWorkflowStart)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

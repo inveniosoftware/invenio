@@ -67,7 +67,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                                        module_name=module_name, uuid=uuid)
                 self._create_db_obj()
 
-        self.set_workflow_by_name(self.name)
+        self.set_workflow_by_name(name)
         self.set_extra_data_params(**kwargs)
 
     def log_info(self, message, error_msg=""):
