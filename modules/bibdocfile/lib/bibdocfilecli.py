@@ -579,13 +579,31 @@ def print_info(docid, info):
     """Nicely print info about a docid."""
     print '%i:%s' % (docid, info)
 
+def retry_mkstemp(suffix, prefix, directory, max_retries=3):
+    for retry_count in range(1, max_retries + 1):
+        try:
+            tmp_file_fd, tmp_file_name = mkstemp(suffix=suffix,
+                                                 prefix=prefix,
+                                                 dir=directory)
+        except OSError, e:
+            if e.errno == 19 and retry_count <= max_retries:
+                # AFS Glitch?
+                time.sleep(30)
+            else:
+                raise
+        else:
+            break
+    return tmp_file_fd, tmp_file_name
+
 def bibupload_ffts(ffts, append=False, do_debug=False, interactive=True):
     """Given an ffts dictionary it creates the xml and submit it."""
     xml = ffts_to_xml(ffts)
     if xml:
         if interactive:
             print xml
-        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPSHAREDDIR)
+        tmp_file_fd, tmp_file_name = retry_mkstemp(suffix='.xml',
+                                                   prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"),
+                                                   directory=CFG_TMPSHAREDDIR)
         os.write(tmp_file_fd, xml)
         os.close(tmp_file_fd)
         os.chmod(tmp_file_name, 0644)
