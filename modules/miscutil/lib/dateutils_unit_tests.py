@@ -212,6 +212,68 @@ class ParseRuntimeLimitTest(InvenioTestCase):
         result = dateutils.parse_runtime_limit(limit)
         self.assertEqual(expected, result)
 
+    def test_parse_runtime_limit_days_only(self):
+        """dateutils - parse runtime using just inside a week range"""
+        limit = 'Mon-Fri'
+        now = datetime.datetime(year=2000, month=1, day=3)
+        present_from = now
+        present_to = now + datetime.timedelta(days=1)
+        future_from = present_from + datetime.timedelta(days=1)
+        future_to = present_to + datetime.timedelta(days=1)
+        expected = (
+            (present_from, present_to),
+            (future_from, future_to),
+        )
+        result = dateutils.parse_runtime_limit(limit, now=now)
+        self.assertEqual(expected, result)
+
+    def test_parse_runtime_limit_days_only_2(self):
+        """dateutils - parse runtime using just outside week range"""
+        limit = 'Mon-Fri'
+        now = datetime.datetime(year=2000, month=1, day=1)
+        present_from = now + datetime.timedelta(days=2)
+        present_to = now + datetime.timedelta(days=3)
+        future_from = present_from + datetime.timedelta(days=1)
+        future_to = present_to + datetime.timedelta(days=1)
+        expected = (
+            (present_from, present_to),
+            (future_from, future_to),
+        )
+        result = dateutils.parse_runtime_limit(limit, now=now)
+        self.assertEqual(expected, result)
+
+    def test_parse_runtime_limit_days_only_3(self):
+        """dateutils - parse runtime using just at the end of a week range"""
+        limit = 'Mon-Fri'
+        now = datetime.datetime(year=2000, month=1, day=7)
+        present_from = now
+        present_to = now + datetime.timedelta(days=1)
+        future_from = now + datetime.timedelta(days=3)
+        future_to = now + datetime.timedelta(days=4)
+        expected = (
+            (present_from, present_to),
+            (future_from, future_to),
+        )
+        result = dateutils.parse_runtime_limit(limit, now=now)
+        self.assertEqual(expected, result)
+
+    def test_parse_runtime_limit_days_times(self):
+        """dateutils - parse runtime using just a week range"""
+        limit = 'Mon-Fri 06:00-18:00'
+        now = datetime.datetime(year=2000, month=1, day=3)
+        day = now.date()
+        t = now.time()
+        present_from = datetime.datetime.combine(day, t.replace(hour=6))
+        present_to = datetime.datetime.combine(day, t.replace(hour=18))
+        future_from = present_from + datetime.timedelta(days=1)
+        future_to = present_to + datetime.timedelta(days=1)
+        expected = (
+            (present_from, present_to),
+            (future_from, future_to),
+        )
+        result = dateutils.parse_runtime_limit(limit, now=now)
+        self.assertEqual(expected, result)
+
 class STRFTimeTest(InvenioTestCase):
     """
     Testing support of datest before 1900 for function strftime

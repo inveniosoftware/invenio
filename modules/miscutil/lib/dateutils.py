@@ -317,9 +317,9 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG
     out += "</select>\n"
     return out
 
-_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?", re.I)
+_RE_RUNTIMELIMIT_FULL = re.compile(r"(?:(?P<weekday_begin>[a-z]+)(?:-(?P<weekday_end>[a-z]+))?)?\s*((?P<hour_begin>\d\d?(:\d\d?)?)(-(?P<hour_end>\d\d?(:\d\d?)?))?)?", re.I)
 _RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hours>\d\d?)(:(?P<minutes>\d\d?))?')
-def parse_runtime_limit(value):
+def parse_runtime_limit(value, now=None):
     """
     Parsing CLI option for runtime limit, supplied as VALUE.
     Value could be something like: Sunday 23:00-05:00, the format being
@@ -347,30 +347,50 @@ def parse_runtime_limit(value):
         except KeyError:
             raise ValueError("%s is not a good weekday name." % value)
 
-    today = date.today()
+    if now is None:
+        now = datetime.now()
+
+    today = now.date()
     g = _RE_RUNTIMELIMIT_FULL.search(value)
     if not g:
         raise ValueError('"%s" does not seem to be correct format for parse_runtime_limit() [Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value)
     pieces = g.groupdict()
 
-    if pieces['weekday'] is None:
-        ## No weekday specified. So either today or tomorrow
+    if pieces['weekday_begin'] is None:
+        # No weekday specified. So either today or tomorrow
         first_occasion_day = timedelta(days=0)
         next_occasion_delta = timedelta(days=1)
     else:
-        ## Weekday specified. So either this week or next
-        weekday = extract_weekday(pieces['weekday'])
-        days = (weekday - today.weekday()) % 7
-        first_occasion_day = timedelta(days=days)
-        next_occasion_delta = timedelta(days=7)
+        # If given 'Mon' then we transform it to 'Mon-Mon'
+        if pieces['weekday_end'] is None:
+            pieces['weekday_end'] = pieces['weekday_begin']
 
-    if pieces['begin'] is None:
-        pieces['begin'] = '00:00'
-    if pieces['end'] is None:
-        pieces['end'] = '00:00'
+        # Day range
+        weekday_begin = extract_weekday(pieces['weekday_begin'])
+        weekday_end = extract_weekday(pieces['weekday_end'])
 
-    beginning_time = extract_time(pieces['begin'])
-    ending_time = extract_time(pieces['end'])
+        if weekday_begin <= today.weekday() <= weekday_end:
+            first_occasion_day = timedelta(days=0)
+        else:
+            days = (weekday_begin - today.weekday()) % 7
+            first_occasion_day = timedelta(days=days)
+
+        weekday = (now + first_occasion_day).weekday()
+        if weekday < weekday_end:
+            # Fits in the same week
+            next_occasion_delta = timedelta(days=1)
+        else:
+            # The week after
+            days = weekday_begin - weekday + 7
+            next_occasion_delta = timedelta(days=days)
+
+    if pieces['hour_begin'] is None:
+        pieces['hour_begin'] = '00:00'
+    if pieces['hour_end'] is None:
+        pieces['hour_end'] = '00:00'
+
+    beginning_time = extract_time(pieces['hour_begin'])
+    ending_time = extract_time(pieces['hour_end'])
 
     if not ending_time:
         ending_time = beginning_time + timedelta(days=1)
@@ -382,7 +402,7 @@ def parse_runtime_limit(value):
         start_time + first_occasion_day + beginning_time,
         start_time + first_occasion_day + ending_time
     )
-    if datetime.now() > current_range[1]:
+    if now > current_range[1]:
         current_range = tuple(t + next_occasion_delta for t in current_range)
 
     future_range = (
