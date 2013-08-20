@@ -542,7 +542,7 @@
 
    <field name="abstract" type="invenioText" indexed="true" stored="true" multiValued="false" termVectors="true"/>
    <field name="author" type="invenioText" indexed="true" stored="true" multiValued="false" termVectors="true"/>
-   <field name="fulltext" type="invenioText" indexed="true" stored="true" multiValued="false" termVectors="true"/>
+   <field name="fulltext" type="invenioText" indexed="true" stored="true" multiValued="false" termVectors="true" termPositions="true" termOffsets="true"/>
    <field name="keyword" type="invenioText" indexed="true" stored="true" multiValued="false" termVectors="true"/>
    <field name="title" type="invenioText" indexed="true" stored="true" multiValued="false" termVectors="true"/>
 

@@ -89,8 +89,12 @@ def solr_get_snippet(keywords, recid, nb_chars, max_snippets, field='fulltext',
 
     res = SOLR_CONNECTION.query(q=' '.join(query_parts), fq='id:(%s)' % recid, fields=['fulltext'],
                                           highlight=True, hl_fragsize=nb_chars, hl_snippets=max_snippets,
+                                          # backward-compatible to simple highlighter
                                           hl_simple_pre=prefix_tag, hl_simple_post=suffix_tag,
-                                          hl_mergeContiguous='true')
+                                          # faster highlighter
+                                          hl_tag_pre=prefix_tag, hl_tag_post=suffix_tag,
+                                          hl_mergeContiguous='true',
+                                          hl_useFastVectorHighlighter='true')
 
     out = ''
     try:
