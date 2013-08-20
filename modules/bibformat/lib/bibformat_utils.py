@@ -613,7 +613,7 @@ def get_pdf_snippets(recID, patterns, user_info):
             break # stop at the first good PDF textable file
 
     nb_chars = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.get('', 0)
-    max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.get('', 0)
+    max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS.get('', 0)
     if CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.has_key(text_path_courtesy):
         nb_chars=CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS[text_path_courtesy]
     if CFG_WEBSEARCH_FULLTEXT_SNIPPETS.has_key(text_path_courtesy):
