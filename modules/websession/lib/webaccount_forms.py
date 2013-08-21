@@ -21,9 +21,10 @@
 
 from invenio.webinterface_handler_flask_utils import _
 from invenio.wtforms_utils import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
-from flask.ext.wtf import Form, SubmitField, BooleanField, TextField, \
-    TextAreaField, PasswordField, Required, \
-    HiddenField,  validators
+from flask.ext.wtf import Form, Required, validators
+from wtforms.fields import SubmitField, BooleanField, TextField, \
+    TextAreaField, PasswordField, \
+    HiddenField
 from invenio.websession_model import User
 from invenio.webuser import email_valid_p, nickname_valid_p
 from sqlalchemy.exc import SQLAlchemyError
