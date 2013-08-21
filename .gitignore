@@ -81,6 +81,7 @@ modules/webstat/bin/webstatadmin
 modules/webstyle/bin/webdoc
 modules/websubmit/bin/bibdocfile
 modules/websubmit/bin/inveniounoconv
+modules/websubmit/bin/websubmitadmin
 tags
 config.status.lineno
 configure.lineno

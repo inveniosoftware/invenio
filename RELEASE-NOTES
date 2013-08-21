@@ -145,6 +145,7 @@ Please proceed as follows:
      $ make check-upgrade
      $ sudo -u www-data make install
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
+         --exclude invenio-autotools.conf \
          --exclude bibformat/format_templates/Default_HTML_brief.bft \
          /opt/invenio/etc/
        # Note: if you are upgrading from previous stable release
