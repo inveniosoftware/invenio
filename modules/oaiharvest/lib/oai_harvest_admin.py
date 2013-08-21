@@ -1042,7 +1042,7 @@ def launch_harvesting_task_for_id(oai_src_id, record_id, uid=None, send_email=Fa
     Launches a oaiharvest BibTask to download (and post-process) given id.
     """
     oai_src = get_oai_src_by_id(oai_src_id)[0]
-    params = ["-r", oai_src['name'], "-i", record_id]
+    params = ["-r", oai_src['name'], "-i", record_id, "-P", "4"]
     if uid:
         # get_user_info -> (uid, nickname, display_name)
         user = get_user_info(uid)[1]
