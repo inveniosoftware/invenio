@@ -83,6 +83,7 @@ modules/webstyle/bin/gotoadmin
 modules/webstyle/bin/webdoc
 modules/websubmit/bin/bibdocfile
 modules/websubmit/bin/inveniounoconv
+modules/websubmit/bin/websubmitadmin
 modules/bibcirculation/bin/bibcircd
 tags
 config.status.lineno
