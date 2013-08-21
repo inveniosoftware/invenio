@@ -69,6 +69,9 @@ try:
     import magic
     if hasattr(magic, "open"):
         CFG_HAS_MAGIC = 1
+        if not hasattr(magic, "MAGIC_MIME_TYPE"):
+            ## Patching RHEL6/CentOS6 version
+            magic.MAGIC_MIME_TYPE = 16
     elif hasattr(magic, "Magic"):
         CFG_HAS_MAGIC = 2
 except ImportError:
