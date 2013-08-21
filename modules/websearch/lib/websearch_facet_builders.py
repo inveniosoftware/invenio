@@ -27,7 +27,7 @@ from invenio.websearch_cache import search_results_cache, \
                                     get_search_results_cache_key_from_qid
 from invenio.intbitset import intbitset
 from invenio.config import CFG_WEBSEARCH_SEARCH_CACHE_TIMEOUT, CFG_PYLIBDIR
-from invenio.pluginutils import PluginContainer
+from invenio.importutils import autodiscover_modules
 from invenio.webuser_flask import current_user
 from invenio.websearch_model import Collection
 from invenio.search_engine import search_pattern, \
@@ -98,15 +98,15 @@ def faceted_results_filter(recids, filter_data, facets):
     return output
 
 
-def _facet_plugin_builder(plugin_name, plugin_code):
+def _facet_plugin_checker(plugin_code):
     """
-    Handy function to bridge pluginutils with (Invenio) facets.
+    Handy function to bridge importutils with (Invenio) facets.
     """
     if 'facet' in dir(plugin_code):
         candidate = getattr(plugin_code, 'facet')
         if isinstance(candidate, FacetBuilder):
             return candidate
-    raise ValueError('%s is not a valid facet plugin' % plugin_name)
+    raise ValueError('%s is not a valid facet plugin' % plugin_code.__name__)
 
 
 class FacetLoader(object):
@@ -114,14 +114,14 @@ class FacetLoader(object):
     @cached_property
     def plugins(self):
         """Loaded facet plugins."""
-        return PluginContainer(os.path.join(
-            CFG_PYLIBDIR, 'invenio', 'websearch_facets', 'facet_*.py'),
-            plugin_builder=_facet_plugin_builder)
+        return map(_facet_plugin_checker,
+                   autodiscover_modules(['invenio.websearch_facets'],
+                                        'facet_.+\.py'))
 
     @cached_property
     def elements(self):
         """Dict with `FacetBuilder` instances accesible by facet name."""
-        return dict((f.name, f) for f in self.plugins.values())
+        return dict((f.name, f) for f in self.plugins)
 
     def __getitem__(self, key):
         return self.elements[key]

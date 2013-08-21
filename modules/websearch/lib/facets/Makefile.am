@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 pylibdir=$(libdir)/python/invenio/websearch_facets
 
-pylib_DATA = facet_collection.py facet_author.py facet_year.py
+pylib_DATA = __init__.py facet_*.py
 
 EXTRA_DIST = $(pylib_DATA)
 
