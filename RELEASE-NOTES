@@ -74,6 +74,7 @@ If you are upgrading from Invenio v1.0.4, then:
      $ sudo -u www-data make install
      $ sudo -u www-data /opt/invenio/bin/inveniocfg --update-all
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
+         --exclude invenio-autotools.conf \
          --exclude bibformat/format_templates/Default_HTML_brief.bft \
          /opt/invenio/etc/
 
