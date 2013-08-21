@@ -298,7 +298,7 @@ class JournalRelated(unittest.TestCase):
     def test_get_journal_article_cache_path(self):
         """webjournal - returns the path to cache file of the articles of a given issue"""
         info = wju.get_journal_article_cache_path('AtlantisTimes', '03/2009')
-        path = CFG_PREFIX + '/var/cache/webjournal/AtlantisTimes/03_2009_articles_cache.dat'
+        path = CFG_PREFIX + '/var/cache/webjournal/AtlantisTimes/2009/03/articles_cache.dat'
         self.assertEqual(info, path)
 
     def test_get_journal_id(self):

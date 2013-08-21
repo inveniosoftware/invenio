@@ -32,9 +32,6 @@ The CERN development team currently consists of:
  - Ludmila Marian <ludmila.marian@gmail.com>
      Citerank family of ranking methods.  Fixes to numerous modules.
 
- - Chris Montarbaud <christiane.montarbaud@cern.ch>
-     Multimedia and photo management.
-
  - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
      Improvements to the BibCirculation module.
 
@@ -42,7 +39,8 @@ The CERN development team currently consists of:
      Contributions to the Italian translation.
 
  - Jiri Kuncar <jiri.kuncar@cern.ch>
-     Contributions to the Czech translation.
+     Fix for demo site installation.  Contributions to the Czech
+     translation.
 
  - Esteban J. G. Gabancho <esteban.jose.garcia.gabancho@cern.ch>
      Initial release of WebApiKey, enhancements for WebSubmit.
@@ -58,9 +56,8 @@ The CERN development team currently consists of:
      Errorlib refactoring, improvements to search UI, discussion tab,
      merged record redirect, adaptation to new web test framework.
 
- - Vasanth Venkatraman <vasanth.venkatraman@cern.ch>
-     Improvements to BibUpload version treatment, monotask and
-     sequence tasks for BibSched.
+ - Grzegorz Szpura <grzegorz.szpura@cern.ch>
+     Better browsing of fuzzy indexes.
 
  - Thorsten Schwander <thorsten.schwander@gmail.com>
      Improvements to dbdump.
@@ -82,10 +79,12 @@ The CERN development team currently consists of:
      items to baskets.
 
  - Alessio Deiana <alessio.deiana@cern.ch>
-     Improvements to data cacher and cite summary.
+     Fix for BibFormat element initialisation.  Improvements to data
+     cacher and cite summary.
 
- - Daniel Stanculescu <daniel.stanculescu@cern.ch>
-     Improvements to Unicode treatment for textutils.
+ - Wojciech Ziolek <wojciech.ziolek@cern.ch>
+     Fixes for OAI holding pen facility, Strftime improvements for
+     dateutils.
 
  - Sebastian Witowski <sebastian.witowski@cern.ch>
      Improvements to multi-record editor.
@@ -128,18 +127,23 @@ currently consists of:
  - Roman Chyla <roman.chyla@cern.ch>
      WSGI handler accepts UTF-8 strings.
 
-The Cornell development team currently consists of:
-
- - Simeon Warner <simeon.warner@cornell.edu>
-     Team leader.
-
- - Peter Halliday <phalliday@cornell.edu>
-     Configurable /record URL name space, improvements to dbquery.
-
 Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project since 2002.  In an approximately decreasing chronological
 order:
+
+ - Daniel Stanculescu <daniel.stanculescu@cern.ch>
+     Improvements to Unicode treatment for textutils.
+
+ - Vasanth Venkatraman <vasanth.venkatraman@cern.ch>
+     Improvements to BibUpload version treatment, monotask and
+     sequence tasks for BibSched.
+
+ - Peter Halliday <phalliday@cornell.edu>
+     Configurable /record URL name space, improvements to dbquery.
+
+ - Chris Montarbaud <christiane.montarbaud@cern.ch>
+     Multimedia and photo management.
 
  - Joe Blaylock <jrbl@slac.stanford.edu>
      Rewrite of SPIRES query syntax parser, support for nested

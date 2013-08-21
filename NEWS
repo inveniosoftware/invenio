@@ -6,6 +6,161 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.1.2 -- released 2013-08-19
+-------------------------------------
+
+ *) BibAuthorID: fix in name comparisons (#1313 #1314); improvements
+    and fixes; improvements, fixes and optimizations; UI and backend
+    improvements
+
+ *) BibCatalog: removal of print statement (#1337)
+
+ *) BibClassify: escape keywords in tag cloud and MARCXML
+
+ *) BibDocFile: better JS washing in web UI; display file upload
+    progress (#1020 #1021); display "Restricted" label correctly
+    (#1299); fix check-md5 with bibdocfsinfo cache (#1249); fix
+    check-md5 with bibdocfsinfo cache (#1249); fix error in calling
+    register_download (#1311); handling of exceptions in Md5Folder
+    (#1060); revert md5 property patch (#1249); support new magic
+    library (#1207)
+
+ *) BibEncode: minor fix in process_batch_job()
+
+ *) BibFormat: additional fulltext file display in HB (#1219); checks
+    for bibformat bin; fix CLI call to old PHP-based formatter; fixes
+    unit tests (#1320); fix for fulltext file format; fix snippets for
+    phrase queries (#1201); format_element initialisation fix; passing
+    of user_info for Excel format; replacement of CDS Invenio by
+    Invenio; setUp/tearDown in unit tests (#1319); skip hidden icons
+    in OpenGraph image tag
+
+ *) BibIndex: better wording for stemming in admin UI; replacement of
+    CDS Invenio by Invenio; synonym indexing speed up (#1484); use
+    human friendly index name (#1329)
+
+ *) BibKnowledge: /kb/export 500 error fix; optional memoisation of
+    KBR lookups (#1484)
+
+ *) BibMerge: delete cache file on submit
+
+ *) BibSched: bibupload max_priority check; bugfix for high-priority
+    monotasks; increases size of monitor columns;
+    parse_runtime_limit() fix (#1432); parse_runtime_limit() tests fix
+    (#1432)
+
+ *) BibUpload: FMT regression test case fix (#1152); indicators in
+    strong tags (#939)
+
+ *) CKEditor: updated to version 3.6.6
+
+ *) dateutils: strftime improvement (#1065); strptime for Python-2.4
+    compatibility
+
+ *) errorlib: hiding bibcatalog info in exception body
+
+ *) global: test suite nosification
+
+ *) htmlutils: fix single quote escaping; improve js string escaping;
+    MathJax 2.1 (#1050)
+
+ *) I18N: updates to Catalan and Spanish translations
+
+ *) installation: fix collectiondetailedrecordpagetabs (#1496); fix
+    for jQuery hotkeys add-on URL (#1507); fix for MathJax OS X
+    install issue (#1455); support for Apache-2.4 (#1552)
+
+ *) inveniocfg: tests runner file closure fix (#1327)
+
+ *) InvenioConnector: fix for CDS authentication; mechanize dependency
+
+ *) inveniogc: consider journal cache subdirs
+
+ *) memoiseutils: initial release
+
+ *) OAIHarvest: fix path for temporary authorlists; holding-pen UI
+    bugfixes (#1401)
+
+ *) OAIRepository: CFG_OAI_REPOSITORY_MARCXML_SIZE; no bibupload -n
+
+ *) RefExtract: replacement of CDS Invenio by Invenio
+
+ *) WebAccess: fix variable parsing in robot auth (#1456); IP-based
+    rules and offline user fix (#1233); replacement of CDS Invenio by
+    InveniO
+
+ *) WebApiKey: renames unit tests to regression tests (#1324)
+
+ *) WebAuthorProfile: fix XSS vulnerability
+
+ *) WebComment: escape review "title"; escape review "title"
+
+ *) WebSearch: 410 HTTP code for deleted records; advanced search
+    notification if no hits; better cleaning of word patterns; fix
+    infinite synonym lookup cases (#804); handles "find feb 12"
+    (#948); nicer browsing of fuzzy indexes (#1348); respect default
+    `rg` in Advanced Search; SPIRES date math search fixes (#431
+    #948); SPIRES invalid date search fix (#1467); tweaks SPIRES
+    two-digit search; unit test disabling for CFG_CERN_SITE; unit test
+    update (#1326)
+
+ *) WebSession: fix for list of admin activities (#1444); login_method
+    changes; unit vs regression test suite cleanup
+
+ *) WebStat: use CFG_JOURNAL_TAG instead of 773/909C4 (#546)
+
+ *) WebSubmit: new websubmitadmin CLI (#1334); replacement of CDS
+
+Invenio v1.0.5 -- released 2013-08-19
+-------------------------------------
+
+ *) BibClassify: escape keywords in tag cloud and MARCXML
+
+ *) BibDocFile: support new magic library
+
+ *) BibFormat: additional fulltext file display in HB; fix CLI call to
+    old PHP-based formatter; format_element initialisation fix
+
+ *) BibIndex: better wording for stemming in admin UI
+
+ *) BibKnowledge: /kb/export 500 error fix
+
+ *) BibUpload: FMT regression test case fix; indicators in strong tags
+
+ *) errorlib: hiding bibcatalog info in exception body
+
+ *) global: test suite nosification
+
+ *) installation: fix collectiondetailedrecordpagetabs; support for
+    Apache-2.4
+
+ *) WebAccess: IP-based rules and offline user fix; replacement of CDS
+    Invenio by InveniO
+
+ *) WebComment: escape review "title"
+
+ *) WebSearch: respect default `rg` in Advanced Search
+
+ *) WebSession: fix for list of admin activities; login_method changes
+
+ *) WebSubmit: new websubmitadmin CLI
+
+CDS Invenio v0.99.8 -- released 2013-08-19
+------------------------------------------
+
+ *) escape keywords in tag cloud and MARCXML (BibClassify)
+
+ *) fix CLI call to old PHP-based formatter; fix format_element
+    initialisation (BibFormat)
+
+ *) better wording for stemming in admin UI (BibIndex)
+
+ *) IP-based rules and offline user fix (WebAccess)
+
+ *) escape review "title" (WebComment)
+
+ *) fix collectiondetailedrecordpagetabs (installation)
+
 Invenio v1.1.1 -- released 2012-12-21
 -------------------------------------
 
