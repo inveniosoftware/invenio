@@ -39,7 +39,7 @@ from invenio.xapianutils_bibindex_indexer import xapian_add
 from invenio.bibdocfile import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, download_url, \
      BibRecDocs
-from invenio.bibindexadminlib import get_idx_indexer
+from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibtask import write_message
 from invenio.errorlib import register_exception
 from invenio.intbitset import intbitset

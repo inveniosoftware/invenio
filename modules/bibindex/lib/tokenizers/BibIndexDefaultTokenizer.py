@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """BibIndexDefaultTokenizer: useful for almost all indexes.
    It performs standard tokenization. It splits phrases into words/pairs or doesnt split at all, strips accents,
-   removes alphanumeric characters and html and latex markup if we want to. Also can stem words for a given language.   
+   removes alphanumeric characters and html and latex markup if we want to. Also can stem words for a given language.
 """
 
 from invenio.bibindex_engine_config import \

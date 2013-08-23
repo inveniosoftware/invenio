@@ -1775,6 +1775,12 @@ CREATE TABLE IF NOT EXISTS idxINDEX_field (
 
 -- this comment line here is just to fix the SQL display mode in Emacs '
 
+CREATE TABLE IF NOT EXISTS idxINDEX_idxINDEX (
+  id_virtual mediumint(9) unsigned NOT NULL,
+  id_normal mediumint(9) unsigned NOT NULL,
+  PRIMARY KEY (id_virtual,id_normal)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxWORD01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(50) default NULL,
@@ -2075,6 +2081,7 @@ CREATE TABLE IF NOT EXISTS idxWORD20R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+
 CREATE TABLE IF NOT EXISTS idxWORD21F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(50) default NULL,
@@ -2144,6 +2151,21 @@ CREATE TABLE IF NOT EXISTS idxWORD25F (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxWORD25R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD26F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD26R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -2525,6 +2547,21 @@ CREATE TABLE IF NOT EXISTS idxPAIR25R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPAIR26F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR26R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2825,6 +2862,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE20R (
   PRIMARY KEY (id_bibrec,type)
 ) ENGINE=MyISAM;
 
+
 CREATE TABLE IF NOT EXISTS idxPHRASE21F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2894,6 +2932,21 @@ CREATE TABLE IF NOT EXISTS idxPHRASE25F (
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE25R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE26F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) ENGINE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE26R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -4618,5 +4671,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_crcLIBRARY_ty
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_new_index_filetype',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_delete_recjson_cache',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_hstRECORD_affected_fields',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_25_virtual_indexes',NOW());
 
 -- end of file

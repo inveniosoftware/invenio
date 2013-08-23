@@ -4475,7 +4475,7 @@ class WebSearchSynonymQueryTest(unittest.TestCase):
                                                expected_text="[52, 59]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2+decay&of=id',
-                                               expected_text="[52, 59]"))
+                                               expected_text="[59]"))
 
     def test_journal_beta_title(self):
         """websearch - index-time synonym search, beta in title"""
@@ -4493,7 +4493,7 @@ class WebSearchSynonymQueryTest(unittest.TestCase):
                                                expected_text="[52, 59]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%CE%B2&of=id',
-                                               expected_text="[52, 59]"))
+                                               expected_text="[59]"))
 
 class WebSearchWashCollectionsTest(unittest.TestCase):
     """Test if the collection argument is washed correctly"""

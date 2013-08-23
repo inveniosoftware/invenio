@@ -100,7 +100,7 @@ from invenio.bibindex_tokenizers.BibIndexCJKTokenizer import BibIndexCJKTokenize
 from invenio.bibindex_engine_utils import author_name_requires_phrase_search
 from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
-from invenio.bibindexadminlib import get_idx_indexer
+from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box

@@ -2579,7 +2579,7 @@ INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
                 VALUES ('Balthasar Montague', 'balthasar.montague@cds.cern.ch', '78644', '20-M-349', '2008-07-21 00:00:00', '');
 
 -- switch on stemming for some indexes:
-UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');
+UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext', 'miscellaneous');
 
 -- exporting demo:
 INSERT INTO expJOB (jobname) VALUES ('sitemap');

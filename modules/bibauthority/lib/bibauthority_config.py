@@ -50,6 +50,8 @@ CFG_BIBAUTHORITY_TYPE_NAMES = {
 # 1. tells us which bibliographic subfields are under authority control
 # 2. tells us which bibliographic subfields refer to which type of
 # ... authority record (must conform to the keys of CFG_BIBAUTHORITY_TYPE_NAMES)
+# Note: if you want to add new tag here you should also append appropriate tag
+# to the miscellaneous index on the BibIndex Admin Site
 CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC = {
     '100__a': 'AUTHOR',
     '100__u': 'INSTITUTION',
