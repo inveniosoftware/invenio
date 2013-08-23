@@ -124,12 +124,12 @@ class InvenioSession(dict, SessionMixin):
             return True
 
     def _get_uid(self):
-        return self.get('_uid', -1)
+        return self.get('user_id', -1)
 
     def _set_uid(self, uid):
-        if self.get('_uid') != uid:
+        if self.get('user_id') != uid:
             self.logging_in = True
-        self['_uid'] = uid
+        self['user_id'] = self['_uid'] = self['uid'] = uid
 
     def _get_user_info(self):
         return current_user
@@ -246,8 +246,6 @@ class InvenioSessionInterface(SessionInterface):
             data = self.serializer.loads(self.storage.get(sid))
 
             session = self.session_class(data, sid=sid)
-            session['_uid'] = session.uid
-            session['uid'] = session.uid
             if session.check_ip(request):
                 return session
         except Exception, err:
@@ -290,7 +288,8 @@ class InvenioSessionInterface(SessionInterface):
             session.sid = sid
             # Fixes problem with lost flashes after login.
             map(lambda (cat, msg): flash(msg, cat), flashes)
-        session['_uid'] = uid
+        # Set all user id keys for compatibility.
+        session.uid = uid
         self.storage.set(sid,
                          self.serializer.dumps(dict(session)),
                          timeout = timeout)

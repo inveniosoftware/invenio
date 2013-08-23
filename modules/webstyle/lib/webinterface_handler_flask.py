@@ -144,7 +144,7 @@ def create_invenio_flask_app(**kwargs_config):
 
     from invenio.pluginutils import PluginContainer
     from invenio.session_flask import InvenioSessionInterface
-    from invenio.webuser_flask import InvenioLoginManager, current_user
+    from invenio.webuser_flask import InvenioLoginManager, current_user, UserInfo
     from invenio.messages import wash_language, gettext_set_language, \
                                  language_list_long, is_language_rtl
     from invenio.urlutils import create_url, get_canonical_and_alternates_urls
@@ -367,9 +367,9 @@ def create_invenio_flask_app(**kwargs_config):
     _app.logger.addHandler(_flask_log_handler)
 
     # Let's create login manager.
-    _login_manager = InvenioLoginManager()
+    _login_manager = InvenioLoginManager(_app)
     _login_manager.login_view = 'webaccount.login'
-    _login_manager.setup_app(_app)
+    _login_manager.anonymous_user = UserInfo
     _login_manager.unauthorized_handler(do_login_first)
 
         # Let's create main menu.
@@ -436,7 +436,6 @@ def create_invenio_flask_app(**kwargs_config):
         Function should not raise an exception if uid is not valid
         or User was not found in database.
         """
-        from invenio.webuser_flask import UserInfo
         return UserInfo(uid)
 
     @_app.before_request

@@ -44,7 +44,7 @@ from invenio.webaccount_forms import LoginForm, RegisterForm
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.websession_model import User
 from invenio.websession_webinterface import wash_login_method
-from invenio.webuser_flask import login_user, logout_user, current_user
+from invenio.webuser_flask import login_user, logout_user, current_user, UserInfo
 
 
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
@@ -63,7 +63,7 @@ def update_login(nickname, password=None, remember_me=False):
     if password is not None:
         where.append(User.password == password)
     user = User.query.filter(*where).one()
-    login_user(user.get_id(), remember_me=remember_me)
+    login_user(user, remember=remember_me)
     return user
 
 

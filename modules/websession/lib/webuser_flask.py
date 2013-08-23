@@ -64,7 +64,15 @@ CFG_USER_DEFAULT_INFO = {
 }
 
 
-class UserInfo(CombinedMultiDict):
+from flask.ext.login import LoginManager, current_user, \
+    login_user, logout_user, login_required, UserMixin
+
+
+class InvenioLoginManager(LoginManager):
+    pass
+
+
+class UserInfo(CombinedMultiDict, UserMixin):
 
     def __init__(self, uid=None, force=False):
         """
@@ -281,92 +289,5 @@ class UserInfo(CombinedMultiDict):
     def get_id(self):
         return self.get('id', -1)
 
-KEY_USER_ID = '_uid'
 
 
-class InvenioLoginManager(object):
-
-    def __init__(self):
-        self.key_user_id = KEY_USER_ID
-        self.guest_user = UserInfo
-        self.login_view = None
-        self.user_callback = None
-        self.unauthorized_callback = None
-
-    def user_loader(self, callback):
-        self.user_callback = callback
-
-    def setup_app(self, app):
-        app.login_manager = self
-        app.before_request(self._load_user)
-
-        def save_user(response):
-            current_user.save()
-            return response
-        app.after_request(save_user)
-        #app.after_request(self._update_remember_cookie)
-
-    def unauthorized_handler(self, callback):
-        self.unauthorized_callback = callback
-
-    def unauthorized(self):
-        if self.unauthorized_callback:
-            return self.unauthorized_callback()
-        if not self.login_view:
-            abort(401)
-        if has_request_context():
-            return redirect(url_for(self.login_view, referer=request.url))
-        return redirect(url_for(self.login_view))
-
-    def _load_user(self):
-        #FIXME add remember me
-        self.reload_user()
-
-    def reload_user(self):
-        ctx = _request_ctx_stack.top
-        uid = session.get(self.key_user_id, None)
-        if uid is None:
-            ctx.user = self.guest_user()
-        else:
-            user = self.user_callback(uid)
-            if user is None:
-                logout_user()
-            else:
-                ctx.user = user
-        ctx.user.save()  # .reload(update_session=True)
-
-
-def _request_top_user():
-    """A proxy object of current user."""
-    try:
-        return _request_ctx_stack.top.user
-    except:
-        return UserInfo()
-
-current_user = LocalProxy(_request_top_user)
-
-
-def login_user(uid, remember_me=False, force=False):
-    #FIXME: create user info from uid
-    #if not force and not user.is_active:
-    #    return False
-
-    session.uid = uid
-    session.set_remember_me(remember_me)
-    current_app.login_manager.reload_user()
-    return True
-
-
-def logout_user():
-    session.uid = None
-    current_app.login_manager.reload_user()
-    return True
-
-
-def login_required(fn):
-    @wraps(fn)
-    def decorated_view(*args, **kwargs):
-        if not current_user.is_authenticated():
-            return current_app.login_manager.unauthorized()
-        return fn(*args, **kwargs)
-    return decorated_view
