@@ -460,7 +460,7 @@ distances from it.
     def test_redis_for_halted(self):
         from invenio.bibworkflow_model import BibWorkflowObject
         from invenio.bibworkflow_api import start
-        from invenio.bibworkflow_utils import get_redis_keys, set_up_redis
+        from invenio.bibworkflow_utils import set_up_redis
         initial_data = {'data': 1}
 
         workflow = start(workflow_name="test_workflow",

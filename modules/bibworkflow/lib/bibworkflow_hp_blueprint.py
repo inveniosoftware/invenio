@@ -28,7 +28,6 @@ from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.bibworkflow_utils import get_workflow_definition
 from invenio.bibworkflow_api import continue_oid_delayed
 from invenio.bibworkflow_hp_load_widgets import widgets
-from invenio.bibworkflow_model import Workflow
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION
 
 from flask import redirect, url_for, flash
@@ -81,8 +80,8 @@ def load_table():
     iDisplayLength = request.args.get('iDisplayLength')
     # sSearch will be used for searching later
     # sSearch = request.args.get('sSearch')
-    iSortCol_0 = request.args.get('iSortCol_0')
-    sSortDir_0 = request.args.get('sSortDir_0')
+    # iSortCol_0 = request.args.get('iSortCol_0')
+    # sSortDir_0 = request.args.get('sSortDir_0')
 
     iDisplayStart = int(request.args.get('iDisplayStart'))
     iDisplayLength = int(request.args.get('iDisplayLength'))

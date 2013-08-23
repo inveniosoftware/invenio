@@ -16,18 +16,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os
 import re
 import redis
-import cPickle
 
 from invenio.bibrecord import create_record
-from invenio.pluginutils import PluginContainer
-from invenio.config import CFG_PYLIBDIR
 from invenio.errorlib import register_exception
-from invenio.bibworkflow_hp_container import HoldingPenContainer
 from invenio.sqlalchemyutils import db
-from flask import jsonify
 
 
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
@@ -143,8 +137,6 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None):
 
     print '-----------------------Setting up HPCONTAINERS!'
 
-    redis_server = redis.Redis()
-
     if iSortCol_0:
         iSortCol_0 = int(iSortCol_0)
 
@@ -165,13 +157,12 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None):
 
 def redis_create_search_entry(bwobject):
     redis_server = set_up_redis()
-    from invenio.bibworkflow_config import CFG_EXTRA_DATA_KEY
 
     #creates database entries to not loose key value pairs in redis
     for key, value in bwobject.extra_data["redis_search"].iteritems():
         redis_server.sadd("holdingpen_sort", str(key))
         redis_server.sadd("holdingpen_sort:%s" % (str(key),), str(value))
-        redis_server.sadd("holdingpen_sort:%s:%s" %(str(key), str(value),),
+        redis_server.sadd("holdingpen_sort:%s:%s" % (str(key), str(value),),
                           bwobject.id)
 
     redis_server.sadd("holdingpen_sort", "owner")

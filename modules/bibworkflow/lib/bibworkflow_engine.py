@@ -16,7 +16,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import sys
 import cPickle
 import traceback
 import logging
@@ -151,7 +150,7 @@ class BibWorkflowEngine(GenericWorkflowEngine):
             raise cPickle.PickleError("The workflow instance "
                                       "inconsistent state, "
                                       "too few objects")
-        self.log = logging.getLogger("workflow.%s" % self.__class__) # default logging
+        self.log = logging.getLogger("workflow.%s" % self.__class__)  # default logging
         self.__dict__ = state
 
     def __repr__(self):
