@@ -24,6 +24,7 @@ Solr utilities.
 
 from invenio.config import CFG_SOLR_URL
 from invenio.solrutils_config import CFG_SOLR_INVALID_CHAR_RANGES
+from invenio.errorlib import register_exception
 
 
 if CFG_SOLR_URL:
@@ -57,8 +58,19 @@ def solr_add_fulltext(recid, text):
         except (UnicodeDecodeError, UnicodeEncodeError):
             # forget about bad UTF-8 files
             pass
+        except:
+            # In case anything else happens
+            register_exception(alert_admin=True)
     return False
 
 
 def solr_commit():
-    SOLR_CONNECTION.commit()
+    try:
+        # Commits might cause an exception, most likely a
+        # timeout while hitting a background merge
+        # Changes will then be committed later by the
+        # calling (periodical) task
+        # Also, autocommits can be used in the solrconfig
+        SOLR_CONNECTION.commit()
+    except:
+        register_exception(alert_admin=True)

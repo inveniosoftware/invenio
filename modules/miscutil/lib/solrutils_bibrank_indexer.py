@@ -79,7 +79,15 @@ def solr_commit_if_necessary(next_commit_counter, final_commit=False, recid=None
         write_message(status_msg)
         task_update_progress(status_msg)
 
-        SOLR_CONNECTION.commit()
+        try:
+            # Commits might cause an exception, most likely a
+            # timeout while hitting a background merge
+            # Changes will then be committed later by the
+            # calling (periodical) task
+            # Also, autocommits can be used in the solrconfig
+            SOLR_CONNECTION.commit()
+        except:
+            register_exception(alert_admin=True)
         next_commit_counter = 0
 
         task_sleep_now_if_required(can_stop_too=True)
