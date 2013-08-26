@@ -25,6 +25,7 @@ Solr utilities.
 import itertools
 
 
+from math import ceil
 from invenio.config import CFG_SOLR_URL
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
@@ -106,7 +107,11 @@ def get_normalized_ranking_scores(response, hitset_filter = None, recids = []):
         if (not hitset_filter and hitset_filter != []) or recid in hitset_filter or recid in recids:
             normalised_score = 0
             if max_score > 0:
-                normalised_score = int(100.0 / max_score * float(hit['score']))
+                # Ceil score, in particular beneficial for scores in (0,1) and (99,100) to take 1 and 100
+                normalised_score = int(ceil(100.0 / max_score * float(hit['score'])))
+                # Correct possible rounding error
+                if normalised_score > 100:
+                    normalised_score = 100
             ranked_result.append((recid, normalised_score))
             matched_recs.add(recid)
 
