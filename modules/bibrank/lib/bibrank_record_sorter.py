@@ -222,7 +222,7 @@ def citation(rank_method_code, related_to, hitset, rank_limit_relevance, verbose
     return rank_by_citations(hits, verbose)
 
 
-def rank_records(rank_method_code, rank_limit_relevance, hitset, related_to=[], verbose=0, field='', rg=None, jrec=None):
+def rank_records(rank_method_code, rank_limit_relevance, hitset, related_to=[], verbose=0, field='', rg=None, jrec=None, kwargs={}):
     """Sorts given records or related records according to given method
 
        Parameters:
@@ -293,7 +293,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset, related_to=[], 
                 if function == "word_similarity_solr":
                     if verbose > 0:
                         voutput += "In Solr part:<br/>"
-                    result = word_similarity_solr(related_to, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount)
+                    result = word_similarity_solr(related_to, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount, kwargs)
                 if function == "word_similarity_xapian":
                     if verbose > 0:
                         voutput += "In Xapian part:<br/>"
