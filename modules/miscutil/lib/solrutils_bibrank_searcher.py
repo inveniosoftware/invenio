@@ -115,7 +115,7 @@ def get_normalized_ranking_scores(response, hitset_filter = None, recids = []):
     return (ranked_result, matched_recs)
 
 
-def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranked_result_amount):
+def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranked_result_amount, kwargs={}):
     """
     Ranking a records containing specified words and returns a sorted list.
     input:
@@ -138,6 +138,9 @@ def word_similarity_solr(pattern, hitset, params, verbose, explicit_field, ranke
     if pattern:
         pattern = " ".join(map(str, pattern))
         from invenio.search_engine import create_basic_search_units
+        # Rank global index for fulltext by default in add to search
+        if kwargs.get('aas', 0) == 2 and explicit_field == 'fulltext':
+            explicit_field = ''
         search_units = create_basic_search_units(None, pattern, explicit_field)
     else:
         return (None, "Records not ranked. The query is not detailed enough, or not enough records found, for ranking to be possible.", "", voutput)
