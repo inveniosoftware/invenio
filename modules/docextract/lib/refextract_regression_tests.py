@@ -137,6 +137,40 @@ class RefextractInvenioTest(InvenioXmlTestCase):
    </datafield>
 </record>""")
 
+    def test_book_isbn_recid(self):
+        ref_line = u"""[1] ISBN:0387940758"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">1</subfield>
+       <subfield code="i">0387940758</subfield>
+       <subfield code="0">34</subfield>
+   </datafield>
+</record>
+""")
+
+    def test_book_recid(self):
+        ref_line = u"""[1] "Electrical breakdown in gases", 1973, Macmillan London"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">1</subfield>
+       <subfield code="t">Electrical breakdown in gases</subfield>
+       <subfield code="y">1973</subfield>
+       <subfield code="0">34</subfield>
+   </datafield>
+</record>
+""")
+
+    def test_book_in_misc_recid(self):
+        ref_line = u"""[1] Electrical breakdown in gases, 1973, Macmillan London"""
+        _reference_test(self, ref_line, u"""<record>
+   <datafield ind1="C" ind2="5" tag="999">
+       <subfield code="o">1</subfield>
+       <subfield code="t">Electrical breakdown in gases</subfield>
+       <subfield code="y">1973</subfield>
+       <subfield code="0">34</subfield>
+   </datafield>
+</record>
+""")
 
 class RefextractTest(InvenioXmlTestCase):
     """Testing output of refextract"""
