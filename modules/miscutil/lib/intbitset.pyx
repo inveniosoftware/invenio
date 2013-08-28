@@ -287,7 +287,7 @@ cdef class intbitset:
     def __cmp__(self, intbitset rhs not None):
         raise TypeError("cannot compare intbitset using cmp()")
 
-    def __richcmp__(self, intbitset rhs not None, int op):
+    def __richcmp__(intbitset self, intbitset rhs not None, int op):
         cdef short unsigned int tmp
         tmp = intBitSetCmp((<intbitset>self).bitset, rhs.bitset)
         if op == 0: # <
@@ -312,7 +312,7 @@ cdef class intbitset:
     def __nonzero__(self):
         return not intBitSetEmpty(self.bitset)
 
-    def __iadd__(self, rhs):
+    def __iadd__(intbitset self, rhs):
         cdef int elem
         if isinstance(rhs, (int, long)):
             if self.sanity_checks:
@@ -340,7 +340,7 @@ cdef class intbitset:
                     intBitSetAddElem(self.bitset, elem)
         return self
 
-    def __isub__(self, rhs):
+    def __isub__(intbitset self, rhs):
         """Remove all elements of another set from this set."""
         cdef int elem
         if isinstance(rhs, (int, long)):
@@ -376,7 +376,7 @@ cdef class intbitset:
                 raise OverflowError("Element must be <= %s" % maxelem)
         intBitSetDelElem(self.bitset, elem)
 
-    def __and__(self, intbitset rhs not None):
+    def __and__(intbitset self, intbitset rhs not None):
         """Return the intersection of two intbitsets as a new set.
         (i.e. all elements that are in both intbitsets.)
         """
@@ -384,7 +384,7 @@ cdef class intbitset:
         (<intbitset>ret).bitset = intBitSetIntersection((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __or__(self, intbitset rhs not None):
+    def __or__(intbitset self, intbitset rhs not None):
         """Return the union of two intbitsets as a new set.
         (i.e. all elements that are in either intbitsets.)
         """
@@ -392,7 +392,7 @@ cdef class intbitset:
         (<intbitset>ret).bitset = intBitSetUnion((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __xor__(self, intbitset rhs not None):
+    def __xor__(intbitset self, intbitset rhs not None):
         """Return the symmetric difference of two sets as a new set.
         (i.e. all elements that are in exactly one of the sets.)
         """
@@ -400,7 +400,7 @@ cdef class intbitset:
         (<intbitset>ret).bitset = intBitSetXor((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __sub__(self, intbitset rhs not None):
+    def __sub__(intbitset self, intbitset rhs not None):
         """Return the difference of two intbitsets as a new set.
         (i.e. all elements that are in this intbitset but not the other.)
         """
@@ -408,17 +408,17 @@ cdef class intbitset:
         (<intbitset>ret).bitset = intBitSetSub((<intbitset> self).bitset, rhs.bitset)
         return ret
 
-    def __iand__(self, intbitset rhs not None):
+    def __iand__(intbitset self, intbitset rhs not None):
         """Update a intbitset with the intersection of itself and another."""
         intBitSetIIntersection(self.bitset, rhs.bitset)
         return self
 
-    def __ior__(self, intbitset rhs not None):
+    def __ior__(intbitset self, intbitset rhs not None):
         """Update a intbitset with the union of itself and another."""
         intBitSetIUnion(self.bitset, rhs.bitset)
         return self
 
-    def __ixor__(self, intbitset rhs not None):
+    def __ixor__(intbitset self, intbitset rhs not None):
         """Update an intbitset with the symmetric difference of itself and another.
         """
         intBitSetIXor(self.bitset, rhs.bitset)

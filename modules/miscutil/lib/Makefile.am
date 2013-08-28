@@ -124,7 +124,6 @@ EXTRA_DIST = $(pylib_DATA) \
              intbitset.h \
              intbitset_impl.c \
              intbitset_setup.py \
-             intbitset.pyx \
              solrutils \
              solrutils/schema.xml \
              solrutils/java_sources.txt \
