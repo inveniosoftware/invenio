@@ -22,6 +22,7 @@
 __revision__ = "$Id$"
 
 from invenio import dbquery
+from invenio.config import CFG_SITE_NAME
 from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
 class RunSqlReturnListOfDictionaries(InvenioTestCase):
@@ -30,7 +31,7 @@ class RunSqlReturnListOfDictionaries(InvenioTestCase):
     def test_select_simple_columns_query(self):
         """dbquery - select simple columns query"""
         res = dbquery.run_sql("SELECT id,name,dbquery FROM collection WHERE id<3", with_dict=True)
-        self.assertEqual(res, ([{'dbquery': None, 'id': 1, 'name': 'Atlantis Institute of Fictive Science'},
+        self.assertEqual(res, ([{'dbquery': None, 'id': 1, 'name': CFG_SITE_NAME},
                                 {'dbquery': 'collection:PREPRINT', 'id': 2, 'name': 'Preprints'}]))
 
     def test_select_date_format_column_query(self):
