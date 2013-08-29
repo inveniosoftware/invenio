@@ -113,6 +113,7 @@ class InveniomanageTest(InvenioTestCase):
 
     def test_signals_usage(self):
         """ Test signal handling. """
+        from invenio.database_manager import main as db_main
         from invenio.signalutils import pre_command, post_command
         from invenio.inveniomanage import main, version as im_version
 
@@ -149,7 +150,7 @@ class InveniomanageTest(InvenioTestCase):
                             "%s was not found in output %s" % (line, lines))
 
         # Expect only general handlers.
-        out, dummy_exit_code = run('inveniomanage database uri', main)
+        out, dummy_exit_code = run('database uri', db_main)
 
         lines = out.split('\n')
         expected = ['>>> pre_handler_general',
