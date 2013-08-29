@@ -436,7 +436,7 @@ def create_invenio_flask_app(**kwargs_config):
         Function should not raise an exception if uid is not valid
         or User was not found in database.
         """
-        return UserInfo(uid)
+        return UserInfo(int(uid))
 
     @_app.before_request
     def reset_template_context_processor():
@@ -499,7 +499,7 @@ def create_invenio_flask_app(**kwargs_config):
     _app.config['menubuilder_map'].update({
             'main.admin': Menu('main.admin', _('Administration'),
                                 'help.admin', 9998, [],
-                                lambda: current_user.is_admin),
+                                lambda: current_user.is_admin if current_user else False),
             'main.help': Menu('main.help', _('Help'), 'help', 9999)})
 
     menu = {'main': Menu('main', '', ''),

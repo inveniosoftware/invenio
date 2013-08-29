@@ -65,7 +65,7 @@ CFG_USER_DEFAULT_INFO = {
 
 
 from flask.ext.login import LoginManager, current_user, \
-    login_user, logout_user, login_required, UserMixin
+    login_user as flask_login_user, logout_user, login_required, UserMixin
 
 
 class InvenioLoginManager(LoginManager):
@@ -270,7 +270,6 @@ class UserInfo(CombinedMultiDict, UserMixin):
         from invenio.access_control_engine import acc_authorize_action
         return acc_authorize_action(self, name)[0] == 0
 
-    @property
     def is_active(self):
         return not self.is_guest
 
@@ -290,4 +289,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         return self.get('id', -1)
 
 
-
+def login_user(user, *args, **kwargs):
+    if type(user) is int:
+        user = UserInfo(user)
+    return flask_login_user(user, *args, **kwargs)

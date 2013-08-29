@@ -276,18 +276,21 @@ class InvenioSessionInterface(SessionInterface):
             cookie_expiry = session_expiry
         sid = session.sid
         if session.logging_in:
+            #FIXME Do we really need to delete the session after login?
             ## The user just logged in, better change the session ID
-            sid = self.generate_sid()
-            flashes = get_flashed_messages(with_categories=True)
+            #sid = self.generate_sid()
+            #flashes = get_flashed_messages(with_categories=True)
             ## And remove the cookie that has been set
-            self.storage.delete(session.sid)
-            session.clear()
-            response.delete_cookie(app.session_cookie_name, domain=domain)
-            response.delete_cookie(app.session_cookie_name + 'stub',
-                                   domain=domain)
-            session.sid = sid
+            #self.storage.delete(session.sid)
+            #session.clear()
+            #response.delete_cookie(app.session_cookie_name, domain=domain)
+            #response.delete_cookie(app.session_cookie_name + 'stub',
+            #                       domain=domain)
+            #session.sid = sid
+            #session.uid = uid
             # Fixes problem with lost flashes after login.
-            map(lambda (cat, msg): flash(msg, cat), flashes)
+            #map(lambda (cat, msg): flash(msg, cat), flashes)
+            pass
         # Set all user id keys for compatibility.
         session.uid = uid
         self.storage.set(sid,

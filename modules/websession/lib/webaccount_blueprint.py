@@ -63,7 +63,7 @@ def update_login(nickname, password=None, remember_me=False):
     if password is not None:
         where.append(User.password == password)
     user = User.query.filter(*where).one()
-    login_user(user, remember=remember_me)
+    login_user(UserInfo(user.id), remember=remember_me)
     return user
 
 
