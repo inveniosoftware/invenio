@@ -24,15 +24,12 @@
 __revision__ = "$Id$"
 
 from mechanize import Browser
+
 from invenio.config import CFG_SITE_SECURE_URL
-
 from invenio.dbquery import run_sql
-from invenio.webgroup import synchronize_external_groups, synchronize_all_external_groups
-from invenio.webgroup_dblayer import get_external_groups, get_all_login_method_groups
-from invenio.testutils import make_test_suite, run_test_suite
-import unittest
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
-class WebGroupTest(unittest.TestCase):
+class WebGroupTest(InvenioTestCase):
     """Test functions related to the Apache authentication."""
 
     def setUp(self):
@@ -49,8 +46,8 @@ class WebGroupTest(unittest.TestCase):
         self.uid2 = run_sql("""INSERT INTO user (email, password) VALUES (%s, AES_ENCRYPT(email,%s))""", (self.email2, self.pwd2, ))
         self.uid2 = int(self.uid2)
 
-        self.goodgroup = 'bla'
-        self.badgroup = 'blo'
+        self.goodgroup = 'testbla'
+        self.badgroup = 'testblo'
         self.goodid = run_sql("""INSERT INTO usergroup(name, description, join_policy, login_method)
             VALUES (%s, %s, 'VE', 'INTERNAL')""", (self.goodgroup, self.goodgroup))
         self.badid = run_sql("""INSERT INTO usergroup(name, description, join_policy, login_method)
@@ -61,6 +58,8 @@ class WebGroupTest(unittest.TestCase):
 
     def test_synchronize_external_groups(self):
         """webgroup - synchronizing one user external groups"""
+        from invenio.webgroup import synchronize_external_groups
+        from invenio.webgroup_dblayer import get_external_groups
         synchronize_external_groups(self.uid, {'group1' : 'descr1', 'group2' : 'descr2'}, self.login_method)
         groups = get_external_groups(self.uid)
         groups_names = [name[1] for name in groups]
@@ -85,6 +84,9 @@ class WebGroupTest(unittest.TestCase):
 
     def test_synchronize_all_external_groups(self):
         """webgroup - synchronizing all external groups"""
+        from invenio.webgroup import synchronize_all_external_groups
+        from invenio.webgroup_dblayer import get_external_groups, \
+            get_all_login_method_groups
         synchronize_all_external_groups({'group1' : ('descr1', [self.email, self.email2])}, self.login_method)
         groups = get_external_groups(self.uid2)
         self.assertEqual(len(groups), 1)
@@ -112,8 +114,8 @@ class WebGroupTest(unittest.TestCase):
         browser = Browser()
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
-        browser['p_un'] = 'admin'
-        browser['p_pw'] = ''
+        browser['nickname'] = 'admin'
+        browser['password'] = ''
         browser.submit()
 
         expected_response = "You are logged in as admin"
@@ -147,8 +149,8 @@ class WebGroupTest(unittest.TestCase):
         browser = Browser()
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
-        browser['p_un'] = 'admin'
-        browser['p_pw'] = ''
+        browser['nickname'] = 'admin'
+        browser['password'] = ''
         browser.submit()
 
         expected_response = "You are logged in as admin"
@@ -159,10 +161,7 @@ class WebGroupTest(unittest.TestCase):
             self.fail("Expected to see %s, got %s." % \
                       (expected_response, login_response_body))
 
-        browser.open(CFG_SITE_SECURE_URL + "/yourmessages/write")
-        browser.select_form(nr=0)
-        browser['search_pattern'] = 'b'
-        browser.submit(name='search_group')
+        browser.open(CFG_SITE_SECURE_URL + "/yourgroups/search?query=groups&term=test")
 
         expected_response = self.goodgroup
         groups_body = browser.response().read()

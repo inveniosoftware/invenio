@@ -69,8 +69,9 @@ def search(query, term):
             User.nickname.like("%s%%" % term)).limit(10).all()
         return jsonify(nicknames=[elem for elem, in res])
     elif query == 'groups' and len(term) >= 3:
-        res = db.session.query(Usergroup.name).filter(
-            Usergroup.name.like("%s%%" % term)).limit(10).all()
+        res = db.session.query(db.func.distinct(Usergroup.name)).\
+            join(UserUsergroup).filter(
+                Usergroup.name.like("%s%%" % term)).limit(10).all()
         return jsonify(groups=[elem for elem, in res])
     return jsonify()
 

@@ -28,6 +28,7 @@ from mechanize import Browser
 
 from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_SECURE_URL
+from invenio.mailutils_unit_tests import MailTestCase
 from invenio.importutils import lazy_import
 from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
@@ -48,10 +49,11 @@ class IsUserSuperAdminTests(InvenioTestCase):
         self.failIf(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_hyde)))
 
 
-class WebSessionYourSettingsTests(InvenioTestCase):
+class WebSessionYourSettingsTests(MailTestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def tearDown(self):
+        super(WebSessionYourSettingsTests, self).tearDown()
         run_sql('DELETE FROM user WHERE email="foo@cds.cern.ch"')
         run_sql('DELETE FROM user WHERE email="FOO@cds.cern.ch"')
 
@@ -206,7 +208,7 @@ class WebSessionYourSettingsTests(InvenioTestCase):
                       (expected_response, login_response_body))
 
         # Going to edit page and setting records per group to 20
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit/websearch_user_settings")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit/WebSearchSettings")
         browser.select_form(nr=0)
         browser['rg'] = ["25"]
         browser.submit()
@@ -232,7 +234,7 @@ class WebSessionYourSettingsTests(InvenioTestCase):
                       (expected_response, records_found_body))
 
         # Going again to edit and setting records per group back to 10
-        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit/websearch_user_settings")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit/WebSearchSettings")
         browser.select_form(name="edit")
         browser['rg'] = ["10"]
         browser.submit()

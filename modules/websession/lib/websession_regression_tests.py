@@ -45,7 +45,8 @@ class WebSessionWebPagesAvailabilityTest(InvenioTestCase):
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
-            error_messages.extend(test_web_page_content(url))
+            error_messages.extend(test_web_page_content(url, username='admin',
+                                                        expected_text=[]))
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
@@ -59,7 +60,8 @@ class WebSessionWebPagesAvailabilityTest(InvenioTestCase):
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
-            error_messages.extend(test_web_page_content(url))
+            error_messages.extend(test_web_page_content(url, username='admin',
+                                                        expected_text=[]))
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
