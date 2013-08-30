@@ -35,6 +35,9 @@ option_default_data = manager.option('--no-data', action='store_false',
 @option_default_data
 def populate(default_data=True):
     """Load demo records.  Useful for testing purposes."""
+    if not default_data:
+        print '>>> Default data has been skiped (--no-data).'
+        return
     from invenio.config import CFG_PREFIX
     from invenio.sqlalchemyutils import db
     print ">>> Going to load demo records..."
