@@ -41,7 +41,6 @@ class DashboardSettings(Settings):
         self.icon = 'user'
         self.title = _('Dashboard')
 
-
     @property
     def is_authorized(self):
         return current_user.is_authenticated()

@@ -42,7 +42,7 @@ class WebBasketSettings(Settings):
         self.icon = 'shopping-cart'
         self.title = _('Baskets WIP')
         #self.view = url_for('webaccount.index')
-        #self.edit = url_for('webaccount.edit', name=__name__.split('.')[-1])
+        #self.edit = url_for('webaccount.edit', name=self.name)
 
     def widget(self):
         uid = current_user.get_id()

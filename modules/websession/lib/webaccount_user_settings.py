@@ -41,7 +41,7 @@ class WebAccountSettings(Settings):
         super(WebAccountSettings, self).__init__()
         self.icon = 'user'
         self.title = _('Account')
-        self.edit = url_for('webaccount.edit', name=__name__.split('.')[-1])
+        self.edit = url_for('webaccount.edit', name=self.name)
 
     def widget(self):
         template = """

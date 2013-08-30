@@ -48,7 +48,7 @@ class WebGroupSettings(Settings):
         self.icon = 'tags'
         self.title = _('Group')
         self.view = url_for('webgroup.index')
-        self.edit = url_for('webgroup.index')
+        #self.edit = url_for('webgroup.edit', name=self.name)
 
     def widget(self):
         uid = current_user.get_id()

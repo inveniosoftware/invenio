@@ -49,8 +49,7 @@ class WebMessageSettings(Settings):
         self.title = _('Messages')
         self.view = url_for('webmessage.index')
         if True or CFG_WEBMESSAGE_EMAIL_ALERT:
-            self.edit = url_for('webaccount.edit',
-                                name=__name__.split('.')[-1])
+            self.edit = url_for('webaccount.edit', name=self.name)
 
     def commit(self):
         pass

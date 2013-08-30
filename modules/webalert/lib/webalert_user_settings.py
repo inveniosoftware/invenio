@@ -59,7 +59,7 @@ class WebAlertSettings(Settings):
         self.icon = 'bell'
         self.title = _('Alerts WIP')
         #self.view = url_for('webalert.index')
-        #self.edit = url_for('webaccount.edit', name=__name__.split('.')[-1])
+        #self.edit = url_for('webaccount.edit', name=self.name)
 
     def widget(self):
         uid = current_user.get_id()
