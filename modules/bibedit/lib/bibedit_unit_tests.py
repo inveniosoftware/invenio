@@ -73,22 +73,7 @@ class TextmarcToXMLTests(InvenioTestCase):
         260__ $$c1961
         300__ $$a15"""
         output = get_xml_from_textmarc(1, textmarc)
-        # We expect success now, ignoring empty field, see ticket:1269.
-        # <http://invenio-software.org/ticket/1269>
-        self.assertEqual(output['resultMsg'], 'textmarc_parsing_success')
-        self.assertEqual(output['resultXML'], """<record>
-   <controlfield tag="001">1</controlfield>
-   <datafield tag="245" ind1=" " ind2=" ">
-      <subfield code="a">Pion production by 24 GeV/c protons in hydrogen</subfield>
-   </datafield>
-   <datafield tag="260" ind1=" " ind2=" ">
-      <subfield code="c">1961</subfield>
-   </datafield>
-   <datafield tag="300" ind1=" " ind2=" ">
-      <subfield code="a">15</subfield>
-   </datafield>
-</record>
-""")
+        self.assertEqual(output['resultMsg'], 'textmarc_parsing_error')
 
     def test_accept_fft_tags_in_textmarc(self):
         textmarc = """100__ $$aDoe, J.$$uCERN
