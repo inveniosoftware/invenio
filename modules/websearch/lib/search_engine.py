@@ -2844,7 +2844,10 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         # child collections of the collection from which the user
         # started his/her search. This list of children colls will be
         # used in the warning proposing a search in that collections
-        current_coll = req.argd['cc'] # current_coll: coll from which user started his/her search
+        try:
+            current_coll = req.argd['cc'] # current_coll: coll from which user started his/her search
+        except (AttributeError, KeyError):
+            current_coll = CFG_SITE_NAME
         current_coll_children = get_collection_allchildren(current_coll) # real & virtual
         # add all restricted collections, that the user has access to, and are under the current collection
         # do not use set here, in order to maintain a specific order:
