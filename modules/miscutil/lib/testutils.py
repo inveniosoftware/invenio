@@ -703,7 +703,7 @@ class InvenioWebTestCase(unittest.TestCase):
 
     @nottest
     def element_value_test(self, element_name="", element_id="", \
-                           expected_element_value="", unexpected_element_value="", in_form=True):
+                           expected_element_value="", unexpected_element_value="", in_form=True, exact_match=True):
         """ Function to check if the value in the given
         element is the expected (unexpected) value or not
         @param element_name: name of the corresponding element in the form
@@ -739,9 +739,15 @@ class InvenioWebTestCase(unittest.TestCase):
         if expected_element_value:
             try:
                 if in_form:
-                    self.assertEqual(q.get_attribute('value'), expected_element_value)
+                    if exact_match:
+                        self.assertEqual(q.get_attribute('value'), expected_element_value)
+                    else:
+                        self.assertNotEqual(-1, q.get_attribute('value').find(expected_element_value))
                 else:
-                    self.assertEqual(q.text, expected_element_value)
+                    if exact_match:
+                        self.assertEqual(q.text, expected_element_value)
+                    else:
+                        self.assertNotEqual(-1, q.text.find(expected_element_value))
             except AssertionError, e:
                 self.errors.append(str(e))
 
