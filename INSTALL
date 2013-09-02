@@ -46,7 +46,8 @@ Contents
 
           $ sudo aptitude install sbcl cmucl pylint pychecker pyflakes \
               python-profiler python-epydoc libapache2-mod-xsendfile \
-              openoffice.org python-utidylib python-beautifulsoup
+              openoffice.org python-utidylib python-beautifulsoup \
+              python-unidecode
 
         (Note that if you use pip to manage your Python dependencies
         instead of operating system packages, please see the section
