@@ -51,7 +51,8 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_BIBSCHED_INCOMPATIBLE_TASKS, \
      CFG_BIBSCHED_NON_CONCURRENT_TASKS, \
-     CFG_VERSION
+     CFG_VERSION, \
+     CFG_BIBSCHED_NEVER_STOPS
 from invenio.dbquery import run_sql, real_escape_string
 from invenio.errorlib import register_exception, register_emergency
 from invenio.shellutils import run_shell_command
@@ -665,7 +666,7 @@ class BibSched(object):
                         error_recoverable = False
             if error_msgs:
                 msg = "BibTask with ERRORS:\n%s" % '\n'.join(error_msgs)
-                if error_recoverable:
+                if error_recoverable or CFG_BIBSCHED_NEVER_STOPS:
                     raise RecoverableError(msg)
                 else:
                     raise StandardError(msg)
