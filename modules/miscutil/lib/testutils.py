@@ -339,7 +339,13 @@ def test_web_page_content(url,
     error_messages = []
     try:
         browser = get_authenticated_mechanize_browser(username, password)
-        browser.open(url)
+        try:
+            browser.open(url)
+        except mechanize.HTTPError, msg:
+            if msg.code != 401:
+                raise msg
+            error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
+                                  (url, username, msg))
         url_body = browser.response().read()
 
         # now test for EXPECTED_TEXT:
@@ -414,9 +420,6 @@ def test_web_page_content(url,
                 raise InvenioTestUtilsBrowserException, error_text
 
 
-    except mechanize.HTTPError, msg:
-        error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
-                              (url, username, msg))
     except InvenioTestUtilsBrowserException, msg:
         error_messages.append('ERROR: Page %s (login %s) led to an error: %s.' % \
                               (url, username, msg))
