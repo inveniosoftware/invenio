@@ -26,6 +26,14 @@ CKEDITOR.addTemplates( 'default',
                                  '<p><div class="phrwithcaption"><div class="imageScale"><img src="http://mediaarchive.cern.ch/MediaArchive/Photo/Public/2008/0806011/0806011_04/0806011_04-A5-at-72-dpi.jpg"/></div><p>Curabitur neque nibh, venenatis in, imperdiet in, hendrerit id, massa.</p></div>Nam diam. Praesent nec massa a elit porttitor rhoncus. Fusce convallis auctor arcu. Fusce commodo mauris sed neque. Pellentesque adipiscing. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Quisque luctus erat eget lorem. Quisque ac nunc. Aliquam pellentesque, purus sed aliquam volutpat, risus turpis aliquam augue, vel tristique mi lacus non leo. Etiam rutrum molestie sapien. Phasellus cursus, quam id placerat porta, lectus nisi aliquet nisl, at varius nibh felis vitae lacus. Proin semper posuere pede. Praesent fringilla libero sit amet lectus. Nam lectus mauris, vestibulum in, fringilla et, fringilla vel, quam. Maecenas ultricies cursus metus.</p>'
 			},
 			{
+				title: 'Wide Centered Image With Caption',
+				image: 'journal-template5.gif',
+				description: 'Full-width centered block for an image and its caption.',
+				html:
+					'<div class="phwidewithcaption"><div class="imageScaleWide"><img src="http://mediaarchive.cern.ch/MediaArchive/Photo/Public/2008/0801015/0801015_01/0801015_01-A5-at-72-dpi.jpg"/></div><p>Pellentesque sapien mi, pharetra vitae, auctor eu, congue sed, turpis.</p></div>'
+			},
+
+			{
 				title: 'Left Image With Caption',
 				image: 'journal-template2.gif',
 				description: 'Left-aligned block for an image and its caption.',

@@ -25,7 +25,10 @@ from invenio import intbitset
 from invenio.solrutils_bibindex_searcher import solr_get_bitset
 from invenio.solrutils_bibrank_searcher import solr_get_ranked, solr_get_similar_ranked
 from invenio.search_engine import get_collection_reclist
-from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker
+from invenio.bibrank_bridge_utils import get_external_word_similarity_ranker, \
+                                         get_logical_fields, \
+                                         get_tags, \
+                                         get_field_content_in_utf8
 
 ROWS = 100
 
@@ -181,13 +184,13 @@ class TestSolrSimilarToRecid(unittest.TestCase):
 
     _SIMILAR = {
         30: (12, 95, 85, 82, 44, 1, 89, 64, 58, 15, 96, 61, 50, 86, 78, 77, 65, 62, 60,
-             47, 46, 100, 99, 102, 91, 80, 7, 92, 88, 74, 57, 55, 108, 84, 81, 79, 54,
-             101, 11, 103, 94, 48, 83, 72, 63, 2, 68, 51, 5, 53, 97, 93, 70, 45, 52, 14,
+             47, 46, 100, 99, 102, 91, 80, 7, 5, 92, 88, 74, 57, 55, 108, 84, 81, 79, 54,
+             101, 11, 103, 94, 48, 83, 72, 63, 2, 68, 51, 53, 97, 93, 70, 45, 52, 14,
              59, 6, 10, 32, 33, 29, 30),
-        59: (17, 69, 3, 20, 109, 14, 22, 33, 24, 60, 6, 73, 113, 107, 78, 4, 13, 5, 45,
-             8, 72, 46, 74, 63, 71, 44, 87, 70, 103, 57, 92, 49, 88, 7, 68, 77, 10, 62,
-             93, 2, 65, 55, 96, 43, 94, 1, 11, 99, 91, 61, 51, 15, 89, 64, 97, 108, 80,
-             101, 86, 90, 54, 95, 102, 47, 100, 79, 83, 48, 12, 81, 82, 58, 50, 56, 84,
+        59: (17, 69, 3, 20, 109, 14, 22, 33, 28, 24, 60, 6, 73, 113, 5, 107, 78, 4, 13,
+             8, 45, 72, 74, 46, 104, 63, 71, 44, 87, 70, 103, 92, 57, 49, 7, 88, 68, 77,
+             62, 10, 93, 2, 65, 55, 43, 94, 96, 1, 11, 99, 91, 61, 51, 15, 64, 97, 89, 101,
+             108, 80, 86, 90, 54, 95, 102, 47, 100, 79, 83, 48, 12, 81, 82, 58, 50, 56, 84,
              85, 53, 52, 59)
     }
 
@@ -255,15 +258,15 @@ class TestSolrWebSearch(unittest.TestCase):
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3Ahiggs&rg=100',
-                                               expected_text="[47, 48, 51, 52, 55, 56, 58, 68, 79, 85, 89, 96]"))
+                                               expected_text="[12, 47, 48, 51, 52, 55, 56, 58, 68, 79, 80, 81, 85, 89, 96]"))
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3Aof&rg=100',
-                                               expected_text="[8, 10, 11, 12, 15, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 64, 68, 74, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97]"))
+                                               expected_text="[8, 10, 11, 12, 15, 43, 44, 45, 46, 47, 48, 49, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 64, 68, 74, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97]"))
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3A%22higgs+boson%22&rg=100',
-                                               expected_text="[55, 56]"))
+                                               expected_text="[12, 47, 51, 55, 56, 68, 81, 85]"))
 
 
 class TestSolrWebRanking(unittest.TestCase):
@@ -287,26 +290,26 @@ class TestSolrWebRanking(unittest.TestCase):
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3Ahiggs&rm=wrd',
-                                               expected_text="[51, 79, 55, 47, 56, 96, 58, 68, 52, 48, 89, 85]"))
+                                               expected_text="[12, 51, 79, 80, 81, 55, 47, 56, 96, 58, 68, 52, 48, 89, 85]"))
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3Ahiggs&rg=100&rm=wrd',
-                                               expected_text="[79, 51, 55, 47, 56, 96, 58, 68, 52, 48, 89, 85]"))
+                                               expected_text="[12, 80, 81, 79, 51, 55, 47, 56, 96, 58, 68, 52, 48, 89, 85]"))
 
         # Record 77 is restricted
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3Aof&rm=wrd',
-                                               expected_text="[8, 10, 15, 43, 44, 45, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 60, 61, 62, 64, 68, 74, 78, 79, 81, 82, 83, 84, 85, 88, 89, 90, 91, 92, 95, 96, 97, 86, 11, 80, 93, 77, 12, 59, 87, 47, 94]",
+                                               expected_text="[8, 10, 15, 43, 44, 45, 46, 48, 49, 51, 52, 53, 54, 55, 56, 57, 58, 60, 61, 62, 64, 68, 74, 78, 79, 81, 82, 83, 84, 85, 88, 89, 90, 91, 92, 95, 96, 97, 86, 11, 80, 93, 77, 12, 59, 87, 47, 94]",
                                                username='admin'))
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3Aof&rg=100&rm=wrd',
-                                               expected_text="[50, 61, 60, 54, 56, 53, 10, 68, 44, 57, 83, 95, 92, 91, 74, 45, 48, 62, 82, 49, 51, 89, 90, 96, 43, 8, 64, 97, 15, 85, 78, 46, 55, 79, 84, 88, 81, 52, 58, 86, 11, 80, 93, 77, 12, 59, 87, 47, 94]",
+                                               expected_text="[61, 60, 54, 56, 53, 10, 68, 44, 57, 83, 95, 92, 91, 74, 45, 48, 62, 82, 49, 51, 89, 90, 96, 43, 8, 64, 97, 15, 85, 78, 46, 55, 79, 84, 88, 81, 52, 58, 86, 11, 80, 93, 77, 12, 59, 87, 47, 94]",
                                                username='admin'))
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=fulltext%3A%22higgs+boson%22&rg=100&rm=wrd',
-                                               expected_text="[55, 56]"))
+                                               expected_text="[12, 47, 51, 68, 81, 85, 55, 56]"))
 
 
 class TestSolrWebSimilarToRecid(unittest.TestCase):
@@ -323,11 +326,61 @@ class TestSolrWebSimilarToRecid(unittest.TestCase):
         """solrutils - web similar results"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=recid%3A30&rm=wrd',
-                                               expected_text="[1, 3, 4, 8, 9, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 34, 43, 44, 49, 50, 56, 58, 61, 64, 66, 67, 69, 71, 73, 75, 76, 77, 78, 82, 85, 86, 87, 89, 90, 95, 96, 98, 104, 107, 109, 113, 65, 62, 60, 47, 46, 100, 99, 102, 91, 80, 7, 92, 88, 74, 57, 55, 108, 84, 81, 79, 54, 101, 11, 103, 94, 48, 83, 72, 63, 2, 68, 51, 5, 53, 97, 93, 70, 45, 52, 14, 59, 6, 10, 32, 33, 29, 30]"))
+                                               expected_text="[1, 3, 4, 8, 9, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 34, 43, 44, 49, 50, 56, 58, 61, 64, 66, 67, 69, 71, 73, 75, 76, 77, 78, 82, 85, 86, 87, 89, 90, 95, 96, 98, 104, 107, 109, 113, 65, 62, 60, 47, 46, 100, 99, 102, 91, 80, 7, 5, 92, 88, 74, 57, 55, 108, 84, 81, 79, 54, 101, 11, 103, 94, 48, 83, 72, 63, 2, 68, 51, 53, 97, 93, 70, 45, 52, 14, 59, 6, 10, 32, 33, 29, 30]"))
 
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=recid%3A30&rg=100&rm=wrd',
-                                               expected_text="[3, 4, 8, 9, 13, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 34, 43, 49, 56, 66, 67, 69, 71, 73, 75, 76, 87, 90, 98, 104, 107, 109, 113, 12, 95, 85, 82, 44, 1, 89, 64, 58, 15, 96, 61, 50, 86, 78, 77, 65, 62, 60, 47, 46, 100, 99, 102, 91, 80, 7, 92, 88, 74, 57, 55, 108, 84, 81, 79, 54, 101, 11, 103, 94, 48, 83, 72, 63, 2, 68, 51, 5, 53, 97, 93, 70, 45, 52, 14, 59, 6, 10, 32, 33, 29, 30]"))
+                                               expected_text="[3, 4, 8, 9, 13, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 31, 34, 43, 49, 56, 66, 67, 69, 71, 73, 75, 76, 87, 90, 98, 104, 107, 109, 113, 12, 95, 85, 82, 44, 1, 89, 64, 58, 15, 96, 61, 50, 86, 78, 77, 65, 62, 60, 47, 46, 100, 99, 102, 91, 80, 7, 5, 92, 88, 74, 57, 55, 108, 84, 81, 79, 54, 101, 11, 103, 94, 48, 83, 72, 63, 2, 68, 51, 53, 97, 93, 70, 45, 52, 14, 59, 6, 10, 32, 33, 29, 30]"))
+
+
+class TestSolrLoadLogicalFieldSettings(unittest.TestCase):
+    """Test for loading Solr logical field settings. Requires:
+    make install-solrutils
+    CFG_SOLR_URL set
+    WRD method referring to Solr: <invenio installation>/etc/bibrank$ cp template_word_similarity_solr.cfg wrd.cfg
+    """
+
+    @nottest
+    def test_load_logical_fields(self):
+        """solrutils - load logical fields"""
+        self.assertEqual({'abstract': ['abstract'], 'author': ['author'], 'title': ['title'], 'keyword': ['keyword']},
+                         get_logical_fields())
+
+    @nottest
+    def test_load_tags(self):
+        """solrutils - load tags"""
+        self.assertEqual({'abstract': ['520__%'], 'author': ['100__a', '700__a'], 'title': ['245__%', '246__%'], 'keyword': ['6531_a']},
+                         get_tags())
+
+
+class TestSolrBuildFieldContent(unittest.TestCase):
+    """Test for building Solr field content. Requires:
+    make install-solrutils
+    CFG_SOLR_URL set
+    WRD method referring to Solr: <invenio installation>/etc/bibrank$ cp template_word_similarity_solr.cfg wrd.cfg
+    """
+
+    @nottest
+    def test_build_default_field_content(self):
+        """solrutils - build default field content"""
+        tags = get_tags()
+
+        self.assertEqual(u'Ellis, J Enqvist, K Nanopoulos, D V',
+                         get_field_content_in_utf8(18, 'author', tags))
+
+        self.assertEqual(u'Kahler manifolds gravitinos axions constraints noscale',
+                         get_field_content_in_utf8(18, 'keyword', tags))
+
+        self.assertEqual(u'In 1962, CERN hosted the 11th International Conference on High Energy Physics. Among the distinguished visitors were eight Nobel prizewinners.Left to right: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang and Robert Hofstadter.',
+                         get_field_content_in_utf8(6, 'abstract', tags))
+
+    @nottest
+    def test_build_custom_field_content(self):
+        """solrutils - build custom field content"""
+        tags = {'abstract': ['520__%', '590__%']}
+
+        self.assertEqual(u"""In 1962, CERN hosted the 11th International Conference on High Energy Physics. Among the distinguished visitors were eight Nobel prizewinners.Left to right: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang and Robert Hofstadter. En 1962, le CERN est l'hote de la onzieme Conference Internationale de Physique des Hautes Energies. Parmi les visiteurs eminents se trouvaient huit laureats du prix Nobel.De gauche a droite: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang et Robert Hofstadter.""",
+                         get_field_content_in_utf8(6, 'abstract', tags))
 
 
 TESTS = []
@@ -336,7 +389,13 @@ TESTS = []
 if CFG_SOLR_URL:
     TESTS.extend((TestSolrSearch, TestSolrWebSearch))
     if get_external_word_similarity_ranker() == 'solr':
-        TESTS.extend((TestSolrRanking, TestSolrSimilarToRecid, TestSolrWebRanking, TestSolrWebSimilarToRecid))
+        TESTS.extend((TestSolrRanking,
+                      TestSolrSimilarToRecid,
+                      TestSolrWebRanking,
+                      TestSolrWebSimilarToRecid,
+                      TestSolrLoadLogicalFieldSettings,
+                      TestSolrBuildFieldContent,
+                      ))
 
 
 TEST_SUITE = make_test_suite(*TESTS)

@@ -136,7 +136,7 @@
       -->
     <!-- <maxBufferedDocs>1000</maxBufferedDocs> -->
 
-    <maxFieldLength>10000</maxFieldLength>
+    <maxFieldLength>1000000</maxFieldLength>
     <writeLockTimeout>1000</writeLockTimeout>
     <commitLockTimeout>10000</commitLockTimeout>
 
@@ -299,12 +299,10 @@
                    since a document was added before automaticly
                    triggering a new commit. 
       -->
-    <!--
        <autoCommit> 
          <maxDocs>10000</maxDocs>
-         <maxTime>1000</maxTime> 
+         <maxTime>300000</maxTime> <!-- Autocommit after 5min (300Kms) at latest -->
        </autoCommit>
-      -->
 
     <!-- Update Related Event Listeners
          
@@ -391,7 +389,7 @@
          be based on the last SolrCore to be initialized.
          
       -->
-    <maxBooleanClauses>1024</maxBooleanClauses>
+    <maxBooleanClauses>10240</maxBooleanClauses>
 
 
     <!-- Solr Internal Query Caches

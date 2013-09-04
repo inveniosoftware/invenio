@@ -1385,6 +1385,15 @@ def get_fld(fldID=''):
     except StandardError, e:
         return ""
 
+def get_fld_id(fld_name=''):
+    """Returns field id for a field name"""
+
+    try:
+        res = run_sql('SELECT id FROM field WHERE name=%s', (fld_name,))
+        return res[0][0]
+    except StandardError, e:
+        return ''
+
 def get_fld_value(fldvID = ''):
     """Returns fieldvalue"""
 

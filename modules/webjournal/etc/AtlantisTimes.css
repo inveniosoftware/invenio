@@ -113,7 +113,13 @@ h2.rightColumnHeader {
 }
 /* Images in detailed articles */
 .imageScale, .imageScale img {
-        width:280px;
+        width:280px !important;
+	height:auto !important;
+}
+/* Wide images in detailed articles */
+.imageScaleWide, .imageScaleWide img {
+        width:100% !important;
+	height:auto !important;
 }
 /* First article image on index page.
 We cannot reuse the phl, ph and phr classes to draw the border, or the
@@ -241,6 +247,21 @@ a.selectedNavigationPage:hover {
         color:#555;
         padding:2px;
         text-align:center;
+}
+/* Wide centered container for image + caption */
+.phwidewithcaption {
+        width:100%;
+        margin:auto;
+	border:1px solid #999;
+        background-color:#fff;
+        clear:both;
+        font-size:80%;
+        color:#555;
+        padding:2px;
+        text-align:left;
+}
+.phwidewithcaption p{
+	width:100%;
 }
 /* Left-aligned container for image + caption */
 .phlwithcaption {

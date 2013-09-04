@@ -115,6 +115,7 @@ img_DATA = add-small.png \
            journal-template2.gif \
            journal-template3.gif \
            journal-template4.gif \
+           journal-template5.gif \
            journal_Athanasius_Kircher_Atlantis.gif \
            journal_content.png \
            journal_footer.png \

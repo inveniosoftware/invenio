@@ -413,7 +413,10 @@ def oairepositoryupdater_task():
             oai_out.close()
             write_message("Wrote to file %s" % filename)
             if not no_upload:
-                task_low_level_submission('bibupload', 'oairepository', '-c', filename)
+                if task_get_option("notimechange"):
+                    task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n')
+                else:
+                    task_low_level_submission('bibupload', 'oairepository', '-c', filename)
             # Prepare to save results in a tmp file
             (fd, filename) = mkstemp(dir=CFG_TMPDIR,
                                         prefix='oairepository_' + \
@@ -428,12 +431,15 @@ def oairepositoryupdater_task():
     oai_out.close()
     write_message("Wrote to file %s" % filename)
 
-    if not no_upload:
-        task_sleep_now_if_required(can_stop_too=True)
-        if tot > 0:
-            task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n')
-        else:
-            os.remove(filename)
+    if tot > 0:
+        if not no_upload:
+            task_sleep_now_if_required(can_stop_too=True)
+            if task_get_option("notimechange"):
+                task_low_level_submission('bibupload', 'oairepository', '-c', filename, '-n')
+            else:
+                task_low_level_submission('bibupload', 'oairepository', '-c', filename)
+    else:
+        os.remove(filename)
 
     return True
 
@@ -486,11 +492,14 @@ field. Please revise your configuration for the variables
             help_specific_usage="Options:\n"
                 " -r --report\t\tOAI repository status\n"
                 " -d --detailed-report\t\tOAI repository detailed status\n"
-                " -n --no-process\tDo no upload the modifications\n",
+                " -n --no-process\tDo no upload the modifications\n"
+                " --notimechange\tDo not update record modification_date\n"
+                "NOTE: --notimechange should be used with care, basically only the first time a new set is added.",
             specific_params=("rdn", [
                 "report",
                 "detailed-report",
-                "no-process"]),
+                "no-process",
+                "notimechange"]),
             task_submit_elaborate_specific_parameter_fnc=
                 task_submit_elaborate_specific_parameter,
             task_run_fnc=oairepositoryupdater_task)
@@ -503,6 +512,8 @@ def task_submit_elaborate_specific_parameter(key, _value, _opts, _args):
         task_set_option("report", 2)
     elif key in ("-n", "--no-process"):
         task_set_option("no_upload", 1)
+    elif key in ("--notimechange",):
+        task_set_option("notimechange", 1)
     else:
         return False
     return True
