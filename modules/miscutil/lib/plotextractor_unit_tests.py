@@ -21,7 +21,6 @@
 
 __revision__ = "$Id$"
 
-import os
 from invenio.testutils import InvenioTestCase
 
 from invenio.plotextractor import put_it_together, \
@@ -31,9 +30,10 @@ from invenio.plotextractor import put_it_together, \
 from invenio.plotextractor_output_utils import remove_dups, \
                                                get_converted_image_name
 
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL
+from plotextractor_getter import harvest_single
+
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.shellutils import run_shell_command
+
 
 class PutItTogetherTest(InvenioTestCase):
     """Test functions related to the put_it_together function."""
@@ -50,7 +50,7 @@ class PutItTogetherTest(InvenioTestCase):
         single_caption = 'singlecaption'
         single_label = 'singlelabel'
 
-        cur_image, caption, images_and_captions = \
+        dummy1, dummy2, images_and_captions = \
                 put_it_together(single_image, single_caption, single_label,
                                 self.empty_images_and_captions, self.dummy_line_index,
                                 self.empty_lines)
@@ -63,7 +63,7 @@ class PutItTogetherTest(InvenioTestCase):
         no_main_two_subs = ['', ['img1', 'img2']]
         single_caption = 'singlecaption'
         single_label = 'singlelabel'
-        cur_image, caption, images_and_captions = \
+        dummy1, dummy2, images_and_captions = \
                 put_it_together(no_main_two_subs, single_caption, single_label,
                                 self.empty_images_and_captions, self.dummy_line_index,
                                 self.empty_lines)
@@ -76,7 +76,7 @@ class PutItTogetherTest(InvenioTestCase):
         no_main_two_subs = ['', ['sub1', 'sub2']]
         main_and_two_sub_captions = ['main caption', ['subcap1', 'subcap2']]
         single_label = 'singlelabel'
-        cur_image, caption, images_and_captions = \
+        dummy1, dummy2, images_and_captions = \
                 put_it_together(no_main_two_subs, main_and_two_sub_captions, single_label,
                                 self.empty_images_and_captions, self.dummy_line_index,
                                 self.empty_lines)
@@ -91,7 +91,7 @@ class PutItTogetherTest(InvenioTestCase):
         main_and_two_sub_images = ['main', ['sub1', 'sub2']]
         main_and_two_sub_captions = ['main caption', ['subcap1', 'subcap2']]
         single_label = 'singlelabel'
-        cur_image, caption, images_and_captions = \
+        dummy1, dummy2, images_and_captions = \
                 put_it_together(main_and_two_sub_images,
                                 main_and_two_sub_captions,
                                 single_label,
@@ -107,7 +107,7 @@ class PutItTogetherTest(InvenioTestCase):
         single_image = 'singleimage'
         no_main_two_subcaptions = ['', ['subcap1', 'subcap2']]
         single_label = 'singlelabel'
-        cur_image, caption, images_and_captions = \
+        dummy1, dummy2, images_and_captions = \
                 put_it_together(single_image, no_main_two_subcaptions, single_label,
                                 self.empty_images_and_captions, self.dummy_line_index,
                                 self.empty_lines)
@@ -121,7 +121,7 @@ class PutItTogetherTest(InvenioTestCase):
         single_image = 'singleimage'
         no_caption = ''
         single_label = 'singlelabel'
-        cur_image, caption, images_and_captions = \
+        dummy1, dummy2, images_and_captions = \
                 put_it_together(single_image, no_caption, single_label,
                                 self.empty_images_and_captions, 1,
                                 self.example_lines)
@@ -318,9 +318,18 @@ class TestGetConvertedImageName(InvenioTestCase):
         converted_image = get_converted_image_name(image)
         self.assertTrue(converted_image == '/path/to/image.png', 'didn\'t change extension')
 
+
+class TestGetter(unittest.TestCase):
+
+    def test_harvest_single(self):
+        """plotextractor - check harvest_single"""
+        tarball, pdf = harvest_single('arXiv:1204.6260', '/tmp', ('pdf', 'tarball'))
+        self.assertTrue(pdf != None, "PDF is of unknown type")
+        self.assertTrue(tarball != None, "Tarball is of unknown type")
+
 TEST_SUITE = make_test_suite(PutItTogetherTest, TestFindOpenAndCloseBraces, \
                              TestIntelligentlyFindFilenames, TestAssembleCaption, TestRemoveDups, \
-                             TestGetConvertedImageName) # FIXME
+                             TestGetConvertedImageName, TestGetter)  # FIXME
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

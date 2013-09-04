@@ -139,8 +139,8 @@ class TestTask(unittest.TestCase):
         record_has_fulltext(1)
 
     def test_download_external_url_invalid_content_type(self):
-        from invenio.arxiv_pdf_checker import download_external_url, \
-                                              InvenioFileDownloadError
+        from invenio.filedownloadutils import (download_external_url,
+                                               InvenioFileDownloadError)
         from invenio.config import CFG_SITE_URL
         temp_fd, temp_path = mkstemp()
         os.close(temp_fd)
@@ -156,8 +156,8 @@ class TestTask(unittest.TestCase):
             os.unlink(temp_path)
 
     def test_download_external_url(self):
-        from invenio.arxiv_pdf_checker import download_external_url, \
-                                              InvenioFileDownloadError
+        from invenio.filedownloadutils import (download_external_url,
+                                               InvenioFileDownloadError)
 
         temp_fd, temp_path = mkstemp()
         os.close(temp_fd)

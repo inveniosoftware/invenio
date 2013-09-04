@@ -29,7 +29,6 @@ import re
 from datetime import datetime
 from tempfile import NamedTemporaryFile
 from xml.dom import minidom
-import urllib2
 import socket
 
 from invenio.bibdocfilecli import bibupload_ffts
@@ -57,6 +56,8 @@ from invenio.bibdocfile import BibRecDocs, \
                                calculate_md5
 from invenio.oai_harvest_dblayer import get_oai_src
 from invenio import oai_harvest_daemon
+from invenio.filedownloadutils import (download_external_url,
+                                       InvenioFileDownloadError)
 
 
 NAME = 'arxiv-pdf-checker'
@@ -64,13 +65,6 @@ ARXIV_VERSION_PATTERN = re.compile(ur'v\d$', re.UNICODE)
 
 STATUS_OK = 'ok'
 STATUS_MISSING = 'missing'
-
-
-class InvenioFileDownloadError(Exception):
-    """A generic download exception."""
-    def __init__(self, msg, code=None):
-        Exception.__init__(self, msg)
-        self.code = code
 
 
 class PdfNotAvailable(Exception):
@@ -153,160 +147,6 @@ def fetch_arxiv_pdf_status(recid):
     return ret and ret[0] or (None, None)
 
 
-### File utils temporary acquisition
-
-# Block size when performing I/O.
-CFG_FILEUTILS_BLOCK_SIZE = 1024 * 8
-
-
-def open_url(url, headers=None):
-    """
-    Opens a URL. If headers are passed as argument, no check is performed and
-    the URL will be opened. Otherwise checks if the URL is present in
-    CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS and uses the headers specified in
-    the config variable.
-
-    @param url: the URL to open
-    @type url: string
-    @param headers: the headers to use
-    @type headers: dictionary
-    @return: a file-like object as returned by urllib2.urlopen.
-    """
-    request = urllib2.Request(url)
-    if headers:
-        for key, value in headers.items():
-            request.add_header(key, value)
-    return urllib2.urlopen(request)
-
-
-def download_external_url(url, download_to_file, content_type=None,
-                          retry_count=10, timeout=10.0):
-    """
-    Download a url (if it corresponds to a remote file) and return a
-    local url to it. If format is specified, a check will be performed
-    in order to make sure that the format of the downloaded file is equal
-    to the expected format.
-
-    @param url: the URL to download
-    @type url: string
-
-    @param download_to_file: the path to download the file to
-    @type url: string
-
-    @param content_type: the content_type of the file (optional)
-    @type format: string
-
-    @param retry_count: max number of retries for downloading the file
-    @type url: int
-
-    @param timeout: time to sleep in between attemps
-    @type url: int
-
-    @return: the path to the download local file
-    @rtype: string
-    @raise InvenioFileDownloadError: if the download failed
-    """
-    error_str = ""
-    error_code = None
-    retry_attempt = 0
-
-    while retry_attempt < retry_count:
-        try:
-            # Attempt to download the external file
-            request = open_url(url)
-            if request.code == 200 and "Refresh" in request.headers:
-                # PDF is being generated, they ask us to wait for n seconds
-                # New arxiv responses, we are not sure if the old ones are
-                # desactivated
-                try:
-                    retry_after = int(request.headers["Refresh"])
-                    # We make sure that we do not retry too often even if
-                    # they tell us to retry after 1s
-                    retry_after = max(retry_after, timeout)
-                except ValueError:
-                    retry_after = timeout
-                write_message("retrying after %ss" % retry_after)
-                time.sleep(retry_after)
-                retry_attempt += 1
-                continue
-        except urllib2.HTTPError, e:
-            error_code = e.code
-            error_str = str(e)
-            retry_after = timeout
-            # This handling is the same as OAI queries.
-            # We are getting 503 errors when PDFs are being generated
-            if e.code == 503 and "Retry-After" in e.headers:
-                # PDF is being generated, they ask us to wait for n seconds
-                try:
-                    retry_after = int(e.headers["Retry-After"])
-                    # We make sure that we do not retry too often even if
-                    # they tell us to retry after 1s
-                    retry_after = max(retry_after, timeout)
-                except ValueError:
-                    pass
-            write_message("retrying after %ss" % retry_after)
-            time.sleep(retry_after)
-            retry_attempt += 1
-        except (urllib2.URLError, socket.timeout, socket.gaierror, socket.error), e:
-            error_str = str(e)
-            write_message("socket error, retrying after %ss" % retry_after)
-            time.sleep(timeout)
-            retry_attempt += 1
-        else:
-            # When we get here, it means that the download was a success.
-            try:
-                finalize_download(url, download_to_file, content_type, request)
-            finally:
-                request.close()
-            return download_to_file
-
-    # All the attempts were used, but no successfull download - so raise error
-    raise InvenioFileDownloadError('URL could not be opened: %s' % (error_str,), code=error_code)
-
-
-def finalize_download(url, download_to_file, content_type, request):
-    # If format is given, a format check is performed.
-    if content_type and content_type not in request.headers['content-type']:
-        msg = 'The downloaded file is not of the desired format'
-        raise InvenioFileDownloadError(msg)
-
-    # Save the downloaded file to desired or generated location.
-    to_file = open(download_to_file, 'w')
-    try:
-        try:
-            while True:
-                block = request.read(CFG_FILEUTILS_BLOCK_SIZE)
-                if not block:
-                    break
-                to_file.write(block)
-        except Exception, e:
-            raise InvenioFileDownloadError("Error when downloading %s into %s: %s" %
-                    (url, download_to_file, e))
-    finally:
-        to_file.close()
-
-    # Check Size
-    filesize = os.path.getsize(download_to_file)
-    if filesize == 0:
-        raise InvenioFileDownloadError("%s seems to be empty" % (url,))
-
-    # Check if it is not an html not found page
-    if filesize < 25000:
-        f = open(download_to_file)
-        try:
-            for line in f:
-                if 'PDF unavailable' in line:
-                    raise PdfNotAvailable()
-        finally:
-            f.close()
-
-    # download successful, return the new path
-    return download_to_file
-
-
-### End of file utils temporary acquisition
-
-
 def download_one(recid, version):
     """Download given version of the PDF from arxiv"""
     write_message('fetching %s' % recid)
@@ -324,6 +164,18 @@ def download_one(recid, version):
         path = download_external_url(url_for_pdf,
                                      temp_file.name,
                                      content_type='pdf')
+
+        # Check if it is not an html not found page
+        filesize = os.path.getsize(path)
+        if filesize < 25000:
+            f = open(path)
+            try:
+                for line in f:
+                    if 'PDF unavailable' in line:
+                        raise PdfNotAvailable()
+            finally:
+                f.close()
+
         docs = BibRecDocs(recid)
         bibdocfiles = docs.list_latest_files(doctype="arXiv")
 
