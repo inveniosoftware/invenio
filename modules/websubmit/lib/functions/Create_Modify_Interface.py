@@ -24,11 +24,13 @@ import os
 import re
 import time
 import pprint
+import cgi
 
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.errorlib import register_exception
+from invenio.htmlutils import escape_javascript_string
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
     """Read a field's value from its corresponding text file in 'cur_dir' (if it exists) into memory.
@@ -206,16 +208,19 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
             val = res[0][8]
             fidesc = res[0][9]
             if element_type == "T":
-                text = "<TEXTAREA name=\"%s\" rows=%s cols=%s wrap>%s</TEXTAREA>" % (field, numrows, numcols, value)
+                text = "<textarea name=\"%s\" rows=%s cols=%s wrap>%s</textarea>" % (field, numrows, numcols, cgi.escape(value))
             elif element_type == "F":
-                text = "<INPUT TYPE=\"file\" name=\"%s\" size=%s maxlength=\"%s\">" % (field, size, maxlength)
+                text = "<input type=\"file\" name=\"%s\" size=%s maxlength=\"%s\">" % (field, size, maxlength)
             elif element_type == "I":
-                value = re.sub("[\n\r\t]+", "", value)
-                text = "<INPUT name=\"%s\" size=%s value=\"%s\"> " % (field, size, val)
-                text = text + "<SCRIPT>document.forms[0].%s.value=\"%s\";</SCRIPT>" % (field, value)
+                text = "<input name=\"%s\" size=%s value=\"%s\"> " % (field, size, val and escape_javascript_string(val, escape_quote_for_html=True) or '')
+                text = text + '''<script type="text/javascript">/*<![CDATA[*/
+                document.forms[0].%s.value="%s";
+                /*]]>*/</script>''' % (field, escape_javascript_string(value, escape_for_html=False))
             elif element_type == "H":
-                text = "<INPUT type=\"hidden\" name=\"%s\" value=\"%s\">" % (field, val)
-                text = text + "<SCRIPT>document.forms[0].%s.value=\"%s\";</SCRIPT>" % (field, value)
+                text = "<input type=\"hidden\" name=\"%s\" value=\"%s\">" % (field, val and escape_javascript_string(val, escape_quote_for_html=True) or '')
+                text = text + '''<script type="text/javascript">/*<![CDATA[*/
+                document.forms[0].%s.value="%s";
+                /*]]>*/</script>''' % (field, escape_javascript_string(value, escape_for_html=False))
             elif element_type == "S":
                 values = re.split("[\n\r]+", value)
                 text = fidesc
@@ -224,7 +229,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
                 else:
                     multipletext = ""
                 if len(values) > 0 and not(len(values) == 1 and values[0] == ""):
-                    text += "<SCRIPT>\n"
+                    text += '<script type="text/javascript">/*<![CDATA[*/\n'
                     text += "var i = 0;\n"
                     text += "el = document.forms[0].elements['%s%s'];\n" % (field, multipletext)
                     text += "max = el.length;\n"
@@ -232,7 +237,8 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
                         text += "var found = 0;\n"
                         text += "var i=0;\n"
                         text += "while (i != max) {\n"
-                        text += "  if (el.options[i].value == \"%s\" || el.options[i].text == \"%s\") {\n" % (val, val)
+                        text += "  if (el.options[i].value == \"%s\" || el.options[i].text == \"%s\") {\n" % \
+                          (escape_javascript_string(val, escape_for_html=False), escape_javascript_string(val, escape_for_html=False))
                         text += "    el.options[i].selected = true;\n"
                         text += "    found = 1;\n"
                         text += "  }\n"
@@ -241,7 +247,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
                         #text += "if (found == 0) {\n"
                         #text += "  el[el.length] = new Option(\"%s\", \"%s\", 1,1);\n"
                         #text += "}\n"
-                    text += "</SCRIPT>\n"
+                    text += "/*]]>*/</script>\n"
             elif element_type == "D":
                 text = fidesc
             elif element_type == "R":
