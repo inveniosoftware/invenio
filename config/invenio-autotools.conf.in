@@ -39,7 +39,6 @@ CFG_WEBDIR = @localstatedir@/www
 
 ## path to interesting programs:
 CFG_PATH_MYSQL = @MYSQL@
-CFG_PATH_PHP = @PHP@
 CFG_PATH_GZIP = @GZIP@
 CFG_PATH_GUNZIP = @GUNZIP@
 CFG_PATH_TAR = @TAR@

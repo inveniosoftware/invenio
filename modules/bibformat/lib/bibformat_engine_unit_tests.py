@@ -28,7 +28,6 @@ from invenio.testutils import InvenioTestCase
 import os
 import sys
 
-from invenio import bibformat
 from invenio import bibformat_engine
 from invenio import bibformat_utils
 from invenio import bibformat_config
@@ -130,7 +129,7 @@ class FormatElementTest(InvenioTestCase):
         #Test elements filename starting without bfe_, with underscore instead of space
         filenames = ["test 1", "test 1.py", "bfe_test 1", "bfe_test 1.py", "BFE_test 1",
                      "BFE_TEST 1", "BFE_TEST 1.py", "BFE_TeST 1.py", "BFE_TeST 1",
-                     "BfE_TeST 1.py", "BfE_TeST 1","test_1", "test_1.py", "bfe_test_1",
+                     "BfE_TeST 1.py", "BfE_TeST 1", "test_1", "test_1.py", "bfe_test_1",
                      "bfe_test_1.py", "BFE_test_1",
                      "BFE_TEST_1", "BFE_TEST_1.py", "BFE_Test_1.py", "BFE_TeST_1",
                      "BfE_TeST_1.py", "BfE_TeST_1"]
@@ -146,7 +145,7 @@ class FormatElementTest(InvenioTestCase):
         #Test elements filename starting with bfe_, and with underscores instead of spaces
         filenames = ["test 2", "test 2.py", "bfe_test 2", "bfe_test 2.py", "BFE_test 2",
                      "BFE_TEST 2", "BFE_TEST 2.py", "BFE_TeST 2.py", "BFE_TeST 2",
-                     "BfE_TeST 2.py", "BfE_TeST 2","test_2", "test_2.py", "bfe_test_2",
+                     "BfE_TeST 2.py", "BfE_TeST 2", "test_2", "test_2.py", "bfe_test_2",
                      "bfe_test_2.py", "BFE_test_2",
                      "BFE_TEST_2", "BFE_TEST_2.py", "BFE_TeST_2.py", "BFE_TeST_2",
                      "BfE_TeST_2.py", "BfE_TeST_2"]
@@ -188,9 +187,9 @@ class FormatElementTest(InvenioTestCase):
         element_5 = bibformat_engine.get_format_element("test_5", with_built_in_params=True)
         self.assert_(element_5 is not None)
         self.assertEqual(element_5['attrs']['description'], '')
-        self.assert_({'name':"param1",
-                     'description':"(no description provided)",
-                     'default':""} in element_5['attrs']['params'] )
+        self.assert_({'name': "param1",
+                     'description': "(no description provided)",
+                     'default': ""} in element_5['attrs']['params'])
         self.assertEqual(element_5['attrs']['seealso'], [])
 
         #Test correct parsing:
@@ -205,13 +204,13 @@ class FormatElementTest(InvenioTestCase):
         #Test @see: parsing
         self.assertEqual(element_1['attrs']['seealso'], ["element2.py", "unknown_element.py"])
         #Test @param parsing
-        self.assert_({'name':"param1",
-                      'description':"desc 1",
-                      'default':""} in element_1['attrs']['params'] )
+        self.assert_({'name': "param1",
+                      'description': "desc 1",
+                      'default': ""} in element_1['attrs']['params'])
 
-        self.assert_({'name':"param2",
-                      'description':"desc 2",
-                      'default':"default value"} in element_1['attrs']['params'] )
+        self.assert_({'name': "param2",
+                      'description': "desc 2",
+                      'default': "default value"} in element_1['attrs']['params'])
 
 
 
@@ -293,13 +292,15 @@ class OutputFormatTest(InvenioTestCase):
         self.assert_(len(output_2['attrs']['code']) <= 6)
         self.assertEqual(output_2['rules'], [])
         unknown_output = bibformat_engine.get_output_format("unknow", with_attributes=True)
-        self.assertEqual(unknown_output, {'rules':[],
-                                          'default':"",
-                                          'attrs':{'names':{'generic':"", 'ln':{}, 'sn':{}},
-                                                   'description':'',
-                                                   'code':"UNKNOW",
-                                                   'visibility': 1,
-                                                   'content_type':""}})
+        self.assertEqual(unknown_output, {'rules': [],
+                                          'default': "",
+                                          'attrs': {'names': {'generic': "",
+                                                              'ln': {},
+                                                              'sn': {}},
+                                                    'description': '',
+                                                    'code': "UNKNOW",
+                                                    'visibility': 1,
+                                                    'content_type': ""}})
 
     def test_get_output_formats(self):
         """ bibformat - loading multiple output formats """
@@ -452,7 +453,7 @@ class PatternTest(InvenioTestCase):
         param_i = 0
         for match in results:
             self.assertEqual(match.group('param'), names[param_i])
-            self.assertEqual(match.group('value'), values [param_i])
+            self.assertEqual(match.group('value'), values[param_i])
             param_i += 1
 
     def test_pattern_format_element_params(self):
@@ -561,14 +562,14 @@ class EscapingAndWashingTest(InvenioTestCase):
         # just escape everything
         text3 = """Ok, let't try with something unparsable < hehe <a onclick="http://www.mycrappywebsite.com" href="login.html">login</a>"""
         result = bibformat_engine.escape_field(text3, mode=2)
-        self.assert_('mycrappywebsite' not in result.lower() or \
+        self.assert_('mycrappywebsite' not in result.lower() or
                      '<a' not in result.lower())
 
         result = bibformat_engine.escape_field(text3, mode=3)
         self.assert_('<a' not in result.lower())
 
         result = bibformat_engine.escape_field(text3, mode=5)
-        self.assert_('mycrappywebsite' not in result.lower() or \
+        self.assert_('mycrappywebsite' not in result.lower() or
                      '<a' not in result.lower())
 
         result = bibformat_engine.escape_field(text3, mode=6)
@@ -765,7 +766,7 @@ class FormatTest(InvenioTestCase):
 
         #Default formatting
         result, needs_2nd_pass = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)
-        self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n''')
+        self.assertEqual(result, '''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n''')
         self.assertEqual(needs_2nd_pass, False)
 
     def test_empty_formatting(self):
@@ -808,7 +809,6 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(needs_2nd_pass, True)
 
         out = bibformat_engine.format_record_2nd_pass(recID=None,
-                                                      of="test6",
                                                       template=result)
         self.assertEqual(out, "helloworld\n")
 
@@ -840,7 +840,6 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(needs_2nd_pass, True)
 
         out = bibformat_engine.format_record_2nd_pass(recID=None,
-                                                      of="test8",
                                                       template=result,
                                                       ln='en')
         self.assertEqual(out, 'Title en\nhelloworld\n<input type="button" value="Record"/>')
@@ -855,7 +854,6 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(needs_2nd_pass, True)
 
         out = bibformat_engine.format_record_2nd_pass(recID=None,
-                                                      of="test8",
                                                       template=result,
                                                       ln='fr')
         self.assertEqual(out, 'Titre fr\nhelloworld\n<input type="button" value="Notice"/>')
@@ -893,12 +891,13 @@ class MarcFilteringTest(InvenioTestCase):
         </datafield>
         </record>
         '''
+
     def test_filtering(self):
         """bibformat - filter hidden fields"""
-        newxml = bibformat_engine.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=True)
+        newxml = bibformat_engine.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595'], force_filtering=True)
         numhfields = newxml.count("595")
         self.assertEqual(numhfields, 0)
-        newxml = bibformat_engine.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=False)
+        newxml = bibformat_engine.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595'], force_filtering=False)
         numhfields = newxml.count("595")
         self.assertEqual(numhfields, 1)
 

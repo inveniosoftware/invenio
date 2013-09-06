@@ -40,7 +40,6 @@ and how the visible URLs are organized.
       /opt/invenio/
       /opt/invenio/bin
       /opt/invenio/lib
-      /opt/invenio/lib/php
       /opt/invenio/lib/python
       /opt/invenio/lib/wml
       /opt/invenio/var
@@ -50,8 +49,6 @@ and how the visible URLs are organized.
    with the obvious meaning:
 
       - bin : for command-line executable binaries and scripts
-
-      - lib/php : for our own PHP libraries, see below
 
       - lib/python : for our own Python libraries, see below
 
@@ -100,10 +97,9 @@ and how the visible URLs are organized.
         available hacking documention, etc.  The module-specific
         information is available under CFG_SITE_URL/hacking/&lt;module&gt;/.
 
-4. Let's now return a bit more closely to the role Python and PHP
+4. Let's now return a bit more closely to the role Python
    library directories outside of the Apache tree:
 
-      /opt/invenio/lib/php
       /opt/invenio/lib/python
 
    Here we put not only (a) libraries that may be reused across CDS

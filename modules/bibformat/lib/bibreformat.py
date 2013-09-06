@@ -22,38 +22,26 @@
 
 __revision__ = "$Id$"
 
-import sys
+import os
+from datetime import datetime
 
-try:
-    from invenio.dbquery import run_sql
-    from invenio.config import \
-         CFG_SITE_URL,\
-         CFG_TMPDIR,\
-         CFG_BINDIR
+from invenio.dbquery import run_sql
 
-    from invenio.intbitset import intbitset
-    from invenio.search_engine import perform_request_search, search_pattern
-    from invenio.search_engine import print_record
-    from invenio.bibrank_citation_searcher import get_cited_by
-    from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
-    from invenio.bibformat import format_record
-    from invenio.bibformat_dblayer import save_preformatted_record
-    from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
-    from invenio.shellutils import split_cli_ids_arg
-    from invenio.bibtask import task_init, write_message, task_set_option, \
-            task_get_option, task_update_progress, task_has_option, \
-            task_low_level_submission, task_sleep_now_if_required
-    import os
-    import time
-    from datetime import datetime
-except ImportError, e:
-    print "Error: %s" % e
-    sys.exit(1)
+from invenio.intbitset import intbitset
+from invenio.search_engine import perform_request_search, search_pattern
+from invenio.bibrank_citation_searcher import get_cited_by
+from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
+from invenio.bibformat_dblayer import save_preformatted_record
+from invenio.shellutils import split_cli_ids_arg
+from invenio.bibtask import task_init, write_message, task_set_option, \
+        task_get_option, task_update_progress, task_has_option, \
+        task_sleep_now_if_required
+from invenio.bibformat_engine import format_record_1st_pass
 
 
-def fetch_last_updated(format):
+def fetch_last_updated(fmt):
     select_sql = "SELECT last_updated FROM format WHERE code = %s"
-    row = run_sql(select_sql, (format.lower(), ))
+    row = run_sql(select_sql, (fmt.lower(), ))
 
     # Fallback in case we receive None instead of a valid date
     last_date = row[0][0] or datetime(year=1900, month=1, day=1)
@@ -61,10 +49,10 @@ def fetch_last_updated(format):
     return last_date
 
 
-def store_last_updated(format, iso_date):
+def store_last_updated(fmt, iso_date):
     sql = "UPDATE format SET last_updated = %s " \
            "WHERE code = %s AND (last_updated < %s or last_updated IS NULL)"
-    run_sql(sql, (iso_date, format.lower(), iso_date))
+    run_sql(sql, (iso_date, fmt.lower(), iso_date))
 
 
 ### run the bibreformat task bibsched scheduled
@@ -153,14 +141,7 @@ def bibreformat_task(fmt, recids, without_fmt, process):
 
 ### Iterate over all records prepared in lists I (option)
     if process:
-        if CFG_BIBFORMAT_USE_OLD_BIBFORMAT: # FIXME: remove this
-                                            # when migration from php to
-                                            # python bibformat is done
-            (total_rec_1, tbibformat_1, tbibupload_1) = iterate_over_old(recIDs,
-                                                                         fmt)
-        else:
-            (total_rec_1, tbibformat_1, tbibupload_1) = iterate_over_new(recIDs,
-                                                                         fmt)
+        total_rec_1, tbibformat_1, tbibupload_1 = iterate_over_new(recIDs, fmt)
         total_rec += total_rec_1
         tbibformat += tbibformat_1
         tbibupload += tbibupload_1
@@ -217,7 +198,7 @@ def check_validity_input_formats(input_formats):
 ### Bibreformat all selected records (using new python bibformat)
 ### (see iterate_over_old further down)
 
-def iterate_over_new(list, fmt):
+def iterate_over_new(recIDs, fmt):
     """
     Iterate over list of IDs
 
@@ -225,164 +206,31 @@ def iterate_over_new(list, fmt):
     @param fmt: the output format to use
     @return: tuple (total number of records, time taken to format, time taken to insert)
     """
-    global total_rec
-
     tbibformat  = 0     # time taken up by external call
     tbibupload  = 0     # time taken up by external call
 
-    tot = len(list)
-    count = 0
-    for recID in list:
+    tot = len(recIDs)
+    for count, recID in enumerate(recIDs):
         t1 = os.times()[4]
-        formatted_record = format_record(recID, fmt,
-                                         on_the_fly=True, save_missing=False)
+        formatted_record = format_record_1st_pass(recID=recID,
+                                                  of=fmt,
+                                                  on_the_fly=True,
+                                                  save_missing=False)
         save_preformatted_record(recID=recID,
                                  of=fmt,
                                  res=formatted_record,
                                  low_priority=True)
         t2 = os.times()[4]
-        tbibformat += (t2 - t1)
-        count += 1
-        if (count % 100) == 0:
+        tbibformat += t2 - t1
+        if count % 100 == 0:
             write_message("   ... formatted %s records out of %s" % (count, tot))
             task_update_progress('Formatted %s out of %s' % (count, tot))
             task_sleep_now_if_required(can_stop_too=True)
-    if (tot % 100) != 0:
-        write_message("   ... formatted %s records out of %s" % (count, tot))
-    return (tot, tbibformat, tbibupload)
 
+    if tot % 100 != 0:
+        write_message("   ... formatted %s records out of %s" % (tot, tot))
 
-def iterate_over_old(list, fmt):
-    """
-    Iterate over list of IDs
-
-    @param list: the list of record IDs to format
-    @param fmt: the output format to use
-    @return: tuple (total number of records, time taken to format, time taken to insert)
-    """
-
-    n_rec       = 0
-    n_max       = 10000
-    xml_content = ''        # hold the contents
-    tbibformat  = 0         # time taken up by external call
-    tbibupload  = 0         # time taken up by external call
-    total_rec   = 0         # Number of formatted records
-
-    for record in list:
-
-        n_rec = n_rec + 1
-        total_rec = total_rec + 1
-
-        message = "Processing record: %d" % (record)
-        write_message(message, verbose=9)
-
-        query = "id=%d&of=xm" % (record)
-
-        count = 0
-
-        contents = print_record(record, 'xm')
-
-        while (contents == "") and (count < 10):
-            contents = print_record(record, 'xm')
-            count = count + 1
-            time.sleep(10)
-        if count == 10:
-            sys.stderr.write("Failed to download %s from %s after 10 attempts... terminating" % (query, CFG_SITE_URL))
-            sys.exit(0)
-
-        xml_content = xml_content + contents
-
-        if xml_content:
-
-            if n_rec >= n_max:
-
-                finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
-                filename = "%s/bibreformat.xml" % CFG_TMPDIR
-                filehandle = open(filename , "w")
-                filehandle.write(xml_content)
-                filehandle.close()
-
-### bibformat external call
-###
-                task_sleep_now_if_required(can_stop_too=True)
-                t11 = os.times()[4]
-                message = "START bibformat external call"
-                write_message(message, verbose=9)
-                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (CFG_BINDIR, fmt.upper(), CFG_TMPDIR, finalfilename, CFG_TMPDIR)
-                os.system(command)
-
-                t22 = os.times()[4]
-                message = "END bibformat external call (time elapsed:%2f)" % (t22-t11)
-                write_message(message, verbose=9)
-                task_sleep_now_if_required(can_stop_too=True)
-                tbibformat = tbibformat + (t22 - t11)
-
-
-### bibupload external call
-###
-
-                t11 = os.times()[4]
-                message = "START bibupload external call"
-                write_message(message, verbose=9)
-
-                task_id = task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
-                write_message("Task #%s submitted" % task_id)
-
-                t22 = os.times()[4]
-                message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
-                write_message(message, verbose=9)
-
-                tbibupload = tbibupload + (t22- t11)
-
-                n_rec = 0
-                xml_content = ''
-
-### Process the last re-formated chunk
-###
-
-    if n_rec > 0:
-
-        write_message("Processing last record set (%d)" % n_rec, verbose=9)
-
-        finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
-        filename = "%s/bibreformat.xml" % CFG_TMPDIR
-        filehandle = open(filename, "w")
-        filehandle.write(xml_content)
-        filehandle.close()
-
-### bibformat external call
-###
-
-        t11 = os.times()[4]
-        message = "START bibformat external call"
-        write_message(message, verbose=9)
-
-        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (CFG_BINDIR, fmt.upper(), CFG_TMPDIR, finalfilename, CFG_TMPDIR)
-        os.system(command)
-
-        t22 = os.times()[4]
-        message = "END bibformat external call (time elapsed:%2f)" % (t22 - t11)
-        write_message(message, verbose=9)
-
-        tbibformat = tbibformat + (t22 - t11)
-
-### bibupload external call
-###
-
-        t11 = os.times()[4]
-        message = "START bibupload external call"
-        write_message(message, verbose=9)
-
-        task_id = task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
-        write_message("Task #%s submitted" % task_id)
-
-        t22 = os.times()[4]
-        message = "END bibupload external call (time elapsed:%2f)" % (t22 - t11)
-        write_message(message, verbose=9)
-
-        tbibupload = tbibupload + (t22 - t11)
-
-    return (total_rec, tbibformat, tbibupload)
+    return tot, tbibformat, tbibupload
 
 
 def all_records():
@@ -451,10 +299,11 @@ def query_records(params):
         else:
             # use perform_request_search when '-c' argument has been
             # defined, as it is not supported by search_pattern()
-            res = intbitset(perform_request_search(req=None, of='id',
-                                         c=params['collection'],
-                                         p=params['pattern'],
-                                         f=params['field']))
+            res = intbitset(perform_request_search(req=None,
+                                                   of='id',
+                                                   c=params['collection'],
+                                                   p=params['pattern'],
+                                                   f=params['field']))
     return res
 
 
@@ -575,7 +424,7 @@ def task_submit_check_options():
     return True
 
 
-def task_submit_elaborate_specific_parameter(key, value, opts, args):
+def task_submit_elaborate_specific_parameter(key, value, opts, args):  # pylint: disable-msg=W0613
     """
     Elaborate specific CLI parameters of BibReformat.
 
@@ -605,7 +454,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         if invalid_format:
             try:
                 raise Exception('Invalid output format.')
-            except Exception:
+            except Exception:  # pylint: disable-msg=W0703
                 from invenio.errorlib import register_exception
                 register_exception(prefix="The given output format '%s' is not available or is invalid. Please try again" % invalid_format, alert_admin=True)
                 return
@@ -616,6 +465,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     else:
         return False
     return True
+
 
 ### okay, here we go:
 if __name__ == '__main__':

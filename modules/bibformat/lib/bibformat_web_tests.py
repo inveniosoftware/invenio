@@ -44,8 +44,6 @@ class InvenioBibFormatWebTest(InvenioWebTestCase):
         self.browser.find_element_by_link_text("Show all 315 authors").click()
         self.page_source_test(expected_text=['Zobernig, G', 'Hide'])
 
-
-
 TEST_SUITE = make_test_suite(InvenioBibFormatWebTest, )
 
 if __name__ == '__main__':

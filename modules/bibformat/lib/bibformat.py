@@ -53,6 +53,35 @@ import sys
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False,
                   save_missing=True, force_2nd_pass=False):
+    """
+    Returns the formatted record with id 'recID' and format 'of'
+
+    If corresponding record does not exist for given output format,
+    returns ''
+
+    ln specifies which language is used for translations.
+
+    verbose can be increased to display debug output.
+
+    xml_record can be specified to ignore the recID and use the given xml
+    instead.
+
+    on_the_fly means we always generate the format, ignoring the cache.
+
+    save_missing can be used to specify to never cache a format after it has
+    been generated. By default, we have a list of cached formats and the result
+    of these formats is saved in the database.
+
+    force_2nd_pass forces the 2nd pass which is basically a second formatting.
+    This is used in case a bibformat element generates new BibFormat tags
+    and thus we do not detect them automatically.
+    (the normal way is to use nocache="1" in a template to have it treated
+     in the 2nd pass instead)
+
+    @param recID: the id of the record to fetch
+    @param of: the output format code
+    @return: formatted record as String, or '' if it does not exist
+    """
     out, needs_2nd_pass = bibformat_engine.format_record_1st_pass(
                                         recID=recID,
                                         of=of,
@@ -66,13 +95,9 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     if needs_2nd_pass or force_2nd_pass:
         out = bibformat_engine.format_record_2nd_pass(
                                     recID=recID,
-                                    of=of,
                                     template=out,
                                     ln=ln,
-                                    verbose=verbose,
-                                    search_pattern=search_pattern,
-                                    xml_record=xml_record,
-                                    user_info=user_info)
+                                    verbose=verbose)
 
     return out
 
@@ -175,9 +200,9 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     #Fill one of the lists with Nones
     if xml_records is not None:
-        recIDs = map(lambda x: None, xml_records)
+        recIDs = [None for dummy in xml_records]
     else:
-        xml_records = map(lambda x: None, recIDs)
+        xml_records = [None for dummy in recIDs]
 
     total_rec = len(recIDs)
     last_iteration = False
@@ -245,7 +270,7 @@ def format_with_format_template(format_template_filename, bfo,
     return evaluated_format
 
 
-def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_info=None):
+def create_excel(recIDs, req=None, ot=None, ot_sep="; ", user_info=None):
     """
     Returns an Excel readable format containing the given recIDs.
     If 'req' is given, also prints the output in 'req' while individual
@@ -392,18 +417,18 @@ def main():
     options["recID"] = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:],
-                                   "hVv:yl:i:o:",
-                                   ["help",
-                                    "version",
-                                    "verbose=",
-                                    "onthefly",
-                                    "lang=",
-                                    "id=",
-                                    "output="])
+        opts, dummy_args = getopt.getopt(sys.argv[1:],
+                                         "hVv:yl:i:o:",
+                                         ["help",
+                                          "version",
+                                          "verbose=",
+                                          "onthefly",
+                                          "lang=",
+                                          "id=",
+                                          "output="])
     except getopt.GetoptError, err:
         usage(1, err)
-        pass
+
     try:
         for opt in opts:
             if opt[0] in ["-h", "--help"]:

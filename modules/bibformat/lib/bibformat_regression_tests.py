@@ -132,7 +132,7 @@ class BibFormatDetailedHTMLTest(InvenioTestCase):
                                      {'siteurl' : CFG_SITE_URL,
                                       'lang': CFG_SITE_LANG}
 
-        self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
+        self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
 
         self.record_74_hd_pubinfo = '''<strong>Published in: </strong><a href="https://cds.cern.ch/ejournals.py?publication=Phys.%20Lett.%2C%20B&amp;volume=481&amp;year=2000&amp;page=79">Phys. Lett., B :481 2000 79-88</a>'''
 
@@ -160,7 +160,7 @@ class BibFormatDetailedHTMLTest(InvenioTestCase):
  Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">
  Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
         self.record_7_hd_resource = '''<img src="%s/%s/7/files/9806033.gif?subformat=icon" alt="9806033" style="max-width:250px;_width:250px;" />''' % (CFG_SITE_URL, CFG_SITE_RECORD)
-        self.record_7_hd_resource_link = '%s/%s/7/files/9806033.jpeg' %  (CFG_SITE_URL, CFG_SITE_RECORD)
+        self.record_7_hd_resource_link = '%s/%s/7/files/9806033.jpeg' % (CFG_SITE_URL, CFG_SITE_RECORD)
 
     def test_detailed_html_output(self):
         """bibformat - Detailed HTML output"""

@@ -28,7 +28,7 @@ import zlib
 import time
 
 from invenio.dbquery import run_sql
-from invenio.search_engine_utils import get_fieldvalues
+
 
 def localtime_to_utc(date, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
@@ -202,7 +202,7 @@ def add_output_format(code, name="", description="", content_type="text/html", v
     @param visibility: if the output format is shown to users (1) or not (0)
     @return: None
     """
-    output_format_id = get_output_format_id(code);
+    output_format_id = get_output_format_id(code)
     if output_format_id is None:
         query = "INSERT INTO format SET code=%s, description=%s, content_type=%s, visibility=%s"
         params = (code.lower(), description, content_type, visibility)
@@ -219,7 +219,7 @@ def remove_output_format(code):
     @param code: the code of the output format to remove
     @return: None
     """
-    output_format_id = get_output_format_id(code);
+    output_format_id = get_output_format_id(code)
     if output_format_id is None:
         return
 
@@ -374,8 +374,8 @@ def get_output_format_names(code):
     @param code: the code of the output format to get the names from
     @return: a dict containing output format names
     """
-    out = {'sn':{}, 'ln':{}, 'generic':''}
-    output_format_id = get_output_format_id(code);
+    out = {'sn': {}, 'ln': {}, 'generic': ''}
+    output_format_id = get_output_format_id(code)
     if output_format_id is None:
         return out
 
@@ -411,7 +411,7 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
         name = name[:256]
     if type.lower() != "sn" and type.lower() != "ln":
         return
-    output_format_id = get_output_format_id(code);
+    output_format_id = get_output_format_id(code)
     if output_format_id is None and lang == "generic" and type.lower() == "ln":
         # Create output format inside table if it did not exist
         # Happens when the output format was added not through web interface
@@ -436,17 +436,18 @@ def change_output_format_code(old_code, new_code):
     @param new_code: the new code
     @return: None
     """
-    output_format_id = get_output_format_id(old_code);
+    output_format_id = get_output_format_id(old_code)
     if output_format_id is None:
         return
 
     query = "UPDATE format SET code=%s WHERE id=%s"
     params = (new_code.lower(), output_format_id)
-    res = run_sql(query, params)
+    run_sql(query, params)
 
 def get_preformatted_record(recID, of, decompress=zlib.decompress):
     """
     Returns the preformatted record with id 'recID' and format 'of'
+    and whether we need a 2nd pass.
 
     If corresponding record does not exist for given output format,
     returns None

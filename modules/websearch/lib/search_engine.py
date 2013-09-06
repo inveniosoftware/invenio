@@ -102,7 +102,6 @@ from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wa
 from invenio.bibindex_engine_config import CFG_BIBINDEX_SYNONYM_MATCH_TYPE
 from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
-from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
 from invenio.bibknowledge import get_kbr_values
 from invenio.data_cacher import DataCacher
@@ -4401,7 +4400,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                     req.write('\n')
         elif format == 'excel':
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-            create_excel(recIDs=recIDs_to_print, req=req, ln=ln, ot=ot, user_info=user_info)
+            create_excel(recIDs=recIDs_to_print, req=req, ot=ot, user_info=user_info)
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
@@ -4817,12 +4816,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     if record_exist_p == 0: # doesn't exist
         return out
 
-    # New Python BibFormat procedure for formatting
-    # Old procedure follows further below
     # We must still check some special formats, but these
     # should disappear when BibFormat improves.
-    if not (CFG_BIBFORMAT_USE_OLD_BIBFORMAT
-            or format.lower().startswith('t')
+    if not (format.lower().startswith('t')
             or format.lower().startswith('hm')
             or str(format[0:3]).isdigit()
             or ot):
@@ -4855,8 +4851,6 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                                                          display_claim_link=display_claim_this_paper)
         return out
 
-    # Old PHP BibFormat procedure for formatting
-    # print record opening tags, if needed:
     if format == "marcxml" or format == "oai_dc":
         out += "  <record>\n"
         out += "   <header>\n"

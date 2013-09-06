@@ -43,7 +43,7 @@ from invenio.shellutils import run_shell_command
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.solrutils_bibindex_searcher import solr_get_snippet
 
-def highlight_matches(text, compiled_pattern, \
+def highlight_matches(text, compiled_pattern,
                       prefix_tag='<strong>', suffix_tag="</strong>"):
     """
     Highlight words in 'text' matching the 'compiled_pattern'
@@ -65,7 +65,7 @@ def highlight_matches(text, compiled_pattern, \
     #Replace and return keywords with prefix+keyword+suffix
     return compiled_pattern.sub(replace_highlight, text)
 
-def highlight(text, keywords=None, \
+def highlight(text, keywords=None,
               prefix_tag='<strong>', suffix_tag="</strong>", whole_word_matches=False):
     """
     Returns text with all words highlighted with given tags (this
@@ -96,7 +96,7 @@ def highlight(text, keywords=None, \
     compiled_pattern = re.compile(pattern, re.IGNORECASE)
 
     #Replace and return keywords with prefix+keyword+suffix
-    return highlight_matches(text, compiled_pattern, \
+    return highlight_matches(text, compiled_pattern,
                              prefix_tag, suffix_tag)
 
 def get_contextual_content(text, keywords, max_lines=2):
@@ -226,7 +226,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
 
     if format.startswith("xm") or format == "marcxml":
         res = None
-        if on_the_fly == False:
+        if on_the_fly is False:
             # look for cached format existence:
             query = """SELECT value FROM bibfmt WHERE
             id_bibrec='%s' AND format='%s'""" % (recID, format)
@@ -406,7 +406,7 @@ def parse_tag(tag):
     @return: a canonical form of the input X{tag}
     """
 
-    p_tag =  ['', '', '', ''] # tag, ind1, ind2, code
+    p_tag = ['', '', '', ''] # tag, ind1, ind2, code
     tag = tag.replace(" ", "") # Remove empty characters
     tag = tag.replace("$", "") # Remove $ characters
     tag = tag.replace(".", "") # Remove . characters
@@ -491,23 +491,21 @@ def get_all_fieldvalues(recID, tags_in):
             continue
         bx = "bib%sx" % digits
         bibx = "bibrec_bib%sx" % digits
-        query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+        query = "SELECT b.value FROM %s AS b, %s AS bb "\
                 "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
                 "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
         res = run_sql(query, (recID, str(tag)+dict_of_tags_out[tag]))
         # go through fields:
-        for row in res:
-            field, value, field_number = row[0], row[1], row[2]
-            out.append(value)
+        out = [row[0] for row in res]
 
     return out
 
 
-re_bold_latex = re.compile('\$?\\\\textbf\{(?P<content>.*?)\}\$?')
-re_emph_latex = re.compile('\$?\\\\emph\{(?P<content>.*?)\}\$?')
-re_generic_start_latex = re.compile('\$?\\\\begin\{(?P<content>.*?)\}\$?')
-re_generic_end_latex = re.compile('\$?\\\\end\{(?P<content>.*?)\}\$?')
-re_verbatim_env_latex = re.compile('\\\\begin\{verbatim.*?\}(?P<content>.*?)\\\\end\{verbatim.*?\}')
+re_bold_latex = re.compile(r'\$?\\\\textbf\{(?P<content>.*?)\}\$?')
+re_emph_latex = re.compile(r'\$?\\\\emph\{(?P<content>.*?)\}\$?')
+re_generic_start_latex = re.compile(r'\$?\\\\begin\{(?P<content>.*?)\}\$?')
+re_generic_end_latex = re.compile(r'\$?\\\\end\{(?P<content>.*?)\}\$?')
+re_verbatim_env_latex = re.compile(r'\\\\begin\{verbatim.*?\}(?P<content>.*?)\\\\end\{verbatim.*?\}')
 
 def latex_to_html(text):
     """
@@ -545,7 +543,7 @@ def latex_to_html(text):
     text = text.replace("\\texttrademark", "&#0153; ")
 
     # Remove commented lines and join lines
-    text = '\\\\'.join([line for line in text.split('\\\\') \
+    text = '\\\\'.join([line for line in text.split('\\\\')
                         if not line.lstrip().startswith('%')])
 
     # Line breaks
@@ -614,10 +612,10 @@ def get_pdf_snippets(recID, patterns, user_info):
 
     nb_chars = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.get('', 0)
     max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS.get('', 0)
-    if CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS.has_key(text_path_courtesy):
-        nb_chars=CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS[text_path_courtesy]
-    if CFG_WEBSEARCH_FULLTEXT_SNIPPETS.has_key(text_path_courtesy):
-        max_snippets=CFG_WEBSEARCH_FULLTEXT_SNIPPETS[text_path_courtesy]
+    if text_path_courtesy in CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS:
+        nb_chars = CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS[text_path_courtesy]
+    if text_path_courtesy in CFG_WEBSEARCH_FULLTEXT_SNIPPETS:
+        max_snippets = CFG_WEBSEARCH_FULLTEXT_SNIPPETS[text_path_courtesy]
 
     if text_path and nb_chars and max_snippets:
         out = ''
@@ -648,13 +646,11 @@ def get_text_snippets(textfile_path, patterns, nb_chars, max_snippets):
     popular Internet search engines: using " ... " between snippets.
     For empty patterns it returns ""
     """
-    """
-    TODO: - distinguish the beginning of sentences and make the snippets
-            start there
-          - optimize finding patterns - first search for patterns apperaing next
-            to each other, secondly look for each patten not for first
-            occurances of any pattern
-    """
+    # TODO: - distinguish the beginning of sentences and make the snippets
+    #         start there
+    #       - optimize finding patterns - first search for patterns apperaing next
+    #         to each other, secondly look for each patten not for first
+    #         occurances of any pattern
 
     if len(patterns) == 0:
         return ""

@@ -167,9 +167,9 @@ def perform_request_format_template_show(bft, ln=CFG_SITE_LANG, code=None,
     content_types.extend([content_type for content_type in standard_content_types
                           if content_type not in content_types])
 
-    return bibformat_templates.tmpl_admin_format_template_show(ln, format_template['attrs']['name'],
-                                                               format_template['attrs']['description'],
-                                                               code, bft,
+    return bibformat_templates.tmpl_admin_format_template_show(ln,
+                                                               code,
+                                                               bft,
                                                                ln_for_preview=ln_for_preview,
                                                                pattern_for_preview=pattern_for_preview,
                                                                editable=editable,
@@ -287,7 +287,7 @@ def perform_request_format_template_show_short_doc(ln=CFG_SITE_LANG, search_doc_
 
 
 
-    return bibformat_templates.tmpl_admin_format_template_show_short_doc(ln, elements)
+    return bibformat_templates.tmpl_admin_format_template_show_short_doc(elements)
 
 def perform_request_format_elements_documentation(ln=CFG_SITE_LANG):
     """
@@ -602,12 +602,11 @@ def perform_request_output_format_show(bfo, ln=CFG_SITE_LANG, r_fld=[], r_val=[]
     editable = can_write_output_format(bfo)
 
     return bibformat_templates.tmpl_admin_output_format_show(ln,
-                                                            bfo,
-                                                            name,
-                                                            rules,
-                                                            default,
-                                                            format_templates,
-                                                            editable)
+                                                             bfo,
+                                                             rules,
+                                                             default,
+                                                             format_templates,
+                                                             editable)
 
 def perform_request_output_format_show_dependencies(bfo, ln=CFG_SITE_LANG):
     """
