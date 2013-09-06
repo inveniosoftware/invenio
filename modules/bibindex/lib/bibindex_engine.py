@@ -1611,7 +1611,7 @@ def get_recIDs_by_date_authority(dates, index_name, force_all=False):
             # dates[1] is ignored, needs dates[0] to find res
             now = datetime.now()
             auth_recIDs = search_pattern(p='980__a:' + auth_type) \
-                & search_unit_in_bibrec(str(dates[0]), str(now), type='m')
+                & search_unit_in_bibrec(str(dates[0]), str(now), search_type='m')
             # now find dependent bibliographic records
             for auth_recID in auth_recIDs:
                 # get the fix authority identifier of this authority record

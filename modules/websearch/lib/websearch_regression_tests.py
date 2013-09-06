@@ -1383,14 +1383,14 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
     def test_search_engine_python_api_for_intersect_results_with_one_collrec(self):
         """websearch - search engine Python API for intersect results with one collrec"""
         self.assertEqual({'Books & Reports': intbitset([19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34])},
-                         intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books & Reports'], 0, 'id', 0, 'en', False))
+                         intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books & Reports'], 'id', 0, 'en', False))
 
     def test_search_engine_python_api_for_intersect_results_with_several_collrecs(self):
         """websearch - search engine Python API for intersect results with several collrecs"""
         self.assertEqual({'Books': intbitset([21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]),
                           'Reports': intbitset([19, 20]),
                           'Theses': intbitset([35, 36, 37, 38, 39, 40, 41, 42, 105])},
-                         intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books', 'Theses', 'Reports'], 0, 'id', 0, 'en', False))
+                         intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books', 'Theses', 'Reports'], 'id', 0, 'en', False))
 
     def test_search_engine_python_api_textmarc_field_filtered_hidden_guest(self):
         """websearch - search engine Python API for Text MARC output, field-filtered, hidden field, no guest access"""
