@@ -95,9 +95,13 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     if needs_2nd_pass or force_2nd_pass:
         out = bibformat_engine.format_record_2nd_pass(
                                     recID=recID,
+                                    of=of,
                                     template=out,
                                     ln=ln,
-                                    verbose=verbose)
+                                    verbose=verbose,
+                                    search_pattern=search_pattern,
+                                    xml_record=xml_record,
+                                    user_info=user_info)
 
     return out
 

@@ -439,9 +439,11 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
                                                                  ), False
 
 
-def format_record_2nd_pass(recID, template, ln=CFG_SITE_LANG, verbose=0):
+def format_record_2nd_pass(recID, template, ln=CFG_SITE_LANG,
+                           search_pattern=None, xml_record=None,
+                           user_info=None, of=None, verbose=0):
     # Create light bfo object
-    bfo = BibFormatObject(recID)
+    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
     # Translations
     template = translate_template(template, ln)
     # Format template
@@ -1296,7 +1298,7 @@ def get_format_element_attrs_from_function(function, element_name,
     else:
         defaults_list = []
 
-    for arg, default in zip(args, defaults_list):
+    for arg, default in map(None, args, defaults_list):
         if arg == "bfo":
             #Don't keep this as parameter. It is hidden to users, and
             #exists in all elements of this kind
