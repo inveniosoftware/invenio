@@ -532,6 +532,11 @@ Contents
           This will automatically download and install Twitter
           Bootstrap prerequisite.
 
+      $ make install-hogan-plugin
+
+          This will automatically download and install Hogan
+          prerequisite.
+
       $ make install-mathjax-plugin  ## optional
 
           This will automatically download and install in the proper
