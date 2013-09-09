@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -34,10 +34,10 @@ from invenio.errorlib import register_exception
 EMAIL_SUBMIT_CONFIGURED = False
 import invenio.config
 if hasattr(invenio.config, 'CFG_BIBCATALOG_SYSTEM') and invenio.config.CFG_BIBCATALOG_SYSTEM == "EMAIL":
-    if hasattr(invenio.config, 'CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL'):
+    if hasattr(invenio.config, 'CFG_BIBCATALOG_SYSTEM_EMAIL_ADDRESS'):
         EMAIL_SUBMIT_CONFIGURED = True
         FROM_ADDRESS = invenio.config.CFG_SITE_SUPPORT_EMAIL
-        TO_ADDRESS = invenio.config.CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL
+        TO_ADDRESS = invenio.config.CFG_BIBCATALOG_SYSTEM_EMAIL_ADDRESS
 
 
 class BibCatalogSystemEmail(BibCatalogSystem):
@@ -45,10 +45,10 @@ class BibCatalogSystemEmail(BibCatalogSystem):
 
     def check_system(self, uid=None):
         """return an error string if there are problems"""
-        
+
         ret = ''
         if not EMAIL_SUBMIT_CONFIGURED:
-            ret  = "Please configure bibcatalog email sending in CFG_BIBCATALOG_SYSTEM and CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL"
+            ret  = "Please configure bibcatalog email sending in CFG_BIBCATALOG_SYSTEM and CFG_BIBCATALOG_SYSTEM_EMAIL_ADDRESS"
         return ret
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
@@ -61,9 +61,9 @@ class BibCatalogSystemEmail(BibCatalogSystem):
         """creates a ticket. return true on success, otherwise false"""
 
         if not EMAIL_SUBMIT_CONFIGURED:
-            register_exception(stream='warning', 
-                               subject='bibcatalog email not configured', 
-                               prefix="please configure bibcatalog email sending in CFG_BIBCATALOG_SYSTEM and CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL")
+            register_exception(stream='warning',
+                               subject='bibcatalog email not configured',
+                               prefix="please configure bibcatalog email sending in CFG_BIBCATALOG_SYSTEM and CFG_BIBCATALOG_SYSTEM_EMAIL_ADDRESS")
 
         ticket_id = self._get_ticket_id()
         priorityset = ""
@@ -98,9 +98,9 @@ class BibCatalogSystemEmail(BibCatalogSystem):
 
     def ticket_comment(self, uid, ticketid, comment):
         """ Comment on ticket with given ticketid"""
-        
+
         subjectset = 'ticket #' + ticketid + ' - Comment ...'
-        textset    = '...\n\n*Comment on ticket #' + ticketid + '\nComment:' + comment 
+        textset    = '...\n\n*Comment on ticket #' + ticketid + '\nComment:' + comment
         ok = send_email(fromaddr=FROM_ADDRESS, toaddr=TO_ADDRESS, subject=subjectset, header='Hello,\n\n', content=textset)
         if ok:
             return 1
@@ -109,9 +109,9 @@ class BibCatalogSystemEmail(BibCatalogSystem):
 
     def ticket_assign(self, uid, ticketid, to_user):
         """ Re-assign existing ticket with given ticketid to user to_user"""
-        
+
         subjectset = 'ticket #' + ticketid + ' - Re-assign ...'
-        textset    = '...\n\n*Please re-assigning ticket #' + ticketid + ' to ' + to_user 
+        textset    = '...\n\n*Please re-assigning ticket #' + ticketid + ' to ' + to_user
         ok = send_email(fromaddr=FROM_ADDRESS, toaddr=TO_ADDRESS, subject=subjectset, header='Hello,\n\n', content=textset)
         if ok:
             return 1
@@ -119,9 +119,9 @@ class BibCatalogSystemEmail(BibCatalogSystem):
 
     def ticket_set_attribute(self, uid, ticketid, attribute, new_value):
         """ Request to set attribute to new value on ticket with given ticketid"""
-        
+
         subjectset = 'ticket #' + ticketid + ' - Attribute Update ...'
-        textset    = '...\n\n*Please modify attribute:' + attribute + ' to:' + new_value + ' on ticket:' + ticketid 
+        textset    = '...\n\n*Please modify attribute:' + attribute + ' to:' + new_value + ' on ticket:' + ticketid
         ok = send_email(fromaddr=FROM_ADDRESS, toaddr=TO_ADDRESS, subject=subjectset, header='Hello,\n\n', content=textset)
         if ok:
             return 1
@@ -162,14 +162,13 @@ class BibCatalogSystemEmail(BibCatalogSystem):
 
     def _get_ticket_id(self):
         """ Return timestamp in seconds since the Epoch converted to base36 """
-     
-        now =  datetime.datetime.now()    
+
+        now =  datetime.datetime.now()
         t = mktime(now.timetuple())+1e-6*now.microsecond
-        
+
         t_str = str("%.6f" % t)
         t1, t2 = t_str.split('.')
-        t_str = t1 + t2        
-    
+        t_str = t1 + t2
+
         #return base64.encodestring(t_str).strip()
         return self._str_base(int(t_str), 36)
-

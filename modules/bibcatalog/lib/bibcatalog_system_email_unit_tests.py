@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,8 +21,10 @@
 """Unit tests for bibcatalog_system_email library."""
 
 import unittest
+
+from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio import bibcatalog_system_email 
+from invenio import bibcatalog_system_email
 
 
 class BibCatalogSystemEmailTest(unittest.TestCase):
@@ -30,9 +32,7 @@ class BibCatalogSystemEmailTest(unittest.TestCase):
 
     def setUp(self):
         self.email = bibcatalog_system_email.BibCatalogSystemEmail()
-        # TODO: fudging the email address is the right thing, but fudge with
-        # a different one - try CFG_SITE_SUPPORT_EMAIL or so
-        bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL = 'eduardob@slac.stanford.edu'
+        bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL = CFG_SITE_SUPPORT_EMAIL
         bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM = 'EMAIL'
         pass
 
@@ -44,24 +44,24 @@ class BibCatalogSystemEmailTest(unittest.TestCase):
         """bibcatalog_system_email - execution raises NotImplementedError exception"""
 
         self.assertRaises(NotImplementedError, self.email.ticket_search, 1)
-    
-    
+
+
     def test_ticket_submit_via_email(self):
         """bibcatalog_system_email - test creating ticket via email"""
 
         # TODO: our return values are ticket id or none; check both cases
         self.assertTrue(self.email.ticket_submit(subject="Issue with RT", text="The RT system is not as good as the email ticketing", owner='eduardo', priority=3, queue='TEST', requestor='Joeb', recordid=100))
-    
+
     def test_ticket_comment_via_email(self):
         """bibcatalog_system_email - test commention on ticket via email"""
 
         self.assertTrue(self.email.ticket_comment(uid=1, ticketid='d834bnklca', comment='Eduardo is commenting on ticket blah, blah, blah'))
-    
+
     def test_ticket_assign_via_email(self):
         """bibcatalog_system_email - test commention on ticket via email"""
 
         self.assertTrue(self.email.ticket_assign(uid=1, ticketid='d834bnklca', to_user='jrbl'))
-    
+
     def test_ticket_set_attribute_via_email(self):
         """bibcatalog_system_email - test setting attribute on ticket via email"""
 
@@ -73,7 +73,7 @@ class BibCatalogSystemEmailTest(unittest.TestCase):
         self.assertEqual(self.email.check_system(), '')
 
 
-    def test_ticket_get_info(self): 
+    def test_ticket_get_info(self):
         """bibcatalog_system_email - ticket_get_info raises NotImplementedError exception"""
 
         self.assertRaises(NotImplementedError, self.email.ticket_get_info, uid=1, ticketid=0)

@@ -587,6 +587,7 @@ Contents
              CFG_WEBALERT_ALERT_ENGINE_EMAIL = john.doe@your.site.com
              CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL = john.doe@your.site.com
              CFG_WEBCOMMENT_DEFAULT_MODERATOR = john.doe@your.site.com
+             CFG_BIBCATALOG_SYSTEM_EMAIL_ADDRESS = john.doe@your.site.com
              CFG_DATABASE_HOST = localhost
              CFG_DATABASE_NAME = invenio
              CFG_DATABASE_USER = invenio

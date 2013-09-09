@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,7 +31,4 @@ if CFG_BIBCATALOG_SYSTEM == 'RT':
     bibcatalog_system = BibCatalogSystemRT()
 elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
     from invenio.bibcatalog_system_email import BibCatalogSystemEmail
-    bibcatalog_system = BibCatalogSystemEmail() 
-
-
-
+    bibcatalog_system = BibCatalogSystemEmail()
