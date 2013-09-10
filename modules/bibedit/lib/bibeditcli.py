@@ -1,7 +1,7 @@
 ## -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -54,7 +54,7 @@ from invenio.bibedit_utils import get_marcxml_of_revision_id, \
     get_record_revision_ids, get_xml_comparison, record_locked_by_other_user, \
     record_locked_by_queue, revision_format_valid_p, save_xml_record, \
     split_revid, get_info_of_revision_id, get_record_revisions
-from invenio.bibrecord import create_record, identical_records
+from invenio.bibrecord import create_record, records_identical
 
 def print_usage():
     """Print help."""
@@ -85,7 +85,7 @@ def cli_clean_revisions(recid, dry_run=True, verbose=True):
             except Exception:
                 print >> sys.stderr, "ERROR: corrupted revisions found. Please run %s --fix-revisions '*'" % sys.argv[0]
                 sys.exit(1)
-            if identical_records(current_rec, previous_rec):
+            if records_identical(current_rec, previous_rec):
                 deleted_revisions += 1
                 if not dry_run:
                     run_sql("DELETE FROM hstRECORD WHERE id_bibrec=%s AND job_id=%s AND job_name=%s AND job_person=%s AND job_date=%s", (recid, job_id, job_name, job_person, job_date))

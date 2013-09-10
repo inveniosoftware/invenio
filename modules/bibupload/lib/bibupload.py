@@ -76,7 +76,7 @@ from invenio.bibrecord import create_records, \
                               record_extract_oai_id, \
                               record_extract_dois, \
                               record_has_field,\
-                              identical_records
+                              records_identical
 from invenio.search_engine import get_record
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
@@ -507,7 +507,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         # Update of the BibFmt
         write_message("Stage 4: Start (Update bibfmt).", verbose=2)
 
-        updates_exist = not identical_records(record, original_record)
+        updates_exist = not records_identical(record, original_record)
         if updates_exist:
             # if record_had_altered_bit, this must be set to true, since the
             # record has been altered.

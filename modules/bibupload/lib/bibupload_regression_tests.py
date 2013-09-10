@@ -56,7 +56,7 @@ from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 from invenio.textutils import encode_for_xml
 from invenio.bibtask import task_set_task_param, setup_loggers, task_set_option, task_low_level_submission
-from invenio.bibrecord import record_has_field,record_get_field_value, identical_records, create_record
+from invenio.bibrecord import record_has_field,record_get_field_value, records_identical, create_record
 from invenio.shellutils import run_shell_command
 from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo
 import base64
@@ -281,11 +281,11 @@ class GenericBibUploadTest(unittest.TestCase):
         rec_in_history = create_record(decompress(run_sql("SELECT marcxml FROM hstRECORD WHERE id_bibrec=%s ORDER BY job_date DESC LIMIT 1", (recid, ))[0][0]))[0]
         rec_in_xm = create_record(decompress(run_sql("SELECT value FROM bibfmt WHERE id_bibrec=%s AND format='xm'", (recid, ))[0][0]))[0]
         rec_in_bibxxx = create_record(get_record_from_bibxxx(recid))[0]
-        self.failUnless(identical_records(rec_in_xm, rec_in_history, skip_005=False), "\n%s\n!=\n%s\n" % (rec_in_xm, rec_in_history))
-        self.failUnless(identical_records(rec_in_xm, rec_in_bibxxx, skip_005=False, ignore_duplicate_subfields=True, ignore_duplicate_controlfields=True), "\n%s\n!=\n%s\n" % (rec_in_xm, rec_in_bibxxx))
+        self.failUnless(records_identical(rec_in_xm, rec_in_history, skip_005=False), "\n%s\n!=\n%s\n" % (rec_in_xm, rec_in_history))
+        self.failUnless(records_identical(rec_in_xm, rec_in_bibxxx, skip_005=False, ignore_duplicate_subfields=True, ignore_duplicate_controlfields=True), "\n%s\n!=\n%s\n" % (rec_in_xm, rec_in_bibxxx))
         if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
             rec_in_recstruct = loads(decompress(run_sql("SELECT value FROM bibfmt WHERE id_bibrec=%s AND format='recstruct'", (recid, ))[0][0]))
-            self.failUnless(identical_records(rec_in_xm, rec_in_recstruct, skip_005=False, ignore_subfield_order=True), "\n%s\n!=\n%s\n" % (rec_in_xm, rec_in_recstruct))
+            self.failUnless(records_identical(rec_in_xm, rec_in_recstruct, skip_005=False, ignore_subfield_order=True), "\n%s\n!=\n%s\n" % (rec_in_xm, rec_in_recstruct))
 
 class BibUploadRealCaseRemovalDOIViaBibEdit(GenericBibUploadTest):
     def test_removal_of_doi_via_bibedit(self):
@@ -434,7 +434,7 @@ class BibUploadTypicalBibEditSessionTest(GenericBibUploadTest):
         _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
         self.check_record_consistency(self.recid)
         ## The change should have been applied!
-        self.failUnless(identical_records(recs[0], get_record(self.recid)), "\n%s\n!=\n%s\n" % (recs[0], get_record(self.recid)))
+        self.failUnless(records_identical(recs[0], get_record(self.recid)), "\n%s\n!=\n%s\n" % (recs[0], get_record(self.recid)))
 
         marc_to_replace2 = """
         <record>
@@ -497,7 +497,7 @@ class BibUploadTypicalBibEditSessionTest(GenericBibUploadTest):
         _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
         self.check_record_consistency(self.recid)
         ## The change should have been merged with the previous without conflict
-        self.failUnless(identical_records(bibupload.xml_marc_to_records(expected_marc)[0], get_record(self.recid)))
+        self.failUnless(records_identical(bibupload.xml_marc_to_records(expected_marc)[0], get_record(self.recid)))
 
     def test_replace_with_conflict(self):
         """BibUpload - test a replace as in BibEdit that leads to conflicts"""
@@ -532,7 +532,7 @@ class BibUploadTypicalBibEditSessionTest(GenericBibUploadTest):
         self.check_record_consistency(self.recid)
 
         ## The change should have been applied!
-        self.failUnless(identical_records(recs[0], get_record(self.recid)), "\n%s\n!=\n%s" % (recs[0], get_record(self.recid)))
+        self.failUnless(records_identical(recs[0], get_record(self.recid)), "\n%s\n!=\n%s" % (recs[0], get_record(self.recid)))
 
         marc_to_replace2 = """
         <record>
@@ -565,8 +565,8 @@ class BibUploadTypicalBibEditSessionTest(GenericBibUploadTest):
         _, self.recid, _ = bibupload.bibupload_records(recs, opt_mode='replace')[0]
         self.check_record_consistency(self.recid)
         ## The change should have been merged with the previous without conflict
-        self.failUnless(identical_records(bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)), "%s != %s" % (bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)))
-        self.failUnless(identical_records(bibupload.xml_marc_to_records(marc_to_replace2)[0], bibupload.xml_marc_to_records(run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid,))[0][0])[0]))
+        self.failUnless(records_identical(bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)), "%s != %s" % (bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)))
+        self.failUnless(records_identical(bibupload.xml_marc_to_records(marc_to_replace2)[0], bibupload.xml_marc_to_records(run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid,))[0][0])[0]))
 
 class BibUploadNoUselessHistoryTest(GenericBibUploadTest):
     """Testing generation of history only when necessary"""

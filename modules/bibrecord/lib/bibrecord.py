@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -245,7 +245,7 @@ def filter_field_instances(field_instances, filter_subcode, filter_value, filter
                     break
     return matched
 
-def identical_records(rec1, rec2, skip_005=True, ignore_subfield_order=False, ignore_duplicate_subfields=False, ignore_duplicate_controlfields=False):
+def records_identical(rec1, rec2, skip_005=True, ignore_subfield_order=False, ignore_duplicate_subfields=False, ignore_duplicate_controlfields=False):
     """
     Return True if rec1 is identical to rec2, regardless of a difference
     in the 005 tag (i.e. the timestamp).
