@@ -215,7 +215,7 @@ class FindSectionTest(InvenioTestCase):
 
 class SearchTest(InvenioTestCase):
     def setUp(self):
-        setup_loggers(verbosity=9)
+        setup_loggers(verbosity=1)
         from invenio import refextract_kbs
         self.old_override = refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE
         refextract_kbs.CFG_REFEXTRACT_KBS_OVERRIDE = {}

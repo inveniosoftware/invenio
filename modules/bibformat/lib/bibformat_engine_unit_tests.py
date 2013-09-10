@@ -34,6 +34,7 @@ from invenio import bibformat_config
 from invenio import bibformatadminlib
 from invenio.config import CFG_TMPDIR
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.messages import gettext_set_language
 
 #CFG_BIBFORMAT_OUTPUTS_PATH = "..%setc%soutput_formats" % (os.sep, os.sep)
 #CFG_BIBFORMAT_TEMPLATES_PATH = "..%setc%sformat_templates" % (os.sep, os.sep)
@@ -822,12 +823,14 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(needs_2nd_pass, False)
 
     def test_format_translations_no_2nd_pass_fr(self):
+        ln = 'fr'
         result, needs_2nd_pass = bibformat_engine.format_record(
                                                 recID=None,
                                                 of="test7",
                                                 xml_record=self.xml_text_2,
-                                                ln='fr')
-        self.assertEqual(result.strip(), 'Titre fr\n<input type="button" value="Notice"/>')
+                                                ln=ln)
+        _ = gettext_set_language(ln)
+        self.assertEqual(result.strip(), 'Titre fr\n<input type="button" value="%s"/>' % _('Record'))
         self.assertEqual(needs_2nd_pass, False)
 
     def test_format_translations_with_2nd_pass_en(self):
@@ -845,18 +848,20 @@ class FormatTest(InvenioTestCase):
         self.assertEqual(out, 'Title en\nhelloworld\n<input type="button" value="Record"/>')
 
     def test_format_translations_with_2nd_pass_fr(self):
+        ln = 'fr'
         result, needs_2nd_pass = bibformat_engine.format_record(
                                                 recID=None,
                                                 of="test8",
                                                 xml_record=self.xml_text_2,
-                                                ln='fr')
+                                                ln=ln)
+        _ = gettext_set_language(ln)
         self.assertEqual(result.strip(), '<lang>\n  <en>Title en</en>\n  <fr>Titre fr</fr>\n</lang>\n<bfe_test_6 />\n<input type="button" value="_(Record)_"/>')
         self.assertEqual(needs_2nd_pass, True)
 
         out = bibformat_engine.format_record_2nd_pass(recID=None,
                                                       template=result,
-                                                      ln='fr')
-        self.assertEqual(out, 'Titre fr\nhelloworld\n<input type="button" value="Notice"/>')
+                                                      ln=ln)
+        self.assertEqual(out, 'Titre fr\nhelloworld\n<input type="button" value="%s"/>' % _('Record'))
 
 class MarcFilteringTest(InvenioTestCase):
     """ bibformat - MARC tag filtering tests"""

@@ -273,10 +273,12 @@ class GenericBibUploadTest(InvenioTestCase):
         setup_loggers()
         task_set_task_param('verbose', self.verbose)
         self.last_recid = run_sql("SELECT MAX(id) FROM bibrec")[0][0]
+        self.tear_down = True
 
     def tearDown(self):
-        for recid in run_sql("SELECT id FROM bibrec WHERE id>%s", (self.last_recid,)):
-            wipe_out_record_from_all_tables(recid[0])
+        if self.tear_down:
+            for recid in run_sql("SELECT id FROM bibrec WHERE id>%s", (self.last_recid,)):
+                wipe_out_record_from_all_tables(recid[0])
 
     def check_record_consistency(self, recid):
         rec_in_history = create_record(decompress(run_sql("SELECT marcxml FROM hstRECORD WHERE id_bibrec=%s ORDER BY job_date DESC LIMIT 1", (recid, ))[0][0]))[0]
@@ -5846,6 +5848,7 @@ allow any</subfield>
                                           testrec_expected_hm), '')
         self.failUnless(try_url_download(testrec_expected_url))
         force_webcoll(recid)
+        self.tear_down = True
         self.assertEqual(test_web_page_content(testrec_expected_url2, expected_text='<em>04 May 2006, 03:02</em>'), [])
 
 

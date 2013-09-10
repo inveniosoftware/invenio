@@ -28,6 +28,7 @@ import time
 
 from time import mktime, strptime
 from invenio import dateutils
+from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -100,28 +101,32 @@ class ConvertIntoDateGUITest(InvenioTestCase):
     if lang_slovak_configured:
         def test_convert_good_to_dategui_sk(self):
             """dateutils - conversion of good text date into Slovak GUI date"""
+            ln = 'sk'
+            _ = gettext_set_language(ln)
             datetext = "2006-07-16 18:36:01"
-            dategui_sk_expected = "16 júl 2006, 18:36"
+            dategui_sk_expected = "16 %s 2006, 18:36" % _('Jul')
             dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
-                                                               ln='sk')
+                                                               ln=ln)
             self.assertEqual(dategui_sk, dategui_sk_expected)
 
     if lang_english_configured:
         def test_convert_bad_to_dategui_en(self):
             """dateutils - conversion of bad text date into English GUI date"""
             datetext = "2006-02-AA 18:36:01"
-            dategui_sk_expected = "N/A"
-            dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
+            dategui_en_expected = "N/A"
+            dategui_en = dateutils.convert_datetext_to_dategui(datetext,
                                                                ln='en')
-            self.assertEqual(dategui_sk, dategui_sk_expected)
+            self.assertEqual(dategui_en, dategui_en_expected)
 
     if lang_slovak_configured:
         def test_convert_bad_to_dategui_sk(self):
             """dateutils - conversion of bad text date into Slovak GUI date"""
+            ln = 'sk'
+            _ = gettext_set_language(ln)
             datetext = "2006-02-AA 18:36:01"
-            dategui_sk_expected = "nepríst."
+            dategui_sk_expected = _('N/A')
             dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
-                                                               ln='sk')
+                                                               ln=ln)
             self.assertEqual(dategui_sk, dategui_sk_expected)
 
 class ParseRuntimeLimitTest(InvenioTestCase):

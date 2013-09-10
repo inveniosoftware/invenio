@@ -821,7 +821,7 @@ class BibRecDocs(object):
         """
 
         if not doctype:
-            return dict((k,v) for (k,(v,_)) in self.bibdocs.iteritems())
+            return dict((k, v) for (k, (v, _)) in self.bibdocs.iteritems())
 
 
         res = {}
@@ -830,7 +830,7 @@ class BibRecDocs(object):
                 res[docname] = doc
         return res
 
-    def list_bibdocs(self, doctype=None):
+    def list_bibdocs(self, doctype=None, rel_type=None):
         """
         Returns the list all bibdocs object belonging to a recid.
         If C{doctype} is set, it returns just the bibdocs of that doctype.
@@ -840,10 +840,9 @@ class BibRecDocs(object):
         @return: the list of bibdocs.
         @rtype: list of BibDoc
         """
-        if not doctype:
-            return [d for (d,_) in self.bibdocs.values()]
-        else:
-            return [bibdoc for (bibdoc, attype) in self.bibdocs.values() if doctype == attype]
+        return [bibdoc for (bibdoc, rtype) in self.bibdocs.values()
+                    if (not doctype or doctype == bibdoc.doctype) and
+                       (rel_type is None or rel_type == rtype)]
 
 
     def get_bibdoc_names(self, doctype=None):
@@ -885,7 +884,7 @@ class BibRecDocs(object):
             potential = [afile for afile in potential if afile.get_checksum() == checksum]
 
             if potential:
-                potential = [afile for afile in potential if \
+                potential = [afile for afile in potential if
                                  filecmp.cmp(afile.get_full_path(), path)]
 
                 if potential:
@@ -1236,7 +1235,7 @@ class BibRecDocs(object):
         self.build_bibdoc_list()
         return bibdoc
 
-    def list_latest_files(self, doctype='', list_hidden=True):
+    def list_latest_files(self, doctype=None, list_hidden=True):
         """
         Returns a list of the latest files.
 
@@ -1712,7 +1711,7 @@ class BibDoc(object):
         # first try to retrieve existing record based on obtained data
         data = None
         extensions = []
-        if docid != None:
+        if docid is not None:
             data = BibDoc._retrieve_data(docid)
             doctype = data["doctype"]
             extensions = data["extensions"]

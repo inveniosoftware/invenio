@@ -30,7 +30,7 @@ from invenio.plotextractor import put_it_together, \
 from invenio.plotextractor_output_utils import remove_dups, \
                                                get_converted_image_name
 
-from plotextractor_getter import harvest_single
+from invenio.plotextractor_getter import harvest_single
 
 from invenio.testutils import make_test_suite, run_test_suite
 

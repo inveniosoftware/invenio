@@ -25,6 +25,7 @@ from invenio.search_engine import get_record as get_record_original
 from invenio.search_engine import perform_request_search
 from invenio.bibrecord import print_rec
 from invenio.testutils import XmlTest
+from invenio.dbquery import run_sql
 
 
 class BibRecordTest(XmlTest):
@@ -35,11 +36,15 @@ class BibRecordTest(XmlTest):
         def order_by_tag(field1, field2):
             """Function used to order the fields according to their tag"""
             return cmp(field1[0], field2[0])
-        bibrecord._order_by_ord = order_by_tag
+        bibrecord._order_by_ord = order_by_tag  # pylint: disable-msg=W0212
 
         self.records_cache = {}
         self.xml_cache = {}
         for recid in perform_request_search(p=""):
+            r = run_sql("SELECT master_format FROM bibrec WHERE id=%s", [recid])
+            self.assertTrue(r, msg="bibrec row for %s missing" % recid)
+            if r[0][0] != 'marc':
+                continue
             record = get_record(recid)
             self.records_cache[recid] = record
             self.xml_cache[recid] = record.to_xml()
