@@ -49,7 +49,7 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, \
      CFG_OAI_PROVENANCE_ALTERED_SUBFIELD, \
      CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
-     CFG_BIBCATALOG_CONFLICTING_REVISIONS_DEFAULT_QUEUE
+     CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE
 
 from invenio.jsonutils import json, CFG_JSON_AVAILABLE
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
@@ -731,7 +731,7 @@ BibUpload task information:
             "user": user,
             "task_params": bibtask._TASK_PARAMS,
             "task_options": bibtask._OPTIONS}
-        bibcatalog_system.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBCATALOG_CONFLICTING_REVISIONS_DEFAULT_QUEUE, owner=uid)
+        bibcatalog_system.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, owner=uid)
 
 def insert_record_into_holding_pen(record, oai_id, pretend=False):
     query = "INSERT INTO bibHOLDINGPEN (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"
