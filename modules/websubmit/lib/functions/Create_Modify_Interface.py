@@ -31,6 +31,7 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.errorlib import register_exception
 from invenio.htmlutils import escape_javascript_string
+from invenio.messages import gettext_set_language, wash_language
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
     """Read a field's value from its corresponding text file in 'cur_dir' (if it exists) into memory.
@@ -104,6 +105,31 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
         WebSubmit fields to include in the Modification interface.
         These field names are separated by"\n" or "+".
 
+       * "prefix" - some content displayed before the main
+         modification interface. Can contain HTML (i.e. needs to be
+         pre-escaped). The prefix can make use of Python string
+         replacement for common values (such as 'rn'). Percent signs
+         (%) must consequently be escaped (with %%).
+
+       * "suffix" - some content displayed after the main modification
+         interface. Can contain HTML (i.e. needs to be
+         pre-escaped). The suffix can make use of Python string
+         replacement for common values (such as 'rn'). Percent signs
+         (%) must consequently be escaped (with %%).
+
+       * "button_label" - the label for the "END" button.
+
+       * "button_prefix" - some content displayed before the button to
+         submit the form. Can contain HTML (i.e. needs to be
+         pre-escaped). The prefix can make use of Python string
+         replacement for common values (such as 'rn'). Percent signs
+         (%) must consequently be escaped (with %%).
+
+       * "dates_conversion" - by default, values interpreted as dates
+         are converted to their 'DD/MM/YYYY' format, whenever
+         possible. Set another value for a different behaviour
+         (eg. 'none' for no conversion)
+
     Given the list of WebSubmit fields to be included in the
     modification interface, the values for each field are retrieved
     for the given record (by way of each WebSubmit field being
@@ -129,10 +155,28 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     retrieve value either from the record, or from the submission
     directory.
     """
+    ln = wash_language(form['ln'])
+    _ = gettext_set_language(ln)
+
     global sysno,rn
     t = ""
     # variables declaration
     fieldname = parameters['fieldnameMBI']
+    prefix = ''
+    suffix = ''
+    end_button_label = 'END'
+    end_button_prefix = ''
+    date_conversion_setting = ''
+    if parameters.has_key('prefix'):
+        prefix = parameters['prefix']
+    if parameters.has_key('suffix'):
+        suffix = parameters['suffix']
+    if parameters.has_key('button_label') and parameters['button_label']:
+        end_button_label = parameters['button_label']
+    if parameters.has_key('button_prefix'):
+        end_button_prefix = parameters['button_prefix']
+    if parameters.has_key('dates_conversion'):
+        date_conversion_setting = parameters['dates_conversion']
     # Path of file containing fields to modify
 
     the_globals = {
@@ -174,7 +218,11 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
         else:
             raise InvenioWebSubmitFunctionError("cannot find fields to modify")
     #output some text
-    t = t+"<CENTER bgcolor=\"white\">The document <B>%s</B> has been found in the database.</CENTER><br />Please modify the following fields:<br />Then press the 'END' button at the bottom of the page<br />\n" % rn
+    if not prefix:
+        t += "<center bgcolor=\"white\">The document <b>%s</b> has been found in the database.</center><br />Please modify the following fields:<br />Then press the '%s' button at the bottom of the page<br />\n" % \
+          (rn, cgi.escape(_(end_button_label)))
+    else:
+        t += prefix % the_globals
     for field in fields:
         subfield = ""
         value = ""
@@ -196,8 +244,9 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
         else:
             # First call to page - get field value from DB record
             value = Create_Modify_Interface_getfieldval_fromDBrec(marccode, sysno)
-        # If field is a date value, transform date into format DD/MM/YYYY:
-        value = Create_Modify_Interface_transform_date(value)
+        if date_conversion_setting != 'none':
+            # If field is a date value, transform date into format DD/MM/YYYY:
+            value = Create_Modify_Interface_transform_date(value)
         res = run_sql("SELECT * FROM sbmFIELDDESC WHERE name=%s", (field,))
         if len(res) > 0:
             element_type = res[0][3]
@@ -270,8 +319,17 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     # output our flag field
     t += '<input type="hidden" name="Create_Modify_Interface_DONE" value="DONE\n" />'
 
+
+    t += '<br />'
+
+    if end_button_prefix:
+        t += end_button_prefix % the_globals
+
     # output some more text
-    t = t + "<br /><br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;user_must_confirm_before_leaving_page = false;document.forms[0].submit();\"></small></CENTER></H4>"
+    t += "<br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"%(end_button_label)s\" onClick=\"document.forms[0].step.value = 2;user_must_confirm_before_leaving_page = false;document.forms[0].submit();\"></small></CENTER></H4>" % {'end_button_label': escape_javascript_string(_(end_button_label), escape_quote_for_html=True)}
+
+    if suffix:
+        t += suffix % the_globals
 
     return t
 
