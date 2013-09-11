@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -145,6 +145,7 @@ re_pattern_today = re.compile("\$TODAY\$")
 re_pattern_parens = re.compile(r'\([^\)]+\s+[^\)]+\)')
 re_unicode_lowercase_a = re.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
 re_unicode_lowercase_ae = re.compile(unicode(r"(?u)[æ]", "utf-8"))
+re_unicode_lowercase_oe = re.compile(unicode(r"(?u)[œ]", "utf-8"))
 re_unicode_lowercase_e = re.compile(unicode(r"(?u)[éèëê]", "utf-8"))
 re_unicode_lowercase_i = re.compile(unicode(r"(?u)[íìïî]", "utf-8"))
 re_unicode_lowercase_o = re.compile(unicode(r"(?u)[óòöôõø]", "utf-8"))
@@ -154,6 +155,7 @@ re_unicode_lowercase_c = re.compile(unicode(r"(?u)[çć]", "utf-8"))
 re_unicode_lowercase_n = re.compile(unicode(r"(?u)[ñ]", "utf-8"))
 re_unicode_uppercase_a = re.compile(unicode(r"(?u)[ÁÀÄÂÃÅ]", "utf-8"))
 re_unicode_uppercase_ae = re.compile(unicode(r"(?u)[Æ]", "utf-8"))
+re_unicode_uppercase_oe = re.compile(unicode(r"(?u)[Œ]", "utf-8"))
 re_unicode_uppercase_e = re.compile(unicode(r"(?u)[ÉÈËÊ]", "utf-8"))
 re_unicode_uppercase_i = re.compile(unicode(r"(?u)[ÍÌÏÎ]", "utf-8"))
 re_unicode_uppercase_o = re.compile(unicode(r"(?u)[ÓÒÖÔÕØ]", "utf-8"))
@@ -163,6 +165,7 @@ re_unicode_uppercase_c = re.compile(unicode(r"(?u)[ÇĆ]", "utf-8"))
 re_unicode_uppercase_n = re.compile(unicode(r"(?u)[Ñ]", "utf-8"))
 re_latex_lowercase_a = re.compile("\\\\[\"H'`~^vu=k]\{?a\}?")
 re_latex_lowercase_ae = re.compile("\\\\ae\\{\\}?")
+re_latex_lowercase_oe = re.compile("\\\\oe\\{\\}?")
 re_latex_lowercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?e\\}?")
 re_latex_lowercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?i\\}?")
 re_latex_lowercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?o\\}?")
@@ -172,6 +175,7 @@ re_latex_lowercase_c = re.compile("\\\\['uc]\\{?c\\}?")
 re_latex_lowercase_n = re.compile("\\\\[c'~^vu]\\{?n\\}?")
 re_latex_uppercase_a = re.compile("\\\\[\"H'`~^vu=k]\\{?A\\}?")
 re_latex_uppercase_ae = re.compile("\\\\AE\\{?\\}?")
+re_latex_uppercase_oe = re.compile("\\\\OE\\{?\\}?")
 re_latex_uppercase_e = re.compile("\\\\[\"H'`~^vu=k]\\{?E\\}?")
 re_latex_uppercase_i = re.compile("\\\\[\"H'`~^vu=k]\\{?I\\}?")
 re_latex_uppercase_o = re.compile("\\\\[\"H'`~^vu=k]\\{?O\\}?")
@@ -1370,6 +1374,7 @@ def strip_accents(x):
     Return such a stripped X."""
     x = re_latex_lowercase_a.sub("a", x)
     x = re_latex_lowercase_ae.sub("ae", x)
+    x = re_latex_lowercase_oe.sub("oe", x)
     x = re_latex_lowercase_e.sub("e", x)
     x = re_latex_lowercase_i.sub("i", x)
     x = re_latex_lowercase_o.sub("o", x)
@@ -1379,6 +1384,7 @@ def strip_accents(x):
     x = re_latex_lowercase_n.sub("n", x)
     x = re_latex_uppercase_a.sub("A", x)
     x = re_latex_uppercase_ae.sub("AE", x)
+    x = re_latex_uppercase_oe.sub("OE", x)
     x = re_latex_uppercase_e.sub("E", x)
     x = re_latex_uppercase_i.sub("I", x)
     x = re_latex_uppercase_o.sub("O", x)
@@ -1395,6 +1401,7 @@ def strip_accents(x):
     # asciify Latin-1 lowercase characters:
     y = re_unicode_lowercase_a.sub("a", y)
     y = re_unicode_lowercase_ae.sub("ae", y)
+    y = re_unicode_lowercase_oe.sub("oe", y)
     y = re_unicode_lowercase_e.sub("e", y)
     y = re_unicode_lowercase_i.sub("i", y)
     y = re_unicode_lowercase_o.sub("o", y)
@@ -1405,6 +1412,7 @@ def strip_accents(x):
     # asciify Latin-1 uppercase characters:
     y = re_unicode_uppercase_a.sub("A", y)
     y = re_unicode_uppercase_ae.sub("AE", y)
+    y = re_unicode_uppercase_oe.sub("OE", y)
     y = re_unicode_uppercase_e.sub("E", y)
     y = re_unicode_uppercase_i.sub("I", y)
     y = re_unicode_uppercase_o.sub("O", y)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -83,6 +83,10 @@ class TestStripAccents(unittest.TestCase):
                          search_engine.strip_accents('mémêmëmè'))
         self.assertEqual("MEMEMEME",
                          search_engine.strip_accents('MÉMÊMËMÈ'))
+        self.assertEqual("oe",
+                         search_engine.strip_accents('œ'))
+        self.assertEqual("OE",
+                         search_engine.strip_accents('Œ'))
 
 class TestQueryParser(unittest.TestCase):
     """Test of search pattern (or query) parser."""

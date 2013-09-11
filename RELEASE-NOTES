@@ -80,6 +80,13 @@ If you are upgrading from Invenio v1.0.4, then:
 
  c) Restart your Apache server and your bibsched queue.
 
+*** NOTE The items below will go into v1.0.6 release announcement ***
+
+ x) If your records may contain `oe` UTF-8 graphemes, please schedule
+    reindexing of concerned indexes at a convenient time, for example:
+
+     $ sudo -u www-data /opt/invenio/bin/bibindex -w title -f100000 -R
+
 If you are upgrading from a previous Invenio release (notably from
 v0.99 release series), then please see a dedicated Invenio Upgrade
 wiki page at <http://invenio-software.org/wiki/Installation/Upgrade>.
