@@ -162,4 +162,11 @@ Please proceed as follows:
 
  d) Restart your Apache server and your bibsched queue.
 
+*** NOTE The items below will go into v1.0.6 release announcement ***
+
+ x) If your records may contain `oe` UTF-8 graphemes, please schedule
+    reindexing of concerned indexes at a convenient time, for example:
+
+     $ sudo -u www-data /opt/invenio/bin/bibindex -w title -f100000 -R
+
 - end of file -

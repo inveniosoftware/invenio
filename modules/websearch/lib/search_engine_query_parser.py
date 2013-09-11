@@ -930,8 +930,7 @@ class SpiresToInvenioSyntaxConverter:
                 # Same problem as last week
                 begin = datetime.today()
                 begin += du_delta(weekday=relativedelta.SU(-2))
-                end = datetime.today()
-                end += du_delta(weekday=relativedelta.SA(-1))
+                end = begin + du_delta(weekday=relativedelta.SA(1))
                 begin = datetime.strftime(begin, '%Y-%m-%d')
                 end = datetime.strftime(end, '%Y-%m-%d')
             elif 'this month' in date_str:
