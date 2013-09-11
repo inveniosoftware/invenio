@@ -175,7 +175,13 @@ def references(recid):
 @blueprint.route('/<int:recid>/files', methods=['GET', 'POST'])
 @request_record
 def files(recid):
-    return render_template('records/files.html')
+    def get_files():
+        from invenio.bibdocfile import BibRecDocs
+        for bibdoc in BibRecDocs(recid).list_bibdocs():
+            for file in bibdoc.list_all_files():
+                yield file.get_url()
+
+    return render_template('records/files.html', files=list(get_files()))
 
 
 @blueprint.route('/<int:recid>/citations', methods=['GET', 'POST'])
@@ -190,7 +196,6 @@ def citations(recid):
         )
     return render_template('records/citations.html',
                            citations=citations)
-
 
 
 @blueprint.route('/<int:recid>/keywords', methods=['GET', 'POST'])

@@ -19,37 +19,34 @@
 
 {% macro menu( active = "service") -%}
 	<ul class="nav nav-pills nav-stacked">
-		<li {{("", "class=active")[active == "service"]}}><a href="{{ url_for('cloudutils.about') }}" >About</a></li>
 		<li {{("", "class=active")[active == "dropbox"]}}><a href="{{ url_for('cloudutils.index', service='dropbox') }}">DropBox</a></li>
-        <li {{("", "class=active")[active == "google_drive"]}}><a href="{{ url_for('cloudutils.index', service='google_drive') }}">Google Drive</a></li>
-    	<li {{("", "class=active")[active == "skydrive"]}}><a href="{{ url_for('cloudutils.index', service='skydrive') }}">SkyDrive</a></li>
-    </ul>
+    <li {{("", "class=active")[active == "google_drive"]}}><a href="{{ url_for('cloudutils.index', service='google_drive') }}">Google Drive</a></li>
+    <li {{("", "class=active")[active == "skydrive"]}}><a href="{{ url_for('cloudutils.index', service='skydrive') }}">SkyDrive</a></li>
+  </ul>
 {%- endmacro %}
 
 
 {% macro pagination( request, number_of_pages = 1, current_page = 1 ) -%}
-    <div class="pagination pagination-centered">
-	    <ul>
-		    {% if not request.args -%}
-		    	{% for index in range(number_of_pages) -%}
-			    	<li {{("", "class=active")[(index+1) == current_page]}} ><a href="{{request.url + '?page='}}{{index+1}}">{{index+1}}</a></li>
-  				{% endfor %}
-			{% elif not request.args.has_key('page') -%}
-				{% for index in range(number_of_pages) -%}
-			    	<li {{("", "class=active")[(index+1) == current_page]}} ><a href="{{request.url + '&page='}}{{index+1}}">{{index+1}}</a></li>
-  				{% endfor %}
-			{% else -%}
-				{%- set url = request.url -%}
-				{%- set target = 'page=' -%}
-				{%- set position = url.rfind(target) + target|length -%}
-				{%- set url = url[0:position] + url[position+request.args["page"]|length:] -%}
-				
-				{% for index in range(number_of_pages) -%}
-					{%- set replacement = "page=" -%}
-			    	<li {{("", "class=active")[(index+1) == current_page]}} ><a href="{{ replacement.join(url.rsplit(target, 1)) }}{{index+1}}">{{index+1}}</a></li>
-  				{% endfor %}
-			{% endif %}
-	    </ul>
-    </div>
-    
+  <div class="pagination pagination-centered">
+    <ul>
+    {% if not request.args -%}
+      {% for index in range(number_of_pages) -%}
+        <li {{("", "class=active")[(index+1) == current_page]}} ><a href="{{request.url + '?page='}}{{index+1}}">{{index+1}}</a></li>
+      {% endfor %}
+    {% elif not request.args.has_key('page') -%}
+      {% for index in range(number_of_pages) -%}
+        <li {{("", "class=active")[(index+1) == current_page]}} ><a href="{{request.url + '&page='}}{{index+1}}">{{index+1}}</a></li>
+      {% endfor %}
+    {% else -%}
+      {%- set url = request.url -%}
+      {%- set target = 'page=' -%}
+      {%- set position = url.rfind(target) + target|length -%}
+      {%- set url = url[0:position] + url[position+request.args["page"]|length:] -%}
+      {% for index in range(number_of_pages) -%}
+        {%- set replacement = "page=" -%}
+        <li {{("", "class=active")[(index+1) == current_page]}} ><a href="{{ replacement.join(url.rsplit(target, 1)) }}{{index+1}}">{{index+1}}</a></li>
+      {% endfor %}
+    {% endif %}
+    </ul>
+  </div>
 {%- endmacro %}
