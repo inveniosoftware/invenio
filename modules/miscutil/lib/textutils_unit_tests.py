@@ -443,9 +443,10 @@ class TestStripping(InvenioTestCase):
     if UNIDECODE_AVAILABLE:
         def test_text_to_ascii(self):
             """textutils - transliterate to ascii using unidecode"""
-            self.assertEqual(translate_to_ascii(
-                ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]),
-                ["a i U", "Hohne", "Age Ost Vaer", "normal"]
+            self.assert_(translate_to_ascii(
+                ["á í Ú", "H\xc3\xb6hne", "Åge Øst Vær", "normal"]) in
+                (["a i U", "Hohne", "Age Ost Vaer", "normal"],  ## unidecode < 0.04.13
+                 ['a i U', 'Hoehne', 'Age Ost Vaer', 'normal']) ## unidecode >= 0.04.13
             )
             self.assertEqual(translate_to_ascii("àèéìòù"), ["aeeiou"])
             self.assertEqual(translate_to_ascii(None), None)
