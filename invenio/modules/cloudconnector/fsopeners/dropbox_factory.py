@@ -19,64 +19,65 @@
 
 """A factory for dropbox file system"""
 
-
-from invenio.DropboxFS import DropboxFS
 import dropbox
-from invenio.cloudutils_config import * 
+
 from fs.errors import ResourceNotFoundError
-from invenio.websession_model import User
-from invenio.sqlalchemyutils import db
-from invenio.cloudutils import CloudRedirectUrl, \
-                               ErrorBuildingFS
+
+from invenio.base.globals import cfg
+from invenio.ext.fs.cloudfs.dropboxfs import DropboxFS
+from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import User
+from invenio.modules.cloudconnector.errors import CloudRedirectUrl, \
+    ErrorBuildingFS
+
 
 class Factory(object):
-    def build_fs(self, current_user, credentials, root=None, 
-                          callback_url=None, request=None, session=None):
-        
-            if( session == None and credentials.get('access_token') == None):
+    def build_fs(self, current_user, credentials, root=None,
+                 callback_url=None, request=None, session=None):
+
+            if session == None and credentials.get('access_token') == None:
                 #Dropbox can't work if session and access_token are None
-                raise ErrorBuildingFS("Session or credentials need to be set " +
+                raise ErrorBuildingFS("Session or credentials need to be set "
                                       "when building dropbox")
-            elif( credentials.get('access_token') != None ):
+            elif credentials.get('access_token') != None:
                 try:
                     filesystem = DropboxFS(root, credentials)
                     filesystem.about()
                     return filesystem
                 except ResourceNotFoundError, e:
                     if(root != "/"):
-                        filesystem = GoogleDriveFS("/", credentials)
+                        filesystem = DropboxFS("/", credentials)
                     filesystem.makedir(root, recursive=True)
                     filesystem = DropboxFS(root, credentials)
                     return filesystem
                 except:
                     #Remove the old stored credentials
-                    new_data = {
-                               'dropbox': {
-                                       'uid': None,
-                                       'access_token': None
-                                       }
-                               }
+                    new_data = {'dropbox':
+                        {'uid': None,
+                         'access_token': None,
+                         }
+                    }
                     self._update_cloudutils_settings(current_user, new_data)
                     flow = dropbox.client.DropboxOAuth2Flow(
-                                                        CFG_DROPBOX_KEY, 
-                                                        CFG_DROPBOX_SECRET, 
-                                                        callback_url, session, 
-                                                        CFG_DROPBOX_CSRF_TOKEN
-                                                        )
-                    
+                        cfg['CFG_DROPBOX_KEY'],
+                        cfg['CFG_DROPBOX_SECRET'],
+                        callback_url, session,
+                        cfg['CFG_DROPBOX_CSRF_TOKEN'],
+                    )
+
                     url = flow.start()
-                    raise CloudRedirectUrl(url)
-            elif(request.args.has_key('code')):
+                    raise CloudRedirectUrl(url, __name__)
+            elif 'code' in request.args:
                 try:
                     access_token, uid, url_state = dropbox.client.DropboxOAuth2Flow(
-                                                            CFG_DROPBOX_KEY, 
-                                                            CFG_DROPBOX_SECRET, 
-                                                            callback_url, session, 
-                                                            CFG_DROPBOX_CSRF_TOKEN
-                                                            ).finish( request.args )
+                        cfg['CFG_DROPBOX_KEY'],
+                        cfg['CFG_DROPBOX_SECRET'],
+                        callback_url, session,
+                        cfg['CFG_DROPBOX_CSRF_TOKEN'],
+                    ).finish(request.args)
                 except Exception, e:
                     raise ErrorBuildingFS(e)
-        
+
                 new_data = {
                             'dropbox': {
                                     'uid': uid,
@@ -84,36 +85,36 @@ class Factory(object):
                                     }
                            }
                 self._update_cloudutils_settings(current_user, new_data)
-                
+
                 filesystem = DropboxFS(root, {"access_token": access_token})
                 return filesystem
-            elif(session != None):
+            elif session is not None:
                 flow = dropbox.client.DropboxOAuth2Flow(
-                                                        CFG_DROPBOX_KEY, 
-                                                        CFG_DROPBOX_SECRET, 
-                                                        callback_url, session, 
-                                                        CFG_DROPBOX_CSRF_TOKEN
-                                                        )
-                    
+                    cfg['CFG_DROPBOX_KEY'],
+                    cfg['CFG_DROPBOX_SECRET'],
+                    callback_url, session,
+                    cfg['CFG_DROPBOX_CSRF_TOKEN'],
+                )
+
                 url = flow.start()
-                raise CloudRedirectUrl(url)
-                
+                raise CloudRedirectUrl(url, __name__)
+
             else:
                 raise ErrorBuildingFS("Insufficient data provided to the cloud builder")
-            
+
     def _update_cloudutils_settings(self, current_user, new_data):
         # Updates cloudutils settings in DataBase and refreshes current user
         user = User.query.get(current_user.get_id())
         settings = user.settings
         cloudutils_settings = settings.get("cloudutils_settings")
-        
+
         if( cloudutils_settings ):
             cloudutils_settings.update( new_data )
-            
+
             settings.update(settings)
         else:
             settings.update({"cloudutils_settings" : new_data})
-        
+
         user.settings = settings
         db.session.merge(user)
         db.session.commit()

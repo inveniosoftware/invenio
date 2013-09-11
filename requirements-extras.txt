@@ -10,3 +10,8 @@ cython
 nose
 nosexcover
 flake8
+dropbox
+oauth2client
+apiclient
+urllib3
+python-skydrive

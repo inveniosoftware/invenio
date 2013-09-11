@@ -17,7 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Dropbox file system"""
+"""
+    Dropbox file system
+    -------------------
+
+    Installation::
+
+        pip install dropbox
+"""
 
 import os
 import time
@@ -89,9 +96,11 @@ class CacheItem(object):
 
 
 class DropboxCache(UserDict):
+
     def __init__(self, client):
         self._client = client
         UserDict.__init__(self)
+
     def set(self, path, metadata):
         self[path] = CacheItem(metadata)
         dname, bname = pathsplit(path)
@@ -196,7 +205,7 @@ class DropboxClient(client.DropboxClient):
         except:
             raise RemoteConnectionError("Most probable reasons: " + \
                                         "access token has expired " + \
-                                    "or user credentials are invalid.")    
+                                    "or user credentials are invalid.")
         self.cache.set(path, metadata)
         return metadata['path']
 
@@ -214,10 +223,10 @@ class DropboxClient(client.DropboxClient):
         except:
             raise RemoteConnectionError("Most probable reasons: " + \
                                         "access token has expired " + \
-                                    "or user credentials are invalid.")     
+                                    "or user credentials are invalid.")
         self.cache.set(dst, metadata)
         return metadata['path']
-    
+
     def file_move(self, src, dst):
         try:
             metadata = super(DropboxClient, self).file_move(src, dst)
@@ -232,11 +241,11 @@ class DropboxClient(client.DropboxClient):
         except:
             raise RemoteConnectionError("Most probable reasons: " + \
                                         "access token has expired " + \
-                                    "or user credentials are invalid.")     
+                                    "or user credentials are invalid.")
         self.cache.pop(src, None)
         self.cache.set(dst, metadata)
         return metadata['path']
-    
+
     def file_delete(self, path):
         try:
             super(DropboxClient, self).file_delete(path)
@@ -249,7 +258,7 @@ class DropboxClient(client.DropboxClient):
         except:
             raise RemoteConnectionError("Most probable reasons: " + \
                                         "access token has expired " + \
-                                    "or user credentials are invalid.") 
+                                    "or user credentials are invalid.")
         self.cache.pop(path, None)
 
     def put_file(self, path, f, overwrite=False):
@@ -262,31 +271,31 @@ class DropboxClient(client.DropboxClient):
         except:
             raise RemoteConnectionError("Most probable reasons: " + \
                                         "access token has expired " + \
-                                    "or user credentials are invalid.") 
+                                    "or user credentials are invalid.")
         self.cache.pop(dirname(path), None)
         return path
-            
+
     def media(self, path):
         try:
             info = super(DropboxClient, self).media( path )
-            return info.get('url', None) 
+            return info.get('url', None)
         except rest.ErrorResponse, e:
             if e.status == 400:
                 raise UnsupportedError("create a link to a folder")
             if e.status == 404:
                 raise ResourceNotFoundError(path)
-            
+
             raise OperationFailedError(opname='file_copy', msg=str(e) )
         except:
             raise RemoteConnectionError("Most probable reasons: " + \
                                         "access token has expired " + \
-                                    "or user credentials are invalid.") 
+                                    "or user credentials are invalid.")
 
 
 class DropboxFS(FS):
     """A Dropbox filesystem."""
     __name__ = "Dropbox"
-    
+
     _meta = { 'thread_safe' : True,
               'virtual' : False,
               'read_only' : False,
@@ -302,18 +311,19 @@ class DropboxFS(FS):
     def __init__(self, root=None, credentials=None, localtime=False, thread_synchronize=True):
         self._root = root
         self._credentials = credentials
-        
-        if( root == None ):
+
+        if root == None:
             root = "/"
-        
-        if( self._credentials == None ):
-            if( "DROPBOX_ACCESS_TOKEN" not in os.environ ):
+
+        if self._credentials == None:
+            if "DROPBOX_ACCESS_TOKEN" not in os.environ:
                 raise CreateFailedError("DROPBOX_ACCESS_TOKEN is not set in os.environ")
             else:
                 self._credentials['access_token'] = os.environ.get('DROPBOX_ACCESS_TOKEN')
-        
+
         super(DropboxFS, self).__init__(thread_synchronize=thread_synchronize)
-        self.client = DropboxClient( oauth2_access_token = self._credentials['access_token'] )
+        self.client = DropboxClient(
+            oauth2_access_token=self._credentials['access_token'])
         self.localtime = localtime
 
     def __repr__(self):
@@ -330,9 +340,9 @@ class DropboxFS(FS):
         if meta_name == 'read_only':
             return self.read_only
         return super(DropboxFS, self).getmeta(meta_name, default)
-    
+
     def is_root(self, path):
-        """Checks if the given path is the root folder of this 
+        """Checks if the given path is the root folder of this
             instance of DropboxFS
         @param path: Path to the folder to check
         """
@@ -340,8 +350,8 @@ class DropboxFS(FS):
             return True
         else:
             return False
-    
-    
+
+
     @synchronize
     def open(self, path, mode="rb", **kwargs):
         """ Open the named file in the given mode.
@@ -352,10 +362,10 @@ class DropboxFS(FS):
             the file is flushed or closed.
         @param path: Path to the file to be opened
         @param mode: In which mode to open the file
-        @raise ResourceNotFoundError: If given path doesn't exist and 
+        @raise ResourceNotFoundError: If given path doesn't exist and
             'w' is not in mode
-        @return: RemoteFileBuffer object 
-        
+        @return: RemoteFileBuffer object
+
         """
         path = abspath(normpath(path))
         spooled_file = SpooledTemporaryFile(mode=mode, bufsize=MAX_BUFFER)
@@ -387,8 +397,8 @@ class DropboxFS(FS):
 
     def setcontents(self, path, data, *args, **kwargs):
         """Sets new content to remote file
-        
-        Method works only with existing files and sets 
+
+        Method works only with existing files and sets
             new content to them.
         @param path: Path the file in which to write the new content
         @param contents: File contents as a string, or any object with
@@ -396,18 +406,18 @@ class DropboxFS(FS):
         @param kwargs: additional parameters like:
             encoding: the type of encoding to use if data is text
             errors: encoding errors
-        @param chunk_size: Number of bytes to read in a chunk, 
-            if the implementation has to resort to a read copy loop 
+        @param chunk_size: Number of bytes to read in a chunk,
+            if the implementation has to resort to a read copy loop
         @return: Path of the updated file
-        
+
         """
         path = abspath(normpath(path))
         self.client.put_file(path, data, overwrite=True)
         return path
-    
+
     def desc(self, path):
         """
-        @return: The title for the given path. 
+        @return: The title for the given path.
         """
         path = abspath(normpath(path))
         info = self.getinfo(path)
@@ -421,7 +431,7 @@ class DropboxFS(FS):
 
     def isdir(self, path):
         """ Checks if a the specified path is a folder
-        
+
         @param path: Path to the file/folder to check
         """
         info = self.getinfo(path)
@@ -429,7 +439,7 @@ class DropboxFS(FS):
 
     def isfile(self, path):
         """ Checks if a the specified path is a file
-        
+
         @param path: Path to the file/folder to check
         """
         info = self.getinfo(path)
@@ -437,7 +447,7 @@ class DropboxFS(FS):
 
     def exists(self, path):
         """ Checks if a the specified path exists
-        
+
         @param path: Path to the file/folder to check
         """
         try:
@@ -458,14 +468,14 @@ class DropboxFS(FS):
             that accepts a path and returns a boolean
         @param full: returns full paths (relative to the root)
         @type full: bool
-        @param absolute: returns absolute paths 
+        @param absolute: returns absolute paths
             (paths beginning with /)
         @type absolute: bool
         @param dirs_only: if True, only return directories
         @type dirs_only: bool
         @param files_only: if True, only return files
-        @type files_only: bool 
-        @return: a list of unicode paths       
+        @type files_only: bool
+        @return: a list of unicode paths
         """
         path = abspath(normpath(path))
         children = self.client.children(path)
@@ -476,9 +486,9 @@ class DropboxFS(FS):
         """ Returned information is metadata from cloud service +
             a few more fields with standard names for some parts
             of the metadata.
-        @param path: path to the file/folder for which to return 
+        @param path: path to the file/folder for which to return
             informations
-        @return: dictionary with informations about the specific file 
+        @return: dictionary with informations about the specific file
         """
         path = abspath(normpath(path))
         metadata = self.client.metadata(path)
@@ -509,8 +519,8 @@ class DropboxFS(FS):
         @param src: Path to the file to be moved
         @param dst: Path to the folder in which the file will be moved
         @param chunk_size: if using chunk upload
-        @return: Path to the moved file  
-        """ 
+        @return: Path to the moved file
+        """
         src = abspath(normpath(src))
         dst = abspath(normpath(dst))
         return self.client.file_move(src, dst)
@@ -520,17 +530,17 @@ class DropboxFS(FS):
         @param src: Path to the folder to be moved
         @param dst: Path to the folder in which the folder will be moved
         @param chunk_size: if using chunk upload
-        @return: Path to the moved folder  
-        """ 
+        @return: Path to the moved folder
+        """
         src = abspath(normpath(src))
         dst = abspath(normpath(dst))
         return self.client.file_move(src, dst)
 
     def rename(self, src, dst, *args, **kwargs):
         """
-        @param src: Path to the file to be renamed 
+        @param src: Path to the file to be renamed
         @param dst: Full path with the new name
-        @raise UnsupportedError: If trying to remove the root directory 
+        @raise UnsupportedError: If trying to remove the root directory
         @return: Path to the renamed file
         """
         src = abspath(normpath(src))
@@ -539,81 +549,81 @@ class DropboxFS(FS):
 
     def makedir(self, path, recursive=False, allow_recreate=False):
         """
-        @param path: path to the folder to be created. 
+        @param path: path to the folder to be created.
             If only the new folder is specified
             it will be created in the root directory
         @param recursive: allows recursive creation of directories
-        @param allow_recreate: dropbox currently doesn't support 
+        @param allow_recreate: dropbox currently doesn't support
             allow_recreate, so if a folder exists it will
         @return: Id of the created directory
-        
+
         """
         if not self._checkRecursive(recursive, path):
             raise UnsupportedError("recursively create specified folder")
-        
+
         path = abspath(normpath(path))
         return self.client.file_create_folder(path)
 
 
     def createfile(self, path, wipe=False, **kwargs):
         """Creates an empty file.
-        
+
         @param path: path to the new file.
-        @param wipe: New file with empty content. 
-        @param kwargs: Additional parameters like: 
-            description - a short description of the new file 
-        @attention: Root directory is the current root directory 
-            of this instance of filesystem and not the root of 
+        @param wipe: New file with empty content.
+        @param kwargs: Additional parameters like:
+            description - a short description of the new file
+        @attention: Root directory is the current root directory
+            of this instance of filesystem and not the root of
             your Google Drive.
         @return: Path to the created file
-        
+
         """
         return self.client.put_file(path, '', overwrite=wipe)
 
     def remove(self, path):
         """
         @param path: path to the file to be deleted
-        @return: None if removal was successful 
+        @return: None if removal was successful
         """
-        path = abspath(normpath(path)) 
+        path = abspath(normpath(path))
         if self.is_root(path = path):
-            raise UnsupportedError("Can't remove the root directory")   
+            raise UnsupportedError("Can't remove the root directory")
         if self.isdir(path = path):
             raise ResourceInvalidError("Specified path is a directory. " +
                                        "Please use removedir.")
-        
+
         self.client.file_delete(path)
 
     def removedir(self, path, *args, **kwargs):
         """
         @param path: path to the file to be deleted
-        @return: None if removal was successful 
+        @return: None if removal was successful
         """
         path = abspath(normpath(path))
-        
+
         if self.is_root(path = path):
-            raise UnsupportedError("Can't remove the root directory")   
+            raise UnsupportedError("Can't remove the root directory")
         if self.isfile(path = path):
             raise ResourceInvalidError("Specified path is a directory. " +
                                        "Please use removedir.")
-        
+
         self.client.file_delete(path)
-        
+
     def getpathurl(self, path):
-        """        
+        """
         @param path: path to the file for which to return the url path
-        @param allow_none: if true, this method can return None if 
+        @param allow_none: if true, this method can return None if
             there is no URL form of the given path
         @type allow_none: bool
         @return: url that corresponds to the given path, if one exists
-        
+
         """
         path = abspath(normpath(path))
         return self.client.media(path)
-    
+
     def about(self):
         """
-        @return: information about the current user 
+        @return: information about the current user
             with whose credentials is the file system instantiated.
         """
         info = self.client.account_info()
@@ -621,37 +631,37 @@ class DropboxFS(FS):
         info['user_name'] = info.pop('display_name')
         info['quota'] = 100*(info['quota_info']["normal"]+info['quota_info']["shared"])/ float(info['quota_info']["quota"])
         return info
-        return self.client.account_info()    
-    
+        return self.client.account_info()
+
     def _checkRecursive(self, recursive, path):
         #  Checks if the new folder to be created is compatible with current
         #  value of recursive
         parts = path.split("/")
         if( parts < 3 ):
             return True
-        
-        testPath = "/".join( parts[:-1] )
-        if( self.exists(testPath) ):
+
+        testPath = "/".join(parts[:-1])
+        if self.exists(testPath):
             return True
-        elif( recursive ):
+        elif recursive:
             return True
         else:
-            return False  
-          
+            return False
+
     def _metadata_to_info(self, metadata, localtime=False):
         """ Returns modified metadata
-        
+
         Method adds a few standard names to the metadata:
             size - the size of the file/folder
             isdir - is something a file or a directory
-            created_time - the time of the creation 
+            created_time - the time of the creation
             path - path to the object which metadata are we showing
             revision - google drive doesn't have a revision parameter
             modified - time of the last modification
         @return: The full metadata and a few more fields
             with standard names.
         """
-        
+
         info = {
             'size': metadata.get('bytes', 0),
             'isdir': metadata.get('is_dir', False),
@@ -672,6 +682,6 @@ class DropboxFS(FS):
                 info['modified'] = datetime.datetime.fromtimestamp(mtime)
         except KeyError:
             pass
-        
+
         info.update(metadata)
         return info
