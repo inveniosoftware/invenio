@@ -269,24 +269,21 @@ class BibFormatBriefHTMLTest(InvenioTestCase):
     def setUp(self):
         """Prepare some ideal outputs"""
 
-        self.record_76_hb = '''<strong>Ιθάκη</strong>
- / <a href="%s/search?f=author&amp;p=%%CE%%9A%%CE%%B1%%CE%%B2%%CE%%AC%%CF%%86%%CE%%B7%%CF%%82%%2C%%20%%CE%%9A%%20%%CE%%A0&amp;ln=%s">Καβάφης, Κ Π</a>
-
-
-
-
-
-<br /><small>
+        self.record_76_hb_title = '''Ιθάκη'''
+        self.record_76_hb_author = '''Καβάφης, Κ Π'''
+        self.record_76_hb_body = '''\
 Σα βγεις στον πηγαιμό για την Ιθάκη, <br />
 να εύχεσαι νάναι μακρύς ο δρόμος, <br />
-γεμάτος περιπέτειες, γεμάτος γνώσεις [...] </small>''' % (CFG_SITE_URL, CFG_SITE_LANG)
+γεμάτος περιπέτειες, γεμάτος γνώσεις'''
 
 
     def test_brief_html_output(self):
         """bibformat - Brief HTML output"""
         pageurl = CFG_SITE_URL + '/%s/76?of=HB' % CFG_SITE_RECORD
         result = test_web_page_content(pageurl,
-                                       expected_text=self.record_76_hb)
+                                       expected_text=[self.record_76_hb_title,
+                                                      self.record_76_hb_author,
+                                                      self.record_76_hb_body])
         self.assertEqual([], result)
 
 class BibFormatMARCXMLTest(InvenioTestCase):
