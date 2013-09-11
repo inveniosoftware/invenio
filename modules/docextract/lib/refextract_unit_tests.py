@@ -244,7 +244,7 @@ class SearchTest(InvenioTestCase):
 
 class RebuildReferencesTest(unittest.TestCase):
     def setUp(self):
-        setup_loggers(verbosity=9)
+        setup_loggers(verbosity=1)
 
     def test_simple(self):
         marker_pattern = ur"^\s*(?P<mark>\[\s*(?P<marknum>\d+)\s*\])"

@@ -249,7 +249,7 @@ def outdated_caches(fmt, last_updated, chunk_size=5000):
 
     last_updated_str = last_updated.strftime('%Y-%m-%d %H:%M:%S')
     recids = intbitset()
-    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0]
+    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0] or 0
     for start in xrange(1, max_id + 1, chunk_size):
         end = start + chunk_size
         recids += intbitset(run_sql(sql, (last_updated_str, fmt, start, end)))
@@ -273,7 +273,7 @@ def missing_caches(fmt, chunk_size=2000):
              AND br.id BETWEEN %%s AND %%s""" % fmt
 
     recids = intbitset()
-    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0]
+    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0] or 0
     for start in xrange(1, max_id + 1, chunk_size):
         end = start + chunk_size
         recids += intbitset(run_sql(sql, (start, end)))
