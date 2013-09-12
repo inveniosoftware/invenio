@@ -823,3 +823,29 @@ def auto_version_url(file_path):
     except IOError:
         pass
     return file_path + "?%s" % file_md5
+
+def get_relative_url(url):
+    """
+    Returns the relative URL from a URL. For example:
+
+    'http://web.net' -> ''
+    'http://web.net/' -> ''
+    'http://web.net/1222' -> '/1222'
+    'http://web.net/wsadas/asd' -> '/wsadas/asd'
+
+    It will never return a trailing "/".
+
+    @param url: A url to transform
+    @type url: str
+
+    @return: relative URL
+    """
+    # remove any protocol info before
+    stripped_site_url = url.replace("://", "")
+    baseurl = "/" + "/".join(stripped_site_url.split("/")[1:])
+
+    # remove any trailing slash ("/")
+    if baseurl[-1] == "/":
+        return baseurl[:-1]
+    else:
+        return baseurl

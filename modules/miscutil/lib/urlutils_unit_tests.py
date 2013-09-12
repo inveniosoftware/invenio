@@ -26,17 +26,17 @@ from invenio.testutils import InvenioTestCase
 from cgi import parse_qs
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.urlutils import \
-     create_AWS_request_url, \
-     string_to_numeric_char_reference, \
-     make_canonical_urlargd, \
-     create_html_link, \
-     create_html_mailto, \
-     same_urls_p, \
-     HASHLIB_IMPORTED, \
-     wash_url_argument, \
-     create_url, \
-     create_Indico_request_url
+from invenio.urlutils import (create_AWS_request_url,
+                              string_to_numeric_char_reference,
+                              make_canonical_urlargd,
+                              create_html_link,
+                              create_html_mailto,
+                              same_urls_p,
+                              HASHLIB_IMPORTED,
+                              wash_url_argument,
+                              create_url,
+                              create_Indico_request_url,
+                              get_relative_url)
 
 class TestWashUrlArgument(InvenioTestCase):
     def test_wash_url_argument(self):
@@ -298,10 +298,35 @@ class TestEmailObfuscationMode(InvenioTestCase):
                          {'CFG_SITE_URL': CFG_SITE_URL})
 
 
+
+class TestRelativeURL(unittest.TestCase):
+    """Tests the get_relative_url function with different input strings"""
+
+    def test_relative_url(self):
+        """urlutils - test get_relative_url"""
+        url_normal = "http://web.net"
+        self.assertEqual("", get_relative_url(url_normal))
+
+        url_normal_trailing = "http://web.net/"
+        self.assertEqual("", get_relative_url(url_normal_trailing))
+
+        url_more = "http://web.net/asd"
+        self.assertEqual("/asd", get_relative_url(url_more))
+
+        url_more_trailing = "http://web.net/asd/"
+        self.assertEqual("/asd", get_relative_url(url_more_trailing))
+
+        url_adv = "http://web.net/asd/qwe"
+        self.assertEqual("/asd/qwe", get_relative_url(url_adv))
+
+        url_adv_trailing = "http://web.net/asd/qwe/"
+        self.assertEqual("/asd/qwe", get_relative_url(url_adv_trailing))
+
 TEST_SUITE = make_test_suite(TestWashUrlArgument,
                              TestUrls,
                              TestHtmlLinks,
-                             TestEmailObfuscationMode)
+                             TestEmailObfuscationMode,
+                             TestRelativeURL)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
