@@ -357,6 +357,10 @@ template function generated it.
         else:
             pageheadertitle = headertitle + ' - ' + sitename
 
+        metabase = ""
+        stripped_url = CFG_SITE_URL.replace("://", "")
+        if '/' in stripped_url:
+            metabase = "<base href='%s'>" % (CFG_SITE_URL,)
 
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"

@@ -302,6 +302,35 @@ def cli_cmd_update_config_py(conf):
     Update new config.py from conf options, keeping previous
     config.py in a backup copy.
     """
+    ## NOTE: the following function exists also in urlutils.py
+    ## However we can't import urlutils here, as it depends on config.py
+    ## to already exist, while we are in the process of creating it.
+    def get_relative_url(url):
+        """
+        Returns the relative URL from a URL. For example:
+
+        'http://web.net' -> ''
+        'http://web.net/' -> ''
+        'http://web.net/1222' -> '/1222'
+        'http://web.net/wsadas/asd' -> '/wsadas/asd'
+
+        It will never return a trailing "/".
+
+        @param url: A url to transform
+        @type url: str
+
+        @return: relative URL
+        """
+        # remove any protocol info before
+        stripped_site_url = url.replace("://", "")
+        baseurl = "/" + "/".join(stripped_site_url.split("/")[1:])
+
+        # remove any trailing slash ("/")
+        if baseurl[-1] == "/":
+            return baseurl[:-1]
+        else:
+            return baseurl
+
     print ">>> Going to update config.py..."
     ## location where config.py is:
     configpyfile = conf.get("Invenio", "CFG_PYLIBDIR") + \
@@ -326,6 +355,9 @@ def cli_cmd_update_config_py(conf):
     if not conf.get("Invenio", "CFG_SITE_SECURE_URL"):
         conf.set("Invenio", "CFG_SITE_SECURE_URL",
                  conf.get("Invenio", "CFG_SITE_URL"))
+    ## Special treatment of base URL, adding CFG_BASE_URL
+    base_url = get_relative_url(conf.get("Invenio", "CFG_SITE_URL"))
+    fdesc.write("CFG_BASE_URL = \"%s\"\n" % (base_url,))
     ## process all the options normally:
     sections = conf.sections()
     sections.sort()
