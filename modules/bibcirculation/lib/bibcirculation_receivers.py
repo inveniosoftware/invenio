@@ -20,7 +20,10 @@
 from datetime import datetime, timedelta
 from fixture import DataSet
 
+from invenio.webinterface_handler_flask import with_app_context
 
+
+@with_app_context(new_context=True)
 def post_handler_demosite_populate(sender, default_data='', *args, **kwargs):
     """Loads data after records are created."""
 
@@ -497,23 +500,26 @@ def post_handler_demosite_populate(sender, default_data='', *args, **kwargs):
             period_of_interest_to = datetime.now() + timedelta(days=90)
             id = 4L
 
-    from invenio.sqlalchemyutils import db
-    from fixture import SQLAlchemyFixture
-    from invenio import bibcirculation_model
 
     fixtures = [CrcLIBRARYData, CrcBORROWERData, CrcITEMData, CrcLOANData,
                 CrcLOANREQUESTData]
-    models = dict((m.__name__, getattr(bibcirculation_model, m.__name__[:-4]))
-                  for m in fixtures)
 
-    dbfixture = SQLAlchemyFixture(env=models, engine=db.metadata.bind,
-                                  session=db.session)
-    data = dbfixture.data(*fixtures)
+    try:
+        from invenio.sqlalchemyutils import db
+        from fixture import SQLAlchemyFixture
+        from invenio import bibcirculation_model
 
-    print ">>> There are", len(models), "tables to be loaded."
+        models = dict((m.__name__, getattr(bibcirculation_model, m.__name__[:-4]))
+                      for m in fixtures)
 
-    data.setup()
-    db.session.commit()
+        dbfixture = SQLAlchemyFixture(env=models, engine=db.metadata.bind,
+                                      session=db.session)
+        data = dbfixture.data(*fixtures)
 
-    print ">>> BibCirculation demosite data has been loaded."
+        print ">>> There are", len(models), "tables to be loaded."
+        data.setup()
+
+        print ">>> BibCirculation demosite data has been loaded."
+    except Exception as e:
+        print ">>> FAIL: data has not been loaded", e
 
