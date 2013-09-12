@@ -21,19 +21,20 @@
 
 __revision__ = "$Id$"
 
-import unittest
 import os
 from logging import StreamHandler, DEBUG
 from cStringIO import StringIO
 
-from invenio.websubmit_file_converter import get_file_converter_logger
 from invenio.errorlib import register_exception
 from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_TMPDIR
+from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
-from invenio import websubmit_file_stamper
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
 
-class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
+websubmit_file_stamper = lazy_import('invenio.websubmit_file_stamper')
+
+class WebSubmitWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSubmit web pages whether they are up or not."""
 
     def test_submission_pages_availability(self):
@@ -85,7 +86,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/submit-guide',
                                                expected_text="Submit Guide"))
 
-class WebSubmitLegacyURLsTest(unittest.TestCase):
+class WebSubmitLegacyURLsTest(InvenioTestCase):
     """ Check that the application still responds to legacy URLs"""
 
     def test_legacy_help_page_link(self):
@@ -103,7 +104,7 @@ class WebSubmitLegacyURLsTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/submit/access.en.html',
                                               expected_text="Submit Guide"))
 
-class WebSubmitXSSVulnerabilityTest(unittest.TestCase):
+class WebSubmitXSSVulnerabilityTest(InvenioTestCase):
     """Test possible XSS vulnerabilities of the submission engine."""
 
     def test_xss_in_submission_doctype(self):
@@ -154,7 +155,7 @@ def WebSubmitFileConverterTestGenerator():
                     continue
                 yield WebSubmitFileConverterTest(input_file, from_format, to_format)
 
-class WebSubmitFileConverterTest(unittest.TestCase):
+class WebSubmitFileConverterTest(InvenioTestCase):
     """Test WebSubmit file converter tool"""
 
     def __init__(self, input_file, from_format, to_format):
@@ -164,6 +165,7 @@ class WebSubmitFileConverterTest(unittest.TestCase):
         self.input_file = input_file
 
     def setUp(self):
+        from invenio.websubmit_file_converter import get_file_converter_logger
         logger = get_file_converter_logger()
         self.log = StringIO()
         logger.setLevel(DEBUG)
@@ -192,7 +194,7 @@ class WebSubmitFileConverterTest(unittest.TestCase):
             register_exception(alert_admin=True)
             self.fail("ERROR: when converting from %s to %s: %s, the log contained: %s" % (self.from_format, self.to_format, err, self.log.getvalue()))
 
-class WebSubmitStampingTest(unittest.TestCase):
+class WebSubmitStampingTest(InvenioTestCase):
     """Test WebSubmit file stamping tool"""
 
     def test_stamp_coverpage(self):
