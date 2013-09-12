@@ -71,6 +71,7 @@ modules/miscutil/bin/dbdump
 modules/miscutil/bin/dbexec
 modules/miscutil/bin/inveniocfg
 modules/miscutil/bin/plotextractor
+modules/miscutil/bin/bibtex
 modules/miscutil/etc/bash_completion.d/inveniocfg
 modules/miscutil/lib/build
 modules/webaccess/bin/authaction
