@@ -20,31 +20,28 @@
 
 """Unit tests for bibcatalog_system_email library."""
 
-import unittest
-
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio import bibcatalog_system_email
+from invenio.mailutils_unit_tests import MailTestCase
 
 
-class BibCatalogSystemEmailTest(unittest.TestCase):
+class BibCatalogSystemEmailTest(MailTestCase):
     """Testing of BibCatalog."""
 
+    EMAIL_BACKEND = 'flask.ext.email.backends.console.Mail'
+
     def setUp(self):
+        super(BibCatalogSystemEmailTest, self).setUp()
+        from invenio import bibcatalog_system_email
         self.email = bibcatalog_system_email.BibCatalogSystemEmail()
         bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL = CFG_SITE_SUPPORT_EMAIL
         bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM = 'EMAIL'
         pass
 
-    def tearDown(self):
-        pass
-
-
     def test_email_ticket_search_exception_not_implemented(self):
         """bibcatalog_system_email - execution raises NotImplementedError exception"""
 
         self.assertRaises(NotImplementedError, self.email.ticket_search, 1)
-
 
     def test_ticket_submit_via_email(self):
         """bibcatalog_system_email - test creating ticket via email"""
@@ -72,12 +69,10 @@ class BibCatalogSystemEmailTest(unittest.TestCase):
 
         self.assertEqual(self.email.check_system(), '')
 
-
     def test_ticket_get_info(self):
         """bibcatalog_system_email - ticket_get_info raises NotImplementedError exception"""
 
         self.assertRaises(NotImplementedError, self.email.ticket_get_info, uid=1, ticketid=0)
-
 
 
 TEST_SUITE = make_test_suite(BibCatalogSystemEmailTest)
