@@ -4789,5 +4789,11 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_04_30_new_plotextra
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_06_new_collectionboxname_table',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_20_new_self_citation_dict_table',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_26_new_citation_log_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_28_bibindex_bibrank_type_index',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_04_11_bibformat_2nd_pass',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_24_new_bibsched_status_table',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_02_new_bibARXIVPDF',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_05_oaiHARVEST_arguments_blob',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_13_new_bibEDITCACHE',NOW());
 
 -- end of file
