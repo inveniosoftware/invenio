@@ -250,19 +250,6 @@ def try_url_download(url):
             % (url, str(e)))
     return True
 
-def force_webcoll(recid):
-    from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
-    from invenio import bibindex_engine
-    reload(bibindex_engine)
-    from invenio import websearch_webcoll
-    reload(websearch_webcoll)
-    index_id, index_name, index_tags = bibindex_engine.get_word_tables(["collection"])[0]
-    bibindex_engine.WordTable(index_name, index_id, index_tags, "idxWORD%02dF", wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"], tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"}).add_recIDs([[recid, recid]], 1)
-    #sleep 1s to make sure all tables are ready
-    time.sleep(1)
-    c = websearch_webcoll.Collection()
-    c.calculate_reclist()
-    c.update_reclist()
 
 class GenericBibUploadTest(InvenioTestCase):
     """Generic BibUpload testing class with predefined
@@ -273,12 +260,30 @@ class GenericBibUploadTest(InvenioTestCase):
         setup_loggers()
         task_set_task_param('verbose', self.verbose)
         self.last_recid = run_sql("SELECT MAX(id) FROM bibrec")[0][0]
-        self.tear_down = True
+        self.tear_down = True ## For debugging, whether to call tearDown
+        self.webcolled_recids = [] ## List of record webcolled to be re-webcolled upon tearDown
 
     def tearDown(self):
         if self.tear_down:
             for recid in run_sql("SELECT id FROM bibrec WHERE id>%s", (self.last_recid,)):
                 wipe_out_record_from_all_tables(recid[0])
+            for recid in list(self.webcolled_recids):
+                self.force_webcoll(recid)
+
+    def force_webcoll(self, recid):
+        self.webcolled_recids.append(recid)
+        from invenio.bibindex_engine_config import CFG_BIBINDEX_INDEX_TABLE_TYPE
+        from invenio import bibindex_engine
+        reload(bibindex_engine)
+        from invenio import websearch_webcoll
+        reload(websearch_webcoll)
+        index_id, index_name, index_tags = bibindex_engine.get_word_tables(["collection"])[0]
+        bibindex_engine.WordTable(index_name, index_id, index_tags, "idxWORD%02dF", wordtable_type=CFG_BIBINDEX_INDEX_TABLE_TYPE["Words"], tag_to_tokenizer_map={'8564_u': "BibIndexFulltextTokenizer"}).add_recIDs([[recid, recid]], 1)
+        #sleep 1s to make sure all tables are ready
+        time.sleep(1)
+        c = websearch_webcoll.Collection()
+        c.calculate_reclist()
+        c.update_reclist()
 
     def check_record_consistency(self, recid):
         rec_in_history = create_record(decompress(run_sql("SELECT marcxml FROM hstRECORD WHERE id_bibrec=%s ORDER BY job_date DESC LIMIT 1", (recid, ))[0][0]))[0]
@@ -4027,7 +4032,7 @@ allow any</subfield>
         result = urlopen(testrec_expected_url).read()
         self.failIf("If you already have an account, please login using the form below." in result, result)
         self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
-        force_webcoll(recid)
+        self.force_webcoll(recid)
         self.assertEqual(test_web_page_content(testrec_expected_url, 'hyde', 'h123yde', expected_text=urlopen("%(siteurl)s/img/site_logo.gif" % {
             'siteurl': CFG_SITE_URL
         }).read()), [])
@@ -4352,7 +4357,7 @@ allow any</subfield>
             'siteurl': CFG_SITE_URL
         }).read()), [])
         self.assertEqual(test_web_page_content(testrec_expected_icon, 'hyde', 'h123yde', expected_text='Authorization failure'), [])
-        force_webcoll(recid)
+        self.force_webcoll(recid)
         self.assertEqual(test_web_page_content(testrec_expected_icon, 'hyde', 'h123yde', expected_text=urlopen('%(siteurl)s/img/restricted.gif' % {'siteurl': CFG_SITE_URL}).read()), [])
 
         self.failUnless("HTTP Error 401: Unauthorized" in test_web_page_content(testrec_expected_url, 'hyde', 'h123yde')[0])
@@ -5847,7 +5852,7 @@ allow any</subfield>
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
         self.failUnless(try_url_download(testrec_expected_url))
-        force_webcoll(recid)
+        self.force_webcoll(recid)
         self.tear_down = True
         self.assertEqual(test_web_page_content(testrec_expected_url2, expected_text='<em>04 May 2006, 03:02</em>'), [])
 
@@ -5895,7 +5900,7 @@ allow any</subfield>
         # replace test buffers with real recid of inserted test record:
         testrec_expected_url = testrec_expected_url.replace('123456789',
                                                           str(recid))
-        force_webcoll(recid)
+        self.force_webcoll(recid)
         self.assertEqual(test_web_page_content(testrec_expected_url, expected_text=['<em>04 May 2006, 03:02</em>', '<em>04 May 2007, 03:02</em>', '<em>04 May 2008, 03:02</em>', '<em>04 May 2009, 03:02</em>']), [])
 
     def test_simple_fft_correct_with_modification_time(self):
@@ -5946,7 +5951,7 @@ allow any</subfield>
         recs = bibupload.xml_marc_to_records(test_to_correct)
         err, recid, msg = bibupload.bibupload(recs[0], opt_mode='correct')
         self.check_record_consistency(recid)
-        force_webcoll(recid)
+        self.force_webcoll(recid)
         self.assertEqual(test_web_page_content(testrec_expected_url, expected_text=['<em>04 May 2008, 03:02</em>']), [])
 
 
