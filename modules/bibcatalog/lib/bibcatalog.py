@@ -27,10 +27,8 @@ from invenio.config import CFG_BIBCATALOG_SYSTEM
 
 if CFG_BIBCATALOG_SYSTEM == 'RT':
     from invenio.bibcatalog_system_rt import BibCatalogSystemRT
-    bibcatalog_system = BibCatalogSystemRT()
 elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
     from invenio.bibcatalog_system_email import BibCatalogSystemEmail
-    bibcatalog_system = BibCatalogSystemEmail()
 else:
     from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
 
@@ -38,6 +36,8 @@ else:
 def get_bibcatalog_system():
     if CFG_BIBCATALOG_SYSTEM == 'RT':
         bc_system = BibCatalogSystemRT()
+    elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
+        bc_system = BibCatalogSystemEmail()
     else:
         bc_system = BibCatalogSystemDummy()
 
