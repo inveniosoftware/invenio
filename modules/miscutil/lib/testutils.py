@@ -187,8 +187,8 @@ class InvenioTestCase(TestCase, unittest2.TestCase):
         return app
 
     def login(self, username, password):
-        from flask import request
-        return self.client.post('/youraccount/login',
+        from flask import request, url_for
+        return self.client.post(url_for('webaccount.login', _external=True, _scheme='https'),
                                 base_url=rewrite_to_secure_url(request.base_url),
                                 data=dict(nickname=username, password=password),
                                 follow_redirects=True)

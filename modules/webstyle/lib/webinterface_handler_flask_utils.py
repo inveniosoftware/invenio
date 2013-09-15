@@ -300,6 +300,7 @@ class InvenioBlueprint(Blueprint):
         Decorator: This requires user to be logged in otherwise login manager
         redirects request to defined view or returns http error 401.
         """
+        f._force_https = True
         return login_required(f)
 
     def invenio_authorized(self, action, **params):
