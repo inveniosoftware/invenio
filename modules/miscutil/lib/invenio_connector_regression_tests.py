@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,14 +22,15 @@
 __revision__ = "$Id$"
 
 import os
-import unittest
 
-from invenio.invenio_connector import InvenioConnector, \
-                                      InvenioConnectorAuthError
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.importutils import lazy_import
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
-class InvenioConnectorTest(unittest.TestCase):
+InvenioConnector = lazy_import('invenio.invenio_connector:InvenioConnector')
+
+
+class InvenioConnectorTest(InvenioTestCase):
     """Test function to get default values."""
 
     def test_local_search(self):
@@ -55,6 +56,7 @@ class InvenioConnectorTest(unittest.TestCase):
 
     def test_search_local_restricted_collections(self):
         """InvenioConnector - local restricted collection search"""
+        from invenio.invenio_connector import InvenioConnectorAuthError
         server = InvenioConnector(CFG_SITE_URL)
         search_params = dict(p='LBL-28106', c=['Theses'], of='id')
         self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)
@@ -66,6 +68,7 @@ class InvenioConnectorTest(unittest.TestCase):
 
     def test_search_remote_restricted_collections(self):
         """InvenioConnector - remote restricted collection search"""
+        from invenio.invenio_connector import InvenioConnectorAuthError
         server = InvenioConnector("http://invenio-demo.cern.ch")
         search_params = dict(p='LBL-28106', c=['Theses'], of='id')
         self.assertRaises(InvenioConnectorAuthError, server.search, **search_params)

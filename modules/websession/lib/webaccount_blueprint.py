@@ -94,7 +94,7 @@ def login(nickname=None, password=None, login_method=None, action='',
     try:
         user = None
         if not CFG_EXTERNAL_AUTH_USING_SSO:
-            if login_method is 'Local':
+            if login_method == 'Local':
                 if form.validate_on_submit():
                     user = update_login(nickname, password, remember_me)
             elif login_method in ['openid', 'oauth1', 'oauth2']:

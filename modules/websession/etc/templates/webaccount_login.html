@@ -41,6 +41,7 @@
     <legend>{{ _('Please Sign In') }}</legend>
     <form action="{{ url_for('webaccount.login') }}" method="POST">
     {{ form.referer }}
+    {{ form.login_method }}
     {{ form.nickname(placeholder=_('Username or email'), class_="span4") }}
     {{ form.password(placeholder=_('Password'), class_="span4") }}
     <label class="checkbox">

@@ -186,16 +186,21 @@ class InvenioConnector(object):
         self.browser.set_handle_robots(False)
         self.browser.open(self.server_url + "/youraccount/login")
         self.browser.select_form(nr=0)
-        self.browser['p_un'] = self.user
-        self.browser['p_pw'] = self.password
+        try:
+            self.browser['nickname'] = self.user
+            self.browser['password'] = self.password
+        except:
+            self.browser['p_un'] = self.user
+            self.browser['p_pw'] = self.password
         # Set login_method to be writable
         self.browser.form.find_control('login_method').readonly = False
         self.browser['login_method'] = self.login_method
         self.browser.submit()
 
     def _check_credentials(self):
-        if not 'youraccount/logout' in self.browser.response().read():
-            raise InvenioConnectorAuthError("It was not possible to successfully login with the provided credentials")
+        out = self.browser.response().read()
+        if not 'youraccount/logout' in out:
+            raise InvenioConnectorAuthError("It was not possible to successfully login with the provided credentials" + out)
 
     def search(self, read_cache=True, **kwparams):
         """
