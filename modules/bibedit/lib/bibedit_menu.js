@@ -448,9 +448,6 @@ function onGetTicketsSuccess(json) {
   else if(json['resultCode'] == 125) {
     rtConnectionError(json['tickets']);
   }
-  else if(json['resultCode'] == 125) {
-    rtConnectionError(json['tickets']);
-  }
 }
 
 function onCloseTicketSuccess(json) {
