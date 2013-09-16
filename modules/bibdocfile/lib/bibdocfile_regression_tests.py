@@ -21,14 +21,12 @@
 
 __revision__ = "$Id$"
 
-import shutil
 import os
-import unittest
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibdocfile import BibRecDocs, BibRelation, MoreInfo, \
-    check_bibdoc_authorization, bibdocfile_url_p, guess_format_from_url, CFG_HAS_MAGIC, \
-    Md5Folder, calculate_md5, calculate_md5_external
-from invenio.dbquery import run_sql
+import shutil
+import time
+from datetime import datetime
+from invenio.importutils import lazy_import
+from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
 
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
@@ -39,13 +37,17 @@ from invenio.config import \
         CFG_WEBDIR, \
         CFG_TMPDIR, \
         CFG_PATH_MD5SUM
-import invenio.template
-from datetime import datetime
-import time
+from invenio.mimetypeutils import CFG_HAS_MAGIC
 
-class BibDocFsInfoTest(unittest.TestCase):
+MoreInfo = lazy_import('invenio.bibdocfile:MoreInfo')
+Md5Folder = lazy_import('invenio.bibdocfile:Md5Folder')
+guess_format_from_url = lazy_import('invenio.bibdocfile:guess_format_from_url')
+
+
+class BibDocFsInfoTest(InvenioTestCase):
     """Regression tests about the table bibdocfsinfo"""
     def setUp(self):
+        from invenio.bibdocfile import BibRecDocs
         self.my_bibrecdoc = BibRecDocs(2)
         self.unique_name = self.my_bibrecdoc.propose_unique_docname('file')
         self.my_bibdoc = self.my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', docname=self.unique_name)
@@ -56,6 +58,7 @@ class BibDocFsInfoTest(unittest.TestCase):
 
     def test_hard_delete(self):
         """bibdocfile - test correct update of bibdocfsinfo when hard-deleting"""
+        from invenio.dbquery import run_sql
         self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 1)
         self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], True)
         self.my_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.gif')
@@ -66,20 +69,20 @@ class BibDocFsInfoTest(unittest.TestCase):
         self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 1)
         self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], True)
 
-class BibDocFileGuessFormat(unittest.TestCase):
+class BibDocFileGuessFormat(InvenioTestCase):
     """Regression tests for guess_format_from_url"""
 
     def test_guess_format_from_url_local_no_ext(self):
         """bibdocfile - guess_format_from_url(), local URL, no extension"""
         self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'test')), '.bin')
 
-    if CFG_HAS_MAGIC:
-        def test_guess_format_from_url_local_no_ext_with_magic(self):
-            """bibdocfile - guess_format_from_url(), local URL, no extension, with magic"""
+    def test_guess_format_from_url_local_no_ext_with_magic(self):
+        """bibdocfile - guess_format_from_url(), local URL, no extension, magic"""
+        if CFG_HAS_MAGIC:
+            ## with magic
             self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'testgif')), '.gif')
-    else:
-        def test_guess_format_from_url_local_no_ext_with_magic(self):
-            """bibdocfile - guess_format_from_url(), local URL, no extension, no magic"""
+        else:
+            ## no magic
             self.assertEqual(guess_format_from_url(os.path.join(CFG_WEBDIR, 'img', 'testgif')), '.bin')
 
     def test_guess_format_from_url_local_unknown_ext(self):
@@ -94,22 +97,18 @@ class BibDocFileGuessFormat(unittest.TestCase):
         """bibdocfile - guess_format_from_url(), remote URL, no extension"""
         self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/test'), '.bin')
 
-    if CFG_HAS_MAGIC:
-        def test_guess_format_from_url_remote_no_ext_with_magic(self):
-            """bibdocfile - guess_format_from_url(), remote URL, no extension, with magic"""
+    def test_guess_format_from_url_remote_no_ext_with_magic(self):
+        """bibdocfile - guess_format_from_url(), remote URL, no extension, magic"""
+        if CFG_HAS_MAGIC:
             self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/testgif'), '.gif')
-    else:
-        def test_guess_format_from_url_remote_no_ext_with_magic(self):
-            """bibdocfile - guess_format_from_url(), remote URL, no extension, no magic"""
+        else:
             self.failUnless(guess_format_from_url(CFG_SITE_URL + '/img/testgif') in ('.bin', '.gif'))
 
-    if CFG_HAS_MAGIC:
-        def test_guess_format_from_url_remote_unknown_ext(self):
-            """bibdocfile - guess_format_from_url(), remote URL, unknown extension, with magic"""
+    def test_guess_format_from_url_remote_unknown_ext(self):
+        """bibdocfile - guess_format_from_url(), remote URL, unknown extension, magic"""
+        if CFG_HAS_MAGIC:
             self.assertEqual(guess_format_from_url(CFG_SITE_URL + '/img/test.foo'), '.gif')
-    else:
-        def test_guess_format_from_url_remote_unknown_ext(self):
-            """bibdocfile - guess_format_from_url(), remote URL, unknown extension, no magic"""
+        else:
             self.failUnless(guess_format_from_url(CFG_SITE_URL + '/img/test.foo') in ('.bin', '.gif'))
 
     def test_guess_format_from_url_remote_known_ext(self):
@@ -161,11 +160,12 @@ distribute copies of the software, or if you modify it.
             os.remove(local_path)
 
 
-class BibRecDocsTest(unittest.TestCase):
+class BibRecDocsTest(InvenioTestCase):
     """regression tests about BibRecDocs"""
 
     def test_BibRecDocs(self):
         """bibdocfile - BibRecDocs functions"""
+        from invenio.bibdocfile import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         #add bibdoc
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg')
@@ -204,17 +204,19 @@ class BibRecDocsTest(unittest.TestCase):
         self.assertEqual(my_bibrecdoc.check_duplicate_docnames(), True)
 
     def tearDown(self):
+        from invenio.bibdocfile import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         #delete
         my_bibrecdoc.delete_bibdoc('img_test')
         my_bibrecdoc.delete_bibdoc('file')
         my_bibrecdoc.delete_bibdoc('test')
 
-class BibDocsTest(unittest.TestCase):
+class BibDocsTest(InvenioTestCase):
     """regression tests about BibDocs"""
 
     def test_BibDocs(self):
         """bibdocfile - BibDocs functions"""
+        from invenio.bibdocfile import BibRecDocs
         #add file
         my_bibrecdoc = BibRecDocs(2)
         timestamp1 = datetime(*(time.strptime("2011-10-09 08:07:06", "%Y-%m-%d %H:%M:%S")[:6]))
@@ -340,6 +342,7 @@ class BibDocsTest(unittest.TestCase):
         self.failUnless(my_bibrecdoc.get_bibdoc_names())
 
     def tearDown(self):
+        from invenio.bibdocfile import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         #delete
         my_bibrecdoc.delete_bibdoc('img_test')
@@ -347,7 +350,7 @@ class BibDocsTest(unittest.TestCase):
 
 
 
-class BibRelationTest(unittest.TestCase):
+class BibRelationTest(InvenioTestCase):
     """ regression tests for BibRelation"""
     def test_RelationCreation_Version(self):
         """
@@ -355,7 +358,7 @@ class BibRelationTest(unittest.TestCase):
         We create two relations differing only on the BibDoc version
         number and verify that they are indeed differen (store different data)
         """
-
+        from invenio.bibdocfile import BibRelation
         rel1 = BibRelation.create(bibdoc1_id = 10, bibdoc2_id=12,
                                   bibdoc1_ver = 1, bibdoc2_ver = 1,
                                   rel_type = "some_rel")
@@ -399,12 +402,14 @@ class BibRelationTest(unittest.TestCase):
         newer_rel1.delete()
         newer_rel2.delete()
 
-class BibDocFilesTest(unittest.TestCase):
+
+class BibDocFilesTest(InvenioTestCase):
     """regression tests about BibDocFiles"""
 
     def test_BibDocFiles(self):
         """bibdocfile - BibDocFile functions """
         #add bibdoc
+        from invenio.bibdocfile import BibRecDocs
         my_bibrecdoc = BibRecDocs(2)
         timestamp = datetime(*(time.strptime("2010-09-08 07:06:05", "%Y-%m-%d %H:%M:%S")[:6]))
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg', modification_date=timestamp)
@@ -448,6 +453,7 @@ class BibDocFilesTest(unittest.TestCase):
         #check
         self.assertEqual(my_new_bibdocfile.check(), True)
         #display
+        import invenio.template
         tmpl = invenio.template.load("bibdocfile")
         value = tmpl.tmpl_display_bibdocfile(my_new_bibdocfile, ln='en')
         assert 'files/img_test.jpg?version=1">' in value
@@ -459,10 +465,11 @@ class BibDocFilesTest(unittest.TestCase):
         my_new_bibdoc.delete()
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
 
-class CheckBibDocAuthorizationTest(unittest.TestCase):
+class CheckBibDocAuthorizationTest(InvenioTestCase):
     """Regression tests for check_bibdoc_authorization function."""
     def test_check_bibdoc_authorization(self):
         """bibdocfile - check_bibdoc_authorization function"""
+        from invenio.bibdocfile import check_bibdoc_authorization
         from invenio.webuser import collect_user_info, get_uid_from_email
         jekyll = collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'role:thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
@@ -478,14 +485,15 @@ class CheckBibDocAuthorizationTest(unittest.TestCase):
         self.assertNotEqual(check_bibdoc_authorization(juliet, 'restricted_video')[0], 0)
         self.assertNotEqual(check_bibdoc_authorization(juliet, 'status: restricted_video')[0], 0)
 
-class BibDocFileURLTest(unittest.TestCase):
+class BibDocFileURLTest(InvenioTestCase):
     """Regression tests for bibdocfile_url_p function."""
     def test_bibdocfile_url_p(self):
         """bibdocfile - check bibdocfile_url_p() functionality"""
+        from invenio.bibdocfile import bibdocfile_url_p
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/98/files/9709037.pdf' % CFG_SITE_RECORD))
         self.failUnless(bibdocfile_url_p(CFG_SITE_URL + '/%s/098/files/9709037.pdf' % CFG_SITE_RECORD))
 
-class MoreInfoTest(unittest.TestCase):
+class MoreInfoTest(InvenioTestCase):
     """regression tests about BibDocFiles"""
 
     def test_initialData(self):
@@ -550,7 +558,7 @@ class MoreInfoTest(unittest.TestCase):
         m2.delete()
 
 
-class BibDocFileMd5FolderTests(unittest.TestCase):
+class BibDocFileMd5FolderTests(InvenioTestCase):
     """Regression test class for the Md5Folder class"""
     def setUp(self):
         self.path = os.path.join(CFG_TMPDIR, 'md5_tests')
@@ -593,9 +601,12 @@ class BibDocFileMd5FolderTests(unittest.TestCase):
     if CFG_PATH_MD5SUM:
         def test_md5_algorithms(self):
             """bibdocfile - compare md5 algorithms"""
+            from invenio.bibdocfile import calculate_md5, \
+                calculate_md5_external
             filepath = os.path.join(self.path, 'test.txt')
             open(filepath, "w").write("test")
-            self.assertEqual(calculate_md5(filepath, force_internal=True), calculate_md5_external(filepath))
+            self.assertEqual(calculate_md5(filepath, force_internal=True),
+                             calculate_md5_external(filepath))
 
 TEST_SUITE = make_test_suite(BibDocFileMd5FolderTests,
                              BibRecDocsTest,
