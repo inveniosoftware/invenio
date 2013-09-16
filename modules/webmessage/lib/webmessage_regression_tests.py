@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -63,7 +63,9 @@ class WebMessageWebPagesAvailabilityTest(InvenioTestCase):
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
-            error_messages.extend(test_web_page_content(url))
+            error_messages.extend(test_web_page_content(url,
+                                                        username='jekyll',
+                                                        password='j123ekyll'))
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
