@@ -292,6 +292,9 @@ class Collection:
         """Create collection page header, navtrail, body (including left and right stripes) and footer, and
            call write_cache_file() afterwards to update the collection webpage cache."""
 
+        return {} ## webpage cache update is not really needed in
+                  ## Invenio-on-Flask, so let's return quickly here
+                  ## for great speed-up benefit
         ## precalculate latest additions for non-aggregate
         ## collections (the info is ln and as independent)
         if self.dbquery:
