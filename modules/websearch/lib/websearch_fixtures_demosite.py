@@ -139,7 +139,7 @@ class CollectionData(DataSet):
     class preprints:
         id = 2
         name = 'Preprints'
-        dbquery = 'collection:PREPRINT'
+        dbquery = '980:"PREPRINT"'
         names = {
             ('en', 'ln'): u'Preprints',
             ('fr', 'ln'): u'Prétirages',
@@ -200,7 +200,7 @@ class CollectionData(DataSet):
     class books(siteCollection):
         id = 3
         name = 'Books'
-        dbquery = 'collection:BOOK'
+        dbquery = '980:"BOOK"'
         names = {
             ('en', 'ln'): u'Books',
             ('fr', 'ln'): u'Livres',
@@ -235,7 +235,7 @@ class CollectionData(DataSet):
     class theses(siteCollection):
         id = 4
         name = 'Theses'
-        dbquery = 'collection:THESIS'
+        dbquery = '980:"THESIS"'
         names = {
             ('en', 'ln'): u'Theses',
             ('fr', 'ln'): u'Thèses',
@@ -270,7 +270,7 @@ class CollectionData(DataSet):
     class reports(siteCollection):
         id = 5
         name = 'Reports'
-        dbquery = 'collection:REPORT'
+        dbquery = '980:"REPORT"'
         names = {
             ('en', 'ln'): u'Reports',
             ('fr', 'ln'): u'Rapports',
@@ -305,7 +305,7 @@ class CollectionData(DataSet):
     class articles(preprints):
         id = 6
         name = 'Articles'
-        dbquery = 'collection:ARTICLE'
+        dbquery = '980:"ARTICLE"'
         names = {
             ('en', 'ln'): u'Articles',
             ('fr', 'ln'): u'Articles',
@@ -340,7 +340,7 @@ class CollectionData(DataSet):
     class pictures(siteCollection):
         id = 8
         name = 'Pictures'
-        dbquery = 'collection:PICTURE'
+        dbquery = '980:"PICTURE"'
         names = {
             ('en', 'ln'): u'Pictures',
             ('fr', 'ln'): u'Photos',
@@ -690,7 +690,7 @@ class CollectionData(DataSet):
     class poetry(siteCollection):
         id = 18
         name = 'Poetry'
-        dbquery = 'collection:POETRY'
+        dbquery = '980:"POETRY"'
         names = {
             ('en', 'ln'): u'Poetry',
             ('fr', 'ln'): u'Poésie',
@@ -725,7 +725,7 @@ class CollectionData(DataSet):
     class atlantisTimesNews:
         id = 19
         name = 'Atlantis Times News'
-        dbquery = 'collection:ATLANTISTIMESNEWS'
+        dbquery = '980:"ATLANTISTIMESNEWS"'
         names = {
             ('en', 'ln'): u'Atlantis Times News',
             ('fr', 'ln'): u'Atlantis Times Actualités',
@@ -734,7 +734,7 @@ class CollectionData(DataSet):
     class atlantisTimesArts:
         id = 20
         name = 'Atlantis Times Arts'
-        dbquery = 'collection:ATLANTISTIMESARTS'
+        dbquery = '980:"ATLANTISTIMESARTS"'
         names = {
             ('en', 'ln'): u'Atlantis Times Arts',
             ('fr', 'ln'): u'Atlantis Times Arts',
@@ -743,7 +743,7 @@ class CollectionData(DataSet):
     class atlantisTimesScience:
         id = 21
         name = 'Atlantis Times Science'
-        dbquery = 'collection:ATLANTISTIMESSCIENCE'
+        dbquery = '980:"ATLANTISTIMESSCIENCE"'
         names = {
             ('en', 'ln'): u'Atlantis Times Science',
             ('fr', 'ln'): u'Atlantis Times Science',
@@ -779,7 +779,7 @@ class CollectionData(DataSet):
     class atlantisTimesDrafts:
         id = 25
         name = 'Atlantis Times Drafts'
-        dbquery = 'collection:ATLANTISTIMESSCIENCEDRAFT or collection:ATLANTISTIMESARTSDRAFT or collection:ATLANTISTIMESNEWSDRAFT'
+        dbquery = '980:"ATLANTISTIMESSCIENCEDRAFT" or 980:"ATLANTISTIMESARTSDRAFT" or 980:"ATLANTISTIMESNEWSDRAFT"'
         names = {
             ('en', 'ln'): u'Atlantis Times Drafts',
             ('fr', 'ln'): u'Atlantis Times Ébauches',
@@ -2962,4 +2962,3 @@ class CollectionFormatData(DataSet):
         score = 93
         id_format = FormatData.Format_7.ref('id')
         id_collection = CollectionData.pictures.ref('id')
-
