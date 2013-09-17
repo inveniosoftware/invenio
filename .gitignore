@@ -10,6 +10,7 @@ config.guess
 config.sub
 install-sh
 missing
+compile
 autom4te.cache
 aclocal.m4
 TAGS
