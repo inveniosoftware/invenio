@@ -462,8 +462,8 @@ class Template:
 <Developer>Powered by Invenio</Developer>
 <Url type="text/html" indexOffset="1" rel="results" template="%(html_search_syntax)s" />
 <Url type="application/rss+xml" indexOffset="1" rel="results" template="%(rss_search_syntax)s" />
-<Url type="application/opensearchdescription+xml" rel="self" template="%(CFG_BASE_URL)s/opensearchdescription" />
-<moz:SearchForm>%(CFG_BASE_URL)s</moz:SearchForm>
+<Url type="application/opensearchdescription+xml" rel="self" template="%(CFG_SITE_URL)s/opensearchdescription" />
+<moz:SearchForm>%(CFG_SITE_URL)s</moz:SearchForm>
 </OpenSearchDescription>""" % \
   {'CFG_BASE_URL': CFG_BASE_URL,
    'short_name': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)[:16],

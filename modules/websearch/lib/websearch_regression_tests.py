@@ -37,14 +37,22 @@ if sys.hexversion < 0x2040000:
 
 from mechanize import Browser, LinkNotFoundError
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
-    CFG_SITE_RECORD, CFG_SITE_LANGS, \
-    CFG_SITE_SECURE_URL, CFG_WEBSEARCH_SPIRES_SYNTAX
-from invenio.testutils import make_test_suite, \
-                              run_test_suite, \
-                              nottest, \
-                              make_url, make_surl, test_web_page_content, \
-                              merge_error_messages
+from invenio.config import (CFG_SITE_URL,
+                            CFG_SITE_NAME,
+                            CFG_SITE_LANG,
+                            CFG_SITE_RECORD,
+                            CFG_SITE_LANGS,
+                            CFG_SITE_SECURE_URL,
+                            CFG_WEBSEARCH_SPIRES_SYNTAX,
+                            CFG_BASE_URL)
+from invenio.testutils import (make_test_suite,
+                               run_test_suite,
+                               nottest,
+                               make_url,
+                               make_surl,
+                               make_rurl,
+                               test_web_page_content,
+                               merge_error_messages)
 from invenio.urlutils import same_urls_p
 from invenio.dbquery import run_sql
 from invenio.search_engine import perform_request_search, \
@@ -320,7 +328,8 @@ class WebSearchTestRecord(InvenioTestCase):
                 # hd format should have a link to the following
                 # formats
                 for oformat in ('hx', 'hm', 'xm', 'xd'):
-                    target = make_url('/%s/1/export/%s?ln=en' % (CFG_SITE_RECORD, oformat))
+                    target = '%s/%s/1/export/%s?ln=en' % \
+                             (CFG_BASE_URL, CFG_SITE_RECORD, oformat)
                     try:
                         browser.find_link(url=target)
                     except LinkNotFoundError:
@@ -328,7 +337,7 @@ class WebSearchTestRecord(InvenioTestCase):
             else:
                 # non-hd HTML formats should have a link back to
                 # the main detailed record
-                target = make_url('/%s/1' % CFG_SITE_RECORD)
+                target = '%s/%s/1' % (CFG_BASE_URL, CFG_SITE_RECORD)
                 try:
                     browser.find_link(url=target)
                 except LinkNotFoundError:
@@ -407,12 +416,12 @@ class WebSearchTestCollections(InvenioTestCase):
                     if aas:
                         args['as'] = aas
 
-                    url = make_url('/search', **args)
+                    url = make_rurl('/search', **args)
                     try:
                         browser.follow_link(url=url)
                     except LinkNotFoundError:
                         args['ln'] = CFG_SITE_LANG
-                        url = make_url('/search', **args)
+                        url = make_rurl('/search', **args)
                         browser.follow_link(url=url)
 
         except LinkNotFoundError:
@@ -444,14 +453,14 @@ class WebSearchTestCollections(InvenioTestCase):
 
             # We navigate from immediate son to immediate son...
             browser.open(make_url('/', **kargs))
-            tryfollow(make_url('/collection/Articles%20%26%20Preprints',
-                               **kargs))
-            tryfollow(make_url('/collection/Articles', **kargs))
+            tryfollow(make_rurl('/collection/Articles%20%26%20Preprints',
+                                **kargs))
+            tryfollow(make_rurl('/collection/Articles', **kargs))
 
             # But we can also jump to a grandson immediately
             browser.back()
             browser.back()
-            tryfollow(make_url('/collection/ALEPH', **kargs))
+            tryfollow(make_rurl('/collection/ALEPH', **kargs))
 
         return
 
@@ -552,7 +561,7 @@ class WebSearchTestBrowse(InvenioTestCase):
         """ websearch - check that browsing works """
 
         browser = Browser()
-        browser.open(make_url('/'))
+        browser.open(make_url('/', ln="en"))
 
         browser.select_form(name='search')
         browser['f'] = ['title']
@@ -562,27 +571,37 @@ class WebSearchTestBrowse(InvenioTestCase):
             # We'll get a few links to search for the actual hits, plus a
             # link to the following results.
             res = []
-            for link in browser.links(url_regex=re.compile(CFG_SITE_URL +
-                                                           r'/search\?')):
-                if link.text == 'Advanced Search':
+            for link in browser.links():
+                if not link.url.startswith("%s/search" % (CFG_BASE_URL,)):
                     continue
 
-                dummy, q = parse_url(link.url)
-                res.append((link, q))
+                if "as=1" in link.url or "action=browse" in link.url:
+                    continue
 
+                for attr in link.attrs:
+                    if "class" in attr:
+                        break
+                else:
+                    dummy, q = parse_url(link.url)
+                    res.append((link, q))
             return res
 
-        # if we follow the last link, we should get another
-        # batch. There is an overlap of one item.
+        # Here we should have 4 links to different records
         batch_1 = collect()
+        self.assertEqual(4, len(batch_1))
 
-        browser.follow_link(link=batch_1[-1][0])
-
+        # if we follow the next link, we should get another
+        # batch of 4. There is an overlap of one item.
+        next_link = [l for l in browser.links() if l.text == "next"][0]
+        browser.follow_link(link=next_link)
         batch_2 = collect()
+        self.assertEqual(8, len(batch_2))
 
         # FIXME: we cannot compare the whole query, as the collection
         # set is not equal
-        self.failUnlessEqual(batch_1[-2][1]['p'], batch_2[0][1]['p'])
+        # Expecting "A naturalist\'s voyage around the world"
+        # Last link in batch_1 should equal the 4th link in batch_2
+        self.failUnlessEqual(batch_1[-1][1]['p'], batch_2[3][1]['p'])
 
     def test_browse_restricted_record_as_unauthorized_user(self):
         """websearch - browse for a record that belongs to a restricted collection as an unauthorized user."""
@@ -820,8 +839,8 @@ class WebSearchTestSearch(InvenioTestCase):
             l = browser.find_link(text=bsu)
             q['p'] = bsu
 
-            if not same_urls_p(l.url, make_url('/search', **q)):
-                self.fail(repr((l.url, make_url('/search', **q))))
+            if not same_urls_p(l.url, make_rurl('/search', **q)):
+                self.fail(repr((l.url, make_rurl('/search', **q))))
 
     def test_similar_authors(self):
         """ websearch - test similar authors box """
@@ -835,10 +854,8 @@ class WebSearchTestSearch(InvenioTestCase):
         browser.submit()
 
         l = browser.find_link(text="Ellis, R S")
-        self.failUnless(same_urls_p(l.url, make_url('/search',
-                                                    p="Ellis, R S",
-                                                    f='author',
-                                                    ln='en')))
+        urlargs = dict(p="Ellis, R S", f='author', ln='en')
+        self.failUnless(same_urls_p(l.url, make_rurl('/search', **urlargs)))
 
     def test_em_parameter(self):
         """ websearch - check different values of em return different parts of the search page"""
@@ -999,7 +1016,7 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=embed",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=embed",
                                                expected_link_label='embed'))
 
     def test_nearest_terms_box_in_unsuccessful_simple_accented_query(self):
@@ -1007,7 +1024,7 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=elliszà',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=embed",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=embed",
                                                expected_link_label='embed'))
 
     def test_nearest_terms_box_in_unsuccessful_structured_query(self):
@@ -1015,12 +1032,12 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellisz&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=eisenhandler&f=author",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=eisenhandler&f=author",
                                                expected_link_label='eisenhandler'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3Aeisenhandler",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=author%3Aeisenhandler",
                                                expected_link_label='eisenhandler'))
 
 
@@ -1029,12 +1046,12 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=bednarz%3Aellis',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=bednarz",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=bednarz",
                                                expected_link_label='bednarz'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=1%3Aellis',
                                                expected_text="no index 1.",
-                                               expected_link_target=CFG_SITE_URL+"/record/47?ln=en",
+                                               expected_link_target=CFG_BASE_URL+"/record/47?ln=en",
                                                expected_link_label="Detailed record"))
 
     def test_nearest_terms_box_in_unsuccessful_phrase_query(self):
@@ -1042,17 +1059,17 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis%2C+Z%22',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3A%22Enqvist%2C+K%22",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=author%3A%22Enqvist%2C+K%22",
                                                expected_link_label='Enqvist, K'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%22ellisz%22&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%22elliszà%22&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))
 
     def test_nearest_terms_box_in_unsuccessful_partial_phrase_query(self):
@@ -1060,17 +1077,17 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%27Ellis%2C+Z%27',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3A%27Enqvist%2C+K%27",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=author%3A%27Enqvist%2C+K%27",
                                                expected_link_label='Enqvist, K'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%27ellisz%27&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%27Enqvist%2C+K%27&f=author",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=%27Enqvist%2C+K%27&f=author",
                                                expected_link_label='Enqvist, K'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%27elliszà%27&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%27Enqvist%2C+K%27&f=author",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=%27Enqvist%2C+K%27&f=author",
                                                expected_link_label='Enqvist, K'))
 
     def test_nearest_terms_box_in_unsuccessful_partial_phrase_advanced_query(self):
@@ -1078,7 +1095,7 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p1=aaa&f1=title&m1=p&as=1',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=p",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=p",
                                                expected_link_label='A simple functional form for proton-nucleus total reaction cross sections'))
 
     def test_nearest_terms_box_in_unsuccessful_exact_phrase_advanced_query(self):
@@ -1086,7 +1103,7 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p1=aaa&f1=title&m1=e&as=1',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=e",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=e",
                                                expected_link_label='A simple functional form for proton-nucleus total reaction cross sections'))
 
     def test_nearest_terms_box_in_unsuccessful_boolean_query(self):
@@ -1094,22 +1111,22 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aellisz+author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aellisz",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aellisz",
                                                expected_link_label='energi'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergi+author%3Aenergie',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist",
                                                expected_link_label='enqvist'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=title%3Aellisz+author%3Aellisz&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aellisz&f=keyword",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aellisz&f=keyword",
                                                expected_link_label='energi'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=title%3Aenergi+author%3Aenergie&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist&f=keyword",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist&f=keyword",
                                                expected_link_label='enqvist'))
 
     def test_nearest_terms_box_in_unsuccessful_uppercase_query(self):
@@ -1117,12 +1134,12 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=fOo%3Atest',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=food",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=food",
                                                expected_link_label='food'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=arXiv%3A1007.5048',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=artist",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=artist",
                                                expected_link_label='artist'))
 
     def test_nearest_terms_box_in_unsuccessful_spires_query(self):
@@ -1130,7 +1147,7 @@ class WebSearchNearestTermsTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=find+a+foobar',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=find+a+finch",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=find+a+finch",
                                                expected_link_label='finch'))
 
 
@@ -1165,13 +1182,13 @@ class WebSearchAuthorQueryTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=Ellis%2C+R&f=author',
                                                expected_text="See also: similar author names",
-                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=Ellis%2C+R+K&f=author",
+                                               expected_link_target=CFG_BASE_URL+"/search?ln=en&p=Ellis%2C+R+K&f=author",
                                                expected_link_label="Ellis, R K"))
 
     def test_do_not_propose_similar_author_names_box(self):
         """ websearch - do not propose similar author names box """
         errmsgs = test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis%2C+R%22',
-                                        expected_link_target=CFG_SITE_URL+"/search?ln=en&p=Ellis%2C+R+K&f=author",
+                                        expected_link_target=CFG_BASE_URL+"/search?ln=en&p=Ellis%2C+R+K&f=author",
                                         expected_link_label="Ellis, R K")
         if errmsgs[0].find("does not contain link to") > -1:
             pass
@@ -4162,7 +4179,7 @@ class WebSearchSummarizerTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=hcs',
                                                expected_text="Less known papers (1-9)",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=ellis%20AND%20cited%3A1-%3E9",
+                                               expected_link_target=CFG_BASE_URL+"/search?p=ellis%20AND%20cited%3A1-%3E9",
                                                expected_link_label='1'))
 
     def test_ellis_not_quark_citation_summary_advanced(self):
@@ -4170,7 +4187,7 @@ class WebSearchSummarizerTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?ln=en&as=1&m1=a&p1=ellis&f1=author&op1=n&m2=a&p2=quark&f2=&op2=a&m3=a&p3=&f3=&action_search=Search&sf=&so=a&rm=&rg=10&sc=1&of=hcs',
                                                expected_text="Less known papers (1-9)",
-                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9',
+                                               expected_link_target=CFG_BASE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9',
                                                expected_link_label='1'))
 
     def test_ellis_not_quark_citation_summary_regular(self):
@@ -4178,7 +4195,7 @@ class WebSearchSummarizerTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=author%3Aellis+and+not+quark&f=&action_search=Search&sf=&so=d&rm=&rg=10&sc=0&of=hcs',
                                                expected_text="Less known papers (1-9)",
-                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9',
+                                               expected_link_target=CFG_BASE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9',
                                                expected_link_label='1'))
 
 

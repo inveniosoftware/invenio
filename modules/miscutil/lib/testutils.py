@@ -46,11 +46,18 @@ except ImportError:
     # web tests will not be available, but unit and regression tests will:
     pass
 
-from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL, CFG_PYLIBDIR, \
-     CFG_JSTESTDRIVER_PORT, CFG_WEBDIR, CFG_PREFIX
-from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
-     CFG_TESTS_REQUIRE_HTML_VALIDATION
+from invenio.config import (CFG_SITE_URL,
+                            CFG_SITE_SECURE_URL,
+                            CFG_LOGDIR,
+                            CFG_SITE_NAME_INTL,
+                            CFG_PYLIBDIR,
+                            CFG_JSTESTDRIVER_PORT,
+                            CFG_WEBDIR,
+                            CFG_PREFIX,
+                            CFG_BASE_URL)
+from invenio.w3c_validator import (w3c_validate,
+                                   w3c_errors_to_str,
+                                   CFG_TESTS_REQUIRE_HTML_VALIDATION)
 from invenio.pluginutils import PluginContainer
 
 try:
@@ -151,6 +158,17 @@ def make_surl(path, **kargs):
     arguments"""
 
     url = CFG_SITE_SECURE_URL + path
+
+    if kargs:
+        url += '?' + urlencode(kargs, doseq=True)
+
+    return url
+
+def make_rurl(path, **kargs):
+    """ Helper to generate an relative invenio URL with query
+    arguments"""
+
+    url = CFG_BASE_URL + path
 
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)

@@ -1780,7 +1780,11 @@ def get_coll_normalised_name(c):
     """Returns normalised collection name (case sensitive) for collection name
        C (case insensitive).
        Returns None if no match found."""
-    return run_sql("SELECT name FROM collection WHERE name=%s", (c,))[0][0]
+    res = run_sql("SELECT name FROM collection WHERE name=%s", (c,))
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."

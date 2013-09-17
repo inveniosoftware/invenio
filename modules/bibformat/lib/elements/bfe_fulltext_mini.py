@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 from invenio.bibformat_elements.bfe_fulltext import get_files, sort_alphanumerically
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_BASE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
+from invenio.urlutils import get_relative_url
 from cgi import escape
 
 def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes', show_subformat_icons='no'):
@@ -98,7 +99,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
                         continue
                     url_list.append('<a %(style)s href="%(url)s">%(file_icon)s%(url_format)s</a>' % {
                         'style': style,
-                        'url': escape(url, True),
+                        'url': get_relative_url(escape(url, True)),
                         'file_icon': file_icon,
                         'url_format': escape(url_format.upper())
                     })
