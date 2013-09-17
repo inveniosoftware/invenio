@@ -90,7 +90,7 @@ from invenio.search_engine_config import \
      InvenioWebSearchWildcardLimitError, \
      CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
      CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues, get_fieldvalues_alephseq_like
 from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
@@ -3507,97 +3507,6 @@ def get_field_tags(field):
     res = run_sql(query, (field, ))
     for val in res:
         out.append(val[0])
-    return out
-
-def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
-    """Return buffer of ALEPH sequential-like textual format with fields found
-       in the list TAGS_IN for record RECID.
-
-       If can_see_hidden is True, just print everything.  Otherwise hide fields
-       from CFG_BIBFORMAT_HIDDEN_TAGS.
-    """
-
-    out = ""
-    if type(tags_in) is not list:
-        tags_in = [tags_in,]
-    if len(tags_in) == 1 and len(tags_in[0]) == 6:
-        ## case A: one concrete subfield asked, so print its value if found
-        ##         (use with care: can mislead if field has multiple occurrences)
-        out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
-    else:
-        ## case B: print our "text MARC" format; works safely all the time
-        # find out which tags to output:
-        dict_of_tags_out = {}
-        if not tags_in:
-            for i in range(0, 10):
-                for j in range(0, 10):
-                    dict_of_tags_out["%d%d%%" % (i, j)] = 1
-        else:
-            for tag in tags_in:
-                if len(tag) == 0:
-                    for i in range(0, 10):
-                        for j in range(0, 10):
-                            dict_of_tags_out["%d%d%%" % (i, j)] = 1
-                elif len(tag) == 1:
-                    for j in range(0, 10):
-                        dict_of_tags_out["%s%d%%" % (tag, j)] = 1
-                elif len(tag) < 5:
-                    dict_of_tags_out["%s%%" % tag] = 1
-                elif tag >= 6:
-                    dict_of_tags_out[tag[0:5]] = 1
-        tags_out = dict_of_tags_out.keys()
-        tags_out.sort()
-        # search all bibXXx tables as needed:
-        for tag in tags_out:
-            digits = tag[0:2]
-            try:
-                intdigits = int(digits)
-                if intdigits < 0 or intdigits > 99:
-                    raise ValueError
-            except ValueError:
-                # invalid tag value asked for
-                continue
-            if tag.startswith("001") or tag.startswith("00%"):
-                if out:
-                    out += "\n"
-                out += "%09d %s %d" % (recID, "001__", recID)
-            bx = "bib%sx" % digits
-            bibx = "bibrec_bib%sx" % digits
-            query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                    "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
-                    "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
-            res = run_sql(query, (recID, str(tag)+'%'))
-            # go through fields:
-            field_number_old = -999
-            field_old = ""
-            for row in res:
-                field, value, field_number = row[0], row[1], row[2]
-                ind1, ind2 = field[3], field[4]
-                printme = True
-                #check the stuff in hiddenfields
-                if not can_see_hidden:
-                    for htag in CFG_BIBFORMAT_HIDDEN_TAGS:
-                        ltag = len(htag)
-                        samelenfield = field[0:ltag]
-                        if samelenfield == htag:
-                            printme = False
-                if ind1 == "_":
-                    ind1 = ""
-                if ind2 == "_":
-                    ind2 = ""
-                # print field tag
-                if printme:
-                    if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                        if out:
-                            out += "\n"
-                        out += "%09d %s " % (recID, field[:5])
-                        field_number_old = field_number
-                        field_old = field
-                    # print subfield value
-                    if field[0:2] == "00" and field[-1:] == "_":
-                        out += value
-                    else:
-                        out += "$$%s%s" % (field[-1:], value)
     return out
 
 def get_merged_recid(recID):
