@@ -6766,8 +6766,6 @@
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">Analyse informatique</subfield>
-    </datafield>
-    <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="n">t.1</subfield>
       <subfield code="p">Les preliminaires</subfield>
     </datafield>
@@ -6814,8 +6812,6 @@
     </datafield>
     <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="a">Analyse informatique</subfield>
-    </datafield>
-    <datafield tag="245" ind1=" " ind2=" ">
       <subfield code="n">t.2</subfield>
       <subfield code="p">L'accomplissement</subfield>
     </datafield>
