@@ -984,7 +984,7 @@ def cli_cmd_create_apache_conf(conf):
                 \.(?:gif|jpe?g|png)$ no-gzip dont-vary
 
             # Make sure proxies don't deliver the wrong content
-            <IfModule mod_header.c>
+            <IfModule mod_headers.c>
                 Header append Vary User-Agent env=!dont-vary
             </IfModule>
         </IfModule>
