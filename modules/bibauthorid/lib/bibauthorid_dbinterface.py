@@ -52,28 +52,9 @@ from invenio.dbquery import run_sql
 
 try:
     from collections import defaultdict
-except ImportError:
-    class defaultdict(dict):
-        '''
-        Implementation of defaultdict to supply missing collections library in python <= 2.4
-        '''
-        def __init__(self, default_factory, *args, **kwargs):
-            super(defaultdict, self).__init__(*args, **kwargs)
-            self.default_factory = default_factory
+except:
+    from invenio.containerutils import defaultdict
 
-        def __missing__(self, key):
-            try:
-                self[key] = self.default_factory()
-            except TypeError:
-                raise KeyError("Missing key %s" % (key,))
-            else:
-                return self[key]
-
-        def __getitem__(self, key):
-            try:
-                return super(defaultdict, self).__getitem__(key)
-            except KeyError:
-                return self.__missing__(key)
 
 MARC_100_700_CACHE = None
 

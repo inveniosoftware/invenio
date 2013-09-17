@@ -213,4 +213,10 @@ The original dateutils.stfrtime function was taken from
 <https://github.com/django/django/blob/stable/1.4.x/django/utils/datetime_safe.py>
 Author: Russell Keith-Magee <russell@keith-magee.com>
 
+Python 2.4 backport of defaultdict was taken from NLTK
+<http://code.google.com/p/nltk/>.  collections.defaultdict originally
+contributed by Yoav Goldberg <yoav.goldberg@gmail.com>, new version by
+Jason Kirtland from Python cookbook.
+<http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/523034>
+
 - end of file -
