@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -103,7 +103,6 @@ from invenio.search_engine import check_user_can_view_record, \
      create_similarly_named_authors_link_box, \
      get_colID, \
      get_coll_i18nname, \
-     get_fieldvalues_alephseq_like, \
      get_most_popular_field_values, \
      get_mysql_recid_from_aleph_sysno, \
      guess_primary_collection_of_a_record, \
@@ -114,7 +113,8 @@ from invenio.search_engine import check_user_can_view_record, \
      perform_request_search, \
      restricted_collection_cache, \
      get_coll_normalised_name
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.search_engine_utils import get_fieldvalues, \
+     get_fieldvalues_alephseq_like
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
