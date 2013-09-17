@@ -108,6 +108,9 @@
     <h4 class="media-heading">
         <a href="{{ url_for('record.metadata', recid=record['recid']) }}">
             {{ record.get('title.title', '') }}
+            {{- record.get('title.volume', '')|prefix(', ') }}
+            {{- record.get('title.subtitle', '')|prefix(': ') }}
+            {{- record.get('edition_statement', '')|prefix('; ') }}
         </a>
     </h4>
     {% endblock %}

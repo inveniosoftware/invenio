@@ -531,6 +531,7 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     from invenio.paginationutils import Pagination
     from invenio.bibformat_engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
 
+    of = of.lower()
     jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
     rg = request.values.get('rg', ctx.get('rg', 10), type=int)
     ln = request.values.get('ln', ln)

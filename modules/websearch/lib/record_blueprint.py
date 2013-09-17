@@ -28,7 +28,7 @@ from invenio.config import CFG_SITE_RECORD, CFG_WEBLINKBACK_TRACKBACK_ENABLED
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \
     mail_cookie_create_authorize_action
-from invenio.bibformat import format_record
+from invenio.bibformat import format_record, get_output_format_content_type
 from invenio.websearch_model import Collection
 from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec
@@ -37,7 +37,7 @@ from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint, \
 from invenio.webuser_flask import current_user
 
 from invenio.search_engine import guess_primary_collection_of_a_record, \
-    check_user_can_view_record
+    check_user_can_view_record, print_record
 
 from invenio.webcomment import get_mini_reviews
 from invenio.websearchadminlib import get_detailed_page_tabs,\
@@ -125,6 +125,9 @@ def request_record(f):
                 from invenio.weblinkback_templates import get_trackback_auto_discovery_tag
                 return dict(headerLinkbackTrackbackLink=get_trackback_auto_discovery_tag(recid))
 
+        def _format_record(recid, of='hd', user_info=current_user, *args, **kwargs):
+            return print_record(recid, format=of, user_info=user_info, *args, **kwargs)
+
         @register_template_context_processor
         def record_context():
             return dict(recid=recid,
@@ -134,10 +137,7 @@ def request_record(f):
                         get_mini_reviews=lambda *args, **kwargs:
                         get_mini_reviews(*args, **kwargs).decode('utf8'),
                         collection=collection,
-                        format_record=lambda recID, of='hb', ln=g.ln: format_record(
-                            recID, of=of, ln=ln, verbose=0,
-                            search_pattern='',
-                            on_the_fly=False)
+                        format_record=_format_record
                         )
         return f(recid, *args, **kwargs)
     return decorated
@@ -146,10 +146,13 @@ def request_record(f):
 @blueprint.route('/<int:recid>/metadata', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>/', methods=['GET', 'POST'])
 @blueprint.route('/<int:recid>', methods=['GET', 'POST'])
+@blueprint.invenio_wash_urlargd({'of': (unicode, 'hd')})
 @request_record
-def metadata(recid):
+def metadata(recid, of='hd'):
     register_page_view_event(recid, current_user.get_id(), str(request.remote_addr))
-    return render_template('record_metadata.html')
+    if get_output_format_content_type(of) != 'text/html':
+        return redirect('/%s/%d/export/%s' % (CFG_SITE_RECORD, recid, of))
+    return render_template('record_metadata.html', of=of)
 
 
 @blueprint.route('/<int:recid>/references', methods=['GET', 'POST'])

@@ -563,7 +563,11 @@ def format_with_format_template(format_template_filename, bfo,
             create_record as bibfield_create_record, \
             get_record as bibfield_get_record
         from invenio.search_engine import print_record
+        from invenio.webuser_flask import current_user
         from invenio.webinterface_handler_flask_utils import unicodifier
+
+        def _format_record(recid, of='hb', user_info=current_user, *args, **kwargs):
+            return print_record(recid, format=of, user_info=user_info, *args, **kwargs)
 
         # Fixes unicode problems in Jinja2 templates.
         def encode_utf8(f):
@@ -583,8 +587,7 @@ def format_with_format_template(format_template_filename, bfo,
             CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
             recid=bfo.recID,
             record=record,
-            format_record=lambda recid, of='hb', *args, **kwargs: print_record(
-                recid, format=of, *args, **kwargs),
+            format_record=_format_record,
             bfo=bfo, **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions).encode('utf-8')
         #except Exception:
         #    register_exception()

@@ -135,7 +135,7 @@
             <li><a
                href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
                class="{{ ' active' if active }}">
-              <i class="pull-right icon {{ ' icon-ok' if request.args.get('of','hb')==i.code }}"></i>
+              <i class="pull-right icon {{ ' icon-ok' if of==i.code }}"></i>
               {{ i.name }}
             </a></li>
           {%- endfor -%}
