@@ -24,6 +24,14 @@ __revision__ = "$Id$"
 from invenio.config import CFG_SITE_URL, CFG_INSPIRE_SITE
 from invenio.messages import gettext_set_language
 
+from invenio.bibcatalog import BIBCATALOG_SYSTEM
+
+try:
+    BIBCATALOG_SYSTEM.ticket_search(0)
+    CFG_CAN_SEARCH_FOR_TICKET = True
+except NotImplementedError:
+    CFG_CAN_SEARCH_FOR_TICKET = False
+
 class Template:
 
     """BibEdit Templates Class."""
@@ -106,25 +114,28 @@ class Template:
                                          id='btnSwitchReadOnly')
             }
 
-        ticketsmenu = '<div class="bibEditMenuSectionHeader">\n' \
-            '          %(imgCompressMenuSection)sTickets\n' \
-            '          </div>\n' \
-            '          <div id="loadingTickets">\n' \
-            '          %(imgTicketsLoader)s\n<span>loading...</span>' \
-            '          </div>\n' \
-            '          <div class="bibEditTicketsMenuSection">\n' \
-            '          <table class="bibEditMenuMore">\n' \
-            '            <col width="136px">\n' \
-            '            <tr class="bibEditMenuMore">\n' \
-            '              <td id="tickets"></td>'\
-            '            </tr>\n' \
-            '          </table>\n' \
-            '        </div>\n' % {
-            'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
-                    'bibEditImgCompressMenuSection', id='ImgTicketsMenu'),
-            'imgTicketsLoader': img('/img/indicator.gif',
-                            'bibEditImgTicketsLoader', id='ImgTicketsLoader')
-            }
+        if CFG_CAN_SEARCH_FOR_TICKET:
+            ticketsmenu = '<div class="bibEditMenuSectionHeader">\n' \
+                '          %(imgCompressMenuSection)sTickets\n' \
+                '          </div>\n' \
+                '          <div id="loadingTickets">\n' \
+                '          %(imgTicketsLoader)s\n<span>loading...</span>' \
+                '          </div>\n' \
+                '          <div class="bibEditTicketsMenuSection">\n' \
+                '          <table class="bibEditMenuMore">\n' \
+                '            <col width="136px">\n' \
+                '            <tr class="bibEditMenuMore">\n' \
+                '              <td id="tickets"></td>'\
+                '            </tr>\n' \
+                '          </table>\n' \
+                '        </div>\n' % {
+                'imgCompressMenuSection': img('/img/bullet_toggle_minus.png',
+                        'bibEditImgCompressMenuSection', id='ImgTicketsMenu'),
+                'imgTicketsLoader': img('/img/indicator.gif',
+                                'bibEditImgTicketsLoader', id='ImgTicketsLoader')
+                }
+        else:
+            ticketsmenu = ''
 
         fieldmenu = '<div class="bibEditMenuSectionHeader">\n' \
             '          %(imgCompressMenuSection)sFields\n' \
