@@ -1230,7 +1230,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
         """websearch - search engine Python API for successful query, respect ranking parameters"""
         self.assertEqual([77, 84, 85],
                          perform_request_search(p='klebanov'))
-        self.assertEqual([85, 77, 84],
+        self.assertEqual([84, 77, 85],
                          perform_request_search(p='klebanov', rm='citation'))
 
     def test_search_engine_python_api_for_existing_record(self):
@@ -1263,8 +1263,8 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
         self.assertEqual([1, 2, 3, 4, 5, 6, 7, 8, 9],
                          perform_request_search(recid=1, recidb=10))
 
-    def test_search_engine_python_api_ranked_by_citation(self):
-        """websearch - search engine Python API for citation ranking"""
+    def test_search_engine_python_api_old_style_ranked_by_citation(self):
+        """websearch - search engine Python API old style citation ranking"""
         self.assertEqual([86, 77],
                 perform_request_search(p='recid:95', rm='citation'))
 
@@ -1393,6 +1393,31 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
        'rec_1_rev': get_fieldvalues(1, '005__')[0],
        'rec_85_rev': get_fieldvalues(85, '005__')[0],
        'rec_107_rev': get_fieldvalues(107, '005__')[0]})
+
+    def test_search_engine_python_api_ranked_by_citation_asc(self):
+        """websearch - search engine Python API for citation ranking asc"""
+        self.assertEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                          16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                          30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50,
+                          51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+                          64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 75, 76, 80,
+                          82, 83, 85, 86, 87, 88, 89, 90, 92, 93, 96, 97, 98,
+                          99, 100, 101, 102, 103, 104, 107, 108, 109, 113, 18,
+                          74, 79, 91, 94, 77, 78, 95, 84, 81],
+                perform_request_search(p='', rm='citation', so='a'))
+
+    def test_search_engine_python_api_ranked_by_citation(self):
+        """websearch - search engine Python API for citation ranking"""
+        self.assertEqual(list(reversed(
+                         [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                          16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+                          30, 31, 32, 33, 34, 43, 44, 45, 46, 47, 48, 49, 50,
+                          51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+                          64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 75, 76, 80,
+                          82, 83, 85, 86, 87, 88, 89, 90, 92, 93, 96, 97, 98,
+                          99, 100, 101, 102, 103, 104, 107, 108, 109, 113, 18,
+                          74, 79, 91, 94, 77, 78, 95, 84, 81])),
+                perform_request_search(p='', rm='citation'))
 
     def test_search_engine_python_api_textmarc_field_filtered(self):
         """websearch - search engine Python API for Text MARC output, field-filtered"""
@@ -2005,11 +2030,11 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
                                                expected_text="[77, 84, 85]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
-                                               expected_text="[85, 84]"))
+                                               expected_text="[84, 85]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=id&rm=citation',
                                                username="admin",
-                                               expected_text="[85, 77, 84]"))
+                                               expected_text="[84, 77, 85]"))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=klebanov&of=intbitset&rm=citation',
                                                username="admin",
@@ -4622,8 +4647,6 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
 
         params.update(map(lambda y: (y[0], ',' in y[1] and ', ' not in y[1] and y[1].split(',') or y[1]), map(lambda x: x.split('=', 1), test_args.split(';'))))
 
-        #params.update(map(lambda x: x.split('=', 1), test_args.split(';')))
-
         req = cStringIO.StringIO()
         params['req'] = req
 
@@ -4681,10 +4704,10 @@ class WebSearchPerformRequestSearchRefactoringTest(InvenioTestCase):
 
         self._run_test('p=el*;sf=title', [100, 32, 8, 15, 16, 81, 97, 34, 23, 127, 58, 2, 14, 9, 128, 11, 30, 109, 52, 48, 94, 17, 56, 18, 91, 59, 12, 92, 74, 54, 103, 10, 51, 47, 13])
 
-        self._run_test('p=boson;rm=citation', [1, 47, 50, 107, 108, 77, 95])
+        self._run_test('p=boson;rm=citation', [95, 77, 108, 107, 50, 47, 1])
 
         if not get_external_word_similarity_ranker():
-            self._run_test('p=boson;rm=wrd', [108, 77, 47, 50, 95, 1, 107])
+            self._run_test('p=boson;rm=wrd', [107, 1, 95, 50, 47, 77, 108])
 
         self._run_test('p1=ellis;f1=author;m1=a;op1=a;p2=john;f2=author;m2=a', [9, 12, 14, 18])
 

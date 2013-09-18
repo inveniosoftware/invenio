@@ -4076,20 +4076,38 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
        (i) rank_method_code is in bsrMETHOD, bibsort buckets can be used;
        (ii)rank_method_code is not in bsrMETHOD, use bibrank;
     """
-
-    if CFG_BIBSORT_BUCKETS and sorting_methods:
+    # Special case: sorting by citations is fast because we store the
+    # ranking dictionary in memory, so we do not use bibsort buckets.
+    if CFG_BIBSORT_BUCKETS and sorting_methods and rank_method_code != 'citation':
         for sort_method in sorting_methods:
             definition = sorting_methods[sort_method]
             if definition.startswith('RNK') and \
-            definition.replace('RNK:', '').strip().lower() == rank_method_code.lower():
-                (solution_recs, solution_scores) = sort_records_bibsort(req, hitset_global, sort_method, '', sort_order, verbose, of, ln, rg, jrec, 'r')
-                #return (solution_recs, solution_scores, '', '', '')
+                   definition.replace('RNK:', '').strip().lower() == rank_method_code.lower():
+                solution_recs, solution_scores = \
+                        sort_records_bibsort(req, hitset_global, sort_method,
+                                             '', sort_order, verbose, of, ln,
+                                             rg, jrec, 'r')
                 comment = ''
                 if verbose > 0:
                     comment = 'find_citations retlist %s' % [[solution_recs[i], solution_scores[i]] for i in range(len(solution_recs))]
-                return (solution_recs, solution_scores, '(', ')', comment)
-    return rank_records_bibrank(rank_method_code, rank_limit_relevance, hitset_global, pattern, verbose, field, rg, jrec)
+                return solution_recs, solution_scores, '(', ')', comment
 
+    solution_recs, solution_scores, prefix, suffix, comment = \
+        rank_records_bibrank(rank_method_code=rank_method_code,
+                             rank_limit_relevance=rank_limit_relevance,
+                             hitset_global=hitset_global,
+                             pattern=pattern,
+                             verbose=verbose,
+                             field=field,
+                             rg=rg,
+                             jrec=jrec)
+
+    # Solution recs can be None, in case of error or other cases
+    # which should be all be changed to return an empty list.
+    if solution_recs and sort_order != 'd':
+        solution_recs.reverse()
+
+    return solution_recs, solution_scores, prefix, suffix, comment
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
     """Initial entry point for sorting records, acts like a dispatcher.
@@ -5636,7 +5654,6 @@ def prs_search(kwargs=None, recid=0, req=None, cc=None, p=None, p1=None, p2=None
     proceeds (so that pieces of a page are rendered even before the
     search ended)
     """
-
     ## 0 - start output
     if recid >= 0: # recid can be 0 if deduced from sysno and if such sysno does not exist
         output = prs_detailed_record(kwargs=kwargs, **kwargs)
@@ -5774,7 +5791,8 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
                                     p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action,
                                     em
                                     ))
-    if record_exists(p[6:]) != 1:
+    recid = p[6:]
+    if record_exists(recid) != 1:
         # record does not exist
         if of.startswith("h"):
             if req.header_only:
@@ -5792,8 +5810,17 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
     else:
         # record well exists, so find similar ones to it
         t1 = os.times()[4]
-        results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-                                rank_records_bibrank(rm, 0, get_collection_reclist(cc), string.split(p), verbose, f, rg, jrec)
+        if rm == 'citation':
+            pattern = 'refersto:recid:%s' % recid
+        else:
+            pattern = 'recid:%s' % recid
+        (results_similar_recIDs,
+         results_similar_relevances,
+         results_similar_relevances_prologue,
+         results_similar_relevances_epilogue,
+         results_similar_comments) = \
+            rank_records_bibrank(rm, 0, get_collection_reclist(cc), [pattern],
+                                 verbose, f, rg, jrec)
         if results_similar_recIDs:
             t2 = os.times()[4]
             cpu_time = t2 - t1
@@ -6557,7 +6584,6 @@ def prs_display_results(kwargs=None, results_final=None, req=None, of=None, sf=N
                         cc=None, ln=None, _=None, ec=None, colls_to_search=None, rm=None, cpu_time=None,
                         f=None, em=None, **dummy
                      ):
-
     ## search stage 6: display results:
 
     # split result set into collections
