@@ -306,11 +306,13 @@ class Template:
           - HTML code of the page headers
         """
         # Including HEPData headers ( Ugly hack but no obvious way to avoid this ...)
-
-        hepDataAdditions = """<script type="text/javascript" src="%s/js/hepdata.js"></script>""" \
+        if CFG_INSPIRE_SITE:
+            hepDataAdditions = """<script type="text/javascript" src="%s/js/hepdata.js"></script>""" \
             % (CFG_BASE_URL, )
-        hepDataAdditions += """<link rel="stylesheet" href="%s/img/hepdata.css" type="text/css" />""" \
+            hepDataAdditions += """<link rel="stylesheet" href="%s/img/hepdata.css" type="text/css" />""" \
             % (CFG_BASE_URL, )
+        else:
+            hepDataAdditions = ""
         # load the right message language
         _ = gettext_set_language(ln)
 
@@ -382,12 +384,12 @@ template function generated it.
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
  %(linkbackTrackbackLink)s
- %(hepDataAdditions)s
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
  <script type="text/javascript" src="%(cssurl)s/js/jquery.min.js"></script>
+ %(hepDataAdditions)s
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
