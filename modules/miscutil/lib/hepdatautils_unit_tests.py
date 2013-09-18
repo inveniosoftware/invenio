@@ -88,9 +88,9 @@ class TestDatasetPaperLogic(unittest.TestCase):
                             "There should not be need of a patch on the same record")
         paper.comment = "azerty"
         diff_xml = paper.get_diff_marcxml(rec)
-        self.assertTrue(diff_xml.find(">Some caption") != -1, \
+        self.assertTrue(diff_xml.find(">Some caption") == -1, \
                         "One of existing captions not found")
-        self.assertTrue(diff_xml.find(">Some ridiculous caption") != -1, \
+        self.assertTrue(diff_xml.find(">Some ridiculous caption") == -1, \
                         "One of existing captions not found")
         self.assertTrue(diff_xml.find(">azerty") != -1, \
                         "New caption not found")
@@ -166,15 +166,7 @@ class TestDatasetPaperLogic(unittest.TestCase):
                             "There should not be need of a patch on the same record")
         paper.comment = "" # empty caption should not be uploaded
         diff_xml = paper.get_diff_marcxml(rec)
-        self.assertTrue(not (diff_xml is None), "Expected non-empty output")
-        rec2 = bibrecord.create_record(diff_xml)[0]
-        fs = bibrecord.record_get_field_instances(rec2, "245", ind1 = " ", ind2 = " ")
-        self.assertEqual(2, len(fs), "Incorrect number of 245 fields")
-        self.assertTrue(diff_xml.find(">Some caption") != -1, \
-                        "One of existing captions not found")
-        self.assertTrue(diff_xml.find(">Some ridiculous caption") != -1, \
-                        "One of existing captions not found")
-
+        self.assertTrue(diff_xml is None, "Expected empty output")
 
     def test_paper_logic(self):
         """Test the case when the main record has to be updated.
@@ -401,6 +393,10 @@ class TestDatasetPaperLogic(unittest.TestCase):
     <subfield code="a">DATA</subfield>
   </datafield>
   <!-- definitions of columns -->
+  <datafield tag="911" ind1=" " ind2=" ">
+    <subfield code="x">1</subfield>
+    <subfield code="y">2</subfield>
+  </datafield>
 
   <datafield tag="910" ind1=" " ind2=" ">
     <subfield code="t">column title</subfield>
