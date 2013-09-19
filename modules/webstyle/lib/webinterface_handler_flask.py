@@ -196,7 +196,16 @@ def create_invenio_flask_app(**kwargs_config):
         _app.config["DEBUG_TB_ENABLED"] = True
         _app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = 'intercept-redirects' in getattr(config, 'CFG_DEVEL_TOOLS', [])
         from flask_debugtoolbar import DebugToolbarExtension
-        DebugToolbarExtension(_app)
+
+        class InvenioDebugToolbarExtension(DebugToolbarExtension):
+            def _show_toolbar(self):
+                user_info = UserInfo(session.get('user_id'))
+                # Enable debug toolbar only for super admin.
+                if not user_info.is_super_admin:
+                    return False
+                return super(InvenioDebugToolbarExtension, self)._show_toolbar()
+
+        InvenioDebugToolbarExtension(_app)
 
     # Set email backend for Flask-Email plugin
     from invenio.mailutils import initialize_email_backend

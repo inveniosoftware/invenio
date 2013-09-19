@@ -1,7 +1,7 @@
 Flask-Admin==1.0.6
 Flask-Assets==0.7
 Flask-Cache==0.12
-Flask-DebugToolbar==0.7.1
+Flask-DebugToolbar==0.8.0
 Flask-Email==1.4.4
 Flask-Gravatar==0.2.3
 Flask-Login==0.2.7
