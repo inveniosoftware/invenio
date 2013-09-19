@@ -6,6 +6,6 @@ Flask-Email==1.4.4
 Flask-Gravatar==0.2.3
 Flask-Login==0.2.7
 Flask-SQLAlchemy==0.16
-Flask-Script==0.5.3
+Flask-Script==0.6.2
 Flask-Testing==0.4
 Flask-WTF==0.8
