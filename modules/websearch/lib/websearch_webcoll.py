@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
      CFG_SCOAP3_SITE
-from invenio.messages import gettext_set_language, language_list_long
+from invenio.messages import gettext_set_language
 from invenio.search_engine import search_pattern_parenthesised, get_creation_date, get_field_i18nname, collection_restricted_p, sort_records, EM_REPOSITORY
 from invenio.search_engine_config import CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
 from invenio.dbquery import run_sql, Error, get_table_update_time
@@ -1191,12 +1191,15 @@ def task_run_core():
                 task_sleep_now_if_required(can_stop_too=True)
         # thirdly, update collection webpage cache:
         if task_get_option("part", 2) == 2:
+            # Updates cache only for chosen languages or for all available ones if none was chosen
+            languages = task_get_option("language", CFG_SITE_LANGS)
+            write_message("Cache update for the following languages: %s" % str(languages), verbose=3)
             i = 0
             for coll in colls:
                 i += 1
                 if coll.reclist_updated_since_start or task_has_option("collection") or task_get_option("force") or not task_get_option("quick"):
                     write_message("%s / webpage cache update" % coll.name)
-                    for lang in CFG_SITE_LANGS:
+                    for lang in languages:
                         coll.update_webpage_cache(lang)
                 else:
                     write_message("%s / webpage cache seems not to need an update and --quick was used" % coll.name, verbose=2)
