@@ -32,6 +32,7 @@ import unittest2
 import cgi
 import subprocess
 
+from flask import request, url_for
 from warnings import warn
 from urlparse import urlsplit, urlunsplit
 from urllib import urlencode
@@ -187,14 +188,16 @@ class InvenioTestCase(TestCase, unittest2.TestCase):
         return app
 
     def login(self, username, password):
-        from flask import request, url_for
-        return self.client.post(url_for('webaccount.login', _external=True, _scheme='https'),
-                                base_url=rewrite_to_secure_url(request.base_url),
+        return self.client.post(url_for('webaccount.login'),
+                                base_url=CFG_SITE_SECURE_URL,
+                                #rewrite_to_secure_url(request.base_url),
                                 data=dict(nickname=username, password=password),
                                 follow_redirects=True)
 
     def logout(self):
-        return self.client.get('/youraccount/logout', follow_redirects=True)
+        return self.client.get(url_for('webaccount.logout'),
+                               base_url=CFG_SITE_SECURE_URL,
+                               follow_redirects=True)
 
 
 class FlaskSQLAlchemyTest(InvenioTestCase):
@@ -778,12 +781,12 @@ class InvenioWebTestCase(InvenioTestCase):
                     self.find_element_by_link_text_with_timeout("login")
                     self.browser.find_element_by_link_text("login").click()
 
-        self.find_element_by_name_with_timeout("p_un")
-        self.browser.find_element_by_name("p_un").clear()
-        self.fill_textbox(textbox_name="p_un", text=username)
-        self.find_element_by_name_with_timeout("p_pw")
-        self.browser.find_element_by_name("p_pw").clear()
-        self.fill_textbox(textbox_name="p_pw",  text=password)
+        self.find_element_by_name_with_timeout("nickname")
+        self.browser.find_element_by_name("nickname").clear()
+        self.fill_textbox(textbox_name="nickname", text=username)
+        self.find_element_by_name_with_timeout("password")
+        self.browser.find_element_by_name("password").clear()
+        self.fill_textbox(textbox_name="password",  text=password)
         self.find_element_by_name_with_timeout("action")
         self.browser.find_element_by_name("action").click()
         if force_ln and CFG_SITE_NAME_INTL[force_ln] not in self.browser.page_source:
