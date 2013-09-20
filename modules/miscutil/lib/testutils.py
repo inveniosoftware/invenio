@@ -553,7 +553,6 @@ def build_and_run_js_unit_test_suite():
     return exitcode
 
 @nottest
-@with_app_context()
 def build_and_run_regression_test_suite():
     """
     Detect all Invenio modules with names ending by
