@@ -245,7 +245,7 @@ def perform_request_display_approved_latest_added_linkbacks_to_accessible_record
     return out
 
 
-def perform_sendtrackback(req, recid, url, title, excerpt, blog_name, blog_id, source, ln):
+def perform_sendtrackback(recid, url, title, excerpt, blog_name, blog_id, source, current_user):
     """
     Send trackback
     @param recid: recid
@@ -269,30 +269,23 @@ def perform_sendtrackback(req, recid, url, title, excerpt, blog_name, blog_id, s
     # request accepted: will be either approved automatically or pending
     else:
         status = 200
-        linkback_id = create_trackback(recid, url, title, excerpt, blog_name, blog_id, source, collect_user_info(req))
+        linkback_id = create_trackback(recid, url, title, excerpt, blog_name, blog_id, source, current_user)
         # approve request automatically from url in whitelist
         if  whitelist_match:
-            approve_linkback(linkback_id, collect_user_info(req))
+            approve_linkback(linkback_id, current_user)
 
     xml_response += '</response>'
 
-    # send response
-    req.set_content_type("text/xml; charset=utf-8")
-    req.set_status(status)
-    req.send_http_header()
-    req.write(xml_response)
+    return xml_response, status
 
 
-def perform_sendtrackback_disabled(req):
+def perform_sendtrackback_disabled():
     status = 404
     xml_response = """<response>
                       <error>1</error>
                       <message>Trackback facility disabled</message>
                       </response>"""
-    req.set_content_type("text/xml; charset=utf-8")
-    req.set_status(status)
-    req.send_http_header()
-    req.write(xml_response)
+    return xml_response, status
 
 
 def update_linkbacks(mode):
