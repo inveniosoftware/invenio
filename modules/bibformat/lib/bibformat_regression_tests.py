@@ -23,8 +23,6 @@ __revision__ = "$Id$"
 
 from invenio.testutils import InvenioTestCase
 import re
-import os
-import sys
 
 from invenio.config import (CFG_SITE_URL,
                             CFG_SITE_LANG,
@@ -599,45 +597,6 @@ class BibFormatAuthorityRecordsBrowsingTest(InvenioTestCase):
             error_messages.append("There is no 'Institut für Energieforschung' in html response.")
         self.assertEqual([], error_messages)
 
-class BibFormat2ndPassTest(unittest.TestCase):
-    """Check for 2 passes parsing for record"""
-
-    def setUp(self):
-        from invenio import bibformat_engine
-        from invenio.config import CFG_TMPDIR
-        sys.path.append('%s' % CFG_TMPDIR)
-        CFG_BIBFORMAT_OUTPUTS_PATH = "%s" % (CFG_TMPDIR)
-        CFG_BIBFORMAT_TEMPLATES_PATH = "%s" % (CFG_TMPDIR)
-        CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (CFG_TMPDIR, os.sep)
-        CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "tests_bibformat_elements"
-        self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
-        self.old_elements_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
-        self.old_import_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
-        self.old_templates_path = bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
-        self.xml_text = '''<record>
-    <controlfield tag="001">33</controlfield>
-    <datafield tag="980" ind1="" ind2="">
-        <subfield code="b">thesis </subfield>
-    </datafield>
-</record>'''
-
-    def tearDown(self):
-        sys.path.pop()
-        from invenio import bibformat_engine
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = self.old_elements_path
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = self.old_import_path
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = self.old_templates_path
-
-    def test_format_2_passes(self):
-        result = format_record(recID=None,
-                               of="test6",
-                               xml_record=self.xml_text)
-        self.assertEqual(result, "helloworld\n")
 
 
 TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
@@ -653,7 +612,7 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatPublInfoFormattingTest,
                              BibFormatAuthorityRecordsTest,
                              BibFormatAuthorityRecordsBrowsingTest,
-                             BibFormat2ndPassTest)
+                             BibFormatPublInfoFormattingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
