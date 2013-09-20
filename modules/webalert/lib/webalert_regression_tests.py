@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,23 +21,22 @@
 
 __revision__ = "$Id$"
 
-import unittest
 from cStringIO import StringIO
 import sys
 import datetime
 import time
+
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_RECORD
-from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
-from invenio.htmlparser import get_as_text
-from invenio.search_engine import get_creation_date
 from invenio.dbquery import run_sql
-from invenio import alert_engine
+from invenio.testutils import make_test_suite, run_test_suite, \
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
 
-class WebAlertWebPagesAvailabilityTest(unittest.TestCase):
+
+class WebAlertWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebAlert web pages whether they are up or not."""
 
     def test_your_alerts_pages_availability(self):
@@ -55,23 +54,36 @@ class WebAlertWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class WebAlertHTMLToTextTest(unittest.TestCase):
+
+class WebAlertHTMLToTextTest(InvenioTestCase):
     """Check that HTML is properly converted to text."""
 
     def test_your_alerts_pages_availability(self):
         """webalert - HTML to text conversion"""
+        from invenio.htmlparser import get_as_text
 
-        self.assertEqual("High energy cosmic rays striking atoms at the top of the atmosphere give the rise to showers of particles striking the Earth's surface \nDes rayons cosmiques de haute energie heurtent des atomes dans la haute atmosphere et donnent ainsi naissance a des gerbes de particules projetees sur la surface terrestre \n10 May 1999 \nPicture number: CERN-DI-9905005", get_as_text(5))
+        out = get_as_text(5)
+        self.assertIn("High energy cosmic rays striking atoms at the top of the atmosphere give the rise to showers of particles striking the Earth's surface", out)
+        self.assertIn("Des rayons cosmiques de haute energie heurtent des atomes dans la haute atmosphere et donnent ainsi naissance a des gerbes de particules projetees sur la surface terrestre", out)
+        self.assertIn("CERN-DI-9905005", out)
 
-        self.assertEqual("Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes / Wang, B ; Lin, C Y ; Abdalla, E [hep-th/0003295] \nComplex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed. [...] \nPublished in Phys. Lett., B :481 2000 79-88", get_as_text(74))
+        out = get_as_text(74)
+        self.assertIn("Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes", out)
+        self.assertIn("hep-th/0003295", out)
+        self.assertIn("Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed.", out)
+        self.assertIn("Phys. Lett., B :481 2000 79-88", out)
 
-class WebAlertFilteringRestrictedRecords(unittest.TestCase):
+
+class WebAlertFilteringRestrictedRecords(InvenioTestCase):
     """Check that restricted records are filtered out for unauthorized users"""
 
     def setUp(self):
         """
         webalert - prepare test alerts
         """
+        from invenio import alert_engine
+        from invenio.search_engine import get_creation_date
+
         # TODO: test alerts for baskets too
         self.added_query_ids = []
         q_query = """INSERT INTO query (type, urlargs) VALUES (%s,%s)"""
