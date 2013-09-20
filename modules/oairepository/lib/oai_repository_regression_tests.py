@@ -21,7 +21,6 @@
 
 __revision__ = "$Id$"
 
-import unittest
 import time
 from datetime import datetime, timedelta
 import re
@@ -33,12 +32,17 @@ from invenio.config import CFG_SITE_URL, \
      CFG_OAI_LOAD, \
      CFG_OAI_ID_FIELD
 from invenio.dbquery import run_sql
+from invenio.importutils import lazy_import
 from invenio.intbitset import intbitset
-from invenio import oai_repository_server, search_engine
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
 
-class OAIRepositoryTouchSetTest(unittest.TestCase):
+oai_repository_server = lazy_import('invenio.oai_repository_server')
+search_engine = lazy_import('invenio.search_engine')
+
+
+class OAIRepositoryTouchSetTest(InvenioTestCase):
     """Check OAI-PMH consistency when touching a set."""
     def setUp(self):
         """Backup the current configuration"""
@@ -73,7 +77,8 @@ class OAIRepositoryTouchSetTest(unittest.TestCase):
         self.assertEqual(len(new_timestamps), len(current_timestamps), "new %s, old %s, from: %s" % (new_timestamps, current_timestamps, future_timestamp))
         self.failUnless(new_timestamps > current_timestamps)
 
-class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
+
+class OAIRepositoryWebPagesAvailabilityTest(InvenioTestCase):
     """Check OAI Repository web pages whether they are up or not."""
 
     def test_oai_server_pages_availability(self):
@@ -106,7 +111,8 @@ class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class TestSelectiveHarvesting(unittest.TestCase):
+
+class TestSelectiveHarvesting(InvenioTestCase):
     """Test set, from and until parameters used to do selective harvesting."""
 
     def test_set(self):
@@ -178,7 +184,8 @@ class TestSelectiveHarvesting(unittest.TestCase):
 
         self.assert_('badResumptionToken' in req.getvalue())
 
-class TestPerformance(unittest.TestCase):
+
+class TestPerformance(InvenioTestCase):
     """Test performance of the repository """
 
     def setUp(self):

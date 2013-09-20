@@ -606,7 +606,7 @@ def format_with_format_template(format_template_filename, bfo,
         # Transform MARCXML using stylesheet
         evaluated_format = format(xml_record, template_source=format_content)
         try:
-            evaluated_format = evaluated_format.decode('utf8')
+            evaluated_format = evaluated_format.decode('utf8').encode('utf8')
         except:
             try:
                 evaluated_format = evaluated_format.encode('utf8')
