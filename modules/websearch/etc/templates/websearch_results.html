@@ -119,7 +119,16 @@
             </a>
             </li>
           {%- endfor -%}
-            </li>
+          {% if collection.rnkMETHODs|length %}
+            <li class="divider"></li>
+          {% for rnk_method in collection.rnkMETHODs %}
+            {%- set used_args = new_args.copy() -%}
+            {%- do used_args.update({'rm': rnk_method.rnkMETHOD.name }) -%}
+            <li><a href="{{ url_for('search.search', **used_args) }}">
+              {{ rnk_method.rnkMETHOD.get_name_ln() }}
+            </a></li>
+          {% endfor %}
+          {% endif %}
           </ul>
         </div>
 

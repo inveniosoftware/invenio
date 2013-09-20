@@ -30,6 +30,8 @@ from invenio.websession_model import User
 from invenio.bibedit_model import Bibrec, Bibdoc
 from invenio.websearch_model import Collection
 
+from flask import g
+
 
 class RnkMETHOD(db.Model):
     """Represents a RnkMETHOD record."""
@@ -41,6 +43,14 @@ class RnkMETHOD(db.Model):
     last_updated = db.Column(db.DateTime, nullable=False,
                              server_default='1900-01-01 00:00:00')
 
+    def get_name_ln(self, ln=None):
+        """Returns localized method name."""
+        try:
+            if ln is None:
+                ln = g.ln
+            return self.names.filter_by(ln=g.ln, type='ln').one().value
+        except:
+            return self.name
 
 class RnkMETHODDATA(db.Model):
     """Represents a RnkMETHODDATA record."""
@@ -58,7 +68,8 @@ class RnkMETHODNAME(db.Model):
     ln = db.Column(db.Char(5), primary_key=True, server_default='')
     type = db.Column(db.Char(3), primary_key=True, server_default='sn')
     value = db.Column(db.String(255), nullable=False)
-    method = db.relationship(RnkMETHOD, backref='names')
+    method = db.relationship(RnkMETHOD, backref=db.backref('names',
+                                                           lazy='dynamic'))
 
 
 class RnkCITATIONDATA(db.Model):

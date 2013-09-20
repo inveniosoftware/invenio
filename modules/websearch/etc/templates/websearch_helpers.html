@@ -374,6 +374,23 @@
             </div>
           </div>
 
+          {% if collection.rnkMETHODs|length %}
+          <div class="control-group clearfix">
+            <label class="control-label pull-left">{{ _('Ranking') }}</label>
+            <div class="controls pull-right">
+              <select name='rm'
+                      style="height: inherit; line-height: inherit;"
+                      class="btn-small span2">
+              {% for rnk_method in collection.rnkMETHODs %}
+                <option value="{{ rnk_method.rnkMETHOD.name }}">
+                  {{ rnk_method.rnkMETHOD.get_name_ln() }}
+                </option>
+              {% endfor %}
+              </select>
+            </div>
+          </div>
+          {% endif %}
+
           <div class="clearfix">
             <label class="control-label pull-left">{{ _('Sort by most') }}</label>
             <div class="controls pull-right">
@@ -391,6 +408,7 @@
             </div>
             </div>
           </div>
+
             </li>
 
             <li class="divider"></li>

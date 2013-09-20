@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,12 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Unit tests for the citation indexer."""
+"""Regression tests for the citation indexer."""
 
-import unittest
 import ConfigParser
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
 
@@ -111,7 +110,7 @@ def remove_from_dicts(dicts, recid):
                 del dicts['refs'][recid]
 
 
-class TestCitationIndexer(unittest.TestCase):
+class TestCitationIndexer(InvenioTestCase):
     """Testing citation indexer."""
     def test_basic(self):
         from invenio.bibrank_citation_indexer import process_chunk
@@ -165,7 +164,7 @@ class TestCitationIndexer(unittest.TestCase):
         compare_dicts(self, dicts)
 
 
-class TestCitationIndexerWarnings(unittest.TestCase):
+class TestCitationIndexerWarnings(InvenioTestCase):
     def cleanup(self):
         run_sql("""DELETE FROM rnkCITATIONDATAERR
                    WHERE citinfo LIKE 'Test Ref %'""")
