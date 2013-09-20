@@ -142,16 +142,19 @@ class WebInterfaceHandlerFlaskTest(InvenioTestCase):
     """Test webinterface handlers."""
     def test_authenticated_decorator(self):
         response = self.client.get(url_for('webmessage.index'),
+                                   base_url=CFG_SITE_SECURE_URL,
                                    follow_redirects=True)
         self.assert401(response)
 
         self.login('admin', '')
         response = self.client.get(url_for('webmessage.index'),
+                                   base_url=CFG_SITE_SECURE_URL,
                                    follow_redirects=True)
         self.assert200(response)
 
         self.logout()
         response = self.client.get(url_for('webmessage.index'),
+                                   base_url=CFG_SITE_SECURE_URL,
                                    follow_redirects=True)
         self.assert401(response)
 
