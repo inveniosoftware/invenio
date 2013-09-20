@@ -22,18 +22,21 @@ __revision__ = "$Id"
 
 __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 
+from flask.ext.login import current_user
+
 from invenio.jsonutils import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
     perform_request_newticket, perform_request_compare, \
-    perform_request_init_template_interface, perform_request_ajax_template_interface
+    perform_request_init_template_interface, \
+    perform_request_ajax_template_interface
 from invenio.bibedit_utils import user_can_edit_record_collection
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL, CFG_SITE_RECORD
 from invenio.messages import gettext_set_language
 from invenio.urlutils import redirect_to_url
 from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.webpage import page
-from invenio.webuser import collect_user_info, getUid, page_not_authorized
+from invenio.webuser import page_not_authorized
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
             ) % CFG_SITE_SECURE_URL
@@ -59,7 +62,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         * Calling the appropriate function from the engine.
 
         """
-        uid = getUid(req)
+        uid = current_user.get_id()
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         # Abort if the simplejson module isn't available
         if not CFG_JSON_AVAILABLE:
@@ -91,8 +94,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             json_response = {'resultCode': 0, 'ID': json_data['ID']}
 
         # Authorization.
-        user_info = collect_user_info(req)
-        if user_info['email'] == 'guest':
+        if current_user.is_guest:
             # User is not logged in.
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
@@ -153,7 +155,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                 'recid': (int, 0)})
 
         ln = argd['ln']
-        uid = getUid(req)
+        uid = current_user.get_id()
         _ = gettext_set_language(ln)
 
         # Checking if currently logged user has permission to perform this request
@@ -189,7 +191,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         if auth_code != 0:
             return page_not_authorized(req=req, referer="/edit",
                                        text=auth_message, navtrail=navtrail)
-        uid = getUid(req)
+        uid = current_user.get_id()
         if argd['recid']:
             (errmsg, url) = perform_request_newticket(argd['recid'], uid)
             if errmsg:
@@ -209,7 +211,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
 
     def templates(self, req, form):
         """handle a edit/templates request"""
-        uid = getUid(req)
+        uid = current_user.get_id()
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         # Abort if the simplejson module isn't available
         if not CFG_JSON_AVAILABLE:
@@ -239,8 +241,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             json_response = {'resultCode': 0}
 
         # Authorization.
-        user_info = collect_user_info(req)
-        if user_info['email'] == 'guest':
+        if current_user.is_guest:
             # User is not logged in.
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
