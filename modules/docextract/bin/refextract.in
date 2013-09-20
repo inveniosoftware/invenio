@@ -48,6 +48,7 @@
 """
 import sys
 
+from invenio.flaskshell import *
 from invenio.refextract_task import main as daemon_main
 
 
