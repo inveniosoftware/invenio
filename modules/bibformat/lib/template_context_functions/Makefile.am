@@ -17,7 +17,7 @@
 
 pylibdir = $(libdir)/python/invenio/template_context_functions
 
-pylib_DATA = __init__.py
+pylib_DATA = __init__.py bfn_*.py
 
 EXTRA_DIST = $(pylib_DATA)
 

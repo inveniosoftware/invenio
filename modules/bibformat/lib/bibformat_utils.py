@@ -635,7 +635,7 @@ def get_pdf_snippets(recID, patterns, user_info):
             out_courtesy = ""
             if CFG_INSPIRE_SITE and text_path_courtesy:
                 out_courtesy = '<strong>Snippets courtesy of ' + text_path_courtesy + '</strong><br>'
-            return """<div class="snippetbox">%s%s</div>""" % (out_courtesy, out)
+            return '%s%s' % (out_courtesy, out)
         else:
             return ""
     else:

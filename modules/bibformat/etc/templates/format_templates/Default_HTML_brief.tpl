@@ -90,6 +90,10 @@
     {% endif %}
 {% endmacro %}
 
+{% macro render_fulltext_snippets() %}
+  {{ bfn_get_fulltext_snippets(record['recid'], request.args['p'], current_user) | wrap(prefix='<p><small>', suffix='</small></p>') }}
+{% endmacro %}
+
 {% macro record_info() %}
   {{ bfe_primary_report_number(bfo, prefix='<i class="icon-qrcode"></i> ') }}
   {{ bfe_additional_report_numbers(bfo, prefix='<i class="icon-qrcode"></i> ',
@@ -127,6 +131,9 @@
     {% endblock %}
 
     <div class="clearfix"></div>
+    {% block fulltext_snippets %}
+        {{ render_fulltext_snippets() }}
+    {% endblock %}
 
     {% block record_footer %}
         {{ render_record_footer(4) }}

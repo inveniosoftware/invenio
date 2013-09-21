@@ -26,6 +26,7 @@ import string
 from invenio.config import CFG_BIBFORMAT_HIDDEN_TAGS
 from invenio.dbquery import run_sql
 from invenio.intbitset import intbitset
+from invenio.cache import cache
 
 def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True, split_by=0):
     """
@@ -180,3 +181,19 @@ def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
                     else:
                         out += "$$%s%s" % (field[-1:], value)
     return out
+
+
+@cache.memoize(timeout=5)
+def get_fulltext_terms_from_search_pattern(search_pattern):
+    keywords = []
+    if search_pattern is not None:
+        from invenio.search_engine import create_basic_search_units
+        for unit in create_basic_search_units(None, str(search_pattern), None):
+            bsu_o, bsu_p, bsu_f, bsu_m = unit[0], unit[1], unit[2], unit[3]
+            if (bsu_o != '-' and bsu_f in [None, 'fulltext']):
+                if bsu_m == 'a' and bsu_p.startswith('%') and bsu_p.endswith('%'):
+                    # remove leading and training `%' representing partial phrase search
+                    keywords.append(bsu_p[1:-1])
+                else:
+                    keywords.append(bsu_p)
+    return keywords
