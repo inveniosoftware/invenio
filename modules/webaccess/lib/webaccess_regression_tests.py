@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,7 +21,6 @@
 
 __revision__ = "$Id$"
 
-import unittest
 import socket
 import time
 import cgi
@@ -29,17 +28,14 @@ import cgi
 from urlparse import urlparse, urlunparse
 from urllib import urlopen, urlencode
 
-from invenio.access_control_admin import acc_add_role, acc_delete_role, \
-    acc_get_role_definition
-from invenio.access_control_firerole import compile_role_definition, \
-    serialize, deserialize
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_DEVEL_SITE
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
-                              get_authenticated_mechanize_browser
+                              get_authenticated_mechanize_browser, \
+                              InvenioTestCase
 from invenio.dbquery import run_sql
 
-class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
+class WebAccessWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebAccess web pages whether they are up or not."""
 
     def test_webaccess_admin_interface_availability(self):
@@ -47,7 +43,9 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
 
         baseurl = CFG_SITE_URL + '/admin/webaccess/webaccessadmin.py/'
 
-        _exports = ['', 'delegate_startarea', 'manageaccounts', 'rolearea', 'actionarea', 'userarea', 'managerobotlogin', 'listgroups', 'resetarea', '']
+        _exports = ['', 'delegate_startarea', 'manageaccounts', 'rolearea',
+                    'actionarea', 'userarea', 'managerobotlogin', 'listgroups',
+                    'resetarea', '']
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:
@@ -83,11 +81,14 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
         browser.open(browser.find_link(text="Become user").absolute_url)
         self.failUnless('romeo' in browser.response().read())
 
-class WebAccessFireRoleTest(unittest.TestCase):
+class WebAccessFireRoleTest(InvenioTestCase):
     """Check WebAccess behaviour WRT FireRole."""
 
     def setUp(self):
         """Create a fake role."""
+        from invenio.access_control_admin import acc_add_role
+        from invenio.access_control_firerole import compile_role_definition, \
+            serialize
         self.role_name = 'test'
         self.role_description = 'test role'
         self.role_definition = 'allow email /.*@cern.ch/'
@@ -98,15 +99,19 @@ class WebAccessFireRoleTest(unittest.TestCase):
 
     def tearDown(self):
         """Drop the fake role."""
+        from invenio.access_control_admin import acc_delete_role
         acc_delete_role(self.role_id)
 
     def test_webaccess_firerole_serialization(self):
         """webaccess - firerole role definition correctly serialized"""
+        from invenio.access_control_admin import acc_get_role_definition
+        from invenio.access_control_firerole import compile_role_definition, \
+            deserialize
         def_ser = compile_role_definition(self.role_definition)
         tmp_def_ser = acc_get_role_definition(self.role_id)
         self.assertEqual(def_ser, deserialize(tmp_def_ser))
 
-class WebAccessUseBasketsTest(unittest.TestCase):
+class WebAccessUseBasketsTest(InvenioTestCase):
     """
     Check WebAccess behaviour WRT enabling/disabling web modules such
     as baskets.
@@ -121,7 +126,7 @@ class WebAccessUseBasketsTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
 
 if CFG_DEVEL_SITE:
-    class WebAccessRobotLoginTest(unittest.TestCase):
+    class WebAccessRobotLoginTest(InvenioTestCase):
         """
         Check whether robot login functionality is OK.
         """

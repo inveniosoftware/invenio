@@ -290,6 +290,6 @@ class UserInfo(CombinedMultiDict, UserMixin):
 
 
 def login_user(user, *args, **kwargs):
-    if type(user) is int:
+    if type(user) in [int, long]:
         user = UserInfo(user)
     return flask_login_user(user, *args, **kwargs)

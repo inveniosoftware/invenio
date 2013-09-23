@@ -35,7 +35,7 @@ class WebBasketSettings(Settings):
     def __init__(self):
         super(WebBasketSettings, self).__init__()
         self.icon = 'shopping-cart'
-        self.title = _('Baskets')
+        self.title = _('Your Baskets')
         self.view = '/yourbaskets'
         #self.edit = url_for('webaccount.edit', name=self.name)
 
