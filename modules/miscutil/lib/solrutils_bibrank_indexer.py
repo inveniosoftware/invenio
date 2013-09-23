@@ -35,6 +35,9 @@ from invenio.errorlib import register_exception
 from invenio.bibrank_bridge_utils import get_tags, get_field_content_in_utf8
 
 
+SOLR_CONNECTION = None
+
+
 if CFG_SOLR_URL:
     import solr
     SOLR_CONNECTION = solr.SolrConnection(CFG_SOLR_URL) # pylint: disable=E1101
