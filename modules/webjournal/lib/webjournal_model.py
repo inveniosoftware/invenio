@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -43,12 +43,9 @@ class JrnISSUE(db.Model):
     issue_number = db.Column(db.String(50), nullable=False, server_default='',
                 primary_key=True)
     issue_display = db.Column(db.String(50), nullable=False, server_default='')
-    date_released = db.Column(db.DateTime, nullable=False,
-                server_default='1900-01-01 00:00:00')
-    date_announced = db.Column(db.DateTime, nullable=False,
-                server_default='1900-01-01 00:00:00')
+    date_released = db.Column(db.DateTime, nullable=True)
+    date_announced = db.Column(db.DateTime, nullable=True)
     journal = db.relationship(JrnJOURNAL, backref='issues')
-
 
 
 __all__ = ['JrnJOURNAL',

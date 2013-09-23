@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,19 +22,21 @@
 __revision__ = "$Id$"
 
 import datetime
-import unittest
 import urllib
-from invenio.search_engine import record_public_p
-from invenio import webjournal_utils as wju
+
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_SUPPORT_EMAIL, \
                            CFG_PREFIX, \
                            CFG_DEVEL_SITE
+from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, \
-     test_web_page_content, merge_error_messages
+     test_web_page_content, merge_error_messages, InvenioTestCase
 
-class ArticlesRelated(unittest.TestCase):
+wju = lazy_import('invenio.webjournal_utils')
+
+
+class ArticlesRelated(InvenioTestCase):
     """Functions about articles"""
 
     def test_is_new_article(self):
@@ -46,7 +48,7 @@ class ArticlesRelated(unittest.TestCase):
         self.assertEqual(article, True)
 
 
-class CategoriesRelated(unittest.TestCase):
+class CategoriesRelated(InvenioTestCase):
     """Functions about journal categories"""
 
     def test_get_journal_categories(self):
@@ -68,7 +70,7 @@ class CategoriesRelated(unittest.TestCase):
                                                 '980__a:ATLANTISTIMESSCIENCE or 980__a:ATLANTISTIMESSCIENCEDRAFT')
 
 
-class JournalConfigVars(unittest.TestCase):
+class JournalConfigVars(InvenioTestCase):
     """Functions to get journal variables """
 
     def test_get_xml_from_config(self):
@@ -162,7 +164,7 @@ class JournalConfigVars(unittest.TestCase):
         self.assertEqual(issue, '02/2009')
 
 
-class TimeIssueFunctions(unittest.TestCase):
+class TimeIssueFunctions(InvenioTestCase):
     """Functions about time, using issues"""
 
     def test_get_current_issue(self):
@@ -252,6 +254,7 @@ class TimeIssueFunctions(unittest.TestCase):
 
     def test_article_in_unreleased_issue(self):
         """webjournal - check access to unreleased article"""
+        from invenio.search_engine import record_public_p
 
         # Record is not public
         self.assertEqual(record_public_p(112), False)
@@ -275,6 +278,7 @@ class TimeIssueFunctions(unittest.TestCase):
 
     def test_restricted_article_in_released_issue(self):
         """webjournal - check access to restricted article in released issue"""
+        from invenio.search_engine import record_public_p
 
         # Record is not public
         self.assertEqual(record_public_p(112), False)
@@ -286,7 +290,7 @@ class TimeIssueFunctions(unittest.TestCase):
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 
-class JournalRelated(unittest.TestCase):
+class JournalRelated(InvenioTestCase):
     """Functions about journal"""
 
     def test_get_journal_info_path(self):
@@ -353,7 +357,7 @@ class JournalRelated(unittest.TestCase):
         self.assertEqual(dont_find_journal, 'ok')
 
 
-class HtmlCachingFunction(unittest.TestCase):
+class HtmlCachingFunction(InvenioTestCase):
     """HTML caching functions"""
 
     def setUp(self):
@@ -376,7 +380,7 @@ class HtmlCachingFunction(unittest.TestCase):
         value = wju.clear_cache_for_issue('AtlantisTimes', '03/2009')
         self.assertEqual(value, True)
 
-class FormattingElements(unittest.TestCase):
+class FormattingElements(InvenioTestCase):
     """Test how formatting elements behave in various contexts"""
 
     def test_language_handling_in_journal(self):
