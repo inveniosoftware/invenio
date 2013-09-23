@@ -1127,11 +1127,23 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
 000000001 100__ $$aPhotolab
 """)
 
+    def test_search_engine_python_api_textmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Python API for Text MARC output, field-filtered, hidden field, no guest access"""
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '595'])
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000001 100__ $$aPhotolab
+""")
+
     def test_search_engine_python_api_xmlmarc_full(self):
         """websearch - search engine Python API for XMLMARC output, full"""
         import cStringIO
         tmp = cStringIO.StringIO()
-        perform_request_search(req=tmp, p='higgs', of='xm', ot=['100', '700'])
+        perform_request_search(req=tmp, p='higgs', of='xm')
         out = tmp.getvalue()
         tmp.close()
         self.assertEqual(out, """\
@@ -1448,8 +1460,7 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
                     'rec_1_rev': get_fieldvalues(1, '005__')[0],
                     'rec_85_rev': get_fieldvalues(85, '005__')[0]})
 
-    @nottest
-    def FIXME_test_search_engine_python_api_xmlmarc_field_filtered(self):
+    def test_search_engine_python_api_xmlmarc_field_filtered(self):
         """websearch - search engine Python API for XMLMARC output, field-filtered"""
         # we are testing example from /help/hacking/search-engine-api
         import cStringIO
@@ -1480,6 +1491,35 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
     <subfield code="a">Photolab</subfield>
   </datafield>
 </record>
+
+</collection>""")
+
+    def test_search_engine_python_api_xmlmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Python API for XMLMARC output, field-filtered, hidden field, no guest access"""
+        # we are testing example from /help/hacking/search-engine-api
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='xm', ot=['100', '595'])
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+<!-- Search-Engine-Total-Number-Of-Results: 2 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+</record>
+
 </collection>""")
 
 class WebSearchSearchEngineWebAPITest(unittest.TestCase):
@@ -1646,6 +1686,29 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
 000000085 700__ $$aPorrati, Massimo
 000000085 700__ $$aZaffaroni, A
 000000001 100__ $$aPhotolab
+"""))
+
+    def test_search_engine_web_api_textmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Web API for Text MARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000001 100__ $$aPhotolab
+"""))
+
+    def test_search_engine_web_api_textmarc_field_filtered_hidden_admin(self):
+        """websearch - search engine Web API for Text MARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 595__ $$aLANL EDS
+000000085 595__ $$aSIS LANLPUBL2004
+000000085 595__ $$aSIS:2004 PR/LKR added
+000000001 100__ $$aPhotolab
+000000001 595__ $$aPress
 """))
 
     def test_search_engine_web_api_textmarc_subfield_values(self):
@@ -1976,8 +2039,7 @@ Zaffaroni, A
                     'rec_1_rev': get_fieldvalues(1, '005__')[0],
                     'rec_85_rev': get_fieldvalues(85, '005__')[0]}))
 
-    @nottest
-    def FIXME_test_search_engine_web_api_xmlmarc_field_filtered(self):
+    def test_search_engine_web_api_xmlmarc_field_filtered(self):
         """websearch - search engine Web API for XMLMARC output, field-filtered"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,700',
@@ -2005,7 +2067,72 @@ Zaffaroni, A
     <subfield code="a">Photolab</subfield>
   </datafield>
 </record>
+
 </collection>"""))
+
+    def test_search_engine_web_api_xmlmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Web API for XMLMARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Search-Engine-Total-Number-Of-Results: 2 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+    def test_search_engine_web_api_xmlmarc_field_filtered_hidden_admin(self):
+        """websearch - search engine Web API for XMLMARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Search-Engine-Total-Number-Of-Results: 2 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">LANL EDS</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS LANLPUBL2004</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:2004 PR/LKR added</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">Press</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
 
 
 class WebSearchRecordWebAPITest(unittest.TestCase):
@@ -2330,8 +2457,27 @@ class WebSearchRecordWebAPITest(unittest.TestCase):
 000000085 700__ $$aZaffaroni, A
 """))
 
-    @nottest
-    def FIXME_test_record_web_api_xmlmarc_field_filtered(self):
+    def test_record_web_api_textmarc_field_filtered_hidden_guest(self):
+        """websearch - /record Web API for TextMARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=tm&ot=100,595',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+"""))
+
+    def test_record_web_api_textmarc_field_filtered_hidden_admin(self):
+        """websearch - /record Web API for TextMARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=tm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 595__ $$aLANL EDS
+000000085 595__ $$aSIS LANLPUBL2004
+000000085 595__ $$aSIS:2004 PR/LKR added
+"""))
+
+    def test_record_web_api_xmlmarc_field_filtered(self):
         """websearch - /record Web API for XMLMARC output, field-filtered"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/record/85?of=xm&ot=100,700',
@@ -2352,6 +2498,53 @@ class WebSearchRecordWebAPITest(unittest.TestCase):
     <subfield code="a">Zaffaroni, A</subfield>
   </datafield>
 </record>
+
+</collection>"""))
+
+    def test_record_web_api_xmlmarc_field_filtered_hidden_guest(self):
+        """websearch - /record Web API for XMLMARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=xm&ot=100,595',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+    def test_record_web_api_xmlmarc_field_filtered_hidden_admin(self):
+        """websearch - /record Web API for XMLMARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=xm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">LANL EDS</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS LANLPUBL2004</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:2004 PR/LKR added</subfield>
+  </datafield>
+</record>
+
 </collection>"""))
 
     def test_record_web_api_textmarc_subfield_values(self):
