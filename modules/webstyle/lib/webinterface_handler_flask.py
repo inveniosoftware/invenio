@@ -575,7 +575,7 @@ def with_app_context(app=None, new_context=False, **kwargs_config):
             """This function has to run within application context."""
 
             if not has_app_context() or new_context:
-                with get_application().app_context():
+                with get_application().test_request_context('/'): #app_context():
                     current_app.preprocess_request()
                     result = f(*args, **kwargs)
             else:

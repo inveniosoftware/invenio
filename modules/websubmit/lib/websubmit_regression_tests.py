@@ -31,6 +31,7 @@ from invenio.importutils import lazy_import
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
+from invenio.webinterface_handler_flask import with_app_context
 
 websubmit_file_stamper = lazy_import('invenio.websubmit_file_stamper')
 
@@ -132,6 +133,8 @@ class WebSubmitXSSVulnerabilityTest(InvenioTestCase):
                           '/submit?doctype=DEMOTHE&access=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&act=SBI',                                               expected_text='Invalid parameters', username="jekyll",
                           password="j123ekyll"))
 
+
+@with_app_context()
 def WebSubmitFileConverterTestGenerator():
     from invenio.websubmit_file_converter import get_conversion_map, can_convert
     if can_convert('.odt', '.txt'):
