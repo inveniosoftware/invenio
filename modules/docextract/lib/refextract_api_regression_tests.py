@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -23,16 +23,13 @@ The Refextract task tests suite for tasks
 It requires a fully functional invenio installation.
 """
 
-import unittest
-
-from invenio.testutils import make_test_suite, run_test_suite
-from invenio.refextract_api import update_references, \
-                                   RecordHasReferences, \
-                                   FullTextNotAvailable
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 
 
-class RefextractApiTest(unittest.TestCase):
+class RefextractApiTest(InvenioTestCase):
     def test_no_fulltext(self):
+        from invenio.refextract_api import FullTextNotAvailable, \
+            update_references
         try:
             update_references(1000000000000)
             self.fail()
@@ -41,6 +38,8 @@ class RefextractApiTest(unittest.TestCase):
             pass
 
     def test_no_overwrite(self):
+        from invenio.refextract_api import RecordHasReferences, \
+            update_references
         try:
             update_references(92, overwrite=False)
             self.fail()
