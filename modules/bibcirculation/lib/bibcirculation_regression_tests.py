@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
-
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
 
-class BibCirculationUsersWebPagesAvailabilityTest(unittest.TestCase):
+
+class BibCirculationUsersWebPagesAvailabilityTest(InvenioTestCase):
     """Check BibCirculation web pages whether they are up or not."""
 
     def test_your_loans_page_availability(self):
@@ -44,7 +44,8 @@ class BibCirculationUsersWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
+
+class BibCirculationAdminsWebPagesAvailabilityTest(InvenioTestCase):
     """Check BibCirculation web pages whether they are up or not for Admins."""
 
     def test_admin_pages_availability(self):
@@ -60,7 +61,7 @@ class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
     def test_borrower_search_availability(self):
         """bibcirculation - availability of borrower search"""
 
-        baseurl = CFG_SITE_URL + '/admin2/bibcirculation/' \
+        baseurl = CFG_SITE_SECURE_URL + '/admin2/bibcirculation/' \
                               + 'borrower_search_result?column=name&string=john'
 
         self.assertEqual([], test_web_page_content(baseurl, username='admin',
@@ -71,7 +72,7 @@ class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
     def test_item_search_availability(self):
         """bibcirculation - availability of item search"""
 
-        baseurl = CFG_SITE_URL + '/admin2/bibcirculation/' \
+        baseurl = CFG_SITE_SECURE_URL + '/admin2/bibcirculation/' \
                               + 'item_search_result?f=barcode&p=bc-34001'
 
         self.assertEqual([], test_web_page_content(baseurl, username='admin',
