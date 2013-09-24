@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,16 +21,16 @@
 
 __revision__ = "$Id$"
 
-import unittest
 import os
 import sys
 
 from invenio.errorlib import register_exception, get_pretty_traceback
 from invenio.config import CFG_SITE_URL, CFG_LOGDIR
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
 
-class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
+class ErrorlibWebPagesAvailabilityTest(InvenioTestCase):
     """Check errorlib web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
@@ -47,7 +47,7 @@ class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-class ErrorlibRegisterExceptionTest(unittest.TestCase):
+class ErrorlibRegisterExceptionTest(InvenioTestCase):
     """Check errorlib register_exception functionality."""
 
     def setUp(self):
