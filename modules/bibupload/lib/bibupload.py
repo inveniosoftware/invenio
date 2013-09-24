@@ -584,6 +584,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     verbose=2)
         if insert_mode_p:
             update_database_with_metadata(record, rec_id, oai_rec_id, pretend=pretend)
+            write_message("   -Stage COMPLETED", verbose=2)
         elif opt_mode in ('replace', 'replace_or_insert',
             'append', 'correct', 'delete') and updates_exist:
             # now we clear all the rows from bibrec_bibxxx from the old
@@ -599,10 +600,10 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                         affected_tags.pop(tag)
             write_message("   -Clean bibrec_bibxxx: DONE", verbose=2)
             update_database_with_metadata(record, rec_id, oai_rec_id, affected_tags, pretend=pretend)
+            write_message("   -Stage COMPLETED", verbose=2)
         else:
             write_message("   -Stage NOT NEEDED in mode %s" % opt_mode,
                         verbose=2)
-        write_message("   -Stage COMPLETED", verbose=2)
         record_deleted_p = False
 
         # Finally we update the bibrec table with the current date
@@ -2914,7 +2915,6 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
                 else:
                     write_message("Record could not have been parsed",
                                   stream=sys.stderr)
-                stat['nb_holdingpen'] += 1
                 if callback_url:
                     results_for_callback['results'].append({'recid': error[1], 'success': False, 'error_message': error[2]})
             elif error[0] == 0:

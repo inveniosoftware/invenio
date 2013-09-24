@@ -33,7 +33,8 @@ from invenio.bibrecord import record_get_field_value, \
                                 record_get_field_instances, \
                                 record_add_field, \
                                 record_delete_field, \
-                                create_record
+                                create_record, \
+                                records_identical
 
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
                                      CFG_BIBUPLOAD_DELETE_CODE, \
@@ -244,7 +245,7 @@ class RevisionVerifier:
 
         return result
 
-    def detect_conflict(self, up_patch, up_date, orig_patch, orig_date):
+    def detect_conflict(self, up_record, up_patch, up_date, orig_record, orig_patch, orig_date):
         """
         Compares the generated patches for Upload and Original Records for any common tags.
         Raises Conflict Error in case of any common tags.
@@ -274,8 +275,21 @@ class RevisionVerifier:
                     conflict_tags.append(tag)
 
         if conflict_tags:
-            raise InvenioBibUploadConflictingRevisionsError(self.rec_id, \
-                                                            conflict_tags, \
+            ## It looks like there are conflicting tags. However these might
+            ## be false positive: we need to filter out those tags which
+            ## have been modified in both situation but ends up having
+            ## the same change.
+            real_conflict_tags = []
+            for tag in conflict_tags:
+                if tag in up_record and tag in orig_record and records_identical({tag: up_record[tag]}, {tag: orig_record[tag]}, ignore_duplicate_subfields=True, ignore_duplicate_controlfields=True):
+                    continue
+                elif tag not in up_record and tag not in orig_record:
+                    continue
+                else:
+                    real_conflict_tags.append(tag)
+            if real_conflict_tags:
+                raise InvenioBibUploadConflictingRevisionsError(self.rec_id, \
+                                                            real_conflict_tags, \
                                                             up_date, \
                                                             orig_date)
 
@@ -393,8 +407,8 @@ class RevisionVerifier:
         # Checking for conflicts
         # If no original patch - Original Record same as Archived Record
         if orig_patch:
-            curr_patch = self.detect_conflict(curr_patch, upload_rev, \
-                                                orig_patch, original_rev)
+            curr_patch = self.detect_conflict(verify_record, curr_patch, upload_rev, \
+                                                original_record, orig_patch, original_rev)
 
         record_patch = self.generate_final_patch(curr_patch, self.rec_id)
         affected_tags = self.retrieve_affected_tags_with_ind(curr_patch)
