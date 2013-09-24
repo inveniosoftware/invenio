@@ -27,6 +27,7 @@ from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import class_mapper, properties
 from sqlalchemy.types import TypeDecorator, TEXT, LargeBinary
 from sqlalchemy.sql.expression import FunctionElement
+from invenio.importutils import autodiscover_modules
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
@@ -36,6 +37,11 @@ try:
     from flask.ext.sqlalchemy import SQLAlchemy
 except:
     from flaskext.sqlalchemy import SQLAlchemy
+
+
+def autodiscover_models():
+    """Makes sure that all tables are loaded in `db.metadata.tables`."""
+    return autodiscover_modules(['invenio'], related_name_re=".+_model\.py")
 
 
 def getRelationships(self):

@@ -47,7 +47,7 @@ def drop(yes_i_know=False):
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     from invenio.webstat import destroy_customevents
     from invenio.inveniocfg import test_db_connection
-    from invenio.sqlalchemyutils import db
+    from invenio.sqlalchemyutils import db, autodiscover_models
     from invenio.bibdocfile import _make_base_dir
 
     ## Step 0: confirm deletion
@@ -55,6 +55,7 @@ def drop(yes_i_know=False):
 
     ## Step 1: test database connection
     test_db_connection()
+    autodiscover_models()
 
     ## Step 2: disable foreign key checks
     if db.engine.name == 'mysql':
@@ -117,9 +118,10 @@ def create(default_data=True):
     from sqlalchemy import event
     from invenio.dateutils import get_time_estimator
     from invenio.inveniocfg import test_db_connection
-    from invenio.sqlalchemyutils import db
+    from invenio.sqlalchemyutils import db, autodiscover_models
 
     test_db_connection()
+    autodiscover_models()
 
     def cfv_after_create(target, connection, **kw):
         print
@@ -177,7 +179,7 @@ def uri():
 
 
 def load_fixtures(suffix='', truncate_tables_first=False):
-    from invenio.sqlalchemyutils import db
+    from invenio.sqlalchemyutils import db, autodiscover_models
     from fixture import SQLAlchemyFixture
     from invenio.importutils import autodiscover_modules
 
@@ -188,8 +190,7 @@ def load_fixtures(suffix='', truncate_tables_first=False):
 
     fixture_modules = autodiscover_modules(['invenio'],
                                            related_name_re=related_name_re)
-    model_modules = autodiscover_modules(['invenio'],
-                                         related_name_re=".+_model\.py")
+    model_modules = autodiscover_models()
     fixtures = dict((f, getattr(ff, f)) for ff in fixture_modules
                     for f in dir(ff) if f[-4:] == 'Data')
     fixture_names = fixtures.keys()

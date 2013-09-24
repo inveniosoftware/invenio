@@ -134,10 +134,6 @@ def create_invenio_flask_app(**kwargs_config):
     from invenio.sqlalchemyutils import db
     db.init_app(_app)
 
-    ## Make sure that all tables are loaded in `db.metadata.tables`.
-    from invenio.importutils import autodiscover_modules
-    autodiscover_modules(['invenio'], related_name_re=".+_model\.py")
-
     ## First check that you have all rights to logs
     from invenio.bibtask import check_running_process_user
     check_running_process_user()
