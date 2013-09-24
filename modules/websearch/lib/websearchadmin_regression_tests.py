@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,13 +21,13 @@
 
 __revision__ = "$Id$"
 
-import unittest
-
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+                              test_web_page_content, merge_error_messages, \
+                              InvenioTestCase
 
-class WebSearchAdminWebPagesAvailabilityTest(unittest.TestCase):
+
+class WebSearchAdminWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSearch Admin web pages whether they are up or not."""
 
     def test_websearch_admin_interface_pages_availability(self):
