@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011, 2012 CERN.
+## Copyright (C) 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,13 +19,11 @@
 
 """Regression tests for the search engine summarizer."""
 
-import unittest
-
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.intbitset import intbitset
 
 
-class WebSearchSummarizerTests(unittest.TestCase):
+class WebSearchSummarizerTests(InvenioTestCase):
     """Test utility functions for search engine summarizer."""
 
     def test_basic(self):
