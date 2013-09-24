@@ -61,8 +61,7 @@ from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_DELETE_CODE, \
     CFG_BIBUPLOAD_DELETE_VALUE, \
     CFG_BIBUPLOAD_OPT_MODES
-from invenio.dbquery import run_sql, \
-                            Error
+from invenio.dbquery import run_sql
 from invenio.bibrecord import create_records, \
                               record_add_field, \
                               record_delete_field, \
@@ -330,20 +329,20 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             except InvenioBibUploadConflictingRevisionsError, err:
                 msg = "     -ERROR: Conflicting Revisions - %s" % err
                 write_message(msg, verbose=1, stream=sys.stderr)
-                submit_ticket_for_holding_pen(rec_id, err, "Conflicting Revisions. Inserting record into holding pen.")
-                insert_record_into_holding_pen(record, str(rec_id))
+                submit_ticket_for_holding_pen(rec_id, err, "Conflicting Revisions. Inserting record into holding pen.", pretend=pretend)
+                insert_record_into_holding_pen(record, str(rec_id), pretend=pretend)
                 return (2, int(rec_id), msg)
             except InvenioBibUploadInvalidRevisionError, err:
                 msg = "     -ERROR: Invalid Revision - %s" % err
                 write_message(msg)
-                submit_ticket_for_holding_pen(rec_id, err, "Invalid Revisions. Inserting record into holding pen.")
-                insert_record_into_holding_pen(record, str(rec_id))
+                submit_ticket_for_holding_pen(rec_id, err, "Invalid Revisions. Inserting record into holding pen.", pretend=pretend)
+                insert_record_into_holding_pen(record, str(rec_id), pretend=pretend)
                 return (2, int(rec_id), msg)
             except InvenioBibUploadMissing005Error, err:
                 msg = "     -ERROR: Missing 005 - %s" % err
                 write_message(msg)
-                submit_ticket_for_holding_pen(rec_id, err, "Missing 005. Inserting record into holding pen.")
-                insert_record_into_holding_pen(record, str(rec_id))
+                submit_ticket_for_holding_pen(rec_id, err, "Missing 005. Inserting record into holding pen.", pretend=pretend)
+                insert_record_into_holding_pen(record, str(rec_id), pretend=pretend)
                 return (2, int(rec_id), msg)
         else:
             write_message("     - No 005 Tag Present. Resuming normal flow.", verbose=2)
@@ -373,7 +372,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             elif opt_mode == 'append':
                 for tag, fields in record.iteritems():
                     if tag not in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
-                        affected_tags[tag]=[(field[1], field[2]) for field in fields]
+                        affected_tags[tag] = [(field[1], field[2]) for field in fields]
 
         # In Replace mode, take over old strong tags if applicable:
         if opt_mode == 'replace' or \
@@ -438,7 +437,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             return (1, int(rec_id))
         else:
             error=None
-            write_message(lambda: "   -Added tag 005: DONE. "+ str(record_get_field_value(record, '005', '', '')), verbose=2)
+            write_message(lambda: "   -Added tag 005: DONE. " + str(record_get_field_value(record, '005', '', '')), verbose=2)
 
         # adding 005 to affected tags will delete the existing 005 entry
         # and update with the latest timestamp.
@@ -720,7 +719,7 @@ def bibupload_post_phase(record, mode=None, rec_id="", pretend=False,
                                                      tmp_ids = tmp_ids,
                                                      tmp_vers = tmp_vers))
 
-def submit_ticket_for_holding_pen(rec_id, err, msg):
+def submit_ticket_for_holding_pen(rec_id, err, msg, pretend=False):
     """
     Submit a ticket via BibCatalog to report about a record that has been put
     into the Holding Pen.
@@ -759,7 +758,8 @@ BibUpload task information:
             "user": user,
             "task_params": bibtask._TASK_PARAMS,
             "task_options": bibtask._OPTIONS}
-        BIBCATALOG_SYSTEM.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, owner=uid)
+        if not pretend:
+            BIBCATALOG_SYSTEM.ticket_submit(subject="%s: %s by %s" % (msg, rec_id, user), recordid=rec_id, text=text, queue=CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE, owner=uid)
 
 def insert_record_into_holding_pen(record, oai_id, pretend=False):
     query = "INSERT INTO bibHOLDINGPEN (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"
@@ -2202,7 +2202,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             if restriction != KEEP_OLD_VALUE:
                                 if not pretend:
                                     bibdoc.set_status(restriction)
-                            if doctype and doctype!= KEEP_OLD_VALUE:
+                            if doctype and doctype != KEEP_OLD_VALUE:
                                 if not pretend:
                                     bibdoc.change_doctype(doctype)
                             if urls:
