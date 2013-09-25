@@ -99,12 +99,11 @@ def cli_upload(req, file_content=None, mode=None):
         arg_file = arg_file.value
 
     # write temporary file:
-    tempfile.tempdir = CFG_TMPDIR
+    (fd, filename) = tempfile.mkstemp(prefix="batchupload_" + \
+               time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_",
+               dir=CFG_TMPDIR)
 
-    filename = tempfile.mktemp(prefix="batchupload_" + \
-               time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_")
-
-    filedesc = open(filename, 'w')
+    filedesc = os.fdopen(fd, 'w')
     filedesc.write(arg_file)
     filedesc.close()
 
@@ -140,11 +139,11 @@ def metadata_upload(req, metafile=None, mode=None, exec_date=None, exec_time=Non
     # write temporary file:
     metafile = metafile.value
     user_info = collect_user_info(req)
-    tempfile.tempdir = CFG_TMPDIR
-    filename = tempfile.mktemp(prefix="batchupload_" + \
+    (fd, filename) = tempfile.mkstemp(prefix="batchupload_" + \
         user_info['nickname'] + "_" + time.strftime("%Y%m%d%H%M%S",
-        time.localtime()) + "_" + metafilename + "_")
-    filedesc = open(filename, 'w')
+        time.localtime()) + "_" + metafilename + "_",
+        dir=CFG_TMPDIR)
+    filedesc = os.fdopen(fd, 'w')
     filedesc.write(metafile)
     filedesc.close()
 
@@ -249,13 +248,12 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 error_msg = err_desc[5] % file_collection
                 errors.append((docfile, error_msg))
                 continue
-            tempfile.tempdir = CFG_TMPDIR
             # Move document to be uploaded to temporary folder
-            tmp_file = tempfile.mktemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension)
+            (fd, tmp_file) = tempfile.mkstemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension, dir=CFG_TMPDIR)
             shutil.copy(os.path.join(folder, docfile), tmp_file)
             # Create MARC temporary file with FFT tag and call bibupload
-            filename = tempfile.mktemp(prefix=identifier + '_')
-            filedesc = open(filename, 'w')
+            (fd, filename) = tempfile.mkstemp(prefix=identifier + '_', dir=CFG_TMPDIR)
+            filedesc = os.fdopen(fd, 'w')
             marc_content = """ <record>
                                     <controlfield tag="001">%(rec_id)s</controlfield>
                                         <datafield tag="FFT" ind1=" " ind2=" ">

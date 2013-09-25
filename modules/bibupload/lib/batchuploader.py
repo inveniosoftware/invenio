@@ -59,7 +59,6 @@ def task_run_core():
         and uploads them.
         Files are then moved to the corresponding DONE folders.
     """
-    tempfile.tempdir = CFG_TMPDIR
     if not task_get_option('documents'):
         # Metadata upload
         daemon_dir = CFG_BATCHUPLOADER_DAEMON_DIR[0] == '/' and CFG_BATCHUPLOADER_DAEMON_DIR \
@@ -82,7 +81,7 @@ def task_run_core():
             for metafile in files:
                 if os.path.isfile(os.path.join(files_dir, metafile)):
                     # Create temporary file to be uploaded
-                    filename = tempfile.mktemp(prefix=metafile + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_")
+                    (fd, filename) = tempfile.mkstemp(prefix=metafile + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", dir=CFG_TMPDIR)
                     shutil.copy(os.path.join(files_dir, metafile), filename)
                     # Send bibsched task
                     mode = "-" + folder[0]
