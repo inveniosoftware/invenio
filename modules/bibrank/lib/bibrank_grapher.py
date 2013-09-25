@@ -30,7 +30,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_VERSION, \
-     CFG_WEBDIR
+     CFG_WEBDIR, \
+     CFG_TMPDIR
 from invenio.websubmit_config import *
 
 ## test gnuplot presence:
@@ -54,9 +55,8 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     One set represents a curve in the graph.
     """
     max_y_datas = 0
-    tempfile.tempdir = CFG_WEBDIR + "/img"
-    fname = tempfile.mktemp()
-    file_dest = open(fname, 'a')
+    (fd, fname) = tempfile.mkstemp(prefix='bibrank_grapher_', dir=CFG_TMPDIR)
+    file_dest = os.fdopen(fd, 'a')
     for list_elem in lists_coordinates:
         y_axe = []
         #prepare data and store them in a file
