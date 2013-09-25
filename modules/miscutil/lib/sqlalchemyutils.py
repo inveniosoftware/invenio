@@ -28,6 +28,7 @@ from sqlalchemy.orm import class_mapper, properties
 from sqlalchemy.types import TypeDecorator, TEXT, LargeBinary
 from sqlalchemy.sql.expression import FunctionElement
 from invenio.intbitset import intbitset
+from invenio.errorlib import register_exception
 from invenio.dbquery import serialize_via_marshal, deserialize_via_marshal
 from invenio.hashutils import md5
 
@@ -249,7 +250,10 @@ class PasswordComparator(Comparator):
 
 def autocommit_on_checkin(dbapi_con, con_record):
     """Calls autocommit on raw mysql connection for fixing bug in MySQL 5.5"""
-    dbapi_con.autocommit(True)
+    try:
+        dbapi_con.autocommit(True)
+    except:
+        register_exception()
 
 ## Possibly register globally.
 #event.listen(Pool, 'checkin', autocommit_on_checkin)
