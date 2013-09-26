@@ -265,13 +265,16 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         else:
             error = None
 
-        error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
-        if error is None:
-            msg = "   Failed: Error during adding to 005 controlfield to record"
-            write_message(msg, verbose=1, stream=sys.stderr)
-            return (1, int(rec_id), msg)
+        if '005' not in record:
+            error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
+            if error is None:
+                msg = "   Failed: Error during adding to 005 controlfield to record"
+                write_message(msg, verbose=1, stream=sys.stderr)
+                return (1, int(rec_id), msg)
+            else:
+                error = None
         else:
-            error=None
+            write_message("   Note: 005 already existing upon inserting of new record. Keeping it.", verbose=2)
 
     elif opt_mode != 'insert':
         insert_mode_p = False
@@ -559,6 +562,9 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     # OK, some formats like HB could not have been deleted, no big deal
                     pass
         write_message("   -Stage COMPLETED", verbose=2)
+
+        ## Let's assert that one and only one 005 tag is existing at this stage.
+        assert len(record['005']) == 1
 
         # Update the database MetaData
         write_message("Stage 5: Start (Update the database with the metadata).",
