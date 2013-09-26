@@ -37,7 +37,7 @@ from werkzeug.utils import import_string
 _RACE_PROTECTION = False
 
 
-def autodiscover_modules(packages, related_name_re='*.py'):
+def autodiscover_modules(packages, related_name_re='*.py', ignore_exceptions=False):
     """
     Autodiscover function follows the pattern used by Celery.
 
@@ -45,6 +45,8 @@ def autodiscover_modules(packages, related_name_re='*.py'):
     @type packages: list of str
     @param related_name_re: Regular expression used to match modules names.
     @type related_name_re: str
+    @param ignore_exceptions: Ignore exception when importing modules.
+    @type ignore_exceptions: bool
     """
     global _RACE_PROTECTION
 
@@ -53,7 +55,8 @@ def autodiscover_modules(packages, related_name_re='*.py'):
     _RACE_PROTECTION = True
     modules = []
     try:
-        tmp = [find_related_modules(pkg, related_name_re) for pkg in packages]
+        tmp = [find_related_modules(pkg, related_name_re, ignore_exceptions)
+               for pkg in packages]
 
         for l in tmp:
             for m in l:
@@ -67,7 +70,7 @@ def autodiscover_modules(packages, related_name_re='*.py'):
     return modules
 
 
-def find_related_modules(package, related_name_re='(.+)\.py'):
+def find_related_modules(package, related_name_re='(.+)\.py', ignore_exceptions=False):
     """Given a package name and a module name pattern, tries to find matching
     modules."""
     package_elements = package.rsplit(".", 1)
@@ -92,12 +95,12 @@ def find_related_modules(package, related_name_re='(.+)\.py'):
     modules = []
 
     for related_name in candidates:
-        modules.append(import_related_module(package, pkg_path, related_name))
+        modules.append(import_related_module(package, pkg_path, related_name, ignore_exceptions))
 
     return modules
 
 
-def import_related_module(package, pkg_path, related_name):
+def import_related_module(package, pkg_path, related_name, ignore_exceptions=False):
     """
     Import module from given path
     """
@@ -106,10 +109,18 @@ def import_related_module(package, pkg_path, related_name):
     except ImportError:
         return
 
-    return getattr(
-        __import__('%s' % (package), globals(), locals(), [related_name]),
-        related_name
-    )
+    try:
+        return getattr(
+            __import__('%s' % (package), globals(), locals(), [related_name]),
+            related_name
+        )
+    except Exception as e:
+        if ignore_exceptions:
+            #FIXME remove invenio dependency
+            from invenio.errorlib import register_exception
+            register_exception()
+        else:
+            raise e
 
 
 def lazy_import(name):
