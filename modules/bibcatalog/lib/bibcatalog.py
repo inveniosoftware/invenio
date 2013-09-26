@@ -24,21 +24,30 @@ This creates an instance of the class that has been configured for this installa
 or returns None if no ticket system is configured.
 """
 from invenio.config import CFG_BIBCATALOG_SYSTEM
+from invenio.errorlib import register_exception
 
 if CFG_BIBCATALOG_SYSTEM == 'RT':
     from invenio.bibcatalog_system_rt import BibCatalogSystemRT
 elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
     from invenio.bibcatalog_system_email import BibCatalogSystemEmail
-else:
-    from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
 
 
 def get_bibcatalog_system():
     if CFG_BIBCATALOG_SYSTEM == 'RT':
-        bc_system = BibCatalogSystemRT()
+        try:
+            bc_system = BibCatalogSystemRT()
+            msg = bc_system.check_system()
+            if msg:
+                raise StandardError(msg)
+        except Exception, err:
+            register_exception(alert_admin=True, prefix=err)
+            from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
+            ## RT has some troubles... let's fall back on the dummy system
+            bc_system = BibCatalogSystemDummy()
     elif CFG_BIBCATALOG_SYSTEM == 'EMAIL':
         bc_system = BibCatalogSystemEmail()
     else:
+        from invenio.bibcatalog_system_dummy import BibCatalogSystemDummy
         bc_system = BibCatalogSystemDummy()
 
     return bc_system
