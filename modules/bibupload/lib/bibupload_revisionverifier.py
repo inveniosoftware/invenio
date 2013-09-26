@@ -28,6 +28,7 @@ __revision__ = "$Id$"
 
 import zlib
 import copy
+from pprint import pformat
 
 from invenio.bibrecord import record_get_field_value, \
                                 record_get_field_instances, \
@@ -288,10 +289,12 @@ class RevisionVerifier:
                 else:
                     real_conflict_tags.append(tag)
             if real_conflict_tags:
-                raise InvenioBibUploadConflictingRevisionsError(self.rec_id, \
-                                                            real_conflict_tags, \
-                                                            up_date, \
-                                                            orig_date)
+                raise InvenioBibUploadConflictingRevisionsError(self.rec_id,
+                                                            real_conflict_tags,
+                                                            up_date,
+                                                            orig_date,
+                                                            up_record,
+                                                            orig_record)
 
         return up_patch
 
@@ -428,7 +431,7 @@ class InvenioBibUploadUnchangedRecordError(Exception):
 
     def __str__(self):
         msg = 'UNCHANGED RECORD : Upload Record %s same as Rev-%s'
-        return repr(msg%(self.recid, self.cur_rev))
+        return msg % (self.recid, self.cur_rev)
 
 
 class InvenioBibUploadConflictingRevisionsError(Exception):
@@ -436,15 +439,21 @@ class InvenioBibUploadConflictingRevisionsError(Exception):
     Exception for conflicting records.
     """
 
-    def __init__(self, recid, tag_list, upload_rev, current_rev):
+    def __init__(self, recid, tag_list, upload_rev, current_rev, up_record, orig_record):
         self.up_rev = upload_rev
         self.cur_rev = current_rev
         self.tags = tag_list
         self.recid = recid
+        self.up_record = up_record
+        self.orig_record = orig_record
 
     def __str__(self):
-        msg = 'CONFLICT : In Record %s between Rev-%s and Rev-%s for Tags : %s'
-        return repr(msg%(self.recid, self.up_rev, self.cur_rev, str(self.tags)))
+        msg = 'CONFLICT : In Record %s between Rev-%s and Rev-%s for Tags:\n' % (self.recid, self.up_rev, self.cur_rev)
+        for tag in self.tags:
+            msg += "  %s ->\n" % tag
+            msg += "     original record: %s\n" % pformat(self.orig_record.get(tag))
+            msg += "     uploaded record: %s\n" % pformat(self.up_record.get(tag))
+        return msg
 
 
 class InvenioBibUploadInvalidRevisionError(Exception):
@@ -458,7 +467,7 @@ class InvenioBibUploadInvalidRevisionError(Exception):
 
     def __str__(self):
         msg = 'INVALID REVISION : %s for Record %s not in Archive.'
-        return repr(msg%(self.upload_rev, self.recid))
+        return msg % (self.upload_rev, self.recid)
 
 
 class InvenioBibUploadMissing005Error(Exception):
