@@ -47,6 +47,7 @@ from invenio.config import CFG_PYLIBDIR, \
     CFG_FLASK_CACHE_TYPE, CFG_FLASK_DISABLED_BLUEPRINTS, \
     CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_FLASK_SERVE_STATIC_FILES, \
     CFG_SITE_SECRET_KEY, CFG_BINDIR
+from invenio.importutils import autodiscover_modules
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY
 
@@ -456,34 +457,35 @@ def create_invenio_flask_app(**kwargs_config):
             context.update(func())
         return context
 
-    def _invenio_blueprint_plugin_builder(plugin_name, plugin_code):
+    def _invenio_blueprint_plugin_builder(plugin):
         """
         Handy function to bridge pluginutils with (Invenio) blueprints.
         """
-        if plugin_name in CFG_FLASK_DISABLED_BLUEPRINTS:
-            raise ValueError('%s is excluded by CFG_FLASK_DISABLED_BLUEPRINTS' % plugin_name)
+        if plugin.__name__ in CFG_FLASK_DISABLED_BLUEPRINTS or \
+           plugin.__name__.split('.')[-1] in CFG_FLASK_DISABLED_BLUEPRINTS:
+            _app.logger.info('%s is excluded by CFG_FLASK_DISABLED_BLUEPRINTS' % plugin_name)
+            return
         from invenio.webinterface_handler_flask_utils import InvenioBlueprint
-        if 'blueprint' in dir(plugin_code):
-            candidate = getattr(plugin_code, 'blueprint')
+        if 'blueprint' in dir(plugin):
+            candidate = getattr(plugin, 'blueprint')
             if isinstance(candidate, InvenioBlueprint):
                 return candidate
-        raise ValueError('%s is not a valid blueprint plugin' % plugin_name)
+        _app.logger.error('%s is not a valid blueprint plugin' % plugin_name)
 
-## Let's load all the blueprints that are composing this Invenio instance
-    _BLUEPRINTS = PluginContainer(
-        os.path.join(CFG_PYLIBDIR, 'invenio', '*_blueprint.py'),
-        plugin_builder=_invenio_blueprint_plugin_builder)
 
-## Let's report about broken plugins
-    open(join(CFG_LOGDIR, 'broken-blueprints.log'), 'w').write(
-        pformat(_BLUEPRINTS.get_broken_plugins()))
+    ## Let's load all the blueprints that are composing this Invenio instance
+    _BLUEPRINTS = [m for m in map(_invenio_blueprint_plugin_builder,
+                      autodiscover_modules(['invenio'],
+                                           related_name_re='.+_blueprint.py',
+                                           ignore_exceptions=True))
+                   if m is not None]
 
     _app.config['breadcrumbs_map'] = {}
     _app.config['menubuilder_map'] = {}
 
-## Let's attach all the blueprints
+    ## Let's attach all the blueprints
     from invenio.webinterface_handler_flask_utils import _
-    for plugin in _BLUEPRINTS.values():
+    for plugin in _BLUEPRINTS:
         _app.register_blueprint(plugin)
         if plugin.config:
             ## Let's include the configuration parameters of the config file.
