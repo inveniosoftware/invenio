@@ -218,7 +218,7 @@ class LazyTemplateContextFunctionsCache(object):
     @cached_property
     def template_context_functions(self):
         """Returns template context functions"""
-        modules = autodiscover_modules(['invenio.template_context_functions'], 'bfn_.+')
+        modules = autodiscover_modules(['invenio.template_context_functions'], 'tfn_.+')
         elem = {}
         for m in modules:
             register_func = getattr(m, 'template_context_function', None)
@@ -257,10 +257,10 @@ class LazyTemplateContextFunctionsCache(object):
             return _bfe_element
 
         # Old bibformat templates
-        bfn_from_files = dict((name.lower(), insert(name.lower()))
+        tfn_from_files = dict((name.lower(), insert(name.lower()))
                               for name in self.bibformat_elements.keys())
         # Update with new template context functions
-        bfn_from_files.update(self.template_context_functions)
+        tfn_from_files.update(self.template_context_functions)
 
         bfe_from_tags = {}
         if has_app_context():
@@ -274,7 +274,7 @@ class LazyTemplateContextFunctionsCache(object):
                                                  db.session.query(Tag.name).all()))
 
         # overwrite functions from tag table with functions from files
-        bfe_from_tags.update(bfn_from_files)
+        bfe_from_tags.update(tfn_from_files)
         return bfe_from_tags
 
 TEMPLATE_CONTEXT_FUNCTIONS_CACHE = LazyTemplateContextFunctionsCache()

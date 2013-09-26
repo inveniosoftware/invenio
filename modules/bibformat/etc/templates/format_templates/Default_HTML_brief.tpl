@@ -70,7 +70,7 @@
       {% endif %}
 
       {# WebTags #}
-      {{ bfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('|') }}
+      {{ tfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('|') }}
     </p>
     {% if record.get('number_of_authors', 0) > number_of_displayed_authors %}
     {% set sep = joiner("; ") %}
@@ -91,7 +91,7 @@
 {% endmacro %}
 
 {% macro render_fulltext_snippets() %}
-  {{ bfn_get_fulltext_snippets(record['recid'], request.args['p'], current_user) | wrap(prefix='<p><small>', suffix='</small></p>') }}
+  {{ tfn_get_fulltext_snippets(record['recid'], request.args['p'], current_user) | wrap(prefix='<p><small>', suffix='</small></p>') }}
 {% endmacro %}
 
 {% macro record_info() %}

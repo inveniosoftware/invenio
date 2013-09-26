@@ -21,7 +21,7 @@
 {%- endif -%}
 
 {% block search_results %}
-  {{ bfn_summarize_records(recids, of=request.args.get('of', 'hcs'), ln=g.ln,
+  {{ tfn_summarize_records(recids, of=request.args.get('of', 'hcs'), ln=g.ln,
                            searchpattern=request.args.get('p', ''),
                            searchfield=request.args.get('f', '')) }}
 {% endblock search_results %}
