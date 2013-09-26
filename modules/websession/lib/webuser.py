@@ -64,6 +64,7 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_URL, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+     CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
      CFG_CERN_SITE, \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
 try:
@@ -464,9 +465,13 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
         elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
             activated = 0 # Administrator confirmation required
 
-
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
-            address_activation_key = mail_cookie_create_mail_activation(email)
+            address_activation_key = mail_cookie_create_mail_activation(
+                email,
+                cookie_timeout=datetime.timedelta(
+                    days=CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
+                )
+            )
             ip_address = req.remote_host or req.remote_ip
             try:
                 if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
