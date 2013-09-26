@@ -45,7 +45,6 @@ from invenio.textutils import \
      translate_to_ascii, \
      strip_accents, \
      transliterate_ala_lc, \
-     remove_control_characters, \
      escape_latex
 
 from invenio.testutils import make_test_suite, run_test_suite
