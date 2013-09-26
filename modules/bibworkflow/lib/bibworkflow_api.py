@@ -21,26 +21,23 @@ BibWorkflow API - functions to run workflows
 
 import os
 from pprint import pformat
+from werkzeug.utils import import_string
 from invenio.config import CFG_BIBWORKFLOW_WORKER
 from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
+from invenio.errorlib import register_exception
 import cPickle
-from invenio.pluginutils import PluginContainer
 
 
 USE_TASK_QUEUE = False
 
 if CFG_BIBWORKFLOW_WORKER:
-    worker_plugin_path = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibworkflow',
-                                      'workers', '*.py')
-    workers = PluginContainer(worker_plugin_path, exception_registration=False)
     try:
-        WORKER = workers.get_enabled_plugins()[CFG_BIBWORKFLOW_WORKER]
+        WORKER = import_string('invenio.bibworkflow.workers.%s:%s' % (
+            CFG_BIBWORKFLOW_WORKER, CFG_BIBWORKFLOW_WORKER))
         USE_TASK_QUEUE = True
-    except KeyError:
-        print 'Could not load Worker'
+    except:
         ## Let's report about broken plugins
-        open(os.path.join(CFG_LOGDIR, 'broken-bibworkflow-workers.log'), 'w').\
-            write(pformat(workers.get_broken_plugins()))
+        register_exception(alert_admin=True)
 
 
 def run(wname, data, task_queue=USE_TASK_QUEUE, external_save=None):
