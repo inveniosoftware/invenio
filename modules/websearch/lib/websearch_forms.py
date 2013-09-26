@@ -23,19 +23,20 @@ from flask import url_for
 from invenio.webinterface_handler_flask_utils import _
 from invenio.bibknowledge import get_kb_mappings
 from invenio.wtforms_utils import InvenioBaseForm, AutocompleteField, \
-                    RowWidget
+    RowWidget
 from wtforms import TextField
-from wtforms import FormField, SelectField
+from wtforms import FormField, SelectField, SelectMultipleField
 from wtforms import Form as WTFormDefault
-from wtforms.ext.sqlalchemy.fields import QuerySelectField, \
-    QuerySelectMultipleField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 
 
 class JournalForm(WTFormDefault):
-    name = QuerySelectField('',
-            get_pk=lambda i: i['key'],
-            get_label=lambda i: i['value'],
-            query_factory=lambda: [{'key':'', 'value':_('Any journal')}] + get_kb_mappings('EJOURNALS'))
+    name = QuerySelectField(
+        '',
+        get_pk=lambda i: i['key'],
+        get_label=lambda i: i['value'],
+        query_factory=lambda: [{'key': '', 'value': _('Any journal')}] +
+                              get_kb_mappings('EJOURNALS'))
     vol = TextField(_('Vol'))
     page = TextField(_('Pg'))
 
@@ -56,10 +57,14 @@ class EasySearchForm(InvenioBaseForm):
     journal = FormField(JournalForm, widget=RowWidget())
 
 
-def get_collection():
-    from invenio.websearch_model import Collection
-    collections = Collection.query.all()
-    return [coll for coll in collections if not coll.is_restricted]
+class GetCollections(object):
+    def __iter__(self):
+        from invenio.websearch_model import Collection
+        collections = Collection.query.all()
+
+        for coll in collections:
+            if not coll.is_restricted:
+                yield (coll.name, coll.name_ln)
 
 
 class WebSearchUserSettingsForm(InvenioBaseForm):
@@ -67,6 +72,5 @@ class WebSearchUserSettingsForm(InvenioBaseForm):
                     choices=[('10', '10'), ('25', '25'), ('50', '50'), ('100', '100')])
     websearch_hotkeys = SelectField(_('Hotkeys'), choices=[('0', _('Disable')),
                                                            ('1', _('Enable'))])
-    c = QuerySelectMultipleField(_('Collections'), query_factory=get_collection,
-                                 get_pk=lambda c: c.name,
-                                 get_label=lambda c: c.name_ln)
+
+    c = SelectMultipleField(_('Collections'), choices=GetCollections())

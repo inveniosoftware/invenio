@@ -45,7 +45,8 @@ from invenio.testutils import make_test_suite, \
                               run_test_suite, \
                               nottest, \
                               make_url, make_surl, test_web_page_content, \
-                              merge_error_messages, InvenioTestCase
+                              merge_error_messages, InvenioTestCase, \
+                              get_authenticated_mechanize_browser
 from invenio.urlutils import same_urls_p
 from invenio.dbquery import run_sql
 from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
@@ -2829,6 +2830,54 @@ class WebSearchExactTitleIndexTest(InvenioTestCase):
             self.fail(merge_error_messages(error_messages))
 
 
+class WebSearchUserSettingsTest(InvenioTestCase):
+    """Checks WebSearch User Settings form"""
+
+    def test_multiple_collection_settings(self):
+        """websearch - check webaccount settings multiple collection manipulation"""
+        from invenio.sqlalchemyutils import db
+        from invenio.websession_model import User
+        edit_url = url_for("webaccount.edit", name="WebSearchSettings", _external=True, _scheme='https')
+        admin = User.query.get(1)
+        settings = dict(admin.settings)
+        db.session.expunge_all()
+
+        # Login admin user
+        browser = get_authenticated_mechanize_browser("admin", "")
+        browser.open(edit_url)
+        browser.select_form(nr=0)
+        browser.form['c'] = ['ALEPH', 'ALEPH Papers']
+        browser.submit()
+
+        admin = User.query.get(1)
+        self.assertEqual(admin.settings.get('c'), ['ALEPH', 'ALEPH Papers'])
+        admin.settings = settings
+        db.session.merge(admin)
+        db.session.commit()
+
+    def test_single_collection_settings(self):
+        """websearch - check webaccount settings single collection manipulation"""
+        from invenio.sqlalchemyutils import db
+        from invenio.websession_model import User
+        edit_url = url_for("webaccount.edit", name="WebSearchSettings", _external=True, _scheme='https')
+        admin = User.query.get(1)
+        settings = dict(admin.settings)
+        db.session.expunge_all()
+
+        # Login admin user
+        browser = get_authenticated_mechanize_browser("admin", "")
+        browser.open(edit_url)
+        browser.select_form(nr=0)
+        browser.form['c'] = ['ALEPH']
+        browser.submit()
+
+        admin = User.query.get(1)
+        self.assertEqual(admin.settings.get('c'), ['ALEPH'])
+        admin.settings = settings
+        db.session.merge(admin)
+        db.session.commit()
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -2872,7 +2921,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchAuthorCountQueryTest,
                              WebSearchPerformRequestSearchRefactoringTest,
                              WebSearchGetRecordTests,
-                             WebSearchExactTitleIndexTest)
+                             WebSearchExactTitleIndexTest,
+                             WebSearchUserSettingsTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

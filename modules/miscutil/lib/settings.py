@@ -26,6 +26,7 @@ from invenio.sqlalchemyutils import db
 from invenio.websession_model import User
 from invenio.webuser_flask import current_user, login_user, logout_user
 
+
 class Storage(object):
     """
     Generic storage engine for settings.
@@ -53,16 +54,11 @@ class Storage(object):
         """
         Stores data in storage system.
 
-        @param data: multivalue dictionary.
-        For keys with only one value in the value list it stores this single
-        value instead of whole list.
+        @param data: Stores data provided by the form
+        @type data: dict
         """
-        self._data.update(map(
-            lambda (k,v): (k, v[0] if len(v) == 1 else v),
-            filter(
-                lambda (k,v): k in self._keys,
-                data.lists()
-            )))
+        self._data.update(
+            [(k, v) for (k, v) in data.items() if k in self._keys])
 
     def save(self):
         """
@@ -169,4 +165,15 @@ class Settings(object):
         """
         self.storage.save()
 
+    def build_form(self):
+        if not self.form_builder:
+            return None
 
+        data = self.load()
+        form = self.form_builder()
+
+        for key in self.keys:
+            if data.get(key) is not None:
+                form[key].data = data[key]
+
+        return form

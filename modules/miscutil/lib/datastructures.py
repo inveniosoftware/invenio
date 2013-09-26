@@ -19,6 +19,7 @@
 Invenio special data structures
 """
 
+
 class LazyDict(object):
     """
     Lazy dictionary that evaluates its content when it is first accessed.
@@ -95,6 +96,7 @@ class LazyDict(object):
         except KeyError:
             return default
 
+
 class LaziestDict(LazyDict):
     """
     Even lazier dictionary (maybe the laziest), it doesn't have content
@@ -147,3 +149,7 @@ class LaziestDict(LazyDict):
                 return False
         return True
 
+
+def flatten_multidict(multidict):
+    return dict([(key, value if len(value) > 1 else value[0])
+                for (key, value) in multidict.iterlists()])

@@ -37,6 +37,7 @@ from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.errorlib import register_exception
+from invenio.datastructures import flatten_multidict
 ## TODO for future reimplementation of stream_file
 #from invenio.bibdocfile import StreamFileException
 from flask import request, after_this_request
@@ -131,8 +132,8 @@ class SimulatedModPythonRequest(object):
     def get_post_form(self):
         """ Returns only POST form. """
         self.__tainted = True
-        form = dict(map(lambda (k, x): (k, x if len(x) > 1 else x[0]),
-                        request.values.to_dict(flat=False).iteritems()))
+        form = flatten_multidict(request.values)
+
         if request.files:
             form.update(request.files.to_dict())
         return form

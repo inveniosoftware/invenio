@@ -19,18 +19,18 @@
 
 """WebSearch User Settings"""
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
+from flask import url_for
 from invenio.webinterface_handler_flask_utils import _
 from invenio.sqlalchemyutils import db
 from invenio.jinja2utils import render_template_to_string
-from invenio.websearch_model import WebQuery, UserQuery
+from invenio.websearch_model import UserQuery
 from invenio.websearch_forms import WebSearchUserSettingsForm
 from invenio.webuser_flask import current_user
-from invenio.settings import Settings, UserSettingsStorage, \
-                             ModelSettingsStorageBuilder
+from invenio.settings import Settings, UserSettingsStorage
+
 
 class WebSearchSettings(Settings):
+    """WebSearch User Settings"""
 
     keys = ['rg', 'websearch_hotkeys', 'c']
     form_builder = WebSearchUserSettingsForm
@@ -44,6 +44,7 @@ class WebSearchSettings(Settings):
         self.edit = url_for('webaccount.edit', name=self.name)
 
     def widget(self):
+        """Displays search settings widget."""
         uid = current_user.get_id()
         queries = db.session.query(db.func.count(UserQuery.id_query)).filter(
             UserQuery.id_user == uid

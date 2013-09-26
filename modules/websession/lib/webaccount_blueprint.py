@@ -37,7 +37,7 @@ from invenio.config import \
     CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
-from invenio.datastructures import LazyDict
+from invenio.datastructures import LazyDict, flatten_multidict
 from invenio.importutils import autodiscover_modules
 from invenio.sqlalchemyutils import db
 from invenio.webaccount_forms import LoginForm, RegisterForm
@@ -277,7 +277,14 @@ def edit(name):
             form = plugin.form_builder(request.form)
 
         if not form or form.validate():
-            plugin.store(request.form)
+            if form:
+                # use the form to interpret data
+                settings_data = form.data
+            else:
+                # no form provided, save the POST request values
+                settings_data = flatten_multidict(request.values)
+
+            plugin.store(settings_data)
             plugin.save()
             flash(_('Data has been saved.'), 'success')
             return redirect(url_for('.index'))
@@ -286,7 +293,7 @@ def edit(name):
 
     # get post data or load data from settings
     if not form and plugin.form_builder:
-        form = plugin.form_builder(MultiDict(plugin.load()))
+        form = plugin.build_form()
 
     return render_template(getattr(plugin, 'edit_template', '') or
                            'webaccount_edit.html', plugin=plugin, form=form)
