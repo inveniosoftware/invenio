@@ -168,11 +168,10 @@ install-jquery-plugins:
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
 	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
 	unzip jquery.tablesorter.zip -d tablesorter && \
-	wget http://keith-wood.name/zip/jquery.bookmark.package-1.4.0.zip && \
-	wget http://labs.abeautifulsite.net/archived/jquery-fileTree/jquery.fileTree-1.01.zip && \
+	wget http://invenio-software.org/download/jquery/jquery.fileTree-1.01.zip && \
 	unzip jquery.fileTree-1.01.zip && \
 	rm jquery.fileTree-1.01.zip && \
-	wget http://www.datatables.net/download/build/ColVis.min.js && \
+	wget http://invenio-software.org/download/jquery/ColVis.min.js && \
 	mv ColVis.min.js jquery.dataTables.ColVis.min.js && \
 	rm jquery.tablesorter.zip && \
 	rm -rf uploadify && \
