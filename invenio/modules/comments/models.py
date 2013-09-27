@@ -24,10 +24,8 @@ WebComment database models.
 # General imports.
 from sqlalchemy import event
 from invenio.ext.sqlalchemy import db
-from flask.ext.login import current_user
 
 # Create your models here.
-
 from invenio.modules.records.models import Record as Bibrec
 from invenio.modules.accounts.models import User
 from invenio.base.signals import record_after_update
@@ -156,12 +154,6 @@ class CmtSUBSCRIPTION(db.Model):
 
     bibrec = db.relationship(Bibrec)
     user = db.relationship(User, backref='comment_subscriptions')
-    user_commented_records = db.relationship(
-        Bibrec, backref='user_comment_subscritions',
-        primaryjoin=lambda: db.and_(
-            CmtSUBSCRIPTION.id_bibrec == Bibrec.id,
-            CmtSUBSCRIPTION.id_user == current_user.get_id()
-        ), viewonly=True)
 
 
 class CmtCOLLAPSED(db.Model):
