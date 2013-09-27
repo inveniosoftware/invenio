@@ -84,7 +84,8 @@ from invenio.oai_harvest_utils import get_nb_records_in_file, \
                                       find_matching_files, \
                                       translate_fieldvalues_from_latex, \
                                       compare_timestamps_with_tolerance, \
-                                      generate_harvest_report
+                                      generate_harvest_report, \
+                                      record_collect_oai_identifiers
 from invenio.webuser import email_valid_p
 from invenio.mailutils import send_email
 
@@ -209,7 +210,6 @@ def task_run_core():
         for fun in post_process_functions:
             active_files_list, error_code = fun(repository=repository, \
                                                 active_files_list=active_files_list, \
-                                                harvested_identifier_list=harvested_identifier_list, \
                                                 downloaded_material_dict=downloaded_material_dict, \
                                                 uploaded_task_ids=uploaded_task_ids)
             if error_code:
@@ -453,7 +453,7 @@ def convert_step(repository, active_files_list, *args, **kwargs):
     return updated_files_list, final_exit_code
 
 
-def plotextract_step(repository, active_files_list, harvested_identifier_list, downloaded_material_dict, *args, **kwargs):
+def plotextract_step(repository, active_files_list, downloaded_material_dict, *args, **kwargs):
     """
     Performs the plotextraction step.
     """
@@ -470,7 +470,6 @@ def plotextract_step(repository, active_files_list, harvested_identifier_list, d
     updated_files_list = []
     i = 0
     for active_file in active_files_list:
-        identifiers = harvested_identifier_list[i]
         i += 1
         task_sleep_now_if_required()
         task_update_progress("Extracting plots from harvested material from %s (%i/%i)" % \
@@ -479,7 +478,6 @@ def plotextract_step(repository, active_files_list, harvested_identifier_list, d
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_plotextractor(active_file,
                                                  updated_file,
-                                                 identifiers,
                                                  downloaded_material_dict,
                                                  repository["arguments"]['p_extraction-source'],
                                                  repository["id"])
@@ -499,7 +497,7 @@ def plotextract_step(repository, active_files_list, harvested_identifier_list, d
     return updated_files_list, final_exit_code
 
 
-def refextract_step(repository, active_files_list, harvested_identifier_list, downloaded_material_dict, *args, **kwargs):
+def refextract_step(repository, active_files_list, downloaded_material_dict, *args, **kwargs):
     """
     Performs the reference extraction step.
     """
@@ -508,7 +506,6 @@ def refextract_step(repository, active_files_list, harvested_identifier_list, do
     i = 0
     write_message("refextraction step started")
     for active_file in active_files_list:
-        identifiers = harvested_identifier_list[i]
         i += 1
         task_sleep_now_if_required()
         task_update_progress("Extracting references from material harvested from %s (%i/%i)" % \
@@ -517,7 +514,6 @@ def refextract_step(repository, active_files_list, harvested_identifier_list, do
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_refextract(active_file,
                                               updated_file,
-                                              identifiers,
                                               downloaded_material_dict,
                                               repository["arguments"],
                                               repository["id"])
@@ -537,7 +533,7 @@ def refextract_step(repository, active_files_list, harvested_identifier_list, do
     return updated_files_list, final_exit_code
 
 
-def authorlist_step(repository, active_files_list, harvested_identifier_list, downloaded_material_dict, *args, **kwargs):
+def authorlist_step(repository, active_files_list, downloaded_material_dict, *args, **kwargs):
     """
     Performs the special authorlist extraction step (Mostly INSPIRE/CERN related).
     """
@@ -546,7 +542,6 @@ def authorlist_step(repository, active_files_list, harvested_identifier_list, do
     final_exit_code = 0
     i = 0
     for active_file in active_files_list:
-        identifiers = harvested_identifier_list[i]
         i += 1
         task_sleep_now_if_required()
         task_update_progress("Extracting any authorlists from material harvested from %s (%i/%i)" % \
@@ -555,7 +550,6 @@ def authorlist_step(repository, active_files_list, harvested_identifier_list, do
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_authorlist_extract(active_file,
                                                       updated_file,
-                                                      identifiers,
                                                       downloaded_material_dict,
                                                       repository["arguments"].get('a_rt-queue', ""),
                                                       repository["arguments"].get('a_stylesheet', "authorlist2marcxml.xsl"),
@@ -576,7 +570,7 @@ def authorlist_step(repository, active_files_list, harvested_identifier_list, do
     return updated_files_list, final_exit_code
 
 
-def fulltext_step(repository, active_files_list, harvested_identifier_list, downloaded_material_dict, *args, **kwargs):
+def fulltext_step(repository, active_files_list, downloaded_material_dict, *args, **kwargs):
     """
     Performs the fulltext download step.
     """
@@ -585,7 +579,6 @@ def fulltext_step(repository, active_files_list, harvested_identifier_list, down
     final_exit_code = 0
     i = 0
     for active_file in active_files_list:
-        identifiers = harvested_identifier_list[i]
         i += 1
         task_sleep_now_if_required()
         task_update_progress("Attaching fulltext to records harvested from %s (%i/%i)" % \
@@ -594,7 +587,6 @@ def fulltext_step(repository, active_files_list, harvested_identifier_list, down
         updated_files_list.append(updated_file)
         (exitcode, err_msg) = call_fulltext(active_file,
                                             updated_file,
-                                            identifiers,
                                             downloaded_material_dict,
                                             repository["arguments"].get('t_doctype', ""),
                                             repository["id"])
@@ -757,7 +749,7 @@ def call_bibconvert(config, harvestpath, convertpath):
                           args=(CFG_BINDIR, config, harvestpath), filename_out=convertpath)
     return (exitcode, cmd_stderr)
 
-def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
+def call_plotextractor(active_file, extracted_file,
                        downloaded_files, plotextractor_types, source_id):
     """
     Function that generates proper MARCXML containing harvested plots for
@@ -765,7 +757,6 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
 
     @param active_file: path to the currently processed file
     @param extracted_file: path to the file where the final results will be saved
-    @param harvested_identifier_list: list of OAI identifiers for this active_file
     @param downloaded_files: dict of identifier -> dict mappings for downloaded material.
     @param plotextractor_types: list of names of which plotextractor(s) to use (latex or pdf)
         (pdf is currently ignored).
@@ -784,11 +775,18 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
     record_xmls = REGEXP_RECORD.findall(records)
     updated_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     updated_xml.append('<collection>')
-    i = 0
     for record_xml in record_xmls:
         current_exitcode = 0
-        identifier = harvested_identifier_list[i]
-        i += 1
+
+        id_list = record_collect_oai_identifiers("<record>" + record_xml + "</record>")
+        # We bet on the first one.
+        identifier = None
+        for oai_id in id_list:
+            if "oai" in oai_id.lower():
+                identifier = oai_id
+                break
+        write_message("OAI identifier found in record: %s" % (identifier,), verbose=6)
+
         if identifier not in downloaded_files:
             downloaded_files[identifier] = {}
         updated_xml.append("<record>")
@@ -829,7 +827,7 @@ def call_plotextractor(active_file, extracted_file, harvested_identifier_list, \
         return exitcode, "\n".join(all_err_msg)
     return exitcode, ""
 
-def call_refextract(active_file, extracted_file, harvested_identifier_list,
+def call_refextract(active_file, extracted_file,
                     downloaded_files, arguments, source_id):
     """
     Function that calls refextractor to extract references and attach them to
@@ -838,7 +836,6 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
 
     @param active_file: path to the currently processed file
     @param extracted_file: path to the file where the final results will be saved
-    @param harvested_identifier_list: list of OAI identifiers for this active_file
     @param downloaded_files: dict of identifier -> dict mappings for downloaded material.
     @param arguments: dict of post-process arguments.
                       r_format, r_kb-journal-file, r_kb-rep-no-file
@@ -868,11 +865,18 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
     record_xmls = REGEXP_RECORD.findall(records)
     updated_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     updated_xml.append('<collection>')
-    i = 0
     for record_xml in record_xmls:
         current_exitcode = 0
-        identifier = harvested_identifier_list[i]
-        i += 1
+
+        id_list = record_collect_oai_identifiers("<record>" + record_xml + "</record>")
+        # We bet on the first one.
+        identifier = None
+        for oai_id in id_list:
+            if "oai" in oai_id.lower():
+                identifier = oai_id
+                break
+        write_message("OAI identifier found in record: %s" % (identifier,), verbose=6)
+
         if identifier not in downloaded_files:
             downloaded_files[identifier] = {}
         updated_xml.append("<record>")
@@ -909,7 +913,7 @@ def call_refextract(active_file, extracted_file, harvested_identifier_list,
         return exitcode, "\n".join(all_err_msg)
     return exitcode, ""
 
-def call_authorlist_extract(active_file, extracted_file, harvested_identifier_list,
+def call_authorlist_extract(active_file, extracted_file,
                             downloaded_files, queue, stylesheet, source_id):
     """
     Function that will look in harvested tarball for any authorlists. If found
@@ -920,9 +924,6 @@ def call_authorlist_extract(active_file, extracted_file, harvested_identifier_li
 
     @param extracted_file: path to the file where the final results will be saved
     @type extracted_file: string
-
-    @param harvested_identifier_list: list of OAI identifiers for this active_file
-    @type harvested_identifier_list: list
 
     @param downloaded_files: dict of identifier -> dict mappings for downloaded material.
     @type downloaded_files: dict
@@ -948,17 +949,23 @@ def call_authorlist_extract(active_file, extracted_file, harvested_identifier_li
     record_xmls = REGEXP_RECORD.findall(records)
     updated_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     updated_xml.append('<collection>')
-    i = 0
     for record_xml in record_xmls:
         current_exitcode = 0
-        identifier = harvested_identifier_list[i]
-        i += 1
         if not oaiharvest_templates.tmpl_should_process_record_with_mode(record_xml, 'p', source_id):
             # We skip this record
             updated_xml.append("<record>")
             updated_xml.append(record_xml)
             updated_xml.append("</record>")
             continue
+
+        id_list = record_collect_oai_identifiers("<record>" + record_xml + "</record>")
+        # We bet on the first one.
+        identifier = None
+        for oai_id in id_list:
+            if "oai" in oai_id.lower():
+                identifier = oai_id
+                break
+        write_message("OAI identifier found in record: %s" % (identifier,), verbose=6)
 
         # Grab BibRec instance of current record for later amending
         existing_record, status_code, dummy1 = create_record("<record>%s</record>" % (record_xml,))
@@ -1030,7 +1037,7 @@ def call_authorlist_extract(active_file, extracted_file, harvested_identifier_li
         return exitcode, "\n".join(all_err_msg)
     return exitcode, ""
 
-def call_fulltext(active_file, extracted_file, harvested_identifier_list,
+def call_fulltext(active_file, extracted_file,
                   downloaded_files, doctype, source_id):
     """
     Function that calls attach FFT tag for a downloaded file to harvested records.
@@ -1038,7 +1045,6 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
 
     @param active_file: path to the currently processed file
     @param extracted_file: path to the file where the final results will be saved
-    @param harvested_identifier_list: list of OAI identifiers for this active_file
     @param downloaded_files: dict of identifier -> dict mappings for downloaded material.
     @param doctype: doctype of downloaded file in BibDocFile
     @param source_id: the repository identifier
@@ -1056,11 +1062,18 @@ def call_fulltext(active_file, extracted_file, harvested_identifier_list,
     record_xmls = REGEXP_RECORD.findall(records)
     updated_xml = ['<?xml version="1.0" encoding="UTF-8"?>']
     updated_xml.append('<collection>')
-    i = 0
     for record_xml in record_xmls:
         current_exitcode = 0
-        identifier = harvested_identifier_list[i]
-        i += 1
+
+        id_list = record_collect_oai_identifiers("<record>" + record_xml + "</record>")
+        # We bet on the first one.
+        identifier = None
+        for oai_id in id_list:
+            if "oai" in oai_id.lower():
+                identifier = oai_id
+                break
+        write_message("OAI identifier found in record: %s" % (identifier,), verbose=6)
+
         if identifier not in downloaded_files:
             downloaded_files[identifier] = {}
         updated_xml.append("<record>")

@@ -30,9 +30,12 @@ import calendar
 import traceback
 
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, \
-                           CFG_SITE_ADMIN_EMAIL
+                           CFG_SITE_ADMIN_EMAIL, \
+                           CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.bibrecord import record_get_field_instances, \
-                              record_modify_subfield
+                              record_modify_subfield, \
+                              create_record, \
+                              record_get_field_values
 from invenio.shellutils import run_shell_command
 from invenio.textutils import translate_latex2unicode
 from invenio.bibtask import write_message
@@ -76,6 +79,36 @@ def collect_identifiers(harvested_file_list):
         data = fd_active.read()
         fd_active.close()
         result.append(REGEXP_OAI_ID.findall(data))
+    return result
+
+
+def record_collect_oai_identifiers(record_xml):
+    """
+    Collects all OAI identifiers from given MARCXML.
+
+    Returns a list of found values in the tag
+    CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG.
+
+    @param record_xml: string containing MARCXML to parse
+
+    @return list of identifiers
+    """
+    result = None
+    (record, status_code, list_of_errors) = create_record(record_xml)
+    if not status_code:
+        # Error happened
+        write_message("Error collecting OAI identifier from record: %s" %
+                     ("\n".join(list_of_errors),))
+    else:
+        # All OK! We can get the IDs
+        result = record_get_field_values(record,
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:3],
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3],
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4],
+                                         CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5])
+        if not result:
+            # No IDs found..
+            write_message("No OAI IDs found in record")
     return result
 
 
