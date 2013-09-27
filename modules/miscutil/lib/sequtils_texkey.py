@@ -283,7 +283,10 @@ def task_run_core():
             try:
                 value = field_get_subfield_values(instance, "z")[0]
             except IndexError:
-                value = ""
+                try:
+                    value = field_get_subfield_values(instance, "a")[0]
+                except IndexError:
+                    value = ""
             provenances = ["SPIRESTeX", "INSPIRETeX"]
             if provenance in provenances and value:
                 has_texkey = True
