@@ -40,14 +40,14 @@ from mechanize import Browser, LinkNotFoundError, HTTPError
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG, \
     CFG_SITE_RECORD, CFG_SITE_LANGS, \
     CFG_SITE_SECURE_URL, CFG_WEBSEARCH_SPIRES_SYNTAX
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, \
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, \
                               run_test_suite, \
                               nottest, \
                               make_url, make_surl, test_web_page_content, \
                               merge_error_messages, InvenioTestCase, \
                               get_authenticated_mechanize_browser
-from invenio.urlutils import same_urls_p
+from invenio.utils.url import same_urls_p
 from invenio.dbquery import run_sql
 from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
 
@@ -4787,8 +4787,8 @@ class WebSearchUserSettingsTest(InvenioTestCase):
 
     def test_multiple_collection_settings(self):
         """websearch - check webaccount settings multiple collection manipulation"""
-        from invenio.sqlalchemyutils import db
-        from invenio.websession_model import User
+        from invenio.ext.sqlalchemy import db
+        from invenio.modules.accounts.models import User
         edit_url = url_for("webaccount.edit", name="WebSearchSettings", _external=True, _scheme='https')
         admin = User.query.get(1)
         settings = dict(admin.settings)
@@ -4809,8 +4809,8 @@ class WebSearchUserSettingsTest(InvenioTestCase):
 
     def test_single_collection_settings(self):
         """websearch - check webaccount settings single collection manipulation"""
-        from invenio.sqlalchemyutils import db
-        from invenio.websession_model import User
+        from invenio.ext.sqlalchemy import db
+        from invenio.modules.accounts.models import User
         edit_url = url_for("webaccount.edit", name="WebSearchSettings", _external=True, _scheme='https')
         admin = User.query.get(1)
         settings = dict(admin.settings)

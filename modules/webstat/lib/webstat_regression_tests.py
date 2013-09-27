@@ -25,7 +25,7 @@ from invenio.testutils import InvenioTestCase
 
 from invenio.config import CFG_SITE_URL, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
      test_web_page_content, merge_error_messages
 
 

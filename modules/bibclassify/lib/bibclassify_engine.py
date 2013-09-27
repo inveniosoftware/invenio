@@ -49,14 +49,14 @@ from invenio import bibclassify_keyword_analyzer as keyworder
 from invenio import bibclassify_acronym_analyzer as acronymer
 
 try:
-    from invenio.urlutils import make_user_agent_string
+    from invenio.utils.url import make_user_agent_string
 except ImportError:
     ## Not in Invenio, we simply use default agent
     def make_user_agent_string(component=None):
         return bconfig.CFG_BIBCLASSIFY_USER_AGENT
 
 try:
-    from invenio.textutils import encode_for_xml
+    from invenio.utils.text import encode_for_xml
 except ImportError:
     ## Not in Invenio, we use a simple workaround
     encode_for_xml = lambda text: text.replace('&', '&amp;').replace('<', '&lt;')

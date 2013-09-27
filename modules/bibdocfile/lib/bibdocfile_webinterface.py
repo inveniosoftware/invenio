@@ -32,7 +32,7 @@ from invenio.bibdocfile_config import CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_DOCTY
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_MISC, \
      CFG_BIBDOCFILE_DOCUMENT_FILE_MANAGER_RESTRICTIONS, \
      CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.access_control_engine import acc_authorize_action
@@ -43,8 +43,8 @@ from invenio.webuser import getUid, page_not_authorized, collect_user_info, isUs
                             isGuestUser
 from invenio import webjournal_utils
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import make_canonical_urlargd, redirect_to_url
-from invenio.messages import gettext_set_language
+from invenio.utils.url import make_canonical_urlargd, redirect_to_url
+from invenio.base.i18n import gettext_set_language
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, get_colID, record_exists, \
      create_navtrail_links, check_user_can_view_record, record_empty, \

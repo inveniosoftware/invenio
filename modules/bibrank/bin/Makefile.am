@@ -15,8 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibrank bibrankgkb
+bin_SCRIPTS = bibrankgkb
 
-EXTRA_DIST = bibrank.in bibrankgkb.in
+EXTRA_DIST = bibrankgkb.in
 
 CLEANFILES = *~ *.tmp

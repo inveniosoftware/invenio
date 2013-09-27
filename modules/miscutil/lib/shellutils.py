@@ -35,7 +35,6 @@ from itertools import chain
 from cStringIO import StringIO
 import subprocess
 
-from invenio.config import CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT
 
 __all__ = ['run_shell_command',
            'run_process_with_timeout',
@@ -155,7 +154,7 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     return cmd_exit_code, cmd_out, cmd_err
 
 
-def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, cwd=None, timeout=CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT, sudo=None):
+def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, cwd=None, timeout=None, sudo=None):
     """Execute the specified process but within a certain timeout.
 
     @param args: the actuall process. This should be a list of string as in:
@@ -200,6 +199,9 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
 
     @raise Timeout: if the process does not terminate within the timeout
     """
+    if timeout is None:
+        from invenio.config import CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT
+        timeout = CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT
     stdout = stderr = None
     if filename_in is not None:
         stdin = open(filename_in)

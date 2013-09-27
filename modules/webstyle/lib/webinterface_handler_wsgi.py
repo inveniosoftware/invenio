@@ -30,14 +30,14 @@ from urlparse import urlparse, urlunparse
 from wsgiref.util import FileWrapper
 
 from invenio.webinterface_handler_wsgi_utils import table
-from invenio.webinterface_handler_config import \
+from invenio.utils.apache import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE, CFG_SITE_URL, \
     CFG_SITE_SECURE_URL, CFG_WEBSTYLE_REVERSE_PROXY_IPS
 from invenio.errorlib import register_exception
-from invenio.datastructures import flatten_multidict
+from invenio.utils.datastructures import flatten_multidict
 ## TODO for future reimplementation of stream_file
 #from invenio.bibdocfile import StreamFileException
 from flask import request, after_this_request
@@ -576,7 +576,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 form[key] = value
 
         if (CFG_FULL_HTTPS or CFG_HAS_HTTPS_SUPPORT and get_session(req).need_https) and not req.is_https():
-            from invenio.urlutils import redirect_to_url
+            from invenio.utils.url import redirect_to_url
             # We need to isolate the part of the URI that is after
             # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
             original_parts = urlparse(req.unparsed_uri)
@@ -643,9 +643,10 @@ def wsgi_handler_test(port=80):
     Simple WSGI testing environment based on wsgiref.
     """
     check_wsgiref_testing_feasability()
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app(wsgi_serve_static_files=True)
+    from invenio.base.factory import create_app
+    app = create_app(wsgi_serve_static_files=True)
     app.run(debug=True, port=port)
+
 
 def main():
     from optparse import OptionParser

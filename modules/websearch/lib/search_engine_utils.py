@@ -26,7 +26,7 @@ import string
 from invenio.config import CFG_BIBFORMAT_HIDDEN_TAGS
 from invenio.dbquery import run_sql
 from invenio.intbitset import intbitset
-from invenio.cache import cache
+from invenio.ext.cache import cache
 
 def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True, split_by=0):
     """

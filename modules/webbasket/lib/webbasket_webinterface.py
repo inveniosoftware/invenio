@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 
 import os
 import cgi
@@ -29,7 +29,7 @@ from invenio.config import CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
                            CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webbasket import \
@@ -66,7 +66,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_SHARE_LEVELS
 from invenio.webbasket_dblayer import get_basket_name, \
      get_max_user_rights_on_basket
-from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd
+from invenio.utils.url import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception

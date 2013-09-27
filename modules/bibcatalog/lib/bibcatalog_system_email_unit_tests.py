@@ -20,8 +20,7 @@
 
 """Unit tests for bibcatalog_system_email library."""
 
-from invenio.config import CFG_SITE_SUPPORT_EMAIL
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.mailutils_unit_tests import MailTestCase
 
 
@@ -33,6 +32,7 @@ class BibCatalogSystemEmailTest(MailTestCase):
     def setUp(self):
         super(BibCatalogSystemEmailTest, self).setUp()
         from invenio import bibcatalog_system_email
+        from invenio.config import CFG_SITE_SUPPORT_EMAIL
         self.email = bibcatalog_system_email.BibCatalogSystemEmail()
         bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM_TICKETS_EMAIL = CFG_SITE_SUPPORT_EMAIL
         bibcatalog_system_email.CFG_BIBCATALOG_SYSTEM = 'EMAIL'

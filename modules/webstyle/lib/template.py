@@ -23,7 +23,7 @@ import os, sys, inspect, getopt, new, cgi, warnings
 try:
     # This tool can be run before Invenio is installed:
     # invenio files might then not exist.
-    from invenio import config
+    from invenio.base.globals import cfg
     from invenio.config import \
          CFG_WEBSTYLE_TEMPLATE_SKIN, \
          CFG_PREFIX
@@ -110,7 +110,7 @@ def load(module=''):
         except ImportError:
             mymodule = __import__("invenio.%s_templates" % (module), local, local,
                                   ["invenio.templates.%s" % (module)])
-    if 'inspect-templates' in getattr(config, 'CFG_DEVEL_TOOLS', []):
+    if 'inspect-templates' in cfg.get('CFG_DEVEL_TOOLS', []):
         for method_name in dir(mymodule.Template):
             if method_name.startswith('tmpl_'):
                 enhance_method(module, mymodule.Template, method_name, method_wrapper)

@@ -27,7 +27,7 @@ import subprocess
 import re
 from xml.dom import minidom
 
-from invenio.jsonutils import json, json_decode_file
+from invenio.utils.json import json, json_decode_file
 from invenio.bibtask import write_message
 from invenio.bibencode_config import (
                         CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT,

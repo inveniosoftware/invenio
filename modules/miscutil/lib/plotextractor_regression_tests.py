@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import CFG_TMPDIR, CFG_SITE_URL
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class GetDefaultsTest(InvenioTestCase):

@@ -27,7 +27,7 @@ from invenio.config import CFG_TMPDIR
 from invenio.bibfield import get_record, create_record, create_records
 from invenio.dbquery import run_sql
 
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 
 class BibFieldRecordFieldValuesTest(InvenioTestCase):
@@ -53,7 +53,7 @@ class BibFieldRecordFieldValuesTest(InvenioTestCase):
 
     def test_compare_field_values_with_bibrecord_values(self):
         """bibfield - same value as in bibrecord"""
-        from invenio.bibrecord import record_get_field_values
+        from invenio.legacy.bibrecord import record_get_field_values
         from invenio.search_engine import get_record as search_engine_get_record
         record = get_record(1)
         bibrecord_value = record_get_field_values(search_engine_get_record(1), '245', ' ', ' ', 'a')[0]
@@ -269,7 +269,7 @@ class BibFieldLegacyTests(InvenioTestCase):
     def test_get_legacy_recstruct(self):
         """bibfield - legacy functions"""
         from invenio.search_engine import get_record as search_engine_get_record
-        from invenio.bibrecord import record_get_field_value
+        from invenio.legacy.bibrecord import record_get_field_value
 
         bibfield_recstruct = get_record(8).get_legacy_recstruct()
         bibrecord = search_engine_get_record(8)

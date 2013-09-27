@@ -23,9 +23,8 @@ Validation functions
 
 import re
 from wtforms.validators import ValidationError, StopValidation, Regexp
-from invenio.config import CFG_SITE_NAME
 from invenio import pidutils
-
+from invenio.base.globals import cfg
 
 #
 # General purpose validators
@@ -168,7 +167,7 @@ class InvalidDOIPrefix(object):
 
         ctx = dict(
             prefix=prefix,
-            CFG_SITE_NAME=CFG_SITE_NAME
+            CFG_SITE_NAME=cfg['CFG_SITE_NAME']
         )
         self.message = self.message % ctx
         self.message_testing = self.message_testing % ctx

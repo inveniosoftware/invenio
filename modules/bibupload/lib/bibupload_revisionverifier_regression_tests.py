@@ -21,16 +21,16 @@
 Contains Test Cases for Revision Verifier module used along with BibUpload.
 """
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, nottest
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, nottest
 
 get_record = lazy_import('invenio.search_engine:get_record')
 print_record = lazy_import('invenio.search_engine:print_record')
 bibupload = lazy_import('invenio.bibupload:bibupload')
 xml_marc_to_records = lazy_import('invenio.bibupload:xml_marc_to_records')
 
-record_get_field_value = lazy_import('invenio.bibrecord:record_get_field_value')
-record_xml_output = lazy_import('invenio.bibrecord:record_xml_output')
+record_get_field_value = lazy_import('invenio.legacy.bibrecord:record_get_field_value')
+record_xml_output = lazy_import('invenio.legacy.bibrecord:record_xml_output')
 
 from invenio.bibupload_revisionverifier \
                         import RevisionVerifier, \

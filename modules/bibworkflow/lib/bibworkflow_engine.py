@@ -20,9 +20,9 @@ import cPickle
 import traceback
 import logging
 
-from invenio.bibworkflow_model import (Workflow,
-                                       WorkflowLogging,
-                                       BibWorkflowObject)
+from invenio.modules.workflows.models import (Workflow,
+                                              WorkflowLogging,
+                                              BibWorkflowObject)
 from workflow.engine import (GenericWorkflowEngine,
                              ContinueNextToken,
                              HaltProcessing,
@@ -32,7 +32,7 @@ from workflow.engine import (GenericWorkflowEngine,
                              WorkflowError)
 from datetime import datetime
 
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 from invenio.config import CFG_DEVEL_SITE
 from invenio.bibworkflow_utils import get_workflow_definition
 from uuid import uuid1 as new_uuid

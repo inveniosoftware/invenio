@@ -36,7 +36,7 @@ import time
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
     CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, CFG_SITE_URL, CFG_SITE_SECURE_URL, \
@@ -45,8 +45,8 @@ from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
 from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
     CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
     CFG_WEBSESSION_ENABLE_LOCKING
-from invenio.session_flask import InvenioSession as FlaskInvenioSession
-from invenio.hashutils import md5
+#from invenio.session_flask import InvenioSession as FlaskInvenioSession
+from invenio.utils.hash import md5
 
 CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 

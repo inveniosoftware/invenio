@@ -43,7 +43,7 @@ from invenio import bibclassify_config as bconfig
 if bconfig.STANDALONE:
     from urllib2 import urlopen
 else:
-    from invenio.urlutils import make_invenio_opener
+    from invenio.utils.url import make_invenio_opener
     urlopen = make_invenio_opener('BibClassify').open
 
 log = bconfig.get_logger("bibclassify.text_extractor")

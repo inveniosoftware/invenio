@@ -28,7 +28,7 @@ from invenio.flaskshell import *
 
 from invenio import dataciteutils
 from invenio import config
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite
 import random
 import string
 import os

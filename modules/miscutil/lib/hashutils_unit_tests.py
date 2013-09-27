@@ -21,8 +21,8 @@
 Test unit for the miscutil/hashutils module.
 """
 
-from invenio.hashutils import md5, sha1
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.utils.hash import md5, sha1
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class TestHashUtils(InvenioTestCase):

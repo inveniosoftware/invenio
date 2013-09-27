@@ -24,8 +24,8 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.importutils import lazy_import
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 InvenioConnector = lazy_import('invenio.invenio_connector:InvenioConnector')
 

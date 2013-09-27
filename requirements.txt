@@ -1,4 +1,3 @@
-# Invenio requirements.
 MySQL-python==1.2.4
 rdflib==2.4.2
 reportlab==2.5
@@ -28,3 +27,4 @@ python-openid
 qrcode
 PIL
 fs==0.4.0
+libmagic==1.0

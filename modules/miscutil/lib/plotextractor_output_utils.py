@@ -13,8 +13,8 @@ import re
 import sys
 
 from invenio.config import CFG_TMPDIR
-from invenio.textutils import encode_for_xml, wash_for_utf8
-from invenio.bibrecord import field_xml_output
+from invenio.utils.text import encode_for_xml, wash_for_utf8
+from invenio.legacy.bibrecord import field_xml_output
 
 DUMMY_IMAGE_TMP = os.path.join(CFG_TMPDIR, 'plotextractor_dummy.png')
 

@@ -20,7 +20,7 @@
 from invenio.xmlDict import XmlDictConfig, ElementTree
 import urllib2
 from werkzeug.contrib.cache import RedisCache
-from invenio.cache import cache
+from invenio.ext.cache import cache
 
 
 class SherpaRomeoSearch(object):

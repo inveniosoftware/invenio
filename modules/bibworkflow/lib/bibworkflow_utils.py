@@ -19,9 +19,9 @@
 import re
 import redis
 
-from invenio.bibrecord import create_record
+from invenio.legacy.bibrecord import create_record
 from invenio.errorlib import register_exception
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
@@ -32,7 +32,7 @@ class InvenioWorkflowDefinitionError(Exception):
 
 
 def create_objects(path_to_file):
-    from invenio.bibworkflow_model import BibWorkflowObject
+    from invenio.modules.workflows.models import BibWorkflowObject
 
     list_of_bwo = []
     f = open(path_to_file, "r")
@@ -70,12 +70,12 @@ def determineDataType(data):
         else:
             data_type = 'dict'
     else:
-        from magic import Magic
-        mime_checker = Magic(mime=True)
 
         # If data is not a dictionary, we try to guess MIME type
         # by using magic library
         try:
+            from magic import Magic
+            mime_checker = Magic(mime=True)
             data_type = mime_checker.from_buffer(data)  # noqa
         except:
             register_exception(stream="warning", prefix=
@@ -133,7 +133,7 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None):
     @type hpitems: list
     @return: A list containing all the HPContainers.
     """
-    from invenio.bibworkflow_model import BibWorkflowObject
+    from invenio.modules.workflows.models import BibWorkflowObject
 
     print '-----------------------Setting up HPCONTAINERS!'
 

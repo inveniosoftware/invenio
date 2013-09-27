@@ -21,20 +21,14 @@
 
 __revision__ = "$Id$"
 
-from invenio.testutils import InvenioTestCase
 import re
 
-from invenio.config import CFG_SITE_URL, \
-                           CFG_SITE_LANG, \
-                           CFG_SITE_RECORD, \
-                           CFG_SITE_NAME
-from invenio.importutils import lazy_import
-from invenio.testutils import InvenioTestCase, \
-                              make_test_suite, \
-                              run_test_suite, \
-                              test_web_page_content, \
-                              get_authenticated_mechanize_browser, \
-                              make_url
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import InvenioTestCase, make_test_suite, \
+    make_url, get_authenticated_mechanize_browser, \
+    run_test_suite, test_web_page_content
+
 format_record = lazy_import('invenio.bibformat:format_record')
 BibFormatObject = lazy_import('invenio.bibformat_engine:BibFormatObject')
 bfe_authority_author = lazy_import('invenio.bibformat_elements.bfe_authority_author')

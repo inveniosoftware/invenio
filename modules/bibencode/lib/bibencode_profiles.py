@@ -22,7 +22,7 @@
 import os
 import shutil
 
-from invenio.jsonutils import json_decode_file
+from invenio.utils.json import json_decode_file
 from invenio.bibencode_config import (
                                       CFG_BIBENCODE_PROFILES_ENCODING,
                                       CFG_BIBENCODE_PROFILES_EXTRACT,

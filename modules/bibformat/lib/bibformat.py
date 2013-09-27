@@ -38,7 +38,7 @@ __revision__ = "$Id$"
 
 import zlib
 
-from invenio import bibformat_dblayer
+import invenio.modules.formatter.api as bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
 from invenio.errorlib import register_exception
@@ -53,7 +53,7 @@ from invenio.messages import wash_language
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.access_control_engine import acc_authorize_action
-from invenio.jinja2utils import render_template_to_string
+from invenio.ext.template import render_template_to_string
 import getopt
 import sys
 
@@ -528,8 +528,8 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     from math import ceil
     from flask import request
     from invenio.bibformat_engine import format_record
-    from invenio.websearch_model import Format
-    from invenio.paginationutils import Pagination
+    from invenio.modules.search.models import Format
+    from invenio.utils.pagination import Pagination
     from invenio.bibformat_engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
 
     of = of.lower()
@@ -551,9 +551,9 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     )
     context.update(ctx)
     return render_template_to_string(
-        ['format_records_%s.tpl' % of,
-         'format_records_%s.tpl' % of[0],
-         'format_records_%s.tpl' % get_output_format_content_type(of).
+        ['format/records/%s.tpl' % of,
+         'format/records/%s.tpl' % of[0],
+         'format/records/%s.tpl' % get_output_format_content_type(of).
             replace('/', '_')],
         **context)
 

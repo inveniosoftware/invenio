@@ -15,8 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 is_type_isbn10 = lazy_import('invenio.bibfield_functions.is_type_isbn:is_type_isbn10')
 is_type_isbn13 = lazy_import('invenio.bibfield_functions.is_type_isbn:is_type_isbn13')

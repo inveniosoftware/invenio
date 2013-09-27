@@ -27,12 +27,12 @@ from invenio.webpage import page
 from invenio import webalert
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd
+from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
 from invenio.webuser import collect_user_info
 
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 import invenio.template
 webalert_templates = invenio.template.load('webalert')
 

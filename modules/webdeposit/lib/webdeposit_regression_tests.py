@@ -17,15 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
     InvenioTestCase, make_pdf_fixture
 
 
 class TestWebDepositUtils(InvenioTestCase):
 
     def clear_tables(self):
-        from invenio.bibworkflow_model import Workflow, BibWorkflowObject
-        from invenio.sqlalchemyutils import db
+        from invenio.modules.workflows.models import Workflow, BibWorkflowObject
+        from invenio.ext.sqlalchemy import db
 
         dep_workflows = Workflow.get(
             Workflow.module_name == "webdeposit"
@@ -63,7 +63,7 @@ class TestWebDepositUtils(InvenioTestCase):
         from flask import current_app, url_for
         from invenio.webdeposit_load_deposition_types import \
             deposition_metadata
-        from invenio.bibworkflow_model import Workflow
+        from invenio.modules.workflows.models import Workflow
         from invenio.webdeposit_utils import create_workflow, deposit_files, \
             get_latest_or_new_workflow
 
@@ -103,7 +103,7 @@ class TestWebDepositUtils(InvenioTestCase):
     def test_workflow_creation(self):
         from invenio.webdeposit_load_deposition_types import \
             deposition_metadata
-        from invenio.bibworkflow_model import Workflow
+        from invenio.modules.workflows.models import Workflow
         from invenio.webdeposit_workflow import DepositionWorkflow
         from invenio.webdeposit_utils import get_latest_or_new_workflow, \
             get_workflow, delete_workflow, InvenioWebDepositNoDepositionType
@@ -161,11 +161,11 @@ class TestWebDepositUtils(InvenioTestCase):
     def test_form_functions(self):
         from invenio.webdeposit_load_deposition_types import \
             deposition_metadata
-        from invenio.webdeposit_load_forms import forms
+        from invenio.modules.deposit import forms
         from invenio.webdeposit_workflow import DepositionWorkflow
         from invenio.webdeposit_utils import get_form, \
             get_form_status, set_form_status, CFG_DRAFT_STATUS
-        from invenio.bibworkflow_model import Workflow
+        from invenio.modules.workflows.models import Workflow
 
         for metadata in deposition_metadata.values():
             for wf_function in metadata['workflow']:
@@ -251,7 +251,7 @@ class TestWebDepositUtils(InvenioTestCase):
         from invenio.search_engine import record_exists
         from invenio.cache import cache
         from invenio.config import CFG_PREFIX
-        from invenio.bibworkflow_model import Workflow
+        from invenio.modules.workflows.models import Workflow
         from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
         from invenio.bibsched_model import SchTASK
 

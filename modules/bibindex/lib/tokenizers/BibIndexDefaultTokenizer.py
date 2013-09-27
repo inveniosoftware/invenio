@@ -24,7 +24,7 @@
 from invenio.bibindex_engine_config import \
      CFG_BIBINDEX_INDEX_TABLE_TYPE
 from invenio.htmlutils import remove_html_markup
-from invenio.textutils import wash_for_utf8, strip_accents
+from invenio.utils.text import wash_for_utf8, strip_accents
 from invenio.bibindex_engine_washer import \
      lower_index_term, remove_latex_markup, \
      apply_stemming, remove_stopwords, length_check

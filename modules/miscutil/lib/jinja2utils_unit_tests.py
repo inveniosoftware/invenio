@@ -21,8 +21,8 @@
 Test unit for the miscutil/jinja2utils module.
 """
 
-from invenio.jinja2utils import render_template_to_string
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.ext.template import render_template_to_string
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class TestJinja2Utils(InvenioTestCase):

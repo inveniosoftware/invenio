@@ -29,7 +29,7 @@ from urlparse import urlparse, urlunparse
 from urllib import urlopen, urlencode
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_DEVEL_SITE
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               get_authenticated_mechanize_browser, \
                               InvenioTestCase

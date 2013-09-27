@@ -19,9 +19,8 @@
 
 """Unit tests for the solrutils library."""
 
-from invenio import intbitset
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 replace_invalid_solr_characters = lazy_import('invenio.solrutils_bibindex_indexer:replace_invalid_solr_characters')
 get_collection_filter = lazy_import('invenio.solrutils_bibrank_searcher:get_collection_filter')
@@ -63,6 +62,7 @@ class TestSolrRankingHelpers(InvenioTestCase):
     """Test for Solr ranking helper functions."""
     def test_get_collection_filter(self):
         """solrutils - creation of collection filter"""
+        from invenio import intbitset
         self.assertEqual('', get_collection_filter(intbitset.intbitset([]), 0))
         self.assertEqual('', get_collection_filter(intbitset.intbitset([]), 1))
         self.assertEqual('', get_collection_filter(intbitset.intbitset([1, 2, 3, 4, 5]), 0))

@@ -51,7 +51,7 @@ from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS, \
      CFG_BIBUPLOAD_CONFLICTING_REVISION_TICKET_QUEUE
 
-from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+from invenio.utils.json import json, CFG_JSON_AVAILABLE
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_SPECIAL_TAGS, \
     CFG_BIBUPLOAD_DELETE_CODE, \
@@ -59,7 +59,7 @@ from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_OPT_MODES
 from invenio.dbquery import run_sql, \
                             Error
-from invenio.bibrecord import create_records, \
+from invenio.legacy.bibrecord import create_records, \
                               record_add_field, \
                               record_delete_field, \
                               record_xml_output, \
@@ -78,11 +78,11 @@ from invenio.bibrecord import create_records, \
                               record_has_field,\
                               records_identical
 from invenio.search_engine import get_record
-from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibcatalog import bibcatalog_system
 from invenio.intbitset import intbitset
-from invenio.urlutils import make_user_agent_string
+from invenio.utils.url import make_user_agent_string
 from invenio.config import CFG_BIBDOCFILE_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \

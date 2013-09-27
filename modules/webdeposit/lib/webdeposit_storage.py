@@ -26,7 +26,6 @@ import hashlib
 
 from fs import opener
 from fs import path
-from invenio.bibdocfile import open_url, InvenioBibdocfileUnauthorizedURL
 import urllib2
 try:
     from invenio.config import CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE
@@ -44,6 +43,8 @@ class ExternalFile(object):
     the storage layer
     """
     def __init__(self, url, filename):
+        from invenio.bibdocfile import open_url, \
+            InvenioBibdocfileUnauthorizedURL
         try:
             self._file = open_url(url, headers={})
             self.filename = None

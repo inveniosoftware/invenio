@@ -27,11 +27,11 @@ from cStringIO import StringIO
 
 from invenio.errorlib import register_exception
 from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_TMPDIR, CFG_PATH_PDFTK
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
-from invenio.webinterface_handler_flask import with_app_context
+from invenio.base.factory import with_app_context
 
 websubmit_file_stamper = lazy_import('invenio.websubmit_file_stamper')
 

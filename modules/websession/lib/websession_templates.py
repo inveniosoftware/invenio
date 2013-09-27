@@ -35,15 +35,18 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_SITE_RECORD
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
-        CFG_EXTERNAL_AUTH_LOGOUT_SSO, CFG_WEB_API_KEY_STATUS, \
+        CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
         CFG_OPENID_PROVIDERS, CFG_OAUTH2_PROVIDERS, \
         CFG_OAUTH1_PROVIDERS, CFG_OPENID_AUTHENTICATION, \
         CFG_OAUTH2_AUTHENTICATION, CFG_OAUTH1_AUTHENTICATION
 
-from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
+from invenio.utils.url import make_canonical_urlargd, create_url, create_html_link
 from invenio.htmlutils import escape_html, nmtoken_from_string
-from invenio.messages import gettext_set_language, language_list_long
+from invenio.base.i18n import gettext_set_language, language_list_long
+from invenio.modules.apikeys.models import WebAPIKey
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
+
+
 class Template:
     def tmpl_back_form(self, ln, message, url, link):
         """
@@ -163,7 +166,7 @@ class Template:
                               'key_label': _("API key"),
                               'remove_key' : _("Delete key"),
                               'sitesecureurl': CFG_SITE_SECURE_URL,
-                              'input_type': ("submit", "hidden")[key_info[2] == CFG_WEB_API_KEY_STATUS['REVOKED']]
+                              'input_type': ("submit", "hidden")[key_info[2] == WebAPIKey.CFG_WEB_API_KEY_STATUS['REVOKED']]
                               }
             out += "</table>"
 

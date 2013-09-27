@@ -26,5 +26,5 @@ def get_creation_date(recid):
 
     @return: Creation date
     """
-    from invenio.bibedit_model import Bibrec
+    from invenio.modules.record_editor.models import Bibrec
     return Bibrec.query.get(recid).creation_date

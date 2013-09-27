@@ -31,7 +31,7 @@ def format_element(bfo, limit, separator=' ; ', extension='[...]', print_links="
     """
     from urllib import quote
     from invenio.config import CFG_SITE_URL
-    from invenio import bibrecord
+    from invenio.legacy import bibrecord
 
     authors = bibrecord.record_get_field_instances(bfo.get_record(), '100')
 

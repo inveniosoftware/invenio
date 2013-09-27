@@ -74,8 +74,8 @@ from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, 
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
 from invenio.access_control_config import SUPERADMINROLE, CFG_EXTERNAL_AUTH_USING_SSO
-from invenio.messages import gettext_set_language, wash_languages, wash_language
-from invenio.mailutils import send_email
+from invenio.base.i18n import gettext_set_language, wash_languages, wash_language
+from invenio.ext.email import send_email
 from invenio.errorlib import register_exception
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
@@ -228,7 +228,7 @@ def getUid(req):
             return -1
 
 
-from invenio.webuser_flask import current_user, login_user, logout_user
+from invenio.ext.login import current_user, login_user, logout_user
 getUid = lambda req: current_user.get_id()
 
 
@@ -1183,15 +1183,15 @@ def collect_user_info(req, login_time=False, refresh=False):
     """
 
     if type(req) in [long, int] or req is None:
-        from invenio.webuser_flask import UserInfo
+        from invenio.ext.login import UserInfo
         return UserInfo(req)
 
-    from invenio.webuser_flask import current_user
+    from flask.ext.login import current_user
     return current_user._get_current_object()
 
     ##
     ## NOT USED ANYMORE
-    ## please see webuser_flask.py
+    ## please see inveno.ext.login
     ##
 
     #FIXME move EXTERNAL SSO functionality

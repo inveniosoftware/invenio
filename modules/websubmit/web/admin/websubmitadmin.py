@@ -25,7 +25,7 @@ from invenio.websubmitadmin_engine import *
 from invenio.config import CFG_SITE_LANG
 from invenio.webuser import getUid, page_not_authorized
 from invenio.webpage import page
-from invenio.messages import wash_language, gettext_set_language
+from invenio.base.i18n import wash_language, gettext_set_language
 
 def index(req, ln=CFG_SITE_LANG):
     """Websubmit Admin home page. Default action: list all WebSubmit document types."""

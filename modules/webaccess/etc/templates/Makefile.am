@@ -16,11 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = webaccess_admin_index.html \
-		 webaccess_admin_rolearea.html \
-		 webaccess_admin_showroledetails.html \
-		 webaccess_admin_userarea.html \
-		 webaccess_admin_actionarea.html
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

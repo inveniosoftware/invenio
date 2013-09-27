@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 formattemplatesdir = $(sysconfdir)/templates/format_templates/
-formattemplates_DATA = *.tpl
+formattemplates_DATA =
 
 EXTRA_DIST = $(formattemplates_DATA)
 

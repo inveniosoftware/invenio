@@ -22,8 +22,8 @@
 __revision__ = "$Id$"
 
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 assemble_caption = lazy_import('invenio.plotextractor:assemble_caption')
 find_open_and_close_braces = lazy_import('invenio.plotextractor:find_open_and_close_braces')

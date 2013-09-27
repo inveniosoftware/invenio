@@ -40,7 +40,7 @@ from invenio.refextract_api import update_references, \
 from invenio.docextract_task import task_run_core_wrapper, split_ids
 from invenio.bibcatalog_system_rt import BibCatalogSystemRT
 from invenio.bibedit_utils import get_bibrecord
-from invenio.bibrecord import record_get_field_instances, \
+from invenio.legacy.bibrecord import record_get_field_instances, \
                               field_get_subfield_values
 
 

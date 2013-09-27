@@ -21,7 +21,7 @@
 
 import ConfigParser
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
 

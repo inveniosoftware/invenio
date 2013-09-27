@@ -29,8 +29,8 @@ from invenio.webjournal_utils import \
      get_grouped_issues, \
      get_release_datetime
 from invenio.webjournal_config import InvenioWebJournalJournalIdNotFoundDBError
-from invenio.messages import gettext_set_language
-from invenio.dateutils import \
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.date import \
      get_i18n_month_name, \
      get_i18n_day_name
 

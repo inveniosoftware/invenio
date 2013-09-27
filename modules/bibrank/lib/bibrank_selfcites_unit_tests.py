@@ -26,7 +26,7 @@ try:
 except ImportError:
     HAS_MOCK = False
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 def get_author_tags_mock():

@@ -25,10 +25,10 @@ __lastupdated__ = """$Date$"""
 
 from invenio.webinterface_handler_wsgi_utils import Field
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.urlutils import redirect_to_url
-from invenio.messages import gettext_set_language
+from invenio.utils.url import redirect_to_url
+from invenio.base.i18n import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
 from invenio.webinterface_handler_wsgi_utils import handle_file_post
 from invenio.webuser import getUid, page_not_authorized, get_email
 from invenio.webpage import page

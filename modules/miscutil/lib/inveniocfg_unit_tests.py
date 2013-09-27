@@ -24,9 +24,8 @@ import sys
 import StringIO
 import logging
 
-from invenio.inveniocfg import main
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.config import CFG_PREFIX
+from invenio.legacy.inveniocfg import main
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class InveniocfgTest(InvenioTestCase):
@@ -89,6 +88,7 @@ class InveniocfgTest(InvenioTestCase):
     #
     def test_invalid_cmd(self):
         """ Test exit value for non-existing option. """
+        from invenio.config import CFG_PREFIX
         self.capture()
         self.assertExitValue(2, main, '--conf-dir', "%s/etc/" % CFG_PREFIX,
                              '--some-invalid-option-which-does-not-exists')
@@ -97,6 +97,7 @@ class InveniocfgTest(InvenioTestCase):
     def test_cmd_get(self):
         """ Test --get cmd """
         # New way of calling get
+        from invenio.config import CFG_PREFIX
         self.capture()
         main('--conf-dir', '%s/etc/' % CFG_PREFIX, '--get=CFG_PREFIX')
         self.assertEqual('%s\n' % CFG_PREFIX, self.output.getvalue())

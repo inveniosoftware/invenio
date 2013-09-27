@@ -17,6 +17,6 @@
 
 CLEANFILES = *~ *.tmp
 
-EXTRA_DIST = bibdocfile.in
+EXTRA_DIST =
 
-bin_SCRIPTS = bibdocfile
+bin_SCRIPTS =

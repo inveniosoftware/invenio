@@ -25,7 +25,7 @@ import datetime
 import time
 import sys
 from urllib import quote
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 import threading
 
 #maximum number of collaborating authors etc shown in GUI
@@ -87,7 +87,7 @@ from invenio.config import \
      CFG_SITE_RECORD
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
+from invenio.utils.url import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
@@ -96,7 +96,7 @@ from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.weblinkback_webinterface import WebInterfaceRecordLinkbacksPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
 from invenio.webpage import page, pageheaderonly, create_error_box
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.search_engine import check_user_can_view_record, \
      collection_reclist_cache, \
      collection_restricted_p, \

@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_PREFIX, \
      CFG_CERN_SITE
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
@@ -45,8 +45,8 @@ from invenio.webpage import warning_page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, \
                             isGuestUser
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import make_canonical_urlargd, redirect_to_url
-from invenio.messages import gettext_set_language
+from invenio.utils.url import make_canonical_urlargd, redirect_to_url
+from invenio.base.i18n import gettext_set_language
 from invenio.bibdocfile import stream_file, \
     decompose_file, propose_next_docname
 from invenio.errorlib import register_exception
@@ -56,7 +56,7 @@ from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_res
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 from invenio.websearchadminlib import get_detailed_page_tabs
-from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+from invenio.utils.json import json, CFG_JSON_AVAILABLE
 import invenio.template
 from flask import session
 

@@ -24,8 +24,8 @@ __revision__ = "$Id$"
 import cgi
 
 from invenio.config import CFG_SITE_LANG
-from invenio.messages import gettext_set_language
-from invenio.urlutils import create_html_link
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.url import create_html_link
 
 class Template:
     """Template class for the external collection search. To be loaded with template.load()"""

@@ -24,9 +24,9 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
 from invenio.webcomment_config import InvenioWebCommentWarning
 from invenio.webcomment import query_get_comment, \
      get_reply_order_cache_data
-from invenio.urlutils import wash_url_argument
+from invenio.utils.url import wash_url_argument
 from invenio.dbquery import run_sql
-from invenio.messages import gettext_set_language, wash_language
+from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.errorlib import register_exception
 from invenio.webuser import get_user_info, collect_user_info, \
                             isUserAdmin

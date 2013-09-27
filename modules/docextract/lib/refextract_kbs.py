@@ -32,7 +32,7 @@ from invenio.refextract_re import re_kb_line, \
                                   re_punctuation
 from invenio.docextract_utils import write_message
 from invenio.docextract_text import re_group_captured_multiple_space
-from invenio.hashutils import md5
+from invenio.utils.hash import md5
 
 def get_kbs(custom_kbs_files=None, cache=None):
     """Load kbs (with caching)

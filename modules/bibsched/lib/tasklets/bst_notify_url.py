@@ -31,7 +31,7 @@ from invenio.config import \
      CFG_SITE_NAME
 from invenio.bibtask import write_message, \
      task_sleep_now_if_required
-from invenio.mailutils import send_email
+from invenio.ext.email import send_email
 
 def bst_notify_url(url, data=None,
                    content_type='text/plain',

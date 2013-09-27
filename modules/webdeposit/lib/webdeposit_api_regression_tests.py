@@ -18,12 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class TestWebDepositAPI(InvenioTestCase):
     def clear_tables(self):
-        from invenio.bibworkflow_model import Workflow, WfeObject
+        from invenio.modules.workflows.models import Workflow, WfeObject
         from invenio.sqlalchemyutils import db
 
         Workflow.query.delete()
@@ -32,7 +32,7 @@ class TestWebDepositAPI(InvenioTestCase):
 
     def setUp(self):
         from random import randint
-        from invenio.web_api_key import create_new_web_api_key, \
+        from invenio.modules.apikeys import create_new_web_api_key, \
             get_available_web_api_keys
         from invenio.webdeposit_load_deposition_types import \
             deposition_metadata
@@ -52,7 +52,7 @@ class TestWebDepositAPI(InvenioTestCase):
 
     def test_create(self):
         from flask import current_app, url_for
-        from invenio.web_api_key import build_web_request
+        from invenio.modules.apikeys import build_web_request
 
         url = url_for('webdeposit_api.deposition_create',
                       deposition_type=self.deposition)
@@ -73,8 +73,8 @@ class TestWebDepositAPI(InvenioTestCase):
             deposition_metadata
         from invenio.webdeposit_utils import create_workflow
         from wtforms import TextAreaField
-        from invenio.webdeposit_load_forms import forms
-        from invenio.web_api_key import build_web_request
+        from invenio.modules.deposit import forms
+        from invenio.modules.apikeys import build_web_request
 
         self.uuid = create_workflow(self.deposition, user_id=1).get_uuid()
 

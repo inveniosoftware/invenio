@@ -35,7 +35,7 @@ from invenio.bibsword_client import perform_display_sub_status, \
                                     perform_display_server_infos, \
                                     list_remote_servers
 from invenio.webpage import page
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websubmit_functions.Get_Recid import \
                                            get_existing_records_for_reportnumber

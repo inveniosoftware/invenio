@@ -23,9 +23,8 @@ __revision__ = \
     "$Id$"
 
 
-from invenio.config import CFG_SITE_URL
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 RecordHTMLParser = lazy_import('invenio.htmlparser:RecordHTMLParser')
 
@@ -35,6 +34,7 @@ class TestWashHTMLtoText(InvenioTestCase):
 
     def test_wash_html_to_text(self):
         """webalert - stripping HTML markup for alert emails"""
+        from invenio.config import CFG_SITE_URL
         htparser = RecordHTMLParser()
         htparser.feed('''<style type="text/css">
                     <!--

@@ -50,10 +50,10 @@ from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
 from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES, \
     InvenioWebSubmitFunctionError, InvenioWebSubmitFunctionStop, \
     InvenioWebSubmitFunctionWarning
-from invenio.messages import gettext_set_language, wash_language
+from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
-from invenio.urlutils import make_canonical_urlargd, redirect_to_url
+from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
 from invenio.htmlutils import get_mathjax_header
 

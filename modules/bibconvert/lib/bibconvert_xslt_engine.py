@@ -49,7 +49,7 @@ from invenio.config import \
      CFG_ETCDIR, \
      CFG_SITE_URL
 from invenio.bibconvert import FormatField
-from invenio.textutils import encode_for_xml
+from invenio.utils.text import encode_for_xml
 
 # The namespace used for BibConvert functions
 CFG_BIBCONVERT_FUNCTION_NS = "http://cdsweb.cern.ch/bibconvert/fn"

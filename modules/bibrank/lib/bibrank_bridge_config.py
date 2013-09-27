@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.config import CFG_ETCDIR
-from invenio.bibformat_dblayer import get_tag_from_name
+from invenio.modules.formatter.api import get_tag_from_name
 from invenio.errorlib import raise_exception
 
 

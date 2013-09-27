@@ -26,7 +26,7 @@ from invenio.config import CFG_SITE_URL, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSI
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME,\
                            CFG_SITE_ADMIN_EMAIL, \
                            CFG_SITE_RECORD
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 
 class Template:

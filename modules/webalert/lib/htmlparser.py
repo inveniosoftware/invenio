@@ -29,7 +29,7 @@ from invenio.config import \
      CFG_SITE_LANG
 from invenio.bibformat import format_record
 from invenio.htmlutils import remove_html_markup
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 whitespaces_pattern = re.compile(r'[ \t]+')
 

@@ -22,7 +22,7 @@ Test unit for the miscutil/importutils module.
 """
 
 from invenio.importutils import autodiscover_modules
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase, nottest
 
 
 class TestImportUtils(InvenioTestCase):
@@ -30,16 +30,17 @@ class TestImportUtils(InvenioTestCase):
     importutils TestSuite.
     """
 
+    @nottest
     def test_autodiscover_modules(self):
-        modules = autodiscover_modules(['invenio.bibformat_elements'], related_name_re='bfe_.+\.py')
+        modules = autodiscover_modules(['invenio.bibformat_elements'], related_name_re='bfe_.+')
         assert(len(modules) > 10)
         modules = autodiscover_modules(['invenio'], related_name_re='(.+)_config\.py')
         assert(len(modules) > 10)
         assert(None not in modules)
-        modules = autodiscover_modules(['invenio.not_an_existing_folder'], related_name_re='foo_.+\.py')
+        modules = autodiscover_modules(['invenio.not_an_existing_folder'], related_name_re='foo_.+')
         assert(len(modules) == 0)
         assert(None not in modules)
-        modules = autodiscover_modules(['invenio.bibformat_elements'], related_name_re='not_an_existing_file_name_.+\.yp')
+        modules = autodiscover_modules(['invenio.bibformat_elements'], related_name_re='not_an_existing_package_name_.+')
         assert(len(modules) == 0)
         assert(None not in modules)
 

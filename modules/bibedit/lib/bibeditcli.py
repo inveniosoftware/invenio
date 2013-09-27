@@ -54,7 +54,7 @@ from invenio.bibedit_utils import get_marcxml_of_revision_id, \
     get_record_revision_ids, get_xml_comparison, record_locked_by_other_user, \
     record_locked_by_queue, revision_format_valid_p, save_xml_record, \
     split_revid, get_info_of_revision_id, get_record_revisions
-from invenio.bibrecord import create_record, records_identical
+from invenio.legacy.bibrecord import create_record, records_identical
 
 def print_usage():
     """Print help."""

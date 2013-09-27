@@ -24,7 +24,7 @@ compatible with file.py structure, but the viceversa is not true).
 
 import sys
 from invenio.intbitset import intbitset
-from invenio.textutils import wrap_text_in_a_box
+from invenio.utils.text import wrap_text_in_a_box
 from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.dbquery import run_sql, OperationalError
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError

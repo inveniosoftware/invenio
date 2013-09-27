@@ -27,9 +27,9 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL, \
      CFG_SITE_RECORD
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap, wrap_records
-from invenio.urlutils import create_html_link
+from invenio.utils.url import create_html_link
 
 from invenio.search_engine import guess_primary_collection_of_a_record, get_coll_ancestors
 

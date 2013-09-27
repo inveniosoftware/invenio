@@ -33,7 +33,7 @@ import sys
 
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_get_role_id, acc_add_user_role
-from invenio.hashutils import md5
+from invenio.utils.hash import md5
 from datetime import datetime, timedelta
 from random import random
 from cPickle import dumps, loads

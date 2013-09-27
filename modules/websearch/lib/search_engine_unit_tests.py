@@ -22,11 +22,11 @@
 __revision__ = \
     "$Id$"
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 search_engine = lazy_import('invenio.search_engine')
-CFG_CERN_SITE = lazy_import('invenio.config:CFG_CERN_SITE')
+
 
 class TestMiscUtilityFunctions(InvenioTestCase):
     """Test whatever non-data-specific utility functions are essential."""
@@ -198,9 +198,10 @@ class TestQueryParser(InvenioTestCase):
         self._check("title:muon", '', None,
                     [['+', 'muon', 'title', 'w']])
 
-    if not CFG_CERN_SITE:
-        def test_parsing_structured_query_existing_field(self):
-            "search engine - parsing structured query, existing field, but no word index"
+    def test_parsing_structured_query_existing_field(self):
+        "search engine - parsing structured query, existing field, but no word index"
+        from invenio.config import CFG_CERN_SITE
+        if not CFG_CERN_SITE:
             self._check("experiment:LHC", '', None,
                         [['+', 'LHC', 'experiment', 'a']])
 

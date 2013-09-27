@@ -48,7 +48,7 @@ import os
 
 from invenio.config import \
      CFG_SITE_LANG
-from invenio.messages import gettext_set_language, wash_language
+from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.bibdocfile_managedocfiles import create_file_upload_interface
 
 def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):

@@ -22,7 +22,7 @@ BibSWORD Client Http Queries
 import urllib2
 from tempfile import NamedTemporaryFile
 from invenio.config import CFG_TMPDIR
-from invenio.urlutils import make_user_agent_string
+from invenio.utils.url import make_user_agent_string
 
 class RemoteSwordServer:
     '''This class gives every tools to communicate with the SWORD/APP deposit

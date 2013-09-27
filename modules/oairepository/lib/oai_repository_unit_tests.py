@@ -26,8 +26,8 @@ __revision__ = "$Id$"
 import re
 from cStringIO import StringIO
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 oai_repository_server = lazy_import('invenio.oai_repository_server')
 

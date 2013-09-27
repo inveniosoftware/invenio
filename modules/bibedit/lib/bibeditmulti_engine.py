@@ -39,7 +39,7 @@ __revision__ = "$Id"
 import subprocess
 import re
 from invenio import search_engine
-from invenio import bibrecord
+from invenio.legacy import bibrecord
 from invenio import bibformat
 
 from invenio.config import CFG_TMPSHAREDDIR, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,\
@@ -52,7 +52,7 @@ from invenio.webuser import collect_user_info, isUserSuperAdmin
 
 from invenio.dbquery import run_sql
 
-from invenio import xmlmarc2textmarc as xmlmarc2textmarc
+from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
 
 from invenio.bibedit_utils import record_locked_by_queue
 
@@ -393,7 +393,7 @@ def perform_request_detailed_record(record_id, update_commands, output_format, l
     response['search_html'] = multiedit_templates.detailed_record(record_content, language)
     return response
 
-def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display, 
+def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display,
                                 language, outputTags, collection="", compute_modifications=0,
                                 upload_mode='-c', checked_records=None):
     """Returns the results of a test search.

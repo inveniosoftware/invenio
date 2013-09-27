@@ -32,9 +32,9 @@ import cookielib
 
 from invenio import bibformat
 
-from invenio.jsonutils import json, CFG_JSON_AVAILABLE
-from invenio.urlutils import auto_version_url
-from invenio.xmlmarc2textmarc import create_marc_record
+from invenio.utils.json import json, CFG_JSON_AVAILABLE
+from invenio.utils.url import auto_version_url
+from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_CLONED_RECORD_COLOR, \
@@ -74,7 +74,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     record_locked_by_user_details, crossref_process_template, \
     modify_record_timestamp
 
-from invenio.bibrecord import create_record, print_rec, record_add_field, \
+from invenio.legacy.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
     record_delete_subfield_from, \
     record_modify_subfield, record_move_subfield, \
@@ -92,7 +92,7 @@ from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
 from invenio.htmlutils import get_mathjax_header
-from invenio.textutils import wash_for_xml, show_diff
+from invenio.utils.text import wash_for_xml, show_diff
 from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
@@ -102,7 +102,7 @@ from invenio.bibcirculation_dblayer import get_number_copies, has_copies
 from invenio.bibcirculation_utils import create_item_details_url
 
 from invenio.refextract_api import FullTextNotAvailable
-from invenio import xmlmarc2textmarc as xmlmarc2textmarc
+from invenio.legacy.bibrecord.scripts import xmlmarc2textmarc as xmlmarc2textmarc
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 
 from invenio.crossrefutils import get_marcxml_for_doi, CrossrefError

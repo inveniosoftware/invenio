@@ -21,11 +21,11 @@ __revision__ = "$Id"
 
 __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 
-from invenio.jsonutils import json, json_unicode_to_utf8
+from invenio.utils.json import json, json_unicode_to_utf8
 from invenio.webinterface_handler import WebInterfaceDirectory, \
                                          wash_urlargd
 from invenio.webpage import page
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio import bibeditmulti_engine as multi_edit_engine
 
 from invenio.webuser import page_not_authorized

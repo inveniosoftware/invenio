@@ -36,7 +36,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     get_record_revision_ids, revision_format_valid_p, split_revid, \
     get_marcxml_of_revision_id
 from invenio.htmlutils import remove_html_markup
-from invenio.bibrecord import create_record, record_xml_output, record_add_field, \
+from invenio.legacy.bibrecord import create_record, record_xml_output, record_add_field, \
                               record_order_subfields
 from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 

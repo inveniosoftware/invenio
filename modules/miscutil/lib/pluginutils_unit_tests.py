@@ -25,11 +25,9 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.config import CFG_PYLIBDIR
+from invenio.base.globals import cfg
 from invenio.pluginutils import PluginContainer, create_enhanced_plugin_builder
-from invenio.bibformat_config import CFG_BIBFORMAT_ELEMENTS_PATH
-from invenio.external_authentication import ExternalAuth
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class TestPluginContainer(InvenioTestCase):
@@ -38,6 +36,8 @@ class TestPluginContainer(InvenioTestCase):
     """
     def test_plugin_container_wrapping_bibformat_elements(self):
         """pluginutils - wrapping bibformat elements"""
+        from invenio.bibformat_config import CFG_BIBFORMAT_ELEMENTS_PATH
+
         def format_signature(bfo, *dummy_args, **dummy_argd):
             pass
 
@@ -60,7 +60,7 @@ class TestPluginContainer(InvenioTestCase):
 
     def test_plugin_container_wrapping_websubmit_functions(self):
         """pluginutils - wrapping websubmit functions"""
-        websubmit_functions = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'websubmit_functions', '*.py'))
+        websubmit_functions = PluginContainer(os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', 'websubmit_functions', '*.py'))
 
         self.failUnless(websubmit_functions['Is_Referee'])
         self.failUnless(websubmit_functions['CaseEDS'])
@@ -73,6 +73,8 @@ class TestPluginContainer(InvenioTestCase):
 
     def test_plugin_container_wrapping_external_authentications(self):
         """pluginutils - wrapping external authentications"""
+        from invenio.external_authentication import ExternalAuth
+
         def plugin_builder(plugin_name, plugin_code):
             for name in dir(plugin_code):
                 candidate = getattr(plugin_code, name)
@@ -83,7 +85,7 @@ class TestPluginContainer(InvenioTestCase):
                     pass
             raise ValueError('%s is not a valid external authentication plugin' % plugin_name)
 
-        external_authentications = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'external_authentication_*.py'), plugin_signature=ExternalAuth, plugin_builder=plugin_builder)
+        external_authentications = PluginContainer(os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', 'external_authentication_*.py'), plugin_signature=ExternalAuth, plugin_builder=plugin_builder)
         self.failUnless(issubclass(external_authentications['external_authentication_sso'], ExternalAuth))
         self.failIf(external_authentications.get('external_authentication_cern_wrapper'))
         self.failUnless(len(external_authentications) >= 1)
@@ -91,7 +93,7 @@ class TestPluginContainer(InvenioTestCase):
 
     def test_plugin_container_module_reloading(self):
         """pluginutils - plugin reloading"""
-        websubmit_functions = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'websubmit_functions', '*.py'))
+        websubmit_functions = PluginContainer(os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', 'websubmit_functions', '*.py'))
         self.assertNotEqual(websubmit_functions['Is_Referee'].__doc__, "test_reloading")
         websubmit_functions['Is_Referee'].__doc__ = "test_reloading"
         self.assertEqual(websubmit_functions['Is_Referee'].__doc__, "test_reloading")
@@ -101,13 +103,13 @@ class TestPluginContainer(InvenioTestCase):
 
     def test_plugin_container_module_caching(self):
         """pluginutils - plugin caching"""
-        websubmit_functions = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'websubmit_functions', '*.py'))
+        websubmit_functions = PluginContainer(os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', 'websubmit_functions', '*.py'))
         self.assertNotEqual(websubmit_functions['Is_Referee'].__doc__, "test_caching")
         websubmit_functions['Is_Referee'].__doc__ = "test_caching"
         self.assertEqual(websubmit_functions['Is_Referee'].__doc__, "test_caching")
 
         websubmit_functions.reload_plugins()
-        websubmit_functions_new = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'websubmit_functions', '*.py'))
+        websubmit_functions_new = PluginContainer(os.path.join(cfg['CFG_PYLIBDIR'], 'invenio', 'websubmit_functions', '*.py'))
         self.assertEqual(websubmit_functions_new['Is_Referee'].__doc__, "test_caching")
 
 TEST_SUITE = make_test_suite(TestPluginContainer,)

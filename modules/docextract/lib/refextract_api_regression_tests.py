@@ -23,7 +23,7 @@ The Refextract task tests suite for tasks
 It requires a fully functional invenio installation.
 """
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class RefextractApiTest(InvenioTestCase):

@@ -27,10 +27,10 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_URL
 import invenio.access_control_engine as access_manager
-from invenio.urlutils import create_html_link
+from invenio.utils.url import create_html_link
 from invenio.dbquery import run_sql
 from invenio.oai_repository_updater import parse_set_definition
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.errorlib import register_exception
 from invenio.oai_repository_config import CFG_OAI_REPOSITORY_GLOBAL_SET_SPEC
 

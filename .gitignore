@@ -1,6 +1,8 @@
 .version
+Invenio.egg-info
 Makefile
 Makefile.in
+build
 compile
 configure
 config.cache
@@ -9,6 +11,8 @@ config.status
 config.nice
 config.guess
 config.sub
+docs/_build
+dist
 install-sh
 missing
 compile
@@ -70,7 +74,6 @@ modules/elmsubmit/etc/elmsubmit.cfg
 modules/miscutil/bin/dbdump
 modules/miscutil/bin/dbexec
 modules/miscutil/bin/inveniocfg
-modules/miscutil/bin/inveniomanage
 modules/miscutil/bin/plotextractor
 modules/miscutil/etc/bash_completion.d/inveniocfg
 modules/miscutil/lib/build

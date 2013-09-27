@@ -750,7 +750,7 @@ about the possibilities offered by the <code>bfo</code>, read the <a href="<CFG_
     will get you the translation for "Welcome" (assuming "Welcome" has
     been translated):
 <pre>
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 ln = bfo.ln
 _ = gettext_set_language(ln)

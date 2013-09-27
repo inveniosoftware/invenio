@@ -20,10 +20,10 @@ import cgi
 
 from invenio.config import CFG_SITE_URL, \
      CFG_SITE_LANG, CFG_SITE_RECORD, CFG_INSPIRE_SITE
-from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datestruct_to_dategui
-from invenio.urlutils import create_html_link
-from invenio.textutils import nice_size
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.date import convert_datestruct_to_dategui
+from invenio.utils.url import create_html_link
+from invenio.utils.text import nice_size
 
 def list_types_from_array(bibdocs):
     """Retrieves the list of types from the given bibdoc list."""

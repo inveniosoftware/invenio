@@ -21,7 +21,7 @@
 __revision__ = "$Id$"
 
 from invenio.bibformat_elements.bfe_fulltext import get_files, sort_alphanumerically
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD
 from cgi import escape
 

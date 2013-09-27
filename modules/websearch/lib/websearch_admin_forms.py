@@ -21,23 +21,16 @@
 
 from string import strip
 from datetime import datetime
-from invenio.webmessage_config import CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
-                                      CFG_WEBMESSAGE_STATUS_CODE, \
-                                      CFG_WEBMESSAGE_SEPARATOR
-from invenio.config import CFG_SITE_LANG, \
-                           CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
-                           CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
-
-from invenio.sqlalchemyutils import db
-from invenio.webinterface_handler_flask_utils import _
-from invenio.websearch_model import get_pbx_pos
+from invenio.ext.sqlalchemy import db
+from invenio.base.i18n import _
+from invenio.modules.search.models import get_pbx_pos
 from flask.ext.wtf import Form
-from invenio.wtforms_utils import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
+from invenio.utils.forms import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
 from wtforms import DateTimeField, BooleanField, TextField, TextAreaField, \
                     PasswordField, validators, HiddenField, FieldList, SelectField
 
 
-# from invenio.messages import language_list_long
+# from invenio.base.i18n import language_list_long
 
 class CollectionForm(InvenioBaseForm):
     id = HiddenField()

@@ -27,9 +27,10 @@ __revision__ = "$Id$"
 import os
 import sys
 
-from invenio.config import CFG_TMPDIR
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.globals import cfg
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
 bibformat = lazy_import('invenio.bibformat')
 bibformat_engine = lazy_import('invenio.bibformat_engine')
 bibformat_utils = lazy_import('invenio.bibformat_utils')
@@ -37,12 +38,6 @@ bibformat_config = lazy_import('invenio.bibformat_config')
 bibformat_engine = lazy_import('invenio.bibformat_engine')
 bibformatadminlib = lazy_import('invenio.bibformatadminlib')
 
-#CFG_BIBFORMAT_OUTPUTS_PATH = "..%setc%soutput_formats" % (os.sep, os.sep)
-#CFG_BIBFORMAT_TEMPLATES_PATH = "..%setc%sformat_templates" % (os.sep, os.sep)
-#CFG_BIBFORMAT_ELEMENTS_PATH = "elements"
-CFG_BIBFORMAT_OUTPUTS_PATH = "%s" % (CFG_TMPDIR)
-CFG_BIBFORMAT_TEMPLATES_PATH = "%s" % (CFG_TMPDIR)
-CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (CFG_TMPDIR, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "tests_bibformat_elements"
 
 class FormatTemplateTest(InvenioTestCase):
@@ -50,7 +45,7 @@ class FormatTemplateTest(InvenioTestCase):
 
     def setUp(self):
         self.old_templates_path = bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
+        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = cfg['CFG_TMPDIR']
 
     def tearDown(self):
         bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = self.old_templates_path
@@ -115,9 +110,9 @@ class FormatElementTest(InvenioTestCase):
     def setUp(self):
         # pylint: disable=C0103
         """bibformat - setting python path to test elements"""
-        sys.path.append('%s' % CFG_TMPDIR)
+        sys.path.append('%s' % cfg['CFG_TMPDIR'])
         self.old_elements_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (cfg['CFG_TMPDIR'], os.sep)
         self.old_import_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
 
@@ -256,7 +251,7 @@ class OutputFormatTest(InvenioTestCase):
 
     def setUp(self):
         self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = cfg['CFG_TMPDIR']
 
     def tearDown(self):
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = self.old_outputs_path
@@ -621,7 +616,7 @@ class FormatTest(InvenioTestCase):
     def setUp(self):
         # pylint: disable=C0103
         """ bibformat - prepare BibRecord objects"""
-        sys.path.append('%s' % CFG_TMPDIR)
+        sys.path.append('%s' % cfg['CFG_TMPDIR'])
 
         self.xml_text_1 = '''
         <record>
@@ -714,13 +709,13 @@ class FormatTest(InvenioTestCase):
         <controlfield tag="001">555</controlfield>
         </record>'''
         self.old_outputs_path = bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = cfg['CFG_TMPDIR']
         self.old_elements_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH
-        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = CFG_BIBFORMAT_ELEMENTS_PATH
+        bibformat_engine.CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (cfg['CFG_TMPDIR'], os.sep)
         self.old_import_path = bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
         bibformat_engine.CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH
         self.old_templates_path = bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH
-        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = CFG_BIBFORMAT_TEMPLATES_PATH
+        bibformat_engine.CFG_BIBFORMAT_TEMPLATES_PATH = cfg['CFG_TMPDIR']
 
     def tearDown(self):
         sys.path.pop()

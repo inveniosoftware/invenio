@@ -25,9 +25,9 @@ from invenio.webjournal_utils import \
      parse_url_string, \
      get_journal_categories, \
      get_category_query
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL
-from invenio.urlutils import create_html_link
+from invenio.utils.url import create_html_link
 from invenio.dbquery import run_sql
 from urllib import quote
 

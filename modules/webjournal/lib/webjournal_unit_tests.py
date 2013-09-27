@@ -24,8 +24,8 @@ __revision__ = \
 
 # pylint invenio/modules/webjournal/lib/webjournal_tests.py
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 issue_is_later_than = lazy_import('invenio.webjournal:issue_is_later_than')
 compare_issues = lazy_import('invenio.webjournal_utils:compare_issues')

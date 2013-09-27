@@ -21,8 +21,8 @@
 There should always be at least one test class for each class in b_e_t.
 """
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 load_tokenizers = lazy_import('invenio.bibindex_engine_utils:load_tokenizers')
 
 _TOKENIZERS = None

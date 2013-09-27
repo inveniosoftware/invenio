@@ -15,8 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = goto_plugins
-
 pylibdir=$(libdir)/python/invenio
 wsgiwebdir=$(localstatedir)/www-wsgi/
 
@@ -33,20 +31,11 @@ pylib_DATA = webdoc.py \
              ckeditor_invenio_connector.py \
              webinterface_handler_wsgi.py \
              webinterface_handler_wsgi_utils.py \
-             webinterface_handler_flask.py \
-             webinterface_handler_flask_utils.py \
-             webinterface_handler_config.py \
              httptest_webinterface.py \
              ping_webinterface.py \
-             goto_webinterface.py \
-             goto_model.py \
-             goto_engine.py
+             goto_webinterface.py
 
 wsgiweb_DATA = invenio.wsgi
-
-jsdir=$(localstatedir)/www/js
-
-js_DATA = bootstrap-select.js invenio.js
 
 EXTRA_DIST = $(pylib_DATA) $(wsgiweb_DATA)
 

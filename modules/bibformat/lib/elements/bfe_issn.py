@@ -28,7 +28,7 @@ import getopt
 from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.config import CFG_CERN_SITE
-from invenio.urlutils import make_invenio_opener
+from invenio.utils.url import make_invenio_opener
 
 BIBFORMAT_OPENER = make_invenio_opener('BibFormat')
 

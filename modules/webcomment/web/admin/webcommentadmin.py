@@ -29,8 +29,8 @@ from invenio.webpage import page, create_error_box
 from invenio.config import CFG_SITE_SECURE_URL,CFG_SITE_LANG,CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
-from invenio.urlutils import wash_url_argument, redirect_to_url
-from invenio.messages import wash_language, gettext_set_language
+from invenio.utils.url import wash_url_argument, redirect_to_url
+from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.access_control_engine import acc_authorize_action
 
 def index(req, ln=CFG_SITE_LANG):

@@ -21,33 +21,34 @@ import os
 from wtforms import Form
 from invenio.config import CFG_PYLIBDIR
 from invenio.pluginutils import PluginContainer
-
+from invenio.utils.datastructures import LazyDict
 
 """
 Loads the available widgets for HP
 """
 
+def load_widgets():
+    def plugin_builder(plugin_name, plugin_code):
+        if plugin_name == '__init__':
+            return
+        try:
+            all_widgets = getattr(plugin_code, '__all__')
+            for name in all_widgets:
+                candidate = getattr(plugin_code, name)
+                if issubclass(candidate, Form):
+                    return candidate
+        except AttributeError:
+            pass
 
-def plugin_builder(plugin_name, plugin_code):
-    if plugin_name == '__init__':
-        return
-    try:
-        all_widgets = getattr(plugin_code, '__all__')
-        for name in all_widgets:
-            candidate = getattr(plugin_code, name)
-            if issubclass(candidate, Form):
-                return candidate
-    except AttributeError:
-        pass
+    CFG_WIDGETS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
+                                               'bibworkflow_widgets',
+                                               '*_widget.py'),
+                                  plugin_builder=plugin_builder)
 
-CFG_WIDGETS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                           'bibworkflow_widgets',
-                                           '*_widget.py'),
-                              plugin_builder=plugin_builder)
+    return dict((widget.__name__, widget)
+                for widget in CFG_WIDGETS.itervalues())
 
-widgets = {}
-for widget in CFG_WIDGETS.itervalues():
-    widgets[widget.__name__] = widget
+widgets = LazyDict(load_widgets)
 
 # ## Let's report about broken plugins
 # open(os.path.join(CFG_LOGDIR, 'broken-deposition-fields.log'), 'w').write(

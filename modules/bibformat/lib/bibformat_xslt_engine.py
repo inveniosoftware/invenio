@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_SITE_URL
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH
-from invenio.bibformat_dblayer import \
+from invenio.modules.formatter.api import \
      get_creation_date, \
      get_modification_date
 

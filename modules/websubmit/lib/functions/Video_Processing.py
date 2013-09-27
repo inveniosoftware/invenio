@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.jsonutils import json_decode_file
+from invenio.utils.json import json_decode_file
 from invenio.errorlib import register_exception
 from invenio.bibencode_config import CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION
 from invenio.bibencode_utils import generate_timestamp

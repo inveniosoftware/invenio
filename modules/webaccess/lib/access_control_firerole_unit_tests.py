@@ -22,8 +22,8 @@
 __revision__ = "$Id$"
 
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 acc_firerole_check_user = lazy_import('invenio.access_control_firerole:acc_firerole_check_user')
 compile_role_definition = lazy_import('invenio.access_control_firerole:compile_role_definition')

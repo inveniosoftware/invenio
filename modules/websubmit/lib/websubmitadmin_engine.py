@@ -31,7 +31,7 @@ from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
 from invenio.websubmitadmin_config import InvenioWebSubmitWarning
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 import invenio.template
 

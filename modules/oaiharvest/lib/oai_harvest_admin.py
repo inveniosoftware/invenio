@@ -55,13 +55,13 @@ from invenio.search_engine import get_record
 
 import invenio.template
 from invenio import oai_harvest_daemon
-from invenio.xmlmarc2textmarc import create_marc_record
-from invenio.bibrecord import create_record
-from invenio.urlutils import create_html_link
+from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
+from invenio.legacy.bibrecord import create_record
+from invenio.utils.url import create_html_link
 
 webstyle_templates = invenio.template.load('webstyle')
 oaiharvest_templates = invenio.template.load('oai_harvest')
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 tmppath = CFG_TMPDIR + '/oaiharvestadmin.' + str(os.getpid())
 guideurl = "help/admin/oaiharvest-admin-guide"

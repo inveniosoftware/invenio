@@ -24,10 +24,10 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_RECORD
-from invenio.importutils import lazy_import
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
-create_records = lazy_import('invenio.bibrecord:create_records')
+create_records = lazy_import('invenio.legacy.bibrecord:create_records')
 match_records = lazy_import('invenio.bibmatch_engine:match_records')
 
 
@@ -607,7 +607,7 @@ class BibMatchTest(InvenioTestCase):
 
     def test_check_altered(self):
         """bibmatch - check altered match"""
-        from invenio.bibrecord import record_has_field
+        from invenio.legacy.bibrecord import record_has_field
         records = create_records(self.recxml4)
         self.assertTrue(not record_has_field(records[0][0], '001'))
         [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, \

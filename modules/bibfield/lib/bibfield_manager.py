@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.scriptutils import Manager
+from invenio.ext.script import Manager
 
 manager = Manager(usage="Perform BibField operations")
 
@@ -43,13 +43,13 @@ def load():
 def reset(split_by=1000):
     """Reset record json structure cache."""
     from invenio.bibfield import get_record
-    from invenio.cache_manager import reset_rec_cache
+    from invenio.base.scripts.cache import reset_rec_cache
     reset_rec_cache('recjson', get_record, split_by=split_by)
 
 
 def main():
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    app = create_app()
     manager.app = app
     manager.run()
 

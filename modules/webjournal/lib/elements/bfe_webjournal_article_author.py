@@ -22,8 +22,8 @@ WebJournal Element - display article author(s)
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE
-from invenio.urlutils import create_html_mailto
-from invenio.messages import gettext_set_language
+from invenio.utils.url import create_html_mailto
+from invenio.base.i18n import gettext_set_language
 
 def format_element(bfo, separator, display_email='yes',
            email_obfuscation_mode=CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE):

@@ -26,20 +26,34 @@ function dropped into /opt/cds-invenio/lib/python/invenio/bibsched_tasklets/.
 __revision__ = "$Id$"
 
 import sys
-import os
+from werkzeug.utils import find_modules, import_string
 from invenio.bibtask import task_init, write_message, task_set_option, \
     task_get_option, task_update_progress
-from invenio.pluginutils import PluginContainer, get_callable_documentation, \
+from invenio.pluginutils import get_callable_documentation, \
     check_arguments_compatibility
-from invenio.bibtask_config import CFG_BIBTASK_TASKLETS_PATH
+#from invenio.base.utils import import_module_from_packages
+from invenio.utils.datastructures import LazyDict
 
 
 def _load_tasklets():
     """
     Load all the bibsched tasklets into the global variable _TASKLETS.
     """
-    return PluginContainer(os.path.join(CFG_BIBTASK_TASKLETS_PATH, 'bst_*.py'))
-_TASKLETS = _load_tasklets()
+    tasklets = {}
+    #FIXME
+    packages = [import_string('invenio.bibsched_tasklets'), ] #import_module_from_packages('bibsched_tasklets')
+    for module in packages:
+        for tasklet in find_modules(module.__name__):
+            try:
+                func = import_string(tasklet + ':' + tasklet.split('.')[-1])
+                tasklets[tasklet.split('.')[-1]] = func
+            except:
+                print 'Fail', tasklet
+
+    return tasklets
+
+
+_TASKLETS = LazyDict(_load_tasklets)
 
 
 def cli_list_tasklets():

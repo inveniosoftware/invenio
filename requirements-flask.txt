@@ -1,9 +1,9 @@
 Jinja2==2.7.1
 SQLAlchemy==0.8.2
 Flask==0.10.1
-WTForms==1.0.2
+WTForms>=1.0.5
 fixture==1.4
-redis==2.6.2
+redis==2.8.0
 twill==0.9
 unittest2==0.5.1
 webassets==0.7

@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.textutils import wash_for_xml
+from invenio.utils.text import wash_for_xml
 from invenio.config import \
      CFG_BINDIR, \
      CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR

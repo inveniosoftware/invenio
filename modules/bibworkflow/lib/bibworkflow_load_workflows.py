@@ -20,36 +20,39 @@
 """
 Loads the available workflows for BibWorkflow
 """
-import os
-from pprint import pformat
-from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
-from invenio.pluginutils import PluginContainer
+from invenio.base.utils import autodiscover_workflows
+from invenio.utils.datastructures import LazyDict
+from werkzeug.utils import import_string, find_modules
 
 
-def plugin_builder(plugin_name, plugin_code):
+def plugin_builder(plugin):
+    plugin_name = plugin.__name__.split('.')[-1]
+    print plugin
     if plugin_name == '__init__':
         return
 
-    plugin_candidate = getattr(plugin_code, plugin_name, None)
+    plugin_candidate = getattr(plugin, plugin_name, None)
     if plugin_candidate is None:
-        all_plugins = getattr(plugin_code, '__all__')
+        print plugin_candidate
+        all_plugins = getattr(plugin, '__all__', [])
         for name in all_plugins:
-            candidate = getattr(plugin_code, name)
+            candidate = getattr(plugin, name)
             return candidate
     else:
         return plugin_candidate
 
-loaded_workflows = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
-                                   '*_workflows', '*.py'),
-                                   plugin_builder=plugin_builder)
 
-workflows = {}
-for workflow in loaded_workflows.values():
-    if workflow is not None:
-        workflows[workflow.__name__] = workflow
+def load_workflows():
 
-# Let's report about broken plugins
-open(os.path.join(CFG_LOGDIR, 'broken-workflows.log'), 'w').write(
-    pformat(loaded_workflows.get_broken_plugins()))
+    workflows = {}
+    for package in autodiscover_workflows():
+        for module in find_modules(package.__name__, include_packages=True):
+            workflow = plugin_builder(import_string(module))
+            if workflow is not None:
+                workflows[workflow.__name__] = workflow
+
+    return workflows
+
+workflows = LazyDict(load_workflows)
 
 __all__ = ['workflows']

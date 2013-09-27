@@ -31,7 +31,7 @@ from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_URL, 
 from invenio.webuser import email_valid_p
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.websubmit_functions.Shared_Functions import ParamFromFile
-from invenio.mailutils import scheduled_send_email
+from invenio.ext.email import scheduled_send_email
 from invenio.bibtask import bibtask_allocate_sequenceid
 
 CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL)

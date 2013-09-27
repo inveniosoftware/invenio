@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import cgi
 import urllib
 
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webbasket_config import \
                        CFG_WEBBASKET_CATEGORIES, \
                        CFG_WEBBASKET_ACTIONS, \
@@ -40,7 +40,7 @@ from invenio.config import \
      CFG_WEBBASKET_USE_RICH_TEXT_EDITOR, \
      CFG_SITE_RECORD
 from invenio.webuser import get_user_info
-from invenio.dateutils import convert_datetext_to_dategui
+from invenio.utils.date import convert_datetext_to_dategui
 from invenio.webbasket_dblayer import get_basket_ids_and_names
 
 ICON_BACK = 'icon-arrow-left'

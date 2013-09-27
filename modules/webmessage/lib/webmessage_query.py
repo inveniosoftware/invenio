@@ -22,19 +22,20 @@
 from time import localtime, mktime
 from datetime import datetime
 
-from invenio.config import \
-     CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
-     CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
 from invenio.dbquery import run_sql, OperationalError
-from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
-                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
-from invenio.dateutils import datetext_default, \
+from invenio.modules.messages.config import \
+    CFG_WEBMESSAGE_STATUS_CODE, \
+    CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
+    CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
+    CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
+
+from invenio.utils.date import datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
-from invenio.sqlalchemyutils import db
-from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
-from invenio.websession_model import User
+from invenio.ext.sqlalchemy import db
+from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
+from invenio.modules.accounts.models import User
 
 def filter_messages_from_user_with_status(uid, status):
     """
