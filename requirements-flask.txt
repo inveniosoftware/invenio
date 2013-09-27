@@ -1,5 +1,5 @@
 Jinja2==2.7
-SQLAlchemy==0.8.1
+SQLAlchemy==0.8.2
 Flask==0.10.1
 WTForms==1.0.2
 fixture==1.4
