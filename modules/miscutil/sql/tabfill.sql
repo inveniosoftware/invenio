@@ -565,7 +565,6 @@ INSERT INTO idxINDEX VALUES (24,'itemcount','This index contains number of copie
 INSERT INTO idxINDEX VALUES (25,'filetype','This index contains extensions of files connected to records.','0000-00-00 00:00:00', '', 'native', '','No','No','No', 'BibIndexFiletypeTokenizer');
 INSERT INTO idxINDEX VALUES (26,'miscellaneous','This index contains words/phrases from miscellaneous fields','0000-00-00 00:00:00', '', 'native','','No','No','No', 'BibIndexDefaultTokenizer');
 
-
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (3,4);

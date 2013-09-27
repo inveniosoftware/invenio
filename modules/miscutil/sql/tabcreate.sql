@@ -4672,5 +4672,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_new_index_fil
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_delete_recjson_cache',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_hstRECORD_affected_fields',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_25_virtual_indexes',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_30_indexer_interface',NOW());
 
 -- end of file

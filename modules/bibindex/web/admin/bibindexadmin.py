@@ -270,6 +270,31 @@ def modifyindexstemming(req, idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='yes'
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
+def modifyindexer(req, idxID, ln=CFG_SITE_LANG, indexer='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except:
+        return error_page('Error', req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyindexer(idxID=idxID,
+                                                   ln=ln,
+                                                   indexer=indexer,
+                                                   callback=callback,
+                                                   confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
 def modifydependentindexes(req, idxID, ln=CFG_SITE_LANG, newIDs=[], callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (CFG_SITE_URL)
 

@@ -41,8 +41,8 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     get_all_virtual_indexes, \
     get_virtual_index_building_blocks, \
     get_index_name_from_index_id, \
-    get_all_index_names_and_column_values
-
+    get_all_index_names_and_column_values, \
+    is_index_virtual
 
 
 _TOKENIZERS = load_tokenizers()
@@ -57,7 +57,7 @@ def getnavtrail(previous = ''):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_index(ln=CFG_SITE_LANG, mtype='', content=''):
+def perform_index(ln=CFG_SITE_LANG, mtype='', content='', **params):
     """start area for modifying indexes
     mtype - the method that called this method.
     content - the output from that method."""
@@ -79,40 +79,40 @@ def perform_index(ln=CFG_SITE_LANG, mtype='', content=''):
     if mtype == "perform_showindexoverview" and content:
         fin_output += content
     elif mtype == "perform_showindexoverview" or not mtype:
-        fin_output += perform_showindexoverview(ln, callback='')
+        fin_output += perform_showindexoverview(ln, callback='', **params)
 
     if mtype == "perform_showvirtualindexoverview" and content:
         fin_output += content
     elif mtype == "perform_showvirtualindexoverview" or not mtype:
-        fin_output += perform_showvirtualindexoverview(ln, callback='')
+        fin_output += perform_showvirtualindexoverview(ln, callback='', **params)
 
     if mtype == "perform_editindexes" and content:
         fin_output += content
     elif mtype == "perform_editindexes" or not mtype:
-        fin_output += perform_editindexes(ln, callback='')
+        fin_output += perform_editindexes(ln, callback='', **params)
 
     if mtype == "perform_addindex" and content:
         fin_output += content
     elif mtype == "perform_addindex" or not mtype:
-        fin_output += perform_addindex(ln, callback='')
+        fin_output += perform_addindex(ln, callback='', **params)
 
     if mtype == "perform_editvirtualindexes" and content:
         fin_output += content
     elif mtype == "perform_editvirtualindexes":
         #not visible in 'show all' view of 'Manage Indexes'
-        fin_output += perform_editvirtualindexes(ln, callback='')
+        fin_output += perform_editvirtualindexes(ln, callback='', **params)
 
     if mtype == "perform_addvirtualindex" and content:
         fin_output += content
     elif mtype == "perform_addvirtualindex":
         #not visible in 'show all' view of 'Manage Indexes'
-        fin_output += perform_addvirtualindex(ln, callback='')
+        fin_output += perform_addvirtualindex(ln, callback='', **params)
 
     if mtype == "perform_deletevirtualindex" and content:
         fin_output += content
     elif mtype == "perform_deletevirtualindex":
         #not visible in 'show all' view of 'Manage Indexes'
-        fin_output += perform_deletevirtualindex(ln, callback='')
+        fin_output += perform_deletevirtualindex(ln, callback='', **params)
 
     return addadminbox("<b>Menu</b>",  [fin_output])
 
@@ -226,10 +226,12 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     <td>7.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyremovehtml">Modify remove HTML markup</a></small></td>
     <td>8.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyremovelatex">Modify remove latex markup</a></small></td>
     <td>9.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifytokenizer">Modify tokenizer</a></small></td>
-    <td>10.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
+    <td>10.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindexer">Modify indexer</a></small></td>
+    <td>11.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln)
+    """ % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln)
+
 
     if mtype == "perform_modifyindex" and content:
         fin_output += content
@@ -276,6 +278,11 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     elif mtype == "perform_modifytokenizer" or not mtype:
         fin_output += perform_modifytokenizer(idxID, ln, callback='')
 
+    if mtype == "perform_modifyindexer" and content:
+        fin_output += content
+    elif mtype == "perform_modifyindexer" or not mtype:
+        fin_output += perform_modifyindexer(idxID, ln, callback='')
+
     if mtype == "perform_deleteindex" and content:
         fin_output += content
     elif mtype == "perform_deleteindex" or not mtype:
@@ -315,7 +322,8 @@ def perform_editvirtualindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', call
 def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Overview of all indexes"""
     output = """<table cellpadding="3" border="1">"""
-    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language", "Synonym knowledge base", "Remove stopwords", "Remove HTML markup", "Remove Latex markup", "Tokenizer", "Index type")
+    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language", "Synonym knowledge base", "Remove stopwords", "Remove HTML markup", "Remove Latex markup", "Tokenizer", "Indexer type")
+
     idx = get_idx()
     idx_dict = dict(get_def_name('', "idxINDEX"))
 
@@ -364,7 +372,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
         if not remove_latex_markup:
             tokenizer = """<strong><span class="info">None</span></strong>"""
 
-        type_of_index = virtual_indexes.get(idxID) and "virtual" or "normal"
+        type_of_indexer = virtual_indexes.get(idxID) and "virtual" or get_idx_indexer(idxNAME)
 
         if forward_table_status_info and reverse_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
@@ -383,7 +391,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        remove_html_markup,
                        remove_latex_markup,
                        tokenizer,
-                       type_of_index)
+                       type_of_indexer)
         elif not forward_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
@@ -399,7 +407,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        remove_html_markup,
                        remove_latex_markup,
                        tokenizer,
-                       type_of_index)
+                       type_of_indexer)
         elif not reverse_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
@@ -415,7 +423,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
                        remove_html_markup,
                        remove_latex_markup,
                        tokenizer,
-                       type_of_index)
+                       type_of_indexer)
     output += "</table>"
 
     body = [output]
@@ -999,14 +1007,14 @@ def perform_deletevirtualindex(ln=CFG_SITE_LANG, idxID='',  callback='yes', conf
                   <select name="idxID" class="admin_w200">
                   <option value="-1">- Select an index -</option>
                """
-        for (idxID, idxNAME) in idx:
-            text += """<option value="%s">%s</option>""" % (idxID, idxNAME)
+        for idx_id, idx_name in idx:
+            selected = str(idxID) == str(idx_id) and 'selected="selected"' or ''
+            text += """<option value="%s" %s>%s</option>""" % (idx_id, selected, idx_name)
         text += """</select>"""
 
         output += createhiddenform(action="deletevirtualindex#3",
                                    text=text,
                                    button="Confirm",
-                                   idxID=idxID,
                                    confirm=1)
     else:
         output = "No index specified"
@@ -1282,6 +1290,65 @@ def perform_modifyindexstemming(idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='y
 
     if callback:
         return perform_editindex(idxID, ln, "perform_modifyindexstemming", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+
+def perform_modifyindexer(idxID, ln=CFG_SITE_LANG, indexer='', callback='yes', confirm=-1):
+    """form to modify an indexer.
+       idxID -  the index name to change.
+       idexer - indexer type: native/SOLR/XAPIAN/virtual"""
+    subtitle  = ""
+    output  = ""
+
+    idx = get_idx(idxID)
+    if idx:
+        current_indexer = is_index_virtual(idx[0][0]) and "virtual" or get_idx_indexer(idx[0][1])
+        subtitle = """<a name="4"></a>5. Modify indexer.&nbsp;&nbsp;&nbsp;
+                      <small>
+                      [<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]
+                      </small>""" % CFG_SITE_URL
+        if confirm in [-1, "-1"]:
+            indexer = current_indexer or ''
+        items = ["native"]
+        if idx[0][1] == "fulltext":
+            items.extend(["SOLR", "XAPIAN"])
+        else:
+            items.extend(["virtual"])
+
+        html_element = """<select name="indexer" class="admin_w200">"""
+        for item in items:
+            selected = indexer==item and 'selected="selected"' or ''
+            html_element += """<option value="%s" %s>%s</option>""" % (item, selected, item)
+        html_element += """</select>"""
+
+        text = """<span class="adminlabel">Indexer type</span>""" + html_element
+        output += createhiddenform(action="modifyindexer#5",
+                                   text=text,
+                                   button="Modify",
+                                   idxID=idxID,
+                                   ln=ln,
+                                   confirm=1)
+
+        if confirm in [1, "1"] and idx[0][1]=="fulltext":
+            res = modify_idx_indexer(idxID, indexer)
+            output += write_outcome(res)
+            output += """<br /><span class="info">Please note you should run:
+                        <pre>$> %s/bibindex --reindex -w fulltext</pre></span>""" % CFG_BINDIR
+        elif confirm in [1, "1"]:
+            if indexer=="virtual" and current_indexer == "native":
+                params = {'idxNEWVID': idxID}
+                return perform_index(ln, "perform_addvirtualindex", "", **params)
+            elif indexer=="native" and current_indexer == "virtual":
+                params = {'idxID':idxID}
+                return perform_index(ln, "perform_deletevirtualindex", "", **params)
+    else:
+        output  = """No index to modify."""
+
+    body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_modifyindexer", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 
@@ -2331,6 +2398,8 @@ def delete_virtual_idx(idxID):
        @param idxID -id of the virtual index to delete/change into normal idx
     """
     try:
+        run_sql("""UPDATE idxINDEX SET indexer='native'
+                   WHERE id=%s""", (idxID, ))
         run_sql("""DELETE FROM idxINDEX_idxINDEX
                    WHERE id_virtual=%s""", (idxID, ))
         return (1, "")
@@ -2443,7 +2512,12 @@ def add_virtual_idx(id_virtual, id_normal):
        Uses function add_dependent_index, because
        query in both cases is the same.
     """
-    return add_dependent_index(id_virtual, id_normal)
+    try:
+        run_sql("""UPDATE idxINDEX SET indexer='virtual'
+                   WHERE id=%s""", (id_virtual, ))
+        return add_dependent_index(id_virtual, id_normal)
+    except StandardError, e:
+        return (0, e)
 
 
 def modify_dependent_indexes(idxID, indexes_to_add, indexes_to_remove):
@@ -2560,13 +2634,22 @@ def modify_idx_stemming(idxID, idxSTEM):
     except StandardError, e:
         return (0, e)
 
+
+def modify_idx_indexer(idxID, indexer):
+    """Modify an indexer type in idxINDEX table"""
+    try:
+        res = run_sql("UPDATE idxINDEX SET indexer=%s WHERE ID=%s", (indexer, idxID))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+
+
 def modify_idx_synonym_kb(idxID, idxKB, idxMATCH):
     """Modify the knowledge base for the synonym lookup in idxINDEX table
        @param idxID: id of the index in idxINDEX table
        @param idxKB: name of the knowledge base (for example: INDEX-SYNONYM-TITLE)
        @param idxMATCH: type of match in the knowledge base: exact, leading-to-coma, leading-to-number
     """
-
     try:
         field_value = ""
         if idxKB != CFG_BIBINDEX_SYNONYM_MATCH_TYPE["None"] and idxMATCH != CFG_BIBINDEX_SYNONYM_MATCH_TYPE["None"]:
