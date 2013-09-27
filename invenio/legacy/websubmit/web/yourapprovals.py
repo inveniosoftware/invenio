@@ -29,7 +29,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_find_possible_roles
 from invenio.webpage import page, error_page
 from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
-from invenio.messages import gettext_set_language, wash_language
+from invenio.base.i18n import gettext_set_language, wash_language
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')

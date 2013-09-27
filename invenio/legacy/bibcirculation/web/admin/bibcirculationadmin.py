@@ -21,7 +21,7 @@ __revision__ = ""
 
 import invenio.bibcirculationadminlib as bal
 from invenio.config import CFG_SITE_LANG
-from invenio.urlutils import wash_url_argument
+from invenio.utils.url import wash_url_argument
 
 def index(req, ln=CFG_SITE_LANG):
     """

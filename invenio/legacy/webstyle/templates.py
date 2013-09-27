@@ -28,7 +28,7 @@ import sys
 import string
 
 from flask import g, current_app
-from invenio.jinja2utils import render_template_to_string
+from invenio.ext.template import render_template_to_string
 from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_SITE_LANG, \
@@ -42,10 +42,10 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_WEBLINKBACK_TRACKBACK_ENABLED
 
-from invenio.messages import gettext_set_language, language_list_long, is_language_rtl
-from invenio.urlutils import make_canonical_urlargd, create_html_link, \
+from invenio.base.i18n import gettext_set_language, language_list_long, is_language_rtl
+from invenio.utils.url import make_canonical_urlargd, create_html_link, \
                              get_canonical_and_alternates_urls
-from invenio.dateutils import convert_datecvs_to_datestruct, \
+from invenio.utils.date import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
 from bs4 import BeautifulSoup
@@ -86,19 +86,23 @@ class Template:
         if title == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
             return ""
 
+        # Breadcrumbs
+        # breadcrumb objects should provide properties 'text' and 'url'
+
         # First element
-        breadcrumbs = [(_("Home"), CFG_SITE_URL), ]
+        breadcrumbs = [dict(text=_("Home"), url=CFG_SITE_URL), ]
 
         # Decode previous elements
         if previous_links:
             soup = BeautifulSoup(previous_links)
             for link in soup.find_all('a'):
-                breadcrumbs.append((unicode(" ".join(link.contents)),
-                                   link.get('href')))
+                breadcrumbs.append(dict(
+                    text=unicode(' '.join(link.contents)),
+                    url=link.get('href')))
 
         # Add head
         if title:
-            breadcrumbs.append((title, ''))
+            breadcrumbs.append(dict(text=title, url='#'))
 
         return render_template_to_string("breadcrumbs.html",
                                          breadcrumbs=breadcrumbs).encode('utf8')

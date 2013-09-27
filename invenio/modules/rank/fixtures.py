@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from fixture import DataSet
-from invenio.websearch_fixtures import CollectionData
+from invenio.modules.search.fixtures import CollectionData
 
 
 class RnkMETHODData(DataSet):
@@ -61,4 +61,4 @@ class CollectionRnkMETHODData(DataSet):
     class CollectionRnkMETHOD_1_1:
         score = 100
         id_rnkMETHOD = RnkMETHODData.RnkMETHOD_1.ref('id')
-        id_collection = CollectionData.siteCollection.ref('id')
+        id_collection = 1 #CollectionData.siteCollection.ref('id')

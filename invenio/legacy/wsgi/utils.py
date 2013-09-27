@@ -56,7 +56,7 @@ import cStringIO
 import tempfile
 from types import TypeType, ClassType, BuiltinFunctionType, MethodType, ListType
 from invenio.config import CFG_TMPDIR, CFG_TMPSHAREDDIR
-from invenio.webinterface_handler_config import \
+from invenio.utils.apache import \
     SERVER_RETURN, \
     HTTP_LENGTH_REQUIRED, \
     HTTP_BAD_REQUEST, \

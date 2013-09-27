@@ -53,7 +53,7 @@ from invenio.dbquery import run_sql
 try:
     from collections import defaultdict
 except:
-    from invenio.containerutils import defaultdict
+    from invenio.utils.container import defaultdict
 
 
 MARC_100_700_CACHE = None

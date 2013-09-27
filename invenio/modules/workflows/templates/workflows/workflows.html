@@ -1,5 +1,5 @@
-{% extends "bibworkflow_layout.html" %}
-{%- js 'js/bibworkflow_workflows.js' -%}
+{% extends "workflows/layout.html" %}
+{%- js url_for('workflows.static', filename='js/workflows/workflows.js') -%}
 {% block body2 %}
     <div id = "alert_placeholder"></div>
 
@@ -25,23 +25,6 @@
                 <td>{{ workflow }}</td>
                 <td><input id="example_{{ workflow }} 
                 " class="btn" type="submit" rel="popover" name="{{ workflow }}"/></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <h1>Broken workflows</h1>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Workflow name</th>
-                <th>Options</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for workflow in broken_workflows %}
-            <tr>
-                <td>{{ workflow }}</td>
-                <td><input class="btn" type="submit" name="{{ workflow }}"/></td>
             </tr>
             {% endfor %}
         </tbody>

@@ -17,9 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.sqlalchemyutils import db
-from invenio.webuser_flask import current_user, login_user, logout_user
-from invenio.testutils import make_flask_test_suite, run_test_suite, \
+from invenio.ext.sqlalchemy import db
+from invenio.ext.login import current_user, login_user, logout_user
+from invenio.testsuite import make_flask_test_suite, run_test_suite, \
     FlaskSQLAlchemyTest, InvenioFixture
 from fixture import SQLAlchemyFixture
 from invenio.webaccount_fixtures import UserData, UsergroupData, \
@@ -27,7 +27,7 @@ from invenio.webaccount_fixtures import UserData, UsergroupData, \
 
 
 def fixture_builder():
-    from invenio.websession_model import User, Usergroup, UserUsergroup
+    from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
     return SQLAlchemyFixture(env={'UserData': User, 'UsergroupData': Usergroup,
                                   'UserUsergroupData': UserUsergroup},
                              engine=db.metadata.bind,
@@ -86,7 +86,7 @@ class WebAccountTest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData)
     def test_change_password(data, self):
-        from invenio.websession_model import User
+        from invenio.modules.accounts.models import User
         NEW_PASSWORD = 'admin'
         users = data.UserData
 
@@ -116,7 +116,7 @@ class UserGroupTest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData, UsergroupData, UserUsergroupData)
     def test_group_relation_consistency(data, self):
-        from invenio.websession_model import User, Usergroup
+        from invenio.modules.accounts.models import User, Usergroup
         orig_len = len(dict(data.UserUsergroupData))
         user_len = sum(len(u.usergroups) for u in User.query.all())
         ugrp_len = sum(len(g.users) for g in Usergroup.query.all())

@@ -23,8 +23,6 @@ pylib_DATA = bibknowledge_webinterface.py \
              bibknowledgeadminlib.py \
              bibknowledge_templates.py \
              bibknowledge_dblayer.py \
-             bibknowledge_fixtures_demosite.py \
-             bibknowledge_model.py \
              bibknowledge_unit_tests.py \
              bibknowledge_regression_tests.py
 

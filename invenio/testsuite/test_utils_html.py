@@ -27,7 +27,7 @@ from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
      CFG_TIDY_INSTALLED, \
      CFG_BEAUTIFULSOUP_INSTALLED, tidy_html, \
      escape_javascript_string
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 class XSSEscapingTest(InvenioTestCase):
     """Test functions related to the prevention of XSS attacks."""

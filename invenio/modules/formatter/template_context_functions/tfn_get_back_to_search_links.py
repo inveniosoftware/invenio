@@ -17,30 +17,28 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-
-from invenio.config import \
-    CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT, \
-    CFG_SITE_URL
 from flask import session
-from invenio.jinja2utils import render_template_to_string
+from invenio.base.globals import cfg
+from invenio.ext.template import render_template_to_string
 
 """
 Template context function - Display links (previous, next, back-to-search)
 to navigate through the records.
 """
 
+
 def template_context_function(recID):
     """
     Displays next-hit/previous-hit/back-to-search links
     on the detailed record pages in order to be able to quickly
     flip between detailed record pages
-    @param recID: detailed record ID
-    @type recID: string
-    @return: html output
+    :param recID: detailed record ID
+    :type recID: string
+    :return: html output
     """
 
     # this variable is set to zero so nothing is displayed
-    if not CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
+    if not cfg['CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT']:
         return ""
 
     # search for a specific record having not done
@@ -52,9 +50,9 @@ def template_context_function(recID):
         return ""
 
     if recids:
-        return render_template_to_string('record_back_to_search_links.html',
+        return render_template_to_string('records/back_to_search_links.html',
                                          recID=int(recID),
-                                         last_query=CFG_SITE_URL + last_query,
+                                         last_query=cfg['CFG_SITE_URL'] + last_query,
                                          recids=recids)
     else:
         # did not rich the limit CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT,

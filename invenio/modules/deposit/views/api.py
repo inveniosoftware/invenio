@@ -19,13 +19,12 @@
 
 
 import json
-from flask import  \
+from flask import Blueprint, \
     request, \
     jsonify
 
 from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
-from invenio.webdeposit_load_deposition_types import deposition_metadata
-from invenio.webinterface_handler_flask_utils import InvenioBlueprint
+from invenio.webdeposit_load_deposition_types import deposition_types
 from invenio.webdeposit_utils import create_workflow,\
     get_workflow, \
     set_form_status, \
@@ -34,13 +33,13 @@ from invenio.webdeposit_utils import create_workflow,\
     validate_preingested_data, \
     deposit_files, \
     InvenioWebDepositNoDepositionType
-from invenio.webuser_flask import current_user
-from invenio.web_api_key import api_key_required
-from invenio.jsonutils import wash_for_json
+from flask.ext.login import current_user
+from invenio.modules.apikeys import api_key_required
+from invenio.utils.json import wash_for_json
 
-blueprint = InvenioBlueprint('webdeposit_api', __name__,
-                             url_prefix='/api/deposit',
-                             config='invenio.websubmit_config')
+blueprint = Blueprint('webdeposit_api', __name__, url_prefix='/api/deposit',
+                      template_folder='../templates',
+                      static_folder='../static')
 
 
 class enum(object):
@@ -57,7 +56,7 @@ def deposition_create(deposition_type):
 
     user_id = current_user.get_id()
 
-    if deposition_type not in deposition_metadata:
+    if deposition_type not in deposition_types:
         return False, jsonify({'error': ERROR.INVALID_DEPOSITION,
                                'message': 'Invalid deposition.'})
 
@@ -68,7 +67,7 @@ def deposition_create(deposition_type):
 @blueprint.route('/set/<deposition_type>/', methods=['GET', 'POST'])
 @api_key_required
 def json_set(deposition_type):
-    if deposition_type not in deposition_metadata:
+    if deposition_type not in deposition_types:
         return False, jsonify({'error': ERROR.INVALID_DEPOSITION,
                                'message': 'Invalid deposition.'})
 

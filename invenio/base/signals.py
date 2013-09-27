@@ -50,7 +50,7 @@ Example subscriber::
     def clear_additional_cache(sender, collection=None, lang=None):
         pass
 
-    from invenio.signalutils import webcoll_after_webpage_cache_update
+    from invenio.base.signals import webcoll_after_webpage_cache_update
     from flask import current_app
     webcoll_after_webpage_cache_update.connect(
         clear_additional_cache,
@@ -67,8 +67,8 @@ Example subscriber::
     def backup_database(sender, *args, **kwargs):
         pass
 
-    from invenio.signalutils import pre_command
-    from invenio.database_manager import drop
+    from invenio.base.signals import pre_command
+    from invenio.base.scripts.database import drop
     pre_command.connect(
         backup_database,
         sender=drop
@@ -84,8 +84,8 @@ Example subscriber::
     def modify_demosite(sender, *args, **kwargs):
         pass
 
-    from invenio.signalutils import post_command
-    from invenio.database_manager import demosite
+    from invenio.base.signals import post_command
+    from invenio.base.scripts.database import demosite
     pre_command.connect(
         modify_demosite,
         sender=demosite

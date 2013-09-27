@@ -20,20 +20,23 @@
 """WebMessage Flask Blueprint"""
 
 from datetime import datetime
-from flask import render_template, request, flash, redirect, url_for
-from invenio import webmessage_dblayer as dbplayer
-from invenio.config import CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES
-from invenio.sqlalchemyutils import db
-from invenio.webmessage import is_no_quota_user
-from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE
-from invenio.webmessage_mailutils import email_quote_txt
-from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
-from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
-from invenio import webmessage_query as dbquery
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webuser_flask import current_user
-
+from flask import render_template, request, flash, redirect, url_for, Blueprint
+from flask.ext.login import current_user, login_required
 from sqlalchemy.sql import operators
+
+from invenio import webmessage_dblayer as dbplayer
+from invenio import webmessage_query as dbquery
+from invenio.base.decorators import wash_arguments, templated, sorted_by, filtered_by
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from invenio.ext.breadcrumb import register_breadcrumb
+from invenio.ext.menu import register_menu
+from invenio.ext.principal import permission_required
+from invenio.ext.sqlalchemy import db
+from invenio.webmessage_forms import AddMsgMESSAGEForm, FilterMsgMESSAGEForm
+
+from .models import MsgMESSAGE, UserMsgMESSAGE, email_alert_register
 
 
 class MessagesMenu(object):
@@ -43,7 +46,7 @@ class MessagesMenu(object):
         unread = db.session.query(db.func.count(UserMsgMESSAGE.id_msgMESSAGE)).\
             filter(db.and_(
                 UserMsgMESSAGE.id_user_to == uid,
-                UserMsgMESSAGE.status == CFG_WEBMESSAGE_STATUS_CODE['NEW']
+                UserMsgMESSAGE.status == cfg['CFG_WEBMESSAGE_STATUS_CODE']['NEW']
             )).scalar()
 
         out = '<div data-menu="click" data-menu-source="' + url_for('webmessage.menu') + '">'
@@ -55,23 +58,17 @@ class MessagesMenu(object):
 
 not_guest = lambda: not current_user.is_guest
 
-blueprint = InvenioBlueprint('webmessage', __name__, url_prefix="/yourmessages",
-                             config='invenio.webmessage_config',
-                             menubuilder=[('personalize.messages',
-                                           _('Your messages'),
-                                           'webmessage.index', 10),
-                                          ('main.messages', MessagesMenu(),
-                                           'webmessage.index', -3, [],
-                                           not_guest)],
-                             breadcrumbs=[(_("Your Account"), 'youraccount.edit'),
-                                          ('Your Messages', 'webmessage.index')])
+blueprint = Blueprint('webmessage', __name__, url_prefix="/yourmessages",
+                      template_folder='templates', static_folder='static')
+
+default_breadcrumb_root(blueprint, '.webaccount.messages')
 
 
 @blueprint.route('/menu', methods=['GET'])
 #FIXME if request is_xhr then do not return 401
-#@blueprint.invenio_authenticated
-#@blueprint.invenio_authorized('usemessages')
-#@blueprint.invenio_templated('webmessage_menu.html')
+#@login_required
+#@permission_required('usemessages')
+#@templated('messages/menu.html')
 def menu():
     uid = current_user.get_id()
 
@@ -85,21 +82,26 @@ def menu():
         order_by(db.desc(MsgMESSAGE.received_date)).limit(5)
 
     #return dict(messages=messages.all())
-    return render_template('webmessage_menu.html', messages=messages.all())
+    return render_template('messages/menu.html', messages=messages.all())
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/index', methods=['GET', 'POST'])
 @blueprint.route('/display', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('usemessages')
-@blueprint.invenio_sorted(MsgMESSAGE)
-@blueprint.invenio_filtered(MsgMESSAGE, columns={
+@login_required
+@permission_required('usemessages')
+@sorted_by(MsgMESSAGE)
+@filtered_by(MsgMESSAGE, columns={
     'subject': operators.startswith_op,
     'user_from.nickname': operators.contains_op},
     form=FilterMsgMESSAGEForm)
-@blueprint.invenio_templated('webmessage_index.html')
+@templated('messages/index.html')
+@register_breadcrumb(blueprint, '.', _('Your Messages'))
+@register_menu(blueprint, 'personalize.messages', _('Your messages'), order=10)
+@register_menu(blueprint, 'main.messages', MessagesMenu(), order=-3,
+               visible_when=not_guest)
 def index(sort=False, filter=None):
+    from invenio.webmessage import is_no_quota_user
     uid = current_user.get_id()
 
     dbquery.update_user_inbox_for_reminders(uid)
@@ -118,11 +120,12 @@ def index(sort=False, filter=None):
 
 @blueprint.route("/add", methods=['GET', 'POST'])
 @blueprint.route("/write", methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_("Write a message"))
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('usemessages')
-@blueprint.invenio_wash_urlargd({'msg_reply_id': (int, 0)})
+@register_breadcrumb(blueprint, '.add', _('Write a message'))
+@login_required
+@permission_required('usemessages')
+@wash_arguments({'msg_reply_id': (int, 0)})
 def add(msg_reply_id):
+    from invenio.webmessage_mailutils import email_quote_txt
     uid = current_user.get_id()
     if msg_reply_id:
         if (dbplayer.check_user_owns_message(uid, msg_reply_id) == 0):
@@ -137,7 +140,7 @@ def add(msg_reply_id):
                 message.subject = _("Re:") + " " + m.message.subject
                 message.body = email_quote_txt(m.message.body)
                 form = AddMsgMESSAGEForm(request.form, obj=message)
-                return render_template('webmessage_add.html', form=form)
+                return render_template('messages/add.html', form=form)
             except db.sqlalchemy.orm.exc.NoResultFound:
                 # The message exists in table user_msgMESSAGE
                 # but not in table msgMESSAGE => table inconsistency
@@ -153,14 +156,14 @@ def add(msg_reply_id):
         form.populate_obj(m)
         m.id_user_from = uid
         m.sent_date = datetime.now()
-        quotas = dbplayer.check_quota(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES - 1)
+        quotas = dbplayer.check_quota(cfg['CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES'] - 1)
         users = filter(lambda x: quotas.has_key(x.id), m.recipients)
         #m.recipients = m.recipients.difference(users))
         for u in users:
             m.recipients.remove(u)
         if len(users) > 0:
             flash(_('Following users reached their quota %d messages: %s') % \
-                  (CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, ', '.join(
+                  (cfg['CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES'], ', '.join(
                   [u.nickname for u in users]),), "error")
         flash(_('Message has %d valid recipients.') %
               (len(m.recipients),), "info")
@@ -171,7 +174,7 @@ def add(msg_reply_id):
                 and m.received_date > datetime.now():
 
                 for um in m.sent_to_users:
-                    um.status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
+                    um.status = cfg['CFG_WEBMESSAGE_STATUS_CODE']['REMINDER']
             else:
                 m.received_date = datetime.now()
             try:
@@ -182,16 +185,16 @@ def add(msg_reply_id):
             except:
                 db.session.rollback()
 
-    return render_template('webmessage_add.html', form=form)
+    return render_template('messages/add.html', form=form)
 
 
 @blueprint.route("/view")
 @blueprint.route("/display_msg")
-@blueprint.invenio_set_breadcrumb(_("Read a message"))
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('usemessages')
-@blueprint.invenio_wash_urlargd({'msgid': (int, 0)})
-@blueprint.invenio_templated('webmessage_view.html')
+@register_breadcrumb(blueprint, '.view', _('View a message'))
+@login_required
+@permission_required('usemessages')
+@wash_arguments({'msgid': (int, 0)})
+@templated('messages/view.html')
 def view(msgid):
     uid = current_user.get_id()
     if (dbquery.check_user_owns_message(uid, msgid) == 0):
@@ -199,7 +202,7 @@ def view(msgid):
     else:
         try:
             m = dbquery.get_message(uid, msgid)
-            m.status = CFG_WEBMESSAGE_STATUS_CODE['READ']
+            m.status = cfg['CFG_WEBMESSAGE_STATUS_CODE']['READ']
             ## It's not necessary since "m" is SQLAlchemy object bind with same
             ## session.
             ##db.session.add(m)
@@ -216,8 +219,8 @@ def view(msgid):
 
 
 @blueprint.route("/delete", methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('usemessages')
+@login_required
+@permission_required('usemessages')
 def delete():
     """
     Delete message specified by 'msgid' that belongs to logged user.
@@ -238,10 +241,10 @@ def delete():
 
 
 @blueprint.route("/delete_all", methods=['GET', 'POST'])
-@blueprint.invenio_set_breadcrumb(_("Delete all messages"))
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('usemessages')
-@blueprint.invenio_wash_urlargd({'confirmed': (int, 0)})
+@register_breadcrumb(blueprint, '.delete', _('Delete all messages'))
+@login_required
+@permission_required('usemessages')
+@wash_arguments({'confirmed': (int, 0)})
 def delete_all(confirmed=0):
     """
     Delete every message belonging a logged user.
@@ -249,10 +252,19 @@ def delete_all(confirmed=0):
     """
     uid = current_user.get_id()
     if confirmed != 1:
-        return render_template('webmessage_confirm_delete.html')
+        return render_template('messages/confirm_delete.html')
 
     if dbquery.delete_all_messages(uid):
         flash(_("Your mailbox has been emptied."), "info")
     else:
         flash(_("Could not empty your mailbox."), "warning")
     return redirect(url_for('.index'))
+
+
+# Registration of email_alert invoked from blueprint
+# in order to use before_app_first_request.
+# Reading config CFG_WEBMESSAGE_EMAIL_ALERT
+# required app context.
+@blueprint.before_app_first_request
+def invoke_email_alert_register():
+    email_alert_register()

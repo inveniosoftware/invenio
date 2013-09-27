@@ -33,7 +33,7 @@ from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITI
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE
 from invenio.bibformat_bfx_engine_config import InvenioBibFormatBfxError, InvenioBibFormatBfxWarning
 from invenio.errorlib import register_exception
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_LANG
 
 address_pattern = r'(?P<parent>[a-z_]*):?/?(?P<tag>[0-9_?\w]*)/?(?P<code>[\w_?]?)#?(?P<reg>.*)'

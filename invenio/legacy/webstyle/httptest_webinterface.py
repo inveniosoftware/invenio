@@ -30,7 +30,7 @@ import cgi
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
 from invenio.webpage import page
 from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
-from invenio.urlutils import redirect_to_url
+from invenio.utils.url import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
     _exports = ["", "post1", "post2", "sso", "dumpreq", "complexpost", "whatismyip", "oraclefriendly"]

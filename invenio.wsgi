@@ -61,8 +61,8 @@ import sys
 sys.stdout = sys.stderr
 
 try:
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    application = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    application = create_app()
 finally:
     ## mod_wsgi uses one thread to import the .wsgi file
     ## and a second one to instantiate the application.

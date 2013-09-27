@@ -18,9 +18,7 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = webalert.py \
-             webalert_model.py \
              webalert_templates.py \
-             webalert_user_settings.py \
              webalert_webinterface.py \
              alert_engine.py \
              alert_engine_unit_tests.py \

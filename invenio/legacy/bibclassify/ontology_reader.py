@@ -64,7 +64,7 @@ if bconfig.STANDALONE:
     from urllib2 import urlopen
 else:
     from invenio import dbquery
-    from invenio.urlutils import make_invenio_opener
+    from invenio.utils.url import make_invenio_opener
     urlopen = make_invenio_opener('BibClassify').open
 
 _contains_digit = re.compile("\d")

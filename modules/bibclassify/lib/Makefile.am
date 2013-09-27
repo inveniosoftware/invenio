@@ -22,10 +22,8 @@ pylib_DATA = bibclassify_acronym_analyzer.py \
              bibclassify_config.py \
              bibclassify_daemon.py \
              bibclassify_engine.py \
-             bibclassify_fixtures_demosite.py \
              bibclassify_keyword_analyzer.py \
              bibclassify_regression_tests.py \
-             bibclassify_model.py \
              bibclassify_ontology_reader.py \
              bibclassify_text_extractor.py \
              bibclassify_text_normalizer.py \

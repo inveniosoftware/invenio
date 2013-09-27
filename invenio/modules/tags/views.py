@@ -17,58 +17,67 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebTag Flask Blueprint"""
+"""
+    invenio.modules.tags.blueprint
+    ------------------------------
 
-# Configs
-from invenio.config import CFG_SITE_LANG
+    Tagging interface.
+"""
 
 # Flask
-from flask import render_template, request, flash, redirect, url_for, jsonify
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webuser_flask import current_user
+from werkzeug import LocalProxy
+from flask import render_template, request, flash, redirect, url_for, \
+    jsonify, Blueprint
+from invenio.base.i18n import _
+from invenio.base.decorators import wash_arguments, templated
+from flask.ext.login import current_user, login_required
+from invenio.base.globals import cfg
+from sqlalchemy.exc import SQLAlchemyError
 
-# Models
-from invenio.sqlalchemyutils import db
-from invenio.webtag_model import \
+# External imports
+from invenio.modules.accounts.models import User
+from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.search.models import Collection
+from invenio.modules.search.blueprint import response_formated_records
+from invenio.ext.menu import register_menu
+from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from invenio.ext.sqlalchemy import db
+
+# Internal imports
+from .models import \
     WtgTAG, \
     WtgTAGRecord, \
-    WtgTAGUsergroup, \
     wash_tag
 
-# Related models
-from invenio.websession_model import User
-from invenio.bibedit_model import Bibrec
-from invenio.websearch_model import Collection
-
 # Forms
-from invenio.webtag_forms import \
+from .forms import \
     CreateTagForm, \
     AttachTagForm, \
     DetachTagForm, \
     DeleteTagForm, \
+    EditTagForm, \
+    TagAnnotationForm, \
     validate_tag_exists, \
     validate_user_owns_tag, \
     validators
 
+# Uset settings
+user_settings = LocalProxy(lambda:
+    current_user['settings'].get('webtag', cfg['CFG_WEBTAG_DEFAULT_USER_SETTINGS']))
 
-from invenio.websearch_blueprint import response_formated_records
+blueprint = Blueprint('webtag', __name__, url_prefix='/yourtags',
+                      template_folder='templates', static_folder='static')
 
-blueprint = InvenioBlueprint('webtag',
-                             __name__,
-                             url_prefix='/yourtags',
-                             config='invenio.webtag_config',
-                             menubuilder=[('personalize.tags',
-                                          _('Your Tags'),
-                                          'webtag.display_cloud')],
-                             breadcrumbs=[(_('Your Account'), 'youraccount.edit'),
-                                          (_('Your Tags'), 'webtag.display_cloud')])
+default_breadcrumb_root(blueprint, '.webaccount.tags')
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/display', methods=['GET', 'POST'])
 @blueprint.route('/display/cloud', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_templated('webtag_display_cloud.html')
+@login_required
+@templated('tags/display_cloud.html')
+@register_menu(blueprint, 'personalize.tags', _('Your Tags'))
+@register_breadcrumb(blueprint, '.', _('Your Tags'))
 def display_cloud():
     """ List of user's private/group/public tags """
     user = User.query.get(current_user.get_id())
@@ -101,11 +110,13 @@ def display_cloud():
     return dict(user_tags=tags,
                 display_mode='cloud')
 
+
 @blueprint.route('/display/list', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_templated('webtag_display_list.html')
-@blueprint.invenio_wash_urlargd({'sort_by': (unicode, 'name'),
+@login_required
+@templated('tags/display_list.html')
+@wash_arguments({'sort_by': (unicode, 'name'),
                                  'order': (unicode, '')})
+@register_breadcrumb(blueprint, '.list', _('Display as List'))
 def display_list(sort_by, order):
     """ List of user's private/group/public tags """
     tags = User.query.get(current_user.get_id()).tags_query
@@ -128,8 +139,8 @@ def display_list(sort_by, order):
 
 
 @blueprint.route('/tag/<int:id_tag>/records', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_set_breadcrumb(_('Associated Records'))
+@login_required
+@register_breadcrumb(blueprint, '.tags_details', _('Associated Records'))
 def tag_details(id_tag):
     """ List of documents attached to this tag """
 
@@ -155,19 +166,102 @@ def tag_details(id_tag):
                               Collection.query.get(1),
                               'hb')
 
+
+@blueprint.route('/tag/<int:id_tag>/edit', methods=['GET', 'POST'])
+@login_required
+@templated('tags/edit.html')
+@register_breadcrumb(blueprint, '.tag_edit', _('Edit tag'))
+def tag_edit(id_tag):
+    """ List of documents attached to this tag """
+    id_user = current_user.get_id()
+    tag = WtgTAG.query.get(id_tag)
+
+    if not tag:
+        flash(_('Invalid tag id'), "error")
+        return redirect(url_for('.display_cloud'))
+
+    if tag.id_user != id_user:
+        flash(_('You are not authorized to view this tag'), "error")
+        return redirect(url_for('.display_cloud'))
+
+    form = EditTagForm(request.values, csrf_enabled=False, obj=tag)
+
+    if form.validate_on_submit():
+        form.populate_obj(tag)
+
+        name_count = db.session.query(WtgTAG).\
+            filter_by(id_user=id_user, name=tag.name).count()
+
+        if name_count == 1:
+            db.session.add(tag)
+            db.session.commit()
+            flash(_('Tag Successfully edited.'), 'success')
+
+        else:
+            flash(_('Tag name') + ' <strong>' + tag.name + '</strong> ' + _('is already in use.'), 'error')
+
+    return dict(tag=tag, form=form)
+
+
+@blueprint.route('/tag/<int:id_tag>/annotations/<int:id_bibrec>', methods=['GET', 'POST'])
+@login_required
+def update_annotation(id_tag, id_bibrec):
+    """ Change the annotation on relationship between record and tag """
+
+    from werkzeug.datastructures import MultiDict
+
+    values = MultiDict(request.values)
+    values['id_tag'] = id_tag
+    values['id_bibrec'] = id_bibrec
+
+    form = TagAnnotationForm(values, csrf_enabled=False)
+
+    if form.validate():
+
+        relation = db.session.query(WtgTAGRecord)\
+            .filter(WtgTAGRecord.id_tag == id_tag)\
+            .filter(WtgTAGRecord.id_bibrec == id_bibrec)\
+            .one()
+
+        relation.annotation = form.data.get('annotation_value', '')
+        db.session.add(relation)
+        db.session.commit()
+
+        return relation.annotation
+
+    else:
+        return str(form.errors)
+
+
+@blueprint.route('/record/<int:id_bibrec>/tags', methods=['GET', 'POST'])
+@login_required
+@templated('tags/record_tags_test.html')
+@register_breadcrumb(blueprint, '.tags_details', _('Tag list'))
+def record_tags(id_bibrec):
+    """ List of documents attached to this tag """
+
+    from .template_context_functions.tfn_webtag_record_tags \
+        import template_context_function
+
+    from invenio.ext.template import render_template_to_string
+
+    return dict(
+        tag_list = template_context_function(id_bibrec, current_user.get_id()))
+
+
 @blueprint.route('/tokenize/<int:id_bibrec>', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'q': (unicode, '')})
+@login_required
+@wash_arguments({'q': (unicode, '')})
 def tokenize(id_bibrec, q):
     """ Data for tokeninput """
-    user = db.session.query(User).get(current_user.get_id())
+    id_user = current_user.get_id()
 
     # Output only tags unattached to this record
-    record = db.session.query(Bibrec).get(id_bibrec)
+    record = Bibrec.query.get(id_bibrec)
 
-    tags = db.session.query(WtgTAG)\
-        .filter_by(user=user)\
-        .filter(WtgTAG.name.like('%'+ q +'%'))\
+    tags = WtgTAG.query\
+        .filter_by(id_user=id_user)\
+        .filter(WtgTAG.name.like('%' + q + '%'))\
         .filter(db.not_(WtgTAG.records.contains(record)))\
         .order_by(WtgTAG.name)
 
@@ -178,7 +272,7 @@ def tokenize(id_bibrec, q):
 
     response_tags = []
     for tag in tags.all():
-        tag_json = tag.serializable_fields(['id', 'name'])
+        tag_json = tag.serializable_fields(set(['id', 'name']))
         response_tags.append(tag_json)
 
         # Check if it matches the search name
@@ -187,14 +281,26 @@ def tokenize(id_bibrec, q):
 
     #If the name was not found
     if add_new_name:
-        tag_json = {'id': 0, 'name': new_name}
-        response_tags.append(tag_json)
+        # Check if a tag with this name is already attached
+        already_attached = WtgTAG.query\
+            .join(WtgTAGRecord)\
+            .filter(WtgTAG.name == new_name)\
+            .filter(WtgTAGRecord.id_bibrec == id_bibrec)\
+            .count()
+
+        if not already_attached:
+            tag_json = {'id': 0, 'name': new_name}
+            response_tags.append(tag_json)
 
     return jsonify(dict(results=response_tags, query=q))
 
+
 @blueprint.route('/record/<int:id_bibrec>/edit', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 def editor(id_bibrec):
+    """Edits your tags for `id_bibrec`.
+
+    :param id_bibrec: record identifier"""
     user = db.session.query(User).get(current_user.get_id())
     record = db.session.query(Bibrec).get(id_bibrec)
 
@@ -204,22 +310,24 @@ def editor(id_bibrec):
 
     tags_json = []
     for tag in tags.all():
-        fields = tag.serializable_fields(['id', 'name'])
+        fields = tag.serializable_fields(set(['id', 'name']))
         fields['can_remove'] = True
         tags_json.append(fields)
 
     # invenio_templated cannot be used,
     # because this view is requested using AJAX
-    return render_template('webtag_editor.html', id_bibrec=id_bibrec,
+    return render_template('tags/record_editor.html', id_bibrec=id_bibrec,
                                                  record_tags=tags_json)
+
 
 #Temporary solution to call validators, we need a better one
 class Field(object):
     def __init__(self, attr, value):
         setattr(self, attr, value)
 
+
 @blueprint.route('/delete', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 def delete():
     """ Delete a tag """
     response = {}
@@ -236,11 +344,17 @@ def delete():
         except validators.ValidationError, ex:
             flash(ex.message, 'error')
 
-    db.session.query(WtgTAG)\
-        .filter(WtgTAG.id.in_(id_tags))\
-        .delete(synchronize_session=False)
+    for id_tag in id_tags:
+        tag = WtgTAG.query.get(id_tag)
+        db.session.delete(tag)
 
-    flash(_('Successfully deleted tags.'),'success')
+    db.session.commit()
+
+    #WtgTAG.query\
+    #    .filter(WtgTAG.id.in_(id_tags))\
+    #    .delete(synchronize_session=False)
+
+    flash(_('Successfully deleted tags.'), 'success')
 
     return redirect(url_for('.display_list'))
 
@@ -257,21 +371,22 @@ def delete():
 #   else:
 #       errors = dict of errors from form
 
+
 @blueprint.route('/create', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_set_breadcrumb(_("New tag"))
-@blueprint.invenio_templated('webtag_create.html')
+@login_required
+@register_breadcrumb(blueprint, '.create', _('New tag'))
+@templated('tags/create.html')
 def create():
     """ Create a new tag """
     response = {}
     response['action'] = 'create'
 
-    user = db.session.query(User).get(current_user.get_id())
+    user = User.query.get(current_user.get_id())
 
     form = CreateTagForm(request.values, csrf_enabled=False)
 
     if form.validate_on_submit() or\
-       (request.is_xhr and form.validate()) :
+       (request.is_xhr and form.validate()):
         new_tag = WtgTAG()
         form.populate_obj(new_tag)
         new_tag.user = user
@@ -305,8 +420,9 @@ def create():
         else:
             return dict(form=form)
 
+
 @blueprint.route('/attach', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 def attach():
     """ Attach a tag to a record """
     response = {}
@@ -333,8 +449,9 @@ def attach():
 
     return jsonify(response)
 
+
 @blueprint.route('/detach', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 def detach():
     """ Detach a tag from a record """
     response = {}

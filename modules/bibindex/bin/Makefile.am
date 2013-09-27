@@ -15,8 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibindex bibstat
+bin_SCRIPTS = bibstat
 
-EXTRA_DIST = bibindex.in bibstat.in
+EXTRA_DIST = bibstat.in
 
 CLEANFILES = *~ *.tmp

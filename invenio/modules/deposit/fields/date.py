@@ -19,7 +19,7 @@
 
 from wtforms import DateField
 from wtforms.validators import optional
-from invenio.webdeposit_field import WebDepositField
+from invenio.modules.deposit.field_base import WebDepositField
 from datetime import date, datetime
 
 __all__ = ['Date']

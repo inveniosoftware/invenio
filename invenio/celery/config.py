@@ -17,7 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from invenio import config
+#from invenio import config
+config = object()
 
 ## Broker settings
 ## ---------------
@@ -26,7 +27,10 @@ BROKER_URL = getattr(config, "CFG_BROKER_URL", "amqp://guest:guest@localhost:567
 # Extra modules with tasks which should be loaded
 # The Invenio Celery loader automatically takes care of loading tasks defined
 # in *_tasks.py files in 'invenio' package.
-CELERY_INCLUDE = ["invenio.bibworkflow_workers.worker_celery"]
+CELERY_INCLUDE = [
+    #"invenio.celery.tasks",
+    #"invenio.bibworkflow_workers.worker_celery",
+]
 
 ## Result backend
 ## --------------

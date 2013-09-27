@@ -19,39 +19,17 @@
 
 """WebAccount Forms"""
 
-from invenio.webinterface_handler_flask_utils import _
-from invenio.webuser_flask import current_user
-from invenio.wtforms_utils import InvenioBaseForm, FilterForm, \
-    DateTimePickerWidget, FilterTextField
-from flask.ext.wtf import Form, Required, validators
+from wtforms.validators import Required
+from flask.ext.wtf import Form, validators
 from wtforms.fields import SubmitField, BooleanField, TextField, \
-    TextAreaField, PasswordField, \
-    HiddenField
-from invenio.websession_model import User
-from invenio.webuser import email_valid_p, nickname_valid_p
+    TextAreaField, PasswordField, HiddenField
 from sqlalchemy.exc import SQLAlchemyError
-from websession_webinterface import wash_login_method
 
-from invenio.config import \
-    CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-    CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
-    CFG_ACCESS_CONTROL_LEVEL_SITE, \
-    CFG_ACCESS_CONTROL_LIMIT_REGISTRATION_TO_DOMAIN, \
-    CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS, \
-    CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-    CFG_SITE_SUPPORT_EMAIL
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
-
-
-def validate_nickname_or_email(form, field):
-    try:
-        User.query.filter(User.nickname == field.data).one()
-    except SQLAlchemyError:
-        try:
-            User.query.filter(User.email == field.data).one()
-        except SQLAlchemyError:
-            raise validators.ValidationError(
-                _('Not valid nickname or email: %s') % (field.data, ))
+from invenio.base.i18n import _
+from invenio.utils.forms import InvenioBaseForm
+from .models import User
+from .validators import wash_login_method, validate_nickname_or_email, \
+    validate_email, validate_nickname
 
 
 class LoginForm(Form):
@@ -73,7 +51,7 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
 
     def validate_email(self, field):
         field.data = field.data.lower()
-        if email_valid_p(field.data.lower()) != 1:
+        if validate_email(field.data.lower()) != 1:
             raise validators.ValidationError(
                 _("Supplied email address %s is invalid.") % field.data
             )
@@ -131,7 +109,7 @@ class ChangePasswordForm(InvenioBaseForm):
             raise validators.ValidationError(
                 _("Please enter your current password"))
 
-        from invenio.webaccount_blueprint import update_login
+        from invenio.modules.account.views import update_login
         if update_login(current_user['nickname'], field.data) is None:
             raise validators.ValidationError(
                 _("The current password you entered does\
@@ -170,11 +148,7 @@ class RegisterForm(Form):
     submit = SubmitField(_("Register"))
 
     def validate_nickname(self, field):
-        if nickname_valid_p(field.data) != 1:
-            raise validators.ValidationError(
-                _("Desired nickname %s is invalid.") % field.data
-            )
-
+        validate_nickname(field.data)
         # is nickname already taken?
         try:
             User.query.filter(User.nickname == field.data).one()
@@ -186,11 +160,7 @@ class RegisterForm(Form):
 
     def validate_email(self, field):
         field.data = field.data.lower()
-        if email_valid_p(field.data.lower()) != 1:
-            raise validators.ValidationError(
-                _("Supplied email address %s is invalid.") % field.data
-            )
-
+        validate_email(field.data.lower())
         # is email already taken?
         try:
             User.query.filter(User.email == field.data).one()

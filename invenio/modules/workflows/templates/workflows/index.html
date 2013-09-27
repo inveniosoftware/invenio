@@ -1,5 +1,5 @@
-{% extends "bibworkflow_layout.html" %}
-{%- js 'js/bibworkflow_index.js' -%}
+{% extends "workflows/layout.html" %}
+{%- js url_for('workflows.static', filename='js/workflows/index.js') -%}
 {% block body2 %}
     <div class="alert alert-block">
       <button type="button" class="close" data-dismiss="alert">&times;</button>

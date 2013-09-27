@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,13 +20,13 @@
 """WebSearch User Settings"""
 
 from flask import url_for
-from invenio.webinterface_handler_flask_utils import _
-from invenio.sqlalchemyutils import db
-from invenio.jinja2utils import render_template_to_string
-from invenio.websearch_model import UserQuery
-from invenio.websearch_forms import WebSearchUserSettingsForm
-from invenio.webuser_flask import current_user
-from invenio.settings import Settings, UserSettingsStorage
+from flask.ext.login import current_user
+from invenio.base.i18n import _
+from invenio.ext.sqlalchemy import db
+from invenio.ext.template import render_template_to_string
+from .models import UserQuery
+from .forms import WebSearchUserSettingsForm
+from invenio.modules.dashboard.settings import Settings, UserSettingsStorage
 
 
 class WebSearchSettings(Settings):

@@ -19,7 +19,7 @@
 
 from invenio.config import CFG_SITE_NAME
 from fixture import DataSet
-from invenio.websearch_fixtures import FormatData
+from invenio.modules.search.fixtures import FormatData
 
 
 class ExternalcollectionData(DataSet):

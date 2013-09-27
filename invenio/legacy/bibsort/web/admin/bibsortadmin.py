@@ -24,7 +24,7 @@ __lastupdated__ = """$Date$"""
 from invenio.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.webuser import getUid, page_not_authorized
-from invenio.urlutils import wash_url_argument
+from invenio.utils.url import wash_url_argument
 from invenio import bibsortadminlib as bsc
 
 

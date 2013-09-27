@@ -17,7 +17,7 @@
 
 # pylint: disable=C0103
 
-from invenio.bibrecord import record_has_field, \
+from invenio.legacy.bibrecord import record_has_field, \
                               record_get_field_instances, \
                               record_delete_field, \
                               record_add_fields

@@ -38,10 +38,10 @@ from invenio.bibauthorid_webapi import get_personiID_external_ids
 from invenio.bibauthorid_frontinterface import get_uid_from_personid
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
 from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
-from invenio.messages import gettext_set_language, wash_language
+from invenio.base.i18n import gettext_set_language, wash_language
 from invenio.webuser import get_email
 from invenio.htmlutils import escape_html
-#from invenio.textutils import encode_for_xml
+#from invenio.utils.text import encode_for_xml
 from flask import session
 
 class Template:

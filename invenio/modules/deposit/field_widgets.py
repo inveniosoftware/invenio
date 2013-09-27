@@ -21,7 +21,7 @@ from werkzeug import MultiDict
 import json
 from wtforms.widgets import html_params, HTMLString, RadioInput, HiddenInput, \
     Input
-from invenio.jinja2utils import render_template_to_string
+from invenio.ext.template import render_template_to_string
 
 
 def date_widget(field, **kwargs):
@@ -47,7 +47,7 @@ def bootstrap_submit(field, **dummy_kwargs):
 
 class PLUploadWidget(object):
     def __init__(self, template=None):
-        self.template = template or "webdeposit_widget_plupload.html"
+        self.template = template or "deposit/widget_plupload.html"
 
     def __call__(self, field, **kwargs):
         field_id = kwargs.pop('id', field.id)

@@ -22,12 +22,12 @@ webbasket database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 
-from invenio.websession_model import User, Usergroup
-from invenio.websearch_model import Collection
+from invenio.modules.accounts.models import User, Usergroup
+from invenio.modules.search.models import Collection
 
 class BskBASKET(db.Model):
     """Represents a BskBASKET record."""

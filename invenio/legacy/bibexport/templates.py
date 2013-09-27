@@ -27,8 +27,8 @@ __revision__ = "$Id: webmessage_templates.py,v 1.32 2008/03/26 23:26:23 tibor Ex
 import cgi
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
-from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datestruct_to_datetext, convert_datetext_to_dategui, convert_datestruct_to_dategui
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.date import convert_datestruct_to_datetext, convert_datetext_to_dategui, convert_datestruct_to_dategui
 from invenio.bibexport_method_fieldexporter_dblayer import Job, JobResult
 
 class Template:

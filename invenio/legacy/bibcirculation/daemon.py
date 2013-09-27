@@ -32,7 +32,7 @@ from invenio.bibtask import task_init, \
                             task_set_option, \
                             task_get_option, \
                             write_message
-from invenio.mailutils import send_email
+from invenio.ext.email import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
                                           CFG_BIBCIRCULATION_LOANS_EMAIL, \

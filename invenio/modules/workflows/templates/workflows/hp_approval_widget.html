@@ -1,10 +1,10 @@
-{% extends "bibworkflow_hp_layout.html" %}
-{%- js 'js/bibworkflow_widgets/approval_widget.js' -%}
+{% extends "workflows/hp_layout.html" %}
+{%- js url_for('workflows.static', filename='js/workflows/widgets/approval.js') -%}
 {% block body2 %}
     <h1>Approval Widget</h1>
 
     <link href="../../js/google-code-prettify/src/prettify.css" type="text/css" rel="stylesheet"/>
-    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&amp;skin=desert"></script> 
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&amp;skin=desert"></script>
 
     <div class="container-fluid">
         <div class="row-fluid">
@@ -41,6 +41,6 @@
                     {{ field }}
                 {% endfor %}
             </form>
-        </div>  
+        </div>
     </div>
 {% endblock %}

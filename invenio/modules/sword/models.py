@@ -22,12 +22,12 @@ bibsword database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 
-from invenio.websession_model import User
-from invenio.bibedit_model import Bibrec
+from invenio.modules.accounts.models import User
+from invenio.modules.record_editor.models import Bibrec
 
 class SwrREMOTESERVER(db.Model):
     """Represents a SwrREMOTESERVER record."""

@@ -35,11 +35,11 @@ from invenio.bibmatch_config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
                                     CFG_BIBMATCH_VALIDATION_RESULT_MODES, \
                                     CFG_BIBMATCH_VALIDATION_COMPARISON_MODES, \
                                     CFG_BIBMATCH_LOGGER
-from invenio.bibrecord import create_records, record_get_field_values
-from invenio.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
+from invenio.legacy.bibrecord import create_records, record_get_field_values
+from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
 from invenio.bibauthorid_name_utils import compare_names
 from invenio.bibauthorid_name_utils import string_partition
-from invenio.textutils import translate_to_ascii
+from invenio.utils.text import translate_to_ascii
 
 re_valid_tag = re.compile("^[0-9]{3}[a-zA-Z0-9_%]{0,3}$")
 
@@ -326,7 +326,7 @@ def validate_match(org_record, matched_record, ruleset, verbose=0, ascii_mode=Fa
 
 def transform_record_to_marc(record, options={'text-marc':1, 'aleph-marc':0}):
     """ This function will transform a given bibrec record into marc using
-    methods from xmlmarc2textmarc in invenio.textutils. The function returns the
+    methods from xmlmarc2textmarc in invenio.utils.text. The function returns the
     record as a MARC string.
 
     @param record: bibrec structure for record to transform

@@ -50,12 +50,12 @@ from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_NOT_FOUND
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd
+from invenio.utils.apache import SERVER_RETURN, HTTP_NOT_FOUND
+from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
 from invenio import webgroup_dblayer
-from invenio.messages import gettext_set_language, wash_language
-from invenio.mailutils import send_email
+from invenio.base.i18n import gettext_set_language, wash_language
+from invenio.ext.email import send_email
 from invenio.errorlib import register_exception
 from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
@@ -71,7 +71,7 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
     CFG_OAUTH1_AUTHENTICATION, CFG_OAUTH2_AUTHENTICATION
 from invenio.session import get_session
 
-from invenio import web_api_key
+from invenio.modules import apikeys as web_api_key
 
 
 import invenio.template
@@ -822,7 +822,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if CFG_OPENAIRE_SITE:
             from invenio.config import CFG_OPENAIRE_PORTAL_URL
             if CFG_OPENAIRE_PORTAL_URL:
-                from invenio.urlutils import create_url
+                from invenio.utils.url import create_url
                 from base64 import encodestring
                 invenio_loginurl = args['referer'] or '%s/youraccount/display?ln=%s' % (CFG_SITE_SECURE_URL, args['ln'])
                 loginurl = create_url(CFG_OPENAIRE_PORTAL_URL, {"option": "com_openaire", "view": "login", "return": encodestring(invenio_loginurl)})

@@ -42,7 +42,7 @@ from invenio.access_control_admin import \
      acc_get_role_users
 from invenio.webpage import page, error_page
 from invenio.webuser import getUid, list_registered_users, page_not_authorized
-from invenio.messages import wash_language
+from invenio.base.i18n import wash_language
 
 def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
           categ="", addusers="", warningText="", role=""):

@@ -27,7 +27,7 @@ from invenio.config import \
      CFG_ETCDIR, \
      CFG_SITE_URL
 import invenio.access_control_engine as acce
-from invenio.messages import language_list_long
+from invenio.base.i18n import language_list_long
 from invenio.dbquery import run_sql
 
 def getnavtrail(previous = ''):

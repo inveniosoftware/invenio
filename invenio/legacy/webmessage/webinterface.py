@@ -32,11 +32,11 @@ from invenio.webmessage import perform_request_display_msg, \
                                perform_request_delete_msg, \
                                perform_request_delete_all, \
                                get_navtrail
-from invenio.webmessage_config import CFG_WEBMESSAGE_RESULTS_FIELD
+from invenio.modules.messages.config import CFG_WEBMESSAGE_RESULTS_FIELD
 from invenio.webmessage_mailutils import escape_email_quoted_text
 from invenio.webpage import page
-from invenio.messages import gettext_set_language
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio.htmlutils import escape_html
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 

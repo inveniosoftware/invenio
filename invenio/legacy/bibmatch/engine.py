@@ -44,17 +44,17 @@ from invenio.bibmatch_config import CFG_BIBMATCH_LOGGER, \
                                     CFG_LOGFILE
 from invenio.invenio_connector import InvenioConnector, \
                                       InvenioConnectorAuthError
-from invenio.bibrecord import create_records, \
+from invenio.legacy.bibrecord import create_records, \
     record_get_field_values, record_xml_output, record_modify_controlfield, \
     record_has_field, record_add_field
 from invenio import bibconvert
 from invenio.search_engine import get_fieldcodes
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser
 from invenio.dbquery import run_sql
-from invenio.textmarc2xmlmarc import transform_file
+from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file
 from invenio.bibmatch_validator import validate_matches, transform_record_to_marc, \
                                        validate_tag
-from invenio.textutils import translate_to_ascii, xml_entities_to_utf8
+from invenio.utils.text import translate_to_ascii, xml_entities_to_utf8
 
 try:
     from cStringIO import StringIO

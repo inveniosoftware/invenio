@@ -64,7 +64,7 @@ INSERT INTO field VALUES (36,'authority subject','authoritysubject');
 INSERT INTO field VALUES (37,'item count','itemcount');
 INSERT INTO field VALUES (38,'file type','filetype');
 INSERT INTO field VALUES (39,'miscellaneous', 'miscellaneous');
-
+INSERT INTO field VALUES (40,'tag','tag');
 
 INSERT INTO field_tag VALUES (10,11,100);
 INSERT INTO field_tag VALUES (11,14,100);

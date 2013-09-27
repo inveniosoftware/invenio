@@ -27,7 +27,7 @@ from invenio.testutils import InvenioTestCase
 import os
 import sys
 import time
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.config import CFG_TMPDIR
 from invenio.bibsword_client_formatter import format_marcxml_file, \
                                               format_submission_status, \

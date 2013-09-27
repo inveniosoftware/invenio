@@ -18,16 +18,16 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from fixture import SQLAlchemyFixture
-from invenio.sqlalchemyutils import db
-from invenio.testutils import make_flask_test_suite, run_test_suite, \
+from invenio.ext.sqlalchemy import db
+from invenio.testsuite import make_flask_test_suite, run_test_suite, \
     FlaskSQLAlchemyTest, InvenioFixture
 from invenio.websearch_fixtures import CollectionData, \
     CollectionCollectionData, ExternalcollectionData
 
 
 def fixture_builder():
-    from invenio.websession_model import User, Usergroup, UserUsergroup
-    from invenio.websearch_model import Collection, CollectionCollection, \
+    from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
+    from invenio.modules.search.models import Collection, CollectionCollection, \
         Externalcollection
 
     return SQLAlchemyFixture(env={'UserData': User,
@@ -55,14 +55,14 @@ class WebSearchCollectionTest(FlaskSQLAlchemyTest):
     @fixture.with_data(ExternalcollectionData, CollectionData,
                        CollectionCollectionData)
     def test_loading_collection_tree(data, self):
-        from invenio.websearch_model import Collection
+        from invenio.modules.search.models import Collection
         print
         p(Collection.query.order_by(Collection.id).first())
         print
 
     @fixture.with_data(ExternalcollectionData, CollectionData)
     def test_external_collection(data, self):
-        from invenio.websearch_model import Collection
+        from invenio.modules.search.models import Collection
         print
         print '----# EXTERNAL COLLECTIONS ----'
         for c in Collection.query.all():

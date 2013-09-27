@@ -71,7 +71,7 @@ def format_element(bfo, limit, separator='; ',
     re_initials = re.compile(r'(?P<initial>\w)(\w+|\.)\s*')
     re_coll = re.compile(r'\s*collaborations?', re.IGNORECASE)
 
-    from invenio.messages import gettext_set_language
+    from invenio.base.i18n import gettext_set_language
 
     _ = gettext_set_language(bfo.lang)    # load the right message language
 

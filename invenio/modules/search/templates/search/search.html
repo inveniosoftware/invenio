@@ -17,8 +17,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {% from "_formhelpers.html" import render_filter_form with context %}
-{% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, search_form_javascript, record_brief_links with context %}
-{% from "websearch_results.html" import render_search_results with context %}
+{% from "search/helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, search_form_javascript, record_brief_links with context %}
+{% from "search/results.html" import render_search_results with context %}
 {% extends "page.html" %}
 {# set title = collection.name_ln if collection.id > 1 else None #}
 {% set title = None %}
@@ -35,11 +35,11 @@
 {% endblock %}
 {% block header %}
   {{ super() }}
-  {% js "js/websearch_typeahead.js" %}
-  {% js "js/websearch_facet.js" %}
-  {% js "js/bootstrap-select.js" %}
+  {% js url_for('search.static', filename='js/search/typeahead.js') %}
+  {% js url_for('search.static', filename='js/search/facet.js') %}
+  {% js url_for('static', filename='js/bootstrap-select.js') %}
   {% js "js/jquery.hotkeys.js" %}
-  {% js "js/websearch_hotkeys.js" %}
+  {% js url_for('search.static', filename='js/search/hotkeys.js') %}
   {%- set args = request.args.copy().to_dict() -%}
   {%- set jrec = (pagination.page-2)*pagination.per_page+1 if pagination.has_prev else 1 -%}
   {%- do args.update({'jrec': jrec}) -%}

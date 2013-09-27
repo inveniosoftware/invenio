@@ -22,7 +22,6 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = bibsort_daemon.py \
              bibsort_engine.py \
              bibsort_engine_unit_tests.py \
-             bibsort_model.py \
              bibsort_washer.py \
              bibsort_washer_unit_tests.py \
              bibsortadminlib.py

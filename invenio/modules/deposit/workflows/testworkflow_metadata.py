@@ -17,18 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.webdeposit_load_forms import forms
-from invenio.webdeposit_models import DepositionType
-from invenio.webdeposit_workflow_tasks import render_form
-
-ArticleForm = forms['ArticleForm']
-
+from invenio.modules.deposit import forms
+from invenio.modules.deposit.models import DepositionType
+from invenio.modules.deposit.tasks import render_form
 
 __all__ = ['TestWorkflow']
 
 
 class TestWorkflow(DepositionType):
-    workflow = [render_form(ArticleForm)]
+    workflow = [render_form(forms.ArticleForm)]
     name = "TestWorkflow"
     name_plural = "TestWorkflows"
     group = ""

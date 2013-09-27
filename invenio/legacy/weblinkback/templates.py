@@ -26,8 +26,8 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_LATEST_COUNT_VALUES, \
                                        CFG_WEBLINKBACK_ACTION_RETURN_CODE
 from invenio.weblinkback import generate_redirect_url
-from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datetext_to_dategui
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.date import convert_datetext_to_dategui
 from invenio.config import CFG_SITE_RECORD, \
                            CFG_SITE_URL, \
                            CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS

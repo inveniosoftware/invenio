@@ -25,10 +25,10 @@ from flask import has_app_context
 
 if not has_app_context():
     # STEP 1 - Import Invenio Flask Application constructor and database object.
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
+    from invenio.base.factory import create_app
 
     # STEP 2 - Create application object and initialize database.
-    app = create_invenio_flask_app()
+    app = create_app()
 
     # STEP 3 - Create fake application request context and use it.
     ctx = app.test_request_context()

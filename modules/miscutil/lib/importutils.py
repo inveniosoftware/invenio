@@ -21,7 +21,7 @@
 Invenio import helper functions.
 
 Usage example:
-  autodiscover_modules(['invenio'], '.+_tasks\.py')
+  autodiscover_modules(['invenio'], '.+_tasks')
 
 An import difference from pluginutils is that modules are imported in their
 package hierarchy, contrary to pluginutils where modules are imported as
@@ -29,15 +29,14 @@ standalone Python modules.
 """
 
 import imp
-import os
 import re
-from werkzeug.local import LocalProxy
-from werkzeug.utils import import_string
+
+from werkzeug import find_modules, import_string
 
 _RACE_PROTECTION = False
 
 
-def autodiscover_modules(packages, related_name_re='*.py', ignore_exceptions=False):
+def autodiscover_modules(packages, related_name_re='.+', ignore_exceptions=False):
     """
     Autodiscover function follows the pattern used by Celery.
 
@@ -70,7 +69,7 @@ def autodiscover_modules(packages, related_name_re='*.py', ignore_exceptions=Fal
     return modules
 
 
-def find_related_modules(package, related_name_re='(.+)\.py', ignore_exceptions=False):
+def find_related_modules(package, related_name_re='.+', ignore_exceptions=False):
     """Given a package name and a module name pattern, tries to find matching
     modules."""
     package_elements = package.rsplit(".", 1)
@@ -86,16 +85,11 @@ def find_related_modules(package, related_name_re='(.+)\.py', ignore_exceptions=
 
     # Find all modules named according to related_name
     p = re.compile(related_name_re)
-    candidates = []
-    for name in os.listdir(pkg_path[0]):
-        name = os.path.basename(name)
-        if p.match(name):
-            # Remove .py from name
-            candidates.append(name[:-3])
     modules = []
 
-    for related_name in candidates:
-        modules.append(import_related_module(package, pkg_path, related_name, ignore_exceptions))
+    for name in find_modules(package, include_packages=True):
+        if p.match(name):
+            modules.append(import_string(name, silent=ignore_exceptions))
 
     return modules
 
@@ -123,8 +117,3 @@ def import_related_module(package, pkg_path, related_name, ignore_exceptions=Fal
             raise e
 
 
-def lazy_import(name):
-    """
-    Lazy import of name using `Werzeug.local.import_string`.
-    """
-    return LocalProxy(lambda: import_string(name))

@@ -63,11 +63,11 @@ from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
      get_colID
-from invenio.urlutils import redirect_to_url, \
+from invenio.utils.url import redirect_to_url, \
                              make_canonical_urlargd
 from invenio.htmlutils import get_mathjax_header
 from invenio.errorlib import register_exception
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -84,7 +84,7 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
 import os
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 from invenio.bibdocfile import \
      stream_file, \
      decompose_file, \

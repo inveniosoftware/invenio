@@ -19,19 +19,16 @@
 
 import os
 import tempfile
-import json
 import cPickle
 import base64
 
-from sqlalchemy import desc
-from sqlalchemy.orm.exc import NoResultFound
 from datetime import datetime
 from sqlalchemy import desc
 from sqlalchemy.orm.exc import NoResultFound
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
+from invenio.base.globals import cfg
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION,\
     CFG_LOG_TYPE
-from invenio.config import CFG_TMPSHAREDDIR
 from invenio.bibworkflow_utils import determineDataType, redis_create_search_entry
 
 
@@ -471,7 +468,7 @@ BibWorkflowObject
                 redis_create_search_entry(self)
             self._update_db()
 
-    def save_to_file(self, directory=CFG_TMPSHAREDDIR,
+    def save_to_file(self, directory=None,
                      prefix="bibworkflow_object_data_", suffix=".obj"):
         """
         Saves the contents of self.data['data'] to file.
@@ -480,6 +477,8 @@ BibWorkflowObject
 
         Warning: Currently assumes non-binary content.
         """
+        if directory is None:
+            directory = cfg['CFG_TMPSHAREDIR']
         tmp_fd, filename = tempfile.mkstemp(dir=directory,
                                             prefix=prefix,
                                             suffix=suffix)

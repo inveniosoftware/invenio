@@ -49,7 +49,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_CACHEDIR
 from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
-from invenio.bibrecord import create_record, create_records, \
+from invenio.legacy.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields, \
     record_order_subfields, record_get_field_instances, \
@@ -63,8 +63,8 @@ from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, \
     CFG_BIBEDIT_QUEUE_CHECK_METHOD, \
     CFG_BIBEDIT_EXTEND_RECORD_WITH_COLLECTION_TEMPLATE, CFG_INSPIRE_SITE
-from invenio.dateutils import convert_datetext_to_dategui
-from invenio.textutils import wash_for_xml
+from invenio.utils.date import convert_datetext_to_dategui
+from invenio.utils.text import wash_for_xml
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions, \
     get_info_of_record_revision
@@ -79,7 +79,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.refextract_api import extract_references_from_record_xml, \
                                    extract_references_from_string_xml, \
                                    extract_references_from_url_xml
-from invenio.textmarc2xmlmarc import transform_file, ParseError
+from invenio.legacy.bibrecord.scripts.textmarc2xmlmarc import transform_file, ParseError
 from invenio.bibauthorid_name_utils import split_name_parts, \
                                         create_normalized_name
 from invenio.bibknowledge import get_kbr_values

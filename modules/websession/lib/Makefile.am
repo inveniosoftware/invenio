@@ -19,24 +19,13 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = session.py webuser.py webuser_unit_tests.py \
 	websession_templates.py websession_webinterface.py \
-	websession_model.py \
-	websession_fixtures_demosite.py \
 	webgroup.py webgroup_dblayer.py websession_config.py \
 	webaccount.py \
-	webaccount_blueprint.py \
-	webaccount_forms.py \
 	webaccount_flask_tests.py \
-	webaccount_password_user_settings.py \
-	webaccount_user_settings.py \
 	websession_regression_tests.py \
-	webgroup_blueprint.py \
-	webgroup_user_settings.py \
 	webgroup_regression_tests.py webuser_regression_tests.py \
 	webgroup_unit_tests.py inveniogc.py webuser_config.py \
-	websession_web_tests.py \
-	webuser_flask.py \
-	dashboard_user_settings.py \
-	session_flask.py
+	websession_web_tests.py
 
 noinst_DATA = password_migration_kit.py
 

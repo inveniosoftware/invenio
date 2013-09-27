@@ -16,21 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = \
-            webdeposit_completed.html \
-            webdeposit_deposition_type.html \
-            webdeposit_error.html \
-            webdeposit_index.html \
-            webdeposit_myview.html \
-            webdeposit_run.html \
-            webdeposit_run_action_bar.html \
-            webdeposit_run_base.html \
-            webdeposit_run_field.html \
-            webdeposit_run_field_label.html \
-            webdeposit_run_field_subform.html \
-            webdeposit_run_group_end.html \
-            webdeposit_run_group_start.html \
-            webdeposit_widget_plupload.html
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

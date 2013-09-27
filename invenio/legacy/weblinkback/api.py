@@ -48,8 +48,8 @@ from invenio.search_engine import check_user_can_view_record, \
 from invenio.access_control_engine import acc_authorize_action, \
                                           acc_get_authorized_emails
 from invenio.webuser import collect_user_info
-from invenio.mailutils import send_email
-from invenio.urlutils import get_title_of_page
+from invenio.ext.email import send_email
+from invenio.utils.url import get_title_of_page
 
 
 def check_user_can_view_linkbacks(user_info, recid):

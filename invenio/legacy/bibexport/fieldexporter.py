@@ -30,7 +30,7 @@ from invenio.bibtask import write_message
 
 # imports used in FieldExporter class
 from invenio import search_engine
-from invenio import bibrecord
+from invenio.legacy import bibrecord
 from invenio import bibdocfile
 import os
 
@@ -40,7 +40,7 @@ from invenio import bibexport_method_fieldexporter_dblayer as fieldexporter_dbla
 
 from invenio import template
 fieldexporter_templates = template.load('bibexport_method_fieldexporter')
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 def run_export_method(jobname):
     """Main function, reading params and running the task."""

@@ -17,82 +17,77 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os
 import warnings
-from pprint import pformat
-from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
-from invenio.pluginutils import PluginContainer
+from invenio.base.utils import autodiscover_workflows
+from invenio.utils.datastructures import LazyDict
+from werkzeug.utils import import_string, find_modules
 
 
-def plugin_builder(plugin_name, plugin_code):
-    if plugin_name == '__init__':
+def plugin_builder(plugin):
+    if plugin.__name__.split('.')[-1] == '__init__':
         return
-    all = getattr(plugin_code, '__all__')
+    all = getattr(plugin, '__all__', [])
     for name in all:
-        return getattr(plugin_code, name)
+        return getattr(plugin, name)
 
 
-loaded_deposition_types = PluginContainer(
-    os.path.join(
-        CFG_PYLIBDIR,
-        'invenio',
-        'webdeposit_workflows',
-        '*_metadata.py'
-    ),
-    plugin_builder=plugin_builder
-)
+def load_deposition_types(deposition_default):
+    """
+    Create a dict with groups, names and deposition types
+    in order to render the deposition type chooser page
 
-"""
-Create a dict with groups, names and deposition types
-in order to render the deposition type chooser page
-
-Used to load all the definitions of webdeposit workflow.
-They must be defined in the deposition_types folder with
-filname '*_metadata.py'. Also if you want to rename the workflow, you can
-redefine the __all__ variable.
+    Used to load all the definitions of webdeposit workflow.
+    They must be defined in the deposition_types folder with
+    filname '*_metadata.py'. Also if you want to rename the workflow, you can
+    redefine the __all__ variable.
 
 
-Example of definition:
+    Example of definition:
 
-__all__ = ['MyDeposition']
+    __all__ = ['MyDeposition']
 
-class MyDeposition(DepositionType):
-    # Define the list of functions you want to run for this workflow
-    workflow = [function1(), function2(), function3()]
+    class MyDeposition(DepositionType):
+        # Define the list of functions you want to run for this workflow
+        workflow = [function1(), function2(), function3()]
 
-    # Define the name to be rendered for the deposition
-    dep_type = "My Deposition"
+        # Define the name to be rendered for the deposition
+        dep_type = "My Deposition"
 
-    # Define the name in plural
-    plural = "My depositions"
+        # Define the name in plural
+        plural = "My depositions"
 
-    # Define in which deposition group it will belong
-    group = "My Depositions Group"
+        # Define in which deposition group it will belong
+        group = "My Depositions Group"
 
-    # Enable the deposition
-    enabled = True
-"""
+        # Enable the deposition
+        enabled = True
+    """
 
-deposition_types = {}
+    deposition_types = {}
+    for package in autodiscover_workflows():
+        for module in find_modules(package.__name__, include_packages=True):
+            deposition_type = plugin_builder(import_string(module))
+
+            if deposition_type is None:
+                continue
+            if deposition_type and deposition_type.is_enabled():
+                deposition_types[deposition_type.__name__] = deposition_type
+                if deposition_type.is_default():
+                    if deposition_default is not None:
+                        warnings.warn(
+                            "%s is overwriting already set default deposition %s." % (
+                                deposition_type.__name__,
+                                deposition_default.__name__
+                            ),
+                            RuntimeWarning
+                        )
+                    deposition_default = deposition_type
+
+    return deposition_types
+
+
 deposition_default = None
+deposition_types = LazyDict(lambda: load_deposition_types(deposition_default))
 
-
-for deposition_type in loaded_deposition_types.values():
-    if deposition_type and deposition_type.is_enabled():
-        deposition_types[deposition_type.__name__] = deposition_type
-        if deposition_type.is_default():
-            if deposition_default is not None:
-                warnings.warn(
-                    "%s is overwriting already set default deposition %s." % (
-                        deposition_type.__name__,
-                        deposition_default.__name__
-                    ),
-                    RuntimeWarning
-                )
-            deposition_default = deposition_type
-
-## Let's report about broken plugins
-open(os.path.join(CFG_LOGDIR, 'broken-depositions.log'), 'w').write(
-    pformat(loaded_deposition_types.get_broken_plugins()))
 
 __all__ = ['deposition_types', 'deposition_default']

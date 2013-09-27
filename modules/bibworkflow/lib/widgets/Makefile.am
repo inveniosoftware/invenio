@@ -19,8 +19,4 @@ pylibdir = $(libdir)/python/invenio/bibworkflow_widgets
 
 pylib_DATA = *.py
 
-jsdir=$(localstatedir)/www/js/bibworkflow_widgets
-
-js_DATA = *.js
-
 CLEANFILES = *~ *.tmp *.pyc

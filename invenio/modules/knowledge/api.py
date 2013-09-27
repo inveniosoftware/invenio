@@ -25,7 +25,7 @@ import os
 import re
 
 from invenio import bibknowledge_dblayer
-from invenio.jsonutils import json
+from invenio.utils.json import json
 from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
 from invenio.config import CFG_WEBDIR
 

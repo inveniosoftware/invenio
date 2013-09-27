@@ -16,15 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = webgroup_index.html \
-                 webaccount_edit.html \
-                 webaccount_index.html \
-                 webaccount_login.html \
-                 webaccount_logout.html \
-                 webaccount_lost.html \
-                 webaccount_register.html \
-                 webaccount_widget.html \
-                 webuser_widget.html
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

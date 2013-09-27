@@ -34,10 +34,10 @@ import itertools
 from werkzeug import MultiDict
 import wtforms
 from wtforms.fields.core import _unset_value
-from invenio.webdeposit_field import WebDepositField
+from ..field_base import WebDepositField
 
 
-__all__ = []
+__all__ = ['FormField', 'FieldList', 'DynamicFieldList']
 
 for attr_name in dir(wtforms):
     attr = getattr(wtforms, attr_name)
@@ -277,3 +277,99 @@ class FieldList(WebDepositField, wtforms.FieldList):
 
         _messages.update(super(FieldList, self).messages)
         return _messages
+
+
+class DynamicFieldList(FieldList):
+    """
+    Encapsulate an ordered list of multiple instances of the same field type,
+    keeping data as a list.
+
+    Extends WTForm FieldList field to allow dynamic add/remove of enclosed
+    fields.
+    """
+    def __init__(self, *args, **kwargs):
+        from invenio.webdeposit_field_widgets import DynamicListWidget
+        self.widget = kwargs.pop('widget', DynamicListWidget())
+        self.empty_index = kwargs.pop('empty_index', '__index__')
+        self.add_label = kwargs.pop('add_label', None)
+        super(DynamicFieldList, self).__init__(*args, **kwargs)
+
+    def process(self, formdata, data=_unset_value):
+        """
+        Adapted from wtforms.FieldList to allow merging content
+        formdata and draft data properly.
+        """
+        self.entries = []
+        if data is _unset_value or not data:
+            try:
+                data = self.default()
+            except TypeError:
+                data = self.default
+
+        self.object_data = data
+
+        if formdata:
+            if self.name not in formdata:
+                max_index = max(
+                    [len(data)-1] + list(
+                        set(self._extract_indices(self.name, formdata))
+                    )
+                )
+                indices = range(0, max_index+1)
+
+                if self.max_entries:
+                    indices = indices[:self.max_entries]
+
+                idata = iter(data)
+                for index in indices:
+                    try:
+                        obj_data = next(idata)
+                    except StopIteration:
+                        obj_data = _unset_value
+                    self._add_entry(formdata, obj_data, index=index)
+            else:
+                # Update keys in formdata, to allow proper form processing
+                self.raw_data = formdata.getlist(self.name)
+                for index, raw_entry in enumerate(self.raw_data):
+                    entry_formdata = MultiDict({
+                        "%s-%s" % (self.name, index): raw_entry
+                    })
+                    self._add_entry(entry_formdata, index=index)
+        else:
+            for obj_data in data:
+                self._add_entry(formdata, obj_data)
+
+        while len(self.entries) < self.min_entries:
+            self._add_entry(formdata)
+        self._add_empty_entry()
+
+    def _add_empty_entry(self):
+        name = '%s-%s' % (self.short_name, self.empty_index)
+        field_id = '%s-%s' % (self.id, self.empty_index)
+        field = self.unbound_field.bind(
+            form=None, name=name, prefix=self._prefix, id=field_id
+        )
+        field.process(None, None)
+        self.entries.append(field)
+        return field
+
+    def get_entries(self):
+        """ Filter out empty index entry """
+        return filter(
+            lambda e: not e.name.endswith(self.empty_index),
+            self.entries
+        )
+
+    def bound_field(self, idx, force=False):
+        """
+        Create a bound subfield for this list.
+        """
+        if idx.isdigit() or idx in [self.empty_index, '__input__'] or force:
+            field = self.unbound_field.bind(
+                form=None,
+                name="%s-%s" % (self.name, idx),
+                prefix=self._prefix,
+                id="%s-%s" % (self.id, idx),
+            )
+            return field
+        return None

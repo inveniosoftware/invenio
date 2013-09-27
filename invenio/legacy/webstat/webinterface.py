@@ -20,7 +20,7 @@ __lastupdated__ = "$Date$"
 
 import os, sys
 from urllib import unquote
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 
 from invenio.config import \
      CFG_TMPDIR, \
@@ -33,7 +33,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.search_engine import collection_restricted_p
 from invenio.webuser import collect_user_info, page_not_authorized
-from invenio.urlutils import redirect_to_url
+from invenio.utils.url import redirect_to_url
 
 from invenio.webstat import perform_request_index, \
     perform_display_keyevent, \

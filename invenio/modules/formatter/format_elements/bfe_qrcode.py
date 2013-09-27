@@ -20,7 +20,7 @@
 """BibFormat element - QR code generator """
 
 from invenio.config import CFG_SITE_SECURE_URL, CFG_WEBDIR, CFG_SITE_RECORD
-from invenio.hashutils import md5
+from invenio.utils.hash import md5
 import os
 try:
     import qrcode

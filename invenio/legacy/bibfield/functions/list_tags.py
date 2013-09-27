@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.webuser_flask import current_user
+from flask.ext.login import current_user
 from invenio.webtag_queries import tags_for_html_brief
 
 def tag_list(recid):

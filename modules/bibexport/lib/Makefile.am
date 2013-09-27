@@ -18,8 +18,6 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibexport.py \
-             bibexport_fixtures_demosite.py \
-             bibexport_model.py \
              bibexport_method_sitemap.py \
              bibexport_method_googlescholar.py \
              bibexport_method_fieldexporter_webinterface.py \

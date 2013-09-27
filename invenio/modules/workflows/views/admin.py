@@ -21,32 +21,33 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from flask import render_template
-from invenio.bibworkflow_model import Workflow, BibWorkflowObject
+from flask import render_template, Blueprint
+from flask.ext.login import login_required
+from ..models import Workflow, BibWorkflowObject
+from invenio.base.i18n import _
+from invenio.base.decorators import wash_arguments, templated
+from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from invenio.ext.menu import register_menu
 from invenio.bibworkflow_api import start_delayed
-from invenio.bibworkflow_load_workflows import loaded_workflows, workflows
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio.bibworkflow_load_workflows import workflows
 from invenio.bibworkflow_utils import (get_workflow_definition,
                                        get_redis_keys as utils_get_redis_keys,
                                        filter_holdingpen_results)
 
 import traceback
 
-blueprint = InvenioBlueprint('bibworkflow', __name__,
-                             url_prefix="/admin/bibworkflow",
-                             menubuilder=[('main.admin.bibworkflow',
-                                           _('Configure BibWorkflow'),
-                                          'bibworkflow.index')],
-                             breadcrumbs=[(_('Administration'),
-                                           'help.admin'),
-                                          (_('Configure BibWorkflow'),
-                                           'bibworkflow.index')],)
+blueprint = Blueprint('bibworkflow', __name__, url_prefix="/admin/bibworkflow",
+                      template_folder='../templates',
+                      static_folder='../static')
+
+default_breadcrumb_root(blueprint, '.admin.bibworkflow')
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/index', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_templated('bibworkflow_index.html')
+@login_required
+@register_breadcrumb(blueprint, '.', _('Workflows'))
+@templated('workflows/index.html')
 def index():
     """
     Dispalys main interface of BibWorkflow.
@@ -57,43 +58,42 @@ def index():
 
 
 @blueprint.route('/entry_details', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'id_entry': (int, 0)})
+@login_required
+@wash_arguments({'id_entry': (int, 0)})
 def entry_details(id_entry):
     """
     Displays entry details.
     """
     wfe_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == id_entry).first()
 
-    return render_template('bibworkflow_entry_details.html',
+    return render_template('workflows/entry_details.html',
                            entry=wfe_object, log="",
                            data_preview=_entry_data_preview(wfe_object.data, 'hd'),
                            workflow_func=get_workflow_definition(wfe_object.bwlWORKFLOW.name))
 
 
 @blueprint.route('/workflow_details', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'id_workflow': (unicode, "")})
+@login_required
+@wash_arguments({'id_workflow': (unicode, "")})
 def workflow_details(id_workflow):
     w_metadata = Workflow.query.filter(Workflow.uuid == id_workflow).first()
 
-    return render_template('bibworkflow_workflow_details.html',
+    return render_template('workflows/workflow_details.html',
                            workflow_metadata=w_metadata,
                            log="",
                            workflow_func=get_workflow_definition(w_metadata.name))
 
 
 @blueprint.route('/workflows', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_templated('bibworkflow_workflows.html')
+@login_required
+@templated('workflows/workflows.html')
 def show_workflows():
-    return dict(workflows=workflows,
-                broken_workflows=loaded_workflows.get_broken_plugins())
+    return dict(workflows=workflows)
 
 
 @blueprint.route('/run_workflow', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'workflow_name': (unicode, "")})
+@login_required
+@wash_arguments({'workflow_name': (unicode, "")})
 def run_workflow(workflow_name, data={"data": 10}):
     try:
         print "Starting workflow '%s'" % (workflow_name,)
@@ -104,9 +104,9 @@ def run_workflow(workflow_name, data={"data": 10}):
 
 
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'oid': (int, 0),
-                                'of': (unicode, 'default')})
+@login_required
+@wash_arguments({'oid': (int, 0),
+                 'of': (unicode, 'default')})
 def entry_data_preview(oid, of):
     workflow_object = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                                      oid).first()
@@ -114,8 +114,8 @@ def entry_data_preview(oid, of):
 
 
 @blueprint.route('/get_redis_keys', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'key': (unicode, "")})
+@login_required
+@wash_arguments({'key': (unicode, "")})
 def get_redis_keys(key):
     keys = utils_get_redis_keys(str(key))
     options = ""
@@ -125,8 +125,8 @@ def get_redis_keys(key):
 
 
 @blueprint.route('/get_redis_values', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_wash_urlargd({'key': (unicode, "")})
+@login_required
+@wash_arguments({'key': (unicode, "")})
 def get_redis_values(key):
     keys = key.split()
     print keys

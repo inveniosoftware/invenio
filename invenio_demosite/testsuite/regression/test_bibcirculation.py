@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
 

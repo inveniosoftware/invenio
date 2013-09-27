@@ -39,8 +39,8 @@ from invenio.config import \
      CFG_TMPSHAREDDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_RECORD
-from invenio.messages import gettext_set_language
-from invenio.mailutils import send_email
+from invenio.base.i18n import gettext_set_language
+from invenio.ext.email import send_email
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
@@ -74,7 +74,7 @@ from invenio.webjournal_utils import \
      issue_is_later_than, \
      WEBJOURNAL_OPENER
 from invenio.dbquery import run_sql
-from invenio.bibrecord import \
+from invenio.legacy.bibrecord import \
      create_record, \
      print_rec
 from invenio.bibformat import format_record

@@ -37,21 +37,34 @@ For more information, see ABOUT-NLS file.
 __revision__ = "$Id$"
 
 import gettext
+from flask import current_app
+from werkzeug.local import LocalProxy
+from invenio.utils.datastructures import LazyDict
 
-from invenio.config import CFG_LOCALEDIR, CFG_SITE_LANG, CFG_SITE_LANGS
+CFG_SITE_LANG = LocalProxy(lambda: current_app.config.get('CFG_SITE_LANG'))
+CFG_SITE_LANGS = LocalProxy(lambda: current_app.config.get('CFG_SITE_LANGS'))
 
-_LANG_GT_D = {}
-for _alang in CFG_SITE_LANGS:
-    _LANG_GT_D[_alang] = gettext.translation('invenio',
-                                             CFG_LOCALEDIR,
-                                             languages = [_alang],
-                                             fallback = True)
+## Placemark for the i18n function
+_ = lambda x: x
+
+
+def _lang_gt_d():
+    """Returns translation functions."""
+    CFG_LOCALEDIR = current_app.config.get('CFG_LOCALEDIR')
+    CFG_SITE_LANGS = current_app.config.get('CFG_SITE_LANGS')
+    out = {}
+    for _alang in CFG_SITE_LANGS:
+        out[_alang] = gettext.translation('invenio', CFG_LOCALEDIR,
+                                          languages=[_alang], fallback=True)
+    return out
+
+_LANG_GT_D = LazyDict(_lang_gt_d)
+
 
 def gettext_set_language(ln, use_unicode=False):
-    """
-      Set the _ gettext function in every caller function
+    """Set the _ gettext function in every caller function
 
-      Usage::
+    Usage::
         _ = gettext_set_language(ln)
     """
     if use_unicode:
@@ -59,6 +72,7 @@ def gettext_set_language(ln, use_unicode=False):
             return _LANG_GT_D[ln].gettext(*args, **kwargs).decode('utf-8')
         return unicode_gettext_wrapper
     return _LANG_GT_D[ln].gettext
+
 
 def wash_language(ln):
     """Look at language LN and check if it is one of allowed languages
@@ -76,6 +90,7 @@ def wash_language(ln):
     else:
         return CFG_SITE_LANG
 
+
 def wash_languages(lns):
     """Look at list of languages LNS and check if there's at least one
        of the allowed languages for the interface. Return it in case
@@ -88,6 +103,7 @@ def wash_languages(lns):
             elif ln[:2] in CFG_SITE_LANGS:
                 return ln[:2]
     return CFG_SITE_LANG
+
 
 def language_list_long(enabled_langs_only=True):
     """
@@ -127,7 +143,8 @@ def language_list_long(enabled_langs_only=True):
                           'sv': 'Svenska',
                           'uk': 'Українська',
                           'zh_CN': '中文(简)',
-                          'zh_TW': '中文(繁)',}
+                          'zh_TW': '中文(繁)',
+                          }
 
     if enabled_langs_only:
         enabled_lang_list = []
@@ -135,8 +152,9 @@ def language_list_long(enabled_langs_only=True):
             enabled_lang_list.append([lang, all_language_names[lang]])
         return enabled_lang_list
     else:
-        return [[lang, lang_long] for lang, lang_long in \
-                                      all_language_names.iteritems()]
+        return [[lang, lang_long] for lang, lang_long in
+                all_language_names.iteritems()]
+
 
 def is_language_rtl(ln):
     """

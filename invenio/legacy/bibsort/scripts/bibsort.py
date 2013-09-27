@@ -1,5 +1,4 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2010, 2011, 2012 CERN.
@@ -50,12 +49,10 @@ Options:
                         run (ex: --recids=1,2-56,72)
 """
 
-try:
-    from invenio.flaskshell import *
-    from invenio.bibsort_daemon import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.base.factory import with_app_context
 
-main()
+
+@with_app_context()
+def main():
+    from invenio.bibsort_daemon import main as bibsort_main
+    return bibsort_main()

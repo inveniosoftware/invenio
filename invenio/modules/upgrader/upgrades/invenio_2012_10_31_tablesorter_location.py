@@ -19,7 +19,7 @@
 
 import warnings
 from invenio.dbquery import run_sql
-from invenio.textutils import wait_for_user
+from invenio.utils.text import wait_for_user
 
 import os
 from invenio.config import CFG_WEBDIR

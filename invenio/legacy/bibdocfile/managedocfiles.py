@@ -84,7 +84,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_CERN_SITE, \
      CFG_SITE_RECORD
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.bibdocfilecli import cli_fix_marc
 from invenio.bibdocfile import BibRecDocs, \
      decompose_file, calculate_md5, BibDocFile, \
@@ -95,7 +95,7 @@ from invenio.errorlib import register_exception
 from invenio.dbquery import run_sql
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
-from invenio.urlutils import create_html_mailto
+from invenio.utils.url import create_html_mailto
 from invenio.htmlutils import escape_javascript_string
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 

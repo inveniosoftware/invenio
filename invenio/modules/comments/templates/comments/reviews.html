@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {%- if not request.is_xhr -%}
-  {% extends "record.html" %}
+  {% extends "records/base.html" %}
 {%- endif -%}
 
 {% block record_content %}
@@ -34,7 +34,7 @@
           <i class="icon-pencil"></i> {{ _('write review') }}
         </a>
       {% else %}
-        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_review', recid=recid) }}">
+        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
           <i class="icon-pencil"></i> {{ _('write review') }}
         </a>
       {% endif %}
@@ -81,20 +81,20 @@
         {%- endif -%} &nbsp;
         - <i class="icon-time"></i> {{ c.date_creation }}
         - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
-          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1,
+          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=1,
             referer=request.url
           ) }}">
           <i class="icon-thumbs-up"></i>
           {{ _('yes') }}
           </a> /
-          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=-1,
+          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=-1,
             referer=request.url
           ) }}">
           <i class="icon-thumbs-down"></i>
           {{ _('no') }}
           </a>
           -
-          <a href="{{ url_for('webcomment.report', recid=recid, id=c.id,
+          <a href="{{ url_for('comments.report', recid=recid, id=c.id,
             referer=request.url
           ) }}">
             <i class="icon-exclamation-sign"></i>
@@ -112,7 +112,7 @@
           <i class="icon-pencil"></i> {{ _('write review') }}
         </a>
       {% else %}
-        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('webcomment.add_review', recid=recid) }}">
+        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
           <i class="icon-pencil"></i> {{ _('write review') }}
         </a>
       {% endif %}

@@ -21,7 +21,6 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = \
 	bibauthorid_cli.py \
 	bibauthorid_daemon.py \
-	bibauthorid_fixtures_demosite.py \
 	bibauthorid_least_squares.py \
 	bibauthorid_personid_maintenance.py \
 	bibauthorid_scheduler.py \
@@ -43,7 +42,6 @@ pylib_DATA = \
 	bibauthorid_general_utils.py \
 	bibauthorid_name_utils.py \
 	bibauthorid_recipes.py \
-        bibauthorid_model.py \
 	bibauthorid_templates.py \
 	bibauthorid_wedge.py \
 	bibauthorid_webauthorprofileinterface.py

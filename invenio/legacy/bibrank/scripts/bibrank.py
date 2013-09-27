@@ -1,5 +1,4 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
@@ -69,12 +68,10 @@ Usage: %s [options]
 
 __revision__ = "$Id$"
 
-try:
-    from invenio.flaskshell import *
-    from invenio.bibrank import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
+from invenio.base.factory import with_app_context
 
-main()
+
+@with_app_context()
+def main():
+    from invenio.bibrank import main as bibrank_main
+    return bibrank_main()

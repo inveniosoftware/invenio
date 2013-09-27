@@ -26,7 +26,7 @@ from invenio.errorlib import register_exception
 from invenio.webuser import email_valid_p
 from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
-from invenio.mailutils import send_email
+from invenio.ext.email import send_email
 
 CFG_MAIL_BODY = """
 **This is an automated mail from %(site-name)s**

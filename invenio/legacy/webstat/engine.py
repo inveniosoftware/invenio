@@ -36,7 +36,7 @@ from invenio.config import CFG_TMPDIR, \
     CFG_BIBCIRCULATION_REQUEST_STATUS_DONE, \
     CFG_BIBCIRCULATION_ILL_STATUS_CANCELLED
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import CFG_JOURNAL_TAG
-from invenio.urlutils import redirect_to_url
+from invenio.utils.url import redirect_to_url
 from invenio.search_engine import perform_request_search, \
     get_collection_reclist, \
     get_most_popular_field_values, \
@@ -50,7 +50,7 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
 from invenio.bibcirculation_dblayer import get_id_bibrec, \
     get_borrower_data
 from invenio.websearch_webcoll import CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE
-from invenio.dateutils import convert_datetext_to_datestruct, convert_datestruct_to_dategui
+from invenio.utils.date import convert_datetext_to_datestruct, convert_datestruct_to_dategui
 
 
 WEBSTAT_SESSION_LENGTH = 48 * 60 * 60 # seconds

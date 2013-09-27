@@ -1,7 +1,7 @@
-{% extends "bibworkflow_hp_layout.html" %}
-{% import 'bibworkflow_hp_utils.html' as utils %}
+{% extends "workflows/hp_layout.html" %}
+{% import 'workflows/hp_utils.html' as utils %}
 {%- js 'js/prettify.js' -%}
-{%- js 'js/bibworkflow_hp_details.js' -%}
+{%- js url_for('workflows.static', filename='js/workflows/hp_details.js') -%}
 {% block body2 %}
 
     <h1>Record Details</h1>

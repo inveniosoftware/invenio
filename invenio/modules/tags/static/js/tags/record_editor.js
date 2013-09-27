@@ -21,40 +21,40 @@
 
 Suggested HTML:
 <div id="..." class="modal hide fade"
- data-webtageditor-element="editor"
- data-webtageditor-recid="{{id_bibrec}}">
+ data-WebTagEditor-element="editor"
+ data-WebTagEditor-recid="{{id_bibrec}}">
 
-    <input type="text" data-webtageditor-element="tokenInput"  />
+    <input type="text" data-WebTagEditor-element="tokenInput"  />
 
-    <div data-webtageditor-element="errorArea"></div>
+    <div data-WebTagEditor-element="errorArea"></div>
 </div>
 
 Suggested contructor:
 
-new webTagEditor('[data-webtageditor-element="editor"][data-webtageditor-recid="{{id_bibrec}}"]',
+new WebTagEditor('[data-WebTagEditor-element="editor"][data-WebTagEditor-recid="{{id_bibrec}}"]',
     {tags: {{tags}},
     url_tokenize: {{url_for()}},
 
 );
 */
 
-function webTagEditor(element, options)
+function WebTagEditor(element, options)
 {
     // $element should be the modal window
     this.$element = $(element).first();
     // $tokenInput is the input which will be converted to tokenInput
-    this.$tokenInput = this.$element.find('[data-webtageditor-element="tokenInput"]').first();
+    this.$tokenInput = this.$element.find('[data-WebTagEditor-element="tokenInput"]').first();
     // $errorArea is a div which will hold error messages
-    this.$errorArea = this.$element.find('[data-webtageditor-element="errorArea"]').first();
+    this.$errorArea = this.$element.find('[data-WebTagEditor-element="errorArea"]').first();
 
     // Arguments
-    this.options = $.extend({}, webTagEditor.DEFAULTS, options);
+    this.options = $.extend({}, WebTagEditor.DEFAULTS, options);
 
     // Check for id_bibrec
     // id_bibrec provided in options has precendece over the one provided in html
     if(this.options.id_bibrec == 0)
     {
-        var recid = this.$element.attr('data-webtageditor-recid');
+        var recid = this.$element.attr('data-WebTagEditor-recid');
 
         if(recid)
         {
@@ -62,7 +62,7 @@ function webTagEditor(element, options)
         }
         else
         {
-            console.log('webTagEditor: missing id_bibrec');
+            console.log('WebTagEditor: missing id_bibrec');
         }
     }
 
@@ -163,7 +163,7 @@ function webTagEditor(element, options)
     })
 }
 
-webTagEditor.DEFAULTS = {
+WebTagEditor.DEFAULTS = {
     id_bibrec: 0,
     tags: [],
     url_tokenize: '/yourtags/tokenize/',
@@ -173,20 +173,20 @@ webTagEditor.DEFAULTS = {
 }
 
 //Processes the server response of attach detach create AJAX requests
-webTagEditor.prototype.onServerResponse = function(item, intended_action, arguments, response)
+WebTagEditor.prototype.onServerResponse = function(item, intended_action, arguments, response)
 {
     if((!('action' in response)) ||
         response['action'] != intended_action)
     {
         var errors = {'response': ['Response action does not match request action.']};
-        this.onServerError(item, intended_action, arguments, bibrec, errors);
+        this.onServerError(item, intended_action, arguments, errors);
         return;
     }
 
     if(!('success' in response))
     {
         var errors = {'response': ['Incorrect response format.']};
-        this.onServerError(item, intended_action, arguments, bibrec,  errors);
+        this.onServerError(item, intended_action, arguments, errors);
         return;
     }
 
@@ -194,7 +194,7 @@ webTagEditor.prototype.onServerResponse = function(item, intended_action, argume
 
     if(!success)
     {
-        this.onServerError(item, intended_action, arguments, bibrec, response['errors']);
+        this.onServerError(item, intended_action, arguments, response['errors']);
         return;
     }
 
@@ -217,25 +217,12 @@ webTagEditor.prototype.onServerResponse = function(item, intended_action, argume
 
 //If the attach detach create AJAX request fails, this functions prints a message and
 // reverts the editor to pre-request state
-webTagEditor.prototype.onServerError = function(item, intended_action, arguments, errors) {
+WebTagEditor.prototype.onServerError = function(item, intended_action, arguments, errors) {
     //Default error = no conncetion
     if(errors == null || errors.length == 0)
     {
         errors = new Array();
         errors['response'] = ['Server not responding.'];
-    }
-
-    //Return tokens to original state
-    if(intended_action == 'create' || intended_action == 'attach')
-    {
-        this.$element.tokenInput('remove', item);
-    }
-    else if(intended_action == 'detach')
-    {
-        this.$element.tokenInput('remove', item);
-        item.readonly = false;
-        item.status = 'stable';
-        this.$element.tokenInput('add', item);
     }
 
     //Display errors
@@ -251,12 +238,27 @@ webTagEditor.prototype.onServerError = function(item, intended_action, arguments
             }
        }
     }
+
+    //Return tokens to original state
+    if(intended_action == 'create' || intended_action == 'attach')
+    {
+        this.$tokenInput.tokenInput('remove', item);
+    }
+    else if(intended_action == 'detach')
+    {
+        this.$tokenInput.tokenInput('remove', item);
+        item.readonly = false;
+        item.status = 'stable';
+        this.$tokenInput.tokenInput('add', item);
+    }
+
+
 }
 
 // tokenInput formatting and preprocessing functions
 // declared here to save memory (one instance of each function for whole class)
 
-webTagEditor.prototype.tokenInput_onResult = function (server_response) {
+WebTagEditor.prototype.tokenInput_onResult = function (server_response) {
     var items = server_response.results;
     var query = server_response.query;
 
@@ -282,7 +284,7 @@ webTagEditor.prototype.tokenInput_onResult = function (server_response) {
     return server_response;
 }
 
-webTagEditor.prototype.tokenInput_resultsFormatter = function(item) {
+WebTagEditor.prototype.tokenInput_resultsFormatter = function(item) {
     var token_html = item.name;
 
     if(item.status == 'creating')
@@ -293,7 +295,7 @@ webTagEditor.prototype.tokenInput_resultsFormatter = function(item) {
     return "<li><p>"+token_html+"</p></li>";
 }
 
-webTagEditor.prototype.tokenInput_tokenFormatter = function(item) {
+WebTagEditor.prototype.tokenInput_tokenFormatter = function(item) {
     var token_html = item.name;
 
     if(item.status == 'removing')

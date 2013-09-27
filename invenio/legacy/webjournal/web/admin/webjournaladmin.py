@@ -26,8 +26,8 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.webuser import getUid, page_not_authorized
-from invenio.messages import wash_language, gettext_set_language
-from invenio.urlutils import wash_url_argument
+from invenio.base.i18n import wash_language, gettext_set_language
+from invenio.utils.url import wash_url_argument
 from invenio.errorlib import register_exception
 from invenio.webjournal_config import \
      InvenioWebJournalNoJournalOnServerError, \

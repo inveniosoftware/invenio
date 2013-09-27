@@ -29,8 +29,8 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SUPPORT_EMAIL, \
                            CFG_PREFIX, \
                            CFG_DEVEL_SITE
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, \
      test_web_page_content, merge_error_messages, InvenioTestCase
 
 wju = lazy_import('invenio.webjournal_utils')

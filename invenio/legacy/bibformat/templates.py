@@ -25,9 +25,9 @@ __revision__ = "$Id$"
 import cgi
 
 # Invenio imports
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.messages import language_list_long
+from invenio.base.i18n import language_list_long
 from invenio.config import CFG_PATH_PHP
 
 MAX_MAPPINGS = 100 #show max this number of mappings on one page

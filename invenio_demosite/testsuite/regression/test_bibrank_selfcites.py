@@ -25,7 +25,7 @@ import sys
 from StringIO import StringIO
 from datetime import datetime, timedelta
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testsuite import make_test_suite, run_test_suite
 
 
 class SelfCitesIndexerTests(InvenioTestCase):

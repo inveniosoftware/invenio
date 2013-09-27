@@ -31,7 +31,7 @@ except ImportError:
     PIL_imported = False
 from invenio.bibformat_engine import BibFormatObject
 from invenio.htmlutils import HTMLWasher, remove_html_markup
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_TMPDIR, \
@@ -49,7 +49,7 @@ from invenio.webjournal_utils import \
      header_pattern, \
      header_pattern2, \
      para_pattern
-from invenio.urlutils import create_html_link
+from invenio.utils.url import create_html_link
 from invenio.bibdocfile import decompose_file
 
 def format_element(bfo, number_of_featured_articles="1",

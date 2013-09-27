@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from fixture import DataSet
-from invenio.websearch_fixtures_demosite import \
+from .websearch import \
     CollectionData as CollectionDataDemosite
 
 

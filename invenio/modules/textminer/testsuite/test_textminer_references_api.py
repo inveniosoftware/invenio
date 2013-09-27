@@ -28,7 +28,7 @@ It requires a fully functional invenio installation.
 # previously installed file.  Also, keeping TEST_SUITE empty so that
 # `inveniocfg --run-unit-tests' would not complain.
 
-from invenio.testutils import make_test_suite, run_test_suite
+from invenio.testsuite import make_test_suite, run_test_suite
 
 TEST_SUITE = make_test_suite()
 

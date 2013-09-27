@@ -27,7 +27,7 @@ module, those starting with CFG_BIBCLASSIFY_WEB....
 
 import cgi
 from invenio import config
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from urllib import quote
 from invenio.htmlutils import escape_html
 from invenio import bibclassify_config as bconfig

@@ -64,7 +64,7 @@ Example of usage:
     d.metadata_delete("10.5072/invenio.test.1")
 """
 
-from invenio import config
+from invenio.base.globals import cfg
 from urllib import urlencode
 import httplib
 import urllib2
@@ -355,19 +355,19 @@ class DataCite(object):
         if not HAS_SSL:
             warn("Module ssl not installed. Please install with e.g. 'pip install ssl'. Required for HTTPS connections to DataCite.")
 
-        self.username = username or getattr(config, 'CFG_DATACITE_USERNAME', '')
-        self.password = password or getattr(config, 'CFG_DATACITE_PASSWORD', '')
-        self.prefix = prefix or getattr(config, 'CFG_DATACITE_DOI_PREFIX', '10.5072')
+        self.username = username or cfg.get('CFG_DATACITE_USERNAME', '')
+        self.password = password or cfg.get('CFG_DATACITE_PASSWORD', '')
+        self.prefix = prefix or cfg.get('CFG_DATACITE_DOI_PREFIX', '10.5072')
         self.api_ver = api_ver  # Currently not used
 
-        self.api_url = url or getattr(config, 'CFG_DATACITE_URL', 'https://mds.datacite.org/')
+        self.api_url = url or cfg.get('CFG_DATACITE_URL', 'https://mds.datacite.org/')
         if self.api_url[-1] != '/':
             self.api_url = self.api_url + "/"
 
         if test_mode is not None:
             self.test_mode = test_mode
         else:
-            self.test_mode = getattr(config, 'CFG_DATACITE_TESTMODE', False)
+            self.test_mode = cfg.get('CFG_DATACITE_TESTMODE', False)
 
         # If in test mode, set prefix to 10.5072, the default DataCite test
         # prefix.

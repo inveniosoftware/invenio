@@ -38,7 +38,7 @@
         {%- set num_comments = record['_number_of_comments'] -%}
         {%- if num_comments -%}
          |
-        <a href="{{ url_for('webcomment.comments', recid=recid) }}">
+        <a href="{{ url_for('comments.comments', recid=recid) }}">
           <i class="icon-comment"></i>
           {{ _("%i comments") % num_comments if num_comments > 1 else _("1 comment") }}
         </a>
@@ -50,7 +50,7 @@
         {%- set num_reviews = record['_number_of_reviews'] -%}
         {%- if num_reviews -%}
          |
-        <a href="{{ url_for('webcomment.reviews', recid=recid) }}">
+        <a href="{{ url_for('comments.reviews', recid=recid) }}">
           <i class="icon-eye-open"></i>
           {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
         </a>

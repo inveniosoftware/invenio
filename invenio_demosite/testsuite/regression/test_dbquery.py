@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 from invenio import dbquery
 from invenio.config import CFG_SITE_NAME
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 class RunSqlReturnListOfDictionaries(InvenioTestCase):
     """Test run_sql behavior when with_dict parameter is provided"""

@@ -23,14 +23,14 @@ WebComment database models.
 
 # General imports.
 from sqlalchemy import event
-from invenio.sqlalchemyutils import db
-from invenio.webuser_flask import current_user
+from invenio.ext.sqlalchemy import db
+from flask.ext.login import current_user
 
 # Create your models here.
 
-from invenio.bibedit_model import Bibrec
-from invenio.websession_model import User
-from invenio.signalutils import record_after_update
+from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.accounts.models import User
+from invenio.base.signals import record_after_update
 
 
 class CmtRECORDCOMMENT(db.Model):

@@ -22,7 +22,7 @@ WebJournal Element - Prints a form that redirects to specified Bulletin
 issue.
 """
 import datetime
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL
 from invenio.webjournal_utils import \
      parse_url_string, \

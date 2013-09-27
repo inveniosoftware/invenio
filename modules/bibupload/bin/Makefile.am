@@ -15,8 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibupload batchuploader
+bin_SCRIPTS = batchuploader
 
-EXTRA_DIST = bibupload.in batchuploader.in
+EXTRA_DIST = batchuploader.in
 
 CLEANFILES = *~ *.tmp

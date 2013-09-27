@@ -17,9 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.cache import cache
-from invenio.search_engine_config import CFG_SEARCH_RESULTS_CACHE_PREFIX
-from invenio.hashutils import md5
+from invenio.base.globals import cfg
+from invenio.ext.cache import cache
+from invenio.utils.hash import md5
 
 search_results_cache = cache
 
@@ -39,14 +39,14 @@ def get_search_results_cache_key(**kwargs):
     """
     Returns key for search results cache.
     """
-    return CFG_SEARCH_RESULTS_CACHE_PREFIX + get_search_query_id(**kwargs)
+    return cfg['CFG_SEARCH_RESULTS_CACHE_PREFIX'] + get_search_query_id(**kwargs)
 
 
 def get_search_results_cache_key_from_qid(qid):
     """
     Returns key for search results cache from query identifier.
     """
-    return CFG_SEARCH_RESULTS_CACHE_PREFIX + qid
+    return cfg['CFG_SEARCH_RESULTS_CACHE_PREFIX'] + qid
 
 
 def get_collection_name_from_cache(qid):

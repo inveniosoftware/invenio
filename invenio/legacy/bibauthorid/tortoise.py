@@ -34,7 +34,7 @@ sys.setcheckinterval(1000000)
 try:
     from collections import defaultdict
 except:
-    from invenio.containerutils import defaultdict
+    from invenio.utils.container import defaultdict
 
 from itertools import groupby, chain, repeat
 from invenio.bibauthorid_general_utils import update_status, update_status_final, override_stdout_config

@@ -27,14 +27,13 @@ import re
 
 __revision__ = "$Id$"
 
-import os
 import datetime
 from werkzeug.utils import import_string
 
-from invenio.config import CFG_PYLIBDIR
-from invenio.datastructures import LaziestDict
+from invenio.utils.datastructures import LaziestDict
 
-CFG_BIBFIELD_FUNCTIONS = LaziestDict(lambda key: import_string('invenio.bibfield_functions.%s:%s' % (key, key)))
+CFG_BIBFIELD_FUNCTIONS = LaziestDict(lambda key: import_string(
+    'invenio.bibfield_functions.%s:%s' % (key, key)))
 
 
 class BibFieldException(Exception):
@@ -673,18 +672,18 @@ def get_main_field(field):
 
 def get_producer_rules(field, code):
     """docstring for get_producer_rules"""
-    from invenio.bibfield_config import config_rules
+    from invenio.core.record.definitions import legacy_field_matchings
 
-    rule = config_rules[field]
+    rule = legacy_field_matchings[field]
     if isinstance(rule, list):
         if len(rule) == 1:
             # case field[n]
-            return [(rule[0].replace('[n]', ''), config_rules[rule[0]]['producer'].get(code, {}))]
+            return [(rule[0].replace('[n]', ''), legacy_field_matchings[rule[0]]['producer'].get(code, {}))]
         else:
             # case field[1], field[n]
             rules = []
             for new_field in rule:
-                rules.append((new_field.replace('[n]', '[1:]'), config_rules[new_field]['producer'].get(code, {})))
+                rules.append((new_field.replace('[n]', '[1:]'), legacy_field_matchings[new_field]['producer'].get(code, {})))
             return rules
     else:
         return [(field, rule['producer'].get(code, {}))]

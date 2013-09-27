@@ -28,13 +28,18 @@ Public APIs:
 
 __required_plugin_API_version__ = "WebSubmit File Metadata Plugin API 1.0"
 
-import os, sys
-import traceback
+import sys
 from optparse import OptionParser
-from invenio.pluginutils import PluginContainer
-from invenio.config import CFG_PYLIBDIR
 from invenio.bibdocfile import decompose_file
 from invenio.websubmit_config import InvenioWebSubmitFileMetadataRuntimeError
+from invenio.utils.datastructures import LazyDict
+from invenio.base.utils import import_submodules_from_packages
+
+metadata_extractor_plugins = LazyDict(lambda: dict(filter(None, map(
+    plugin_builder_function,
+    import_submodules_from_packages('websubmit_file_metadata_plugins',
+                                    packages=['invenio'])))))
+
 
 def read_metadata(inputfile, force=None, remote=False,
                   loginpw=None, verbose=0):
@@ -66,13 +71,6 @@ def read_metadata(inputfile, force=None, remote=False,
     ext = decompose_file(inputfile)[2]
     if verbose > 5:
         print ext.lower(), 'extension to extract from'
-
-    # Load plugins
-    metadata_extractor_plugins = PluginContainer(
-        os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'websubmit_file_metadata_plugins', 'wsm_*.py'),
-        plugin_builder=plugin_builder_function,
-        api_version=__required_plugin_API_version__)
 
     # Loop through the plugins to find a good one for given file
     for plugin_name, plugin in metadata_extractor_plugins.iteritems():
@@ -139,14 +137,6 @@ def write_metadata(inputfile, outputfile, metadata_dictionary,
     if verbose > 5:
         print ext.lower(), 'extension to write to'
 
-    # Plugins
-    metadata_extractor_plugins = PluginContainer(
-        os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'websubmit_file_metadata_plugins', 'wsm_*.py'),
-        plugin_builder=plugin_builder_function,
-        api_version=__required_plugin_API_version__
-        )
-
     # Loop through the plugins to find a good one to ext
     for plugin_name, plugin in metadata_extractor_plugins.iteritems():
         if plugin.has_key('can_write_local') and \
@@ -168,12 +158,6 @@ def metadata_info(verbose=0):
 
     # Plugins
     print 'Available plugins:'
-    metadata_extractor_plugins = PluginContainer(
-        os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'websubmit_file_metadata_plugins', 'wsm_*.py'),
-        plugin_builder=plugin_builder_function,
-        api_version=__required_plugin_API_version__
-        )
 
     # Print each operation on each plugin
     for plugin_name, plugin_funcs in metadata_extractor_plugins.iteritems():
@@ -184,20 +168,20 @@ def metadata_info(verbose=0):
                   ', '.join(plugin_funcs)
 
     # Are there any unloaded plugins?
-    broken_plugins = metadata_extractor_plugins.get_broken_plugins()
-    if len(broken_plugins.keys()) > 0:
-        print 'Could not load the following plugin%s:' % \
-              (len(broken_plugins.keys()) > 1 and 's' or '')
-        for broken_plugin_name, broken_plugin_trace_info in broken_plugins.iteritems():
-            print '-- Name: ' + broken_plugin_name
-            if verbose > 5:
-                formatted_traceback = \
-                                    traceback.format_exception(broken_plugin_trace_info[0],
-                                                               broken_plugin_trace_info[1],
-                                                               broken_plugin_trace_info[2])
-                print '    ' + ''.join(formatted_traceback).replace('\n', '\n    ')
-            elif verbose > 0:
-                print '    ' + str(broken_plugin_trace_info[1])
+    # broken_plugins = metadata_extractor_plugins.get_broken_plugins()
+    # if len(broken_plugins.keys()) > 0:
+    #     print 'Could not load the following plugin%s:' % \
+    #           (len(broken_plugins.keys()) > 1 and 's' or '')
+    #     for broken_plugin_name, broken_plugin_trace_info in broken_plugins.iteritems():
+    #         print '-- Name: ' + broken_plugin_name
+    #         if verbose > 5:
+    #             formatted_traceback = \
+    #                                 traceback.format_exception(broken_plugin_trace_info[0],
+    #                                                            broken_plugin_trace_info[1],
+    #                                                            broken_plugin_trace_info[2])
+    #             print '    ' + ''.join(formatted_traceback).replace('\n', '\n    ')
+    #         elif verbose > 0:
+    #             print '    ' + str(broken_plugin_trace_info[1])
 
 def print_metadata(metadata):
     """
@@ -213,7 +197,7 @@ def print_metadata(metadata):
     else:
         print '(No metadata)'
 
-def plugin_builder_function(plugin_name, plugin_code):
+def plugin_builder_function(plugin):
     """
     Internal function used to build the plugin container, so it behaves as a
     dictionary.
@@ -223,6 +207,16 @@ def plugin_builder_function(plugin_name, plugin_code):
     @return: the plugin container
     @rtype: dict
     """
+    name = plugin.__name__.split('.')[-1]
+    if not name.startswith('wsm_'):
+        return
+
+    ## Let's check for API version.
+    api_version = getattr(plugin, '__plugin_version__', None)
+    if api_version != __required_plugin_API_version__:
+        raise Exception("Plugin version mismatch."
+            " Expected %s, found %s" % (__required_plugin_API_version__,
+                                        api_version))
     ret = {}
     for funct_name in ('can_read_local',
                        'can_read_remote',
@@ -230,10 +224,10 @@ def plugin_builder_function(plugin_name, plugin_code):
                        'read_metadata_local',
                        'write_metadata_local',
                        'read_metadata_remote'):
-        funct = getattr(plugin_code, funct_name, None)
+        funct = getattr(plugin, funct_name, None)
         if funct is not None:
             ret[funct_name] = funct
-    return ret
+    return name, ret
 
 def main():
     """

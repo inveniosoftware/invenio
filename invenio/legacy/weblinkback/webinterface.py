@@ -20,7 +20,7 @@
 
 """WebLinkback - Web Interface"""
 
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webuser import getUid, collect_user_info, page_not_authorized
 from invenio.weblinkback import check_user_can_view_linkbacks, \
@@ -32,7 +32,7 @@ from invenio.weblinkback_dblayer import approve_linkback, \
                                         reject_linkback
 from invenio.weblinkback_config import CFG_WEBLINKBACK_LATEST_COUNT_DEFAULT, \
                                        CFG_WEBLINKBACK_SUBSCRIPTION_DEFAULT_ARGUMENT_NAME
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd
+from invenio.utils.url import redirect_to_url, make_canonical_urlargd
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_SITE_LANG, \

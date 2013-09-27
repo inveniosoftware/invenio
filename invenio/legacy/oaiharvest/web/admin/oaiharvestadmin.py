@@ -25,7 +25,7 @@ import datetime
 import urllib
 
 import invenio.oai_harvest_admin as oha
-from invenio.jsonutils import json
+from invenio.utils.json import json
 from invenio.webpage import page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.dbquery import Error

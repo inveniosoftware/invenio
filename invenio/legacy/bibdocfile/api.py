@@ -75,7 +75,7 @@ from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident
 
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
 
@@ -87,11 +87,11 @@ if sys.hexversion < 0x2040000:
 from invenio.shellutils import escape_shell_arg
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
-from invenio.bibrecord import record_get_field_instances, \
+from invenio.legacy.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml
-from invenio.urlutils import create_url, make_user_agent_string
-from invenio.textutils import nice_size
+from invenio.utils.url import create_url, make_user_agent_string
+from invenio.utils.text import nice_size
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
 from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
@@ -114,7 +114,7 @@ from invenio.config import CFG_SITE_URL, \
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 from invenio.pluginutils import PluginContainer
-from invenio.hashutils import md5
+from invenio.utils.hash import md5
 
 import invenio.template
 

@@ -22,14 +22,13 @@
     {% for breadcrumb in breadcrumbs %}
     {% if loop.last %}
     <li class="active">
-      {{ breadcrumb[0] }}
+      {{ breadcrumb.text|safe }}
     </li>
     {% else %}
     <li>
-      {% set url_args = breadcrumb[2] or {} %}
-      <a href="{{ url_for(breadcrumb[1], **url_args) }}"
+      <a href="{{ breadcrumb.url }}"
          class="navtrail">
-        {{ breadcrumb[0] }}
+        {{ breadcrumb.text|safe }}
       </a> <span class="divider">/</span>
     </li>
     {% endif %}

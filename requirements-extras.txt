@@ -1,8 +1,4 @@
-# More requirements files are needed, since e.g gnuplot-py import numpy in its setup.py,
-# which means it has to be installed in a second step.
 gnuplot-py==1.8
-
-# Following packages are optional (if you do development you probably want to install them):
 pylint
 http://sourceforge.net/projects/pychecker/files/pychecker/0.8.19/pychecker-0.8.19.tar.gz/download
 pep8

@@ -65,11 +65,10 @@ from invenio.config import \
      CFG_SITE_RECORD, \
      CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 
-from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
-
 from invenio.dbquery import run_sql
-from invenio.messages import gettext_set_language
-from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
+from invenio.base.i18n import gettext_set_language
+from invenio.base.globals import cfg
+from invenio.utils.url import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
@@ -1357,7 +1356,7 @@ class Template:
             # the following prints the "external collection" arrow just after the name and
             # number of records of the hosted collection
             # 1) we might want to make the arrow work as an anchor to the hosted collection as well.
-            # That would probably require a new separate function under invenio.urlutils
+            # That would probably require a new separate function under invenio.utils.url
             # 2) we might want to place the arrow between the name and the number of records of the hosted collection
             # That would require to edit/separate the above out += ...
             if type == 'r':
@@ -3030,7 +3029,7 @@ class Template:
                 count += 1
                 out += """
                       <span %(collclass)s><strong><a href="#%(coll)s">%(coll_name)s</a></strong>, <a href="#%(coll)s">%(number)s</a><br /></span>""" % \
-                                      {'collclass' : count > CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT and 'class="morecollslist" style="display:none"' or '',
+                                      {'collclass' : count > cfg['CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT'] and 'class="morecollslist" style="display:none"' or '',
                                        'coll' : coll['id'],
                                        'coll_name' : cgi.escape(coll['name']),
                                        'number' : _("%s records found") % \
@@ -3041,12 +3040,12 @@ class Template:
                 count += 1
                 out += """
                       <span %(collclass)s><strong><a href="#%(coll)s">%(coll_name)s</a></strong><br /></span>""" % \
-                                      {'collclass' : count > CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT and 'class="morecollslist" style="display:none"' or '',
+                                      {'collclass' : count > cfg['CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT'] and 'class="morecollslist" style="display:none"' or '',
                                        'coll' : coll['id'],
                                        'coll_name' : cgi.escape(coll['name']),
                                        'number' : _("%s records found") % \
                                        ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')}
-        if count > CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT:
+        if count > cfg['CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT']:
             out += """<a class="lesscolls" style="display:none; color:red; font-size:small" href="#"><i>%s</i></a>""" % _("Show less collections")
             out += """<a class="morecolls" style="color:red; font-size:small" href="#"><i>%s</i></a>""" % _("Show all collections")
 
@@ -3377,8 +3376,8 @@ class Template:
 
           - 'recID' *int* - The record id
         """
-        from invenio.jinja2utils import render_template_to_string
-        tpl = """{%- from "websearch_helpers.html" import record_brief_links with context -%}
+        from invenio.ext.template import render_template_to_string
+        tpl = """{%- from "search/helpers.html" import record_brief_links with context -%}
         {{ record_brief_links(get_record(recid)) }}"""
         return render_template_to_string(tpl, recid=recID, _from_string=True).encode('utf-8')
 
@@ -3805,8 +3804,8 @@ class Template:
           - 'ln' *string* - The language to display
         """
         from invenio.search_engine import get_record
-        from invenio.bibrecord import field_get_subfield_values
-        from invenio.bibrecord import record_get_field_instances
+        from invenio.legacy.bibrecord import field_get_subfield_values
+        from invenio.legacy.bibrecord import record_get_field_instances
         _ = gettext_set_language(ln)
 
         out = ''

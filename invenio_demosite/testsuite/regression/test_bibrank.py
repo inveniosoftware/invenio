@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
 from invenio.dbquery import run_sql
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase, nottest
 
@@ -172,7 +172,7 @@ TESTS = [BibRankWebPagesAvailabilityTest,
          BibRankCitationRankingTest,
          BibRankExtCitesTest]
 
-from invenio.webinterface_handler_flask import with_app_context
+from invenio.base.factory import with_app_context
 
 @with_app_context()
 def create_external_word_similarity_ranker_tests():

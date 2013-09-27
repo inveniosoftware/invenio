@@ -55,11 +55,11 @@ from invenio.bibencode_config import (
                                       CFG_BIBENCODE_PBCORE_MARC_XSLT,
                                       CFG_BIBENCODE_ASPECT_RATIO_MARC_FIELD
                                       )
-from invenio.mailutils import send_email
-from invenio.messages import gettext_set_language
+from invenio.ext.email import send_email
+from invenio.base.i18n import gettext_set_language
 from invenio.webuser import emailUnique, get_user_preferences
 from invenio.bibformat_xslt_engine import format
-from invenio.jsonutils import json, json_decode_file
+from invenio.utils.json import json, json_decode_file
 import invenio.config
 
 ## Stored messages for email notifications

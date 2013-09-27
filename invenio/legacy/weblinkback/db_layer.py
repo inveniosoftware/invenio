@@ -24,7 +24,7 @@ from invenio.weblinkback_config import CFG_WEBLINKBACK_STATUS, \
                                        CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME, \
                                        CFG_WEBLINKBACK_DEFAULT_USER, \
                                        CFG_WEBLINKBACK_PAGE_TITLE_STATUS
-from invenio.textutils import xml_entities_to_utf8
+from invenio.utils.text import xml_entities_to_utf8
 
 
 def get_all_linkbacks(recid=None, status=None, order=CFG_WEBLINKBACK_ORDER_BY_INSERTION_TIME["ASC"], linkback_type=None):

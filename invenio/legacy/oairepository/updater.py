@@ -55,7 +55,7 @@ from invenio.bibtask import \
      task_init, \
      task_sleep_now_if_required, \
      task_low_level_submission
-from invenio.bibrecord import \
+from invenio.legacy.bibrecord import \
      record_get_field_value, \
      record_get_field_values, \
      record_add_field, \

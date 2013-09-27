@@ -22,11 +22,11 @@ webaccess database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 
-from invenio.websession_model import User
+from invenio.modules.accounts.models import User
 
 class AccACTION(db.Model):
     """Represents a AccACTION record."""

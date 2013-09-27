@@ -21,7 +21,7 @@
 Invenio hash functions.
 
 Usage example:
-  >>> from invenio.hashutils import md5
+  >>> from invenio.utils.hash import md5
   >>> print md5('MyPa$$')
 
 Simplifies imports of hash functions depending on Python version.

@@ -60,7 +60,7 @@ from invenio.bibtask import \
      task_sleep_now_if_required, \
      task_update_progress, \
      task_low_level_submission
-from invenio.bibrecord import record_extract_oai_id, create_records, \
+from invenio.legacy.bibrecord import record_extract_oai_id, create_records, \
                               create_record, record_add_fields, \
                               record_delete_fields, record_xml_output, \
                               record_get_field_instances, \
@@ -72,7 +72,7 @@ from invenio.plotextractor_getter import harvest_single, make_single_directory
 from invenio.plotextractor_converter import untar
 from invenio.plotextractor import process_single, get_defaults
 from invenio.shellutils import run_shell_command, Timeout
-from invenio.textutils import translate_latex2unicode
+from invenio.utils.text import translate_latex2unicode
 from invenio.bibedit_utils import record_find_matching_fields
 from invenio.bibcatalog import bibcatalog_system
 import invenio.template

@@ -22,9 +22,9 @@ Invenio utilities to settings manipulation.
 """
 from werkzeug.utils import cached_property
 
-from invenio.sqlalchemyutils import db
-from invenio.websession_model import User
-from invenio.webuser_flask import current_user, login_user, logout_user
+from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import User
+from invenio.ext.login import current_user, login_user, logout_user
 
 
 class Storage(object):

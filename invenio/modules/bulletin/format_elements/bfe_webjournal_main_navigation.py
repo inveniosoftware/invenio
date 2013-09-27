@@ -24,8 +24,8 @@ from invenio.webjournal_utils import \
      parse_url_string, \
      make_journal_url, \
      get_journal_categories
-from invenio.urlutils import create_html_link
-from invenio.messages import gettext_set_language
+from invenio.utils.url import create_html_link
+from invenio.base.i18n import gettext_set_language
 
 def format_element(bfo, category_prefix, category_suffix, separator=" | ",
            display_all_categories='no'):

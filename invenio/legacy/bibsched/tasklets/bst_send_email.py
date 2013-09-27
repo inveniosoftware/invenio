@@ -21,7 +21,7 @@
 Invenio Bibliographic Tasklet send_email wrapper.
 """
 
-from invenio.mailutils import send_email
+from invenio.ext.email import send_email
 
 def bst_send_email(fromaddr,
                toaddr,

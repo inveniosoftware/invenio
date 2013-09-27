@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 import zlib
 import copy
 
-from invenio.bibrecord import record_get_field_value, \
+from invenio.legacy.bibrecord import record_get_field_value, \
                                 record_get_field_instances, \
                                 record_add_field, \
                                 record_delete_field, \

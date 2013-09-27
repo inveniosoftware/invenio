@@ -24,13 +24,13 @@ __lastupdated__ = """$Date$"""
 import MySQLdb
 
 from invenio import bibformatadminlib, \
-                    bibformat_dblayer,\
                     bibformat_engine
+import invenio.modules.formatter.api as bibformat_dblayer
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, error_page
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
-from invenio.messages import wash_language, gettext_set_language
-from invenio.urlutils import wash_url_argument, redirect_to_url
+from invenio.base.i18n import wash_language, gettext_set_language
+from invenio.utils.url import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \
                            create_basic_search_units
 from invenio.bibformat_config import InvenioBibFormatError, InvenioBibFormatWarning

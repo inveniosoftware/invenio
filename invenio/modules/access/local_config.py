@@ -22,12 +22,14 @@ __revision__ = \
 
 # pylint: disable=C0301
 
-from invenio import config
+#from invenio import config
+from flask import current_app
+config = current_app.config
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE, \
      CFG_OPENAIRE_SITE, CFG_SITE_RECORD, CFG_INSPIRE_SITE, \
      CFG_SITE_ADMIN_EMAIL
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 class InvenioWebAccessFireroleError(Exception):
     """Just an Exception to discover if it's a FireRole problem"""
@@ -419,23 +421,23 @@ CFG_OAUTH2_CONFIGURATIONS =  {
 }
 
 ## Let's override OpenID/OAuth1/OAuth2 configuration from invenio(-local).conf
-CFG_OPENID_PROVIDERS = config.CFG_OPENID_PROVIDERS
-CFG_OAUTH1_PROVIDERS = config.CFG_OAUTH1_PROVIDERS
-CFG_OAUTH2_PROVIDERS = config.CFG_OAUTH2_PROVIDERS
-if config.CFG_OPENID_CONFIGURATIONS:
-    for provider, configuration in config.CFG_OPENID_CONFIGURATIONS.items():
+CFG_OPENID_PROVIDERS = config['CFG_OPENID_PROVIDERS']
+CFG_OAUTH1_PROVIDERS = config['CFG_OAUTH1_PROVIDERS']
+CFG_OAUTH2_PROVIDERS = config['CFG_OAUTH2_PROVIDERS']
+if config['CFG_OPENID_CONFIGURATIONS']:
+    for provider, configuration in config['CFG_OPENID_CONFIGURATIONS'].items():
         if provider in CFG_OPENID_CONFIGURATIONS:
             CFG_OPENID_CONFIGURATIONS[provider].update(configuration)
         else:
             CFG_OPENID_CONFIGURATIONS[provider] = configuration
-if config.CFG_OAUTH1_CONFIGURATIONS:
-    for provider, configuration in config.CFG_OAUTH1_CONFIGURATIONS.items():
+if config['CFG_OAUTH1_CONFIGURATIONS']:
+    for provider, configuration in config['CFG_OAUTH1_CONFIGURATIONS'].items():
         if provider in CFG_OAUTH1_CONFIGURATIONS:
             CFG_OAUTH1_CONFIGURATIONS[provider].update(configuration)
         else:
             CFG_OAUTH1_CONFIGURATIONS[provider] = configuration
-if config.CFG_OAUTH2_CONFIGURATIONS:
-    for provider, configuration in config.CFG_OAUTH2_CONFIGURATIONS.items():
+if config['CFG_OAUTH2_CONFIGURATIONS']:
+    for provider, configuration in config['CFG_OAUTH2_CONFIGURATIONS'].items():
         if provider in CFG_OAUTH2_CONFIGURATIONS:
             CFG_OAUTH2_CONFIGURATIONS[provider].update(configuration)
         else:
@@ -641,7 +643,8 @@ DEF_DEMO_AUTHS = (
              ('anyuser', 'submit', {'doctype': 'DEMOART', 'act': 'SBI', 'categ': 'ARTICLE'}),
             )
 
-_ = gettext_set_language(CFG_SITE_LANG)
+#_ = gettext_set_language(CFG_SITE_LANG)
+_ = lambda x: x
 
 # Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
@@ -707,11 +710,3 @@ CFG_WEBACCESS_WARNING_MSGS = {
                                23: """Verification failed. It is probably because the configuration isn't set properly. Please contact with the <a href="mailto:%s">administator</a>""" % CFG_SITE_ADMIN_EMAIL
         }
 
-#There are three status key that must be here: OK, REMOVED and REVOKED
-#the value doesn't matter at all
-CFG_WEB_API_KEY_STATUS = {
-                      'OK':'OK',
-                      'REMOVED':'REMOVED',
-                      'REVOKED':'REVOKED',
-                      'WARNING':'WARNING'
-                      }

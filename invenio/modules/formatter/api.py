@@ -18,158 +18,197 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Database access related functions for BibFormat engine and
-administration pages.
+    invenio.modules.formatter.api
+    -----------------------------------------
+    Database access related functions for BibFormat engine and
+    administration pages.
 """
-
-__revision__ = "$Id$"
-
 import zlib
-import time
+from invenio.ext.sqlalchemy import db
+from sqlalchemy.exc import SQLAlchemyError
+from invenio.utils.date import convert_datetime_to_utc_string, strftime
 
-from invenio.dbquery import run_sql
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.search.models import Tag
 
-def localtime_to_utc(date, fmt="%Y-%m-%dT%H:%M:%SZ"):
-    """
-    Convert localtime to UTC
+from .models import Format, Formatname, Bibfmt
 
-    @param date: the date to convert to UTC
-    @type date: string
-    @param fmt: the output format for the returned date
-    @return: a UTC version of input X{date}
-    @rtype: string
-    """
-
-    ldate = date.split(" ")[0]
-    ltime = date.split(" ")[1]
-
-    lhour   = ltime.split(":")[0]
-    lminute = ltime.split(":")[1]
-    lsec    = ltime.split(":")[2]
-
-    lyear   = ldate.split("-")[0]
-    lmonth  = ldate.split("-")[1]
-    lday    = ldate.split("-")[2]
-
-    timetoconvert = time.strftime(fmt, time.gmtime(time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))))
-
-    return timetoconvert
 
 def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
     Returns the creation date of the record 'sysno'.
 
-    @param sysno: the record ID for which we want to retrieve creation date
-    @param fmt: output format for the returned date
-    @return: creation date of the record
-    @rtype: string
+    :param sysno: the record ID for which we want to retrieve creation date
+    :param fmt: output format for the returned date
+    :return: creation date of the record
+    :rtype: string
     """
-    out   = ""
-    res = run_sql("SELECT DATE_FORMAT(creation_date, '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
-    if res[0][0]:
-        out = localtime_to_utc(res[0][0], fmt)
-    return out
+    try:
+        return convert_datetime_to_utc_string(
+            Bibrec.query.get(sysno).creation_date, fmt)
+
+    except SQLAlchemyError:
+        return ""
+
 
 def get_modification_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
     Returns the date of last modification for the record 'sysno'.
 
-    @param sysno: the record ID for which we want to retrieve modification date
-    @param fmt: output format for the returned date
-    @return: modification date of the record
-    @rtype: string
+    :param sysno: the record ID for which we want to retrieve modification date
+    :param fmt: output format for the returned date
+    :return: modification date of the record
+    :rtype: string
     """
-    out = ""
-    res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
-    if res and res[0][0]:
-        out = localtime_to_utc(res[0][0], fmt)
-    return out
+    try:
+        return convert_datetime_to_utc_string(
+            Bibrec.query.get(sysno).modification_date, fmt)
+
+    except SQLAlchemyError:
+        return ""
+
 
 ## XML Marc related functions
 def get_tag_from_name(name):
     """
     Returns the marc code corresponding the given name
 
-    @param name: name for which we want to retrieve the tag
-    @return: a tag corresponding to X{name} or None if not found
+    :param name: name for which we want to retrieve the tag
+    :return: a tag corresponding to X{name} or None if not found
     """
-    res = run_sql("SELECT value FROM tag WHERE name LIKE %s", (name,))
-    if len(res)>0:
-        return res[0][0]
-    else:
+    try:
+        return Tag.query.filter(Tag.name.like(name)).one().value
+
+    except SQLAlchemyError:
         return None
+
 
 def get_tags_from_name(name):
     """
     Returns the marc codes corresponding the given name,
     ordered by value
 
-    @param name: name for which we want to retrieve the tags
-    @return: list of tags corresponding to X{name} or None if not found
+    :param name: name for which we want to retrieve the tags
+    :return: list of tags corresponding to X{name} or None if not found
     """
-    res = run_sql("SELECT value FROM tag WHERE name LIKE %s ORDER BY value", (name,))
-    if len(res)>0:
-        return list(res[0])
-    else:
+    try:
+        return [tag.value for tag in
+                Tag.query.filter(Tag.name.like(name))
+                .order_by(Tag.value).all()]
+
+    except SQLAlchemyError:
         return None
+
 
 def tag_exists_for_name(name):
     """
     Returns True if a tag exists for name in 'tag' table.
 
-    @param name: name for which we want to check if a tag exist
-    @return: True if a tag exist for X{name} or False
+    :param name: name for which we want to check if a tag exist
+    :return: True if a tag exist for X{name} or False
     """
-    rows = run_sql("SELECT value FROM tag WHERE name LIKE %s", (name,))
-    if len(rows) > 0:
-        return True
-    return False
+    return (Tag.query.filter(Tag.name.like(name)).count() > 0)
+
 
 def get_name_from_tag(tag):
     """
     Returns the name corresponding to a marc code
 
-    @param tag: tag to consider
-    @return: a name corresponding to X{tag}
+    :param tag: tag to consider
+    :return: a name corresponding to X{tag}
     """
-    res = run_sql("SELECT name FROM tag WHERE value LIKE %s", (tag,))
-    if len(res)>0:
-        return res[0][0]
-    else:
+    try:
+        return Tag.query.filter(Tag.value.like(tag)).one().name
+
+    except SQLAlchemyError:
         return None
+
 
 def name_exists_for_tag(tag):
     """
     Returns True if a name exists for tag in 'tag' table.
 
-    @param tag: tag for which we want to check if a name exist
-    @return: True if a name exist for X{tag} or False
+    :param tag: tag for which we want to check if a name exist
+    :return: True if a name exist for X{tag} or False
     """
-    rows = run_sql("SELECT name FROM tag WHERE value LIKE %s", (tag,))
-    if len(rows) > 0:
-        return True
-    return False
+    return (Tag.query.filter(Tag.value.like(tag)).count() > 0)
+
 
 def get_all_name_tag_mappings():
     """
     Return the list of mappings name<->tag from 'tag' table.
 
     The returned object is a dict with name as key (if 2 names are the same
-    we will take the value of one of them, as we cannot make the difference in format
-    templates)
+    we will take the value of one of them, as we cannot make the difference
+    in format templates)
 
-    @return: a dict containing list of mapping in 'tag' table
+    :return: a dict containing list of mapping in 'tag' table
     """
-    out = {}
-    query = "SELECT value, name FROM tag"
-    res = run_sql(query)
-    for row in res:
-        out[row[1]] = row[0]
-    return out
+    result = dict()
+
+    for tag in Tag.query.all():
+        result[tag.name] = tag.value
+
+    return result
 
 
 ## Output formats related functions
+def get_format_by_code(code):
+    """
+    Returns the output format object given by code in the database.
+
+    Output formats are located inside 'format' table
+
+    :param code: the code of an output format
+    :return: Format object with given ID. None if not found
+    """
+    f_code = code
+    if len(code) > 6:
+        f_code = code[:6]
+
+    try:
+        return Format.query.filter(Format.code == f_code.lower()).one()
+
+    except SQLAlchemyError:
+        return None
+
+
+def get_format_property(code, property_name, default_value=None):
+    """
+    Returns the value of a property of the output format given by code.
+
+    If code or property does not exist, return default_value
+
+    :param code: the code of the output format to get the value from
+    :param property_name: name of property to return
+    :param default_value: value to be returned if format not found
+    :return: output format property value
+    """
+    return getattr(get_format_by_code(code), property_name, default_value)
+
+
+def set_format_property(code, property_name, value):
+    """
+    Sets the property of an output format, given by its code
+
+    If 'code' does not exist, create format
+
+    :param code: the code of the output format to update
+    :param property_name: name of property to set
+    :param value: value to assign
+    """
+    format = get_format_by_code(code)
+    if format is None:
+        format = Format()
+
+    setattr(format, property_name, value)
+
+    if(property == 'name'):
+        format.set_name(value)
+
+    db.session.add(format)
+    db.session.commit()
+
 
 def get_output_format_id(code):
     """
@@ -177,37 +216,40 @@ def get_output_format_id(code):
 
     Output formats are located inside 'format' table
 
-    @param code: the code of an output format
-    @return: the id in the database of the output format. None if not found
+    :param code: the code of an output format
+    :return: the id in the database of the output format. None if not found
     """
-    f_code = code
-    if len(code)>6:
-        f_code = code[:6]
-    res = run_sql("SELECT id FROM format WHERE code=%s", (f_code.lower(),))
-    if len(res)>0:
-        return res[0][0]
-    else:
-        return None
+    return get_format_property(code, 'id', None)
 
-def add_output_format(code, name="", description="", content_type="text/html", visibility=1):
+
+def add_output_format(code, name="", description="",
+                      content_type="text/html", visibility=1):
     """
     Add output format into format table.
 
     If format with given code already exists, do nothing
 
-    @param code: the code of the new format
-    @param name: a new for the new format
-    @param description: a description for the new format
-    @param content_type: the content_type (if applicable) of the new output format
-    @param visibility: if the output format is shown to users (1) or not (0)
-    @return: None
+    :param code: the code of the new format
+    :param name: a new for the new format
+    :param description: a description for the new format
+    :param content_type: the content_type (if applicable)
+        of the new output format
+    :param visibility: if the output format is shown to users (1) or not (0)
+    :return: None
     """
-    output_format_id = get_output_format_id(code);
-    if output_format_id is None:
-        query = "INSERT INTO format SET code=%s, description=%s, content_type=%s, visibility=%s"
-        params = (code.lower(), description, content_type, visibility)
-        run_sql(query, params)
-        set_output_format_name(code, name)
+    format = get_format_by_code(code)
+
+    if format is None:
+        format = Format()
+        format.code = code.lower()
+        format.description = description
+        format.content_type = content_type
+        format.visibility = visibility
+        format.set_name(name)
+
+        db.session.add(format)
+        db.session.commit()
+
 
 def remove_output_format(code):
     """
@@ -216,17 +258,17 @@ def remove_output_format(code):
     If code does not exist in database, do nothing
     The function also removes all localized names in formatname table
 
-    @param code: the code of the output format to remove
-    @return: None
+    :param code: the code of the output format to remove
+    :return: None
     """
-    output_format_id = get_output_format_id(code);
-    if output_format_id is None:
-        return
+    format = get_format_by_code(code)
 
-    query = "DELETE FROM formatname WHERE id_format='%s'" % output_format_id
-    run_sql(query)
-    query = "DELETE FROM format WHERE id='%s'" % output_format_id
-    run_sql(query)
+    if format is not None:
+        db.session.query(Formatname)\
+            .filter(Formatname.id_format == format.id).delete()
+        db.session.delete(format)
+        db.session.commit()
+
 
 def get_output_format_description(code):
     """
@@ -234,16 +276,11 @@ def get_output_format_description(code):
 
     If code or description does not exist, return empty string
 
-    @param code: the code of the output format to get the description from
-    @return: output format description
+    :param code: the code of the output format to get the description from
+    :return: output format description
     """
+    return get_format_property(code, 'description', '')
 
-    res = run_sql("SELECT description FROM format WHERE code=%s", (code,))
-    if len(res) > 0:
-        res = res[0][0]
-        if res is not None:
-            return res
-    return ""
 
 def set_output_format_description(code, description):
     """
@@ -251,17 +288,12 @@ def set_output_format_description(code, description):
 
     If 'code' does not exist, create format
 
-    @param code: the code of the output format to update
-    @param description: the new description
-    @return: None
+    :param code: the code of the output format to update
+    :param description: the new description
+    :return: None
     """
-    output_format_id = get_output_format_id(code)
-    if output_format_id is None:
-        add_output_format(code, "", description)
+    set_format_property(code, 'description', description)
 
-    query = "UPDATE format SET description=%s WHERE code=%s"
-    params = (description, code.lower())
-    run_sql(query, params)
 
 def get_output_format_visibility(code):
     """
@@ -269,15 +301,16 @@ def get_output_format_visibility(code):
 
     If code does not exist, return 0
 
-    @param code: the code of an output format
-    @return: output format visibility (0 if not visible, 1 if visible
+    :param code: the code of an output format
+    :return: output format visibility (0 if not visible, 1 if visible
     """
-    res = run_sql("SELECT visibility FROM format WHERE code=%s", (code,))
-    if len(res) > 0:
-        res = res[0][0]
-        if res is not None and int(res) in range(0, 2):
-            return int(res)
-    return 0
+    visibility = get_format_property(code, 'visibility', 0)
+
+    if visibility is not None and int(visibility) in range(0, 2):
+        return int(visibility)
+    else:
+        return 0
+
 
 def set_output_format_visibility(code, visibility):
     """
@@ -285,17 +318,12 @@ def set_output_format_visibility(code, visibility):
 
     If 'code' does not exist, create format
 
-    @param code: the code of the output format to update
-    @param visibility: the new visibility (0: not visible, 1:visible)
-    @return: None
+    :param code: the code of the output format to update
+    :param visibility: the new visibility (0: not visible, 1:visible)
+    :return: None
     """
-    output_format_id = get_output_format_id(code)
-    if output_format_id is None:
-        add_output_format(code, "", "", "", visibility)
+    set_format_property(code, 'visibility', visibility)
 
-    query = "UPDATE format SET visibility=%s WHERE code=%s"
-    params = (visibility, code.lower())
-    run_sql(query, params)
 
 def get_existing_content_types():
     """
@@ -304,18 +332,16 @@ def get_existing_content_types():
 
     Always returns at least a list with 'text/html'
 
-    @return: a list of content-type strings
+    :return: a list of content-type strings
     """
-    query = "SELECT DISTINCT content_type FROM format GROUP BY content_type"
-    res = run_sql(query)
 
-    if res is not None:
-        res = [val[0] for val in res if len(val) > 0]
-        if not 'text/html' in res:
-            res.append('text/html')
-        return res
-    else:
-        return ['text/html']
+    types = db.session.query(Format.content_type).distinct()
+
+    if 'text/html' not in types:
+        types.append('text/html')
+
+    return types
+
 
 def get_output_format_content_type(code):
     """
@@ -323,15 +349,11 @@ def get_output_format_content_type(code):
 
     If code or content_type does not exist, return empty string
 
-    @param code: the code of the output format to get the description from
-    @return: output format content_type
+    :param code: the code of the output format to get the description from
+    :return: output format content_type
     """
-    res = run_sql("SELECT content_type FROM format WHERE code=%s", (code,))
-    if len(res) > 0:
-        res = res[0][0]
-        if res is not None:
-            return res
-    return ""
+    return get_format_property(code, 'content_type', '') or ''
+
 
 def set_output_format_content_type(code, content_type):
     """
@@ -339,56 +361,52 @@ def set_output_format_content_type(code, content_type):
 
     If 'code' does not exist, create format
 
-    @param code: the code of the output format to update
-    @param content_type: the content type for the format
-    @return: None
+    :param code: the code of the output format to update
+    :param content_type: the content type for the format
+    :return: None
     """
-    output_format_id = get_output_format_id(code)
-    if output_format_id is None:
-        # add one if not exist (should not happen)
-        add_output_format(code, "", "", content_type)
-
-    query = "UPDATE format SET content_type=%s WHERE code=%s"
-    params = (content_type, code.lower())
-    run_sql(query, params)
+    set_format_property(code, 'content_type', content_type)
 
 
 def get_output_format_names(code):
     """
     Returns the localized names of the output format designated by 'code'
 
-    The returned object is a dict with keys 'ln' (for long name) and 'sn' (for short name),
-    containing each a dictionary with languages as keys.
-    The key 'generic' contains the generic name of the output format (for use in admin interface)
+    The returned object is a dict with keys 'ln' (for long name)
+    and 'sn' (for short name), containing each a dictionary
+    with languages as keys.
+    The key 'generic' contains the generic name of the output format
+    (for use in admin interface)
     For eg::
-           {'ln':{'en': "a long name", 'fr': "un long nom", 'de': "ein lange Name"},
+           {'ln':
+           {'en': "a long name", 'fr': "un long nom", 'de': "ein lange Name"},
            'sn':{'en': "a name", 'fr': "un nom", 'de': "ein Name"}
            'generic': "a name"}
 
-    The returned dictionary is never None. The keys 'ln' and 'sn' are always present. However
-    only languages present in the database are in dicts 'sn' and 'ln'. language "CFG_SITE_LANG" is always
-    in dict.
+    The returned dictionary is never None.
+    The keys 'ln' and 'sn' are always present.
+    However only languages present in the database are in dicts 'sn' and 'ln'.
+    Language "CFG_SITE_LANG" is always in dict.
 
     The localized names of output formats are located in formatname table.
 
-    @param code: the code of the output format to get the names from
-    @return: a dict containing output format names
+    :param code: the code of the output format to get the names from
+    :return: a dict containing output format names
     """
-    out = {'sn':{}, 'ln':{}, 'generic':''}
-    output_format_id = get_output_format_id(code);
-    if output_format_id is None:
+    out = {'sn': {}, 'ln': {}, 'generic': ''}
+    format = get_format_by_code(code)
+    if format is None:
         return out
 
-    res = run_sql("SELECT name FROM format WHERE code=%s", (code,))
-    if len(res) > 0:
-        out['generic'] = res[0][0]
+    out['generic'] = format.name
+    for fname in Formatname.query\
+            .filter(Formatname.id_format == format.id).all():
 
-    query = "SELECT type, ln, value FROM formatname WHERE id_format='%s'" % output_format_id
-    res = run_sql(query)
-    for row in res:
-        if row[0] == 'sn' or row[0] == 'ln':
-            out[row[0]][row[1]] = row[2]
+        if fname.type == 'sn' or fname.type == 'ln':
+            out[fname.type][fname.ln] = fname.value
+
     return out
+
 
 def set_output_format_name(code, name, lang="generic", type='ln'):
     """
@@ -396,53 +414,40 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
 
     if 'type' different from 'ln' or 'sn', do nothing
     if 'name' exceeds 256 chars, 'name' is truncated to first 256 chars.
-    if 'code' does not correspond to exisiting output format, create format if "generic" is given as lang
+    if 'code' does not correspond to exisiting output format,
+    create format if "generic" is given as lang
 
     The localized names of output formats are located in formatname table.
 
-    @param code: the code of an ouput format
-    @param type: either 'ln' (for long name) and 'sn' (for short name)
-    @param lang: the language in which the name is given
-    @param name: the name to give to the output format
-    @return: None
+    :param code: the code of an ouput format
+    :param type: either 'ln' (for long name) and 'sn' (for short name)
+    :param lang: the language in which the name is given
+    :param name: the name to give to the output format
+    :return: None
     """
-
-    if len(name) > 256:
-        name = name[:256]
     if type.lower() != "sn" and type.lower() != "ln":
         return
-    output_format_id = get_output_format_id(code);
-    if output_format_id is None and lang == "generic" and type.lower() == "ln":
+
+    format = get_format_by_code(code)
+    if format is None and lang == "generic" and type.lower() == "ln":
         # Create output format inside table if it did not exist
         # Happens when the output format was added not through web interface
-        add_output_format(code, name)
-        output_format_id = get_output_format_id(code) # Reload id, because it was not found previously
+        format = Format()
 
-    if lang =="generic" and type.lower()=="ln":
-        # Save inside format table for main name
-        query = "UPDATE format SET name=%s WHERE code=%s"
-        params = (name, code.lower())
-        run_sql(query, params)
-    else:
-        # Save inside formatname table for name variations
-        run_sql("REPLACE INTO formatname SET id_format=%s, ln=%s, type=%s, value=%s",
-                (output_format_id, lang, type.lower(), name))
+    if format is not None:
+        format.set_name(name, lang, type)
+
 
 def change_output_format_code(old_code, new_code):
     """
     Change the code of an output format
 
-    @param old_code: the code of the output format to change
-    @param new_code: the new code
-    @return: None
+    :param old_code: the code of the output format to change
+    :param new_code: the new code
+    :return: None
     """
-    output_format_id = get_output_format_id(old_code);
-    if output_format_id is None:
-        return
+    set_format_property(old_code, 'code', new_code.lower())
 
-    query = "UPDATE format SET code=%s WHERE id=%s"
-    params = (new_code.lower(), output_format_id)
-    res = run_sql(query, params)
 
 def get_preformatted_record(recID, of, decompress=zlib.decompress):
     """
@@ -451,25 +456,28 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
     If corresponding record does not exist for given output format,
     returns None
 
-    @param recID: the id of the record to fetch
-    @param of: the output format code
-    @param decompress: the method used to decompress the preformatted record in database
-    @return: formatted record as String, or None if not exist
+    :param recID: the id of the record to fetch
+    :param of: the output format code
+    :param decompress: the method used to decompress
+        the preformatted record in database
+    :return: formatted record as String, or None if not exist
     """
-    # Decide whether to use DB slave:
-    if of in ('xm', 'recstruct'):
-        run_on_slave = False # for master formats, use DB master
-    else:
-        run_on_slave = True # for other formats, we can use DB slave
-    # Try to fetch preformatted record
-    query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
-    params = (recID, of)
-    res = run_sql(query, params, run_on_slave=run_on_slave)
-    if res:
-        # record 'recID' is formatted in 'of', so return it
-        return "%s" % decompress(res[0][0])
-    else:
+    try:
+        value = Bibfmt.query\
+            .filter(Bibfmt.id_bibrec == recID)\
+            .filter(Bibfmt.format == of)\
+            .one().value
+
+        return str(decompress(value))
+
+    except SQLAlchemyError:
         return None
+    # Decide whether to use DB slave:
+    # if of in ('xm', 'recstruct'):
+    #     run_on_slave = False # for master formats, use DB master
+    # else:
+    #     run_on_slave = True # for other formats, we can use DB slave
+
 
 def get_preformatted_record_date(recID, of):
     """
@@ -479,28 +487,26 @@ def get_preformatted_record_date(recID, of):
     If corresponding record does not exist for given output format,
     returns None
 
-    @param recID: the id of the record to fetch
-    @param of: the output format code
-    @return: the date of the last update of the cache, or None if not exist
+    :param recID: the id of the record to fetch
+    :param of: the output format code
+    :return: the date of the last update of the cache, or None if not exist
     """
-    # Decide whether to use DB slave:
-    if of in ('xm', 'recstruct'):
-        run_on_slave = False # for master formats, use DB master
-    else:
-        run_on_slave = True # for other formats, we can use DB slave
-    # Try to fetch preformatted record
-    query = "SELECT last_updated FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
-    res = run_sql(query, run_on_slave=run_on_slave)
-    if res:
-        # record 'recID' is formatted in 'of', so return it
-        return "%s" % res[0][0]
-    else:
+    try:
+        last_updated = Bibfmt.query\
+            .filter(Bibfmt.id_bibrec == recID)\
+            .filter(Bibfmt.format == of)\
+            .one().last_updated
+
+        return strftime("%Y-%m-%d %H:%M:%S", last_updated)
+
+    except SQLAlchemyError:
         return None
 
 ## def keep_formats_in_db(output_formats):
 ##     """
 ##     Remove from db formats that are not in the list
-##     TOBE USED ONLY ONCE OLD BIBFORMAT IS REMOVED (or old behaviours will be erased...)
+##     TOBE USED ONLY ONCE OLD BIBFORMAT IS REMOVED
+##     (or old behaviours will be erased...)
 ##     """
 ##     query = "SELECT code FROM format"
 ##     res = run_sql(query)

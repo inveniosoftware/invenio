@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.scriptutils import Manager, change_command_name
+from invenio.ext.script import Manager, change_command_name
 
 manager = Manager(usage="Perform Apache operations.")
 
@@ -31,7 +31,7 @@ def version(separator='\n'):
     returned format is 'apache_version [apache_path]'.)  Return empty
     list if no success.
     """
-    from invenio.inveniocfg import _grep_version_from_executable
+    from invenio.legacy.inveniocfg import _grep_version_from_executable
     from invenio.shellutils import run_shell_command
     out = []
     dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
@@ -56,14 +56,14 @@ def create_config(force=False, no_ssl=True):
     import shutil
     from flask import current_app
     from jinja2 import TemplateNotFound
-    from invenio.jinja2utils import render_template_to_string
-    from invenio.textutils import wrap_text_in_a_box
+    from invenio.ext.template import render_template_to_string
+    from invenio.utils.text import wrap_text_in_a_box
     from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 
     CFG_PREFIX = current_app.config.get('CFG_PREFIX', '')
 
     def get_context():
-        from invenio.inveniocfg import _detect_ip_address
+        from invenio.legacy.inveniocfg import _detect_ip_address
 
         conf = current_app.config
 
@@ -184,8 +184,8 @@ Please see the INSTALL file for more details.
 
 
 def main():
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    app = create_app()
     manager.app = app
     manager.run()
 

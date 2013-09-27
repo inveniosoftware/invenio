@@ -19,12 +19,12 @@
 
 from wtforms.validators import Required
 from invenio.webdeposit_form import WebDepositForm as Form
-from invenio.webinterface_handler_flask_utils import _
+from invenio.base.i18n import _
 from invenio.webdeposit_field_widgets import plupload_widget, date_widget, \
                                              bootstrap_submit
 
 # Import custom fields
-from invenio.webdeposit_load_fields import fields
+from invenio.modules.deposit import fields
 __all__ = ['PreprintForm']
 
 

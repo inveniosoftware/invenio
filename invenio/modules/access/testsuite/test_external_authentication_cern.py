@@ -21,9 +21,7 @@
 
 __revision__ = "$Id$"
 
-
-from invenio.config import CFG_CERN_SITE
-from invenio.testutils import make_test_suite, run_test_suite, nottest, \
+from invenio.testsuite import make_test_suite, run_test_suite, nottest, \
     InvenioTestCase
 
 
@@ -61,10 +59,7 @@ class ExternalAuthenticationCernTest(InvenioTestCase):
         self.assertEqual(self.cern.fetch_user_preferences(self.username, self.userpwd)['email'], self.useremail)
         #self.assertRaises(KeyError, self.cern.fetch_user_preferences('patata', 'patata')['email'])
 
-if CFG_CERN_SITE:
-    TEST_SUITE = make_test_suite(ExternalAuthenticationCernTest,)
-else:
-    TEST_SUITE = make_test_suite()
+TEST_SUITE = make_test_suite(ExternalAuthenticationCernTest,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

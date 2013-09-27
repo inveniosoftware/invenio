@@ -32,14 +32,7 @@ except ImportError:
 
 from functools import wraps
 from flask import request, abort
-from invenio.config import CFG_WEB_API_KEY_ALLOWED_URL
-from invenio.access_control_config import CFG_WEB_API_KEY_STATUS
-from invenio.web_api_key_model import WebAPIKey
-
-_CFG_WEB_API_KEY_ALLOWED_URL = [(re.compile(_url), _authorized_time,
-                                _need_timestamp)
-                                for _url, _authorized_time, _need_timestamp
-                                in CFG_WEB_API_KEY_ALLOWED_URL]
+from .models import WebAPIKey
 
 
 def create_new_web_api_key(uid, key_description=None):
@@ -55,7 +48,7 @@ def create_new_web_api_key(uid, key_description=None):
     WebAPIKey.create_new(uid, key_description)
 
 
-def show_web_api_keys(uid, diff_status=CFG_WEB_API_KEY_STATUS['REMOVED']):
+def show_web_api_keys(uid, diff_status=None):
     """
     Makes a query to the DB to obtain all the user's REST API keys
 
@@ -79,7 +72,7 @@ def mark_web_api_key_as_removed(key_id):
     @param key_id: The id of the REST key that will be "removed"
     @type key_id: string
     """
-    WebAPIKey.mark_as(key_id, CFG_WEB_API_KEY_STATUS['REMOVED'])
+    WebAPIKey.mark_as(key_id, WebAPIKey.CFG_WEB_API_KEY_STATUS['REMOVED'])
 
 
 def get_available_web_api_keys(uid):

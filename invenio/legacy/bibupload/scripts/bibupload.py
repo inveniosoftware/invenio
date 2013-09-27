@@ -1,8 +1,7 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -45,12 +44,11 @@ BibUpload: Receive MARC XML file and update the appropriate database tables acco
      -V  --version           print the script version
 """
 
-try:
-    from invenio.flaskshell import *
-    from invenio.bibupload import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
 
-main()
+from invenio.base.factory import with_app_context
+
+
+@with_app_context()
+def main():
+    from invenio.bibupload import main as bibupload_main
+    return bibupload_main()

@@ -20,7 +20,7 @@
 import os
 import sys
 
-from invenio.scriptutils import Manager
+from invenio.ext.script import Manager
 
 manager = Manager(usage="Perform demosite operations")
 
@@ -33,13 +33,17 @@ option_default_data = manager.option('--no-data', action='store_false',
 
 
 @option_default_data
-def populate(default_data=True):
+def populate(packages=['invenio_atlantis'], default_data=True):
     """Load demo records.  Useful for testing purposes."""
     if not default_data:
         print '>>> Default data has been skiped (--no-data).'
         return
+
+    from werkzeug.utils import import_string
+    map(import_string, packages)
+
     from invenio.config import CFG_PREFIX
-    from invenio.sqlalchemyutils import db
+    from invenio.ext.sqlalchemy import db
     print ">>> Going to load demo records..."
     db.session.execute("TRUNCATE schTASK")
     db.session.commit()
@@ -67,29 +71,35 @@ def populate(default_data=True):
 
 
 @manager.command
-def create(data='demosite'):
+def create(packages=['invenio_atlantis']):
     """Populate database with demo site data."""
 
-    from invenio.sqlalchemyutils import db
+    from invenio.ext.sqlalchemy import db
     from invenio.config import CFG_PREFIX
-    from invenio.websession_model import User
-    from invenio.config_manager import get_conf
+    from invenio.modules.accounts.models import User
+    from invenio.base.scripts.config import get_conf
 
     print ">>> Going to create demo site..."
     db.session.execute("TRUNCATE schTASK")
-    db.session.execute("TRUNCATE session")
+    try:
+        db.session.execute("TRUNCATE session")
+    except:
+        pass
     User.query.filter(User.email == '').delete()
     db.session.commit()
 
-    from invenio.database_manager import load_fixtures
-    load_fixtures(suffix=data, truncate_tables_first=True)
+    from werkzeug.utils import import_string
+    map(import_string, packages)
+
+    from invenio.base.scripts.database import load_fixtures
+    load_fixtures(packages=packages, truncate_tables_first=True)
 
     db.session.execute("UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');")
     db.session.commit()
 
     conf = get_conf()
 
-    from invenio.inveniocfg import cli_cmd_reset_sitename, \
+    from invenio.legacy.inveniocfg import cli_cmd_reset_sitename, \
         cli_cmd_reset_siteadminemail, cli_cmd_reset_fieldnames
 
     cli_cmd_reset_sitename(conf)
@@ -108,8 +118,8 @@ def create(data='demosite'):
 
 
 def main():
-    from invenio.webinterface_handler_flask import create_invenio_flask_app
-    app = create_invenio_flask_app()
+    from invenio.base.factory import create_app
+    app = create_app()
     manager.app = app
     manager.run()
 

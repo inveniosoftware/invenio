@@ -33,11 +33,10 @@ except:
 from pprint import pformat
 from werkzeug import import_string
 
-from invenio.config import CFG_PYLIBDIR, CFG_LOGDIR
-from invenio.datastructures import LaziestDict
+from invenio.utils.datastructures import LaziestDict
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
-from invenio.signalutils import record_after_update
+from invenio.base.signals import record_after_update
 
 from invenio.bibfield_jsonreader import JsonReader
 from invenio.bibfield_utils import BlobWrapper, BibFieldDict
@@ -131,8 +130,7 @@ def guess_legacy_field_names(fields, master_format='marc'):
     >>> guess_legacy_fields(('100__a', '245'), 'marc')
     {'100__a':['authors[0].full_name'], '245':['title']}
     """
-    from invenio.bibfield_config import legacy_rules
-
+    from invenio.core.record.definitions import legacy_field_matchings
     res = {}
     if isinstance(fields, basestring):
         fields = (fields, )

@@ -62,7 +62,7 @@
     {%- set num_comments = record['_number_of_comments'] -%}
     {%- if num_comments -%}
      -
-    <a href="{{ url_for('webcomment.comments', recid=recID) }}"
+    <a href="{{ url_for('comments.comments', recid=recID) }}"
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}c">
       <i class="icon-comment"></i>
@@ -76,7 +76,7 @@
     {%- set num_reviews = record['_number_of_reviews'] -%}
     {%- if num_reviews -%}
      -
-    <a href="{{ url_for('webcomment.reviews', recid=recID) }}">
+    <a href="{{ url_for('comments.reviews', recid=recID) }}">
       <i class="icon-eye-open"></i>
       {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
     </a>

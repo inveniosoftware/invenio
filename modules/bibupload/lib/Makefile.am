@@ -19,7 +19,6 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibupload_config.py \
              bibupload.py \
-             bibupload_model.py \
              bibupload_regression_tests.py \
              batchuploader_webinterface.py \
              batchuploader_engine.py \

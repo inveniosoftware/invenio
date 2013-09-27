@@ -20,7 +20,6 @@ webdir=$(localstatedir)/www/img
 jsdir=$(localstatedir)/www/js
 
 pylib_DATA = bibedit_config.py \
-             bibedit_model.py \
              bibedit_dblayer.py \
              bibedit_engine.py \
              bibedit_unit_tests.py \

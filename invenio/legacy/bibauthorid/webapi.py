@@ -30,7 +30,7 @@ import invenio.webauthorprofile_interface as webauthorapi
 import invenio.search_engine as search_engine
 from invenio.search_engine import perform_request_search
 from cgi import escape
-from invenio.dateutils import strftime
+from invenio.utils.date import strftime
 from time import gmtime, ctime
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.webuser import collect_user_info, getUid
@@ -41,7 +41,7 @@ from invenio.external_authentication_robot import ExternalAuthRobot
 from invenio.external_authentication_robot import load_robot_keys
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
 from invenio.config import CFG_SITE_URL
-from invenio.mailutils import send_email
+from invenio.ext.email import send_email
 
 from operator import add
 

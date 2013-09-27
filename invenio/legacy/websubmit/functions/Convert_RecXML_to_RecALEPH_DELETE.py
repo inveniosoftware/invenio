@@ -25,7 +25,7 @@ import os
 from os import access, R_OK, W_OK
 from invenio.config import CFG_BINDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.textutils import wash_for_xml
+from invenio.utils.text import wash_for_xml
 
 def Convert_RecXML_to_RecALEPH_DELETE(parameters, curdir, form, user_info=None):
     """

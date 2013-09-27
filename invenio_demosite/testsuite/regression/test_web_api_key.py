@@ -19,19 +19,14 @@
 
 """Unit tests for REST like authentication API."""
 
-import sys
 import re
 import hmac
 import urllib
 import time
 
-from invenio.testutils import InvenioTestCase, make_test_suite, \
+from invenio.utils.hash import sha1
+from invenio.testsuite import InvenioTestCase, make_test_suite, \
     run_test_suite
-if sys.version_info < (2, 5):
-    import sha as sha1
-else:
-    from hashlib import sha1
-from invenio.access_control_config import CFG_WEB_API_KEY_STATUS
 
 
 def build_web_request(path, params, api_key=None, secret_key=None):
@@ -52,9 +47,9 @@ def build_web_request(path, params, api_key=None, secret_key=None):
 class APIKeyTest(InvenioTestCase):
     """ Test functions related to the REST authentication API """
     def setUp(self):
-        from invenio import web_api_key
-        from invenio.websession_model import User
-        from invenio.web_api_key_model import WebAPIKey
+        from invenio.modules import apikeys as web_api_key
+        from invenio.modules.accounts.models import User
+        from invenio.modules.apikeys.models import WebAPIKey
         self.model = WebAPIKey
         self.web_api_key = web_api_key
         self.web_api_key.CFG_WEB_API_KEY_ALLOWED_URL = [('/search\?*', 0, True),
@@ -72,6 +67,7 @@ class APIKeyTest(InvenioTestCase):
 
     def test_create_remove_show_key(self):
         """apikey - create/list/delete REST key"""
+
         self.assertEqual(0, len(self.web_api_key.show_web_api_keys(uid=self.id_admin)))
 
         self.web_api_key.create_new_web_api_key(self.id_admin, "Test key I")
@@ -89,15 +85,17 @@ class APIKeyTest(InvenioTestCase):
         self.assertEqual(4, len(self.web_api_key.show_web_api_keys(uid=self.id_admin)))
         self.assertEqual(5, len(self.web_api_key.show_web_api_keys(uid=self.id_admin, diff_status='')))
 
-        self.model.mark_as(keys_info[1].id, CFG_WEB_API_KEY_STATUS['WARNING'])
-        self.model.mark_as(keys_info[2].id, CFG_WEB_API_KEY_STATUS['REVOKED'])
+        self.model.mark_as(keys_info[1].id,
+                           self.model.CFG_WEB_API_KEY_STATUS['WARNING'])
+        self.model.mark_as(keys_info[2].id,
+                           self.model.CFG_WEB_API_KEY_STATUS['REVOKED'])
 
         self.assertEqual(4, len(self.web_api_key.show_web_api_keys(uid=self.id_admin)))
         self.assertEqual(5, len(self.web_api_key.show_web_api_keys(uid=self.id_admin, diff_status='')))
 
     def test_acc_get_uid_from_request(self):
-        from flask import current_app
         """webapikey - Login user from request using REST key"""
+        from flask import current_app
         path = '/search'
         params = 'ln=es&sc=1&c=Articles & Preprints&action_search=Buscar&p=ellis'
 

@@ -20,13 +20,13 @@
 """Unit tests for the WebDeposit Form """
 
 import copy
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class WebDepositFormTest(InvenioTestCase):
     def setUp(self):
         from invenio.webdeposit_form import WebDepositForm
-        from invenio.webdeposit_load_fields import fields
+        from invenio.modules.deposit import fields
         from werkzeug import MultiDict
 
         def reset_processor(form, field, submit):
@@ -125,7 +125,7 @@ class WebDepositFormTest(InvenioTestCase):
         self.assertEqual(form.data, self.object_data)
 
     def test_getting_jsondata(self):
-        from invenio.webdeposit_load_fields import fields
+        from invenio.modules.deposit import fields
         from invenio.webdeposit_form import WebDepositForm
         from datetime import date
 
@@ -346,7 +346,7 @@ class WebDepositFormTest(InvenioTestCase):
         )
 
     def test_nested(self):
-        from invenio.webdeposit_load_fields import fields
+        from invenio.modules.deposit import fields
         from invenio.webdeposit_form import WebDepositForm
 
         class NestedNestedForm(WebDepositForm):

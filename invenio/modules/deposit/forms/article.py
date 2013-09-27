@@ -18,12 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 from wtforms.validators import Required
-from invenio.webinterface_handler_flask_utils import _
+from invenio.base.i18n import _
 from invenio.webdeposit_form import WebDepositForm
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
     ExtendedListWidget, ListItemWidget, ckeditor_widget, TagInput, \
     TagListWidget
-from invenio.webdeposit_load_fields import fields
+from invenio.modules.deposit import fields
+
 __all__ = ['ArticleForm']
 
 

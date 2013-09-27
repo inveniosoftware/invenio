@@ -37,61 +37,38 @@ import gc
 import os
 import string
 import time
-import marshal
 import re
-import atexit
-import os
 
-from zlib import compress, decompress
 from thread import get_ident
-from invenio import config
-from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
-    CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
-    CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
-
-if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
-    try:
-        import sqlalchemy.pool as pool
-        import MySQLdb as mysqldb
-        mysqldb = pool.manage(mysqldb, use_threadlocal=True)
-        connect = mysqldb.connect
-    except ImportError:
-        CFG_MISCUTIL_SQL_USE_SQLALCHEMY = False
-        from MySQLdb import connect
-else:
-    from MySQLdb import connect
-
-## DB config variables.  These variables are to be set in
-## invenio-local.conf by admins and then replaced in situ in this file
-## by calling "inveniocfg --update-dbexec".
-## Note that they are defined here and not in config.py in order to
-## prevent them from being exported accidentally elsewhere, as no-one
-## should know DB credentials but this file.
-## FIXME: this is more of a blast-from-the-past that should be fixed
-## both here and in inveniocfg when the time permits.
-try:
-    from invenio.dbquery_config import CFG_DATABASE_HOST, \
-                                       CFG_DATABASE_PORT, \
-                                       CFG_DATABASE_NAME, \
-                                       CFG_DATABASE_USER, \
-                                       CFG_DATABASE_PASS, \
-                                       CFG_DATABASE_TYPE, \
-                                       CFG_DATABASE_SLAVE
-except ImportError:
-    CFG_DATABASE_HOST = 'localhost'
-    CFG_DATABASE_PORT = '3306'
-    CFG_DATABASE_NAME = 'invenio'
-    CFG_DATABASE_USER = 'invenio'
-    CFG_DATABASE_PASS = 'my123p$ss'
-    CFG_DATABASE_TYPE = 'mysql'
-    CFG_DATABASE_SLAVE = ''
+from flask import current_app
+from werkzeug.utils import cached_property
+from invenio.base.globals import cfg
+from invenio.utils.datastructures import LazyDict
+from invenio.utils.serializers import serialize_via_marshal, \
+    deserialize_via_marshal
 
 
-_DB_CONN = {}
-_DB_CONN[CFG_DATABASE_HOST] = {}
-_DB_CONN[CFG_DATABASE_SLAVE] = {}
+class DBConnect(object):
+    def __call__(self, *args, **kwargs):
+        return self._connect(*args, **kwargs)
 
-def unlock_all():
+    @cached_property
+    def _connect(self):
+        if cfg['CFG_MISCUTIL_SQL_USE_SQLALCHEMY']:
+            try:
+                import sqlalchemy.pool as pool
+                import MySQLdb as mysqldb
+                mysqldb = pool.manage(mysqldb, use_threadlocal=True)
+                connect = mysqldb.connect
+            except ImportError:
+                cfg['CFG_MISCUTIL_SQL_USE_SQLALCHEMY'] = False
+                from MySQLdb import connect
+        else:
+            from MySQLdb import connect
+        return connect
+
+
+def unlock_all(app):
     for dbhost in _DB_CONN.keys():
         for db in _DB_CONN[dbhost].values():
             try:
@@ -99,8 +76,19 @@ def unlock_all():
                 cur.execute("UNLOCK TABLES")
             except:
                 pass
+    return app
 
-atexit.register(unlock_all)
+
+def _db_conn():
+    current_app.teardown_appcontext_funcs.append(unlock_all)
+    out = {}
+    out[cfg['CFG_DATABASE_HOST']] = {}
+    out[cfg['CFG_DATABASE_SLAVE']] = {}
+    return out
+
+connect = DBConnect()
+_DB_CONN = LazyDict(_db_conn)
+
 
 class InvenioDbQueryWildcardLimitError(Exception):
     """Exception raised when query limit reached."""
@@ -108,7 +96,7 @@ class InvenioDbQueryWildcardLimitError(Exception):
         """Initialization."""
         self.res = res
 
-def _db_login(dbhost=CFG_DATABASE_HOST, relogin=0):
+def _db_login(dbhost=None, relogin=0):
     """Login to the database."""
 
     ## Note: we are using "use_unicode=False", because we want to
@@ -121,20 +109,22 @@ def _db_login(dbhost=CFG_DATABASE_HOST, relogin=0):
     ## would constitute an equivalent.  But we are not bothering with
     ## older MySQLdb versions here, since we are recommending to
     ## upgrade to more recent versions anyway.
+    if dbhost is None:
+        dbhost = cfg['CFG_DATABASE_HOST']
 
-    if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
-        return connect(host=dbhost, port=int(CFG_DATABASE_PORT),
-                       db=CFG_DATABASE_NAME, user=CFG_DATABASE_USER,
-                       passwd=CFG_DATABASE_PASS,
+    if cfg['CFG_MISCUTIL_SQL_USE_SQLALCHEMY']:
+        return connect(host=dbhost, port=int(cfg['CFG_DATABASE_PORT']),
+                       db=cfg['CFG_DATABASE_NAME'], user=cfg['CFG_DATABASE_USER'],
+                       passwd=cfg['CFG_DATABASE_PASS'],
                        use_unicode=False, charset='utf8')
     else:
         thread_ident = (os.getpid(), get_ident())
     if relogin:
         connection = _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
-                                         port=int(CFG_DATABASE_PORT),
-                                         db=CFG_DATABASE_NAME,
-                                         user=CFG_DATABASE_USER,
-                                         passwd=CFG_DATABASE_PASS,
+                                         port=int(cfg['CFG_DATABASE_PORT']),
+                                         db=cfg['CFG_DATABASE_NAME'],
+                                         user=cfg['CFG_DATABASE_USER'],
+                                         passwd=cfg['CFG_DATABASE_PASS'],
                                          use_unicode=False, charset='utf8')
         connection.autocommit(True)
         return connection
@@ -143,26 +133,30 @@ def _db_login(dbhost=CFG_DATABASE_HOST, relogin=0):
             return _DB_CONN[dbhost][thread_ident]
         else:
             connection = _DB_CONN[dbhost][thread_ident] = connect(host=dbhost,
-                                             port=int(CFG_DATABASE_PORT),
-                                             db=CFG_DATABASE_NAME,
-                                             user=CFG_DATABASE_USER,
-                                             passwd=CFG_DATABASE_PASS,
+                                             port=int(cfg['CFG_DATABASE_PORT']),
+                                             db=cfg['CFG_DATABASE_NAME'],
+                                             user=cfg['CFG_DATABASE_USER'],
+                                             passwd=cfg['CFG_DATABASE_PASS'],
                                              use_unicode=False, charset='utf8')
             connection.autocommit(True)
             return connection
 
-def _db_logout(dbhost=CFG_DATABASE_HOST):
+def _db_logout(dbhost=None):
     """Close a connection."""
+    if dbhost is None:
+        dbhost = cfg['CFG_DATABASE_HOST']
     try:
         del _DB_CONN[dbhost][(os.getpid(), get_ident())]
     except KeyError:
         pass
 
-def close_connection(dbhost=CFG_DATABASE_HOST):
+def close_connection(dbhost=None):
     """
     Enforce the closing of a connection
     Highly relevant in multi-processing and multi-threaded modules
     """
+    if dbhost is None:
+        dbhost = cfg['CFG_DATABASE_HOST']
     try:
         db = _DB_CONN[dbhost][(os.getpid(), get_ident())]
         cur = db.cursor()
@@ -200,18 +194,18 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     this file and catch them.
     """
 
-    if CFG_ACCESS_CONTROL_LEVEL_SITE == 3:
+    if cfg['CFG_ACCESS_CONTROL_LEVEL_SITE'] == 3:
         # do not connect to the database as the site is closed for maintenance:
         return []
 
     if param:
         param = tuple(param)
 
-    dbhost = CFG_DATABASE_HOST
-    if run_on_slave and CFG_DATABASE_SLAVE:
-        dbhost = CFG_DATABASE_SLAVE
+    dbhost = cfg['CFG_DATABASE_HOST']
+    if run_on_slave and cfg['CFG_DATABASE_SLAVE']:
+        dbhost = cfg['CFG_DATABASE_SLAVE']
 
-    if 'sql-logger' in getattr(config, 'CFG_DEVEL_TOOLS', []):
+    if 'sql-logger' in cfg.get('CFG_DEVEL_TOOLS', []):
         log_sql_query(dbhost, sql, param)
 
     try:
@@ -257,7 +251,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
             rc = cur.lastrowid
         return rc
 
-def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT, run_on_slave=False):
+def run_sql_many(query, params, limit=None, run_on_slave=False):
     """Run SQL on the server with PARAM.
     This method does executemany and is therefore more efficient than execute
     but it has sense only with queries that affect state of a database
@@ -271,9 +265,12 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT, run_o
 
     @return: SQL result as provided by database
     """
-    dbhost = CFG_DATABASE_HOST
-    if run_on_slave and CFG_DATABASE_SLAVE:
-        dbhost = CFG_DATABASE_SLAVE
+    if limit is None:
+        limit = cfg['CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT']
+
+    dbhost = cfg['CFG_DATABASE_HOST']
+    if run_on_slave and cfg['CFG_DATABASE_SLAVE']:
+        dbhost = cfg['CFG_DATABASE_SLAVE']
     i = 0
     r = None
     while i < len(params):
@@ -340,9 +337,8 @@ def log_sql_query(dbhost, sql, param=None):
        in run_sql() above. Useful for fine-level debugging only!
     """
     from flask import current_app
-    from invenio.config import CFG_LOGDIR
-    from invenio.dateutils import convert_datestruct_to_datetext
-    from invenio.textutils import indent_text
+    from invenio.utils.date import convert_datestruct_to_datetext
+    from invenio.utils.text import indent_text
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
     message += indent_text('Host:\n' + indent_text(str(dbhost), 2, wrap=True), 2)
@@ -415,14 +411,6 @@ def get_table_status_info(tablename, run_on_slave=False):
             table_status_info['Update_time'] = row[11]
     return table_status_info
 
-def serialize_via_marshal(obj):
-    """Serialize Python object via marshal into a compressed string."""
-    return compress(marshal.dumps(obj))
-
-def deserialize_via_marshal(astring):
-    """Decompress and deserialize string into a Python object via marshal."""
-    return marshal.loads(decompress(astring))
-
 def wash_table_column_name(colname):
     """
     Evaluate table-column name to see if it is clean.
@@ -450,9 +438,9 @@ def real_escape_string(unescaped_string, run_on_slave=False):
     @return: Returns the escaped string
     @rtype: str
     """
-    dbhost = CFG_DATABASE_HOST
-    if run_on_slave and CFG_DATABASE_SLAVE:
-        dbhost = CFG_DATABASE_SLAVE
+    dbhost = cfg['CFG_DATABASE_HOST']
+    if run_on_slave and cfg['CFG_DATABASE_SLAVE']:
+        dbhost = cfg['CFG_DATABASE_SLAVE']
     connection_object = _db_login(dbhost)
     escaped_string = connection_object.escape_string(unescaped_string)
     return escaped_string

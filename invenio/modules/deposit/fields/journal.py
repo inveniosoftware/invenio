@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
+from invenio.modules.deposit.field_base import WebDepositField
 from invenio.webdeposit_autocomplete_utils import sherpa_romeo_journals
 from invenio.webdeposit_processor_utils import sherpa_romeo_journal_process
 
@@ -39,7 +39,7 @@ class JournalField(WebDepositField, TextField):
 
 # from wtforms import TextField
 # from invenio.bibknowledge import get_kb_mappings
-# from invenio.webdeposit_field import WebDepositField
+# from invenio.modules.deposit.field_base import WebDepositField
 
 # __all__ = ['JournalField']
 

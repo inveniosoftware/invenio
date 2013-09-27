@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+#
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -48,21 +50,6 @@ CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT = 10
 
 ## Prefix used for search results cache.
 CFG_SEARCH_RESULTS_CACHE_PREFIX = "search_results::"
-
-class InvenioWebSearchUnknownCollectionError(Exception):
-    """Exception for bad collection."""
-    def __init__(self, colname):
-        """Initialisation."""
-        self.colname = colname
-    def __str__(self):
-        """String representation."""
-        return repr(self.colname)
-
-class InvenioWebSearchWildcardLimitError(Exception):
-    """Exception raised when query limit reached."""
-    def __init__(self, res):
-        """Initialization."""
-        self.res = res
 
 ## CERN Site hack
 #CFG_WEBSEARCH_SEARCH_WITHIN = ['title',
@@ -138,5 +125,3 @@ CFG_WEBSEACH_MATCHING_TYPES = [
         """
         }
     ]
-
-

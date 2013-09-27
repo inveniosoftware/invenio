@@ -26,8 +26,8 @@ The tests will not modifiy the database.
 
 import re
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 # Import the minimal necessary methods and variables needed to run Refextract
 refextract_re = lazy_import('invenio.refextract_re')
 setup_loggers = lazy_import('invenio.docextract_utils:setup_loggers')

@@ -1,8 +1,7 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011 CERN.
+## Copyright (C) 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,8 +23,13 @@
 
 __revision__ = "$Id$"
 
-from invenio.flaskshell import *
-from invenio.oai_repository_updater import main
+from invenio.base.factory import with_app_context
+
+
+@with_app_context()
+def main():
+    from invenio.oai_repository_updater import main as oai_main
+    return oai_main()
 
 ### okay, here we go:
 if __name__ == '__main__':

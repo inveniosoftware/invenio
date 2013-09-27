@@ -24,8 +24,6 @@ __lastupdated__ = """$Date$"""
 ## fill config variables:
 
 import re
-import getopt
-import sys
 import time
 
 from invenio.config import \
@@ -44,25 +42,23 @@ from invenio.config import \
     CFG_SITE_SECURE_URL
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
-from invenio.mailutils import send_email
-from invenio.errorlib import register_exception
+from invenio.ext.email import send_email
 from invenio.bibrankadminlib import addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
 from invenio.access_control_firerole import compile_role_definition, \
-    repair_role_definitions, serialize
-from invenio.messages import gettext_set_language
+    serialize
+from invenio.base.i18n import gettext_set_language
 from invenio.dbquery import run_sql, OperationalError, wash_table_column_name
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.webuser import email_valid_p, get_user_preferences, \
     set_user_preferences, update_Uid
-from invenio.urlutils import redirect_to_url, wash_url_argument
-from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
-    DEF_DEMO_ROLES, DEF_DEMO_AUTHS, WEBACCESSACTION, MAXPAGEUSERS, \
+from invenio.utils.url import redirect_to_url, wash_url_argument
+from invenio.access_control_config import \
+    WEBACCESSACTION, MAXPAGEUSERS, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTHENTICATION, DELEGATEADDUSERROLE, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, InvenioWebAccessFireroleError, \
-    MAXSELECTUSERS, CFG_EXTERNAL_AUTH_DEFAULT, CFG_WEB_API_KEY_STATUS
-from invenio.bibtask import authenticate
+    MAXSELECTUSERS, CFG_EXTERNAL_AUTH_DEFAULT
 from cgi import escape
 
 def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG_SITE_LANG):
@@ -1271,6 +1267,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
 def perform_modifyapikeydata(req, userID, keyID='', status='' , callback='yes', confirm=0):
     """modify REST API keys of an account"""
 
+    from invenio.modules.apikeys.model import WebAPIKey
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
@@ -1288,7 +1285,7 @@ def perform_modifyapikeydata(req, userID, keyID='', status='' , callback='yes', 
             text += ' <input class="admin_wvar" type="hidden" name="keyID" value="%s" />' % key_info[0]
             text += ' <span class="adminlabel">Description: </span>%s<br />\n' % key_info[1]
             text += ' <select name="status"> '
-            for status in CFG_WEB_API_KEY_STATUS.values():
+            for status in WebAPIKey.CFG_WEB_API_KEY_STATUS.values():
                 text += ' <option %s value="%s">%s</option>' % (("", "selected")[key_info[2] == status], status, status)
             text += ' </select> <br />\n'
             if key_info[0] == keyID:
@@ -3791,92 +3788,3 @@ def send_account_deleted_message(new_account_email, send_to, ln=CFG_SITE_LANG):
     body += "\n%s" % CFG_SITE_NAME
 
     return send_email(CFG_SITE_SUPPORT_EMAIL, send_to, sub, body, header='')
-
-def usage(exitcode=1, msg=""):
-    """Prints usage info."""
-    if msg:
-        print >> sys.stderr, "Error: %s." % msg
-        print >> sys.stderr
-    print >> sys.stderr, """Usage: %s [options]
-
-General options:
-  -h, --help\t\tprint this help
-  -V, --version\t\tprint version number
-
-Authentication options:
-  -u, --user=USER\tUser name needed to perform the administrative task
-
-Option to administrate authorizations:
-  -a, --add\t\tadd default authorization settings
-  -c, --compile\t\tcompile firewall like role definitions (FireRole)
-  -r, --reset\t\treset to default settings
-  -D, --demo\t\tto be used with -a or -r in order to consider demo site authorizationss
-""" % sys.argv[0]
-    sys.exit(exitcode)
-
-
-def main():
-    """Main function that analyzes command line input and calls whatever
-    is appropriate. """
-
-    ## parse command line:
-    # set user-defined options:
-    options = {'user' : '', 'reset' : 0, 'compile' : 0, 'add' : 0, 'demo' : 0}
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVu:racD",
-                                    ["help", "version", "user=",
-                                    "reset", "add", "compile", "demo"])
-    except getopt.GetoptError, err:
-        usage(1, err)
-    try:
-        for opt in opts:
-            if opt[0] in ("-h", "--help"):
-                usage(0)
-            elif opt[0] in ("-V", "--version"):
-                print __revision__
-                sys.exit(0)
-            elif opt[0] in ("-u", "--user"):
-                options["user"] = opt[1]
-            elif opt[0] in ("-r", "--reset"):
-                options["reset"] = 1
-            elif opt[0] in ("-a", "--add"):
-                options["add"] = 1
-            elif opt[0] in ("-c", "--compile"):
-                options["compile"] = 1
-            elif opt[0] in ("-D", "--demo"):
-                options["demo"] = 1
-            else:
-                usage(1)
-        if options['add'] or options['reset'] or options['compile']:
-            if acca.acc_get_action_id('cfgwebaccess'):
-                # Action exists hence authentication works :-)
-                options['user'] = authenticate(options['user'],
-                    authorization_msg="WebAccess Administration",
-                    authorization_action="cfgwebaccess")
-            if options['reset'] and options['demo']:
-                acca.acc_reset_default_settings([CFG_SITE_ADMIN_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
-                print "Reset default demo site settings."
-            elif options['reset']:
-                acca.acc_reset_default_settings([CFG_SITE_ADMIN_EMAIL])
-                print "Reset default settings."
-            elif options['add'] and options['demo']:
-                acca.acc_add_default_settings([CFG_SITE_ADMIN_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
-                print "Added default demo site settings."
-            elif options['add']:
-                acca.acc_add_default_settings([CFG_SITE_ADMIN_EMAIL])
-                print "Added default settings."
-            if options['compile']:
-                repair_role_definitions()
-                print "Compiled firewall like role definitions."
-        else:
-            usage(1, "You must specify at least one command")
-    except StandardError, e:
-        register_exception()
-        usage(e)
-    return
-
-### okay, here we go:
-if __name__ == '__main__':
-    main()
-
-

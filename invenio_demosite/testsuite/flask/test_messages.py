@@ -17,9 +17,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.sqlalchemyutils import db
-from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE
-from invenio.testutils import make_flask_test_suite, run_test_suite, \
+from invenio.ext.sqlalchemy import db
+from invenio.modules.messages.config import CFG_WEBMESSAGE_STATUS_CODE
+from invenio.testsuite import make_flask_test_suite, run_test_suite, \
     FlaskSQLAlchemyTest, InvenioFixture
 
 from fixture import SQLAlchemyFixture
@@ -27,7 +27,7 @@ from invenio.webaccount_fixtures import UserData
 
 
 def fixture_builder():
-    from invenio.websession_model import User
+    from invenio.modules.accounts.models import User
     return SQLAlchemyFixture(env={'UserData': User}, engine=db.metadata.bind,
                              session=db.session)
 
@@ -39,8 +39,8 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData)
     def test_index(data, self):
-        from invenio.websession_model import User
-        from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
+        from invenio.modules.accounts.models import User
+        from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
 
         users = data.UserData
         admin = User.query.filter(User.nickname.like('admin')).one()
@@ -100,8 +100,8 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData)
     def test_send_later(data, self):
-        from invenio.websession_model import User
-        from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
+        from invenio.modules.accounts.models import User
+        from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
 
         users = data.UserData
         romeo = User.query.filter(User.nickname.like('romeo')).one()
@@ -171,13 +171,13 @@ class MsgMESSAGETest(FlaskSQLAlchemyTest):
 
     @fixture.with_data(UserData)
     def test_with_fixture(data, self):
-        from invenio.websession_model import User
+        from invenio.modules.accounts.models import User
         u = User.query.all()
         assert len(u) == len(dict(data.UserData))
         db.session.commit()
 
     def test_without_fixture(self):
-        from invenio.websession_model import User
+        from invenio.modules.accounts.models import User
         u = User.query.all()
         assert len(u) == 0
 

@@ -21,7 +21,7 @@
 
 import sys
 import time
-from invenio.dateutils import datetime, strftime
+from invenio.utils.date import datetime, strftime
 from invenio.dbquery import deserialize_via_marshal, \
 serialize_via_marshal, run_sql, Error
 from invenio.search_engine import get_field_tags, search_pattern

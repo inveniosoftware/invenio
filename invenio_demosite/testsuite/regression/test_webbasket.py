@@ -26,7 +26,7 @@ import mechanize
 import re
 
 from invenio.config import CFG_SITE_URL, CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase, \
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase, \
                               test_web_page_content, make_url, make_surl, merge_error_messages
 
 class WebBasketWebPagesAvailabilityTest(InvenioTestCase):

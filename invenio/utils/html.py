@@ -21,11 +21,10 @@
 __revision__ = "$Id$"
 
 from HTMLParser import HTMLParser
-from invenio.config import CFG_SITE_URL, \
-     CFG_MATHJAX_HOSTING, \
-     CFG_SITE_LANG, \
-     CFG_WEBDIR
-from invenio.textutils import indent_text, encode_for_xml
+from werkzeug.local import LocalProxy
+from invenio.base.globals import cfg
+from invenio.utils.text import indent_text, encode_for_xml
+default_ln = lambda ln: cfg('CFG_SITE_LANG') if ln is None else ln
 import re
 import cgi
 import os
@@ -436,7 +435,7 @@ def get_mathjax_header(https=False):
     @note: with new releases of MathJax, update this function toghether with
            $MJV variable in the root Makefile.am
     """
-    if CFG_MATHJAX_HOSTING.lower() == 'cdn':
+    if cfg['CFG_MATHJAX_HOSTING'].lower() == 'cdn':
         if https:
             mathjax_path = "https://d3eoax9i5htok0.cloudfront.net/mathjax/2.1-latest"
         else:
@@ -460,14 +459,14 @@ def is_html_text_editor_installed():
     """
     Returns True if the wysiwyg editor (CKeditor) is installed
     """
-    return os.path.exists(os.path.join(CFG_WEBDIR, 'ckeditor', 'ckeditor.js'))
+    return os.path.exists(os.path.join(cfg['CFG_WEBDIR'], 'ckeditor', 'ckeditor.js'))
 
-ckeditor_available = is_html_text_editor_installed()
+ckeditor_available = LocalProxy(is_html_text_editor_installed)
 
 def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
                          enabled=True, file_upload_url=None, toolbar_set="Basic",
                          custom_configurations_path='/ckeditor/invenio-ckeditor-config.js',
-                         ln=CFG_SITE_LANG):
+                         ln=None):
     """
     Returns a wysiwyg editor (CKEditor) to embed in html pages.
 
@@ -526,6 +525,8 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     @return: the HTML markup of the editor
     """
+    ln = default_ln(ln)
+
     if textual_content is None:
         textual_content = content
 
@@ -600,7 +601,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
            'custom_configurations_path': custom_configurations_path,
            'toolbar': toolbar_set,
            'file_upload_script': file_upload_script,
-           'CFG_SITE_URL': CFG_SITE_URL,
+           'CFG_SITE_URL': cfg['CFG_SITE_URL'],
            'ln': ln}
 
     else:

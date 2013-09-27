@@ -25,7 +25,7 @@ tables and into the normal bibdoc + subformat infrastructure.
 import sys
 from datetime import datetime
 
-from invenio.textutils import wrap_text_in_a_box, wait_for_user
+from invenio.utils.text import wrap_text_in_a_box, wait_for_user
 from invenio.bibtask import check_running_process_user
 from invenio.dbquery import run_sql, OperationalError
 from invenio.bibdocfile import BibDoc

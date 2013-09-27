@@ -1,6 +1,6 @@
-{%- js 'js/bibworkflow_entry_details.js' -%}
-{% extends "bibworkflow_layout_workflow_details.html" %}
-{% import 'bibworkflow_utils.html' as utils %}
+{%- js url_for('workflows.static', filename='js/workflows/entry_details.js') -%}
+{% extends "workflows/layout_workflow_details.html" %}
+{% import 'workflows/utils.html' as utils %}
 {% block body %}
 <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>

@@ -22,13 +22,13 @@ Oai harvest database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
 
 #from websearch_model import Collection
-from invenio.bibedit_model import Bibrec
-from invenio.bibsched_model import SchTASK
+from invenio.modules.record_editor.models import Bibrec
+from invenio.modules.legacy.scheduler.models import SchTASK
 
 class OaiHARVEST(db.Model):
     """Represents a OaiHARVEST record."""

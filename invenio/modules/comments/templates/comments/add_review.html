@@ -19,7 +19,7 @@
 {% from "_formhelpers.html" import render_field with context %}
 {% macro add_comment() %}
 <form name="write_message"
-      action="{{ url_for('webcomment.add_review', recid=recid) }}"
+      action="{{ url_for('comments.add_review', recid=recid) }}"
       style="{{ 'margin-bottom:0px;' if request.is_xhr }}"
       method="post" class="form-horizontal">
   <div class="{{ 'modal-body' if request.is_xhr }}">
@@ -40,7 +40,7 @@
 {% endmacro %}
 
 {%- if not request.is_xhr -%}
-  {% extends "record.html" %}
+  {% extends "records/base.html" %}
   {% block record_content %}
   {{ add_comment() }}
   {% endblock %}

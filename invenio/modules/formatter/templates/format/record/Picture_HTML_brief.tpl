@@ -1,4 +1,4 @@
-{% extends 'format_templates/Default_HTML_brief.tpl' %}
+{% extends 'format/record/Default_HTML_brief.tpl' %}
 
 {% block record_header %}
 <h4 class="media-heading">

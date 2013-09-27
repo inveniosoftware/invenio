@@ -19,13 +19,11 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = oai_harvest_getter.py \
              oai_harvest_dblayer.py \
-             oai_harvest_fixtures_demosite.py \
              oai_harvest_templates.py \
              oai_harvest_admin.py \
              oai_harvest_admin_regression_tests.py \
              oai_harvest_daemon.py \
              oai_harvest_config.py \
-             oai_harvest_model.py \
              oai_harvest_web_tests.py
 
 EXTRA_DIST = $(pylib_DATA)

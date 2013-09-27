@@ -37,7 +37,6 @@ pylib_DATA = docextract_pdf.py \
              refextract_tag.py \
              refextract_cli.py \
              refextract_kbs.py \
-             refextract_model.py \
              refextract_linker.py \
              refextract_regression_tests.py \
              refextract_unit_tests.py \

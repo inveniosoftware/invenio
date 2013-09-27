@@ -21,14 +21,14 @@ WebJournal widget - Display Indico seminars
 """
 from invenio.config import CFG_CACHEDIR, CFG_SITE_LANG
 from xml.dom import minidom
-from invenio.urlutils import create_Indico_request_url, make_invenio_opener
+from invenio.utils.url import create_Indico_request_url, make_invenio_opener
 import time
 import base64
 import socket
 
 from invenio.webjournal_utils import \
      parse_url_string, WEBJOURNAL_OPENER
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 update_frequency = 3600 # in seconds
 

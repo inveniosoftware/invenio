@@ -33,11 +33,11 @@ import base64
 from cPickle import dumps
 from zlib import decompress, compress
 
-from invenio.jsonutils import json, json_unicode_to_utf8
+from invenio.utils.json import json, json_unicode_to_utf8
 from invenio.shellutils import mymkdir
 from invenio.external_authentication import ExternalAuth, InvenioWebAccessExternalAuthError
 from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_SECURE_URL
-from invenio.hashutils import sha1
+from invenio.utils.hash import sha1
 
 CFG_ROBOT_EMAIL_ATTRIBUTE_NAME = 'email'
 CFG_ROBOT_NICKNAME_ATTRIBUTE_NAME = 'nickname'
@@ -351,7 +351,7 @@ class ExternalAuthRobot(ExternalAuth):
         @rtype: string
         """
         from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
-        from invenio.urlutils import create_url
+        from invenio.utils.url import create_url
         if assertion is None:
             assertion = {}
         assertion[self.email_attribute_name] = email

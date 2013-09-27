@@ -29,8 +29,8 @@ from invenio.config import CFG_SITE_URL
 from invenio.webpage import page
 from invenio.errorlib import send_error_report_to_admin
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url
-from invenio.messages import gettext_set_language
+from invenio.utils.url import redirect_to_url
+from invenio.base.i18n import gettext_set_language
 
 class WebInterfaceErrorPages(WebInterfaceDirectory):
     """Defines the set of /error pages."""

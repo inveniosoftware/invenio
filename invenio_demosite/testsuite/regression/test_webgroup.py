@@ -27,7 +27,7 @@ from mechanize import Browser
 
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 class WebGroupTest(InvenioTestCase):
     """Test functions related to the Apache authentication."""

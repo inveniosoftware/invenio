@@ -52,13 +52,14 @@ from flask import has_app_context
 from operator import itemgetter
 from werkzeug.utils import cached_property
 
+from invenio.base.utils import autodiscover_template_context_functions
 from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
      CFG_SITE_LANG
 from invenio.errorlib import \
      register_exception
-from invenio.bibrecord import \
+from invenio.legacy.bibrecord import \
      create_record, \
      record_get_field_instances, \
      record_get_field_value, \
@@ -66,11 +67,11 @@ from invenio.bibrecord import \
      record_xml_output
 from invenio.bibformat_xslt_engine import format
 from invenio.dbquery import run_sql
-from invenio.messages import \
+from invenio.base.i18n import \
      language_list_long, \
      wash_language, \
      gettext_set_language
-from invenio import bibformat_dblayer
+import invenio.modules.formatter.api as bibformat_dblayer
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_DIR, \
      CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
@@ -91,7 +92,7 @@ from invenio.htmlutils import \
 from invenio.webuser import collect_user_info
 from invenio.bibknowledge import get_kbr_values
 from invenio.importutils import autodiscover_modules
-from invenio.jinja2utils import render_template_to_string
+from invenio.ext.template import render_template_to_string
 from HTMLParser import HTMLParseError
 from invenio.shellutils import escape_shell_arg
 
@@ -218,19 +219,19 @@ class LazyTemplateContextFunctionsCache(object):
     @cached_property
     def template_context_functions(self):
         """Returns template context functions"""
-        modules = autodiscover_modules(['invenio.template_context_functions'], 'tfn_.+')
+        modules = autodiscover_template_context_functions()
         elem = {}
         for m in modules:
             register_func = getattr(m, 'template_context_function', None)
             if register_func and isinstance(register_func, types.FunctionType):
-                 elem[m.__name__.split('.')[-1]] = register_func
+                elem[m.__name__.split('.')[-1]] = register_func
 
         return elem
 
     @cached_property
     def bibformat_elements(self):
         """Returns bibformat elements."""
-        modules = autodiscover_modules(['invenio.bibformat_elements'], 'bfe_.+')
+        modules = autodiscover_modules(['invenio.bibformat_elements'], '.*\.bfe_.+')
 
         elem = {}
         for m in modules:
@@ -264,8 +265,8 @@ class LazyTemplateContextFunctionsCache(object):
 
         bfe_from_tags = {}
         if has_app_context():
-            from invenio.sqlalchemyutils import db
-            from invenio.websearch_model import Tag
+            from invenio.ext.sqlalchemy import db
+            from invenio.modules.search.models import Tag
 
             # get functions from tag table
             bfe_from_tags = dict(('bfe_'+fix_tag_name(name),
@@ -563,8 +564,8 @@ def format_with_format_template(format_template_filename, bfo,
             create_record as bibfield_create_record, \
             get_record as bibfield_get_record
         from invenio.search_engine import print_record
-        from invenio.webuser_flask import current_user
-        from invenio.webinterface_handler_flask_utils import unicodifier
+        from flask.ext.login import current_user
+        from invenio.base.helpers import unicodifier
 
         def _format_record(recid, of='hb', user_info=current_user, *args, **kwargs):
             return print_record(recid, format=of, user_info=user_info, *args, **kwargs)
@@ -584,7 +585,7 @@ def format_with_format_template(format_template_filename, bfo,
         record.__getitem__ = encode_utf8(record.__getitem__)
         record.get = encode_utf8(record.get)
         evaluated_format = render_template_to_string(
-            CFG_BIBFORMAT_TEMPLATES_DIR+'/'+format_template_filename,
+            'format/record/'+format_template_filename,
             recid=bfo.recID,
             record=record,
             format_record=_format_record,

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,39 +20,21 @@
 """Library of functions for the xmlmarc2textmarc utility."""
 
 from __future__ import generators
+import getopt, sys
+from os.path import basename
+from random import randint, seed
 
-__revision__ = "$Id$"
 
-from invenio.bibrecord import \
+from invenio.base.globals import cfg
+
+from invenio.legacy.bibrecord import \
      create_records, \
      record_get_field_values, \
      record_order_fields
 
-from invenio.config import CFG_CERN_SITE, CFG_SITE_NAME
-
-from random import randint, seed
-from os.path import basename
-import getopt, sys
-
-
 
 ## maximum length of an ALEPH MARC record line
 CFG_MAXLEN_ALEPH_LINE = 1500
-
-if CFG_CERN_SITE:
-    ## This is a CERN installation. Set the organization's identifier to
-    ## "SzGeCERN". This value will be used when adding the mandatory "003"
-    ## ALEPH control field when translating a MARC XML record that does not
-    ## already have the field.
-    CFG_ORGANIZATION_IDENTIFIER = "SzGeCERN"
-else:
-    ## This is not a CERN installation. The organization's identifier should be
-    ## set with the appropriate value. If it is left empty, MARC XML -> ALEPH
-    ## conversions in INSERT record and REPLACE record modes will fail.
-    ##
-    ## ***NOTE: SET ME!***
-    ##
-    CFG_ORGANIZATION_IDENTIFIER = ""
 
 
 def get_fieldname_changes():
@@ -72,6 +54,7 @@ def get_fieldname_changes():
              '970' : 'SYS',
            }
 
+
 def get_fields_dropped_in_aleph():
     """Get a list of fieldnames to be dropped from an ALEPH MARC record.
        These fields are dropped before the function
@@ -87,17 +70,20 @@ def get_fields_dropped_in_aleph():
              'FFT',
            ]
 
+
 def get_aleph_001(sysno):
     """Get a 001 string for an ALEPH MARC record, (without the SYS prefix).
        @return: string
     """
     return " 001   L %s" % (sysno,)
 
+
 def get_aleph_FMT():
     """Get a FMT string for an ALEPH MARC record, (without the SYS prefix).
        @return: string
     """
     return " FMT   L BK"
+
 
 def get_aleph_OWN():
     """Get an "OWN$$aPUBLIC" string for an ALEPH MARC record, (without
@@ -106,6 +92,7 @@ def get_aleph_OWN():
     """
     return " OWN   L $$aPUBLIC"
 
+
 def get_aleph_DEL():
     """Get a "DEL$$aY" string for an ALEPH MARC record, (without the
        SYS prefix).
@@ -113,23 +100,27 @@ def get_aleph_DEL():
     """
     return " DEL   L $$aY"
 
+
 def get_aleph_LDR():
     """Get a LDR string for an ALEPH MARC record, (without the SYS prefix).
        @return: string
     """
     return " LDR   L ^^^^^nam^^22^^^^^^a^4500"
 
+
 def get_aleph_003():
     """Get a 003 string for an ALEPH MARC record, (without the SYS prefix).
        @return: string
     """
-    return " 003   L %s" % CFG_ORGANIZATION_IDENTIFIER
+    return " 003   L %s" % cfg['CFG_ORGANIZATION_IDENTIFIER']
+
 
 def get_aleph_008():
     """Get a 008 string for an ALEPH MARC record, (without the SYS prefix).
        @return: string
     """
     return " 008   L ^^^^^^s^^^^^^^^^^^^^^^^r^^^^^000^0^eng^d"
+
 
 def get_sysno_generator():
     """Create and return a generator for an ALEPH system number.
@@ -146,6 +137,7 @@ def get_sysno_generator():
     while sysno < 1000000000:
         yield """%09d""" % sysno
         sysno = sysno + 1
+
 
 def create_marc_record(record, sysno, options):
     """Create a text-marc, or aleph-marc record from the contents
@@ -311,6 +303,7 @@ def create_marc_record(record, sysno, options):
     ## Return the formatted MARC record:
     return out
 
+
 def print_field(field_lines, alephmarc=0):
     """Create the lines of a record relating to a given field,
        and return these lines as a string.
@@ -400,6 +393,7 @@ def print_field(field_lines, alephmarc=0):
                 out += "%(sys)s\n" % { 'sys' : line[0][1] }
     return out
 
+
 def create_field_lines(fieldname, field, sysno, alephmarc=0):
     """From the internal representation of a field, as pulled from
        a record created by bibrecord, create a list of lists
@@ -463,6 +457,7 @@ def create_field_lines(fieldname, field, sysno, alephmarc=0):
     field_lines.append(field_instance_line_segments)
     return field_lines
 
+
 def get_sysno_from_record(record, options):
     """Function to get the system number for a record.
        In the case of a pure text MARC record being created, the
@@ -503,6 +498,7 @@ def get_sysno_from_record(record, options):
             ## get SYS
             sysno = vals970a[0][0:9]
     return sysno
+
 
 def recxml2recmarc(xmltext, options, sysno_generator=get_sysno_generator()):
     """The function that processes creating the records from
@@ -713,14 +709,14 @@ def get_cli_options():
             usage(1, err_msg)
 
         if 1 in (options["insert-mode"], options["replace-mode"]) and \
-           CFG_ORGANIZATION_IDENTIFIER.strip() == "":
+           cfg['CFG_ORGANIZATION_IDENTIFIER'].strip() == "":
             ## It is ILLEGAL to create an ALEPH-MARC mode INSERT or
             ## REPLACE record if the organization's identifier is not known.
             ## Write out an error mesage and exit with failure.
-            sys.stderr.write("Error: ***CFG_ORGANIZATION_IDENTIFIER IS NOT " \
+            sys.stderr.write("Error: ***cfg['CFG_ORGANIZATION_IDENTIFIER'] IS NOT " \
                              "SET!*** Unable to create ALEPH INSERT or " \
                              "REPLACE records. Please inform your %s" \
-                             " Administrator.\n" % CFG_SITE_NAME)
+                             " Administrator.\n" % cgf['CFG_SITE_NAME'])
             sys.exit(1)
 
     ## Check that a filename for the MARC XML file was provided:
@@ -731,6 +727,7 @@ def get_cli_options():
         usage(1)
 
     return (options, args)
+
 
 def main():
     """Main function."""

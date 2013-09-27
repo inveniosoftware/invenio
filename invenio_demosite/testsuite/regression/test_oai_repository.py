@@ -32,9 +32,9 @@ from invenio.config import CFG_SITE_URL, \
      CFG_OAI_LOAD, \
      CFG_OAI_ID_FIELD
 from invenio.dbquery import run_sql
-from invenio.importutils import lazy_import
+from invenio.base.wrappers import lazy_import
 from invenio.intbitset import intbitset
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
 

@@ -87,14 +87,11 @@ from invenio.config import \
      CFG_XAPIAN_ENABLED, \
      CFG_BIBINDEX_CHARS_PUNCTUATION
 
-from invenio.search_engine_config import \
+from invenio.modules.search.errors import \
      InvenioWebSearchUnknownCollectionError, \
-     InvenioWebSearchWildcardLimitError, \
-     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
-     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
-     CFG_SEARCH_RESULTS_CACHE_PREFIX
+     InvenioWebSearchWildcardLimitError
 from invenio.search_engine_utils import get_fieldvalues, get_fieldvalues_alephseq_like
-from invenio.bibrecord import create_record, record_xml_output
+from invenio.legacy.bibrecord import create_record, record_xml_output
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -119,7 +116,7 @@ from invenio.intbitset import intbitset
 from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
-from invenio.textutils import encode_for_xml, wash_for_utf8, strip_accents
+from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
 from invenio.htmlutils import get_mathjax_header
 from invenio.htmlutils import nmtoken_from_string
 
@@ -137,11 +134,11 @@ from invenio.dbquery import run_sql, run_sql_with_limit, wash_table_column_name,
                             get_table_update_time
 from invenio.webuser import getUid, collect_user_info, session_param_set
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
     SpiresToInvenioSyntaxConverter
 
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 from invenio.solrutils_bibindex_searcher import solr_get_bitset
 from invenio.xapianutils_bibindex_searcher import xapian_get_bitset
 
@@ -542,7 +539,7 @@ def get_available_output_formats(visible_only=False):
     return formats
 
 # Flask cache for search results.
-from invenio.websearch_cache import search_results_cache, get_search_results_cache_key
+from invenio.modules.search.cache import search_results_cache, get_search_results_cache_key
 
 class CollectionI18nNameDataCacher(DataCacher):
     """
@@ -2348,6 +2345,18 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
     elif f == 'collection':
         # we are doing search by the collection name or MARC field
         hitset = search_unit_collection(p, m, wl=wl)
+    elif f == 'tag':
+        module_found = False
+        try:
+            from invenio.modules.tags.search_units import search_unit_in_tags
+            module_found = True
+        except:
+            # WebTag module is disabled, so ignore 'tag' selector
+            pass
+
+        if module_found:
+            return search_unit_in_tags(p)
+
     elif m == 'a' or m == 'r':
         # we are doing either phrase search or regexp search
         if f == 'fulltext':
@@ -2382,7 +2391,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
 def get_idxpair_field_ids():
     """Returns the list of ids for the fields that idxPAIRS should be used on"""
     index_dict = dict(run_sql("SELECT name, id FROM idxINDEX"))
-    return [index_dict[field] for field in index_dict if field in CFG_WEBSEARCH_IDXPAIRS_FIELDS]
+    return [index_dict[field] for field in index_dict if field in cfg['CFG_WEBSEARCH_IDXPAIRS_FIELDS']]
 
 
 def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
@@ -2572,7 +2581,7 @@ def search_unit_in_idxpairs(p, f, type, wl=0):
         raise InvenioWebSearchWildcardLimitError(result_set)
 
     # check if we need to eliminate the false positives
-    if CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH and do_exact_search:
+    if cfg['CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH'] and do_exact_search:
         # we need to eliminate the false positives
         idxphrase_table_washed = wash_table_column_name("idxPHRASE%02dR" % index_id)
         not_exact_search = intbitset()

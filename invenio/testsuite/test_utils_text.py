@@ -34,18 +34,18 @@ try:
 except ImportError:
     UNIDECODE_AVAILABLE = False
 
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-decode_to_unicode = lazy_import('invenio.textutils:decode_to_unicode')
-guess_minimum_encoding = lazy_import('invenio.textutils:guess_minimum_encoding')
-strip_accents = lazy_import('invenio.textutils:strip_accents')
-translate_latex2unicode = lazy_import('invenio.textutils:translate_latex2unicode')
-translate_to_ascii = lazy_import('invenio.textutils:translate_to_ascii')
-transliterate_ala_lc = lazy_import('invenio.textutils:transliterate_ala_lc')
-wash_for_utf8 = lazy_import('invenio.textutils:wash_for_utf8')
-wash_for_xml = lazy_import('invenio.textutils:wash_for_xml')
-wrap_text_in_a_box = lazy_import('invenio.textutils:wrap_text_in_a_box')
+decode_to_unicode = lazy_import('invenio.utils.text:decode_to_unicode')
+guess_minimum_encoding = lazy_import('invenio.utils.text:guess_minimum_encoding')
+strip_accents = lazy_import('invenio.utils.text:strip_accents')
+translate_latex2unicode = lazy_import('invenio.utils.text:translate_latex2unicode')
+translate_to_ascii = lazy_import('invenio.utils.text:translate_to_ascii')
+transliterate_ala_lc = lazy_import('invenio.utils.text:transliterate_ala_lc')
+wash_for_utf8 = lazy_import('invenio.utils.text:wash_for_utf8')
+wash_for_xml = lazy_import('invenio.utils.text:wash_for_xml')
+wrap_text_in_a_box = lazy_import('invenio.utils.text:wrap_text_in_a_box')
 
 
 class GuessMinimumEncodingTest(InvenioTestCase):

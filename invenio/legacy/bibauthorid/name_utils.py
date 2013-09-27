@@ -27,7 +27,7 @@ import invenio.bibauthorid_config as bconfig
 from invenio.bibauthorid_string_utils import string_partition
 from copy import deepcopy
 
-from invenio.textutils import translate_to_ascii
+from invenio.utils.text import translate_to_ascii
 
 from invenio.bibauthorid_general_utils import name_comparison_print
 
@@ -788,6 +788,7 @@ def generate_last_name_cluster_str(name):
     return artifact_removal.sub("", family).lower()
 
 
-GLOBAL_gendernames = _load_gender_firstnames_dict()
-GLOBAL_name_variations = _load_firstname_variations()
+from invenio.utils.datastructures import LazyDict
+GLOBAL_gendernames = LazyDict(_load_gender_firstnames_dict)
+GLOBAL_name_variations = [] #_load_firstname_variations()
 

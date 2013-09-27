@@ -21,7 +21,7 @@
 Persistent identifier utilities tests
 """
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio import pidutils
 
 identifiers = [

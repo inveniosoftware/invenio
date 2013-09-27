@@ -23,47 +23,26 @@ from datetime import datetime
 import socket
 
 from flask import g, render_template, request, flash, redirect, url_for, \
-    current_app, abort
-from invenio.sqlalchemyutils import db
+    current_app, abort, Blueprint
+from invenio.ext.sqlalchemy import db
 from invenio.webmessage_mailutils import email_quote_txt
-from invenio.webcomment_model import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
+from invenio.modules.comments.models import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
                                      CmtACTIONHISTORY
-from invenio.webcomment_forms import AddCmtRECORDCOMMENTForm, \
-                                     AddCmtRECORDCOMMENTFormReview
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webuser_flask import current_user
-from invenio.config import CFG_PREFIX, \
-    CFG_SITE_LANG, \
-    CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
-    CFG_SITE_SUPPORT_EMAIL,\
-    CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
-    CFG_SITE_URL,\
-    CFG_SITE_NAME,\
-    CFG_SITE_RECORD, \
-    CFG_WEBCOMMENT_ALLOW_REVIEWS,\
-    CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
-    CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-    CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
-    CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
-    CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
-    CFG_WEBCOMMENT_DEFAULT_MODERATOR, \
-    CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
-    CFG_WEBCOMMENT_ROUND_DATAFIELD, \
-    CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
-    CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
+from .forms import AddCmtRECORDCOMMENTForm, AddCmtRECORDCOMMENTFormReview
+from invenio.base.i18n import _
+from invenio.base.decorators import templated
+from flask.ext.login import current_user, login_required
+from invenio.ext.menu import register_menu
+from invenio.ext.breadcrumb import register_breadcrumb
+from invenio.ext.principal import permission_required
+#from invenio.config import CFG_SITE_RECORD
+CFG_SITE_RECORD = 'record'
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
-from invenio.access_control_engine import acc_authorize_action
 
-blueprint = InvenioBlueprint('webcomment', __name__,
-                             url_prefix="/" + CFG_SITE_RECORD,
-                             config='invenio.webcomment_config',
-                             breadcrumbs=[(_('Comments'),
-                                           'webcomment.subscribtions')],
-                             menubuilder=[('personalize.comment_subscriptions',
-                                           _('Your comment subscriptions'),
-                                           'webcomment.subscriptions', 20)])
+blueprint = Blueprint('comments', __name__, url_prefix="/" + CFG_SITE_RECORD,
+                      template_folder='templates')
 
-from invenio.record_blueprint import request_record
+from invenio.modules.records.views import request_record
 
 
 def log_comment_action(action_code, id, recid, uid=None):
@@ -85,6 +64,10 @@ class CommentRights(object):
         self.uid = uid or current_user.get_id()
         self.id_collection = 0  # FIXME
 
+    def authorize_action(self, *args, **kwargs):
+        from invenio.access_control_engine import acc_authorize_action
+        return acc_authorize_action(*args, **kwargs)
+
     def can_perform_action(self, action=None):
         cond = CmtACTIONHISTORY.id_user == self.uid \
             if self.uid > 0 else \
@@ -102,20 +85,20 @@ class CommentRights(object):
         #restriction =  self.comment.restriction
         if restriction == "":
             return (0, '')
-        return acc_authorize_action(
+        return self.authorize_action(
             self.uid,
             'viewrestrcomment',
             status=restriction)
 
     def can_send_comment(self):
-        return acc_authorize_action(
+        return self.authorize_action(
             self.uid,
             'sendcomment',
             authorized_if_no_roles=True,
             collection=self.id_collection)
 
     def can_attach_comment_file(self):
-        return acc_authorize_action(
+        return self.authorize_action(
             self.uid,
             'attachcommentfile',
             authorized_if_no_roles=False,
@@ -124,10 +107,9 @@ class CommentRights(object):
 
 @blueprint.route('/<int:recid>/comments/add', methods=['GET', 'POST'])
 @request_record
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('sendcomment',
-                              authorized_if_no_roles=True,
-                              collection=lambda: g.collection.id)
+@login_required
+@permission_required('sendcomment', authorized_if_no_roles=True,
+                     collection=lambda: g.collection.id)
 def add_comment(recid):
     uid = current_user.get_id()
     in_reply = request.args.get('in_reply', type=int)
@@ -143,7 +125,7 @@ def add_comment(recid):
             c.body = email_quote_txt(comment.body or '')
             c.in_reply_to_id_cmtRECORDCOMMENT = in_reply
             form = AddCmtRECORDCOMMENTForm(request.form, obj=c)
-            return render_template('webcomment_add.html', form=form)
+            return render_template('comments/add.html', form=form)
 
     form = AddCmtRECORDCOMMENTForm(request.values)
     if form.validate_on_submit():
@@ -157,19 +139,18 @@ def add_comment(recid):
             db.session.add(c)
             db.session.commit()
             flash(_('Comment was sent'), "info")
-            return redirect(url_for('webcomment.comments', recid=recid))
+            return redirect(url_for('comments.comments', recid=recid))
         except:
             db.session.rollback()
 
-    return render_template('webcomment_add.html', form=form)
+    return render_template('comments/add.html', form=form)
 
 
 @blueprint.route('/<int:recid>/reviews/add', methods=['GET', 'POST'])
 @request_record
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('sendcomment',
-                              authorized_if_no_roles=True,
-                              collection=lambda: g.collection.id)
+@login_required
+@permission_required('sendcomment', authorized_if_no_roles=True,
+                     collection=lambda: g.collection.id)
 def add_review(recid):
     uid = current_user.get_id()
     form = AddCmtRECORDCOMMENTFormReview(request.values)
@@ -183,11 +164,11 @@ def add_review(recid):
             db.session.add(c)
             db.session.commit()
             flash(_('Review was sent'), "info")
-            return redirect(url_for('webcomment.reviews', recid=recid))
+            return redirect(url_for('comments.reviews', recid=recid))
         except:
             db.session.rollback()
 
-    return render_template('webcomment_add_review.html', form=form)
+    return render_template('comments/add_review.html', form=form)
 
 
 @blueprint.route('/<int:recid>/comments', methods=['GET', 'POST'])
@@ -214,7 +195,7 @@ def comments(recid):
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score == 0
     )).all()
-    return render_template('webcomment_comments.html', comments=comments)
+    return render_template('comments/comments.html', comments=comments)
 
 
 @blueprint.route('/<int:recid>/reviews', methods=['GET', 'POST'])
@@ -240,7 +221,7 @@ def reviews(recid):
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score > 0
     )).all()
-    return render_template('webcomment_reviews.html', comments=comments)
+    return render_template('comments/reviews.html', comments=comments)
 
 
 @blueprint.route('/<int:recid>/report/<int:id>', methods=['GET', 'POST'])
@@ -256,7 +237,7 @@ def report(recid, id):
     else:
         flash(_('Comment has been already reported.'), 'error')
 
-    return redirect(url_for('webcomment.comments', recid=recid))
+    return redirect(url_for('comments.comments', recid=recid))
 
 
 @blueprint.route('/<int:recid>/vote/<int:id>/<value>',
@@ -276,11 +257,11 @@ def vote(recid, id, value):
     else:
         flash(_('You can not vote for this comment.'), 'error')
 
-    return redirect(url_for('webcomment.comments', recid=recid))
+    return redirect(url_for('comments.comments', recid=recid))
 
 
 @blueprint.route('/<int:recid>/toggle/<int:id>', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 @request_record
 def toggle(recid, id, show=None):
     uid = current_user.get_id()
@@ -296,13 +277,13 @@ def toggle(recid, id, show=None):
         comment.collapse(uid)
 
     if not request.is_xhr:
-        return redirect(url_for('webcomment.comments', recid=recid))
+        return redirect(url_for('comments.comments', recid=recid))
     else:
         return 'OK'
 
 
 @blueprint.route('/<int:recid>/comments/subscribe', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 @request_record
 def subscribe(recid):
     uid = current_user.get_id()
@@ -319,7 +300,7 @@ def subscribe(recid):
 
 @blueprint.route('/<int:recid>/comments/unsubscribe', methods=['GET', 'POST'])
 @blueprint.route('/comments/unsubscribe', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 def unsubscribe(recid=None):
     uid = current_user.get_id()
     if recid is None:
@@ -342,10 +323,12 @@ def unsubscribe(recid=None):
         return redirect(url_for('.subscriptions'))
 
 
-@blueprint.invenio_set_breadcrumb(_("Your comment subscriptions"))
 @blueprint.route('/comments/subscriptions', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-@blueprint.invenio_templated('webcomment_subscriptions.html')
+@login_required
+@templated('comments/subscriptions.html')
+@register_menu(blueprint, 'personalize.comment_subscriptions',
+               _('Your comment subscriptions'), order=20)
+@register_breadcrumb(blueprint, '.', _("Your comment subscriptions"))
 def subscriptions():
     uid = current_user.get_id()
     subscriptions = CmtSUBSCRIPTION.query.filter(

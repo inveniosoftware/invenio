@@ -16,11 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = webcomment_comments.html \
-		 webcomment_reviews.html \
-		 webcomment_subscriptions.html \
-		 webcomment_add_review.html \
-		 webcomment_add.html
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

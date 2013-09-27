@@ -25,8 +25,6 @@ CFG_SITE_ADMIN_EMAIL.
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_ADMIN_EMAIL
-from flask.ext.email.backends.smtp import Mail as SMTP
-from flask.ext.email.backends.console import Mail as Console
 
 
 def adminonly_class(Backend):
@@ -54,8 +52,3 @@ def adminonly_class(Backend):
                 map(process_message, email_messages))
 
     return _Mail
-
-SMTPMail = adminonly_class(SMTP)
-ConsoleMail = adminonly_class(Console)
-
-__all__ = ['SMTPMail', 'ConsoleMail']

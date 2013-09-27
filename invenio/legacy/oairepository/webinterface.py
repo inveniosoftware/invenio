@@ -23,7 +23,7 @@ import os
 import time
 import cStringIO
 
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 from invenio import oai_repository_server
 from invenio.errorlib import register_exception
 from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP, CFG_DEVEL_SITE, \

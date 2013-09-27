@@ -18,19 +18,7 @@
 SUBDIRS = format_templates
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = format_records_text_html.tpl \
-		 format_records_id.tpl \
-		 format_records_hcs.tpl \
-		 format_records_x.tpl \
-		 format_records_xd.tpl \
-		 format_records_xe.tpl \
-		 format_records_xe8x.tpl \
-		 format_records_xm.tpl \
-		 format_records_xn.tpl \
-		 format_records_xo.tpl \
-		 format_records_xp.tpl \
-		 format_records_xr.tpl \
-		 format_records_xw.tpl
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

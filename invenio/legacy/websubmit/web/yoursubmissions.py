@@ -31,7 +31,7 @@ from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, error_page
 from invenio.webuser import getUid, get_email, page_not_authorized
-from invenio.messages import gettext_set_language, wash_language
+from invenio.base.i18n import gettext_set_language, wash_language
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')

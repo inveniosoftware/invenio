@@ -27,8 +27,7 @@ import sys
 import re
 import textwrap
 import htmlentitydefs
-import invenio.template
-from invenio.config import CFG_ETCDIR
+from invenio.base.globals import cfg
 try:
     import chardet
     CHARDET_AVAILABLE = True
@@ -414,6 +413,36 @@ def wash_for_utf8(text, correct=True):
     ret.append(text)
     return ''.join(ret)
 
+
+def nice_number(number, thousands_separator=',', max_ndigits_after_dot=None):
+    """
+    Return nicely printed number NUMBER in language LN using
+    given THOUSANDS_SEPARATOR character.
+    If max_ndigits_after_dot is specified and the number is float, the
+    number is rounded by taking in consideration up to max_ndigits_after_dot
+    digit after the dot.
+
+    This version does not pay attention to locale.  See
+    tmpl_nice_number_via_locale().
+    """
+    if type(number) is float:
+        if max_ndigits_after_dot is not None:
+            number = round(number, max_ndigits_after_dot)
+        int_part, frac_part = str(number).split('.')
+        return '%s.%s' % (nice_number(int(int_part), thousands_separator),
+                          frac_part)
+    else:
+        chars_in = list(str(number))
+        number = len(chars_in)
+        chars_out = []
+        for i in range(0, number):
+            if i % 3 == 0 and i != 0:
+                chars_out.append(thousands_separator)
+            chars_out.append(chars_in[number - i - 1])
+        chars_out.reverse()
+        return ''.join(chars_out)
+
+
 def nice_size(size):
     """
     @param size: the size.
@@ -421,7 +450,6 @@ def nice_size(size):
     @return: a nicely printed size.
     @rtype: string
     """
-    websearch_templates = invenio.template.load('websearch')
     unit = 'B'
     if size > 1024:
         size /= 1024.0
@@ -432,7 +460,7 @@ def nice_size(size):
             if size > 1024:
                 size /= 1024.0
                 unit = 'GB'
-    return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=2), unit)
+    return '%s %s' % (nice_number(size, max_ndigits_after_dot=2), unit)
 
 def remove_line_breaks(text):
     """
@@ -483,8 +511,7 @@ def decode_to_unicode(text, default_encoding='utf-8'):
         dummy, detected_encoding = guess_minimum_encoding(text)
     return text.decode(detected_encoding)
 
-def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
-                            (CFG_ETCDIR,)):
+def translate_latex2unicode(text, kb_file=None):
     """
     This function will take given text, presumably containing LaTeX symbols,
     and attempts to translate it to Unicode using the given or default KB
@@ -504,6 +531,8 @@ def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
     @return: Unicode representation of translated text
     @rtype: unicode
     """
+    if kb_file is None:
+        kb_file = "%s/bibconvert/KB/latex-to-unicode.kb" % (cfg['CFG_ETCDIR'],)
     # First decode input text to Unicode
     try:
         text = decode_to_unicode(text)
@@ -522,8 +551,7 @@ def translate_latex2unicode(text, kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
     # Return Unicode representation of translated text
     return text
 
-def _load_latex2unicode_constants(kb_file="%s/bibconvert/KB/latex-to-unicode.kb" % \
-                            (CFG_ETCDIR,)):
+def _load_latex2unicode_constants(kb_file=None):
     """
     Load LaTeX2Unicode translation table dictionary and regular expression object
     from KB to a global dictionary.
@@ -536,6 +564,9 @@ def _load_latex2unicode_constants(kb_file="%s/bibconvert/KB/latex-to-unicode.kb"
                             'table': dict of LaTeX -> Unicode mappings}
     @rtype: dict
     """
+    if kb_file is None:
+        kb_file = "%s/bibconvert/KB/latex-to-unicode.kb" % (cfg['CFG_ETCDIR'],)
+
     try:
         data = open(kb_file)
     except IOError:

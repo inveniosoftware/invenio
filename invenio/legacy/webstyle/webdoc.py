@@ -36,12 +36,12 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_SITE_NAME_INTL, \
      CFG_CACHEDIR
-from invenio.dateutils import \
+from invenio.utils.date import \
      convert_datestruct_to_datetext, \
      convert_datestruct_to_dategui, \
      convert_datecvs_to_datestruct
 from invenio.shellutils import mymkdir
-from invenio.messages import \
+from invenio.base.i18n import \
      gettext_set_language, \
      wash_language, \
      language_list_long

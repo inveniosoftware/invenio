@@ -38,7 +38,7 @@ from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.websubmit_functions.Shared_Functions import ParamFromFile
 from invenio.errorlib import register_exception
 from invenio.search_engine import print_record
-from invenio.mailutils import send_email
+from invenio.ext.email import send_email
 
 
 CFG_MAIL_BODY = """

@@ -25,8 +25,8 @@ import os
 import shutil
 import time
 from datetime import datetime
-from invenio.importutils import lazy_import
-from invenio.testutils import InvenioTestCase, make_test_suite, run_test_suite
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
@@ -37,7 +37,7 @@ from invenio.config import \
         CFG_WEBDIR, \
         CFG_TMPDIR, \
         CFG_PATH_MD5SUM
-from invenio.mimetypeutils import CFG_HAS_MAGIC
+from invenio.utils.mimetype import CFG_HAS_MAGIC
 
 MoreInfo = lazy_import('invenio.bibdocfile:MoreInfo')
 Md5Folder = lazy_import('invenio.bibdocfile:Md5Folder')

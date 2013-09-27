@@ -23,14 +23,12 @@ BibEdit database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
-from invenio.search_engine_utils import get_fieldvalues
+from invenio.ext.sqlalchemy import db
+from flask import current_app
 from werkzeug import cached_property
 
-from invenio.config import \
-     CFG_CERN_SITE
-
 # Create your models here.
+
 
 class Bibrec(db.Model):
     """Represents a Bibrec record."""
@@ -54,16 +52,18 @@ class Bibrec(db.Model):
         """
            Return True if record is marked as deleted.
         """
-
+        from invenio.search_engine_utils import get_fieldvalues
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(self.id, "980__%")
 
         return ("DELETED" in dbcollids) or \
-               (CFG_CERN_SITE and "DUMMY" in dbcollids)
+               (current_app.config.get('CFG_CERN_SITE')
+                and "DUMMY" in dbcollids)
 
     @staticmethod
     def _next_merged_recid(recid):
         """ Returns the ID of record merged with record with ID = recid """
+        from invenio.search_engine_utils import get_fieldvalues
         merged_recid = None
         for val in get_fieldvalues(recid, "970__d"):
             try:
@@ -121,21 +121,6 @@ class Bibrec(db.Model):
         return not is_record_in_any_collection(self.id,
                                                recreate_cache_if_needed=False)
 
-
-class Bibfmt(db.Model):
-    """Represents a Bibfmt record."""
-    def __init__(self):
-        pass
-    __tablename__ = 'bibfmt'
-    id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
-                db.ForeignKey(Bibrec.id), nullable=False, server_default='0',
-                primary_key=True, autoincrement=False)
-    format = db.Column(db.String(10), nullable=False,
-                server_default='', primary_key=True, index=True)
-    last_updated = db.Column(db.DateTime, nullable=False,
-                server_default='1900-01-01 00:00:00', index=True)
-    value = db.Column(db.iLargeBinary)
-    bibrec = db.relationship(Bibrec, backref='bibfmt')
 
 class BibHOLDINGPEN(db.Model):
     """Represents a BibHOLDINGPEN record."""

@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
+from invenio.modules.deposit.field_base import WebDepositField
 #from invenio.webdeposit_processor_utils import sherpa_romeo_issn_validate
 
 __all__ = ['ISSNField']

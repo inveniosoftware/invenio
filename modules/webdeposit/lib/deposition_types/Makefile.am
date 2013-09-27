@@ -17,12 +17,6 @@
 
 pylibdir = $(libdir)/python/invenio/webdeposit_workflows
 
-pylib_DATA = __init__.py \
-             article_metadata.py \
-             photo_metadata.py \
-             preprint_metadata.py \
-             thesis_metadata.py \
-             poetry_metadata.py \
-             testworkflow_metadata.py
+pylib_DATA =
 
 CLEANFILES = *~ *.tmp *.pyc

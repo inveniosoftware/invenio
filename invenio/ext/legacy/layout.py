@@ -27,7 +27,7 @@ their corresponding URLs (ie, /search to the websearch modules,...)
 from invenio.webinterface_handler import create_handler
 from invenio.errorlib import register_exception
 from invenio.webinterface_handler import WebInterfaceDirectory
-from invenio import webinterface_handler_config as apache
+from invenio.utils import apache
 from invenio.config import CFG_DEVEL_SITE, CFG_OPENAIRE_SITE
 
 class WebInterfaceDumbPages(WebInterfaceDirectory):

@@ -32,11 +32,9 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable=W0622
 
-from invenio.intbitset import intbitset
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.config import CFG_TMPDIR
+from werkzeug.local import LocalProxy
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-CFG_INTBITSET_BIG_EXAMPLE = open(os.path.join(CFG_TMPDIR, "intbitset_example.int")).read()
 
 def _check_enough_ram():
     """
@@ -53,11 +51,19 @@ def _check_enough_ram():
             # Still no luck
             return False
 
-CFG_ENOUGH_RAM = _check_enough_ram()
+CFG_ENOUGH_RAM = LocalProxy(_check_enough_ram)
+
 
 class IntBitSetTest(InvenioTestCase):
     """Test functions related to intbitset data structure."""
     def setUp(self):
+        from invenio.config import CFG_TMPDIR
+        from invenio.intbitset import intbitset
+        self.intbitset = intbitset
+
+        CFG_INTBITSET_BIG_EXAMPLE = open(os.path.join(
+            CFG_TMPDIR, "intbitset_example.int")).read()
+
         self.sets = [
             [1024],
             [10, 20],
@@ -95,11 +101,11 @@ class IntBitSetTest(InvenioTestCase):
             (intbitset.__ne__, set.__ne__, lambda x, y: cmp(x, y) != 0),
         ]
 
-        self.big_examples = [list(intbitset(CFG_INTBITSET_BIG_EXAMPLE))]
+        self.big_examples = [list(self.intbitset(CFG_INTBITSET_BIG_EXAMPLE))]
 
         self.corrupted_strdumps = [
             "ciao",
-            intbitset([2, 6000000]).strbits(),
+            self.intbitset([2, 6000000]).strbits(),
             "djflsdkfjsdljfsldkfjsldjlfk",
         ]
 
@@ -114,7 +120,7 @@ class IntBitSetTest(InvenioTestCase):
         creator_list = intbitset1.extract_finite_list()
         up_to1 = creator_list and max(creator_list) or -1
         self.failUnless(up_to1 <= size1 * wordbitsize < allocated1 * wordbitsize, "up_to1=%s, size1=%s, allocated1=%s while testing %s during %s" % (up_to1, size1 * wordbitsize, allocated1 * wordbitsize, intbitset1, msg))
-        tmp = intbitset(intbitset1.fastdump())
+        tmp = self.intbitset(intbitset1.fastdump())
         size2 = tmp.get_size()
         allocated2 = tmp.get_allocated()
         creator_list = tmp.extract_finite_list()
@@ -123,8 +129,8 @@ class IntBitSetTest(InvenioTestCase):
 
 
     def _helper_test_via_fncs_list(self, fncs, intbitset1, intbitset2):
-        orig1 = intbitset(intbitset1)
-        orig2 = intbitset(intbitset2)
+        orig1 = self.intbitset(intbitset1)
+        orig2 = self.intbitset(intbitset2)
 
         msg = "Testing %s(%s, %s)" % (fncs[0].__name__, repr(intbitset1), repr(intbitset2))
 
@@ -165,27 +171,27 @@ class IntBitSetTest(InvenioTestCase):
     def _helper_test_normal_set(self, fncs):
         for set1 in self.sets:
             for set2 in self.sets:
-                self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset(set2))
+                self._helper_test_via_fncs_list(fncs, self.intbitset(set1), self.intbitset(set2))
 
     def _helper_test_empty_set(self, fncs):
         for set1 in self.sets:
-            self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset([]))
-            self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset(set1))
-        self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset([]))
+            self._helper_test_via_fncs_list(fncs, self.intbitset(set1), self.intbitset([]))
+            self._helper_test_via_fncs_list(fncs, self.intbitset([]), self.intbitset(set1))
+        self._helper_test_via_fncs_list(fncs, self.intbitset([]), self.intbitset([]))
 
     def _helper_test_inifinite_set(self, fncs):
         for set1 in self.sets:
             for set2 in self.sets:
-                self._helper_test_via_fncs_list(fncs, intbitset(set1), intbitset(set2, trailing_bits=True))
-                self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset(set2))
-                self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset(set2, trailing_bits=True))
+                self._helper_test_via_fncs_list(fncs, self.intbitset(set1), self.intbitset(set2, trailing_bits=True))
+                self._helper_test_via_fncs_list(fncs, self.intbitset(set1, trailing_bits=True), self.intbitset(set2))
+                self._helper_test_via_fncs_list(fncs, self.intbitset(set1, trailing_bits=True), self.intbitset(set2, trailing_bits=True))
 
     def _helper_test_infinite_vs_empty(self, fncs):
         for set1 in self.sets:
-            self._helper_test_via_fncs_list(fncs, intbitset(set1, trailing_bits=True), intbitset([]))
-            self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset(set1, trailing_bits=True))
-        self._helper_test_via_fncs_list(fncs, intbitset([]), intbitset(trailing_bits=True))
-        self._helper_test_via_fncs_list(fncs, intbitset(trailing_bits=True), intbitset([]))
+            self._helper_test_via_fncs_list(fncs, self.intbitset(set1, trailing_bits=True), self.intbitset([]))
+            self._helper_test_via_fncs_list(fncs, self.intbitset([]), self.intbitset(set1, trailing_bits=True))
+        self._helper_test_via_fncs_list(fncs, self.intbitset([]), self.intbitset(trailing_bits=True))
+        self._helper_test_via_fncs_list(fncs, self.intbitset(trailing_bits=True), self.intbitset([]))
 
 
     def test_set_intersection(self):
@@ -319,14 +325,14 @@ class IntBitSetTest(InvenioTestCase):
     def test_list_dump(self):
         """intbitset - list dump"""
         for set1 in self.sets + [[]]:
-            self.assertEqual(list(intbitset(set1)), set1)
+            self.assertEqual(list(self.intbitset(set1)), set1)
 
     def test_ascii_bit_dump(self):
         """intbitset - ascii bit dump"""
         for set1 in self.sets + [[]]:
             tot = 0
             count = 0
-            for bit in intbitset(set1).strbits():
+            for bit in self.intbitset(set1).strbits():
                 if bit == '0':
                     self.failIf(count in set1)
                 elif bit == '1':
@@ -341,35 +347,35 @@ class IntBitSetTest(InvenioTestCase):
         """intbitset - support tuple of tuples"""
         for set1 in self.sets + [[]]:
             tmp_tuple = tuple([(elem, ) for elem in set1])
-            self.assertEqual(list(intbitset(set1)), list(intbitset(tmp_tuple)))
+            self.assertEqual(list(self.intbitset(set1)), list(self.intbitset(tmp_tuple)))
         for set1 in self.sets + [[]]:
             tmp_tuple = tuple([(elem, ) for elem in set1])
-            self.assertEqual(intbitset(set1, trailing_bits=True), intbitset(tmp_tuple, trailing_bits=True))
+            self.assertEqual(self.intbitset(set1, trailing_bits=True), self.intbitset(tmp_tuple, trailing_bits=True))
 
     def test_marshalling(self):
         """intbitset - marshalling"""
         for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
+            self.assertEqual(self.intbitset(set1), self.intbitset().fastload((self.intbitset(set1).fastdump())))
         for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
+            self.assertEqual(self.intbitset(set1, trailing_bits=True), self.intbitset().fastload(self.intbitset(set1, trailing_bits=True).fastdump()))
 
     def test_pickling(self):
         """intbitset - pickling"""
         import cPickle
         for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1), cPickle.loads(cPickle.dumps(intbitset(set1), -1)))
+            self.assertEqual(self.intbitset(set1), cPickle.loads(cPickle.dumps(self.intbitset(set1), -1)))
         for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1, trailing_bits=True), cPickle.loads(cPickle.dumps(intbitset(set1, trailing_bits=True), -1)))
+            self.assertEqual(self.intbitset(set1, trailing_bits=True), cPickle.loads(cPickle.dumps(self.intbitset(set1, trailing_bits=True), -1)))
 
     def test_set_emptiness(self):
         """intbitset - tests for emptiness"""
         for set1 in self.sets + [[]]:
-            self.assertEqual(not set(set1), not intbitset(set1))
+            self.assertEqual(not set(set1), not self.intbitset(set1))
 
     def test_set_len(self):
         """intbitset - tests len()"""
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
             pythonset1 = set(set1)
             self.assertEqual(len(pythonset1), len(intbitset1))
             intbitset1.add(76543)
@@ -382,10 +388,10 @@ class IntBitSetTest(InvenioTestCase):
     def test_set_clear(self):
         """intbitset - clearing"""
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
             intbitset1.clear()
             self.assertEqual(list(intbitset1), [])
-            intbitset1 = intbitset(set1, trailing_bits=True)
+            intbitset1 = self.intbitset(set1, trailing_bits=True)
             intbitset1.clear()
             self.assertEqual(list(intbitset1), [])
 
@@ -396,10 +402,11 @@ class IntBitSetTest(InvenioTestCase):
         else:
             big_examples = []
         for set1 in self.sets + [[]] + big_examples:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
+            intbitset = self.intbitset
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
         for set1 in self.sets + [[]] + big_examples:
-            intbitset1 = intbitset(set1, trailing_bits=True)
+            intbitset1 = self.intbitset(set1, trailing_bits=True)
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
 
     def test_set_cmp(self):
@@ -407,13 +414,13 @@ class IntBitSetTest(InvenioTestCase):
         for set1 in self.sets + [[]]:
             for set2 in self.sets + [[]]:
                 for op in self.cmp_list:
-                    self.assertEqual(op[0](intbitset(set1), intbitset(set2)), op[1](set(set1), set(set2)), "Error in comparing %s %s with comparing function %s" % (set1, set2, op[0].__name__))
+                    self.assertEqual(op[0](self.intbitset(set1), self.intbitset(set2)), op[1](set(set1), set(set2)), "Error in comparing %s %s with comparing function %s" % (set1, set2, op[0].__name__))
 
     def test_set_update_with_signs(self):
         """intbitset - set update with signs"""
         dict1 = {10 : -1, 20 : 1, 23 : -1, 27 : 1, 33 : -1, 56 : 1, 70 : -1, 74 : 1}
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
             intbitset1.update_with_signs(dict1)
             up_to = max(dict1.keys() + set1)
             for i in xrange(up_to + 1):
@@ -426,8 +433,8 @@ class IntBitSetTest(InvenioTestCase):
         """intbitset - set cloning"""
         import copy
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
-            intbitset2 = intbitset(intbitset1)
+            intbitset1 = self.intbitset(set1)
+            intbitset2 = self.intbitset(intbitset1)
             intbitset3 = copy.deepcopy(intbitset2)
             self._helper_sanity_test(intbitset1)
             self._helper_sanity_test(intbitset2)
@@ -436,8 +443,8 @@ class IntBitSetTest(InvenioTestCase):
             self.assertEqual(intbitset1, intbitset3)
 
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1, trailing_bits=True)
-            intbitset2 = intbitset(intbitset1)
+            intbitset1 = self.intbitset(set1, trailing_bits=True)
+            intbitset2 = self.intbitset(intbitset1)
             intbitset3 = copy.deepcopy(intbitset2)
             self._helper_sanity_test(intbitset1)
             self._helper_sanity_test(intbitset2)
@@ -448,7 +455,7 @@ class IntBitSetTest(InvenioTestCase):
     def test_set_pop(self):
         """intbitset - set pop"""
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
             pythonlist1 = list(set1)
             while True:
                 try:
@@ -464,7 +471,7 @@ class IntBitSetTest(InvenioTestCase):
     def test_set_getitem(self):
         """intbitset - __getitem__"""
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
             pythonlist1 = list(set1)
             for i in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
                 try:
@@ -476,7 +483,7 @@ class IntBitSetTest(InvenioTestCase):
                 self.assertEqual(res1, res2)
 
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
             pythonlist1 = list(set1)
             for start in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
                 for stop in xrange(-2 * len(set1) - 2, 2 * len(set1) + 2):
@@ -489,7 +496,7 @@ class IntBitSetTest(InvenioTestCase):
     def test_set_iterator(self):
         """intbitset - set iterator"""
         for set1 in self.sets + [[]]:
-            intbitset1 = intbitset(set1)
+            intbitset1 = self.intbitset(set1)
             self._helper_sanity_test(intbitset1)
             tmp_set1 = []
             for recid in intbitset1:
@@ -500,21 +507,21 @@ class IntBitSetTest(InvenioTestCase):
 
         for set1 in self.sets + [[]]:
             tmp_set1 = []
-            for recid in intbitset(set1):
+            for recid in self.intbitset(set1):
                 tmp_set1.append(recid)
             self.assertEqual(set1, tmp_set1)
 
     def test_set_corruption(self):
         """intbitset - set corruption"""
-        set1 = intbitset()
+        set1 = self.intbitset()
         for strdump in self.corrupted_strdumps:
             ## These should fail because they are not compressed
-            self.assertRaises(ValueError, intbitset, strdump)
+            self.assertRaises(ValueError, self.intbitset, strdump)
             self.assertRaises(ValueError, set1.fastload, strdump)
             strdump = zlib.compress(strdump)
             ## These should fail because they are not of the good
             ## length
-            self.assertRaises(ValueError, intbitset, strdump)
+            self.assertRaises(ValueError, self.intbitset, strdump)
             self.assertRaises(ValueError, set1.fastload, strdump)
 
     def test_set_consistence(self):
@@ -537,10 +544,10 @@ class IntBitSetTest(InvenioTestCase):
             )
         )
         for original, dumped, dumped_trails in tests:
-            intbitset1 = intbitset(original)
-            intbitset2 = intbitset(original, trailing_bits=True)
-            intbitset3 = intbitset(dumped)
-            intbitset4 = intbitset(dumped_trails)
+            intbitset1 = self.intbitset(original)
+            intbitset2 = self.intbitset(original, trailing_bits=True)
+            intbitset3 = self.intbitset(dumped)
+            intbitset4 = self.intbitset(dumped_trails)
             self._helper_sanity_test(intbitset1)
             self._helper_sanity_test(intbitset2)
             self._helper_sanity_test(intbitset3)

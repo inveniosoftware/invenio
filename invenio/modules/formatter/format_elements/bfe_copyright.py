@@ -31,7 +31,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
-from invenio.urlutils import create_html_link
+from invenio.utils.url import create_html_link
 
 CFG_CERN_LICENSE_URL = 'http://copyright.cern.ch/'
 

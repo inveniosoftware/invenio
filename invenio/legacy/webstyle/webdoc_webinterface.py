@@ -26,12 +26,12 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_LANGS
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid
 from invenio.webdoc import get_webdoc_parts, get_webdoc_topics
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url
+from invenio.utils.url import redirect_to_url
 
 class WebInterfaceDocumentationPages(WebInterfaceDirectory):
     """Defines the set of documentation pages, usually installed under /help."""

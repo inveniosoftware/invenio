@@ -614,16 +614,12 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibconvert/etc/Makefile \
      modules/bibconvert/lib/Makefile \
      modules/bibdocfile/Makefile \
-     modules/bibdocfile/bin/bibdocfile \
      modules/bibdocfile/bin/Makefile \
      modules/bibdocfile/doc/Makefile \
      modules/bibdocfile/doc/hacking/Makefile \
      modules/bibdocfile/lib/Makefile \
      modules/bibrecord/Makefile \
      modules/bibrecord/bin/Makefile \
-     modules/bibrecord/bin/xmlmarc2textmarc \
-     modules/bibrecord/bin/textmarc2xmlmarc \
-     modules/bibrecord/bin/xmlmarclint \
      modules/bibrecord/doc/Makefile \
      modules/bibrecord/doc/admin/Makefile \
      modules/bibrecord/doc/hacking/Makefile \
@@ -660,7 +656,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibfield/etc/Makefile \
      modules/bibformat/Makefile \
      modules/bibformat/bin/Makefile \
-     modules/bibformat/bin/bibreformat \
      modules/bibformat/doc/Makefile \
      modules/bibformat/doc/admin/Makefile \
      modules/bibformat/doc/hacking/Makefile \
@@ -671,7 +666,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibformat/etc/output_formats/Makefile \
      modules/bibformat/lib/Makefile \
      modules/bibformat/lib/elements/Makefile \
-     modules/bibformat/lib/template_context_functions/Makefile \
      modules/bibformat/web/Makefile \
      modules/bibformat/web/admin/Makefile \
      modules/oaiharvest/Makefile \
@@ -685,7 +679,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/oaiharvest/web/admin/Makefile \
      modules/oairepository/Makefile \
      modules/oairepository/bin/Makefile \
-     modules/oairepository/bin/oairepositoryupdater \
      modules/oairepository/doc/Makefile \
      modules/oairepository/doc/admin/Makefile \
      modules/oairepository/doc/hacking/Makefile \
@@ -695,7 +688,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/oairepository/web/admin/Makefile \
      modules/bibindex/Makefile \
      modules/bibindex/bin/Makefile \
-     modules/bibindex/bin/bibindex \
      modules/bibindex/bin/bibstat \
      modules/bibindex/doc/Makefile \
      modules/bibindex/doc/admin/Makefile \
@@ -727,7 +719,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibmerge/web/admin/Makefile \
      modules/bibrank/Makefile \
      modules/bibrank/bin/Makefile \
-     modules/bibrank/bin/bibrank \
      modules/bibrank/bin/bibrankgkb \
      modules/bibrank/doc/Makefile \
      modules/bibrank/doc/admin/Makefile \
@@ -752,7 +743,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibupload/Makefile \
      modules/bibsort/Makefile \
      modules/bibsort/bin/Makefile \
-     modules/bibsort/bin/bibsort \
      modules/bibsort/lib/Makefile \
      modules/bibsort/etc/Makefile \
      modules/bibsort/doc/Makefile \
@@ -769,7 +759,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibsword/lib/Makefile \
      modules/bibsword/etc/Makefile \
      modules/bibupload/bin/Makefile \
-     modules/bibupload/bin/bibupload \
      modules/bibupload/bin/batchuploader \
      modules/bibupload/doc/Makefile \
      modules/bibupload/doc/admin/Makefile \
@@ -788,8 +777,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/miscutil/bin/Makefile \
      modules/miscutil/bin/dbdump \
      modules/miscutil/bin/dbexec \
-     modules/miscutil/bin/inveniocfg \
-     modules/miscutil/bin/inveniomanage \
      modules/miscutil/bin/plotextractor \
      modules/miscutil/demo/Makefile \
      modules/miscutil/doc/Makefile \
@@ -808,7 +795,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/webaccess/Makefile \
      modules/webaccess/bin/Makefile \
      modules/webaccess/bin/authaction \
-     modules/webaccess/bin/webaccessadmin \
      modules/webaccess/etc/Makefile \
      modules/webaccess/etc/templates/Makefile \
      modules/webaccess/doc/Makefile \
@@ -873,15 +859,12 @@ AC_CONFIG_FILES([config.nice  \
      modules/webmessage/web/Makefile \
      modules/websearch/Makefile \
      modules/websearch/bin/Makefile \
-     modules/websearch/bin/webcoll \
      modules/websearch/doc/Makefile \
      modules/websearch/doc/admin/Makefile \
      modules/websearch/doc/hacking/Makefile \
      modules/websearch/etc/Makefile \
      modules/websearch/etc/templates/Makefile \
      modules/websearch/lib/Makefile \
-     modules/websearch/lib/facets/Makefile \
-     modules/websearch/lib/template_context_functions/Makefile \
      modules/websearch/web/Makefile \
      modules/websearch/web/admin/Makefile \
      modules/websession/Makefile \
@@ -905,7 +888,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/webstat/lib/Makefile \
      modules/webstyle/Makefile \
      modules/webstyle/bin/Makefile \
-     modules/webstyle/bin/gotoadmin \
      modules/webstyle/bin/webdoc \
      modules/webstyle/css/Makefile \
      modules/webstyle/doc/Makefile \
@@ -915,7 +897,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/webstyle/etc/templates/Makefile \
      modules/webstyle/img/Makefile \
      modules/webstyle/lib/Makefile \
-     modules/webstyle/lib/goto_plugins/Makefile \
      modules/websubmit/Makefile \
      modules/websubmit/bin/Makefile \
      modules/websubmit/bin/inveniounoconv \
@@ -952,7 +933,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibworkflow/lib/Makefile \
      modules/bibworkflow/lib/workflows/Makefile \
      modules/bibworkflow/lib/tasks/Makefile \
-     modules/bibworkflow/lib/workers/Makefile \
      modules/bibworkflow/lib/widgets/Makefile \
      modules/bibworkflow/web/Makefile \
      modules/webtag/Makefile \
@@ -961,7 +941,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/webtag/etc/Makefile \
      modules/webtag/etc/templates/Makefile \
      modules/webtag/lib/Makefile \
-     modules/webtag/lib/template_context_functions/Makefile \
      modules/webtag/web/Makefile \
      ])
 

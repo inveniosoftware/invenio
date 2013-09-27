@@ -41,7 +41,7 @@ import sys
 from invenio.config import CFG_TMPDIR
 
 ## BibRecord -> to create MARCXML records
-from invenio.bibrecord import record_add_field, record_xml_output
+from invenio.legacy.bibrecord import record_add_field, record_xml_output
 
 ## BibTask -> to manipulate Bibliographic Tasks
 from invenio.bibtask import task_low_level_submission, write_message, task_update_progress

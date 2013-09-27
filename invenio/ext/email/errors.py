@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,19 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-""" Configuration file for miscutil module.
-- Contains standard error messages for errorlib
-  e.g. No error message given, etc.
+"""
+    invenio.ext.email.errors
+    ------------------------
+
+    Contains standard error messages for email extension.
 """
 
-__revision__ = "$Id$"
+class EmailError(Exception):
+    """A generic email error."""
 
-# Exceptions: errors
-class InvenioMiscUtilError(Exception):
-    """A generic error for MiscUtil."""
     def __init__(self, message):
         """Initialisation."""
         self.message = message
+
     def __str__(self):
         """String representation."""
         return repr(self.message)

@@ -38,8 +38,8 @@ import re
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
-from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datetext_to_dategui, \
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.date import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
@@ -47,7 +47,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_CATEGORIES, \
                                      InvenioWebBasketWarning
-from invenio.urlutils import get_referer
+from invenio.utils.url import get_referer
 from invenio.webuser import isGuestUser, collect_user_info
 from invenio.search_engine import \
      record_exists, \

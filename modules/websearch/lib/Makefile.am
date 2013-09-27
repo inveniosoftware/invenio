@@ -15,29 +15,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = facets template_context_functions
-
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
 	websearchadminlib.py \
-	websearch_blueprint.py \
-	websearch_cache.py \
-	websearch_facet_builders.py \
-	websearch_forms.py \
 	websearch_flask_tests.py \
-	websearch_fixtures.py \
-	websearch_fixtures_demosite.py \
-	websearch_model.py \
 	websearch_templates.py \
-	websearch_user_settings.py \
 	websearch_webinterface.py \
-	websearch_receivers.py \
 	websearch_regression_tests.py \
 	websearch_web_tests.py \
-	record_blueprint.py \
 	search_engine.py \
-	search_engine_config.py \
 	search_engine_unit_tests.py \
 	search_engine_utils.py \
 	search_engine_query_parser.py \
@@ -55,17 +42,8 @@ pylib_DATA = \
 	websearch_external_collections_templates.py \
 	websearch_external_collections_unit_tests.py \
 	websearch_external_collections_utils.py \
-	websearch_admin_blueprint.py \
 	websearch_admin_forms.py
 
-
-jsdir=$(localstatedir)/www/js
-
-js_DATA = websearch_facet.js \
-          websearch_hotkeys.js \
-          websearch_typeahead.js
-
-EXTRA_DIST = $(pylib_DATA) \
-             $(js_DATA)
+EXTRA_DIST = $(pylib_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

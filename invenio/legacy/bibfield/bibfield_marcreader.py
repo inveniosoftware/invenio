@@ -38,7 +38,7 @@ class MarcReader(JsonReader):
         """
         Splits the blob using <record.*?>.*?</record> as pattern.
 
-        Note 1: Taken from invenio.bibrecord:create_records
+        Note 1: Taken from invenio.legacy.bibrecord:create_records
         Note 2: Use the DOTALL flag to include newlines.
         """
         import re
@@ -58,12 +58,12 @@ class MarcReader(JsonReader):
                 self.__create_rectree_from_recstruct()
             elif self.blob_wrapper.schema.lower() in ['xml', 'file:xml']:
                 #TODO: Implement translation directrly from xml
-                from invenio.bibrecord import create_record
+                from invenio.legacy.bibrecord import create_record
                 self.blob_wrapper.blob = create_record(self.blob_wrapper.blob)[0]
                 self.__create_rectree_from_recstruct()
         except AttributeError:
             #Assume marcxml
-            from invenio.bibrecord import create_record
+            from invenio.legacy.bibrecord import create_record
             self.blob_wrapper.blob = create_record(self.blob_wrapper.blob)[0]
             self.__create_rectree_from_recstruct()
 

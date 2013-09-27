@@ -26,8 +26,8 @@ from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, adderrorbox, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.webuser import getUid, page_not_authorized
-from invenio.messages import gettext_set_language
-from invenio.urlutils import wash_url_argument
+from invenio.base.i18n import gettext_set_language
+from invenio.utils.url import wash_url_argument
 
 def switchfmtscore(req, colID, type, id_1, id_2, ln=CFG_SITE_LANG):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)

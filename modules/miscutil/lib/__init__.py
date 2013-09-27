@@ -16,3 +16,6 @@ revisions and the like, please go to U{Invenio git web repository
 This place enables you to browse Invenio source code documentation
 as well as the source code snippets themselves.
 """
+
+from pkgutil import extend_path
+__path__ = extend_path(__path__, __name__)

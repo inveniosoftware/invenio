@@ -17,15 +17,16 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% extends "webtag_display.html" %}
+{% extends "tags/display.html" %}
 
 {% block webtag_display %}
 <div class="row-fluid">
   <h4> {{_('Tag Cloud') }} </h4>
   <div class="span4">
   {% for tag in user_tags %}
-      <a href="{{ url_for('webtag.tag_details', id_tag=tag.id) }}"
-         style="font-size: {{tag.css_size}}%; white-space: nowrap;">
+      {#<a href="{{ url_for('search.search', p='tag:"' + tag['name']) + '"' }}"#}
+      <a href="{{ url_for('webtag.tag_edit', id_tag=tag.id) }}"
+        style="font-size: {{tag.css_size}}%; white-space: nowrap;">
         {{ tag.name }}
       </a>
   {% endfor %}

@@ -41,7 +41,7 @@ import time
 import re
 import ConfigParser
 
-from invenio.urlutils import make_invenio_opener
+from invenio.utils.url import make_invenio_opener
 from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
 

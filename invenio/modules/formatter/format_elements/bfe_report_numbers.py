@@ -22,7 +22,7 @@
 __revision__ = ""
 
 import cgi
-from invenio.urlutils import create_html_link
+from invenio.utils.url import create_html_link
 
 def format_element(bfo, limit, separator=" ", extension=" etc.", link='yes'):
     """

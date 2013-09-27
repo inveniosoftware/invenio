@@ -27,9 +27,7 @@ import glob
 import inspect
 import imp
 
-from invenio.errorlib import register_exception
-from invenio.config import CFG_PYLIBDIR
-from invenio.textutils import wrap_text_in_a_box
+from invenio.utils.text import wrap_text_in_a_box
 
 
 class InvenioPluginContainerError(Exception):
@@ -149,6 +147,10 @@ class PluginContainer(object):
         @param plugin_pathnames: one or more plugins_pathnames
         @type plugin_pathnames: string/list
         """
+
+        if type(plugin_pathnames) is unicode:
+            plugin_pathnames = str(plugin_pathnames)
+
         if type(plugin_pathnames) is str:
             self._plugin_pathnames.append(plugin_pathnames)
         else:
@@ -256,11 +258,13 @@ class PluginContainer(object):
         @rtype: string
         @raise ValueError: if the path is not under CFG_PYLIBDIR/invenio
         """
+        from invenio.config import CFG_PYLIBDIR
         invenio_path = os.path.abspath(os.path.join(CFG_PYLIBDIR, 'invenio'))
         plugin_path = os.path.abspath(plugin_path)
         if not self._external and not os.path.abspath(plugin_path).startswith(invenio_path):
             raise ValueError('A plugin should be stored under "%s" ("%s" was'
                 ' specified)' % (invenio_path, plugin_path))
+
         return plugin_path
 
     def _plugin_pathnames_iterator(self):
@@ -359,6 +363,7 @@ class PluginContainer(object):
             }
         except Exception:
             if self._register_exception:
+                from invenio.errorlib import register_exception
                 register_exception()
             self._plugin_map[plugin_name] = {
                 'plugin': None,

@@ -22,7 +22,7 @@ WebSession database models.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 from sqlalchemy.ext.hybrid import hybrid_property
 # Create your models here.
 
@@ -139,18 +139,6 @@ class UserUsergroup(db.Model):
     usergroup = db.relationship(Usergroup, backref='users')
 
 
-class Session(db.Model):
-    """Represents a Session record."""
-    __tablename__ = 'session'
-    session_key = db.Column(db.String(32), nullable=False,
-                server_default='', primary_key=True)
-    session_expiry = db.Column(db.DateTime, nullable=False,
-                server_default='1900-01-01 00:00:00', index=True)
-    session_object = db.Column(db.LargeBinary, nullable=True)
-    uid = db.Column(db.Integer(15, unsigned=True),
-                nullable=False, index=True)
-
-
 class UserEXT(db.Model):
     """Represents a UserEXT record."""
     __tablename__ = 'userEXT'
@@ -166,5 +154,4 @@ class UserEXT(db.Model):
 __all__ = ['User',
            'Usergroup',
            'UserUsergroup',
-           'UserEXT',
-           'Session']
+           'UserEXT']

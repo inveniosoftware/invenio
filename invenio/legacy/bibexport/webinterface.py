@@ -28,12 +28,12 @@ import re
 from invenio.webpage import page
 from invenio.webinterface_handler import WebInterfaceDirectory, \
                                          wash_urlargd
-from invenio.urlutils import redirect_to_url
+from invenio.utils.url import redirect_to_url
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL
-from invenio.dateutils import convert_datestruct_to_datetext, \
+from invenio.utils.date import convert_datestruct_to_datetext, \
                               convert_datetext_to_datestruct
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.bibexport_method_fieldexporter import get_css, \
                                         get_navigation_menu, \
                                         perform_request_edit_query, \

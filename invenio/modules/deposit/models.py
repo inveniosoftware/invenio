@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of Invenio.
-# Copyright (C) 2013 CERN.
-#
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 2 of the
-# License, or (at your option) any later version.
-#
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+##
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 Classes for wrapping BibWorkflowObject and friends to make it easier to
 work with the data attributes.
@@ -31,16 +30,15 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
 from werkzeug.utils import secure_filename
 from flask import redirect, render_template, flash, url_for, request, session
+from flask.ext.login import current_user
 
-from invenio.sqlalchemyutils import db
-from invenio.webuser_flask import current_user
-
+from invenio.ext.sqlalchemy import db
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION, CFG_WORKFLOW_STATUS
-from invenio.bibworkflow_model import BibWorkflowObject, Workflow
+from invenio.modules.workflows.models import BibWorkflowObject, Workflow
 from invenio.bibworkflow_engine import BibWorkflowEngine
 from invenio.bibworkflow_api import continue_oid
 
-from invenio.webdeposit_load_forms import forms
+from invenio.modules.deposit import forms
 from invenio.webdeposit_form import CFG_FIELD_FLAGS, DataExporter
 from invenio.webdeposit_signals import file_uploaded
 from invenio.webdeposit_storage import Storage
@@ -157,7 +155,7 @@ class DepositionType(object):
         if ctx:
             return render_template(**ctx)
         else:
-            return render_template('webdeposit_error.html', **dict(
+            return render_template('deposit/error.html', **dict(
                 depostion=deposition,
                 deposition_type=(
                     None if deposition.type.is_default()
@@ -448,7 +446,7 @@ class DepositionDraft(FactoryMixin):
 
     def __setstate__(self, state):
         self.completed = state['completed']
-        self.form_class = forms[state['type']] if state['type'] else None
+        self.form_class = getattr(forms, state['type']) if state['type'] else None
         self.values = state['values']
         self.flags = state['flags']
         self.validate = state.get('validate', True)
@@ -941,7 +939,7 @@ class Deposition(object):
     def get_depositions(cls, user, type=None):
         params = [
             Workflow.module_name == 'webdeposit',
-            BibWorkflowObject.id_user == user.get_id()
+            Workflow.id_user == user.get_id()
         ]
 
         if type:

@@ -33,9 +33,9 @@ from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileC
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.dbquery import run_sql
 from invenio.bibsched import server_pid
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.search_engine import get_record
-from invenio.bibrecord import record_get_field_values, record_get_field_value
+from invenio.legacy.bibrecord import record_get_field_values, record_get_field_value
 
 def createRelatedFormats(fullpath, overwrite=True, debug=False):
     """Given a fullpath, this function extracts the file's extension and

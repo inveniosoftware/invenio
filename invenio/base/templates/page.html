@@ -16,25 +16,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{%- set guest = current_user.is_guest -%}
-{%- set usealerts = current_user['precached_usealerts'] -%}
-{%- set usemessages = current_user['precached_usemessages'] -%}
-{%- set usebaskets = current_user['precached_usebaskets'] -%}
-{%- set useloans = current_user['precached_useloans'] -%}
-{%- set usegroups = current_user['precached_usegroups'] -%}
-{%- set viewsubmissions = current_user['precached_viewsubmissions'] -%}
-{%- set useapprove = current_user['precached_useapprove'] -%}
-{%- set useadmin = current_user['precached_useadmin'] -%}
-{%- set usestats = current_user['precached_usestats'] -%}
-{%- set viewclaimlink = current_user['precached_viewclaimlink'] -%}
-{%- set usepaperclaim = current_user['precached_usepaperclaim'] -%}
-{%- set usepaperattribution = current_user['precached_usepaperattribution'] -%}
 
 {# Global CSS #}
 {%- css 'css/bootstrap.css', '00-invenio' -%}
 {%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
 {%- css 'css/token-input.css', '00-invenio' -%}
 {%- css 'css/token-input-facebook.css', '00-invenio' -%}
+{%- css url_for('webtag.static', filename='css/tags/popover.css'), '00-invenio' -%}
 {%- if config.CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' %}
 {%- css 'css/'+config.CFG_WEBSTYLE_TEMPLATE_SKIN, '00-invenio' -%}
 {%- endif %}
@@ -44,6 +32,7 @@
 {%- js 'js/bootstrap.js', '00-invenio' -%}
 {%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
 {%- js 'js/hogan.js', '00-invenio' -%}
+{%- js 'js/jquery.jeditable.mini.js', '00-invenio' -%}
 {%- js 'js/invenio.js', '00-invenio' -%}
 
 {%- if not no_pageheader -%}

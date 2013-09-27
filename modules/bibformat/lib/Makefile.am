@@ -15,12 +15,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = elements template_context_functions
+SUBDIRS = elements
 
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibformat_config.py bibformat_templates.py \
-             bibformatadminlib.py bibformat_engine.py bibformat_dblayer.py \
+             bibformatadminlib.py bibformat_engine.py \
              bibformat_utils.py bibformat.py \
              bibformat_manager.py \
              bibformatadmin_regression_tests.py bibformat_engine_unit_tests.py \

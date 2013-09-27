@@ -16,13 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = page.html \
-                 legacy_page.html \
-		 404.html \
-                 _formhelpers.html \
-		 breadcrumbs.html \
-		 header.html \
-		 footer.html
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

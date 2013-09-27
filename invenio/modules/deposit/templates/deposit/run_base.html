@@ -20,27 +20,27 @@
 
 
 {% macro form_action_bar(margin="") -%}
-    {% include "webdeposit_run_action_bar.html" %}
+    {% include "deposit/run_action_bar.html" %}
 {%- endmacro %}
 
 {%- macro form_group_accordion_start(group, idx) -%}
-    {% include "webdeposit_run_group_start.html" %}
+    {% include "deposit/run_group_start.html" %}
 {%- endmacro -%}
 
 {%- macro form_group_accordion_end(group, idx) -%}
-    {% include "webdeposit_run_group_end.html" %}
+    {% include "deposit/run_group_end.html" %}
 {%- endmacro -%}
 
 {%- macro field_label(thisfield) -%}
-    {% include "webdeposit_run_field_label.html" %}
+    {% include "deposit/run_field_label.html" %}
 {%- endmacro -%}
 
 {%- macro field_display(thisfield, field_class="span5", container_class="control-group") -%}
-    {% include "webdeposit_run_field.html" %}
+    {% include "deposit/run_field.html" %}
 {%- endmacro -%}
 
 {%- macro field_display_subform(thisfield) -%}
-    {% include "webdeposit_run_field_subform.html" %}
+    {% include "deposit/run_field_subform.html" %}
 {%- endmacro -%}
 
 {%- block header %}
@@ -48,9 +48,9 @@
     {%- block webdeposit_assets %}
         {% js 'js/jquery-ui.min.js', '20-jquery-ui' %}
         {% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
-        {% js 'js/webdeposit_form.js', '50-webdeposit' %}
+        {% js url_for('webdeposit.static', filename='js/deposit/form.js'), '50-webdeposit' %}
         {% js 'js/hogan.js', '40-webdeposit-hogan' %}
-        {% js 'js/webdeposit_templates.js', '50-webdeposit' %}
+        {% js url_for('webdeposit.static', filename='js/deposit/templates.js'), '50-webdeposit' %}
         {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
         {% js 'ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
         {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '20-jquery-ui' %}
@@ -177,7 +177,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
     </div>
     {% if form._drafting %}
         <div class="span4">
-            {% include "webdeposit_myview.html" %}
+            {% include "deposit/myview.html" %}
         </div>
     {% endif %}
     </div>

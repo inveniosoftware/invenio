@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,50 +19,42 @@
 
 """WebGroup Flask Blueprint"""
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for
-from invenio import webgroup_dblayer as dbplayer
-from invenio.sqlalchemyutils import db
-from invenio.webuser_flask import current_user
-from invenio.config import CFG_SITE_LANG
-from invenio.websession_model import User, Usergroup, UserUsergroup
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webinterface_handler import wash_urlargd
-from invenio.dbquery import run_sql
+from flask import Blueprint, render_template, request, jsonify
+from flask.ext.login import current_user, login_required
+from invenio.base.decorators import wash_arguments
+from invenio.base.i18n import _
+from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from invenio.ext.sqlalchemy import db
+from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
 
-from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
-      CFG_WEBSESSION_USERGROUP_STATUS, \
-      CFG_WEBSESSION_GROUP_JOIN_POLICY, \
-      InvenioWebSessionError, \
-      InvenioWebSessionWarning
+blueprint = Blueprint('webgroup', __name__, url_prefix="/yourgroups",
+                      template_folder='templates', static_folder='static')
 
-blueprint = InvenioBlueprint('webgroup', __name__, url_prefix="/yourgroups",
-                             breadcrumbs=[(_("Your Groups"),
-                                           'webgroup.index')])
-
+default_breadcrumb_root(blueprint, '.webaccount.webgroup')
 
 def filter_by_user_status(uid, user_status, login_method='INTERNAL'):
-    return db.and_(UserUsergroup.id_user==uid,
-                   UserUsergroup.user_status==user_status,
-                   Usergroup.login_method==login_method)
+    return db.and_(UserUsergroup.id_user == uid,
+                   UserUsergroup.user_status == user_status,
+                   Usergroup.login_method == login_method)
 
 
 @blueprint.route('/')
 @blueprint.route('/index', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@register_breadcrumb(blueprint, '.', _('Your Groups'))
+@login_required
 def index():
     uid = current_user.get_id()
     mg = Usergroup.query.join(Usergroup.users).\
-            filter(UserUsergroup.id_user==uid).all()
-            #filter_by_user_status(uid,
-            #CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])).\
-            #all()
+        filter(UserUsergroup.id_user==uid).all()
+        #filter_by_user_status(uid,
+        #CFG_WEBSESSION_USERGROUP_STATUS["MEMBER"])).\
+        #all()
 
-    return render_template('webgroup_index.html', member_groups=map(dict, mg))
+    return render_template('groups/index.html', member_groups=map(dict, mg))
 
 
 @blueprint.route("/search", methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({"query": (unicode, ""), "term": (unicode, "")})
+@wash_arguments({"query": (unicode, ""), "term": (unicode, "")})
 def search(query, term):
     if query == 'users' and len(term) >= 3:
         res = db.session.query(User.nickname).filter(
@@ -75,21 +67,23 @@ def search(query, term):
         return jsonify(groups=[elem for elem, in res])
     return jsonify()
 
+
 @blueprint.route("/tokenize", methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({"q": (unicode, "")})
+@wash_arguments({"q": (unicode, "")})
 def tokenize(q):
     res = Usergroup.query.filter(
         Usergroup.name.like("%s%%" % q)).limit(10).all()
     return jsonify(data=map(dict, res))
 
+
 @blueprint.route("/join", methods=['GET', 'POST'])
 @blueprint.route("/leave", methods=['GET', 'POST'])
-@blueprint.invenio_wash_urlargd({"id": (int, 0)})
+@wash_arguments({"id": (int, 0)})
 def _manipulate_group(id):
     uid = current_user.get_id()
     try:
-        user = User.query.filter(User.id==uid).one()
-        group = Usergroup.query.filter(Usergroup.id==id).one()
+        user = User.query.filter(User.id == uid).one()
+        group = Usergroup.query.filter(Usergroup.id == id).one()
         if request.path.find("/join") > 0:
             user.usergroups.append(UserUsergroup(usergroup=group))
             db.session.add(user)
@@ -108,7 +102,7 @@ def _manipulate_group(id):
 
 
 #@blueprint.route("/add", methods=['GET', 'POST'])
-#@blueprint.invenio_authenticated
+#@login_required
 #def add():
 #    uid = current_user.get_id()
 #    form = AddMsgMESSAGEForm(request.form)

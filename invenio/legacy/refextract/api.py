@@ -41,7 +41,7 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from invenio.search_engine import get_record
 from invenio.bibtask import task_low_level_submission
-from invenio.bibrecord import record_delete_fields, record_xml_output, \
+from invenio.legacy.bibrecord import record_delete_fields, record_xml_output, \
     create_record, record_get_field_instances, record_add_fields, \
     record_has_field
 from invenio.refextract_find import get_reference_section_beginning, \

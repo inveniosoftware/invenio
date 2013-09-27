@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_WEBDIR, \
      CFG_TMPDIR, \
      CFG_SITE_RECORD
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
 from invenio.dbquery import run_sql
@@ -293,7 +293,7 @@ class WebCommentRestrictionsTest(InvenioTestCase):
 
         # Juliet should not be able to access the comment
         self.login('juliet', 'j123uliet')
-        response = self.client.get(url_for('webcomment.comments', recid=self.restricted_discussion, _external=True, _scheme='https'))
+        response = self.client.get(url_for('comments.comments', recid=self.restricted_discussion, _external=True, _scheme='https'))
         self.assertNotIn(self.msg6, response.data)
 
         # Juliet should not be able to access the attached files
@@ -303,7 +303,7 @@ class WebCommentRestrictionsTest(InvenioTestCase):
 
         # Romeo should be able to access the comment
         self.login('romeo', 'r123omeo')
-        response = self.client.get(url_for('webcomment.comments', recid=self.restricted_discussion, _external=True, _scheme='https'))
+        response = self.client.get(url_for('comments.comments', recid=self.restricted_discussion, _external=True, _scheme='https'))
         self.assertIn(self.msg6, response.data)
 
         # Romeo should be able to access the attached files

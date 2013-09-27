@@ -22,7 +22,7 @@
 import json
 from functools import wraps
 
-from flask import current_app, \
+from flask import current_app, Blueprint, \
     render_template, \
     request, \
     jsonify, \
@@ -32,38 +32,26 @@ from flask import current_app, \
     send_file, \
     abort, \
     make_response
+from flask.ext.login import current_user, login_required
 from werkzeug.utils import secure_filename
 
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-
-from invenio.webuser_flask import current_user
-
-from invenio.webdeposit_load_forms import forms
+from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from invenio.ext.menu import register_menu
+from invenio.base.i18n import _
+from invenio.modules.deposit import forms
 from invenio.webdeposit_signals import template_context_created
-from invenio.webdeposit_models import Deposition, DepositionType, \
+from invenio.modules.deposit.models import Deposition, DepositionType, \
     DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
     DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
     DepositionDraftCacheManager
 from invenio.webdeposit_storage import ChunkedDepositionStorage, \
     DepositionStorage, ExternalFile, UploadError
 
+blueprint = Blueprint('webdeposit', __name__, url_prefix='/deposit',
+                      template_folder='../templates',
+                      static_folder='../static')
 
-blueprint = InvenioBlueprint(
-    'webdeposit',
-    __name__,
-    url_prefix='/deposit',
-    config='invenio.websubmit_config',
-    menubuilder=[('main.webdeposit', _('Upload'), 'webdeposit.index', 3)],
-    breadcrumbs=[(_('Upload'), 'webdeposit.index')]
-)
-
-
-deptypes = "<any(%s):deposition_type>" % (", ".join(
-    map(lambda x: '"%s"' % x, DepositionType.keys())
-))
-"""
-URL pattern of matching all deposition types.
-"""
+default_breadcrumb_root(blueprint, '.webdeposit')
 
 
 def deposition_error_handler(endpoint='.index'):
@@ -97,7 +85,9 @@ def deposition_error_handler(endpoint='.index'):
 
 
 @blueprint.route('/')
-@blueprint.invenio_authenticated
+@login_required
+@register_menu(blueprint, 'main.webdeposit', _('Deposit'), order=2)
+@register_breadcrumb(blueprint, '.', _('Deposit'))
 def index():
     """
     Renders the deposition index page
@@ -105,9 +95,6 @@ def index():
     The template context can be customized via the template_context_created
     signal.
     """
-    current_app.config['breadcrumbs_map'][request.endpoint] = [
-        (_('Home'), '')] + blueprint.breadcrumbs
-
     draft_cache = DepositionDraftCacheManager.from_request()
     draft_cache.save()
 
@@ -124,13 +111,13 @@ def index():
     )
 
     return render_template(
-        'webdeposit_index.html',
+        'deposit/index.html',
         **ctx
     )
 
 
-@blueprint.route('/%s/' % deptypes)
-@blueprint.invenio_authenticated
+@blueprint.route('/<depositions:deposition_type>')
+@login_required
 def deposition_type_index(deposition_type):
     if len(DepositionType.keys()) <= 1 and DepositionType.get_default():
         abort(404)
@@ -139,9 +126,9 @@ def deposition_type_index(deposition_type):
     if not deptype.is_enabled():
         abort(404)
 
-    current_app.config['breadcrumbs_map'][request.endpoint] = \
-        [(_('Home'), '')] + blueprint.breadcrumbs + \
-         [(deptype.name_plural, None)]
+    #current_app.config['breadcrumbs_map'][request.endpoint] = \
+    #    [(_('Home'), '')] + blueprint.breadcrumbs + \
+    #     [(deptype.name_plural, None)]
 
     draft_cache = DepositionDraftCacheManager.from_request()
     draft_cache.save()
@@ -159,14 +146,14 @@ def deposition_type_index(deposition_type):
     )
 
     return render_template(
-        'webdeposit_deposition_type.html',
+        'deposit/deposition_type.html',
         **ctx
     )
 
 
-@blueprint.route('/%s/create/' % deptypes, methods=['POST', 'GET'])
+@blueprint.route('/<depositions:deposition_type>/create', methods=['POST', 'GET'])
 @blueprint.route('/create/', methods=['POST', 'GET'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def create(deposition_type=None):
     """
@@ -188,9 +175,9 @@ def create(deposition_type=None):
     ))
 
 
-@blueprint.route('/%s/<uuid>/<draft_id>/' % deptypes, methods=['POST'])
+@blueprint.route('/<depositions:deposition_type>/<uuid>/<draft_id>', methods=['POST'])
 @blueprint.route('/<uuid>/<draft_id>/', methods=['POST'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def save(deposition_type=None, uuid=None, draft_id=None):
     """
@@ -267,9 +254,9 @@ def save(deposition_type=None, uuid=None, draft_id=None):
         return jsonify(None)
 
 
-@blueprint.route('/%s/<uuid>/delete/' % deptypes)
-@blueprint.route('/<uuid>/delete/')
-@blueprint.invenio_authenticated
+@blueprint.route('/<depositions:deposition_type>/delete')
+@blueprint.route('/<uuid>/delete')
+@login_required
 @deposition_error_handler()
 def delete(deposition_type=None, uuid=None):
     """
@@ -283,9 +270,9 @@ def delete(deposition_type=None, uuid=None):
     return redirect(url_for(".index"))
 
 
-@blueprint.route('/%s/<uuid>/' % deptypes, methods=['GET', 'POST'])
+@blueprint.route('/<depositions:deposition_type>/<uuid>', methods=['GET', 'POST'])
 @blueprint.route('/<uuid>/', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def run(deposition_type=None, uuid=None):
     """
@@ -294,21 +281,21 @@ def run(deposition_type=None, uuid=None):
     deposition = Deposition.get(uuid, current_user, type=deposition_type)
 
     # Set breadcrumb
-    breadcrumb = [(_('Home'), '')] + blueprint.breadcrumbs
-    if not deposition.type.is_default():
-        breadcrumb.append(
-            (deposition.type.name, '.deposition_type_index', {
-                'deposition_type': deposition.type.get_identifier()
-            })
-        )
+    #breadcrumb = [(_('Home'), '')] + blueprint.breadcrumbs
+    #if not deposition.type.is_default():
+    #    breadcrumb.append(
+    #        (deposition.type.name, '.deposition_type_index', {
+    #            'deposition_type': deposition.type.get_identifier()
+    #        })
+    #    )
 
-    breadcrumb.append(
-        (deposition.title or _('Untitled'), '.run', {
-            'deposition_type': deposition.type.get_identifier(),
-            'uuid': deposition.id
-        })
-    )
-    current_app.config['breadcrumbs_map'][request.endpoint] = breadcrumb
+    #breadcrumb.append(
+    #    (deposition.title or _('Untitled'), '.run', {
+    #        'deposition_type': deposition.type.get_identifier(),
+    #        'uuid': deposition.id
+    #    })
+    #)
+    #current_app.config['breadcrumbs_map'][request.endpoint] = breadcrumb
 
     # If normal form handling should be supported, it can be handled here with
     # something like::
@@ -324,10 +311,10 @@ def run(deposition_type=None, uuid=None):
     return deposition.run_workflow()
 
 
-@blueprint.route('/%s/<uuid>/<draft_id>/status/' % deptypes,
-                 methods=['GET', 'POST'])
+#@blueprint.route('/%s/<uuid>/<draft_id>/status/' % deptypes,
+#                 methods=['GET', 'POST'])
 @blueprint.route('/<uuid>/<draft_id>/status/', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def status(deposition_type=None, uuid=None, draft_id=None):
     """
@@ -338,9 +325,9 @@ def status(deposition_type=None, uuid=None, draft_id=None):
     return jsonify({"status": 1 if completed else 0})
 
 
-@blueprint.route('/%s/<uuid>/file/url/' % deptypes, methods=['POST'])
+#@blueprint.route('/%s/<uuid>/file/url/' % deptypes, methods=['POST'])
 @blueprint.route('/<uuid>/file/url/', methods=['POST'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def upload_url(deposition_type=None, uuid=None):
     """
@@ -368,9 +355,9 @@ def upload_url(deposition_type=None, uuid=None):
     )
 
 
-@blueprint.route('/%s/<uuid>/file/' % deptypes, methods=['POST'])
+#@blueprint.route('/%s/<uuid>/file/' % deptypes, methods=['POST'])
 @blueprint.route('/<uuid>/file/', methods=['POST'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def upload_file(deposition_type=None, uuid=None):
     """
@@ -404,10 +391,10 @@ def upload_file(deposition_type=None, uuid=None):
     return jsonify(dict(filename=df.name, id=df.uuid, checksum=None))
 
 
-@blueprint.route('/%s/<uuid>/file/delete/' % deptypes,
-                 methods=['POST'])
+#@blueprint.route('/%s/<uuid>/file/delete/' % deptypes,
+#                 methods=['POST'])
 @blueprint.route('/<uuid>/file/delete/', methods=['POST'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def delete_file(deposition_type=None, uuid=None):
     """
@@ -427,9 +414,9 @@ def delete_file(deposition_type=None, uuid=None):
         return ('', 400)
 
 
-@blueprint.route('/%s/<uuid>/file/' % deptypes, methods=['GET'])
+#@blueprint.route('/%s/<uuid>/file/' % deptypes, methods=['GET'])
 @blueprint.route('/<uuid>/file/', methods=['GET'])
-@blueprint.invenio_authenticated
+@login_required
 @deposition_error_handler()
 def get_file(deposition_type=None, uuid=None):
     """
@@ -451,7 +438,7 @@ def get_file(deposition_type=None, uuid=None):
 
 @blueprint.route('/autocomplete/<form_type>/<field_name>',
                  methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
+@login_required
 def autocomplete(form_type, field_name):
     """
     Auto-complete a form field

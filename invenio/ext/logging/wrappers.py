@@ -30,15 +30,10 @@ import re
 import inspect
 from cStringIO import StringIO
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
-    CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, \
-    CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, \
-    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, \
-    CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
-    CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER
-from invenio.urlutils import wash_url_argument
-from invenio.messages import wash_language, gettext_set_language
-from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.utils.url import wash_url_argument
+from invenio.base.i18n import wash_language, gettext_set_language
+from invenio.base.globals import cfg
+from invenio.utils.date import convert_datestruct_to_datetext
 from invenio.dbquery import run_sql
 
 
@@ -121,15 +116,15 @@ def register_emergency(msg, recipients=None):
     get_emergency_recipients() which loads settings from
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES
     """
-    from invenio.mailutils import send_email
+    from invenio.ext.email import send_email
     if not recipients:
         recipients = get_emergency_recipients()
     recipients = set(recipients)
-    recipients.add(CFG_SITE_ADMIN_EMAIL)
+    recipients.add(cfg['CFG_SITE_ADMIN_EMAIL'])
     for address_str in recipients:
-        send_email(CFG_SITE_SUPPORT_EMAIL, address_str, "Emergency notification", msg)
+        send_email(cfg['CFG_SITE_SUPPORT_EMAIL'], address_str, "Emergency notification", msg)
 
-def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
+def get_emergency_recipients(recipient_cfg=None):
     """Parse a list of appropriate emergency email recipients from
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, or from a provided dictionary
     comprised of 'time constraint' => 'comma separated list of addresses'
@@ -143,7 +138,9 @@ def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
         '*': 'john.doe.phone@foo.com'}
     """
 
-    from invenio.dateutils import parse_runtime_limit
+    from invenio.utils.date import parse_runtime_limit
+    if recipient_cfg is None:
+        recifient_cfg = cfg['CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']
 
     recipients = set()
     for time_condition, address_str in recipient_cfg.items():
@@ -159,8 +156,7 @@ def find_all_values_to_hide(local_variables, analyzed_stack=None):
     """Return all the potential password to hyde."""
     ## Let's add at least the DB password.
     if analyzed_stack is None:
-        from invenio.dbquery import CFG_DATABASE_PASS
-        ret = set([CFG_DATABASE_PASS])
+        ret = set([cfg['CFG_DATABASE_PASS']])
         analyzed_stack = set()
     else:
         ret = set()
@@ -313,7 +309,7 @@ def exception_should_be_notified(name, filename, line):
             delta = datetime.datetime.now() - last_notified
             counter += 1
             total += 1
-            if (delta.seconds + delta.days * 86400) >= CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER:
+            if (delta.seconds + delta.days * 86400) >= cfg['CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER']:
                 run_sql("UPDATE hstEXCEPTION SET last_seen=NOW(), last_notified=NOW(), counter=1, total=%s WHERE id=%s", (total, exc_id))
                 return True
             else:
@@ -412,7 +408,7 @@ def register_exception(stream='error',
             written_to_log = False
             try:
                 ## Let's try to write into the log.
-                open(os.path.join(CFG_LOGDIR, 'invenio.' + stream), 'a').write(
+                open(os.path.join(cfg['CFG_LOGDIR'], 'invenio.' + stream), 'a').write(
                     log_text)
                 written_to_log = True
             except:
@@ -421,22 +417,22 @@ def register_exception(stream='error',
 
             ## let's log the exception and see whether we should report it.
             pretty_notification_info = get_pretty_notification_info(exc_name, filename, line_no)
-            if exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
-                (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or
+            if exception_should_be_notified(exc_name, filename, line_no) and (cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 1 or
+                (alert_admin and cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 0) or
                 not written_to_log):
                 ## If requested or if it's impossible to write in the log
-                from invenio.mailutils import send_email
+                from invenio.ext.email import send_email
                 if not subject:
                     subject = 'Exception (%s:%s:%s)' % (filename, line_no, function_name)
-                subject = '%s at %s' % (subject, CFG_SITE_URL)
+                subject = '%s at %s' % (subject, cfg['CFG_SITE_URL'])
                 email_text = "\n%s\n%s" % (pretty_notification_info, email_text)
                 if not written_to_log:
                     email_text += """\
 Note that this email was sent to you because it has been impossible to log
-this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
+this exception into %s""" % os.path.join(cfg['CFG_LOGDIR'], 'invenio.' + stream)
                 send_email(
-                    CFG_SITE_ADMIN_EMAIL,
-                    CFG_SITE_ADMIN_EMAIL,
+                    cfg['CFG_SITE_ADMIN_EMAIL'],
+                    cfg['CFG_SITE_ADMIN_EMAIL'],
                     subject=subject,
                     content=email_text)
             return 1
@@ -444,7 +440,7 @@ this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
             return 0
     except Exception, err:
         print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (
-            CFG_LOGDIR + '/invenio.' + stream, err)
+            cfg['CFG_LOGDIR'] + '/invenio.' + stream, err)
         return 0
 
 
@@ -483,7 +479,7 @@ def raise_exception(exception_type = Exception,
 
     @param alert_admin: wethever to send the exception to the administrator via
         email. Note this parameter is bypassed when
-                CFG_SITE_ADMIN_EMAIL_EXCEPTIONS is set to a value different than 1
+               CFG_SITE_ADMIN_EMAIL_EXCEPTIONS is set to a value different than 1
     @param subject: overrides the email subject
 
     @return: 1 if successfully wrote to stream, 0 if not
@@ -506,8 +502,8 @@ def send_error_report_to_admin(header, url, time_msg,
     Sends an email to the admin with client info and tracestack
     """
     from_addr = '%s Alert Engine <%s>' % (
-        CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-    to_addr = CFG_SITE_ADMIN_EMAIL
+        cfg['CFG_SITE_NAME'], cfg['CFG_WEBALERT_ALERT_ENGINE_EMAIL'])
+    to_addr = cfg['CFG_SITE_ADMIN_EMAIL']
     body = """
 The following error was seen by a user and sent to you.
 %(contact)s
@@ -531,10 +527,10 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % {
         'error': error,
         'sys_error': sys_error,
         'traceback': traceback_msg,
-        'logdir': CFG_LOGDIR,
+        'logdir': cfg['CFG_LOGDIR'],
         'contact': "Please contact %s quoting the following information:" %
-            (CFG_SITE_SUPPORT_EMAIL, )}
-    from invenio.mailutils import send_email
+            (cfg['CFG_SITE_SUPPORT_EMAIL'], )}
+    from invenio.ext.email import send_email
     send_email(from_addr, to_addr, subject="Error notification", content=body)
 
 def _get_filename_and_line(exc_info):

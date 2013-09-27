@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_NAME
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 from invenio.webuser import \
      create_userinfobox_body, \
      create_useractivities_menu, \

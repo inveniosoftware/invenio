@@ -15,23 +15,13 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = template_context_functions
-
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
-    webtag_blueprint.py \
-    webtag_config.py \
-    webtag_forms.py \
-    webtag_model.py \
     webtag_regression_tests.py \
-    webtag_unit_tests.py \
-    webtag_user_settings.py \
-    webtag_validators.py
+    webtag_unit_tests.py
 
 jsdir=$(localstatedir)/www/js
-
-js_DATA = webtag_editor.js
 
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)

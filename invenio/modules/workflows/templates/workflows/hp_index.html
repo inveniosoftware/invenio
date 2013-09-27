@@ -1,18 +1,18 @@
-{% extends "bibworkflow_hp_layout.html" %}
+{% extends "workflows/hp_layout.html" %}
 {% block body2 %}
-    
+
 {%- js 'js/jquery.dataTables.min.js' -%}
-{%- js 'js/DT_bootstrap.js' -%}
-{%- js 'js/bibworkflow_hp_index.js' -%}
+{%- js url_for('workflows.static', filename='js/workflows/DT_bootstrap.js') -%}
+{%- js url_for('workflows.static', filename='js/workflows/hp_index.js') -%}
 
     <style type="text/css" title="currentStyle">
-        @import "../../css/DT_bootstrap.css";
+      @import "{{ url_for('workflows.static', filename='css/workflows/DT_bootstrap.css') }}";
     </style>
 
     <h1>Records in Holding Pen</h1>
 
     <button id="refresh_button" class="btn btn-primary pull-right">Refresh!</button>
-    
+
     <div class="container">
         <div class="row-fluid">
             <table id="example" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">

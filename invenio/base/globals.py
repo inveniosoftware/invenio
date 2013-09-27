@@ -17,22 +17,24 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebTag Forms"""
+"""
+    invenio.base.globals
 
-from invenio.webtag_config import \
-    CFG_WEBTAG_LAST_MYSQL_CHARACTER
+    Defines additional global objects available in template context.
+"""
 
-from invenio.webtag_config import \
-    CFG_WEBTAG_NAME_MAX_LENGTH
+from flask import current_app, request
+from werkzeug.local import LocalProxy
 
-from invenio.webinterface_handler_flask_utils import _
 
-from invenio.wtforms_utils import InvenioBaseForm
-from invenio.webuser_flask import current_user
+def _lookup_current_function():
+    return current_app.view_functions.get(request.endpoint)
 
-from wtforms import IntegerField, HiddenField, TextField, validators
 
-# Models
-from invenio.sqlalchemyutils import db
-from invenio.webtag_model import WtgTAG, wash_tag_silent, wash_tag_blocking
+def _lookup_current_blueprint():
+    return current_app.blueprints.get(request.blueprint, None)
 
+# context data
+current_function = LocalProxy(_lookup_current_function)
+current_blueprint = LocalProxy(_lookup_current_blueprint)
+cfg = LocalProxy(lambda: current_app.config)

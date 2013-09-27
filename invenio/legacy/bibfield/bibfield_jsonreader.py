@@ -23,9 +23,7 @@ BibField Json Reader
 
 __revision__ = "$Id$"
 
-import os
 import re
-
 import sys
 if sys.version_info < (2,5):
     def all(list):
@@ -39,14 +37,13 @@ if sys.version_info < (2,5):
                 return True
         return False
 
-from invenio.config import CFG_PYLIBDIR
-from invenio.pluginutils import PluginContainer
+from werkzeug import cached_property
 
 from invenio.bibfield_utils import BibFieldDict, \
                                    InvenioBibFieldContinuableError, \
                                    InvenioBibFieldError
-from invenio.bibfield_config import config_rules
-
+from invenio.core.record.definitions import field_definitions
+from invenio.base.utils import import_submodules_from_packages
 
 class JsonReader(BibFieldDict):
     """
@@ -80,6 +77,13 @@ class JsonReader(BibFieldDict):
             self.is_init_phase = False
         else:
             self['__master_format'] = 'json'
+
+    @cached_property
+    def producers(self):
+        def _produce(module):
+            return module.__name__.split('.')[-1], module.produce
+        return dict(map(
+            _produce, import_submodules_from_packages('recordext.producers')))
 
     @staticmethod
     def split_blob(blob, schema):
@@ -130,10 +134,10 @@ class JsonReader(BibFieldDict):
 
         for key in self.keys():
             try:
-                check_rules(config_rules[key]['checker'], key)
+                check_rules(field_definitions[key]['checker'], key)
             except TypeError:
-                for kkey in config_rules[key]:
-                    check_rules(config_rules[kkey]['checker'], kkey)
+                for kkey in field_definitions[key]:
+                    check_rules(field_definitions[kkey]['checker'], kkey)
             except KeyError:
                 continue
 
@@ -154,13 +158,13 @@ class JsonReader(BibFieldDict):
         """
         from collections import Iterable
         def encode_for_marcxml(value):
-            from invenio.textutils import encode_for_xml
+            from invenio.utils.text import encode_for_xml
             if isinstance(value, unicode):
                 value = value.encode('utf8')
             return encode_for_xml(str(value))
 
         export = '<record>'
-        marc_dicts = self.produce_json_for_marc()
+        marc_dicts = self.producers['marc'](self)
         for marc_dict in marc_dicts:
             content = ''
             tag = ''
@@ -200,7 +204,7 @@ class JsonReader(BibFieldDict):
 
         #CHECK: it might be a bit overkilling
         """
-        from invenio.bibrecord import create_record
+        from invenio.legacy.bibrecord import create_record
         return create_record(self.legacy_export_as_marc())[0]
 
     def _prepare_blob(self):
@@ -229,8 +233,8 @@ class JsonReader(BibFieldDict):
         else:
             #TODO: allow a list of doctypes and get the union of them
             # fields = doctype_definition[blob.doctype]['fields']
-            # Now just getting all the possible field from config_rules
-            fields = dict(zip(config_rules.keys(), config_rules.keys()))
+            # Now just getting all the possible field from field_definitions
+            fields = dict(zip(field_definitions.keys(), field_definitions.keys()))
             for json_id, field_name in fields.iteritems():
                 self._unpack_rule(json_id, field_name)
 
@@ -243,7 +247,7 @@ class JsonReader(BibFieldDict):
         if not field_name:
             field_name = json_id
 
-        rule_def = config_rules[json_id]
+        rule_def = field_definitions[json_id]
 
         if isinstance(rule_def, list):  # Undo the workaround for [0] and [n]
             return all([self._unpack_rule(json_id_rule) for json_id_rule in rule_def])
@@ -353,10 +357,6 @@ class JsonReader(BibFieldDict):
                             remove_none_values(element)
         remove_none_values(self.rec_json)
 
-
-
-for key, value in PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibfield_functions', 'produce_json_for_*.py')).iteritems():
-    setattr(JsonReader, key, value)
 
 ## Compulsory plugin interface
 readers = JsonReader

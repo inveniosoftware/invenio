@@ -46,12 +46,12 @@ import urllib
 CFG_HEPNAMES_EMAIL = 'authors@inspirehep.net'
 MAX_ITEM_BEFORE_COLLAPSE = 10
 
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 from invenio.intbitset import intbitset
 
 from invenio.search_engine import perform_request_search
-from invenio.urlutils import create_html_link
+from invenio.utils.url import create_html_link
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")

@@ -15,8 +15,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibreformat
+bin_SCRIPTS =
 
-EXTRA_DIST = bibreformat.in
+EXTRA_DIST =
 
 CLEANFILES = *~ *.tmp 

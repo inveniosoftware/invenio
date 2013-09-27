@@ -25,7 +25,7 @@ providers.
 __revision__ = \
     "$Id$"
 
-from invenio.containerutils import get_substructure
+from invenio.utils.container import get_substructure
 from invenio.dbquery import run_sql
 from invenio.external_authentication import ExternalAuth
 

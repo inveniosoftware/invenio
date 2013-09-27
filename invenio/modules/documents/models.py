@@ -22,10 +22,10 @@ BibDoc Filesystem database model.
 """
 
 # General imports.
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 # Create your models here.
-from invenio.bibedit_model import Bibdoc
+from invenio.modules.record_editor.models import Bibdoc
 
 
 class Bibdocfsinfo(db.Model):

@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from werkzeug.utils import import_string
-from invenio.datastructures import LaziestDict
+from invenio.utils.datastructures import LaziestDict
 
 CFG_BIBFIELD_TYPES = LaziestDict(lambda key: import_string('invenio.bibfield_functions.%s:%s' % (key, key)))
 

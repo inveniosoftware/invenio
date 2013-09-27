@@ -17,17 +17,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.webdeposit_load_forms import forms
-from invenio.webdeposit_models import DepositionType
-from invenio.webdeposit_workflow_tasks import render_form
+from invenio.modules.deposit import forms
+from invenio.modules.deposit.models import DepositionType
+from invenio.modules.deposit.tasks import render_form
 
 __all__ = ['Preprint']
 
-PreprintForm = forms['PreprintForm']
-
 
 class Preprint(DepositionType):
-    workflow = [render_form(PreprintForm), ]
+    workflow = [render_form(forms.PreprintForm), ]
     name = "Preprint"
     name_plural = "Preprints"
     group = "Articles & Preprints"

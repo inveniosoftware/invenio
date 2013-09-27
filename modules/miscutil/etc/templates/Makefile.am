@@ -16,12 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = admin_base.html \
-                 mail_html.tpl \
-                 mail_text.tpl \
-                 invenio-apache-vhost.tpl \
-                 invenio-apache-vhost.conf.tpl \
-                 invenio-apache-vhost-ssl.conf.tpl
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

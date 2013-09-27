@@ -19,7 +19,7 @@
 Forward to ArXiv.org source code
 '''
 
-from invenio.bibformat_dblayer import get_tag_from_name
+from invenio.modules.formatter.api import get_tag_from_name
 
 #Maximal time to keep the stored XML Service doucment before reloading it in sec
 CFG_BIBSWORD_SERVICEDOCUMENT_UPDATE_TIME = 3600

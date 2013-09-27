@@ -32,7 +32,7 @@ case something goes wrong.
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
-from invenio.textutils import wrap_text_in_a_box
+from invenio.utils.text import wrap_text_in_a_box
 import sys
 
 def migrate_passwords():

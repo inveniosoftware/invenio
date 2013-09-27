@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-##
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,26 +16,43 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-webmessage config file, here you can manage error messages, size of messages,
-quotas, and some db related fields...
+    WebMessage parameters
+
+    webmessage config file, here you can manage error messages,
+    size of messages, quotas, and some db related fields...
 """
 
-__revision__ = "$Id$"
+# from invenio.conf:
+
+## CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE -- how large web messages do we
+## allow?
+CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE = 20000
+
+## CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES -- how many messages for a
+## regular user do we allow in its inbox?
+CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES = 30
+
+## CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS -- how many days before
+## we delete orphaned messages?
+CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS = 60
+
+# from webmessage_
 
 # status of message (table user_msgMESSAGE)
 CFG_WEBMESSAGE_STATUS_CODE = \
-{
-    'NEW': 'N',
-    'READ': 'R',
-    'REMINDER': 'M'
-}
+    {
+        'NEW': 'N',
+        'READ': 'R',
+        'REMINDER': 'M'
+    }
 # values indicating which results field to display while writing a message
+# TODO: used only in 'master' files
 CFG_WEBMESSAGE_RESULTS_FIELD = \
-{
-    'USER': 'user',
-    'GROUP': 'group',
-    'NONE': 'none'
-}
+    {
+        'USER': 'user',
+        'GROUP': 'group',
+        'NONE': 'none'
+    }
 
 # separator used in every list of recipients
 CFG_WEBMESSAGE_SEPARATOR = ','
@@ -47,13 +62,3 @@ CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA = ['superadmin']
 
 # alert user also by email
 CFG_WEBMESSAGE_EMAIL_ALERT = True
-
-# Exceptions: errors
-class InvenioWebMessageError(Exception):
-    """A generic error for WebMessage."""
-    def __init__(self, message):
-        """Initialisation."""
-        self.message = message
-    def __str__(self):
-        """String representation."""
-        return repr(self.message)

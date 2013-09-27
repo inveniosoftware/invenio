@@ -26,8 +26,8 @@ from warnings import warn
 
 from invenio.bibclassify_unit_tests import BibClassifyTestCase
 from invenio.config import CFG_SITE_URL
-from invenio.importutils import lazy_import
-from invenio.testutils import make_test_suite, run_test_suite, \
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, \
     test_web_page_content
 
 bconfig = lazy_import('invenio.bibclassify_config')

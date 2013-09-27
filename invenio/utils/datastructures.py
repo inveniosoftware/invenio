@@ -24,26 +24,19 @@ class LazyDict(object):
     """
     Lazy dictionary that evaluates its content when it is first accessed.
 
-    Example os use:
+    Example of use:
 
-    def bfe_discover():
-        import types
-        from invenio.importutils import autodiscover_modules
-        modules = autodiscover_modules(['invenio.bibformat_elements'], 'bfe_.+')
-        bfes= {}
-        for m in modules:
-            register_func = getattr(m, 'format_element', None)
-            if register_func and isinstance(register_func, types.FunctionType):
-                bfes[m.__name__.split('.')[-1]] = register_func
-        return bfes
+    def my_dict():
+        from werkzeug.utils import import_string
+        return {'foo': import_string('foo')}
 
-    lazy_dict = LazyDict(bfe_discover)
+    lazy_dict = LazyDict(my_dict)
     # at this point the internal dictionary is empty
-    lazy_dict['bfe_webjournal_imprint']
+    lazy_dict['foo']
     """
     def __init__(self, function=dict):
         """
-        @param function: it must return a dictionary like structure
+        :param function: it must return a dictionary like structure
         """
         super(LazyDict, self).__init__()
         self._cached_dict = None

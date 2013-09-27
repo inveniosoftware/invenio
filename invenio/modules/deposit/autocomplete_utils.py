@@ -19,7 +19,6 @@
 
 from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.orcid import OrcidSearch
-from invenio.bibknowledge import get_kb_mappings
 
 
 def kb_autocomplete(name, mapper=None):
@@ -31,6 +30,7 @@ def kb_autocomplete(name, mapper=None):
                    autocomplete entry.
     """
     def inner(dummy_form, dummy_field, term, limit=50):
+        from invenio.bibknowledge import get_kb_mappings
         result = get_kb_mappings(name, '', term)[:limit]
         return map(mapper, result) if mapper is not None else result
     return inner

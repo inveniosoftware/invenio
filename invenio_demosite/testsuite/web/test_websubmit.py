@@ -20,7 +20,7 @@
 """WebSubmit module web tests."""
 
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.testutils import make_test_suite, \
+from invenio.testsuite import make_test_suite, \
                               run_test_suite, \
                               InvenioWebTestCase
 

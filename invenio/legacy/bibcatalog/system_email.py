@@ -28,7 +28,7 @@ from time import mktime
 import invenio.webuser
 from invenio.shellutils import escape_shell_arg
 from invenio.bibcatalog_system import BibCatalogSystem
-from invenio.mailutils import send_email
+from invenio.ext.email import send_email
 from invenio.errorlib import register_exception
 
 EMAIL_SUBMIT_CONFIGURED = False

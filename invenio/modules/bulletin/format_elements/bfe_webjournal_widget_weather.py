@@ -40,7 +40,7 @@ from invenio.config import \
 from invenio.errorlib import register_exception
 from invenio.webjournal_utils import \
      parse_url_string, WEBJOURNAL_OPENER
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 re_image_pattern = re.compile(r'<img\s*(class=["\']imageScale["\'])*?\s*src="(?P<image>\S*)"\s*/>',
                               re.DOTALL | re.IGNORECASE | re.VERBOSE)

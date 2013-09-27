@@ -38,7 +38,7 @@ try:
     from invenio.bibdocfile import BibDoc
     from invenio.bibsched import gc_tasks
     from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
-    from invenio.dateutils import convert_datestruct_to_datetext
+    from invenio.utils.date import convert_datestruct_to_datetext
 except ImportError, e:
     print "Error: %s" % (e,)
     sys.exit(1)

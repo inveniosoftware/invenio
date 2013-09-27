@@ -128,7 +128,7 @@ def register_hr_redirections():
     Run this only once
     """
 
-    from invenio.goto_engine import register_redirection
+    from invenio.modules.redirector.api import register_redirection
     plugin = 'goto_plugin_cern_hr_documents'
 
     ## Staff rules and regulations

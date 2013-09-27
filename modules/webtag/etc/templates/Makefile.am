@@ -16,20 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 templatesdir = $(sysconfdir)/templates
-templates_DATA = webtag_display.html \
-                 webtag_display_base.html \
-                 webtag_display_cloud.html \
-                 webtag_display_cloud_base.html \
-                 webtag_display_list.html \
-                 webtag_display_list_base.html \
-                 webtag_create.html \
-                 webtag_create_base.html \
-                 webtag_editor.html \
-                 webtag_editor_base.html \
-                 webtag_record.html \
-                 webtag_record_base.html \
-                 webtag_user_settings.html \
-                 webtag_user_settings_base.html
+templates_DATA =
 
 EXTRA_DIST = $(templates_DATA)
 

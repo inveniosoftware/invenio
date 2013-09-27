@@ -21,21 +21,15 @@
 
 from flask import Blueprint, session, make_response, g, render_template, \
                   request, flash, jsonify, redirect, url_for, current_app
-from invenio.websession_model import User, Usergroup, UserUsergroup
-from invenio.webinterface_handler_flask_utils import _
-
-from invenio.webmessage_config import CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
-                                      CFG_WEBMESSAGE_STATUS_CODE, \
-                                      CFG_WEBMESSAGE_SEPARATOR, \
-                                      CFG_WEBMESSAGE_EMAIL_ALERT
-
-from invenio.sqlalchemyutils import db
-from invenio.jinja2utils import render_template_to_string
-from invenio.settings import Settings, UserSettingsStorage, \
+from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
+from invenio.base.i18n import _
+from invenio.ext.sqlalchemy import db
+from invenio.ext.template import render_template_to_string
+from invenio.modules.dashboard.settings import Settings, UserSettingsStorage, \
                              ModelSettingsStorageBuilder
-from invenio.webmessage_model import MsgMESSAGE, UserMsgMESSAGE
+from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
 from invenio.webmessage_forms import WebMessageUserSettingsForm
-from invenio.webuser_flask import current_user
+from flask.ext.login import current_user
 
 class WebMessageSettings(Settings):
 
@@ -48,8 +42,7 @@ class WebMessageSettings(Settings):
         self.icon = 'envelope'
         self.title = _('Messages')
         self.view = url_for('webmessage.index')
-        if True or CFG_WEBMESSAGE_EMAIL_ALERT:
-            self.edit = url_for('webaccount.edit', name=self.name)
+        self.edit = url_for('webaccount.edit', name=self.name)
 
     def commit(self):
         pass
@@ -59,7 +52,8 @@ class WebMessageSettings(Settings):
         unread = db.session.query(db.func.count(UserMsgMESSAGE.id_msgMESSAGE)).\
             filter(db.and_(
                 UserMsgMESSAGE.id_user_to == uid,
-                UserMsgMESSAGE.status == CFG_WEBMESSAGE_STATUS_CODE['NEW']
+                UserMsgMESSAGE.status == current_app.config[
+                    'CFG_WEBMESSAGE_STATUS_CODE']['NEW']
             )).scalar()
 
         total = db.session.query(db.func.count(UserMsgMESSAGE.id_msgMESSAGE)).\
