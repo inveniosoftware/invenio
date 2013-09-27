@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -93,8 +93,8 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
     #if old_versions:
         #versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/CFG_SITE_RECORD/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
-    out = []
     if main_urls:
+        out = []
         main_urls_keys = sort_alphanumerically(main_urls.keys())
         for descr in main_urls_keys:
             urls = main_urls[descr]
