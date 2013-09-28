@@ -446,7 +446,7 @@ def interface(req,
             if filename != "":
                 fp = open(os.path.join(dir_to_open, filename), "w")
                 while True:
-                    buf = formfields.file.read(10240)
+                    buf = formfields.read(10240)
                     if buf:
                         fp.write(buf)
                     else:
