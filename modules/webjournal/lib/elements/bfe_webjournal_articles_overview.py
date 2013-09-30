@@ -23,7 +23,7 @@ certain category in one specific issue.
 """
 import re
 import os
-import urllib
+import urllib, urllib2
 try:
     from PIL import Image
     PIL_imported = True
@@ -221,8 +221,14 @@ def format_element(bfo, number_of_featured_articles="1",
                                 local_img = local_img[0:100] + '_' + local_img[156:]
                             if not os.path.exists(local_img):
                                 # Too bad, must download entire image for PIL
-                                (local_img, headers) = urllib.urlretrieve(img, local_img)
-                            img_file = Image.open(local_img)
+                                content_type = get_content_type(img)
+                                if 'image' in content_type:
+                                    (local_img, headers) = urllib.urlretrieve(img, local_img)
+                                    img_file = Image.open(local_img) # IOError if not readable image
+                                else:
+                                    raise IOError('Not an image')
+                            else:
+                                img_file = Image.open(local_img) # IOError if not readable image
                         except IOError, e:
                             pass
                         else:
@@ -464,3 +470,19 @@ def _get_feature_text(record, language):
 
     return header_text
 
+def get_content_type(url):
+    """
+    Returns the content-type of the given URL.
+    Return empty string if content-type could not be resolved
+
+    @param url: URL for which we would like to get the content-type
+    @type url: string
+    @return: the content-type of the given URL
+    @rtype: string
+    """
+    req = urllib2.Request(url)
+    try:
+        response = urllib2.urlopen(req)
+        return response.info().getheader('content-type')
+    except Exception, e:
+        return ''
