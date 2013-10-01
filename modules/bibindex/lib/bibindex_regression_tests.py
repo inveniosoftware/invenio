@@ -41,7 +41,8 @@ from invenio.bibindex_engine_utils import get_index_id_from_index_name, \
     get_tag_indexes, \
     get_all_indexes, \
     make_prefix
-from invenio.bibindex_engine_config import CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
+from invenio.bibindex_engine_config import \
+    CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
     CFG_BIBINDEX_INDEX_TABLE_TYPE, \
     CFG_BIBINDEX_UPDATE_MESSAGE
 from invenio.bibtask import task_low_level_submission
@@ -51,8 +52,8 @@ from invenio.dbquery import run_sql, deserialize_via_marshal
 from invenio.intbitset import intbitset
 from invenio.search_engine import get_record
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibauthority_engine import (get_index_strings_by_control_no,
-                                         get_control_nos_from_recID)
+from invenio.bibauthority_engine import get_index_strings_by_control_no, \
+    get_control_nos_from_recID
 from invenio.bibindex_engine_utils import run_sql_drop_silently
 
 from invenio.bibupload import bibupload, xml_marc_to_records

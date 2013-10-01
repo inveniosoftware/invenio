@@ -36,7 +36,6 @@ from invenio.config import CFG_SOLR_URL
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
      CFG_MYSQL_THREAD_TIMEOUT, \
      CFG_CHECK_MYSQL_THREADS, \
-     CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR, \
      CFG_BIBINDEX_INDEX_TABLE_TYPE, \
      CFG_BIBINDEX_ADDING_RECORDS_STARTED_STR, \
      CFG_BIBINDEX_UPDATE_MESSAGE, \
@@ -48,9 +47,6 @@ from invenio.bibauthority_config import \
      CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC
 from invenio.bibauthority_engine import get_index_strings_by_control_no, \
      get_control_nos_from_recID
-from invenio.bibindexadminlib import get_idx_remove_html_markup, \
-                                     get_idx_remove_latex_markup, \
-                                     get_idx_remove_stopwords
 from invenio.bibdocfile import BibRecDocs
 from invenio.search_engine import perform_request_search, \
      get_index_stemming_language, \
@@ -81,6 +77,10 @@ from invenio.bibindex_engine_utils import load_tokenizers, \
     run_sql_drop_silently, \
     get_min_last_updated, \
     remove_inexistent_indexes, \
+    get_all_synonym_knowledge_bases, \
+    get_index_remove_stopwords, \
+    get_index_remove_html_markup, \
+    get_index_remove_latex_markup, \
     filter_for_virtual_indexes, \
     get_records_range_for_index, \
     make_prefix, \
@@ -126,6 +126,7 @@ def list_unique(_list):
     for e in _list:
         _dict[e] = 1
     return _dict.keys()
+
 
 ## safety function for killing slow DB threads:
 def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS,
@@ -315,60 +316,8 @@ def get_field_indexes(field):
         #future implemeptation for fields
         return []
 
+
 get_field_indexes_memoised = Memoise(get_field_indexes)
-
-
-def get_all_synonym_knowledge_bases():
-    """
-        Returns a dictionary of name key and knowledge base name
-        and match type tuple value information of all defined words indexes
-        that have knowledge base information.
-        Returns empty dictionary in case there are no tags indexed.
-        Example: output['global'] = ('INDEX-SYNONYM-TITLE', 'exact'),
-                 output['title'] = ('INDEX-SYNONYM-TITLE', 'exact').
-    """
-    res = get_all_index_names_and_column_values("synonym_kbrs")
-    out = {}
-    for row in res:
-        kb_data = row[1]
-        # ignore empty strings
-        if len(kb_data):
-            out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
-    return out
-
-
-def get_index_remove_stopwords(index_id):
-    """Returns value of a remove_stopword field from idxINDEX database table
-       if it's not 'No'. If it's 'No' returns False.
-       Just for consistency with WordTable.
-       @param index_id: id of the index
-    """
-    result = get_idx_remove_stopwords(index_id)
-    if isinstance(result, tuple):
-        return False
-    if result == 'No' or result == '':
-        return False
-    return result
-
-
-def get_index_remove_html_markup(index_id):
-    """ Gets remove_html_markup parameter from database ('Yes' or 'No') and
-        changes it  to True, False.
-        Just for consistency with WordTable."""
-    result = get_idx_remove_html_markup(index_id)
-    if result == 'Yes':
-        return True
-    return False
-
-
-def get_index_remove_latex_markup(index_id):
-    """ Gets remove_latex_markup parameter from database ('Yes' or 'No') and
-        changes it  to True, False.
-        Just for consistency with WordTable."""
-    result = get_idx_remove_latex_markup(index_id)
-    if result == 'Yes':
-        return True
-    return False
 
 
 def get_index_tokenizer(index_id):

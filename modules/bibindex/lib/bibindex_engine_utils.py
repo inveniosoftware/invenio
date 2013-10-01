@@ -34,7 +34,8 @@ from invenio.config import \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS
 from invenio.pluginutils import PluginContainer
-from invenio.bibindex_engine_config import CFG_BIBINDEX_TOKENIZERS_PATH
+from invenio.bibindex_engine_config import CFG_BIBINDEX_TOKENIZERS_PATH, \
+    CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR
 
 
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
@@ -60,7 +61,6 @@ def load_tokenizers():
     return PluginContainer(os.path.join(CFG_BIBINDEX_TOKENIZERS_PATH, 'BibIndex*.py'))
 
 
-
 def get_all_index_names_and_column_values(column_name):
     """Returns a list of tuples of name and another column of all defined words indexes.
        Returns empty list in case there are no tags indexed in this index or in case
@@ -76,6 +76,61 @@ def get_all_index_names_and_column_values(column_name):
         write_message("Exception caught for SQL statement: %s; column %s might not exist" % (query, column_name), sys.stderr)
     return out
 
+
+def get_all_synonym_knowledge_bases():
+    """Returns a dictionary of name key and knowledge base name and match type tuple value
+        information of all defined words indexes that have knowledge base information.
+        Returns empty dictionary in case there are no tags indexed.
+        Example: output['global'] = ('INDEX-SYNONYM-TITLE', 'exact'), output['title'] = ('INDEX-SYNONYM-TITLE', 'exact')."""
+    res = get_all_index_names_and_column_values("synonym_kbrs")
+    out = {}
+    for row in res:
+        kb_data = row[1]
+        # ignore empty strings
+        if len(kb_data):
+            out[row[0]] = tuple(kb_data.split(CFG_BIBINDEX_COLUMN_VALUE_SEPARATOR))
+    return out
+
+
+def get_index_remove_stopwords(index_id):
+    """Returns value of a remove_stopword field from idxINDEX database table
+       if it's not 'No'. If it's 'No' returns False.
+       Just for consistency with WordTable.
+       @param index_id: id of the index
+    """
+    try:
+        result = run_sql("SELECT remove_stopwords FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+    except:
+        return False
+    if result == 'No' or result == '':
+        return False
+    return result
+
+
+def get_index_remove_html_markup(index_id):
+    """ Gets remove_html_markup parameter from database ('Yes' or 'No') and
+        changes it  to True, False.
+        Just for consistency with WordTable."""
+    try:
+        result = run_sql("SELECT remove_html_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+    except:
+        return False
+    if result == 'Yes':
+        return True
+    return False
+
+
+def get_index_remove_latex_markup(index_id):
+    """ Gets remove_latex_markup parameter from database ('Yes' or 'No') and
+        changes it  to True, False.
+        Just for consistency with WordTable."""
+    try:
+        result = run_sql("SELECT remove_latex_markup FROM idxINDEX WHERE ID=%s", (index_id, ))[0][0]
+    except:
+        return False
+    if result == 'Yes':
+        return True
+    return False
 
 
 def author_name_requires_phrase_search(p):
