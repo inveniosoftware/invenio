@@ -27,7 +27,7 @@ from invenio.testutils import InvenioTestCase
 from invenio.plotextractor import get_defaults
 from invenio.plotextractor_output_utils import remove_dups, get_converted_image_name
 
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL
+from invenio.config import CFG_TMPSHAREDDIR, CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.shellutils import run_shell_command
 
@@ -35,17 +35,17 @@ class GetDefaultsTest(InvenioTestCase):
     """Test function to get default values."""
     def setUp(self):
         self.arXiv_id = "arXiv:astro-ph_0104076"
-        self.tarball = "%s/2001/04/arXiv:astro-ph_0104076/arXiv:astro-ph_0104076" % (CFG_TMPDIR,)
+        self.tarball = "%s/2001/04/arXiv:astro-ph_0104076/arXiv:astro-ph_0104076" % (CFG_TMPSHAREDDIR,)
 
     def test_get_defaults(self):
         """plotextractor - get defaults"""
-        sdir_should_be = os.path.join(CFG_TMPDIR, self.arXiv_id + '_plots')
+        sdir_should_be = os.path.join(CFG_TMPSHAREDDIR, self.arXiv_id + '_plots')
         refno_should_be = "15" # Note: For ATLANTIS DEMO site
         sdir, refno = get_defaults(tarball=self.tarball, sdir=None, refno_url=CFG_SITE_URL)
         if sdir != None:
             run_shell_command("rm -rf %s" % (sdir,))
         self.assertTrue(sdir == sdir_should_be, \
-                         "didn\'t get correct default scratch dir")
+                         "didn\'t get correct default scratch dir: expected %s found %s" % (sdir_should_be, sdir))
         self.assertTrue(refno == refno_should_be, \
                          'didn\'t get correct default reference number')
 
