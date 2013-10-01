@@ -22,16 +22,18 @@
 import json
 import string
 import functools
+import cStringIO
 from math import ceil
 from flask import make_response, g, request, flash, jsonify, \
-    redirect, url_for, current_app, abort
+    redirect, url_for, current_app, abort, session
 
 from invenio import bibindex_model as BibIndex
 from invenio import websearch_receivers
 from invenio.bibindex_engine import get_index_id_from_index_name
 from invenio.bibformat import get_output_format_content_type, print_records
 from invenio.cache import cache
-from invenio.config import CFG_WEBSEARCH_RSS_TTL
+from invenio.config import CFG_WEBSEARCH_RSS_TTL, \
+    CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT
 from invenio.websearch_cache import \
     get_search_query_id, get_collection_name_from_cache
 from invenio.access_control_engine import acc_authorize_action
@@ -50,7 +52,7 @@ from invenio.websearch_facet_builders import \
 from invenio.search_engine import get_creation_date, perform_request_search,\
     print_record, create_nearest_terms_box, browse_pattern_phrases
 from invenio.paginationutils import Pagination
-
+    
 blueprint = InvenioBlueprint('search', __name__, url_prefix="",
                              config='invenio.search_engine_config',
                              breadcrumbs=[],
@@ -373,6 +375,19 @@ def search(collection, p, of, so, rm):
     #if so or rm:
     if len(of)>0 and of[0] == 'h':
         recids.reverse()
+
+    # back-to-search related code
+    if request and not isinstance(request.get_legacy_request(), cStringIO.OutputType):
+        # store the last search results page
+        session['websearch-last-query'] = request.get_legacy_request().unparsed_uri
+        if len(recids) > CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
+            last_query_hits = None
+        else:
+            last_query_hits = recids
+        # store list of results if user wants to display hits
+        # in a single list, or store list of collections of records
+        # if user displays hits split by collections:
+        session["websearch-last-query-hits"] = last_query_hits
 
     ctx = dict(facets=FACETS.config(collection=collection, qid=qid),
                records=len(get_current_user_records_that_can_be_displayed(qid)),

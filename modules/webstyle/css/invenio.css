@@ -3980,4 +3980,14 @@ img.login_button_big {
 img.login_button_small {
     border-radius: 2px;
 }
+
+.outof {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.linksbox {
+  text-align: right;
+}
+
 /* end of invenio.css */
