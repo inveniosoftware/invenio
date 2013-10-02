@@ -795,7 +795,7 @@ def pre_check_bibsched():
     is_manual = False
     is_0_running = False
     for line in (output + error).splitlines():
-        if 'BibSched queue running mode: MANUAL' in line:
+        if 'BibSched daemon status: DOWN' in line:
             is_manual = True
         if 'Running processes: 0' in line:
             is_0_running = True
