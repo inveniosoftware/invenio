@@ -94,7 +94,7 @@ from invenio.search_engine_config import \
      CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH, \
      CFG_SEARCH_RESULTS_CACHE_PREFIX
 from invenio.search_engine_utils import get_fieldvalues, get_fieldvalues_alephseq_like
-from invenio.bibrecord import create_record
+from invenio.bibrecord import create_record, record_xml_output
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -4245,13 +4245,23 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
             # print records
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
 
-            format_records(recIDs_to_print,
-                           format,
-                           ln=ln,
-                           search_pattern=search_pattern,
-                           record_separator="\n",
-                           user_info=user_info,
-                           req=req)
+            if ot:
+                # asked to print some filtered fields only, so call print_record() on the fly:
+                for irec in range(irec_max, irec_min, -1):
+                    x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
+                                    user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                    req.write(x)
+                    if x:
+                        req.write('\n')
+            else:
+                format_records(recIDs_to_print,
+                               format,
+                               ln=ln,
+                               search_pattern=search_pattern,
+                               record_separator="\n",
+                               user_info=user_info,
+                               req=req)
+
             # print footer if needed
             if print_records_epilogue_p:
                 print_records_epilogue(req, format)
@@ -4670,11 +4680,19 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         # look for detailed format existence:
         query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
         res = run_sql(query, (recID, format), 1)
-        if res and record_exist_p == 1:
-            # record 'recID' is formatted in 'format', so print it
+        if res and record_exist_p == 1 and not ot:
+            # record 'recID' is formatted in 'format', and we are not
+            # asking for field-filtered output; so print it:
             out += "%s" % decompress(res[0][0])
+        elif ot:
+            # field-filtered output was asked for; print only some fields
+            if not can_see_hidden:
+                ot = list(set(ot) - set(CFG_BIBFORMAT_HIDDEN_TAGS))
+            out += record_xml_output(get_record(recID), ot)
         else:
-            # record 'recID' is not formatted in 'format' -- they are not in "bibfmt" table; so fetch all the data from "bibXXx" tables:
+            # record 'recID' is not formatted in 'format' or we ask
+            # for field-filtered output -- they are not in "bibfmt"
+            # table; so fetch all the data from "bibXXx" tables:
             if format == "marcxml":
                 out += """    <record xmlns="http://www.loc.gov/MARC21/slim">\n"""
                 out += "        <controlfield tag=\"001\">%d</controlfield>\n" % int(recID)

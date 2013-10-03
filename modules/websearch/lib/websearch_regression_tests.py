@@ -1127,13 +1127,13 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
                          perform_request_search(p='ellis'))
 
-    def test_search_engine_web_api_ignore_paging_parameter(self):
+    def test_search_engine_python_api_ignore_paging_parameter(self):
         """websearch - search engine Python API for successful query, ignore paging parameters"""
         from invenio.search_engine import perform_request_search
         self.assertEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47],
                          perform_request_search(p='ellis', rg=5, jrec=3))
 
-    def test_search_engine_web_api_respect_sorting_parameter(self):
+    def test_search_engine_python_api_respect_sorting_parameter(self):
         """websearch - search engine Python API for successful query, respect sorting parameters"""
         from invenio.search_engine import perform_request_search
         self.assertEqual([77, 84, 85],
@@ -1141,7 +1141,7 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
         self.assertEqual([77, 85, 84],
                          perform_request_search(p='klebanov', sf='909C4v'))
 
-    def test_search_engine_web_api_respect_ranking_parameter(self):
+    def test_search_engine_python_api_respect_ranking_parameter(self):
         """websearch - search engine Python API for successful query, respect ranking parameters"""
         from invenio.search_engine import perform_request_search
         self.assertEqual([77, 84, 85],
@@ -1179,10 +1179,138 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
         self.assertEqual([82, 83, 87, 89],
                 perform_request_search(p='recid:81', rm='citation'))
 
-    def test_search_engine_python_api_textmarc(self):
-        """websearch - search engine Python API for Text MARC output"""
+    def test_search_engine_python_api_textmarc_full(self):
+        """websearch - search engine Python API for Text MARC output, full"""
         from invenio.search_engine import perform_request_search
-        # we are testing example from /help/hacking/search-engine-api
+        from invenio.search_engine_utils import get_fieldvalues
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='tm')
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+000000107 001__ 107
+000000107 003__ SzGeCERN
+000000107 005__ %(rec_107_rev)s
+000000107 035__ $$9SPIRES$$a4066995
+000000107 037__ $$aCERN-EP-99-060
+000000107 041__ $$aeng
+000000107 084__ $$2CERN Library$$aEP-1999-060
+000000107 088__ $$9SCAN-9910048
+000000107 088__ $$aCERN-L3-175
+000000107 110__ $$aCERN. Geneva
+000000107 245__ $$aLimits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$
+000000107 260__ $$c1999
+000000107 269__ $$aGeneva$$bCERN$$c26 Apr 1999
+000000107 300__ $$a18 p
+000000107 490__ $$aALEPH Papers
+000000107 500__ $$aPreprint not submitted to publication
+000000107 65017 $$2SzGeCERN$$aParticle Physics - Experiment
+000000107 690C_ $$aCERN
+000000107 690C_ $$aPREPRINT
+000000107 693__ $$aCERN LEP$$eALEPH
+000000107 693__ $$aCERN LEP$$eDELPHI
+000000107 693__ $$aCERN LEP$$eL3
+000000107 693__ $$aCERN LEP$$eOPAL
+000000107 695__ $$9MEDLINE$$asearches Higgs bosons
+000000107 697C_ $$aLexiHiggs
+000000107 710__ $$5EP
+000000107 710__ $$gALEPH Collaboration
+000000107 710__ $$gDELPHI Collaboration
+000000107 710__ $$gL3 Collaboration
+000000107 710__ $$gLEP Working Group for Higgs Boson Searches
+000000107 710__ $$gOPAL Collaboration
+000000107 901__ $$uCERN
+000000107 916__ $$sh$$w199941
+000000107 960__ $$a11
+000000107 963__ $$aPUBLIC
+000000107 970__ $$a000330309CER
+000000107 980__ $$aARTICLE
+000000085 001__ 85
+000000085 003__ SzGeCERN
+000000085 005__ %(rec_85_rev)s
+000000085 035__ $$a2356302CERCER
+000000085 035__ $$9SLAC$$a5423422
+000000085 037__ $$ahep-th/0212181
+000000085 041__ $$aeng
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 245__ $$a3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS
+000000085 260__ $$c2003
+000000085 269__ $$c16 Dec 2002
+000000085 300__ $$a8 p
+000000085 520__ $$aWe study a duality, recently conjectured by Klebanov and Polyakov, between higher-spin theories on AdS_4 and O(N) vector models in 3-d. These theories are free in the UV and interacting in the IR. At the UV fixed point, the O(N) model has an infinite number of higher-spin conserved currents. In the IR, these currents are no longer conserved for spin s>2. In this paper, we show that the dual interpretation of this fact is that all fields of spin s>2 in AdS_4 become massive by a Higgs mechanism, that leaves the spin-2 field massless. We identify the Higgs field and show how it relates to the RG flow connecting the two CFTs, which is induced by a double trace deformation.
+000000085 65017 $$2SzGeCERN$$aParticle Physics - Theory
+000000085 690C_ $$aARTICLE
+000000085 695__ $$9LANL EDS$$aHigh Energy Physics - Theory
+000000085 700__ $$aPorrati, Massimo
+000000085 700__ $$aZaffaroni, A
+000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.pdf
+000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 859__ $$falberto.zaffaroni@mib.infn.it
+000000085 909C4 $$c289-293$$pPhys. Lett. B$$v561$$y2003
+000000085 916__ $$sn$$w200251
+000000085 960__ $$a13
+000000085 961__ $$c20060823$$h0007$$lCER01$$x20021217
+000000085 963__ $$aPUBLIC
+000000085 970__ $$a002356302CER
+000000085 980__ $$aARTICLE
+000000085 999C5 $$mD. Francia and A. Sagnotti,$$o[1]$$rhep-th/0207002$$sPhys. Lett. B 543 (2002) 303
+000000085 999C5 $$mP. Haggi-Mani and B. Sundborg,$$o[1]$$rhep-th/0002189$$sJ. High Energy Phys. 0004 (2000) 031
+000000085 999C5 $$mB. Sundborg,$$o[1]$$rhep-th/0103247$$sNucl. Phys. B, Proc. Suppl. 102 (2001) 113
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0105001$$sJ. High Energy Phys. 0109 (2001) 036
+000000085 999C5 $$mA. Mikhailov,$$o[1]$$rhep-th/0201019
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0205131$$sNucl. Phys. B 644 (2002) 303
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0205132$$sJ. High Energy Phys. 0207 (2002) 055
+000000085 999C5 $$mJ. Engquist, E. Sezgin and P. Sundell,$$o[1]$$rhep-th/0207101$$sClass. Quantum Gravity 19 (2002) 6175
+000000085 999C5 $$mM. A. Vasiliev,$$o[1]$$rhep-th/9611024$$sInt. J. Mod. Phys. D 5 (1996) 763
+000000085 999C5 $$mD. Anselmi,$$o[1]$$rhep-th/9808004$$sNucl. Phys. B 541 (1999) 323
+000000085 999C5 $$mD. Anselmi,$$o[1]$$rhep-th/9906167$$sClass. Quantum Gravity 17 (2000) 1383
+000000085 999C5 $$mE. S. Fradkin and M. A. Vasiliev,$$o[2]$$sNucl. Phys. B 291 (1987) 141
+000000085 999C5 $$mE. S. Fradkin and M. A. Vasiliev,$$o[2]$$sPhys. Lett. B 189 (1987) 89
+000000085 999C5 $$mI. R. Klebanov and A. M. Polyakov,$$o[3]$$rhep-th/0210114$$sPhys. Lett. B 550 (2002) 213
+000000085 999C5 $$mM. A. Vasiliev,$$o[4]$$rhep-th/9910096
+000000085 999C5 $$mT. Leonhardt, A. Meziane and W. Ruhl,$$o[5]$$rhep-th/0211092
+000000085 999C5 $$mO. Aharony, M. Berkooz and E. Silverstein,$$o[6]$$rhep-th/0105309$$sJ. High Energy Phys. 0108 (2001) 006
+000000085 999C5 $$mE. Witten,$$o[7]$$rhep-th/0112258
+000000085 999C5 $$mM. Berkooz, A. Sever and A. Shomer$$o[8]$$rhep-th/0112264$$sJ. High Energy Phys. 0205 (2002) 034
+000000085 999C5 $$mS. S. Gubser and I. Mitra,$$o[9]$$rhep-th/0210093
+000000085 999C5 $$mS. S. Gubser and I. R. Klebanov,$$o[10]$$rhep-th/0212138
+000000085 999C5 $$mM. Porrati,$$o[11]$$rhep-th/0112166$$sJ. High Energy Phys. 0204 (2002) 058
+000000085 999C5 $$mK. G. Wilson and J. B. Kogut,$$o[12]$$sPhys. Rep. 12 (1974) 75
+000000085 999C5 $$mI. R. Klebanov and E. Witten,$$o[13]$$rhep-th/9905104$$sNucl. Phys. B 556 (1999) 89
+000000085 999C5 $$mW. Heidenreich,$$o[14]$$sJ. Math. Phys. 22 (1981) 1566
+000000085 999C5 $$mD. Anselmi,$$o[15]$$rhep-th/0210123
+000000001 001__ 1
+000000001 005__ %(rec_1_rev)s
+000000001 037__ $$aCERN-EX-0106015
+000000001 100__ $$aPhotolab
+000000001 245__ $$aALEPH experiment: Candidate of Higgs boson production
+000000001 246_1 $$aExpérience ALEPH: Candidat de la production d'un boson Higgs
+000000001 260__ $$c14 06 2000
+000000001 340__ $$aFILM
+000000001 520__ $$aCandidate for the associated production of the Higgs boson and Z boson. Both, the Higgs and Z boson decay into 2 jets each. The green and the yellow jets belong to the Higgs boson. They represent the fragmentation of a bottom andanti-bottom quark. The red and the blue jets stem from the decay of the Z boson into a quark anti-quark pair. Left: View of the event along the beam axis. Bottom right: Zoom around the interaction point at the centre showing detailsof the fragmentation of the bottom and anti-bottom quarks. As expected for b quarks, in each jet the decay of a long-lived B meson is visible. Top right: "World map" showing the spatial distribution of the jets in the event.
+000000001 65017 $$2SzGeCERN$$aExperiments and Tracks
+000000001 6531_ $$aLEP
+000000001 8560_ $$fneil.calder@cern.ch
+000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.jpg
+000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon$$xicon
+000000001 909C0 $$o0003717PHOPHO
+000000001 909C0 $$y2000
+000000001 909C0 $$b81
+000000001 909C1 $$c2001-06-14$$l50$$m2001-08-27$$oCM
+000000001 909CP $$pBldg. 2
+000000001 909CP $$rCalder, N
+000000001 909CS $$sn$$w200231
+000000001 980__ $$aPICTURE
+""" % {'siteurl': CFG_SITE_URL,
+       'rec_1_rev': get_fieldvalues(1, '005__')[0],
+       'rec_85_rev': get_fieldvalues(85, '005__')[0],
+       'rec_107_rev': get_fieldvalues(107, '005__')[0]})
+
+    def test_search_engine_python_api_textmarc_field_filtered(self):
+        """websearch - search engine Python API for Text MARC output, field-filtered"""
+        from invenio.search_engine import perform_request_search
+        import cStringIO
         tmp = cStringIO.StringIO()
         perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '700'])
         out = tmp.getvalue()
@@ -1209,6 +1337,531 @@ class WebSearchSearchEnginePythonAPITest(InvenioTestCase):
                           'Reports': intbitset([19, 20]),
                           'Theses': intbitset([35, 36, 37, 38, 39, 40, 41, 42, 105])},
                          intersect_results_with_collrecs(None, intbitset(range(0,110)), ['Books', 'Theses', 'Reports'], 0, 'id', 0, 'en', False))
+
+    def test_search_engine_python_api_textmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Python API for Text MARC output, field-filtered, hidden field, no guest access"""
+        from invenio.search_engine import perform_request_search
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '595'])
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000001 100__ $$aPhotolab
+""")
+
+    def test_search_engine_python_api_xmlmarc_full(self):
+        """websearch - search engine Python API for XMLMARC output, full"""
+        from invenio.search_engine import perform_request_search
+        from invenio.search_engine_utils import get_fieldvalues
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='xm')
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+<!-- Search-Engine-Total-Number-Of-Results: 3 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">107</controlfield>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <controlfield tag="005">%(rec_107_rev)s</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SPIRES</subfield>
+    <subfield code="a">4066995</subfield>
+  </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EP-99-060</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="084" ind1=" " ind2=" ">
+    <subfield code="2">CERN Library</subfield>
+    <subfield code="a">EP-1999-060</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="9">SCAN-9910048</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">CERN-L3-175</subfield>
+  </datafield>
+  <datafield tag="110" ind1=" " ind2=" ">
+    <subfield code="a">CERN. Geneva</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Limits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">1999</subfield>
+  </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="a">Geneva</subfield>
+    <subfield code="b">CERN</subfield>
+    <subfield code="c">26 Apr 1999</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">18 p</subfield>
+  </datafield>
+  <datafield tag="490" ind1=" " ind2=" ">
+    <subfield code="a">ALEPH Papers</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Preprint not submitted to publication</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Experiment</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">CERN</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">PREPRINT</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">ALEPH</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">DELPHI</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">L3</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">OPAL</subfield>
+  </datafield>
+  <datafield tag="695" ind1=" " ind2=" ">
+    <subfield code="9">MEDLINE</subfield>
+    <subfield code="a">searches Higgs bosons</subfield>
+  </datafield>
+  <datafield tag="697" ind1="C" ind2=" ">
+    <subfield code="a">LexiHiggs</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="5">EP</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">ALEPH Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">DELPHI Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">L3 Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">LEP Working Group for Higgs Boson Searches</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">OPAL Collaboration</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">h</subfield>
+    <subfield code="w">199941</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">11</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">000330309CER</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">85</controlfield>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <controlfield tag="005">%(rec_85_rev)s</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">2356302CERCER</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SLAC</subfield>
+    <subfield code="a">5423422</subfield>
+  </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">hep-th/0212181</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">2003</subfield>
+  </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="c">16 Dec 2002</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">8 p</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">We study a duality, recently conjectured by Klebanov and Polyakov, between higher-spin theories on AdS_4 and O(N) vector models in 3-d. These theories are free in the UV and interacting in the IR. At the UV fixed point, the O(N) model has an infinite number of higher-spin conserved currents. In the IR, these currents are no longer conserved for spin s>2. In this paper, we show that the dual interpretation of this fact is that all fields of spin s>2 in AdS_4 become massive by a Higgs mechanism, that leaves the spin-2 field massless. We identify the Higgs field and show how it relates to the RG flow connecting the two CFTs, which is induced by a double trace deformation.</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Theory</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+  <datafield tag="695" ind1=" " ind2=" ">
+    <subfield code="9">LANL EDS</subfield>
+    <subfield code="a">High Energy Physics - Theory</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Porrati, Massimo</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Zaffaroni, A</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="4">
+    <subfield code="c">289-293</subfield>
+    <subfield code="p">Phys. Lett. B</subfield>
+    <subfield code="v">561</subfield>
+    <subfield code="y">2003</subfield>
+  </datafield>
+  <datafield tag="859" ind1=" " ind2=" ">
+    <subfield code="f">alberto.zaffaroni@mib.infn.it</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">n</subfield>
+    <subfield code="w">200251</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">13</subfield>
+  </datafield>
+  <datafield tag="961" ind1=" " ind2=" ">
+    <subfield code="c">20060823</subfield>
+    <subfield code="h">0007</subfield>
+    <subfield code="l">CER01</subfield>
+    <subfield code="x">20021217</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">002356302CER</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Francia and A. Sagnotti,</subfield>
+    <subfield code="s">Phys. Lett. B 543 (2002) 303</subfield>
+    <subfield code="r">hep-th/0207002</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">P. Haggi-Mani and B. Sundborg,</subfield>
+    <subfield code="s">J. High Energy Phys. 0004 (2000) 031</subfield>
+    <subfield code="r">hep-th/0002189</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">B. Sundborg,</subfield>
+    <subfield code="s">Nucl. Phys. B, Proc. Suppl. 102 (2001) 113</subfield>
+    <subfield code="r">hep-th/0103247</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">J. High Energy Phys. 0109 (2001) 036</subfield>
+    <subfield code="r">hep-th/0105001</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">A. Mikhailov,</subfield>
+    <subfield code="r">hep-th/0201019</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">Nucl. Phys. B 644 (2002) 303</subfield>
+    <subfield code="r">hep-th/0205131</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">J. High Energy Phys. 0207 (2002) 055</subfield>
+    <subfield code="r">hep-th/0205132</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">J. Engquist, E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">Class. Quantum Gravity 19 (2002) 6175</subfield>
+    <subfield code="r">hep-th/0207101</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">M. A. Vasiliev,</subfield>
+    <subfield code="s">Int. J. Mod. Phys. D 5 (1996) 763</subfield>
+    <subfield code="r">hep-th/9611024</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="s">Nucl. Phys. B 541 (1999) 323</subfield>
+    <subfield code="r">hep-th/9808004</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="s">Class. Quantum Gravity 17 (2000) 1383</subfield>
+    <subfield code="r">hep-th/9906167</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[2]</subfield>
+    <subfield code="m">E. S. Fradkin and M. A. Vasiliev,</subfield>
+    <subfield code="s">Nucl. Phys. B 291 (1987) 141</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[2]</subfield>
+    <subfield code="m">E. S. Fradkin and M. A. Vasiliev,</subfield>
+    <subfield code="s">Phys. Lett. B 189 (1987) 89</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[3]</subfield>
+    <subfield code="m">I. R. Klebanov and A. M. Polyakov,</subfield>
+    <subfield code="s">Phys. Lett. B 550 (2002) 213</subfield>
+    <subfield code="r">hep-th/0210114</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[4]</subfield>
+    <subfield code="m">M. A. Vasiliev,</subfield>
+    <subfield code="r">hep-th/9910096</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[5]</subfield>
+    <subfield code="m">T. Leonhardt, A. Meziane and W. Ruhl,</subfield>
+    <subfield code="r">hep-th/0211092</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[6]</subfield>
+    <subfield code="m">O. Aharony, M. Berkooz and E. Silverstein,</subfield>
+    <subfield code="s">J. High Energy Phys. 0108 (2001) 006</subfield>
+    <subfield code="r">hep-th/0105309</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[7]</subfield>
+    <subfield code="m">E. Witten,</subfield>
+    <subfield code="r">hep-th/0112258</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[8]</subfield>
+    <subfield code="m">M. Berkooz, A. Sever and A. Shomer</subfield>
+    <subfield code="s">J. High Energy Phys. 0205 (2002) 034</subfield>
+    <subfield code="r">hep-th/0112264</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[9]</subfield>
+    <subfield code="m">S. S. Gubser and I. Mitra,</subfield>
+    <subfield code="r">hep-th/0210093</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[10]</subfield>
+    <subfield code="m">S. S. Gubser and I. R. Klebanov,</subfield>
+    <subfield code="r">hep-th/0212138</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[11]</subfield>
+    <subfield code="m">M. Porrati,</subfield>
+    <subfield code="s">J. High Energy Phys. 0204 (2002) 058</subfield>
+    <subfield code="r">hep-th/0112166</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[12]</subfield>
+    <subfield code="m">K. G. Wilson and J. B. Kogut,</subfield>
+    <subfield code="s">Phys. Rep. 12 (1974) 75</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[13]</subfield>
+    <subfield code="m">I. R. Klebanov and E. Witten,</subfield>
+    <subfield code="s">Nucl. Phys. B 556 (1999) 89</subfield>
+    <subfield code="r">hep-th/9905104</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[14]</subfield>
+    <subfield code="m">W. Heidenreich,</subfield>
+    <subfield code="s">J. Math. Phys. 22 (1981) 1566</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[15]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="r">hep-th/0210123</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <controlfield tag="005">%(rec_1_rev)s</controlfield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EX-0106015</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">ALEPH experiment: Candidate of Higgs boson production</subfield>
+  </datafield>
+  <datafield tag="246" ind1=" " ind2="1">
+    <subfield code="a">Expérience ALEPH: Candidat de la production d'un boson Higgs</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">14 06 2000</subfield>
+  </datafield>
+  <datafield tag="340" ind1=" " ind2=" ">
+    <subfield code="a">FILM</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Candidate for the associated production of the Higgs boson and Z boson. Both, the Higgs and Z boson decay into 2 jets each. The green and the yellow jets belong to the Higgs boson. They represent the fragmentation of a bottom andanti-bottom quark. The red and the blue jets stem from the decay of the Z boson into a quark anti-quark pair. Left: View of the event along the beam axis. Bottom right: Zoom around the interaction point at the centre showing detailsof the fragmentation of the bottom and anti-bottom quarks. As expected for b quarks, in each jet the decay of a long-lived B meson is visible. Top right: "World map" showing the spatial distribution of the jets in the event.</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Experiments and Tracks</subfield>
+  </datafield>
+  <datafield tag="653" ind1="1" ind2=" ">
+    <subfield code="a">LEP</subfield>
+  </datafield>
+  <datafield tag="856" ind1="0" ind2=" ">
+    <subfield code="f">neil.calder@cern.ch</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/1/files/0106015_01.jpg</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon</subfield>
+    <subfield code="x">icon</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="o">0003717PHOPHO</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="y">2000</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="b">81</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="1">
+    <subfield code="c">2001-06-14</subfield>
+    <subfield code="l">50</subfield>
+    <subfield code="m">2001-08-27</subfield>
+    <subfield code="o">CM</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="P">
+    <subfield code="p">Bldg. 2</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="P">
+    <subfield code="r">Calder, N</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="S">
+    <subfield code="s">n</subfield>
+    <subfield code="w">200231</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">PICTURE</subfield>
+  </datafield>
+</record>
+</collection>""" % {'siteurl': CFG_SITE_URL,
+                    'rec_1_rev': get_fieldvalues(1, '005__')[0],
+                    'rec_85_rev': get_fieldvalues(85, '005__')[0],
+                    'rec_107_rev': get_fieldvalues(107, '005__')[0]})
+
+    def test_search_engine_python_api_xmlmarc_field_filtered(self):
+        """websearch - search engine Python API for XMLMARC output, field-filtered"""
+        # we are testing example from /help/hacking/search-engine-api
+        from invenio.search_engine import perform_request_search
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='xm', ot=['100', '700'])
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+<!-- Search-Engine-Total-Number-Of-Results: 3 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Porrati, Massimo</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Zaffaroni, A</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+</record>
+
+</collection>""")
+
+    def test_search_engine_python_api_xmlmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Python API for XMLMARC output, field-filtered, hidden field, no guest access"""
+        # we are testing example from /help/hacking/search-engine-api
+        from invenio.search_engine import perform_request_search
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='xm', ot=['100', '595'])
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+<!-- Search-Engine-Total-Number-Of-Results: 3 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+</record>
+
+</collection>""")
 
 class WebSearchSearchEngineWebAPITest(InvenioTestCase):
     """Check typical search engine Web API calls on the demo data."""
@@ -1289,6 +1942,1147 @@ class WebSearchSearchEngineWebAPITest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?recid=1&recidb=10&of=id',
                                                expected_text="[1, 2, 3, 4, 5, 6, 7, 8, 9]"))
+
+    def test_search_engine_web_api_ranked_by_citation(self):
+        """websearch - search engine Web API for citation ranking"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A81&rm=citation&of=id',
+                                               expected_text="[82, 83, 87, 89]"))
+
+    def test_search_engine_web_api_textmarc_full(self):
+        """websearch - search engine Web API for Text MARC output, full"""
+        from invenio.search_engine_utils import get_fieldvalues
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm',
+                                               expected_text="""\
+000000107 001__ 107
+000000107 003__ SzGeCERN
+000000107 005__ %(rec_107_rev)s
+000000107 035__ $$9SPIRES$$a4066995
+000000107 037__ $$aCERN-EP-99-060
+000000107 041__ $$aeng
+000000107 084__ $$2CERN Library$$aEP-1999-060
+000000107 088__ $$9SCAN-9910048
+000000107 088__ $$aCERN-L3-175
+000000107 110__ $$aCERN. Geneva
+000000107 245__ $$aLimits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$
+000000107 260__ $$c1999
+000000107 269__ $$aGeneva$$bCERN$$c26 Apr 1999
+000000107 300__ $$a18 p
+000000107 490__ $$aALEPH Papers
+000000107 500__ $$aPreprint not submitted to publication
+000000107 65017 $$2SzGeCERN$$aParticle Physics - Experiment
+000000107 690C_ $$aCERN
+000000107 690C_ $$aPREPRINT
+000000107 693__ $$aCERN LEP$$eALEPH
+000000107 693__ $$aCERN LEP$$eDELPHI
+000000107 693__ $$aCERN LEP$$eL3
+000000107 693__ $$aCERN LEP$$eOPAL
+000000107 695__ $$9MEDLINE$$asearches Higgs bosons
+000000107 697C_ $$aLexiHiggs
+000000107 710__ $$5EP
+000000107 710__ $$gALEPH Collaboration
+000000107 710__ $$gDELPHI Collaboration
+000000107 710__ $$gL3 Collaboration
+000000107 710__ $$gLEP Working Group for Higgs Boson Searches
+000000107 710__ $$gOPAL Collaboration
+000000107 901__ $$uCERN
+000000107 916__ $$sh$$w199941
+000000107 960__ $$a11
+000000107 963__ $$aPUBLIC
+000000107 970__ $$a000330309CER
+000000107 980__ $$aARTICLE
+000000085 001__ 85
+000000085 003__ SzGeCERN
+000000085 005__ %(rec_85_rev)s
+000000085 035__ $$a2356302CERCER
+000000085 035__ $$9SLAC$$a5423422
+000000085 037__ $$ahep-th/0212181
+000000085 041__ $$aeng
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 245__ $$a3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS
+000000085 260__ $$c2003
+000000085 269__ $$c16 Dec 2002
+000000085 300__ $$a8 p
+000000085 520__ $$aWe study a duality, recently conjectured by Klebanov and Polyakov, between higher-spin theories on AdS_4 and O(N) vector models in 3-d. These theories are free in the UV and interacting in the IR. At the UV fixed point, the O(N) model has an infinite number of higher-spin conserved currents. In the IR, these currents are no longer conserved for spin s>2. In this paper, we show that the dual interpretation of this fact is that all fields of spin s>2 in AdS_4 become massive by a Higgs mechanism, that leaves the spin-2 field massless. We identify the Higgs field and show how it relates to the RG flow connecting the two CFTs, which is induced by a double trace deformation.
+000000085 65017 $$2SzGeCERN$$aParticle Physics - Theory
+000000085 690C_ $$aARTICLE
+000000085 695__ $$9LANL EDS$$aHigh Energy Physics - Theory
+000000085 700__ $$aPorrati, Massimo
+000000085 700__ $$aZaffaroni, A
+000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.pdf
+000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 859__ $$falberto.zaffaroni@mib.infn.it
+000000085 909C4 $$c289-293$$pPhys. Lett. B$$v561$$y2003
+000000085 916__ $$sn$$w200251
+000000085 960__ $$a13
+000000085 961__ $$c20060823$$h0007$$lCER01$$x20021217
+000000085 963__ $$aPUBLIC
+000000085 970__ $$a002356302CER
+000000085 980__ $$aARTICLE
+000000085 999C5 $$mD. Francia and A. Sagnotti,$$o[1]$$rhep-th/0207002$$sPhys. Lett. B 543 (2002) 303
+000000085 999C5 $$mP. Haggi-Mani and B. Sundborg,$$o[1]$$rhep-th/0002189$$sJ. High Energy Phys. 0004 (2000) 031
+000000085 999C5 $$mB. Sundborg,$$o[1]$$rhep-th/0103247$$sNucl. Phys. B, Proc. Suppl. 102 (2001) 113
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0105001$$sJ. High Energy Phys. 0109 (2001) 036
+000000085 999C5 $$mA. Mikhailov,$$o[1]$$rhep-th/0201019
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0205131$$sNucl. Phys. B 644 (2002) 303
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0205132$$sJ. High Energy Phys. 0207 (2002) 055
+000000085 999C5 $$mJ. Engquist, E. Sezgin and P. Sundell,$$o[1]$$rhep-th/0207101$$sClass. Quantum Gravity 19 (2002) 6175
+000000085 999C5 $$mM. A. Vasiliev,$$o[1]$$rhep-th/9611024$$sInt. J. Mod. Phys. D 5 (1996) 763
+000000085 999C5 $$mD. Anselmi,$$o[1]$$rhep-th/9808004$$sNucl. Phys. B 541 (1999) 323
+000000085 999C5 $$mD. Anselmi,$$o[1]$$rhep-th/9906167$$sClass. Quantum Gravity 17 (2000) 1383
+000000085 999C5 $$mE. S. Fradkin and M. A. Vasiliev,$$o[2]$$sNucl. Phys. B 291 (1987) 141
+000000085 999C5 $$mE. S. Fradkin and M. A. Vasiliev,$$o[2]$$sPhys. Lett. B 189 (1987) 89
+000000085 999C5 $$mI. R. Klebanov and A. M. Polyakov,$$o[3]$$rhep-th/0210114$$sPhys. Lett. B 550 (2002) 213
+000000085 999C5 $$mM. A. Vasiliev,$$o[4]$$rhep-th/9910096
+000000085 999C5 $$mT. Leonhardt, A. Meziane and W. Ruhl,$$o[5]$$rhep-th/0211092
+000000085 999C5 $$mO. Aharony, M. Berkooz and E. Silverstein,$$o[6]$$rhep-th/0105309$$sJ. High Energy Phys. 0108 (2001) 006
+000000085 999C5 $$mE. Witten,$$o[7]$$rhep-th/0112258
+000000085 999C5 $$mM. Berkooz, A. Sever and A. Shomer$$o[8]$$rhep-th/0112264$$sJ. High Energy Phys. 0205 (2002) 034
+000000085 999C5 $$mS. S. Gubser and I. Mitra,$$o[9]$$rhep-th/0210093
+000000085 999C5 $$mS. S. Gubser and I. R. Klebanov,$$o[10]$$rhep-th/0212138
+000000085 999C5 $$mM. Porrati,$$o[11]$$rhep-th/0112166$$sJ. High Energy Phys. 0204 (2002) 058
+000000085 999C5 $$mK. G. Wilson and J. B. Kogut,$$o[12]$$sPhys. Rep. 12 (1974) 75
+000000085 999C5 $$mI. R. Klebanov and E. Witten,$$o[13]$$rhep-th/9905104$$sNucl. Phys. B 556 (1999) 89
+000000085 999C5 $$mW. Heidenreich,$$o[14]$$sJ. Math. Phys. 22 (1981) 1566
+000000085 999C5 $$mD. Anselmi,$$o[15]$$rhep-th/0210123
+000000001 001__ 1
+000000001 005__ %(rec_1_rev)s
+000000001 037__ $$aCERN-EX-0106015
+000000001 100__ $$aPhotolab
+000000001 245__ $$aALEPH experiment: Candidate of Higgs boson production
+000000001 246_1 $$aExpérience ALEPH: Candidat de la production d'un boson Higgs
+000000001 260__ $$c14 06 2000
+000000001 340__ $$aFILM
+000000001 520__ $$aCandidate for the associated production of the Higgs boson and Z boson. Both, the Higgs and Z boson decay into 2 jets each. The green and the yellow jets belong to the Higgs boson. They represent the fragmentation of a bottom andanti-bottom quark. The red and the blue jets stem from the decay of the Z boson into a quark anti-quark pair. Left: View of the event along the beam axis. Bottom right: Zoom around the interaction point at the centre showing detailsof the fragmentation of the bottom and anti-bottom quarks. As expected for b quarks, in each jet the decay of a long-lived B meson is visible. Top right: "World map" showing the spatial distribution of the jets in the event.
+000000001 65017 $$2SzGeCERN$$aExperiments and Tracks
+000000001 6531_ $$aLEP
+000000001 8560_ $$fneil.calder@cern.ch
+000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.jpg
+000000001 8564_ $$u%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon$$xicon
+000000001 909C0 $$o0003717PHOPHO
+000000001 909C0 $$y2000
+000000001 909C0 $$b81
+000000001 909C1 $$c2001-06-14$$l50$$m2001-08-27$$oCM
+000000001 909CP $$pBldg. 2
+000000001 909CP $$rCalder, N
+000000001 909CS $$sn$$w200231
+000000001 980__ $$aPICTURE
+""" % {'siteurl': CFG_SITE_URL,
+       'rec_1_rev': get_fieldvalues(1, '005__')[0],
+       'rec_85_rev': get_fieldvalues(85, '005__')[0],
+       'rec_107_rev': get_fieldvalues(107, '005__')[0]}))
+
+    def test_search_engine_web_api_textmarc_field_filtered(self):
+        """websearch - search engine Web API for Text MARC output, field-filtered"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,700',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 700__ $$aPorrati, Massimo
+000000085 700__ $$aZaffaroni, A
+000000001 100__ $$aPhotolab
+"""))
+
+    def test_search_engine_web_api_textmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Web API for Text MARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000001 100__ $$aPhotolab
+"""))
+
+    def test_search_engine_web_api_textmarc_field_filtered_hidden_admin(self):
+        """websearch - search engine Web API for Text MARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 595__ $$aLANL EDS
+000000085 595__ $$aSIS LANLPUBL2004
+000000085 595__ $$aSIS:2004 PR/LKR added
+000000001 100__ $$aPhotolab
+000000001 595__ $$aPress
+"""))
+
+    def test_search_engine_web_api_textmarc_subfield_values(self):
+        """websearch - search engine Web API for Text MARC output, subfield values"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=700__a',
+                                               expected_text="""\
+Porrati, Massimo
+Zaffaroni, A
+"""))
+
+    def test_search_engine_web_api_xmlmarc_full(self):
+        """websearch - search engine Web API for XMLMARC output, full"""
+        from invenio.search_engine_utils import get_fieldvalues
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Search-Engine-Total-Number-Of-Results: 3 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">107</controlfield>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <controlfield tag="005">%(rec_107_rev)s</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SPIRES</subfield>
+    <subfield code="a">4066995</subfield>
+  </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EP-99-060</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="084" ind1=" " ind2=" ">
+    <subfield code="2">CERN Library</subfield>
+    <subfield code="a">EP-1999-060</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="9">SCAN-9910048</subfield>
+  </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">CERN-L3-175</subfield>
+  </datafield>
+  <datafield tag="110" ind1=" " ind2=" ">
+    <subfield code="a">CERN. Geneva</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Limits on Higgs boson masses from combining the data of the four LEP experiments at $\sqrt{s} \leq 183 GeV$</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">1999</subfield>
+  </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="a">Geneva</subfield>
+    <subfield code="b">CERN</subfield>
+    <subfield code="c">26 Apr 1999</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">18 p</subfield>
+  </datafield>
+  <datafield tag="490" ind1=" " ind2=" ">
+    <subfield code="a">ALEPH Papers</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Preprint not submitted to publication</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Experiment</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">CERN</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">PREPRINT</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">ALEPH</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">DELPHI</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">L3</subfield>
+  </datafield>
+  <datafield tag="693" ind1=" " ind2=" ">
+    <subfield code="a">CERN LEP</subfield>
+    <subfield code="e">OPAL</subfield>
+  </datafield>
+  <datafield tag="695" ind1=" " ind2=" ">
+    <subfield code="9">MEDLINE</subfield>
+    <subfield code="a">searches Higgs bosons</subfield>
+  </datafield>
+  <datafield tag="697" ind1="C" ind2=" ">
+    <subfield code="a">LexiHiggs</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="5">EP</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">ALEPH Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">DELPHI Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">L3 Collaboration</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">LEP Working Group for Higgs Boson Searches</subfield>
+  </datafield>
+  <datafield tag="710" ind1=" " ind2=" ">
+    <subfield code="g">OPAL Collaboration</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">h</subfield>
+    <subfield code="w">199941</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">11</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">000330309CER</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">85</controlfield>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <controlfield tag="005">%(rec_85_rev)s</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">2356302CERCER</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SLAC</subfield>
+    <subfield code="a">5423422</subfield>
+  </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">hep-th/0212181</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">2003</subfield>
+  </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="c">16 Dec 2002</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">8 p</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">We study a duality, recently conjectured by Klebanov and Polyakov, between higher-spin theories on AdS_4 and O(N) vector models in 3-d. These theories are free in the UV and interacting in the IR. At the UV fixed point, the O(N) model has an infinite number of higher-spin conserved currents. In the IR, these currents are no longer conserved for spin s>2. In this paper, we show that the dual interpretation of this fact is that all fields of spin s>2 in AdS_4 become massive by a Higgs mechanism, that leaves the spin-2 field massless. We identify the Higgs field and show how it relates to the RG flow connecting the two CFTs, which is induced by a double trace deformation.</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Theory</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+  <datafield tag="695" ind1=" " ind2=" ">
+    <subfield code="9">LANL EDS</subfield>
+    <subfield code="a">High Energy Physics - Theory</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Porrati, Massimo</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Zaffaroni, A</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="4">
+    <subfield code="c">289-293</subfield>
+    <subfield code="p">Phys. Lett. B</subfield>
+    <subfield code="v">561</subfield>
+    <subfield code="y">2003</subfield>
+  </datafield>
+  <datafield tag="859" ind1=" " ind2=" ">
+    <subfield code="f">alberto.zaffaroni@mib.infn.it</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">n</subfield>
+    <subfield code="w">200251</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">13</subfield>
+  </datafield>
+  <datafield tag="961" ind1=" " ind2=" ">
+    <subfield code="c">20060823</subfield>
+    <subfield code="h">0007</subfield>
+    <subfield code="l">CER01</subfield>
+    <subfield code="x">20021217</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">002356302CER</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Francia and A. Sagnotti,</subfield>
+    <subfield code="s">Phys. Lett. B 543 (2002) 303</subfield>
+    <subfield code="r">hep-th/0207002</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">P. Haggi-Mani and B. Sundborg,</subfield>
+    <subfield code="s">J. High Energy Phys. 0004 (2000) 031</subfield>
+    <subfield code="r">hep-th/0002189</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">B. Sundborg,</subfield>
+    <subfield code="s">Nucl. Phys. B, Proc. Suppl. 102 (2001) 113</subfield>
+    <subfield code="r">hep-th/0103247</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">J. High Energy Phys. 0109 (2001) 036</subfield>
+    <subfield code="r">hep-th/0105001</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">A. Mikhailov,</subfield>
+    <subfield code="r">hep-th/0201019</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">Nucl. Phys. B 644 (2002) 303</subfield>
+    <subfield code="r">hep-th/0205131</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">J. High Energy Phys. 0207 (2002) 055</subfield>
+    <subfield code="r">hep-th/0205132</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">J. Engquist, E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">Class. Quantum Gravity 19 (2002) 6175</subfield>
+    <subfield code="r">hep-th/0207101</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">M. A. Vasiliev,</subfield>
+    <subfield code="s">Int. J. Mod. Phys. D 5 (1996) 763</subfield>
+    <subfield code="r">hep-th/9611024</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="s">Nucl. Phys. B 541 (1999) 323</subfield>
+    <subfield code="r">hep-th/9808004</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="s">Class. Quantum Gravity 17 (2000) 1383</subfield>
+    <subfield code="r">hep-th/9906167</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[2]</subfield>
+    <subfield code="m">E. S. Fradkin and M. A. Vasiliev,</subfield>
+    <subfield code="s">Nucl. Phys. B 291 (1987) 141</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[2]</subfield>
+    <subfield code="m">E. S. Fradkin and M. A. Vasiliev,</subfield>
+    <subfield code="s">Phys. Lett. B 189 (1987) 89</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[3]</subfield>
+    <subfield code="m">I. R. Klebanov and A. M. Polyakov,</subfield>
+    <subfield code="s">Phys. Lett. B 550 (2002) 213</subfield>
+    <subfield code="r">hep-th/0210114</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[4]</subfield>
+    <subfield code="m">M. A. Vasiliev,</subfield>
+    <subfield code="r">hep-th/9910096</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[5]</subfield>
+    <subfield code="m">T. Leonhardt, A. Meziane and W. Ruhl,</subfield>
+    <subfield code="r">hep-th/0211092</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[6]</subfield>
+    <subfield code="m">O. Aharony, M. Berkooz and E. Silverstein,</subfield>
+    <subfield code="s">J. High Energy Phys. 0108 (2001) 006</subfield>
+    <subfield code="r">hep-th/0105309</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[7]</subfield>
+    <subfield code="m">E. Witten,</subfield>
+    <subfield code="r">hep-th/0112258</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[8]</subfield>
+    <subfield code="m">M. Berkooz, A. Sever and A. Shomer</subfield>
+    <subfield code="s">J. High Energy Phys. 0205 (2002) 034</subfield>
+    <subfield code="r">hep-th/0112264</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[9]</subfield>
+    <subfield code="m">S. S. Gubser and I. Mitra,</subfield>
+    <subfield code="r">hep-th/0210093</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[10]</subfield>
+    <subfield code="m">S. S. Gubser and I. R. Klebanov,</subfield>
+    <subfield code="r">hep-th/0212138</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[11]</subfield>
+    <subfield code="m">M. Porrati,</subfield>
+    <subfield code="s">J. High Energy Phys. 0204 (2002) 058</subfield>
+    <subfield code="r">hep-th/0112166</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[12]</subfield>
+    <subfield code="m">K. G. Wilson and J. B. Kogut,</subfield>
+    <subfield code="s">Phys. Rep. 12 (1974) 75</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[13]</subfield>
+    <subfield code="m">I. R. Klebanov and E. Witten,</subfield>
+    <subfield code="s">Nucl. Phys. B 556 (1999) 89</subfield>
+    <subfield code="r">hep-th/9905104</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[14]</subfield>
+    <subfield code="m">W. Heidenreich,</subfield>
+    <subfield code="s">J. Math. Phys. 22 (1981) 1566</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[15]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="r">hep-th/0210123</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <controlfield tag="005">%(rec_1_rev)s</controlfield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EX-0106015</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">ALEPH experiment: Candidate of Higgs boson production</subfield>
+  </datafield>
+  <datafield tag="246" ind1=" " ind2="1">
+    <subfield code="a">Expérience ALEPH: Candidat de la production d'un boson Higgs</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">14 06 2000</subfield>
+  </datafield>
+  <datafield tag="340" ind1=" " ind2=" ">
+    <subfield code="a">FILM</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Candidate for the associated production of the Higgs boson and Z boson. Both, the Higgs and Z boson decay into 2 jets each. The green and the yellow jets belong to the Higgs boson. They represent the fragmentation of a bottom andanti-bottom quark. The red and the blue jets stem from the decay of the Z boson into a quark anti-quark pair. Left: View of the event along the beam axis. Bottom right: Zoom around the interaction point at the centre showing detailsof the fragmentation of the bottom and anti-bottom quarks. As expected for b quarks, in each jet the decay of a long-lived B meson is visible. Top right: "World map" showing the spatial distribution of the jets in the event.</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Experiments and Tracks</subfield>
+  </datafield>
+  <datafield tag="653" ind1="1" ind2=" ">
+    <subfield code="a">LEP</subfield>
+  </datafield>
+  <datafield tag="856" ind1="0" ind2=" ">
+    <subfield code="f">neil.calder@cern.ch</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/1/files/0106015_01.jpg</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/1/files/0106015_01.gif?subformat=icon</subfield>
+    <subfield code="x">icon</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="o">0003717PHOPHO</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="y">2000</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="0">
+    <subfield code="b">81</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="1">
+    <subfield code="c">2001-06-14</subfield>
+    <subfield code="l">50</subfield>
+    <subfield code="m">2001-08-27</subfield>
+    <subfield code="o">CM</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="P">
+    <subfield code="p">Bldg. 2</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="P">
+    <subfield code="r">Calder, N</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="S">
+    <subfield code="s">n</subfield>
+    <subfield code="w">200231</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">PICTURE</subfield>
+  </datafield>
+</record>
+</collection>""" % {'siteurl': CFG_SITE_URL,
+                    'rec_1_rev': get_fieldvalues(1, '005__')[0],
+                    'rec_85_rev': get_fieldvalues(85, '005__')[0],
+                    'rec_107_rev': get_fieldvalues(107, '005__')[0]}))
+
+    def test_search_engine_web_api_xmlmarc_field_filtered(self):
+        """websearch - search engine Web API for XMLMARC output, field-filtered"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,700',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Search-Engine-Total-Number-Of-Results: 3 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Porrati, Massimo</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Zaffaroni, A</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+    def test_search_engine_web_api_xmlmarc_field_filtered_hidden_guest(self):
+        """websearch - search engine Web API for XMLMARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Search-Engine-Total-Number-Of-Results: 3 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+    def test_search_engine_web_api_xmlmarc_field_filtered_hidden_admin(self):
+        """websearch - search engine Web API for XMLMARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=xm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Search-Engine-Total-Number-Of-Results: 3 -->
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">107</controlfield>
+</record>
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">LANL EDS</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS LANLPUBL2004</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:2004 PR/LKR added</subfield>
+  </datafield>
+</record>
+<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Photolab</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">Press</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+
+
+class WebSearchRecordWebAPITest(InvenioTestCase):
+    """Check typical /record Web API calls on the demo data."""
+
+    def test_record_web_api_textmarc_full(self):
+        """websearch - /record Web API for TextMARC output, full"""
+        from invenio.search_engine_utils import get_fieldvalues
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=tm',
+                                               expected_text="""\
+000000085 001__ 85
+000000085 003__ SzGeCERN
+000000085 005__ %(rec_85_rev)s
+000000085 035__ $$a2356302CERCER
+000000085 035__ $$9SLAC$$a5423422
+000000085 037__ $$ahep-th/0212181
+000000085 041__ $$aeng
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 245__ $$a3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS
+000000085 260__ $$c2003
+000000085 269__ $$c16 Dec 2002
+000000085 300__ $$a8 p
+000000085 520__ $$aWe study a duality, recently conjectured by Klebanov and Polyakov, between higher-spin theories on AdS_4 and O(N) vector models in 3-d. These theories are free in the UV and interacting in the IR. At the UV fixed point, the O(N) model has an infinite number of higher-spin conserved currents. In the IR, these currents are no longer conserved for spin s>2. In this paper, we show that the dual interpretation of this fact is that all fields of spin s>2 in AdS_4 become massive by a Higgs mechanism, that leaves the spin-2 field massless. We identify the Higgs field and show how it relates to the RG flow connecting the two CFTs, which is induced by a double trace deformation.
+000000085 65017 $$2SzGeCERN$$aParticle Physics - Theory
+000000085 690C_ $$aARTICLE
+000000085 695__ $$9LANL EDS$$aHigh Energy Physics - Theory
+000000085 700__ $$aPorrati, Massimo
+000000085 700__ $$aZaffaroni, A
+000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.pdf
+000000085 8564_ $$u%(siteurl)s/record/85/files/0212181.ps.gz
+000000085 859__ $$falberto.zaffaroni@mib.infn.it
+000000085 909C4 $$c289-293$$pPhys. Lett. B$$v561$$y2003
+000000085 916__ $$sn$$w200251
+000000085 960__ $$a13
+000000085 961__ $$c20060823$$h0007$$lCER01$$x20021217
+000000085 963__ $$aPUBLIC
+000000085 970__ $$a002356302CER
+000000085 980__ $$aARTICLE
+000000085 999C5 $$mD. Francia and A. Sagnotti,$$o[1]$$rhep-th/0207002$$sPhys. Lett. B 543 (2002) 303
+000000085 999C5 $$mP. Haggi-Mani and B. Sundborg,$$o[1]$$rhep-th/0002189$$sJ. High Energy Phys. 0004 (2000) 031
+000000085 999C5 $$mB. Sundborg,$$o[1]$$rhep-th/0103247$$sNucl. Phys. B, Proc. Suppl. 102 (2001) 113
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0105001$$sJ. High Energy Phys. 0109 (2001) 036
+000000085 999C5 $$mA. Mikhailov,$$o[1]$$rhep-th/0201019
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0205131$$sNucl. Phys. B 644 (2002) 303
+000000085 999C5 $$mE. Sezgin and P. Sundell,$$o[1]$$rhep-th/0205132$$sJ. High Energy Phys. 0207 (2002) 055
+000000085 999C5 $$mJ. Engquist, E. Sezgin and P. Sundell,$$o[1]$$rhep-th/0207101$$sClass. Quantum Gravity 19 (2002) 6175
+000000085 999C5 $$mM. A. Vasiliev,$$o[1]$$rhep-th/9611024$$sInt. J. Mod. Phys. D 5 (1996) 763
+000000085 999C5 $$mD. Anselmi,$$o[1]$$rhep-th/9808004$$sNucl. Phys. B 541 (1999) 323
+000000085 999C5 $$mD. Anselmi,$$o[1]$$rhep-th/9906167$$sClass. Quantum Gravity 17 (2000) 1383
+000000085 999C5 $$mE. S. Fradkin and M. A. Vasiliev,$$o[2]$$sNucl. Phys. B 291 (1987) 141
+000000085 999C5 $$mE. S. Fradkin and M. A. Vasiliev,$$o[2]$$sPhys. Lett. B 189 (1987) 89
+000000085 999C5 $$mI. R. Klebanov and A. M. Polyakov,$$o[3]$$rhep-th/0210114$$sPhys. Lett. B 550 (2002) 213
+000000085 999C5 $$mM. A. Vasiliev,$$o[4]$$rhep-th/9910096
+000000085 999C5 $$mT. Leonhardt, A. Meziane and W. Ruhl,$$o[5]$$rhep-th/0211092
+000000085 999C5 $$mO. Aharony, M. Berkooz and E. Silverstein,$$o[6]$$rhep-th/0105309$$sJ. High Energy Phys. 0108 (2001) 006
+000000085 999C5 $$mE. Witten,$$o[7]$$rhep-th/0112258
+000000085 999C5 $$mM. Berkooz, A. Sever and A. Shomer$$o[8]$$rhep-th/0112264$$sJ. High Energy Phys. 0205 (2002) 034
+000000085 999C5 $$mS. S. Gubser and I. Mitra,$$o[9]$$rhep-th/0210093
+000000085 999C5 $$mS. S. Gubser and I. R. Klebanov,$$o[10]$$rhep-th/0212138
+000000085 999C5 $$mM. Porrati,$$o[11]$$rhep-th/0112166$$sJ. High Energy Phys. 0204 (2002) 058
+000000085 999C5 $$mK. G. Wilson and J. B. Kogut,$$o[12]$$sPhys. Rep. 12 (1974) 75
+000000085 999C5 $$mI. R. Klebanov and E. Witten,$$o[13]$$rhep-th/9905104$$sNucl. Phys. B 556 (1999) 89
+000000085 999C5 $$mW. Heidenreich,$$o[14]$$sJ. Math. Phys. 22 (1981) 1566
+000000085 999C5 $$mD. Anselmi,$$o[15]$$rhep-th/0210123
+""" % {'siteurl': CFG_SITE_URL,
+       'rec_85_rev': get_fieldvalues(85, '005__')[0]}))
+
+    def test_record_web_api_xmlmarc_full(self):
+        """websearch - /record Web API for XMLMARC output, full"""
+        from invenio.search_engine_utils import get_fieldvalues
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=xm',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <controlfield tag="005">%(rec_85_rev)s</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">2356302CERCER</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SLAC</subfield>
+    <subfield code="a">5423422</subfield>
+  </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">hep-th/0212181</subfield>
+  </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">2003</subfield>
+  </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="c">16 Dec 2002</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">8 p</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">We study a duality, recently conjectured by Klebanov and Polyakov, between higher-spin theories on AdS_4 and O(N) vector models in 3-d. These theories are free in the UV and interacting in the IR. At the UV fixed point, the O(N) model has an infinite number of higher-spin conserved currents. In the IR, these currents are no longer conserved for spin s>2. In this paper, we show that the dual interpretation of this fact is that all fields of spin s>2 in AdS_4 become massive by a Higgs mechanism, that leaves the spin-2 field massless. We identify the Higgs field and show how it relates to the RG flow connecting the two CFTs, which is induced by a double trace deformation.</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Theory</subfield>
+  </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+  <datafield tag="695" ind1=" " ind2=" ">
+    <subfield code="9">LANL EDS</subfield>
+    <subfield code="a">High Energy Physics - Theory</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Porrati, Massimo</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Zaffaroni, A</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.pdf</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%(siteurl)s/record/85/files/0212181.ps.gz</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="4">
+    <subfield code="c">289-293</subfield>
+    <subfield code="p">Phys. Lett. B</subfield>
+    <subfield code="v">561</subfield>
+    <subfield code="y">2003</subfield>
+  </datafield>
+  <datafield tag="859" ind1=" " ind2=" ">
+    <subfield code="f">alberto.zaffaroni@mib.infn.it</subfield>
+  </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">n</subfield>
+    <subfield code="w">200251</subfield>
+  </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">13</subfield>
+  </datafield>
+  <datafield tag="961" ind1=" " ind2=" ">
+    <subfield code="c">20060823</subfield>
+    <subfield code="h">0007</subfield>
+    <subfield code="l">CER01</subfield>
+    <subfield code="x">20021217</subfield>
+  </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">002356302CER</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Francia and A. Sagnotti,</subfield>
+    <subfield code="s">Phys. Lett. B 543 (2002) 303</subfield>
+    <subfield code="r">hep-th/0207002</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">P. Haggi-Mani and B. Sundborg,</subfield>
+    <subfield code="s">J. High Energy Phys. 0004 (2000) 031</subfield>
+    <subfield code="r">hep-th/0002189</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">B. Sundborg,</subfield>
+    <subfield code="s">Nucl. Phys. B, Proc. Suppl. 102 (2001) 113</subfield>
+    <subfield code="r">hep-th/0103247</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">J. High Energy Phys. 0109 (2001) 036</subfield>
+    <subfield code="r">hep-th/0105001</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">A. Mikhailov,</subfield>
+    <subfield code="r">hep-th/0201019</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">Nucl. Phys. B 644 (2002) 303</subfield>
+    <subfield code="r">hep-th/0205131</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">J. High Energy Phys. 0207 (2002) 055</subfield>
+    <subfield code="r">hep-th/0205132</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">J. Engquist, E. Sezgin and P. Sundell,</subfield>
+    <subfield code="s">Class. Quantum Gravity 19 (2002) 6175</subfield>
+    <subfield code="r">hep-th/0207101</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">M. A. Vasiliev,</subfield>
+    <subfield code="s">Int. J. Mod. Phys. D 5 (1996) 763</subfield>
+    <subfield code="r">hep-th/9611024</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="s">Nucl. Phys. B 541 (1999) 323</subfield>
+    <subfield code="r">hep-th/9808004</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="s">Class. Quantum Gravity 17 (2000) 1383</subfield>
+    <subfield code="r">hep-th/9906167</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[2]</subfield>
+    <subfield code="m">E. S. Fradkin and M. A. Vasiliev,</subfield>
+    <subfield code="s">Nucl. Phys. B 291 (1987) 141</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[2]</subfield>
+    <subfield code="m">E. S. Fradkin and M. A. Vasiliev,</subfield>
+    <subfield code="s">Phys. Lett. B 189 (1987) 89</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[3]</subfield>
+    <subfield code="m">I. R. Klebanov and A. M. Polyakov,</subfield>
+    <subfield code="s">Phys. Lett. B 550 (2002) 213</subfield>
+    <subfield code="r">hep-th/0210114</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[4]</subfield>
+    <subfield code="m">M. A. Vasiliev,</subfield>
+    <subfield code="r">hep-th/9910096</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[5]</subfield>
+    <subfield code="m">T. Leonhardt, A. Meziane and W. Ruhl,</subfield>
+    <subfield code="r">hep-th/0211092</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[6]</subfield>
+    <subfield code="m">O. Aharony, M. Berkooz and E. Silverstein,</subfield>
+    <subfield code="s">J. High Energy Phys. 0108 (2001) 006</subfield>
+    <subfield code="r">hep-th/0105309</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[7]</subfield>
+    <subfield code="m">E. Witten,</subfield>
+    <subfield code="r">hep-th/0112258</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[8]</subfield>
+    <subfield code="m">M. Berkooz, A. Sever and A. Shomer</subfield>
+    <subfield code="s">J. High Energy Phys. 0205 (2002) 034</subfield>
+    <subfield code="r">hep-th/0112264</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[9]</subfield>
+    <subfield code="m">S. S. Gubser and I. Mitra,</subfield>
+    <subfield code="r">hep-th/0210093</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[10]</subfield>
+    <subfield code="m">S. S. Gubser and I. R. Klebanov,</subfield>
+    <subfield code="r">hep-th/0212138</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[11]</subfield>
+    <subfield code="m">M. Porrati,</subfield>
+    <subfield code="s">J. High Energy Phys. 0204 (2002) 058</subfield>
+    <subfield code="r">hep-th/0112166</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[12]</subfield>
+    <subfield code="m">K. G. Wilson and J. B. Kogut,</subfield>
+    <subfield code="s">Phys. Rep. 12 (1974) 75</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[13]</subfield>
+    <subfield code="m">I. R. Klebanov and E. Witten,</subfield>
+    <subfield code="s">Nucl. Phys. B 556 (1999) 89</subfield>
+    <subfield code="r">hep-th/9905104</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[14]</subfield>
+    <subfield code="m">W. Heidenreich,</subfield>
+    <subfield code="s">J. Math. Phys. 22 (1981) 1566</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[15]</subfield>
+    <subfield code="m">D. Anselmi,</subfield>
+    <subfield code="r">hep-th/0210123</subfield>
+  </datafield>
+</record>
+</collection>""" % {'siteurl': CFG_SITE_URL,
+                    'rec_85_rev': get_fieldvalues(85, '005__')[0]}))
+
+    def test_record_web_api_textmarc_field_filtered(self):
+        """websearch - /record Web API for TextMARC output, field-filtered"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=tm&ot=100,700',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 700__ $$aPorrati, Massimo
+000000085 700__ $$aZaffaroni, A
+"""))
+
+    def test_record_web_api_textmarc_field_filtered_hidden_guest(self):
+        """websearch - /record Web API for TextMARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=tm&ot=100,595',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+"""))
+
+    def test_record_web_api_textmarc_field_filtered_hidden_admin(self):
+        """websearch - /record Web API for TextMARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=tm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 595__ $$aLANL EDS
+000000085 595__ $$aSIS LANLPUBL2004
+000000085 595__ $$aSIS:2004 PR/LKR added
+"""))
+
+    def test_record_web_api_xmlmarc_field_filtered(self):
+        """websearch - /record Web API for XMLMARC output, field-filtered"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=xm&ot=100,700',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Porrati, Massimo</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Zaffaroni, A</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+    def test_record_web_api_xmlmarc_field_filtered_hidden_guest(self):
+        """websearch - /record Web API for XMLMARC output, field-filtered, hidden field, no guest access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=xm&ot=100,595',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+    def test_record_web_api_xmlmarc_field_filtered_hidden_admin(self):
+        """websearch - /record Web API for XMLMARC output, field-filtered, hidden field, admin access"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=xm&ot=100,595',
+                                               username='admin',
+                                               expected_text="""\
+<?xml version="1.0" encoding="UTF-8"?>
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+<record>
+  <controlfield tag="001">85</controlfield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">LANL EDS</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS LANLPUBL2004</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:2004 PR/LKR added</subfield>
+  </datafield>
+</record>
+
+</collection>"""))
+
+    def test_record_web_api_textmarc_subfield_values(self):
+        """websearch - /record Web API for TextMARC output, subfield values"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/85?of=tm&ot=700__a',
+                                               expected_text="""\
+Porrati, Massimo
+Zaffaroni, A
+"""))
+
 
 class WebSearchRestrictedCollectionTest(InvenioTestCase):
     """Test of the restricted collections behaviour."""
@@ -2890,6 +4684,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchAuthorQueryTest,
                              WebSearchSearchEnginePythonAPITest,
                              WebSearchSearchEngineWebAPITest,
+                             WebSearchRecordWebAPITest,
                              WebSearchRestrictedCollectionTest,
                              WebSearchRestrictedCollectionHandlingTest,
                              WebSearchRestrictedPicturesTest,

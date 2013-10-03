@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -60,6 +60,12 @@ __revision__ = "$Id$" #: revision number
 QUIET_MODE = False #: are we running in quiet mode? (will be set from CLI)
 
 
+try:
+    from pylint.__pkginfo__ import version as PYLINT_VERSION
+except ImportError:
+    PYLINT_VERSION = '0.0.0' #: cannot detect pylint version; pretend old
+
+
 def get_list_of_python_code_files(modulesdir, modulename):
     """Return list of Python source code files for MODULENAME in MODULESDIR,
        excluding test files.
@@ -73,11 +79,10 @@ def get_list_of_python_code_files(modulesdir, modulename):
                                                    (modulesdir, modulename)],
                                                    extension='.in'))
     # last, remove Makefile, test files, z_ files:
-    # pylint: disable=W0141
-    out = filter(lambda x: not x.endswith("Makefile.in"), out)
-    out = filter(lambda x: not x.endswith("dbexec.in"), out)
-    out = filter(lambda x: not x.endswith("_tests.py"), out)
-    out = filter(lambda x: x.find("/z_") == -1, out)
+    out = [x for x in out if not x.endswith("Makefile.in")]
+    out = [x for x in out if not x.endswith("dbexec.in")]
+    out = [x for x in out if not x.endswith("_tests.py")]
+    out = [x for x in out if x.find("/z_") == -1]
     # return list:
     return out
 
@@ -86,23 +91,17 @@ def wash_list_of_python_files_for_pylinting(filenames):
     """Remove away some Python files that are not suitable for
        pylinting, e.g. known wrong test files or empty init files.
     """
-    # pylint: disable=W0141
     # take only .py files for pylinting:
-    filenames = filter(lambda x: x.endswith(".py"),
-                                 filenames)
+    filenames = [x for x in filenames if x.endswith(".py")]
     # remove empty __init__.py files (FIXME: we may check for file size here
     # in case we shall have non-empty __init__.py files one day)
-    filenames = filter(lambda x: not x.endswith("__init__.py"),
-                                 filenames)
+    filenames = [x for x in filenames if not x.endswith("__init__.py")]
     # take out unloadable bibformat test files:
-    filenames = filter(lambda x: not x.endswith("bfe_test_4.py"),
-                                 filenames)
+    filenames = [x for x in filenames if not x.endswith("bfe_test_4.py")]
     # take out test unloadable file:
-    filenames = filter(lambda x: not x.endswith("test3.py"),
-                                 filenames)
+    filenames = [x for x in filenames if not x.endswith("test3.py")]
     # take out test no docstring file:
-    filenames = filter(lambda x: not x.endswith("test_5.py"),
-                                 filenames)
+    filenames = [x for x in filenames if not x.endswith("test_5.py")]
     return filenames
 
 
@@ -170,7 +169,10 @@ def get_pylint_results(filename):
     error and return (-999999999, -999999999, 0, 0, 0, 0, 0).
     """
     process = subprocess.Popen(['pylint',
-                                '--output-format=parseable',
+                                PYLINT_VERSION.startswith('0') and \
+                                  '--output-format=parseable' or \
+                                  '--msg-template={path}:{line}:' +
+                                  ' [{msg_id}({symbol}), {obj}] {msg}',
                                 '--rcfile=/dev/null',
                                 filename],
                                stdout=subprocess.PIPE,
@@ -304,13 +306,11 @@ def get_invenio_modulenames(dirname="."):
     """
     modulenames = os.listdir(dirname)
     # remove CVS:
-    # pylint: disable=W0141
-    modulenames = filter(lambda x: not x=="CVS", modulenames)
+    modulenames = [x for x in modulenames if not x == "CVS"]
     # remove non-directories:
-    modulenames = filter(lambda x: os.path.isdir(dirname + "/" + x),
-                         modulenames)
+    modulenames = [x for x in modulenames if os.path.isdir(dirname + "/" + x)]
     # remove webhelp, not in Python:
-    modulenames = filter(lambda x: not x=="webhelp", modulenames)
+    modulenames = [x for x in modulenames if not x == "webhelp"]
     # sort alphabetically:
     modulenames.sort()
     return modulenames
@@ -677,7 +677,10 @@ def cmd_check_errors(filenames):
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
-                                    '--output-format=parseable',
+                                    PYLINT_VERSION.startswith('0') and \
+                                      '--output-format=parseable' or \
+                                      '--msg-template={path}:{line}:' +
+                                      ' [{msg_id}({symbol}), {obj}] {msg}',
                                     '--errors-only', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -698,7 +701,10 @@ def cmd_check_variables(filenames):
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
-                                    '--output-format=parseable',
+                                    PYLINT_VERSION.startswith('0') and \
+                                      '--output-format=parseable' or \
+                                      '--msg-template={path}:{line}:' +
+                                      ' [{msg_id}({symbol}), {obj}] {msg}',
                                     '--reports=n', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -727,7 +733,10 @@ def cmd_check_indentation(filenames):
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
-                                    '--output-format=parseable',
+                                    PYLINT_VERSION.startswith('0') and \
+                                      '--output-format=parseable' or \
+                                      '--msg-template={path}:{line}:' +
+                                      ' [{msg_id}({symbol}), {obj}] {msg}',
                                     '--reports=n', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
