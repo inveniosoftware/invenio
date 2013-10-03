@@ -462,8 +462,8 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
             address_activation_key = mail_cookie_create_mail_activation(email)
             try:
                 ip_address = req.remote_host or req.remote_ip
-            except KeyError:
-                ip_address = req.remote_ip
+            except:
+                ip_address = None
             try:
                 if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
                                   tmpl.tmpl_account_address_activation_email_body(

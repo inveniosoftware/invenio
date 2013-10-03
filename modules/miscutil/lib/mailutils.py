@@ -40,6 +40,7 @@ from formatter import DumbWriter, AbstractFormatter
 from flask.ext.email.message import EmailMultiAlternatives, EmailMessage
 
 from invenio.config import \
+    CFG_EMAIL_BACKEND, \
     CFG_SITE_SUPPORT_EMAIL, \
     CFG_SITE_URL, \
     CFG_SITE_LANG, \
@@ -64,7 +65,7 @@ except ImportError:
 from invenio.errorlib import register_exception
 from invenio.miscutil_config import InvenioMiscUtilError
 from invenio.jinja2utils import render_template_to_string
-
+from invenio.webinterface_handler_flask_utils import unicodifier
 
 def initialize_email_backend(app):
     """
@@ -78,12 +79,12 @@ def initialize_email_backend(app):
     app.config['MANAGERS'] = (CFG_SITE_SUPPORT_EMAIL, )
 
     if app.config.get('EMAIL_BACKEND') is None:
-        if app.config.get('CFG_EMAIL_BACKEND'):
-            app.config['EMAIL_BACKEND'] = app.config.get('CFG_EMAIL_BACKEND')
+        if app.config.get('CFG_EMAIL_BACKEND') or CFG_EMAIL_BACKEND:
+            app.config['EMAIL_BACKEND'] = app.config.get('CFG_EMAIL_BACKEND',
+                                                         CFG_EMAIL_BACKEND)
         elif CFG_MISCUTIL_SMTP_HOST and CFG_MISCUTIL_SMTP_PORT:
             app.config['EMAIL_BACKEND'] = 'flask.ext.email.backends.smtp.Mail'
     # Defaults to 'flask.ext.email.backends.locmem.Mail'
-
     app.config['EMAIL_HOST'] = CFG_MISCUTIL_SMTP_HOST
     app.config['EMAIL_PORT'] = CFG_MISCUTIL_SMTP_PORT
     app.config['EMAIL_HOST_USER'] = CFG_MISCUTIL_SMTP_USER
@@ -300,8 +301,11 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     if html_images is None:
         html_images = {}
 
-    content = render_template_to_string('mail_text.tpl', content=content,
-                                        header=header, footer=footer)
+    content = render_template_to_string('mail_text.tpl',
+                                        content=unicodifier(content),
+                                        header=unicodifier(header),
+                                        footer=unicodifier(footer)
+                                        ).encode('utf8')
 
     if type(toaddr) is not str:
         toaddr = ','.join(toaddr)
@@ -327,10 +331,12 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     headers['User-Agent'] = 'Invenio %s at %s' % (CFG_VERSION, CFG_SITE_URL)
 
     if html_content:
-        html_content = render_template_to_string('mail_html.tpl',
-                                                 content=html_content,
-                                                 header=html_header,
-                                                 footer=html_footer)
+        html_content = render_template_to_string(
+            'mail_html.tpl',
+            content=unicodifier(html_content),
+            header=unicodifier(html_header),
+            footer=unicodifier(html_footer)
+            ).encode('utf8')
 
         msg_root = EmailMultiAlternatives(subject=subject, body=content,
                                           from_email=fromaddr,
