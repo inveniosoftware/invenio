@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -58,6 +58,12 @@ import subprocess
 __revision__ = "$Id$" #: revision number
 
 QUIET_MODE = False #: are we running in quiet mode? (will be set from CLI)
+
+
+try:
+    from pylint.__pkginfo__ import version as PYLINT_VERSION
+except ImportError:
+    PYLINT_VERSION = '0.0.0' #: cannot detect pylint version; pretend old
 
 
 def get_list_of_python_code_files(modulesdir, modulename):
@@ -170,7 +176,10 @@ def get_pylint_results(filename):
     error and return (-999999999, -999999999, 0, 0, 0, 0, 0).
     """
     process = subprocess.Popen(['pylint',
-                                '--output-format=parseable',
+                                PYLINT_VERSION.startswith('0') and \
+                                  '--output-format=parseable' or \
+                                  '--msg-template={path}:{line}:' +
+                                  ' [{msg_id}({symbol}), {obj}] {msg}',
                                 '--rcfile=/dev/null',
                                 filename],
                                stdout=subprocess.PIPE,
@@ -304,7 +313,7 @@ def get_invenio_modulenames(dirname="."):
     """
     modulenames = os.listdir(dirname)
     # remove CVS:
-    # pylint: disable=W0141
+    # pylint: disable=W0141,W0110
     modulenames = filter(lambda x: not x=="CVS", modulenames)
     # remove non-directories:
     modulenames = filter(lambda x: os.path.isdir(dirname + "/" + x),
@@ -677,7 +686,10 @@ def cmd_check_errors(filenames):
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
-                                    '--output-format=parseable',
+                                    PYLINT_VERSION.startswith('0') and \
+                                      '--output-format=parseable' or \
+                                      '--msg-template={path}:{line}:' +
+                                      ' [{msg_id}({symbol}), {obj}] {msg}',
                                     '--errors-only', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -698,7 +710,10 @@ def cmd_check_variables(filenames):
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
-                                    '--output-format=parseable',
+                                    PYLINT_VERSION.startswith('0') and \
+                                      '--output-format=parseable' or \
+                                      '--msg-template={path}:{line}:' +
+                                      ' [{msg_id}({symbol}), {obj}] {msg}',
                                     '--reports=n', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
@@ -727,7 +742,10 @@ def cmd_check_indentation(filenames):
     for filename in filenames:
         out = ''
         process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
-                                    '--output-format=parseable',
+                                    PYLINT_VERSION.startswith('0') and \
+                                      '--output-format=parseable' or \
+                                      '--msg-template={path}:{line}:' +
+                                      ' [{msg_id}({symbol}), {obj}] {msg}',
                                     '--reports=n', filename],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
