@@ -4330,5 +4330,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_bibdocfile_mo
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_02_01_oaiREPOSITORY_last_updated',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_07_crcILLREQUEST_overdue_letter',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_01_12_bibrec_master_format',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_06_11_rnkDOWNLOADS_file_format',NOW());
 
 -- end of file
