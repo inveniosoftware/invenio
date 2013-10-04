@@ -106,7 +106,7 @@ def find_year(recordyear):
     return year
 
 
-def html_command(file):
+def html_command(filename):
     t = ''
     if CFG_BIBRANK_SHOW_CITATION_GRAPHS == 1:
         t = '<img src="%s/%s/%s" align="center" alt="Citation Graph">' \
