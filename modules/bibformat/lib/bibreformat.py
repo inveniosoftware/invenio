@@ -212,13 +212,14 @@ def iterate_over_new(recIDs, fmt):
     tot = len(recIDs)
     for count, recID in enumerate(recIDs):
         t1 = os.times()[4]
-        formatted_record = format_record_1st_pass(recID=recID,
+        formatted_record, needs_2nd_pass = format_record_1st_pass(recID=recID,
                                                   of=fmt,
                                                   on_the_fly=True,
                                                   save_missing=False)
         save_preformatted_record(recID=recID,
                                  of=fmt,
                                  res=formatted_record,
+                                 needs_2nd_pass=needs_2nd_pass,
                                  low_priority=True)
         t2 = os.times()[4]
         tbibformat += t2 - t1
@@ -304,6 +305,79 @@ def query_records(params):
                                                    c=params['collection'],
                                                    p=params['pattern'],
                                                    f=params['field']))
+    return res
+
+
+def all_records():
+    """Produces record IDs for all available records"""
+    return intbitset(run_sql("SELECT id FROM bibrec"))
+
+
+def outdated_caches(fmt, last_updated, chunk_size=5000):
+    sql = """SELECT br.id
+             FROM bibrec AS br
+             INNER JOIN bibfmt AS bf ON bf.id_bibrec = br.id
+             WHERE br.modification_date >= %s
+             AND bf.format = %s
+             AND bf.last_updated < br.modification_date
+             AND br.id BETWEEN %s AND %s"""
+
+    last_updated_str = last_updated.strftime('%Y-%m-%d %H:%M:%S')
+    recids = intbitset()
+    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0]
+    for start in xrange(1, max_id + 1, chunk_size):
+        end = start + chunk_size
+        recids += intbitset(run_sql(sql, (last_updated_str, fmt, start, end)))
+
+    return recids
+
+
+def missing_caches(fmt, chunk_size=2000):
+    """Produces record IDs to be formated, because their fmt cache is missing
+
+    @param fmt: format to query for
+    @return: record IDs generator without pre-created format cache
+    """
+    write_message("Querying database for records without cache...")
+
+    sql = """SELECT br.id
+             FROM bibrec as br
+             LEFT JOIN bibfmt as bf
+             ON bf.id_bibrec = br.id AND bf.format ='%s'
+             WHERE bf.id_bibrec IS NULL
+             AND br.id BETWEEN %%s AND %%s""" % fmt
+
+    recids = intbitset()
+    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0]
+    for start in xrange(1, max_id + 1, chunk_size):
+        end = start + chunk_size
+        recids += intbitset(run_sql(sql, (start, end)))
+
+    return recids
+
+def query_records(params):
+    """Prduces record IDs from given query parameters
+
+    By passing the appriopriate CLI options, we can query here for additional
+    records.
+    """
+    write_message("Querying database (records query)...")
+    res = intbitset()
+    if params['field'] or params['collection'] or params['pattern']:
+
+        if not params['collection']:
+            # use search_pattern() whenever possible, as it can search
+            # even in private collections
+            res = search_pattern(p=params['pattern'],
+                                 f=params['field'],
+                                 m=params['matching'])
+        else:
+            # use perform_request_search when '-c' argument has been
+            # defined, as it is not supported by search_pattern()
+            res = intbitset(perform_request_search(req=None, of='id',
+                                         c=params['collection'],
+                                         p=params['pattern'],
+                                         f=params['field']))
     return res
 
 
