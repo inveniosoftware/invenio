@@ -24,7 +24,9 @@
 from invenio.config import (CFG_HEPDATA_URL,
                             CFG_HEPDATA_PLOTSIZE,
                             CFG_LOGDIR,
-                            CFG_SITE_URL)
+                            CFG_SITE_URL,
+                            CFG_SITE_RECORD,
+                            CFG_BASE_URL)
 
 import re
 import os
@@ -652,7 +654,7 @@ def render_hepdata_dataset_html(dataset, recid, seq, display_link=True):
 
     link_txt = "Go to the record"
     if display_link:
-        c.append("<a href=\"%s/record/%s\">%s</a>" % (CFG_BASE_URL, str(dataset.recid), link_txt))
+        c.append("<a href=\"%s/%s/%s\">%s</a>" % (CFG_BASE_URL, CFG_SITE_RECORD, str(dataset.recid), link_txt))
 
     temporary = get_fieldvalues(dataset.recid, '500__a')
     if temporary:

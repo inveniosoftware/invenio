@@ -3940,7 +3940,6 @@ class Template:
                 create_hepdata_ticket(dataset.recid, 'Data missing in 520__9')
                 continue
             if publisher == "HEPDATA" and flag_hepdata == 0:
-                c.append('<a href="http://hepdata.cedar.ac.uk/view/ins%s" target="_blank"> Durham HepData project </a>' % (recid))
                 flag_hepdata = 1
             elif publisher == "Dataverse":
                 flag_dataverse = 1
@@ -3948,7 +3947,7 @@ class Template:
         if flag_hepdata == 1 or flag_dataverse == 1:
             c.append("<h3> This data comes from ")
             if flag_hepdata == 1:
-                c.append(hepdata_text)
+                c.append('<a href="http://hepdata.cedar.ac.uk/view/ins%s" target="_blank"> Durham HepData project </a>' % (recid))
             if flag_hepdata == 1 and flag_dataverse == 1:
                 c.append(' and ')
             if flag_dataverse == 1:
