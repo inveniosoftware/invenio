@@ -1,7 +1,3 @@
-<div class="pull-right linksbox">
-  {{ tfn_get_back_to_search_links(record['recid'], g.ln) }}
-</div>
-
 {{ bfe_topbanner(bfo, prefix='<div style="padding-left:10px;padding-right:10px">', suffix='</div><hr/>') }}
 
 <div style="padding-left:10px;padding-right:10px">
@@ -35,3 +31,5 @@
 
 {# WebTags #}
 {{ tfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('<hr />') }}
+
+{{ tfn_get_back_to_search_links(record['recid'])|wrap(prefix='<div class="pull-right linksbox">', suffix='</div>') }}

@@ -32,3 +32,5 @@
 
 {# WebTags #}
 {{ tfn_webtag_record_tags(record['recid'], current_user.get_id())|prefix('<hr />') }}
+
+{{ tfn_get_back_to_search_links(record['recid'])|wrap(prefix='<div class="pull-right linksbox">', suffix='</div>') }}
