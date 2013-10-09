@@ -1,5 +1,5 @@
 <div class="pull-right linksbox">
-  {{ tfn_get_back_to_search_links(record['recid'], g.ln).decode('utf-8') }}
+  {{ tfn_get_back_to_search_links(record['recid'], g.ln) }}
 </div>
 
 {{ bfe_topbanner(bfo, prefix='<div style="padding-left:10px;padding-right:10px">', suffix='</div><hr/>') }}

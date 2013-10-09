@@ -1,0 +1,85 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{# Display links to quickly flip between detailed record pages #}
+
+{% block body %}
+
+  {% set nb_recids = recids|length %}
+
+  {%- if nb_recids > 1 -%}
+    {% set pos = recids.index(recID) %}
+    {% set numrec = pos + 1 %}
+    {% set recIDfirst = recids[0] %}
+    {% set recIDprev = recids[pos - 1] %}
+    {% set recIDnext = recids[pos + 1] %}
+    {% set recIDlast = recids[nb_recids - 1] %}
+
+    {%- if pos == 0 -%}
+      {# to display only the links to the next and last record #}
+      <div><span class='moreinfo'>
+        <span><b>{{ numrec }}</b> {{_('of')}} <b>{{ nb_recids }}</b></span>
+        <a href="{{ url_for('record.metadata', recid=recIDnext, ln=g.ln) }}">
+          <i class="icon-angle-right icon-large"></i>
+        </a>
+        <a href="{{ url_for('record.metadata', recid=recIDlast, ln=g.ln) }}">
+          <i class="icon-double-angle-right icon-large"></i>
+        </a>
+	  </span></div>
+
+	{%- elif pos == nb_recids - 1 -%}
+      {# to display only the links to the first and previous record #}
+      <div><span class='moreinfo'>
+        <a href="{{ url_for('record.metadata', recid=recIDfirst, ln=g.ln) }}">
+          <i class="icon-double-angle-left icon-large"></i>
+        </a>
+        <a href="{{ url_for('record.metadata', recid=recIDprev, ln=g.ln) }}">
+          <i class="icon-angle-left icon-large"></i>
+        </a>
+		<span><b>{{ numrec }}</b> {{_('of')}} <b>{{ nb_recids }}</b></span>
+	  </span></div>
+
+    {%- else -%}
+      {# to display all links: first, previous, next, last record, and "back to search" #}
+      <div><span class='moreinfo'>
+        <a href="{{ url_for('record.metadata', recid=recIDfirst, ln=g.ln) }}">
+          <i class="icon-double-angle-left icon-large"></i>
+        </a>
+        <a href="{{ url_for('record.metadata', recid=recIDprev, ln=g.ln) }}">
+          <i class="icon-angle-left icon-large"></i>
+        </a>
+		<span class="outof"><b>{{ numrec }}</b> {{_('of')}} <b>{{ nb_recids }}</b></span>
+        <a href="{{ url_for('record.metadata', recid=recIDnext, ln=g.ln) }}">
+          <i class="icon-angle-right icon-large"></i>
+        </a>
+        <a href="{{ url_for('record.metadata', recid=recIDlast, ln=g.ln) }}">
+          <i class="icon-double-angle-right icon-large"></i>
+        </a>
+      </span></div>
+
+    {%- endif -%}
+  {%- endif -%}
+
+  <div><span class='moreinfo'>
+    <a href="{{ url_for(last_query, ln=g.ln) }}">
+      {{ _('Back to search') }}
+    </a>
+  </span></div>
+
+{% endblock %}

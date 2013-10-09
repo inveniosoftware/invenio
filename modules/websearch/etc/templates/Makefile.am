@@ -24,6 +24,7 @@ templates_DATA = record.html \
 		 record_keywords.html \
 		 record_references.html \
 		 record_usage.html \
+		 record_back_to_search_links.html \
 		 websearch_browse.html \
 		 websearch_collection.html \
 		 websearch_index.html \
