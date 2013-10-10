@@ -594,7 +594,7 @@ def format_with_format_template(format_template_filename, bfo,
                 return unicodifier(f(*args, **kwds))
             return wrapper
 
-        if bfo.recID:
+        if bfo.xml_record is None:
             record = new_get_record(bfo.recID)
         else:
             record = new_create_record(bfo.xml_record, master_format='marc')
