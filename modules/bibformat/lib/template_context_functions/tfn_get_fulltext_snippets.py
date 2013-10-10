@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebTag List of tags in document view"""
+"""Template context function to get fulltext snippets via Solr."""
 
 from invenio.config import CFG_WEBSEARCH_FULLTEXT_SNIPPETS
 from invenio.errorlib import register_exception
