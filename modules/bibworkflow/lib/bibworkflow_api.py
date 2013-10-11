@@ -36,7 +36,7 @@ class InvenioBibWorkflowWorkerUnavailable(Exception):
 
 if CFG_BIBWORKFLOW_WORKER:
     try:
-        WORKER = import_string('invenio.bibworkflow.workers.%s:%s' % (
+        WORKER = import_string('invenio.bibworkflow_workers.%s:%s' % (
             CFG_BIBWORKFLOW_WORKER, CFG_BIBWORKFLOW_WORKER))
         USE_TASK_QUEUE = True
     except:
