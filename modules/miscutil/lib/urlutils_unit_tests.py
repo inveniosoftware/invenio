@@ -96,7 +96,9 @@ class TestUrls(InvenioTestCase):
                                                  ':' : '?&'},
                                                 {'a': ('int', 1),
                                                  'b': ('str', 2)}),
-                         "?b%26=2%3D&amp;%3A=%3F%26&amp;b=2")
+                         "?b%26=2%3D&%3A=%3F%26&b=2")
+                         #FIXME removed double escaping of '&'
+                         #      "?b%26=2%3D&amp;%3A=%3F%26&amp;b=2")
 
     if HASHLIB_IMPORTED:
         def test_signed_aws_request_creation(self):
