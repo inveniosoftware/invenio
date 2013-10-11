@@ -69,6 +69,24 @@ class LoginForm(Form):
 class ChangeUserEmailSettingsForm(InvenioBaseForm):
     email = TextField(_("New email"))
 
+    def validate_email(self, field):
+        field.data = field.data.lower()
+        if email_valid_p(field.data.lower()) != 1:
+            raise validators.ValidationError(
+                _("Supplied email address %s is invalid.") % field.data
+            )
+
+        # is email already taken?
+        try:
+            User.query.filter(User.email == field.data).one()
+            raise validators.ValidationError(
+                _("Supplied email address %s already exists in the database.") % field.data
+            )
+        except SQLAlchemyError:
+            pass
+
+        # invalidate account/ re-send email validation
+
 
 class RegisterForm(Form):
     """
