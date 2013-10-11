@@ -40,11 +40,16 @@ from invenio.config import \
 from invenio.datastructures import LazyDict, flatten_multidict
 from invenio.importutils import autodiscover_modules
 from invenio.sqlalchemyutils import db
-from invenio.webaccount_forms import LoginForm, RegisterForm
+from invenio.webaccount_forms import LoginForm, RegisterForm, LostPasswordForm
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.websession_model import User
 from invenio.websession_webinterface import wash_login_method
-from invenio.webuser_flask import login_user, logout_user, current_user, UserInfo
+from invenio.webuser_flask import \
+    login_user, \
+    logout_user, \
+    current_user, \
+    UserInfo, \
+    reset_password
 
 
 CFG_HAS_HTTPS_SUPPORT = CFG_SITE_SECURE_URL.startswith("https://")
@@ -319,3 +324,18 @@ def view(name):
         return render_template('webaccount_widget.html', widget=widget)
     else:
         return "2", 406
+
+
+@blueprint.route('/lost', methods=['GET', 'POST'])
+@blueprint.invenio_set_breadcrumb(_("Lost"))
+@blueprint.invenio_force_https
+def lost():
+    import logging
+
+    form = LostPasswordForm(request.values)
+    if form.validate_on_submit():
+        if reset_password(request.values['email'], g.ln):
+            flash(_('A password reset link has been sent to %s') % request.values['email'], 'success')
+    else:
+        pass
+    return render_template('webaccount_lost.html', form=form)

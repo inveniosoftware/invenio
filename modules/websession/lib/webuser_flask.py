@@ -21,6 +21,7 @@
 Flask-sqlalchemy re-implementation of webuser.
 """
 
+from datetime import timedelta
 from functools import wraps
 from flask import session, request, url_for, current_app, has_request_context,\
     _request_ctx_stack, abort, redirect
@@ -32,7 +33,11 @@ from invenio.config import \
     CFG_ACCESS_CONTROL_LEVEL_GUESTS, \
     CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, \
     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-    CFG_BIBAUTHORID_ENABLED
+    CFG_BIBAUTHORID_ENABLED, \
+    CFG_SITE_SUPPORT_EMAIL, \
+    CFG_SITE_NAME_INTL, \
+    CFG_SITE_NAME, \
+    CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 
 CFG_USER_DEFAULT_INFO = {
     'remote_ip': '',
@@ -293,3 +298,31 @@ def login_user(user, *args, **kwargs):
     if type(user) in [int, long]:
         user = UserInfo(user)
     return flask_login_user(user, *args, **kwargs)
+
+
+def reset_password(email, ln):
+    # create the reset key
+    from invenio.access_control_mailcookie import mail_cookie_create_pw_reset
+    reset_key = mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
+    if reset_key is None:
+        return False  # reset key could not be created
+
+    # load the email template
+    import invenio.template
+    websession_templates = invenio.template.load('websession')
+
+    # finally send the email
+    from invenio.mailutils import send_email
+    from invenio.webinterface_handler_flask_utils import _
+    if not send_email(CFG_SITE_SUPPORT_EMAIL, email, "%s %s"
+                      % (_("Password reset request for"),
+                         CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
+                      websession_templates.
+                      tmpl_account_reset_password_email_body(email,
+                                                             reset_key,
+                                                             request.
+                                                             remote_addr,
+                                                             ln)):
+        return False  # mail could not be sent
+
+    return True  # password reset email send successfully

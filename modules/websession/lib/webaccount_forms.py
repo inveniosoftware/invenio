@@ -85,7 +85,25 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
         except SQLAlchemyError:
             pass
 
-        # invalidate account/ re-send email validation
+        # FIXME: invalidate account/ re-send email validation
+
+class LostPasswordForm(InvenioBaseForm):
+    email = TextField(_("Email address"))
+
+    def validate_email(self, field):
+        field.data = field.data.lower()
+        if email_valid_p(field.data.lower()) != 1:
+            raise validators.ValidationError(
+                _("Supplied email address %s is invalid.") % field.data
+            )
+
+        # is email registered?
+        try:
+            User.query.filter(User.email == field.data).one()
+        except SQLAlchemyError:
+            raise validators.ValidationError(
+                _("Supplied email address %s is not registered.") % field.data
+            )
 
 
 class RegisterForm(Form):

@@ -1,5 +1,6 @@
+{#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,17 +15,20 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_formhelpers.html" import render_field with context %}
+{% extends "page.html" %}
+{% set title = None %}
 
-templatesdir = $(sysconfdir)/templates
-templates_DATA = webgroup_index.html \
-                 webaccount_index.html \
-                 webaccount_edit.html \
-                 webaccount_login.html \
-                 webaccount_logout.html \
-                 webaccount_lost.html \
-                 webaccount_register.html \
-                 webaccount_widget.html
 
-EXTRA_DIST = $(templates_DATA)
-
-CLEANFILES = *~ *.tmp
+{% block body %}
+<form name="edit" method="post" class="form-horizontal">
+  <p class="text-center">{{ _('If you have lost the password for your internal account, then please enter your email address in the following form in order to have a password reset link emailed to you') }}</p>
+  {%- for field in form -%}
+    {{ render_field(field) }}
+  {%- endfor -%}
+  <div class="form-actions">
+    <input type="submit" name="save" value="{{ _("Send password reset link") }}" class="btn btn-primary"/>
+  </div>
+</form>
+{% endblock %}
