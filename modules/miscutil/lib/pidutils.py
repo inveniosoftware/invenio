@@ -20,7 +20,7 @@ from urlparse import urlparse
 
 
 doi_regexp = re.compile(
-    "(doi:|http://dx.doi.org/)?10\.\d+(.\d+)*/.*$",
+    "(doi:|http://dx.doi.org/)?(10\.\d+(.\d+)*/.*)$",
     flags=re.I
 )
 """
@@ -28,7 +28,7 @@ See http://en.wikipedia.org/wiki/Digital_object_identifier
 """
 
 handle_regexp = re.compile(
-    "(hdl:|http://hdl.handle.net/)?[^/\.]+(\.[^/\.]+)*/.*$",
+    "(hdl:|http://hdl.handle.net/)?([^/\.]+(\.[^/\.]+)*/.*)$",
     flags=re.I
 )
 """
@@ -53,7 +53,7 @@ arxiv_pre_2007_regexp = re.compile("[a-z\-]+(\.[A-Z]{2})?/\d{4}\d+$")
 See http://arxiv.org/help/arxiv_identifier
 """
 
-ads_regexp = re.compile("(ads:|ADS:)?\d{4}[A-Z]\S{13}[A-Z.:]$")
+ads_regexp = re.compile("(ads:|ADS:)?(\d{4}[A-Z]\S{13}[A-Z.:])$")
 """
 See http://adsabs.harvard.edu/abs_doc/help_pages/data.html
 """
@@ -63,7 +63,7 @@ pmcid_regexp = re.compile("PMC\d+$", flags=re.I)
 PubMed Central ID regular expression
 """
 
-pmid_regexp = re.compile("(pmid:)?\d+$", flags=re.I)
+pmid_regexp = re.compile("(pmid:)?(\d+)$", flags=re.I)
 """
 PubMed ID regular expression
 """
@@ -78,7 +78,7 @@ lsid_regexp = re.compile("urn:lsid:[^:]+(:[^:]+){2,3}$", flags=re.I)
 """
 See http://en.wikipedia.org/wiki/LSID
 """
-('urn:lsid:ubio.org:namebank:11815',['lsid']),
+
 
 def _convert_x_to_10(x):
     """
@@ -115,7 +115,9 @@ def is_isbn13(val):
     if len(val) != 13:
         return False
     try:
-        total = sum([int(num) * weight for num, weight in zip(val, (1, 3) * 6)])
+        total = sum([
+            int(num) * weight for num, weight in zip(val, (1, 3) * 6)
+        ])
         ck = (10 - total) % 10
         return ck == int(val[-1])
     except ValueError:
@@ -150,7 +152,7 @@ def is_istc(val):
         return False
     sequence = [11, 9, 3, 1]
     try:
-        r = sum([int(x, 16)*sequence[i%4] for i, x in enumerate(val[:-1])])
+        r = sum([int(x, 16)*sequence[i % 4] for i, x in enumerate(val[:-1])])
         ck = hex(r % 16)[2:].upper()
         return ck == val[-1]
     except ValueError:
@@ -180,7 +182,7 @@ def is_ean8(val):
         return False
     sequence = [3, 1]
     try:
-        r = sum([int(x)*sequence[i%2] for i, x in enumerate(val[:-1])])
+        r = sum([int(x)*sequence[i % 2] for i, x in enumerate(val[:-1])])
         ck = (10 - r % 10) % 10
         return ck == int(val[-1])
     except ValueError:
@@ -197,7 +199,7 @@ def is_ean13(val):
         return False
     sequence = [1, 3]
     try:
-        r = sum([int(x)*sequence[i%2] for i, x in enumerate(val[:-1])])
+        r = sum([int(x)*sequence[i % 2] for i, x in enumerate(val[:-1])])
         ck = (10 - r % 10) % 10
         return ck == int(val[-1])
     except ValueError:
@@ -236,26 +238,29 @@ def is_orcid(val):
     """
     val = val.replace("-", "").replace(" ", "")
     if is_isni(val):
-        val = int(val[:-1], 10) # Remove check digit and convert to int.
+        val = int(val[:-1], 10)  # Remove check digit and convert to int.
         return val >= 15000000 and val <= 35000000
     return False
+
 
 def is_ark(val):
     """ Test if argument is an ARK """
     res = urlparse(val)
-    return ark_suffix_regexp.match(val) or (res.scheme == 'http'
-            and res.netloc != ''
-            # Note res.path includes leading slash, hence [1:] to use same reexp
-            and ark_suffix_regexp.match(res.path[1:])
-            and res.params == '')
+    return ark_suffix_regexp.match(val) or (
+        res.scheme == 'http'
+        and res.netloc != ''
+        # Note res.path includes leading slash, hence [1:] to use same reexp
+        and ark_suffix_regexp.match(res.path[1:])
+        and res.params == ''
+    )
 
 
 def is_purl(val):
     """ Test if argument is a PURL """
     res = urlparse(val)
     return (res.scheme == 'http'
-            and res.netloc in ['purl.org','purl.oclc.org', 'purl.net',
-            'purl.com']
+            and res.netloc in ['purl.org', 'purl.oclc.org', 'purl.net',
+                               'purl.com']
             and res.path != '')
 
 
@@ -308,6 +313,7 @@ def is_pmid(val):
     """
     return pmid_regexp.match(val)
 
+
 def is_pmcid(val):
     """
     PubMed Central ID
@@ -324,6 +330,7 @@ CFG_PID_SCHEMES = [
     ('urn', is_urn),
     ('url', is_url),
     ('ads', is_ads),
+    ('arxiv', is_arxiv),
     ('pmcid', is_pmcid),
     ('isbn', is_isbn),
     ('issn', is_issn),
@@ -347,12 +354,53 @@ def detect_identifier_schemes(val):
         if test(val):
             schemes.append(scheme)
 
-    if 'pmid' in schemes and len(schemes)!= 1:
+    if 'pmid' in schemes and len(schemes) != 1:
         # Remove pmid as it's too generic (any int)
-        schemes = filter(lambda x: x !='pmid', schemes)
+        schemes = filter(lambda x: x != 'pmid', schemes)
     elif 'handle' in schemes and 'url' in schemes \
-          and not val.startswith("http://hdl.handle.net/"):
-        schemes = filter(lambda x: x !='handle', schemes)
+         and not val.startswith("http://hdl.handle.net/"):
+        schemes = filter(lambda x: x != 'handle', schemes)
     elif 'handle' in schemes and 'ark' in schemes:
-        schemes = filter(lambda x: x !='handle', schemes)
+        schemes = filter(lambda x: x != 'handle', schemes)
     return schemes
+
+
+def normalize_doi(val):
+    m = doi_regexp.match(val)
+    return m.group(2)
+
+
+def normalize_handle(val):
+    m = handle_regexp.match(val)
+    return m.group(2)
+
+
+def normalize_ads(val):
+    m = ads_regexp.match(val)
+    return m.group(2)
+
+
+def normalize_pmid(val):
+    m = pmid_regexp.match(val)
+    return m.group(2)
+
+
+def normalize_pid(val, scheme):
+    """
+    Normalize a persistent identifier
+
+    E.g. doi:10.1234/foo and http://dx.doi.org/10.1234/foo and 10.1234/foo
+    will all be normalized to 10.1234/foo.
+    """
+    if not val:
+        return val
+
+    if scheme == 'doi':
+        return normalize_doi(val)
+    elif scheme == 'handle':
+        return normalize_handle(val)
+    elif scheme == 'ads':
+        return normalize_ads(val)
+    elif scheme == 'pmid':
+        return normalize_pmid(val)
+    return val
