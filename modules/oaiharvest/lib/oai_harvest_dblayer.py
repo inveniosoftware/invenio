@@ -16,6 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import time
+import zlib
 from invenio.dbquery import run_sql, serialize_via_marshal
 from invenio.bibrecord import create_records, record_extract_oai_id
 
@@ -339,7 +340,13 @@ def get_holdingpen_entries(start = 0, limit = 0):
 
 def get_holdingpen_entry(oai_id, date_inserted):
     query = "SELECT changeset_xml FROM bibHOLDINGPEN WHERE changeset_date = %s AND oai_id = %s"
-    return run_sql(query, (str(date_inserted), str(oai_id)))[0][0]
+    changeset_xml = run_sql(query, (str(date_inserted), str(oai_id)))[0][0]
+    try:
+        changeset_xml = zlib.decompress(changeset_xml)
+    except zlib.error:
+        # Legacy: the xml can be in TEXT format, leave it unchanged
+        pass
+    return changeset_xml
 
 def delete_holdingpen_entry(hpupdate_id):
     query = "DELETE FROM bibHOLDINGPEN WHERE changeset_id=%s"
@@ -409,4 +416,12 @@ def get_holdingpen_entry_details(hpupdate_id):
     (oai_id, record_id,  date_inserted, content)
     """
     query = "SELECT oai_id, id_bibrec, changeset_date, changeset_xml FROM bibHOLDINGPEN WHERE changeset_id=%s"
-    return run_sql(query, (hpupdate_id,))[0]
+    res = run_sql(query, (hpupdate_id,))
+    if res:
+        try:
+            changeset_xml = zlib.decompress(res[0][3])
+            return res[0][0], res[0][1], res[0][2], changeset_xml
+        except zlib.error:
+            # Legacy: the xml can be in TEXT format, leave it unchanged
+            pass
+        return res[0]

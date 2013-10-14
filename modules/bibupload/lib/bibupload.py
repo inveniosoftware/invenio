@@ -776,7 +776,7 @@ def insert_record_into_holding_pen(record, oai_id, pretend=False):
             bibrec_id = 0
 
     if not pretend:
-        run_sql(query, (oai_id, xml_record, bibrec_id))
+        run_sql(query, (oai_id, compress(xml_record), bibrec_id))
 
     # record_id is logged as 0! ( We are not inserting into the main database)
     log_record_uploading(oai_id, task_get_task_param('task_id', 0), 0, 'H', pretend=pretend)

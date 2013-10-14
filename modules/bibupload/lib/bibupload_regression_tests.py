@@ -28,6 +28,7 @@ from invenio.testutils import InvenioTestCase
 import os
 import time
 import sys
+import zlib
 from marshal import loads
 from zlib import decompress
 from urllib import urlencode
@@ -574,7 +575,7 @@ class BibUploadTypicalBibEditSessionTest(GenericBibUploadTest):
         self.check_record_consistency(self.recid)
         ## The change should have been merged with the previous without conflict
         self.failUnless(records_identical(bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)), "%s != %s" % (bibupload.xml_marc_to_records(marc_to_replace1)[0], get_record(self.recid)))
-        self.failUnless(records_identical(bibupload.xml_marc_to_records(marc_to_replace2)[0], bibupload.xml_marc_to_records(run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid,))[0][0])[0]))
+        self.failUnless(records_identical(bibupload.xml_marc_to_records(marc_to_replace2)[0], bibupload.xml_marc_to_records(zlib.decompress(run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid,))[0][0]))[0]))
 
 class BibUploadNoUselessHistoryTest(GenericBibUploadTest):
     """Testing generation of history only when necessary"""
@@ -3788,7 +3789,7 @@ class BibUploadHoldingPenTest(GenericBibUploadTest):
         recs = bibupload.xml_marc_to_records(test_to_upload)
         bibupload.insert_record_into_holding_pen(recs[0], "")
         res = run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid, ))
-        self.failUnless("Rupp, G" in res[0][0])
+        self.failUnless("Rupp, G" in zlib.decompress(res[0][0]))
 
     def test_holding_pen_upload_with_oai_id(self):
         """bibupload - holding pen upload with oai_id"""
@@ -3822,7 +3823,7 @@ class BibUploadHoldingPenTest(GenericBibUploadTest):
         recs = bibupload.xml_marc_to_records(test_to_upload)
         bibupload.insert_record_into_holding_pen(recs[0], self.oai_id)
         res = run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s AND oai_id=%s", (self.recid, self.oai_id))
-        self.failUnless("Rupp, G" in res[0][0])
+        self.failUnless("Rupp, G" in zlib.decompress(res[0][0]))
 
     def tearDown(self):
         GenericBibUploadTest.tearDown(self)

@@ -24,6 +24,7 @@ try:
     import cPickle as Pickle
 except ImportError:
     import Pickle
+import zlib
 
 from datetime import datetime, timedelta
 
@@ -101,8 +102,16 @@ def get_hp_update_xml(changeId):
     """
     Get the MARC XML of the Holding Pen update
     """
-    return run_sql("""SELECT  changeset_xml, id_bibrec from bibHOLDINGPEN WHERE
-                      changeset_id=%s""", (str(changeId),))[0]
+    res = run_sql("""SELECT  changeset_xml, id_bibrec from bibHOLDINGPEN WHERE
+                      changeset_id=%s""", (changeId,))
+    if res:
+        try:
+            changeset_xml = zlib.decompress(res[0][0])
+            return changeset_xml, res[0][1]
+        except zlib.error:
+            # Legacy: the xml can be in TEXT format, leave it unchanged
+            pass
+        return res[0]
 
 def delete_hp_change(changeId):
     """

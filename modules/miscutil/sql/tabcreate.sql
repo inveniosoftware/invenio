@@ -3247,7 +3247,7 @@ CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
 CREATE TABLE IF NOT EXISTS bibHOLDINGPEN (
   changeset_id INT NOT NULL AUTO_INCREMENT, -- the identifier of the changeset stored in the holding pen
   changeset_date datetime NOT NULL DEFAULT '0000:00:00 00:00:00', -- when was the changeset inserted
-  changeset_xml TEXT NOT NULL DEFAULT '',
+  changeset_xml longblob NOT NULL,
   oai_id varchar(40) NOT NULL DEFAULT '', -- OAI identifier of concerned record
   id_bibrec mediumint(8) unsigned NOT NULL default '0', -- record ID of concerned record (filled by bibupload)
   PRIMARY KEY (changeset_id),
@@ -4868,5 +4868,5 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_02_new_bibARXIVP
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_12_05_oaiHARVEST_arguments_blob',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_13_new_bibEDITCACHE',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_09_26_webauthorlist',NOW());
-
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_11_bibHOLDINGPEN_longblob',NOW());
 -- end of file
