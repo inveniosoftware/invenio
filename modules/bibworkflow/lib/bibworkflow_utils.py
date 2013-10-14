@@ -196,7 +196,7 @@ def get_redis_values(key):
     return redis_server.smembers("holdingpen_sort:%s" % (str(key),))
 
 
-def set_up_redis(url="localhost"):
+def set_up_redis():
     """
     Sets up the redis server for the saving of the HPContainers
 
@@ -204,5 +204,8 @@ def set_up_redis(url="localhost"):
     @param url: address to setup the Redis server
     @return: Redis server object.
     """
-    redis_server = redis.Redis(url)
+    from flask import current_app
+    redis_server = redis.Redis.from_url(
+        current_app.config.get('CACHE_REDIS_URL', 'redis://localhost:6379')
+    )
     return redis_server
