@@ -241,7 +241,6 @@ def send_email(fromaddr,
         return False
     sent = False
     while not sent and attempt_times > 0:
-        sent = body.send()
         try:
             sent = body.send()
         except Exception:
