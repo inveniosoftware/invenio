@@ -2163,6 +2163,10 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?p=higgs&of=tm&ot=100,595',
                                                username='admin',
                                                expected_text="""\
+000000107 595__ $$aNo authors
+000000107 595__ $$aCERN-EP
+000000107 595__ $$aOA
+000000107 595__ $$aSIS:200740 PR/LKR not found (from SLAC, INSPEC)
 000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
 000000085 595__ $$aLANL EDS
 000000085 595__ $$aSIS LANLPUBL2004
@@ -2691,6 +2695,18 @@ Zaffaroni, A
 <collection xmlns="http://www.loc.gov/MARC21/slim">
 <record>
   <controlfield tag="001">107</controlfield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">No authors</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">CERN-EP</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">OA</subfield>
+  </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:200740 PR/LKR not found (from SLAC, INSPEC)</subfield>
+  </datafield>
 </record>
 <record>
   <controlfield tag="001">85</controlfield>
