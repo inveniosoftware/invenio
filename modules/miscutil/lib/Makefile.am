@@ -27,7 +27,7 @@ pylib_DATA = __init__.py \
              data_cacher.py \
              dbdump.py \
              web_api_key.py \
-             web_api_key_unit_tests.py \
+             web_api_key_regression_tests.py \
              dbquery.py \
              dbquery_unit_tests.py \
              dbquery_regression_tests.py \
