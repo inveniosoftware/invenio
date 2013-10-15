@@ -21,73 +21,45 @@
 {% block body %}
 
 <div class="page-header">
-  <h3>
-    {{ _(deposition_type) }}
-    <small>
-      {{ _('select or create deposition') }}
-      <a class="btn btn-info pull-right"
-         href="{{ url_for('webdeposit.create_new', deposition_type=deposition_type) }}">
-        <i class="icon-edit icon-white"></i> {{ _('New Deposition') }}
-      </a>
-    </small>
-  </h3>
+  <h3>{{ _('Select a Document Type') }}</h3>
 </div>
 
 <div class="row">
-  {% if drafts %}
-  <ul class="nav nav-tabs nav-stacked offset3 span6">
-  {% for draft in drafts %}
-    <li> <a href="{{ url_for('webdeposit.add', deposition_type=draft.workflow.name, uuid=draft.uuid) }}">
-       <i class="icon-chevron-right pull-right"></i>
-       {{ '<strong>'|safe if uuid == draft.uuid }}
-        {{ draft.workflow.name }}:
-        {% if draft.form_values and draft.form_values.title %}
-            {{ draft.form_values.title }}
-        {% else %}
-            {{ _('Untitled') }}
-        {% endif %}
-      {{ '</strong>'|safe if uuid == draft.uuid }}
-      <span style="font-size: 80%;" class="muted">{{ draft.timestamp|invenio_pretty_date }}</span>
-     </a>
-    </li>
+  <div id="webdeposit_types_accordion" class="offset3 span6 accordion">
+    {% for deptype_group in deposition_types.values()|groupby('group') %}
+    <div class="accordion-group">
+      <div class="accordion-heading">
+        <h4>
+        <a class="accordion-toggle" data-toggle="collapse"
+           data-parent="#webdeposit_types_accordion"
+           href="#collapse{{ loop.index }}">
+          <i class="icon-list pull-right"></i> {{ deptype_group.grouper }}
+        </a>
+        </h4>
+      </div>
+      <div id="collapse{{ loop.index }}" class="collapse">
+        <div class="accordion-inner" style="padding: 0px;">
+          <ul class="nav nav-pills nav-stacked" style="margin-bottom: 0px;">
+          {% for deptype in deptype_group.list|sort(attribute='name') %}
+            <li>
+              <a href="{{ url_for('.deposition_type_index', deposition_type=deptype.get_identifier()) }}">
+                <i class="icon-chevron-right pull-right"></i>
+                {{ deptype.name }}
+                {% if deptype.type in drafts %}
+                &nbsp;
+                <span class="badge badge-important">
+                  {{ drafts[dep.dep_type] }}
+                </span>
+                {% endif %}
+              </a>
+            </li>
+          {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
   {% endfor %}
-  </ul>
-  {% else %}
-  <div class="span12">
-    <strong>{{ _('There is no ongoing deposition.') }}</strong>
   </div>
-  {% endif %}
 </div>
-
-{% if past_depositions %}
-
-<div class="row" style="margin-top: 22px;">
-  <ul class="nav nav-list">
-  <li class="divider" style="overflow: visible;"></li>
-</ul>
-
-  <h4 class="offset2"style="margin-top: 25px;">Past depositions</h4>
-
-   <ul class="nav nav-tabs nav-stacked offset3 span6">
-       {% for dep in past_depositions %}
-      {% if dep.extra_data.recid %}
-          <li> <a href="/record/{{ dep.extra_data.recid }}">
-           <i class="icon-chevron-right pull-right"></i>
-            {{ dep.name }}:
-            {% if dep.extra_data.title %}
-                {{ dep.extra_data.title }}
-            {% else %}
-                {{ _('Untitled') }}
-            {% endif %}
-         </a>
-         </li>
-     {% endif %}
-  {% endfor %}
-  </ul>
-
-
-</div>
-
-{% endif %}
 
 {% endblock %}

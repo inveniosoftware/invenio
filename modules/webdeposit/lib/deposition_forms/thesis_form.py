@@ -20,7 +20,6 @@
 from wtforms.validators import Required
 from invenio.webdeposit_form import WebDepositForm as Form
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_cook_json_utils import add_author
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
                                              bootstrap_submit
 
@@ -34,9 +33,8 @@ class ThesisForm(Form):
     title = fields.TitleField(label=_('Original Thesis Title'),
                               validators=[Required()])
     subtitle = fields.TitleField(label=_('Original Thesis Subtitle'),
-                                 recjson_key='title.subtitle')
-    author = fields.AuthorField(label=_('Author'),
-                                cook_function=add_author)
+                                 export_key='title.subtitle')
+    author = fields.AuthorField(label=_('Author'),)
     supervisor = fields.AuthorField(label=_('Thesis Supervisor'))
     abstract = fields.AbstractField(label=_('Abstract'))
 

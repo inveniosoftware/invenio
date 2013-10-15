@@ -34,15 +34,6 @@ class Date(WebDepositField, DateField):
         defaults.update(kwargs)
         super(Date, self).__init__(**defaults)
 
-    def json_data(self):
-        """
-        Serialize data into JSON serializalbe object
-        """
-        # Just use _value() to format the date into a string.
-        if self.data:
-            return self.data.strftime(self.format) #pylint: disable-msg=
-        return None
-
     def process_data(self, value):
         """
         Called when loading data from Python (incoming objects can be either
@@ -58,3 +49,13 @@ class Date(WebDepositField, DateField):
         # Be sure to set both self.object_data and self.data due to internals of
         # Field.process() and draft_form_process_and_validate().
         self.data = self.object_data
+
+    @property
+    def json_data(self):
+        """
+        Serialize data into JSON serializalbe object
+        """
+        # Just use _value() to format the date into a string.
+        if self.data:
+            return self.data.strftime(self.format) #pylint: disable-msg=
+        return None

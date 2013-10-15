@@ -105,6 +105,7 @@ WSGIRestrictStdout Off
     {%- for xsfp in [config.CFG_BIBDOCFILE_FILEDIR,
                     config.CFG_WEBDIR,
                     config.CFG_WEBSUBMIT_STORAGEDIR,
+                    config.CFG_WEBDEPOSIT_STORAGEDIR,
                     config.CFG_TMPDIR,
                     [config.CFG_PREFIX, 'var', 'tmp', 'attachfile']|path_join,
                     [config.CFG_PREFIX, 'var', 'data', 'comments']|path_join,

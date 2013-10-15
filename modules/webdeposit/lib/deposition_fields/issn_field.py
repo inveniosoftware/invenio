@@ -27,7 +27,7 @@ class ISSNField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
             icon='icon-barcode',
-            recjson_key='issn',
+            export_key='issn',
             #validators=[sherpa_romeo_issn_validate] #FIXME
         )
         defaults.update(kwargs)

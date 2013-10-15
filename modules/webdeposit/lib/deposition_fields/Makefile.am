@@ -18,21 +18,20 @@
 pylibdir = $(libdir)/python/invenio/webdeposit_deposition_fields
 
 pylib_DATA = __init__.py \
-             author_field.py \
-             journal_field.py \
-             publisher_field.py \
-             title_field.py \
-             date_field.py \
              abstract_field.py \
+             author_field.py \
+             date_field.py \
+             doi_field.py \
              file_upload_field.py \
              issn_field.py \
+             journal_field.py \
              keywords_field.py \
              language_field.py \
              notes_field.py \
              pages_number_field.py \
-             doi_field.py \
+             publisher_field.py \
              record_id_field.py \
-             wtforms_field.py \
-			 record_id_field.py
+             title_field.py \
+             wtforms_field.py
 
 CLEANFILES = *~ *.tmp *.pyc

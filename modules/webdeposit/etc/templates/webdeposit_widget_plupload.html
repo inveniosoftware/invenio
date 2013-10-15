@@ -1,7 +1,7 @@
 <div class="pluploader" {{field_id}}>
     <div class="well" id="filebox">
         <div id="drag_and_drop_text" style="text-align:center;z-index:-100;">
-            <h1><small>Drag and Drop files here</small></h1>
+            <h1><small>Drag and drop files here to upload</small></h1>
         </div>
     </div>
     <table id="file-table" class="table table-striped table-bordered" style="display:none;">
@@ -10,13 +10,13 @@
             <th>Filename</th>
             <th>Size</th>
             <th>Status</th>
-            <td></td>
+            <th></th>
             </tr>
         </thead>
         <tbody id="filelist">
         </tbody>
     </table>
-    <a class="btn btn-primary" id="pickfiles" >Select files</a>
+    <a class="btn" id="pickfiles" >Select files...</a>
     <a class="btn btn-success disabled" id="uploadfiles"><i class="icon-upload icon-white"></i> Start upload</a>
     <a class="btn btn-danger" id="stopupload"
     style="display:none;"><i class="icon-stop icon-white"></i> Cancel upload</a>

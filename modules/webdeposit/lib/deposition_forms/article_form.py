@@ -18,30 +18,62 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
 from wtforms.validators import Required
-from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_form import WebDepositForm as Form
+from invenio.webdeposit_form import WebDepositForm
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
-                                             bootstrap_submit
+    ExtendedListWidget, ListItemWidget, ckeditor_widget, TagInput, \
+    TagListWidget
 from invenio.webdeposit_load_fields import fields
 __all__ = ['ArticleForm']
 
 
-class ArticleForm(Form):
+def keywords_autocomplete(form, field, term, limit=50):
+    return ["Keyword 1", "Keyword 2"]
 
-    doi = fields.DOIField(label=_('DOI'), recjson_key='publication_info.DOI')
+
+class AuthorForm(WebDepositForm):
+    name = fields.TextField(
+        placeholder="Family name, First name",
+        widget_classes='span3',
+    )
+    affiliation = fields.TextField(
+        placeholder="Affiliation",
+        widget_classes='span2',
+    )
+
+
+class ArticleForm(WebDepositForm):
+
+    doi = fields.DOIField(label=_('DOI'), export_key='publication_info.DOI')
     publisher = fields.PublisherField(label=_('Publisher'),
                                       validators=[Required()],
-                                      recjson_key='imprint.publisher_name')
+                                      export_key='imprint.publisher_name')
     journal = fields.JournalField(label=_('Journal Title'),
                                   validators=[Required()])
-    issn = fields.ISSNField(label=_('ISSN'), recjson_key='issn')
+    issn = fields.ISSNField(label=_('ISSN'), export_key='issn')
     title = fields.TitleField(label=_('Document Title'),
-                              recjson_key='title.title')
-    author = fields.AuthorField(label=_('Author'),
-                                recjson_key='authors[0].full_name')
-    abstract = fields.AbstractField(label=_('Abstract'),
-                                    recjson_key='abstract.summary')
+                              export_key='title.title')
+    authors = fields.DynamicFieldList(
+        fields.FormField(
+            AuthorForm,
+            widget=ExtendedListWidget(
+                item_widget=ListItemWidget(with_label=False),
+                class_='inline',
+            ),
+        ),
+        label='Authors',
+        add_label='Add another author',
+        icon='icon-user',
+        widget_classes='',
+        min_entries=1,
+        export_key='authors'
+    )
+
+    abstract = fields.AbstractField(
+        label=_('Abstract'),
+        export_key='abstract.summary',
+        widget=ckeditor_widget
+    )
     pagesnum = fields.PagesNumberField(label=_('Number of Pages'))
     languages = [("en", _("English")),
                  ("fre", _("French")),
@@ -61,22 +93,40 @@ class ArticleForm(Form):
                  ("rus", _("Russian"))]
     language = fields.LanguageField(label=_('Language'), choices=languages)
     date = fields.Date(label=_('Date of Document'), widget=date_widget,
-                       recjson_key='imprint.date')
-    keywords = fields.KeywordsField(label=_('Keywords'))
-    notes = fields.NotesField(label=_('Notes'), recjson_key='comment')
-    plupload_file = fields.FileUploadField(widget=plupload_widget)
-    submit = fields.SubmitField(label=_('Submit Article'),
-                                widget=bootstrap_submit)
+                       export_key='imprint.date')
+    authors = fields.DynamicFieldList(
+        fields.FormField(
+            AuthorForm,
+            widget=ExtendedListWidget(
+                item_widget=ListItemWidget(with_label=False),
+                class_='inline',
+            ),
+        ),
+        label='Authors',
+        add_label='Add another author',
+        icon='icon-user',
+        widget_classes='',
+        min_entries=1,
+        export_key='authors'
+    )
+    keywords = fields.DynamicFieldList(
+        fields.TextField(
+            placeholder="Start typing a keyword...",
+            autocomplete=keywords_autocomplete,
+            widget=TagInput()
+        ),
+        widget=TagListWidget(template="{{value}}"),
+        icon='icon-tags',
+    )
+    notes = fields.NotesField(label=_('Notes'), export_key='comment')
+    plupload_file = fields.FileUploadField(widget=plupload_widget, label="")
 
     """ Form Configuration variables """
     _title = _('Submit an Article')
-    _subtitle = 'Instructions: (i) Press "Save" to save your upload for editing'\
-                'later, as many times you like. (ii) Upload and remove extra files in the'\
-                'bottom of the form. (iii) When ready, press "Submit" to finalize and make'\
-                'your upload public (editing afterwards only possible via submitting changes'\
-                'to <a class="muted"'\
-                'href="mailto:' + CFG_SITE_SUPPORT_EMAIL + '">' +\
-                CFG_SITE_SUPPORT_EMAIL+'</a>).'
+    _subtitle = 'Instructions: (i) Press "Save" to save your upload for '\
+                'editing later, as many times you like. (ii) Upload or remove'\
+                ' extra files in the bottom of the form. (iii) When ready, '\
+                'press "Submit" to finalize your upload.'
     _drafting = True   # enable and disable drafting
 
     # Group fields in categories
@@ -87,6 +137,6 @@ class ArticleForm(Form):
             {'description': "Publisher and Journal fields are required.",
              'indication': 'required'}),
         ('Basic Information',
-            ['title', 'author', 'abstract', 'pagesnum']),
+            ['title', 'authors', 'abstract', 'pagesnum']),
         ('Other', ['language', 'date', 'keywords', 'notes'])
     ]

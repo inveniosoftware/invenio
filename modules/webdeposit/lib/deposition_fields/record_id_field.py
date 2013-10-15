@@ -30,7 +30,7 @@ class RecordIDField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
             icon='icon-barcode',
-            recjson_key='recid',
+            export_key='recid',
             processors=[record_id_process]
         )
         defaults.update(kwargs)

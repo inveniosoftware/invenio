@@ -16,4 +16,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "webdeposit_add_base.html" %}
+{% extends "page.html" %}
+
+{% block body %}
+<div class="row">
+    <div class="span8">
+
+    <div class="progress progress-striped progress-danger" style="height: inherit;">
+        <div class="bar" style="width: 100%;">
+            <h4>Error</h4>
+        </div>
+    </div>
+    </div>
+    <div class="span4">
+        {% include "webdeposit_myview.html" %}
+    </div>
+    </div>
+</div>
+{% endblock %}

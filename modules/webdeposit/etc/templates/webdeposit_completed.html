@@ -1,0 +1,49 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+
+{% block body %}
+<div class="row">
+    <div class="span8">
+
+    <div class="well">
+        <span class="pull-right">
+            <button class="btn hide" data-toggle="tooltip" title="" ><i class="icon-pencil"></i> Edit</button>
+            <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}" class="btn btn-primary" data-toggle="tooltip" title=""><i class="icon-eye-open"></i> Live version</a>
+        </span>
+        <span class="clearfix"></span>
+    </div>
+
+    <div class="progress progress-striped progress-warning" style="height: inherit;">
+        <div class="bar" style="width: 100%;">
+            <h4>Preview</h4>
+        </div>
+    </div>
+    <small class="muted">This is a preview of your upload. The public version is available on <a href="{{url_for('record.metadata', recid=sip.metadata['recid'])}}">{{url_for('record.metadata', recid=sip.metadata['recid'], _external=True)}}</a>. If you want to remove your upload, please contact <a href="mailto:{{config.CFG_SITE_SUPPORT_EMAIL}}">{{config.CFG_SITE_SUPPORT_EMAIL}}</a>.</small>
+    <hr />
+    {{format_record(recID=sip.metadata['recid'], xml_record=sip.package, of='hd')|safe}}
+    {{format_record(recID=sip.metadata['recid'], xml_record=sip.package, of='hdinfo')|safe}}
+
+    </div>
+    <div class="span4">
+        {% include "webdeposit_myview.html" %}
+    </div>
+    </div>
+</div>
+{% endblock %}

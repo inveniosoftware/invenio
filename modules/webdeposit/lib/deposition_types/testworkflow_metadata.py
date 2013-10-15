@@ -10,26 +10,26 @@
 ##
 ## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from wtforms import TextField
-from invenio.webdeposit_field import WebDepositField
-from invenio.webdeposit_autocomplete_utils import orcid_authors
+from invenio.webdeposit_load_forms import forms
+from invenio.webdeposit_models import DepositionType
+from invenio.webdeposit_workflow_tasks import render_form
 
-__all__ = ['AuthorField']
+ArticleForm = forms['ArticleForm']
 
 
-class AuthorField(WebDepositField, TextField):
-    def __init__(self, **kwargs):
-        defaults = dict(
-            icon='icon-user',
-            export_key='authors[0].full_name',
-            autocomplete=orcid_authors
-        )
-        defaults.update(kwargs)
-        super(AuthorField, self).__init__(**defaults)
+__all__ = ['TestWorkflow']
+
+
+class TestWorkflow(DepositionType):
+    workflow = [render_form(ArticleForm)]
+    name = "TestWorkflow"
+    name_plural = "TestWorkflows"
+    group = ""
+    enabled = False

@@ -20,44 +20,49 @@
 
 
 {% macro form_action_bar(margin="") -%}
-    {% include "webdeposit_add_action_bar.html" %}
+    {% include "webdeposit_run_action_bar.html" %}
 {%- endmacro %}
 
 {%- macro form_group_accordion_start(group, idx) -%}
-    {% include "webdeposit_add_group_start.html" %}
+    {% include "webdeposit_run_group_start.html" %}
 {%- endmacro -%}
 
 {%- macro form_group_accordion_end(group, idx) -%}
-    {% include "webdeposit_add_group_end.html" %}
+    {% include "webdeposit_run_group_end.html" %}
 {%- endmacro -%}
 
 {%- macro field_label(thisfield) -%}
-    {% include "webdeposit_add_field_label.html" %}
+    {% include "webdeposit_run_field_label.html" %}
 {%- endmacro -%}
 
 {%- macro field_display(thisfield, field_class="span5", container_class="control-group") -%}
-    {% include "webdeposit_add_field.html" %}
+    {% include "webdeposit_run_field.html" %}
 {%- endmacro -%}
 
 {%- macro field_display_subform(thisfield) -%}
-    {% include "webdeposit_add_field_subform.html" %}
+    {% include "webdeposit_run_field_subform.html" %}
 {%- endmacro -%}
 
-{% block header %}
+{%- block header %}
     {{ super() }}
-    {% js 'js/jquery-ui.min.js', '20-jquery-ui' %}
-    {% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
-    {% js 'js/webdeposit_form.js', '50-webdeposit' %}
-    {% js 'js/hogan.js', '40-webdeposit-hogan' %}
-    {% js 'js/webdeposit_templates.js', '50-webdeposit' %}
-    {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
-    {% js 'ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
-    {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '20-jquery-ui' %}
-    {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css', '20-jquery-ui' %}
+    {%- block webdeposit_assets %}
+        {% js 'js/jquery-ui.min.js', '20-jquery-ui' %}
+        {% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
+        {% js 'js/webdeposit_form.js', '50-webdeposit' %}
+        {% js 'js/hogan.js', '40-webdeposit-hogan' %}
+        {% js 'js/webdeposit_templates.js', '50-webdeposit' %}
+        {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
+        {% js 'ckeditor/invenio-ckeditor-config.js', '50-ckeditor' %}
+        {% css 'img/jquery-ui/themes/base/jquery.ui.theme.css', '20-jquery-ui' %}
+        {% css 'img/jquery-ui/themes/base/jquery.ui.datepicker.css', '20-jquery-ui' %}
+    {%- endblock webdeposit_assets %}
+{%- endblock header %}
 
+{%- block css %}
 <style>
-
-.ui-autocomplete-loading { background: white url('{{ url_for('static', filename='img/loading.gif') }}') right center no-repeat; }
+.ui-autocomplete-loading {
+    background: white url('{{ url_for('static', filename='img/loading.gif') }}') right top no-repeat;
+}
 
 span.ui-icon.ui-icon-circle-triangle-w { color: transparent; cursor: pointer; }
 span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
@@ -80,19 +85,44 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
 
 .rmlink {
     cursor: pointer;
-    display: block;
-    margin-left: auto;
-    margin-right: auto
+}
+.sortlink {
+    cursor: move;
+    margin-left: 10px;
+}
+.empty-element {
+   display: none;
+}
+.sortlink:hover {
+   cursor: move;
+}
+.remove-element {
+   padding-left: 10px;
+}
+.field-list-element {
+    margin-bottom: 10px;
+}
+.field-list-element ul.inline {
+    margin: 0;
+}
+.tag {
+    cursor: move;
 }
 </style>
-
-{% endblock %}
+{%- endblock css %}
 
 {% block body %}
+{% block form_submit_dialog %}
+<div id="form-submit-dialog" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
+  <div class="modal-body">
+    <div align="center">Submitting <img src="/img/loading.gif" /></div>
+  </div>
+</div>
+{% endblock form_submit_dialog %}
 <div class="row">
     <div id="file_container" class="span8 form-feedback-warning">
     <div id="flash-message"></div>
-    <form enctype="multipart/form-data" name="submitForm" id="submitForm" class="form-horizontal" method="post" action="{{ url_for('webdeposit.add', deposition_type=deposition_type, uuid=uuid) }}">
+    <form enctype="multipart/form-data" name="submitForm" id="submitForm" class="form-horizontal" method="post" action="{{ url_for('.run', deposition_type=deposition_type, uuid=uuid) }}">
     {% block form_header scoped %}{{ form_action_bar() }}{% endblock form_header%}
 
     {% block form_title scoped %}
@@ -124,11 +154,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
                     <fieldset>
                     {% for field in fields %}
                         {% block field_body scoped %}
-                            {% if field.form %}
-                                {{ field_display_subform(field) }}
-                            {% else %}
-                                {{ field_display(field) }}
-                            {% endif %}
+                            {{ field_display(field) }}
                         {% endblock field_body %}
                     {% endfor %}
                     </fieldset>
@@ -146,7 +172,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
             {% endblock form_group %}
         {% endfor %}
     {% endblock form_body %}
-
+    {% block form_footer scoped %}{{ form_action_bar() }}{% endblock form_footer %}
     </form>
     </div>
     {% if form._drafting %}
@@ -168,36 +194,44 @@ var date_options = {dateFormat: 'yy-mm-dd'}
 </script>
 {%- endblock form_script_options %}
 <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
-<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    required_fields = {{ form.required_field_names|tojson|safe }};
+    {# Fix issue with typeahead.js drop-down partly cut-off due to overflow #}
+    $('#webdeposit_form_accordion').on('hide', function (e) {
+        $(e.target).css("overflow","hidden");
+    })
+    $('#webdeposit_form_accordion').on('shown', function (e) {
+        $(e.target).css("overflow", "visible");
+    })
+    $('#webdeposit_form_accordion .accordion-body.in.collapse').css("overflow", "visible");
+});
+$(document).ready(function() {
+    var save_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}';
+    var save_all_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, all='1') }}';
+    var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
+    var autocomplete_url = '{{ url_for(".autocomplete", form_type=form.type, field_name="__FIELDNAME__") }}';
 
     webdeposit_init_plupload(
+        '{{config.CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
         '.pluploader',
-        '{{ url_for('webdeposit.plupload', deposition_type=deposition_type, uuid=uuid) }}',
-        '{{ url_for('webdeposit.plupload_delete', uuid=uuid) }}',
-        '{{ url_for('webdeposit.plupload_get_file', uuid=uuid) }}',
+        save_url,
+        '{{ url_for('.upload_file', deposition_type=deposition_type, uuid=uuid) }}',
+        '{{ url_for('.delete_file', deposition_type=deposition_type, uuid=uuid) }}',
+        '{{ url_for('.get_file', deposition_type=deposition_type, uuid=uuid) }}',
         {{ form.files|safe }},
-        '{{ url_for('webdeposit.upload_from_url', deposition_type=deposition_type, uuid=uuid) }}'
+        '{{ url_for('.upload_url', deposition_type=deposition_type, uuid=uuid) }}'
     );
-    webdeposit_input_error_check('#submitForm input, #submitForm textarea, #submitForm select', '{{ url_for("webdeposit.error_check", uuid=uuid) }}');
-    webdeposit_button_click('#submitForm .form-button', '{{ url_for("webdeposit.error_check", uuid=uuid) }}');
-    webdeposit_check_status('{{ url_for('webdeposit.check_status', uuid=uuid) }}');
-    // Render autocomplete functions and ckeditor
-{%- for field in form %}
-    {%- if field.autocomplete %}
-    webdeposit_field_autocomplete('input[name="{{ field.name }}"]', '{{ url_for("webdeposit.autocomplete", form_type=form.type, field=field.name) }}');
-    {%- endif %}
-    {%- if field.ckeditor %}
-    webdeposit_ckeditor_init( '{{ field.id }}', '{{ url_for("webdeposit.error_check", uuid=uuid) }}');
-    {%- endif %}
-{%- endfor %}
-    $(".datepicker").datepicker();
+    webdeposit_init_save(save_all_url, '.form-save', '#submitForm');
+    webdeposit_init_submit(complete_url, '.form-submit', '#submitForm', '#form-submit-dialog');
+    webdeposit_init_inputs('#submitForm input, #submitForm textarea, #submitForm select', save_url);
+    webdeposit_init_buttons('#submitForm .form-button', save_url);
+    webdeposit_init_autocomplete('[data-autocomplete="1"]', save_url, autocomplete_url);
+    webdeposit_init_field_lists('#submitForm .dynamic-field-list', save_url, '[data-autocomplete="1"]', autocomplete_url);
+    webdeposit_init_ckeditor( '#submitForm textarea[data-ckeditor="1"]', save_url);
 
-    // Save & submit buttons
-    webdeposit_init_save('{{ url_for("webdeposit.error_check", uuid=uuid) }}', '.form-save', '#submitForm');
-    webdeposit_init_submit('{{ url_for("webdeposit.error_check", uuid=uuid) }}', '.form-submit', '#submitForm');
+    // Date picker
+    $(".datepicker").datepicker(date_options);
+    //webdeposit_check_status('{{ url_for('.status', deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}');
 });
 </script>
 {% endblock javascript %}

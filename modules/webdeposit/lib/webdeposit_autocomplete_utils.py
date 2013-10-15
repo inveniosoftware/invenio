@@ -19,6 +19,21 @@
 
 from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.orcid import OrcidSearch
+from invenio.bibknowledge import get_kb_mappings
+
+
+def kb_autocomplete(name, mapper=None):
+    """
+    Create a autocomplete function from knowledge base
+
+    @param name: Name of knowledge base
+    @param mapper: Function that will map an knowledge base entry to
+                   autocomplete entry.
+    """
+    def inner(dummy_form, dummy_field, term, limit=50):
+        result = get_kb_mappings(name, '', term)[:limit]
+        return map(mapper, result) if mapper is not None else result
+    return inner
 
 
 def sherpa_romeo_publishers(dummy_form, term, limit=50):

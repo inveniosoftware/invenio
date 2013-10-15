@@ -26,6 +26,8 @@ See more information on:
 http://wtforms.simplecodes.com/docs/1.0.4/fields.html#wtforms.fields.Field.__init__
 """
 
+from invenio.htmlutils import HTMLWasher
+
 
 def strip_string(value):
     """
@@ -104,3 +106,14 @@ def strip_prefixes(*prefixes):
                     return value[len(prefix):]
         return value
     return _inner
+
+
+def sanitize_html(value):
+    """
+    Sanitize HTML
+    """
+    if isinstance(value, basestring):
+        washer = HTMLWasher()
+        return washer.wash(value)
+    else:
+        return value

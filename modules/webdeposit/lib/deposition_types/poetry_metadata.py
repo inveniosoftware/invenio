@@ -18,28 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.webdeposit_load_forms import forms
-from invenio.webdeposit_workflow_utils import authorize_user, \
-                                              render_form, \
-                                              wait_for_submission, \
-                                              export_marc_from_json, \
-                                              create_record_from_marc
+from invenio.webdeposit_models import DepositionType
+from invenio.webdeposit_workflow_tasks import render_form
 
 __all__ = ['Poetry']
-
-
 PoemForm = forms['PoemForm']
 
-dep_type = "Poetry"
-plural = "Poems"
-group = "Multimedia & Arts"
-wf = [authorize_user(),
-      render_form(PoemForm),
-      wait_for_submission(),
-      export_marc_from_json(),
-      create_record_from_marc()]
 
-Poetry = {"dep_type": dep_type,
-          "workflow": wf,
-          "plural": plural,
-          "group": group,
-          "enabled": True}
+class Poetry(DepositionType):
+    workflow = [render_form(PoemForm), ]
+    name = "Poetry"
+    name_plural = "Poems"
+    group = "Multimedia & Arts"
+    enabled = True
+    default = False

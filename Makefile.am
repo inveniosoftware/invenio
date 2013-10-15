@@ -355,6 +355,26 @@ uninstall-hogan-plugin:
 	@echo "** Hogan.js was successfully uninstalled.                **"
 	@echo "***********************************************************"
 
+install-typeahead-plugin:
+	@echo "***********************************************************"
+	@echo "** Installing typeahead.js, please wait...               **"
+	@echo "***********************************************************"
+	rm -rf /tmp/typeahead
+	mkdir /tmp/typeahead
+	(cd /tmp/typeahead && \
+	wget -O typeahead.min.js 'http://twitter.github.com/typeahead.js/releases/latest/typeahead.min.js' && \
+	cp typeahead.min.js ${prefix}/var/www/js/typeahead.min.js && \
+	rm -fr /tmp/typeahead )
+	@echo "***********************************************************"
+	@echo "** typeahead.js was successfully installed.              **"
+	@echo "***********************************************************"
+
+uninstall-typeahead-plugin:
+	rm ${prefix}/var/www/js/typeahead.min.js
+	@echo "***********************************************************"
+	@echo "** typeahead.js was successfully uninstalled.            **"
+	@echo "***********************************************************"
+
 install-jquery-tokeninput:
 	@echo "***********************************************************"
 	@echo "** Installing JQuery Tokeninput, please wait...          **"

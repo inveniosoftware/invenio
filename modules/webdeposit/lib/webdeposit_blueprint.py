@@ -17,9 +17,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebDeposit Flask Blueprint"""
+"""WebDeposit Blueprint"""
 
-import os
+import json
+from functools import wraps
 
 from flask import current_app, \
     render_template, \
@@ -29,128 +30,169 @@ from flask import current_app, \
     url_for, \
     flash, \
     send_file, \
-    abort
+    abort, \
+    make_response
 from werkzeug.utils import secure_filename
-from uuid import uuid1 as new_uuid
 
-from invenio.cache import cache
-from invenio.webdeposit_load_deposition_types import deposition_types, \
-    deposition_metadata
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
-from invenio.webdeposit_utils import get_form, \
-    draft_field_list_add, \
-    delete_workflow, \
-    create_workflow, \
-    get_latest_or_new_workflow, \
-    get_workflow, \
-    draft_field_get_all, \
-    draft_form_process_and_validate, \
-    draft_form_autocomplete, \
-    draft_field_get, \
-    set_form_status, \
-    get_form_status, \
-    create_user_file_system, \
-    CFG_DRAFT_STATUS, \
-    url_upload,\
-    get_all_drafts, \
-    deposit_files, \
-    delete_file, \
-    save_form
+
 from invenio.webuser_flask import current_user
-from invenio.bibworkflow_config import CFG_WORKFLOW_STATUS
 
-blueprint = InvenioBlueprint('webdeposit', __name__,
-                             url_prefix='/deposit',
-                             config='invenio.websubmit_config',
-                             menubuilder=[('main.webdeposit',
-                                          _('Deposit'),
-                                          'webdeposit.index_deposition_types',
-                                          2)],
-                             breadcrumbs=[(_('Deposit'),
-                                          'webdeposit.index_deposition_types')])
+from invenio.webdeposit_load_forms import forms
+from invenio.webdeposit_signals import template_context_created
+from invenio.webdeposit_models import Deposition, DepositionType, \
+    DepositionFile, InvalidDepositionType, DepositionDoesNotExists, \
+    DraftDoesNotExists, FormDoesNotExists, DepositionNotDeletable, \
+    DepositionDraftCacheManager
+from invenio.webdeposit_storage import ChunkedDepositionStorage, \
+    DepositionStorage, ExternalFile, UploadError
 
 
-@blueprint.route('/upload_from_url/<deposition_type>/<uuid>', methods=['POST'])
-@blueprint.invenio_authenticated
-def upload_from_url(deposition_type, uuid):
-    if request.method == 'POST':
-        url = request.form['url']
-
-        if "name" in request.form:
-            name = request.form['name']
-        else:
-            name = None
-
-        if "size" in request.form:
-            size = request.form['size']
-        else:
-            size = None
-
-        unique_filename = url_upload(current_user.get_id(),
-                                     deposition_type,
-                                     uuid, url, name, size)
-        return unique_filename
+blueprint = InvenioBlueprint(
+    'webdeposit',
+    __name__,
+    url_prefix='/deposit',
+    config='invenio.websubmit_config',
+    menubuilder=[('main.webdeposit', _('Upload'), 'webdeposit.index', 3)],
+    breadcrumbs=[(_('Upload'), 'webdeposit.index')]
+)
 
 
-@blueprint.route('/upload/<deposition_type>/<uuid>', methods=['POST'])
-@blueprint.invenio_authenticated
-def plupload(deposition_type, uuid):
-    """ The file is splitted in chunks on the client-side
-        and it is merged again on the server-side
+deptypes = "<any(%s):deposition_type>" % (", ".join(
+    map(lambda x: '"%s"' % x, DepositionType.keys())
+))
+"""
+URL pattern of matching all deposition types.
+"""
 
-        @return: the path of the uploaded file
+
+def deposition_error_handler(endpoint='.index'):
     """
-    return deposit_files(current_user.get_id(), deposition_type, uuid)
-
-
-@blueprint.route('/plupload_delete/<uuid>', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-def plupload_delete(uuid):
-    return delete_file(current_user.get_id(), uuid)
-
-
-@blueprint.route('/plupload_get_file/<uuid>', methods=['GET'])
-@blueprint.invenio_authenticated
-def plupload_get_file(uuid):
-    filename = request.args.get('filename')
-    tmp = ""
-    files = draft_field_get(current_user.get_id(), uuid, "files")
-    for f in files:
-        tmp += f['file'].split('/')[-1] + '<br><br>'
-        if filename == f['file'].split('/')[-1]:
-            return send_file(f['file'],
-                             attachment_filename=f['name'],
-                             as_attachment=True)
-
-    return "filename: " + filename + '<br>' + tmp
-
-
-@blueprint.route('/check_status/<uuid>/', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-def check_status(uuid):
-    form_status = get_form_status(current_user.get_id(), uuid)
-    return jsonify({"status": form_status})
-
-
-@blueprint.route('/autocomplete/<form_type>/<field>', methods=['GET', 'POST'])
-@blueprint.invenio_authenticated
-def autocomplete(form_type, field):
-    """ Returns a list with of suggestions for the field
-        based on the current value
+    Decorator to handle deposition exceptions
     """
-    term = request.args.get('term')  # value
-    limit = request.args.get('limit', 50, type=int)
+    def decorator(f):
+        @wraps(f)
+        def inner(*args, **kwargs):
+            try:
+                return f(*args, **kwargs)
+            except InvalidDepositionType, dummy_e:
+                if request.is_xhr:
+                    abort(400)
+                flash(_("Invalid deposition type."), 'error')
+                return redirect(url_for(endpoint))
+            except (DepositionDoesNotExists,), dummy_e:
+                flash(_("Deposition does not exists."), 'error')
+                return redirect(url_for(endpoint))
+            except (DepositionNotDeletable,), dummy_e:
+                flash(_("Deposition cannot be deleted."), 'error')
+                return redirect(url_for(endpoint))
+            except (DraftDoesNotExists,), dummy_e:
+                abort(400)
+            except (FormDoesNotExists,), dummy_e:
+                abort(400)
+            except (UploadError,), dummy_e:
+                abort(400)
+        return inner
+    return decorator
 
-    result = draft_form_autocomplete(
-        form_type, field, term, limit
+
+@blueprint.route('/')
+@blueprint.invenio_authenticated
+def index():
+    """
+    Renders the deposition index page
+
+    The template context can be customized via the template_context_created
+    signal.
+    """
+    current_app.config['breadcrumbs_map'][request.endpoint] = [
+        (_('Home'), '')] + blueprint.breadcrumbs
+
+    draft_cache = DepositionDraftCacheManager.from_request()
+    draft_cache.save()
+
+    ctx = dict(
+        deposition_types=DepositionType.all(),
+        my_depositions=Deposition.get_depositions(current_user),
+        prefill_data=draft_cache.data,
     )
 
-    return jsonify(results=result)
+    # Send signal to allow modifications to the template context
+    template_context_created.send(
+        '%s.%s' % (blueprint.name, index.__name__),
+        context=ctx
+    )
+
+    return render_template(
+        'webdeposit_index.html',
+        **ctx
+    )
 
 
-@blueprint.route('/save/<uuid>', methods=['POST'])
+@blueprint.route('/%s/' % deptypes)
 @blueprint.invenio_authenticated
-def error_check(uuid):
+def deposition_type_index(deposition_type):
+    if len(DepositionType.keys()) <= 1 and DepositionType.get_default():
+        abort(404)
+
+    deptype = DepositionType.get(deposition_type)
+    if not deptype.is_enabled():
+        abort(404)
+
+    current_app.config['breadcrumbs_map'][request.endpoint] = \
+        [(_('Home'), '')] + blueprint.breadcrumbs + \
+         [(deptype.name_plural, None)]
+
+    draft_cache = DepositionDraftCacheManager.from_request()
+    draft_cache.save()
+
+    ctx = dict(
+        my_depositions=Deposition.get_depositions(current_user, type=deptype),
+        prefill_data=draft_cache.data,
+        deposition_type=deptype
+    )
+
+    # Send signal to allow modifications to the template context
+    template_context_created.send(
+        '%s.%s' % (blueprint.name, deposition_type_index.__name__),
+        context=ctx
+    )
+
+    return render_template(
+        'webdeposit_deposition_type.html',
+        **ctx
+    )
+
+
+@blueprint.route('/%s/create/' % deptypes, methods=['POST', 'GET'])
+@blueprint.route('/create/', methods=['POST', 'GET'])
+@blueprint.invenio_authenticated
+@deposition_error_handler()
+def create(deposition_type=None):
+    """
+    Create a new deposition
+    """
+    if request.is_xhr and request.method != 'POST':
+        return ('', 405)
+
+    deposition = Deposition.create(current_user, deposition_type)
+    deposition.save()
+
+    return (str(deposition.id), 200) if request.is_xhr else redirect(url_for(
+        ".run",
+        deposition_type=(
+            None if deposition.type.is_default()
+            else deposition.type.get_identifier()
+        ),
+        uuid=deposition.id
+    ))
+
+
+@blueprint.route('/%s/<uuid>/<draft_id>/' % deptypes, methods=['POST'])
+@blueprint.route('/<uuid>/<draft_id>/', methods=['POST'])
+@blueprint.invenio_authenticated
+@deposition_error_handler()
+def save(deposition_type=None, uuid=None, draft_id=None):
     """
     Save and run error check on field values
 
@@ -195,8 +237,29 @@ def error_check(uuid):
     if request.method != 'POST':
         abort(400)
 
-    # Process data, run validation, set in workflow object and return result
-    result = draft_form_process_and_validate(current_user.get_id(), uuid, request.json)
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+
+    is_submit = request.args.get('submit') == '1'
+    is_complete_form = request.args.get('all') == '1'
+
+    data = request.json
+    if 'files' in data:
+        deposition.sort_files(data['files'])
+
+    # get_draft() and process() will raise an exception if draft doesn't exist
+    # or the draft does not have a form.
+    draft = deposition.get_draft(draft_id)
+    if draft.is_completed():
+        abort(400)
+    dummy_form, validated, result = draft.process(
+        data, complete_form=is_complete_form
+    )
+
+    # Complete draft only if form validates.
+    if validated and is_submit:
+        draft.complete()
+
+    deposition.save()
 
     try:
         return jsonify(result)
@@ -204,177 +267,208 @@ def error_check(uuid):
         return jsonify(None)
 
 
-@blueprint.route('/<deposition_type>/delete/<uuid>')
+@blueprint.route('/%s/<uuid>/delete/' % deptypes)
+@blueprint.route('/<uuid>/delete/')
 @blueprint.invenio_authenticated
-def delete(deposition_type, uuid):
-    """ Deletes the whole deposition with uuid=uuid
-        (including form drafts)
-        redirects to load another workflow
+@deposition_error_handler()
+def delete(deposition_type=None, uuid=None):
     """
-    if deposition_type not in deposition_metadata:
-        flash(_('Invalid deposition type `%s`.' % deposition_type), 'error')
-        return redirect(url_for('.index_deposition_types'))
-    delete_workflow(current_user.get_id(), uuid)
-    flash(deposition_type + _(' deposition deleted!'), 'error')
-    return redirect(url_for("webdeposit.index",
-                            deposition_type=deposition_type))
+    Deletes the whole deposition with uuid=uuid (including form drafts) and
+    redirect to index page.
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+    deposition.delete()
+
+    flash(_('%(name)s deleted.') % {'name': deposition.type.name}, 'success')
+    return redirect(url_for(".index"))
 
 
-@blueprint.route('/<deposition_type>/new/')
+@blueprint.route('/%s/<uuid>/' % deptypes, methods=['GET', 'POST'])
+@blueprint.route('/<uuid>/', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-def create_new(deposition_type):
-    """ Creates new deposition
+@deposition_error_handler()
+def run(deposition_type=None, uuid=None):
     """
-    if deposition_type not in deposition_metadata:
-        flash(_('Invalid deposition type `%s`.' % deposition_type), 'error')
-        return redirect(url_for('.index_deposition_types'))
-    workflow = create_workflow(deposition_type, current_user.get_id())
-    uuid = workflow.get_uuid()
-    flash(deposition_type + _(' deposition created!'), 'info')
-    return redirect(url_for("webdeposit.add",
-                            deposition_type=deposition_type,
-                            uuid=uuid))
+    Runs the workflows and shows the current output of the workflow.
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+
+    # Set breadcrumb
+    breadcrumb = [(_('Home'), '')] + blueprint.breadcrumbs
+    if not deposition.type.is_default():
+        breadcrumb.append(
+            (deposition.type.name, '.deposition_type_index', {
+                'deposition_type': deposition.type.get_identifier()
+            })
+        )
+
+    breadcrumb.append(
+        (deposition.title or _('Untitled'), '.run', {
+            'deposition_type': deposition.type.get_identifier(),
+            'uuid': deposition.id
+        })
+    )
+    current_app.config['breadcrumbs_map'][request.endpoint] = breadcrumb
+
+    # If normal form handling should be supported, it can be handled here with
+    # something like::
+    #
+    # if request.method == 'POST':
+    #     # draft_id should be sent from the form.
+    #     draft = deposition.get_draft(draft_id)
+    #     dummy_form, validated, dummy_results = draft.process(request.form)
+    #     if validated:
+    #         draft.complete()
+    #     deposition.save()
+
+    return deposition.run_workflow()
 
 
-@blueprint.route('/')
-def index_deposition_types():
-    """ Renders the deposition types (workflows) list """
-    current_app.config['breadcrumbs_map'][request.endpoint] = [
-        (_('Home'), '')] + blueprint.breadcrumbs
-    drafts = get_all_drafts(current_user.get_id())
-
-    return render_template('webdeposit_index_deposition_types.html',
-                           deposition_types=deposition_types,
-                           drafts=drafts)
-
-
-@blueprint.route('/<deposition_type>/')
+@blueprint.route('/%s/<uuid>/<draft_id>/status/' % deptypes,
+                 methods=['GET', 'POST'])
+@blueprint.route('/<uuid>/<draft_id>/status/', methods=['GET', 'POST'])
 @blueprint.invenio_authenticated
-def index(deposition_type):
-    if deposition_type not in deposition_metadata:
-        flash(_('Invalid deposition type `%s`.' % deposition_type), 'error')
-        return redirect(url_for('.index_deposition_types'))
-    current_app.config['breadcrumbs_map'][request.endpoint] = [
-        (_('Home'), '')] + blueprint.breadcrumbs + [(deposition_type, None)]
-    user_id = current_user.get_id()
-    drafts = draft_field_get_all(user_id, deposition_type)
-
-    from invenio.bibworkflow_model import Workflow
-    past_depositions = \
-        Workflow.get(Workflow.name == deposition_type,
-                     Workflow.user_id == user_id,
-                     Workflow.status == CFG_WORKFLOW_STATUS.FINISHED).\
-        all()
-
-    return render_template('webdeposit_index.html', drafts=drafts,
-                           deposition_type=deposition_type,
-                           deposition_types=deposition_types,
-                           past_depositions=past_depositions)
+@deposition_error_handler()
+def status(deposition_type=None, uuid=None, draft_id=None):
+    """
+    Get the status of a draft (uncompleted/completed)
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+    completed = deposition.get_draft(draft_id).is_completed()
+    return jsonify({"status": 1 if completed else 0})
 
 
-@blueprint.route('/<deposition_type>/<uuid>', methods=['GET', 'POST'])
+@blueprint.route('/%s/<uuid>/file/url/' % deptypes, methods=['POST'])
+@blueprint.route('/<uuid>/file/url/', methods=['POST'])
 @blueprint.invenio_authenticated
-def add(deposition_type, uuid):
+@deposition_error_handler()
+def upload_url(deposition_type=None, uuid=None):
     """
-        Runs the workflows and shows the current form/output of the workflow
-        Loads the associated to the uuid workflow.
-
-        if the current step of the workflow renders a form, it loads it.
-        if the workflow is finished or in case of error,
-        it redirects to the deposition types page
-        flashing also the associated message.
-
-        Moreover, it handles a form's POST request for the fields and files,
-        and validates the whole form after the submission.
-
-        @param deposition_type: the type of the deposition to be run.
-        @param uuid: the universal unique identifier for the workflow.
+    Upload a new file by use of a URL
     """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
 
-    status = 0
+    # TODO: Improve to read URL as a chunked file to prevent overfilling
+    # memory.
+    url_file = ExternalFile(
+        request.form['url'],
+        request.form.get('name', None),
+    )
 
-    if deposition_type not in deposition_metadata:
-        flash(_('Invalid deposition type `%s`.' % deposition_type), 'error')
-        return redirect(url_for('.index_deposition_types'))
+    df = DepositionFile(backend=DepositionStorage(deposition.id))
 
-    elif uuid is None:
-        # get the latest one. if there is no workflow created
-        # lets create a new workflow with given deposition type
-        workflow = get_latest_or_new_workflow(deposition_type)
-        uuid = workflow.get_uuid()
-        #flash(_('Deposition %s') % (uuid,), 'info')
-        return redirect(url_for('.add', deposition_type=deposition_type,
-                                uuid=uuid))
+    if df.save(url_file, filename=secure_filename(url_file.filename)):
+        deposition.add_file(df)
+        deposition.save()
+
+    url_file.close()
+
+    return jsonify(
+        dict(filename=df.name, id=df.uuid, checksum=df.checksum)
+    )
+
+
+@blueprint.route('/%s/<uuid>/file/' % deptypes, methods=['POST'])
+@blueprint.route('/<uuid>/file/', methods=['POST'])
+@blueprint.invenio_authenticated
+@deposition_error_handler()
+def upload_file(deposition_type=None, uuid=None):
+    """
+    Upload a new file (with chunking support)
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+
+    uploaded_file = request.files['file']
+    filename = secure_filename(
+        request.form.get('name') or uploaded_file.filename
+    )
+    chunk = request.form.get('chunk', None)
+    chunks = request.form.get('chunks', None)
+
+    if chunk is not None and chunks is not None:
+        backend = ChunkedDepositionStorage(deposition.id)
+        kwargs = dict(chunk=chunk, chunks=chunks)
     else:
-        # get workflow with specific uuid
-        workflow = get_workflow(uuid, deposition_type)
-        if workflow is None:
-            flash(_('Deposition with uuid `') + uuid + '` not found.', 'error')
-            return redirect(url_for('.index_deposition_types'))
+        backend = DepositionStorage(deposition.id)
+        kwargs = {}
 
-    cache.delete_many(str(current_user.get_id()) + ":current_deposition_type",
-                      str(current_user.get_id()) + ":current_uuid")
-    cache.add(str(current_user.get_id()) + ":current_deposition_type",
-              deposition_type)
-    cache.add(str(current_user.get_id()) + ":current_uuid", uuid)
+    df = DepositionFile(backend=backend)
 
-    current_app.config['breadcrumbs_map'][request.endpoint] = [
-        (_('Home'), '')] + blueprint.breadcrumbs + \
-        [(deposition_type, 'webdeposit.index',
-         {'deposition_type': deposition_type}),
-         (uuid, 'webdeposit.add',
-         {'deposition_type': deposition_type, 'uuid': uuid})]
+    if df.save(uploaded_file, filename=filename, **kwargs):
+        deposition.add_file(df)
+        deposition.save()
+        return jsonify(
+            dict(filename=df.name, id=df.uuid, checksum=df.checksum)
+        )
 
-    if request.method == 'POST':
-        # Save the files
-        for uploaded_file in request.files.values():
-            filename = secure_filename(uploaded_file.filename)
-            if filename == "":
-                continue
+    return jsonify(dict(filename=df.name, id=df.uuid, checksum=None))
 
-            CFG_USER_WEBDEPOSIT_FOLDER = create_user_file_system(current_user.get_id(),
-                                                                 deposition_type,
-                                                                 uuid)
-            unique_filename = str(new_uuid()) + filename
-            file_path = os.path.join(CFG_USER_WEBDEPOSIT_FOLDER,
-                                     unique_filename)
-            uploaded_file.save(file_path)
-            size = os.path.getsize(file_path)
-            file_metadata = dict(name=filename, file=file_path, size=size)
-            draft_field_list_add(current_user.get_id(), uuid,
-                                 "files", file_metadata)
 
-        # Save form values
-        form = get_form(current_user.get_id(), uuid, formdata=request.form)
+@blueprint.route('/%s/<uuid>/file/delete/' % deptypes,
+                 methods=['POST'])
+@blueprint.route('/<uuid>/file/delete/', methods=['POST'])
+@blueprint.invenio_authenticated
+@deposition_error_handler()
+def delete_file(deposition_type=None, uuid=None):
+    """
+    Delete an uploaded file
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
 
-        # Validate form
-        if not form.validate():
-            # render the form with error messages
-            # the `workflow.get_output` function returns also the template
-            form.post_process()
-            save_form(current_user.get_id(), uuid, form)
-            return render_template(**workflow.get_output(form=form,
-                                                         form_validation=True))
-        #Set the latest form status to finished
-        set_form_status(current_user.get_id(), uuid,
-                        CFG_DRAFT_STATUS['finished'])
-        save_form(current_user.get_id(), uuid, form)
+    try:
+        df = deposition.remove_file(request.form['file_id'])
+        df.delete()
 
-    workflow.run()
-    status = workflow.get_status()
-    if status != CFG_WORKFLOW_STATUS.FINISHED and \
-            status != CFG_WORKFLOW_STATUS.ERROR:
-        # render current step of the workflow
-        # the `workflow.get_output` function returns also the template
-        return render_template(**workflow.get_output())
-    elif status == CFG_WORKFLOW_STATUS.FINISHED:
-        msg = deposition_type + _(' deposition has been successfully finished.')
-        recid = workflow.get_data('recid')
-        if recid is not None:
-            msg += ' Record available <a href=/record/%s>here</a>.' % recid
-        flash(msg, 'success')
-        return redirect(url_for('.index_deposition_types'))
-    elif status == CFG_WORKFLOW_STATUS.ERROR:
-        flash(deposition_type + _(' deposition %s has returned error.'), 'error')
-        current_app.logger.error('Deposition: %s has returned error. %d' % uuid)
-        return redirect(url_for('.index_deposition_types'))
+        deposition.save()
+
+        return ('', 200)
+    except Exception, e:
+        print "DEBUG", e
+        return ('', 400)
+
+
+@blueprint.route('/%s/<uuid>/file/' % deptypes, methods=['GET'])
+@blueprint.route('/<uuid>/file/', methods=['GET'])
+@blueprint.invenio_authenticated
+@deposition_error_handler()
+def get_file(deposition_type=None, uuid=None):
+    """
+    Download an uploaded file
+    """
+    deposition = Deposition.get(uuid, current_user, type=deposition_type)
+
+    df = deposition.get_file(request.args.get('file_id'))
+
+    if df.is_local():
+        return send_file(
+            df.get_syspath(),
+            attachment_filename=df.name,
+            as_attachment=True
+        )
+    else:
+        return redirect(df.get_url())
+
+
+@blueprint.route('/autocomplete/<form_type>/<field_name>',
+                 methods=['GET', 'POST'])
+@blueprint.invenio_authenticated
+def autocomplete(form_type, field_name):
+    """
+    Auto-complete a form field
+    """
+    term = request.args.get('term')  # value
+    limit = request.args.get('limit', 50, type=int)
+
+    try:
+        form = forms[form_type]()
+        result = form.autocomplete(field_name, term, limit=limit)
+        result = result if result is not None else []
+    except KeyError:
+        result = []
+
+    # jsonify doesn't return lists as top-level items.
+    resp = make_response(
+        json.dumps(result, indent=None if request.is_xhr else 2)
+    )
+    resp.mimetype = "application/json"
+    return resp

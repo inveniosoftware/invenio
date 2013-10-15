@@ -25,6 +25,6 @@ __all__ = ['FileUploadField']
 
 class FileUploadField(WebDepositField, FileField):
     def __init__(self, **kwargs):
-        defaults = dict(icon='icon-file')
+        defaults = dict(icon='icon-upload', export_key=False)
         defaults.update(kwargs)
         super(FileUploadField, self).__init__(**defaults)

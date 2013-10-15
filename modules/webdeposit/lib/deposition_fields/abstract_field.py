@@ -28,7 +28,7 @@ class AbstractField(WebDepositField, TextAreaField):
     def __init__(self, **kwargs):
         defaults = dict(
             icon='icon-pencil',
-            recjson_key='abstract.summary'
+            export_key='abstract.summary'
         )
         defaults.update(kwargs)
         super(AbstractField, self).__init__(**defaults)

@@ -27,7 +27,7 @@ __all__ = ['LanguageField']
 class LanguageField(WebDepositField, SelectField):
     def __init__(self, **kwargs):
         defaults = dict(icon='icon-flag',
-                        recjson_key='language',
+                        export_key='language',
                         validators=[optional()])
         defaults.update(kwargs)
         super(LanguageField, self).__init__(**defaults)

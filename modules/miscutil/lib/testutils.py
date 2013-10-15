@@ -1,27 +1,27 @@
-## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable=E1102
+
+from __future__ import with_statement
 
 """
 Helper functions for building and running test suites.
 """
-
-__revision__ = "$Id$"
 
 CFG_TESTUTILS_VERBOSE = 1
 
@@ -31,6 +31,8 @@ import time
 import unittest2
 import cgi
 import subprocess
+import binascii
+import StringIO
 
 from flask import request, url_for
 from warnings import warn
@@ -48,10 +50,10 @@ except ImportError:
 import unittest
 
 from invenio.config import CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL, CFG_PYLIBDIR, \
-     CFG_JSTESTDRIVER_PORT, CFG_WEBDIR, CFG_PREFIX
+    CFG_SITE_SECURE_URL, CFG_LOGDIR, CFG_SITE_NAME_INTL, CFG_PYLIBDIR, \
+    CFG_JSTESTDRIVER_PORT, CFG_WEBDIR, CFG_PREFIX
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
-     CFG_TESTS_REQUIRE_HTML_VALIDATION
+    CFG_TESTS_REQUIRE_HTML_VALIDATION
 from invenio.pluginutils import PluginContainer
 
 try:
@@ -61,6 +63,7 @@ except ImportError:
         """Helper decorator to mark a function as not to be tested by nose."""
         f.__test__ = False
         return f
+
 
 @nottest
 def warn_user_about_tests(test_suite_type='regression'):
@@ -119,6 +122,7 @@ Please confirm by typing 'Yes, I know!': """ % test_suite_type)
 
     return
 
+
 @nottest
 def make_test_suite(*test_cases):
     """ Build up a test suite given separate test cases"""
@@ -136,8 +140,9 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
 from invenio.webinterface_handler_flask import create_invenio_flask_app, \
     with_app_context
 from invenio.urlutils import rewrite_to_secure_url
-import pyparsing  # needed to import here before flask.ext.testing in
-                  # order to avoid pyparsing troubles due to twill
+import pyparsing  # pylint: disable=W0611
+                  # pyparsinf needed to import here before flask.ext.testing
+                  # in order to avoid pyparsing troubles due to twill
 from flask.ext.testing import TestCase
 from sqlalchemy.engine.url import URL
 from functools import wraps
@@ -249,6 +254,7 @@ def make_url(path, **kargs):
 
     return url
 
+
 def make_surl(path, **kargs):
     """ Helper to generate an absolute invenio Secure URL with query
     arguments"""
@@ -260,9 +266,75 @@ def make_surl(path, **kargs):
 
     return url
 
+
+def base64_to_file(base64_file, filepath):
+    """
+    Write a base64 encoded version of a file to disk.
+    """
+    with open(filepath, 'wb') as f:
+        f.write(binascii.a2b_base64(base64_file))
+
+
+def file_to_base64(filepath):
+    """
+    Get base64 encoded version of a file. Useful to encode a test file for
+    inclusion in tests.
+    """
+    with open(filepath, 'rb') as f:
+        return binascii.b2a_base64(f.read())
+
+
+def stringio_to_base64(stringio_obj):
+    """
+    Get base64 encoded version of a StringIO object.
+    """
+    return binascii.b2a_base64(stringio_obj.getvalue())
+
+
+def make_file_fixture(filename, base64_file):
+    """
+    Generate a file fixture suitable for use with the Flask test client.
+
+    @param base64_file: A string encoding a file in base64. Use
+        file_to_base64() to get the base64 encoding of a file. If not provided
+        a PDF file be generated instead, including
+    """
+    return (
+        StringIO.StringIO(binascii.a2b_base64(base64_file)),
+        filename
+    )
+
+
+def make_pdf_fixture(filename, text=None):
+    """
+    Generates a PDF fixture suitable for use with Werkzeug test client and
+    Flask test request context.
+
+    Use of this function requires that reportlab have been installed.
+
+    @param filename: Desired filename.
+    @param text: Text to include in PDF. Defaults to "Filename: <filename>", if
+        not specified.
+    """
+    if text is None:
+        text = "Filename: %s" % filename
+
+    # Generate simple PDF
+    from reportlab.pdfgen import canvas
+    output = StringIO.StringIO()
+    c = canvas.Canvas(output)
+    c.drawString(100, 100, text)
+    c.showPage()
+    c.save()
+
+    return make_file_fixture(filename, stringio_to_base64(output))
+
+
 class InvenioTestUtilsBrowserException(Exception):
+
     """Helper exception for the regression test suite browser."""
     pass
+
 
 @nottest
 def test_web_page_existence(url):
@@ -278,6 +350,7 @@ def test_web_page_existence(url):
         raise
     return True
 
+
 def get_authenticated_mechanize_browser(username="guest", password=""):
     """
     Return an instance of a mechanize browser already authenticated
@@ -286,9 +359,10 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     try:
         import mechanize
     except ImportError:
-        raise InvenioTestUtilsBrowserException('ERROR: Cannot import mechanize.')
+        raise InvenioTestUtilsBrowserException(
+            'ERROR: Cannot import mechanize.')
     browser = mechanize.Browser()
-    browser.set_handle_robots(False) # ignore robots.txt, since we test gently
+    browser.set_handle_robots(False)  # ignore robots.txt, since we test gently
     if username == "guest":
         return browser
     browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
@@ -300,8 +374,10 @@ def get_authenticated_mechanize_browser(username="guest", password=""):
     try:
         username_account_page_body.index("You are logged in as %s." % username)
     except ValueError:
-        raise InvenioTestUtilsBrowserException('ERROR: Cannot login as %s.' % username)
+        raise InvenioTestUtilsBrowserException(
+            'ERROR: Cannot login as %s.' % username)
     return browser
+
 
 @nottest
 def test_web_page_content(url,
@@ -334,7 +410,8 @@ def test_web_page_content(url,
     try:
         import mechanize
     except ImportError:
-        raise InvenioTestUtilsBrowserException('ERROR: Cannot import mechanize.')
+        raise InvenioTestUtilsBrowserException(
+            'ERROR: Cannot import mechanize.')
     if '--w3c-validate' in sys.argv:
         require_validate_p = True
         sys.stderr.write('Required validation\n')
@@ -363,8 +440,8 @@ def test_web_page_content(url,
                 url_body.index(cur_expected_text)
             except ValueError:
                 raise InvenioTestUtilsBrowserException, \
-                      'ERROR: Page %s (login %s) does not contain %s, but contains %s' % \
-                      (url, username, cur_expected_text, url_body)
+                    'ERROR: Page %s (login %s) does not contain %s, but contains %s' % \
+                    (url, username, cur_expected_text, url_body)
 
         # now test for UNEXPECTED_TEXT:
         # first normalize unexpected_text
@@ -380,8 +457,8 @@ def test_web_page_content(url,
             try:
                 url_body.index(cur_unexpected_text)
                 raise InvenioTestUtilsBrowserException, \
-                      'ERROR: Page %s (login %s) contains %s.' % \
-                      (url, username, cur_unexpected_text)
+                    'ERROR: Page %s (login %s) contains %s.' % \
+                    (url, username, cur_unexpected_text)
             except ValueError:
                 pass
 
@@ -389,16 +466,17 @@ def test_web_page_content(url,
         if expected_link_target or expected_link_label:
             # first normalize expected_link_target and expected_link_label
             if isinstance(expected_link_target, str) or \
-                   expected_link_target is None:
+                expected_link_target is None:
                 expected_link_targets = [expected_link_target]
             else:
                 expected_link_targets = expected_link_target
             if isinstance(expected_link_label, str) or \
-                   expected_link_label is None:
+                expected_link_label is None:
                 expected_link_labels = [expected_link_label]
             else:
                 expected_link_labels = expected_link_label
-            max_links = max(len(expected_link_targets), len(expected_link_labels))
+            max_links = max(
+                len(expected_link_targets), len(expected_link_labels))
             expected_link_labels = chain(expected_link_labels, repeat(None))
             expected_link_targets = chain(expected_link_targets, repeat(None))
             # then test
@@ -410,22 +488,26 @@ def test_web_page_content(url,
                                       text=cur_expected_link_label)
                 except mechanize.LinkNotFoundError:
                     raise InvenioTestUtilsBrowserException, \
-                          'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
-                          (url, username, cur_expected_link_target, cur_expected_link_label)
+                        'ERROR: Page %s (login %s) does not contain link to %s entitled %s.' % \
+                        (url, username, cur_expected_link_target,
+                        cur_expected_link_label)
 
         # now test for validation if required
         if require_validate_p:
             valid_p, errors, warnings = w3c_validate(url_body)
             if not valid_p:
                 error_text = 'ERROR: Page %s (login %s) does not validate:\n %s' % \
-                                  (url, username, w3c_errors_to_str(errors, warnings))
-                open('%s/w3c-markup-validator.log' % CFG_LOGDIR, 'a').write(error_text)
+                    (url, username, w3c_errors_to_str(
+                     errors, warnings))
+                open('%s/w3c-markup-validator.log' %
+                     CFG_LOGDIR, 'a').write(error_text)
                 raise InvenioTestUtilsBrowserException, error_text
 
 
     except InvenioTestUtilsBrowserException, msg:
-        error_messages.append('ERROR: Page %s (login %s) led to an error: %s.' % \
-                              (url, username, msg))
+        error_messages.append(
+            'ERROR: Page %s (login %s) led to an error: %s.' %
+            (url, username, msg))
 
     try:
         # logout after tests:
@@ -446,6 +528,7 @@ def test_web_page_content(url,
 
     return error_messages
 
+
 def merge_error_messages(error_messages):
     """If the ERROR_MESSAGES list is non-empty, merge them and return nicely
        formatted string suitable for printing.  Otherwise return empty
@@ -455,6 +538,7 @@ def merge_error_messages(error_messages):
     if error_messages:
         out = "\n*** " + "\n*** ".join(error_messages)
     return out
+
 
 @nottest
 def build_and_run_unit_test_suite():
@@ -470,13 +554,16 @@ def build_and_run_unit_test_suite():
 
     broken_tests = test_modules_map.get_broken_plugins()
 
-    broken_unit_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests]
+    broken_unit_tests = ['%s (reason: %s)' % (name, broken_tests[name][1])
+                         for name in broken_tests]
     if broken_unit_tests:
-        warn("Broken unit tests suites found: %s" % ', '.join(broken_unit_tests))
+        warn("Broken unit tests suites found: %s" %
+             ', '.join(broken_unit_tests))
 
     complete_suite = unittest.TestSuite(test_modules)
     res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
     return res.wasSuccessful()
+
 
 @nottest
 def build_and_run_js_unit_test_suite():
@@ -520,8 +607,9 @@ def build_and_run_js_unit_test_suite():
                 continue
 
             print "Found test file %s. Running tests... " % (base + ext)
-            dummy_current_exitcode, cmd_stdout, dummy_err_msg = run_shell_command(cmd="java -jar %s/JsTestDriver.jar --config %s --tests all" % \
-                                                                                  (CFG_PREFIX + "/lib/java/js-test-driver", CFG_WEBDIR + "/js/" + base + '.conf'))
+            dummy_current_exitcode, cmd_stdout, dummy_err_msg = run_shell_command(
+                cmd="java -jar %s/JsTestDriver.jar --config %s --tests all" %
+                (CFG_PREFIX + "/lib/java/js-test-driver", CFG_WEBDIR + "/js/" + base + '.conf'))
             print cmd_stdout
             if "Fails: 0" not in cmd_stdout:
                 errors_found += 1
@@ -530,9 +618,10 @@ def build_and_run_js_unit_test_suite():
 
     print "Going to start JsTestDriver server..."
     server_process = subprocess.Popen(["java", "-jar",
-        "%s/JsTestDriver.jar" % (CFG_PREFIX + "/lib/java/js-test-driver"), "--runnerMode", "INFO",
-        "--port", "%d" % CFG_JSTESTDRIVER_PORT],
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                                       "%s/JsTestDriver.jar" % (
+                                       CFG_PREFIX + "/lib/java/js-test-driver"), "--runnerMode", "INFO",
+                                       "--port", "%d" % CFG_JSTESTDRIVER_PORT],
+                                      stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     try:
         if not _server_init(server_process):
@@ -552,6 +641,7 @@ def build_and_run_js_unit_test_suite():
 
     return exitcode
 
+
 @nottest
 def build_and_run_regression_test_suite():
     """
@@ -566,15 +656,18 @@ def build_and_run_regression_test_suite():
 
     broken_tests = test_modules_map.get_broken_plugins()
 
-    broken_regression_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests]
+    broken_regression_tests = ['%s (reason: %s)' % (name, broken_tests[name][1])
+                               for name in broken_tests]
     if broken_regression_tests:
-        warn("Broken regression tests suites found: %s" % ', '.join(broken_regression_tests))
+        warn("Broken regression tests suites found: %s" %
+             ', '.join(broken_regression_tests))
 
     warn_user_about_tests()
 
     complete_suite = unittest.TestSuite(test_modules)
     res = unittest.TextTestRunner(verbosity=2).run(complete_suite)
     return res.wasSuccessful()
+
 
 @nottest
 def build_and_run_web_test_suite():
@@ -590,7 +683,8 @@ def build_and_run_web_test_suite():
 
     broken_tests = test_modules_map.get_broken_plugins()
 
-    broken_web_tests = ['%s (reason: %s)' % (name, broken_tests[name][1]) for name in broken_tests]
+    broken_web_tests = ['%s (reason: %s)' % (name, broken_tests[name][1])
+                        for name in broken_tests]
     if broken_web_tests:
         warn("Broken web tests suites found: %s" % ', '.join(broken_web_tests))
 
@@ -602,6 +696,7 @@ def build_and_run_web_test_suite():
 
 
 class InvenioWebTestCase(InvenioTestCase):
+
     """ Helper library of useful web test functions
     for web tests creation.
     """
@@ -609,7 +704,7 @@ class InvenioWebTestCase(InvenioTestCase):
     def setUp(self):
         """Initialization before tests."""
 
-        ## Let's default to English locale
+        # Let's default to English locale
         profile = webdriver.FirefoxProfile()
         profile.set_preference('intl.accept_languages', 'en-us, en')
         profile.update_preferences()
@@ -638,7 +733,8 @@ class InvenioWebTestCase(InvenioTestCase):
         """
 
         try:
-            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_name(element_name))
+            WebDriverWait(self.browser, timeout).until(
+                lambda driver: driver.find_element_by_name(element_name))
         except:
             raise InvenioWebTestCaseException(element=element_name)
 
@@ -654,7 +750,8 @@ class InvenioWebTestCase(InvenioTestCase):
         """
 
         try:
-            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_link_text(element_link_text))
+            WebDriverWait(self.browser, timeout).until(
+                lambda driver: driver.find_element_by_link_text(element_link_text))
         except:
             raise InvenioWebTestCaseException(element=element_link_text)
 
@@ -670,9 +767,11 @@ class InvenioWebTestCase(InvenioTestCase):
         """
 
         try:
-            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_partial_link_text(element_partial_link_text))
+            WebDriverWait(self.browser, timeout).until(
+                lambda driver: driver.find_element_by_partial_link_text(element_partial_link_text))
         except:
-            raise InvenioWebTestCaseException(element=element_partial_link_text)
+            raise InvenioWebTestCaseException(
+                element=element_partial_link_text)
 
     def find_element_by_id_with_timeout(self, element_id, timeout=30, text=""):
         """ Find an element by id. This waits up to 'timeout' seconds
@@ -694,15 +793,18 @@ class InvenioWebTestCase(InvenioTestCase):
         """
 
         try:
-            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_id(element_id))
+            WebDriverWait(self.browser, timeout).until(
+                lambda driver: driver.find_element_by_id(element_id))
         except:
             raise InvenioWebTestCaseException(element=element_id)
 
         if text:
             q = self.browser.find_element_by_id(element_id)
             try:
-                # if the element's text is not equal to the given text, an exception will be raised
-                WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_id(element_id) and q.text==text)
+                # if the element's text is not equal to the given text, an
+                # exception will be raised
+                WebDriverWait(self.browser, timeout).until(
+                    lambda driver: driver.find_element_by_id(element_id) and q.text == text)
             except:
                 # let's store the result of the comparison in the errors list
                 try:
@@ -722,7 +824,8 @@ class InvenioWebTestCase(InvenioTestCase):
         """
 
         try:
-            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_xpath(element_xpath))
+            WebDriverWait(self.browser, timeout).until(
+                lambda driver: driver.find_element_by_xpath(element_xpath))
         except:
             raise InvenioWebTestCaseException(element=element_xpath)
 
@@ -738,7 +841,8 @@ class InvenioWebTestCase(InvenioTestCase):
         """
 
         try:
-            WebDriverWait(self.browser, timeout).until(lambda driver: driver.find_element_by_class_name(element_class_name))
+            WebDriverWait(self.browser, timeout).until(
+                lambda driver: driver.find_element_by_class_name(element_class_name))
         except:
             raise InvenioWebTestCaseException(element=element_class_name)
 
@@ -753,7 +857,8 @@ class InvenioWebTestCase(InvenioTestCase):
         """
 
         try:
-            WebDriverWait(self.browser, timeout).until(lambda driver: driver.page_source)
+            WebDriverWait(self.browser, timeout).until(
+                lambda driver: driver.page_source)
         except:
             raise InvenioWebTestCaseException(element="page source")
 
@@ -775,7 +880,8 @@ class InvenioWebTestCase(InvenioTestCase):
             if not "You can use your nickname or your email address to login." in self.browser.page_source:
                 if "You are no longer recognized by our system" in self.browser.page_source:
                     self.find_element_by_link_text_with_timeout("login here")
-                    self.browser.find_element_by_link_text("login here").click()
+                    self.browser.find_element_by_link_text(
+                        "login here").click()
                 else:
                     self.find_element_by_link_text_with_timeout("login")
                     self.browser.find_element_by_link_text("login").click()
@@ -804,7 +910,7 @@ class InvenioWebTestCase(InvenioTestCase):
         self.browser.find_element_by_link_text("logout").click()
 
     @nottest
-    def element_value_test(self, element_name="", element_id="", \
+    def element_value_test(self, element_name="", element_id="",
                            expected_element_value="", unexpected_element_value="", in_form=True):
         """ Function to check if the value in the given
         element is the expected (unexpected) value or not
@@ -832,7 +938,8 @@ class InvenioWebTestCase(InvenioTestCase):
         if unexpected_element_value:
             try:
                 if in_form:
-                    self.assertNotEqual(q.get_attribute('value'), unexpected_element_value)
+                    self.assertNotEqual(
+                        q.get_attribute('value'), unexpected_element_value)
                 else:
                     self.assertNotEqual(q.text, unexpected_element_value)
             except AssertionError, e:
@@ -841,7 +948,8 @@ class InvenioWebTestCase(InvenioTestCase):
         if expected_element_value:
             try:
                 if in_form:
-                    self.assertEqual(q.get_attribute('value'), expected_element_value)
+                    self.assertEqual(
+                        q.get_attribute('value'), expected_element_value)
                 else:
                     self.assertEqual(q.text, expected_element_value)
             except AssertionError, e:
@@ -870,7 +978,8 @@ class InvenioWebTestCase(InvenioTestCase):
 
             for unexpected_text in unexpected_texts:
                 try:
-                    self.assertEqual(-1, self.browser.page_source.find(unexpected_text))
+                    self.assertEqual(
+                        -1, self.browser.page_source.find(unexpected_text))
                 except AssertionError, e:
                     self.errors.append(str(e))
 
@@ -882,7 +991,8 @@ class InvenioWebTestCase(InvenioTestCase):
 
             for expected_text in expected_texts:
                 try:
-                    self.assertNotEqual(-1, self.browser.page_source.find(expected_text))
+                    self.assertNotEqual(
+                        -1, self.browser.page_source.find(expected_text))
                 except AssertionError, e:
                     self.errors.append(str(e))
 
@@ -994,6 +1104,7 @@ class InvenioWebTestCase(InvenioTestCase):
 
 
 class InvenioWebTestCaseException(Exception):
+
     """This exception is thrown if the element
     we are looking for is not found after a set time period.
     The element is not found because the page needs more
@@ -1018,6 +1129,7 @@ class InvenioWebTestCaseException(Exception):
         """String representation."""
         return repr(self.message)
 
+
 def build_and_run_flask_test_suite():
     """
     Detect all Invenio modules with names ending by
@@ -1033,10 +1145,11 @@ def build_and_run_flask_test_suite():
         if ext != '.py' or not base.endswith('_flask_tests'):
             continue
 
-        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        module = __import__(
+            'invenio.' + base, globals(), locals(), ['TEST_SUITE'])
         test_modules.append(module.TEST_SUITE)
 
-    #FIXME create warning about tested databases
+    # FIXME create warning about tested databases
     warn_user_about_tests()
 
     complete_suite = unittest.TestSuite(test_modules)

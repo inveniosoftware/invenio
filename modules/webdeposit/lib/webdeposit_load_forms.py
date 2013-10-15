@@ -46,7 +46,14 @@ for form in CFG_FORMS.itervalues():
         forms[form.__name__] = form
 
 ## Let's report about broken plugins
+import traceback
+broken_plugins = CFG_FORMS.get_broken_plugins()
+for k in broken_plugins.keys():
+    broken_plugins[k] = list(broken_plugins[k])
+    broken_plugins[k][2] = traceback.format_exc(broken_plugins[k][2])
+
+
 open(os.path.join(CFG_LOGDIR, 'broken-deposition-forms.log'), 'w').write(
-    pformat(CFG_FORMS.get_broken_plugins()))
+    pformat(broken_plugins))
 
 __all__ = ['forms']

@@ -30,7 +30,10 @@ an example)::
         pass
 """
 
+import itertools
+from werkzeug import MultiDict
 import wtforms
+from wtforms.fields.core import _unset_value
 from invenio.webdeposit_field import WebDepositField
 
 
@@ -40,14 +43,237 @@ for attr_name in dir(wtforms):
     attr = getattr(wtforms, attr_name)
     try:
         if issubclass(attr, wtforms.Field):
-            # From a WTForm field, dynamically create a new class the same name as
-            # the WTForm field (inheriting from WebDepositField() and the WTForm
-            # field itself). Store the new class in the current module with the
-            # same name as the WTForms.
+            # From a WTForm field, dynamically create a new class the same name
+            # as the WTForm field (inheriting from WebDepositField() and the
+            # WTForm field itself). Store the new class in the current module
+            # with the same name as the WTForms.
             #
-            # For further information please see Python reference documne for
-            # globals() and type() functions.
-            globals()[attr_name] = type(str(attr_name), (WebDepositField, attr), {})
+            # For further information please see Python reference documentation
+            # for globals() and type() functions.
+            globals()[attr_name] = type(
+                str(attr_name),
+                (WebDepositField, attr),
+                {}
+            )
             __all__.append(attr_name)
     except TypeError:
         pass
+
+
+#
+# Special needs for field enclosures
+#
+class FormField(WebDepositField, wtforms.FormField):
+    def __init__(self, *args, **kwargs):
+        if 'autocomplete' in kwargs:
+            raise TypeError('FormField cannot take autocomplete argument. Instead, define it on the enclosed fields.')
+        if 'placeholder' in kwargs:
+            raise TypeError('FormField cannot take placeholder argument. Instead, define it on the enclosed fields.')
+        if 'processors' in kwargs:
+            raise TypeError('FormField cannot take processors. Instead, define them on the enclosed fields.')
+        super(FormField, self).__init__(*args, **kwargs)
+
+    def reset_field_data(self, exclude=[]):
+        """
+        Reset the fields.data value to that of field.object_data.
+
+        Usually not called directly, but rather through Form.reset_field_data()
+
+        @param exclude: List of formfield names to exclude.
+        """
+        self.form.reset_field_data(exclude=exclude)
+
+    def process(self, formdata, data=_unset_value):
+        """
+        Preprocess formdata in case we are passed a JSON data structure.
+        """
+        if formdata and self.name in formdata:
+            formdata = formdata[self.name]
+            formdata = MultiDict(dict([
+                ("%s%s%s" % (self.name, self.separator, k), v)
+                for k, v in formdata.items()
+            ]))
+
+        super(FormField, self).process(formdata, data=data)
+
+    def post_process(self, form=None, formfields=[], extra_processors=[],
+                     submit=False):
+        """
+        Run post process on each subfield as well as extra processors defined
+        on form.
+        """
+        # Ignore extra_processors on purpose (as they are not allowed for
+        # field enclosures)
+        self.form.post_process(form=self.form, formfields=formfields,
+            submit=submit)
+
+    def perform_autocomplete(self, form, name, term, limit=50):
+        """
+        Run auto-complete method for field. This method should not be called
+        directly, instead use Form.autocomplete().
+        """
+        if name.startswith(self.name + self.separator):
+            form = self.form_class(prefix=self.name + self.separator)
+            return form.autocomplete(name, term, limit=limit, _form=form)
+        return None
+
+    def get_flags(self, filter_func=None):
+        flags = self.form.get_flags(filter_func=filter_func)
+        flags[self.name] = filter_func(self)
+        return flags
+
+    def set_flags(self, flags):
+        self.form.set_flags(flags)
+        super(FormField, self).set_flags(flags)
+
+    @property
+    def json_data(self):
+        return self.form.json_data
+
+    @property
+    def messages(self):
+        _messages = self.form.messages
+        _messages.update(super(FormField, self).messages)
+        return _messages
+
+
+class FieldList(WebDepositField, wtforms.FieldList):
+    def __init__(self, *args, **kwargs):
+        if 'autocomplete' in kwargs:
+            raise TypeError('FieldList does not accept autocomplete argument. Instead, define it on the enclosed field.')
+        if 'placeholder' in kwargs:
+            raise TypeError('FieldList does not accept placeholder argument. Instead, define it on the enclosed field.')
+        if 'processors' in kwargs:
+            raise TypeError('FieldList does not accept processors. Instead, define them on the enclosed field.')
+        super(FieldList, self).__init__(*args, **kwargs)
+
+    def get_entries(self):
+        #Needed so subclasses can customize which entries are returned
+        return self.entries
+
+    def _extract_indices(self, prefix, formdata):
+        """
+        Yield indices of any keys with given prefix.
+
+        formdata must be an object which will produce keys when iterated.  For
+        example, if field 'foo' contains keys 'foo-0-bar', 'foo-1-baz', then
+        the numbers 0 and 1 will be yielded, but not neccesarily in order.
+        """
+        # Add fix for non-standard separator
+        separator = '-'
+        if issubclass(self.unbound_field.field_class, FormField):
+            separator = self.unbound_field.kwargs.get('separator','-')
+        offset = len(prefix) + 1
+        for k in formdata:
+            if k.startswith(prefix):
+                k = k[offset:].split(separator, 1)[0]
+                if k.isdigit():
+                    yield int(k)
+
+    def reset_field_data(self, exclude=[]):
+        """
+        Reset the fields.data value to that of field.object_data.
+
+        Usually not called directly, but rather through Form.reset_field_data()
+
+        @param exclude: List of formfield names to exclude.
+        """
+        if self.name not in exclude:
+            for subfield in self.get_entries():
+                subfield.reset_field_data(exclude=exclude)
+
+    def validate(self, form, extra_validators=tuple()):
+        """ Adapted to use self.get_entries() instead of self.entries """
+        self.errors = []
+
+        # Run validators on all entries within
+        for subfield in self.get_entries():
+            if not subfield.validate(form):
+                self.errors.append(subfield.errors)
+
+        chain = itertools.chain(self.validators, extra_validators)
+        stop_validation = self._run_validation_chain(form, chain)
+
+        return len(self.errors) == 0
+
+    def post_process(self, form=None, formfields=[], extra_processors=[],
+                     submit=False):
+        """
+        Run post process on each subfield as well as extra processors defined
+        on form.
+        """
+        for subfield in self.get_entries():
+            # Ignore extra_processors on purpose (as they are not allowed for
+            # field enclosures)
+            subfield.post_process(
+                form=form, formfields=formfields, extra_processors=[],
+                submit=submit
+            )
+
+    def perform_autocomplete(self, form, name, term, limit=50):
+        """
+        Run auto-complete method for field. This method should not be called
+        directly, instead use Form.autocomplete().
+        """
+        separator = '-'
+        if issubclass(self.unbound_field.field_class, FormField):
+            separator = self.unbound_field.kwargs.get('separator','-')
+        offset = len(self.name) + 1
+
+        if name.startswith(self.name):
+            idx = name[offset:].split(separator, 1)[0]
+            field = self.bound_field(idx)
+            if field:
+                return field.perform_autocomplete(form, name, term, limit=limit)
+        return None
+
+    def bound_field(self, idx):
+        """
+        Create a bound field for index
+        """
+        if idx.isdigit():
+            field = self.unbound_field.bind(
+                form=None,
+                name="%s-%s" % (self.name, idx),
+                prefix=self._prefix,
+                id="%s-%s" % (self.id, idx),
+            )
+            return field
+        return None
+
+    def get_flags(self, filter_func=None):
+        flags = {}
+        for f in self.get_entries():
+            if hasattr(f, 'get_flags'):
+                flags.update(f.get_flags(filter_func=filter_func))
+            else:
+                flags.update({f.name: filter_func(f)})
+        flags[self.name] = filter_func(self)
+        return flags
+
+    def set_flags(self, flags):
+        for f in self.get_entries():
+            f.set_flags(flags)
+        super(FieldList, self).set_flags(flags)
+
+    @property
+    def json_data(self):
+        return [
+            f.json_data if getattr(f, 'json_data', None) else f.data
+            for f in self.get_entries()
+        ]
+
+    @property
+    def data(self):
+        """ Adapted to use self.get_entries() instead of self.entries """
+        return [f.data for f in self.get_entries()]
+
+    @property
+    def messages(self):
+        _messages = {}
+
+        for f in self.get_entries():
+            _messages.update(f.messages)
+
+        _messages.update(super(FieldList, self).messages)
+        return _messages

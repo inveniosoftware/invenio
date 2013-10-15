@@ -24,11 +24,51 @@ Validation functions
 import re
 from wtforms.validators import ValidationError, StopValidation, Regexp
 from invenio.config import CFG_SITE_NAME
+from invenio import pidutils
 
 
 #
 # General purpose validators
 #
+class ListLength(object):
+    """
+    Require number of elements
+
+    :param min_num: Minimum number of elements.
+    :param max_num: Maximum number of elements.
+    :param element_filter: Callable used to filter the list prior to testing
+        the number of elements. Useful to remove empty elements.
+    """
+    def __init__(self, min_num=None, max_num=None,
+                 element_filter=lambda x: True):
+        self.min = min_num
+        self.max = max_num
+        self.element_filter = element_filter
+
+    def __call__(self, form, field):
+        test_list = []
+        if self.min or self.max:
+            test_list = filter(self.element_filter, field.data)
+
+        if self.min:
+            if self.min > len(test_list):
+                raise ValidationError(
+                    "Minimum %s %s required." % (
+                        self.min,
+                        "entry is" if self.min == 1 else "entries are"
+                    )
+                )
+        if self.max:
+            if self.max < len(test_list):
+                raise ValidationError(
+                    "Maximum %s %s allowed." % (
+                        self.max,
+                        "entry is" if self.max == 1 else "entries are"
+                    )
+                )
+
+
+
 class RequiredIf(object):
     """
     Require field if value of another field is set to a certain value.
@@ -42,19 +82,52 @@ class RequiredIf(object):
         try:
             other_field = getattr(form, self.other_field_name)
             other_val = other_field.data
-            if other_val in self.values:
-                if not field.data or isinstance(field.data, basestring) \
-                   and not field.data.strip():
-                    if self.message is None:
-                        self.message = 'This field is required.'
-                    field.errors[:] = []
-                    raise StopValidation(self.message % {
-                        'other_field': other_field.label.text,
-                        'value': other_val
-                    })
+            for v in self.values:
+                # Check if field value is required
+                if (callable(v) and v(other_val)) or (other_val == v):
+                    # Field value is required - check the value
+                    if not field.data or isinstance(field.data, basestring) \
+                       and not field.data.strip():
+                        if self.message is None:
+                            self.message = 'This field is required.'
+                        field.errors[:] = []
+                        raise StopValidation(self.message % {
+                            'other_field': other_field.label.text,
+                            'value': other_val
+                        })
         except AttributeError:
             pass
 
+
+class NotRequiredIf(RequiredIf):
+    def __call__(self, form, field):
+        try:
+            other_field = getattr(form, self.other_field_name)
+            other_val = other_field.data
+            for v in self.values:
+                # Check if field value is not required.
+                if (callable(v) and v(other_val)) or (other_val == v):
+                    raise StopValidation()
+        except AttributeError:
+            pass
+
+
+
+def number_validate(form, field, submit=False,
+                    error_message='It must be a number!'):
+    value = field.data or ''
+    if value == "" or value.isspace():
+        return
+
+    def is_number(s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+
+    if not is_number(value):
+        raise ValidationError(error_message)
 
 #
 # DOI-related validators
@@ -126,38 +199,35 @@ class PreReservedDOI(object):
 
     def __call__(self, form, field):
         attr_value = getattr(form, self.field_name).data
-        if attr_value and field.data and field.data != attr_value and field.data.startswith("%s/" % self.prefix):
+        if isinstance(attr_value, dict):
+            attr_value = attr_value['doi']
+        if attr_value and field.data and field.data != attr_value \
+           and field.data.startswith("%s/" % self.prefix):
             raise StopValidation(self.message)
         # Stop further validation if DOI equals pre-reserved DOI.
         if attr_value and field.data and field.data == attr_value:
             raise StopValidation()
 
 
+class PidValidator(object):
+    """
+    Validate that value is a persistent identifier understood by us.
+    """
+    def __init__(self, message=None):
+        self.message = message or "Not a valid persistent identifier"
+
+    def __call__(self, form, field):
+        schemes = pidutils.detect_identifier_schemes(field.data)
+        if not schemes:
+            raise ValidationError(self.message)
+
+
 #
 # Aliases
 #
 required_if = RequiredIf
+not_required_if = NotRequiredIf
+list_length = ListLength
 invalid_doi_prefix_validator = InvalidDOIPrefix
 pre_reserved_doi_validator = PreReservedDOI
-
-
-def number_validate(form, field, submit=False, error_message='It must be a number!'):
-    value = field.data or ''
-    if value == "" or value.isspace():
-        return
-
-    def is_number(s):
-        try:
-            float(s)
-            return True
-        except ValueError:
-            return False
-
-    if not is_number(value):
-        try:
-            field.errors.append(error_message)
-        except AttributeError:
-            field.errors = list(field.process_errors)
-            field.errors.append(error_message)
-        field.add_message('error', error_message)
-        return
+pid_validator = PidValidator

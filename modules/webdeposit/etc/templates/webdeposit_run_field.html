@@ -1,0 +1,19 @@
+{%- if thisfield == '-' %}
+<hr />
+{%- else %}
+{%- set field_class = thisfield.widget_classes if thisfield.widget_classes is not none else field_class %}
+<div class="{{container_class}} {{ "error" if thisfield.errors }}{{ 'hide' if thisfield.flags.hidden}}" id="state-group-{{ thisfield.name }}">
+    {{ field_label(thisfield) }}
+    <div class="{{ 'controls' if thisfield.widget.__class__.__name__ not in ['plupload_widget', 'PLUploadWidget'] }}" id="field-{{ thisfield.name }}">
+        {{ thisfield(class_= field_class + " " + thisfield.short_name) }}
+        {%- if thisfield.description %}
+            <p class="muted field-desc"><small>{{thisfield.description|urlize}}</small></p>
+        {%- endif %}
+        <div class="alert help-inline {{ 'alert-error' if thisfield.errors else 'hide' }}" id="state-{{ thisfield.name }}" style="margin-top: 5px;{% if thisfield.errors %} display:block;{% endif %}">
+            {%- for error in thisfield.errors %}
+                <div>{{ error }}</div>
+            {%- endfor %}
+        </div>
+    </div>
+</div>
+{%- endif %}

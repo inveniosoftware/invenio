@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-##
+
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,12 +17,27 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from wtforms import IntegerField
-from invenio.webdeposit_field import WebDepositField
+from blinker import Namespace
+_signals = Namespace()
 
-__all__ = ['IntegerTextField']
+template_context_created = _signals.signal('template-context-created')
+"""
+This signal is sent right before collection is saved.
+Sender is the blueprint. Extra data pass is:
 
+ * context
+"""
 
-class IntegerTextField(WebDepositField, IntegerField):
-    # FIXME is field needed?
-    pass
+file_uploaded = _signals.signal('file_uploaded')
+"""
+This signal is sent right after a file has been uploaded.
+Sender is the deposition type.. Extra data pass is:
+
+ * user_id: Id of user uploading the file.
+ * uuid: Workflow id.
+ * name: Filename
+ * file: Full path of file
+ * size: Size of file
+ * id: unique file id
+ * content_type:
+"""

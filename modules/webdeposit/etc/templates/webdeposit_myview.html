@@ -1,20 +1,45 @@
 <div class="well">
     <h2>My uploads</h2>
-    {% if not drafts %}
+    {% if not my_depositions %}
     <p class="muted">You currently have no uploads.</p>
     {% else %}
+    {% for dep in my_depositions if not dep.is_finished() %}
+    {%- set deposition_type = None if dep.type.is_default() else dep.type.get_identifier() -%}
+    {%- if loop.first %}
     <h4>Unsubmitted</h4>
     <table class="table table-striped">
-    {% for draft in drafts %}
+    {%- endif %}
     <tr>
-        <td><a href="{{ url_for('webdeposit.add', deposition_type=draft.workflow.name, uuid=draft.uuid) }}">{% if draft.form_values and draft.form_values.title %}
-                  {{ draft.form_values.title }}
+        <td><a href="{{ url_for('webdeposit.run', deposition_type=deposition_type, uuid=dep.id) }}">{% if dep.title %}
+                  {{ dep.title }}
               {% else %}
                   {{ _('Untitled') }}
-              {% endif %}</a></td><td>{{ draft.timestamp|invenio_pretty_date }}</td><td><a href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=uuid) }}" class="rmlink" rel="tooltip" title="Delete upload"><i class="icon-trash"></i></a></td>
+              {% endif %}</a></td><td>{{ dep.modified|invenio_pretty_date }}</td><td><a href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=dep.id) }}" class="rmlink" rel="tooltip" title="Delete upload"><i class="icon-trash"></i></a></td>
     </tr>
-    {% endfor %}
+    {%- if loop.last %}
     </table>
+    {%- endif %}
+    {% else %}
+
+    {% endfor %}
+
+    {% for dep in my_depositions if dep.is_finished() %}
+    {%- set deposition_type = None if dep.type.is_default() else dep.type.get_identifier() -%}
+    {%- if loop.first %}
+    <h4>Submitted</h4>
+    <table class="table table-striped">
     {% endif %}
+    <tr>
+        <td><a href="{{ url_for('webdeposit.run', deposition_type=deposition_type, uuid=dep.id) }}">{% if dep.title %}
+                  {{ dep.title }}
+              {% else %}
+                  {{ _('Untitled') }}
+              {% endif %}</a></td><td>{{ dep.modified|invenio_pretty_date }}</td><td></td>
+    </tr>
+    {%- if loop.last %}
+    </table>
+    {%- endif %}
+    {%- endfor %}
+    {%- endif %}
 </div>
 

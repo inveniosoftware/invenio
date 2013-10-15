@@ -18,28 +18,17 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from invenio.webdeposit_load_forms import forms
-from invenio.webdeposit_workflow_utils import authorize_user, \
-                                              render_form, \
-                                              wait_for_submission, \
-                                              export_marc_from_json, \
-                                              create_record_from_marc
-
+from invenio.webdeposit_models import DepositionType
+from invenio.webdeposit_workflow_tasks import render_form,
 
 __all__ = ['Photo']
 
 PhotoForm = forms['PhotoForm']
 
-dep_type = "Photo"
-plural = "Photos"
-group = "Multimedia & Arts"
-wf = [authorize_user(),
-      render_form(PhotoForm),
-      wait_for_submission(),
-      export_marc_from_json(),
-      create_record_from_marc()]
 
-Photo = {"dep_type": dep_type,
-         "workflow": wf,
-         "plural": plural,
-         "group": group,
-         "enabled": True}
+class Photo(DepositionType):
+    workflow = [render_form(PhotoForm), ]
+    name = "Photo"
+    name_plural = "Photos"
+    group = "Multimedia & Arts"
+    enabled = True

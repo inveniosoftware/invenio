@@ -38,9 +38,8 @@ class TitleField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
             icon='icon-book',
-            recjson_key='title.title',
+            export_key='title.title',
             #FIXMEvalidators=[validate_title]
-
         )
         defaults.update(kwargs)
         super(TitleField, self).__init__(**defaults)

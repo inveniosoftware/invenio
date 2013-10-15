@@ -22,24 +22,55 @@ from werkzeug import MultiDict
 from invenio.dataciteutils import DataciteMetadata
 from invenio.sherpa_romeo import SherpaRomeoSearch
 from invenio.bibfield import get_record
+from invenio import pidutils
+
 #
 # General purpose processors
 #
 
 
-def replace_field_data(field_name):
+def replace_field_data(field_name, getter=None):
     """
     Returns a processor, which will replace the given field names value with
     the value from the field where the processor is installed.
     """
     def _inner(form, field, submit=False):
-        getattr(form, field_name).data = field.data
+        getattr(form, field_name).data = getter(field) if getter else field.data
     return _inner
+
+
+#
+# PID processors
+#
+class PidSchemeDetection(object):
+    """
+    Detect the persistent identifier scheme and store it in another field.
+    """
+    def __init__(self, set_field=None):
+        self.set_field = set_field
+
+    def __call__(self, form, field, submit=False):
+        if field.data:
+            schemes = pidutils.detect_identifier_schemes(field.data)
+            if schemes:
+                getattr(form, self.set_field).data = schemes[0]
+
+
+class PidNormalize(object):
+    """
+    Normalize a persistent identifier
+    """
+    def __init__(self, scheme_field=None):
+        self.scheme_field = scheme_field
+
+    def __call__(self, form, field, submit=False):
+        scheme = getattr(form, self.scheme_field).data
+        field.data = pidutils.normalize_pid(field.data, scheme=scheme)
+
 
 #
 # DOI-related processors
 #
-
 
 def datacite_dict_mapper(datacite, form, mapping):
     """
@@ -72,14 +103,12 @@ class DataCiteLookup(object):
                 datacite = DataciteMetadata(field.data)
                 if datacite.error:
                     if self.display_info:
-                        field.add_message('info',
-                                          "DOI metadata could not be retrieved.")
+                        field.add_message("DOI metadata could not be retrieved.", state='info')
                     return
                 if self.mapping_func:
                     self.mapping_func(datacite, form, self.mapping)
                     if self.display_info:
-                        field.add_message('info',
-                                          "DOI metadata successfully imported from DataCite.")
+                        field.add_message("DOI metadata successfully imported from DataCite.", state='info')
             except Exception:
                 # Ignore errors
                 pass
@@ -95,7 +124,7 @@ def sherpa_romeo_issn_process(form, field, submit=False):
     s = SherpaRomeoSearch()
     s.search_issn(value)
     if s.error:
-        field.add_message('info', s.error_message)
+        field.add_message(s.error_message, state='info')
         return
 
     if s.get_num_hits() == 1:
@@ -114,7 +143,7 @@ def sherpa_romeo_issn_process(form, field, submit=False):
                 form.journal.data = journal
             return
 
-    field.add_message('info', "Couldn't find Journal.")
+    field.add_message("Couldn't find Journal.", state='info')
 
 
 def sherpa_romeo_publisher_process(form, field, submit=False):
@@ -124,7 +153,7 @@ def sherpa_romeo_publisher_process(form, field, submit=False):
     s = SherpaRomeoSearch()
     s.search_publisher(value)
     if s.error:
-        field.add_message('info', s.error_message)
+        field.add_message(s.error_message, state='info')
 
     conditions = s.parser.get_publishers(attribute='conditions')
     if conditions is not None and s.get_num_hits() == 1:
@@ -178,7 +207,7 @@ def sherpa_romeo_publisher_process(form, field, submit=False):
             info_html += "<p>" + copyright_links_html + "</p>"
 
         if info_html != "":
-            field.add_message('info', info_html)
+            field.add_message(info_html, state='info')
 
 
 def sherpa_romeo_journal_process(form, field, submit=False):
@@ -189,7 +218,7 @@ def sherpa_romeo_journal_process(form, field, submit=False):
     s = SherpaRomeoSearch()
     s.search_journal(value, 'exact')
     if s.error:
-        field.add_message('info',  s.error_message)
+        field.add_message(s.error_message, state='info')
         return
 
     if s.get_num_hits() == 1:
@@ -206,14 +235,14 @@ def sherpa_romeo_journal_process(form, field, submit=False):
                     form.publisher.post_process(form)
                 return
 
-            field.add_message('info', "Journal's Publisher not found")
+            field.add_message("Journal's Publisher not found", state='info')
             if hasattr(form, 'issn'):
                 form.issn.data = issn
             if hasattr(form, 'publisher'):
                 form.publisher.data = publisher
                 form.publisher.post_process(form)
         else:
-            field.add_message('info', "Couldn't find ISSN.")
+            field.add_message("Couldn't find ISSN.", state='info')
 
 
 def record_id_process(form, field, submit=False):
@@ -231,16 +260,17 @@ def record_id_process(form, field, submit=False):
     if is_number(field.data):
         json_reader = get_record(value)
     else:
-        field.add_message('error', "Record id must be a number!")
+        field.add_message("Record id must be a number!", state='error')
         return
 
     if json_reader is not None:
         webdeposit_json = form.uncook_json(json_reader, {}, value)
         #FIXME: update current json, past self, what do you mean?? :S
 
-        field.add_message('info', '<a href="/record/"' + value +
-                                 '>Record</a> was loaded successfully')
+        field.add_message('<a href="/record/"' + value +
+                          '>Record</a> was loaded successfully',
+                          state='info')
 
         form.process(MultiDict(webdeposit_json))
     else:
-        field.add_message('info', "Record doesn't exist")
+        field.add_message("Record doesn't exist", state='info')
