@@ -959,11 +959,11 @@ def get_cache_last_updated_timestamp():
 def set_cache_last_updated_timestamp(timestamp):
     """Set last updated cache timestamp to TIMESTAMP."""
     try:
-        f = open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, "w")
+        with open(CFG_CACHE_LAST_UPDATED_TIMESTAMP_FILE, "w") as f:
+            f.write(timestamp)
     except:
+        # FIXME: do something here
         pass
-    f.write(timestamp)
-    f.close()
     return timestamp
 
 def main():
