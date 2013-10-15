@@ -106,6 +106,39 @@ class LostPasswordForm(InvenioBaseForm):
             )
 
 
+class ChangePasswordForm(InvenioBaseForm):
+    current_password = PasswordField(_("Current password"),
+                                     description=_("Your current password"))
+    password = PasswordField(
+        _("Password"),
+        description=
+        _("The password phrase may contain punctuation, spaces, etc."))
+    password2 = PasswordField(_("Confirm password"),)
+
+    def validate_current_password(self, field):
+        if len(field.data) == 0:
+            raise validators.ValidationError(
+                _("Please enter your current password"))
+
+        from invenio.webuser_flask import current_user
+        from invenio.webaccount_blueprint import update_login
+        if update_login(current_user['nickname'], field.data) is None:
+            raise validators.ValidationError(
+                _("The current password you entered does\
+                  not match with our records."))
+
+    def validate_password(self, field):
+        CFG_ACCOUNT_MIN_PASSWORD_LENGTH = 6
+        if len(field.data) < CFG_ACCOUNT_MIN_PASSWORD_LENGTH:
+            raise validators.ValidationError(
+                _("Password must be at least %d characters long." % (
+                    CFG_ACCOUNT_MIN_PASSWORD_LENGTH, )))
+
+    def validate_password2(self, field):
+        if field.data != self.password.data:
+            raise validators.ValidationError(_("Both passwords must match."))
+
+
 class RegisterForm(Form):
     """
     User registration form

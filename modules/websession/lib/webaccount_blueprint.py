@@ -40,7 +40,11 @@ from invenio.config import \
 from invenio.datastructures import LazyDict, flatten_multidict
 from invenio.importutils import autodiscover_modules
 from invenio.sqlalchemyutils import db
-from invenio.webaccount_forms import LoginForm, RegisterForm, LostPasswordForm
+from invenio.webaccount_forms import \
+    LoginForm, \
+    RegisterForm, \
+    LostPasswordForm, \
+    ChangePasswordForm
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.websession_model import User
 from invenio.websession_webinterface import wash_login_method
@@ -67,7 +71,10 @@ def update_login(nickname, password=None, remember_me=False):
     where = [db.or_(User.nickname == nickname, User.email == nickname)]
     if password is not None:
         where.append(User.password == password)
-    user = User.query.filter(*where).one()
+    try:
+        user = User.query.filter(*where).one()
+    except:
+        return None
     login_user(UserInfo(user.id), remember=remember_me)
     return user
 

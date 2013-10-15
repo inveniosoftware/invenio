@@ -1,5 +1,6 @@
+{#
 ## This file is part of Invenio.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,18 +15,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
 
-templatesdir = $(sysconfdir)/templates
-templates_DATA = webgroup_index.html \
-                 webaccount_edit.html \
-                 webaccount_index.html \
-                 webaccount_login.html \
-                 webaccount_logout.html \
-                 webaccount_lost.html \
-                 webaccount_register.html \
-                 webaccount_widget.html \
-                 webuser_widget.html
-
-EXTRA_DIST = $(templates_DATA)
-
-CLEANFILES = *~ *.tmp
+{% block webuser_widget %}
+    {{  _("You are logged in as %s") | format(current_user.nickname) }}
+    <p>
+        <a href="{{ url_for('webaccount.edit', name='WebAccountSettings') }}">
+            {{ _('Change your email') }}
+        </a>
+    </p>
+    <p>
+        <a href="{{ url_for('webaccount.edit', name='WebAccountPasswordSettings') }}">
+            {{ _('Change your password') }}
+        </a>
+    </p>
+{% endblock webuser_widget %}

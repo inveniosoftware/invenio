@@ -26,6 +26,7 @@ pylib_DATA = session.py webuser.py webuser_unit_tests.py \
 	webaccount_blueprint.py \
 	webaccount_forms.py \
 	webaccount_flask_tests.py \
+	webaccount_password_user_settings.py \
 	webaccount_user_settings.py \
 	websession_regression_tests.py \
 	webgroup_blueprint.py \
