@@ -37,7 +37,7 @@ def format_element(bfo, width="50"):
     if width < 30:
         width = 30
 
-    name_width = 19
+    name_width = 20
     value_width = width-name_width
     recID = bfo.control_field('001')
 
@@ -117,7 +117,7 @@ def format_element(bfo, width="50"):
     import invenio.bibformat_elements.bfe_title as bfe_title
     title = bfe_title.format_element(bfo=bfo, separator = ". ")
     out += format_bibtex_field("title",
-                               title,
+                               '{' + title + '}',
                                name_width,
                                value_width)
 
@@ -187,6 +187,16 @@ def format_element(bfo, width="50"):
 
         out += format_bibtex_field("school",
                                    university,
+                                   name_width,
+                                   value_width)
+
+    # Collaboration
+    collaborations = []
+    for collaboration in bfo.fields("710__g"):
+        if collaboration not in collaborations:
+            collaborations.append(collaboration)
+    out += format_bibtex_field("collaboration",
+                               ", ".join(collaborations),
                                    name_width,
                                    value_width)
 
