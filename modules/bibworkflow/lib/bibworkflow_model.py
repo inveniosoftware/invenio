@@ -315,6 +315,9 @@ class BibWorkflowObject(db.Model):
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
     child_logs = db.relationship("BibWorkflowObjectLogging")
+    workflow = db.relationship(
+        Workflow, foreign_keys=[id_workflow], remote_side=Workflow.uuid
+    )
 
     def get_data(self):
         """
