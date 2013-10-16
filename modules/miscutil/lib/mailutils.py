@@ -218,7 +218,7 @@ def send_email(fromaddr,
     if html_images is None:
         html_images = {}
 
-    if type(toaddr) is str:
+    if type(toaddr) is not list:
         toaddr = toaddr.strip().split(',')
 
     toaddr = remove_temporary_emails(toaddr)
@@ -306,10 +306,10 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
                                         footer=unicodifier(footer)
                                         ).encode('utf8')
 
-    if type(toaddr) is not str:
+    if type(toaddr) is list:
         toaddr = ','.join(toaddr)
 
-    if type(replytoaddr) is not str:
+    if type(replytoaddr) is list:
         replytoaddr = ','.join(replytoaddr)
 
     toaddr = remove_temporary_emails(toaddr)

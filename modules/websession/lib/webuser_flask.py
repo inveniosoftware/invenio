@@ -299,7 +299,6 @@ def login_user(user, *args, **kwargs):
         user = UserInfo(user)
     return flask_login_user(user, *args, **kwargs)
 
-
 def reset_password(email, ln):
     # create the reset key
     from invenio.access_control_mailcookie import mail_cookie_create_pw_reset

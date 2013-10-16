@@ -43,8 +43,7 @@ from invenio.sqlalchemyutils import db
 from invenio.webaccount_forms import \
     LoginForm, \
     RegisterForm, \
-    LostPasswordForm, \
-    ChangePasswordForm
+    LostPasswordForm
 from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
 from invenio.websession_model import User
 from invenio.websession_webinterface import wash_login_method
@@ -342,12 +341,11 @@ def view(name):
 @blueprint.invenio_set_breadcrumb(_("Lost"))
 @blueprint.invenio_force_https
 def lost():
-    import logging
-
     form = LostPasswordForm(request.values)
     if form.validate_on_submit():
         if reset_password(request.values['email'], g.ln):
             flash(_('A password reset link has been sent to %s') % request.values['email'], 'success')
     else:
         pass
+    logout_user()  # makes no sense to have the user logged-in here
     return render_template('webaccount_lost.html', form=form)

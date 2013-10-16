@@ -20,7 +20,9 @@
 """WebAccount Forms"""
 
 from invenio.webinterface_handler_flask_utils import _
-from invenio.wtforms_utils import InvenioBaseForm, FilterForm, DateTimePickerWidget, FilterTextField
+from invenio.webuser_flask import current_user
+from invenio.wtforms_utils import InvenioBaseForm, FilterForm, \
+    DateTimePickerWidget, FilterTextField
 from flask.ext.wtf import Form, Required, validators
 from wtforms.fields import SubmitField, BooleanField, TextField, \
     TextAreaField, PasswordField, \
@@ -85,7 +87,16 @@ class ChangeUserEmailSettingsForm(InvenioBaseForm):
         except SQLAlchemyError:
             pass
 
-        # FIXME: invalidate account/ re-send email validation
+        # if the email is changed we reset the password to a random one, such
+        # that the user is forced to confirm the new email
+        import random
+        from webuser import updatePasswordUser
+        updatePasswordUser(current_user['id'], int(random.random() * 1000000))
+
+        from flask import flash, url_for
+        flash(_("Note that if you have changed your email address, you \
+                will have to <a href=%s>reset</a> your password anew." %
+                url_for('webaccount.lost')), 'warning')
 
 class LostPasswordForm(InvenioBaseForm):
     email = TextField(_("Email address"))
@@ -120,7 +131,6 @@ class ChangePasswordForm(InvenioBaseForm):
             raise validators.ValidationError(
                 _("Please enter your current password"))
 
-        from invenio.webuser_flask import current_user
         from invenio.webaccount_blueprint import update_login
         if update_login(current_user['nickname'], field.data) is None:
             raise validators.ValidationError(
