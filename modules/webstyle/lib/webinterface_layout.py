@@ -257,7 +257,7 @@ try:
     from invenio.webcomment_webinterface import WebInterfaceYourCommentsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceYourAlertsPages = WebInterfaceDumbPages
+    WebInterfaceYourCommentsPages = WebInterfaceDumbPages
 
 try:
     from invenio.goto_webinterface import WebInterfaceGotoPages
