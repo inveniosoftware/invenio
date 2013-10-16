@@ -349,8 +349,8 @@ CFG_OAUTH1_CONFIGURATIONS = {
 #	for finding where the id, email or nickname is.
 CFG_OAUTH2_CONFIGURATIONS =  {
     'facebook': {
-        'consumer_key': '118319526393',
-        'consumer_secret': '8d675eb0ef89f2f8fbbe4ee56ab473c6',
+        'consumer_key': '',
+        'consumer_secret': '',
         'access_token_url': 'https://graph.facebook.com/oauth/access_token',
         'authorize_url': 'https://www.facebook.com/dialog/oauth',
         'authorize_parameters': {
