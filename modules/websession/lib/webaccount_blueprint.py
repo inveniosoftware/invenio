@@ -128,19 +128,24 @@ def login(nickname=None, password=None, login_method=None, action='',
                 user = update_login(nickname)
 
         if user:
-            flash(_("You are logged in as %s.") % user.nickname, "info")
-            if referer is not None:
-                from urlparse import urlparse
-                # we should not redirect to these URLs after login
-                blacklist = [url_for('webaccount.register'),
-                             url_for('webaccount.logout'),
-                             url_for('webaccount.login')]
-                if not urlparse(referer).path in blacklist:
-                    # Change HTTP method to https if needed.
-                    referer = referer.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL)
-                    return redirect(referer)
-                return redirect('/')
-
+            if user.note == '2':  # account is not confirmed
+                logout_user()
+                flash(_("You have not yet confirmed the email address for the \
+                        '%s' authentication method.") % login_method, 'warning')
+            else:  # account is valid
+                flash(_("You are logged in as %s.") % user.nickname, "info")
+                if referer is not None:
+                    from urlparse import urlparse
+                    # we should not redirect to these URLs after login
+                    blacklist = [url_for('webaccount.register'),
+                                 url_for('webaccount.logout'),
+                                 url_for('webaccount.login'),
+                                 url_for('webaccount.lost')]
+                    if not urlparse(referer).path in blacklist:
+                        # Change HTTP method to https if needed.
+                        referer = referer.replace(CFG_SITE_URL, CFG_SITE_SECURE_URL)
+                        return redirect(referer)
+                    return redirect('/')
     except:
         flash(_("Problem with login."), "error")
 
