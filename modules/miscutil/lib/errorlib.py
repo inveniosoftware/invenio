@@ -132,7 +132,7 @@ def register_emergency(msg, recipients=None):
     for address_str in recipients:
         send_email(CFG_SITE_SUPPORT_EMAIL, address_str, subject, msg)
 
-def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
+def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, now=None):
     """Parse a list of appropriate emergency email recipients from
     CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, or from a provided dictionary
     comprised of 'time constraint' => 'comma separated list of addresses'
@@ -148,14 +148,18 @@ def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
 
     from invenio.dateutils import parse_runtime_limit
 
+    if now is None:
+        now = datetime.datetime.now()
+
     recipients = set()
     for time_condition, address_str in recipient_cfg.items():
         if time_condition and time_condition is not '*':
-            (current_range, future_range) = parse_runtime_limit(time_condition)
-            if not current_range[0] <= datetime.datetime.now() <= current_range[1]:
+            current_range, dummy_range = parse_runtime_limit(time_condition,
+                                                             now=now)
+            if not current_range[0] <= now <= current_range[1]:
                 continue
 
-        recipients.update([address_str])
+        recipients.add(address_str)
     return list(recipients)
 
 def find_all_values_to_hide(local_variables, analyzed_stack=None):
