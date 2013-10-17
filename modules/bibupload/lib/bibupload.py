@@ -280,7 +280,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         if '005' not in record:
             error = record_add_field(record, '005', controlfield_value=now.strftime("%Y%m%d%H%M%S.0"))
             if error is None:
-                msg = "   Failed: Error during adding to 005 controlfield to record"
+                msg = "   ERROR: during adding to 005 controlfield to record"
                 write_message(msg, verbose=1, stream=sys.stderr)
                 return (1, int(rec_id), msg)
             else:
@@ -459,7 +459,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         if extract_tag_from_record(record, 'FFT') is not None:
             record_had_FFT = True
             if not writing_rights_p():
-                msg = "Error no rights to write fulltext files"
+                msg = "ERROR: no rights to write fulltext files"
                 write_message("   Stage 2 failed: %s" % msg,
                     verbose=1, stream=sys.stderr)
                 raise StandardError(msg)
@@ -469,11 +469,11 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                                         tmp_vers=tmp_vers)
             except Exception, e:
                 register_exception()
-                msg = "   Stage 2 failed: Error while elaborating FFT tags: %s" % e
+                msg = "   Stage 2 failed: ERROR: while elaborating FFT tags: %s" % e
                 write_message(msg, verbose=1, stream=sys.stderr)
                 return (1, int(rec_id), msg)
             if record is None:
-                msg = "   Stage 2 failed: Error while elaborating FFT tags"
+                msg = "   Stage 2 failed: ERROR: while elaborating FFT tags"
                 write_message(msg, verbose=1, stream=sys.stderr)
                 return (1, int(rec_id), msg)
             write_message("   -Stage COMPLETED", verbose=2)
@@ -495,11 +495,11 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     write_message("     -Modified field list updated with FFT details: %s" % str(affected_tags), verbose=2)
             except Exception, e:
                 register_exception(alert_admin=True)
-                msg = "   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e
+                msg = "   Stage 2B failed: ERROR: while synchronizing 8564 tags: %s" % e
                 write_message(msg, verbose=1, stream=sys.stderr)
                 return (1, int(rec_id), msg)
             if record is None:
-                msg = "   Stage 2B failed: Error while synchronizing 8564 tags"
+                msg = "   Stage 2B failed: ERROR: while synchronizing 8564 tags"
                 write_message(msg, verbose=1, stream=sys.stderr)
                 return (1, int(rec_id), msg)
             write_message("   -Stage COMPLETED", verbose=2)
@@ -547,20 +547,20 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
             modification_date = time.strftime('%Y-%m-%d %H:%M:%S', time.strptime(record_get_field_value(record, '005'), '%Y%m%d%H%M%S.0'))
             error = update_bibfmt_format(rec_id, rec_xml_new, 'xm', modification_date, pretend=pretend)
             if error == 1:
-                msg = "   Failed: error during update_bibfmt_format 'xm'"
+                msg = "   Failed: ERROR: during update_bibfmt_format 'xm'"
                 write_message(msg, verbose=1, stream=sys.stderr)
                 return (1, int(rec_id), msg)
             if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
                 error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct', modification_date, pretend=pretend)
                 if error == 1:
-                    msg = "   Failed: error during update_bibfmt_format 'recstruct'"
+                    msg = "   Failed: ERROR: during update_bibfmt_format 'recstruct'"
                     write_message(msg, verbose=1, stream=sys.stderr)
                     return (1, int(rec_id), msg)
             if not CFG_BIBUPLOAD_DISABLE_RECORD_REVISIONS:
                 # archive MARCXML format of this record for version history purposes:
                 error = archive_marcxml_for_history(rec_id, affected_fields=affected_tags, pretend=pretend)
                 if error == 1:
-                    msg = "   Failed to archive MARCXML for history"
+                    msg = "   ERROR: Failed to archive MARCXML for history"
                     write_message(msg, verbose=1, stream=sys.stderr)
                     return (1, int(rec_id), msg)
                 else:
@@ -693,11 +693,11 @@ def bibupload_post_phase(record, mode=None, rec_id="", pretend=False,
                 record = fun()
             except Exception, e:
                 register_exception()
-                write_message("   Stage failed: Error while elaborating %s tags: %s" % (tag, e),
+                write_message("   Stage failed: ERROR: while elaborating %s tags: %s" % (tag, e),
                               verbose=1, stream=sys.stderr)
                 return (1, int(rec_id)) # TODO: ?
             if record is None:
-                write_message("   Stage failed: Error while elaborating %s tags" % (tag, ),
+                write_message("   Stage failed: ERROR: while elaborating %s tags" % (tag, ),
                               verbose=1, stream=sys.stderr)
                 return (1, int(rec_id))
             write_message("   -Stage COMPLETED", verbose=2)
@@ -803,7 +803,7 @@ def open_marc_file(path):
         marc = marc_file.read()
         marc_file.close()
     except IOError, erro:
-        write_message("Error: %s" % erro, verbose=1, stream=sys.stderr)
+        write_message("ERROR: %s" % erro, verbose=1, stream=sys.stderr)
         if erro.errno == 2:
             # No such file or directory
             # Not scary
@@ -818,11 +818,11 @@ def xml_marc_to_records(xml_marc):
     # Creation of the records from the xml Marc in argument
     recs = create_records(xml_marc, 1, 1)
     if recs == []:
-        msg = "Error: Cannot parse MARCXML file."
+        msg = "ERROR: Cannot parse MARCXML file."
         write_message(msg, verbose=1, stream=sys.stderr)
         raise StandardError(msg)
     elif recs[0][0] is None:
-        msg = "Error: MARCXML file has wrong format: %s" % recs
+        msg = "ERROR: MARCXML file has wrong format: %s" % recs
         write_message(msg, verbose=1, stream=sys.stderr)
         raise RecoverableError(msg)
     else:
@@ -1029,7 +1029,7 @@ def retrieve_rec_id(record, opt_mode, pretend=False, post_phase = False):
                     # we found the rec_id but it's not in the system and we are
                     # requested to replace records. Therefore we create on the fly
                     # a empty record allocating the recid.
-                    write_message("   Warning: tag 001 found in the xml with"
+                    write_message("   WARNING: tag 001 found in the xml with"
                                 " value %(rec_id)s, but rec_id %(rec_id)s does"
                                 " not exist. Since the mode replace was"
                                 " requested the rec_id %(rec_id)s is allocated"
@@ -1247,11 +1247,11 @@ def create_new_record(rec_id=None, pretend=False):
         try:
             rec_id = int(rec_id)
         except (ValueError, TypeError), error:
-            write_message("   Error during the creation_new_record function: %s "
+            write_message("   ERROR: during the creation_new_record function: %s "
         % error, verbose=1, stream=sys.stderr)
             return None
         if run_sql("SELECT id FROM bibrec WHERE id=%s", (rec_id, )):
-            write_message("   Error during the creation_new_record function: the requested rec_id %s already exists." % rec_id)
+            write_message("   ERROR: during the creation_new_record function: the requested rec_id %s already exists." % rec_id)
             return None
     if pretend:
         if rec_id:
@@ -1533,7 +1533,7 @@ def elaborate_mit_tags(record, rec_id, mode, pretend = False, tmp_ids = {},
                         raise StandardError("BibDoc of a name %s does not exist within a record" % (bibdoc_name, ))
             else:
                 if bibdoc_name != None:
-                    write_message("Warning: both name and id of the first document of a relation have been specified. Ignoring the name")
+                    write_message("WARNING: both name and id of the first document of a relation have been specified. Ignoring the name", stream=sys.stderr)
             if (moreinfo_str is None or mode in ("replace", "correct")) and (not pretend):
 
                 MoreInfo(docid=bibdoc_id , version = bibdoc_ver,
@@ -1592,7 +1592,7 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
                     # resolving temporary identifier
                     bibdoc1_id = resolve_identifier(tmp_ids, bibdoc1_id)
                     if bibdoc1_name != None:
-                        write_message("Warning: both name and id of the first document of a relation have been specified. Ignoring the name")
+                        write_message("WARNING: both name and id of the first document of a relation have been specified. Ignoring the name", stream=sys.stderr)
 
                 bibdoc1_ver = _get_subfield_value(brt, "v")
                 if not (bibdoc1_ver is None):
@@ -1615,7 +1615,7 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
                 else:
                     bibdoc2_id = resolve_identifier(tmp_ids, bibdoc2_id)
                     if bibdoc2_name != None:
-                        write_message("Warning: both name and id of the first document of a relation have been specified. Ignoring the name")
+                        write_message("WARNING: both name and id of the first document of a relation have been specified. Ignoring the name", stream=sys.stderr)
 
 
 
@@ -1715,7 +1715,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, docformat, docname, doctype, newname, description, comment, flags, modification_date, e), stream=sys.stderr)
                 raise
         except Exception, e:
-            write_message("Error in adding '%s' as a new format because of: %s" % (url, e), stream=sys.stderr)
+            write_message("ERROR: in adding '%s' as a new format because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
 
@@ -1732,7 +1732,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, docformat, docname, doctype, newname, description, comment, flags, modification_date, e), stream=sys.stderr)
                 raise
         except Exception, e:
-            write_message("Error in adding '%s' as a new version because of: %s" % (url, e), stream=sys.stderr)
+            write_message("ERROR: in adding '%s' as a new version because of: %s" % (url, e), stream=sys.stderr)
             raise
         return True
 
@@ -1831,13 +1831,13 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
             # value -1 means that identifier has been declared but not assigned a value yet
             if bibdoc_tmpid:
                 if bibdoc_tmpid in tmp_ids:
-                    write_message("WARNING: the temporary identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpid, ))
+                    write_message("WARNING: the temporary identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpid, ), stream=sys.stderr)
                 else:
                     tmp_ids[bibdoc_tmpid] = -1
 
             if bibdoc_tmpver:
                 if bibdoc_tmpver in tmp_vers:
-                    write_message("WARNING: the temporary version identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpver, ))
+                    write_message("WARNING: the temporary version identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpver, ), stream=sys.stderr)
                 else:
                     tmp_vers[bibdoc_tmpver] = -1
 
@@ -1890,7 +1890,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 if url:
                     name = get_docname_from_url(url)
                 elif mode != 'correct' and doctype != 'FIX-MARC':
-                    raise StandardError, "Warning: fft '%s' doesn't specifies either a location in $a or a docname in $n" % str(fft)
+                    raise StandardError, "WARNING: fft '%s' doesn't specifies either a location in $a or a docname in $n" % str(fft)
                 else:
                     continue
 
@@ -1958,7 +1958,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 try:
                     timestamp = datetime(*(time.strptime(timestamp[0], "%Y-%m-%d %H:%M:%S")[:6]))
                 except ValueError:
-                    write_message('Warning: The timestamp is not in a good format, thus will be ignored. The format should be YYYY-MM-DD HH:MM:SS')
+                    write_message('WARNING: The timestamp is not in a good format, thus will be ignored. The format should be YYYY-MM-DD HH:MM:SS', stream=sys.stderr)
                     timestamp = ''
             else:
                 timestamp = ''
@@ -2025,7 +2025,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         downloaded_url = download_url(url, docformat)
                         write_message("%s saved into %s" % (url, downloaded_url), verbose=9)
                     except Exception, err:
-                        write_message("Error in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
+                        write_message("ERROR: in downloading '%s' because of: %s" % (url, err), stream=sys.stderr)
                         raise
                     if mode == 'correct' and bibdoc is not None and not new_revision_needed:
                         downloaded_urls.append((downloaded_url, docformat, description, comment, flags, timestamp))
@@ -2168,7 +2168,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                                         ## Let's refresh the list of bibdocs.
                                         bibrecdocs.build_bibdoc_list()
                                 except StandardError, e:
-                                    write_message('Error in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
+                                    write_message('ERROR: in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
                                     raise
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.list_bibdocs():
@@ -2258,13 +2258,13 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
             brd = BibRecDocs(rec_id)
             if bibdoc_tmpid:
                 if bibdoc_tmpid in tmp_ids and tmp_ids[bibdoc_tmpid] != -1:
-                    write_message("WARNING: the temporary identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpid, ))
+                    write_message("WARNING: the temporary identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpid, ), stream=sys.stderr)
                 else:
                     tmp_ids[bibdoc_tmpid] = brd.get_docid(docname)
 
             if bibdoc_tmpver:
                 if bibdoc_tmpver in tmp_vers and tmp_vers[bibdoc_tmpver] != -1:
-                    write_message("WARNING: the temporary version identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpver, ))
+                    write_message("WARNING: the temporary version identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpver, ), stream=sys.stderr)
                 else:
                     if version == None:
                         if version:
@@ -2312,7 +2312,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         if not pretend:
             row_id  = run_sql(query, params)
         if not pretend and row_id is None:
-            write_message("   Failed: Error during update_bibfmt_format function", verbose=1, stream=sys.stderr)
+            write_message("   ERROR: during update_bibfmt_format function", verbose=1, stream=sys.stderr)
             return 1
         else:
             write_message("   -Update the format %s in bibfmt: DONE" % format_name , verbose=2)
@@ -2325,7 +2325,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         # Insert the format information in BibFMT
         res = insert_bibfmt(id_bibrec, format_value, format_name, modification_date, pretend=pretend)
         if res is None:
-            write_message("   Failed: Error during insert_bibfmt", verbose=1, stream=sys.stderr)
+            write_message("   ERROR: during insert_bibfmt", verbose=1, stream=sys.stderr)
             return 1
         else:
             write_message("   -Insert the format %s in bibfmt: DONE" % format_name , verbose=2)
@@ -2480,7 +2480,7 @@ def append_new_tag_to_old_record(record, rec_old):
                     newfield_number = record_add_field(rec_old, tag,
                         controlfield_value=controlfield_value)
                     if newfield_number is None:
-                        write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
+                        write_message("   ERROR: when adding the field"+tag, verbose=1, stream=sys.stderr)
         else:
             # For each tag there is a list of tuples representing datafields
             for single_tuple in record[tag]:
@@ -2499,7 +2499,7 @@ def append_new_tag_to_old_record(record, rec_old):
                 newfield_number = record_add_field(rec_old, tag, ind1,
                     ind2, subfields=subfield_list)
                 if newfield_number is None:
-                    write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
+                    write_message("   ERROR: when adding the field"+tag, verbose=1, stream=sys.stderr)
 
     # Go through each tag in the appended record
     for tag in record:
@@ -2935,7 +2935,7 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
 
     # Second phase -> Now we can process all entries where temporary identifiers might appear (BDR, BDM)
 
-    write_message("Identifiers table after processing: %s  versions: %s" % (str(tmp_ids), str(tmp_vers)))
+    write_message("Identifiers table after processing: %s  versions: %s" % (str(tmp_ids), str(tmp_vers)), verbose=2)
     write_message("Uploading BDR and BDM fields")
     if opt_mode != "holdingpen":
         for record in records:
@@ -2975,7 +2975,7 @@ def task_run_core():
                               callback_url=callback_url,
                               results_for_callback=results_for_callback)
         else:
-            write_message("   Error bibupload failed: No record found",
+            write_message("   ERROR: bibupload failed: No record found",
                         verbose=1, stream=sys.stderr)
         callback_url = task_get_option("callback_url")
         if callback_url:
