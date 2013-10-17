@@ -154,6 +154,7 @@ def task_run_core():
         # Harvest phase
         harvested_files_list = []
         harvestpath = "%s_%d_%s_" % (filepath_prefix, j, time.strftime("%Y%m%d%H%M%S"))
+        harvest_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         harvested_files_list, error_code = harvest_step(repository, harvestpath, identifiers, datelist, current_progress)
         if harvested_files_list == None or len(harvested_files_list) < 1:
             if error_code:
@@ -221,6 +222,11 @@ def task_run_core():
                               (active_files,
                                get_nb_records_in_file(active_files)))
         write_message("post-harvest processes ended")
+
+        # We got this far. Now we can actually update the last_run
+        if not datelist and not identifiers and repository["frequency"] != 0:
+            update_lastrun(repository["id"],
+                           runtime=harvest_start_time)
 
         # Generate reports
         ticket_queue = task_get_option("create-ticket-in")
@@ -382,7 +388,6 @@ def harvest_step(repository, harvestpath, identifiers, dates, current_progress):
             return [], error_code
         write_message("source %s was successfully harvested" % \
                       (repository["name"],))
-        update_lastrun(repository["id"])
 
     elif not dates and repository["frequency"] != 0:
         # Just a regular update from last time it ran
@@ -408,7 +413,6 @@ def harvest_step(repository, harvestpath, identifiers, dates, current_progress):
                 return [], error_code
             write_message("source %s was successfully harvested" % \
                           (repository["name"],))
-            update_lastrun(repository["id"])
         else:
             write_message("source %s does not need updating" % (repository["name"],))
             return [], 0  # No actual error here.

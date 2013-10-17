@@ -50,13 +50,14 @@ class HistoryEntry:
                "oai_src_id: " + str(self.oai_src_id) + ', ' + ")"
 
 
-def update_lastrun(index):
+def update_lastrun(index, runtime=None):
     """ A method that updates the lastrun of a repository
         successfully harvested """
     try:
-        today = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        if not runtime:
+            runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         sql = 'UPDATE oaiHARVEST SET lastrun=%s WHERE id=%s'
-        run_sql(sql, (today, index))
+        run_sql(sql, (runtime, index))
         return 1
     except StandardError, e:
         return (0, e)
