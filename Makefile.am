@@ -160,7 +160,7 @@ install-jquery-plugins:
 	wget http://invenio-software.org/download/jquery/jquery-1.7.1.min.js && \
 	mv jquery-1.7.1.min.js jquery.min.js && \
 	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
-        wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
+        wget http://invenio-software.org/download/jquery/jquery.jeditable.custom.min.js -O jquery.jeditable.mini.js && \
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
