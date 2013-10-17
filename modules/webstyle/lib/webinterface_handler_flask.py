@@ -197,8 +197,11 @@ def create_invenio_flask_app(**kwargs_config):
         class InvenioDebugToolbarExtension(DebugToolbarExtension):
             def _show_toolbar(self):
                 user_info = UserInfo(session.get('user_id'))
-                # Enable debug toolbar only for super admin.
-                if not user_info.is_super_admin:
+                # the debug toolbar will be enabled iff it is added in
+                # CFG_DEVEL_TOOLS and CFG_DEVEL_SITE == 9 (shown to ALL users)
+                # or the user is super admin (regardless of CFG_DEVEL_SITE)
+                if _app.config["CFG_DEVEL_SITE"] != 9 and \
+                   not user_info.is_super_admin:
                     return False
                 return super(InvenioDebugToolbarExtension, self)._show_toolbar()
 
