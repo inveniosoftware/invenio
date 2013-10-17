@@ -1475,6 +1475,9 @@ def synchronize_8564(rec_id, record, record_had_FFT, pretend=False):
 
     tags8564s_to_add = tags8564s_to_add.values()
     tags8564s_to_add.sort()
+    ## FIXME: we are not yet able to preserve the sorting
+    ## of 8564 tags WRT FFT in BibUpload.
+    ## See ticket #1606.
     for subfields in tags8564s_to_add:
         subfields = subfields.items()
         subfields.sort()

@@ -282,7 +282,15 @@ class RevisionVerifier:
             ## the same change.
             real_conflict_tags = []
             for tag in conflict_tags:
-                if tag in up_record and tag in orig_record and records_identical({tag: up_record[tag]}, {tag: orig_record[tag]}, ignore_duplicate_subfields=True, ignore_duplicate_controlfields=True):
+                if tag == '856':
+                    ## HACK: FIXME: we are not yet able to preserve the sorting
+                    ## of 8564 tags WRT FFT in BibUpload.
+                    ## Therefore we implement here a workaround to ignore
+                    ## the order of fields in case of 856.
+                    ## See ticket #1606.
+                    if tag in up_record and tag in orig_record and records_identical({tag: up_record[tag]}, {tag: orig_record[tag]}, ignore_duplicate_subfields=True, ignore_duplicate_controlfields=True, ignore_field_order=False, ignore_subfield_order=False):
+                        continue
+                elif tag in up_record and tag in orig_record and records_identical({tag: up_record[tag]}, {tag: orig_record[tag]}, ignore_duplicate_subfields=True, ignore_duplicate_controlfields=True):
                     continue
                 elif tag not in up_record and tag not in orig_record:
                     continue
