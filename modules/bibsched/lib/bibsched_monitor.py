@@ -371,6 +371,11 @@ D - Debug mode for remote task
                     new_motd = f.read()
                 finally:
                     f.close()
+                # Remove the user part of the motd
+                # It should be in this format:
+                # <user>, <reason>
+                new_motd = new_motd.split(',')[-1].strip()
+
                 if new_motd.strip():
                     f = open(CFG_MOTD_PATH, 'w')
                     try:
@@ -651,10 +656,12 @@ order to let this task run. The current priority is %s. New value:"
                         self.change_auto_mode(False, state['selected_option'])
                         return
                     else:
+                        # Forever selected
+                        # Change to manual mode with no duration
                         self.edit_motd()
                         self.read_motd()
                         if self.motd and len(self.motd) > 30:
-                            self.change_auto_mode(False, state['selected_option'])
+                            self.change_auto_mode(False, duration=None)
                             return
                         else:
                             self.win.border()
