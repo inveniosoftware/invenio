@@ -71,7 +71,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     can_record_have_physical_copies, extend_record_with_template, \
     replace_references, merge_record_with_template, record_xml_output, \
     record_is_conference, add_record_cnum, get_xml_from_textmarc, \
-    record_locked_by_user_details, crossref_process_template
+    record_locked_by_user_details, crossref_process_template, \
+    modify_record_timestamp
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -790,6 +791,9 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         revId = data['revId']
         job_date = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(revId).groups()
         revision_xml = get_marcxml_of_revision(recid, job_date)
+        # Modify the 005 tag in order to merge with the latest version of record
+        last_revision_ts = data['lastRevId'] + ".0"
+        revision_xml = modify_record_timestamp(revision_xml, last_revision_ts)
         save_xml_record(recid, uid, revision_xml)
         if (cache_exists(recid, uid)):
             delete_cache_file(recid, uid)
