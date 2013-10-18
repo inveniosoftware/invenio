@@ -4104,7 +4104,7 @@ CREATE TABLE IF NOT EXISTS crcLIBRARY (
   address varchar(255) NOT NULL default '',
   email varchar(255) NOT NULL default '',
   phone varchar(30) NOT NULL default '',
-  type varchar(30) default NULL,
+  type varchar(30) NOT NULL default 'main',
   notes text,
   PRIMARY KEY (id)
 ) ENGINE=MyISAM;
@@ -4567,5 +4567,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_28_idxINDEX_toke
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_03_29_idxINDEX_stopwords_update',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_20_bibauthority_updates',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_new_index_itemcount',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_crcLIBRARY_type',NOW());
 
 -- end of file

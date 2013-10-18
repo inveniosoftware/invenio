@@ -2467,8 +2467,8 @@ INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-SA-3.0','http:/
 INSERT INTO knwKBRVAL (m_key,m_value,id_knwKB) VALUES ('CC-BY-NC-ND-3.0','http://creativecommons.org/licenses/by-nc-nd/3.0/', '7');
 
 -- crcLIBRARY demo data:
-INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', '');
-INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis HEP Library', 'CH-1211 Geneva 21', 'atlantis.hep@cds.cern.ch', '1234567', '');
+INSERT INTO crcLIBRARY (name, address, email, phone, type, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', 'main', '');
+INSERT INTO crcLIBRARY (name, address, email, phone, type, notes) VALUES ('Atlantis HEP Library', 'CH-1211 Geneva 21', 'atlantis.hep@cds.cern.ch', '1234567', 'external', '');
 
 -- crcITEM demo data:
 INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
