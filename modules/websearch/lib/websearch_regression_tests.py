@@ -357,7 +357,7 @@ class WebSearchTestRecord(unittest.TestCase):
                                                (CFG_SITE_RECORD, CFG_SITE_LANG)))
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/1/export/hx' % CFG_SITE_RECORD),
-                                               expected_text='title        = "ALEPH experiment'))
+                                               expected_text='title         = "{ALEPH experiment'))
         self.assertEqual([],
                          test_web_page_content(make_url('/%s/1/export/t?ot=245' % CFG_SITE_RECORD),
                                                expected_text='245__ $$aALEPH experiment'))
