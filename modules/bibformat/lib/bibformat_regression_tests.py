@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -81,14 +81,14 @@ class BibFormatBibTeXTest(unittest.TestCase):
         """Prepare some ideal outputs"""
         self.record_74_hx = '''<pre>
 @article{Wang:74,
-      author       = "Wang, B and Lin, C Y and Abdalla, E",
-      title        = "Quasinormal modes of Reissner-Nordstrom Anti-de Sitter
-                      Black Holes",
-      journal      = "Phys. Lett., B",
-      number       = "hep-th/0003295",
-      volume       = "481",
-      pages        = "79-88",
-      year         = "2000",
+      author        = "Wang, B and Lin, C Y and Abdalla, E",
+      title         = "{Quasinormal modes of Reissner-Nordstrom Anti-de Sitter
+                       Black Holes}",
+      journal       = "Phys. Lett., B",
+      number        = "hep-th/0003295",
+      volume        = "481",
+      pages         = "79-88",
+      year          = "2000",
 }
 </pre>'''
 
