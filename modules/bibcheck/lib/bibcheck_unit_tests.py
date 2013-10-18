@@ -96,7 +96,7 @@ class BibCheckRulesParseTest(unittest.TestCase):
                 load_rule(config, PLUGINS_MOCK, rule_name)
                 self.fail()
             except RulesParseError, ex:
-                if str(ex.message).find(exception) < 0:
+                if str(ex).find(exception) < 0:
                     self.fail()
 
     def test_valid_rule(self):
