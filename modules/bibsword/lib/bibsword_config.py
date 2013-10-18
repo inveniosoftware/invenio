@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -67,14 +67,14 @@ marc_tag_contributor_name = get_tag_from_name('additional author name')
 if marc_tag_contributor_name:
     CFG_MARC_CONTRIBUTOR_NAME = marc_tag_contributor_name
 else:
-    CFG_MARC_CONTRIBUTOR_NAME = '700_a'
+    CFG_MARC_CONTRIBUTOR_NAME = '700__a'
 
 # contributor affiliation:
 marc_tag_contributor_affiliation = get_tag_from_name('additional author affiliation')
 if marc_tag_contributor_affiliation:
     CFG_MARC_CONTRIBUTOR_AFFILIATION = marc_tag_contributor_affiliation
 else:
-    CFG_MARC_CONTRIBUTOR_AFFILIATION = '700_u'
+    CFG_MARC_CONTRIBUTOR_AFFILIATION = '700__u'
 
 # abstract:
 marc_tag_abstract = get_tag_from_name('main abstract')
@@ -138,6 +138,3 @@ if marc_tag_internal_note:
     CFG_MARC_RECORD_SUBMIT_INFO = marc_tag_internal_note
 else:
     CFG_MARC_RECORD_SUBMIT_INFO = '595__a'
-
-
-
