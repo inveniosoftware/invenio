@@ -4538,26 +4538,26 @@ class WebSearchItemCountQueryTest(unittest.TestCase):
     def test_itemcount_plus(self):
         """websearch - item count, search for more than one item, using 'plus'"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + 'search?p=2%2B&f=itemcount&of=id',
-                                               expected_text="[31,32,34]"))
+                         test_web_page_content(CFG_SITE_URL + '/search?p=2%2B&f=itemcount&of=id',
+                                               expected_text="[31, 32, 34]"))
 
     def test_itemcount_span(self):
         """websearch - item count, search for more than one item, using 'span'"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + 'search?p=2->10&f=itemcount&of=id',
-                                               expected_text="[31,32,34]"))
+                         test_web_page_content(CFG_SITE_URL + '/search?p=2->10&f=itemcount&of=id',
+                                               expected_text="[31, 32, 34]"))
 
     def test_itemcount_phrase(self):
         """websearch - item count, search for records with exactly two items, phrase"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%222%22&f=itemcount&of=id',
-                                               expected_text="[31,34]"))
+                                               expected_text="[31, 34]"))
 
     def test_itemcount_records_with_two_items(self):
         """websearch - item count, search for records with exactly two items"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + 'search?p=2&f=itemcount&of=id',
-                                               expected_text="[31,34]"))
+                         test_web_page_content(CFG_SITE_URL + '/search?p=2&f=itemcount&of=id',
+                                               expected_text="[31, 34]"))
 
 
 class WebSearchPerformRequestSearchRefactoringTest(unittest.TestCase):
@@ -4754,7 +4754,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchPerformRequestSearchRefactoringTest,
                              WebSearchGetRecordTests,
                              WebSearchExactTitleIndexTest,
-                             WebSearchCJKTokenizedSearchTest)
+                             WebSearchCJKTokenizedSearchTest,
+                             WebSearchItemCountQueryTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
