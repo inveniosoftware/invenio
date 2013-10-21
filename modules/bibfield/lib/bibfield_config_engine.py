@@ -310,7 +310,7 @@ class BibFieldParser(object):
         #Just creates a dict entry with the main json field name and points it to
         #the full one i.e.: 'authors' : ['authors[0]', 'authors[n]']
         if '[0]' in json_id or '[n]' in json_id:
-            main_json_id = re.sub('[\[n\] \[0\]]', '', json_id)
+            main_json_id = re.sub('(\[n\]|\[0\])', '', json_id)
             if not main_json_id in self.config_rules:
                 self.config_rules[main_json_id] = []
             self.config_rules[main_json_id].append(json_id)
