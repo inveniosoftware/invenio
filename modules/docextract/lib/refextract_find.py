@@ -67,7 +67,7 @@ def find_reference_section(docbody):
         if title_match:
             title = title_match.group('title')
             index = len(docbody) - 1 - reversed_index
-            temp_ref_details, found_title = find_numeration(docbody[index:index+3], title)
+            temp_ref_details, found_title = find_numeration(docbody[index:index+6], title)
             if temp_ref_details:
                 if ref_details and 'title' in ref_details \
                                and ref_details['title'] \
