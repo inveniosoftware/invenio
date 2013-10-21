@@ -100,6 +100,11 @@ re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*)
 
 VOLATILE_PREFIX = "VOLATILE:"
 
+
+class InvalidCache(Exception):
+    pass
+
+
 # Authorization
 
 def user_can_edit_record_collection(req, recid):
@@ -278,6 +283,8 @@ def get_cache_contents(recid, uid):
         assert_undo_redo_lists_correctness(undo_list, redo_list)
 
         return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list
+    else:
+        raise InvalidCache()
 
 def update_cache_contents(recid, uid, record_revision, record, pending_changes,
                           disabled_hp_changes, undo_list, redo_list):

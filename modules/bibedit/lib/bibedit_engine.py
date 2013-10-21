@@ -54,7 +54,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_DISPLAY_REFERENCE_TAGS, CFG_BIBEDIT_DISPLAY_AUTHOR_TAGS, \
     CFG_BIBEDIT_EXCLUDE_CURATOR_TAGS, CFG_BIBEDIT_AUTHOR_DISPLAY_THRESHOLD
 
-from invenio.config import (CFG_SITE_LANG, CFG_DEVEL_SITE,
+from invenio.config import (CFG_SITE_LANG,
     CFG_BIBCATALOG_SYSTEM_RT_URL, CFG_BIBEDIT_SHOW_HOLDING_PEN_REMOVED_FIELDS,
     CFG_BIBCATALOG_SYSTEM)
 
@@ -77,7 +77,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     replace_references, merge_record_with_template, record_xml_output, \
     record_is_conference, add_record_cnum, get_xml_from_textmarc, \
     record_locked_by_user_details, crossref_process_template, \
-    modify_record_timestamp, get_affiliation_for_paper
+    modify_record_timestamp, get_affiliation_for_paper, InvalidCache
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -128,6 +128,12 @@ except NotImplementedError:
     CFG_CAN_SEARCH_FOR_TICKET = False
 
 re_revdate_split = re.compile(r'^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
+
+
+def bibedit_register_exception(data):
+    register_exception(alert_admin=True,
+                       prefix="\n".join(data['action_log']))
+
 
 def get_empty_fields_templates():
     """
@@ -391,7 +397,17 @@ def perform_request_newticket(recid, uid):
     return (errmsg, t_url)
 
 
-def perform_request_ajax(req, recid, uid, data, isBulk = False):
+def perform_request_ajax(req, recid, uid, data, isBulk=False):
+    try:
+        return _perform_request_ajax(req, recid, uid, data, isBulk)
+    except:   # pylint: disable=W0702
+        # Custom error exception for bibedit
+        # We have an action log that we want to display in full
+        bibedit_register_exception(data)
+        return {'resultCode': CFG_BIBEDIT_AJAX_RESULT_CODES_REV['server_error']}
+
+
+def _perform_request_ajax(req, recid, uid, data, isBulk=False):
     """Handle Ajax requests by redirecting to appropriate function."""
     response = {}
     request_type = data['requestType']
@@ -489,11 +505,8 @@ def perform_bulk_request_ajax(req, recid, uid, reqsData, undoRedo, cacheMTime):
             # save the handler on the server side !
             data['undoRedo'] = undoRedo
             isFirst = False
-        lastResult = perform_request_ajax(req, recid, uid, data, isBulk=True)
-        try:
-            lastTime = lastResult['cacheMTime']
-        except KeyError:
-            raise Exception(str(lastResult))
+        lastResult = _perform_request_ajax(req, recid, uid, data, isBulk=True)
+        lastTime = lastResult['cacheMTime']
     return lastResult
 
 
@@ -615,8 +628,6 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                 except CrossrefError, inst:
                     response['resultCode'] = \
                         CFG_BIBEDIT_AJAX_RESULT_CODES_REV[inst.code]
-                except:
-                    response['resultCode'] = 0
                 else:
                     record = crossref_process_template(marcxml_template, CFG_INSPIRE_SITE)
                     if not record:
@@ -715,7 +726,7 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                     cache_dirty, record_revision, record, pending_changes, \
                         disabled_hp_changes, undo_list, redo_list = \
                         get_cache_contents(recid, uid)
-                except TypeError:
+                except InvalidCache:
                     # No cache found in the DB
                     record_revision, record = create_cache(recid, uid)
                     if not record:
@@ -804,51 +815,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
         # - Record locked by queue
         # If the cache is outdated cacheOutdated will be set to True in the
         # response.
-        if not cache_exists(recid, uid):
-            response['resultCode'] = 106
-        elif not get_cache_mtime(recid, uid) == data['cacheMTime']:
-            response['resultCode'] = 107
-        elif cache_expired(recid, uid) and \
-                record_locked_by_other_user(recid, uid):
-            response['resultCode'] = 104
-        elif record_locked_by_queue(recid):
-            response['resultCode'] = 105
-        else:
-            try:
-                tmp_result = get_cache_contents(recid, uid)
-                record_revision = tmp_result[1]
-                record = tmp_result[2]
-                pending_changes = tmp_result[3]
-#                disabled_changes = tmp_result[4]
-
-                xml_record = wash_for_xml(print_rec(record))
-                record, status_code, list_of_errors = create_record(xml_record)
-
-                # Simulate upload to catch errors
-                errors_upload = perform_upload_check(xml_record, '--replace')
-                if errors_upload:
-                    response['resultCode'], response['errors'] = 113, \
-                        errors_upload
-                    return response
-                elif status_code == 0:
-                    response['resultCode'], response['errors'] = 110, \
-                        list_of_errors
-                if not data['force'] and not latest_record_revision(recid, record_revision):
-                    response['cacheOutdated'] = True
-                else:
-                    if record_is_conference(record):
-                        new_cnum = add_record_cnum(recid, uid)
-                        if new_cnum:
-                            response["new_cnum"] = new_cnum
-
-                    save_xml_record(recid, uid)
-                    response['resultCode'] = 4
-            except Exception, e:
-                register_exception()
-                response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
-                    'error_wrong_cache_file_format']
-                if CFG_DEVEL_SITE: # return debug information in the request
-                    response['exception_message'] = e.__str__()
+        perform_request_submit(recid=recid,
+                               uid=uid,
+                               data=data,
+                               response=response)
     elif request_type == 'revert':
         revId = data['revId']
         job_date = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(revId).groups()
@@ -901,10 +871,10 @@ def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG
                         get_cache_contents(recid, uid)[1:]
             else:
                 try:
-                    record_revision, record, pending_changes, \
-                        deactivated_hp_changes, undo_list, redo_list = \
-                        get_cache_contents(recid, uid)[1:]
-                except:
+                    dummy_cache_dirty, record_revision, record, \
+                        pending_changes, deactivated_hp_changes, undo_list, \
+                        redo_list = get_cache_contents(recid, uid)
+                except InvalidCache:
                     record_revision, record, pending_changes, \
                         deactivated_hp_changes = create_cache(recid, uid)
             record_add_field(record, '980', ' ', ' ', '', [('c', 'DELETED')])
@@ -1011,14 +981,8 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data,
         # immediately one after another
         response['resultCode'] = 107
     else:
-        try:
-            record_revision, record, pending_changes, deactivated_hp_changes, \
-                undo_list, redo_list = get_cache_contents(recid, uid)[1:]
-        except:
-            register_exception()
-            response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[
-                'error_wrong_cache_file_format']
-            return response
+        record_revision, record, pending_changes, deactivated_hp_changes, \
+            undo_list, redo_list = get_cache_contents(recid, uid)[1:]
 
         # process all the Holding Pen changes operations ... regardles the
         # request type
@@ -1392,7 +1356,7 @@ def perform_request_bibcatalog(request_type, uid, data):
             if bibcat_resp == "":
                 un, pw = get_bibcat_from_prefs(uid)
                 if un and pw:
-                    ticket_assigned = BIBCATALOG_SYSTEM.ticket_steal(uid, data['ticketid'])
+                    BIBCATALOG_SYSTEM.ticket_steal(uid, data['ticketid'])
                     ticket_closed = BIBCATALOG_SYSTEM.ticket_set_attribute(uid, data['ticketid'], 'status', 'resolved')
                     if ticket_closed == 1:
                         response['ticket_closed_description'] = 'Ticket resolved'
@@ -1834,3 +1798,42 @@ def perform_guess_affiliations(uid, data):
     response['subfieldsToAdd'] = result
 
     return response
+
+
+def perform_request_submit(recid, uid, data, response):
+    if not cache_exists(recid, uid):
+        response['resultCode'] = 106
+    elif not get_cache_mtime(recid, uid) == data['cacheMTime']:
+        response['resultCode'] = 107
+    elif cache_expired(recid, uid) and \
+            record_locked_by_other_user(recid, uid):
+        response['resultCode'] = 104
+    elif record_locked_by_queue(recid):
+        response['resultCode'] = 105
+    else:
+        dummy_cache_dirty, record_revision, record, dummy_pending_changes, \
+            disabled_hp_changes, dummy_undo_list, dummy_redo_list \
+                                            = get_cache_contents(recid, uid)
+
+        xml_record = wash_for_xml(print_rec(record))
+        record, status_code, list_of_errors = create_record(xml_record)
+
+        # Simulate upload to catch errors
+        errors_upload = perform_upload_check(xml_record, '--replace')
+        if errors_upload:
+            response['resultCode'], response['errors'] = 113, \
+                errors_upload
+            return response
+        elif status_code == 0:
+            response['resultCode'], response['errors'] = 110, \
+                list_of_errors
+        if not data['force'] and not latest_record_revision(recid, record_revision):
+            response['cacheOutdated'] = True
+        else:
+            if record_is_conference(record):
+                new_cnum = add_record_cnum(recid, uid)
+                if new_cnum:
+                    response["new_cnum"] = new_cnum
+
+            save_xml_record(recid, uid)
+            response['resultCode'] = 4

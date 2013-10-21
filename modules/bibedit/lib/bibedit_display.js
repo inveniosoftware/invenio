@@ -926,8 +926,8 @@ function displayMessage(msgCode, keepContent, args) {
         msg = 'Search term did not match any records.';
         break;
     case 0:
-        msg = 'A server error has occured. Please contact your system ' +
-            'administrator.<br />' + 'Error code: <b>' + msgCode + '</b>';
+        msg = 'A server error has occurred. Please contact your system ' +
+            'administrator.<br />';
         break;
     case 4:
         msg = 'Your modifications have now been submitted. ' +
@@ -997,8 +997,9 @@ function displayMessage(msgCode, keepContent, args) {
             'Errors: <b>' + args[0] + '</b><br /><br />';
         break;
     case 111:
-        msg = 'Internal error. Cache file format is incorrect. ' +
-            'Try to open the record again';
+        msg = 'A server error has occurred. Try reopening the record. ' +
+            'If the problem persists, please contact your system ' +
+            'administrator.<br />';
         break;
     case 113:
         msg = 'An error ocurred during the upload simulation: <br /><br />' +
