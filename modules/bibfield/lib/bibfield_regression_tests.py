@@ -237,6 +237,19 @@ class BibFieldCreateRecordTests(unittest.TestCase):
         self.assertTrue(len(rec['url']) == 7)
         self.assertTrue(rec['url[0].url'] == "http://www.nobel.se/physics/laureates/1950/index.html")
 
+    def test_bibdoc_integration(self):
+        """bibfield - bibdoc integration"""
+        rec = get_record(7)
+
+        self.assertTrue('_files' in rec)
+        self.assertEquals(len(rec['files']), 2)
+        image = rec['files'][1]
+        self.assertEquals(image['eformat'], '.jpeg')
+        self.assertEquals(image['name'], '9806033')
+
+        bibdoc = rec['bibdocs'].list_latest_files()[1]
+        self.assertEquals(image['name'], bibdoc.name)
+
 
 class BibFieldLegacyTests(unittest.TestCase):
     """
