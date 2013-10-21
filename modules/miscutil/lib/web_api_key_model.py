@@ -23,14 +23,10 @@ Web API Key database models.
 # General imports.
 from urlparse import parse_qs, urlparse, urlunparse
 from invenio.sqlalchemyutils import db
+from invenio.hashutils import sha1
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
-import sys
-if sys.version_info < (2, 5):
-    import sha as sha1
-else:
-    from hashlib import sha1
 import hmac
 import time
 import re
@@ -60,9 +56,8 @@ from invenio.websession_model import User
 
 class WebAPIKey(db.Model):
     """Represents a Web API Key record."""
-    def __str__(self):
-        return "%s <%s>" % (self.nickname, self.email)
     __tablename__ = 'webapikey'
+
     id = db.Column(db.String(150), primary_key=True, nullable=False)
     secret = db.Column(db.String(150), nullable=False)
     id_user = db.Column(db.Integer(15, unsigned=True), db.ForeignKey(User.id),
@@ -239,7 +234,6 @@ class WebAPIKey(db.Model):
             register_customevent("apikeyusage", [uid, api_key, path, url_req])
             return uid
         else:
-            print 'wrong signature'
             return -1
 
     @classmethod
@@ -272,9 +266,6 @@ class WebAPIKey(db.Model):
 
         @return: Signed request string or, in case of error, ''
         """
-
-        if params is None:
-            params = {}
 
         if params is None:
             params = {}
