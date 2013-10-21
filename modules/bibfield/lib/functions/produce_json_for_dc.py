@@ -19,7 +19,7 @@
 
 def produce_json_for_dc(self, fields=None):
     """
-    Export the record in dublin core format
+    Export the record in dublin core format.
 
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.
@@ -54,10 +54,10 @@ def produce_json_for_dc(self, fields=None):
                                 except:
                                     try:
                                         tmp_dict[key] = self._try_to_eval(subfield, value=f)
-                                    except:
-                                        pass
+                                    except Exception,e:
+                                        self['__error_messages.cerror[n]'] = 'Producer CError - Unable to produce %s - %s' % (field, str(e))
                         if tmp_dict:
                             out.append(tmp_dict)
         except KeyError:
-            pass
+            self['__error_messages.cerror[n]'] = 'Producer CError - No producer rule for field %s' % field
     return out

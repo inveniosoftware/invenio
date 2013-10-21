@@ -66,7 +66,7 @@ def create_record(blob, master_format='marc', verbose=0, **additional_info):
     """
     blob_wrapper = BlobWrapper(blob=blob, master_format=master_format, **additional_info)
 
-    return CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)](blob_wrapper)
+    return CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)](blob_wrapper, check=True)
 
 
 def create_records(blob, master_format='marc', verbose=0, **additional_info):

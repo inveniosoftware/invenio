@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-def check_field_type(record, field, field_type, subfield=None):
+def check_field_type(record, field, field_type, subfield=None, continuable=True):
     """
     Checks if record[field.subfield] is of type "field_type"
 
@@ -43,16 +43,20 @@ def check_field_type(record, field, field_type, subfield=None):
     from invenio.pluginutils import PluginContainer
     CFG_BIBFIELD_TYPES = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibfield_functions', 'is_type_*.py'))
 
-    from invenio.bibfield_utils import BibFieldCheckerException
-    new_type = 'is_type_%s' % (field_type,)
+    from invenio.bibfield_utils import InvenioBibFieldContinuableError, \
+                                       InvenioBibFieldError
+
+    error = continuable and InvenioBibFieldContinuableError or InvenioBibFieldError
+
+    new_type = 'is_type_%s' % (field_type, )
 
     if new_type in CFG_BIBFIELD_TYPES:
         globals()[new_type] = CFG_BIBFIELD_TYPES[new_type]
         if not eval('%s(record[key])' % (new_type,)):
-            raise BibFieldCheckerException("Field %s should be of type '%s'" % (key, field_type))
+            raise error("Field %s should be of type '%s'" % (key, field_type))
     else:
         if not check_field_sys_type(record[key], field_type):
-            raise BibFieldCheckerException("Field %s should be of type '%s'" % (key, field_type))
+            raise error("Field %s should be of type '%s'" % (key, field_type))
 
 
 def check_field_sys_type(value, field_type):

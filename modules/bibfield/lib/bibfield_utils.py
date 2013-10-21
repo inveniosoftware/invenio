@@ -43,11 +43,13 @@ class BibFieldException(Exception):
     pass
 
 
-class BibFieldCheckerException(Exception):
-    """
-    Exception raised when some error happens during checking
-    """
+class InvenioBibFieldContinuableError(Exception):
+    """BibField continuable error"""
     pass
+
+
+class InvenioBibFieldError(Exception):
+    """BibField fatal error, @see CFG_BIBUPLOAD_BIBFIELD_STOP_ERROR_POLICY"""
 
 
 class BibFieldDict(object):
