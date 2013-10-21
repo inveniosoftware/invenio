@@ -82,7 +82,7 @@ class JsonReader(BibFieldDict):
             self['__master_format'] = 'json'
 
     @staticmethod
-    def split_blob(blob):
+    def split_blob(blob, schema):
         """
         In case of several records inside the blob this method specify how to split
         then and work one by one afterwards

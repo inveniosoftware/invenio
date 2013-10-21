@@ -78,7 +78,7 @@ def create_records(blob, master_format='marc', verbose=0, **additional_info):
 
     @return List of record objects initiated by the functions create_record()
     """
-    record_blods = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)].split_blob(blob)
+    record_blods = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)].split_blob(blob, additional_info.get('schema', None))
 
     return [create_record(record_blob, master_format, verbose=verbose, **additional_info) for record_blob in record_blods]
 
