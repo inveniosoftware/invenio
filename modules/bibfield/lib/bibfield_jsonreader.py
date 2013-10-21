@@ -280,10 +280,12 @@ class JsonReader(BibFieldDict):
         if rule_type == 'derived':
             self[field_name] = self._try_to_eval(rule['value'])
         else:
-            self[field_name] = [self._try_to_eval(rule['value']), rule['value']]
-
-        if rule['do_not_cache']:
-            self['__do_not_cache'].append(field_name)
+            self['__calculated_functions'][field_name] = rule['value']
+            if rule['do_not_cache']:
+                self['__do_not_cache'].append(field_name)
+                self[field_name] = None
+            else:
+                self[field_name] = self._try_to_eval(rule['value'])
 
         for alias in aliases:
             self['__aliases'][alias] = field_name

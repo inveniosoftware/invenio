@@ -145,16 +145,20 @@ class BibFieldDictUnitTest(unittest.TestCase):
 
     def test_bibfielddict(self):
         """BibFieldDict - Unit Test"""
+        import random
+        from invenio.bibfield_utils import BibFieldDict
         d = BibFieldDict()
         d['foo'] = {'a': 'world', 'b': 'hello'}
         d['a'] = [{'b': 1}, {'b': 2}, {'b': 3}]
-        d['_c'] = [1, "random.random()"]
-        d['_cc'] = [1, "random.random()"]
+        d['_c'] = 1
+        d['_cc'] = random.random()
 
         d['__do_not_cache'].append('_cc')
+        d['__calculated_functions']['_c'] = "random.random()"
+        d['__calculated_functions']['_cc'] = "random.random()"
         d['__aliases']['aa'] = 'a'
 
-        self.assertTrue(len(d.keys()) == 6)
+        self.assertTrue(len(d.keys()) == 7)
         self.assertTrue('foo' in d)
         self.assertTrue('a.b' in d)
 
