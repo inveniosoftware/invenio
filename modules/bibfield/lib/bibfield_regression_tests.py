@@ -135,6 +135,108 @@ class BibFieldCreateRecordTests(unittest.TestCase):
         records = create_records(blob_error0)
         self.assertEqual(len(records), 0)
 
+    def test_fft_url_tags(self):
+        """bibfield - FFT versus URL"""
+        marc_blob = """
+              <record>
+                <datafield tag="037" ind1=" " ind2=" ">
+                  <subfield code="a">CERN-HI-6206002</subfield>
+                </datafield>
+                <datafield tag="041" ind1=" " ind2=" ">
+                  <subfield code="a">eng</subfield>
+                </datafield>
+                <datafield tag="245" ind1=" " ind2=" ">
+                  <subfield code="a">At CERN in 1962</subfield>
+                  <subfield code="s">eight Nobel prizewinners</subfield>
+                </datafield>
+                <datafield tag="260" ind1=" " ind2=" ">
+                  <subfield code="c">1962</subfield>
+                </datafield>
+                <datafield tag="506" ind1="1" ind2=" ">
+                  <subfield code="a">jekyll_only</subfield>
+                </datafield>
+                <datafield tag="521" ind1=" " ind2=" ">
+                  <subfield code="a">In 1962, CERN hosted the 11th International Conference on High Energy Physics. Among the distinguished visitors were eight Nobel prizewinners.Left to right: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang and Robert Hofstadter.</subfield>
+                </datafield>
+                <datafield tag="590" ind1=" " ind2=" ">
+                  <subfield code="a">En 1962, le CERN est l'hote de la onzieme Conference Internationale de Physique des Hautes Energies. Parmi les visiteurs eminents se trouvaient huit laureats du prix Nobel.De gauche a droite: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang et Robert Hofstadter.</subfield>
+                </datafield>
+                <datafield tag="595" ind1=" " ind2=" ">
+                  <subfield code="a">Press</subfield>
+                </datafield>
+                <datafield tag="650" ind1="1" ind2="7">
+                  <subfield code="2">SzGeCERN</subfield>
+                  <subfield code="a">Personalities and History of CERN</subfield>
+                </datafield>
+                <datafield tag="653" ind1="1" ind2=" ">
+                  <subfield code="a">Nobel laureate</subfield>
+                </datafield>
+                <datafield tag="FFT" ind1=" " ind2=" ">
+                  <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/6206002.jpg</subfield>
+                  <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/6206002.gif</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="o">0000736PHOPHO</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="y">1962</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="0">
+                  <subfield code="b">81</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="1">
+                  <subfield code="c">1998-07-23</subfield>
+                  <subfield code="l">50</subfield>
+                  <subfield code="m">2002-07-15</subfield>
+                  <subfield code="o">CM</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1950/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1950 : Cecil Frank Powell</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1944/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1944 : Isidor Isaac Rabi</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1932/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1932 : Werner Karl Heisenberg</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/chemistry/laureates/1951/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Chemistry 1951 : Edwin Mattison McMillan</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1959/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1959 : Emilio Gino Segre</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1957/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1957 : Chen Ning Yang and Tsung-Dao Lee</subfield>
+                </datafield>
+                <datafield tag="856" ind1="4" ind2=" ">
+                  <subfield code="u">http://www.nobel.se/physics/laureates/1961/index.html</subfield>
+                  <subfield code="y">The Nobel Prize in Physics 1961 : Robert Hofstadter</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="P">
+                  <subfield code="s">6206002 (1962)</subfield>
+                </datafield>
+                <datafield tag="909" ind1="C" ind2="S">
+                  <subfield code="s">n</subfield>
+                  <subfield code="w">199830</subfield>
+                </datafield>
+                <datafield tag="980" ind1=" " ind2=" ">
+                  <subfield code="a">PICTURE</subfield>
+                </datafield>
+              </record>"""
+        rec = create_record(marc_blob, master_format='marc', schema='xml')
+        self.assertTrue('fft' in rec)
+        self.assertTrue(len(rec['fft']) == 1)
+        self.assertTrue(rec['fft[0].path'] == "http://invenio-software.org/download/invenio-demo-site-files/6206002.jpg")
+        self.assertTrue('url' in rec)
+        self.assertTrue(len(rec['url']) == 7)
+        self.assertTrue(rec['url[0].url'] == "http://www.nobel.se/physics/laureates/1950/index.html")
+
 
 class BibFieldLegacyTests(unittest.TestCase):
     """

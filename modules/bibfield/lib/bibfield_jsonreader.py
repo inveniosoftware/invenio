@@ -258,10 +258,18 @@ class JsonReader(BibFieldDict):
             else:
                 for elements in self._get_elements_from_rec_tree(rule['source_tag']):
                     if isinstance(elements, list):
+                        returned_value = False
                         for element in elements:
-                            self[field_name] = self._try_to_eval(rule['value'], value=element)
+                            if rule['only_if_master_value'] and not all(self._try_to_eval(rule['only_if_master_value'], value=element)):
+                                returned_value = returned_value or False
+                            else:
+                                self[field_name] = self._try_to_eval(rule['value'], value=element)
+                                returned_value = returned_value or True
                     else:
-                        self[field_name] = self._try_to_eval(rule['value'], value=elements)
+                        if rule['only_if_master_value'] and not all(self._try_to_eval(rule['only_if_master_value'], value=elements)):
+                            return False
+                        else:
+                            self[field_name] = self._try_to_eval(rule['value'], value=elements)
             for alias in aliases:
                 self['__aliases'][alias] = field_name
             return True
