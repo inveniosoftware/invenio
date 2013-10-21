@@ -94,6 +94,14 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         self.assertEqual('ALEPH EXPERIMENT: CANDIDATE OF HIGGS BOSON PRODUCTION',
                          record.get('title.title', formatfunction=dummy))
 
+    def test_get_record_using_field_filter(self):
+        """bibfield - get record filtering fields"""
+        authors = get_record(12, fields=('authors',))
+        self.assertEquals(len(authors['authors']), 19)
+        mainauthor_title = get_record(12, fields=('authors[0]', 'title'))
+        self.assertTrue('authors[0].full_name' in mainauthor_title)
+        self.assertTrue('title' in mainauthor_title)
+
 
 class BibFieldCreateRecordTests(unittest.TestCase):
     """

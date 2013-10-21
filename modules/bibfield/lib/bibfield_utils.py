@@ -212,8 +212,13 @@ class BibFieldDict(object):
         return True
 
     def __repr__(self):
-        """@see C{dict.__repr__}"""
-        return  repr(self.rec_json)
+        """
+        Hides the '__keys' from the dictionary representation, if those keys
+        are needed record.rec_json could be accessed.
+        @see C{dict.__repr__}
+        """
+        info = dict((key, value) for key, value in self.rec_json.iteritems() if not re.search('^__[a-zA-Z0-9]', key))
+        return repr(info)
 
     def __iter__(self):
         """@see C{dict.__iter__}"""

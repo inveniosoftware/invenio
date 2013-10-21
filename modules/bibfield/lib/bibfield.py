@@ -35,7 +35,7 @@ from invenio.dbquery import run_sql
 from invenio.pluginutils import PluginContainer
 
 from invenio.bibfield_jsonreader import JsonReader
-from invenio.bibfield_utils import BlobWrapper
+from invenio.bibfield_utils import BlobWrapper, BibFieldDict
 
 # Plug-in utils
 
@@ -83,7 +83,7 @@ def create_records(blob, master_format='marc', verbose=0, **additional_info):
     return [create_record(record_blob, master_format, verbose=verbose, **additional_info) for record_blob in record_blods]
 
 
-def get_record(recid, reset_cache=False):
+def get_record(recid, reset_cache=False, fields=()):
     """
     Record factory, it retrieves the record from bibfmt table if it is there,
     if not, or reset_cache is set to True, it searches for the appropriate
@@ -92,26 +92,31 @@ def get_record(recid, reset_cache=False):
     @return: Bibfield object representing the record or None if the recid is not
     present in the system
     """
+    record = None
     #Search for recjson
     if not reset_cache:
         res = run_sql("SELECT value FROM bibfmt WHERE id_bibrec=%s AND format='recjson'",
                       (recid,))
         if res:
-            return JsonReader(BlobWrapper(pickle.loads(res[0][0])))
+            record = JsonReader(BlobWrapper(pickle.loads(res[0][0])))
 
     #There is no version cached or we want to renew it
     #Then retrieve information and blob
+    if not record or reset_cache:
+        blob_wrapper = _build_wrapper(recid)
+        if not blob_wrapper:
+            return None
+        record = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (blob_wrapper.master_format,)](blob_wrapper)
 
-    blob_wrapper = _build_wrapper(recid)
-    if not blob_wrapper:
-        return None
-    record = \
-        CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (blob_wrapper.master_format,)](blob_wrapper)
+        #Update bibfmt for future uses
+        run_sql("REPLACE INTO bibfmt(id_bibrec, format, last_updated, value) VALUES (%s, 'recjson', NOW(), %s)",
+                (recid, pickle.dumps((record.rec_json))))
 
-    #Update bibfmt for future uses
-    run_sql("REPLACE INTO bibfmt(id_bibrec, format, last_updated, value) VALUES (%s, 'recjson', NOW(), %s)",
-            (recid, pickle.dumps((record.rec_json))))
-
+    if fields:
+        chunk = BibFieldDict()
+        for key in fields:
+            chunk[key] = record.get(key)
+        record = chunk
     return record
 
 
