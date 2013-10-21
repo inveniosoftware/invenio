@@ -99,11 +99,9 @@ class JsonReader(BibFieldDict):
     def is_empty(self):
         """
         One record is empty if there is nothing stored inside rec_json or there is
-        only '__master_format'
+        only '__key'
         """
-        if not self.rec_json:
-            return True
-        if self.keys() == ['__master_format']:
+        if self.rec_json is None or len(self.rec_json.keys()) == 0:
             return True
         if all(key.startswith('_') for key in self.keys()):
             return True
