@@ -201,10 +201,15 @@ class BibFieldDict(object):
 
     def __eq__(self, other):
         """@see C{dict.__eq__}"""
+        if not self.keys() == other.keys():
+            return False
         try:
-            return dict.__eq__(self.rec_json, other.rec_json)
+            for key in [k for k in self.keys() if not k in self['__do_not_cache']]:
+                if not self.get(k) == other.get(k):
+                    return False
         except:
             return False
+        return True
 
     def __repr__(self):
         """@see C{dict.__repr__}"""
