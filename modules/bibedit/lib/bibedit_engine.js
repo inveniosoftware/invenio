@@ -189,6 +189,9 @@ var gLastChecked = null;
 // Indicates if profiling is on
 var gProfile = false;
 
+// Log of all the actions effectuated by the user
+var gActionLog = [];
+
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -431,6 +434,11 @@ function initJeditable(){
  * **************************** 3. Ajax ****************************************
  */
 
+function log_action(msg) {
+    gActionLog.unshift(msg)
+    gActionLog = gActionLog.slice(0, 200);
+}
+
 function initAjax(){
   /*
    * Initialize Ajax.
@@ -449,6 +457,8 @@ function createReq(data, onSuccess, asynchronous, deferred, onError) {
   /*
    * Create Ajax request.
    */
+  data.action_log = gActionLog;
+
   if (typeof onError === "undefined") {
     onError = onAjaxError;
   }
@@ -568,7 +578,7 @@ function onAjaxSuccess(json, onSuccess){
       : gSITE_URL + '/'+ gSITE_RECORD +'/edit/';
     return;
   }
-  else if ($.inArray(resCode, [101, 102, 104, 105, 106, 107, 108, 109]) != -1) {
+  else if ($.inArray(resCode, [101, 102, 104, 105, 106, 107, 108, 109, 111]) != -1) {
     cleanUp(!gNavigatingRecordSet, null, null, true, true, false);
     args = [];
     if (resCode == 104) {
@@ -946,6 +956,7 @@ function deleteFieldFromTag(tag, fieldPosition){
   /*
    * Delete a specified field.
    */
+  log_action("deleteFieldFromTag " + tag + ' ' + fieldPosition)
   var field = gRecord[tag][fieldPosition];
   var fields = gRecord[tag];
   for (var change in gHoldingPenChanges) {
@@ -1633,6 +1644,7 @@ function onNewRecordClick(event){
   /*
    * Handle 'New' button (new record).
    */
+  log_action("onNewRecordClick")
   updateStatus('updating');
   if ( gRecordDirty || gReqQueue.length > 0 ) {
     if (!displayAlert('confirmLeavingChangedRecord')){
@@ -1662,6 +1674,7 @@ function onNewRecordClick(event){
 
 function onTemplateRecordClick(event){
     /* Handle 'Template management' button */
+    log_action("onTemplateRecordClick");
     var template_window = window.open('/record/edit/templates', '', 'resizeable,scrollbars');
     template_window.document.close(); // needed for chrome and safari
 }
@@ -1689,7 +1702,7 @@ function getRecord(recID, recRev, onSuccess, args){
    *             callback loads the retrieved record into the bibEdit user
    *             interface
    */
-
+  log_action("getRecord recid:" + recID + " " + "recRev:" + recRev);
   /* Make sure the record revision exists, otherwise default to current */
   if ($.inArray(recRev, gRecRevisionHistory) === -1) {
     recRev = 0;
@@ -1753,6 +1766,7 @@ function onGetRecordSuccess(json){
   /*
    * Handle successfull 'getRecord' requests.
    */
+  log_action("onGetRecordSuccess");
   cleanUp(!gNavigatingRecordSet);
   // Store record data.
   gRecID = json['recID'];
@@ -1856,6 +1870,7 @@ function onSubmitPreviewSuccess(dialogPreview, html_preview){
    * dialog: object containing the different parts of the modal dialog
    * html_preview: a formatted preview of the record content
   */
+  log_action("onSubmitPreviewSuccess");
   updateStatus('ready');
   addContentToDialog(dialogPreview, html_preview, "Do you want to submit the record?");
   dialogPreview.dialogDiv.dialog({
@@ -1971,6 +1986,7 @@ function onSubmitClick() {
   /*
    * Handle 'Submit' button (submit record).
    */
+  log_action("onSubmitClick");
   save_changes().done(function() {
     updateStatus('updating');
     /* Save all opened fields before submitting */
@@ -1993,6 +2009,7 @@ function onPreviewClick() {
   /*
    * Handle 'Preview' button (preview record).
    */
+  log_action("onPreviewClick");
   clearWarnings();
   var reqData = {
               'new_window': true,
@@ -2039,6 +2056,7 @@ function onPrintClick() {
    * Print page, makes use of special css rules @media print
    */
   // If we are in textarea view, copy the contents to the helper div
+  log_action("onPrintClick");
   $('#print_helper').text($('#textmarc_textbox').val());
   $("#bibEditContentTable").css('height', "100%");
   window.print();
@@ -2061,7 +2079,7 @@ function onTextMarcClick() {
   * 2) Remove editor table and display content in textbox
   * 3) Activate flag to know we are in text marc mode (for submission)
   */
-
+  log_action("onTextMarcClick");
   $("#img_textmarc").off("click");
 
   save_changes().done(function() {
@@ -2132,6 +2150,7 @@ function onTableViewClick() {
    *    content
    * 2) Get the record from the cache and display it in the table
   */
+  log_action("onTableViewClick");
   createReq({recID: gRecID, textmarc: $('#textmarc_textbox').val(),
       requestType: 'getTableView', recordDirty: gRecordDirty
        }, function(json) {
@@ -2163,6 +2182,7 @@ function onOpenPDFClick() {
   /*
    * Create request to retrieve PDF from record and open it in new window
    */
+   log_action("onOpenPDFClick");
    createReq({recID: gRecID, requestType: 'get_pdf_url'
        }, function(json){
         // Preview was successful.
@@ -2186,6 +2206,7 @@ function getPreview(dialog, onSuccess) {
     /*
      * Get preview to be added to the dialog before submission
      */
+    log_action("getPreview");
     clearWarnings();
     var html_preview;
     var reqData = {
@@ -2217,6 +2238,7 @@ function onCancelClick(){
   /*
    * Handle 'Cancel' button (cancel editing).
    */
+  log_action("onCancelClick");
   updateStatus('updating');
   if (!gRecordDirty || displayAlert('confirmCancel')) {
   createReq({
@@ -2256,6 +2278,7 @@ function onCloneRecordClick() {
   /*
    * Handle 'Clone' button (clone record).
    */
+  log_action("onCloneRecordClick");
   updateStatus('updating');
   if (!displayAlert('confirmClone')){
     updateStatus('ready');
@@ -2283,6 +2306,7 @@ function onDeleteRecordClick(){
   /*
    * Handle 'Delete record' button.
    */
+  log_action("onDeleteRecordClick");
   if (gPhysCopiesNum > 0){
     displayAlert('errorPhysicalCopiesExist');
     return;
@@ -2320,6 +2344,7 @@ function onMergeClick(event){
    * Handle click on 'Merge' link (to merge outdated cache with current DB
    * version of record).
    */
+  log_action("onMergeClick");
   notImplemented(event);
 
   updateStatus('updating');
@@ -2536,6 +2561,7 @@ function onMARCTagsClick(event){
   /*
    * Handle 'MARC' link (MARC tags).
    */
+  log_action("onMARCTagsClick");
   $(this).unbind('click').attr('disabled', 'disabled');
   createReq({recID: gRecID, requestType: 'changeTagFormat', tagFormat: 'MARC'});
   gTagFormat = 'MARC';
@@ -2549,6 +2575,7 @@ function onHumanTagsClick(event){
   /*
    * Handle 'Human' link (Human tags).
    */
+  log_action("onHumanTagsClick");
   $(this).unbind('click').attr('disabled', 'disabled');
   createReq({recID: gRecID, requestType: 'changeTagFormat',
        tagFormat: 'human'});
@@ -2623,6 +2650,7 @@ function onFieldBoxClick(e, box){
   /*
    * Handle field select boxes.
    */
+  log_action("onFieldBoxClick " + box);
    if ( !jQuery.contains(document.documentElement, gLastChecked)) {
        gLastChecked = box;
        clickBox(box);
@@ -2670,6 +2698,7 @@ function onSubfieldBoxClick(box){
   /*
    * Handle subfield select boxes.
    */
+  log_action("onSubfieldBoxClick " + box);
   var tmpArray = box.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2],
     subfieldIndex = tmpArray[3];
@@ -2892,7 +2921,7 @@ function createAddFieldInterface(initialContent, initialTemplateNo){
       $('#bibEditTable tbody').eq(insertionPoint).after(
       createAddFieldForm(fieldTmpNo, initialTemplateNo));
   }
-  
+
   $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
 
   // Bind event handlers.
@@ -2981,6 +3010,7 @@ function onAddFieldClick(){
   /*
    * Handle 'Add field' button.
    */
+  log_action("onAddFieldClick");
   if (failInReadOnly())
     return;
   activateSubmitButton();
@@ -3297,6 +3327,7 @@ function onAddSubfieldsClick(img){
    * Handle 'Add subfield' buttons.
    */
   var fieldID = img.id.slice(img.id.indexOf('_')+1);
+  log_action("onAddSubfieldsClick " + fieldID);
   addSubfield(fieldID);
 }
 
@@ -3305,6 +3336,7 @@ function onDOISearchClick(button){
    * Handle 'Search for DOI' button.
    */
   // gets the doi based from appropriate cell
+  log_action("onDOISearchClick");
   var doi = $(button).parent().prev().text();
   createReq({doi: doi, requestType: 'DOISearch'}, function(json)
   {
@@ -3656,7 +3688,7 @@ function onContentClick(event, cell) {
 }
 
 
-function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, 
+function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
         subfieldCode, value, changeNo, undoDescriptor, modifySubfieldCode){
   var requestType;
   if (modifySubfieldCode == true) {
@@ -3684,14 +3716,14 @@ function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex,
 }
 
 
-function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, 
+function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode,
                             value, consumedChange, undoDescriptor,
                             modifySubfieldCode){
   // Create Ajax request for simple updating the subfield value
   if (consumedChange == undefined || consumedChange == null){
     consumedChange = -1;
   }
-  
+
   var data = getUpdateSubfieldValueRequestData(tag,
                                                fieldPosition,
                                                subfieldIndex,
@@ -3979,6 +4011,7 @@ function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
   /*
    * Handle subfield moving arrows.
    */
+  log_action("onMoveSubfieldClick " + type + ' ' + tag);
   if (failInReadOnly()){
     return;
   }
@@ -4010,6 +4043,7 @@ function onDeleteClick(event){
   /*
    * Handle 'Delete selected' button or delete hotkeys.
    */
+  log_action("onDeleteClick");
   if (failInReadOnly()){
     return;
   }
@@ -4058,6 +4092,7 @@ function onMoveFieldUp(tag, fieldPosition) {
   if (failInReadOnly()){
     return;
   }
+  log_action('onMoveFieldUp ' + tag + ' ' + fieldPosition)
   fieldPosition = parseInt(fieldPosition);
   var thisField = gRecord[tag][fieldPosition];
   if (fieldPosition > 0) {
@@ -4077,6 +4112,7 @@ function onMoveFieldDown(tag, fieldPosition) {
   if (failInReadOnly()){
     return;
   }
+  log_action('onMoveFieldDown ' + tag + ' ' + fieldPosition)
   fieldPosition = parseInt(fieldPosition);
   var thisField = gRecord[tag][fieldPosition];
   if (fieldPosition < gRecord[tag].length-1) {
@@ -4114,6 +4150,7 @@ function switchToReadOnlyMode(){
     alert("Please submit the record or cancel your changes before going to the read-only mode ");
     return false;
   }
+  log_action("switchToReadOnlyMode");
   gReadOnlyMode = true;
   createReq({recID: gRecID, requestType: 'deleteRecordCache'}, function() {},
             true, undefined, onDeleteRecordCacheError);
@@ -4177,6 +4214,7 @@ function onRevertClick(revisionId){
   /*
    * Handle 'Revert' button (submit record).
    */
+  log_action("onRevertClick " + revisionId);
   updateStatus('updating');
   if (displayAlert('confirmRevert')){
     createReq({recID: gRecID, revId: revisionId, lastRevId: gRecLatestRev, requestType: 'revert',
@@ -4342,6 +4380,7 @@ function getSelectionMarcXml(){
 function onPerformCopy(){
   /** The handler performing the copy operation
    */
+  log_action("onPerformCopy");
   if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
     /*we do not want to perform this in case we are in an ordinary text area*/
     return;
@@ -4357,9 +4396,10 @@ function onPerformPaste(){
 
      According to the default behaviour, the fields are appended as last of the same kind
    */
-   if (!gRecord) {
+  log_action("onPerformPaste");
+  if (!gRecord) {
     return;
-   }
+  }
 
   if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
     /*we do not want to perform this in case we are in an ordinary text area*/
@@ -4759,7 +4799,7 @@ function prepareUndoHandlerChangeFieldCode(oldTag, oldInd1, oldInd2, newTag, new
   result.ind1 = newInd1;
   result.ind2 = newInd2;
   result.fieldPos = fieldPos;
-  
+
   if (gRecord[newTag] == undefined) {
       result.newFieldPos = 0;
   }
@@ -5188,6 +5228,7 @@ function performMoveSubfield(tag, fieldPosition, subfieldIndex, direction, undoR
 
 
 function onRedo(evt){
+  log_action("redo");
   if (gRedoList.length <= 0){
     alert("No Redo operations to process");
     return;
@@ -5320,6 +5361,7 @@ function urMarkSelectedUntil(entry){
 
 
 function onUndo(evt){
+  log_action("undo");
   if (gUndoList.length <= 0){
     alert("No Undo operations to process");
     return;
@@ -6093,6 +6135,7 @@ function sanitize_value(value) {
  * @return {String}
  */
 function onFieldTagChange(value, cell) {
+    log_action("onFieldTagChange " + value);
 
     function updateModel() {
         var currentField = gRecord[oldTag][cell.fieldPosition];
@@ -6166,6 +6209,7 @@ function onFieldTagChange(value, cell) {
  * @return {Object}
  */
 function onSubfieldCodeChange(value, cell) {
+  log_action("onSubfieldCodeChange " + value);
 
   function updateModel() {
     subfield_instance[0] = value;
@@ -6208,6 +6252,7 @@ function onSubfieldCodeChange(value, cell) {
  * @return {String}
  */
 function onContentChange(value, cell) {
+  log_action("onContentChange " + value);
 
   function redrawTags() {
     redrawFieldPosition(cell.tag, cell.fieldPosition);
@@ -6410,6 +6455,8 @@ function onEditableCellChange(value, th) {
 /*****************************************************************************/
 
 function onfocusreference(check_box) {
+  log_action("onfocusreference");
+
   var $reference_checkbox = $("#focuson_references");
 
   /* For cases when we call the function without click on the interface */
@@ -6432,6 +6479,7 @@ function onfocusreference(check_box) {
 
 
 function onfocusauthor(check_box) {
+  log_action("onfocusauthor");
 
   if (gRecordHideAuthors) {
     gRecordHideAuthors = false;
@@ -6461,6 +6509,8 @@ function onfocusauthor(check_box) {
 
 
 function onfocusother(check_box) {
+  log_action("onfocusother");
+
   var $others_checkbox = $("#focuson_others");
 
   /* For cases when we call the function without click on the interface */
@@ -6486,6 +6536,8 @@ function onfocusother(check_box) {
 }
 
 function onfocuscurator(check_box) {
+  log_action("onfocuscurator");
+
   var $curator_checkbox = $("#focuson_curator");
 
   if ( $curator_checkbox.length === 0 ) {
@@ -6590,10 +6642,11 @@ function displayAll() {
   onfocusauthor();
 }
 
-
 /*************** Functions related to affiliation guess ***************/
 
 function onGuessAffiliations() {
+  log_action("onGuessAffiliations");
+
   var reqData = {
               recID: gRecID,
               requestType: 'guessAffiliations'

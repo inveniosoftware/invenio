@@ -106,7 +106,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV = {
     'autosuggestion_scanned' : 36,
     'error_rec_locked_by_user' : 104,
     'error_rec_locked_by_queue' : 105,
-    'error_wrong_cache_file_format' : 111,
+    'server_error' : 111,
     'error_physical_copies_exist': 112,
     'cache_updated_with_references': 114,
     'textmarc_parsing_error' : 115,

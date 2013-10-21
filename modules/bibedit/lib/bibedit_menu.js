@@ -155,6 +155,8 @@ function onSearchClick(event) {
   updateStatus('updating');
 
   var searchPattern = $('#txtSearchPattern').val();
+  log_action("onSearchClick " + searchPattern);
+
   var searchType = $('#sctSearchType').val();
 
   if ( searchType == 'recID' ) {
@@ -247,6 +249,7 @@ function onNextRecordClick(){
   /*
    * Handle click on the 'Next' button in the record browser.
    */
+  log_action("onNextRecordClick");
   updateStatus('updating');
   if (gRecordDirty){
     if (!displayAlert('confirmLeavingChangedRecord')){
@@ -272,6 +275,7 @@ function onPrevRecordClick(){
   /*
    * Handle click on the 'Previous' button in the record browser.
    */
+  log_action("onPrevRecordClick");
   updateStatus('updating');
   if (gRecordDirty){
     if (!displayAlert('confirmLeavingChangedRecord')){
