@@ -37,7 +37,7 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
     """
 
     def test_marcxml_to_cool_struct_preparation(self):
-        """docstring for test_marcxml_to_cool_struct_preparation"""
+        """Bibfield - intermediate structure from marc xml"""
         #First record from demobibcfg.xml
         xml = """
             <record>
@@ -122,7 +122,7 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
         self.assertTrue('100__' in r.rec_tree)
 
     def test_rec_json_creation_from_marcxml(self):
-        """docstring for test_rec_json_creation_from_marcxml"""
+        """BibField - recjson from marcxml"""
         xml = """
             <record>
                 <datafield tag="037" ind1=" " ind2=" ">
@@ -461,7 +461,7 @@ class BibFieldMarcReaderMarcXML(unittest.TestCase):
         self.assertTrue(len(r['reference']) == 36)
 
     def test_rec_json_creation_from_marcxml_file(self):
-        """docstring for test_rec_json_creation_from_marcxml_file"""
+        """BibField - recjson from marcxml file"""
         import os
         import tempfile
         from invenio.config import CFG_TMPDIR
@@ -528,7 +528,7 @@ class BibFieldMarcReaderRecstruct(unittest.TestCase):
     """
 
     def test_rectruct_to_cool_struct_preparation(self):
-        """docstring for test_rectruct_to_cool_struct_preparation"""
+        """BibField -intermediate structure from recjson"""
         from invenio.search_engine import get_record as search_engine_get_record
         bibrecord = search_engine_get_record(13)
         blob = BlobWrapper(blob=bibrecord, master_format='marc', schema='recstruct')
@@ -539,7 +539,7 @@ class BibFieldMarcReaderRecstruct(unittest.TestCase):
         self.assertTrue('100__' in r.rec_tree)
 
     def test_recjson_creation_from_recstruct(self):
-        """docstring for test_recjson_creation_from_recstruc"""
+        """BibField - recjson from recstruct"""
         from invenio.search_engine import get_record as search_engine_get_record
         bibrecord = search_engine_get_record(7)
         blob = BlobWrapper(blob=bibrecord, master_format='marc', schema='recstruct')

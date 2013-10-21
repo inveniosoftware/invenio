@@ -57,19 +57,19 @@ CFG_BIBFIELD_READERS = PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio',
 # end Plug-in utils
 
 
-def create_record(blob, master_format='marc', verbose=0, **aditional_info):
+def create_record(blob, master_format='marc', verbose=0, **additional_info):
     """
     Creates a record object from the blob description using the apropiate reader
     for it.
 
     @return Record object
     """
-    blob_wrapper = BlobWrapper(blob=blob, master_format=master_format, **aditional_info)
+    blob_wrapper = BlobWrapper(blob=blob, master_format=master_format, **additional_info)
 
     return CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)](blob_wrapper)
 
 
-def create_records(blob, master_format='marc', verbose=0, **aditional_info):
+def create_records(blob, master_format='marc', verbose=0, **additional_info):
     """
     Creates a list of records from the blod descriptions using the split_records
     function to divide then.
@@ -80,7 +80,7 @@ def create_records(blob, master_format='marc', verbose=0, **aditional_info):
     """
     record_blods = CFG_BIBFIELD_READERS['bibfield_%sreader.py' % (master_format,)].split_blob(blob)
 
-    return [create_record(record_blob, master_format, verbose=verbose, **aditional_info) for record_blob in record_blods]
+    return [create_record(record_blob, master_format, verbose=verbose, **additional_info) for record_blob in record_blods]
 
 
 def get_record(recid, reset_cache=False):
@@ -113,6 +113,27 @@ def get_record(recid, reset_cache=False):
             (recid, pickle.dumps((record.rec_json))))
 
     return record
+
+
+def guess_legacy_field_names(fields, master_format='marc'):
+    """
+    Using the legacy rules written in the config file (@legacy) tries to find
+    the equivalent json field for one or more legacy fields.
+
+    >>> guess_legacy_fields(('100__a', '245'), 'marc')
+    {'100__a':['authors[0].full_name'], '245':['title']}
+    """
+    from invenio.bibfield_config import legacy_rules
+
+    res = {}
+    if isinstance(fields, basestring):
+        fields = (fields, )
+    for field in fields:
+        try:
+            res[field] = legacy_rules[master_format].get(field, [])
+        except:
+            res[field] = []
+    return res
 
 
 def _build_wrapper(recid):

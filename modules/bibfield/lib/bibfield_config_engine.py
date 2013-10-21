@@ -44,28 +44,30 @@ def _create_config_parser():
 
     BNF like grammar:
 
-    rule ::= ([persitent_identifier] json_id ["[0]" | "[n]"] "," aliases":" INDENT body UNDENT) | include
+    rule ::= ([persitent_identifier] json_id ["[0]" | "[n]"] "," aliases":" INDENT body UNDENT) | include | python_comment
     include ::= "include(" PATH ")"
-    body ::=  [inherit_from] (creator | derived | calculated) [checker] [documentation]
+    body ::=  [inherit_from] (creator | derived | calculated) [checker] [documentation] [producer]
     aliases ::= json_id ["[0]" | "[n]"] ["," aliases]
+
     creator ::= "creator:" INDENT creator_body+ UNDENT
-    creator_body ::= [parse_first] [legacy] source_format "," source_tag "," python_allowed_expr
+    creator_body ::= [decorators] source_format "," source_tag "," python_allowed_expr
     source_format ::= MASTER_FORMATS
     source_tag ::= QUOTED_STRING
 
     derived ::= "derived" INDENT derived_calculated_body UNDENT
     calculated ::= "calculated:" INDENT derived_calculated_body UNDENT
-    derived_calculated_body ::= [parse_first] [depends_on] [only_if] [do_not_cache] "," python_allowed_exp
+    derived_calculated_body ::= [decorators] "," python_allowed_exp
 
-
+    decorators ::= (peristent_identfier | legacy | do_not_cache | parse_first | depends_on | only_if)*
     peristent_identfier ::= @persitent_identifier( level )
-    inherit_from ::= "@inherit_from()"
     legacy ::= "@legacy(" correspondences+ ")"
-    do_not_cache ::= "@do_not_cache"
     correspondences ::= "(" source_tag [ "," tag_name ] "," json_id ")"
     parse_first ::= "@parse_first(" jsonid+ ")"
     depends_on ::= "@depends_on(" json_id+ ")"
     only_if ::= "@only_if(" python_condition+ ")"
+
+    inherit_from ::= "@inherit_from()"
+    do_not_cache ::= "@do_not_cache"
 
     python_allowed_exp ::= ident | list_def | dict_def | list_access | dict_access | function_call
 
@@ -74,6 +76,10 @@ def _create_config_parser():
     documentation ::= INDENT doc_string subfield* UNDENT
     doc_string ::= QUOTED_STRING
     subfield ::= "@subfield" json_id["."json_id*] ":" docstring
+
+    producer ::= "producer:" INDENT producer_body UNDENT
+    producer_body ::= producer_code "," python_dictionary
+    producer_code ::= ident
     """
 
     indent_stack = [1]
@@ -99,7 +105,7 @@ def _create_config_parser():
     UNDENT = FollowedBy(empty).setParseAction(check_unindent)
     UNDENT.setParseAction(do_unindent)
 
-    json_id = (Word(alphanums + "_") + Optional(oneOf("[0] [n]")))\
+    json_id = (Word(alphas + "_", alphanums + "_") + Optional(oneOf("[0] [n]")))\
               .setResultsName("json_id", listAllMatches=True)\
               .setParseAction(lambda tokens: "".join(tokens))
     aliases = delimitedList((Word(alphanums + "_") + Optional(oneOf("[0] [n]")))
@@ -112,13 +118,11 @@ def _create_config_parser():
     dict_access = list_access = originalTextFor(ident + nestedExpr('[', ']'))
     function_call = originalTextFor(ZeroOrMore(ident + ".") + ident + nestedExpr('(', ')'))
 
-    python_allowed_expr << (ident ^ dict_def ^ list_def ^ dict_access ^ list_access ^ function_call)\
+    python_allowed_expr << (ident ^ dict_def ^ list_def ^ dict_access ^ list_access ^ function_call ^ restOfLine)\
                           .setResultsName("value", listAllMatches=True)
 
     persistent_identifier = (Suppress("@persistent_identifier") +  nestedExpr("(", ")"))\
                             .setResultsName("persistent_identifier")
-    inherit_from = (Suppress("@inherit_from") + originalTextFor(nestedExpr("(", ")")))\
-                    .setResultsName("inherit_from")
     legacy = (Suppress("@legacy") + originalTextFor(nestedExpr("(", ")")))\
              .setResultsName("legacy", listAllMatches=True)
     only_if = (Suppress("@only_if") + originalTextFor(nestedExpr("(", ")")))\
@@ -129,21 +133,27 @@ def _create_config_parser():
                   .setResultsName("parse_first")
     do_not_cache = (Suppress("@") + "do_not_cache")\
                    .setResultsName("do_not_cache")
+    field_decorator = parse_first ^ depends_on ^ only_if ^ do_not_cache ^ legacy
+
+    #Independent decorators
+    inherit_from = (Suppress("@inherit_from") + originalTextFor(nestedExpr("(", ")")))\
+                    .setResultsName("inherit_from")
+
     master_format = (Suppress("@master_format") + originalTextFor(nestedExpr("(", ")")))\
                     .setResultsName("master_format")
 
-    derived_calculated_body = Optional(parse_first) + Optional(depends_on) + Optional(only_if) + Optional(do_not_cache) + python_allowed_expr
+    derived_calculated_body = ZeroOrMore(field_decorator) + python_allowed_expr
 
     derived = "derived" + Suppress(":") + INDENT + derived_calculated_body + UNDENT
     calculated = "calculated" + Suppress(":") + INDENT + derived_calculated_body + UNDENT
 
     source_tag = quotedString\
-                .setParseAction(removeQuotes)\
-                .setResultsName("source_tag", listAllMatches=True)
+                 .setParseAction(removeQuotes)\
+                 .setResultsName("source_tag", listAllMatches=True)
     source_format = oneOf(CFG_BIBFIELD_MASTER_FORMATS)\
                     .setResultsName("source_format", listAllMatches=True)
-    creator_body = (Optional(parse_first) + Optional(depends_on) + Optional(only_if) +  Optional(legacy) + source_format + Suppress(",") + source_tag + Suppress(",") + python_allowed_expr)\
-                                            .setResultsName("creator_def", listAllMatches=True)
+    creator_body = (ZeroOrMore(field_decorator) + source_format + Suppress(",") + source_tag + Suppress(",") + python_allowed_expr)\
+                   .setResultsName("creator_def", listAllMatches=True)
     creator = "creator" + Suppress(":") + INDENT + OneOrMore(creator_body) + UNDENT
 
     checker_function = (Optional(master_format) + ZeroOrMore(ident + ".") + ident + originalTextFor(nestedExpr('(', ')')))\
@@ -156,10 +166,16 @@ def _create_config_parser():
     documentation = ("documentation" + Suppress(":") + INDENT + Optional(doc_string).setResultsName("main_doc") + ZeroOrMore(subfield) + UNDENT)\
                      .setResultsName("documentation")
 
+    producer_code = Word(alphas + "_", alphanums + "_")\
+                    .setResultsName("producer_code", listAllMatches=True)
+    producer_body = (producer_code + Suppress(",") + python_allowed_expr)\
+                    .setResultsName("producer_def", listAllMatches=True)
+    producer = "producer"  + Suppress(":") + INDENT + OneOrMore(producer_body) + UNDENT
+
     field_def = (creator | derived | calculated)\
                 .setResultsName("type_field", listAllMatches=True)
 
-    body = Optional(inherit_from) + Optional(field_def) + Optional(checker) + Optional(documentation)
+    body = Optional(inherit_from) + Optional(field_def) + Optional(checker) + Optional(documentation) + Optional(producer)
     comment = Literal("#") + restOfLine + LineEnd()
     include = (Suppress("include") + quotedString)\
               .setResultsName("includes", listAllMatches=True)
@@ -198,6 +214,8 @@ class BibFieldParser(object):
         self.main_config_file = main_config_file
 
         self.config_rules = {}
+        self.legacy_rules = {}
+
         self._unresolved_inheritence = []
         self._create_config_rules()
 
@@ -207,7 +225,9 @@ class BibFieldParser(object):
         then afterwards from the readers
         """
         fd = open(file_name, 'w')
-        fd.write('config_rules=%s' % (str(self.config_rules,)))
+        fd.write('config_rules=%s' % (repr(self.config_rules), ))
+        fd.write('\n')
+        fd.write('legacy_rules=%s' % (repr(self.legacy_rules), ))
         fd.write('\n')
         fd.close()
 
@@ -269,15 +289,18 @@ class BibFieldParser(object):
         Creates the config_rule entries for the creator rules.
         The result looks like this:
 
-        {'title':{'rules': { 'inherit_from'  : (inherit_from_list),
-                             'source_format' : [translation_rules],
-                             'legacy': (legacy_rules)}
-                  'checker': [(function_name, arguments), ...]
-                  'documentation' : {'doc_string' : '...',
-                                     'subfields' : .....},
-                  'type' : 'real'
-                  'aliases' : [list_of_aliases_ids]
-                 },
+        {'json_id':{'rules': { 'inherit_from'        : (inherit_from_list),
+                               'source_format'       : [translation_rules],
+                               'parse_first'         : (parse_first_json_ids),
+                               'depends_on'          : (depends_on_json_id),
+                               'only_if'             : (only_if_boolean_expressions),
+                             },
+                    'checker': [(function_name, arguments), ...]
+                    'documentation' : {'doc_string': '...',
+                                       'subfields' : .....},
+                    'type' : 'real'
+                    'aliases' : [list_of_aliases_ids]
+                   },
                  ....
         }
         """
@@ -314,24 +337,14 @@ class BibFieldParser(object):
                 #Allow several tags point to the same json id
                 rules[source_format] = []
 
-            legacy = ()
-            if creator.legacy:
-                legacy = eval(creator.legacy[0][0])
+            (depends_on, only_if, parse_first) = self._create_decorators_content(creator)
+            self._create_legacy_rules(creator.legacy, json_id, source_format)
 
-            depends_on = only_if = parse_first = None
-            if creator.parse_first:
-                parse_first = creator.parse_first[0]
-            if rule.depends_on:
-                depends_on = rule.depends_on[0]
-            if rule.only_if:
-                only_if = rule.only_if[0]
-
-            rules[source_format].append({'source_tag' : creator.source_tag[0].split(),
-                                         'value'      : creator.value[0],
-                                         'legacy'     : legacy,
-                                         'parse_first': parse_first,
-                                         'depends_on' : depends_on,
-                                         'only_if'    : only_if})
+            rules[source_format].append({'source_tag'           : creator.source_tag[0].split(),
+                                         'value'                : creator.value[0],
+                                         'depends_on'           : depends_on,
+                                         'only_if'              : only_if,
+                                         'parse_first'          : parse_first})
 
         #Chech duplicate names to overwrite configuration
         if not json_id in self.config_rules:
@@ -339,6 +352,7 @@ class BibFieldParser(object):
                                           'rules'         : rules,
                                           'checker'       : [],
                                           'documentation' : BibFieldDict(),
+                                          'producer'        : {},
                                           'type'          : 'real',
                                           'aliases'       : aliases,
                                           'persistent_identifier': persistent_id,
@@ -355,6 +369,7 @@ class BibFieldParser(object):
 
         self._create_checkers(rule)
         self._create_documentation(rule)
+        self._create_producer(rule)
 
     def _create_derived_calculated_rule(self, rule):
         """
@@ -368,8 +383,6 @@ class BibFieldParser(object):
             raise BibFieldParserException("Name error: '%s' field name already defined"
                                     % (rule.json_id[0],))
 
-        depends_on = only_if = parse_first = persistent_id = None
-
         aliases = []
         if rule.aliases:
             aliases = rule.aliases.asList()
@@ -377,33 +390,85 @@ class BibFieldParser(object):
             aliases.append(json_id[1:])
 
         do_not_cache = False
+        if rule.do_not_cache:
+            do_not_cache = True
+
+        persistent_id = None
+        if rule.persistent_identifier:
+            persistent_id = int(rule.persistent_identifier[0][0])
+
+        (depends_on, only_if, parse_first) = self._create_decorators_content(rule)
+        self._create_legacy_rules(rule.legacy, json_id)
+
+        self.config_rules[json_id] = {'rules'        : {},
+                                      'checker'      : [],
+                                      'documentation': BibFieldDict(),
+                                      'producer'       : {},
+                                      'aliases'      : aliases,
+                                      'type'         : rule.type_field[0],
+                                      'persistent_identifier' : persistent_id,
+                                      'overwrite'    : False}
+
+        self.config_rules[json_id]['rules'] = {'value'               : rule.value[0],
+                                               'depends_on'          : depends_on,
+                                               'only_if'             : only_if,
+                                               'parse_first'         : parse_first,
+                                               'do_not_cache'        : do_not_cache}
+
+        self._create_checkers(rule)
+        self._create_documentation(rule)
+        self._create_producer(rule)
+
+    def _create_decorators_content(self, rule):
+        """
+        Extracts from the rule all the possible decorators.
+        """
+        depends_on = only_if = parse_first = None
+
         if rule.depends_on:
             depends_on = rule.depends_on[0]
         if rule.only_if:
             only_if = rule.only_if[0]
         if rule.parse_first:
             parse_first = rule.parse_first[0]
-        if rule.do_not_cache:
-            do_not_cache = True
-        if rule.persistent_identifier:
-            persistent_id = int(rule.persistent_identifier[0][0])
 
-        self.config_rules[json_id] = {'rules'        : {},
-                                      'checker'      : [],
-                                      'documentation': BibFieldDict(),
-                                      'aliases'      : aliases,
-                                      'type'         : rule.type_field[0],
-                                      'persistent_identifier' : persistent_id,
-                                      'overwrite'    : False}
+        return (depends_on, only_if, parse_first)
 
-        self.config_rules[json_id]['rules'] = {'value'       : rule.value[0],
-                                               'parse_first' : parse_first,
-                                               'depends_on'  : depends_on,
-                                               'only_if'     : only_if,
-                                               'do_not_cache': do_not_cache}
+    def _create_legacy_rules(self, legacy_rules, json_id, source_format=None):
+        """
+        Creates the legacy rules dictionary:
 
-        self._create_checkers(rule)
-        self._create_documentation(rule)
+        {'100'   : ['authors[0]'],
+         '100__' : ['authors[0]'],
+         '100__%': ['authors[0]'],
+         '100__a': ['auhtors[0].full_name'],
+         .......
+         }
+        """
+        if not legacy_rules:
+            return
+        for legacy_rule in legacy_rules:
+            legacy_rule = eval(legacy_rule[0])
+
+            if source_format is None:
+                inner_source_format = legacy_rule[0]
+                legacy_rule = legacy_rule[1]
+            else:
+                inner_source_format = source_format
+
+            if not inner_source_format in self.legacy_rules:
+                self.legacy_rules[inner_source_format] = {}
+
+            for field_legacy_rule in legacy_rule:
+                #Allow string and tuple in the config file
+                legacy_fields = isinstance(field_legacy_rule[0], basestring) and (field_legacy_rule[0], ) or field_legacy_rule[0]
+                json_field = json_id
+                if field_legacy_rule[-1]:
+                    json_field = '.'.join((json_field, field_legacy_rule[-1]))
+                for legacy_field in legacy_fields:
+                    if not legacy_field in self.legacy_rules[inner_source_format]:
+                        self.legacy_rules[inner_source_format][legacy_field] = []
+                    self.legacy_rules[inner_source_format][legacy_field].append(json_field)
 
     def _resolve_inheritance(self, json_id):
         """docstring for _resolve_inheritance"""
@@ -469,3 +534,20 @@ class BibFieldParser(object):
                     key = "%s.%s" % ('subfields', subfield[0].replace('.', '.subfields.'))
                     config_doc[key] = {'doc_string': subfield[1],
                                        'subfields' : None}
+
+    def _create_producer(self, rule):
+        """
+        Creates the dictionary of possible producer formats for the given rule
+        """
+        json_id = rule.json_id[0]
+        assert json_id in self.config_rules
+
+        if rule.producer_def:
+            if self.config_rules[json_id]['overwrite']:
+                self.config_rules[json_id]['producer'] = {}
+            for producer in rule.producer_def:
+                producer_code = producer.producer_code[0]
+                rule = producer.value[0]
+                if not producer_code in self.config_rules[json_id]['producer']:
+                    self.config_rules[json_id]['producer'][producer_code] = []
+                self.config_rules[json_id]['producer'][producer_code].append(eval(rule))

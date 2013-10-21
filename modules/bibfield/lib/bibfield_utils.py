@@ -625,3 +625,22 @@ def build_data_structure(record, field):
                 exec("record%s={}" % (eval_string,))
                 exec("record%s=None" % (eval_string + key,))
         eval_string += key
+
+
+def get_producer_rules(field, code):
+    """docstring for get_producer_rules"""
+    from invenio.bibfield_config import config_rules
+
+    rule = config_rules[field]
+    if isinstance(rule, list):
+        if len(rule) == 1:
+            # case field[n]
+            return [(rule[0].replace('[n]', ''), config_rules[rule[0]]['producer'].get(code, {}))]
+        else:
+            # case field[1], field[n]
+            rules = []
+            for new_field in rule:
+                rules.append((new_field.replace('[n]', '[1:]'), config_rules[new_field]['producer'].get(code, {})))
+            return rules
+    else:
+        return [(field, rule['producer'].get(code, {}))]
