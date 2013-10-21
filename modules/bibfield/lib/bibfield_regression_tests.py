@@ -48,7 +48,7 @@ class BibFieldRecordFieldValuesTest(unittest.TestCase):
         self.assertEqual(record['recid'], record.get('recid'))
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title.title'])
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record['title']['title'])
-        self.assertEqual(None, record['title.subtitle'])
+        self.assertFalse('title.subtitle' in record)
         self.assertEqual('Physics at the front-end of a neutrino factory : a quantitative appraisal', record.get('title.title'))
         self.assertEqual('Mangano', record['authors[0].last_name'])
         self.assertEqual('M L', record['authors[0].first_name'])

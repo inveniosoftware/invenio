@@ -336,7 +336,22 @@ class JsonReader(BibFieldDict):
         If needed this method will post process the json structure, e.g. pruning
         the json to delete None values
         """
-        pass
+        def remove_none_values(d):
+            if d is None or not isinstance(d, dict):
+                return
+            for key, value in d.items():
+                if value is None:
+                    del d[key]
+                if isinstance(value, dict):
+                    remove_none_values(value)
+                if isinstance(value, list):
+                    for element in value:
+                        if element is None:
+                            value.remove(element)
+                        else:
+                            remove_none_values(element)
+        remove_none_values(self.rec_json)
+
 
 
 for key, value in PluginContainer(os.path.join(CFG_PYLIBDIR, 'invenio', 'bibfield_functions', 'produce_json_for_*.py')).iteritems():
