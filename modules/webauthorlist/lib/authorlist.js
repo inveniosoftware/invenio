@@ -858,6 +858,26 @@ Authorlist.prototype._fnClearTables = function() {
     this._oAffiliations._oDataTable.fnClearTable();
 };
 
+
+/*
+* Function: _fnCleanEmptyAffiliations
+* Purpose:  Removes empty affiliations from the data object
+* Input(s): object:oData - all the data from the table
+* Returns:  void
+*
+*/
+Authorlist.prototype._fnCleanEmptyAffiliations= function( oData ) {
+    oData.authors.forEach( function( aoAuthor ) {
+        var aasAffiliations = aoAuthor[ Authorlist.INDICES.Affiliations ];
+        aasAffiliations.forEach( function( asAffiliation, index ) {
+                var sAffName = asAffiliation[ Authorlist.INDICES.AffiliationName ];
+                if ( sAffName.match( Authorlist.EMPTY ) ) {
+                    aasAffiliations.splice(index, 1);
+                }
+            } );
+    });
+}
+
 /*
 * Function: _fnExport
 * Purpose:  Exports the data of the authorlist instance on the server as long as 
@@ -870,6 +890,7 @@ Authorlist.prototype._fnExport = function( nButton ) {
     nButton = jQuery( nButton );
 
     var oData = this.fnGetData();
+    this._fnCleanEmptyAffiliations(oData);
     var asErrors = this.fnValidate( oData );
     var sButtonText = nButton.find( '.' + Authorlist.CSS.ButtonText ).text();
     var sURL = Authorlist.URLS[ sButtonText ];
