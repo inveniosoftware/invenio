@@ -28,7 +28,38 @@ from invenio.webinterface_handler import create_handler
 from invenio.errorlib import register_exception
 from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio import webinterface_handler_config as apache
-from invenio.config import CFG_DEVEL_SITE, CFG_OPENAIRE_SITE
+from invenio.config import CFG_DEVEL_SITE, CFG_OPENAIRE_SITE, CFG_ACCESS_CONTROL_LEVEL_SITE
+
+
+class WebInterfaceDisabledPages(WebInterfaceDirectory):
+    """This class implements a dumb interface to use as a fallback in case the
+    site is switched to read only mode, i.e. CFG_ACCESS_CONTROL_LEVEL_SITE > 0"""
+    _exports = ['']
+    def __call__(self, req, form):
+        try:
+            from invenio.webpage import page
+        except ImportError:
+            register_exception()
+            page = lambda * args: args[1]
+        req.status = apache.HTTP_SERVICE_UNAVAILABLE
+        msg = "<p>This functionality is currently unavailable due to a service maintenance.</p>"
+        try:
+            from invenio.config import CFG_SITE_ADMIN_EMAIL
+            msg += """<p>You can contact <code>%s</code>
+                         in case of questions.</p>""" % \
+                      CFG_SITE_ADMIN_EMAIL
+        except ImportError:
+            pass
+        msg += """<p>We are going to restore the service soon.</p>
+                  <p>Sorry for the inconvenience.</p>"""
+        try:
+            return page('Service unavailable', msg, req=req)
+        except:
+            return msg
+
+    def _lookup(self, component, path):
+        return WebInterfaceDisabledPages(), path
+    index = __call__
 
 class WebInterfaceDumbPages(WebInterfaceDirectory):
     """This class implements a dumb interface to use as a fallback in case of
@@ -52,7 +83,7 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
         msg += """<p>We hope to restore the service soon.</p>
                   <p>Sorry for the inconvenience.</p>"""
         try:
-            return page('Service failure', msg)
+            return page('Service failure', msg, req=req)
         except:
             return msg
 
@@ -347,37 +378,70 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         if CFG_OPENAIRE_SITE:
             self.deposit = WebInterfaceOpenAIREDepositPages()
 
-    submit = WebInterfaceSubmitPages()
-    youraccount = WebInterfaceYourAccountPages()
-    youralerts = WebInterfaceYourAlertsPages()
-    yourbaskets = WebInterfaceYourBasketsPages()
-    yourmessages = WebInterfaceYourMessagesPages()
-    yourloans = WebInterfaceYourLoansPages()
-    ill = WebInterfaceILLPages()
-    yourgroups = WebInterfaceYourGroupsPages()
-    yourtickets = WebInterfaceYourTicketsPages()
-    comments = WebInterfaceCommentsPages()
-    error = WebInterfaceErrorPages()
-    oai2d = WebInterfaceOAIProviderPages()
-    rss = WebInterfaceRSSFeedServicePages()
-    stats = WebInterfaceStatsPages()
-    journal = WebInterfaceJournalPages()
-    help = WebInterfaceDocumentationPages()
-    info = WebInterfaceInfoPages()
-    unapi = WebInterfaceUnAPIPages()
-    exporter = WebInterfaceFieldExporterPages()
-    kb = WebInterfaceBibKnowledgePages()
-    admin2 = WebInterfaceAdminPages()
-    batchuploader = WebInterfaceBatchUploaderPages()
-    bibsword = WebInterfaceSword()
-    ping = WebInterfacePingPages()
-    linkbacks = WebInterfaceRecentLinkbacksPages()
-    author = WebInterfaceAuthor()
-    person = WebInterfacePerson()
-    textmining = WebInterfaceDocExtract()
-    yourcomments = WebInterfaceYourCommentsPages()
-    goto = WebInterfaceGotoPages()
-    authorlist = WebInterfaceAuthorlistPages()
+    if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+        submit = WebInterfaceDisabledPages()
+        youraccount = WebInterfaceDisabledPages()
+        youralerts = WebInterfaceDisabledPages()
+        yourbaskets = WebInterfaceDisabledPages()
+        yourmessages = WebInterfaceDisabledPages()
+        yourloans = WebInterfaceDisabledPages()
+        ill = WebInterfaceDisabledPages()
+        yourgroups = WebInterfaceDisabledPages()
+        yourtickets = WebInterfaceDisabledPages()
+        comments = WebInterfaceDisabledPages()
+        error = WebInterfaceErrorPages()
+        oai2d = WebInterfaceDisabledPages()
+        rss = WebInterfaceRSSFeedServicePages()
+        stats = WebInterfaceDisabledPages()
+        journal = WebInterfaceDisabledPages()
+        help = WebInterfaceDocumentationPages()
+        info = WebInterfaceInfoPages()
+        unapi = WebInterfaceUnAPIPages()
+        exporter = WebInterfaceDisabledPages()
+        kb = WebInterfaceBibKnowledgePages()
+        admin2 = WebInterfaceDisabledPages()
+        batchuploader = WebInterfaceDisabledPages()
+        bibsword = WebInterfaceDisabledPages()
+        ping = WebInterfacePingPages()
+        linkbacks = WebInterfaceDisabledPages()
+        author = WebInterfaceDisabledPages()
+        person = WebInterfaceDisabledPages()
+        textmining = WebInterfaceDocExtract()
+        yourcomments = WebInterfaceDisabledPages()
+        goto = WebInterfaceDisabledPages()
+        authorlist = WebInterfaceDisabledPages()
+    else:
+        submit = WebInterfaceSubmitPages()
+        youraccount = WebInterfaceYourAccountPages()
+        youralerts = WebInterfaceYourAlertsPages()
+        yourbaskets = WebInterfaceYourBasketsPages()
+        yourmessages = WebInterfaceYourMessagesPages()
+        yourloans = WebInterfaceYourLoansPages()
+        ill = WebInterfaceILLPages()
+        yourgroups = WebInterfaceYourGroupsPages()
+        yourtickets = WebInterfaceYourTicketsPages()
+        comments = WebInterfaceCommentsPages()
+        error = WebInterfaceErrorPages()
+        oai2d = WebInterfaceOAIProviderPages()
+        rss = WebInterfaceRSSFeedServicePages()
+        stats = WebInterfaceStatsPages()
+        journal = WebInterfaceJournalPages()
+        help = WebInterfaceDocumentationPages()
+        info = WebInterfaceInfoPages()
+        unapi = WebInterfaceUnAPIPages()
+        exporter = WebInterfaceFieldExporterPages()
+        kb = WebInterfaceBibKnowledgePages()
+        admin2 = WebInterfaceAdminPages()
+        batchuploader = WebInterfaceBatchUploaderPages()
+        bibsword = WebInterfaceSword()
+        ping = WebInterfacePingPages()
+        linkbacks = WebInterfaceRecentLinkbacksPages()
+        author = WebInterfaceAuthor()
+        person = WebInterfacePerson()
+        textmining = WebInterfaceDocExtract()
+        yourcomments = WebInterfaceYourCommentsPages()
+        goto = WebInterfaceGotoPages()
+        authorlist = WebInterfaceAuthorlistPages()
 
 
 # This creates the 'handler' function, which will be invoked directly
