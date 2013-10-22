@@ -877,7 +877,7 @@ def ref_analyzer(citation_informations, updated_recids, tags, config):
         for recid in (r for r in refs if r):
             valid = get_recids_matching_query(p=recid, f="001", config=config)
             if valid:
-                add_to_refs(thisrecid, recid)
+                add_to_refs(thisrecid, valid[0])
 
     mesg = "done fully"
     write_message(mesg)
