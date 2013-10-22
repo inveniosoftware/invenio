@@ -19,10 +19,45 @@
 imgdir=$(localstatedir)/www/img
 
 img_DATA = bibauthorid.css bootstrap.min.css glyphicons-halflings.png glyphicons-halflings-white.png \
-	   bai-help-colorschememapping.xml  bai-help-image001.png  bai-help-image003.png  bai-help-image005.png  bai-help-image007.png  bai-help-image009.png \
-	   bai-help-filelist.xml bai-help-image002.png  bai-help-image004.png  bai-help-image006.png  bai-help-image008.png  bai-help-themedata.thmx \
-	   bai-help.html 
+	   bibauthorid-help-full-image001.png \
+	   bibauthorid-help-full-image003.png \
+	   bibauthorid-help-full-image005.png \
+	   bibauthorid-help-full-image007.png \
+	   bibauthorid-help-full-image009.png \
+	   bibauthorid-help-full-image011.png \
+	   bibauthorid-help-full-image013.png \
+	   bibauthorid-help-full-image015.png \
+	   bibauthorid-help-full-image017.png \
+	   bibauthorid-help-full-image019.png \
+	   bibauthorid-help-full-image021.png \
+	   bibauthorid-help-full-image023.png \
+	   bibauthorid-help-full-image025.png \
+	   bibauthorid-help-full-image027.png \
+	   bibauthorid-help-full-image028.png \
+	   bibauthorid-help-full-image029.png \
+	   bibauthorid-help-full-image031.png \
+	   bibauthorid-help-full-image033.png \
+	   bibauthorid-help.html \
+	   bibauthorid-help-small-image001.png \
+	   bibauthorid-help-small-image003.png \
+	   bibauthorid-help-small-image005.png \
+	   bibauthorid-help-small-image007.png \
+	   bibauthorid-help-small-image009.png \
+	   bibauthorid-help-small-image011.png \
+	   bibauthorid-help-small-image013.png \
+	   bibauthorid-help-small-image015.png \
+	   bibauthorid-help-small-image017.png \
+	   bibauthorid-help-small-image019.png \
+	   bibauthorid-help-small-image021.png \
+	   bibauthorid-help-small-image023.png \
+	   bibauthorid-help-small-image025.png \
+	   bibauthorid-help-small-image027.png \
+	   bibauthorid-help-small-image028.png \
+	   bibauthorid-help-small-image029.png \
+	   bibauthorid-help-small-image031.png \
+	   bibauthorid-help-small-image033.png 
 
 EXTRA_DIST = $(img_DATA)
 
 CLEANFILES = *~ *.tmp
+

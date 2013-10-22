@@ -551,7 +551,8 @@ var ticketbox = {
         commitModalTemplate: Handlebars.compile("<div class=\"modal ow-closed\">" +
             "<div class=\"modal-header\"><h1>{{ title }}</h1></div>" +
             "<div class=\"modal-body\">" +
-            "   <form class=\"form-horizontal\" novalidate>" +
+            "<span class=\"confirm-text\"><p>{{#guest}}Please provide your details to submit your suggestions.<br>{{/guest}}If you have any comments, please fill in the comments box below.</p></span>" +
+            "<form class=\"form-horizontal\" novalidate>" +
             "{{#guest}}<div class=\"control-group\"><label class=\"control-label\" for=\"firstName\">First Name</label><div class=\"controls\"><input class=\"input-large\" required=\"true\" data-trigger=\"change keyup focusin focusout\" data-notblank=\"true\" data-required-message=\"This field is required.\" data-validation-minlength=\"1\" data-minlength=\"2\" data-minlength-message=\"Your input is too short.\" type=\"text\" id=\"firstName\" placeholder=\"First Name\" value=\"{{ userDetails.first_name }}\"></div></div>" +
             "<div class=\"control-group\"><label class=\"control-label\" for=\"lastName\">Last Name</label><div class=\"controls\"><input class=\"input-large\" required=\"true\" data-trigger=\"change keyup focusin focusout\" data-notblank=\"true\" data-required-message=\"This field is required.\" data-validation-minlength=\"1\" data-minlength=\"2\" data-minlength-message=\"Your input is too short.\" type=\"text\" id=\"lastName\" placeholder=\"Last Name\" value=\"{{ userDetails.last_name }}\"></div></div>" +
             "<div class=\"control-group\"><label class=\"control-label\" for=\"email\">Email</label><div class=\"controls\"><input class=\"input-xlarge\" required=\"true\" data-trigger=\"change keyup focusin focusout\" data-notblank=\"true\" data-required-message=\"This field is required.\" data-validation-minlength=\"1\" data-type-email-message=\"Please enter a valid email address.\" type=\"email\" id=\"email\" placeholder=\"Email\" value=\"{{ userDetails.email }}\"></div></div>{{/guest}}" +
@@ -1016,7 +1017,7 @@ var ticketbox = {
             };
 
             var guestCommitModal = function() {
-                _.extend(context, {title: "Please Enter Your Details", guest: true});
+                _.extend(context, {title: "Enter Your Details", guest: true});
                 return $(view.commitModalTemplate(context)).appendTo($span);
             };
 
@@ -1619,6 +1620,12 @@ jQuery(function($) {
 //    app.searchView = searchInterface;
 
     console.log("Ticketing Loaded.");
+
+    var profilePageRegex = /\/author\/profile\//;
+    var profilePage = profilePageRegex.test(window.location.pathname);
+    if (profilePage) {
+        $("#bai_content").prepend("<div class='well'><h4>Welcome to the improved author profiles!</h4><p>We have revised our author page. Please let us know what you think via <a href='mailto:feedback@inspirehep.net?subject=Revised%20Author%20Profiles'>feedback@inspirehep.net</a></p></div>");
+    }
 
 });
 

@@ -3313,7 +3313,7 @@ After the merging only the primary profile will exist in the system and all othe
 
     def tmpl_help_page(self):
         helphtml = """
-     <iframe src="/img/bai-help.html" seamless style="width:100%;height:5000px"></iframe>
+     <iframe src="/img/bibauthorid-help.html" seamless style="width:100%;height:6000px"></iframe>
         """
         return helphtml
 
