@@ -175,9 +175,9 @@ def get_author_canonical_ids_for_recid(recID):
     Return list of author canonical IDs (e.g. `J.Ellis.1') for the
     given record.  Done by consulting BibAuthorID module.
     """
-    from invenio.bibauthorid_dbinterface import get_persons_from_recids
+    from invenio.bibauthorid_dbinterface import get_data_of_papers
     lwords = []
-    res = get_persons_from_recids([recID])
+    res = get_data_of_papers([recID])
     if res is None:
         ## BibAuthorID is not enabled
         return lwords

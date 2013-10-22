@@ -18,7 +18,10 @@
 
 imgdir=$(localstatedir)/www/img
 
-img_DATA = bibauthorid.css
+img_DATA = bibauthorid.css bootstrap.min.css glyphicons-halflings.png glyphicons-halflings-white.png \
+	   bai-help-colorschememapping.xml  bai-help-image001.png  bai-help-image003.png  bai-help-image005.png  bai-help-image007.png  bai-help-image009.png \
+	   bai-help-filelist.xml bai-help-image002.png  bai-help-image004.png  bai-help-image006.png  bai-help-image008.png  bai-help-themedata.thmx \
+	   bai-help.html 
 
 EXTRA_DIST = $(img_DATA)
 

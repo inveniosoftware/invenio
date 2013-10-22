@@ -16,6 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+from invenio.bibauthorid_webapi import get_canonical_id_from_person_id
 
 """ Bibauthorid Web Interface Logic and URL handler. """
 
@@ -24,219 +25,227 @@
 # pylint: disable=W0613
 
 from cgi import escape
-from copy import deepcopy
+
 from pprint import pformat
 from operator import itemgetter
+import re
+import pprint
 
 try:
-    from invenio.jsonutils import json, CFG_JSON_AVAILABLE
+    from invenio.jsonutils import json, json_unicode_to_utf8, CFG_JSON_AVAILABLE
 except:
     CFG_JSON_AVAILABLE = False
     json = None
 
-from invenio.bibauthorid_config import AID_ENABLED, CLAIMPAPER_ADMIN_ROLE, CLAIMPAPER_USER_ROLE, \
-                            PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
-                            BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS
+from invenio.config import CFG_SITE_URL
+from invenio.bibauthorid_config import AID_ENABLED, PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT, \
+                            BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE, VALID_EXPORT_FILTERS, PERSONS_PER_PAGE, \
+                            MAX_NUM_SHOW_PAPERS
 
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, CFG_INSPIRE_SITE #, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, CFG_INSPIRE_SITE, CFG_SITE_SECURE_URL
 
+from invenio.bibauthorid_name_utils import most_relevant_name
 from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.messages import gettext_set_language #, wash_language
+from invenio.messages import gettext_set_language  # , wash_language
 from invenio.template import load
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.session import get_session
-from invenio.urlutils import redirect_to_url
+from invenio.urlutils import redirect_to_url, get_canonical_and_alternates_urls
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, set_user_preferences, \
                             email_valid_p, emailUnique, get_email_from_username, get_uid_from_email, \
-                            isUserSuperAdmin
+                            isUserSuperAdmin, isGuestUser
 from invenio.access_control_admin import acc_find_user_role_actions, acc_get_user_roles, acc_get_role_id
 from invenio.search_engine import perform_request_search
 from invenio.search_engine_utils import get_fieldvalues
-
+from invenio.bibauthorid_config import CREATE_NEW_PERSON
+import invenio.webinterface_handler_config as apache
+import invenio.webauthorprofile_interface as webauthorapi
 import invenio.bibauthorid_webapi as webapi
-from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
-from invenio.bibauthorid_backinterface import update_personID_external_ids
+from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arxiv_pubid, is_valid_orcid
+from invenio.bibauthorid_backinterface import update_external_ids_of_authors, get_orcid_id_of_author, \
+            get_validated_request_tickets_for_author, get_title_of_paper, get_claimed_papers_of_author
+from invenio.bibauthorid_dbinterface import defaultdict, remove_arxiv_papers_of_author
+from invenio.webauthorprofile_orcidutils import get_dois_from_orcid
 
+from invenio.bibauthorid_templates import WebProfileMenu, WebProfilePage
 
 # Imports related to hepnames update form
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_get_field_value, record_get_field_values, \
                               record_get_field_instances, field_get_subfield_values
 
+
 TEMPLATE = load('bibauthorid')
 
-class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
-    """
-    Handle /person pages and AJAX requests
+class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
+    '''
+    Handles /author/claim pages and AJAX requests.
 
-    Supplies the methods
-        /person/<string>
-        /person/action
-        /person/welcome
-        /person/search
-        /person/you -> /person/<string>
-        /person/export
-        /person/claimstub
-    """
-    _exports = ['', 'action', 'welcome', 'search', 'you', 'export', 'tickets_admin', 'claimstub', 'update']
+    Supplies the methods:
+        /author/claim/<string>
+        /author/claim/action
+        /author/claim/claimstub
+        /author/claim/export
+        /author/claim/generate_autoclaim_data
+        /author/claim/merge_profiles_ajax
+        /author/claim/search_box_ajax
+        /author/claim/tickets_admin
 
+        /author/claim/search
+    '''
+    _exports = ['',
+                'action',
+                'claimstub',
+                'export',
+                'generate_autoclaim_data',
+                'merge_profiles_ajax',
+                'search_box_ajax',
+                'tickets_admin'
+                ]
 
-    def __init__(self, person_id=None):
-        """
+    def _lookup(self, component, path):
+        '''
+        This handler parses dynamic URLs:
+            - /author/profile/1332 shows the page of author with id: 1332
+            - /author/profile/100:5522,1431 shows the page of the author
+              identified by the bibrefrec: '100:5522,1431'
+        '''
+        if not component in self._exports:
+            return WebInterfaceBibAuthorIDClaimPages(component), path
+
+    def _is_profile_owner(self, pid):
+        return self.person_id == int(pid)
+
+    def _is_admin(self, pinfo):
+        return pinfo['ulevel'] == 'admin'
+
+    def __init__(self, identifier=None):
+        '''
         Constructor of the web interface.
 
-        @param person_id: The identifier of a user. Can be one of:
-            - a bibref: e.g. "100:1442,155"
-            - a person id: e.g. "14"
-            - a canonical id: e.g. "Ellis_J_1"
-        @type person_id: string
+        @param identifier: identifier of an author. Can be one of:
+            - an author id: e.g. "14"
+            - a canonical id: e.g. "J.R.Ellis.1"
+            - a bibrefrec: e.g. "100:1442,155"
+        @type identifier: str
+        '''
+        self.person_id = -1   # -1 is a non valid author identifier
 
-        @return: will return an empty object if the identifier is of wrong type
-        @rtype: None (if something is not right)
-        """
-        pid = -1
-        is_bibref = False
-        is_canonical_id = False
-        self.adf = self.__init_call_dispatcher()
+        if identifier is None or not isinstance(identifier, str):
+            return
 
-        if (not isinstance(person_id, str)) or (not person_id):
+        # check if it's a canonical id: e.g. "J.R.Ellis.1"
+        pid = int(webapi.get_person_id_from_canonical_id(identifier))
+        if pid >= 0:
             self.person_id = pid
-            return None
+            return
 
-        if person_id.count(":") and person_id.count(","):
-            is_bibref = True
-        elif webapi.is_valid_canonical_id(person_id):
-            is_canonical_id = True
+        # check if it's an author id: e.g. "14"
+        try:
+            pid = int(identifier)
+            if webapi.author_has_papers(pid):
+                self.person_id = pid
+                return
+        except ValueError:
+            pass
 
-        if is_bibref and pid > -2:
-            bibref = person_id
-            table, ref, bibrec = None, None, None
-
-            if not bibref.count(":"):
-                pid = -2
-
-            if not bibref.count(","):
-                pid = -2
-
-            try:
-                table = bibref.split(":")[0]
-                ref = bibref.split(":")[1].split(",")[0]
-                bibrec = bibref.split(":")[1].split(",")[1]
-            except IndexError:
-                pid = -2
-
-            try:
-                table = int(table)
-                ref = int(ref)
-                bibrec = int(bibrec)
-            except (ValueError, TypeError):
-                pid = -2
-
-            if pid == -1:
-                try:
-                    pid = int(webapi.get_person_id_from_paper(person_id))
-                except (ValueError, TypeError):
-                    pid = -1
-            else:
-                pid = -1
-        elif is_canonical_id:
-            try:
-                pid = int(webapi.get_person_id_from_canonical_id(person_id))
-            except (ValueError, TypeError):
-                pid = -1
-        else:
-            try:
-                pid = int(person_id)
-            except ValueError:
-                pid = -1
-
-        self.person_id = pid
-
+        # check if it's a bibrefrec: e.g. "100:1442,155"
+        if webapi.is_valid_bibref(identifier):
+            pid = int(webapi.get_person_id_from_paper(identifier))
+            if pid >= 0:
+                self.person_id = pid
+                return
 
     def __call__(self, req, form):
         '''
         Serve the main person page.
         Will use the object's person id to get a person's information.
 
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: Parameters sent via GET or POST request
+        @param req: apache request object
+        @type req: apache request object
+        @param form: POST/GET variables of the request
         @type form: dict
 
         @return: a full page formatted in HTML
-        @return: string
+        @rtype: str
         '''
-        self._session_bareinit(req)
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        ulevel = pinfo['ulevel']
+
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
-                                   'verbose': (int, 0),
+                                   'open_claim': (str, None),
                                    'ticketid': (int, -1),
-                                   'open_claim': (str, None)})
+                                   'verbose': (int, 0)})
+
+        debug = "verbose" in argd and argd["verbose"] > 0
 
         ln = argd['ln']
-        # ln = wash_language(argd['ln'])
-
-        rt_ticket_id = argd['ticketid']
-        req.argd = argd #needed for perform_req_search
-        session = get_session(req)
-        ulevel = self.__get_user_role(req)
-        uid = getUid(req)
+        req.argd = argd   # needed for perform_req_search
 
         if self.person_id < 0:
-            return redirect_to_url(req, "%s/person/search" % (CFG_SITE_URL))
-
-        if isUserSuperAdmin({'uid': uid}):
-            ulevel = 'admin'
+            return redirect_to_url(req, '%s/author/search' % (CFG_SITE_URL))
 
         no_access = self._page_access_permission_wall(req, [self.person_id])
-
         if no_access:
             return no_access
 
-        try:
-            pinfo = session["personinfo"]
-        except KeyError:
-            pinfo = dict()
-            session['personinfo'] = pinfo
-
-        if 'open_claim' in argd and argd['open_claim']:
-            pinfo['claim_in_process'] = True
-        elif "claim_in_process" in pinfo and pinfo["claim_in_process"]:
-            pinfo['claim_in_process'] = True
-        else:
-            pinfo['claim_in_process'] = False
+        pinfo['claim_in_process'] = True
 
         uinfo = collect_user_info(req)
         uinfo['precached_viewclaimlink'] = pinfo['claim_in_process']
-        set_user_preferences(uid, uinfo)
+        set_user_preferences(pinfo['uid'], uinfo)
 
-        pinfo['ulevel'] = ulevel
         if self.person_id != -1:
-            pinfo["claimpaper_admin_last_viewed_pid"] = self.person_id
-        pinfo["ln"] = ln
+            pinfo['claimpaper_admin_last_viewed_pid'] = self.person_id
 
-        if not "ticket" in pinfo:
-            pinfo["ticket"] = []
-
-        if rt_ticket_id:
+        rt_ticket_id = argd['ticketid']
+        if rt_ticket_id != -1:
             pinfo["admin_requested_ticket_id"] = rt_ticket_id
 
         session.dirty = True
 
-        content = ''
-        for part in ['optional_menu', 'ticket_box', 'personid_info', 'tabs', 'footer']:
-            content += self.adf[part][ulevel](req, form, ln)
+        ## Create menu and page using templates
+        menu = WebProfileMenu(webapi.get_canonical_id_from_person_id(self.person_id), "claim", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
 
-        title = self.adf['title'][ulevel](req, form, ln)
-        body = TEMPLATE.tmpl_person_detail_layout(content)
-        metaheaderadd = self._scripts()
-        metaheaderadd += '\n <meta name="robots" content="nofollow" />'
-        self._clean_ticket(req)
+        profile_page = WebProfilePage("claim", webapi.get_longest_name_from_pid(self.person_id))
+        profile_page.add_profile_menu(menu)
 
-        return page(title=title,
-            metaheaderadd=metaheaderadd,
-            body=body,
-            req=req,
-            language=ln)
+        gboxstatus = self.person_id
+        gpid = self.person_id
+        gNumOfWorkers = 3   # to do: read it from conf file
+        gReqTimeout = 3000
+        gPageTimeout = 12000
+
+        profile_page.add_bootstrapped_data(json.dumps({
+            "other": "var gBOX_STATUS = '%s';var gPID = '%s'; var gNumOfWorkers= '%s'; var gReqTimeout= '%s'; var gPageTimeout= '%s';" % (gboxstatus, gpid, gNumOfWorkers, gReqTimeout, gPageTimeout),
+            "backbone": """
+            (function(ticketbox) {
+                 var app = ticketbox.app;
+                 app.userops.set(%s);
+                 app.bodyModel.set({userLevel: "%s", guestPrompt: true});
+            })(ticketbox);""" % (WebInterfaceAuthorTicketHandling.bootstrap_status(pinfo, "user"), ulevel)
+        }))
+
+        if debug:
+            profile_page.add_debug_info(pinfo)
+
+        # content += self._generate_person_info_box(ulevel, ln) #### Name variants
+        # metaheaderadd = self._scripts() + '\n <meta name="robots" content="nofollow" />'
+        # body = self._generate_optional_menu(ulevel, req, form)
+
+        content = self._generate_tabs(ulevel, req)
+        content += self._generate_footer(ulevel)
+        content = content.decode('utf-8', 'strict')
+
+        webapi.history_log_visit(req, 'claim', pid=self.person_id)
+        return page(title=self._generate_title(ulevel),
+                    metaheaderadd=profile_page.get_head().encode('utf-8'),
+                    body=profile_page.get_wrapped_body(content).encode('utf-8'),
+                    req=req,
+                    language=ln,
+                    show_title_p=False)
 
 
     def _page_access_permission_wall(self, req, req_pid=None, req_level=None):
@@ -283,7 +292,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
         if is_authorized and not webapi.user_can_view_CMP(uid):
             is_authorized = False
-
         if is_authorized and 'ticket' in pinfo:
             for tic in pinfo["ticket"]:
                 if 'pid' in tic:
@@ -293,11 +301,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             user_pid = webapi.get_pid_from_uid(uid)
 
             if not uinfo['precached_usepaperattribution']:
-                if user_pid[1]:
-                    user_pid = user_pid[0][0]
-                else:
-                    user_pid = -1
-
                 if (not user_pid in pids_to_check
                     and 'ulevel' in pinfo
                     and not pinfo["ulevel"] == "admin"):
@@ -315,573 +318,288 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         else:
             return ""
 
-
-    def _session_bareinit(self, req):
+    def _generate_title(self, ulevel):
         '''
-        Initializes session personinfo entry if none exists
-        @param req: Apache Request Object
-        @type req: Apache Request Object
+        Generates the title for the specified user permission level.
+
+        @param ulevel: user permission level
+        @type ulevel: str
+
+        @return: title
+        @rtype: str
         '''
-        session = get_session(req)
-        uid = getUid(req)
-        ulevel = self.__get_user_role(req)
+        def generate_title_guest():
+            title = 'Assign papers'
+            if self.person_id:
+                title = 'Assign papers for: ' + str(webapi.get_person_redirect_link(self.person_id))
+            return title
 
-        if isUserSuperAdmin({'uid': uid}):
-            ulevel = 'admin'
+        def generate_title_user():
+            title = 'Assign papers'
+            if self.person_id:
+                title = 'Assign papers (user interface) for: ' + str(webapi.get_person_redirect_link(self.person_id))
+            return title
 
-        try:
-            pinfo = session["personinfo"]
-            pinfo['ulevel'] = ulevel
-            if "claimpaper_admin_last_viewed_pid" not in pinfo:
-                pinfo["claimpaper_admin_last_viewed_pid"] = -2
-            if 'ln' not in pinfo:
-                pinfo["ln"] = 'en'
-            if 'ticket' not in pinfo:
-                pinfo["ticket"] = []
-            session.dirty = True
-        except KeyError:
-            pinfo = dict()
-            session['personinfo'] = pinfo
-            pinfo['ulevel'] = ulevel
-            pinfo["claimpaper_admin_last_viewed_pid"] = -2
-            pinfo["ln"] = 'en'
-            pinfo["ticket"] = []
-            session.dirty = True
+        def generate_title_admin():
+            title = 'Assign papers'
+            if self.person_id:
+                title = 'Assign papers (administrator interface) for: ' + str(webapi.get_person_redirect_link(self.person_id))
+            return title
 
 
-    def _lookup(self, component, path):
-        """
-        This handler parses dynamic URLs:
-        - /person/1332 shows the page of person 1332
-        - /person/100:5522,1431 shows the page of the person
-            identified by the table:bibref,bibrec pair
-        """
-        if not component in self._exports:
-            return WebInterfaceBibAuthorIDPages(component), path
+        generate_title = {'guest': generate_title_guest,
+                          'user': generate_title_user,
+                          'admin': generate_title_admin}
+
+        return generate_title[ulevel]()
 
 
-    def __init_call_dispatcher(self):
+    def _generate_optional_menu(self, ulevel, req, form):
         '''
-        Initialization of call dispacher dictionary
+        Generates the menu for the specified user permission level.
 
-        @return: call dispatcher dictionary
-        @rtype: dict
-        '''
-        #author_detail_functions
-        adf = dict()
-        adf['title'] = dict()
-        adf['optional_menu'] = dict()
-        adf['ticket_box'] = dict()
-        adf['tabs'] = dict()
-        adf['footer'] = dict()
-        adf['personid_info'] = dict()
-        adf['ticket_dispatch'] = dict()
-        adf['ticket_commit'] = dict()
-
-        adf['title']['guest'] = self._generate_title_guest
-        adf['title']['user'] = self._generate_title_user
-        adf['title']['admin'] = self._generate_title_admin
-
-        adf['optional_menu']['guest'] = self._generate_optional_menu_guest
-        adf['optional_menu']['user'] = self._generate_optional_menu_user
-        adf['optional_menu']['admin'] = self._generate_optional_menu_admin
-
-        adf['ticket_box']['guest'] = self._generate_ticket_box_guest
-        adf['ticket_box']['user'] = self._generate_ticket_box_user
-        adf['ticket_box']['admin'] = self._generate_ticket_box_admin
-
-        adf['personid_info']['guest'] = self._generate_person_info_box_guest
-        adf['personid_info']['user'] = self._generate_person_info_box_user
-        adf['personid_info']['admin'] = self._generate_person_info_box_admin
-
-        adf['tabs']['guest'] = self._generate_tabs_guest
-        adf['tabs']['user'] = self._generate_tabs_user
-        adf['tabs']['admin'] = self._generate_tabs_admin
-
-        adf['footer']['guest'] = self._generate_footer_guest
-        adf['footer']['user'] = self._generate_footer_user
-        adf['footer']['admin'] = self._generate_footer_admin
-
-        adf['ticket_dispatch']['guest'] = self._ticket_dispatch_user
-        adf['ticket_dispatch']['user'] = self._ticket_dispatch_user
-        adf['ticket_dispatch']['admin'] = self._ticket_dispatch_admin
-
-        adf['ticket_commit']['guest'] = self._ticket_commit_guest
-        adf['ticket_commit']['user'] = self._ticket_commit_user
-        adf['ticket_commit']['admin'] = self._ticket_commit_admin
-
-        return adf
-
-
-    def _generate_title_guest(self, req, form, ln):
-        '''
-        Generate the title for a guest user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
+        @param ulevel: user permission level
+        @type ulevel: str
+        @param req: apache request object
+        @type req: apache request object
         @param form: POST/GET variables of the request
         @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
+
+        @return: menu
+        @rtype: str
         '''
-        if self.person_id:
-            return 'Attribute papers for: ' + str(webapi.get_person_redirect_link(self.person_id))
-        else:
-            return 'Attribute papers'
+        def generate_optional_menu_guest(req, form):
+            argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
+                                       'verbose': (int, 0)})
+            menu = TEMPLATE.tmpl_person_menu(self.person_id, argd['ln'])
+
+            if "verbose" in argd and argd["verbose"] > 0:
+                session = get_session(req)
+                pinfo = session['personinfo']
+                menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
+
+            return menu
+
+        def generate_optional_menu_user(req, form):
+            argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
+                                       'verbose': (int, 0)})
+            menu = TEMPLATE.tmpl_person_menu(self.person_id, argd['ln'])
+
+            if "verbose" in argd and argd["verbose"] > 0:
+                session = get_session(req)
+                pinfo = session['personinfo']
+                menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
+
+            return menu
+
+        def generate_optional_menu_admin(req, form):
+            argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
+                                       'verbose': (int, 0)})
+            menu = TEMPLATE.tmpl_person_menu_admin(self.person_id, argd['ln'])
+
+            if "verbose" in argd and argd["verbose"] > 0:
+                session = get_session(req)
+                pinfo = session['personinfo']
+                menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
+
+            return menu
 
 
-    def _generate_title_user(self, req, form, ln):
-        '''
-        Generate the title for a regular user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        if self.person_id:
-            return 'Attribute papers (user interface) for: ' + str(webapi.get_person_redirect_link(self.person_id))
-        else:
-            return 'Attribute papers'
+        generate_optional_menu = {'guest': generate_optional_menu_guest,
+                                  'user': generate_optional_menu_user,
+                                  'admin': generate_optional_menu_admin}
 
-    def _generate_title_admin(self, req, form, ln):
-        '''
-        Generate the title for an admin user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        if self.person_id:
-            return 'Attribute papers (administrator interface) for: ' + str(webapi.get_person_redirect_link(self.person_id))
-        else:
-            return 'Attribute papers'
+        return "<div class=\"clearfix\">" + generate_optional_menu[ulevel](req, form) + "</div>"
 
 
-    def _generate_optional_menu_guest(self, req, form, ln):
+    def _generate_ticket_box(self, ulevel, req):
         '''
-        Generate the menu for a guest user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
-                                   'verbose': (int, 0)})
-        menu = TEMPLATE.tmpl_person_menu()
+        Generates the semi-permanent info box for the specified user permission
+        level.
 
-        if "verbose" in argd and argd["verbose"] > 0:
+        @param ulevel: user permission level
+        @type ulevel: str
+        @param req: apache request object
+        @type req: apache request object
+
+        @return: info box
+        @rtype: str
+        '''
+        def generate_ticket_box_guest(req):
             session = get_session(req)
             pinfo = session['personinfo']
-            menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
-
-        return menu
-
-
-    def _generate_optional_menu_user(self, req, form, ln):
-        '''
-        Generate the menu for a regular user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
-                                   'verbose': (int, 0)})
-        menu = TEMPLATE.tmpl_person_menu()
-
-        if "verbose" in argd and argd["verbose"] > 0:
-            session = get_session(req)
-            pinfo = session['personinfo']
-            menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
-
-        return menu
-
-
-    def _generate_optional_menu_admin(self, req, form, ln):
-        '''
-        Generate the title for an admin user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
-                                   'verbose': (int, 0)})
-        menu = TEMPLATE.tmpl_person_menu_admin()
-
-        if "verbose" in argd and argd["verbose"] > 0:
-            session = get_session(req)
-            pinfo = session['personinfo']
-            menu += "\n<pre>" + pformat(pinfo) + "</pre>\n"
-
-        return menu
-
-
-    def _generate_ticket_box_guest(self, req, form, ln):
-        '''
-        Generate the semi-permanent info box for a guest user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        session = get_session(req)
-        pinfo = session['personinfo']
-        ticket = pinfo['ticket']
-        results = []
-        pendingt = []
-        for t in ticket:
-            if 'execution_result' in t:
-                if t['execution_result']:
+            ticket = pinfo['ticket']
+            results = list()
+            pendingt = list()
+            for t in ticket:
+                if 'execution_result' in t:
                     for res in t['execution_result']:
                         results.append(res)
-            else:
-                pendingt.append(t)
+                else:
+                    pendingt.append(t)
 
-        box = ''
-        if pendingt:
-            box = box + TEMPLATE.tmpl_ticket_box('in_process', 'transaction', len(pendingt))
+            box = ""
+            if pendingt:
+                box += TEMPLATE.tmpl_ticket_box('in_process', 'transaction', len(pendingt))
 
-        if results:
-            failed = [messages for status, messages in results if not status]
-            if failed:
-                box = box + TEMPLATE.tmpl_transaction_box('failure', failed)
+            if results:
+                failed = [messages for status, messages in results if not status]
+                if failed:
+                    box += TEMPLATE.tmpl_transaction_box('failure', failed)
 
-            successfull = [messages for status, messages in results if status]
-            if successfull:
-                box = box + TEMPLATE.tmpl_transaction_box('success', successfull)
+                successfull = [messages for status, messages in results if status]
+                if successfull:
+                    box += TEMPLATE.tmpl_transaction_box('success', successfull)
 
-        return box
+            return box
+
+        def generate_ticket_box_user(req):
+            return generate_ticket_box_guest(req)
+
+        def generate_ticket_box_admin(req):
+            return generate_ticket_box_guest(req)
 
 
-    def _generate_ticket_box_user(self, req, form, ln):
+        generate_ticket_box = {'guest': generate_ticket_box_guest,
+                               'user': generate_ticket_box_user,
+                               'admin': generate_ticket_box_admin}
+
+        return generate_ticket_box[ulevel](req)
+
+
+    def _generate_person_info_box(self, ulevel, ln):
         '''
-        Generate the semi-permanent info box for a regular user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
+        Generates the name info box for the specified user permission level.
+
+        @param ulevel: user permission level
+        @type ulevel: str
+        @param ln: page display language
+        @type ln: str
+
+        @return: name info box
+        @rtype: str
         '''
-        return self._generate_ticket_box_guest(req, form, ln)
+        def generate_person_info_box_guest(ln):
+            names = webapi.get_person_names_from_id(self.person_id)
+            box = TEMPLATE.tmpl_admin_person_info_box(ln, person_id=self.person_id,
+                                                      names=names)
+            return box
+
+        def generate_person_info_box_user(ln):
+            return generate_person_info_box_guest(ln)
+
+        def generate_person_info_box_admin(ln):
+            return generate_person_info_box_guest(ln)
 
 
-    def _generate_ticket_box_admin(self, req, form, ln):
+        generate_person_info_box = {'guest': generate_person_info_box_guest,
+                                    'user': generate_person_info_box_user,
+                                    'admin': generate_person_info_box_admin}
+
+        return generate_person_info_box[ulevel](ln)
+
+
+    def _generate_tabs(self, ulevel, req):
         '''
-        Generate the semi-permanent info box for an admin user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
+        Generates the tabs content for the specified user permission level.
+
+        @param ulevel: user permission level
+        @type ulevel: str
+        @param req: apache request object
+        @type req: apache request object
+
+        @return: tabs content
+        @rtype: str
         '''
-        return self._generate_ticket_box_guest(req, form, ln)
+        from invenio.bibauthorid_templates import verbiage_dict as tmpl_verbiage_dict
+        from invenio.bibauthorid_templates import buttons_verbiage_dict as tmpl_buttons_verbiage_dict
 
+        def generate_tabs_guest(req):
+            links = list()   # ['delete', 'commit','del_entry','commit_entry']
+            tabs = ['records', 'repealed', 'review']
 
-    def _generate_person_info_box_guest(self, req, form, ln):
-        '''
-        Generate the name info box for a guest user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        return self._generate_person_info_box_admin(req, form, ln)
+            return generate_tabs_admin(req, show_tabs=tabs, ticket_links=links,
+                                       open_tickets=list(),
+                                       verbiage_dict=tmpl_verbiage_dict['guest'],
+                                       buttons_verbiage_dict=tmpl_buttons_verbiage_dict['guest'],
+                                       show_reset_button=False)
 
+        def generate_tabs_user(req):
+            links = ['delete', 'del_entry']
+            tabs = ['records', 'repealed', 'review', 'tickets']
 
-    def _generate_person_info_box_user(self, req, form, ln):
-        '''
-        Generate the name info box for a regular user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        return self._generate_person_info_box_admin(req, form, ln)
+            session = get_session(req)
+            pinfo = session['personinfo']
+            uid = getUid(req)
+            user_is_owner = 'not_owner'
+            if pinfo["claimpaper_admin_last_viewed_pid"] == webapi.get_pid_from_uid(uid):
+                user_is_owner = 'owner'
 
-
-    def _generate_person_info_box_admin(self, req, form, ln):
-        '''
-        Generate the name info box for an admin user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        names = webapi.get_person_names_from_id(self.person_id)
-        box = TEMPLATE.tmpl_admin_person_info_box(ln, person_id=self.person_id,
-                                                  names=names)
-
-        return box
-
-
-    def _generate_tabs_guest(self, req, form, ln):
-        '''
-        Generate the tabs content for a guest user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        session = get_session(req)
-#        uid = getUid(req)
-        pinfo = session["personinfo"]
-        if 'ln' in pinfo:
-            ln = pinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
-        _ = gettext_set_language(ln)
-
-        links = [] # ['delete', 'commit','del_entry','commit_entry']
-        tabs = ['records', 'repealed', 'review']
-        verbiage_dict = {'confirmed': 'Papers', 'repealed': _('Papers removed from this profile'),
-                                         'review': _('Papers in need of review'),
-                                         'tickets': _('Open Tickets'), 'data': _('Data'),
-                                         'confirmed_ns': _('Papers of this Person'),
-                                         'repealed_ns': _('Papers _not_ of this Person'),
-                                         'review_ns': _('Papers in need of review'),
-                                         'tickets_ns': _('Tickets for this Person'),
-                                         'data_ns': _('Additional Data for this Person')}
-
-        buttons_verbiage_dict = {'mass_buttons': {'no_doc_string': _('Sorry, there are currently no documents to be found in this category.'),
-                                                  'b_confirm': _('Yes, those papers are by this person.'),
-                                                  'b_repeal': _('No, those papers are not by this person'),
-                                                  'b_to_others': _('Assign to other person'),
-                                                  'b_forget': _('Forget decision')},
-                                 'record_undecided': {'alt_confirm': _('Confirm!'),
-                                                     'confirm_text': _('Yes, this paper is by this person.'),
-                                                     'alt_repeal': _('Rejected!'),
-                                                     'repeal_text': _('No, this paper is <i>not</i> by this person'),
-                                                     'to_other_text': _('Assign to another person'),
-                                                     'alt_to_other': _('To other person!')},
-                                 'record_confirmed': {'alt_confirm': _('Confirmed.'),
-                                                       'confirm_text': _('Marked as this person\'s paper'),
-                                                       'alt_forget': _('Forget decision!'),
-                                                       'forget_text': _('Forget decision.'),
-                                                       'alt_repeal': _('Repeal!'),
-                                                       'repeal_text': _('But it\'s <i>not</i> this person\'s paper.'),
-                                                       'to_other_text': _('Assign to another person'),
-                                                       'alt_to_other': _('To other person!')},
-                                 'record_repealed': {'alt_confirm': _('Confirm!'),
-                                                    'confirm_text': _('But it <i>is</i> this person\'s paper.'),
-                                                    'alt_forget': _('Forget decision!'),
-                                                    'forget_text': _('Forget decision.'),
-                                                    'alt_repeal': _('Repealed'),
-                                                    'repeal_text': _('Marked as not this person\'s paper'),
-                                                    'to_other_text': _('Assign to another person'),
-                                                    'alt_to_other': _('To other person!')}}
-
-        return self._generate_tabs_admin(req, form, ln, show_tabs=tabs, ticket_links=links,
-                                         show_reset_button=False,
-                                         open_tickets=[], verbiage_dict=verbiage_dict,
-                                         buttons_verbiage_dict=buttons_verbiage_dict)
-
-
-    def _generate_tabs_user(self, req, form, ln):
-        '''
-        Generate the tabs content for a regular user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        '''
-        session = get_session(req)
-        uid = getUid(req)
-        pinfo = session['personinfo']
-        if 'ln' in pinfo:
-            ln = pinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
-        _ = gettext_set_language(ln)
-
-        links = ['delete', 'del_entry']
-        tabs = ['records', 'repealed', 'review', 'tickets']
-        if pinfo["claimpaper_admin_last_viewed_pid"] == webapi.get_pid_from_uid(uid)[0][0]:
-            verbiage_dict = {'confirmed': _('Your papers'), 'repealed': _('Not your papers'),
-                                             'review': _('Papers in need of review'),
-                                             'tickets': _('Your tickets'), 'data': _('Data'),
-                                             'confirmed_ns': _('Your papers'),
-                                             'repealed_ns': _('Not your papers'),
-                                             'review_ns': _('Papers in need of review'),
-                                             'tickets_ns': _('Your tickets'),
-                                             'data_ns': _('Additional Data for this Person')}
-            buttons_verbiage_dict = {'mass_buttons': {'no_doc_string': _('Sorry, there are currently no documents to be found in this category.'),
-                                                                  'b_confirm': _('These are mine!'),
-                                                                  'b_repeal': _('These are not mine!'),
-                                                                  'b_to_others': _('It\'s not mine, but I know whose it is!'),
-                                                                  'b_forget': _('Forget decision')},
-                                                 'record_undecided': {'alt_confirm': _('Mine!'),
-                                                                     'confirm_text': _('This is my paper!'),
-                                                                     'alt_repeal': _('Not mine!'),
-                                                                     'repeal_text': _('This is not my paper!'),
-                                                                     'to_other_text': _('Assign to another person'),
-                                                                     'alt_to_other': _('To other person!')},
-                                                 'record_confirmed': {'alt_confirm': _('Not Mine.'),
-                                                                       'confirm_text': _('Marked as my paper!'),
-                                                                       'alt_forget': _('Forget decision!'),
-                                                                       'forget_text': _('Forget assignment decision'),
-                                                                       'alt_repeal': _('Not Mine!'),
-                                                                       'repeal_text': _('But this is mine!'),
-                                                                       'to_other_text': _('Assign to another person'),
-                                                                       'alt_to_other': _('To other person!')},
-                                                 'record_repealed': {'alt_confirm': _('Mine!'),
-                                                                    'confirm_text': _('But this is my paper!'),
-                                                                    'alt_forget': _('Forget decision!'),
-                                                                    'forget_text': _('Forget decision!'),
-                                                                    'alt_repeal': _('Not Mine!'),
-                                                                    'repeal_text': _('Marked as not your paper.'),
-                                                                     'to_other_text': _('Assign to another person'),
-                                                                     'alt_to_other': _('To other person!')}}
-        else:
-            verbiage_dict = {'confirmed': _('Papers'), 'repealed': _('Papers removed from this profile'),
-                                 'review': _('Papers in need of review'),
-                                 'tickets': _('Your tickets'), 'data': _('Data'),
-                                 'confirmed_ns': _('Papers of this Person'),
-                                 'repealed_ns': _('Papers _not_ of this Person'),
-                                 'review_ns': _('Papers in need of review'),
-                                 'tickets_ns': _('Tickets you created about this person'),
-                                 'data_ns': _('Additional Data for this Person')}
-            buttons_verbiage_dict = {'mass_buttons': {'no_doc_string': _('Sorry, there are currently no documents to be found in this category.'),
-                                                  'b_confirm': _('Yes, those papers are by this person.'),
-                                                  'b_repeal': _('No, those papers are not by this person'),
-                                                  'b_to_others': _('Assign to other person'),
-                                                  'b_forget': _('Forget decision')},
-                                 'record_undecided': {'alt_confirm': _('Confirm!'),
-                                                     'confirm_text': _('Yes, this paper is by this person.'),
-                                                     'alt_repeal': _('Rejected!'),
-                                                     'repeal_text': _('No, this paper is <i>not</i> by this person'),
-                                                     'to_other_text': _('Assign to another person'),
-                                                     'alt_to_other': _('To other person!')},
-                                 'record_confirmed': {'alt_confirm': _('Confirmed.'),
-                                                       'confirm_text': _('Marked as this person\'s paper'),
-                                                       'alt_forget': _('Forget decision!'),
-                                                       'forget_text': _('Forget decision.'),
-                                                       'alt_repeal': _('Repeal!'),
-                                                       'repeal_text': _('But it\'s <i>not</i> this person\'s paper.'),
-                                                       'to_other_text': _('Assign to another person'),
-                                                       'alt_to_other': _('To other person!')},
-                                 'record_repealed': {'alt_confirm': _('Confirm!'),
-                                                    'confirm_text': _('But it <i>is</i> this person\'s paper.'),
-                                                    'alt_forget': _('Forget decision!'),
-                                                    'forget_text': _('Forget decision.'),
-                                                    'alt_repeal': _('Repealed'),
-                                                    'repeal_text': _('Marked as not this person\'s paper'),
-                                                    'to_other_text': _('Assign to another person'),
-                                                    'alt_to_other': _('To other person!')}}
-        session = get_session(req)
-        uid = getUid(req)
-        open_tickets = webapi.get_person_request_ticket(self.person_id)
-        tickets = []
-        for t in open_tickets:
-            owns = False
-            for row in t[0]:
-                if row[0] == 'uid-ip' and row[1].split('||')[0] == str(uid):
-                    owns = True
-            if owns:
-                tickets.append(t)
-        return self._generate_tabs_admin(req, form, ln, show_tabs=tabs, ticket_links=links,
-                                         open_tickets=tickets, verbiage_dict=verbiage_dict,
-                                         buttons_verbiage_dict=buttons_verbiage_dict)
-
-
-    def _generate_tabs_admin(self, req, form, ln,
-                             show_tabs=['records', 'repealed', 'review', 'comments', 'tickets', 'data'],
-                             open_tickets=None, ticket_links=['delete', 'commit', 'del_entry', 'commit_entry'],
-                             verbiage_dict=None, buttons_verbiage_dict=None, show_reset_button=True):
-        '''
-        Generate the tabs content for an admin user
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: POST/GET variables of the request
-        @type form: dict
-        @param ln: language to show this page in
-        @type ln: string
-        @param show_tabs: list of tabs to display
-        @type show_tabs: list of strings
-        @param ticket_links: list of links to display
-        @type ticket_links: list of strings
-        @param verbiage_dict: language for the elements
-        @type verbiage_dict: dict
-        @param buttons_verbiage_dict: language for the buttons
-        @type buttons_verbiage_dict: dict
-        '''
-        session = get_session(req)
-        personinfo = {}
-
-        try:
-            personinfo = session["personinfo"]
-        except KeyError:
-            return ""
-
-        if 'ln' in personinfo:
-            ln = personinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
-        _ = gettext_set_language(ln)
-
-        if not verbiage_dict:
-            verbiage_dict = self._get_default_verbiage_dicts_for_admin(req)
-        if not buttons_verbiage_dict:
-            buttons_verbiage_dict = self._get_default_buttons_verbiage_dicts_for_admin(req)
-
-        all_papers = webapi.get_papers_by_person_id(self.person_id,
-                                                    ext_out=True)
-
-        records = [{'recid': paper[0],
-                    'bibref': paper[1],
-                    'flag': paper[2],
-                    'authorname': paper[3],
-                    'authoraffiliation': paper[4],
-                    'paperdate': paper[5],
-                    'rt_status': paper[6],
-                    'paperexperiment': paper[7]}
-                    for paper in all_papers]
-
-        rejected_papers = [row for row in records if row['flag'] < -1]
-        rest_of_papers = [row for row in records if row['flag'] >= -1]
-        review_needed = webapi.get_review_needing_records(self.person_id)
-
-        if len(review_needed) < 1:
-            if 'review' in show_tabs:
-                show_tabs.remove('review')
-
-        rt_tickets = None
-
-        if open_tickets == None:
             open_tickets = webapi.get_person_request_ticket(self.person_id)
-        else:
-            if len(open_tickets) < 1:
-                if 'tickets' in show_tabs:
+            tickets = list()
+            for t in open_tickets:
+                owns = False
+                for row in t[0]:
+                    if row[0] == 'uid-ip' and row[1].split('||')[0] == str(uid):
+                        owns = True
+                if owns:
+                    tickets.append(t)
+
+            return generate_tabs_admin(req, show_tabs=tabs, ticket_links=links,
+                                       open_tickets=tickets,
+                                       verbiage_dict=tmpl_verbiage_dict['user'][user_is_owner],
+                                       buttons_verbiage_dict=tmpl_buttons_verbiage_dict['user'][user_is_owner])
+
+        def generate_tabs_admin(req, show_tabs=['records', 'repealed', 'review', 'comments', 'tickets', 'data'],
+                                ticket_links=['delete', 'commit', 'del_entry', 'commit_entry'], open_tickets=None,
+                                verbiage_dict=None, buttons_verbiage_dict=None, show_reset_button=True):
+            session = get_session(req)
+            personinfo = dict()
+
+            try:
+                personinfo = session["personinfo"]
+            except KeyError:
+                return ""
+
+            if 'ln' in personinfo:
+                ln = personinfo["ln"]
+            else:
+                ln = CFG_SITE_LANG
+
+            all_papers = webapi.get_papers_by_person_id(self.person_id, ext_out=True)
+            records = [{'recid': paper[0],
+                        'bibref': paper[1],
+                        'flag': paper[2],
+                        'authorname': paper[3],
+                        'authoraffiliation': paper[4],
+                        'paperdate': paper[5],
+                        'rt_status': paper[6],
+                        'paperexperiment': paper[7]} for paper in all_papers]
+            rejected_papers = [row for row in records if row['flag'] < -1]
+            rest_of_papers = [row for row in records if row['flag'] >= -1]
+            review_needed = webapi.get_review_needing_records(self.person_id)
+
+            if len(review_needed) < 1:
+                if 'review' in show_tabs:
+                    show_tabs.remove('review')
+
+            if open_tickets == None:
+                open_tickets = webapi.get_person_request_ticket(self.person_id)
+            else:
+                if len(open_tickets) < 1 and 'tickets' in show_tabs:
                     show_tabs.remove('tickets')
 
-        if "admin_requested_ticket_id" in personinfo:
-            rt_tickets = personinfo["admin_requested_ticket_id"]
+            rt_tickets = None
+            if "admin_requested_ticket_id" in personinfo:
+                rt_tickets = personinfo["admin_requested_ticket_id"]
 
-        # Send data to template function
-        tabs = TEMPLATE.tmpl_admin_tabs(ln, person_id=self.person_id,
+            if verbiage_dict is None:
+                verbiage_dict = translate_dict_values(tmpl_verbiage_dict['admin'], ln)
+            if buttons_verbiage_dict is None:
+                buttons_verbiage_dict = translate_dict_values(tmpl_buttons_verbiage_dict['admin'], ln)
+
+            # send data to the template function
+            tabs = TEMPLATE.tmpl_admin_tabs(ln, person_id=self.person_id,
                                             rejected_papers=rejected_papers,
                                             rest_of_papers=rest_of_papers,
                                             review_needed=review_needed,
@@ -893,574 +611,69 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                             buttons_verbiage_dict=buttons_verbiage_dict,
                                             show_reset_button=show_reset_button)
 
-        return tabs
+            return tabs
 
-
-    def _get_default_verbiage_dicts_for_admin(self, req):
-
-        session = get_session(req)
-        personinfo = {}
-
-        try:
-            personinfo = session["personinfo"]
-        except KeyError:
-            return ""
-
-        if 'ln' in personinfo:
-            ln = personinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
-        _ = gettext_set_language(ln)
-
-        verbiage_dict = {'confirmed': _('Papers'), 'repealed': _('Papers removed from this profile'),
-                                 'review': _('Papers in need of review'),
-                                 'tickets': _('Tickets'), 'data': _('Data'),
-                                 'confirmed_ns': _('Papers of this Person'),
-                                 'repealed_ns': _('Papers _not_ of this Person'),
-                                 'review_ns': _('Papers in need of review'),
-                                 'tickets_ns': _('Request Tickets'),
-                                 'data_ns': _('Additional Data for this Person')}
-        return verbiage_dict
-
-
-    def _get_default_buttons_verbiage_dicts_for_admin(self, req):
-
-        session = get_session(req)
-        personinfo = {}
-
-        try:
-            personinfo = session["personinfo"]
-        except KeyError:
-            return ""
-
-        if 'ln' in personinfo:
-            ln = personinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
-        _ = gettext_set_language(ln)
-
-        buttons_verbiage_dict = {'mass_buttons': {'no_doc_string': _('Sorry, there are currently no documents to be found in this category.'),
-                                                  'b_confirm': _('Yes, those papers are by this person.'),
-                                                  'b_repeal': _('No, those papers are not by this person'),
-                                                  'b_to_others': _('Assign to other person'),
-                                                  'b_forget': _('Forget decision')},
-                                 'record_undecided': {'alt_confirm': _('Confirm!'),
-                                                     'confirm_text': _('Yes, this paper is by this person.'),
-                                                     'alt_repeal': _('Rejected!'),
-                                                     'repeal_text': _('No, this paper is <i>not</i> by this person'),
-                                                     'to_other_text': _('Assign to another person'),
-                                                     'alt_to_other': _('To other person!')},
-                                 'record_confirmed': {'alt_confirm': _('Confirmed.'),
-                                                       'confirm_text': _('Marked as this person\'s paper'),
-                                                       'alt_forget': _('Forget decision!'),
-                                                       'forget_text': _('Forget decision.'),
-                                                       'alt_repeal': _('Repeal!'),
-                                                       'repeal_text': _('But it\'s <i>not</i> this person\'s paper.'),
-                                                       'to_other_text': _('Assign to another person'),
-                                                       'alt_to_other': _('To other person!')},
-                                 'record_repealed': {'alt_confirm': _('Confirm!'),
-                                                    'confirm_text': _('But it <i>is</i> this person\'s paper.'),
-                                                    'alt_forget': _('Forget decision!'),
-                                                    'forget_text': _('Forget decision.'),
-                                                    'alt_repeal': _('Repealed'),
-                                                    'repeal_text': _('Marked as not this person\'s paper'),
-                                                    'to_other_text': _('Assign to another person'),
-                                                    'alt_to_other': _('To other person!')}}
-        return buttons_verbiage_dict
-
-
-    def _generate_footer_guest(self, req, form, ln):
-        return self._generate_footer_admin(req, form, ln)
-
-
-    def _generate_footer_user(self, req, form, ln):
-        return self._generate_footer_admin(req, form, ln)
-
-
-    def _generate_footer_admin(self, req, form, ln):
-        return TEMPLATE.tmpl_invenio_search_box()
-
-
-    def _ticket_dispatch_guest(self, req):
-        '''
-        Takes care of the ticket  when in guest mode
-        '''
-        return self._ticket_dispatch_user(req)
-
-
-    def _ticket_dispatch_user(self, req):
-        '''
-        Takes care of the ticket  when in user and guest mode
-
-        '''
-        session = get_session(req)
-        uid = getUid(req)
-        pinfo = session["personinfo"]
-#        ulevel = pinfo["ulevel"]
-        ticket = pinfo["ticket"]
-        bibref_check_required = self._ticket_review_bibref_check(req)
-
-        if bibref_check_required:
-            return bibref_check_required
-
-        for t in ticket:
-            #FIXME: Net to catch a bug! It happens that self._ticket_review_bibref_check(req) return ""
-            #even if a ticket exists such that bibref is not table:ref,rec but only rec.
-            #Did not manage to reproduce in controlled conditions and exception dump does not include
-            #enough information, needs debug info dump in order to be fixable. This performs the dump,
-            #so we know what to look for.
-            if not webapi.is_valid_bibref(t['bibref']):
-                import pickle,datetime
-                date=str(datetime.datetime.now()).replace(" ",'.')
-                o = open("/tmp/BibAuthorID-temporary-dbg-%s" %date,'w')
-                pickle.dump(session,o)
-                o.close()
-
-            t['status'] = webapi.check_transaction_permissions(uid,
-                                                               t['bibref'],
-                                                               t['pid'],
-                                                               t['action'])
-        session.dirty = True
-        return self._ticket_final_review(req)
-
-
-    def _ticket_dispatch_admin(self, req):
-        '''
-        Takes care of the ticket  when in administrator mode
-
-        '''
-        return self._ticket_dispatch_user(req)
-
-
-    def _ticket_review_bibref_check(self, req):
-        '''
-        checks if some of the transactions on the ticket are needing a review.
-        If it's the case prompts the user to select the right bibref
-        '''
-        session = get_session(req)
-        pinfo = session["personinfo"]
-        ticket = pinfo["ticket"]
-
-        if 'arxiv_name' in pinfo:
-            arxiv_name = [pinfo['arxiv_name']]
-        else:
-            arxiv_name = None
-
-        if 'ln' in pinfo:
-            ln = pinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
-
-        _ = gettext_set_language(ln)
-
-        if ("bibref_check_required" in pinfo and pinfo["bibref_check_required"]
-            and "bibref_check_reviewed_bibrefs" in pinfo):
-
-            for rbibreft in pinfo["bibref_check_reviewed_bibrefs"]:
-                if not rbibreft.count("||") or not rbibreft.count(","):
-                    continue
-
-                rpid, rbibref = rbibreft.split("||")
-                rrecid = rbibref.split(",")[1]
-                rpid = webapi.wash_integer_id(rpid)
-
-                for ticket_update in [row for row in ticket
-                                      if (row['bibref'] == str(rrecid) and
-                                          row['pid'] == rpid)]:
-                    ticket_update["bibref"] = rbibref
-                    if "incomplete" in ticket_update:
-                        del(ticket_update["incomplete"])
-
-            for ticket_remove in [row for row in ticket
-                                  if ('incomplete' in row)]:
-                ticket.remove(ticket_remove)
-
-            if ("bibrefs_auto_assigned" in pinfo):
-                del(pinfo["bibrefs_auto_assigned"])
-
-            if ("bibrefs_to_confirm" in pinfo):
-                del(pinfo["bibrefs_to_confirm"])
-
-            del(pinfo["bibref_check_reviewed_bibrefs"])
-            pinfo["bibref_check_required"] = False
-            session.dirty = True
-
-            return ""
-
-        else:
-            bibrefs_auto_assigned = {}
-            bibrefs_to_confirm = {}
-            needs_review = []
-
-#            if ("bibrefs_auto_assigned" in pinfo
-#                 and pinfo["bibrefs_auto_assigned"]):
-#                bibrefs_auto_assigned = pinfo["bibrefs_auto_assigned"]
-#
-#            if ("bibrefs_to_confirm" in pinfo
-#                 and pinfo["bibrefs_to_confirm"]):
-#                bibrefs_to_confirm = pinfo["bibrefs_to_confirm"]
-
-            for transaction in ticket:
-                if not webapi.is_valid_bibref(transaction['bibref']):
-                    transaction['incomplete'] = True
-                    needs_review.append(transaction)
-
-            if not needs_review:
-                pinfo["bibref_check_required"] = False
-                session.dirty = True
-                return ""
-
-            for transaction in needs_review:
-                recid = webapi.wash_integer_id(transaction['bibref'])
-
-                if recid < 0:
-                    continue #this doesn't look like a recid--discard!
-
-                pid = transaction['pid']
-
-                if ((pid in bibrefs_auto_assigned
-                     and 'bibrecs' in bibrefs_auto_assigned[pid]
-                     and recid in bibrefs_auto_assigned[pid]['bibrecs'])
-                    or
-                    (pid in bibrefs_to_confirm
-                     and 'bibrecs' in bibrefs_to_confirm[pid]
-                     and recid in bibrefs_to_confirm[pid]['bibrecs'])):
-                    continue # we already assessed those bibrefs.
-
-                fctptr = webapi.get_possible_bibrefs_from_pid_bibrec
-                bibrec_refs = fctptr(pid, [recid], additional_names=arxiv_name)
-                person_name = webapi.get_most_frequent_name_from_pid(pid, allow_none=True)
-
-                if not person_name:
-                    if arxiv_name:
-                        person_name = ''.join(arxiv_name)
+        def translate_dict_values(dictionary, ln):
+            def translate_str_values(dictionary, f=lambda x: x):
+                translated_dict = dict()
+                for key, value in dictionary.iteritems():
+                    if isinstance(value, str):
+                        translated_dict[key] = f(value)
+                    elif isinstance(value, dict):
+                        translated_dict[key] = translate_str_values(value, f)
                     else:
-                        person_name = " "
+                        raise TypeError("Value should be either string or dictionary.")
+                return translated_dict
 
-                for brr in bibrec_refs:
-                    if len(brr[1]) == 1:
-                        if not pid in bibrefs_auto_assigned:
-                            bibrefs_auto_assigned[pid] = {
-                                'person_name': person_name,
-                                'canonical_id': "TBA",
-                                'bibrecs': {brr[0]: brr[1]}}
-                        else:
-                            bibrefs_auto_assigned[pid]['bibrecs'][brr[0]] = brr[1]
-                    else:
-                        if not brr[1]:
-                            tmp = webapi.get_bibrefs_from_bibrecs([brr[0]])
-
-                            try:
-                                brr[1] = tmp[0][1]
-                            except IndexError:
-                                continue # No bibrefs on record--discard
-
-                        if not pid in bibrefs_to_confirm:
-                            bibrefs_to_confirm[pid] = {
-                                'person_name': person_name,
-                                'canonical_id': "TBA",
-                                'bibrecs': {brr[0]: brr[1]}}
-                        else:
-                            bibrefs_to_confirm[pid]['bibrecs'][brr[0]] = brr[1]
-
-            if bibrefs_to_confirm or bibrefs_auto_assigned:
-                pinfo["bibref_check_required"] = True
-                baa = deepcopy(bibrefs_auto_assigned)
-                btc = deepcopy(bibrefs_to_confirm)
-
-                for pid in baa:
-                    for rid in baa[pid]['bibrecs']:
-                        baa[pid]['bibrecs'][rid] = []
-
-                for pid in btc:
-                    for rid in btc[pid]['bibrecs']:
-                        btc[pid]['bibrecs'][rid] = []
-
-                pinfo["bibrefs_auto_assigned"] = baa
-                pinfo["bibrefs_to_confirm"] = btc
-            else:
-                pinfo["bibref_check_required"] = False
-
-            session.dirty = True
-
-            if 'external_first_entry' in pinfo and pinfo['external_first_entry']:
-                del(pinfo["external_first_entry"])
-                pinfo['external_first_entry_skip_review'] = True
-                session.dirty = True
-                return "" # don't bother the user the first time
-
-            body = TEMPLATE.tmpl_bibref_check(bibrefs_auto_assigned,
-                                          bibrefs_to_confirm)
-            body = TEMPLATE.tmpl_person_detail_layout(body)
-
-            metaheaderadd = self._scripts(kill_browser_cache=True)
-            title = _("Submit Attribution Information")
-
-            return page(title=title,
-                metaheaderadd=metaheaderadd,
-                body=body,
-                req=req,
-                language=ln)
+            return translate_str_values(dictionary, f=gettext_set_language(ln))
 
 
-    def _ticket_final_review(self, req):
+        generate_tabs = {'guest': generate_tabs_guest,
+                         'user': generate_tabs_user,
+                         'admin': generate_tabs_admin}
+
+        return generate_tabs[ulevel](req)
+
+
+    def _generate_footer(self, ulevel):
         '''
-        displays the user what can/cannot finally be done, leaving the option of kicking some
-        transactions from the ticket before commit
+        Generates the footer for the specified user permission level.
+
+        @param ulevel: user permission level
+        @type ulevel: str
+
+        @return: footer
+        @rtype: str
         '''
-        session = get_session(req)
-        uid = getUid(req)
-        userinfo = collect_user_info(uid)
-        pinfo = session["personinfo"]
-        ulevel = pinfo["ulevel"]
-        ticket = pinfo["ticket"]
-        ticket = [row for row in ticket if not "execution_result" in row]
-        skip_checkout_page = True
-        upid = -1
-        user_first_name = ""
-        user_first_name_sys = False
-        user_last_name = ""
-        user_last_name_sys = False
-        user_email = ""
-        user_email_sys = False
+        def generate_footer_guest():
+            return TEMPLATE.tmpl_invenio_search_box()
 
-        if 'ln' in pinfo:
-            ln = pinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
+        def generate_footer_user():
+            return generate_footer_guest()
 
-        _ = gettext_set_language(ln)
+        def generate_footer_admin():
+            return generate_footer_guest()
 
-        if ("external_firstname" in userinfo
-              and userinfo["external_firstname"]):
-            user_first_name = userinfo["external_firstname"]
-            user_first_name_sys = True
-        elif "user_first_name" in pinfo and pinfo["user_first_name"]:
-            user_first_name = pinfo["user_first_name"]
+        generate_footer = {'guest': generate_footer_guest,
+                           'user': generate_footer_user,
+                           'admin': generate_footer_admin}
 
-        if ("external_familyname" in userinfo
-              and userinfo["external_familyname"]):
-            user_last_name = userinfo["external_familyname"]
-            user_last_name_sys = True
-        elif "user_last_name" in pinfo and pinfo["user_last_name"]:
-            user_last_name = pinfo["user_last_name"]
-
-        if ("email" in userinfo
-              and not userinfo["email"] == "guest"):
-            user_email = userinfo["email"]
-            user_email_sys = True
-        elif "user_email" in pinfo and pinfo["user_email"]:
-            user_email = pinfo["user_email"]
-
-        pinfo["user_first_name"] = user_first_name
-        pinfo["user_first_name_sys"] = user_first_name_sys
-        pinfo["user_last_name"] = user_last_name
-        pinfo["user_last_name_sys"] = user_last_name_sys
-        pinfo["user_email"] = user_email
-        pinfo["user_email_sys"] = user_email_sys
-
-        if "upid" in pinfo and pinfo["upid"]:
-            upid = pinfo["upid"]
-        else:
-            dbpid = webapi.get_pid_from_uid(uid)
-
-            if dbpid and dbpid[1]:
-                if dbpid[0] and not dbpid[0] == -1:
-                    upid = dbpid[0][0]
-                    pinfo["upid"] = upid
-
-        session.dirty = True
-
-        if not (user_first_name or user_last_name or user_email):
-            skip_checkout_page = False
-
-        if [row for row in ticket
-            if row["status"] in ["denied", "warning_granted",
-                                 "warning_denied"]]:
-            skip_checkout_page = False
-
-        if 'external_first_entry_skip_review' in pinfo and pinfo['external_first_entry_skip_review']:
-            del(pinfo["external_first_entry_skip_review"])
-            skip_checkout_page = True
-            session.dirty = True
-
-        if (not ticket or skip_checkout_page
-            or ("checkout_confirmed" in pinfo
-                and pinfo["checkout_confirmed"]
-                and "checkout_faulty_fields" in pinfo
-                and not pinfo["checkout_faulty_fields"])):
-            self.adf['ticket_commit'][ulevel](req)
-
-            if "checkout_confirmed" in pinfo:
-                del(pinfo["checkout_confirmed"])
-
-            if "checkout_faulty_fields" in pinfo:
-                del(pinfo["checkout_faulty_fields"])
-
-            if "bibref_check_required" in pinfo:
-                del(pinfo["bibref_check_required"])
-
-#            if "user_ticket_comments" in pinfo:
-#                del(pinfo["user_ticket_comments"])
-
-            session.dirty = True
-            return self._ticket_dispatch_end(req)
-
-        for tt in list(ticket):
-            if not 'bibref' in tt or not 'pid' in tt:
-                del(ticket[tt])
-                continue
-
-            tt['authorname_rec'] = get_bibrefrec_name_string(tt['bibref'])
-            tt['person_name'] = webapi.get_most_frequent_name_from_pid(tt['pid'])
-
-        mark_yours = []
-        mark_not_yours = []
-
-        if upid >= 0:
-            mark_yours = [row for row in ticket
-                          if (str(row["pid"]) == str(upid) and
-                              row["action"] in ["to_other_person", "confirm"])]
-            mark_not_yours = [row for row in ticket
-                              if (str(row["pid"]) == str(upid) and
-                                  row["action"] in ["repeal", "reset"])]
-        mark_theirs = [row for row in ticket
-                       if ((not str(row["pid"]) == str(upid)) and
-                           row["action"] in ["to_other_person", "confirm"])]
-        mark_not_theirs = [row for row in ticket
-                           if ((not str(row["pid"]) == str(upid)) and
-                               row["action"] in ["repeal", "reset"])]
-
-        session.dirty = True
-
-        body = TEMPLATE.tmpl_ticket_final_review(req, mark_yours,
-                                                 mark_not_yours,
-                                                 mark_theirs,
-                                                 mark_not_theirs)
-        body = TEMPLATE.tmpl_person_detail_layout(body)
-        metaheaderadd = self._scripts(kill_browser_cache=True)
-        title = _("Please review your actions")
-
-        #body = body + '<pre>' + pformat(pinfo) + '</pre>'
-        return page(title=title,
-            metaheaderadd=metaheaderadd,
-            body=body,
-            req=req,
-            language=ln)
-
-
-    def _ticket_commit_admin(self, req):
-        '''
-        Actual execution of the ticket transactions
-        '''
-        self._clean_ticket(req)
-        session = get_session(req)
-        uid = getUid(req)
-        pinfo = session["personinfo"]
-        ticket = pinfo["ticket"]
-
-        userinfo = {'uid-ip': "%s||%s" % (uid, req.remote_ip)}
-
-        if "user_ticket_comments" in pinfo:
-            userinfo['comments'] = pinfo["user_ticket_comments"]
-        if "user_first_name" in pinfo:
-            userinfo['firstname'] = pinfo["user_first_name"]
-        if "user_last_name" in pinfo:
-            userinfo['lastname'] = pinfo["user_last_name"]
-        if "user_email" in pinfo:
-            userinfo['email'] = pinfo["user_email"]
-
-        for t in ticket:
-            t['execution_result'] = webapi.execute_action(t['action'], t['pid'], t['bibref'], uid,
-                                                          userinfo['uid-ip'], str(userinfo))
-        session.dirty = True
-
-
-    def _ticket_commit_user(self, req):
-        '''
-        Actual execution of the ticket transactions
-        '''
-        self._clean_ticket(req)
-        session = get_session(req)
-        uid = getUid(req)
-        pinfo = session["personinfo"]
-        ticket = pinfo["ticket"]
-        ok_tickets = []
-
-        userinfo = {'uid-ip': "%s||%s" % (uid, req.remote_ip)}
-
-        if "user_ticket_comments" in pinfo:
-            userinfo['comments'] = pinfo["user_ticket_comments"]
-        if "user_first_name" in pinfo:
-            userinfo['firstname'] = pinfo["user_first_name"]
-        if "user_last_name" in pinfo:
-            userinfo['lastname'] = pinfo["user_last_name"]
-        if "user_email" in pinfo:
-            userinfo['email'] = pinfo["user_email"]
-
-        for t in list(ticket):
-            if t['status'] in ['granted', 'warning_granted']:
-                t['execution_result'] = webapi.execute_action(t['action'],
-                                                    t['pid'], t['bibref'], uid,
-                                                    userinfo['uid-ip'], str(userinfo))
-                ok_tickets.append(t)
-                ticket.remove(t)
-
-
-        if ticket:
-            webapi.create_request_ticket(userinfo, ticket)
-
-        if CFG_INSPIRE_SITE and ok_tickets:
-            webapi.send_user_commit_notification_email(userinfo, ok_tickets)
-
-        for t in ticket:
-            t['execution_result'] = [(True, ''),]
-
-        ticket[:] = ok_tickets
-        session.dirty = True
-
-
-    def _ticket_commit_guest(self, req):
-        '''
-        Actual execution of the ticket transactions
-        '''
-        self._clean_ticket(req)
-        session = get_session(req)
-        pinfo = session["personinfo"]
-        uid = getUid(req)
-        userinfo = {'uid-ip': "userid: %s (from %s)" % (uid, req.remote_ip)}
-
-        if "user_ticket_comments" in pinfo:
-            if pinfo["user_ticket_comments"]:
-                userinfo['comments'] = pinfo["user_ticket_comments"]
-            else:
-                userinfo['comments'] = "No comments submitted."
-        if "user_first_name" in pinfo:
-            userinfo['firstname'] = pinfo["user_first_name"]
-        if "user_last_name" in pinfo:
-            userinfo['lastname'] = pinfo["user_last_name"]
-        if "user_email" in pinfo:
-            userinfo['email'] = pinfo["user_email"]
-
-        ticket = pinfo['ticket']
-        webapi.create_request_ticket(userinfo, ticket)
-
-        for t in ticket:
-            t['execution_result'] = [(True, ''),]
-
-        session.dirty = True
+        return generate_footer[ulevel]()
 
 
     def _ticket_dispatch_end(self, req):
         '''
         The ticket dispatch is finished, redirect to the original page of
-        origin or to the last_viewed_pid
+        origin or to the last_viewed_pid or return to the papers autoassigned box to populate its data
         '''
         session = get_session(req)
         pinfo = session["personinfo"]
-
+        webapi.session_bareinit(req)
         if 'claim_in_process' in pinfo:
             pinfo['claim_in_process'] = False
+
+        if "merge_ticket" in pinfo and pinfo['merge_ticket']:
+            pinfo['merge_ticket'] = []
 
         uinfo = collect_user_info(req)
         uinfo['precached_viewclaimlink'] = True
@@ -1473,55 +686,37 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             session.dirty = True
             return redirect_to_url(req, referer)
 
-        return redirect_to_url(req, "%s/person/%s?open_claim=True" % (CFG_SITE_URL,
-                                 webapi.get_person_redirect_link(
-                                   pinfo["claimpaper_admin_last_viewed_pid"])))
+        # if we are coming fromt he autoclaim box we should not redirect and just return to the caller function
+        if 'autoclaim' in pinfo and pinfo['autoclaim']['review_failed'] == False and pinfo['autoclaim']['begin_autoclaim'] == True:
+            pinfo['autoclaim']['review_failed'] = False
+            pinfo['autoclaim']['begin_autoclaim'] = False
+            session.dirty = True
+        else:
+            redirect_page = webapi.history_get_last_visited_url(pinfo['visit_diary'], limit_to_page=['manage_profile', 'claim'])
+            if not redirect_page:
+                redirect_page = webapi.get_fallback_redirect_link(req)
+            if 'autoclaim' in pinfo and pinfo['autoclaim']['review_failed'] == True and pinfo['autoclaim']['checkout'] == True:
+                redirect_page = '%s/author/claim/action?checkout=True'  % (CFG_SITE_URL,)
+                pinfo['autoclaim']['checkout'] = False
+                session.dirty = True
+            elif not 'manage_profile' in redirect_page:
+                pinfo['autoclaim']['review_failed'] = False
+                pinfo['autoclaim']['begin_autoclaim'] == False
+                pinfo['autoclaim']['checkout'] = True
+                session.dirty = True
+                redirect_page = '%s/author/claim/%s?open_claim=True'  % (CFG_SITE_URL, webapi.get_person_redirect_link(pinfo["claimpaper_admin_last_viewed_pid"]))
+            else:
+                pinfo['autoclaim']['review_failed'] = False
+                pinfo['autoclaim']['begin_autoclaim'] == False
+                pinfo['autoclaim']['checkout'] = True
+                session.dirty = True
+            return redirect_to_url(req, redirect_page)
+
+#            redirect_link = diary('get_redirect_link', caller='_ticket_dispatch_end', parameters=[('open_claim','True')])
+#            return redirect_to_url(req, redirect_link)
 
 
-    def _clean_ticket(self, req):
-        '''
-        Removes from a ticket the transactions with an execution_result flag
-        '''
-        session = get_session(req)
-        pinfo = session["personinfo"]
-        ticket = pinfo["ticket"]
-        for t in list(ticket):
-            if 'execution_result' in t:
-                ticket.remove(t)
-        session.dirty = True
-
-
-    def __get_user_role(self, req):
-        '''
-        Determines whether a user is guest, user or admin
-        '''
-        minrole = 'guest'
-        role = 'guest'
-
-        if not req:
-            return minrole
-
-        uid = getUid(req)
-
-        if not isinstance(uid, int):
-            return minrole
-
-        admin_role_id = acc_get_role_id(CLAIMPAPER_ADMIN_ROLE)
-        user_role_id = acc_get_role_id(CLAIMPAPER_USER_ROLE)
-
-        user_roles = acc_get_user_roles(uid)
-
-        if admin_role_id in user_roles:
-            role = 'admin'
-        elif user_role_id in user_roles:
-            role = 'user'
-
-        if role == 'guest' and webapi.is_external_user(uid):
-            role = 'user'
-
-        return role
-
-
+    # need review if should be deleted
     def __user_is_authorized(self, req, action):
         '''
         Determines if a given user is authorized to perform a specified action
@@ -1559,7 +754,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         return False
 
 
-    def _scripts(self, kill_browser_cache=False):
+    @staticmethod
+    def _scripts(kill_browser_cache=False):
         '''
         Returns html code to be included in the meta header of the html page.
         The actual code is stored in the template.
@@ -1602,8 +798,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
         if not ("user_email_sys" in pinfo and pinfo["user_email_sys"]):
             if "user_email" in argd and argd['user_email']:
-                if (not argd["user_email"]
-                    or not email_valid_p(argd["user_email"])):
+                if not email_valid_p(argd["user_email"]):
                     pinfo["checkout_faulty_fields"].append("user_email")
                 else:
                     pinfo["user_email"] = escape(argd["user_email"])
@@ -1611,6 +806,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                 if (ulevel == "guest"
                     and emailUnique(argd["user_email"]) > 0):
                     pinfo["checkout_faulty_fields"].append("user_email_taken")
+            else:
+                pinfo["checkout_faulty_fields"].append("user_email")
 
         if "user_comments" in argd:
             if argd["user_comments"]:
@@ -1624,205 +821,234 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
     def action(self, req, form):
         '''
         Initial step in processing of requests: ticket generation/update.
-        Also acts as action dispatcher for interface mass action requests
+        Also acts as action dispatcher for interface mass action requests.
 
         Valid mass actions are:
-        - confirm: confirm assignments to a person
-        - repeal: repeal assignments from a person
-        - reset: reset assignments of a person
+        - add_external_id: add an external identifier to an author
+        - add_missing_external_ids: add missing external identifiers of an author
+        - bibref_check_submit:
         - cancel: clean the session (erase tickets and so on)
-        - to_other_person: assign a document from a person to another person
+        - cancel_rt_ticket:
+        - cancel_search_ticket:
+        - cancel_stage:
+        - checkout:
+        - checkout_continue_claiming:
+        - checkout_remove_transaction:
+        - checkout_submit:
+        - claim: claim papers for an author
+        - commit_rt_ticket:
+        - confirm: confirm assignments to an author
+        - delete_external_ids: delete external identifiers of an author
+        - repeal: repeal assignments from an author
+        - reset: reset assignments of an author
+        - set_canonical_name: set/swap the canonical name of an author
+        - to_other_person: assign a document from an author to another author
 
-        @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: Parameters sent via GET or POST request
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via GET or POST request
         @type form: dict
 
         @return: a full page formatted in HTML
-        @return: string
+        @return: str
         '''
-        self._session_bareinit(req)
-        argd = wash_urlargd(
-            form,
-            {'ln': (str, CFG_SITE_LANG),
-             'pid': (int, None),
-             'confirm': (str, None),
-             'repeal': (str, None),
-             'reset': (str, None),
-             'cancel': (str, None),
-             'cancel_stage': (str, None),
-             'bibref_check_submit': (str, None),
-             'checkout': (str, None),
-             'checkout_continue_claiming': (str, None),
-             'checkout_submit': (str, None),
-             'checkout_remove_transaction': (str, None),
-             'to_other_person': (str, None),
-             'cancel_search_ticket': (str, None),
-             'user_first_name': (str, None),
-             'user_last_name': (str, None),
-             'user_email': (str, None),
-             'user_comments': (str, None),
-             'claim': (str, None),
-             'cancel_rt_ticket': (str, None),
-             'commit_rt_ticket': (str, None),
-             'rt_id': (int, None),
-             'rt_action': (str, None),
-             'selection': (list, []),
-             'set_canonical_name': (str, None),
-             'canonical_name': (str, None),
-             'add_missing_external_ids': (str, None),
-             'rewrite_all_external_ids': (str, None),
-             'delete_external_ids': (str, None),
-             'existing_ext_ids': (list, None),
-             'add_external_id': (str, None),
-             'ext_system': (str, None),
-             'ext_id': (str, None) })
-
-        ln = argd['ln']
-        # ln = wash_language(argd['ln'])
-        pid = None
-        action = None
-        bibrefs = None
-
+        webapi.session_bareinit(req)
         session = get_session(req)
-        uid = getUid(req)
         pinfo = session["personinfo"]
+        argd = wash_urlargd(form,
+                            {'autoclaim_show_review':(str, None),
+                             'canonical_name': (str, None),
+                             'existing_ext_ids': (list, None),
+                             'ext_id': (str, None),
+                             'uid': (int, None),
+                             'ext_system': (str, None),
+                             'ln': (str, CFG_SITE_LANG),
+                             'pid': (int, -1),
+                             'primary_profile':(str, None),
+                             'search_param': (str, None),
+                             'rt_action': (str, None),
+                             'rt_id': (int, None),
+                             'selection': (list, None),
+
+                             # permitted actions
+                             'add_external_id': (str, None),
+                             'set_uid': (str, None),
+                             'add_missing_external_ids': (str, None),
+                             'associate_profile': (str, None),
+                             'bibref_check_submit': (str, None),
+                             'cancel': (str, None),
+                             'cancel_merging': (str, None),
+                             'cancel_rt_ticket': (str, None),
+                             'cancel_search_ticket': (str, None),
+                             'cancel_stage': (str, None),
+                             'checkout': (str, None),
+                             'checkout_continue_claiming': (str, None),
+                             'checkout_remove_transaction': (str, None),
+                             'checkout_submit': (str, None),
+                             'assign': (str, None),
+                             'commit_rt_ticket': (str, None),
+                             'confirm': (str, None),
+                             'delete_external_ids': (str, None),
+                             'merge': (str, None),
+                             'repeal': (str, None),
+                             'reset': (str, None),
+                             'send_message': (str, None),
+                             'set_canonical_name': (str, None),
+                             'to_other_person': (str, None)})
+
         ulevel = pinfo["ulevel"]
         ticket = pinfo["ticket"]
-        tempticket = []
+        uid = getUid(req)
+        ln = argd['ln']
+        action = None
 
-        if not "ln" in pinfo:
-            pinfo["ln"] = ln
-            session.dirty = True
+        permitted_actions = ['add_external_id',
+                             'set_uid',
+                             'add_missing_external_ids',
+                             'associate_profile',
+                             'bibref_check_submit',
+                             'cancel',
+                             'cancel_merging',
+                             'cancel_rt_ticket',
+                             'cancel_search_ticket',
+                             'cancel_stage',
+                             'checkout',
+                             'checkout_continue_claiming',
+                             'checkout_remove_transaction',
+                             'checkout_submit',
+                             'assign',
+                             'commit_rt_ticket',
+                             'confirm',
+                             'delete_external_ids',
+                             'merge',
+                             'repeal',
+                             'reset',
+                             'send_message',
+                             'set_canonical_name',
+                             'to_other_person']
 
-        if 'confirm' in argd and argd['confirm']:
-            action = 'confirm'
-        elif 'repeal' in argd and argd['repeal']:
-            action = 'repeal'
-        elif 'reset' in argd and argd['reset']:
-            action = 'reset'
-        elif 'bibref_check_submit' in argd and argd['bibref_check_submit']:
-            action = 'bibref_check_submit'
-        elif 'cancel' in argd and argd['cancel']:
-            action = 'cancel'
-        elif 'cancel_stage' in argd and argd['cancel_stage']:
-            action = 'cancel_stage'
-        elif 'cancel_search_ticket' in argd and argd['cancel_search_ticket']:
-            action = 'cancel_search_ticket'
-        elif 'checkout' in argd and argd['checkout']:
-            action = 'checkout'
-        elif 'checkout_submit' in argd and argd['checkout_submit']:
-            action = 'checkout_submit'
-        elif ('checkout_remove_transaction' in argd
-            and argd['checkout_remove_transaction']):
-            action = 'checkout_remove_transaction'
-        elif ('checkout_continue_claiming' in argd
-            and argd['checkout_continue_claiming']):
-            action = "checkout_continue_claiming"
-        elif 'cancel_rt_ticket' in argd and argd['cancel_rt_ticket']:
-            action = 'cancel_rt_ticket'
-        elif 'commit_rt_ticket' in argd and argd['commit_rt_ticket']:
-            action = 'commit_rt_ticket'
-        elif 'to_other_person' in argd and argd['to_other_person']:
-            action = 'to_other_person'
-        elif 'claim' in argd and argd['claim']:
-            action = 'claim'
-        elif 'set_canonical_name' in argd and argd['set_canonical_name']:
-            action = 'set_canonical_name'
-        elif 'add_missing_external_ids' in argd and argd['add_missing_external_ids']:
-            action = 'add_missing_external_ids'
-        elif 'rewrite_all_external_ids' in argd and argd['rewrite_all_external_ids']:
-            action = 'rewrite_all_external_ids'
-        elif 'delete_external_ids' in argd and argd['delete_external_ids']:
-            action = 'delete_external_ids'
-        elif 'add_external_id' in argd and argd['add_external_id']:
-            action = 'add_external_id'
+        for act in permitted_actions:
+            # one action (the most) is enabled in the form
+            if argd[act] is not None:
+                action = act
 
-        no_access = self._page_access_permission_wall(req, pid)
-
-        if no_access and not action in ["claim"]:
+        no_access = self._page_access_permission_wall(req, None)
+        if no_access and action not in ["assign"]:
             return no_access
 
-        if action in ['to_other_person', 'claim']:
-            if 'selection' in argd and len(argd['selection']) > 0:
-                bibrefs = argd['selection']
+        # incomplete papers (incomplete paper info or other problems) trigger action function without user's interference
+        # in order to fix those problems and claim papers or remove them from the ticket
+        if (action is None
+             and "bibref_check_required" in pinfo
+             and pinfo["bibref_check_required"]):
+
+            if "bibref_check_reviewed_bibrefs" in pinfo:
+                del(pinfo["bibref_check_reviewed_bibrefs"])
+                session.dirty = True
+
+        def add_external_id():
+            '''
+            associates the user with pid to the external id ext_id
+            '''
+            if argd['pid'] > -1:
+                pid = argd['pid']
             else:
                 return self._error_page(req, ln,
-                                        "Fatal: cannot create ticket without any bibrefrec")
-            if action == 'claim':
-                return self._ticket_open_claim(req, bibrefs, ln)
+                            "Fatal: cannot add external id to unknown person")
+
+            if argd['ext_system'] is not None:
+                ext_sys = argd['ext_system']
             else:
-                return self._ticket_open_assign_to_other_person(req, bibrefs, form)
+                return self._error_page(req, ln,
+                            "Fatal: cannot add an external id without specifying the system")
 
-        if action in ["cancel_stage"]:
-            if 'bibref_check_required' in pinfo:
-                del(pinfo['bibref_check_required'])
-
-            if 'bibrefs_auto_assigned' in pinfo:
-                del(pinfo['bibrefs_auto_assigned'])
-
-            if 'bibrefs_to_confirm' in pinfo:
-                del(pinfo['bibrefs_to_confirm'])
-
-            for tt in [row for row in ticket if 'incomplete' in row]:
-                ticket.remove(tt)
-
-            session.dirty = True
-
-            return self._ticket_dispatch_end(req)
-
-        if action in ["checkout_submit"]:
-            pinfo["checkout_faulty_fields"] = []
-            self._check_user_fields(req, form)
-
-            if not ticket:
-                pinfo["checkout_faulty_fields"].append("tickets")
-
-            if pinfo["checkout_faulty_fields"]:
-                pinfo["checkout_confirmed"] = False
+            if argd['ext_id'] is not None:
+                ext_id = argd['ext_id']
             else:
-                pinfo["checkout_confirmed"] = True
+                return self._error_page(req, ln,
+                            "Fatal: cannot add a custom external id without a suggestion")
 
-            session.dirty = True
-            return self.adf['ticket_dispatch'][ulevel](req)
-            #return self._ticket_final_review(req)
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.add_person_external_id(pid, ext_sys, ext_id, userinfo)
 
-        if action in ["checkout_remove_transaction"]:
-            bibref = argd['checkout_remove_transaction']
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
 
-            if webapi.is_valid_bibref(bibref):
-                for rmt in [row for row in ticket
-                            if row["bibref"] == bibref]:
-                    ticket.remove(rmt)
+        def set_uid():
+            '''
+            associates the user with pid to the external id ext_id
+            '''
+            if argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: current user is unknown")
 
-            pinfo["checkout_confirmed"] = False
-            session.dirty = True
-            return self.adf['ticket_dispatch'][ulevel](req)
-            #return self._ticket_final_review(req)
+            if argd['uid'] is not None:
+                dest_uid = int(argd['uid'])
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: user id is not valid")
 
-        if action in ["checkout_continue_claiming"]:
-            pinfo["checkout_faulty_fields"] = []
-            self._check_user_fields(req, form)
+            userinfo = "%s||%s" % (uid, req.remote_ip)
+            webapi.set_person_uid(pid, dest_uid, userinfo)
 
-            return self._ticket_dispatch_end(req)
+            # remove arxiv pubs of current pid
+            remove_arxiv_papers_of_author(pid)
+            dest_uid_pid = webapi.get_pid_from_uid(dest_uid)
+            if dest_uid_pid > -1:
+                # move the arxiv pubs of the dest_uid to the current pid
+                dest_uid_arxiv_papers = webapi.get_arxiv_papers_of_author(dest_uid_pid)
+                webapi.add_arxiv_papers_to_author(dest_uid_arxiv_papers, pid)
 
-        if (action in ['bibref_check_submit']
-            or (not action
-                and "bibref_check_required" in pinfo
-                and pinfo["bibref_check_required"])):
-            if not action in ['bibref_check_submit']:
-                if "bibref_check_reviewed_bibrefs" in pinfo:
-                    del(pinfo["bibref_check_reviewed_bibrefs"])
-                    session.dirty = True
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
 
-                return self.adf['ticket_dispatch'][ulevel](req)
+        def add_missing_external_ids():
+            if argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: cannot recompute external ids for an unknown person")
 
-            pinfo["bibref_check_reviewed_bibrefs"] = []
+            update_external_ids_of_authors([pid], overwrite=False)
+
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+
+        def associate_profile():
+            '''
+            associates the user with user id to the person profile with pid
+            '''
+            if argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln,
+                        "Fatal: cannot associate profile without a person id.")
+
+            uid = getUid(req)
+
+            pid, profile_claimed = webapi.claim_profile(uid, pid)
+
+            redirect_pid = pid
+
+            if profile_claimed:
+                pinfo['pid'] = pid
+                pinfo['should_check_to_autoclaim'] = True
+                pinfo["login_info_message"] = "confirm_success"
+                session.dirty = True
+                redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, redirect_pid))
+            # if someone have already claimed this profile it redirects to choose_profile with an error message
+            else:
+                param=''
+                if 'search_param' in argd and argd['search_param']:
+                    param = '&search_param=' + argd['search_param']
+                redirect_to_url(req, '%s/author/choose_profile?failed=%s%s' % (CFG_SITE_URL, True, param))
+
+        def bibref_check_submit():
+            pinfo["bibref_check_reviewed_bibrefs"] = list()
             add_rev = pinfo["bibref_check_reviewed_bibrefs"].append
 
             if ("bibrefs_auto_assigned" in pinfo
-                or "bibrefs_to_confirm" in pinfo):
-                person_reviews = []
+                 or "bibrefs_to_confirm" in pinfo):
+                person_reviews = list()
 
                 if ("bibrefs_auto_assigned" in pinfo
                      and pinfo["bibrefs_auto_assigned"]):
@@ -1836,7 +1062,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                     for person_id in ref_review:
                         for bibrec in ref_review[person_id]["bibrecs"]:
                             rec_grp = "bibrecgroup%s" % bibrec
-                            elements = []
+                            elements = list()
 
                             if rec_grp in form:
                                 if isinstance(form[rec_grp], str):
@@ -1853,187 +1079,405 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                         tref = test[1] + "," + str(bibrec)
                                         tpid = webapi.wash_integer_id(test[0])
 
-                                        if (webapi.is_valid_bibref(tref) and
-                                            tpid > -1):
+                                        if (webapi.is_valid_bibref(tref)
+                                             and tpid > -1):
                                             add_rev(element + "," + str(bibrec))
             session.dirty = True
 
-            return self.adf['ticket_dispatch'][ulevel](req)
-
-        if not action:
-            return self._error_page(req, ln,
-                                    "Fatal: cannot create ticket if no action selected.")
-
-        if action in ['confirm', 'repeal', 'reset']:
-            if 'pid' in argd:
-                pid = argd['pid']
-            else:
-                return self._error_page(req, ln,
-                                        "Fatal: cannot create ticket without a person id!")
-
-            if 'selection' in argd and len(argd['selection']) > 0:
-                bibrefs = argd['selection']
-            else:
-                if pid == -3:
-                    return self._error_page(req, ln,
-                                        "Fatal: Please select a paper to assign to the new person first!")
-                else:
-                    return self._error_page(req, ln,
-                                        "Fatal: cannot create ticket without any paper selected!")
-
-            if 'rt_id' in argd and argd['rt_id']:
-                rt_id = argd['rt_id']
-                for b in bibrefs:
-                    self._cancel_transaction_from_rt_ticket(rt_id, pid, action, b)
-            #create temporary ticket
-            if pid == -3:
-                pid = webapi.create_new_person(uid)
-
-            for bibref in bibrefs:
-                tempticket.append({'pid': pid, 'bibref': bibref, 'action': action})
-
-            #check if ticket targets (bibref for pid) are already in ticket
-            for t in tempticket:
-                for e in list(ticket):
-                    if e['bibref'] == t['bibref']:
-                        ticket.remove(e)
-                ticket.append(t)
-            if 'search_ticket' in pinfo:
-                del(pinfo['search_ticket'])
-
-            #start ticket processing chain
-            pinfo["claimpaper_admin_last_viewed_pid"] = pid
-            session.dirty = True
-            return self.adf['ticket_dispatch'][ulevel](req)
-#            return self.perform(req, form)
-
-        elif action in ['cancel']:
+        def cancel():
             self.__session_cleanup(req)
-#            return self._error_page(req, ln,
-#                                    "Not an error! Session cleaned! but "
-#                                    "redirect to be implemented")
+
             return self._ticket_dispatch_end(req)
 
-        elif action in ['cancel_search_ticket']:
+        def cancel_merging():
+            '''
+            empties the session out of merge content and redirects to the manage profile page
+            that the user was viewing before the merge
+            '''
+            if argd['primary_profile']:
+                primary_cname = argd['primary_profile']
+            else:
+                return self._error_page(req, ln,
+                                        "Fatal: Couldn't redirect to the previous page")
+
+            webapi.session_bareinit(req)
+            session = get_session(req)
+            pinfo = session['personinfo']
+
+            if pinfo['merge_profiles']:
+                pinfo['merge_profiles'] = list()
+
+            session.dirty = True
+
+            redirect_url = "%s/author/manage_profile/%s" % (CFG_SITE_URL, primary_cname)
+            return redirect_to_url(req, redirect_url)
+
+        def cancel_rt_ticket():
+            if argd['selection'] is not None:
+                bibrefrecs = argd['selection']
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: cannot cancel unknown ticket")
+
+            if argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln, "Fatal: cannot cancel unknown ticket")
+
+            if argd['rt_id'] is not None and argd['rt_action'] is not None:
+                rt_id = int(argd['rt_id'])
+                rt_action = argd['rt_action']
+
+                for bibrefrec in bibrefrecs:
+                    webapi.delete_transaction_from_request_ticket(pid, rt_id, rt_action, bibrefrec)
+            else:
+                rt_id = int(bibrefrecs[0])
+                webapi.delete_request_ticket(pid, rt_id)
+
+            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, pid))
+
+        def cancel_search_ticket(without_return=False):
             if 'search_ticket' in pinfo:
                 del(pinfo['search_ticket'])
             session.dirty = True
+
             if "claimpaper_admin_last_viewed_pid" in pinfo:
                 pid = pinfo["claimpaper_admin_last_viewed_pid"]
-                return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
-            return self.search(req, form)
 
-        elif action in ['checkout']:
-            return self.adf['ticket_dispatch'][ulevel](req)
-            #return self._ticket_final_review(req)
+                if not without_return:
+                    return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
 
-        elif action in ['cancel_rt_ticket', 'commit_rt_ticket']:
-            if 'selection' in argd and len(argd['selection']) > 0:
-                bibref = argd['selection']
+            if not without_return:
+                return self.search(req, form)
+
+        def cancel_stage():
+            if 'bibref_check_required' in pinfo:
+                del(pinfo['bibref_check_required'])
+
+            if 'bibrefs_auto_assigned' in pinfo:
+                del(pinfo['bibrefs_auto_assigned'])
+
+            if 'bibrefs_to_confirm' in pinfo:
+                del(pinfo['bibrefs_to_confirm'])
+
+            for tt in [row for row in ticket if 'incomplete' in row]:
+                ticket.remove(tt)
+
+            session.dirty = True
+
+            return self._ticket_dispatch_end(req)
+
+        def checkout():
+            pass
+            # return self._ticket_final_review(req)
+
+        def checkout_continue_claiming():
+            pinfo["checkout_faulty_fields"] = list()
+            self._check_user_fields(req, form)
+
+            return self._ticket_dispatch_end(req)
+
+        def checkout_remove_transaction():
+            bibref = argd['checkout_remove_transaction']
+
+            if webapi.is_valid_bibref(bibref):
+                for rmt in [row for row in ticket if row["bibref"] == bibref]:
+                    ticket.remove(rmt)
+
+            pinfo["checkout_confirmed"] = False
+            session.dirty = True
+            # return self._ticket_final_review(req)
+
+        def checkout_submit():
+            pinfo["checkout_faulty_fields"] = list()
+            self._check_user_fields(req, form)
+
+            if not ticket:
+                pinfo["checkout_faulty_fields"].append("tickets")
+
+            pinfo["checkout_confirmed"] = True
+            if pinfo["checkout_faulty_fields"]:
+                pinfo["checkout_confirmed"] = False
+
+            session.dirty = True
+
+            # return self._ticket_final_review(req)
+
+        def claim():
+            if argd['selection'] is not None:
+                bibrefs = argd['selection']
             else:
                 return self._error_page(req, ln,
-                                        "Fatal: cannot cancel unknown ticket")
-            if 'pid' in argd and argd['pid'] > -1:
+                            "Fatal: cannot create ticket without any bibrefrec")
+
+            if action == 'assign' and 'pid' in argd:
+                return self._ticket_open_claim(req, bibrefs, ln)
+            elif action == 'to_other_person' or 'pid' not in argd:
+                return self._ticket_open_assign_to_other_person(req, bibrefs, form)
+
+        def commit_rt_ticket():
+            if argd['selection'] is not None:
+                tid = argd['selection'][0]
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: cannot cancel unknown ticket")
+
+            if argd['pid'] > -1:
                 pid = argd['pid']
             else:
                 return self._error_page(req, ln,
-                                        "Fatal: cannot cancel unknown ticket")
-            if action == 'cancel_rt_ticket':
-                if 'rt_id' in argd and argd['rt_id'] and 'rt_action' in argd and argd['rt_action']:
-                    rt_id = argd['rt_id']
-                    rt_action = argd['rt_action']
-                    if 'selection' in argd and len(argd['selection']) > 0:
-                        bibrefs = argd['selection']
-                    else:
-                        return self._error_page(req, ln,
-                                        "Fatal: no bibref")
-                    for b in bibrefs:
-                        self._cancel_transaction_from_rt_ticket(rt_id, pid, rt_action, b)
-                        return redirect_to_url(req, "/person/%s" % webapi.get_person_redirect_link(pid))
-                return self._cancel_rt_ticket(req, bibref[0], pid)
-            elif action == 'commit_rt_ticket':
-                return self._commit_rt_ticket(req, bibref[0], pid)
+                            "Fatal: cannot cancel unknown ticket")
 
-        elif action == 'set_canonical_name':
-            if 'pid' in argd and argd['pid'] > -1:
+            return self._commit_rt_ticket(req, tid, pid)
+
+        def confirm_repeal_reset():
+            if argd['pid'] > -1 or int(argd['pid']) == CREATE_NEW_PERSON:
+                pid = argd['pid']
+                cancel_search_ticket(without_return = True)
+            else:
+                return self._ticket_open_assign_to_other_person(req, argd['selection'], form)
+                #return self._error_page(req, ln, "Fatal: cannot create ticket without a person id! (crr %s)" %repr(argd))
+
+            bibrefrecs = argd['selection']
+
+            if argd['confirm']:
+                action = 'assign'
+            elif argd['repeal']:
+                action = 'reject'
+            elif argd['reset']:
+                action = 'reset'
+            else:
+                return self._error_page(req, ln, "Fatal: not existent action!")
+
+            for bibrefrec in bibrefrecs:
+                form['jsondata'] = json.dumps({'pid': str(pid),
+                                               'action': action,
+                                               'bibrefrec': bibrefrec,
+                                               'on': 'user'})
+
+                t = WebInterfaceAuthorTicketHandling()
+                t.add_operation(req, form)
+
+            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+
+        def delete_external_ids():
+            '''
+            deletes association between the user with pid and the external id ext_id
+            '''
+            if argd['pid'] > -1:
                 pid = argd['pid']
             else:
                 return self._error_page(req, ln,
-                                        "Fatal: cannot set canonical name to unknown person")
-            if 'canonical_name' in argd and argd['canonical_name']:
-                cname = argd['canonical_name']
-            else:
-                return self._error_page(req, ln,
-                        "Fatal: cannot set a custom canonical name without a suggestion")
+                            "Fatal: cannot delete external ids from an unknown person")
 
-            uid = getUid(req)
-            userinfo = "%s||%s" % (uid, req.remote_ip)
-            webapi.update_person_canonical_name(pid, cname, userinfo)
-
-            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
-
-        elif action == 'add_missing_external_ids':
-            if 'pid' in argd and argd['pid'] > -1:
-                pid = argd['pid']
-            else:
-                return self._error_page(req, ln, "Fatal: cannot recompute external ids for an unknown person")
-
-            update_personID_external_ids([pid], overwrite=False)
-
-            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
-
-        elif action == 'rewrite_all_external_ids':
-            if 'pid' in argd and argd['pid'] > -1:
-                pid = argd['pid']
-            else:
-                return self._error_page(req, ln, "Fatal: cannot recompute external ids for an unknown person")
-
-            update_personID_external_ids([pid], overwrite=True)
-
-            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
-
-        elif action == 'delete_external_ids':
-            if 'pid' in argd and argd['pid'] > -1:
-                pid = argd['pid']
-            else:
-                return self._error_page(req, ln, "Fatal: cannot delete external ids from an unknown person")
-
-            if 'existing_ext_ids' in argd and argd['existing_ext_ids']:
+            if argd['existing_ext_ids'] is not None:
                 existing_ext_ids = argd['existing_ext_ids']
             else:
-                return self._error_page(req, ln, "Fatal: you must select at least one external id in order to delete it!")
+                return self._error_page(req, ln,
+                            "Fatal: you must select at least one external id in order to delete it")
 
-            uid = getUid(req)
             userinfo = "%s||%s" % (uid, req.remote_ip)
             webapi.delete_person_external_ids(pid, existing_ext_ids, userinfo)
 
-            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+            return redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
 
-        elif action == 'add_external_id':
-            if 'pid' in argd and argd['pid'] > -1:
-                pid = argd['pid']
-            else:
-                return self._error_page(req, ln, "Fatal: cannot add external id to unknown person")
+        def none_action():
+            return self._error_page(req, ln,
+                        "Fatal: cannot create ticket if no action selected.")
 
-            if 'ext_system' in argd and argd['ext_system']:
-                ext_sys = argd['ext_system']
+        def merge():
+            '''
+            performs a merge if allowed on the profiles that the user chose
+            '''
+            if argd['primary_profile']:
+                primary_cname = argd['primary_profile']
             else:
-                return self._error_page(req, ln, "Fatal: cannot add an external id without specifying the system")
+                return self._error_page(req, ln,
+                                        "Fatal: cannot perform a merge without a primary profile!")
 
-            if 'ext_id' in argd and argd['ext_id']:
-                ext_id = argd['ext_id']
+            if argd['selection']:
+                profiles_to_merge = argd['selection']
             else:
-                return self._error_page(req, ln, "Fatal: cannot add a custom external id without a suggestion")
+                return self._error_page(req, ln,
+                                        "Fatal: cannot perform a merge without any profiles selected!")
+
+            webapi.session_bareinit(req)
+            session = get_session(req)
+            pinfo = session['personinfo']
+            uid = getUid(req)
+
+            primary_pid = webapi.get_person_id_from_canonical_id(primary_cname)
+            pids_to_merge = [webapi.get_person_id_from_canonical_id(cname) for cname in profiles_to_merge]
+
+            is_admin = False
+            if pinfo['ulevel'] == 'admin':
+                is_admin = True
+
+            # checking if there are restrictions regarding this merge
+            can_perform_merge, preventing_pid = webapi.merge_is_allowed(primary_pid, pids_to_merge, is_admin)
+
+            if not can_perform_merge:
+                # when redirected back to the merge profiles page display an error message about the currently attempted merge
+                pinfo['merge_info_message'] = ("failure", "confirm_failure")
+                session.dirty = True
+
+                redirect_url = "%s/author/merge_profiles?primary_profile=%s" % (CFG_SITE_URL, primary_cname)
+                return redirect_to_url(req, redirect_url)
+
+            if is_admin:
+                webapi.merge_profiles(primary_pid, pids_to_merge)
+                # when redirected back to the manage profile page display a message about the currently attempted merge
+                pinfo['merge_info_message'] = ("success", "confirm_success")
+
+            else:
+                name = ''
+                if 'user_last_name' in pinfo:
+                    name = pinfo['user_last_name']
+
+                if 'user_first_name' in pinfo:
+                    name += pinfo['user_first_name']
+
+                email = ''
+                if 'user_email' in pinfo:
+                    email = pinfo['user_email']
+
+                selection_str = "&selection=".join(profiles_to_merge)
+
+                userinfo = {'uid-ip': "userid: %s (from %s)" % (uid, req.remote_ip),
+                            'name': name,
+                            'email': email,
+                            'merge link': "%s/author/merge_profiles?primary_profile=%s&selection=%s" % (CFG_SITE_URL, primary_cname, selection_str)}
+                # a message is sent to the admin with info regarding the currently attempted merge
+                webapi.create_request_message(userinfo, subj='Merge profiles request')
+
+                # when redirected back to the manage profile page display a message about the merge
+                pinfo['merge_info_message'] = ("success", "confirm_operation")
+
+            pinfo['merge_profiles'] = list()
+
+            session.dirty = True
+
+            redirect_url = "%s/author/manage_profile/%s" % (CFG_SITE_URL, primary_cname)
+            return redirect_to_url(req, redirect_url)
+
+        def send_message():
+            '''
+            sends a message from the user to the admin
+            '''
+            webapi.session_bareinit(req)
+            session = get_session(req)
+            pinfo = session['personinfo']
+            #pp = pprint.PrettyPrinter(indent=4)
+            #session_dump = pp.pprint(pinfo)
+            session_dump = str(pinfo)
+            name = ''
+            name_changed = False
+            name_given = ''
+            email = ''
+            email_changed = False
+            email_given = ''
+            comment = ''
+            last_page_visited = ''
+
+            if "user_last_name" in pinfo:
+                name = pinfo["user_last_name"]
+
+            if "user_first_name" in pinfo:
+                name += pinfo["user_first_name"]
+            name = name.rstrip()
+
+            if "user_email" in pinfo:
+                email = pinfo["user_email"]
+            email = email.rstrip()
+
+            if 'Name' in form:
+                if not name:
+                    name = form['Name']
+                elif name != form['Name']:
+                    name_given = form['Name']
+                    name_changed = True
+                name = name.rstrip()
+
+            if 'E-mail'in form:
+                if not email:
+                    email = form['E-mail']
+                elif name != form['E-mail']:
+                    email_given = form['E-mail']
+                    email_changed = True
+                email = email.rstrip()
+
+            if 'Comment' in form:
+                comment = form['Comment']
+                comment = comment.rstrip()
+
+
+            if not name or not comment or not email:
+                redirect_to_url(req, '%s/author/help?incomplete_params=%s' % (CFG_SITE_URL, True))
+            if 'last_page_visited' in form:
+                last_page_visited = form['last_page_visited']
 
             uid = getUid(req)
+            userinfo = {'uid-ip': "userid: %s (from %s)" % (uid, req.remote_ip),
+                        'name': name,
+                        'email': email,
+                        'comment': comment,
+                        'last_page_visited': last_page_visited,
+                        'session_dump': session_dump,
+                        'name_given': name_given,
+                        'email_given': email_given,
+                        'name_changed': name_changed,
+                        'email_changed': email_changed}
+
+            webapi.create_request_message(userinfo)
+
+        def set_canonical_name():
+            if argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: cannot set canonical name to unknown person")
+
+            if argd['canonical_name'] is not None:
+                cname = argd['canonical_name']
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: cannot set a custom canonical name without a suggestion")
+
             userinfo = "%s||%s" % (uid, req.remote_ip)
-            webapi.add_person_external_id(pid, ext_sys, ext_id, userinfo)
+            if webapi.is_valid_canonical_id(cname):
+                webapi.swap_person_canonical_name(pid, cname, userinfo)
+            else:
+                webapi.update_person_canonical_name(pid, cname, userinfo)
 
-            return redirect_to_url(req, "/person/%s%s" % (webapi.get_person_redirect_link(pid), '#tabData'))
+            return redirect_to_url(req, "%s/author/claim/%s%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid), '#tabData'))
 
-        else:
-            return self._error_page(req, ln,
-                                    "Fatal: What were I supposed to do?")
+        action_functions = {'add_external_id': add_external_id,
+                            'set_uid': set_uid,
+                            'add_missing_external_ids': add_missing_external_ids,
+                            'associate_profile': associate_profile,
+                            'bibref_check_submit': bibref_check_submit,
+                            'cancel': cancel,
+                            'cancel_merging': cancel_merging,
+                            'cancel_rt_ticket': cancel_rt_ticket,
+                            'cancel_search_ticket': cancel_search_ticket,
+                            'cancel_stage': cancel_stage,
+                            'checkout': checkout,
+                            'checkout_continue_claiming': checkout_continue_claiming,
+                            'checkout_remove_transaction': checkout_remove_transaction,
+                            'checkout_submit': checkout_submit,
+                            'assign': claim,
+                            'commit_rt_ticket': commit_rt_ticket,
+                            'confirm': confirm_repeal_reset,
+                            'delete_external_ids': delete_external_ids,
+                            'merge': merge,
+                            'repeal': confirm_repeal_reset,
+                            'reset': confirm_repeal_reset,
+                            'send_message': send_message,
+                            'set_canonical_name': set_canonical_name,
+                            'to_other_person': claim,
+                            None: none_action}
+
+        return action_functions[action]()
 
 
     def _ticket_open_claim(self, req, bibrefs, ln):
@@ -2066,9 +1510,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if not no_access and uinfo["precached_usepaperclaim"]:
             tpid = webapi.get_pid_from_uid(uid)
 
-            if tpid and tpid[0] and tpid[1] and tpid[0][0]:
-                pid = tpid[0][0]
+            if tpid > -1:
+                pid = tpid
 
+        last_viewed_pid = False
         if (not no_access
             and "claimpaper_admin_last_viewed_pid" in pinfo
             and pinfo["claimpaper_admin_last_viewed_pid"]):
@@ -2077,12 +1522,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             if len(names) > 0:
                 if len(names[0]) > 0:
                     last_viewed_pid = [pinfo["claimpaper_admin_last_viewed_pid"], names[0][0]]
-                else:
-                    last_viewed_pid = False
-            else:
-                last_viewed_pid = False
-        else:
-            last_viewed_pid = False
 
         if no_access:
             search_enabled = False
@@ -2093,7 +1532,7 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
                                         search_enabled=search_enabled)
         body = TEMPLATE.tmpl_person_detail_layout(body)
         title = _('Claim this paper')
-        metaheaderadd = self._scripts(kill_browser_cache=True)
+        metaheaderadd = WebInterfaceBibAuthorIDClaimPages._scripts(kill_browser_cache=True)
 
         return page(title=title,
             metaheaderadd=metaheaderadd,
@@ -2116,14 +1555,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         pinfo = session["personinfo"]
         pinfo["search_ticket"] = dict()
         search_ticket = pinfo["search_ticket"]
-        search_ticket['action'] = 'confirm'
+        search_ticket['action'] = 'assign'
         search_ticket['bibrefs'] = bibrefs
         session.dirty = True
         return self.search(req, form)
-
-
-    def comments(self, req, form):
-        return ""
 
 
     def _cancel_rt_ticket(self, req, tid, pid):
@@ -2131,8 +1566,8 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         deletes an RT ticket
         '''
         webapi.delete_request_ticket(pid, tid)
-        return redirect_to_url(req, "/person/%s" %
-                               webapi.get_person_redirect_link(str(pid)))
+        return redirect_to_url(req, "%s/author/claim/%s" %
+                               (CFG_SITE_URL, webapi.get_person_redirect_link(str(pid))))
 
 
     def _cancel_transaction_from_rt_ticket(self, tid, pid, action, bibref):
@@ -2142,35 +1577,30 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         webapi.delete_transaction_from_request_ticket(pid, tid, action, bibref)
 
 
-    def _commit_rt_ticket(self, req, bibref, pid):
+    def _commit_rt_ticket(self, req, tid, pid):
         '''
         Commit of an rt ticket: creates a real ticket and commits.
         '''
         session = get_session(req)
         pinfo = session["personinfo"]
-        ulevel = pinfo["ulevel"]
         ticket = pinfo["ticket"]
+        uid = getUid(req)
+        tid = int(tid)
 
-        open_rt_tickets = webapi.get_person_request_ticket(pid)
-        tic = [a for a in open_rt_tickets if str(a[1]) == str(bibref)]
-        if len(tic) > 0:
-            tic = tic[0][0]
-        #create temporary ticket
-        tempticket = []
-        for t in tic:
-            if t[0] in ['confirm', 'repeal']:
-                tempticket.append({'pid': pid, 'bibref': t[1], 'action': t[0]})
+        rt_ticket = get_validated_request_tickets_for_author(pid, tid)[0]
 
-        #check if ticket targets (bibref for pid) are already in ticket
-        for t in tempticket:
-            for e in list(ticket):
-                if e['pid'] == t['pid'] and e['bibref'] == t['bibref']:
-                    ticket.remove(e)
-            ticket.append(t)
+        for action, bibrefrec in rt_ticket['operations']:
+            operation_parts = {'pid': pid,
+                               'action': action,
+                               'bibrefrec': bibrefrec}
+            operation_to_be_added = webapi.construct_operation(operation_parts, pinfo, uid)
+            webapi.add_operation_to_ticket(operation_to_be_added, ticket)
+
         session.dirty = True
-        #start ticket processing chain
-        webapi.delete_request_ticket(pid, bibref)
-        return self.adf['ticket_dispatch'][ulevel](req)
+
+        webapi.delete_request_ticket(pid, tid)
+
+        redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, pid))
 
 
     def _error_page(self, req, ln=CFG_SITE_LANG, message=None, intro=True):
@@ -2241,11 +1671,10 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         if "checkout_faulty_fields" in pinfo:
             del(pinfo["checkout_faulty_fields"])
 
-        #pinfo['ulevel'] = ulevel
-#        pinfo["claimpaper_admin_last_viewed_pid"] = -1
+        # pinfo['ulevel'] = ulevel
+        # pinfo["claimpaper_admin_last_viewed_pid"] = -1
         pinfo["admin_requested_ticket_id"] = -1
         session.dirty = True
-
 
     def _generate_search_ticket_box(self, req):
         '''
@@ -2259,12 +1688,6 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         pinfo = session["personinfo"]
         search_ticket = None
 
-        if 'ln' in pinfo:
-            ln = pinfo["ln"]
-        else:
-            ln = CFG_SITE_LANG
-
-        _ = gettext_set_language(ln)
         if 'search_ticket' in pinfo:
             search_ticket = pinfo['search_ticket']
         if not search_ticket:
@@ -2272,347 +1695,903 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         else:
             return TEMPLATE.tmpl_search_ticket_box('person_search', 'assign_papers', search_ticket['bibrefs'])
 
+    def search_box(self, query, shown_element_functions):
+        '''
+        collecting the persons' data that the search function returned
 
-    def search(self, req, form, is_fallback=False, fallback_query='', fallback_title='', fallback_message=''):
+        @param req: Apache request object
+        @type req: Apache request object
+
+        @param query: the query string
+        @type query: string
+
+        @param shown_element_functions: contains the functions that will tell to the template which columns to show and what buttons to print
+        @type shown_element_functions: dict
+
+        @return: html body
+        @rtype: string
+        '''
+        pid_list = self._perform_search(query)
+        search_results = []
+        for pid in pid_list:
+            result = defaultdict(list)
+            result['pid'] = pid
+            result['canonical_id'] = webapi.get_canonical_id_from_person_id(pid)
+            result['name_variants'] = webapi.get_person_names_from_id(pid)
+            result['external_ids'] = webapi.get_external_ids_from_person_id(pid)
+            # this variable shows if we want to use the following data in the search template
+            if 'pass_status' in shown_element_functions and shown_element_functions['pass_status']:
+                result['status'] = webapi.is_profile_available(pid)
+            search_results.append(result)
+
+        body = TEMPLATE.tmpl_author_search(query, search_results, shown_element_functions)
+
+        body = TEMPLATE.tmpl_person_detail_layout(body)
+
+        return body
+
+    def search(self, req, form):
         '''
         Function used for searching a person based on a name with which the
         function is queried.
 
         @param req: Apache Request Object
-        @type req: Apache Request Object
-        @param form: Parameters sent via GET or POST request
         @type form: dict
 
         @return: a full page formatted in HTML
-        @return: string
+        @rtype: string
         '''
-        self._session_bareinit(req)
+        webapi.session_bareinit(req)
         session = get_session(req)
-        no_access = self._page_access_permission_wall(req)
-        new_person_link = False
 
-        if no_access:
-            return no_access
+        pinfo = session['personinfo']
+        ulevel = pinfo['ulevel']
+        person_id = self.person_id
+        uid = getUid(req)
 
-        pinfo = session["personinfo"]
-        search_ticket = None
-        if 'search_ticket' in pinfo:
-            search_ticket = pinfo['search_ticket']
-
-        if "ulevel" in pinfo:
-            if pinfo["ulevel"] == "admin":
-                new_person_link = True
-
-        body = ''
-        if search_ticket:
-            body = body + self._generate_search_ticket_box(req)
-
-        max_num_show_papers = 5
         argd = wash_urlargd(
             form,
             {'ln': (str, CFG_SITE_LANG),
              'verbose': (int, 0),
              'q': (str, None)})
 
+        debug = "verbose" in argd and argd["verbose"] > 0
         ln = argd['ln']
-        # ln = wash_language(argd['ln'])
+
+        cname = ''
+        is_owner = False
+        last_visited_pid = webapi.history_get_last_visited_pid(session['personinfo']['visit_diary'])
+        if last_visited_pid is not None:
+            cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
+            is_owner = self._is_profile_owner(last_visited_pid)
+
+        menu = WebProfileMenu(cname, "search", ln, is_owner, self._is_admin(pinfo))
+
+        title = "Person search"
+        # Create Wrapper Page Markup
+        profile_page = WebProfilePage("search", title, no_cache=True)
+        profile_page.add_profile_menu(menu)
+
+        profile_page.add_bootstrapped_data(json.dumps({
+            "other": "var gBOX_STATUS = '10';var gPID = '10'; var gNumOfWorkers= '10'; var gReqTimeout= '10'; var gPageTimeout= '10';",
+            "backbone": """
+            (function(ticketbox) {
+                 var app = ticketbox.app;
+                 app.userops.set(%s);
+                 app.bodyModel.set({userLevel: "%s"});
+            })(ticketbox);""" % (WebInterfaceAuthorTicketHandling.bootstrap_status(pinfo, "user"), ulevel)
+        }))
+
+        if debug:
+            profile_page.add_debug_info(pinfo)
+
+
+        no_access = self._page_access_permission_wall(req)
+        shown_element_functions = dict()
+        shown_element_functions['show_search_bar'] = TEMPLATE.tmpl_general_search_bar()
+
+        if no_access:
+            return no_access
+
+        search_ticket = None
+        bibrefs = []
+
+        if 'search_ticket' in pinfo:
+            search_ticket = pinfo['search_ticket']
+            for r in search_ticket['bibrefs']:
+                bibrefs.append(r)
+
+        if search_ticket and "ulevel" in pinfo:
+            if pinfo["ulevel"] == "admin":
+                shown_element_functions['new_person_gen'] = TEMPLATE.tmpl_assigning_search_new_person_generator(bibrefs)
+
+        content = ""
+
+        if search_ticket:
+            shown_element_functions['button_gen'] = TEMPLATE.tmpl_assigning_search_button_generator(bibrefs)
+            content = content + self._generate_search_ticket_box(req)
+
+
         query = None
-        recid = None
-        nquery = None
-        search_results = None
-        title = "Person Search"
 
         if 'q' in argd:
             if argd['q']:
                 query = escape(argd['q'])
 
-        if is_fallback and fallback_query:
-            query = fallback_query
+        content += self.search_box(query, shown_element_functions)
+        body = profile_page.get_wrapped_body(content)
 
+        parameter = None
         if query:
-            authors = []
+            parameter = '?search_param=%s' + query
+        webapi.history_log_visit(req, 'search', params = parameter)
 
-            if query.count(":"):
+
+        return page(title=title,
+                    metaheaderadd=profile_page.get_head().encode('utf-8'),
+                    body=body.encode('utf-8'),
+                    req=req,
+                    language=ln,
+                    show_title_p=False)
+
+    def merge_profiles(self, req, form):
+        '''
+        begginig of the proccess that performs the merge over multipe person profiles
+
+        @param req: Apache Request Object
+        @type form: dict
+
+        @return: a full page formatted in HTML
+        @rtype: string
+        '''
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
+                                   'primary_profile': (str, None),
+                                   'search_param': (str, ''),
+                                   'verbose': (int, 0)})
+
+        debug = "verbose" in argd and argd["verbose"] > 0
+
+        pinfo = session['personinfo']
+        primary_cname = argd['primary_profile']
+        search_param = argd['search_param']
+
+        ln = argd['ln']
+        _ = gettext_set_language(ln)
+
+        if not primary_cname:
+            return page_not_authorized(req, text=_('This page is not accessible directly.'))
+
+        no_access = self._page_access_permission_wall(req)
+        if no_access:
+            return no_access
+
+        primary_pid = webapi.get_person_id_from_canonical_id(primary_cname)
+        is_available = webapi.is_profile_available(primary_pid)
+
+        body = ''
+
+        cname = ''
+        is_owner = False
+        last_visited_pid = webapi.history_get_last_visited_pid(session['personinfo']['visit_diary'])
+        if last_visited_pid is not None:
+            cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
+            is_owner = self._is_profile_owner(last_visited_pid)
+
+        title = 'Merge Profiles'
+        menu = WebProfileMenu(cname, "manage_profile", ln, is_owner, self._is_admin(pinfo))
+        merge_page = WebProfilePage("merge_profile", title, no_cache=True)
+        merge_page.add_profile_menu(menu)
+
+        if debug:
+            merge_page.add_debug_info(pinfo)
+
+        # display status for any previously attempted merge
+        if pinfo['merge_info_message']:
+            teaser_key, message = pinfo['merge_info_message']
+            body += TEMPLATE.tmpl_merge_transaction_box(teaser_key, [message])
+            pinfo['merge_info_message'] = None
+
+            session.dirty = True
+
+        body += TEMPLATE.tmpl_merge_ticket_box('person_search', 'merge_profiles', primary_cname)
+
+        shown_element_functions = dict()
+        shown_element_functions['show_search_bar'] = TEMPLATE.tmpl_merge_profiles_search_bar(primary_cname)
+        shown_element_functions['button_gen'] = TEMPLATE.merge_profiles_button_generator()
+        shown_element_functions['pass_status'] = 'True'
+
+        profiles_to_merge = list()
+        if pinfo['merge_profiles']:
+            profiles_to_merge = pinfo['merge_profiles']
+
+        merge_page.add_bootstrapped_data(json.dumps({
+            "other": "var gMergeProfile = %s; var gMergeList = %s;" % ([primary_cname, '1' if is_available else '0'], profiles_to_merge)
+        }))
+
+        body += self.search_box(search_param, shown_element_functions)
+        body = merge_page.get_wrapped_body(body)
+
+        return page(title=title,
+                    metaheaderadd=merge_page.get_head().encode('utf-8'),
+                    body=body.encode('utf-8'),
+                    req=req,
+                    language=ln,
+                    show_title_p=False)
+
+    def _perform_search(self, search_param):
+        '''
+        calls the search function on the search_param and returns the results
+
+        @param search_param: query string
+        @type search_param: String
+
+
+        @return: list of pids that the search found they match with the search query
+        @return: list
+
+        '''
+        pid_canditates_list = []
+        nquery = None
+        if search_param:
+            if search_param.count(":"):
                 try:
-                    left, right = query.split(":")
+                    left, right = search_param.split(":")
                     try:
-                        recid = int(left)
-                        nquery = str(right)
+                        nsearch_param = str(right)
                     except (ValueError, TypeError):
                         try:
-                            recid = int(right)
-                            nquery = str(left)
+                            nsearch_param = str(left)
                         except (ValueError, TypeError):
-                            recid = None
-                            nquery = query
+                            nsearch_param = search_param
                 except ValueError:
-                    recid = None
-                    nquery = query
-
+                    nsearch_param = search_param
             else:
-                nquery = query
+                nsearch_param = search_param
 
-            sorted_results = webapi.search_person_ids_by_name(nquery)
+            sorted_results = webapi.search_person_ids_by_name(nsearch_param)
 
-            for index, results in enumerate(sorted_results):
-                pid = results[0]
-#                authorpapers = webapi.get_papers_by_person_id(pid, -1)
-#                authorpapers = sorted(authorpapers, key=itemgetter(0),
-#                                      reverse=True)
-                if index < PERSON_SEARCH_RESULTS_SHOW_PAPERS_PERSON_LIMIT:
-                    #We are no longer sorting by date because of the huge impact this have
-                    #on the system.
-                    #The sorting is now done per recordid
-#                    authorpapers = [[paper] for paper in
-#                                    sort_records(None, [i[0] for i in
-#                                                 webapi.get_papers_by_person_id(pid, -1)],
-#                                                 sort_field="year", sort_order="a")]
-                    authorpapers = sorted([[p[0]] for p in webapi.get_papers_by_person_id(pid, -1)],
-                                          key=itemgetter(0))
+            for result in sorted_results:
+                pid_canditates_list.append(result[0])
+        return pid_canditates_list
+
+    def merge_profiles_ajax(self, req, form):
+        '''
+        Function used for handling Ajax requests used in order to add/remove profiles
+        in/from the merging profiles list, which is saved in the session.
+
+        @param req: Apache Request Object
+        @type req: Apache Request Object
+        @param form: Parameters sent via Ajax request
+        @type form: dict
+
+        @return: json data
+        '''
+        # Abort if the simplejson module isn't available
+        if not CFG_JSON_AVAILABLE:
+            print "Json not configurable"
+
+        # If it is an Ajax request, extract any JSON data.
+        ajax_request = False
+        # REcent papers request
+        if form.has_key('jsondata'):
+            json_data = json.loads(str(form['jsondata']))
+            # Deunicode all strings (Invenio doesn't have unicode
+            # support).
+            json_data = json_unicode_to_utf8(json_data)
+            ajax_request = True
+            json_response = {'resultCode': 0}
+
+        # Handle request.
+        if ajax_request:
+            req_type = json_data['requestType']
+            if req_type == 'addProfile':
+                if json_data.has_key('profile'):
+                    profile = json_data['profile']
+                    person_id = webapi.get_person_id_from_canonical_id(profile)
+                    if person_id != -1:
+                        webapi.session_bareinit(req)
+                        session = get_session(req)
+                        profiles_to_merge = session["personinfo"]["merge_profiles"]
+                        profile_availability = webapi.is_profile_available(person_id)
+                        if profile_availability:
+                            profile_availability = "1"
+                        else:
+                            profile_availability = "0"
+                        if profile not in [el[0] for el in profiles_to_merge]:
+                            profiles_to_merge.append([profile, profile_availability])
+                            session.dirty = True
+                            # TODO check access rights and get profile from db
+                            json_response.update({'resultCode': 1})
+                            json_response.update({'addedPofile': profile})
+                            json_response.update({'addedPofileAvailability': profile_availability})
+                        else:
+                            json_response.update({'result': 'Error: Profile does not exist'})
+                    else:
+                        json_response.update({'result': 'Error: Profile was already in the list'})
                 else:
-                    authorpapers = [['Not retrieved to increase performances.']]
+                    json_response.update({'result': 'Error: Missing profile'})
+            elif req_type == 'removeProfile':
+                if json_data.has_key('profile'):
+                    profile = json_data['profile']
+                    if webapi.get_person_id_from_canonical_id(profile) != -1:
+                        webapi.session_bareinit(req)
+                        session = get_session(req)
+                        profiles_to_merge = session["personinfo"]["merge_profiles"]
+                        print (str(profiles_to_merge))
+                        if profile in [el[0] for el in profiles_to_merge]:
+                            for prof in list(profiles_to_merge):
+                                if prof[0] == profile:
+                                    profiles_to_merge.remove(prof)
+                            session.dirty = True
+                            # TODO check access rights and get profile from db
+                            json_response.update({'resultCode': 1})
+                            json_response.update({'removedProfile': profile})
+                        else:
+                            json_response.update({'result': 'Error: Profile was missing already from the list'})
+                    else:
+                        json_response.update({'result': 'Error: Profile does not exist'})
+                else:
+                    json_response.update({'result': 'Error: Missing profile'})
+            elif req_type == 'setPrimaryProfile':
+                if json_data.has_key('profile'):
+                    profile = json_data['profile']
+                    profile_id = webapi.get_person_id_from_canonical_id(profile)
+                    if profile_id != -1:
+                        webapi.session_bareinit(req)
+                        session = get_session(req)
+                        profile_availability = webapi.is_profile_available(profile_id)
+                        if profile_availability:
+                            profile_availability = "1"
+                        else:
+                            profile_availability = "0"
+                        profiles_to_merge = session["personinfo"]["merge_profiles"]
+                        if profile in [el[0] for el in profiles_to_merge]:
+                            for prof in list(profiles_to_merge):
+                                if prof[0] == profile:
+                                    profiles_to_merge.remove(prof)
+                        primary_profile = session["personinfo"]["merge_primary_profile"]
+                        if primary_profile not in profiles_to_merge:
+                            profiles_to_merge.append(primary_profile)
+                        session["personinfo"]["merge_primary_profile"] = [profile, profile_availability]
+                        session.dirty = True
+                        json_response.update({'resultCode': 1})
+                        json_response.update({'primaryProfile': profile})
+                        json_response.update({'primaryPofileAvailability': profile_availability})
+                    else:
+                        json_response.update({'result': 'Error: Profile was already in the list'})
+                else:
+                    json_response.update({'result': 'Error: Missing profile'})
+            else:
+                json_response.update({'result': 'Error: Wrong request type'})
+            return json.dumps(json_response)
 
-                if (recid and
-                    not (str(recid) in [row[0] for row in authorpapers])):
-                    continue
-
-                authors.append([results[0], results[1],
-                                authorpapers[0:max_num_show_papers], len(authorpapers)])
-
-            search_results = authors
-
-        if recid and (len(search_results) == 1) and not is_fallback:
-            return redirect_to_url(req, "/person/%s" % search_results[0][0])
-
-        body = body + TEMPLATE.tmpl_author_search(query, search_results, search_ticket, author_pages_mode=True, fallback_mode=is_fallback,
-                                                  fallback_title=fallback_title, fallback_message=fallback_message, new_person_link=new_person_link)
-
-        if not is_fallback:
-            body = TEMPLATE.tmpl_person_detail_layout(body)
-
-        return page(title=title,
-                    metaheaderadd=self._scripts(kill_browser_cache=True),
-                    body=body,
-                    req=req,
-                    language=ln)
-
-
-    def claimstub(self, req, form):
+    def search_box_ajax(self, req, form):
         '''
-        Generate stub page before claiming process
+        Function used for handling Ajax requests used in the search box.
+
+        @param req: Apache Request Object
+        @type req: Apache Request Object
+        @param form: Parameters sent via Ajax request
+        @type form: dict
+
+        @return: json data
+        '''
+        # Abort if the simplejson module isn't available
+        if not CFG_JSON_AVAILABLE:
+            print "Json not configurable"
+
+        # If it is an Ajax request, extract any JSON data.
+        ajax_request = False
+        # REcent papers request
+        if form.has_key('jsondata'):
+            json_data = json.loads(str(form['jsondata']))
+            # Deunicode all strings (Invenio doesn't have unicode
+            # support).
+            json_data = json_unicode_to_utf8(json_data)
+            ajax_request = True
+            json_response = {'resultCode': 0}
+
+        # Handle request.
+        if ajax_request:
+            req_type = json_data['requestType']
+            if req_type == 'getPapers':
+                if json_data.has_key('personId'):
+                    pId = json_data['personId']
+                    papers = sorted([[p[0]] for p in webapi.get_papers_by_person_id(int(pId), -1)],
+                                          key=itemgetter(0))
+                    papers_html = TEMPLATE.tmpl_gen_papers(papers[0:MAX_NUM_SHOW_PAPERS])
+                    json_response.update({'result': "\n".join(papers_html)})
+                    json_response.update({'totalPapers': len(papers)})
+                    json_response.update({'resultCode': 1})
+                    json_response.update({'pid': str(pId)})
+                else:
+                    json_response.update({'result': 'Error: Missing person id'})
+            elif req_type == 'getNames':
+                if json_data.has_key('personId'):
+                    pId = json_data['personId']
+                    names = webapi.get_person_names_from_id(int(pId))
+                    names_html = TEMPLATE.tmpl_gen_names(names)
+                    json_response.update({'result': "\n".join(names_html)})
+                    json_response.update({'resultCode': 1})
+                    json_response.update({'pid': str(pId)})
+            elif req_type == 'getIDs':
+                if json_data.has_key('personId'):
+                    pId = json_data['personId']
+                    ids = webapi.get_external_ids_from_person_id(int(pId))
+                    ids_html = TEMPLATE.tmpl_gen_ext_ids(ids)
+                    json_response.update({'result': "\n".join(ids_html)})
+                    json_response.update({'resultCode': 1})
+                    json_response.update({'pid': str(pId)})
+            elif req_type == 'isProfileClaimed':
+                if json_data.has_key('personId'):
+                    pId = json_data['personId']
+                    isClaimed = webapi.get_uid_from_personid(pId)
+                    if isClaimed != -1:
+                        json_response.update({'resultCode': 1})
+                    json_response.update({'pid': str(pId)})
+            else:
+                json_response.update({'result': 'Error: Wrong request type'})
+            return json.dumps(json_response)
+
+
+    def choose_profile(self, req, form):
+        '''
+        Generate SSO landing/choose_profile page
 
         @param req: Apache request object
         @type req: Apache request object
         @param form: GET/POST request params
         @type form: dict
         '''
-        argd = wash_urlargd(
-            form,
-            {'ln': (str, CFG_SITE_LANG),
-             'person': (str, '')})
-
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
+                                   'search_param': (str, None),
+                                   'failed': (str, None),
+                                   'verbose': (int, 0)})
         ln = argd['ln']
-        # ln = wash_language(argd['ln'])
-        _ = gettext_set_language(ln)
 
-        person = '-1'
-        if 'person' in argd and argd['person']:
-            person = argd['person']
+        debug = "verbose" in argd and argd["verbose"] > 0
 
+        req.argd = argd   # needed for perform_req_search
+        search_param = argd['search_param']
+
+        webapi.session_bareinit(req)
         session = get_session(req)
-        try:
-            pinfo = session["personinfo"]
-            if pinfo['ulevel'] == 'admin':
-                return redirect_to_url(req, '%s/person/%s?open_claim=True' % (CFG_SITE_URL, person))
-        except KeyError:
-            pass
-
-        if BIBAUTHORID_UI_SKIP_ARXIV_STUB_PAGE:
-            return redirect_to_url(req, '%s/person/%s?open_claim=True' % (CFG_SITE_URL, person))
-
-        body = TEMPLATE.tmpl_claim_stub(person)
-
-        pstr = 'Person ID missing or invalid'
-        if person != '-1':
-            pstr = person
-        title = _('You are going to claim papers for: %s' % pstr)
-
-        return page(title=title,
-                    metaheaderadd=self._scripts(kill_browser_cache=True),
-                    body=body,
-                    req=req,
-                    language=ln)
-
-    def update(self, req, form):
-        """
-        Generate hepnames update form
-        """
-        argd = wash_urlargd(form,
-                            {'ln': (str, CFG_SITE_LANG),
-                             'email': (str, ''),
-                             'IRN': (str, ''),
-                            })
-        # Retrieve info for HEP name based on email or IRN
-        recids = []
-        if argd['email']:
-            recids = perform_request_search(p="371__m:%s" % argd['email'], cc="HepNames")
-        elif argd['IRN']:
-            recids = perform_request_search(p="001:%s" % argd['IRN'], cc="HepNames")
-        else:
-            redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
-        if not recids:
-            redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
-        else:
-            hepname_bibrec = get_bibrecord(recids[0])
-
-        # Extract all info from recid that should be included in the form
-        full_name = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="a")
-        display_name = record_get_field_value(hepname_bibrec, tag="880", ind1="", ind2="", code="a")
-        email = record_get_field_value(hepname_bibrec, tag="371", ind1="", ind2="", code="m")
-        status = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="g")
-        keynumber = record_get_field_value(hepname_bibrec, tag="970", ind1="", ind2="", code="a")
-        try:
-            keynumber = keynumber.split('-')[1]
-        except IndexError:
-            pass
-        research_field_list = record_get_field_values(hepname_bibrec, tag="650", ind1="1", ind2="7", code="a")
-        institution_list = []
-        for instance in record_get_field_instances(hepname_bibrec, tag="371", ind1="", ind2=""):
-            if not instance or field_get_subfield_values(instance, "m"):
-                continue
-            institution_info = ["", "", "", "", ""]
-            if field_get_subfield_values(instance, "a"):
-                institution_info[0] = field_get_subfield_values(instance, "a")[0]
-            if field_get_subfield_values(instance, "r"):
-                institution_info[1] = field_get_subfield_values(instance, "r")[0]
-            if field_get_subfield_values(instance, "s"):
-                institution_info[2] = field_get_subfield_values(instance, "s")[0]
-            if field_get_subfield_values(instance, "t"):
-                institution_info[3] = field_get_subfield_values(instance, "t")[0]
-            if field_get_subfield_values(instance, "z"):
-                institution_info[4] = field_get_subfield_values(instance, "z")[0]
-            institution_list.append(institution_info)
-        phd_advisor_list = record_get_field_values(hepname_bibrec, tag="701", ind1="", ind2="", code="a")
-        experiment_list = record_get_field_values(hepname_bibrec, tag="693", ind1="", ind2="", code="e")
-        web_page = record_get_field_value(hepname_bibrec, tag="856", ind1="1", ind2="", code="u")
-
-        # Create form and pass as parameters all the content from the record
-        body = TEMPLATE.tmpl_update_hep_name(full_name, display_name, email,
-                                             status, research_field_list,
-                                             institution_list, phd_advisor_list,
-                                             experiment_list, web_page, keynumber)
-        title = "HEPNames"
-        return page(title=title,
-                    metaheaderadd = TEMPLATE.tmpl_update_hep_name_headers(),
-                    body=body,
-                    req=req,
-                    )
-
-    def welcome(self, req, form):
-        '''
-        Generate SSO landing/welcome page
-
-        @param req: Apache request object
-        @type req: Apache request object
-        @param form: GET/POST request params
-        @type form: dict
-        '''
         uid = getUid(req)
-        self._session_bareinit(req)
-        argd = wash_urlargd(
-            form,
-            {'ln': (str, CFG_SITE_LANG),
-             'chosen_profile': (int, None)})
+        pinfo = session['personinfo']
 
-        ln = argd['ln']
-        chosen_profile = argd['chosen_profile']
+        failed = True
+        if not argd['failed']:
+            failed = False
 
-        # ln = wash_language(argd['ln'])
         _ = gettext_set_language(ln)
 
-        if uid == 0:
-            return page_not_authorized(req, text=_("This page in not accessible directly."))
+        if not CFG_INSPIRE_SITE:
+            return page_not_authorized(req, text=_("This page is not accessible directly."))
 
-        title_message = _('Welcome!')
+        params = WebInterfaceBibAuthorIDClaimPages.get_params_to_check_login_info(session)
+        login_info = webapi.get_login_info(uid, params)
 
-        # start continuous writing to the browser...
-        req.content_type = "text/html"
-        req.send_http_header()
-        ssl_param = 0
+        if 'arXiv' not in login_info['logged_in_to_remote_systems']:
+            return page_not_authorized(req, text=_("This page is not accessible directly."))
 
-        if req.is_https():
-            ssl_param = 1
+        pid = webapi.get_user_pid(login_info['uid'])
 
-        req.write(pageheaderonly(req=req, title=title_message,
-                                 language=ln, secure_page_p=ssl_param))
+        # Create Wrapper Page Markup
+        is_owner = False
+        menu = WebProfileMenu('', "choose_profile", ln, is_owner, self._is_admin(pinfo))
+        choose_page = WebProfilePage("choose_profile", "Choose your profile", no_cache=True)
+        choose_page.add_profile_menu(menu)
 
-        req.write(TEMPLATE.tmpl_welcome_start())
+        if debug:
+            choose_page.add_debug_info(pinfo)
 
-        body = ""
+        content = TEMPLATE.tmpl_choose_profile(failed)
+        body = choose_page.get_wrapped_body(content)
 
-        if CFG_INSPIRE_SITE:
-            body = TEMPLATE.tmpl_welcome_arxiv()
-        else:
-            body = TEMPLATE.tmpl_welcome()
-
-        req.write(body)
-
-        req.write("USERID: %s " % str(uid))
-
-        if chosen_profile == None:
-            archive_user_info = webapi.arxiv_login(req)
-        elif chosen_profile == -1:
-            archive_user_info = webapi.arxiv_login(req, -1)
-        else:
-            archive_user_info = webapi.arxiv_login(req, chosen_profile)
-        # now do what will take time...
-
-        #req.write("ARXIV USER INFO: %s" % str(archive_user_info))
-
-        if archive_user_info[0] == "pid":  ##### differentiate the two cases
-            pid = archive_user_info[1]
-        elif archive_user_info[0] == "chosen pid not available":
-            pid = archive_user_info[1]
-            req.write(TEMPLATE.tmpl_profile_not_available())
-        elif archive_user_info[0] == "pid assigned by user":
-            pid = archive_user_info[1]
-            req.write(TEMPLATE.tmpl_profile_assigned_by_user())
-        else :
-            req.write(TEMPLATE.tmpl_claim_profile())
-            req.write(TEMPLATE.tmpl_profile_option(archive_user_info[1]))
-            req.write(pagefooteronly(req=req))
-            return
-
-        #session must be read after webapi.arxiv_login did it's stuff
-        session = get_session(req)
+        #In any case, when we step by here, an autoclaim should be performed right after!
         pinfo = session["personinfo"]
-        pinfo["claimpaper_admin_last_viewed_pid"] = pid
+        pinfo['should_check_to_autoclaim'] = True
         session.dirty = True
 
-        link = TEMPLATE.tmpl_welcome_link()
-        req.write(link)
-        req.write("<br><br>")
-        uinfo = collect_user_info(req)
+        last_visited_pid = webapi.history_get_last_visited_pid(session['personinfo']['visit_diary'])
 
-        arxivp = []
-        if 'external_arxivids' in uinfo and uinfo['external_arxivids']:
+        # if already logged in then redirect the user to the page he was viewing
+        if pid != -1:
+            redirect_pid = pid
+            if last_visited_pid:
+                redirect_pid = last_visited_pid
+            redirect_to_url(req, '%s/author/manage_profile/%s' % (CFG_SITE_URL, str(redirect_pid)))
+        else:
+            # get name strings and email addresses from SSO/Oauth logins: {'system':{'name':[variant1,...,variantn], 'email':'blabla@bla.bla', 'pants_size':20}}
+            remote_login_systems_info = webapi.get_remote_login_systems_info(req, login_info['logged_in_to_remote_systems'])
+            # get union of recids that are associated to the ids from all the external systems: set(inspire_recids_list)
+            recids = webapi.get_remote_login_systems_recids(req, login_info['logged_in_to_remote_systems'])
+            # this is the profile with the biggest intersection of papers  so it's more probable that this is the profile the user seeks
+            probable_pid = webapi.match_profile(req, recids, remote_login_systems_info)
+
+#            if not search_param and probable_pid > -1 and probable_pid == last_visited_pid:
+#                # try to assign the user to the profile he chose. If for some reason the profile is not available we assign him to an empty profile
+#                redirect_pid, profile_claimed = webapi.claim_profile(login_info['uid'], probable_pid)
+#                if profile_claimed:
+#                    redirect_to_url(req, '%s/author/claim/action?associate_profile=True&redirect_pid=%s' % (CFG_SITE_URL, str(redirect_pid)))
+
+            probable_profile_suggestion_info = None
+            last_viewed_profile_suggestion_info = None
+
+            if last_visited_pid > -1 and webapi.is_profile_available(last_visited_pid):
+                # get information about the most probable profile and show it to the user
+                last_viewed_profile_suggestion_info = webapi.get_profile_suggestion_info(req, last_visited_pid, recids)
+
+            if probable_pid > -1 and webapi.is_profile_available(probable_pid):
+                # get information about the most probable profile and show it to the user
+                probable_profile_suggestion_info = webapi.get_profile_suggestion_info(req, probable_pid, recids )
+
+            if not search_param:
+                # we prefil the search with most relevant among the names that we get from external systems
+                name_variants = webapi.get_name_variants_list_from_remote_systems_names(remote_login_systems_info)
+                search_param = most_relevant_name(name_variants)
+
+            body = body + TEMPLATE.tmpl_probable_profile_suggestion(probable_profile_suggestion_info, last_viewed_profile_suggestion_info, search_param)
+
+            shown_element_functions = dict()
+            shown_element_functions['button_gen'] = TEMPLATE.tmpl_choose_profile_search_button_generator()
+            shown_element_functions['new_person_gen'] = TEMPLATE.tmpl_choose_profile_search_new_person_generator()
+            shown_element_functions['show_search_bar'] = TEMPLATE.tmpl_choose_profile_search_bar()
+            # show in the templates the column status (if profile is bound to a user or not)
+            shown_element_functions['show_status'] = True
+            # pass in the templates the data of the column status (if profile is bound to a user or not)
+            # we might need the data without having to show them in the columne (fi merge_profiles
+            shown_element_functions['pass_status'] = True
+            # show search results to the user
+            body = body + self.search_box(search_param, shown_element_functions)
+            body = body + TEMPLATE.tmpl_choose_profile_footer()
+
+            title = _(' ')
+            return page(title=title,
+                        metaheaderadd=choose_page.get_head().encode('utf-8'),
+                        body=body,
+                        req=req,
+                        language=ln)
+
+    @staticmethod
+    def _arxiv_box(req, login_info, person_id, user_pid):
+        '''
+        Proccess and collect data for arXiv box
+
+        @param req: Apache request object
+        @type req: Apache request object
+
+        @param login_info: status of login in the following format: {'logged_in': True, 'uid': 2, 'logged_in_to_remote_systems':['Arxiv', ...]}
+        @type login_info: dict
+
+        @param login_info: person id of the current page's profile
+        @type login_info: int
+
+        @param login_info: person id of the user
+        @type login_info: int
+
+        @return: data required to built the arXiv box
+        @rtype: dict
+        '''
+        session = get_session(req)
+        pinfo = session["personinfo"]
+        arxiv_data = dict()
+
+        arxiv_data['view_own_profile'] = person_id == user_pid
+
+        # if the user is not a guest and he is connected through arXiv
+        arxiv_data['login'] = login_info['logged_in']
+
+        arxiv_data['user_pid'] = user_pid
+        arxiv_data['user_has_pid'] = user_pid != -1
+
+        # if the profile the use is logged in is the same with the profile of the page that the user views
+
+        arxiv_data['view_own_profile'] = user_pid == person_id
+
+        return arxiv_data
+
+    @staticmethod
+    def _orcid_box(arxiv_logged_in, person_id, user_pid, ulevel):
+        '''
+        Proccess and collect data for orcid box
+
+        @param req: Apache request object
+        @type req: Apache request object
+
+        @param arxiv_logged_in: shows if the user is logged in through arXiv or not
+        @type arxiv_logged_in: boolean
+
+        @param person_id: person id of the current page's profile
+        @type person_id: int
+
+        @param user_pid: person id of the user
+        @type user_pid: int
+
+        @param ulevel: user's level
+        @type ulevel: string
+
+        @return: data required to built the orcid box
+        @rtype: dict
+        '''
+        orcid_data = dict()
+        orcid_data['arxiv_login'] = arxiv_logged_in
+        orcid_data['orcids'] = None
+        orcid_data['add_power'] = False
+        orcid_data['own_profile'] = False
+        orcid_data['pid'] = person_id
+        # if the profile the use is logged in is the same with the profile of the page that the user views
+        if person_id == user_pid:
+            orcid_data['own_profile'] = True
+
+        # if the user is an admin then he can add an existing orcid to the profile
+        if ulevel == "admin":
+            orcid_data['add_power'] = True
+
+        orcids = webapi.get_orcids_by_pid(person_id)
+
+        if orcids:
+            orcid_data['orcids'] = orcids
+
+        return orcid_data
+
+    @staticmethod
+    def _autoclaim_papers_box(req, person_id, user_pid, remote_logged_in_systems):
+        '''
+        Proccess and collect data for orcid box
+
+        @param req: Apache request object
+        @type req: Apache request object
+
+        @param person_id: person id of the current page's profile
+        @type person_id: int
+
+        @param user_pid: person id of the user
+        @type user_pid: int
+
+        @param remote_logged_in_systems: the remote logged in systems
+        @type remote_logged_in_systems: list
+
+        @return: data required to built the autoclaim box
+        @rtype: dict
+        '''
+        autoclaim_data = dict()
+        # if no autoclaim should occur or had occured and results should be shown then the box should remain hidden
+        autoclaim_data['hidden'] = True
+        autoclaim_data['person_id'] = person_id
+
+        # if the profile the use is logged in is the same with the profile of the page that the user views
+        if person_id == user_pid:
+            recids_to_autoclaim = webapi.get_remote_login_systems_recids(req, remote_logged_in_systems)
+            autoclaim_data['hidden'] = False
+            autoclaim_data['num_of_claims'] = len(recids_to_autoclaim)
+
+        return autoclaim_data
+
+
+############################################
+#        New autoclaim functions           #
+############################################
+
+    def generate_autoclaim_data(self, req, form):
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            pid = int(json_data['personId'])
+        except:
+            raise NotImplementedError("Some error with the parameter from the Ajax request occured.")
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+
+        # If autoclaim was done already and no new remote systems exist
+        # in order to autoclaim new papers send the cached result
+        if not pinfo['orcid']['import_pubs'] and pinfo['autoclaim']['res'] is not None:
+            autoclaim_data = pinfo['autoclaim']['res']
+            json_response = {'resultCode': 1, 'result': TEMPLATE.tmpl_autoclaim_box(autoclaim_data, CFG_SITE_LANG, add_box=False, loading=False)}
+            return json.dumps(json_response)
+
+        external_pubs_association = pinfo['autoclaim']['external_pubs_association']
+        autoclaim_ticket = pinfo['autoclaim']['ticket']
+        ulevel = pinfo['ulevel']
+        uid = getUid(req)
+
+        params = WebInterfaceBibAuthorIDClaimPages.get_params_to_check_login_info(session)
+        login_status = webapi.get_login_info(uid, params)
+        remote_systems = login_status['logged_in_to_remote_systems']
+
+        papers_to_autoclaim = set(webapi.get_papers_from_remote_systems(remote_systems, params, external_pubs_association))
+        already_claimed_recids = set([rec for _, _, rec in get_claimed_papers_of_author(pid)]) & papers_to_autoclaim
+        papers_to_autoclaim = papers_to_autoclaim - set([rec for _, _, rec in get_claimed_papers_of_author(pid)])
+
+        for paper in papers_to_autoclaim:
+            operation_parts = {'pid': pid,
+                               'action': 'assign',
+                               'bibrefrec': str(paper)}
+
+            operation_to_be_added = webapi.construct_operation(operation_parts, pinfo, uid)
+
+            if operation_to_be_added is None:
+                # In case the operation could not be created (because of an
+                # erroneous bibrefrec) ignore it and continue with the rest
+                continue
+
+            webapi.add_operation_to_ticket(operation_to_be_added, autoclaim_ticket)
+
+        additional_info = {'first_name': '', 'last_name': '', 'email': '',
+                           'comments': 'Assigned automatically when autoclaim was triggered.'}
+        userinfo = webapi.fill_out_userinfo(additional_info, uid, req.remote_ip, ulevel, strict_check=False)
+
+        webapi.commit_operations_from_ticket(autoclaim_ticket, userinfo, uid, ulevel)
+        autoclaim_data = dict()
+        autoclaim_data['hidden'] = False
+        autoclaim_data['person_id'] = pid
+        autoclaim_data['successfull_recids'] = set([op['rec'] for op in webapi.get_ticket_status(autoclaim_ticket) if 'execution_result' in op]) | already_claimed_recids
+        webapi.clean_ticket(autoclaim_ticket)
+        autoclaim_data['unsuccessfull_recids'] = [op['rec'] for op in webapi.get_ticket_status(autoclaim_ticket)]
+        autoclaim_data['num_of_unsuccessfull_recids'] = len(autoclaim_data['unsuccessfull_recids'])
+        autoclaim_data['recids_to_external_ids'] = dict()
+        for key, value in external_pubs_association.iteritems():
+            ext_system, ext_id = key
+            rec = value
+            title = get_title_of_paper(rec)
+            autoclaim_data['recids_to_external_ids'][rec] = title
+
+        # cache the result in the session
+        pinfo['autoclaim']['res'] = autoclaim_data
+        if pinfo['orcid']['import_pubs']:
+            pinfo['orcid']['import_pubs'] = False
+        session.dirty = True
+
+        json_response = {'resultCode': 1, 'result': TEMPLATE.tmpl_autoclaim_box(autoclaim_data, CFG_SITE_LANG, add_box=False, loading=False)}
+        req.write(json.dumps(json_response))
+
+
+    @staticmethod
+    def get_params_to_check_login_info(session):
+
+        def get_params_to_check_login_info_of_arxiv(session):
             try:
-                for i in uinfo['external_arxivids'].split(';'):
-                    arxivp.append(i)
-            except (IndexError, KeyError):
-                pass
+                return session['user_info']
+            except KeyError:
+                return None
 
-        req.write(TEMPLATE.tmpl_welcome_personid_association(pid))
-        req.write(TEMPLATE.tmpl_welcome_arXiv_papers(arxivp))
-        if CFG_INSPIRE_SITE:
-            #logs arXive logins, for debug purposes.
-            dbg = ('uinfo= ' + str(uinfo) + '\npinfo= ' + str(pinfo) + '\nreq= ' + str(req)
-                    + '\nsession= ' + str(session))
-            userinfo = "%s||%s" % (uid, req.remote_ip)
-            webapi.insert_log(userinfo, pid, 'arXiv_login', 'dbg', '', comment=dbg)
+        def get_params_to_check_login_info_of_orcid(session):
+            pinfo = session['personinfo']
 
-        req.write(TEMPLATE.tmpl_welcome_end())
-        req.write(pagefooteronly(req=req))
+            try:
+                pinfo['orcid']['has_orcid_id'] = bool(get_orcid_id_of_author(pinfo['pid'])[0][0] and pinfo['orcid']['import_pubs'])
+            except:
+                pinfo['orcid']['has_orcid_id'] = False
+
+            session.dirty = True
+
+            return pinfo['orcid']
+
+        get_params_for_remote_system = {'arXiv': get_params_to_check_login_info_of_arxiv,
+                                        'orcid': get_params_to_check_login_info_of_orcid}
+
+        params = dict()
+        for system, get_params in get_params_for_remote_system.iteritems():
+            params[system] = get_params(session)
+
+        return params
+
+
+    @staticmethod
+    def _claim_paper_box(person_id):
+        '''
+        Proccess and collect data for claim paper box
+
+        @param person_id: person id of the current page's profile
+        @type person_id: int
+
+        @return: data required to built the claim paper box
+        @rtype: dict
+        '''
+        claim_paper_data = dict()
+        claim_paper_data['canonical_id'] = str(webapi.get_canonical_id_from_person_id(person_id))
+        return claim_paper_data
+
+    @staticmethod
+    def _support_box():
+        '''
+        Proccess and collect data for support box
+
+        @return: data required to built the support box
+        @rtype: dict
+        '''
+        support_data = dict()
+        return support_data
+
+    @staticmethod
+    def _merge_box(person_id):
+        '''
+        Proccess and collect data for merge box
+
+        @param person_id: person id of the current page's profile
+        @type person_id: int
+
+        @return: data required to built the merge box
+        @rtype: dict
+        '''
+        merge_data = dict()
+        search_param = webapi.get_canonical_id_from_person_id(person_id)
+        name_variants = [element[0] for element in webapi.get_person_names_from_id(person_id)]
+        relevant_name = most_relevant_name(name_variants)
+
+        if relevant_name:
+            search_param = relevant_name.split(",")[0]
+
+        merge_data['search_param'] = search_param
+        merge_data['canonical_id'] = webapi.get_canonical_id_from_person_id(person_id)
+        return merge_data
+
+    @staticmethod
+    def _internal_ids_box(person_id, user_pid, ulevel):
+        '''
+        Proccess and collect data for external_ids box
+
+        @param person_id: person id of the current page's profile
+        @type person_id: int
+
+        @param user_pid: person id of the user
+        @type user_pid: int
+
+        @param remote_logged_in_systems: the remote logged in systems
+        @type remote_logged_in_systems: list
+
+        @return: data required to built the external_ids box
+        @rtype: dict
+        '''
+        external_ids_data = dict()
+        external_ids_data['uid'],external_ids_data['old_uids'] = webapi.get_internal_user_id_from_person_id(person_id)
+        external_ids_data['person_id'] = person_id
+        external_ids_data['user_pid'] = user_pid
+        external_ids_data['ulevel'] = ulevel
+
+        return external_ids_data
+
+    @staticmethod
+    def _external_ids_box(person_id, user_pid, ulevel):
+        '''
+        Proccess and collect data for external_ids box
+
+        @param person_id: person id of the current page's profile
+        @type person_id: int
+
+        @param user_pid: person id of the user
+        @type user_pid: int
+
+        @param remote_logged_in_systems: the remote logged in systems
+        @type remote_logged_in_systems: list
+
+        @return: data required to built the external_ids box
+        @rtype: dict
+        '''
+        internal_ids_data = dict()
+        internal_ids_data['ext_ids'] = webapi.get_external_ids_from_person_id(person_id)
+        internal_ids_data['person_id'] = person_id
+        internal_ids_data['user_pid'] = user_pid
+        internal_ids_data['ulevel'] = ulevel
+
+        return internal_ids_data
+
+    @staticmethod
+    def _hepnames_box(person_id):
+        return webapi.get_hepnames(person_id)
 
     def tickets_admin(self, req, form):
         '''
@@ -2623,10 +2602,29 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
         @param form: GET/POST request params
         @type form: dict
         '''
-        self._session_bareinit(req)
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+
+        webapi.session_bareinit(req)
         no_access = self._page_access_permission_wall(req, req_level='admin')
         if no_access:
             return no_access
+
+        session = get_session(req)
+        pinfo = session['personinfo']
+
+        cname = ''
+        is_owner = False
+        last_visited_pid = webapi.history_get_last_visited_pid(pinfo['visit_diary'])
+        if last_visited_pid is not None:
+            cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
+            is_owner = self._is_profile_owner(last_visited_pid)
+
+        menu = WebProfileMenu(cname, "open_tickets", ln, is_owner, self._is_admin(pinfo))
+
+        title = "Open RT tickets"
+        profile_page = WebProfilePage("help", title, no_cache=True)
+        profile_page.add_profile_menu(menu)
 
         tickets = webapi.get_persons_with_open_tickets_list()
         tickets = list(tickets)
@@ -2636,15 +2634,54 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
             tickets.append([webapi.get_most_frequent_name_from_pid(int(t[0])),
                          webapi.get_person_redirect_link(t[0]), t[0], t[1]])
 
-        body = TEMPLATE.tmpl_tickets_admin(tickets)
-        body = TEMPLATE.tmpl_person_detail_layout(body)
+        content = TEMPLATE.tmpl_tickets_admin(tickets)
+        content = TEMPLATE.tmpl_person_detail_layout(content)
 
-        title = 'Open RT tickets'
+        body = profile_page.get_wrapped_body(content)
 
         return page(title=title,
-                    metaheaderadd=self._scripts(),
-                    body=body,
-                    req=req)
+                    metaheaderadd=profile_page.get_head().encode('utf-8'),
+                    body=body.encode('utf-8'),
+                    req=req,
+                    language=ln,
+                    show_title_p=False)
+
+    def help(self, req, form):
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        _ = gettext_set_language(ln)
+
+        if not CFG_INSPIRE_SITE:
+            return page_not_authorized(req, text=_("This page is not accessible directly."))
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+
+        cname = ''
+        is_owner = False
+        last_visited_pid = webapi.history_get_last_visited_pid(pinfo['visit_diary'])
+        if last_visited_pid is not None:
+            cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
+            is_owner = self._is_profile_owner(last_visited_pid)
+
+        menu = WebProfileMenu(cname, "help", ln, is_owner, self._is_admin(pinfo))
+
+        title = "Help page"
+        profile_page = WebProfilePage("help", title, no_cache=True)
+        profile_page.add_profile_menu(menu)
+
+        content = TEMPLATE.tmpl_help_page()
+
+        body = profile_page.get_wrapped_body(content)
+
+        return page(title=title,
+                    metaheaderadd=profile_page.get_head().encode('utf-8'),
+                    body=body.encode('utf-8'),
+                    req=req,
+                    language=ln,
+                    show_title_p=False)
+
 
     def export(self, req, form):
         '''
@@ -2730,7 +2767,959 @@ class WebInterfaceBibAuthorIDPages(WebInterfaceDirectory):
 
 
     index = __call__
-    me = welcome
-    you = welcome
+
+
+class WebInterfaceBibAuthorIDManageProfilePages(WebInterfaceDirectory):
+    _exports = ['',
+                'import_orcid_pubs',
+                'connect_author_with_hepname',
+                'connect_author_with_hepname_ajax',
+                'suggest_orcid',
+                'suggest_orcid_ajax']
+
+    def _lookup(self, component, path):
+        '''
+        This handler parses dynamic URLs:
+            - /author/profile/1332 shows the page of author with id: 1332
+            - /author/profile/100:5522,1431 shows the page of the author
+              identified by the bibrefrec: '100:5522,1431'
+        '''
+        if not component in self._exports:
+            return WebInterfaceBibAuthorIDManageProfilePages(component), path
+
+    def _is_profile_owner(self, pid):
+        return self.person_id == int(pid)
+
+    def _is_admin(self, pinfo):
+        return pinfo['ulevel'] == 'admin'
+
+    def __init__(self, identifier=None):
+        '''
+        Constructor of the web interface.
+
+        @param identifier: identifier of an author. Can be one of:
+            - an author id: e.g. "14"
+            - a canonical id: e.g. "J.R.Ellis.1"
+            - a bibrefrec: e.g. "100:1442,155"
+        @type identifier: str
+        '''
+        self.person_id = -1   # -1 is a non valid author identifier
+
+        if identifier is None or not isinstance(identifier, str):
+            return
+
+        # check if it's a canonical id: e.g. "J.R.Ellis.1"
+
+        try:
+            pid = int(identifier)
+        except ValueError:
+            pid = int(webapi.get_person_id_from_canonical_id(identifier))
+
+        if pid >= 0:
+            self.person_id = pid
+            return
+
+        # check if it's an author id: e.g. "14"
+        try:
+            pid = int(identifier)
+            if webapi.author_has_papers(pid):
+                self.person_id = pid
+                return
+        except ValueError:
+            pass
+
+        # check if it's a bibrefrec: e.g. "100:1442,155"
+        if webapi.is_valid_bibref(identifier):
+            pid = int(webapi.get_person_id_from_paper(identifier))
+            if pid >= 0:
+                self.person_id = pid
+                return
+
+    def __call__(self, req, form):
+        '''
+            Generate SSO landing/author management page
+
+            @param req: Apache request object
+            @type req: Apache request object
+            @param form: GET/POST request params
+            @type form: dict
+        '''
+        webapi.session_bareinit(req)
+        session = get_session(req)
+
+        pinfo = session['personinfo']
+        ulevel = pinfo['ulevel']
+        person_id = self.person_id
+        uid = getUid(req)
+
+        pinfo['claim_in_process'] = True
+
+        argd = wash_urlargd(form, {
+            'ln': (str, CFG_SITE_LANG),
+            'verbose': (int, 0)})
+
+        debug = "verbose" in argd and argd["verbose"] > 0
+
+        ln = argd['ln']
+        _ = gettext_set_language(ln)
+
+        if not CFG_INSPIRE_SITE or self.person_id is None:
+            return page_not_authorized(req, text=_("This page is not accessible directly."))
+
+        if person_id < 0:
+            return page_not_authorized(req, text=_("This page is not accessible directly."))
+
+        # log the visit
+        webapi.history_log_visit(req, 'manage_profile', pid=person_id)
+
+        # store the arxiv papers the user owns
+        if uid > 0 and not pinfo['arxiv_status']:
+            uinfo = collect_user_info(req)
+            arxiv_papers = list()
+
+            if 'external_arxivids' in uinfo and uinfo['external_arxivids']:
+                arxiv_papers = uinfo['external_arxivids'].split(';')
+
+            if arxiv_papers:
+                webapi.add_arxiv_papers_to_author(arxiv_papers, person_id)
+
+            pinfo['arxiv_status'] = True
+
+        params = WebInterfaceBibAuthorIDClaimPages.get_params_to_check_login_info(session)
+        login_info = webapi.get_login_info(uid, params)
+
+        title_message = _('Profile management')
+
+        ssl_param = 0
+        if req.is_https():
+            ssl_param = 1
+
+
+        # Create Wrapper Page Markup
+
+        cname = webapi.get_canonical_id_from_person_id(self.person_id)
+        if cname == self.person_id:
+            return page_not_authorized(req, text=_("This page is not accessible directly."))
+
+        menu = WebProfileMenu(cname, "manage_profile", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
+        profile_page = WebProfilePage("manage_profile", webapi.get_longest_name_from_pid(self.person_id), no_cache=True)
+        profile_page.add_profile_menu(menu)
+
+        gboxstatus = self.person_id
+        gpid = self.person_id
+        gNumOfWorkers = 3   # to do: read it from conf file
+        gReqTimeout = 3000
+        gPageTimeout = 12000
+
+        profile_page.add_bootstrapped_data(json.dumps({
+            "other": "var gBOX_STATUS = '%s';var gPID = '%s'; var gNumOfWorkers= '%s'; var gReqTimeout= '%s'; var gPageTimeout= '%s';" % (gboxstatus, gpid, gNumOfWorkers, gReqTimeout, gPageTimeout),
+            "backbone": """
+            (function(ticketbox) {
+                 var app = ticketbox.app;
+                 app.userops.set(%s);
+                 app.bodyModel.set({userLevel: "%s"});
+            })(ticketbox);""" % (WebInterfaceAuthorTicketHandling.bootstrap_status(pinfo, "user"), ulevel)
+        }))
+
+        if debug:
+            profile_page.add_debug_info(pinfo)
+
+        user_pid = webapi.get_user_pid(login_info['uid'])
+        person_data = webapi.get_person_info_by_pid(person_id)
+
+        # proccess and collect data for every box [LEGACY]
+        arxiv_data = WebInterfaceBibAuthorIDClaimPages._arxiv_box(req, login_info, person_id, user_pid)
+        orcid_data = WebInterfaceBibAuthorIDClaimPages._orcid_box(arxiv_data['login'], person_id, user_pid, ulevel)
+        claim_paper_data = WebInterfaceBibAuthorIDClaimPages._claim_paper_box(person_id)
+        support_data = WebInterfaceBibAuthorIDClaimPages._support_box()
+        ext_ids_data = None
+        int_ids_data = None
+        if ulevel == 'admin':
+            ext_ids_data = WebInterfaceBibAuthorIDClaimPages._external_ids_box(person_id, user_pid, ulevel)
+            int_ids_data = WebInterfaceBibAuthorIDClaimPages._internal_ids_box(person_id, user_pid, ulevel)
+        autoclaim_data = WebInterfaceBibAuthorIDClaimPages._autoclaim_papers_box(req, person_id, user_pid, login_info['logged_in_to_remote_systems'])
+        merge_data = WebInterfaceBibAuthorIDClaimPages._merge_box(person_id)
+        hepnames_data = WebInterfaceBibAuthorIDClaimPages._hepnames_box(person_id)
+
+
+        content = ''
+        # display status for any previously attempted merge
+        if pinfo['merge_info_message']:
+            teaser_key, message = pinfo['merge_info_message']
+            content += TEMPLATE.tmpl_merge_transaction_box(teaser_key, [message])
+            pinfo['merge_info_message'] = None
+
+            session.dirty = True
+
+        content += TEMPLATE.tmpl_profile_management(ln, person_data, arxiv_data,
+                                                    orcid_data, claim_paper_data,
+                                                    int_ids_data, ext_ids_data,
+                                                    autoclaim_data, support_data,
+                                                    merge_data, hepnames_data)
+
+        body = profile_page.get_wrapped_body(content)
+
+        return page(title=title_message,
+                    metaheaderadd=profile_page.get_head().encode('utf-8'),
+                    body=body.encode('utf-8'),
+                    req=req,
+                    language=ln,
+                    show_title_p=False)
+
+
+    def import_orcid_pubs(self, req, form):
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        orcid_info = pinfo['orcid']
+
+        # author should have already an orcid if this method was triggered
+        orcid_id = get_orcid_id_of_author(pinfo['pid'])[0][0]
+        orcid_dois = get_dois_from_orcid(orcid_id)
+        # TODO: what to do in case some ORCID server error occurs?
+        if orcid_dois is None:
+            redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pinfo['pid']))
+
+        # TODO: it would be smarter if:
+        # 1. we save in the db the orcid_dois
+        # 2. to expire only the external pubs box in the profile page
+        webauthorapi.expire_all_cache_for_personid(pinfo['pid'])
+
+        orcid_info['imported_pubs'] = orcid_dois
+        orcid_info['import_pubs'] = True
+        session.dirty = True
+
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_SECURE_URL, pinfo['pid']))
+
+
+    def connect_author_with_hepname(self, req, form):
+        argd = wash_urlargd(form, {'cname':(str, None),
+                                   'hepname': (str, None),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        if argd['cname'] is not None:
+            cname = argd['cname']
+        else:
+            return self._error_page(req, ln, "Fatal: cannot associate a hepname without a person id.")
+
+        if argd['hepname'] is not None:
+            hepname = argd['hepname']
+        else:
+            return self._error_page(req, ln, "Fatal: cannot associate an author with a non valid hepname.")
+
+        webapi.connect_author_with_hepname(cname, hepname)
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        last_visited_page = webapi.history_get_last_visited_url(pinfo['visit_diary'], just_page=True)
+
+        redirect_to_url(req, "%s/author/%s/%s" % (CFG_SITE_URL, last_visited_page, cname))
+
+
+    def connect_author_with_hepname_ajax(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            cname = json_data['cname']
+            hepname = json_data['hepname']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.connect_author_with_hepname(cname, hepname)
+
+
+    def suggest_orcid(self, req, form):
+        argd = wash_urlargd(form, {'orcid':(str, None),
+                                   'pid': (int, -1),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        if argd['pid'] > -1:
+            pid = argd['pid']
+        else:
+            return self._error_page(req, ln, "Fatal: cannot associate an orcid without a person id.")
+
+        if argd['orcid'] is not None and is_valid_orcid(argd['orcid']):
+            orcid = argd['orcid']
+        else:
+            return self._error_page(req, ln, "Fatal: cannot associate an author with a non valid ORCiD.")
+
+        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid)
+        redirect_to_url(req, "%s/author/manage_profile/%s" % (CFG_SITE_URL, pid))
+
+
+    def suggest_orcid_ajax(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            orcid = json_data['orcid']
+            pid = json_data['pid']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        if not is_valid_orcid(orcid):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.connect_author_with_orcid(webapi.get_canonical_id_from_person_id(pid), orcid)
+
+
+    def _fail(self, req, code):
+        req.status = code
+        return
+
+    def _error_page(self, req, ln=CFG_SITE_LANG, message=None, intro=True):
+        '''
+        Create a page that contains a message explaining the error.
+
+        @param req: Apache Request Object
+        @type req: Apache Request Object
+        @param ln: language
+        @type ln: string
+        @param message: message to be displayed
+        @type message: string
+        '''
+        body = []
+
+        _ = gettext_set_language(ln)
+
+        if not message:
+            message = "No further explanation available. Sorry."
+
+        if intro:
+            body.append(_("<p>We're sorry. An error occurred while "
+                        "handling your request. Please find more information "
+                        "below:</p>"))
+        body.append("<p><strong>%s</strong></p>" % message)
+
+        return page(title=_("Notice"),
+                body="\n".join(body),
+                description="%s - Internal Error" % CFG_SITE_NAME,
+                keywords="%s, Internal Error" % CFG_SITE_NAME,
+                language=ln,
+                req=req)
+
+
+    index = __call__
+
+
+class WebInterfaceAuthorTicketHandling(WebInterfaceDirectory):
+
+    _exports = ['get_status',
+                'update_status',
+                'add_operation',
+                'modify_operation',
+                'remove_operation',
+                'commit',
+                'abort']
+
+    @staticmethod
+    def bootstrap_status(pinfo, on_ticket):
+        '''
+        Function used for generating get_status json bootstrapping.
+
+        @param pinfo: person_info
+        @type req: dict
+        @param on_ticket: ticket target
+        @type on_ticket: str
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+
+        author_ticketing = WebInterfaceAuthorTicketHandling()
+
+        ticket = author_ticketing._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return "{}"
+
+        ticket_status = webapi.get_ticket_status(ticket)
+
+        return json.dumps(ticket_status)
+
+    def get_status(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            on_ticket = json_data['on']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+
+        ticket = self._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        ticket_status = webapi.get_ticket_status(ticket)
+
+        session.dirty = True
+
+        req.content_type = 'application/json'
+        req.write(json.dumps(ticket_status))
+
+
+    def update_status(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            on_ticket = json_data['on']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+
+        ticket = self._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.update_ticket_status(ticket)
+
+        session.dirty = True
+
+
+    def add_operation(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            operation_parts = {'pid': int(json_data['pid']),
+                               'action': json_data['action'],
+                               'bibrefrec': json_data['bibrefrec']}
+            on_ticket = json_data['on']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        uid = getUid(req)
+
+        operation_to_be_added = webapi.construct_operation(operation_parts, pinfo, uid)
+        if operation_to_be_added is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        ticket = self._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.add_operation_to_ticket(operation_to_be_added, ticket)
+
+        session.dirty = True
+
+
+    def modify_operation(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            operation_parts = {'pid': int(json_data['pid']),
+                               'action': json_data['action'],
+                               'bibrefrec': json_data['bibrefrec']}
+            on_ticket = json_data['on']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        uid = getUid(req)
+
+        operation_to_be_modified = webapi.construct_operation(operation_parts, pinfo, uid, should_have_bibref=False)
+        if operation_to_be_modified is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        ticket = self._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        operation_is_modified = webapi.modify_operation_from_ticket(operation_to_be_modified, ticket)
+        if not operation_is_modified:
+            # Operation couldn't be modified because it doesn't exist in the
+            # ticket. Wrong parameters were given hence we should fail!
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        session.dirty = True
+
+
+    def remove_operation(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            operation_parts = {'pid': int(json_data['pid']),
+                               'action': json_data['action'],
+                               'bibrefrec': json_data['bibrefrec']}
+            on_ticket = json_data['on']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        uid = getUid(req)
+
+        operation_to_be_removed = webapi.construct_operation(operation_parts, pinfo, uid)
+        if operation_to_be_removed is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        ticket = self._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        operation_is_removed = webapi.remove_operation_from_ticket(operation_to_be_removed, ticket)
+        if not operation_is_removed:
+            # Operation couldn't be removed because it doesn't exist in the
+            # ticket. Wrong parameters were given hence we should fail!
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        session.dirty = True
+
+
+    def commit(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            additional_info = {'first_name': json_data.get('first_name',"Default"),
+                               'last_name': json_data.get('last_name',"Default"),
+                               'email': json_data.get('email',"Default"),
+                               'comments': json_data['comments']}
+            on_ticket = json_data['on']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        ulevel = pinfo['ulevel']
+        uid = getUid(req)
+
+        user_is_guest = isGuestUser(uid)
+
+        if not user_is_guest:
+            try:
+                additional_info['first_name'] = session['user_info']['external_firstname']
+                additional_info['last_name'] = session['user_info']['external_familyname']
+                additional_info['email'] = session['user_info']['email']
+            except KeyError:
+                additional_info['first_name'] = additional_info['last_name'] = additional_info['email'] = str(uid)
+
+        ticket = self._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        # When a guest is claiming we should not commit if he
+        # doesn't provide us his full personal information
+        strict_check = user_is_guest
+        userinfo = webapi.fill_out_userinfo(additional_info, uid, req.remote_ip, ulevel, strict_check=strict_check)
+        if userinfo is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.commit_operations_from_ticket(ticket, userinfo, uid, ulevel)
+
+        session.dirty = True
+
+
+    def abort(self, req, form):
+        '''
+        Function used for handling Ajax requests.
+
+        @param req: apache request object
+        @type req: apache request object
+        @param form: parameters sent via Ajax request
+        @type form: dict
+
+        @return:
+        @rtype: json data
+        '''
+        # Abort if the simplejson module isn't available
+        assert CFG_JSON_AVAILABLE, "Json not available"
+        # Fail if no json data exists in the Ajax request
+        if not form.has_key('jsondata'):
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        json_data = json.loads(str(form['jsondata']))
+        json_data = json_unicode_to_utf8(json_data)
+
+        try:
+            on_ticket = json_data['on']
+        except:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+
+        ticket = self._get_according_ticket(on_ticket, pinfo)
+        if ticket is None:
+            return self._fail(req, apache.HTTP_NOT_FOUND)
+
+        # When a user is claiming we should completely delete his ticket if he
+        # aborts the claiming procedure
+        delete_ticket = (on_ticket == 'user')
+        webapi.abort_ticket(ticket, delete_ticket=delete_ticket)
+
+        session.dirty = True
+
+
+    def _get_according_ticket(self, on_ticket, pinfo):
+        ticket = None
+        if on_ticket == 'user':
+            ticket = pinfo['ticket']
+        elif on_ticket == 'autoclaim':
+            ticket = pinfo['autoclaim']['ticket']
+
+        return ticket
+
+
+    def _fail(self, req, code):
+        req.status = code
+        return
+
+
+class WebAuthorSearch(WebInterfaceDirectory):
+    """
+    Provides an interface to profile search using AJAX queries.
+    """
+    _exports = ['list',
+                'details']
+
+    # This class requires JSON libraries
+    assert CFG_JSON_AVAILABLE, "[WebAuthorSearch] JSON must be enabled."
+
+    class QueryPerson(WebInterfaceDirectory):
+        _exports = ['']
+
+        MIN_QUERY_LENGTH = 2
+        QUERY_REGEX = re.compile(r"[\w\s\.\-,@]+$", re.UNICODE)
+
+        def __init__(self, query=None):
+            self.query = query
+
+        def _lookup(self, component, path):
+            if component not in self._exports:
+                return WebAuthorSearch.QueryPerson(component), path
+
+        def __call__(self, req, form):
+            if self.query is None or len(self.query) < self.MIN_QUERY_LENGTH:
+                req.status = apache.HTTP_BAD_REQUEST
+                return "Query too short"
+            if not self.QUERY_REGEX.match(self.query):
+                req.status = apache.HTTP_BAD_REQUEST
+                return "Invalid query."
+
+            pid_results = [{"pid": pid[0]} for pid in webapi.search_person_ids_by_name(self.query)]
+            req.content_type = 'application/json'
+            return json.dumps(pid_results)
+
+        # Request for index handled by __call__
+        index = __call__
+
+    def _JSON_received(self, form):
+        try:
+            return "jsondata" in form
+        except TypeError:
+            return False
+
+    def _extract_JSON(self, form):
+        try:
+            json_data = json.loads(str(form['jsondata']))
+            json_data = json_unicode_to_utf8(json_data)
+            return json_data
+        except ValueError:
+            return None
+
+    def _get_pid_details(self, pid):
+        details = webapi.get_person_info_by_pid(pid)
+        details.update({
+            "names": [{"name": x, "paperCount": y} for x, y in webapi.get_person_names_from_id(pid)],
+            "externalIds": [{x: y} for x, y in webapi.get_external_ids_from_person_id(pid).items()]
+        })
+        details['cname'] = details.pop("canonical_name", None)
+        return details
+
+    def details(self, req, form):
+        if self._JSON_received(form):
+            try:
+                json_data = self._extract_JSON(form)
+                pids = json_data['pids']
+
+                req.content_type = 'application/json'
+                details = [self._get_pid_details(pid) for pid in pids]
+                return json.dumps(details)
+
+            except (TypeError, KeyError):
+                req.status = apache.HTTP_BAD_REQUEST
+                return "Invalid query."
+        else:
+            req.status = apache.HTTP_BAD_REQUEST
+            return "Incorrect query format."
+
+    list = QueryPerson()
+
+
+class WebInterfaceAuthor(WebInterfaceDirectory):
+    '''
+    Handles /author/* pages.
+
+    Supplies the methods:
+        /author/choose_profile
+        /author/claim/
+        /author/help
+        /author/manage_profile
+        /author/merge_profiles
+        /author/profile/
+        /author/search
+        /author/ticket/
+    '''
+    _exports = ['',
+                'choose_profile',
+                'claim',
+                'help',
+                'manage_profile',
+                'merge_profiles',
+                'profile',
+                'search',
+                'search_ajax',
+                'ticket']
+
+    from invenio.webauthorprofile_webinterface import WebAuthorPages
+
+    claim = WebInterfaceBibAuthorIDClaimPages()
+    index = claim.search
+    profile = WebAuthorPages()
+    choose_profile = claim.choose_profile
+    help = claim.help
+    manage_profile = WebInterfaceBibAuthorIDManageProfilePages()
+    merge_profiles = claim.merge_profiles
+    search = claim.search
+    search_ajax = WebAuthorSearch()
+    ticket = WebInterfaceAuthorTicketHandling()
+
+
+class WebInterfacePerson(WebInterfaceDirectory):
+    '''
+    Handles /person/* pages.
+
+    Supplies the methods:
+        /person/welcome
+    '''
+    _exports = ['welcome','update']
+
+    def welcome(self, req, form):
+        redirect_to_url(req, "%s/author/choose_profile" % CFG_SITE_URL)
+
+
+    def update(self, req, form):
+        """
+        Generate hepnames update form
+        """
+        argd = wash_urlargd(form,
+                            {'ln': (str, CFG_SITE_LANG),
+                             'email': (str, ''),
+                             'IRN': (str, ''),
+                            })
+        # Retrieve info for HEP name based on email or IRN
+        recids = []
+        if argd['email']:
+            recids = perform_request_search(p="371__m:%s" % argd['email'], cc="HepNames")
+        elif argd['IRN']:
+            recids = perform_request_search(p="001:%s" % argd['IRN'], cc="HepNames")
+        else:
+            redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
+        if not recids:
+            redirect_to_url(req, "%s/collection/HepNames" % (CFG_SITE_URL))
+        else:
+            hepname_bibrec = get_bibrecord(recids[0])
+
+        # Extract all info from recid that should be included in the form
+        full_name = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="a")
+        display_name = record_get_field_value(hepname_bibrec, tag="880", ind1="", ind2="", code="a")
+        email = record_get_field_value(hepname_bibrec, tag="371", ind1="", ind2="", code="m")
+        status = record_get_field_value(hepname_bibrec, tag="100", ind1="", ind2="", code="g")
+        keynumber = record_get_field_value(hepname_bibrec, tag="970", ind1="", ind2="", code="a")
+        try:
+            keynumber = keynumber.split('-')[1]
+        except IndexError:
+            pass
+        research_field_list = record_get_field_values(hepname_bibrec, tag="650", ind1="1", ind2="7", code="a")
+        institution_list = []
+        for instance in record_get_field_instances(hepname_bibrec, tag="371", ind1="", ind2=""):
+            if not instance or field_get_subfield_values(instance, "m"):
+                continue
+            institution_info = ["", "", "", "", ""]
+            if field_get_subfield_values(instance, "a"):
+                institution_info[0] = field_get_subfield_values(instance, "a")[0]
+            if field_get_subfield_values(instance, "r"):
+                institution_info[1] = field_get_subfield_values(instance, "r")[0]
+            if field_get_subfield_values(instance, "s"):
+                institution_info[2] = field_get_subfield_values(instance, "s")[0]
+            if field_get_subfield_values(instance, "t"):
+                institution_info[3] = field_get_subfield_values(instance, "t")[0]
+            if field_get_subfield_values(instance, "z"):
+                institution_info[4] = field_get_subfield_values(instance, "z")[0]
+            institution_list.append(institution_info)
+        phd_advisor_list = record_get_field_values(hepname_bibrec, tag="701", ind1="", ind2="", code="a")
+        experiment_list = record_get_field_values(hepname_bibrec, tag="693", ind1="", ind2="", code="e")
+        web_page = record_get_field_value(hepname_bibrec, tag="856", ind1="1", ind2="", code="u")
+
+        # Create form and pass as parameters all the content from the record
+        body = TEMPLATE.tmpl_update_hep_name(full_name, display_name, email,
+                                             status, research_field_list,
+                                             institution_list, phd_advisor_list,
+                                             experiment_list, web_page)
+        title = "HEPNames"
+        return page(title=title,
+                    metaheaderadd = TEMPLATE.tmpl_update_hep_name_headers(),
+                    body=body,
+                    req=req,
+                    )
+
+
 # pylint: enable=C0301
 # pylint: enable=W0613

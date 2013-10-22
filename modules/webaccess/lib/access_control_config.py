@@ -404,8 +404,8 @@ CFG_OAUTH2_CONFIGURATIONS =  {
         'nickname': ['user', 'username']
     },
     'orcid': {
-        'consumer_key': '',
-        'consumer_secret': '',
+        'consumer_key': '0000-0002-8651-6707',
+        'consumer_secret': '215e23ca-7421-4543-8306-a105fe0b5688',
         'authorize_url': 'http://sandbox-1.orcid.org/oauth/authorize',
         'access_token_url': 'http://api.sandbox-1.orcid.org/oauth/token',
         'request_url': 'http://api.sandbox-1.orcid.org/{id}/orcid-profile',
@@ -671,7 +671,7 @@ CFG_ACC_ACTIVITIES_URLS = {
     'runbibcirculation' : (_("Run BibCirculation"), "%s/admin/bibcirculation/bibcirculationadmin.py?ln=%%s" % CFG_SITE_URL),
     'runbatchuploader' : (_("Run Batch Uploader"), "%s/batchuploader/metadata?ln=%%s" % CFG_SITE_URL),
     'runinfomanager' : (_("Run Info Space Manager"), "%s/info/manage?ln=%%s" % CFG_SITE_URL),
-    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/person/search?ln=%%s" % CFG_SITE_URL)
+    'claimpaper_claim_others_papers' : (_("Run Person/Author Manager"), "%s/author/search?ln=%%s" % CFG_SITE_URL)
 }
 
 CFG_WEBACCESS_MSGS = {

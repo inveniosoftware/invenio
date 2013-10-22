@@ -107,6 +107,8 @@ def find_year(recordyear):
 
 
 def html_command(filename):
+    """return html code for showing citation graph image
+    """
     t = ''
     if CFG_BIBRANK_SHOW_CITATION_GRAPHS == 1:
         t = '<img src="%s/%s/%s" align="center" alt="Citation Graph">' \

@@ -54,7 +54,8 @@ etc_DATA = Default_HTML_captions.bft \
            Authority_HTML_brief.bft \
            Authority_HTML_detailed.bft \
            Detailed_HEPDATA_dataset.bft \
-           Default_HTML_citation_log.bft
+           Default_HTML_citation_log.bft \
+	   WebAuthorProfile_data_helper.bft
 
 tmpdir = $(prefix)/var/tmp
 

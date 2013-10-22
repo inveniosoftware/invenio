@@ -221,10 +221,16 @@ except:
     WebInterfacePingPages = WebInterfaceDumbPages
 
 try:
-    from invenio.bibauthorid_webinterface import WebInterfaceBibAuthorIDPages
+    from invenio.bibauthorid_webinterface import WebInterfaceAuthor
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBibAuthorIDPages = WebInterfaceDumbPages
+    WebInterfaceAuthor = WebInterfaceDumbPages
+
+try:
+    from invenio.bibauthorid_webinterface import WebInterfacePerson
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfacePerson = WebInterfaceDumbPages
 
 try:
     from invenio.bibcirculationadmin_webinterface import \
@@ -239,13 +245,6 @@ try:
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceBibSchedPages = WebInterfaceDumbPages
-
-try:
-    from invenio.webauthorprofile_webinterface import WebAuthorPages
-    WebInterfaceWebAuthorPages = WebAuthorPages
-except:
-    register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceWebAuthorPages = WebInterfaceDumbPages
 
 try:
     from invenio.docextract_webinterface import WebInterfaceDocExtract
@@ -331,10 +330,10 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
                    'batchuploader',
                    'bibsword',
                    'ping',
-                   'person',
                    'admin2',
                    'linkbacks',
                    'author',
+                   'person',
                    'textmining',
                    'goto',
                    'info',
@@ -372,15 +371,14 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     batchuploader = WebInterfaceBatchUploaderPages()
     bibsword = WebInterfaceSword()
     ping = WebInterfacePingPages()
-    person = WebInterfaceBibAuthorIDPages()
     linkbacks = WebInterfaceRecentLinkbacksPages()
-    #redirects author to the new webauthor
-    author = WebInterfaceWebAuthorPages()
-    #author = WebInterfaceAuthorPages()
+    author = WebInterfaceAuthor()
+    person = WebInterfacePerson()
     textmining = WebInterfaceDocExtract()
     yourcomments = WebInterfaceYourCommentsPages()
     goto = WebInterfaceGotoPages()
     authorlist = WebInterfaceAuthorlistPages()
+
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.

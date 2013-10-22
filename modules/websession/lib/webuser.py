@@ -235,8 +235,15 @@ def setUid(req, uid, remember_me=False):
     if hasattr(req, '_user_info'):
         del req._user_info
     session = get_session(req)
+    try:
+        guest_personinfo = session['personinfo']
+    except KeyError:
+        guest_personinfo = dict()
     session.invalidate()
     session = get_session(req)
+    # a part of the session before the user logged in (browsing as guest)
+    # is copied to the new session
+    session['guest_personinfo'] = guest_personinfo
     session['uid'] = uid
     if remember_me:
         session.set_timeout(86400)

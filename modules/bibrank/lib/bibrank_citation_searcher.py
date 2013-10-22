@@ -166,7 +166,7 @@ def get_records_with_num_cites(numstr, allrecs=intbitset([]),
         sec = int(firstsec[0][1])
         if first == 0:
             # Start with those that have no cites..
-            matches = allrecs - citations_keys
+    	    matches = allrecs - citations_keys
         if first <= sec:
             matches += intbitset([recid for recid, cit_count
                              in cache_cited_by_dictionary_counts

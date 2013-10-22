@@ -130,6 +130,7 @@ def redirect_to_url(req, url, redirection_type=None, norobot=False):
         not to index past this point.
     @see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3
     """
+    url = url.strip()
     if redirection_type is None:
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
 

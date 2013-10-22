@@ -3474,7 +3474,7 @@ class Template:
                 out += "<!--not showing citations links-->"
         if display_claim_link: #Maybe we want not to show the link to who cannot use id?
             out += '<span class="moreinfo"> - %s</span>' % \
-                create_html_link(CFG_BASE_URL + '/person/action', {'claim':'True', 'selection':str(recID)},
+                create_html_link(CFG_SITE_URL + '/author/claim/action', {'assign':'True', 'selection':str(recID)},
                                                                         'Attribute this paper',
                                                                         {'class': "moreinfo"})
 
@@ -4536,8 +4536,8 @@ class Template:
             #req.write("<h1>%s</h1>" % (authorname))
 
         if person_link:
-            cmp_link = ('<div><a href="%s/person/claimstub?person=%s">%s</a></div>'
-                      % (CFG_BASE_URL, person_link,
+            cmp_link = ('<div><a href="%s/author/claim/claimstub?person=%s">%s</a></div>'
+                      % (CFG_SITE_URL, person_link,
                          _("This is me.  Verify my publication list.")))
             if return_html:
                 html.append(cmp_link)

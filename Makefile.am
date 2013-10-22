@@ -177,6 +177,12 @@ install-jquery-plugins:
 	rm -rf uploadify && \
 	unzip -u uploadify.zip -d uploadify && \
 	wget http://invenio-software.org/download/jquery/flot-0.6.zip && \
+	wget http://www.csspace.net/tmp/jquery-lightbox-0.5.zip && \
+	rm -rf jquery-lightbox && \
+	unzip -u jquery-lightbox-0.5.zip -d jquery-lightbox && \
+	sed -i 's/images\//\/js\/jquery-lightbox\/images\//g' jquery-lightbox/js/jquery.lightbox-0.5.js && \
+	rm -rf jquery-lightbox-0.5.zip && \
+	wget http://flot.googlecode.com/files/flot-0.6.zip && \
 	wget -O jquery-ui-timepicker-addon.js http://invenio-software.org/download/jquery/jquery-ui-timepicker-addon-1.0.3.js && \
 	unzip -u flot-0.6.zip && \
 	mv flot/jquery.flot.selection.min.js flot/jquery.flot.min.js flot/excanvas.min.js ./ && \
@@ -195,6 +201,11 @@ install-jquery-plugins:
 	rm -f jquery.bookmark.ext.* bookmarks-big.png bookmarkBasic.html jquery.bookmark.js jquery.bookmark.pack.js && \
 	mv bookmarks.png ../img/ && \
 	mv jquery.bookmark.css ../css/ && \
+	wget --no-check-certificate https://raw.github.com/0x000000/OmniWindow/master/jquery.omniwindow.js && \
+	wget --no-check-certificate http://malsup.github.com/jquery.blockUI.js && \
+	wget --no-check-certificate https://github.com/Darsain/sly/raw/master/dist/sly.min.js &&\
+	wget --no-check-certificate https://raw.github.com/guillaumepotier/Parsley.js/master/parsley.js &&\
+	wget --no-check-certificate http://fgnass.github.io/spin.js/dist/spin.min.js &&\
 	rm -f jquery.bookmark.package-1.4.0.zip && \
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \

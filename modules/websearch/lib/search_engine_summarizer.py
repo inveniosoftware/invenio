@@ -152,19 +152,29 @@ def get_cites_counts(recids):
     return cites_counts
 
 
-def render_citation_summary(req, ln, recids, collections, searchpattern,
-                                                                  searchfield):
-    title = websearch_templates.tmpl_citesummary_title(ln)
-    req.write(title)
+def generate_citation_summary(recids, collections=CFG_CITESUMMARY_COLLECTIONS):
 
     coll_recids = get_recids(recids, collections)
-    search_patterns = dict([(coll, searchpattern) \
-                                               for coll, dummy in collections])
-
     cites_counts = get_cites_counts(recids)
+
     stats = {}
     for coll, dummy in collections:
         stats[coll] = compute_citation_stats(coll_recids[coll], cites_counts)
+
+    return coll_recids, stats
+
+def render_citation_summary(req, ln, recids, searchpattern, searchfield,
+                            stats, collections=CFG_CITESUMMARY_COLLECTIONS):
+    title = websearch_templates.tmpl_citesummary_title(ln)
+    req.write(title)
+
+    search_patterns = dict([(coll, searchpattern) \
+                                               for coll, dummy in collections])
+
+    if stats is None:
+        status = generate_citation_summary(recids, collections)
+
+    coll_recids, stats = stats
 
     render_citesummary_prologue(req,
                                 ln,
@@ -193,12 +203,13 @@ def render_citation_summary(req, ln, recids, collections, searchpattern,
     req.write(links)
 
 
-def render_extended_citation_summary(req, ln, recids, initial_collections,
+def render_extended_citation_summary(req, ln, recids, collections,
                                                    searchpattern, searchfield):
     title = websearch_templates.tmpl_citesummary2_title(searchpattern, ln)
     req.write(title)
 
-    collections_recids = get_recids(recids, initial_collections)
+    initial_collections = collections
+    collections_recids = get_recids(recids, collections)
 
     def coll_self_cites(name):
         return name + '<br />excluding self cites'
@@ -348,16 +359,21 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="",
         req = StringIO()
 
     if of == 'hcs':
-        renderer = render_citation_summary
+        stats = generate_citation_summary(recids, collections)
+        render_citation_summary(req=req,
+                                ln=ln,
+                                recids=recids,
+                                collections=collections,
+                                searchpattern=searchpattern,
+                                searchfield=searchfield,
+                                stats=stats)
     else:
-        renderer = render_extended_citation_summary
-
-    renderer(req,
-             ln,
-             recids,
-             collections,
-             searchpattern,
-             searchfield)
+        render_extended_citation_summary(req=req,
+                                         ln=ln,
+                                         recids=recids,
+                                         collections=collections,
+                                         searchpattern=searchpattern,
+                                         searchfield=searchfield)
 
     req.write(websearch_templates.tmpl_citesummary_footer())
 

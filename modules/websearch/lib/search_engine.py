@@ -129,6 +129,7 @@ from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, \
     get_refersto_hitset, get_citedby_hitset, get_cited_by_list, \
     get_refers_to_list, get_citers_log
+
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 from invenio.bibrank_selfcites_searcher import get_self_cited_by_list, \
                                                get_self_cited_by, \
@@ -165,6 +166,8 @@ from invenio.websearch_external_collections import calculate_hosted_collections_
 from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
 from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+
+from invenio.bibauthorid_config import LIMIT_TO_COLLECTIONS as BIBAUTHORID_LIMIT_TO_COLLECTIONS
 
 websearch_templates = invenio.template.load('websearch')
 VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
@@ -4600,6 +4603,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                                  sp=sp,
                                                                                                  rm=rm))
                         # Self-cited
+                        from invenio.bibrank_selfcites_indexer import get_self_cited_by
                         selfcited = get_self_cited_by(recid)
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))
@@ -4859,12 +4863,18 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
 
     _ = gettext_set_language(ln)
 
-    display_claim_this_paper = False
-
-    try:
-        display_claim_this_paper = user_info["precached_viewclaimlink"]
-    except (KeyError, TypeError):
+    # The 'attribute this paper'  link is shown only if the session states it should and
+    # the record is included in the collections to which bibauthorid is limited.
+    if user_info:
+        display_claim_this_paper = (user_info.get("precached_viewclaimlink", False) and
+                                recID in intbitset.union(*[get_collection_reclist(x)
+                                for x in BIBAUTHORID_LIMIT_TO_COLLECTIONS]))
+    else:
         display_claim_this_paper = False
+
+
+
+
     #check from user information if the user has the right to see hidden fields/tags in the
     #records as well
     can_see_hidden = False

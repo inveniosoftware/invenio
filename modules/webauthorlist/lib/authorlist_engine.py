@@ -17,7 +17,10 @@
 
 """ Invenio Authorlist Data Conversion Engine. """
 import time
-import simplejson as json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 from xml.dom import minidom
 
 try:

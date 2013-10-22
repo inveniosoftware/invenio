@@ -102,7 +102,7 @@ def format_element(bfo, limit, separator=' ; ',
             if print_links.lower() == "yes":
                 if link_author_pages == "yes":
                     author['a'] = '<a rel="author" href="' + CFG_BASE_URL + \
-                                  '/author/' + quote(author['a']) + \
+                                  '/author/profile/' + quote(author['a']) + \
                                   '?recid=' +  bibrec_id + \
                                   '&ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'

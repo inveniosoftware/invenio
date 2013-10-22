@@ -40,7 +40,7 @@ from invenio.config import CFG_ETCDIR, \
                            CFG_BIBRANK_SELFCITES_USE_BIBAUTHORID, \
                            CFG_BIBRANK_SELFCITES_PRECOMPUTE
 from invenio.dbquery import run_sql
-from invenio.bibauthorid_searchinterface import get_personids_from_bibrec
+from invenio.bibauthorid_searchinterface import get_authors_of_claimed_paper
 from invenio.bibrank_citation_searcher import get_cited_by
 
 
@@ -61,7 +61,7 @@ def get_personids_from_record(record):
     We limit the result length to 20 authors, after which it returns an
     empty set for performance reasons
     """
-    ids = get_personids_from_bibrec(record)
+    ids = get_authors_of_claimed_paper(record)
     if 0 < len(ids) <= 20:
         person_ids = set(ids)
     else:

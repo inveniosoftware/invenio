@@ -438,6 +438,7 @@ def remove_old_img(prefix_file_name, directory="%s/img/" % CFG_WEBDIR):
                                                 % (directory, prefix_file_name)
     return os.system(command)
 
+
 def plot_command(first_line, file_source, indexes, title, style, line_type, line_width, point_type="", point_size=""):
     """Return a string of a gnuplot plot command.Particularly useful when multiple curves
     From a temporary file, draw a gnuplot graph

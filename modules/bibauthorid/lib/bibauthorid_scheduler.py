@@ -17,6 +17,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+
+#############################################################################################
+#This has been temporarily deprecated, please use schedule_workes from general utils instead#
+#############################################################################################
+
 import re
 import os
 import sys

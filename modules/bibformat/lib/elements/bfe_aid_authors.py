@@ -62,7 +62,7 @@ def format_element(bfo, limit, separator='; ',
     from urllib import quote
     from cgi import escape
     import re
-    from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD
+    from invenio.config import CFG_BASE_URL, CFG_SITE_RECORD, CFG_SITE_URL
 
     #regex for parsing last and first names and initials
     re_last_first = re.compile('^(?P<last>[^,]+)\s*,\s*(?P<first_names>[^\,]*)(?P<extension>\,?.*)$')
@@ -141,8 +141,8 @@ def format_element(bfo, limit, separator='; ',
 
                 author['display'] = '<a class="authorlink" target="_blank" ' + \
                                     'href="' + \
-                                    CFG_BASE_URL + \
-                                    '/person/search?q=' + bibrec_id + ':' + \
+                                    CFG_SITE_URL + \
+                                    '/author/search?q=' + bibrec_id + ':' + \
                                     quote(author['a']) + \
                                     '&ln=' + bfo.lang + \
                                     '">' + escape(author['display']) + '</a>' + \

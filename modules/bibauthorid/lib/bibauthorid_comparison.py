@@ -23,16 +23,20 @@ from itertools import starmap
 
 from operator import mul, itemgetter
 from invenio.bibauthorid_name_utils import compare_names
-from invenio.bibauthorid_dbinterface import get_name_by_bibrecref
+from invenio.bibauthorid_dbinterface import get_name_by_bibref
 from invenio.bibauthorid_dbinterface import get_grouped_records
-from invenio.bibauthorid_dbinterface import get_all_authors
-from invenio.bibauthorid_dbinterface import get_collaboration
-from invenio.bibauthorid_dbinterface import resolve_affiliation
-from invenio.bibauthorid_backinterface import get_key_words
+from invenio.bibauthorid_dbinterface import get_authors_of_paper
+from invenio.bibauthorid_dbinterface import get_collaborations_for_paper
+from invenio.bibauthorid_dbinterface import get_resolved_affiliation
+from invenio.bibauthorid_backinterface import get_keywords_for_paper
 from invenio.bibrank_citation_searcher import get_cited_by, get_refers_to
 #metadat_comparison_print commented everywhere to increase performances,
 #import and calls left here to make future debug easier.
 from invenio.bibauthorid_general_utils import metadata_comparison_print
+import random
+import gc
+
+CFG_MEMOIZE_DICT_SIZE = 1000000
 
 # This module is not thread safe!
 # Be sure to use processes instead of
@@ -49,21 +53,26 @@ try:
     use_refrec = lambda x : x
     use_ref = itemgetter(0, 1)
     use_rec = itemgetter(2)
+    use_string = lambda x : x
 except:
     #python 2.4 compatibility, a bit slower than itemgetter
     use_refrec = lambda x: x
     use_ref = lambda x: x[0:2]
     use_rec = lambda x: x[2]
+    use_string = lambda x : x
 
-caches = []
+CACHES = list()
+
 def create_new_cache():
-    ret = {}
-    caches.append(ret)
+    ret = dict()
+    #global CACHES
+    CACHES.append(ret)
     return ret
 
 
 def clear_all_caches():
-    for c in caches:
+    #global CACHES
+    for c in CACHES:
         c.clear()
 
 
@@ -88,13 +97,12 @@ def jaccard(set1, set2):
     return ret
 
 
-def cached_sym(reducing):
+def cached_sym(red):
     '''
     Memoizes a pure function with two symmetrical arguments.
     '''
     def deco(func):
         cache = create_new_cache()
-        red = reducing
         def ret(a, b):
             ra, rb = red(a), red(b)
             if ra > rb:
@@ -103,25 +111,36 @@ def cached_sym(reducing):
                 return  cache[(ra, rb)]
             except KeyError:
                 val = func(a, b)
+                if len(cache) > CFG_MEMOIZE_DICT_SIZE:
+                    keys  = cache.keys()
+                    random.shuffle(keys)
+                    to_delete = keys[0:CFG_MEMOIZE_DICT_SIZE/2]
+                    map(cache.pop, to_delete)
+                    gc.collect()
                 cache[(ra, rb)] = val
                 return val
         return ret
     return deco
 
 
-def cached_arg(reducing):
+def cached_arg(red):
     '''
     Memoizes a pure function.
     '''
     def deco(func):
         cache = create_new_cache()
-        red = reducing
         def ret(a):
             ra = red(a)
             try:
                 return cache[ra]
             except KeyError:
                 val = func(a)
+                if len(cache) > CFG_MEMOIZE_DICT_SIZE:
+                    keys  = cache.keys()
+                    random.shuffle(keys)
+                    to_delete = keys[0:CFG_MEMOIZE_DICT_SIZE/2]
+                    map(cache.pop, to_delete)
+                    gc.collect()
                 cache[ra] = val
                 return val
         return ret
@@ -173,7 +192,7 @@ def compare_bibrefrecs(bibref1, bibref2):
 #        if insp_ids != '?':
 #            return insp_ids
 
-    results = []
+    results = list()
     for func, weight, fname in cbrr_func_weight:
         r = func(bibref1,bibref2)
         assert r == '?' or (r <= 1 and r>=0), 'COMPARISON %s returned %s for %s' % (fname, str(r),str(len(results)))
@@ -187,7 +206,7 @@ def compare_bibrefrecs(bibref1, bibref2):
 
     if not results:
         metadata_comparison_print("Final result: Skipped all tests, returning 0,0")
-        return 0, 0
+        return (0, 0)
 
     cert = sum(starmap(mul, results))
     prob = sum(res[1] for res in results)
@@ -220,7 +239,7 @@ def _compare_affiliations(bib1, bib2):
 @cached_arg(use_refrec)
 def _find_unified_affiliation(bib):
     aff = get_grouped_records(bib, str(bib[0]) + '__u').values()[0]
-    return set(x for x in list(canonical_str(resolve_affiliation(a)) for a in aff) if not x == "None")
+    return set(x for x in list(canonical_str(get_resolved_affiliation(a)) for a in aff) if not x == "None")
 
 
 def _compare_unified_affiliations(bib1, bib2):
@@ -292,18 +311,19 @@ def _compare_papers(bib1, bib2):
     return '?'
 
 
-get_name_by_bibrecref = cached_arg(use_ref)(get_name_by_bibrecref)
+cached_get_name_by_bibrecref = cached_arg(use_ref)(get_name_by_bibref)
+cached_compare_names  = cached_sym(use_string)(compare_names)
 
 @cached_sym(use_ref)
 def _compare_names(bib1, bib2):
     metadata_comparison_print("Comparing names.")
 
-    name1 = get_name_by_bibrecref(bib1)
-    name2 = get_name_by_bibrecref(bib2)
+    name1 = cached_get_name_by_bibrecref(bib1)
+    name2 = cached_get_name_by_bibrecref(bib2)
 
     metadata_comparison_print(" Found %s and %s" % (name1,name2))
     if name1 and name2:
-        cmpv = compare_names(name1, name2, False)
+        cmpv = cached_compare_names(name1, name2)
         metadata_comparison_print(" cmp(%s,%s) = %s" % (name1, name2, str(cmpv)))
         return cmpv
     return '?'
@@ -311,7 +331,7 @@ def _compare_names(bib1, bib2):
 
 @cached_arg(use_rec)
 def _find_key_words(bib):
-    words = get_key_words(bib[2])
+    words = get_keywords_for_paper(bib[2])
     return set(canonical_str(word) for word in words)
 
 
@@ -326,7 +346,7 @@ def _compare_key_words(bib1, bib2):
 
 @cached_arg(use_rec)
 def _find_collaboration(bib):
-    colls = get_collaboration(bib[2])
+    colls = get_collaborations_for_paper(bib[2])
     return set(canonical_str(coll) for coll in colls)
 
 
@@ -349,7 +369,7 @@ def _compare_collaboration(bib1, bib2):
 
 @cached_arg(use_rec)
 def _find_coauthors(bib):
-    return set(canonical_str(a) for a in get_all_authors(bib[2]))
+    return set(canonical_str(a) for a in get_authors_of_paper(bib[2]))
 
 
 @cached_sym(use_rec)
@@ -408,14 +428,14 @@ def _compare_citations_by(bib1, bib2):
 # unfortunately, we have to do all comparisons
 if bconfig.CFG_INSPIRE_SITE:
     cbrr_func_weight = (
-                   (_compare_inspireid, 2., 'inspID'),
+                   (_compare_inspireid, .5, 'inspID'),
                    (_compare_affiliations, .3, 'aff'),
-                   (_compare_names, .8, 'names'),
+                   (_compare_names, 1., 'names'),
                    #(_compare_citations, .1, 'cit'),
                    #(_compare_citations_by, .1, 'citby'),
-                   (_compare_key_words, .1, 'kw'),
+                   #(_compare_key_words, .1, 'kw'),
                    (_compare_collaboration, .3, 'collab'),
-                   (_compare_coauthors, .1,'coauth')
+                   #(_compare_coauthors, .1,'coauth')
                    )
 elif bconfig.CFG_ADS_SITE:
     cbrr_func_weight = (

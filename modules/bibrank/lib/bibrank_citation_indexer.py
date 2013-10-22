@@ -24,8 +24,8 @@ import time
 import os
 import sys
 import ConfigParser
-from itertools import islice
 from datetime import datetime
+from itertools import islice
 
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql, \
@@ -191,7 +191,6 @@ def process_and_store(recids, config, chunk_size):
         weights = None
 
     return weights
-
 
 def process_chunk(recids, config):
     tags = get_tags_config(config)
@@ -1079,7 +1078,6 @@ def compute_refs_diff(recid, new_refs):
     old_refs = set(row[0] for row in run_sql("""SELECT citee
                                                 FROM rnkCITATIONDICT
                                                 WHERE citer = %s""", [recid]))
-
     refs_to_add = new_refs - old_refs
     refs_to_delete = old_refs - new_refs
     return len(refs_to_add) - len(refs_to_delete)
@@ -1092,7 +1090,6 @@ def compute_cites_diff(recid, new_cites):
     old_cites = set(row[0] for row in run_sql("""SELECT citer
                                                  FROM rnkCITATIONDICT
                                                  WHERE citee = %s""", [recid]))
-
     cites_to_add = new_cites - old_cites
     cites_to_delete = old_cites - new_cites
     return len(cites_to_add) - len(cites_to_delete)

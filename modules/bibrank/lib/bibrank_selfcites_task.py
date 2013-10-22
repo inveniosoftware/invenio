@@ -52,7 +52,7 @@ from invenio.bibrank_selfcites_indexer import update_self_cites_tables, \
                                               compute_simple_self_citations, \
                                               get_authors_tags
 from invenio.bibrank_citation_searcher import get_refers_to
-from invenio.bibauthorid_daemon import get_user_log as bibauthorid_user_log
+from invenio.bibauthorid_daemon import get_user_logs as bibauthorid_user_log
 from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
 from invenio.bibrank_tag_based_indexer import intoDB, fromDB
 from invenio.intbitset import intbitset

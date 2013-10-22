@@ -32,33 +32,6 @@ import threading
 MAX_COLLAB_LIST = 10
 MAX_KEYWORD_LIST = 10
 MAX_VENUE_LIST = 10
-#tag constants
-AUTHOR_TAG = "100__a"
-AUTHOR_INST_TAG = "100__u"
-COAUTHOR_TAG = "700__a"
-COAUTHOR_INST_TAG = "700__u"
-VENUE_TAG = "909C4p"
-KEYWORD_TAG = "695__a"
-FKEYWORD_TAG = "6531_a"
-CFG_INSPIRE_UNWANTED_KEYWORDS_START = ['talk',
-                                      'conference',
-                                      'conference proceedings',
-                                      'numerical calculations',
-                                      'experimental results',
-                                      'review',
-                                      'bibliography',
-                                      'upper limit',
-                                      'lower limit',
-                                      'tables',
-                                      'search for',
-                                      'on-shell',
-                                      'off-shell',
-                                      'formula',
-                                      'lectures',
-                                      'book',
-                                      'thesis']
-CFG_INSPIRE_UNWANTED_KEYWORDS_MIDDLE = ['GeV',
-                                        '((']
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -197,22 +170,22 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
 
         formats_dict = get_output_formats(True)
         formats = {}
-        for format in formats_dict.values():
-            if format['attrs']['visibility']:
-                formats[format['attrs']['code'].lower()] = format['attrs']['content_type']
+        for f in formats_dict.values():
+            if f['attrs']['visibility']:
+                formats[f['attrs']['code'].lower()] = f['attrs']['content_type']
         del formats_dict
 
         if argd['id'] and argd['format']:
             ## Translate back common format names
-            format = {
+            f = {
                 'nlm' : 'xn',
                 'marcxml' : 'xm',
                 'dc' : 'xd',
                 'endnote' : 'xe',
                 'mods' : 'xo'
             }.get(argd['format'], argd['format'])
-            if format in formats:
-                redirect_to_url(req, '%s/%s/%s/export/%s' % (CFG_SITE_URL, CFG_SITE_RECORD, argd['id'], format))
+            if f in formats:
+                redirect_to_url(req, '%s/%s/%s/export/%s' % (CFG_SITE_URL, CFG_SITE_RECORD, argd['id'], f))
             else:
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_ACCEPTABLE
         elif argd['id']:
@@ -231,10 +204,10 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     #_exports.extend(output_formats)
 
-    def __init__(self, recid, tab, format=None):
+    def __init__(self, recid, tab, form=None):
         self.recid = recid
         self.tab = tab
-        self.format = format
+        self.format = form
 
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
