@@ -40,7 +40,7 @@ from invenio.modules.access.firerole import load_role_definition, acc_firerole_e
 from flask.ext.login import current_user
 
 
-def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **arguments):
+def acc_authorize_action(req, name_action, authorized_if_no_roles=False, batch_args=False, **arguments):
     """
     Given the request object (or the user_info dictionary, or the uid), checks
     if the user is allowed to run name_action with the given parameters.
@@ -62,27 +62,32 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
     else:
         user_info = collect_user_info(req)
 
-    roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
-    roles.add(CFG_SUPERADMINROLE_ID)
+    roles_list = acc_find_possible_roles(name_action, always_add_superadmin=True, batch_args=batch_args, **arguments)
 
-    if acc_is_user_in_any_role(user_info, roles):
-        ## User belong to at least one authorized role
-        ## or User is SUPERADMIN
-        return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+    if not batch_args:
+        roles_list = [roles_list]
 
-    if len(roles) <= 1:
-        ## No role is authorized for the given action/arguments
-        if authorized_if_no_roles:
-            ## User is authorized because no authorization exists for the given
-            ## action/arguments
-            return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+    result = []
+    for roles in roles_list:
+        if acc_is_user_in_any_role(user_info, roles):
+            ## User belong to at least one authorized role
+            ## or User is SUPERADMIN
+            ret_val = (0, CFG_WEBACCESS_WARNING_MSGS[0])
+        elif len(roles) <= 1:
+            ## No role is authorized for the given action/arguments
+            if authorized_if_no_roles:
+                ## User is authorized because no authorization exists for the given
+                ## action/arguments
+                ret_val = (0, CFG_WEBACCESS_WARNING_MSGS[0])
+            else:
+                ## User is not authorized.
+                ret_val = (20, CFG_WEBACCESS_WARNING_MSGS[20] % cgi.escape(name_action))
         else:
-            ## User is not authorized.
-            return (20, CFG_WEBACCESS_WARNING_MSGS[20] % cgi.escape(name_action))
-
-    ## User is not authorized
-    in_a_web_request_p = bool(user_info.get('uri', ''))
-    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info.get('uri', '')), CFG_WEBACCESS_MSGS[1]) or "")))
+            ## User is not authorized
+            in_a_web_request_p = bool(user_info.get('uri', ''))
+            ret_val = (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info.get('uri', '')), CFG_WEBACCESS_MSGS[1]) or "")))
+        result.append(ret_val)
+    return result if batch_args else result[0]
 
 
 def acc_get_authorized_emails(name_action, **arguments):
