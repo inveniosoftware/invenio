@@ -96,7 +96,7 @@ def create_temporary_image(recid, kind_of_graph, data_file, x_label, y_label,
         (kind_of_graph == "download_history" and CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 1) or \
         (kind_of_graph == "download_users" and CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION == 1):
         if CFG_GNUPLOT_AVAILABLE == 0:
-            return (None, None)
+            return None
         # Graphe name: file to store graph
         if kind_of_graph == 'citation':
             # Rename is done outside of this function
