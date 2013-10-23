@@ -4603,7 +4603,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                                  sp=sp,
                                                                                                  rm=rm))
                         # Self-cited
-                        from invenio.bibrank_selfcites_indexer import get_self_cited_by
+                        from invenio.bibrank_selfcites_searcher import get_self_cited_by
                         selfcited = get_self_cited_by(recid)
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
                                   ln, selfcited=selfcited, citinglist=citinglist))
