@@ -1609,7 +1609,7 @@ jQuery(function($) {
     disableLinks($("#person_menu").find("li.disabled"));
 
     // Stupid polling
-    setInterval(function() { app.userops.fetch({"on": 'user'});}, 6500);
+    setInterval(function() { app.userops.fetch({"on": 'user'});}, 15000);
 
 //    // PidSearch test
 //    var searchModel = new PidSearch.SearchModel();

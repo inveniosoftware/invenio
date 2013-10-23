@@ -441,7 +441,7 @@ def _compute_cache_for_person(person_id):
                (get_kwtuples,),
                (get_fieldtuples,),
                (get_hepnames_data,),
-               (get_summarize_records, ('hcs', 'en')),
+               (get_summarize_records,),
                (get_self_pubs,),
                (get_internal_publications,),
                (get_external_publications,),

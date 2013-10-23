@@ -299,7 +299,7 @@ MathJax.Hub.Config({
         self.bootstrap_data = data
 
     def get_head(self):
-        if "profile" not in self.page and "webauthorprofile.js" in self.scripts:
+        if self.page.lower() != 'profile' and "webauthorprofile.js" in self.scripts:
             self.scripts.remove("webauthorprofile.js")
 
         return self.environment.get_template("head.html").render({
