@@ -142,8 +142,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
         tickets = []
 
         if len(searchexp) == 0:
-            #just make an expression that is true for all tickets
-            searchexp = "Created > '1900-01-01'"
+            return tickets
 
         command = CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls -l \"" + searchexp + "\""
         command_out = self._run_rt_command(command, uid)
