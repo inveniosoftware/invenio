@@ -1404,7 +1404,7 @@ def acc_find_possible_actions_argument_listid(id_role, id_action, arglistid):
     return res2
 
 
-def acc_find_possible_roles(name_action, always_add_superadmin=True, **arguments):
+def acc_find_possible_roles(name_action, always_add_superadmin=True, batch_args=False, **arguments):
     """Find all the possible roles that are enabled to action_name with
     given arguments. roles is a list of role_id
     """
@@ -1426,11 +1426,32 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True, **arguments
 
     if always_add_superadmin:
         roles.add(CFG_SUPERADMINROLE_ID)
-    for auth in query_roles_with_args.params(id_action=id_action).all():
-        if auth.id_accROLE not in roles:
-            if not ((auth.argument.value != arguments.get(auth.argument.keyword, '*') != '*') and auth.argument.value != '*'):
-                roles.add(auth.id_accROLE)
-    return roles
+
+    # Unpack arguments
+    if batch_args:
+        batch_arguments = []
+        args_len = len(arguments.values()[0])
+        for i in range(args_len):
+            elem = {}
+            for k in arguments.keys():
+                elem[k] = arguments[k][i]
+            batch_arguments.append(elem)
+    else:
+        batch_arguments = [arguments]
+
+    acc_authorizations = query_roles_with_args.params(
+        id_action=id_action
+    ).all()
+
+    result = []
+    for arguments in batch_arguments:
+        batch_roles = roles.copy()
+        for auth in acc_authorizations:
+            if auth.id_accROLE not in batch_roles:
+                if not ((auth.argument.value != arguments.get(auth.argument.keyword, '*') != '*') and auth.argument.value != '*'):
+                    batch_roles.add(auth.id_accROLE)
+        result.append(batch_roles)
+    return result if batch_args else result[0]
 
 def acc_find_possible_actions_user_from_user_info(user_info, id_action):
     """user based function to find all action combination for a given

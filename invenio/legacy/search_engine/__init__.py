@@ -256,8 +256,16 @@ def get_permitted_restricted_collections(user_info, recreate_cache_if_needed=Tru
     if recreate_cache_if_needed:
         restricted_collection_cache.recreate_cache_if_needed()
     ret = []
-    for collection in restricted_collection_cache.cache:
-        if acc_authorize_action(user_info, 'viewrestrcoll', collection=collection)[0] == 0:
+
+    auths = acc_authorize_action(
+        user_info,
+        'viewrestrcoll',
+        batch_args=True,
+        collection=restricted_collection_cache.cache
+    )
+
+    for collection, auth in zip(restricted_collection_cache.cache, auths):
+        if auth[0] == 0:
             ret.append(collection)
     return ret
 
