@@ -23,7 +23,7 @@
 
 import re
 import string
-from datetime import datetime
+from invenio.dateutils import datetime
 
 try:
     import dateutil
@@ -44,7 +44,7 @@ except ImportError:
 from invenio.bibindex_tokenizers.BibIndexAuthorTokenizer import BibIndexAuthorTokenizer as FNT
 from invenio.logicutils import to_cnf
 from invenio.config import CFG_WEBSEARCH_SPIRES_SYNTAX
-from invenio.dateutils import strptime
+from invenio.dateutils import strptime, strftime
 
 
 NameScanner = FNT()
@@ -896,7 +896,7 @@ class SpiresToInvenioSyntaxConverter:
             try:
                 d = strptime(date_str, '%Y-%m-%d')
                 d += du_delta(days=relative_units)
-                return datetime.strftime(d, '%Y-%m-%d'), end
+                return strftime('%Y-%m-%d', d), end
             except ValueError:
                 pass
 
@@ -904,7 +904,7 @@ class SpiresToInvenioSyntaxConverter:
                 d = strptime(date_str, '%y-%m-%d')
                 d += du_delta(days=relative_units)
                 d = guess_best_year(d)
-                return datetime.strftime(d, '%Y-%m-%d'), end
+                return strftime('%Y-%m-%d', d), end
             except ValueError:
                 pass
 
@@ -913,14 +913,14 @@ class SpiresToInvenioSyntaxConverter:
                 try:
                     d = strptime(date_str, date_fmt)
                     d += du_delta(months=relative_units)
-                    return datetime.strftime(d, '%Y-%m'), end
+                    return strftime('%Y-%m', d), end
                 except ValueError:
                     pass
 
             try:
                 d = strptime(date_str, '%Y')
                 d += du_delta(years=relative_units)
-                return datetime.strftime(d, '%Y'), end
+                return strftime('%Y', d), end
             except ValueError:
                 pass
 
@@ -928,14 +928,14 @@ class SpiresToInvenioSyntaxConverter:
                 d = strptime(date_str, '%y')
                 d += du_delta(days=relative_units)
                 d = guess_best_year(d)
-                return datetime.strftime(d, '%Y'), end
+                return strftime('%Y', d), end
             except ValueError:
                 pass
 
             try:
                 d = strptime(date_str, '%b %y')
                 d = guess_best_year(d)
-                return datetime.strftime(d, '%Y-%m'), end
+                return strftime('%Y-%m', d), end
             except ValueError:
                 pass
 
@@ -946,29 +946,29 @@ class SpiresToInvenioSyntaxConverter:
                 begin = datetime.today()
                 begin += du_delta(weekday=relativedelta.SU(-1))
                 end = datetime.today()
-                begin = datetime.strftime(begin, '%Y-%m-%d')
-                end = datetime.strftime(end, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', begin)
+                end = strftime('%Y-%m-%d', end)
             elif 'last week' in date_str:
                 # Past monday to today
                 # Same problem as last week
                 begin = datetime.today()
                 begin += du_delta(weekday=relativedelta.SU(-2))
                 end = begin + du_delta(weekday=relativedelta.SA(1))
-                begin = datetime.strftime(begin, '%Y-%m-%d')
-                end = datetime.strftime(end, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', begin)
+                end = strftime('%Y-%m-%d', end)
             elif 'this month' in date_str:
                 d = datetime.today()
-                begin = datetime.strftime(d, '%Y-%m')
+                begin = strftime('%Y-%m', d)
             elif 'last month' in date_str:
                 d = datetime.today() - du_delta(months=1)
-                begin = datetime.strftime(d, '%Y-%m')
+                begin = strftime('%Y-%m', d)
             elif 'yesterday' in date_str:
                 d = datetime.today() - du_delta(days=1)
-                begin = datetime.strftime(d, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', d)
             elif 'today' in date_str:
                 start = datetime.today()
                 start += du_delta(days=relative_units)
-                begin = datetime.strftime(start, '%Y-%m-%d')
+                begin = strftime('%Y-%m-%d', start)
             elif date_str.strip() == '0':
                 begin = '0'
             else:
@@ -978,7 +978,7 @@ class SpiresToInvenioSyntaxConverter:
                 except ValueError:
                     begin = date_str
                 else:
-                    begin = datetime.strftime(d, '%Y-%m-%d')
+                    begin = strftime('%Y-%m-%d', d)
 
             return begin, end
 
