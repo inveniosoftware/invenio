@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 from HTMLParser import HTMLParser
 from invenio.config import CFG_SITE_URL, \
      CFG_MATHJAX_HOSTING, \
+     CFG_MATHJAX_RENDERS_MATHML, \
      CFG_SITE_LANG, \
      CFG_WEBDIR
 from invenio.textutils import indent_text, encode_for_xml
@@ -443,6 +444,12 @@ def get_mathjax_header(https=False):
             mathjax_path = "http://cdn.mathjax.org/mathjax/2.1-latest"
     else:
         mathjax_path = "/MathJax"
+
+    if CFG_MATHJAX_RENDERS_MATHML:
+        mathjax_config = "TeX-AMS-MML_HTMLorMML"
+    else:
+        mathjax_config = "TeX-AMS_HTML"
+
     return """<script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   tex2jax: {inlineMath: [['$','$']],
@@ -451,9 +458,10 @@ MathJax.Hub.Config({
   messageStyle: "none"
 });
 </script>
-<script src="%(mathjax_path)s/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
+<script src="%(mathjax_path)s/MathJax.js?config=%(mathjax_config)s" type="text/javascript">
 </script>""" % {
-    'mathjax_path': mathjax_path
+    'mathjax_path': mathjax_path,
+    'mathjax_config': mathjax_config,
 }
 
 def is_html_text_editor_installed():
