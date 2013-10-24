@@ -1721,7 +1721,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
 
     def _add_new_version(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, modification_date, pretend=False):
         """Adds a new version for a given bibdoc. Returns True when everything's fine."""
-        write_message('Add new version to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s' % (repr(bibdoc), url, docformat, docname, doctype, newname, description, comment, flags))
+        write_message('Add new version to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s, flags: %s' % (repr(bibdoc), url, docformat, docname, doctype, newname, description, comment, flags), verbose=9)
         try:
             if not url:
                 return _update_description_and_comment(bibdoc, docname, docformat, description, comment, flags, pretend=pretend)
