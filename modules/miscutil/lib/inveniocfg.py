@@ -84,6 +84,7 @@ import re
 import shutil
 import socket
 import sys
+import zlib
 
 
 def print_usage():
@@ -541,7 +542,7 @@ def cli_cmd_reset_recstruct_cache(conf):
     format."""
     from invenio.intbitset import intbitset
     from invenio.dbquery import run_sql, serialize_via_marshal
-    from invenio.search_engine import get_record
+    from invenio.search_engine import get_record, print_record
     from invenio.bibsched import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
@@ -559,7 +560,15 @@ def cli_cmd_reset_recstruct_cache(conf):
         tot = len(recids)
         count = 0
         for recid in recids:
-            value = serialize_via_marshal(get_record(recid))
+            try:
+                value = serialize_via_marshal(get_record(recid))
+            except zlib.error, err:
+                print >> sys.stderr, "Looks like XM is corrupted for record %s. Let's recover it from bibxxx" % recid
+                run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='xm'", (recid, ))
+                xm_value = zlib.compress(print_record(recid, 'xm'))
+                run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'xm', NOW(), %s)", (recid, xm_value))
+                value = serialize_via_marshal(get_record(recid))
+
             run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recstruct'", (recid, ))
             run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
             count += 1
