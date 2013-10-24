@@ -147,80 +147,82 @@ class WebProfileMenu():
 
 class WebProfilePage():
 
-    css_dir = CFG_SITE_URL + "/img"
-    img_dir = CFG_SITE_URL + "/img"
-    scripts_dir = CFG_SITE_URL + "/js"
-    url = CFG_SITE_URL + "/author"
 
-    scripts = [
-        "jquery-ui.min.js",
-        "jquery.form.js",
-        "jquery.dataTables.min.js",
-        "jquery-lightbox/js/jquery.lightbox-0.5.js",
-        "jquery.omniwindow.js",
-        # "jquery.blockUI.js",
-        "spin.min.js",
-        "sly.min.js",
-        "parsley.js",
-        "bootstrap.min.js",
-        "underscore-min.js",
-        "backbone.js",
-        "handlebars.js",
-        "bibauthorid.js",
-        "webauthorprofile.js",
-    ]
+    def __init__(self, page, heading, no_cache=False):
+        self.css_dir = CFG_SITE_URL + "/img"
+        self.img_dir = CFG_SITE_URL + "/img"
+        self.scripts_dir = CFG_SITE_URL + "/js"
+        self.url = CFG_SITE_URL + "/author"
 
-    stylesheets = [
-        "jquery-ui/themes/smoothness/jquery-ui.css",
-        "datatables_jquery-ui.css",
-        "bibauthorid.css",
-        "bootstrap.min.css"
-    ]
+        self.scripts = [
+                        "jquery-ui.min.js",
+                        "jquery.form.js",
+                        "jquery.dataTables.min.js",
+                        "jquery-lightbox/js/jquery.lightbox-0.5.js",
+                        "jquery.omniwindow.js",
+                        # "jquery.blockUI.js",
+                        "spin.min.js",
+                        "sly.min.js",
+                        "parsley.js",
+                        "bootstrap.min.js",
+                        "underscore-min.js",
+                        "backbone.js",
+                        "handlebars.js",
+                        "bibauthorid.js",
+                        "webauthorprofile.js",
+                        ]
 
-    template_files = {
-        'head.html': """\
-{% if no_cache %}
-    <!-- Meta -->
-    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-    <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
-    <META HTTP-EQUIV="Pragma-directive" CONTENT="no-cache">
-    <META HTTP-EQUIV="Cache-Directive" CONTENT="no-cache">
-    <META HTTP-EQUIV="Expires" CONTENT="0">
-{% endif %}
+        self.stylesheets = [
+                        "jquery-ui/themes/smoothness/jquery-ui.css",
+                        "datatables_jquery-ui.css",
+                        "bibauthorid.css",
+                        "bootstrap.min.css"
+                        ]
 
-{% if scripts %}
-    <!-- Scripts -->
-    {% for item in scripts %}<script type="text/javascript" src="{{ scripts_dir }}/{{ item }}"></script>
-    {% endfor %}
-{% endif %}
+        self.template_files = {
+                        'head.html': """\
+                                {% if no_cache %}
+                        <!-- Meta -->
+                        <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+                        <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+                        <META HTTP-EQUIV="Pragma-directive" CONTENT="no-cache">
+                        <META HTTP-EQUIV="Cache-Directive" CONTENT="no-cache">
+                        <META HTTP-EQUIV="Expires" CONTENT="0">
+                        {% endif %}
 
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  tex2jax: {inlineMath: [['$','$']],
-            processEscapes: true},
-  showProcessingMessages: false,
-  messageStyle: "none"
-});
-</script>
-<script src="/MathJax/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
-</script>
+                {% if scripts %}
+                <!-- Scripts -->
+                {% for item in scripts %}<script type="text/javascript" src="{{ scripts_dir }}/{{ item }}"></script>
+                {% endfor %}
+                {% endif %}
 
-{% if stylesheets %}
-    <!-- Stylesheets -->
-    {% for item in stylesheets %}<link rel="stylesheet" type="text/css" href="{{ css_dir }}/{{ item }}" />
-    {% endfor %}
-{% endif %}
-""",
-        'profile_menu.html': """
-<span class="bsw"><ul id="authorid_menu" class="nav nav-pills">
-    {% for item in menu %}\
-    <li{{ ' class="active"' if item.active }}{{ ' class="disabled"' if item.disabled }}>
-        <a href="{{ url }}/{{ item.page }}{% if not item.static %}/{{ item.canonical_name }}{% endif %}">{{ item.text }}</a>
-    </li>
-    {% endfor %}
-</ul></span>
-""",
-        'index.html': """\
+                <script type="text/x-mathjax-config">
+                MathJax.Hub.Config({
+                        tex2jax: {inlineMath: [['$','$']],
+                        processEscapes: true},
+                        showProcessingMessages: false,
+                        messageStyle: "none"
+                        });
+                </script>
+                <script src="/MathJax/MathJax.js?config=TeX-AMS_HTML" type="text/javascript">
+                </script>
+
+                {% if stylesheets %}
+                <!-- Stylesheets -->
+                {% for item in stylesheets %}<link rel="stylesheet" type="text/css" href="{{ css_dir }}/{{ item }}" />
+                {% endfor %}
+                {% endif %}
+                """,
+                'profile_menu.html': """
+                <span class="bsw"><ul id="authorid_menu" class="nav nav-pills">
+                {% for item in menu %}\
+                        <li{{ ' class="active"' if item.active }}{{ ' class="disabled"' if item.disabled }}>
+                <a href="{{ url }}/{{ item.page }}{% if not item.static %}/{{ item.canonical_name }}{% endif %}">{{ item.text }}</a>
+                </li>
+                {% endfor %}
+                </ul></span>
+                """,
+                'index.html': """\
 
 {% if bootstrap %}<div class="hidden" id="jsbootstrap">{{ bootstrap|e }}</div>{% endif %}
 <div class="ow-overlay ow-closed"></div>
@@ -231,7 +233,7 @@ MathJax.Hub.Config({
 
 <div id="person_name"><h1 class="authornametitle">{{ title }}</h1></div>
 <div id="person_menu">\
-{% if menu %}{% include 'profile_menu.html' %}{% endif %}
+        {% if menu %}{% include 'profile_menu.html' %}{% endif %}
 </div>
 
 
@@ -241,37 +243,35 @@ MathJax.Hub.Config({
 </div>
 </span>
 """,
-        'generic_wrapper.html': """
+'generic_wrapper.html': """
 {% extends "index.html" %}
 {% block content %}
 {{ html|safe }}
 {% endblock%}
 """,
-        'debug_block.html': """
+'debug_block.html': """
 <div id="debug_info"><span class="bsw">
-    <table class="table table-striped">
-        <caption><h2>Debug Information</h2></caption>
-        <thead>
-            <tr>
-                <th>Key</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for key, value in debug.iteritems() %}
-            <tr>
-                <td>{{ key|e}}</td>
-                <td>{{ value|e }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<table class="table table-striped">
+<caption><h2>Debug Information</h2></caption>
+<thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+{% for key, value in debug.iteritems() %}
+<tr>
+<td>{{ key|e}}</td>
+<td>{{ value|e }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
 </span></div>
 """
-    }
+}
 
-
-    def __init__(self, page, heading, no_cache=False):
         self._initialise_class_variables()
         self.no_cache = no_cache
         self.heading = heading
@@ -280,6 +280,7 @@ MathJax.Hub.Config({
 
         self.loader = DictLoader(self.template_files)
         self.environment = Environment(loader=self.loader)
+
 
     def _initialise_class_variables(self):
         self.menu = None
