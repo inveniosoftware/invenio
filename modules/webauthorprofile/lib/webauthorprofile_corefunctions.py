@@ -445,6 +445,7 @@ def _compute_cache_for_person(person_id):
                (get_self_pubs,),
                (get_internal_publications,),
                (get_external_publications,),
+               (get_datasets,)
                 ]
 
     waited = 0

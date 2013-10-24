@@ -202,20 +202,10 @@ class WebAuthorPages(WebInterfaceDirectory):
 
         recid = argd['recid']
         if recid > -1:
-            sorted_authors = search_person_ids_by_name(self.original_search_parameter)
-            authors_with_recid = list()
+            possible_authors = search_person_ids_by_name(self.original_search_parameter, limit_to_recid = recid)
 
-            for author, _ in sorted_authors:
-                papers_of_author = get_papers_by_person_id(author, -1)
-                papers_of_author = [int(paper[0]) for paper in papers_of_author]
-
-                if recid not in papers_of_author:
-                    continue
-
-                authors_with_recid.append(int(author))
-
-            if len(authors_with_recid) == 1:
-                self.person_id = authors_with_recid[0]
+            if len(possible_authors) == 1:
+                self.person_id = possible_authors[0][0]
                 self.cid = get_person_redirect_link(self.person_id)
                 redirect_to_url(req, '%s/author/profile/%s%s' % (CFG_SITE_URL, self.cid, encoded))
 

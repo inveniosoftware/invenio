@@ -560,7 +560,7 @@ def get_user_level(uid):
     actions = [row[1] for row in acc_find_user_role_actions({'uid': uid})]
     return max([dbapi.get_paper_access_right(acc) for acc in actions])
 
-def search_person_ids_by_name(namequery):
+def search_person_ids_by_name(namequery, limit_to_recid=None):
     '''
     Prepares the search to search in the database
 
@@ -576,14 +576,21 @@ def search_person_ids_by_name(namequery):
     try:
         query = str(namequery)
     except (ValueError, TypeError):
-        return []
+        return list()
 
     if query:
         escaped_query = escape(query, quote=True)
     else:
-        return []
+        return list()
 
-    return dbapi.find_personIDs_by_name_string(escaped_query)
+    results = dbapi.find_personIDs_by_name_string(escaped_query)
+
+    if not limit_to_recid:
+        return results
+    else:
+        limit_to_persons = set([x[0] for x in dbapi.get_author_to_papers_mapping([limit_to_recid])])
+        return filter(lambda x: x[0] in limit_to_persons, results)
+
 
 ############################################
 #           DB Data Mutators               #

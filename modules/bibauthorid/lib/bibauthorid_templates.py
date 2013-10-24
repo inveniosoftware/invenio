@@ -28,7 +28,7 @@
 #
 import invenio.bibauthorid_config as bconfig
 from invenio.config import CFG_SITE_LANG
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_BASE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL, CFG_WEBAUTHORPROFILE_CFG_HEPNAMES_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
@@ -149,10 +149,10 @@ class WebProfilePage():
 
 
     def __init__(self, page, heading, no_cache=False):
-        self.css_dir = CFG_SITE_URL + "/img"
-        self.img_dir = CFG_SITE_URL + "/img"
-        self.scripts_dir = CFG_SITE_URL + "/js"
-        self.url = CFG_SITE_URL + "/author"
+        self.css_dir = CFG_BASE_URL + "/img"
+        self.img_dir = CFG_BASE_URL + "/img"
+        self.scripts_dir = CFG_BASE_URL + "/js"
+        self.url = CFG_BASE_URL + "/author"
 
         self.scripts = [
                         "jquery-ui.min.js",
