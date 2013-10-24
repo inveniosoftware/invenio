@@ -133,6 +133,11 @@ class Template:
             out += """
                     <table>
                     """
+
+            # In Python 2.4 tuples don't have the index attribute.
+            # We therefore need to convert the keys_info tuple to a list.
+            keys_info = list(keys_info)
+
             for key_info in keys_info:
                 out += """
                         <tr><td>%(key_description)s</td>
