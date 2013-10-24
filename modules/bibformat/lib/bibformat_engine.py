@@ -371,7 +371,7 @@ def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
         return out
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
-                  search_pattern=None, xml_record=None, user_info=None):
+                  search_pattern=None, xml_record=None, user_info=None, qid=""):
     """
     Formats a record given output format. Main entry function of
     bibformat engine.
@@ -463,7 +463,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
         return out
 
     # Format with template
-    out_ = format_with_format_template(template, bfo, verbose)
+    out_ = format_with_format_template(template, bfo, verbose, qid=qid)
 
     out += out_
 
@@ -510,7 +510,7 @@ def decide_format_template(bfo, of):
         return None
 
 def format_with_format_template(format_template_filename, bfo,
-                                verbose=0, format_template_code=None):
+                                verbose=0, format_template_code=None, qid=""):
     """ Format a record given a
     format template.
 
@@ -588,6 +588,7 @@ def format_with_format_template(format_template_filename, bfo,
             recid=bfo.recID,
             record=record,
             format_record=_format_record,
+            qid=qid,
             bfo=bfo, **TEMPLATE_CONTEXT_FUNCTIONS_CACHE.functions).encode('utf-8')
         #except Exception:
         #    register_exception()

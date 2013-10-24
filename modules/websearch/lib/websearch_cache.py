@@ -55,3 +55,10 @@ def get_collection_name_from_cache(qid):
     """
     return search_results_cache.get(
         get_search_results_cache_key_from_qid(qid) + '::cc')
+
+def get_pattern_from_cache(qid):
+    """
+    Returns pattern from query identifier.
+    """
+    return search_results_cache.get(
+        get_search_results_cache_key_from_qid(qid) + '::p')

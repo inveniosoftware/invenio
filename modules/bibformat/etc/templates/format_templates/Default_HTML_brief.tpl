@@ -91,7 +91,7 @@
 {% endmacro %}
 
 {% macro render_fulltext_snippets() %}
-  {{ tfn_get_fulltext_snippets(record['recid'], request.args['p'], current_user) | wrap(prefix='<p><small>', suffix='</small></p>') }}
+  {{ tfn_get_fulltext_snippets(record['recid'], request.args['p'], qid, current_user) | wrap(prefix='<p><small>', suffix='</small></p>') }}
 {% endmacro %}
 
 {% macro record_info() %}

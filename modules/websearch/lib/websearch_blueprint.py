@@ -453,7 +453,7 @@ def results(qid, p, of, so, rm):
 
         return response_formated_records(
             recids, collection, of,
-            create_nearest_terms_box=_create_neareset_term_box)
+            create_nearest_terms_box=_create_neareset_term_box, qid=qid)
 
     return make_results()
 

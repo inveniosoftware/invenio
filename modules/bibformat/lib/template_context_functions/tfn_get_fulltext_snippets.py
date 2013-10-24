@@ -23,15 +23,19 @@ from invenio.config import CFG_WEBSEARCH_FULLTEXT_SNIPPETS
 from invenio.errorlib import register_exception
 from invenio.bibformat_utils import get_pdf_snippets
 from invenio.search_engine_utils import get_fulltext_terms_from_search_pattern
+from invenio.websearch_cache import get_pattern_from_cache
 
-
-def template_context_function(id_bibrec, pattern, current_user):
+def template_context_function(id_bibrec, pattern, qid, current_user):
     """
     @param id_bibrec ID of record
     @param pattern search pattern
     @param current_user user object
+    @param qid query id
     @return HTML containing snippet
     """
+
+    if not pattern: pattern = get_pattern_from_cache(qid)
+
     if id_bibrec and pattern and current_user:
         # Requires search in fulltext field
         if CFG_WEBSEARCH_FULLTEXT_SNIPPETS and 'fulltext:' in pattern:
@@ -40,9 +44,10 @@ def template_context_function(id_bibrec, pattern, current_user):
                 snippets = ''
                 try:
                     snippets = get_pdf_snippets(id_bibrec, terms, current_user).decode('utf8')
+                    if snippets: return ' ... ' + snippets + ' ... '
                 except:
                     register_exception()
-                return snippets
+                return ''
         else:
             return ''
     else:
