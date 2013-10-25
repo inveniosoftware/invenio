@@ -4615,5 +4615,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_20_bibauthority_
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_08_22_new_index_itemcount',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_crcLIBRARY_type',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_18_new_index_filetype',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_delete_recjson_cache',NOW());
 
 -- end of file
