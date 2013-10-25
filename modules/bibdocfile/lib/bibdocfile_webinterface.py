@@ -83,6 +83,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         def getfile(req, form):
             args = wash_urlargd(form, bibdocfile_templates.files_default_urlargd)
             ln = args['ln']
+            if filename[:9] == "allfiles-":
+                filesizes = filename[9:]
+                # stream a tar package to the user
+                brd = BibRecDocs(self.recid)
+                brd.stream_archive_of_latest_files(req, filesizes)
+                return
 
             _ = gettext_set_language(ln)
 
