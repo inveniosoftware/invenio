@@ -185,6 +185,9 @@ var gLastRequestCompleted = new Date();
 // last checkbox checked
 var gLastChecked = null;
 
+// Indicates if profiling is on
+var gProfile = false;
+
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -459,11 +462,18 @@ function createReq(data, onSuccess, asynchronous, deferred, onError) {
     data.cacheMTime = gCacheMTime;
   }
 
-  var ajax_options = {data: { jsondata: JSON.stringify(data) },
+  var formdata = {jsondata: JSON.stringify(data)};
+  if (gProfile) {
+    formdata.ajaxProfile = true;
+  }
+  var ajax_options =  {data: formdata,
                       success: function(json) {
                           onAjaxSuccess(json, onSuccess);
                           if (deferred !== undefined) {
                             deferred.resolve(json);
+                          }
+                          if ( json['profilerStats']) {
+                            $("#bibEditContent").after(json['profilerStats']);
                           }
                       },
                       error: onError};
@@ -709,6 +719,8 @@ function initStateFromHash(){
   var tmpRecID = gHashParsed.recid;
   var tmpRecRev = gHashParsed.recrev;
   var tmpReadOnlyMode = gHashParsed.romode;
+  var profile = gHashParsed.profile;
+  if (profile) gProfile = true;
 
   // Find out which internal state the new hash leaves us with
   if ( tmpState && tmpRecID ) {
