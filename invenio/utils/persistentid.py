@@ -404,3 +404,29 @@ def normalize_pid(val, scheme):
     elif scheme == 'pmid':
         return normalize_pmid(val)
     return val
+
+
+def to_url(val, scheme):
+    val = normalize_pid(val, scheme)
+    if scheme == 'doi':
+        return "http://dx.doi.org/%s" % val
+    elif scheme == 'handle':
+        return "http://hdl.handle.net/%s" % val
+    elif scheme == 'handle':
+        return "http://hdl.handle.net/%s" % val
+    elif scheme == 'arxiv':
+        return "http://arxiv.org/abs/%s" % val
+    elif scheme == 'orcid':
+        return "http://orcid.org/%s" % val
+    elif scheme == 'pmid':
+        return "http://www.ncbi.nlm.nih.gov/pubmed/%s" % val
+    elif scheme == 'ads':
+        return "http://adsabs.harvard.edu/abs/%s" % val
+    elif scheme == 'pmcid':
+        return "http://www.ncbi.nlm.nih.gov/pmc/articles/%s/" % val
+    elif scheme == 'urn':
+        if val.lower().startswith("urn:nbn:"):
+            return "http://nbn-resolving.org/%s" % val
+    elif scheme in ['purl', 'url']:
+        return val
+    return ""

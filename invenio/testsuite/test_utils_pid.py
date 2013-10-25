@@ -96,6 +96,13 @@ class PersistentIdentifierUtilities(InvenioTestCase):
                 normalized_value or i
             )
 
+    def test_tourl(self):
+        for i, expected_schemes, normalized_value in identifiers:
+            pidutils.to_url(
+                pidutils.normalize_pid(i, expected_schemes[0]),
+                expected_schemes[0]
+            )
+
 
 TEST_SUITE = make_test_suite(PersistentIdentifierUtilities)
 
