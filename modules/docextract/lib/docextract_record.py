@@ -156,6 +156,13 @@ class BibRecord(object):
             r = default
         return r
 
+    def get(self, tag, default):
+        try:
+            r = self[tag]
+        except KeyError:
+            r = default
+        return r
+
     def __eq__(self, b):
         if set(self.record.keys()) != set(b.record.keys()):
             return False
