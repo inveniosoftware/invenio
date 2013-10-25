@@ -43,16 +43,22 @@ CFG_BIBRANK_CITATION_HISTORY_MIN_X_POINTS = 2
 REL_PATH = 'img/citation-graphs'
 BASE_DIR = os.path.join(CFG_WEBDIR, os.path.join(*REL_PATH.split('/')))
 
+DATE_TAGS = ('269__c', '773__y', '260__c', '111__x', '502__d')
+
+
+def get_record_year(recid):
+    record_date = []
+    for tag in DATE_TAGS:
+        record_date = get_fieldvalues(recid, tag)
+        if record_date:
+            break
+    return record_date
+
 
 def calculate_citation_graphe_x_coordinates(recid):
     """Return a range of year from the publication year of record RECID
        until the current year."""
-    record_date = get_fieldvalues(recid, '269__c')
-    if not record_date:
-        record_date = get_fieldvalues(recid, '773__y')
-        if not record_date:
-            record_date = get_fieldvalues(recid, '260__c')
-
+    record_date = get_record_year(recid)
     currentyear = time.localtime()[0]
 
     recordyear = None
@@ -75,11 +81,7 @@ def calculate_citation_history_coordinates(recid):
         return []
 
     for recid in get_cited_by(recid):
-        rec_date = get_fieldvalues(recid, '269__c')
-        if not rec_date:
-            rec_date = get_fieldvalues(recid, '773__y')
-            if not rec_date:
-                rec_date = get_fieldvalues(recid, '260__c')
+        rec_date = get_record_year(recid)
         # Some records simlpy do not have these fields
         if rec_date:
             # Maybe rec_date[0][0:4] has a typo and cannot
