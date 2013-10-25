@@ -41,15 +41,13 @@ from invenio.search_engine import get_collection_reclist
 from invenio.search_engine_utils import get_fieldvalues
 
 
-def get_kbs(custom_kbs_files=None, cache=None):
+def get_kbs(custom_kbs_files=None, cache={}):
     """Load kbs (with caching)
 
     This function stores the loaded kbs into the cache variable
     For the caching to work, it needs to receive an empty dictionary
     as "cache" paramater.
     """
-    if not cache:
-        cache = {}
 
     cache_key = make_cache_key(custom_kbs_files)
     if cache_key not in cache:
