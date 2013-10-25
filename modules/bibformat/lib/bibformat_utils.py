@@ -589,8 +589,7 @@ def get_pdf_snippets(recID, patterns, user_info):
 
     @param recID: record ID to consider
     @param patterns: list of patterns to retrieve
-    @param nb_words_around: max number of words around the matched pattern
-    @param max_snippets: max number of snippets to include
+    @param user_info: the user_info object from collect_user_info
     @return: snippet
     """
     from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization
@@ -599,7 +598,7 @@ def get_pdf_snippets(recID, patterns, user_info):
     text_path_courtesy = ""
     for bd in BibRecDocs(recID).list_bibdocs():
         # Show excluded fulltext in snippets on Inspire, otherwise depending on authorization
-        if bd.get_text() and (CFG_INSPIRE_SITE or not check_bibdoc_authorization(user_info, bd.get_status())[0]):
+        if hasattr(bd, 'get_text') and (CFG_INSPIRE_SITE or not check_bibdoc_authorization(user_info, bd.get_status())[0]):
             text_path = bd.get_text_path()
             text_path_courtesy = bd.get_status()
             if CFG_INSPIRE_SITE and not text_path_courtesy:
