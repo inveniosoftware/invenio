@@ -85,7 +85,7 @@ def calculate_citation_history_coordinates(recid):
             # Maybe rec_date[0][0:4] has a typo and cannot
             # be converted to an int
             try:
-                d = strptime(rec_date[0], '%Y-%m')
+                d = strptime(rec_date[0][:4], '%Y')
             except ValueError:
                 pass
             else:
