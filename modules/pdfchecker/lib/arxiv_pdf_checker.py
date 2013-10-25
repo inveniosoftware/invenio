@@ -92,7 +92,7 @@ def extract_arxiv_ids_from_recid(recid):
     037__ $9arXiv$arXiv:1010.1111
     """
     record = get_record(recid)
-    for report_number_field in record['037']:
+    for report_number_field in record.get('037', []):
         try:
             source = report_number_field.get_subfield_values('9')[0]
         except IndexError:
