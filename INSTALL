@@ -38,7 +38,8 @@ Contents
               gs-common clisp gettext libapache2-mod-wsgi unzip \
               python-dateutil python-rdflib \
               python-gnuplot python-magic pdftk html2text giflib-tools \
-              pstotext netpbm python-pypdf python-chardet python-lxml
+              pstotext netpbm python-pypdf python-chardet python-lxml \
+              python-unidecode
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
@@ -139,6 +140,9 @@ Contents
           - (optional) Python Twitter (and its dependencies) if you want
              to use the Twitter Fetcher bibtasklet:
              <http://code.google.com/p/python-twitter/>
+          - (optional) unidecode, for ASCII representation of Unicode
+             text:
+             <https://pypi.python.org/pypi/Unidecode>
 
         Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
               you are using an older version of MySQLdb, you may get
