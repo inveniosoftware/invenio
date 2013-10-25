@@ -2382,7 +2382,7 @@ def get_free_author_ids():   ### get_free_pids
                 _select_from_aidpersonidpapers_where(select=['personid']),
                 _select_from_aidpersoniddata_where(select=['personid'])))
 
-    return ifilter(lambda x: x not in all_pids, count())
+    return ifilter(lambda x: x not in all_pids, count(1))
 
 
 def get_free_author_id():   ### get_new_personid

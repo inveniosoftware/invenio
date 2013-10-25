@@ -303,7 +303,7 @@ def merge_dynamic():
 
         assert len(assigned) == 1
 
-        if rejected:
+        if int(target_pid) in [int(x[0]) for x in rejected]:
             move_signature(sig, free_pids.next())
         else:
             conflicts = get_signatures_of_paper_and_author(sig, target_pid)
@@ -333,25 +333,23 @@ def merge_dynamic():
         old_pids = set()
 
         for k, ds in results:
-            pids = []
-            claim = []
+            pids = list()
             for d in ds:
                 pid_flag = get_author_and_status_of_confirmed_paper(d)
                 if pid_flag:
                     pid, flag = pid_flag[0]
                     pids.append(pid)
                     old_pids.add(pid)
-                    if flag > 1:
-                        claim.append((d, pid))
 
             matr.append(dict((k, len(list(d))) for k, d in groupby(sorted(pids))))
 
         # We cast it to list in order to ensure the order persistence.
         old_pids = list(old_pids)
+        #best_match = cluster,pid_idx,n
         best_match = maximized_mapping([[row.get(old, 0) for old in old_pids] for row in matr])
 
-        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, _ in best_match]
-        not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), best_match))
+        matched_clusters = [(results[new_idx][1], old_pids[old_idx]) for new_idx, old_idx, score in best_match if score > 0]
+        not_matched_clusters = frozenset(xrange(len(results))) - frozenset(imap(itemgetter(0), [x for x in best_match if x[2] > 0]))
         not_matched_clusters = izip((results[i][1] for i in not_matched_clusters), free_pids)
 
         for sigs, pid in chain(matched_clusters, not_matched_clusters):

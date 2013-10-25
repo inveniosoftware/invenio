@@ -150,7 +150,23 @@ def create_bibauthorid_indexer():
         asciified_name = translate_to_ascii(name)[0]
         indexable_name = create_indexable_name(asciified_name)
         if indexable_name:
-            indexable_name_pids_dict[indexable_name] = (asciified_name, name_pids_dict[name])
+            try:
+                asciified_name, pids = indexable_name_pids_dict[indexable_name]
+                updated_pids = pids | name_pids_dict[name]
+                indexable_name_pids_dict[indexable_name] = (asciified_name, updated_pids)
+            except KeyError:
+                indexable_name_pids_dict[indexable_name] = (asciified_name, name_pids_dict[name])
+
+        surname = split_name_parts(name)[0]
+        asciified_surname = translate_to_ascii(surname)[0]
+        indexable_surname = create_indexable_name(asciified_surname)
+        if indexable_surname:
+            try:
+                asciified_surname, pids = indexable_name_pids_dict[indexable_surname]
+                updated_pids = pids | name_pids_dict[name]
+                indexable_name_pids_dict[indexable_surname] = (asciified_surname, updated_pids)
+            except KeyError:
+                indexable_name_pids_dict[indexable_surname] = (asciified_surname, name_pids_dict[name])
 
     indexable_names_list = indexable_name_pids_dict.keys()
 
@@ -216,6 +232,35 @@ def solve_T_occurence_problem(query_string):
     return nameids
 
 
+def calculate_name_score1(query_string, nameids):
+    '''
+    docstring
+
+    @param query_string:
+    @type query_string:
+    @param nameids:
+    @type nameids:
+
+    @return:
+    @rtype:
+    '''
+    name_personids_list = get_authors_data_from_indexable_name_ids(nameids)
+    query_last_name = split_name_parts(query_string)[0]
+    query_last_name_len = len(query_last_name)
+    name_score_list = list()
+
+    for name, personids in name_personids_list:
+        current_last_name = split_name_parts(name)[0]
+        current_last_name_len = len(current_last_name)
+        if abs(query_last_name_len - current_last_name_len) == 0:
+            dist = distance(query_last_name, current_last_name)
+            limit = min([query_last_name_len, current_last_name_len])
+            name_score = sum([1/float(2**(i+1)) for i in range(limit) if query_last_name[i] == current_last_name[i]])/(dist + 1)
+            if name_score > 0.5:
+                name_score_list.append((name, name_score, deserialize(personids)))
+
+    return name_score_list
+
 def calculate_name_score(query_string, nameids):
     '''
     docstring
@@ -279,7 +324,7 @@ def calculate_pid_score(names_score_list):
     return pids_score_list
 
 
-def find_personids_by_name(query_string):
+def find_personids_by_name1(query_string):
     '''
     It finds a collection of personids who own a signature that is similar to the given query string.
     Its approach is by solving a 'T-occurance problem' and then it applies some filters to the candidate
@@ -301,16 +346,53 @@ def find_personids_by_name(query_string):
     if not indexable_query_string:
         return list()
 
+    #query_string_surname = split_name_parts(query_string)[0]
+    #asciified_query_string_surname = translate_to_ascii(query_string_surname)[0]
+    #indexable_query_string_surname = create_indexable_name(asciified_query_string_surname)
+
+    #if not indexable_query_string and not indexable_query_string_surname:
+    #    return list()
+
+    s1 = solve_T_occurence_problem(indexable_query_string)
+
+    if not s1:
+        s1 = intbitset()
+
     nameids = solve_T_occurence_problem(indexable_query_string)
+
+    #s2 = solve_T_occurence_problem(indexable_query_string_surname)
+    #if not s2:
+    #    s2 = intbitset()
+
+    #nameids = s1 | s2
     if not nameids:
         return list()
 
     name_score_list = calculate_name_score(asciified_query_string, nameids)
-    name_ranking_list = sorted(name_score_list, key=itemgetter(1), reverse=True)
+    
+    return name_score_list
+    #name_ranking_list = sorted(name_score_list, key=itemgetter(1), reverse=True)
 
+    #pid_score_list = calculate_pid_score(name_ranking_list)
+    #pids_ranking_list = sorted(pid_score_list, key=itemgetter(2), reverse=True)
+
+    #ranked_pid_name_list = [pid for pid, name, final_score in pids_ranking_list]
+
+    #return ranked_pid_name_list
+
+
+def find_personids_by_name(query_string):
+    query_string_surname = split_name_parts(query_string)[0]
+    
+    name_score_list = set(find_personids_by_name1(query_string) + find_personids_by_name1(query_string_surname))
+    name_ranking_list = sorted(name_score_list, key=itemgetter(1), reverse=True)
+    
     pid_score_list = calculate_pid_score(name_ranking_list)
     pids_ranking_list = sorted(pid_score_list, key=itemgetter(2), reverse=True)
 
     ranked_pid_name_list = [pid for pid, name, final_score in pids_ranking_list]
 
-    return ranked_pid_name_list
+    return ranked_pid_name_list    
+
+
+

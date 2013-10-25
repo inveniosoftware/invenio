@@ -212,6 +212,7 @@ def fallback_find_personids_by_name_string(target):
     for lev in levels:
         names = dbinter.get_authors_by_name_regexp(lev)
         if names:
+            print "%s" % lev
             break
 
     is_canonical = False
