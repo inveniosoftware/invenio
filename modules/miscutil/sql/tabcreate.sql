@@ -4130,5 +4130,6 @@ INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_10_31_tablesorter_l
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_01_lower_user_email',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_21_aiduserinputlog_userid_check',NOW());
 INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2012_11_15_hstRECORD_marcxml_longblob',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('invenio_2013_10_25_new_param_websubmit_function',NOW());
 
 -- end of file
