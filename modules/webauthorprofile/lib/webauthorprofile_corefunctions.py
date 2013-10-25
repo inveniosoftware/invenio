@@ -50,9 +50,9 @@ from invenio.bibauthorid_webauthorprofileinterface import get_papers_by_person_i
     get_names_of_author, create_normalized_name, \
     get_person_redirect_link, is_valid_canonical_id, split_name_parts, \
     gathered_names_by_personid, get_canonical_name_of_author, get_coauthors_of_author, \
-    get_names_count_of_author, get_existing_authors, get_all_personids_recs, \
+    get_names_count_of_author, get_existing_authors, get_confirmed_papers_of_author, \
     get_title_of_paper, get_orcid_id_of_author, get_arxiv_papers_of_author, \
-    get_hepnames
+    get_hepnames, remove_empty_authors
 from invenio.bibauthorid_general_utils import get_title_of_doi, get_title_of_arxiv_pubid
 from invenio.webauthorprofile_dbapi import get_cached_element, precache_element, cache_element, \
     expire_all_cache_for_person, get_expired_person_ids, get_cache_oldest_date
@@ -340,7 +340,7 @@ def _get_internal_publications(person_id):
     '''
     internal_pubs = dict()
 
-    recs = [i[0] for i in get_all_personids_recs(person_id)]
+    recs = get_confirmed_papers_of_author(person_id)
     for rec in recs:
         internal_pubs[rec] = get_title_of_paper(rec)
 
@@ -355,7 +355,7 @@ def get_datasets(person_id):
     return retrieve_update_cache('datasets_pubs', 'pid:' + str(person_id), _get_datasets, person_id)
 
 def _get_datasets(person_id):
-    recs =  [i[0] for i in get_all_personids_recs(person_id)]
+    recs =  get_confirmed_papers_of_author(person_id)
     data_recs = set()
 
     for rec in recs:
@@ -468,13 +468,16 @@ def _compute_cache_for_person(person_id):
     print person_id, ',' , str(time() - start)
 
 def precompute_cache_for_person(person_ids=None, all_persons=False, only_expired=False):
-    pids = []
+    pids = set()
     if all_persons:
-        pids = list(get_existing_authors(with_papers_only=True))
+        pids = get_existing_authors(with_papers_only=True)
     elif only_expired:
-        pids = get_expired_person_ids()
+        pids = set(get_expired_person_ids())
     if person_ids:
-        pids += person_ids
+        pids |= person_ids
+
+    empty_pids = remove_empty_authors(remove=False)
+    pids = pids - empty_pids
 
     last = len(pids)
     for i, p in enumerate(pids):
@@ -485,13 +488,13 @@ def precompute_cache_for_person(person_ids=None, all_persons=False, only_expired
         #print 'DONE: ', p , ',' , str(time() - start)
 
 def multiprocessing_precompute_cache_for_person(person_ids=None, all_persons=False, only_expired=False):
-    pids = []
+    pids = set()
     if all_persons:
-        pids = list(get_existing_authors(with_papers_only=True))
+        pids = get_existing_authors(with_papers_only=True)
     elif only_expired:
-        pids = get_expired_person_ids()
+        pids = set(get_expired_person_ids())
     if person_ids:
-        pids += person_ids
+        pids |= person_ids
 
     from multiprocessing import Pool
     p = Pool()
@@ -684,11 +687,10 @@ def max_key(iterable, key):
 def _get_coauthors_bai(collabs, person_id):
     cid = canonical_name(person_id)
 
+    exclude_recs = None
     if collabs:
         query = 'author:%s and (%s)' % (cid, ' or '.join([('collaboration:"%s"' % x) for x in zip(*collabs)[0]]))
         exclude_recs = perform_request_search(rg=0, p=query)
-    else:
-        exclude_recs = None
 
     personids = get_coauthors_of_author(person_id, exclude_recs)
 

@@ -136,10 +136,14 @@ def split_name_parts(name_string, delete_name_additions=True,
             # Fix for dashes
             surname = re.sub('-([a-z])', lambda n:'-' + n.group(1).upper(), surname)
         else:
+            surname = name_string
+            surname = surname.strip().capitalize()
+            # Fix for dashes
+            surname = re.sub('-([a-z])', lambda n:'-' + n.group(1).upper(), surname)
             if not return_all_lower:
-                return [name_string.strip().capitalize(), [], [], []]
+                return [surname, [], [], []]
             else:
-                return [name_string.strip().lower(), [], [], []]
+                return [surname.lower(), [], [], []]
 
     if rest_of_name.count(","):
         rest_of_name = string_partition(rest_of_name, ",")[0]
@@ -205,11 +209,10 @@ def create_normalized_name(splitted_name):
     for i in range(len(splitted_name[1])):
         try:
             fname = splitted_name[2][splitted_name[3].index(i)]
-            name = name + ' ' + fname
+            name = name + ' ' + fname.capitalize()
         except (IndexError, ValueError):
-            name = name + ' ' + splitted_name[1][i] + '.'
+            name = name + ' ' + splitted_name[1][i].capitalize() + '.'
 
-    name = ' '.join([x.capitalize() for x in name.split(' ')])
     return name
 
 
@@ -344,7 +347,7 @@ def soft_compare_names(origin_name, target_name):
     targ_name[0] = clean_name_string(targ_name[0],
                                      replacement="",
                                      keep_whitespace=False)
-    if orig_name[0] == targ_name[0]:
+    if orig_name[0].lower() == targ_name[0].lower():
         score += 0.6
     else:
         if ((jaro_fctn(orig_name[0].lower(), targ_name[0].lower()) < .95)

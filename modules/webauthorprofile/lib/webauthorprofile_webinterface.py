@@ -51,6 +51,8 @@ from invenio.bibauthorid_webinterface import WebInterfaceAuthorTicketHandling
 import invenio.bibauthorid_webapi as webapi
 
 import invenio.template
+import cProfile, pstats, cStringIO
+
 websearch_templates = invenio.template.load('websearch')
 webauthorprofile_templates = invenio.template.load('webauthorprofile')
 bibauthorid_template = invenio.template.load('bibauthorid')
@@ -77,6 +79,28 @@ from webauthorprofile_config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBAUTHORPROFILE_USE_BIBAUTHORID
 
 RECOMPUTE_ALLOWED_DELAY = timedelta(minutes=30)
+
+
+def wrap_json_req_profiler(func):
+
+    def json_req_profiler(self, req, form):
+        if "ajaxProfile" in form:
+            profiler = cProfile.Profile()
+            return_val = profiler.runcall(func, self, req, form)
+
+            results = cStringIO.StringIO()
+            stats = pstats.Stats(profiler, stream=results)
+            stats.sort_stats('cumulative')
+            stats.print_stats(100)
+
+            json_data = json.loads(return_val)
+            json_data.update({"profilerStats": "<pre style='overflow: scroll'>" + results.getvalue() + "</pre>"})
+            return json.dumps(json_data)
+
+        else:
+            return func(self, req, form)
+
+    return json_req_profiler
 
 class WebAuthorPages(WebInterfaceDirectory):
     '''
@@ -244,7 +268,8 @@ class WebAuthorPages(WebInterfaceDirectory):
         debug = "verbose" in argd and argd["verbose"] > 0
 
         # Create Page Markup and Menu
-        menu = WebProfileMenu(webapi.get_canonical_id_from_person_id(self.person_id), "profile", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
+        cname = webapi.get_canonical_id_from_person_id(self.person_id)
+        menu = WebProfileMenu(str(cname), "profile", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
 
         profile_page = WebProfilePage("profile", webapi.get_longest_name_from_pid(self.person_id))
         profile_page.add_profile_menu(menu)
@@ -313,7 +338,7 @@ class WebAuthorPages(WebInterfaceDirectory):
                         language=ln,
                         show_title_p=False)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_name_variants(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -337,9 +362,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'name_variants': {'status': namesdictStatus, 'html_content': webauthorprofile_templates.tmpl_author_name_variants_box(db_names_dict, bibauthorid_data, ln='en', add_box=False, loading=not db_names_dict)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_combined_papers(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -367,9 +392,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'combined_papers': {'status': selfpubsStatus, 'html_content': webauthorprofile_templates.tmpl_papers_with_self_papers_box(pubs, selfpubs, bibauthorid_data, totaldownloads, ln='en', add_box=False, loading=not selfpubsStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_keywords(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -392,9 +417,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'keywords': {'status': kwtuplesStatus, 'html_content': webauthorprofile_templates.tmpl_keyword_box(kwtuples, bibauthorid_data, ln='en', add_box=False, loading=not kwtuplesStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_fieldcodes(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -417,9 +442,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'fieldcodes': {'status': fieldtuplesStatus, 'html_content': webauthorprofile_templates.tmpl_fieldcode_box(fieldtuples, bibauthorid_data, ln='en', add_box=False, loading=not fieldtuplesStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_affiliations(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -434,9 +459,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'affiliations': {'status': author_aff_pubsStatus, 'html_content': webauthorprofile_templates.tmpl_affiliations_box(author_aff_pubs, ln='en', add_box=False, loading=not author_aff_pubsStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_coauthors(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -456,9 +481,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'coauthors': {'status': coauthorsStatus, 'html_content': webauthorprofile_templates.tmpl_coauthor_box(bibauthorid_data, coauthors, ln='en', add_box=False, loading=not coauthorsStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_pubs(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -478,9 +503,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'numpaperstitle': {'status': pubsStatus, 'html_content': webauthorprofile_templates.tmpl_numpaperstitle(bibauthorid_data, pubs)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_authors_pubs(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -509,9 +534,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'authornametitle': {'status': (namesdictStatus and namesdictStatus and pubsStatus), 'html_content': webauthorprofile_templates.tmpl_authornametitle(authorname, bibauthorid_data, pubs, person_link, ln='en', loading=not (namesdictStatus and namesdictStatus and pubsStatus))}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_citations(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -530,9 +555,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'citations': {'status': (summarize_recordsStatus and pubsStatus), 'html_content': webauthorprofile_templates.tmpl_citations_box(summarize_records, pubs, ln='en', add_box=False, loading=not (summarize_recordsStatus and pubsStatus))}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_pubs_graph(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -547,9 +572,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'pubs_graph': {'status': pubs_per_yearStatus, 'html_content': webauthorprofile_templates.tmpl_graph_box(pubs_per_year, ln='en', add_box=False, loading=not pubs_per_yearStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_hepdata(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -562,9 +587,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'hepdata': {'status': hepdictStatus, 'html_content': bibauthorid_template.tmpl_hepnames_box(hepdict, ln='en', add_box=False, loading=not hepdictStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_collaborations(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -582,9 +607,9 @@ class WebAuthorPages(WebInterfaceDirectory):
 
                 json_response['boxes_info'].update({'collaborations': {'status': collabStatus, 'html_content': webauthorprofile_templates.tmpl_collab_box(collab, bibauthorid_data, ln='en', add_box=False, loading=not collabStatus)}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
-
+    @wrap_json_req_profiler
     def create_authorpage_pubs_list(self, req, form):
         if form.has_key('jsondata'):
             json_response = {'boxes_info': {}}
@@ -608,7 +633,7 @@ class WebAuthorPages(WebInterfaceDirectory):
                                              external_pubs, datasets_pubs, ln='en',
                               add_box=False, loading=not (internal_pubsStatus and external_pubsStatus))}})
                 req.content_type = 'application/json'
-                req.write(json.dumps(json_response))
+                return json.dumps(json_response)
 
 
     def create_authorpage_websearch(self, req, form, ln='en', expire_cache=False):

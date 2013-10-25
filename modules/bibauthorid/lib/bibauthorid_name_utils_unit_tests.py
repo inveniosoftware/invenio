@@ -79,7 +79,9 @@ class Test_split_name_parts(unittest.TestCase):
          'test, mix initials morder': ['Test',['M', 'I', 'M'],['Mix', 'Initials', 'Morder'],[0, 1, 2]],
          'test, s. s. b.': ['Test', ['S', 'S', 'B'], [], []],
          'test, s. still be': ['Test', ['S', 'S', 'B'], ['Still', 'Be'], [1, 2]],
-         'with .[+)* ] just but without comma test': ['Test',['W', '[', '*', ']', 'J', 'B', 'W', 'C'],['With', '[+', 'Just', 'But', 'Without', 'Comma'],[0, 1, 4, 5, 6, 7]]
+         'with .[+)* ] just but without comma test': ['Test',['W', '[', '*', ']', 'J', 'B', 'W', 'C'],['With', '[+', 'Just', 'But', 'Without', 'Comma'],[0, 1, 4, 5, 6, 7]],
+         'test-dash': ['Test-Dash', [], [], []],
+         'test-dash,': ['Test-Dash', [], [], []]
          }
 
     def test_split_name_parss(self):
@@ -181,6 +183,9 @@ class Test_soft_name_comparison(unittest.TestCase):
         'Diff, Con Nome': ['Erent, Con Nome', [(ge, 0.0), (le, 0.4)]],
         'Diff, Con Nomee': ['Erent, Che Noun', [(ge, 0.0), (le, 0.2)]],
         'Diff, Name': ['Erent, Completely', [(ge, 0.0), (le, 0.1)]],
+        'Test-dash': ['Test-dash', [(ge, 0.5), (le, 1.)]],
+        'Test, noname': ['Test,', [(ge, 0.5), (le, 1.)]],
+        'Test, noname': ['Test', [(ge, 0.5), (le, 1.)]],
         }
 
     def test_value_ranges(self):

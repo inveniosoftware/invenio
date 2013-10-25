@@ -1990,55 +1990,61 @@ def delete_transaction_from_request_ticket(pid, tid, action, bibrefrec):
 
 def create_request_ticket(userinfo, ticket):
     '''
-    Creates a request ticket
+    Creates a request ticket and sends an email to RT.
+
     @param usernfo: dictionary of info about user
     @param ticket: dictionary ticket
     '''
-    # write ticket to DB
-    # send eMail to RT
     udata = list()
     mailcontent = list()
     m = mailcontent.append
+
     m("A user sent a change request through the web interface.")
     m("User Information:")
 
     for k, v in userinfo.iteritems():
+        udata.append([k, v])
         if v:
             m("    %s: %s" % (k, v))
 
-    m("\nLinks to all issued Person-based requests:\n")
+    m("\nOperations:")
 
-    for i in userinfo:
-        udata.append([i, userinfo[i]])
+    tic = dict()
+    for op in ticket:
+        bibrefrec = op['bibref'] + ',' + str(op['rec'])
 
-    tic = {}
-    for t in ticket:
-        if not t['action'] in ['assign', 'reject', 'reset']:
+        if not op['action'] in ['assign', 'reject', 'reset']:
             return False
-        elif t['pid'] < 0:
+        elif op['pid'] < 0:
             return False
-        elif not is_valid_bibref(t['bibref'] + ',' + str(t['rec'])):
+        elif not is_valid_bibref(bibrefrec):
             return False
 
-        if t['action'] == 'reset':
-            # we ignore reset operations
+        # ignore reset operations
+        if op['action'] == 'reset':
             continue
 
-        try:
-            tic[t['pid']].append((t['action'], t['bibref'] + ',' + str(t['rec'])))
-        except KeyError:
-            tic[t['pid']] = [(t['action'], t['bibref'] + ',' + str(t['rec'])), ]
+        cname = get_person_redirect_link(op['pid'])
 
-    for pid in tic:
+        try:
+            tic[(op['pid'], cname)].append((op['action'], bibrefrec))
+        except KeyError:
+            tic[(op['pid'], cname)] = [(op['action'], bibrefrec),]
+
+        preposition = 'to' if op['action'] == 'assign' else 'from'
+        m("    %s %s %s %s" % (op['action'].title(), bibrefrec, preposition, cname))
+
+    m("\nLinks to all issued Person-based requests:\n")
+
+    for pid, cname in tic:
         data = list()
         for i in udata:
             data.append(i)
         data.append(['date', ctime()])
-        data.append(['operations', tic[pid]])
-        dbapi.update_request_ticket_for_author(pid, dict(data))
-        pidlink = get_person_redirect_link(pid)
+        data.append(['operations', tic[(pid, cname)]])
 
-        m("%s/author/claim/%s?open_claim=True#tabTickets" % (CFG_SITE_URL, pidlink))
+        dbapi.update_request_ticket_for_author(pid, dict(data))
+        m("%s/author/claim/%s?open_claim=True#tabTickets" % (CFG_SITE_URL, cname))
 
     m("\nPlease remember that you have to be logged in "
       "in order to see the ticket of a person.\n")
@@ -2904,7 +2910,7 @@ def construct_operation(operation_parts, pinfo, uid, should_have_bibref=False):
     if pid == bconfig.CREATE_NEW_PERSON:
         pid = create_new_person(uid)
     action = operation_parts['action']
-    bibref, rec = _split_bibrefrec(operation_parts['bibrefrec'])
+    bibref, rec = split_bibrefrec(operation_parts['bibrefrec'])
     bibrefs = None
 
     if rec < 0 or pid < 0 or action not in ['assign', 'reject', 'reset']:
@@ -3046,7 +3052,7 @@ def clean_ticket(ticket):
 #      Not Exposed Ticket Functions        #
 ############################################
 
-def _split_bibrefrec(bibrefrec):
+def split_bibrefrec(bibrefrec):
     if is_valid_bibref(bibrefrec):
         bibref, rec = bibrefrec.split(',')
         rec = int(rec)
@@ -3122,7 +3128,7 @@ def _commit_ticket(ticket, userinfo, uid, ulevel):
         create_request_ticket(userinfo, ticket)
 
         for op in ticket:
-            op['execution_result'] = { 'success':True, 'operation':'ticketized' }
+            op['execution_result'] = {'success': True, 'operation': 'ticketized'}
 
 
     def commit_ticket_user(ticket, userinfo, uid, modified_pids):
@@ -3144,7 +3150,7 @@ def _commit_ticket(ticket, userinfo, uid, ulevel):
             send_user_commit_notification_email(userinfo, ok_ops)
 
         for op in ticket:
-            op['execution_result'] = { 'success':True, 'operation':'ticketized' }
+            op['execution_result'] = {'success': True, 'operation': 'ticketized'}
 
         ticket += ok_ops
 

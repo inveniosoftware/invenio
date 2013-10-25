@@ -210,7 +210,8 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         session.dirty = True
 
         ## Create menu and page using templates
-        menu = WebProfileMenu(webapi.get_canonical_id_from_person_id(self.person_id), "claim", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
+        cname = webapi.get_canonical_id_from_person_id(self.person_id)
+        menu = WebProfileMenu(str(cname), "claim", ln, self._is_profile_owner(pinfo['pid']), self._is_admin(pinfo))
 
         profile_page = WebProfilePage("claim", webapi.get_longest_name_from_pid(self.person_id))
         profile_page.add_profile_menu(menu)
@@ -893,6 +894,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'confirm': (str, None),
                              'delete_external_ids': (str, None),
                              'merge': (str, None),
+                             'reject': (str, None),
                              'repeal': (str, None),
                              'reset': (str, None),
                              'send_message': (str, None),
@@ -924,6 +926,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                              'confirm',
                              'delete_external_ids',
                              'merge',
+                             'reject',
                              'repeal',
                              'reset',
                              'send_message',
@@ -1208,15 +1211,47 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
 
         def claim():
             if argd['selection'] is not None:
-                bibrefs = argd['selection']
+                bibrefrecs = argd['selection']
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: cannot create ticket without any bibrefrec")
+            if argd['pid'] > -1:
+                pid = argd['pid']
+            else:
+                return self._error_page(req, ln,
+                            "Fatal: cannot claim papers to an unknown person")
+
+            if action == 'assign':
+                claimed_recs = [paper[2] for paper in get_claimed_papers_of_author(pid)]
+                for bibrefrec in list(bibrefrecs):
+                    _, rec = webapi.split_bibrefrec(bibrefrec)
+                    if rec in claimed_recs:
+                        bibrefrecs.remove(bibrefrec)
+
+            for bibrefrec in bibrefrecs:
+                operation_parts = {'pid': pid,
+                                   'action': action,
+                                   'bibrefrec': bibrefrec}
+
+                operation_to_be_added = webapi.construct_operation(operation_parts, pinfo, uid)
+                if operation_to_be_added is None:
+                    continue
+
+                ticket = pinfo['ticket']
+                webapi.add_operation_to_ticket(operation_to_be_added, ticket)
+
+            session.dirty = True
+
+            return redirect_to_url(req, "%s/author/claim/%s" % (CFG_SITE_URL, webapi.get_person_redirect_link(pid)))
+
+        def claim_to_other_person():
+            if argd['selection'] is not None:
+                bibrefrecs = argd['selection']
             else:
                 return self._error_page(req, ln,
                             "Fatal: cannot create ticket without any bibrefrec")
 
-            if action == 'assign' and 'pid' in argd:
-                return self._ticket_open_claim(req, bibrefs, ln)
-            elif action == 'to_other_person' or 'pid' not in argd:
-                return self._ticket_open_assign_to_other_person(req, bibrefs, form)
+            return self._ticket_open_assign_to_other_person(req, bibrefrecs, form)
 
         def commit_rt_ticket():
             if argd['selection'] is not None:
@@ -1473,11 +1508,12 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
                             'confirm': confirm_repeal_reset,
                             'delete_external_ids': delete_external_ids,
                             'merge': merge,
+                            'reject': claim,
                             'repeal': confirm_repeal_reset,
                             'reset': confirm_repeal_reset,
                             'send_message': send_message,
                             'set_canonical_name': set_canonical_name,
-                            'to_other_person': claim,
+                            'to_other_person': claim_to_other_person,
                             None: none_action}
 
         return action_functions[action]()
@@ -1768,7 +1804,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
             is_owner = self._is_profile_owner(last_visited_pid)
 
-        menu = WebProfileMenu(cname, "search", ln, is_owner, self._is_admin(pinfo))
+        menu = WebProfileMenu(str(cname), "search", ln, is_owner, self._is_admin(pinfo))
 
         title = "Person search"
         # Create Wrapper Page Markup
@@ -1847,22 +1883,22 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         @return: a full page formatted in HTML
         @rtype: string
         '''
-
-        webapi.session_bareinit(req)
-        session = get_session(req)
-
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
                                    'primary_profile': (str, None),
                                    'search_param': (str, ''),
+                                   'selection': (list, None),
                                    'verbose': (int, 0)})
 
-        debug = "verbose" in argd and argd["verbose"] > 0
-
-        pinfo = session['personinfo']
+        ln = argd['ln']
         primary_cname = argd['primary_profile']
         search_param = argd['search_param']
+        selection = argd['selection']
+        debug = 'verbose' in argd and argd['verbose'] > 0
 
-        ln = argd['ln']
+        webapi.session_bareinit(req)
+        session = get_session(req)
+        pinfo = session['personinfo']
+        profiles_to_merge = pinfo['merge_profiles']
         _ = gettext_set_language(ln)
 
         if not primary_cname:
@@ -1871,6 +1907,17 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         no_access = self._page_access_permission_wall(req)
         if no_access:
             return no_access
+
+        if selection is not None:
+            profiles_to_merge_session = [cname for cname, is_available in profiles_to_merge]
+
+            for profile in selection:
+                if profile not in profiles_to_merge_session:
+                    pid = webapi.get_person_id_from_canonical_id(profile)
+                    is_available = webapi.is_profile_available(pid)
+                    pinfo['merge_profiles'].append([profile, '1' if is_available else '0'])
+
+            session.dirty = True
 
         primary_pid = webapi.get_person_id_from_canonical_id(primary_cname)
         is_available = webapi.is_profile_available(primary_pid)
@@ -1885,7 +1932,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             is_owner = self._is_profile_owner(last_visited_pid)
 
         title = 'Merge Profiles'
-        menu = WebProfileMenu(cname, "manage_profile", ln, is_owner, self._is_admin(pinfo))
+        menu = WebProfileMenu(str(cname), "manage_profile", ln, is_owner, self._is_admin(pinfo))
         merge_page = WebProfilePage("merge_profile", title, no_cache=True)
         merge_page.add_profile_menu(menu)
 
@@ -1906,10 +1953,6 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
         shown_element_functions['show_search_bar'] = TEMPLATE.tmpl_merge_profiles_search_bar(primary_cname)
         shown_element_functions['button_gen'] = TEMPLATE.merge_profiles_button_generator()
         shown_element_functions['pass_status'] = 'True'
-
-        profiles_to_merge = list()
-        if pinfo['merge_profiles']:
-            profiles_to_merge = pinfo['merge_profiles']
 
         merge_page.add_bootstrapped_data(json.dumps({
             "other": "var gMergeProfile = %s; var gMergeList = %s;" % ([primary_cname, '1' if is_available else '0'], profiles_to_merge)
@@ -2623,7 +2666,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
             is_owner = self._is_profile_owner(last_visited_pid)
 
-        menu = WebProfileMenu(cname, "open_tickets", ln, is_owner, self._is_admin(pinfo))
+        menu = WebProfileMenu(str(cname), "open_tickets", ln, is_owner, self._is_admin(pinfo))
 
         title = "Open RT tickets"
         profile_page = WebProfilePage("help", title, no_cache=True)
@@ -2668,7 +2711,7 @@ class WebInterfaceBibAuthorIDClaimPages(WebInterfaceDirectory):
             cname = webapi.get_canonical_id_from_person_id(last_visited_pid)
             is_owner = self._is_profile_owner(last_visited_pid)
 
-        menu = WebProfileMenu(cname, "help", ln, is_owner, self._is_admin(pinfo))
+        menu = WebProfileMenu(str(cname), "help", ln, is_owner, self._is_admin(pinfo))
 
         title = "Help page"
         profile_page = WebProfilePage("help", title, no_cache=True)

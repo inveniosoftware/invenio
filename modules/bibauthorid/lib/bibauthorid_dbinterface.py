@@ -543,7 +543,7 @@ def wrong_names_exist(printer, repair=False):   ### check_wrong_names
         printer("%d corrupted names in aidPERSONIDPAPERS." % wrong_names_count)
         for wrong_name in wrong_names:
             if wrong_name[2]:
-                printer("Outdated name, '%s'(%s:%d)." % (wrong_name[2], wrong_name[0], wrong_name[1]))
+                printer("Outdated name, ('%s')  '%s'(%s:%d)." % (wrong_name[3], wrong_name[2], wrong_name[0], wrong_name[1]))
             else:
                 printer("Invalid id(%s:%d)." % (wrong_name[0], wrong_name[1]))
 
@@ -997,7 +997,7 @@ def get_coauthors_of_author(pid, excluding_recs=None):   ### get_coauthor_pids
     pids = set([(int(p), int(r)) for p, r in pids if int(p) != int(pid)])
     pids = sorted([p for p, r in pids])
     pids = groupby(pids)
-    pids = [(key, len(list(val))) for key, val in pids if key != pid]
+    pids = [(key, len(list(val))) for key, val in pids]
     pids = sorted(pids, key=itemgetter(1), reverse=True)
 
     return pids
@@ -1336,9 +1336,9 @@ def get_wrong_names():
     aidpersonidpapers100 = set(_select_from_aidpersonidpapers_where(select=['bibref_value', 'name'], table='100'))
     aidpersonidpapers700 = set(_select_from_aidpersonidpapers_where(select=['bibref_value', 'name'], table='700'))
 
-    wrong100 = set(('100', nid, bib100.get(nid, None)) for nid, nvalue in aidpersonidpapers100 \
+    wrong100 = set(('100', nid, bib100.get(nid, None), nvalue) for nid, nvalue in aidpersonidpapers100 \
                    if nvalue != bib100.get(nid, None))
-    wrong700 = set(('700', nid, bib700.get(nid, None)) for nid, nvalue in aidpersonidpapers700 \
+    wrong700 = set(('700', nid, bib700.get(nid, None), nvalue) for nid, nvalue in aidpersonidpapers700 \
                    if nvalue != bib700.get(nid, None))
 
     total = len(wrong100) + len(wrong700)

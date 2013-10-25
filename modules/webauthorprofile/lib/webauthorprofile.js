@@ -53,6 +53,11 @@ $(document).ready(function() {
     setTimeout("cancelPendingRequests()", gPageTimeout);
 });
 
+function isProfile() {
+    var profileMatch = /profile=/;
+    return profileMatch.test(window.location.search);
+}
+
 function createReq( calledFunc ) {
   /* Prepare and send ajax requests */
   var errorCallback = onAjaxError(calledFunc);
@@ -61,7 +66,7 @@ function createReq( calledFunc ) {
     dataType: 'json',
     type: 'POST',
     url: '/author/profile/' + calledFunc,
-    data: {jsondata: JSON.stringify(data)},
+    data: isProfile() ? {jsondata: JSON.stringify(data), ajaxProfile: true} : {jsondata: JSON.stringify(data)},
     success: onAjaxSuccess,
     error: errorCallback,
     timeout: gReqTimeout,
@@ -103,8 +108,13 @@ function onAjaxSuccess(json) {
     gBOX_STATUS = json['boxes_info'];
     for (var box_id in gBOX_STATUS) {
         var box_info = gBOX_STATUS[box_id];
-        if (box_info['status'] === true)
+        if (box_info['status'] === true) {
+            if (json.hasOwnProperty("profilerStats")) {
+                box_info['html_content'] += "<div class=\"profiler-stats\">" + json['profilerStats'] + "</div>";
+            }
             add_box_content(box_id, box_info['html_content']);
+        }
+
     }
     if ( currentFunc < funcsLength ) {
       createReq(funcs[currentFunc]);
