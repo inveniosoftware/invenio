@@ -39,11 +39,12 @@ except:
 # citation dictionaries are loaded lazily, which is good for CLI
 # processes such as bibsched, but for web user queries we want them to
 # be available right after web server start-up):
-try:
-    from invenio.bibrank_citation_searcher import get_cited_by_weight
-    get_cited_by_weight([])
-except:
-    pass
+from invenio.bibrank_citation_searcher import get_cited_by_weight
+get_cited_by_weight([])
+
+# pre-load docextract knowledge bases
+from invenio.refextract_kbs import get_kbs
+get_kbs()
 
 try:
     from invenio.webinterface_handler_wsgi import application
