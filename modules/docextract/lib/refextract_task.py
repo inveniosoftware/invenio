@@ -119,7 +119,7 @@ Please set the config variable CFG_INSPIRE_SITE instead."""
             recids = set()
             task_set_option('recids', recids)
         recids.update(split_ids(value))
-    elif key == '--recids':
+    elif key in ('-r', '--recids'):
         msg = """The --recids has been renamed.
 please use --id for specifying recids."""
         raise StandardError(msg)
@@ -270,7 +270,7 @@ def main():
 
 """,
         version="Invenio v%s" % CFG_VERSION,
-        specific_params=("hVv:x:r:c:naif:",
+        specific_params=("hVv:x:r:c:nai:f:",
                             ["help",
                              "version",
                              "verbose=",
