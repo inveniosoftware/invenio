@@ -437,6 +437,7 @@ def task_run_core(name=NAME):
         msg = 'Updated %s records' % len(updated_recids)
         write_message(msg)
         task_update_progress(msg)
+        write_message(repr(updated_recids))
 
         # For all updated records, we want to sync the 8564 tags
         # and reextract references
