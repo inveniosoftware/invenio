@@ -134,11 +134,14 @@ def is_isbn(val):
 
 def is_issn(val):
     """ Test if argument is an ISSN number """
-    val = val.replace("-", "").replace(" ", "").upper()
-    if len(val) != 8:
+    try:
+        val = val.replace("-", "").replace(" ", "").upper()
+        if len(val) != 8:
+            return False
+        r = sum([(8 - i) * (_convert_x_to_10(x)) for i, x in enumerate(val)])
+        return not (r % 11)
+    except ValueError:
         return False
-    r = sum([(8 - i) * (_convert_x_to_10(x)) for i, x in enumerate(val)])
-    return not (r % 11)
 
 
 def is_istc(val):

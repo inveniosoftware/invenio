@@ -103,6 +103,18 @@ class PersistentIdentifierUtilities(InvenioTestCase):
                 expected_schemes[0]
             )
 
+    def test_valueerror(self):
+        # Many validators rely on a special length of the identifier before
+        # testing further. This test, checks that the validators are still
+        # well-behaved when the length matches, but the persisitent identifier
+        # is invalid.
+        for i in range(20):
+            nonsense_pid = "a" * i
+            self.assertEqual(
+                pidutils.detect_identifier_schemes(nonsense_pid),
+                []
+            )
+
 
 TEST_SUITE = make_test_suite(PersistentIdentifierUtilities)
 
