@@ -696,7 +696,7 @@ def upload_step(repository, active_files_list, uploaded_task_ids=None, *args, **
         if CFG_INSPIRE_SITE:
             # Launch BibIndex,Webcoll update task to show uploaded content quickly
             bibindex_params = ['-w', 'collection,reportnumber,global', \
-                               '-P', '6', \
+                               '-P', '4', \
                                '-I', str(sequence_id), \
                                '--post-process', 'bst_run_bibtask[taskname="webcoll", user="oaiharvest", P="6", c="HEP"]']
             task_low_level_submission("bibindex", "oaiharvest", *tuple(bibindex_params))
