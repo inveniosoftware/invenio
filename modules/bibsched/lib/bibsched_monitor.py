@@ -51,6 +51,9 @@ from invenio.bibsched import bibsched_get_status, \
                              bibsched_set_status, \
                              bibsched_send_signal, \
                              bibsched_set_priority, \
+                             bibsched_set_name, \
+                             bibsched_set_sleeptime, \
+                             bibsched_set_runtime, \
                              spawn_task, \
                              gc_tasks, \
                              Log, \
@@ -188,7 +191,8 @@ class Manager(object):
                                            ord("p"), ord("P"), ord("o"), ord("O"),
                                            ord("l"), ord("L"), ord("e"), ord("E"),
                                            ord("z"), ord("Z"), ord("b"), ord("B"),
-                                           ord("h"), ord("H"), ord("D"))):
+                                           ord("h"), ord("H"), ord("D"), ord("c"),
+                                           ord("f"), ord("j"))):
             self.display_in_footer("in automatic mode")
         else:
             status = self.currentrow and self.currentrow[5] or None
@@ -221,6 +225,12 @@ class Manager(object):
                 self.display_change_queue_mode_box()
             elif char == ord("l"):
                 self.open_task_log()
+            elif char == ord("c"):
+                self.change_task_name()
+            elif char == ord("f"):
+                self.change_task_sleeptime()
+            elif char == ord("j"):
+                self.change_task_runtime()
             elif char == ord("L"):
                 self.open_task_log(err=True)
             elif char in (ord("w"), ord("W")):
@@ -315,6 +325,9 @@ k - Acknowledge task
 s - Sleep task
 r - Run task
 n - Change task priority
+c - Change task name
+f - Change task sleeptime
+j - Change task runtime
 w - Wake up task
 D - Debug mode for remote task
 """
@@ -451,24 +464,66 @@ D - Debug mode for remote task
         self.panel = None
 
     def count_processes(self, status):
-        out = 0
-        res = run_sql("""SELECT COUNT(id) FROM schTASK
-                         WHERE status=%s GROUP BY status""", (status,))
+        return run_sql("""SELECT COUNT(id) FROM schTASK
+                         WHERE status=%s GROUP BY status""", (status,))[0][0]
+
+    def change_task_name(self):
+        task_id = self.currentrow[0]
         try:
-            out = res[0][0]
-        except:
-            pass
-        return out
+            base_name, task_name = self.currentrow[1].split(':', 1)
+        except ValueError:
+            base_name = self.currentrow[1]
+            task_name = ""
+        name = self._display_ask_string_box('Enter the new task name:',
+                                            default=task_name)
+        if name:
+            new_name = '%s:%s' % (base_name, name)
+        else:
+            new_name = base_name
+
+        bibsched_set_name(task_id, new_name)
+        # We need to update the tasks list with our new priority
+        # to be able to display it
+        self.update_rows()
+        # We need to update the priority number next to the task
+        self.repaint()
+
+    def change_task_sleeptime(self):
+        task_id = self.currentrow[0]
+        sleeptime = self.currentrow[4]
+        new_sleeptime = self._display_ask_string_box('Enter the new task sleeptime:',
+                                                     default=sleeptime)
+
+        bibsched_set_sleeptime(task_id, new_sleeptime)
+        # We need to update the tasks list with our new priority
+        # to be able to display it
+        self.update_rows()
+        # We need to update the priority number next to the task
+        self.repaint()
+
+    def change_task_runtime(self):
+        task_id = self.currentrow[0]
+        runtime = self.currentrow[3]
+        new_runtime = self._display_ask_string_box('Enter the new task runtime:',
+                                                     default=runtime.strftime("%Y-%m-%d_%H:%M:%S"))
+
+        bibsched_set_runtime(task_id, new_runtime)
+        # We need to update the tasks list with our new priority
+        # to be able to display it
+        self.update_rows()
+        # We need to update the priority number next to the task
+        self.repaint()
 
     def change_task_priority(self):
         task_id = self.currentrow[0]
         priority = self.currentrow[8]
-        new_priority = self._display_ask_number_box("Insert the desired \
+        new_priority = self._display_ask_string_box("Insert the desired \
 priority for task %s. The smaller the number the less the priority. Note that \
 a number less than -10 will mean to always postpone the task while a number \
 bigger than 10 will mean some tasks with less priority could be stopped in \
 order to let this task run. The current priority is %s. New value:"
-                                                        % (task_id, priority))
+                                                        % (task_id, priority),
+                                                        default=str(priority))
         try:
             new_priority = int(new_priority)
         except ValueError:
@@ -487,7 +542,6 @@ order to let this task run. The current priority is %s. New value:"
             return
 
         task_id = self.currentrow[0]
-        process = self.currentrow[1]
         status = self.currentrow[5]
         #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             #self.display_in_footer("a process is already running!")
@@ -532,7 +586,7 @@ order to let this task run. The current priority is %s. New value:"
         finally:
             self.panel = None
 
-    def _display_ask_number_box(self, msg):
+    def _display_ask_string_box(self, msg, default=""):
         """Utility to display confirmation boxes."""
         msg = wrap_text_in_a_box(msg, style='no_border')
         rows = msg.split('\n')
@@ -554,6 +608,8 @@ order to let this task run. The current priority is %s. New value:"
         self.win.refresh()
         self.win.move(height - 2, 2)
         self.curses.echo()
+        for c in reversed(default):
+            self.curses.ungetch(c)
         ret = self.win.getstr()
         self.curses.noecho()
         self.panel = None
@@ -759,7 +815,6 @@ order to let this task run. The current priority is %s. New value:"
 
     def stop_task(self):
         task_id = self.currentrow[0]
-        process = self.currentrow[1]
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING', 'ABOUT TO SLEEP', 'SLEEPING'):
             if status == 'SLEEPING':

@@ -241,6 +241,19 @@ def bibsched_set_priority(task_id, priority):
     """Update the priority of task_id."""
     return run_sql("UPDATE schTASK SET priority=%s WHERE id=%s", (priority, task_id))
 
+def bibsched_set_name(task_id, name):
+    """Update the name of task_id."""
+    return run_sql("UPDATE schTASK SET proc=%s WHERE id=%s", (name, task_id))
+
+def bibsched_set_sleeptime(task_id, sleeptime):
+    """Update the sleeptime of task_id."""
+    return run_sql("UPDATE schTASK SET sleeptime=%s WHERE id=%s", (sleeptime, task_id))
+
+
+def bibsched_set_runtime(task_id, runtime):
+    """Update the sleeptime of task_id."""
+    return run_sql("UPDATE schTASK SET runtime=%s WHERE id=%s", (runtime, task_id))
+
 
 def bibsched_send_signal(task_id, sig):
     """Send a signal to a given task."""
