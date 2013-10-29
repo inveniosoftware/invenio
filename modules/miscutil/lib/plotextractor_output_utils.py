@@ -12,11 +12,9 @@ import os
 import re
 import sys
 
-from invenio.config import CFG_TMPDIR
 from invenio.textutils import encode_for_xml, wash_for_utf8
 from invenio.bibrecord import field_xml_output
 
-DUMMY_IMAGE_TMP = os.path.join(CFG_TMPDIR, 'plotextractor_dummy.png')
 
 def write_message(message):
     print message
@@ -288,48 +286,39 @@ def create_MARC(extracted_image_data, tarball, refno):
 
     index = 0
     for (image_location, caption, dummy, contexts) in extracted_image_data:
-        if image_location == '':
-            # we don't know the image, but the captions are for separate things
-            for cap in caption.split(' : '):
-                # Add DUMMY-PLOT MARCXML per loose captions
-                subfields = []
-                subfields.append(('a', DUMMY_IMAGE_TMP))
-                subfields.append(('t', "PlotMisc"))
-                subfields.append(('d', "%05d %s" % (index, cap)))
-                subfields.append(('n', "fig%05d" % (index,)))
-                subfields.append(('o', "HIDDEN"))
-                marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-                index = index + 1
+        # Merge subfolder into docname, until root directory
+        relative_image_path = image_location.replace(root_dir, '')
+        docname = "_".join(relative_image_path.split('.')[:-1]).replace('/', '_').replace(';', '').replace(':', '')
+
+        if type(caption) == list:
+            caption = " ".join(caption)
+
+        if len(caption) < 3:
+            subfields = []
+            subfields.append(('a', image_location))
+            subfields.append(('t', "PlotMisc"))
+            subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
+            subfields.append(('n', docname))
+            subfields.append(('o', "HIDDEN"))
+            marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
         else:
-            # Merge subfolder into docname, until root directory
-            relative_image_path = image_location.replace(root_dir, '')
-            docname = "_".join(relative_image_path.split('.')[:-1]).replace('/', '_').replace(';', '').replace(':', '')
-            if len(caption) < 3:
+            # Add PLOT MARCXML
+            subfields = []
+            subfields.append(('a', image_location))
+            subfields.append(('t', "Plot"))
+            subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
+            subfields.append(('n', docname))
+            marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
+            if contexts:
+                # Add CONTEXT MARCXML
                 subfields = []
-                subfields.append(('a', image_location))
-                subfields.append(('t', "PlotMisc"))
-                subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
+                subfields.append(('a', "%s.context" % (image_location,)))
+                subfields.append(('t', "Plot"))
+                subfields.append(('f', ".png;context"))
                 subfields.append(('n', docname))
                 subfields.append(('o', "HIDDEN"))
                 marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-            else:
-                # Add PLOT MARCXML
-                subfields = []
-                subfields.append(('a', image_location))
-                subfields.append(('t', "Plot"))
-                subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
-                subfields.append(('n', docname))
-                marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-                if contexts:
-                    # Add CONTEXT MARCXML
-                    subfields = []
-                    subfields.append(('a', "%s.context" % (image_location,)))
-                    subfields.append(('t', "Plot"))
-                    subfields.append(('f', ".png;context"))
-                    subfields.append(('n', docname))
-                    subfields.append(('o', "HIDDEN"))
-                    marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
-            index = index + 1
+        index += 1
     marcxml.append('</record>')
     return '\n'.join(marcxml)
 

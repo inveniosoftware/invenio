@@ -325,7 +325,7 @@ img_DATA = add-small.png \
 
 tmpdir=$(localstatedir)/tmp
 
-tmp_DATA = plotextractor_dummy.png
+tmp_DATA =
 
 EXTRA_DIST = $(img_DATA) $(tmp_DATA)
 
