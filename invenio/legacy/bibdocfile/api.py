@@ -1675,7 +1675,10 @@ class BibDoc(object):
 
         # retreiving all available formats
         fprefix = container["storagename"] or "content"
-        container["extensions"] = [fname[len(fprefix):] for fname in filter(lambda x: x.startswith(fprefix),os.listdir(container["basedir"]))]
+        try:
+            container["extensions"] = [fname[len(fprefix):] for fname in filter(lambda x: x.startswith(fprefix),os.listdir(container["basedir"]))]
+        except OSError:
+            container["extensions"] = []
         return container
 
     @staticmethod

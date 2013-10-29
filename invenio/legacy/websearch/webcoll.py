@@ -872,14 +872,14 @@ def perform_display_collection(colID, colname, aas, ln, em, show_help_boxes):
                 data["lt_portalbox"] = ""
             if EM_REPOSITORY["rt_portalbox"] not in em:
                 data["rt_portalbox"] = ""
-    c_body = websearch_templates.tmpl_webcoll_body(ln, colID, data["te_portalbox"],
-                data["searchfor_%s"%aas], data["np_portalbox"], data["narrowsearch_%s"%aas],
-                data["focuson_%s"%aas], data["instantbrowse_%s"%aas], data["ne_portalbox"],
+    c_body = websearch_templates.tmpl_webcoll_body(ln, colID, data.get("te_portalbox", ""),
+                data.get("searchfor_%s"%aas,''), data.get("np_portalbox", ''), data.get("narrowsearch_%s"%aas, ''),
+                data.get("focuson_%s"%aas, ''), data.get("instantbrowse_%s"%aas, ''), data.get("ne_portalbox", ''),
                 em=="" or EM_REPOSITORY["body"] in em)
     if show_help_boxes <= 0:
         data["rt_portalbox"] = ""
-    return (c_body, data["navtrail_%s"%aas], data["lt_portalbox"], data["rt_portalbox"],
-            data["tp_portalbox"], data["te_portalbox"], data["last_updated"])
+    return (c_body, data.get("navtrail_%s"%aas, ''), data.get("lt_portalbox", ''), data.get("rt_portalbox", ''),
+            data.get("tp_portalbox", ''), data.get("te_portalbox", ''), data.get("last_updated", ''))
 
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
