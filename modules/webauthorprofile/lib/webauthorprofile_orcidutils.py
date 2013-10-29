@@ -18,6 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import requests
+from invenio.bibauthorid_general_utils import get_doi
+
 try:
     import json
 except ImportError:
@@ -44,12 +46,8 @@ def get_dois_from_orcid(orcid_id):
         for pub in orcid_profile['orcid-profile']['orcid-activities']['orcid-works']['orcid-work']:
             try:
                 if pub['work-external-identifiers']['work-external-identifier'][0]['work-external-identifier-type'] == 'DOI':
-                    doi = pub['work-external-identifiers']['work-external-identifier'][0]['work-external-identifier-id']['value']
-                    if doi.startswith('http://dx.doi.org/'):
-                        dois.append(doi[18:])
-                    elif doi.startswith('http://doi.org/'):
-                        dois.append(doi[15:])
-                    else:
+                    doi = get_doi(pub['work-external-identifiers']['work-external-identifier'][0]['work-external-identifier-id']['value'])
+                    if doi is not None:
                         dois.append(doi)
             except KeyError:
                 pass

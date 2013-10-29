@@ -64,7 +64,7 @@ inspire_regex = re.compile(r"(INSPIRE-)(\d+)$", re.IGNORECASE)
 
 arxiv_new_regex = re.compile(r"(arXiv:)?(\d{4})\.(\d{4,6})(v\d+)?$", re.IGNORECASE)
 arxiv_old_regex = re.compile(r"(arXiv:)?((?:[a-zA-Z]|[a-zA-Z]-[a-zA-Z])+)(\.[a-zA-Z]{2})?/(\d{7})(v\d+)?$", re.IGNORECASE)
-doi_regex = re.compile(r"10\.(\d+)(/|\.)\S.*$", re.IGNORECASE)
+doi_regex = re.compile(r"((?:https?://)?(?:dx.)?doi.org/)?(10\.(\d+)(/|\.)\S.*)$", re.IGNORECASE)
 
 
 def get_orcid_from_string(identifier, uri=False):
@@ -212,6 +212,20 @@ def is_doi(identifier):
     """
     result = doi_regex.match(identifier.strip())
     return result is not None
+
+def get_doi(identifier):
+    """
+    Extracts doi from a given ID that matches the format of a DOI.
+
+    examples: 10.1016/S0735-1097(98)00347-7, 10.1007/978-3-642-28108-2_19
+    @param identifier: The string of an identifier to check.
+    @return: doi: None or a string representing the doi.
+    """
+    result = doi_regex.match(identifier.strip())
+    if result is not None:
+        return result.group(2)
+    else:
+        return None
 
 
 def is_arxiv_id_or_doi(identifier):
