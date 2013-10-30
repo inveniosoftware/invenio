@@ -5158,10 +5158,10 @@ allow any</subfield>
 
         self.failUnless(try_url_download(testrec_expected_url))
         self.assertEqual(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm), '', "bufers not equal: %s and %s" % (inserted_xm, testrec_expected_xm))
+                                          testrec_expected_xm), '', "buffers not equal: %s and %s" % (inserted_xm, testrec_expected_xm))
 
         self.assertEqual(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm), '', "bufers not equal: %s and %s" % (inserted_hm, testrec_expected_hm))
+                                          testrec_expected_hm), '', "buffers not equal: %s and %s" % (inserted_hm, testrec_expected_hm))
 
         self._test_bibdoc_status(recid, 'patata', '')
 

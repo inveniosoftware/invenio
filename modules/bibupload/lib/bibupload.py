@@ -456,6 +456,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         # Have a look if we have FFT tags
         write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
         record_had_FFT = False
+        bibrecdocs = None
         if extract_tag_from_record(record, 'FFT') is not None:
             record_had_FFT = True
             if not writing_rights_p():
@@ -464,9 +465,10 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
                     verbose=1, stream=sys.stderr)
                 raise StandardError(msg)
             try:
+                bibrecdocs = BibRecDocs(rec_id)
                 record = elaborate_fft_tags(record, rec_id, opt_mode,
                                         pretend=pretend, tmp_ids=tmp_ids,
-                                        tmp_vers=tmp_vers)
+                                        tmp_vers=tmp_vers, bibrecdocs=bibrecdocs)
             except Exception, e:
                 register_exception()
                 msg = "   Stage 2 failed: ERROR: while elaborating FFT tags: %s" % e
@@ -484,7 +486,9 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
         write_message("Stage 2B: Start (Synchronize 8564 tags).", verbose=2)
         if record_had_FFT or extract_tag_from_record(record, '856') is not None:
             try:
-                record = synchronize_8564(rec_id, record, record_had_FFT, pretend=pretend)
+                if bibrecdocs is None:
+                    bibrecdocs = BibRecDocs(rec_id)
+                record = synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=pretend)
                 # in case if FFT is in affected list make appropriate changes
                 if opt_mode is not 'insert': # because for insert, all tags are affected
                     if ('4', ' ') not in affected_tags.get('856', []):
@@ -1335,7 +1339,7 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx,
         return 1
     return res
 
-def synchronize_8564(rec_id, record, record_had_FFT, pretend=False):
+def synchronize_8564(rec_id, record, record_had_FFT, bibrecdocs, pretend=False):
     """
     Synchronize 8564_ tags and BibDocFile tables.
 
@@ -1364,7 +1368,7 @@ def synchronize_8564(rec_id, record, record_had_FFT, pretend=False):
                 write_message("INFO: URL %s is not pointing to a fulltext owned by this record (%s)" % (url, recid), stream=sys.stderr)
             else:
                 try:
-                    bibdoc = BibRecDocs(recid).get_bibdoc(docname)
+                    bibdoc = bibrecdocs.get_bibdoc(docname)
                     if description and not pretend:
                         bibdoc.set_description(description[0], docformat)
                     if comment and not pretend:
@@ -1426,7 +1430,6 @@ def synchronize_8564(rec_id, record, record_had_FFT, pretend=False):
         @return: BibDocFile URL -> wanna-be subfields dictionary
         """
         ret = {}
-        bibrecdocs = BibRecDocs(rec_id)
         latest_files = bibrecdocs.list_latest_files(list_hidden=False)
         for afile in latest_files:
             url = afile.get_url()
@@ -1686,7 +1689,7 @@ def elaborate_brt_tags(record, rec_id, mode, pretend=False, tmp_ids = {}, tmp_ve
     return record
 
 def elaborate_fft_tags(record, rec_id, mode, pretend=False,
-                       tmp_ids = {}, tmp_vers = {}):
+                       tmp_ids = {}, tmp_vers = {}, bibrecdocs=None):
     """
     Process FFT tags that should contain $a with file pathes or URLs
     to get the fulltext from.  This function enriches record with
@@ -1758,17 +1761,15 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
             print "exited because the mode is incorrect"
             return
 
-        brd = BibRecDocs(rec_id)
-
         docid = None
         try:
-            docid = brd.get_docid(docname)
+            docid = bibrecdocs.get_docid(docname)
         except:
             raise StandardError("MoreInfo: No document of a given name associated with the record")
 
         if not version:
             # We have to retrieve the most recent version ...
-            version = brd.get_bibdoc(docname).get_latest_version()
+            version = bibrecdocs.get_bibdoc(docname).get_latest_version()
 
         doc_moreinfo_s, version_moreinfo_s, version_format_moreinfo_s, format_moreinfo_s = more_infos
 
@@ -2001,9 +2002,6 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
         # Let's remove all FFT tags
         record_delete_field(record, 'FFT', ' ', ' ')
 
-        # Preprocessed data elaboration
-        bibrecdocs = BibRecDocs(rec_id)
-
         ## Let's pre-download all the URLs to see if, in case of mode 'correct' or 'append'
         ## we can avoid creating a new revision.
 
@@ -2064,10 +2062,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
             if not pretend:
                 for bibdoc in bibrecdocs.list_bibdocs():
                     bibdoc.delete()
-                bibrecdocs.build_bibdoc_list()
-
-
-
+                    bibrecdocs.dirty = True
 
         for docname, (doctype, newname, restriction, version, urls, more_infos, bibdoc_tmpid, bibdoc_tmpver) in docs.iteritems():
             write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, urls, mode), verbose=9)
@@ -2087,68 +2082,70 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                 for (url, docformat, description, comment, flags, timestamp) in urls:
                     assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
             elif mode == 'replace_or_insert': # to be thought as correct_or_insert
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    brd = BibRecDocs(rec_id)
-                    dn = brd.get_docname(bibdoc.id)
-
-                    if dn == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE'):
-                            if newname != docname:
-                                try:
-                                    if not pretend:
-                                        bibrecdocs.change_name(newname = newname, docid = bibdoc.id)
-                                        ## Let's refresh the list of bibdocs.
-                                        bibrecdocs.build_bibdoc_list()
-                                except StandardError, e:
-                                    write_message(e, stream=sys.stderr)
-                                    raise
-                found_bibdoc = False
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    brd = BibRecDocs(rec_id)
-                    dn = brd.get_docname(bibdoc.id)
-                    if dn == newname:
-                        found_bibdoc = True
-                        if doctype == 'PURGE':
-                            if not pretend:
-                                bibdoc.purge()
-                        elif doctype == 'DELETE':
-                            if not pretend:
-                                bibdoc.delete()
-                        elif doctype == 'EXPUNGE':
-                            if not pretend:
-                                bibdoc.expunge()
-                        elif doctype == 'FIX-ALL':
-                            if not pretend:
-                                bibrecdocs.fix(docname)
-                        elif doctype == 'FIX-MARC':
-                            pass
-                        elif doctype == 'DELETE-FILE':
-                            if urls:
-                                for (url, docformat, description, comment, flags, timestamp) in urls:
-                                    if not pretend:
-                                        bibdoc.delete_file(docformat, version)
-                        elif doctype == 'REVERT':
+                try:
+                    bibdoc = bibrecdocs.get_bibdoc(docname)
+                    found_bibdoc = True
+                except InvenioBibDocFileError:
+                    found_bibdoc = False
+                else:
+                    if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE'):
+                        if newname != docname:
                             try:
                                 if not pretend:
-                                    bibdoc.revert(version)
-                            except Exception, e:
-                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
+                                    bibrecdocs.change_name(newname=newname, docid=bibdoc.id)
+                                    write_message(lambda: "After renaming: %s" % bibrecdocs, verbose=9)
+                            except StandardError, e:
+                                write_message('ERROR: in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
                                 raise
-                        else:
-                            if restriction != KEEP_OLD_VALUE:
+                try:
+                    bibdoc = bibrecdocs.get_bibdoc(newname)
+                    found_bibdoc = True
+                except InvenioBibDocFileError:
+                    found_bibdoc = False
+                else:
+                    if doctype == 'PURGE':
+                        if not pretend:
+                            bibdoc.purge()
+                            bibrecdocs.dirty = True
+                    elif doctype == 'DELETE':
+                        if not pretend:
+                            bibdoc.delete()
+                            bibrecdocs.dirty = True
+                    elif doctype == 'EXPUNGE':
+                        if not pretend:
+                            bibdoc.expunge()
+                            bibrecdocs.dirty = True
+                    elif doctype == 'FIX-ALL':
+                        if not pretend:
+                            bibrecdocs.fix(docname)
+                    elif doctype == 'FIX-MARC':
+                        pass
+                    elif doctype == 'DELETE-FILE':
+                        if urls:
+                            for (url, docformat, description, comment, flags, timestamp) in urls:
                                 if not pretend:
-                                    bibdoc.set_status(restriction)
-                            # Since the docname already existed we have to first
-                            # bump the version by pushing the first new file
-                            # then pushing the other files.
-                            if urls:
-                                (first_url, first_format, first_description, first_comment, first_flags, first_timestamp) = urls[0]
-                                other_urls = urls[1:]
-                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, first_timestamp, pretend=pretend))
-                                for (url, docformat, description, comment, flags, timestamp) in other_urls:
-                                    assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
-                        ## Let's refresh the list of bibdocs.
-                        bibrecdocs.build_bibdoc_list()
+                                    bibdoc.delete_file(docformat, version)
+                    elif doctype == 'REVERT':
+                        try:
+                            if not pretend:
+                                bibdoc.revert(version)
+                        except Exception, e:
+                            write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
+                            raise
+                    else:
+                        if restriction != KEEP_OLD_VALUE:
+                            if not pretend:
+                                bibdoc.set_status(restriction)
+                        # Since the docname already existed we have to first
+                        # bump the version by pushing the first new file
+                        # then pushing the other files.
+                        if urls:
+                            (first_url, first_format, first_description, first_comment, first_flags, first_timestamp) = urls[0]
+                            other_urls = urls[1:]
+                            assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, first_timestamp, pretend=pretend))
+                            for (url, docformat, description, comment, flags, timestamp) in other_urls:
+                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
+                    ## Let's refresh the list of bibdocs.
                 if not found_bibdoc:
                     if not pretend:
                         bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
@@ -2156,67 +2153,69 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         for (url, docformat, description, comment, flags, timestamp) in urls:
                             assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
             elif mode == 'correct':
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    brd = BibRecDocs(rec_id)
-                    dn = brd.get_docname(bibdoc.id)
-                    if dn == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE'):
-                            if newname != docname:
-                                try:
-                                    if not pretend:
-                                        bibrecdocs.change_name(docid = bibdoc.id, newname=newname)
-                                        ## Let's refresh the list of bibdocs.
-                                        bibrecdocs.build_bibdoc_list()
-                                except StandardError, e:
-                                    write_message('ERROR: in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
-                                    raise
-                found_bibdoc = False
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    brd = BibRecDocs(rec_id)
-                    dn = brd.get_docname(bibdoc.id)
-                    if dn == newname:
-                        found_bibdoc = True
-                        if doctype == 'PURGE':
-                            if not pretend:
-                                bibdoc.purge()
-                        elif doctype == 'DELETE':
-                            if not pretend:
-                                bibdoc.delete()
-                        elif doctype == 'EXPUNGE':
-                            if not pretend:
-                                bibdoc.expunge()
-                        elif doctype == 'FIX-ALL':
-                            if not pretend:
-                                bibrecdocs.fix(newname)
-                        elif doctype == 'FIX-MARC':
-                            pass
-                        elif doctype == 'DELETE-FILE':
-                            if urls:
-                                for (url, docformat, description, comment, flags, timestamp) in urls:
-                                    if not pretend:
-                                        bibdoc.delete_file(docformat, version)
-                        elif doctype == 'REVERT':
+                try:
+                    bibdoc = bibrecdocs.get_bibdoc(docname)
+                    found_bibdoc = True
+                except InvenioBibDocFileError:
+                    found_bibdoc = False
+                else:
+                    if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE'):
+                        if newname != docname:
                             try:
                                 if not pretend:
-                                    bibdoc.revert(version)
-                            except Exception, e:
-                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
+                                    bibrecdocs.change_name(newname=newname, docid=bibdoc.id)
+                                    write_message(lambda: "After renaming: %s" % bibrecdocs, verbose=9)
+                            except StandardError, e:
+                                write_message('ERROR: in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
                                 raise
-                        else:
-                            if restriction != KEEP_OLD_VALUE:
+                try:
+                    bibdoc = bibrecdocs.get_bibdoc(newname)
+                    found_bibdoc = True
+                except InvenioBibDocFileError:
+                    found_bibdoc = False
+                else:
+                    if doctype == 'PURGE':
+                        if not pretend:
+                            bibdoc.purge()
+                            bibrecdocs.dirty = True
+                    elif doctype == 'DELETE':
+                        if not pretend:
+                            bibdoc.delete()
+                            bibrecdocs.dirty = True
+                    elif doctype == 'EXPUNGE':
+                        if not pretend:
+                            bibdoc.expunge()
+                            bibrecdocs.dirty = True
+                    elif doctype == 'FIX-ALL':
+                        if not pretend:
+                            bibrecdocs.fix(newname)
+                    elif doctype == 'FIX-MARC':
+                        pass
+                    elif doctype == 'DELETE-FILE':
+                        if urls:
+                            for (url, docformat, description, comment, flags, timestamp) in urls:
                                 if not pretend:
-                                    bibdoc.set_status(restriction)
-                            if doctype and doctype != KEEP_OLD_VALUE:
-                                if not pretend:
-                                    bibdoc.change_doctype(doctype)
-                            if urls:
-                                (first_url, first_format, first_description, first_comment, first_flags, first_timestamp) = urls[0]
-                                other_urls = urls[1:]
-                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, first_timestamp, pretend=pretend))
-                                for (url, docformat, description, comment, flags, timestamp) in other_urls:
-                                    assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
-                        ## Let's refresh the list of bibdocs.
-                        bibrecdocs.build_bibdoc_list()
+                                    bibdoc.delete_file(docformat, version)
+                    elif doctype == 'REVERT':
+                        try:
+                            if not pretend:
+                                bibdoc.revert(version)
+                        except Exception, e:
+                            write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
+                            raise
+                    else:
+                        if restriction != KEEP_OLD_VALUE:
+                            if not pretend:
+                                bibdoc.set_status(restriction)
+                        if doctype and doctype != KEEP_OLD_VALUE:
+                            if not pretend:
+                                bibdoc.change_doctype(doctype)
+                        if urls:
+                            (first_url, first_format, first_description, first_comment, first_flags, first_timestamp) = urls[0]
+                            other_urls = urls[1:]
+                            assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags, first_timestamp, pretend=pretend))
+                            for (url, docformat, description, comment, flags, timestamp) in other_urls:
+                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
                 if not found_bibdoc:
                     if doctype in ('PURGE', 'DELETE', 'EXPUNGE', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE', 'REVERT'):
                         write_message("('%s', '%s', '%s') not performed because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
@@ -2228,39 +2227,35 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                             for (url, docformat, description, comment, flags, timestamp) in urls:
                                 assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
             elif mode == 'append':
+                found_bibdoc = False
                 try:
+                    bibdoc = bibrecdocs.get_bibdoc(docname)
+                    found_bibdoc = True
+                except InvenioBibDocFileError:
                     found_bibdoc = False
-                    for bibdoc in bibrecdocs.list_bibdocs():
-                        brd = BibRecDocs(rec_id)
-                        dn = brd.get_docname(bibdoc.id)
-                        if dn == docname:
-                            found_bibdoc = True
+                else:
+                    for (url, docformat, description, comment, flags, timestamp) in urls:
+                        assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
+                if not found_bibdoc:
+                    try:
+                        if not pretend:
+                            bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
+                            bibdoc.set_status(restriction)
                             for (url, docformat, description, comment, flags, timestamp) in urls:
-                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp, pretend=pretend))
-                    if not found_bibdoc:
-                        try:
-                            if not pretend:
-                                bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
-                                bibdoc.set_status(restriction)
-                                for (url, docformat, description, comment, flags, timestamp) in urls:
-                                    assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
-                        except Exception, e:
-                            register_exception()
-                            write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
-                            raise
-                except:
-                    register_exception()
-                    raise
+                                assert(_add_new_format(bibdoc, url, docformat, docname, doctype, newname, description, comment, flags, timestamp))
+                    except Exception, e:
+                        register_exception()
+                        write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
+                        raise
             if not pretend:
                 _process_document_moreinfos(more_infos, newname, version, urls and urls[0][1], mode)
 
             # resolving temporary version and identifier
-            brd = BibRecDocs(rec_id)
             if bibdoc_tmpid:
                 if bibdoc_tmpid in tmp_ids and tmp_ids[bibdoc_tmpid] != -1:
                     write_message("WARNING: the temporary identifier %s has been declared more than once. Ignoring the second occurance" % (bibdoc_tmpid, ), stream=sys.stderr)
                 else:
-                    tmp_ids[bibdoc_tmpid] = brd.get_docid(docname)
+                    tmp_ids[bibdoc_tmpid] = bibrecdocs.get_docid(docname)
 
             if bibdoc_tmpver:
                 if bibdoc_tmpver in tmp_vers and tmp_vers[bibdoc_tmpver] != -1:
@@ -2270,7 +2265,7 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False,
                         if version:
                             tmp_vers[bibdoc_tmpver] = version
                         else:
-                            tmp_vers[bibdoc_tmpver] = brd.get_bibdoc(docname).get_latest_version()
+                            tmp_vers[bibdoc_tmpver] = bibrecdocs.get_bibdoc(docname).get_latest_version()
                     else:
                         tmp_vers[bibdoc_tmpver] = version
     return record
