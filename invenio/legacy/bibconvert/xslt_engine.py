@@ -48,6 +48,7 @@ from warnings import warn
 from invenio.config import \
      CFG_ETCDIR, \
      CFG_SITE_URL
+
 from invenio.utils.text import encode_for_xml
 
 from .api import FormatField
@@ -55,6 +56,7 @@ from .registry import templates
 
 # The namespace used for BibConvert functions
 CFG_BIBCONVERT_FUNCTION_NS = "http://cdsweb.cern.ch/bibconvert/fn"
+
 
 # Import one XSLT processor
 #
@@ -269,7 +271,6 @@ def convert(xmltext, template_filename=None, template_source=None):
 
     Raises an exception if cannot find an appropriate XSLT processor.
 
-
     @param xmltext: The string representation of the XML to process
     @param template_filename: The name of the template to use for the processing
     @param template_source: The configuration describing the processing.
@@ -290,41 +291,43 @@ def convert(xmltext, template_filename=None, template_source=None):
             elif os.path.exists(template_filename):
                 template = file(template_filename).read()
             else:
-                sys.stderr.write(template_filename +' does not exist.')
-                return None
+                sys.stderr.write(template_filename + ' does not exist.')
+                raise Exception(template_filename + ' does not exist.')
         except IOError:
-            sys.stderr.write(template_filename +' could not be read.')
-            return None
+            sys.stderr.write(template_filename + ' could not be read.')
+            raise Exception(template_filename + ' could not be read.')
     else:
-        sys.stderr.write(template_filename +' was not given.')
-        return None
+        sys.stderr.write(template_filename + ' was not given.')
+        raise Exception(template_filename + ' was not given.')
 
     result = ""
 
     if processor_type == 1:
         # lxml
-
         try:
+            try:
+                if(-1 < xmltext.index('?') < 3):
+                    xmltext = xmltext[xmltext.index('>')+1:]
+            except ValueError:
+                #If index() doesn't find the '?' then it raises a useless exception
+                pass
+
             xml = etree.XML(xmltext)
         except etree.XMLSyntaxError, e:
             error = 'The XML code given is invalid. [%s]' % (e,)
-            sys.stderr.write(error)
-            return None
-        except:
-            error = 'Failed to process the XML code.'
-            sys.stderr.write(error)
-            return None
+            raise Exception(error)
+        except Exception as e:
+            error = 'Failed to process the XML code.' + str(e)
+            raise Exception(error)
 
         try:
             xsl = etree.XML(template)
         except etree.XMLSyntaxError, e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
-            sys.stderr.write(error)
-            return None
-        except:
-            error = 'Failed to process the XSL code.'
-            sys.stderr.write(error)
-            return None
+            raise Exception(error)
+        except Exception as e :
+            error = 'Failed to process the XSL code.' + str(e)
+            raise Exception(error)
 
         try:
             fns = etree.FunctionNamespace(CFG_BIBCONVERT_FUNCTION_NS)
@@ -332,26 +335,22 @@ def convert(xmltext, template_filename=None, template_source=None):
             fns["escape"] = bibconvert_escape_lxml
         except etree.NamespaceRegistryError, e:
             error = 'Failed registering the XPath extension function. [%s]' % (e,)
-            sys.stderr.write(error)
-            return None
+            raise Exception(error)
 
         try:
             xslt = etree.XSLT(xsl)
         except etree.XSLTParseError, e:
             error = 'The XSL code given is invalid. [%s]' % (e,)
-            sys.stderr.write(error)
-            return None
+            raise Exception(error)
         except:
             error = 'Failed to process the XSL code.'
-            sys.stderr.write(error)
-            return None
+            raise Exception(error)
 
         try:
             temporary_result = xslt(xml)
         except:
             error = 'Failed to perform the XSL transformation.'
-            sys.stderr.write(error)
-            return None
+            raise Exception(error)
 
         result = str(temporary_result)
 
@@ -363,7 +362,6 @@ def convert(xmltext, template_filename=None, template_source=None):
 
     elif processor_type == 2:
         # libxml2 & libxslt
-
         # Register BibConvert functions for use in XSL
         libxslt.registerExtModuleFunction("format",
                                           CFG_BIBCONVERT_FUNCTION_NS,
@@ -378,14 +376,16 @@ def convert(xmltext, template_filename=None, template_source=None):
         except libxml2.parserError, e:
             sys.stderr.write('Parsing XSL template failed:\n ' + \
                              str(e) + '\n')
-            return None
+            raise Exception('Parsing XSL template failed:\n ' + \
+                             str(e) + '\n')
         processor = libxslt.parseStylesheetDoc(template_xml)
         try:
             source = libxml2.parseDoc(xmltext)
         except libxml2.parserError, e:
             sys.stderr.write('Parsing XML source failed:\n ' + \
                              str(e) + '\n')
-            return None
+            raise Exception('Parsing XSL template failed:\n ' + \
+                             str(e) + '\n')
 
         # Transform
         result_object = processor.applyStylesheet(source, None)
@@ -398,7 +398,6 @@ def convert(xmltext, template_filename=None, template_source=None):
 
     elif processor_type == 3:
         # 4suite
-
         # Init
         processor = Processor.Processor()
 
@@ -419,17 +418,18 @@ def convert(xmltext, template_filename=None, template_source=None):
             processor.appendStylesheet(transform)
         except XsltException, e:
             sys.stderr.write('Parsing XSL template failed:\n' + str(e))
-            return None
+            raise Exception('Parsing XSL template failed:\n ' +
+                            str(e) + '\n')
 
         # Transform
         try:
             result = processor.run(source)
         except XsltException, e:
             sys.stderr.write('Conversion failed:\n' + str(e))
-            return None
+            raise Exception('Conversion failed:\n' + str(e))
     else:
         sys.stderr.write("No XSLT processor could be found")
-
+        raise Exception("No XSLT processor could be found")
     return result
 
 ## def bc_profile():
