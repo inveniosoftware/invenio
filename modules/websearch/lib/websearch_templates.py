@@ -97,6 +97,7 @@ class Template:
         'en': 'en_US',
         'es': 'es_ES',
         'pt': 'pt_BR',
+        'fa': 'fa_IR',
         'fr': 'fr_FR',
         'it': 'it_IT',
         'ka': 'ka_GE',

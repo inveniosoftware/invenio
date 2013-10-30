@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -104,6 +104,7 @@ def language_list_long(enabled_langs_only=True):
                           'el': 'Ελληνικά',
                           'en': 'English',
                           'es': 'Español',
+                          'fa': 'فارسی',
                           'fr': 'Français',
                           'hr': 'Hrvatski',
                           'gl': 'Galego',
@@ -143,6 +144,6 @@ def is_language_rtl(ln):
     @return: is language right-to-left direction?
     @rtype: bool
     """
-    if ln in ('ar',):
+    if ln in ('ar', 'fa'):
         return True
     return False
