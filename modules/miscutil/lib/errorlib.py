@@ -128,8 +128,14 @@ def register_emergency(msg, recipients=None):
         recipients = get_emergency_recipients()
     recipients = set(recipients)
     recipients.add(CFG_SITE_ADMIN_EMAIL)
-    subject = "Emergency notification from " + gethostname() + " at " + CFG_SITE_URL
+    mail_subject = "Emergency notification from " + gethostname() + " at " + CFG_SITE_URL
+    sms_subject = "ALERT"
     for address_str in recipients:
+        if "sms" in address_str:
+            # Probably an SMS, lets reduce things!
+            subject = sms_subject
+        else:
+            subject = mail_subject
         send_email(CFG_SITE_SUPPORT_EMAIL, address_str, subject, msg)
 
 def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, now=None):
@@ -456,14 +462,14 @@ this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
         return 0
 
 
-def raise_exception(exception_type = Exception,
-                    msg = '',
-                       stream='error',
-                       req=None,
-                       prefix='',
-                       suffix='',
-                       alert_admin=False,
-                       subject=''):
+def raise_exception(exception_type=Exception,
+                    msg='',
+                    stream='error',
+                    req=None,
+                    prefix='',
+                    suffix='',
+                    alert_admin=False,
+                    subject=''):
     """
     Log error exception to invenio.err and warning exception to invenio.log.
     Errors will be logged together with client information (if req is
