@@ -37,7 +37,7 @@ def default_config(config):
     ## Result backend
     ## --------------
     config.setdefault("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
-    config.setdefault("CELERY_RESULT_SERIALIZER", "msgpack")
+    config.setdefault("CELERY_RESULT_SERIALIZER", "pickle")
 
     ## Routing
     ## -------
@@ -47,7 +47,7 @@ def default_config(config):
     ## --------------
     config.setdefault("CELERY_ALWAYS_EAGER", False)
     config.setdefault("CELERY_IGNORE_RESULT", False)
-    config.setdefault("CELERY_TASK_SERIALIZER", "msgpack")
+    config.setdefault("CELERY_TASK_SERIALIZER", "pickle")
 
     ## Worker
     ## ------
