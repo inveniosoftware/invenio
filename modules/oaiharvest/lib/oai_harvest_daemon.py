@@ -692,14 +692,6 @@ def upload_step(repository, active_files_list, uploaded_task_ids=None, *args, **
                           (repository["name"],))
     if len(active_files_list) == 0:
         write_message("nothing to upload")
-    else:
-        if CFG_INSPIRE_SITE:
-            # Launch BibIndex,Webcoll update task to show uploaded content quickly
-            bibindex_params = ['-w', 'collection,reportnumber,global', \
-                               '-P', '4', \
-                               '-I', str(sequence_id), \
-                               '--post-process', 'bst_run_bibtask[taskname="webcoll", user="oaiharvest", P="6", c="HEP"]']
-            task_low_level_submission("bibindex", "oaiharvest", *tuple(bibindex_params))
     write_message("upload step ended")
     return active_files_list, final_exit_code
 
