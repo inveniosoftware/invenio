@@ -87,6 +87,7 @@ from invenio.websearch_external_collections_utils import get_collection_id
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibformat import format_record
+from invenio.search_engine_utils import record_exists
 
 from invenio import hepdatadisplayutils
 
@@ -3961,7 +3962,7 @@ class Template:
 
         if data.systematics and data.systematics.strip() != "":
             c.append("<h3>Systematic data: </h3>")
-            c.append(data.systematics) 
+            c.append(data.systematics)
             c.append("</div>")
 
         if data.additional_data_links:
@@ -4241,7 +4242,10 @@ class Template:
             out.append('<table><tr><td class="blocknote">Citation Log: </td></tr><tr><td><a id="citationlogshow" class="moreinfo" style="text-decoration: underline; " onclick="$(\'#citationlog\').show(); $(\'#citationlogshow\').hide();">show</a></td></tr></table>')
             out.append('<table id="citationlog" style="display: none;">')
             for recid, action_type, action_date in log_entries:
-                record_str = format_record(recid, 'HS2')
+                if record_exists(recid) == 1:
+                    record_str = format_record(recid, 'HS2')
+                else:
+                    record_str = 'The record with id %s was deleted' % recid
                 out.append("""<tr>
   <td>%s</td>
   <td class="citationlogdate">%s</td>

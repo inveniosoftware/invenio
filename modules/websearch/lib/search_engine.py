@@ -91,7 +91,9 @@ from invenio.search_engine_config import \
      InvenioWebSearchWildcardLimitError, \
      CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
      CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
-from invenio.search_engine_utils import get_fieldvalues, get_fieldvalues_alephseq_like
+from invenio.search_engine_utils import (get_fieldvalues,
+                                         get_fieldvalues_alephseq_like,
+                                         record_exists)
 from invenio.bibrecord import create_record, record_xml_output
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
@@ -3761,25 +3763,6 @@ def get_merged_recid(recID):
             pass
     return merged_recid
 
-def record_exists(recID):
-    """Return 1 if record RECID exists.
-       Return 0 if it doesn't exist.
-       Return -1 if it exists but is marked as deleted.
-    """
-    out = 0
-    res = run_sql("SELECT id FROM bibrec WHERE id=%s", (recID,), 1)
-    if res:
-        try: # if recid is '123foo', mysql will return id=123, and we don't want that
-            recID = int(recID)
-        except ValueError:
-            return 0
-        # record exists; now check whether it isn't marked as deleted:
-        dbcollids = get_fieldvalues(recID, "980__%")
-        if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
-            out = -1 # exists, but marked as deleted
-        else:
-            out = 1 # exists fine
-    return out
 
 def record_empty(recID):
     """

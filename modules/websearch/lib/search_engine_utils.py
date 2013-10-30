@@ -21,9 +21,8 @@
 
 """Invenio search engine utilities."""
 
-import string
-
-from invenio.config import CFG_BIBFORMAT_HIDDEN_TAGS
+from invenio.config import (CFG_BIBFORMAT_HIDDEN_TAGS,
+                            CFG_CERN_SITE)
 from invenio.dbquery import run_sql
 from invenio.intbitset import intbitset
 
@@ -40,10 +39,10 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True, sort=True, split_by=0):
     out = []
     try:
         recIDs = int(recIDs)
-    except:
+    except (ValueError, TypeError):
         pass
     if isinstance(recIDs, (int, long)):
-        recIDs = [recIDs,]
+        recIDs = [recIDs, ]
     if not isinstance(recIDs, (list, tuple, intbitset)):
         return []
     if len(recIDs) == 0:
@@ -100,11 +99,11 @@ def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
 
     out = ""
     if type(tags_in) is not list:
-        tags_in = [tags_in,]
+        tags_in = [tags_in, ]
     if len(tags_in) == 1 and len(tags_in[0]) == 6:
         ## case A: one concrete subfield asked, so print its value if found
         ##         (use with care: can mislead if field has multiple occurrences)
-        out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
+        out += "\n".join(get_fieldvalues(recID, tags_in[0]))
     else:
         ## case B: print our "text MARC" format; works safely all the time
         # find out which tags to output:
@@ -179,4 +178,26 @@ def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
                         out += value
                     else:
                         out += "$$%s%s" % (field[-1:], value)
+    return out
+
+
+def record_exists(recID):
+    """Return 1 if record RECID exists.
+       Return 0 if it doesn't exist.
+       Return -1 if it exists but is marked as deleted.
+    """
+    try: # if recid is '123foo', mysql will return id=123, and we don't want that
+        recID = int(recID)
+    except (ValueError, TypeError):
+        return 0
+
+    out = 0
+    res = run_sql("SELECT id FROM bibrec WHERE id=%s", (recID,), 1)
+    if res:
+        # record exists; now check whether it isn't marked as deleted:
+        dbcollids = get_fieldvalues(recID, "980__%")
+        if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
+            out = -1 # exists, but marked as deleted
+        else:
+            out = 1 # exists fine
     return out
