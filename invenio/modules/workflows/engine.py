@@ -17,9 +17,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import cPickle
+
 import sys
+
 from datetime import datetime
 from uuid import uuid1 as new_uuid
+
+
+import base64
+
 from workflow.engine import (GenericWorkflowEngine,
                              ContinueNextToken,
                              HaltProcessing,
@@ -37,6 +43,8 @@ from .config import (CFG_WORKFLOW_STATUS,
                      CFG_OBJECT_VERSION)
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
+
+
 
 
 DEBUG = CFG_DEVEL_SITE > 0
@@ -59,7 +67,6 @@ class BibWorkflowEngine(GenericWorkflowEngine):
                     Workflow.get(Workflow.uuid == uuid).first()
             else:
                 uuid = new_uuid()
-
             if self.db_obj is None:
                 self.db_obj = Workflow(name=name, id_user=id_user,
                                        current_object=curr_obj,
@@ -74,13 +81,27 @@ class BibWorkflowEngine(GenericWorkflowEngine):
         self.set_workflow_by_name(self.name)
         self.set_extra_data_params(**kwargs)
 
+    def get_extra_data(self):
+        """
+        Main method to retrieve data saved to the object.
+        """
+        return cPickle.loads(base64.b64decode(self.db_obj._extra_data))
+
+    def set_extra_data(self, value):
+        """
+        Main method to update data saved to the object.
+        """
+        self.db_obj._extra_data = base64.b64encode(cPickle.dumps(value))
+
     def extra_data_get(self, key):
-        if key not in self.db_obj.extra_data.keys():
-            raise KeyError
-        return self.db_obj.extra_data[key]
+        if key not in self.db_obj.get_extra_data():
+            raise KeyError("%s not in extra_data" % (key,))
+        return self.db_obj.get_extra_data()[key]
 
     def extra_data_set(self, key, value):
-        self.db_obj.extra_data[key] = value
+        tmp = self.db_obj.get_extra_data()
+        tmp[key] = value
+        self.db_obj.set_extra_data(tmp)
 
     extra_data = dictproperty(fget=extra_data_get, fset=extra_data_set,
                               doc="Sets up property")
@@ -232,7 +253,6 @@ BibWorkflowEngine
 
     def restart(self, obj, task):
         """Restart the workflow engine after it was deserialized
-
         """
         self.log.info("Restarting workflow from %s object and %s task" %
                       (str(obj), str(task),))
@@ -292,7 +312,7 @@ BibWorkflowEngine
 
         i = self._i
         # negative index not allowed, -1 is special
-        while i[0] < len(objects) - 1 and i[0] >= -1:
+        while len(objects) - 1 > i[0] >= -1:
             i[0] += 1
             obj = objects[i[0]]
             obj.log.info("Object is selected for processing")
@@ -348,7 +368,6 @@ BibWorkflowEngine
                         # stopped
                         obj.log.info("Object proccesing is halted")
                     raise
-
                 except Exception:
                     self.log.info("Unexpected error: %s", sys.exc_info()[0])
                     obj.log.error("Something terribly wrong"
@@ -371,9 +390,11 @@ BibWorkflowEngine
         """Executes the callback - override this method to implement logging"""
         obj.data = obj.get_data()
         obj.extra_data = obj.get_extra_data()
+        self.extra_data = self.get_extra_data()
         try:
             callback(obj, self)
         finally:
+            self.set_extra_data(self.extra_data)
             obj.set_data(obj.data)
             obj.set_extra_data(obj.extra_data)
 

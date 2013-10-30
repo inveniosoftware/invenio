@@ -20,9 +20,18 @@
 BibWorkflow API - functions to run workflows
 """
 
-from werkzeug import cached_property
-from werkzeug.utils import import_string
+
+
+from werkzeug.utils import (import_string,
+                            cached_property)
 from invenio.base.globals import cfg
+
+from invenio.base.config import CFG_BIBWORKFLOW_WORKER
+
+
+
+from invenio.bibworkflow_utils import BibWorkflowObjectIdContainer
+from invenio.modules.workflows.models import BibWorkflowObject
 
 
 class InvenioBibWorkflowWorkerUnavailable(Exception):
@@ -48,6 +57,7 @@ class WorkerBackend(object):
 
 
 WORKER = WorkerBackend()
+
 
 
 def start(workflow_name, data, **kwargs):
@@ -96,6 +106,21 @@ def start_delayed(workflow_name, data, **kwargs):
 
     @return: BibWorkflowEngine that ran the workflow.
     """
+    if not CFG_BIBWORKFLOW_WORKER:
+        raise InvenioBibWorkflowWorkerUnavailable('No worker configured')
+
+    #The goal of this part is to avoid a SQLalchemy decoherence in case
+    #some one try to send a Bibworkflow object. To avoid to send the
+    #complete object and get SQLAlchemy error of mapping, we save the id
+    #into our Id container, In the celery process the object is reloaded
+    #from the database !
+    if isinstance(data, list):
+        for i in range(0, len(data)):
+            if isinstance(data[i], BibWorkflowObject):
+                data[i] = BibWorkflowObjectIdContainer(data[i])
+    else:
+        if isinstance(data, BibWorkflowObject):
+            data = BibWorkflowObjectIdContainer(data)
     return WORKER().run_worker(workflow_name, data, **kwargs)
 
 
@@ -157,7 +182,6 @@ def start_by_oids(workflow_name, oids, **kwargs):
     """
     from .models import BibWorkflowObject
     objects = BibWorkflowObject.query.filter(BibWorkflowObject.id.in_(list(oids))).all()
-
     return start(workflow_name, objects, **kwargs)
 
 
