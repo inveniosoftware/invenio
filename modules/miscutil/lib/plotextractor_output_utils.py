@@ -273,19 +273,13 @@ def create_MARC(extracted_image_data, tarball, refno):
     root_dir = os.path.dirname(tarball) + os.sep + os.path.basename(tarball) + \
                  '_plots' + os.sep
 
-    # For building result MARCXML
-    marcxml = ['<record>']
-
-    # Datafield := (subfields, ind1, ind2, controlfield)
-    # Subfield := (code, value)
-
-    #FIXME: Determine what to do without refno
-    if refno and refno.isdigit():
-        field = (None, ' ', ' ', refno)
-        marcxml.append(field_xml_output(field, '001'))
-
+    marcxml_fft = []
     index = 0
     for (image_location, caption, dummy, contexts) in extracted_image_data:
+        if len(image_location) < 3:
+            # If not useful URL -> move on to next
+            continue
+
         # Merge subfolder into docname, until root directory
         relative_image_path = image_location.replace(root_dir, '')
         docname = "_".join(relative_image_path.split('.')[:-1]).replace('/', '_').replace(';', '').replace(':', '')
@@ -300,7 +294,7 @@ def create_MARC(extracted_image_data, tarball, refno):
             subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
             subfields.append(('n', docname))
             subfields.append(('o', "HIDDEN"))
-            marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
+            marcxml_fft.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
         else:
             # Add PLOT MARCXML
             subfields = []
@@ -308,7 +302,7 @@ def create_MARC(extracted_image_data, tarball, refno):
             subfields.append(('t', "Plot"))
             subfields.append(('d', "%05d %s" % (index, caption.replace(' : ', ''))))
             subfields.append(('n', docname))
-            marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
+            marcxml_fft.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
             if contexts:
                 # Add CONTEXT MARCXML
                 subfields = []
@@ -317,10 +311,24 @@ def create_MARC(extracted_image_data, tarball, refno):
                 subfields.append(('f', ".png;context"))
                 subfields.append(('n', docname))
                 subfields.append(('o', "HIDDEN"))
-                marcxml.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
+                marcxml_fft.append(field_xml_output((subfields, ' ', ' ', None), "FFT"))
         index += 1
-    marcxml.append('</record>')
-    return '\n'.join(marcxml)
+
+    if marcxml_fft:
+        # For building result MARCXML
+        marcxml_header = ['<record>']
+
+        # Datafield := (subfields, ind1, ind2, controlfield)
+        # Subfield := (code, value)
+
+        #FIXME: Determine what to do without refno
+        if refno and refno.isdigit():
+            field = (None, ' ', ' ', refno)
+            marcxml_header.append(field_xml_output(field, '001'))
+        marcxml = marcxml_header + marcxml_fft
+        marcxml.append('</record>')
+        return '\n'.join(marcxml)
+    return ""
 
 def get_image_location(image, sdir, image_list, recurred=False):
     """
