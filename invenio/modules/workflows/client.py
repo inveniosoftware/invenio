@@ -20,14 +20,15 @@ import traceback
 from workflow.engine import HaltProcessing
 from .config import CFG_OBJECT_VERSION
 from .config import CFG_WORKFLOW_STATUS
+from .utils import InvenioWorkflowError
 
 
 def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False, **kwargs):
     """
     Main function running the workflow.
     """
-    initial_run = True
 
+    initial_run = True
     while True:
         try:
             if initial_run:
@@ -50,6 +51,8 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False, **kwargs):
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             if stop_on_halt:
                 break
+        except InvenioWorkflowError as e:
+            raise e
         except Exception as e:
             # Processing generated an exception.
             # We print the stacktrace, save the object and continue
@@ -63,6 +66,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False, **kwargs):
             wfe.save(CFG_WORKFLOW_STATUS.ERROR)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
             if stop_on_halt or stop_on_error:
+                e = InvenioWorkflowError(str(e),wfe.uuid,wfe.getCurrObjId())
                 raise e
 
 

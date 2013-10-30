@@ -35,9 +35,9 @@ def run_worker(wname, data, **kwargs):
     """
     wfe = BibWorkflowEngine(wname, **kwargs)
     wfe.save()
-
     objects = prepare_objects(data, wfe)
     run_workflow(wfe=wfe, data=objects, **kwargs)
+
     return wfe
 
 
@@ -111,9 +111,7 @@ def prepare_objects(data, workflow_object):
                                             id_parent=new_initial.id)
             current_obj.set_data(obj)
             objects.append(current_obj)
-
     return objects
-
 
 def _prepare_objects_helper(obj, workflow_object):
     assert obj
@@ -168,7 +166,7 @@ and RUNNING object will be deleted.""")
             obj.log.info("""You are running workflow on a object created manualy
 outside of the workflow. Workflow will execute on THIS object (it will change
 its state and/or data) but it would also create INITIAL version of the object to
- keep its oryginal state.""")
+ keep its original state.""")
 
             # We assume that there is no parent object, so we create a new
             # INITIAL object, which will become a parent.

@@ -30,6 +30,7 @@ from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
 from .config import CFG_OBJECT_VERSION
 from .utils import redis_create_search_entry
+
 from .logger import (get_logger,
                      BibWorkflowLogHandler)
 
@@ -54,16 +55,18 @@ def get_default_extra_data():
 
 
 class Workflow(db.Model):
+
     __tablename__ = "bwlWORKFLOW"
+
     uuid = db.Column(db.String(36), primary_key=True, nullable=False)
+
     name = db.Column(db.String(255), default="Default workflow",
                      nullable=False)
     created = db.Column(db.DateTime, default=datetime.now, nullable=False)
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     id_user = db.Column(db.Integer, default=0, nullable=False)
-    extra_data = db.Column(db.MutableDict.as_mutable(db.PickleType),
-                           nullable=False, default={})
+    _extra_data = db.Column(db.LargeBinary, nullable=False, default=get_default_extra_data())
     status = db.Column(db.Integer, default=0, nullable=False)
     current_object = db.Column(db.Integer, default="0", nullable=False)
     objects = db.relationship("BibWorkflowObject", backref="bwlWORKFLOW")
@@ -72,6 +75,7 @@ class Workflow(db.Model):
     counter_error = db.Column(db.Integer, default=0, nullable=False)
     counter_finished = db.Column(db.Integer, default=0, nullable=False)
     module_name = db.Column(db.String(64), nullable=False)
+
 
     def __repr__(self):
         return "<Workflow(name: %s, module: %s, cre: %s, mod: %s," \
@@ -146,8 +150,7 @@ class Workflow(db.Model):
         """ Returns the objects of the workflow """
         return cls.get(Workflow.uuid == uuid).one().objects
 
-    @classmethod
-    def get_extra_data(cls, user_id=0, uuid=None, key=None, getter=None):
+    def get_extra_data(self, user_id=0, uuid=None, key=None, getter=None):
         """Returns a json of the column extra_data or
         if any of the other arguments are defined,
         a specific value.
@@ -157,16 +160,16 @@ class Workflow(db.Model):
         @param getter: a callable that takes a dict as param and returns a
         value
         """
-        extra_data = cls.get(Workflow.id_user == user_id,
-                             Workflow.uuid == uuid).one().extra_data
+        extra_data = Workflow.get(Workflow.id_user == self.id_user,
+                                  Workflow.uuid == self.uuid).one()._extra_data
 
+        extra_data = cPickle.loads(base64.b64decode(extra_data))
         if key is not None:
             return extra_data[key]
         elif callable(getter):
             return getter(extra_data)
 
-    @classmethod
-    def set_extra_data(cls, user_id=0, uuid=None,
+    def set_extra_data(self, user_id=0, uuid=None,
                        key=None, value=None, setter=None):
         """Modifies the json of the column extra_data or
         if any of the other arguments are defined,
@@ -177,15 +180,15 @@ class Workflow(db.Model):
         @param value: the new value
         @param setter: a callable that takes a dict as param and modifies it
         """
-        extra_data = cls.get(Workflow.id_user == user_id,
-                             Workflow.uuid == uuid).one().extra_data
-
+        extra_data = Workflow.get(Workflow.id_user == user_id,
+                                  Workflow.uuid == uuid).one()._extra_data
+        extra_data = cPickle.loads(base64.b64decode(extra_data))
         if key is not None and value is not None:
             extra_data[key] = value
         elif callable(setter):
             setter(extra_data)
 
-        cls.get(Workflow.uuid == uuid).update({'extra_data': extra_data})
+        Workflow.get(Workflow.uuid == self.uuid).update({'_extra_data': base64.b64encode(cPickle.dumps(extra_data))})
 
     @classmethod
     def delete(cls, uuid=None):
@@ -196,6 +199,7 @@ class Workflow(db.Model):
 class BibWorkflowObject(db.Model):
     # db table definition
     __tablename__ = "bwlOBJECT"
+
     id = db.Column(db.Integer, primary_key=True)
 
     # Our internal data column. Default is encoded dict.
@@ -214,7 +218,10 @@ class BibWorkflowObject(db.Model):
     modified = db.Column(db.DateTime, default=datetime.now,
                          onupdate=datetime.now, nullable=False)
     status = db.Column(db.String(255), default="", nullable=False)
-    data_type = db.Column(db.String(100), nullable=True)
+
+    data_type = db.Column(db.String(150), default="",
+                          nullable=True)
+
     uri = db.Column(db.String(500), default="")
     id_user = db.Column(db.Integer, default=0, nullable=False)
     child_logs = db.relationship("BibWorkflowObjectLog")
@@ -238,6 +245,7 @@ class BibWorkflowObject(db.Model):
         """
         Main method to retrieve data saved to the object.
         """
+
         return cPickle.loads(base64.b64decode(self._data))
 
     def set_data(self, value):
@@ -267,7 +275,7 @@ class BibWorkflowObject(db.Model):
                "version = %s, id_parent = %s, created = %s, extra_data = %s)" \
                % (str(self.id), str(self.get_data()), str(self.id_workflow),
                   str(self.version), str(self.id_parent), str(self.created),
-                  str(self._extra_data))
+                  str(self.get_extra_data()))
 
     def __str__(self, log=False):
         return """
@@ -302,8 +310,7 @@ BibWorkflowObject
        str(self.data_type),
        str(self.uri),
        str(self.get_data()),
-       str(self._extra_data),)
-       # str(self.extra_object_class),
+       str(self.get_extra_data),)
 
     def __eq__(self, other):
         if isinstance(other, BibWorkflowObject):
@@ -335,6 +342,7 @@ BibWorkflowObject
 
     def _create_version_obj(self, id_workflow, version, id_parent=None,
                             no_update=False):
+
         obj = BibWorkflowObject(_data=self._data,
                                 id_workflow=id_workflow,
                                 version=version,
@@ -342,6 +350,7 @@ BibWorkflowObject
                                 _extra_data=self._extra_data,
                                 status=self.status,
                                 data_type=self.data_type)
+
         db.session.add(obj)
         db.session.commit()
         if version is CFG_OBJECT_VERSION.INITIAL and not no_update:
@@ -393,28 +402,10 @@ BibWorkflowObject
         return filename
 
     def __getstate__(self):
-        return {"_data": self._data,
-                "id_workflow": self.id_workflow,
-                "version": self.version,
-                "id_parent": self.id_parent,
-                "created": self.created,
-                "modified": self.modified,
-                "status": self.status,
-                "data_type": self.data_type,
-                "uri": self.uri,
-                "_extra_data": self._extra_data}
+        return self.__dict__
 
     def __setstate__(self, state):
-        self._data = state["_data"]
-        self.id_workflow = state["id_workflow"]
-        self.version = state["version"]
-        self.id_parent = state["id_parent"]
-        self.created = state["created"]
-        self.modified = state["modified"]
-        self._extra_data = state["_extra_data"]
-        self.status = state["status"]
-        self.data_type = state["data_type"]
-        self.uri = state["uri"]
+        self.__dict__ = state
 
     def copy(self, other):
         """Copies data and metadata except id and id_workflow"""
@@ -423,8 +414,7 @@ BibWorkflowObject
         self.version = other.version
         self.id_parent = other.id_parent
         self.created = other.created
-        self.modified = datetime.now()
-        self.owner = other.owner
+        self.modified = other.modified
         self.status = other.status
         self.data_type = other.data_type
         self.uri = other.uri

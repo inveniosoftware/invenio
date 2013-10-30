@@ -70,8 +70,10 @@ class CeleryTest(InvenioTestCase):
 
     def test_task_invenio_version(self):
         """ Test calling of tasks """
-        from invenio.config import CFG_VERSION
-        from invenio.celery.tasks import invenio_version
+
+        from invenio.base.config import CFG_VERSION
+        from invenio.celery.workers import invenio_version
+
         # Call task function without celery
         self.assertEqual(invenio_version(), CFG_VERSION)
         # Call task via Celery machinery

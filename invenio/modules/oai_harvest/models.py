@@ -30,36 +30,48 @@ from invenio.ext.sqlalchemy import db
 from invenio.modules.record_editor.models import Bibrec
 from invenio.modules.scheduler.models import SchTASK
 
+
 class OaiHARVEST(db.Model):
     """Represents a OaiHARVEST record."""
+
     __tablename__ = 'oaiHARVEST'
+
     id = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
-                primary_key=True, autoincrement=True)
+                   primary_key=True, autoincrement=True)
     baseurl = db.Column(db.String(255), nullable=False, server_default='')
     metadataprefix = db.Column(db.String(255), nullable=False,
-                server_default='oai_dc')
+                               server_default='oai_dc')
     arguments = db.Column(db.LargeBinary, nullable=True)
     comment = db.Column(db.Text, nullable=True)
     name = db.Column(db.String(255), nullable=False)
     lastrun = db.Column(db.DateTime, nullable=True)
     frequency = db.Column(db.MediumInteger(12), nullable=False,
-                server_default='0')
+                          server_default='0')
     postprocess = db.Column(db.String(20), nullable=False,
-                server_default='h')
+                            server_default='h')
     setspecs = db.Column(db.Text, nullable=False)
+
+    @classmethod
+    def get(cls, *criteria, **filters):
+        """ A wrapper for the filter and filter_by functions of sqlalchemy.
+        Define a dict with which columns should be filtered by which values.
+
+        look up also sqalchemy BaseQuery's filter and filter_by documentation
+        """
+        return cls.query.filter(*criteria).filter_by(**filters)
 
 
 class OaiREPOSITORY(db.Model):
     """Represents a OaiREPOSITORY record."""
     __tablename__ = 'oaiREPOSITORY'
     id = db.Column(db.MediumInteger(9, unsigned=True), nullable=False,
-                primary_key=True, autoincrement=True)
+                   primary_key=True, autoincrement=True)
     setName = db.Column(db.String(255), nullable=False,
-                server_default='')
+                        server_default='')
     setSpec = db.Column(db.String(255), nullable=False,
-                server_default='')
+                        server_default='')
     setCollection = db.Column(db.String(255), nullable=False,
-                server_default='')
+                              server_default='')
     setDescription = db.Column(db.Text, nullable=False)
     setDefinition = db.Column(db.Text, nullable=False)
     setRecList = db.Column(db.iLargeBinary, nullable=True)
@@ -84,20 +96,19 @@ class OaiHARVESTLOG(db.Model):
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                 db.ForeignKey(Bibrec.id), nullable=False, server_default='0')
     bibupload_task_id = db.Column(db.Integer(11), db.ForeignKey(SchTASK.id),
-                nullable=False, server_default='0',
-                primary_key=True)
+                                  nullable=False, server_default='0',
+                                  primary_key=True)
     oai_id = db.Column(db.String(40), nullable=False, server_default='',
-                primary_key=True)
+                       primary_key=True)
     date_harvested = db.Column(db.DateTime, nullable=False,
-                server_default='1900-01-01 00:00:00',
-                primary_key=True)
+                               server_default='1900-01-01 00:00:00',
+                               primary_key=True)
     date_inserted = db.Column(db.DateTime, nullable=False,
-        server_default='1900-01-01 00:00:00')
+                              server_default='1900-01-01 00:00:00')
     inserted_to_db = db.Column(db.Char(1), nullable=False,
-                server_default='P')
+                               server_default='P')
     bibrec = db.relationship(Bibrec, backref='harvestlogs')
     schtask = db.relationship(SchTASK)
-
 
 
 __all__ = ['OaiHARVEST',

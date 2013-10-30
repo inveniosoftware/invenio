@@ -20,10 +20,57 @@ import re
 import redis
 
 from invenio.legacy.bibrecord import create_record
+
 from invenio.ext.logging import register_exception
-from invenio.ext.sqlalchemy import db
+
+
 
 REGEXP_RECORD = re.compile("<record.*?>(.*?)</record>", re.DOTALL)
+
+
+class BibWorkflowObjectIdContainer(object):
+    """
+    This class is only made to be able to store a workflow ID and
+    to retrieve easily the workflow from this ID. It is used maily
+    to overide some problem with SQLAlchemy when we change of
+    execution thread ( for example Celery )
+    """
+
+    def __init__(self, bibworkflowobject=None):
+        if bibworkflowobject is not None:
+            self.id = bibworkflowobject.id
+        else:
+            self.id = None
+
+    def get_object(self):
+        from invenio.modules.workflows.models import BibWorkflowObject
+
+        if self.id is not None:
+            my_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == self.id).one()
+            import ast
+            temp = my_object.get_extra_data()
+            temp["repository"].arguments = ast.literal_eval(my_object.get_extra_data()["repository"].arguments)
+            my_object.set_extra_data(temp)
+            return my_object
+        else:
+            return None
+
+    def __str__(self):
+        return "BibWorkflowObject" + str(self.id)
+
+
+class InvenioWorkflowError(Exception):
+
+    def __init__(self, error, id_workflow, id_object=0, message=""):
+        self.id_workflow = id_workflow
+        self.id_object = id_object
+        self.error = error
+        self.message = message
+        Exception.__init__(self, error, id_workflow, id_object, message)
+        super(InvenioWorkflowError, self).__init__(error,id_workflow, id_object, message)
+
+    def __str__(self):
+        return str(self.id_workflow) + "  " + str(self.id_object) + "   " + str(self.error) + "   " + str(self.message)
 
 
 class InvenioWorkflowDefinitionError(Exception):
@@ -35,8 +82,7 @@ def get_workflow_definition(name):
     if name in workflows:
         return workflows[name]
     else:
-        raise InvenioWorkflowDefinitionError("Cannot find workflow %s"
-                                             % (name,))
+        raise InvenioWorkflowDefinitionError("Cannot find workflow %s" % (name,))
 
 
 def determineDataType(data):
@@ -151,8 +197,6 @@ def set_up_redis():
     """
     Sets up the redis server for the saving of the HPContainers
 
-    @type url: string
-    @param url: address to setup the Redis server
     @return: Redis server object.
     """
     from flask import current_app
