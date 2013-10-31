@@ -402,7 +402,7 @@ def format_record_1st_pass(recID, of, ln=CFG_SITE_LANG, verbose=0,
 
         # We have spent time computing this format
         # We want to save this effort if the format is cached
-        if save_missing and recID \
+        if save_missing and recID and ln == CFG_SITE_LANG \
            and of.lower() in CFG_BIBFORMAT_CACHED_FORMATS and verbose == 0:
             bibformat_dblayer.save_preformatted_record(recID,
                                                        of,
