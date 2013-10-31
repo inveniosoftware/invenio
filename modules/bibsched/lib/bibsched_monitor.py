@@ -192,7 +192,7 @@ class Manager(object):
                                            ord("l"), ord("L"), ord("e"), ord("E"),
                                            ord("z"), ord("Z"), ord("b"), ord("B"),
                                            ord("h"), ord("H"), ord("D"), ord("c"),
-                                           ord("f"), ord("j"))):
+                                           ord("f"), ord("j"), ord("4"))):
             self.display_in_footer("in automatic mode")
         else:
             status = self.currentrow and self.currentrow[5] or None
@@ -292,6 +292,14 @@ class Manager(object):
                 self.update_rows()
                 self.repaint()
                 self.display_in_footer("only archived processes are displayed")
+            elif char == ord("4"):
+                self.display = 4
+                self.first_visible_line = 0
+                self.selected_line = self.header_lines
+                # We need to update the display to display archived tasks
+                self.update_rows()
+                self.repaint()
+                self.display_in_footer("only non periodic processes are displayed")
             elif char in (ord("q"), ord("Q")):
                 if self.curses.panel.top_panel() == self.panel:
                     self.panel = None
@@ -1097,11 +1105,17 @@ order to let this task run. The current priority is %s. New value:"
             where = "WHERE status IN ('RUNNING', 'CONTINUING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING', 'WAITING', 'ERRORS REPORTED', 'DONE WITH ERRORS', 'ERROR', 'CERROR', 'KILLED', 'STOPPED')"
             order = "runtime ASC"
             limit = ""
-        else:
+        elif self.display == 3:
             table = "hstTASK"
             order = "runtime DESC"
             where = ""
             limit = ""
+        elif self.display == 4:
+            table = "schTASK"
+            where = "WHERE status IN ('RUNNING', 'CONTINUING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING', 'WAITING', 'ERRORS REPORTED', 'DONE WITH ERRORS', 'ERROR', 'CERROR', 'KILLED', 'STOPPED') AND sleeptime = \"\""
+            order = "runtime ASC"
+            limit = ""
+
         self.rows = run_sql("""SELECT id, proc, user, runtime, sleeptime,
                                status, progress, arguments, priority, host,
                                sequenceid
