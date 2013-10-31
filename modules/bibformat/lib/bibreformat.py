@@ -258,7 +258,7 @@ def outdated_caches(fmt, last_updated, chunk_size=5000):
     return recids
 
 
-def missing_caches(fmt, chunk_size=2000):
+def missing_caches(fmt, chunk_size=100000):
     """Produces record IDs to be formated, because their fmt cache is missing
 
     @param fmt: format to query for
@@ -266,20 +266,19 @@ def missing_caches(fmt, chunk_size=2000):
     """
     write_message("Querying database for records without cache...")
 
-    sql = """SELECT br.id
-             FROM bibrec as br
-             LEFT JOIN bibfmt as bf
-             ON bf.id_bibrec = br.id AND bf.format ='%s'
-             WHERE bf.id_bibrec IS NULL
-             AND br.id BETWEEN %%s AND %%s""" % fmt
-
-    recids = intbitset()
+    all_recids = intbitset()
     max_id = run_sql("SELECT max(id) FROM bibrec")[0][0] or 0
     for start in xrange(1, max_id + 1, chunk_size):
         end = start + chunk_size
-        recids += intbitset(run_sql(sql, (start, end)))
+        sql = "SELECT id FROM bibrec WHERE id BETWEEN %s AND %s"
+        recids = intbitset(run_sql(sql, (start, end)))
+        sql = """SELECT id_bibrec FROM bibfmt
+                 WHERE id_bibrec BETWEEN %s AND %s
+                 AND format = %s"""
+        without_fmt = intbitset(run_sql(sql, (start, end, fmt)))
+        all_recids += recids - without_fmt
 
-    return recids
+    return all_recids
 
 def query_records(params):
     """Prduces record IDs from given query parameters
@@ -308,79 +307,6 @@ def query_records(params):
     return res
 
 
-def all_records():
-    """Produces record IDs for all available records"""
-    return intbitset(run_sql("SELECT id FROM bibrec"))
-
-
-def outdated_caches(fmt, last_updated, chunk_size=5000):
-    sql = """SELECT br.id
-             FROM bibrec AS br
-             INNER JOIN bibfmt AS bf ON bf.id_bibrec = br.id
-             WHERE br.modification_date >= %s
-             AND bf.format = %s
-             AND bf.last_updated < br.modification_date
-             AND br.id BETWEEN %s AND %s"""
-
-    last_updated_str = last_updated.strftime('%Y-%m-%d %H:%M:%S')
-    recids = intbitset()
-    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0]
-    for start in xrange(1, max_id + 1, chunk_size):
-        end = start + chunk_size
-        recids += intbitset(run_sql(sql, (last_updated_str, fmt, start, end)))
-
-    return recids
-
-
-def missing_caches(fmt, chunk_size=2000):
-    """Produces record IDs to be formated, because their fmt cache is missing
-
-    @param fmt: format to query for
-    @return: record IDs generator without pre-created format cache
-    """
-    write_message("Querying database for records without cache...")
-
-    sql = """SELECT br.id
-             FROM bibrec as br
-             LEFT JOIN bibfmt as bf
-             ON bf.id_bibrec = br.id AND bf.format ='%s'
-             WHERE bf.id_bibrec IS NULL
-             AND br.id BETWEEN %%s AND %%s""" % fmt
-
-    recids = intbitset()
-    max_id = run_sql("SELECT max(id) FROM bibrec")[0][0]
-    for start in xrange(1, max_id + 1, chunk_size):
-        end = start + chunk_size
-        recids += intbitset(run_sql(sql, (start, end)))
-
-    return recids
-
-def query_records(params):
-    """Prduces record IDs from given query parameters
-
-    By passing the appriopriate CLI options, we can query here for additional
-    records.
-    """
-    write_message("Querying database (records query)...")
-    res = intbitset()
-    if params['field'] or params['collection'] or params['pattern']:
-
-        if not params['collection']:
-            # use search_pattern() whenever possible, as it can search
-            # even in private collections
-            res = search_pattern(p=params['pattern'],
-                                 f=params['field'],
-                                 m=params['matching'])
-        else:
-            # use perform_request_search when '-c' argument has been
-            # defined, as it is not supported by search_pattern()
-            res = intbitset(perform_request_search(req=None, of='id',
-                                         c=params['collection'],
-                                         p=params['pattern'],
-                                         f=params['field']))
-    return res
-
-
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
@@ -397,11 +323,11 @@ def task_run_core():
         if task_has_option("last"):
             recids += outdated_caches(fmt, last_updated)
 
-        if task_has_option('without'):
+        if task_has_option('ignore_without'):
+            without_fmt = intbitset()
+        else:
             without_fmt = missing_caches(fmt)
             recids += without_fmt
-        else:
-            without_fmt = intbitset()
 
         cli_recids = split_cli_ids_arg(task_get_option('recids', ''))
         recids += cli_recids
@@ -468,7 +394,7 @@ Reformatting options:
   -f,  --field          \t Force reformatting records by field
   -p,  --pattern        \t Force reformatting records by pattern
   -i,  --id             \t Force reformatting records by record id(s)
-  --missing             \t Force reformatting records without format
+  --no-missing          \t Ignore reformatting records without format
 Pattern options:
   -m,  --matching       \t Specify if pattern is exact (e), regular expression (r),
                         \t partial (p), any of the words (o) or all of the words (a)
@@ -483,7 +409,7 @@ Pattern options:
                  "format=",
                  "noprocess",
                  "id=",
-                 "missing"]),
+                 "no-missing"]),
             task_submit_check_options_fnc=task_submit_check_options,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -508,9 +434,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):  # pylint:
     """
     if key in ("-a", "--all"):
         task_set_option("all", 1)
-        task_set_option("without", 1)
-    elif key in ("--missing", ):
-        task_set_option("without", 1)
+    elif key in ("--no-missing", ):
+        task_set_option("ignore_without", 1)
     elif key in ("-c", "--collection"):
         task_set_option("collection", value)
     elif key in ("-n", "--noprocess"):
