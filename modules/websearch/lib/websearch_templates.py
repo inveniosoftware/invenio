@@ -66,7 +66,8 @@ from invenio.config import \
      CFG_HEPDATA_URL, \
      CFG_HEPDATA_PLOTSIZE, \
      CFG_BASE_URL, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS
 
 from invenio.search_engine_config import CFG_WEBSEARCH_RESULTS_OVERVIEW_MAX_COLLS_TO_PRINT
 from invenio.websearch_services import \
@@ -3832,6 +3833,10 @@ class Template:
 
         # this variable is set to zero and then, nothing is displayed
         if not CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
+            return ''
+
+        # this variable is set to zero and then nothing is saved in the previous session
+        if not CFG_WEBSEARCH_PREV_NEXT_HIT_FOR_GUESTS:
             return ''
 
         # search for a specific record having not done any search before
