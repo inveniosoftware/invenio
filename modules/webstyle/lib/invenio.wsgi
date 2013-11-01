@@ -48,6 +48,11 @@ get_kbs()
 # pre-load docextract author regexp
 from invenio.authorextract_re import get_author_regexps
 get_author_regexps()
+# increase compile regexps cache size for further
+# speed improvements in docextract
+import re
+re._MAXCACHE = 2000
+
 
 try:
     from invenio.webinterface_handler_wsgi import application
