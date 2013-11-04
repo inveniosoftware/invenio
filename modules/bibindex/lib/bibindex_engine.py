@@ -880,10 +880,11 @@ class WordTable:
             tokenizing_function = self.default_tokenizer_function
             for recID in range(recID1, recID2 + 1):
                 record = get_record(recID)
-                new_words = tokenizing_function(record)
-                if not wlist.has_key(recID):
-                    wlist[recID] = []
-                wlist[recID] = list_union(new_words, wlist[recID])
+                if record:
+                    new_words = tokenizing_function(record)
+                    if not wlist.has_key(recID):
+                        wlist[recID] = []
+                    wlist[recID] = list_union(new_words, wlist[recID])
         # case of special indexes:
         elif self.index_name in ('authorcount', 'journal'):
             for tag in self.fields_to_index:

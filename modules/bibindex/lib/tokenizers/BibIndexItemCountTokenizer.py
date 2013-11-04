@@ -40,6 +40,8 @@ class BibIndexItemCountTokenizer(BibIndexEmptyTokenizer):
             count = record['_number_of_copies']
         except KeyError:
             pass
+        except TypeError:
+            return []
         return [str(count)]
 
 

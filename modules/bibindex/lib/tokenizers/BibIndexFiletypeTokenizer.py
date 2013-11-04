@@ -55,6 +55,8 @@ class BibIndexFiletypeTokenizer(BibIndexEmptyTokenizer):
                 values = record['filetypes']
         except KeyError:
             pass
+        except TypeError:
+            return []
         return values
 
     def get_tokenizing_function(self, wordtable_type):
