@@ -43,10 +43,6 @@ The code taken from mod_python is under the following License.
  #
  # $Id: apache.py 468216 2006-10-27 00:54:12Z grahamd $
 
-try:
-    import threading
-except:
-    import dummy_threading as threading
 from wsgiref.headers import Headers
 import time
 import re
@@ -63,10 +59,6 @@ from invenio.webinterface_handler_config import \
     InvenioWebInterfaceWSGIContentLenghtError, \
     InvenioWebInterfaceWSGIContentTypeError, \
     InvenioWebInterfaceWSGIContentMD5Error
-
-# Cache for values of PythonPath that have been seen already.
-_path_cache = {}
-_path_cache_lock = threading.Lock()
 
 class table(Headers):
     add = Headers.add_header

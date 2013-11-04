@@ -21,11 +21,13 @@ mod_wsgi Invenio application loader.
 """
 
 # start remote debugger if appropriate:
-try:
-    from invenio import remote_debugger
-    remote_debugger.start_file_changes_monitor()
-except:
-    pass
+from invenio.config import CFG_DEVEL_SITE
+if CFG_DEVEL_SITE:
+    try:
+        from invenio import remote_debugger
+        remote_debugger.start_file_changes_monitor()
+    except:
+        pass
 
 # wrap warnings (usually from sql queries) to log the traceback
 # of their origin for debugging
