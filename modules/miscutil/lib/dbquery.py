@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -40,6 +40,8 @@ import time
 import marshal
 import re
 import atexit
+import os
+
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -150,8 +152,11 @@ def close_connection(dbhost=CFG_DATABASE_HOST):
     Highly relevant in multi-processing and multi-threaded modules
     """
     try:
-        _DB_CONN[dbhost][(os.getpid(), get_ident())].close()
-        del(_DB_CONN[dbhost][(os.getpid(), get_ident())])
+        db = _DB_CONN[dbhost][(os.getpid(), get_ident())]
+        cur = db.cursor()
+        cur.execute("UNLOCK TABLES")
+        db.close()
+        del _DB_CONN[dbhost][(os.getpid(), get_ident())]
     except KeyError:
         pass
 
