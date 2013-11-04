@@ -36,6 +36,7 @@ import string
 import time
 import marshal
 import re
+import os
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -90,7 +91,7 @@ def _db_login(relogin = 0):
                        passwd=CFG_DATABASE_PASS,
                        use_unicode=False, charset='utf8')
     else:
-        thread_ident = get_ident()
+        thread_ident = (os.getpid(), get_ident())
     if relogin:
         _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
                                          port=int(CFG_DATABASE_PORT),
@@ -114,7 +115,21 @@ def _db_login(relogin = 0):
 def _db_logout():
     """Close a connection."""
     try:
-        del _DB_CONN[get_ident()]
+        del _DB_CONN[(os.getpid(), get_ident())]
+    except KeyError:
+        pass
+
+def close_connection(dbhost=CFG_DATABASE_HOST):
+    """
+    Enforce the closing of a connection
+    Highly relevant in multi-processing and multi-threaded modules
+    """
+    try:
+        db = _DB_CONN[(os.getpid(), get_ident())]
+        cur = db.cursor()
+        cur.execute("UNLOCK TABLES")
+        db.close()
+        del _DB_CONN[(os.getpid(), get_ident())]
     except KeyError:
         pass
 
