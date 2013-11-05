@@ -19,41 +19,11 @@
 
 """
 Invenio DB dumper.
-
-Usage: /opt/invenio/bin/dbdump [options]
-
-Command options:
-  -o, --output=DIR      Output directory. [default=/opt/invenio/var/log]
-  -n, --number=NUM      Keep up to NUM previous dump files. [default=5]
-  --params=PARAMS       Specify your own mysqldump parameters. Optional.
-  --compress            Compress dump directly into gzip.
-  --slave=HOST          Perform the dump from a slave, if no host use CFG_DATABASE_SLAVE.
-  --ignore=TABLES       Specify the tables to ignore (comma seperated)
-
-Scheduling options:
-  -u, --user=USER User name to submit the task as, password needed.
-  -t, --runtime=TIME Time to execute the task (now), e.g. +15s, 5m, 3h, 2002-10-27 13:57:26.
-  -s, --sleeptime=SLEEP Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d.
-  -L  --limit=LIMIT Time limit when it is allowed to execute the task, e.g. Sunday 01:00-05:00.
-                    The time limit syntax is [Wee[kday]] [hh[:mm][-hh[:mm]]].
-  -P, --priority=PRI Task priority (0=default, 1=higher, etc).
-  -N, --name=NAME Task specific name (advanced option).
-
-General options:
-  -h, --help  Print this help.
-  -V, --version  Print version information.
-  -v, --verbose=LEVEL Verbose level (0=min, 1=default, 9=max).
-      --profile=STATS Print profile information. STATS is a comma-separated
-   list of desired output stats (calls, cumulative,
-   file, line, module, name, nfl, pcalls, stdname, time).
 """
-
-__revision__ = "$Id$"
 
 import os
 import re
 import time
-import sys
 
 from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_PATH_GZIP
 from invenio.dbquery import CFG_DATABASE_HOST, \
@@ -62,8 +32,6 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
                             CFG_DATABASE_NAME, \
                             CFG_DATABASE_PORT, \
                             CFG_DATABASE_SLAVE, \
-                            CFG_DATABASE_SLAVE_SU_USER, \
-                            CFG_DATABASE_SLAVE_SU_PASS, \
                             get_connection_for_dump_on_slave, \
                             run_sql
 from invenio.bibtask import task_init, \
@@ -76,6 +44,14 @@ from invenio.bibtask import task_init, \
 from invenio.shellutils import run_shell_command, \
                                escape_shell_arg
 
+def get_table_names(value):
+    """
+    Get table names of the tables matching the given regular expressions
+    @param option: list of regular expressions
+    @return: list of strings
+    """
+    rex = re.compile(value)
+    return [row[0] for row in run_sql("SHOW TABLES") if rex.search(row[0])]
 
 def _delete_old_dumps(dirname, filename, number_to_keep):
     """
@@ -149,7 +125,7 @@ def check_slave_is_in_consistent_state(connection=None):
 def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
                   user=CFG_DATABASE_USER, passw=CFG_DATABASE_PASS, \
                   name=CFG_DATABASE_NAME, params=None, compress=False, \
-                  ignore=None):
+                  ignore_tables=None):
     """
     Dump Invenio database into SQL file located at DUMP_PATH.
 
@@ -183,8 +159,8 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
     @param compress: should the dump be compressed through gzip?
     @type compress: bool
 
-    @param ignore: list of tables to ignore in the dump
-    @type ignore: string
+    @param ignore_tables: list of tables to ignore in the dump
+    @type ignore: list of string
     """
     write_message("... writing %s" % (dump_path,))
 
@@ -199,24 +175,26 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
                  " --quick --extended-insert --set-charset --disable-keys" \
                  " --lock-tables=false --max_allowed_packet=2G "
 
-    if ignore:
-        params += " ".join(["--ignore-table=%s.%s" % (CFG_DATABASE_NAME, table) for table in ignore])
+    if ignore_tables:
+        params += " ".join([escape_shell_arg("--ignore-table=%s.%s" % (CFG_DATABASE_NAME, table)) for table in ignore_tables])
 
     dump_cmd = "%s %s " \
                " --host=%s --port=%s --user=%s --password=%s %s" % \
                (cmd_prefix, \
                 params, \
-                re.escape(host), \
-                re.escape(str(port)), \
-                re.escape(user), \
-                re.escape(passw), \
-                re.escape(name))
+                escape_shell_arg(host), \
+                escape_shell_arg(str(port)), \
+                escape_shell_arg(user), \
+                escape_shell_arg(passw), \
+                escape_shell_arg(name))
 
     if compress:
         dump_cmd = "%s | %s -cf; exit ${PIPESTATUS[0]}" % \
                    (dump_cmd, \
                     CFG_PATH_GZIP)
         dump_cmd = "bash -c %s" % (escape_shell_arg(dump_cmd),)
+
+    write_message(dump_cmd, verbose=2)
 
     exit_code, stdout, stderr = run_shell_command(dump_cmd, None, dump_path)
 
@@ -260,8 +238,12 @@ def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
             task_set_option('slave', CFG_DATABASE_SLAVE)
     elif key in ('--dump-on-slave-helper', ):
         task_set_option('dump_on_slave_helper_mode', True)
-    elif key in ('--ignore',):
-        task_set_option('ignore', value)
+    elif key in ('--ignore-tables',):
+        try:
+            re.compile(value)
+            task_set_option("ignore_tables", value)
+        except re.error:
+            raise StandardError, "ERROR: Passed string: '%s' is not a valid regular expression." % value
     else:
         return False
     return True
@@ -277,80 +259,83 @@ def _dbdump_run_task_core():
     # read params:
     host = CFG_DATABASE_HOST
     port = CFG_DATABASE_PORT
-    if task_get_option('slave') and not task_get_option('dump_on_slave_helper_mode'):
-        connection = get_connection_for_dump_on_slave()
-        write_message("Dump on slave requested")
-        write_message("... checking if slave is well up...")
-        check_slave_is_up(connection)
-        write_message("... checking if slave is in consistent state...")
-        check_slave_is_in_consistent_state(connection)
-        write_message("... detaching slave database...")
-        detach_slave(connection)
-        write_message("... scheduling dump on slave helper...")
-        helper_arguments = []
-        if task_get_option("number"):
-            helper_arguments += ["--number", str(task_get_option("number"))]
-        if task_get_option("output"):
-            helper_arguments += ["--output", str(task_get_option("output"))]
-        if task_get_option("params"):
-            helper_arguments += ["--params", str(task_get_option("params"))]
-        if task_get_option("ignore"):
-            helper_arguments += ["--ignore", str(task_get_option("ignore"))]
-        if task_get_option("compress"):
-            helper_arguments += ["--compress"]
-        if task_get_option("slave"):
-            helper_arguments += ["--slave", str(task_get_option("slave"))]
-        helper_arguments += ['-N', 'slavehelper', '--dump-on-slave-helper']
-        task_id = task_low_level_submission('dbdump', task_get_task_param('user'), '-P4', *helper_arguments)
-        write_message("Slave scheduled with ID %s" % task_id)
-        task_update_progress("DONE")
-        return True
-    elif task_get_option('dump_on_slave_helper_mode'):
-        write_message("Dumping on slave mode")
-        connection = get_connection_for_dump_on_slave()
-        write_message("... checking if slave is well down...")
-        check_slave_is_down(connection)
-        host = CFG_DATABASE_SLAVE
+    connection = None
+    try:
+        if task_get_option('slave') and not task_get_option('dump_on_slave_helper_mode'):
+            connection = get_connection_for_dump_on_slave()
+            write_message("Dump on slave requested")
+            write_message("... checking if slave is well up...")
+            check_slave_is_up(connection)
+            write_message("... checking if slave is in consistent state...")
+            check_slave_is_in_consistent_state(connection)
+            write_message("... detaching slave database...")
+            detach_slave(connection)
+            write_message("... scheduling dump on slave helper...")
+            helper_arguments = []
+            if task_get_option("number"):
+                helper_arguments += ["--number", str(task_get_option("number"))]
+            if task_get_option("output"):
+                helper_arguments += ["--output", str(task_get_option("output"))]
+            if task_get_option("params"):
+                helper_arguments += ["--params", str(task_get_option("params"))]
+            if task_get_option("ignore_tables"):
+                helper_arguments += ["--ignore-tables", str(task_get_option("ignore_tables"))]
+            if task_get_option("compress"):
+                helper_arguments += ["--compress"]
+            if task_get_option("slave"):
+                helper_arguments += ["--slave", str(task_get_option("slave"))]
+            helper_arguments += ['-N', 'slavehelper', '--dump-on-slave-helper']
+            task_id = task_low_level_submission('dbdump', task_get_task_param('user'), '-P4', *helper_arguments)
+            write_message("Slave scheduled with ID %s" % task_id)
+            task_update_progress("DONE")
+            return True
+        elif task_get_option('dump_on_slave_helper_mode'):
+            write_message("Dumping on slave mode")
+            connection = get_connection_for_dump_on_slave()
+            write_message("... checking if slave is well down...")
+            check_slave_is_down(connection)
+            host = CFG_DATABASE_SLAVE
 
-    task_update_progress("Reading parameters")
-    write_message("Reading parameters started")
-    output_dir = task_get_option('output', CFG_LOGDIR)
-    output_num = task_get_option('number', 5)
-    params = task_get_option('params', None)
-    compress = task_get_option('compress', False)
-    slave = task_get_option('slave', False)
-    ignore = task_get_option('ignore', None)
+        task_update_progress("Reading parameters")
+        write_message("Reading parameters started")
+        output_dir = task_get_option('output', CFG_LOGDIR)
+        output_num = task_get_option('number', 5)
+        params = task_get_option('params', None)
+        compress = task_get_option('compress', False)
+        slave = task_get_option('slave', False)
+        ignore_tables = task_get_option('ignore_tables', None)
+        if ignore_tables:
+            ignore_tables = get_table_names(ignore_tables)
+        else:
+            ignore_tables = None
 
-    output_file_suffix = task_get_task_param('task_starting_time')
-    output_file_suffix = output_file_suffix.replace(' ', '_') + '.sql'
-    if compress:
-        output_file_suffix = "%s.gz" % (output_file_suffix,)
-    write_message("Reading parameters ended")
+        output_file_suffix = task_get_task_param('task_starting_time')
+        output_file_suffix = output_file_suffix.replace(' ', '_') + '.sql'
+        if compress:
+            output_file_suffix = "%s.gz" % (output_file_suffix,)
+        write_message("Reading parameters ended")
 
-    if ignore:
-        ignore = [table.strip() for table in ignore.split(',')]
+        # make dump:
+        task_update_progress("Dumping database")
+        write_message("Database dump started")
 
-    # make dump:
-    task_update_progress("Dumping database")
-    write_message("Database dump started")
-
-    if slave:
-        output_file_prefix = 'slave-%s-dbdump-' % (CFG_DATABASE_NAME,)
-    else:
-        output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
-    output_file = output_file_prefix + output_file_suffix
-    dump_path = output_dir + os.sep + output_file
-    dump_database(dump_path, \
-                    host=host,
-                    port=port,
-                    params=params, \
-                    compress=compress, \
-                    ignore=ignore)
-
-    if task_get_option('dump_on_slave_helper_mode'):
-        write_message("Reattaching slave")
-        attach_slave(connection)
-    write_message("Database dump ended")
+        if slave:
+            output_file_prefix = 'slave-%s-dbdump-' % (CFG_DATABASE_NAME,)
+        else:
+            output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
+        output_file = output_file_prefix + output_file_suffix
+        dump_path = output_dir + os.sep + output_file
+        dump_database(dump_path, \
+                        host=host,
+                        port=port,
+                        params=params, \
+                        compress=compress, \
+                        ignore_tables=ignore_tables)
+        write_message("Database dump ended")
+    finally:
+        if connection and task_get_option('dump_on_slave_helper_mode'):
+            write_message("Reattaching slave")
+            attach_slave(connection)
     # prune old dump files:
     task_update_progress("Pruning old dump files")
     write_message("Pruning old dump files started")
@@ -371,11 +356,14 @@ def main():
   --params=PARAMS       Specify your own mysqldump parameters. Optional.
   --compress            Compress dump directly into gzip.
   -S, --slave=HOST      Perform the dump from a slave, if no host use CFG_DATABASE_SLAVE.
-  --ignore=TABLES       Specify the tables to ignore (comma seperated)
+  --ignore-tables=regex Ignore tables matching the given regular expression
+
+Examples:
+    $ dbdump --ignore-tables '^(idx|rnk)'
+    $ dbdump -n3 -o/tmp -s1d -L 02:00-04:00
 """ % CFG_LOGDIR,
-              version=__revision__,
               specific_params=("n:o:p:S:",
-                               ["number=", "output=", "params=", "slave=", "compress", 'ignore=', "dump-on-slave-helper"]),
+                               ["number=", "output=", "params=", "slave=", "compress", 'ignore-tables=', "dump-on-slave-helper"]),
               task_submit_elaborate_specific_parameter_fnc=_dbdump_elaborate_submit_param,
               task_run_fnc=_dbdump_run_task_core)
 
