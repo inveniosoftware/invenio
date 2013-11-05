@@ -18,12 +18,11 @@
 
 """ Implements a workflow for testing """
 
-from invenio.bibworkflow_tasks.test_tasks import \
-    lower_than_20, \
-    add, \
-    higher_than_20, \
-    sleep_task, \
-    simple_task
+from invenio.modules.workflows.tasks.test_tasks import (lower_than_20,
+                                                        add,
+                                                        higher_than_20,
+                                                        sleep_task,
+                                                        simple_task)
 
 
 class test_workflow_2(object):

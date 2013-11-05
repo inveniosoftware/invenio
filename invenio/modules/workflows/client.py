@@ -42,8 +42,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False, **kwargs):
                 break
         except HaltProcessing as e:
             # Processing was halted. Lets save current object and continue.
-            wfe.log_error(message="Processing halted!",
-                          error_msg=str(e))
+            wfe.log.error("Processing halted!" + str(e))
             wfe._objects[wfe.getCurrObjId()].save(CFG_OBJECT_VERSION.HALTED,
                                                   wfe.getCurrTaskId(),
                                                   id_workflow=wfe.uuid)
@@ -54,8 +53,7 @@ def run_workflow(wfe, data, stop_on_halt=False, stop_on_error=False, **kwargs):
         except Exception as e:
             # Processing generated an exception.
             # We print the stacktrace, save the object and continue
-            wfe.log_error(message="Processing error! %r" % (e,),
-                          error_msg=traceback.format_exc())
+            wfe.log.error("Processing error! %r\n%s" % (e, traceback.format_exc()))
             # Changing counter should be moved to wfe object
             # together with default exception handling
             wfe.increase_counter_error()
@@ -83,7 +81,7 @@ def continue_execution(wfe, data, restart_point="restart_task",
     Use stop_on_halt to stop processing the workflow
     if HaltProcessing is raised.
     """
-    wfe.log_info("Continue execution from: " + str(restart_point))
+    wfe.log.info("Continue execution from: " + str(restart_point))
     pos = data[0].get_current_task()
 
     if restart_point == "restart_prev":
@@ -114,8 +112,7 @@ def continue_execution(wfe, data, restart_point="restart_task",
                 break
         except HaltProcessing as e:
             # Processing was halted. Lets save current object and continue.
-            wfe.log_error(message="Processing halted!",
-                          error_msg=str(e))
+            wfe.log.error("Processing halted!" + str(e))
             wfe._objects[wfe.getCurrObjId()].save(2, wfe.getCurrTaskId())
             wfe.save(CFG_WORKFLOW_STATUS.HALTED)
             wfe.setPosition(wfe.getCurrObjId() + 1, [0, 0])
@@ -124,8 +121,7 @@ def continue_execution(wfe, data, restart_point="restart_task",
         except Exception as e:
             # Processing generated an exception. We print the stacktrace,
             # save the object and continue
-            wfe.log_error(message="Processing error! %r" % (e,),
-                          error_msg=traceback.format_exc())
+            wfe.log.error("Processing error! %r\n%s" % (e, traceback.format_exc()))
             # Changing counter should be moved to wfe object together
             # with default exception handling
             wfe.increase_counter_error()

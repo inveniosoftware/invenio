@@ -158,18 +158,19 @@ def create_hp_containers(iSortCol_0=None, sSortDir_0=None):
 def redis_create_search_entry(bwobject):
     redis_server = set_up_redis()
 
+    extra_data = bwobject.get_extra_data()
     #creates database entries to not loose key value pairs in redis
-    for key, value in bwobject.extra_data["redis_search"].iteritems():
+    for key, value in extra_data["redis_search"].iteritems():
         redis_server.sadd("holdingpen_sort", str(key))
         redis_server.sadd("holdingpen_sort:%s" % (str(key),), str(value))
         redis_server.sadd("holdingpen_sort:%s:%s" % (str(key), str(value),),
                           bwobject.id)
 
     redis_server.sadd("holdingpen_sort", "owner")
-    redis_server.sadd("holdingpen_sort:owner", bwobject.extra_data['owner'])
-    redis_server.sadd("holdingpen_sort:owner:%s" % (bwobject.extra_data['owner'],),
+    redis_server.sadd("holdingpen_sort:owner", extra_data['owner'])
+    redis_server.sadd("holdingpen_sort:owner:%s" % (extra_data['owner'],),
                       bwobject.id)
-    redis_server.sadd("holdingpen_sort:last_task_name:%s" % (bwobject.extra_data['last_task_name'],),
+    redis_server.sadd("holdingpen_sort:last_task_name:%s" % (extra_data['last_task_name'],),
                       bwobject.id)
 
 

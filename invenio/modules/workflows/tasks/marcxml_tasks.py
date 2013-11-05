@@ -22,7 +22,7 @@ def approve_record(obj, eng):
     """
     obj.extra_data["last_task_name"] = 'Record Approval'
     try:
-        eng.log_info("Adding the approval widget to %s" % (obj.id))
+        eng.log.info("Adding the approval widget to %s" % (obj.id))
         obj.extra_data['widget'] = 'approval_widget'
         eng.halt("Record needs approval")
     except KeyError:
@@ -42,14 +42,14 @@ def convert_record(stylesheet="oaiarxiv2marcxml.xsl"):
         from invenio.bibconvert_xslt_engine import convert
 
         obj.extra_data["last_task_name"] = 'Convert Record'
-        eng.log_info("Starting conversion using %s stylesheet" %
+        eng.log.info("Starting conversion using %s stylesheet" %
                      (stylesheet,))
-        eng.log_info("Type of data: %s" % (obj.data_type,))
+        eng.log.info("Type of data: %s" % (obj.data_type,))
         try:
             obj.data = convert(obj.data, stylesheet)
         except:
             obj.extra_data["error_msg"] = 'Could not convert record'
-            eng.log_error("Error: %s" % (obj.extra_data["error_msg"],))
+            eng.log.error("Error: %s" % (obj.extra_data["error_msg"],))
             raise
 
     _convert_record.__title__ = "Convert Record"
@@ -65,7 +65,7 @@ def download_fulltext(obj, eng):
 
     obj.extra_data["last_task_name"] = 'Download Fulltext'
     try:
-        eng.log_info("Starting download of %s" % (obj.data['url']))
+        eng.log.info("Starting download of %s" % (obj.data['url']))
         url = download_url(obj.data['url'])
         obj.extra_data['tasks_results']['fulltext_url'] = url
     except KeyError:
@@ -94,10 +94,10 @@ def match_record(obj, eng):
         # render holding pen corresponding template
         eng.halt("Match resolution needed")
     elif matches[0]:
-        eng.log_info("Matching: new record")
+        eng.log.info("Matching: new record")
     else:
         results = matches[1][0][1]
-        eng.log_info("Matching: existing record %s" % (results,))
+        eng.log.info("Matching: existing record %s" % (results,))
     obj.extra_data['widget'] = 'bibmatch_widget'
 
 match_record.__title__ = "Bibmatch Record"
@@ -105,7 +105,7 @@ match_record.__description__ = "This task matches a XML record."
 
 
 def print_record(obj, eng):
-    eng.log_info(obj.get_data())
+    eng.log.info(obj.get_data())
 
 print_record.__title__ = "Print Record"
 print_record.__description__ = "Prints the record data to engine log"
@@ -117,12 +117,12 @@ def upload_record(mode="ir"):
 
         obj.extra_data["last_task_name"] = 'Upload Record'
 
-        eng.log_info("Saving data to temporary file for upload")
+        eng.log.info("Saving data to temporary file for upload")
         filename = obj.save_to_file()
         params = ["-%s" % (mode,), filename]
         task_id = task_low_level_submission("bibupload", "bibworkflow",
                                             *tuple(params))
-        eng.log_info("Submitted task #%s" % (task_id,))
+        eng.log.info("Submitted task #%s" % (task_id,))
 
     _upload_record.__title__ = "Upload Record"
     _upload_record.__description__ = "Uploads the record using BibUpload"

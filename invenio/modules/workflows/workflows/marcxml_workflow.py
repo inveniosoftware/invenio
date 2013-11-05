@@ -18,9 +18,8 @@
 
 """Implements an example of a typical ingestion workflow for MARCXML records"""
 
-from invenio.bibworkflow_tasks.marcxml_tasks import (match_record,
-                                                     approve_record,
-                                                     convert_record)
+from invenio.modules.workflows.tasks.marcxml_tasks import (approve_record,
+                                                           convert_record)
 
 
 class marcxml_workflow(object):

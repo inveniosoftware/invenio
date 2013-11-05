@@ -34,7 +34,7 @@ class WorkerBackend(object):
     @cached_property
     def worker(self):
         try:
-            return import_string('invenio.bibworkflow_workers.%s:%s' % (
+            return import_string('invenio.modules.workflows.workers.%s:%s' % (
                 cfg['CFG_BIBWORKFLOW_WORKER'], cfg['CFG_BIBWORKFLOW_WORKER']))
         except:
             from invenio.errorlib import register_exception
