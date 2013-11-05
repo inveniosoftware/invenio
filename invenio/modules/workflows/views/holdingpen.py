@@ -20,6 +20,7 @@
 from flask import render_template, Blueprint, redirect, url_for, flash, request
 from flask.ext.login import login_required
 
+from .. import wfwidgets
 from ..models import BibWorkflowObject, Workflow
 from invenio.base.decorators import templated, wash_arguments
 from invenio.base.i18n import _
@@ -27,7 +28,6 @@ from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.menu import register_menu
 from invenio.bibworkflow_utils import get_workflow_definition
 from invenio.bibworkflow_api import continue_oid_delayed
-from invenio.bibworkflow_hp_load_widgets import widgets
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
@@ -245,7 +245,7 @@ def show_widget(bwobject_id, widget):
     bwparent = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
                                               bwobject.id_parent).first()
 
-    widget_form = widgets[widget]
+    widget_form = getattr(wfwidgets, widget)
 
     if widget == 'bibmatch_widget':
         # setting up bibmatch widget
@@ -263,7 +263,7 @@ def show_widget(bwobject_id, widget):
 
         data_preview = _entry_data_preview(bwobject.get_data())
 
-        return render_template('bibworkflow_hp_'+widget+'.html',
+        return render_template('workflows/hp_'+widget+'.html',
                                bwobject=bwobject,
                                widget=widget_form,
                                match_preview=match_preview, matches=matches,

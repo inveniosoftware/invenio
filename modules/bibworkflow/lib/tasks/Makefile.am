@@ -17,4 +17,4 @@
 
 pylibdir = $(libdir)/python/invenio/bibworkflow_tasks
 
-pylib_DATA = *.py
+pylib_DATA =
