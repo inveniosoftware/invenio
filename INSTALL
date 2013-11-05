@@ -38,7 +38,8 @@ Contents
               gs-common clisp gettext libapache2-mod-wsgi unzip \
               python-dateutil python-rdflib python-pyparsing \
               python-gnuplot python-magic pdftk html2text giflib-tools \
-              pstotext netpbm python-pypdf python-chardet python-lxml
+              pstotext netpbm python-pypdf python-chardet python-lxml \
+              python-unidecode
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
@@ -147,6 +148,9 @@ Contents
           - (optional) Python Rauth if you want to enable OAuth 1.0/2.0
              support for authentication (depends on Python-2.6 or later):
              <http://packages.python.org/rauth/>
+          - (optional) unidecode, for ASCII representation of Unicode
+             text:
+             <https://pypi.python.org/pypi/Unidecode>
 
         Note: MySQLdb version 1.2.1_p2 or higher is recommended.  If
               you are using an older version of MySQLdb, you may get

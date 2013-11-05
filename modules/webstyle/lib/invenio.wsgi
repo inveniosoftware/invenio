@@ -47,4 +47,12 @@ try:
 except:
     pass
 
-from invenio.webinterface_handler_wsgi import application
+try:
+    from invenio.webinterface_handler_wsgi import application
+finally:
+    ## mod_wsgi uses one thread to import the .wsgi file
+    ## and a second one to instantiate the application.
+    ## Therefore we need to close redundant conenctions that
+    ## are allocated on the 1st thread.
+    from invenio.dbquery import close_connection
+    close_connection()
