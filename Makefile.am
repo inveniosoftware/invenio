@@ -53,7 +53,7 @@ dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
 
 # Bootstrap version
-BOOTSTRAPV = 2.2.1
+BOOTSTRAPV = 3.0.2
 
 # Hogan.js version
 HOGANVER = 2.0.0
@@ -329,30 +329,44 @@ install-bootstrap:
 	rm -rf /tmp/invenio-bootstrap
 	mkdir /tmp/invenio-bootstrap
 	(cd /tmp/invenio-bootstrap && \
-	wget -O bootstrap.zip 'http://invenio-software.org/download/bootstrap/bootstrap-${BOOTSTRAPV}.zip' && \
+	wget -O bootstrap.zip 'https://github.com/twbs/bootstrap/releases/download/v${BOOTSTRAPV}/bootstrap-${BOOTSTRAPV}-dist.zip' && \
 	unzip -u bootstrap.zip && \
-	cp bootstrap/css/bootstrap-responsive.css ${prefix}/var/www/css/bootstrap-responsive.css && \
-	cp bootstrap/css/bootstrap-responsive.min.css ${prefix}/var/www/css/bootstrap-responsive.min.css && \
-	cp bootstrap/css/bootstrap.css ${prefix}/var/www/css/bootstrap.css && \
-	cp bootstrap/css/bootstrap.min.css ${prefix}/var/www/css/bootstrap.min.css && \
-	cp bootstrap/img/glyphicons-halflings-white.png ${prefix}/var/www/img/glyphicons-halflings-white.png && \
-	cp bootstrap/img/glyphicons-halflings.png ${prefix}/var/www/img/glyphicons-halflings.png && \
-	cp bootstrap/js/bootstrap.js ${prefix}/var/www/js/bootstrap.js && \
-	cp bootstrap/js/bootstrap.min.js ${prefix}/var/www/js/bootstrap.min.js && \
+	cp dist/css/bootstrap.css ${prefix}/var/www/css/bootstrap.css && \
+	cp dist/css/bootstrap.min.css ${prefix}/var/www/css/bootstrap.min.css && \
+	cp dist/css/bootstrap-theme.css ${prefix}/var/www/css/bootstrap-theme.css && \
+	cp dist/css/bootstrap-theme.min.css ${prefix}/var/www/css/bootstrap-theme.min.css && \
+	mkdir -p ${prefix}/var/www/fonts && \
+	cp dist/fonts/glyphicons-halflings-regular.eot ${prefix}/var/www/fonts/glyphicons-halflings-regular.eot && \
+	cp dist/fonts/glyphicons-halflings-regular.svg ${prefix}/var/www/fonts/glyphicons-halflings-regular.svg && \
+	cp dist/fonts/glyphicons-halflings-regular.ttf ${prefix}/var/www/fonts/glyphicons-halflings-regular.ttf && \
+	cp dist/fonts/glyphicons-halflings-regular.woff ${prefix}/var/www/fonts/glyphicons-halflings-regular.woff && \
+	cp dist/js/bootstrap.js ${prefix}/var/www/js/bootstrap.js && \
+	cp dist/js/bootstrap.min.js ${prefix}/var/www/js/bootstrap.min.js && \
+	wget -O bootstrap-typeahead.zip 'http://twitter.github.com/typeahead.js/releases/latest/typeahead.js.zip' && \
+	unzip -u bootstrap-typeahead.zip && \
+	cp typeahead.js/typeahead.js ${prefix}/var/www/js/typeahead.js && \
+	cp typeahead.js/typeahead.min.js ${prefix}/var/www/js/typeahead.min.js && \
+	wget -O typeahead.js-bootstrap.css 'https://raw.github.com/jharding/typeahead.js-bootstrap.css/master/typeahead.js-bootstrap.css' && \
+	mv typeahead.js-bootstrap.css ${prefix}/var/www/css/typeahead.js-bootstrap.css && \
 	rm -fr /tmp/invenio-bootstrap )
 	@echo "***********************************************************"
 	@echo "** The Twitter Bootstrap was successfully installed.     **"
 	@echo "***********************************************************"
 
 uninstall-bootstrap:
-	rm ${prefix}/var/www/css/bootstrap-responsive.css && \
-	rm ${prefix}/var/www/css/bootstrap-responsive.min.css && \
 	rm ${prefix}/var/www/css/bootstrap.css && \
 	rm ${prefix}/var/www/css/bootstrap.min.css && \
-	rm ${prefix}/var/www/img/glyphicons-halflings-white.png && \
-	rm ${prefix}/var/www/img/glyphicons-halflings.png && \
+	rm ${prefix}/var/www/css/bootstrap-theme.css && \
+	rm ${prefix}/var/www/css/bootstrap-theme.min.css && \
+	rm ${prefix}/var/www/css/typeahead.js-bootstrap.css && \
+	rm ${prefix}/var/www/fonts/glyphicons-halflings-regular.eot && \
+	rm ${prefix}/var/www/fonts/glyphicons-halflings-regular.svg && \
+	rm ${prefix}/var/www/fonts/glyphicons-halflings-regular.ttf && \
+	rm ${prefix}/var/www/fonts/glyphicons-halflings-regular.woff && \
 	rm ${prefix}/var/www/js/bootstrap.js && \
-	rm ${prefix}/var/www/js/bootstrap.min.js
+	rm ${prefix}/var/www/js/bootstrap.min.js && \
+	rm ${prefix}/var/www/js/typeahead.js && \
+	rm ${prefix}/var/www/js/typeahead.min.js
 	@echo "***********************************************************"
 	@echo "** The Twitter Bootstrap was successfully uninstalled.   **"
 	@echo "***********************************************************"
@@ -386,6 +400,8 @@ install-typeahead-plugin:
 	(cd /tmp/typeahead && \
 	wget -O typeahead.min.js 'http://twitter.github.com/typeahead.js/releases/latest/typeahead.min.js' && \
 	cp typeahead.min.js ${prefix}/var/www/js/typeahead.min.js && \
+	wget -O typeahead.js-bootstrap.css 'https://raw.github.com/jharding/typeahead.js-bootstrap.css/master/typeahead.js-bootstrap.css' && \
+	cp typeahead.js-bootstrap.css ${prefix}/var/www/css/typeahead.js-bootstrap.css && \
 	rm -fr /tmp/typeahead )
 	@echo "***********************************************************"
 	@echo "** typeahead.js was successfully installed.              **"

@@ -1,7 +1,7 @@
 <div class="well">
     <h2>My uploads</h2>
     {% if not my_depositions %}
-    <p class="muted">You currently have no uploads.</p>
+    <p class="text-muted">You currently have no uploads.</p>
     {% else %}
     {% for dep in my_depositions if not dep.is_finished() %}
     {%- set deposition_type = None if dep.type.is_default() else dep.type.get_identifier() -%}
@@ -14,7 +14,7 @@
                   {{ dep.title }}
               {% else %}
                   {{ _('Untitled') }}
-              {% endif %}</a></td><td>{{ dep.modified|invenio_pretty_date }}</td><td><a href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=dep.id) }}" class="rmlink" rel="tooltip" title="Delete upload"><i class="icon-trash"></i></a></td>
+              {% endif %}</a></td><td>{{ dep.modified|invenio_pretty_date }}</td><td><a href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=dep.id) }}" class="rmlink" rel="tooltip" title="Delete upload"><i class="glyphicon glyphicon-trash"></i></a></td>
     </tr>
     {%- if loop.last %}
     </table>

@@ -40,26 +40,26 @@ from invenio.utils.date import convert_datetext_to_dategui
 from invenio.legacy.webbasket.db_layer import get_basket_ids_and_names
 
 ICON_BACK = 'icon-arrow-left'
-ICON_CREATE_BASKET = 'icon-plus'
+ICON_CREATE_BASKET = 'glyphicon glyphicon-plus'
 ICON_EDIT_BASKET = 'icon-wrench'
 ICON_DELETE_BASKET = 'icon-trash'
 
-ICON_ADD_ITEM = 'icon-plus'
+ICON_ADD_ITEM = 'glyphicon glyphicon-plus'
 ICON_MOVE_ITEM = 'icon-share-alt'
-ICON_COPY_ITEM = 'icon-plus-sign'
+ICON_COPY_ITEM = 'glyphicon glyphicon-plus-sign'
 ICON_REMOVE_ITEM = 'icon-trash'
 
 ICON_MOVE_UP = 'icon-arrow-up'
-ICON_MOVE_UP_MUTED = 'icon-arrow-up muted'
+ICON_MOVE_UP_MUTED = 'icon-arrow-up text-muted'
 ICON_MOVE_DOWN = 'icon-arrow-down'
-ICON_MOVE_DOWN_MUTED = 'icon-arrow-down muted'
+ICON_MOVE_DOWN_MUTED = 'icon-arrow-down text-muted'
 ICON_NEXT_ITEM = 'icon-arrow-right'
-ICON_NEXT_ITEM_MUTED = 'icon-arrow-right muted'
+ICON_NEXT_ITEM_MUTED = 'icon-arrow-right text-muted'
 ICON_PREVIOUS_ITEM = 'icon-arrow-left'
-ICON_PREVIOUS_ITEM_MUTED = 'icon-arrow-left muted'
+ICON_PREVIOUS_ITEM_MUTED = 'icon-arrow-left text-muted'
 
 ICON_NOTES = 'icon-file'
-ICON_ADD_NOTE = 'icon-pencil'
+ICON_ADD_NOTE = 'glyphicon glyphicon-pencil'
 
 
 class Template:
@@ -146,10 +146,10 @@ class Template:
                                    'label': _('Edit topic')}
                 personal_tab = """
               <div class="row-fluid">
-                <div class="span7 bsk_directory_box_nav_tab_content">
+                <div class="col-md-7 bsk_directory_box_nav_tab_content">
                   %(personalbaskets_link)s&nbsp;&gt;&nbsp;%(topic_link)s
                 </div>
-                <div class="span5 pagination-right bsk_directory_box_nav_tab_options">
+                <div class="col-md-5 pagination-right bsk_directory_box_nav_tab_options">
                   %(go_back)s
                   &nbsp;&nbsp;
                   %(create_basket)s
@@ -253,7 +253,7 @@ class Template:
 
         if personal_baskets_info:
             tabs += """
-            <div class="span12">
+            <div class="col-md-12">
               %s
             </div>""" % (personal_tab,)
 
@@ -261,7 +261,7 @@ class Template:
         ## and the options on it.
         elif group_baskets_info:
             tabs += """
-            <div class="span12">
+            <div class="col-md-12">
               %s
             </div>""" % (group_tab,)
         ## If only a sepcific category is selected (or eveb none) display
@@ -269,13 +269,13 @@ class Template:
         else:
             tabs += """
 
-            <div class="span4">
+            <div class="col-md-4">
                 %(personal_tab)s
             </div>
-            <div class="span4">
+            <div class="col-md-4">
                 %(group_tab)s
             </div>
-            <div class="span4">
+            <div class="col-md-4">
                 %(public_tab)s
             </div>""" % {'personal_tab': personal_tab,
                          'group_tab': group_tab,
@@ -353,7 +353,7 @@ class Template:
             content_list.reverse()
             content = """
                 <div class="row-fluid">
-                    <div class="span12">
+                    <div class="col-md-12">
                         <table cellspacing="0px" cellpadding="0px" align="center" width="100%">
                           <tr>"""
             for i in range(nb_cells):
@@ -381,7 +381,7 @@ class Template:
                                       'label': _('Create basket')}
                 content += """
                 <div class="row-fluid well">
-                    <div class="span5 offset7 pagination-right bsk_directory_box_nav_extra_options">
+                    <div class="col-md-5 offset7 pagination-right bsk_directory_box_nav_extra_options">
                         %s
                     </div>
                 </div>""" % (create_basket_link,)
@@ -520,7 +520,7 @@ class Template:
         %(tabs)s
       </div>
       <div class="row-fluid bsk_directory_box_content">
-        <div class="span12 %(class)s">
+        <div class="col-md-12 %(class)s">
           %(content)s
         </div>
       </div>
@@ -1417,10 +1417,10 @@ class Template:
         out = """
 <div class="bskbasket">
     <div class="row-fluid bskbasketheader">
-        <div class="span1 bskactions">
+        <div class="col-md-1 bskactions">
             <img src="%(logo)s" alt="%(label)s" />
         </div>
-        <div class="span11 bsktitle">
+        <div class="col-md-11 bsktitle">
             <b>%(label)s</b><br />
             %(count)s
         </div>
@@ -1672,15 +1672,15 @@ class Template:
     <div class="bskbasket">
         <div class="well bskbasketheader">
             <div class="row-fluid bskactions">
-                <div class="span1 bskactions">
+                <div class="col-md-1 bskactions">
                     <img src="%(logo)s" alt="%(label)s" />
                 </div>
-                <div class="span11 bsktitle">
+                <div class="col-md-11 bsktitle">
                     <b>Adding items to your basket</b>
                 </div>
             </div>
             <div class="row-fluid bskbasketheader bskactions">
-                <div class="span12">
+                <div class="col-md-12">
                     To add internal items to your basket please select them
                     through the  <a href="%(search_link)s">search page</a>
                     and use the "Add to basket" functionality.
@@ -1722,7 +1722,7 @@ class Template:
 
         out += """
 <div class="row-fluid">
-    <div class="span12 well bskbasketheader bskbasketheadertitle">
+    <div class="col-md-12 well bskbasketheader bskbasketheadertitle">
         <strong>
             %(header_label)s
         </strong>
@@ -2354,7 +2354,7 @@ class Template:
 
     <div class="row-fluid well" %(optional_colspan)s>
       <!-- bskbasketheadertitle -->
-      <div class="span4">
+      <div class="col-md-4">
         <strong>
           %(name)s
         </strong>
@@ -2365,7 +2365,7 @@ class Template:
       </div>
 
       <!-- bskbasketheaderoptions -->
-      <div class="span5 offset3 pagination-right">
+      <div class="col-md-5 col-md-offset-3 pagination-right">
         %(add_ext_resource)s
         %(edit_basket)s
         %(delete_basket)s
@@ -2437,12 +2437,12 @@ class Template:
 
         out = """
         <div class="row-fluid well">
-            <div class="span4 bskbasketfootertitle">
+            <div class="col-md-4 bskbasketfootertitle">
                 <small>
                 %(display_public)s
                 </small>
             </div>
-            <div class="span5 offset3 pagination-right bskbasketfooteroptions">
+            <div class="col-md-5 col-md-offset-3 pagination-right bskbasketfooteroptions">
                 %(add_ext_resource)s
                 %(edit_basket)s
                 %(delete_basket)s
@@ -2644,19 +2644,19 @@ class Template:
         out = """
 
     <div class="row-fluid">
-      <div class="span1 bskcontentcount">
+      <div class="col-md-1 bskcontentcount">
         %(count)i.
       </div>
-      <div class="span11 bskcontentcol">
+      <div class="col-md-11 bskcontentcol">
         %(icon)s%(content)s
       </div>
     </div>
 
     <div class="row-fluid">
-      <div class="span1 bskcontentoptions">
+      <div class="col-md-1 bskcontentoptions">
         %(moveup)s%(movedown)s
       </div>
-      <div class="span4 moreinfo">"""
+      <div class="col-md-4 moreinfo">"""
 
         if item[0] > 0:
             detailed_record = """<a class="moreinfo" href="%(siteurl)s/%(CFG_SITE_RECORD)s/%(recid)s">%(detailed_record_label)s</a>"""
@@ -2687,7 +2687,7 @@ class Template:
 
         out += """
       </div>
-      <div class="span5 offset2 pagination-right bskbasketheaderoptions">
+      <div class="col-md-5 col-md-offset-2 pagination-right bskbasketheaderoptions">
         %(copy)s
         &nbsp;
         %(move)s

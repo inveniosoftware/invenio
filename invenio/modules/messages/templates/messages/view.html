@@ -21,7 +21,7 @@
 {% block body %}
 
 <div class="row">
-<dl class="dl-horizontal well offset1 span5">
+<dl class="dl-horizontal well col-md-offset-1 col-md-5">
   <dt>{{ _("From") }}</dt>
   <dd>
     <a href="{{ url_for('.add', sent_to_user_nicks=m.message.user_from.nickname) }}">
@@ -47,7 +47,7 @@
 </dl>
 </div>
 <div class="row">
-  <div style="min-height: 100px;" class="offset1 span10 thumbnail">
+  <div style="min-height: 100px;" class="col-md-offset-1 col-md-10 thumbnail">
   {{ m.message.body }}
   </div>
 </div>

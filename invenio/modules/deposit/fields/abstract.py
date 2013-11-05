@@ -27,8 +27,9 @@ __all__ = ['AbstractField']
 class AbstractField(WebDepositField, TextAreaField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-pencil',
-            export_key='abstract.summary'
+            icon='pencil',
+            export_key='abstract.summary',
+            widget_classes='form-control'
         )
         defaults.update(kwargs)
         super(AbstractField, self).__init__(**defaults)

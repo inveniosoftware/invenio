@@ -233,7 +233,15 @@ def send_email(fromaddr,
             register_exception()
             if debug_level > 1:
                 try:
-                    raise EmailError(g._('Error in sending message. Waiting %s seconds. Exception is %s, while sending email from %s to %s with body %s.') % (attempt_sleeptime, sys.exc_info()[0], fromaddr, toaddr, body))
+                    raise EmailError(g._('Error in sending message. \
+                        Waiting %(sec)s seconds. Exception is %(exc)s, \
+                        while sending email from %(sender)s to %(receipient)s \
+                        with body %(email_body)s.', \
+                        sec = attempt_sleeptime, \
+                        exc = sys.exc_info()[0], \
+                        sender = fromaddr, \
+                        receipient = toaddr, \
+                        email_body = body))
                 except EmailError:
                     register_exception()
         if not sent:

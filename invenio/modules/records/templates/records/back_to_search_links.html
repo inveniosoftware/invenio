@@ -24,7 +24,7 @@
 <div>
   <span class='moreinfo'>
     <a href="{{ url_for(last_query, ln=g.ln) }}">
-      <i class="icon-arrow-left"></i> {{ _('Back to search') }}
+      <i class="glyphicon glyphicon-arrow-left"></i> {{ _('Back to search') }}
     </a>
 
   {%- if nb_recids > 1 -%}
@@ -39,36 +39,36 @@
       {# to display only the links to the next and last record #}
       <span><b>{{ numrec }}</b> {{_('of')}} <b>{{ nb_recids }}</b></span>
       <a href="{{ url_for('record.metadata', recid=recIDnext, ln=g.ln) }}">
-        <i class="icon-step-forward icon-large"></i>
+        <i class="glyphicon glyphicon-step-forward"></i>
       </a>
       <a href="{{ url_for('record.metadata', recid=recIDlast, ln=g.ln) }}">
-        <i class="icon-fast-forward icon-large"></i>
+        <i class="glyphicon glyphicon-fast-forward"></i>
       </a>
 
   {%- elif pos == nb_recids - 1 -%}
       {# to display only the links to the first and previous record #}
       <a href="{{ url_for('record.metadata', recid=recIDfirst, ln=g.ln) }}">
-        <i class="icon-fast-backward icon-large"></i>
+        <i class="glyphicon glyphicon-fast-backward"></i>
       </a>
       <a href="{{ url_for('record.metadata', recid=recIDprev, ln=g.ln) }}">
-        <i class="icon-step-backward icon-large"></i>
+        <i class="glyphicon glyphicon-step-backward"></i>
       </a>
       <span><b>{{ numrec }}</b> {{_('of')}} <b>{{ nb_recids }}</b></span>
 
     {%- else -%}
       {# to display all links: first, previous, next, last record, and "back to search" #}
       <a href="{{ url_for('record.metadata', recid=recIDfirst, ln=g.ln) }}">
-        <i class="icon-fast-backward icon-large"></i>
+        <i class="glyphicon glyphicon-fast-backward"></i>
       </a>
       <a href="{{ url_for('record.metadata', recid=recIDprev, ln=g.ln) }}">
-        <i class="icon-step-backward icon-large"></i>
+        <i class="glyphicon glyphicon-step-backward"></i>
       </a>
       <span class="outof"><b>{{ numrec }}</b> {{_('of')}} <b>{{ nb_recids }}</b></span>
       <a href="{{ url_for('record.metadata', recid=recIDnext, ln=g.ln) }}">
-        <i class="icon-step-forward icon-large"></i>
+        <i class="glyphicon glyphicon-step-forward"></i>
       </a>
       <a href="{{ url_for('record.metadata', recid=recIDlast, ln=g.ln) }}">
-        <i class="icon-fast-forward icon-large"></i>
+        <i class="glyphicon glyphicon-fast-forward"></i>
       </a>
     {%- endif -%}
   {%- endif -%}

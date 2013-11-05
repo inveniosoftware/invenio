@@ -25,25 +25,25 @@
 </div>
 
 <div class="row">
-  <div id="webdeposit_types_accordion" class="offset3 span6 accordion">
+  <div id="webdeposit_types_accordion" class="col-md-offset-3 col-md-6 panel-group">
     {% for deptype_group in deposition_types.values()|groupby('group') %}
-    <div class="accordion-group">
-      <div class="accordion-heading">
+    <div class="panel panel-default">
+      <div class="panel-heading">
         <h4>
-        <a class="accordion-toggle" data-toggle="collapse"
+        <a data-toggle="collapse"
            data-parent="#webdeposit_types_accordion"
            href="#collapse{{ loop.index }}">
-          <i class="icon-list pull-right"></i> {{ deptype_group.grouper }}
+          <i class="glyphicon glyphicon-list pull-right"></i> {{ deptype_group.grouper }}
         </a>
         </h4>
       </div>
       <div id="collapse{{ loop.index }}" class="collapse">
-        <div class="accordion-inner" style="padding: 0px;">
+        <div class="panel-body" style="padding: 0px;">
           <ul class="nav nav-pills nav-stacked" style="margin-bottom: 0px;">
           {% for deptype in deptype_group.list|sort(attribute='name') %}
             <li>
               <a href="{{ url_for('.deposition_type_index', deposition_type=deptype.get_identifier()) }}">
-                <i class="icon-chevron-right pull-right"></i>
+                <i class="glyphicon glyphicon-chevron-right pull-right"></i>
                 {{ deptype.name }}
                 {% if deptype.type in drafts %}
                 &nbsp;

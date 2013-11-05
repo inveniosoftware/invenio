@@ -28,9 +28,10 @@ __all__ = ['PublisherField']
 class PublisherField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-certificate',
+            icon='certificate',
             processors=[sherpa_romeo_publisher_process],
-            autocomplete=sherpa_romeo_publishers
+            autocomplete=sherpa_romeo_publishers,
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(PublisherField, self).__init__(**defaults)

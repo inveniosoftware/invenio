@@ -27,7 +27,7 @@
 <div class="container">
   <hr/>
   <div class="row">
-  <div class="span6">
+  <div class="col-md-6">
   {{ config["CFG_SITE_NAME_INTL"][g.ln] }} &nbsp;::&nbsp;<a class="footer" href="{{ url_for('') }}">{{ _("Search") }}</a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('submit') }}">{{ _("Submit") }}</a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('webaccount.index') }}">{{ _("Personalize") }}</a>&nbsp;::&nbsp;<a class="footer" href="{{ url_for('help') }}">{{ _("Help") }}</a>
   <br />
   {{ _("Powered by") }} <a class="footer" href="http://invenio-software.org/">Invenio</a> v{{ config.CFG_VERSION }}
@@ -38,7 +38,7 @@
       {{ _("Last updated") }}: {{ lastupdated|invenio_format_date }}
   {% endif %}
   </div>
-  <div class="span6">
+  <div class="col-md-6">
     <p style="text-align: right">
       {% if config.CFG_LANGUAGE_LIST_LONG %}
           {{ _("This site is also available in the following languages:") }} <br />

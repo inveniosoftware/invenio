@@ -65,7 +65,7 @@
     <a href="{{ url_for('comments.comments', recid=recID) }}"
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}c">
-      <i class="icon-comment"></i>
+      <i class="glyphicon glyphicon-comment"></i>
       {{ _("%i comments") % num_comments if num_comments > 1 else _("1 comment") }}
     </a>
     {%- endif -%}
@@ -77,7 +77,7 @@
     {%- if num_reviews -%}
      -
     <a href="{{ url_for('comments.reviews', recid=recID) }}">
-      <i class="icon-eye-open"></i>
+      <i class="glyphicon glyphicon-eye-open"></i>
       {{ _("%i reviews") % num_reviews if num_reviews > 1 else _("1 review") }}
     </a>
     {%- endif -%}
@@ -99,7 +99,7 @@
     <a href="{{ url_for(".collection", name=collection.name, ln=g.ln, _external=True) }}">
       {{ collection.name_ln }}
     </a>
-    <small class="muted">({{ collection.nbrecs }})</small>&nbsp;
+    <small class="text-muted">({{ collection.nbrecs }})</small>&nbsp;
   {% if collection.collection_children and idxs|length < limit %}
     {%- do idxs.append(loop.index) -%}
     <ul {{ kwargs|xmlattr }}>
@@ -115,16 +115,14 @@
 {% macro portalbox_sidebar(portalboxes, width=2) %}
   {% if portalboxes %}
   <div {{ kwargs|xmlattr }}>
-    <ul class="thumbnails">
     {% for cp in portalboxes %}
-    <li class="span{{ width }}">
-    <div class="thumbnail">
-      <h5>{{ cp.portalbox.title }}</h5>
-      <p>{{ cp.portalbox.body|safe }}</p>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <h5>{{ cp.portalbox.title }}</h5>
+        <p>{{ cp.portalbox.body|safe }}</p>
+      </div>
     </div>
-    </li>
     {% endfor %}
-    </ul>
   </div>
   {% endif %}
 {% endmacro %}
@@ -154,144 +152,154 @@
 
 
 {% macro _search_simple_box(collection) %}
-  {% for f in easy_search_form if not f.name=='csrf_token' %}
-  <div class="control-group">
-    <label class="control-label">
-      {{ f.label.text }}
-    </label>
-    <div class="controls controls-row">
-      {{ f|safe }}
+    {% for f in easy_search_form if not f.name=='csrf_token' %}
+    <div class="form-group">
+      <label class="col-md-2 col-sm-3 control-label">
+        {{ f.label.text }}
+      </label>
+      <div class="col-md-10 col-sm-9">
+        {{ f(class_='form-control')|safe }}
+      </div>
     </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
+
+    <div class="form-group">
+      <div class="col-md-offset-2 col-md-10 col-sm-offset-3 col-sm-9">
+        <div class="pull-right">
+          <button name="action_browse" class="btn">
+            <i class="glyphicon glyphicon-list"></i> {{ _("Browse") }}
+          </button>
+          <button name="action_search" type="submit" class="btn btn-primary">
+            <i class="glyphicon glyphicon-search"></i> {{ _("Search") }}
+          </button>
+        </div>
+      </div>
+    </div>
 {% endmacro %}
 
 
 {% macro _search_advanced_box(collection) %}
-
-  <div class="control-group">
-    <label class="control-label">
-      <strong>{{ _('what') }}?</strong>
-    </label>
-    <div class="controls">
-      <input type="text" name="p1" value="" class="span3"/>
+    <div class="form-group">
+      <label class="col-sm-3 col-md-2 control-label">
+        {{ _('what') }}?
+      </label>
+      <div class="col-sm-9 col-md-10">
+        <input type="text" name="p1" value="" class="form-control"/>
+      </div>
     </div>
-  </div>
 
-  <div class="control-group">
-    <label class="control-label">
-      <strong>{{ _('where') }}?</strong>
-    </label>
-    <div class="controls">
-    <select class="span2" name="f">
-      {% for (code, name) in collection.search_within %}
-      <option value="{{ code }}">
-        {{ name }}
-      </option>
-      {% endfor %}
-    </select>
+    <div class="form-group">
+      <label class="col-sm-3 col-md-2 control-label">
+        {{ _('where') }}?
+      </label>
+      <div class="col-sm-9 col-md-10">
+        <select class="form-control" name="f">
+          {% for (code, name) in collection.search_within %}
+          <option value="{{ code }}">
+            {{ name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
     </div>
-  </div>
 
-  <div class="control-group">
-    <label class="control-label">
-      <strong>{{ _('how') }}?</strong>
-    </label>
-    <div class="controls">
-      <select class="span2" name="m1">
-        {%- for v in config.CFG_WEBSEACH_MATCHING_TYPES|sort(attribute='order') -%}
-          <option value="{{ v.code }}">{{ _(v.title)|safe }}</option>
-        {%- endfor -%}
-      </select>
-    <span id="addtosearch" class="btn">
-      <i class="icon-ok"></i>
-    </span>
+    <div class="form-group">
+      <label class="col-sm-3 col-md-2 control-label">
+        {{ _('how') }}?
+      </label>
+      <div class="col-sm-9 col-md-10">
+        <select name="m1" class="form-control">
+          {%- for v in config.CFG_WEBSEACH_MATCHING_TYPES|sort(attribute='order') -%}
+            <option value="{{ v.code }}">{{ _(v.title)|safe }}</option>
+          {%- endfor -%}
+        </select>
+      </div>
     </div>
-  </div>
 
-  {% for id, soo in collection.search_options|groupby('id_field') %}
-  <hr/>
-  <div class="control-group">
-    <label class="control-label">{{ soo[0].field.name_ln }}</label>
-    <div class="controls">
-    <select class="span2" name="{{ soo[0].field.code }}">
-      <option value="">*** {{ _('select') }} ***</option>
-      {% for so in soo %}
-      <option value="{{ so.fieldvalue.value }}">
-        {{ so.fieldvalue.name }}
-      </option>
-      {% endfor %}
-    </select>
-    <span data-target="p" data-source="{{ soo[0].field.code }}" class="btn appender">
-      <i class="icon-ok"></i>
-    </span>
+    {% for id, soo in collection.search_options|groupby('id_field') %}
+    <hr/>
+    <div class="form-group">
+      <label class="control-label col-sm-3 col-md-2">{{ soo[0].field.name_ln }}</label>
+      <div class="col-sm-9 col-md-10">
+        <div class="input-group">
+          <select class="form-control" name="{{ soo[0].field.code }}">
+            <option value="">*** {{ _('select') }} ***</option>
+            {% for so in soo %}
+            <option value="{{ so.fieldvalue.value }}">
+              {{ so.fieldvalue.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <span data-target="p" data-source="{{ soo[0].field.code }}" class="btn appender">
+            <i class="glyphicon glyphicon-ok"></i>
+          </span>
+        </div>
+      </div>
     </div>
-  </div>
-  {% endfor %}
+    {% endfor %}
+
+    <div class="form-group">
+      <div class="col-md-offset-2 col-md-10 col-sm-offset-3 col-sm-9">
+        <div class="pull-left">
+          <button id="addtosearch" class="btn">
+            <i class="glyphicon glyphicon-plus"></i> {{ _("Add to search") }}
+          </button>
+        </div>
+        <div class="pull-right">
+          <button name="action_browse" class="btn">
+            <i class="glyphicon glyphicon-list"></i> {{ _("Browse") }}
+          </button>
+          <button name="action_search" type="submit" class="btn btn-primary">
+            <i class="glyphicon glyphicon-search"></i> {{ _("Search") }}
+          </button>
+        </div>
+      </div>
+    </div>
 
 {% endmacro %}
 
 {% macro search_box(collection) %}
-  <div style="padding: 0px;" class="dropdown-menu donothide">
-    <div class="row">
-      <div class="span6" style="min-width: 400px;">
+  <div class="form-horizontal add_to_search-form">
+    <div class="form-group _tab-form-group">
+      <label class="col-sm-3 col-md-2 control-label">
+        {{ _('Add to search') }}
+      </label>
+      <div class="col-md-10 col-sm-9" data-toggle="buttons">
+        <div class="btn-group pull-left" id="add_type-btn-group" data-toggle="buttons">
+          <label class="btn btn-sm btn-default active">
+            <input type="radio" name="op1" value="a" active/>{{ _('AND') }}
+          </label>
+          <label class="btn btn-sm btn-default">
+            <input type="radio" name="op1" value="o"/>{{ _('OR') }}
+          </label>
+          <label class="btn btn-sm btn-default">
+            <input type="radio" name="op1" value="n"/>{{ _('AND NOT') }}
+          </label>
+        </div>
 
-        <div class="modal-header">
-          <button type="button" style="z-index:9999; position: relative;" class="close" onclick="$('.dropdown').removeClass('open open-permanent')">×</button>
-          <div class="control" style="margin-bottom: 0px;">
-            <label class="control-label">
-              <strong>{{ _('Add to search') }}</strong>
-            </label>
-            <div class="controls">
-            <div style="padding-top:4px;" class="btn-group" data-toggle="buttons-radio">
-              <label class="btn btn-mini active">
-                <input style="display:none;" type="radio" name="op1" value="a" checked/>{{ _('AND') }}
-              </label>
-              <label class="btn btn-mini">
-                <input style="display:none;" type="radio" name="op1" value="o"/>{{ _('OR') }}
-              </label>
-              <label class="btn btn-mini">
-                <input style="display:none;" type="radio" name="op1" value="n"/>{{ _('AND NOT') }}
-              </label>
-            </div>
-            </div>
-          </div>
-        </div><!-- end modal-header-->
-
-        <div style="max-height: 800px;" class="modal-body">
-
-<div class="tab-content">
-  <div class="tab-pane active" id="simple-search">
-    {{ _search_simple_box(collection) }}
-  </div>
-  <div class="tab-pane" id="advanced-search">
-    {{ _search_advanced_box(collection) }}
-  </div>
-</div>
-
-
-        </div><!-- end modal-body -->
-
-        <div class="modal-footer">
-          <small><ul class="nav nav-pills nav-pill-gray pull-left" style="margin-bottom: 0px; text-align: left;">
+        <div class="pull-right">
+          <ul class="nav nav-tabs pull-right tab-buttons">
             <li class="active">
-              <a href="#simple-search" data-toggle="tab">{{ _('simple') }}</a>
+              <a href="#simple-search" id="simple-search-tab-button" data-toggle="tab">{{ _('simple') }}</a>
             </li>
             <li>
-              <a href="#advanced-search" data-toggle="tab">{{ _('advanced') }}</a>
+              <a href="#advanced-search" id="advanced-search-tab-button" data-toggle="tab">{{ _('advanced') }}</a>
             </li>
-          </ul></small>
-          <button name="action_browse" class="btn">
-            <i class="icon-list"></i> {{ _("Browse") }}
-          </button>
-          <button name="action_search" type="submit" class="btn btn-primary">
-            <i class="icon-search icon-white"></i> {{ _("Search") }}
-          </button>
-        </div><!-- end modal-footer -->
+          </ul>
+        </div>
+      </div>
 
-      </div><!-- end span5 -->
-    </div><!-- end row -->
-  </div><!-- end dropdown-menu -->
+    </div>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="simple-search">
+        {{ _search_simple_box(collection) }}
+      </div>
+      <div class="tab-pane" id="advanced-search">
+        {{ _search_advanced_box(collection) }}
+      </div>
+    </div>
+  </div>
 
 <style>
 .nav.nav-pill-gray > .active > a,
@@ -301,281 +309,350 @@
   color: inherit;
 }
 
-#searchdropdown .searchexamples i.pull-right {
-  margin-right: -6px;
-  margin-top: 3px;
-  opacity: .25;
+/* line below the tab bar */
+
+._tab-form-group {
+  border-bottom: 1px solid #e7e7e7;
 }
 
-#searchdropdown .searchexamples .after-fix {
-  padding-right: 20px;
+._tab-form-group .nav-tabs {
+  border-bottom: none;
 }
 
-.open-permanent .donothide {
-  display: block!important;
-}
+/* ----------------------- */
+
 
 </style>
 {% endmacro %}
 
-{% macro search_form(collection) %}
-  <div id="search-box-main" class="row">
-    <div class="span12">
-    <div class="well well-small"
-         style="margin-bottom: 20px; margin-left: -9px; margin-right: -9px;">
-      <div class="row">
+{% macro searchsettings_form(collection) %}
 
-        <form action="{{ url_for('search.search') }}" name="settings" method="get"
-              style="margin-bottom: 0px; position: relative; z-index: 1;"
-              class="pull-right form-inline">
-          <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
-
-
-        <div id="settingsdropdown" class="pull-right btn-group dropdown">
-          <button class="btn dropdown-toggle add-open-permanent" data-target="#settingsdropdown" data-toggle="dropdown">
-            <i class="icon-cog"></i>
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu donothide clearfix"
-              style="min-width: 300px; padding-bottom: 0px;">
-            <li class="nav-header">{{ _('Search settings') }}</li>
-
-            <li class="divider"></li>
-            <li class="clearfix nav-list">
-
-          <div class="control-group clearfix">
-            <label class="control-label pull-left">{{ _('Display on page') }}</label>
-            <div class="controls pull-right">
-              <select
-                      name="rg"
-                      style="height: inherit; line-height: inherit;"
-                      class="btn-small span2">
-              {%- for i in [10, 25, 50, 100, 250, 500] -%}
-              {%- if i <= config.CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS -%}
-                <option value="{{ i }}"{{ ' selected' if request.args.get('rg',10)==i.__str__() }}>{{ i }} {{ _('results') }}</option>
-              {%- endif -%}
-              {%- endfor -%}
-              </select>
-            </div>
-          </div>
-
-
-          <div class="control-group clearfix">
-            <label class="control-label pull-left">{{ _('Output format') }}</label>
-            <div class="controls pull-right">
-              <select
-                      name="of"
-                      style="height: inherit; line-height: inherit;"
-                      class="btn-small span2">
-              {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
-                <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
-              {%- endfor -%}
-              </select>
-            </div>
-          </div>
-
-          {% if collection.rnkMETHODs|length %}
-          <div class="control-group clearfix">
-            <label class="control-label pull-left">{{ _('Ranking') }}</label>
-            <div class="controls pull-right">
-              <select name='rm'
-                      style="height: inherit; line-height: inherit;"
-                      class="btn-small span2">
-              {% for rnk_method in collection.rnkMETHODs %}
-                <option value="{{ rnk_method.rnkMETHOD.name }}">
-                  {{ rnk_method.rnkMETHOD.get_name_ln() }}
-                </option>
-              {% endfor %}
-              </select>
-            </div>
-          </div>
-          {% endif %}
-
-          <div class="clearfix">
-            <label class="control-label pull-left">{{ _('Sort by most') }}</label>
-            <div class="controls pull-right">
-            <div class="btn-group" data-toggle="buttons-radio">
-            {%- for (k,v,vv) in [('recent', 'rm', ''), ('cited', 'rm', 'citation'), ('relevant', 'rm', 'wrd')] -%}
-              <label class="btn btn-mini {{ 'active' if request.args.get(v,'') == vv}}">
-                <input style="display:none;"
-                  type="radio"
-                  name="{{ v }}"
-                  value="{{ vv }}"
-                  {{ 'checked="checked"'|safe if request.args.get(v,'') == vv}}>
-                {{ _(k) }}
-              </label>
-            {%- endfor -%}
-            </div>
-            </div>
-          </div>
-
-            </li>
-
-            <li class="divider"></li>
-            <li class="clearfix nav-list">
-            <div class="control-group clearfix">
-              <label class="control-label pull-left">{{ _('Search form') }}</label>
-            <div class="controls pull-right">
-            <div class="btn-group" data-toggle="buttons-radio">
-            {%- for (k,v) in [(_('Simple'), 'simple'), (_('Advanced'), 'advanced')] -%}
-              {%- set active = v=='simple' -%}
-              <label class="btn btn-mini">
-                <input style="display:none;"
-                  type="radio"
-                  name="box"
-                  value="{{ v }}"
-                  {{ 'checked="checked"'|safe if active}}>
-                {{ k }}
-              </label>
-            {%- endfor -%}
-            </div>
-            </div>
-            </div>
-            </li>
-
-            <li class="modal-footer nav-list clearfix">
-              {%- if not current_user.is_guest -%}
-              <button name="action_save"
-                      rel="tooltip"
-                      title="{{ _('store permanently in user settings') }}"
-                      data-placement="bottom"
-                      class="btn btn-primary btn-small pull-left">
-                <i class="icon-hdd icon-white"></i> {{ _('Save') }}
-              </button>
-              {%- endif -%}
-              <button name="action_search"
-                      rel="tooltip"
-                      title="{{ _('use settings in current search') }}"
-                      data-placement="bottom"
-                      class="btn btn-small pull-right">
-                <i class="icon-ok"></i> {{ _('Apply') }}
-              </button>
-            </li>
-          </ul>
-        </div>
-        </form>
-
-
-
-        <form action="{{ url_for('search.search') }}"
-              name="search"
-              method="get"
-              style="margin-bottom: 0px;"
-              class="form-horizontal span11">
-        <div class="row">
-          <div class="span2 visible-desktop">
-            <label for="p"
-                style="padding-top: 5px; text-align: right; font-size: 90%;">
-              {%- set nbrecs = collection.nbrecs -%}
-              {%- if not collection.nbrecs -%}
-              {%- set nbrecs = 0 -%}
-              {%- endif -%}
-              {{ _("Search %s records for")|format(nbrecs) }}
-            </label>
-          </div>
-          <div class="span9">
-            <div id="searchdropdown"
-                 class="dropdown">
-            {#
-            {% set search_placeholder = _('Input query') %}
-            {% if collection.examples %}
-              {% set search_placeholder = (collection.examples|random).body %}
-            {% endif %}
-            #}
-              <div class="input-prepend input-append">
-                <div class="dropdown add-on">
-                  <a class="dropdown-toggle"
-                     rel="tooltip" title="{{ _('Search Tips and Examples') }}"
-                     data-placement="bottom"
-                     data-delay="100"
-                     data-toggle="dropdown" role="button"
-                     href="#"><i class="icon-question-sign"></i></a>
-                  <ul class="searchexamples dropdown-menu" style="text-align: left;">
-                    <li>
-                      <a href="/help/search-tips">
-                        <i class="pull-right icon-info-sign"></i>
-                        <strong>{{ _("Search Tips") }}</strong>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="/help/search-guide">
-                        <i class="pull-right icon-leaf"></i>
-                        <strong>{{ _("Search Guide") }}</strong>
-                      </a>
-                    </li>
-                    {% if collection.examples %}
-                    <li class="divider"></li>
-                    <li class="nav-header">
-                      {{ _('Search examples') }}
-                    </li>
-                  {%- for e in collection.examples if e.body -%}
-                    <li>
-                      <a href="{{ url_for('search.search', p=e.body) }}">
-                        <i class="pull-right icon-chevron-right"></i>
-                        <span class="after-fix">{{ e.body }}</span>
-                      </a>
-                    </li>
-                  {%- endfor -%}
-                  {% endif %}
-                  </ul>
-                </div><!--
-                No space!
-             --><input autocomplete="off"
-                  data-provide="typeahead"
-                  data-items="4"
-                  name="p"
-                  class="span6"
-                  type="text"
-                  style="min-width:200px;"
-                  {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
-                  tabindex="1"
-                  value="{{ request.args.get('p', '') }}"
-                  {%- if request.endpoint == 'search.index' -%}
-                  autofocus
-                  {%- endif -%}
-                  /><!--
-                No space!
-             --><span data-toggle="dropdown" data-target="#searchdropdown" class="add-on btn add-open-permanent">
-                  <i class="caret"></i>
-                </span>
-              </div>
-
-{#
- # This is a dirty hack for browser without Javascript support.
- #}
-<script type="text/javascript">
-  var box = {{ search_box(collection)|tojson|safe }};
-  document.write(box);
-</script>
-
-              <!-- Hidden configuration fields -->
-              {% if collection.id != 1 %}
-              <input type="hidden" name="cc" value="{{ collection.name }}" />
-              {% endif %}
-              {{ _search_hidden_options() }}
-              <!-- end of configuration fields -->
-
-              <button name="action_search" type="submit" class="btn btn-primary">
-                <i class="icon-search icon-white"></i>
-                <span class="hidden-phone">{{ _("Search") }}</span>
-              </button>
-              {#
-              <span class="help-inline">
-                <a href="/help/search-tips">{{ _("Search Tips") }}</a>
-              </span>
-              #}
-            </div>
-          </div><!-- end controls -->
-        </div>
-        </form>
-
-      </div><!-- end sub row -->
-    </div><!-- end span12 -->
+  <form action="{{ url_for('search.search') }}" 
+    name="settings" 
+    method="get"
+    class="form-horizontal">
+    <div class="row">
+    <input name="p" value="{{ request.args.get('p','') }}" type="hidden" />
+    <div class="form-group col-md-6">
+      <label class="control-label col-sm-6 col-xs-5">{{ _('Display on page') }}</label>
+      <div class="col-sm-6 col-xs-7">
+        <select
+          name="rg"
+          class="btn-sm form-control">
+          {%- for i in [10, 25, 50, 100, 250, 500] -%}
+            {%- if i <= config.CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS -%}
+              <option value="{{ i }}"{{ ' selected' if request.args.get('rg',10)==i.__str__() }}>{{ i }} {{ _('results') }}</option>
+            {%- endif -%}
+          {%- endfor -%}
+        </select>
+      </div>
     </div>
-  </div><!-- end row -->
+
+    <div class="form-group col-md-6">
+    <label class="control-label col-sm-6 col-xs-5">{{ _('Output format') }}</label>
+    <div class="col-sm-6 col-xs-7">
+      <select
+              name="of"
+              class="btn-sm form-control">
+      {%- for i in collection.formatoptions if i.content_type == 'text/html' and i.visibility == 1 -%}
+        <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
+      {%- endfor -%}
+      </select>
+    </div>
+  </div>
+
+  {% if collection.rnkMETHODs|length %}
+  <div class="form-group col-md-6">
+    <label class="control-label col-sm-6 col-xs-5">{{ _('Ranking') }}</label>
+    <div class="btn-group col-sm-6 col-xs-7">
+      <select name='rm'
+              class="btn-xs form-control">
+      {% for rnk_method in collection.rnkMETHODs %}
+        <option value="{{ rnk_method.rnkMETHOD.name }}">
+          {{ rnk_method.rnkMETHOD.get_name_ln() }}
+        </option>
+      {% endfor %}
+      </select>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="form-group col-md-6">
+    <label class="control-label col-sm-6 col-xs-5">{{ _('Sort by most') }}</label>
+    <div class="btn-group col-sm-6 col-xs-7" data-toggle="buttons">
+    {%- for (k,v,vv) in [('recent', 'rm', ''), ('cited', 'rm', 'citation'), ('relevant', 'rm', 'wrd')] -%}
+      <label class="btn btn-sm btn-default {{ 'active' if request.args.get(v,'') == vv}}">
+        <input
+          type="radio"
+          name="{{ v }}"
+          value="{{ vv }}"
+          {{ 'checked="checked"'|safe if request.args.get(v,'') == vv}}>
+        {{ _(k) }}
+      </label>
+    {%- endfor -%}
+    </div>
+  </div>
+
+   <div class="form-group col-md-6">
+    <label class="col-sm-6 control-label col-xs-5">{{ _('Search form') }}</label>
+    <div class="btn-group col-sm-6 col-xs-7" data-toggle="buttons">
+      {%- for (k,v) in [(_('Simple'), 'simple'), (_('Advanced'), 'advanced')] -%}
+      {%- set active = v=='simple' -%}
+      <label class="btn btn-sm btn-default">
+        <input
+          type="radio"
+          name="box"
+          value="{{ v }}"
+          {{ 'checked="checked"'|safe if active}}>
+        {{ k }}
+      </label>
+      {%- endfor -%}
+    </div>
+  </div>
+  </div>
+
+  <div class="form-group col-md-6 pull-right">
+    {%- if not current_user.is_guest -%}
+    <button name="action_save"
+      rel="tooltip"
+      title="{{ _('store permanently in user settings') }}"
+      data-placement="bottom"
+      class="btn btn-primary btn-sm pull-left">
+      <i class="glyphicon glyphicon-hdd"></i> {{ _('Save') }}
+    </button>
+    {%- endif -%}
+    <button name="action_search"
+      rel="tooltip"
+      title="{{ _('use settings in current search') }}"
+      data-placement="bottom"
+      class="btn btn-sm pull-right">
+      <i class="glyphicon glyphicon-ok"></i> {{ _('Apply') }}
+    </button>
+  </div>
+  
+  </form>
+
+{% endmacro %}
+
+{% macro search_form(collection) %}
+  <style>
+
+    #search-label {
+      font-size: 14px;
+    }
+
+    /* -------------- */
+
+    /* 
+    to make "add to search" form look consistent
+    in much shrinked window
+
+    values copied from bootstrap ones for higher than xs size counterparts -> to be unified using "less"
+    */
+
+    .navbar-collapse {
+      border-top: none;
+    }
+
+    .navbar-collapse .navbar-nav.navbar-left:first-child {
+      margin-left: -15px;
+    }
+
+    .navbar-form {
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-right: 0;
+      margin-left: 0;
+      border: 0;
+    }
+
+    /* ------------ */
+
+    .navbar-row {
+      width: 100%;
+      margin: inherit;
+    }
+
+    .navbar-row .navbar-row-container {
+      /* same colour as navbar border*/
+      border-top: 1px solid #e7e7e7;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    .navbar-collapse {
+      max-height: none;
+    }
+
+    /* 
+      somehow original bootstrap's -4px doesn't look good
+      and results in thick (double) borders around buttons
+    */
+    .input-group-btn > .btn + .btn,
+    .input-group-btn > .btn {
+      margin-left: -5px;
+    }
+
+    /*
+      too keep searchbar with buttons in one line
+    */
+    @media (min-width: 768px) { /* ld size */
+       #searchform-input-group {
+         width: 670px;
+       }
+    }
+
+    @media (min-width: 992px) { /* md size */
+       #searchform-input-group {
+         width: 710px;
+       }
+    }
+
+    @media (min-width: 1200px) { /* ld size */
+       #searchform-input-group {
+         width: 920px;
+       }
+    }
+
+    /* 
+      showing dropdown stil as dropdown
+      on shrinked window
+    */
+    @media (max-width: 767px) {
+      .navbar-nav .open .dropdown-menu {
+        position: absolute;
+        margin-top: 2px;
+        background-color: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+      }
+
+      .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+        color: #333333;
+      }
+    }
+
+  </style>
+  <div id="search-box-main">
+    <nav class="navbar navbar-default" role="navigation">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <span class="navbar-brand hidden-sm hidden-xs" id="search-label">
+          {%- set nbrecs = collection.nbrecs -%}
+          {%- if not collection.nbrecs -%}
+          {%- set nbrecs = 0 -%}
+          {%- endif -%}
+          {{ _("Search %s records for")|format(nbrecs) }}
+        </span>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          
+        </ul>
+        <form action="{{ url_for('search.search') }}"
+            name="search"
+            method="get"
+            role="search"
+            id="searchform">
+        <div class="nav navbar-nav navbar-left navbar-form">
+            <div class="input-group" id="searchform-input-group">
+              <span class="input-group-btn">
+                <a class="dropdown-toggle btn btn-default"
+                       rel="tooltip" title="{{ _('Search Tips and Examples') }}"
+                       data-placement="bottom"
+                       data-delay="100"
+                       data-toggle="dropdown" role="button"
+                       href="#"><i class="glyphicon glyphicon-question-sign"></i>
+                </a>
+                <ul class="searchexamples dropdown-menu">
+                  <li>
+                    <a href="/help/search-tips">
+                      <strong>{{ _("Search Tips") }}</strong>
+                      <i class="pull-right glyphicon glyphicon-info-sign"></i>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/help/search-guide">
+                      <i class="pull-right glyphicon glyphicon-leaf"></i>
+                      <strong>{{ _("Search Guide") }}</strong>
+                    </a>
+                  </li>
+                  {% if collection.examples %}
+                  <li class="divider"></li>
+                  <li class="dropdown-header">
+                    {{ _('Search examples') }}
+                  </li>
+                {%- for e in collection.examples if e.body -%}
+                  <li>
+                    <a href="{{ url_for('search.search', p=e.body) }}">
+                      <i class="pull-right glyphicon glyphicon-chevron-right"></i>
+                      <span class="after-fix">{{ e.body }}</span>
+                    </a>
+                  </li>
+                {%- endfor -%}
+                {% endif %}
+                </ul>
+              </span>
+              <input autocomplete="off"
+                      data-items="4"
+                      name="p"
+                      class="form-control"
+                      type="text"
+                      {# placeholder="{{ _('Example') }}: {{ search_placeholder }}" #}
+                      tabindex="1"
+                      value="{{ request.args.get('p', '') }}"
+                      {%- if request.endpoint == 'search.index' -%}
+                      autofocus
+                      {%- endif -%}
+              /><!-- No space! -->
+              <span class="input-group-btn invenio-collapsable-tabs" data-toggle="buttons">
+                <a href="#" class="btn btn-default right-not-rounded left-not-rounded" data-toggle="collapse" data-target="#navbar-bottom">
+                  <i class="glyphicon glyphicon-plus"></i>
+                  <b class="caret"></b>
+                </a>
+                <a href="#" class="btn btn-default right-not-rounded left-not-rounded" data-toggle="collapse" data-target="#navbar-bottom2">
+                  <i class="glyphicon glyphicon-cog"></i>
+                  <b class="caret"></b>
+                </a>
+              </span>
+              <span class="input-group-btn">
+                <button name="action_search" type="submit" class="btn btn-primary btn-inline-icon-hide-sm">
+                  <i class="glyphicon glyphicon-search"></i><span>&nbsp;{{ _("Search") }}</span>
+                </button>
+              </span>
+            </div>
+        </div>
+        <div class="nav navbar-nav navbar-row">
+          <div id="navbar-bottom" class="collapse">
+            <div class="row navbar-row-container">
+              <div class="col-md-12">
+                <script type="text/javascript">
+                  var box = {{ search_box(collection)|tojson|safe }};
+                  document.write(box);
+                </script>
+              </div>
+            </div>
+          </div>
+        </div>
+        </form>
+        <div class="nav navbar-nav navbar-row">
+          <div id="navbar-bottom2" class="collapse">
+            <div class="row navbar-row-container">
+              <div class="col-md-12">
+                {{ searchsettings_form(collection) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.navbar-collapse -->
+    </nav>
+
+  </div>
   {% for category, msg in get_flashed_messages(with_categories=True, category_filter=['websearch-after-search-form']) %}
   <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
       {{ msg|safe }}
     </div>
   </div>
@@ -589,28 +666,53 @@
   $(function () {
 
     $("form[name=search]").submit(function() {
-      $('.donothide').remove();
+      $('.add_to_search-form').remove();
       return true; // ensure form still submits
     })
 
-    $('#settingsdropdown select[name="of"]').buttonSelect({
-      button: '<div class="btn btn-mini" />'
-    , span: '<span class="btn btn-mini" style="width: 80px;" />'
-    , next: '<i class="icon icon-chevron-right"></i>'
-    , prev: '<i class="icon icon-chevron-left"></i>'
+    // side buttons for results number field
+    $('form[name=settings] select[name="of"]').buttonSelect({
+      button: '<div class="btn btn-sm btn-default" />'
+    , span: '<span class="btn btn-sm btn-default" style="width: 100px;" />'
+    , next: '<i class="glyphicon glyphicon-chevron-right"></i>'
+    , prev: '<i class="glyphicon glyphicon-chevron-left"></i>'
     })
 
-    $('#settingsdropdown select[name="rg"]').buttonSelect({
-      button: '<div class="btn btn-mini" />'
-    , span: '<span class="btn btn-mini" style="width: 80px;" />'
-    , next: '<i class="icon icon-plus"></i>'
-    , prev: '<i class="icon icon-minus"></i>'
+    // side buttons for output format field
+    $('form[name=settings] select[name="rg"]').buttonSelect({
+      button: '<div class="btn btn-sm btn-default" />'
+    , span: '<span class="btn btn-sm btn-default" style="width: 100px;" />'
+    , next: '<i class="glyphicon glyphicon-plus"></i>'
+    , prev: '<i class="glyphicon glyphicon-minus"></i>'
     })
 
-    //if (!("autofocus" in $("form[name=search] input[name=q]"))) {
+    // if (!("autofocus" in $("form[name=search] input[name=q]"))) {
     //  // ensure we get the focus always in search input
     //  $("form[name=search] input[name=q]").focus();
-    //}
+    // }
+
+    //--------------------
+
+    var radio_checkbox_hybrid = function (radioButtons) {
+
+      /*
+        Allows to deactivate a toggle buttons (like checkbuttons)
+        and make them behave as radio ones when the another one is clicked
+
+        @param radioButtons jQuerySelector for all the buttons in a group
+      */
+   
+      radioButtons.click(function () {
+        var buttons = $(this).siblings();
+        if (buttons.hasClass("active")) {
+          buttons.click();
+        }
+      });
+    }
+
+    radio_checkbox_hybrid($(".invenio-collapsable-tabs a"))
+
+    //---------------------
 
     var op1_fn = {'a': 'AND ', 'o': 'OR ', 'n': 'AND NOT '},
         m1_fn = {
@@ -622,7 +724,7 @@
         };
 
     var addtosearch_callback = function(e) {
-      var op1 = $('[name=op1]:checked').val(),
+      var op1 = $('#add_type-btn-group .active').children(':first').val(),
           m1 = $('[name=m1]').val(),
           p1 = $('[name=p1]').val(),
           f = $('[name=f]').val(),
@@ -647,7 +749,7 @@
         // get values
         var p = $('[name=p]'),
             val = $.trim(p.val()),
-            op1 = $('[name=op1]:checked').val(),
+            op1 = $('#add_type-btn-group .active').children(':first').val(),
             op = (op1=='a' && val=="")?'':op1_fn[op1],
             author = $('#author').val(),
             title = $('#title').val(),
@@ -678,28 +780,27 @@
         //query = query.replace(/topcite (\d+)?\+/, 'topcite $1->99999');
         //query = query.replace(' and ', ' ');
         //query = query.replace(/ /g, '+');
-        //window.location = search_url;
+        // window.location = search_url;
         if (query.length > 0) {
           p.val(val+query.join(' '+op1_fn[op1]));
         }
     };
 
-    $('.donothide .btn-primary').on('click', function(e) {
-      if ($('.modal-footer li.active a').attr('href') === '#simple-search') {
+    $('.add_to_search-form button[name=action_search]').on('click', function(e) {
+      if ($('.add_to_search-form .tab-buttons li.active a').attr('href') === '#simple-search') {
         perform_easy_search();
       } else {
         addtosearch_callback(e);
-        $('#searchdropdown .appender').trigger('click');
+        $('.add_to_search-form .appender').trigger('click');
       }
     });
 
     $('form[name=search] button[name=action_browse]').on('click', function(e) {
-      $('form[name=search] button[name=action_search]')
-        .attr('name', 'action_browse');
-      $('.donothide .btn-primary').trigger('click');
+      $('form[name=search] button[name=action_search]').attr('name', 'action_browse');
+      $('.add_to_search-form button[name=action_search]').trigger('click');
     });
 
-    $('#advanced-search #addtosearch').on('click', addtosearch_callback);
+    $('#addtosearch').on('click', addtosearch_callback);
     $('#advanced-search [name=p1]').keypress(function(event) {
       if ( event.which == 13 ) {
         if ($(this).val() !== '') {
@@ -709,8 +810,8 @@
       }
     });
 
-    $('#searchdropdown #advanced-search .appender').on('click', function(e) {
-        var op1 = $('[name=op1]:checked').val(),
+    $('.add_to_search-form #advanced-search .appender').on('click', function(e) {
+        var op1 = $('#add_type-btn-group .active').children(':first').val(),
             btn = $(this),
             source = $('[name='+btn.attr('data-source')+']'),
             target = $('[name='+btn.attr('data-target')+']'),
@@ -728,89 +829,65 @@
         return false;
     });
 
-    $('.add-open-permanent').on('click', function(e) {
-      $(this).parents('.dropdown').addClass('open-permanent')
-    })
 
-    $(document).on('click', function(e) {
-      if ($(e.target).parents('.donothide').length <= 0) {
-        $('.open-permanent').removeClass('open-permanent')
-      }
-    })
+    // -------------- SEARCH FIELD TYPEAHEAD ----------------
 
     var source = $.map({{ collection.search_within[1:]|tojson|safe }},
           function(val, i) { return val[0]+':';}); //['author:', 'title:', 'isbn:'];
+
+    var autocompleteQueriesType = {};
+
+    // keys existence in this dict is needed for autocompletition
+    for (var i in source) {
+      var key = source[i]
+      if (key[key.length - 1] == ':')
+        key = key.substring(0, key.length - 1);
+      autocompleteQueriesType[key] = undefined;
+    }
+
+    autocompleteQueriesType['author'] = 'exactauthor';
+
     source.push('AND ');
     source.push('OR ');
     source.push('AND NOT ');
 
-    var sources = {
     {% for id, soo in collection.search_options|groupby('id_field') %}
-      '{{ soo[0].field.code }}': [{% for so in soo %}
-            '{{ so.fieldvalue.name }}' {{ ',' if not loop.last }}
-            {% endfor %}
-        ]{{ ',' if not loop.last }}
-    {% endfor %}
-    };
-
-    {% for id, soo in collection.search_options|groupby('id_field') %}
-    source.push('{{ soo[0].field.code }}:');
+      source.push('{{ soo[0].field.code }}:');
     {% endfor %}
 
-    sources['author'] = function(query) {
-            var typeahead = this
-            $.ajax({
-              type: 'GET',
-              url: '{{ url_for('search.autocomplete', field='exactauthor') }}',
-              data: $.param({
-                q: query.substr(query.lastIndexOf(':')+1)
-              })
-            }).done(function(data) {
-              var a = [query.substr(query.lastIndexOf(':')+1)]
-                , b = data.results
-                , c = a.concat(b)
-              typeahead.process(c)
-            }).fail(function(data) {
-              var a = [query.substr(query.lastIndexOf(':')+1)]
-              typeahead.process(a)
-            })
-          };
+    // autocompleteQueriesType = {
+    // {% for id, soo in collection.search_options|groupby('id_field') %}
+    //   '{{ soo[0].field.code }}': [{% for so in soo %}
+    //         '{{ so.fieldvalue.name }}' {{ ',' if not loop.last }}
+    //         {% endfor %}
+    //     ]{{ ',' if not loop.last }}
+    // {% endfor %}
+    // };
+    //
 
+    var searchField = $('form[name=search] input[name=p]');
 
+    searchField.searchTypeahead(autocompleteQueriesType, source);
 
-    $('form[name=search] input[name=p]').searchTypeahead({
-      source: source,
-      sources: sources,
-      type: 'search'
+    
+    // END -------------- SEARCH TYPEAHEAD -------------- END
+
+    // ------------ typehead for "Add to search" form ----------------
+
+    $('[data-provide="typeahead-url"]').each(function (i, field) {
+      field = $(field);
+      field.typeahead({
+        prefetch: {
+          url: field.data('source'),
+          filter: function(data) {
+            return data.results;
+          }
+        },
+        limit: 10
+      });
     });
 
-    $('body').on(
-      'focus.typeahead.data-api',
-      '[data-provide="typeahead-url"]',
-      function (e) {
-        var $this = $(this)
-        if ($this.data('typeahead')) return
-        e.preventDefault()
-        var data_url = $this.data('source')
-        var options = {
-          source: function(query) {
-            var typeahead = this
-            $.ajax({
-              type: 'GET',
-              url: data_url,
-              data: $.param({
-                q: query
-              })
-            }).done(function(data) {
-              typeahead.process(data.results)
-            })
-          }
-        }
-        var data = $.extend({}, $this.data(), options)
-        $this.typeahead(data)
-      }
-    );
-
+    // ---------------------------------------------------------------
 
   });
 

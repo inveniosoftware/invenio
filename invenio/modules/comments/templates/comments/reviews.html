@@ -30,11 +30,11 @@
       {{ _("Reviews") }}
       <small>
       {% if current_user.is_guest %}
-        <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+        <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
       {% else %}
-        <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
+        <a class="btn btn-default pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
       {% endif %}
-          <i class="icon-pencil"></i> {{ _('write review') }}
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
 
       </small>
@@ -43,7 +43,7 @@
 
   {%- if comments -%}
 
-  <ul class="unstyled">
+  <ul class="list-unstyled">
   {%- for c in comments -%}
   <li name="{{ c.id }}">
     <div>
@@ -51,7 +51,7 @@
     {{ c.title }}
     <small>
        /
-      {{ ('<i class="icon-star"></i>'|safe) * (c.star_score) }}{{ ('<i class="icon-star-empty"></i>'|safe) * ((5-c.star_score)) }} &nbsp;
+      {{ ('<i class="glyphicon glyphicon-star"></i>'|safe) * (c.star_score) }}{{ ('<i class="glyphicon glyphicon-star-empty"></i>'|safe) * ((5-c.star_score)) }} &nbsp;
       {%- if c.nb_votes_total > 0 -%}
         {%- set votes = c.nb_votes_yes-(c.nb_votes_total-c.nb_votes_yes) -%}
         {%- if votes > 0 -%}
@@ -78,25 +78,25 @@
         <img src="/img/user-icon-1-16x16.gif" alt="avatar"/>
           {{ _('Guest') }}
         {%- endif -%} &nbsp;
-        - <i class="icon-time"></i> {{ c.date_creation }}
-        - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
+        - <i class="glyphicon glyphicon-time"></i> {{ c.date_creation }}
+        - <i class="glyphicon glyphicon-question-sign"></i> {{ _('Was it helpful?') }}
           <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=1,
             referer=request.url
           ) }}">
-          <i class="icon-thumbs-up"></i>
+          <i class="glyphicon glyphicon-thumbs-up"></i>
           {{ _('yes') }}
           </a> /
           <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=-1,
             referer=request.url
           ) }}">
-          <i class="icon-thumbs-down"></i>
+          <i class="glyphicon glyphicon-thumbs-down"></i>
           {{ _('no') }}
           </a>
           -
           <a href="{{ url_for('comments.report', recid=recid, id=c.id,
             referer=request.url
           ) }}">
-            <i class="icon-exclamation-sign"></i>
+            <i class="glyphicon glyphicon-exclamation-sign"></i>
             {{ _('report abuse') }}
           </a>
       </small>
@@ -108,11 +108,11 @@
 
   {% if current_user.is_guest %}
         <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
-          <i class="icon-pencil"></i> {{ _('write review') }}
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
       {% else %}
         <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_review', recid=recid) }}">
-          <i class="icon-pencil"></i> {{ _('write review') }}
+          <i class="glyphicon glyphicon-pencil"></i> {{ _('write review') }}
         </a>
       {% endif %}
   {%- else -%}

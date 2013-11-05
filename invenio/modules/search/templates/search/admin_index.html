@@ -73,28 +73,28 @@
 </div>
 
 <div class="row">
-  <div style="min-height: 30px; padding: 10px;" class="trash droppable connectedSortable span8" data-id="0">
-    <i class="icon icon-trash"></i> {{ _('Drop here to delete.') }}
+  <div style="min-height: 30px; padding: 10px;" class="trash droppable connectedSortable col-md-8" data-id="0">
+    <i class="glyphicon glyphicon-trash"></i> {{ _('Drop here to delete.') }}
   </div>
 </div>
 
 
 <div class="row">
-  <div class="span4 collection">
+  <div class="col-md-4 collection">
     <h4>{{ _("Narrow by collections") }}</h4>
     {{ collection_tree(collection, '_collection_children_r', class="nav nav-list sortable
     connectedSortable" ) }}
   </div>
 
-  <div class="span4 collection">
+  <div class="col-md-4 collection">
 	  <h4>{{ _("Focus on") }}</h4>
     {{ collection_tree(collection, '_collection_children_v', class="nav nav-list sortable
     connectedSortable") }}
   </div>
 
-  <div class="span4 collection">
+  <div class="col-md-4 collection">
     <ul class="nav nav-list">
-      <li class="nav-header">{{ _('Orphans') }}</li>
+      <li class="dropdown-header">{{ _('Orphans') }}</li>
       <li>
         <ul class="nav nav-list draggable" data-id="0" data-len="{{ orphans|length() }}" >
       {% if orphans %}

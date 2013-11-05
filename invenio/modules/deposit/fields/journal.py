@@ -28,9 +28,10 @@ __all__ = ['JournalField']
 class JournalField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-book',
+            icon='book',
             processors=[sherpa_romeo_journal_process],
             autocomplete=sherpa_romeo_journals,
+            widget_classes="form-control",
         )
         defaults.update(kwargs)
         super(JournalField, self).__init__(**defaults)

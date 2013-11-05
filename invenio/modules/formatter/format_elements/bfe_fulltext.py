@@ -105,7 +105,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
                 # rather study doc type, and base ourselves on
                 # Main/Additional/Plot etc.
                 continue
-            out += ['<li class="nav-header"><strong>%s:</strong></li>' % descr]
+            out += ['<li class="dropdown-header"><strong>%s:</strong></li>' % descr]
             urls_dict = {}
             for url, name, url_format in urls:
                 if name not in urls_dict:
@@ -115,7 +115,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
             for name, urls_and_format in urls_dict.items():
                 if len(urls_dict) > 1:
                     print_name = "<em>%s</em>" % name
-                    url_list = ['<li class="nav-header">' + print_name + "</li>"]
+                    url_list = ['<li class="dropdown-header">' + print_name + "</li>"]
                 else:
                     url_list = []
                 for url, url_format in urls_and_format:

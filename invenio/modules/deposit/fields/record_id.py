@@ -29,9 +29,10 @@ class RecordIDField(WebDepositField, TextField):
 
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-barcode',
+            icon='barcode',
             export_key='recid',
-            processors=[record_id_process]
+            processors=[record_id_process],
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(RecordIDField, self).__init__(**defaults)

@@ -31,7 +31,6 @@ from ..utils import (get_workflow_definition,
                      sort_bwolist)
 from ..api import continue_oid_delayed, start
 
-
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
                       template_folder='../templates',
                       static_folder='../static')

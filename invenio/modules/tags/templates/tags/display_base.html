@@ -24,7 +24,7 @@
 {% block body %}
   <div class="btn-group pull-right">
     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-      <i class="icon-th"></i>
+      <i class="glyphicon glyphicon-th"></i>
       {{_('Display mode')}}
       <span class="caret"></span>
     </a>
@@ -32,7 +32,7 @@
       <li>
         <a href="{{ url_for('.display_cloud') }}">
           {% if display_mode == 'cloud' %}
-            <i class="pull-right icon icon-ok"></i>
+            <i class="pull-right icon glyphicon glyphicon-ok"></i>
           {% endif %}
           {{_('Cloud')}}
         </a>
@@ -40,7 +40,7 @@
       <li>
         <a href="{{ url_for('.display_list') }}">
           {% if display_mode == 'list' %}
-            <i class="pull-right icon icon-ok"></i>
+            <i class="pull-right icon glyphicon glyphicon-ok"></i>
           {% endif %}
           {{_('List')}}
         </a>

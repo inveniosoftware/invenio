@@ -34,11 +34,11 @@
       {{ _("Comments") }}
       <small>
         {% if current_user.is_guest %}
-          <a class="btn pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
+          <a class="btn btn-default pull-right" href="{{ url_for('webaccount.login', referer=request.url) }}">
         {% else %}
-          <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid) }}">
+          <a class="btn btn-default pull-right" data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid) }}">
         {% endif %}
-            <i class="icon-pencil"></i> {{ _('write comment') }}
+            <i class="glyphicon glyphicon-pencil"></i> {{ _('write comment') }}
           </a>
       </small>
     </h4>
@@ -54,7 +54,7 @@
        data-toggle="collapse"
        data-target="#collapse-{{ c.id }}"
        href="{#{ url_for('comments.toggle', recid=recid, id=c.id) }#}">
-      <i class="icon-chevron-down"></i>
+      <i class="glyphicon glyphicon-chevron-down"></i>
     </a>
 
     <h4>
@@ -95,8 +95,8 @@
         <img src="/img/user-icon-1-16x16.gif" alt="avatar"/>
           {{ _('Guest') }}
         {%- endif -%} &nbsp;
-        - <i class="icon-time"></i> {{ c.date_creation }}
-        - <i class="icon-pencil"></i>
+        - <i class="glyphicon glyphicon-time"></i> {{ c.date_creation }}
+        - <i class="glyphicon glyphicon-pencil"></i>
         {% if current_user.is_guest %}
           <a href="{{ url_for('webaccount.login', referer=url_for('comments.add_comment', recid=recid, in_reply=c.id)) }}">
         {% else %}
@@ -104,28 +104,28 @@
         {% endif %}
             {{ _('reply') }}
           </a>
-        - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
+        - <i class="glyphicon glyphicon-question-sign"></i> {{ _('Was it helpful?') }}
          <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=1,
             referer=request.url
           ) }}">
-          <i class="icon-thumbs-up"></i>
+          <i class="glyphicon glyphicon-thumbs-up"></i>
           {{ _('yes') }}
           </a> /
           <a href="{{ url_for('comments.vote', recid=recid, id=c.id, value=-1,
             referer=request.url
           ) }}">
-          <i class="icon-thumbs-down"></i>
+          <i class="glyphicon glyphicon-thumbs-down"></i>
           {{ _('no') }}
           </a>
         -
           <a href="{{ url_for('comments.report', recid=recid, id=c.id) }}">
-            <i class="icon-exclamation-sign"></i>
+            <i class="glyphicon glyphicon-exclamation-sign"></i>
             {{ _('report abuse') }}
           </a>
       </small>
     </blockquote>
     {%- if c.replies -%}
-    <ul class="unstyled" style="padding-left: 20px;">
+    <ul class="list-unstyled" style="padding-left: 20px;">
       {{ loop(c.replies) }}
     </ul>
     {%- endif -%}
@@ -143,7 +143,7 @@
   {% else %}
     <a class="btn pull-right" data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid) }}">
   {% endif %}
-      <i class="icon-pencil"></i> {{ _('write comment') }}
+      <i class="glyphicon glyphicon-pencil"></i> {{ _('write comment') }}
     </a>
 
   {%- else -%}
@@ -159,7 +159,7 @@
 
   <div class="alert">
   {%- set info_subs = _('%(open_tag)s Unsubscribe %(close_tag)s from this discussion. You will not receive any new comments by email.') % {
-    'open_tag': '<strong><a href="'+url_for('comments.unsubscribe', recid=recid)+'"><i class="icon-trash"></i>',
+    'open_tag': '<strong><a href="'+url_for('comments.unsubscribe', recid=recid)+'"><i class="glyphicon glyphicon-trash"></i>',
     'close_tag':'</a></strong>'} -%}
     {{ info_subs|safe }}
   </div>
@@ -168,7 +168,7 @@
 
   <div class="alert alert-info">
   {%- set info_subs = _('%(open_tag)s Subscribe %(close_tag)s to this discussion. You will then receive all new comments by email.') % {
-    'open_tag': '<strong><a href="'+url_for('comments.subscribe', recid=recid)+'"><i class="icon-envelope"></i>',
+    'open_tag': '<strong><a href="'+url_for('comments.subscribe', recid=recid)+'"><i class="glyphicon glyphicon-envelope"></i>',
     'close_tag':'</a></strong>'} -%}
     {{ info_subs|safe }}
   </div>

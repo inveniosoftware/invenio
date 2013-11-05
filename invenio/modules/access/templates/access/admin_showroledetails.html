@@ -35,19 +35,19 @@ $(document).ready(function() {
 <ul class="nav nav-pills">
   <li>
     <a rel="tooltip" title="{{ _('go here to add a new role.') }}" href="{{ url_for('.addrole') }}">
-      <i class="icon-pencil"></i> {{ _("Create new role") }}
+      <i class="glyphicon glyphicon-pencil"></i> {{ _("Create new role") }}
     </a>
   </li>
   <li>
     <a rel="tooltip" title="{{ _('connect a user to role %s.') % role.name }}" href="{{ url_for('.adduserrole', id_role=role.id) }}">
-      <i class="icon-user"></i> {{ _("Connect user") }}
+      <i class="glyphicon glyphicon-user"></i> {{ _("Connect user") }}
     </a>
   </li>
 {#  <li><button class="btn" data-toggle="collapse" data-target="#filter" href="#filter">{{ _("Toggle Filter") }}</button></li>#}
 </ul>
 
 <div class="row">
-<div class="span4">
+<div class="col-md-4">
 <h3>{{ _('Role details') }}</h3>
 <dl>
   <dt>{{ _('Id') }}</dt>
@@ -60,7 +60,7 @@ $(document).ready(function() {
   <dd><pre>{{ role.firerole_def_src }}</pre></dd>
 </dl>
 </div>
-<div class="span4">
+<div class="col-md-4">
 <h3>{{ _('Users') }}</h3>
 {%- if role.users -%}
 <table class="table">
@@ -72,7 +72,7 @@ $(document).ready(function() {
     </a>
     </td><td>
     <a rel="tooltip" title="{{ _('disconnect from role') }}" class="pull-right" href="{{ url_for('.deleteuserrole', id_role=role.id, id_user=u.user.id) }}">
-      <i class="icon-remove-sign"></i>
+      <i class="glyphicon glyphicon-remove-sign"></i>
     </a>
     </td>
   </tr>
@@ -81,24 +81,24 @@ $(document).ready(function() {
 {%- endif -%}
 </div>
 
-<div class="span4">
+<div class="col-md-4">
 <h3>{{ _('Actions') }}</h3>
 {%- if role.authorizations -%}
 <div class="accordion">
   {%- for action, authorizations in role.authorizations|groupby('action') -%}
-  <div class="accordion-group">
-    <div class="accordion-heading">
-    <div class="accordion-toggle" data-toggle="collapse" data-target="#auths{{ action.id }}">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+    <div data-toggle="collapse" data-target="#auths{{ action.id }}">
     <a href="{{ url_for('.showactiondetails', id_action=action.id) }}">
       {{ action.name }}
     </a>
     <a rel="tooltip" title="{{ _('disconnect action with all arguments from role') }}" class="pull-right" href="{{ url_for('.deleteauthorization', id_role=role.id, id_action=action.id) }}">
-      <i class="icon-remove-sign"></i>
+      <i class="glyphicon glyphicon-remove-sign"></i>
     </a>
     </div>
     </div>
     {%- if authorizations and authorizations[0].argument -%}
-    <div id="auths{{ action.id }}" class="collapse in accordion-body">
+    <div id="auths{{ action.id }}" class="collapse in panel-collapse">
     <table class="table">
     {%- for i, auths in authorizations|groupby('argumentlistid') -%}
       {%- if loop.first -%}
@@ -111,7 +111,7 @@ $(document).ready(function() {
       </td>
       <td>
         <a rel="tooltip" title="{{ _('disconnect argument list from role') }}" class="pull-right" href="{{ url_for('.deleteauthorization', id_role=role.id, id_action=action.id, argumentlistid=i) }}">
-          <i class="icon-remove-sign"></i>
+          <i class="glyphicon glyphicon-remove-sign"></i>
         </a>
       </td>
       </tr>

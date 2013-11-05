@@ -447,7 +447,7 @@ def autocomplete(form_type, field_name):
     limit = request.args.get('limit', 50, type=int)
 
     try:
-        form = forms[form_type]()
+        form = getattr(forms, form_type)()
         result = form.autocomplete(field_name, term, limit=limit)
         result = result if result is not None else []
     except KeyError:

@@ -562,7 +562,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
                                    '<span class="label pull-right">' +
                                    time.strftime('%Y-%m-%d', topic_item[1]) +
                                    '</span>' if sort_by == 'date' else
-                                   '<i class="icon-chevron-right pull-right"></i>'))
+                                   '<i class="glyphicon glyphicon-chevron-right pull-right"></i>'))
                                 for topic_item in topic[:limit]]) + \
             '</li></ul>'
 

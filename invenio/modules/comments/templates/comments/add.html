@@ -23,17 +23,18 @@
       style="{{ 'margin-bottom:0px;' if request.is_xhr }}"
       method="post" class="form-horizontal">
   <div class="{{ 'modal-body' if request.is_xhr }}">
-    {{ form.csrf_token }}
-    {{ render_field(form.in_reply_to_id_cmtRECORDCOMMENT) }}
-    {{ render_field(form.title) }}
-    {{ render_field(form.body) }}
+    <div class="col-sd-12 col-xs-12">
+      {{ form.csrf_token }}
+      {{ render_field(form.in_reply_to_id_cmtRECORDCOMMENT) }}
+      {{ render_field(form.title) }}
+      {{ render_field(form.body) }}
+    </div>
   </div>
   <div class="{{ 'modal-footer ' if request.is_xhr else 'form-actions'}}">
         <input type="submit" name="send_button" value="{{ _("Send") }}" class="btn btn-primary"/>
-
-      {%- if request.is_xhr -%}
-        <a class="btn" data-dismiss="modal">Close</a>
-      {%- endif -%}
+        {%- if request.is_xhr -%}
+          <a class="btn" data-dismiss="modal">Close</a>
+        {%- endif -%}
   </div>
 </form>
 {% endmacro %}
@@ -45,9 +46,13 @@
   {% endblock %}
 {%- else -%}
 
-  <div class="modal-header">
-    <a class="close" data-dismiss="modal">×</a>
-    <h3>{{ _('Write a comment') }}</h3>
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <a class="close" data-dismiss="modal">×</a>
+      <h3>{{ _('Write a comment') }}</h3>
+    </div>
+    {{ add_comment() }}
   </div>
-  {{ add_comment() }}
+</div>
 {%- endif -%}

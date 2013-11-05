@@ -65,20 +65,20 @@
         <span class="btn-group">
           <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
                 class="btn">
-            <i class="icon icon-check"
+            <i class="glyphicon glyphicon-check"
                rel="tooltip"
                title="{{ _('Toggle all') }}"></i>
           </span>
           {% if current_user.precached_usebaskets %}
           <button name="action" value="addtobasket" class="btn">
-            <i class="icon icon-bookmark"
+            <i class="glyphicon glyphicon-bookmark"
                rel="tooltip"
                title="{{ _('Add to basket') }}"></i>
             <span style="display: none">{{ _('Add to basket') }}</span>
           </button>
           {% endif %}
         </span>
-        <p class="help-inline hidden-phone">
+        <p class="help-inline hidden-xs">
           {%- set r_from = (pagination.page-1)*pagination.per_page+1 -%}
           {%- set r_to = pagination.page*pagination.per_page -%}
           {%- set r_of = recids|length -%}
@@ -88,7 +88,7 @@
         <div class="btn-group pull-right">
 
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-random"></i> {{ _('Sort by') }}
+            <i class="glyphicon glyphicon-random"></i> {{ _('Sort by') }}
             <span class="caret"></span>
           </a>
 
@@ -114,7 +114,7 @@
             <li>
             <a href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
                class="{{ 'active' if active }}">
-              <i class="pull-right icon {{ ' icon-ok' if active }}"></i>
+              <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if active }}"></i>
                 {{ _(k) }}
             </a>
             </li>
@@ -134,7 +134,7 @@
 
         <div class="btn-group pull-right" style="margin-right: 5px;">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-th"></i> {{ _('Display') }}
+            <i class="glyphicon glyphicon-th"></i> {{ _('Display') }}
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
@@ -144,7 +144,7 @@
             <li><a
                href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
                class="{{ ' active' if active }}">
-              <i class="pull-right icon {{ ' icon-ok' if of==i.code }}"></i>
+              <i class="pull-right icon {{ ' glyphicon glyphicon-ok' if of==i.code }}"></i>
               {{ i.name }}
             </a></li>
           {%- endfor -%}
@@ -157,15 +157,15 @@
 
         {%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
           {%- if of[0] == 'h' -%}
-            <div class="row-fluid">
-              <div class="span1">
+            <div class="row">
+              <div class="col-md-1">
                 <label class="checkbox">
                   <input name="recid" type="checkbox" value="{{ recid }}" />
                   <abbr class="unapi-id" title="{{ recid }}"></abbr>
                   {{ loop.index+(pagination.page-1)*rg }}
                 </label>
               </div>
-              <div class="span10">
+              <div class="col-md-10">
                 {{ format_record(recid, of, ln=g.ln, qid=qid)|safe }}
                 {{ '<hr/>'|safe if not loop.last }}
               </div>
@@ -176,31 +176,31 @@
         {%- endfor -%}
         <hr/>
         <div class="row clearfix">
-          <div class="span10">
+          <div class="col-md-10">
             <span class="pull-left btn-group clearfix">
             <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
                   class="btn">
-              <i class="icon icon-check"
+              <i class="glyphicon glyphicon-check"
                  rel="tooltip"
                  title="{{ _('Toggle all') }}"></i>
             </span>
             {% if current_user.precached_usebaskets %}
             <button name="action" value="addtobasket" class="btn">
-              <i class="icon icon-bookmark"
+              <i class="glyphicon glyphicon-bookmark"
                  rel="tooltip"
                  title="{{ _('Add to basket') }}"></i>
                  <span style="display: none">{{ _('Add to basket') }}</span>
             </button>
             {% endif %}
            </span>
-            <span class="span4">
-              <select name="of" class="span2">
+            <span class="col-md-4">
+              <select name="of" class="col-md-2">
               {%- for i in export_formats -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>
               {%- endfor -%}
               </select>
              <button name="action" value="export" class="btn">
-              <i class="icon icon-download-alt"
+              <i class="glyphicon glyphicon-download-alt"
                  rel="tooltip"
                  title="{{ _('Export') }}"></i> {{ _('Export') }}
              </button>

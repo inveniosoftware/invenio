@@ -16,12 +16,12 @@
 {% block page_body %}
 <div class="container">
 <div class="row">
-    <div class="span3">
+    <div class="col-md-3">
         <ul class="nav nav-tabs nav-stacked">
             {{ layout.menu() }}
         </ul>
     </div>
-    <div class="span9">
+    <div class="col-md-9">
         {% if admin_view.name %}<h4>{{admin_view.name}}</h4>{% endif %}
         {{ layout.messages() }}
         {% block body %}{% endblock %}

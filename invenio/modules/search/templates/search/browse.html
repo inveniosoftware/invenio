@@ -36,7 +36,7 @@
   {{ portalboxes.te }}
 {% endblock %}
 {% block header %}
-  {{ super() }}
+  {{ super() }} 
   {% js url_for('search.static', filename='js/search/typeahead.js') %}
   {% js url_for('search.static', filename='js/search/facet.js') %}
   {% js url_for('static', filename='js/bootstrap-select.js') %}
@@ -79,7 +79,7 @@ body {
 {% if not records|length %}
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <p>
       <strong>{{ _('Your search did not match any records. Please try again.') }}</strong>
     </p>
@@ -90,7 +90,7 @@ body {
 {% else %}
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <table class="table table-striped table-hover">
       <tr>
         <th style="width: 20%">{{ _('Hits') }}</th>

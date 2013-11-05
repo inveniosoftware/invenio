@@ -20,9 +20,9 @@
 {% extends "tags/display.html" %}
 
 {% block webtag_display %}
-<div class="row-fluid">
+<div class="row">
   <h4> {{_('Tag Cloud') }} </h4>
-  <div class="span4">
+  <div class="col-md-4">
   {% for tag in user_tags %}
       <a href="{{ url_for('search.search', p='tag:"' + tag['name']) + '"' }}"
       {#<a href="{{ url_for('webtag.tag_edit', id_tag=tag.id) }}"#}

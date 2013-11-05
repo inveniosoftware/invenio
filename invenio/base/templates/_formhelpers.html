@@ -20,19 +20,31 @@
 ## See http://flask.pocoo.org/docs/patterns/wtforms/
 #}
 {% macro render_field(field, show_error_list=True) %}
+  {% set label_size = kwargs.get('label_size') %}
+  {% set field_size = kwargs.get('field_size') %}
   {%- if field.name == "csrf_token" or field.type == 'HiddenField' -%}
   {{ field(**kwargs)|safe }}
   {%- else -%}
-  <div class="control-group {% if show_error_list and field.errors %} error{% endif %}">
-    {{ field.label(class="control-label") }}
-    <div class="controls">
+  <div class="form-group {% if show_error_list and field.errors %} error{% endif %}">
+    {% set label_classes = "control-label" %}
+    {% if label_size %}
+      {% set label_classes = label_classes + ' col-md-' + label_size|string %}
+    {% endif %}
+    {{ field.label(class_=label_classes) }}
+    {% set classes = kwargs.get('class_', '') + ' form-control' %}
+    {% do kwargs.update({'class_': classes }) %}
+    {% if field_size %}
+      <div class="col-md-{{field_size|string}}">
+    {% endif %}
     {{ field(**kwargs)|safe }}
     {% if show_error_list and field.errors %}
       {% for error in field.errors %}
       <span class="help-inline">{{ error }}</span>
       {% endfor %}
     {% endif %}
-    </div>
+    {% if field_size %}
+      </div>
+    {% endif %}
   </div>
   {%- endif -%}
 {% endmacro %}
@@ -64,9 +76,9 @@
 ## Field input wrapper.
 #}
 {% macro _filter_element(field) %}
-  <div class="input-append filter_element">
-    {{ field }}<span class="add-on remove-field" onclick="$(this).parent().remove()">
-      <i class="icon-minus"></i>
+  <div class="input-group filter_element">
+    {{ field }}<span class="input-group-addon remove-field" onclick="$(this).parent().remove()">
+      <i class="glyphicon glyphicon-minus"></i>
     </span>
   </div>
 {% endmacro %}
@@ -76,10 +88,10 @@
 ## elements for dynamic field manipulation.
 #}
 {% macro filter_field(field) %}
-<div class="control-group">
+<div class="form-group">
   {{ field.label(class="control-label") }}
   <div class="controls">
-    <div class="span6 paste">
+    <div class="col-md-6 paste">
     {% if field.raw_data %}
     {% for i in range(field.raw_data|count) %}
       {{ _filter_element(field) }}
@@ -89,7 +101,7 @@
     {% endif %}
     </div>
     <span class="pull-right btn btn-primary add-field" onclick="$('#field_copy_{{ field.id }}').children().clone().appendTo($(this).siblings('.paste'));">
-      <i class="icon-plus icon-white"></i>
+      <i class="glyphicon glyphicon-plus"></i>
     </span>
   </div>
 </div>

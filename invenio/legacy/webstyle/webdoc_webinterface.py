@@ -156,7 +156,7 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
                      'hacking': '<a class="navtrail" href="/help/hacking%s">%s</a>' % \
                      (ln_link, _("Hacking Invenio"))}
         body = '<div class="container" ><div class="row">' + \
-               '<div  class="span8"><h5>' + \
+               '<div  class="col-md-8"><h5>' + \
               _('Table of contents of the %(x_category)s pages.',
                 x_category=_(categ))
         if categ != 'help':
@@ -167,7 +167,7 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
 
         body += '</h5>' + get_webdoc_topics(sort_by='name', sc=1,
                                           categ=[categ], ln=ln) + \
-                '</div><div  class="span4">' + \
+                '</div><div  class="col-md-4">' + \
                 '<h5>'+_("Latest modifications:") + '</h5>' + \
                 get_webdoc_topics(sort_by='date', sc=0, limit=5,
                                   categ=[categ], ln=ln)+'</div></div></div>'

@@ -27,7 +27,7 @@
       {{ _('select or create deposition') }}
       <a class="btn btn-info pull-right"
          href="{{ url_for('webdeposit.create', deposition_type=deposition_type.get_identifier()) }}">
-        <i class="icon-edit icon-white"></i> {{ _('New Deposition') }}
+        <i class="glyphicon glyphicon-edit"></i> {{ _('New Deposition') }}
       </a>
     </small>
   </h3>
@@ -35,18 +35,18 @@
 
 <div class="row">
   {% if my_depositions %}
-  <ul class="nav nav-tabs nav-stacked offset3 span6">
+  <ul class="nav nav-tabs nav-stacked col-md-offset-3 col-md-6">
   {% for dep in my_depositions if not dep.is_finished() %}
     <li> <a href="{{ url_for('webdeposit.run', deposition_type=dep.type.get_identifier(), uuid=dep.id) }}">
-       <i class="icon-chevron-right pull-right"></i>
+       <i class="glyphicon glyphicon-chevron-right pull-right"></i>
         <strong>{{ dep.type.name }}: {{ dep.title or _('Untitled') }}</strong>
-    <span style="font-size: 80%;" class="muted">{{ dep.modified|invenio_pretty_date }}</span>
+    <span style="font-size: 80%;" class="text-muted">{{ dep.modified|invenio_pretty_date }}</span>
      </a>
     </li>
   {% endfor %}
   </ul>
   {% else %}
-  <div class="span12">
+  <div class="col-md-12">
     <strong>{{ _('There is no ongoing deposition.') }}</strong>
   </div>
   {% endif %}
@@ -59,12 +59,12 @@
   <li class="divider" style="overflow: visible;"></li>
 </ul>
 
-  <h4 class="offset2"style="margin-top: 25px;">Past depositions</h4>
+  <h4 class="col-md-offset-1"style="margin-top: 25px;">Past depositions</h4>
 
-   <ul class="nav nav-tabs nav-stacked offset3 span6">
+   <ul class="nav nav-tabs nav-stacked col-md-offset-3 col-md-6">
 {% endif %}
   <li> <a href="{{ url_for('webdeposit.run', deposition_type=dep.type.get_identifier(), uuid=dep.id) }}">
-           <i class="icon-chevron-right pull-right"></i>
+           <i class="glyphicon glyphicon-chevron-right pull-right"></i>
             {{ dep.type.name }}: {{ dep.title or _('Untitled') }}
          </a>
          </li>

@@ -23,10 +23,12 @@
                            + config.CFG_OAUTH1_PROVIDERS * config.CFG_OAUTH1_AUTHENTICATION
                            + config.CFG_OAUTH2_PROVIDERS * config.CFG_OAUTH2_AUTHENTICATION %}
 
+{%- css url_for('webaccount.static', filename='css/accounts/login.css'), '10-login' -%}
+
 {% block body %}
 
 <div class="row">
-  <div class="span8 offset2">
+  <div class="col-md-8 col-md-offset-2">
     <p class="lead text-center">{{ _("If you already have an account, please login using the form below.") }}</p>
     <p class="text-center">{{ _("If you don't own an account yet, please %(x_url_open)sregister")|format(
       x_url_open='<a href="'+url_for('webaccount.register')+'">')|safe }}
@@ -37,17 +39,19 @@
 </div>
 
 <div class="row">
-  <div class="span4 offset{{ '2' if activated_providers else '4' }}">
+  <div class="col-md-4 col-md-offset-{{ '2' if activated_providers else '4' }}">
     <legend>{{ _('Please Sign In') }}</legend>
-    <form action="{{ url_for('webaccount.login') }}" method="POST">
+    <form class="form-signin" action="{{ url_for('webaccount.login') }}" method="POST">
+      <div class="form-group">
     {{ form.referer }}
     {{ form.login_method }}
-    {{ form.nickname(placeholder=_('Username or email'), class_="span4") }}
-    {{ form.password(placeholder=_('Password'), class_="span4") }}
-    <label class="checkbox">
-      {{ form.remember(class_="checkbox") }} {{ form.remember.label.text }}
-    </label>
-    {{ form.submit(class_="btn btn-info btn-block") }}
+    {{ form.nickname(placeholder=_('Username or email'), class_="form-control", type="text") }}
+    {{ form.password(placeholder=_('Password'), class_="form-control", type="password") }}
+      </div>
+      <label class="checkbox">
+        {{ form.remember(class_="checkbox") }} {{ form.remember.label.text }}
+      </label>
+      {{ form.submit(class_="btn btn-info btn-block") }}
     </form>
     <p class="text-right">
       <a href="{{ url_for('webaccount.lost') }}">
@@ -141,7 +145,7 @@
                type="text" name="identifier" value=""
                placeholder="{{ label|format(provider=provider) }}">
         <button class="btn btn-info btn-block" type="submit">
-          {{ _('Continue') }}&nbsp;<i class="icon-chevron-right icon-white"></i>
+          {{ _('Continue') }}&nbsp;<i class="glyphicon glyphicon-chevron-right"></i>
         </button>
       </form>
     </div>
@@ -179,11 +183,11 @@
   border: none;
 }
 </style>
-    <div class="span1 hidden-phone" style="height: 200px; padding: 0px; display: block; float: left; width: 1px;
+    <div class="col-md-1 hidden-xs" style="height: 200px; padding: 0px; display: block; float: left; width: 1px;
     border-right: 1px solid #ccc;">&nbsp;</div>
 
 
-    <div class="span4">
+    <div class="col-md-4">
       <legend style="font-size: 90%;">{{ _('or Select Your Authentication Provider:') }}</legend>
 
       <ul class="auth_providers thumbnails">

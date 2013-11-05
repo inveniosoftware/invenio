@@ -27,7 +27,8 @@ __all__ = ['PagesNumberField']
 class PagesNumberField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-th',
+            icon='th',
+            widget_classes="form-control"
             #FIXMEvalidators=[number_validate(error_message='Pages must be a number!')] #FIXME
         )
         defaults.update(kwargs)

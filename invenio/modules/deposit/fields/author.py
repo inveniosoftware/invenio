@@ -27,9 +27,10 @@ __all__ = ['AuthorField']
 class AuthorField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-user',
+            icon='user',
             export_key='authors[0].full_name',
-            autocomplete=orcid_authors
+            autocomplete=orcid_authors,
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(AuthorField, self).__init__(**defaults)

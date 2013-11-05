@@ -62,11 +62,11 @@
   background-color: rgba(255,255,255,0.5);
 }
 
-#facet_list .accordion-heading {
+#facet_list .panel-heading {
   background-color: whiteSmoke;
 }
 
-#facet_list .accordion-heading a:after {
+#facet_list .panel-heading a:after {
   content: ' ';
   float: right;
   display: inline-block;
@@ -81,7 +81,7 @@
   background-position: -264px -24px;
 }
 
-#facet_list ul.unstyled ul.unstyled {
+#facet_list ul.list-unstyled ul.list-unstyled {
   padding-left: 10px;
   font-size: 90%;
 }
@@ -112,7 +112,7 @@ body {
 {% if not recids|length %}
 
 <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <p>
       <strong>{{ _('Your search did not match any records. Please try again.') }}</strong>
     </p>
@@ -123,26 +123,26 @@ body {
 {% else %}
 
 <div class="row">
-  <div class="span2 visible-desktop">
+  <div class="col-md-2 visible-md">
     <div class="row">
     <div
-      class="accordion span2 facet"
+      class="accordion col-md-2 facet"
       id="facet_list">
     </div>
     </div>
   </div>
 
-  <div class="span10">
+  <div class="col-md-10">
 
-    <div class="row visible-desktop">
-      <div class="span10">
+    <div class="row visible-md">
+      <div class="col-md-10">
         <div class="well" id="facet_filter" style="clear:both; display: none;">
           <input type="hidden" value="{{ request.args.get('p', '') }}" name="p" />
         </div>
       </div>
     </div>
     <div class="row">
-      <div id="search_results" class="span10">
+      <div id="search_results" class="col-md-10">
       {% block search_results %}
         {{ render_search_results(recids, collection, pagination, format_record) }}
       {% endblock search_results %}
@@ -193,7 +193,7 @@ body {
 
   $('#facet_list').facet({
     button_builder: function(title) {
-      return '<a style="cursor:pointer" class="muted"><small>'+title+' ...</small></a> ';
+      return '<a style="cursor:pointer" class="text-muted"><small>'+title+' ...</small></a> ';
     },
     row_builder: function(data, name) {
       var title = data[(data.length==3)?2:0],
@@ -206,7 +206,7 @@ body {
                     'data-facet-key="' + name + '" '+
                     'data-facet-value="' + data[0] + '">' +
         title +
-        '</a> <small class="muted">('+counter+')</small>' +
+        '</a> <small class="text-muted">('+counter+')</small>' +
         '</li>'
     },
     box_builder: function(name, title) {
@@ -216,7 +216,7 @@ body {
          'data-target="#facet_list" ' +
          'data-facet-key="'+ name +'"><strong>'+
         title + '</strong></a>' +
-        '<ul class="context unstyled"><ul></div>'
+        '<ul class="context list-unstyled"><ul></div>'
     },
     facets: {{ facets|tojson|safe }}
   }).on('updated', function(event) {
@@ -286,7 +286,7 @@ body {
 
       var $e = $(this),
           filterContent = function() {
-            return '{{ _('Default action is <em class="text-info">limit</em>, however you can also <abbr title="you can use shift+left click"><em class="text-error">exclude</em></abbr> selected term from results.')|safe }}<br/><a class="btn btn-small btn-error" style="cursor:pointer" ' +
+            return '{{ _('Default action is <em class="text-info">limit</em>, however you can also <abbr title="you can use shift+left click"><em class="text-danger">exclude</em></abbr> selected term from results.')|safe }}<br/><a class="btn btn-sm btn-error" style="cursor:pointer" ' +
               'data-target="#facet_list" ' +
               'data-facet="toggle" ' +
               'data-facet-action="-" '+
@@ -331,7 +331,7 @@ body {
             })
 
             if ($el_clicked.hasClass('text-info') ||
-                $el_clicked.hasClass('text-error')) {
+                $el_clicked.hasClass('text-danger')) {
               $ul.remove()
               $el_clicked.addClass('expandable')
               $('#facet_list').data('facet').filter = $('#facet_list').data('facet').exclude('!', $(this).attr('data-facet-key'), $(this).attr('data-facet-value'))
@@ -347,7 +347,7 @@ body {
       $(this).on('click', function() {
         $('[data-facet-key="'+ $(this).attr('data-facet-key') +'"]')
           .attr('data-facet-action', '+')
-          .removeClass('text-error')
+          .removeClass('text-danger')
           .removeClass('text-info')
           .css('font-weight', 'normal')
         $(this).removeClass('muted').addClass('text-info')
@@ -373,7 +373,7 @@ body {
       .filter('[data-facet-value="'+event.value+'"]')
       .each(function(e) {
         $(this)
-          .removeClass('text-error')
+          .removeClass('text-danger')
           .removeClass('text-info')
           .css('font-weight', 'normal')
           .attr('data-facet-action', '+')
@@ -429,7 +429,7 @@ body {
             var facet = {url: options.url_map[event.key]
                       , facet: event.key}
               , data = {parent: event.value}
-              , $ul = $('<ul class="context unstyled"><ul>').clone().appendTo($el_clicked.parent())
+              , $ul = $('<ul class="context list-unstyled"><ul>').clone().appendTo($el_clicked.parent())
 
             var data_facet = $('#facet_list').data('facet')
             if (data_facet.find('!', event.key, event.value).length == 0) {

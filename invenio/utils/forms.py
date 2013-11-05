@@ -44,21 +44,34 @@ class RowWidget(object):
     """
     Renders a list of fields as a set of table rows with th/td pairs.
     """
-    def __init__(self):
-        pass
+    def __init__(self, **kwargs):
+        self.defaults = kwargs
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field, class_='', row_class='row', **kwargs):
+        """
+        There are Bootstrap 3 specific improvements for row wrapping.
+        """
         html = []
         hidden = ''
-        for subfield in field:
+        arguments = self.defaults
+        arguments.update(kwargs)
+        classes = arguments.get('classes', {})
+        for i, subfield in enumerate(field):
             if subfield.type == 'HiddenField':
                 hidden += text_type(subfield)
             else:
-                html.append('%s%s' % (hidden, text_type(subfield(class_="span1", placeholder=subfield.label.text))))
+                wrapper_class = classes.get(i, '')
+                html.append('%s<div class="%s">%s</div>' % (
+                    hidden, 
+                    wrapper_class,
+                    text_type(subfield(
+                        class_=class_,
+                        placeholder=subfield.label.text))))
                 hidden = ''
         if hidden:
             html.append(hidden)
-        return HTMLString(''.join(html))
+        return HTMLString('<div class="%s">' % (row_class, ) + 
+                          ''.join(html) + '</div>')
 
 
 class TimeField(Field):
