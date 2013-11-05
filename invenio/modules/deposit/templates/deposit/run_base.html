@@ -35,7 +35,7 @@
     {% include "deposit/run_field_label.html" %}
 {%- endmacro -%}
 
-{%- macro field_display(thisfield, field_class="span5", container_class="control-group") -%}
+{%- macro field_display(thisfield, field_class="", container_class="form-group") -%}
     {% include "deposit/run_field.html" %}
 {%- endmacro -%}
 
@@ -67,12 +67,12 @@
 span.ui-icon.ui-icon-circle-triangle-w { color: transparent; cursor: pointer; }
 span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
 
-.typeahead {
+/*.typeahead {
     max-height: 250px;
     overflow-y: auto;
     /* prevent horizontal scrollbar */
-    overflow-x: hidden;
-}
+    /*overflow-x: hidden;*/
+/*}*/
 
 .l{
     size: 10px;
@@ -120,7 +120,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
 </div>
 {% endblock form_submit_dialog %}
 <div class="row">
-    <div id="file_container" class="span8 form-feedback-warning">
+    <div id="file_container" class="col-md-8 form-feedback-warning">
     <div id="flash-message"></div>
     <form enctype="multipart/form-data" name="submitForm" id="submitForm" class="form-horizontal" method="post" action="{{ url_for('.run', deposition_type=deposition_type, uuid=uuid) }}">
     {% block form_header scoped %}{{ form_action_bar() }}{% endblock form_header%}
@@ -128,7 +128,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
     {% block form_title scoped %}
         <h1>{{ form._title }}</h1>
         {% if form._subtitle %}
-            <p class="muted"><small>{{ form._subtitle|safe }}</small></p>
+            <p class="text-muted"><small>{{ form._subtitle|safe }}</small></p>
         {% endif %}
     {% endblock form_title %}
 
@@ -137,7 +137,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
             {% set grouploop = loop %}
             {% block form_group scoped %}
                 {% if grouploop.first %}
-                    <div id="webdeposit_form_accordion" class="accordion">
+                    <div id="webdeposit_form_accordion">
                 {% endif %}
                 {% block form_group_header scoped %}
                     {% if group %}
@@ -151,13 +151,11 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
                     {% endif %}
 
                     {% block fieldset scoped %}
-                    <fieldset>
                     {% for field in fields %}
                         {% block field_body scoped %}
                             {{ field_display(field) }}
                         {% endblock field_body %}
                     {% endfor %}
-                    </fieldset>
                     {% endblock fieldset %}
                 {% endblock form_group_body%}
 
@@ -176,7 +174,7 @@ span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
     </form>
     </div>
     {% if form._drafting %}
-        <div class="span4">
+        <div class="col-md-4">
             {% include "deposit/myview.html" %}
         </div>
     {% endif %}
@@ -203,7 +201,7 @@ $(document).ready(function() {
     $('#webdeposit_form_accordion').on('shown', function (e) {
         $(e.target).css("overflow", "visible");
     })
-    $('#webdeposit_form_accordion .accordion-body.in.collapse').css("overflow", "visible");
+    $('#webdeposit_form_accordion .panel-collapse.in.collapse').css("overflow", "visible");
 });
 $(document).ready(function() {
     var save_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id) }}';

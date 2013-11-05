@@ -713,9 +713,9 @@ function webdeposit_init_plupload(max_size, selector, save_url, url, delete_url,
         $('#upload-errors').hide();
         if (err.file){
             $('#' + err.file.id + " .progress").removeClass("progress-striped").addClass("progress-danger");
-            $('#upload-errors').append('<div class="alert alert-error"><strong>Error:</strong> Could not upload ' + err.file.name +" due to " + message + "</div>");
+            $('#upload-errors').append('<div class="alert alert-danger"><strong>Error:</strong> Could not upload ' + err.file.name +" due to " + message + "</div>");
         } else {
-            $('#upload-errors').append('<div class="alert alert-error"><strong>Error:</strong> ' + message + "</div>");
+            $('#upload-errors').append('<div class="alert alert-danger"><strong>Error:</strong> ' + message + "</div>");
         }
         $('#upload-errors').show('fast');
         $('#uploadfiles').addClass("disabled");
@@ -1248,6 +1248,7 @@ $.fn.fieldlist = function(opts) {
         // Remove class
         new_element.removeClass(options.empty_cssclass);
         new_element.addClass(options.element_css_class);
+        new_element.addClass("input-group");
         // Pre-populate field values
         update_element_values(new_element, data, field_prefix_index);
         // Update ids

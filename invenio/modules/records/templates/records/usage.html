@@ -26,9 +26,9 @@
   </div>
 
   {%- if viewsimilarity -%}
-  <div class="span6">
+  <div class="col-md-6">
   <h4>{{ _("People who viewed this page also viewed:") }}</h4>
-  <ul class="unstyled">
+  <ul class="list-unstyled">
   {%- for c in viewsimilarity -%}
   <li>
     <span class="badge">{{ c[1] }}</span> &nbsp;
@@ -41,9 +41,9 @@
   {%- endif -%}
 
   {%- if downloadsimilarity -%}
-  <div class="span5">
+  <div class="col-md-5">
   <h4>{{ _("People who downloaded files from this page also viewed:") }}</h4>
-  <ul class="unstyled">
+  <ul class="list-unstyled">
   {%- for c in downloadsimilarity -%}
   <li>
     <span class="badge">{{ c[1] }}</span> &nbsp;
@@ -56,9 +56,9 @@
   {%- endif -%}
 
   {%- if downloadgraph -%}
-  <div class="span5">
+  <div class="col-md-5">
   <h4>{{ _("Download history graph") }}</h4>
-  <ul class="unstyled">
+  <ul class="list-unstyled">
   {{ downloadgraph|safe }}
   </ul>
   {%- endif -%}

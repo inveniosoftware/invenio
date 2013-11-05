@@ -18,9 +18,9 @@
  */
 
 $(function() {
-        $( "#holdingpencontainer" ).accordion({collapsible: true, autoHeight: false});
-        $( "#holdingpencontainer > div" ).accordion({collapsible: true, autoHeight: false});
-        $( "#holdingpencontainer > div > div" ).accordion({collapsible: true, active: false, autoHeight: false, clearStyle: true});
+        $( "#holdingpencontainer" ).panel-group ({collapsible: true, autoHeight: false});
+        $( "#holdingpencontainer > div" ).panel-group ({collapsible: true, autoHeight: false});
+        $( "#holdingpencontainer > div > div" ).panel-group ({collapsible: true, active: false, autoHeight: false, clearStyle: true});
 
         $( "#holdingpencontainer > div > div").bind("accordionchangestart", function(event, ui) {
             console.dir(ui.newHeader); // jQuery, activated header

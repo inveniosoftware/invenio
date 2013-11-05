@@ -34,7 +34,7 @@ class ThesisForm(Form):
                               validators=[Required()])
     subtitle = fields.TitleField(label=_('Original Thesis Subtitle'),
                                  export_key='title.subtitle')
-    author = fields.AuthorField(label=_('Author'),)
+    author = fields.AuthorField(label=_('Author'))
     supervisor = fields.AuthorField(label=_('Thesis Supervisor'))
     abstract = fields.AbstractField(label=_('Abstract'))
 
@@ -60,7 +60,8 @@ class ThesisForm(Form):
 
     funded_choices = [("yes", _("Yes")), ("no", _("No"))]
     funded = fields.SelectField(label=_("Has your thesis been funded by the CERN Doctoral Student Program?"),
-                                choices=funded_choices)
+                                choices=funded_choices,
+                                widget_classes="form-control")
 
     file_field = fields.FileUploadField(widget=plupload_widget)
     submit = fields.SubmitField(label=_('Submit Thesis'), widget=bootstrap_submit)

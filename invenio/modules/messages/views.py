@@ -50,7 +50,7 @@ class MessagesMenu(object):
             )).scalar()
 
         out = '<div data-menu="click" data-menu-source="' + url_for('webmessage.menu') + '">'
-        out += '<i class="icon-envelope icon-white"></i>'
+        out += '<i class="glyphicon glyphicon-envelope"></i>'
         if unread:
             out += ' <span class="badge badge-important">%d</span>' % unread
         out += "</div>"

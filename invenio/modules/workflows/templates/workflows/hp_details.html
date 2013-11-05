@@ -35,31 +35,31 @@
 
 {% block hpbody %}
     <div class="row-fluid">
-        <div class="span3 pull-left"><a href="{{url_for('holdingpen.maintable')}}"><i class="icon-hand-left"></i> Back to Main Table</a></div>
+        <div class="col-md-3 pull-left"><a href="{{url_for('holdingpen.maintable')}}"><i class="icon-hand-left"></i> Back to Main Table</a></div>
         <div class="span4"><h1>Record Details</h1></div>
     </div>
 
     <div id = "alert_placeholder"></div>
 
-    <div class="container-fluid">
-        <div class="row-fluid">
-            <div class="span9">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
                 <div class="btn-group" name="object_preview_btn" data-toggle="buttons-radio">
-                    <button class="preview btn btn-mini btn-primary active" name="hd">HTML</button>
-                    <button class="preview btn btn-mini btn-primary" name="xm">MARCXML</button>
-                    <button class="preview btn btn-mini btn-primary" name="tm">MARC</button>
+                    <button type="radio" class="preview btn btn-xs btn-primary active" name="hd">HTML</button>
+                    <button type="radio" class="preview btn btn-xs btn-primary" name="xm">MARCXML</button>
+                    <button type="radio" class="preview btn btn-xs btn-primary" name="tm">MARC</button>
                 </div>
-                <div class="btn-group pull" name="data_version" data-toggle="buttons-radio">
-                    <button class="btn btn-mini active" name="initial" onclick="">Initial</button>
+                <div class="btn-group pull" name="data_version" data-toggle="buttons">
+                    <button type="radio" class="btn btn-xs active" name="initial" onclick="">Initial</button>
                     {% if bwobject.version == 1 %}
-                        <button class="btn btn-mini" name="final" onclick="">Final</button>
+                        <button type="radio" class="btn btn-xs" name="final" onclick="">Final</button>
                     {% else %}
-                        <button class="btn btn-mini disabled" name="final">Final</button>
+                        <button class="btn btn-xs disabled" name="final">Final</button>                 
                     {% endif %}
                     {% if bwobject.version == 2 %}
-                        <button class="btn btn-mini" name="error" onclick="">Error</button>
+                        <button class="btn btn-xs" name="error" onclick="">Error</button>
                     {% else %}
-                        <button class="btn btn-mini disabled" name="error">Error</button>
+                        <button class="btn btn-xs disabled" name="error">Error</button>
                     {% endif %}
                 </div>
 
@@ -82,25 +82,25 @@
                     {{ data_preview|safe }}
                 </div>
             </div>
-
-            <div class="span3">
+            
+            <div class="col-md-3">
                 <div id="action-area" class="alert">
                     <b>Actions</b>
-                    <div class="row-fluid">
-                        <div class="span6">
+                    <div class="row">
+                        <div class="col-md-6">
                             {% if bwobject.get_extra_data()['widget'] %}
-                            <a class="btn btn-info btn-small" href="{{ url_for('holdingpen.show_widget', bwobject_id=bwobject.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Widget</a></br>
+                            <a class="btn btn-info btn-sm" href="{{ url_for('holdingpen.show_widget', bwobject_id=bwobject.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Widget</a></br>
                             {% else %}
-                            <a class="btn btn-info btn-small disabled"><i class="icon-wrenchwhite icon-wrench"></i>Widget</a></br>
+                            <a class="btn btn-info btn-sm disabled"><i class="glyphicon glyphicon-wrench"></i>Widget</a></br>
                             {% endif %}
 
                         </div>
 
-                        <div id="static-actions" class="span6">
-                            <button id="restart_button" class="btn btn-small btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-repeat"></i>Restart</button></br>
-                            <button id="restart_button_prev" class="btn btn-small btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-backward"></i>Restart Task</button></br>
-                            <button id="continue_button" class="btn btn-small btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-forward"></i>Skip Task</button></br>
-                            <a id="delete_btn" href="#confirmationModal" role="button" class="btn btn-small btn-block btn-danger" data-toggle="modal"><i class="icon-trash"></i>Delete</a>
+                        <div id="static-actions" class="col-md-6">
+                            <button id="restart_button" class="btn btn-sm btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="glyphicon glyphicon-repeat"></i>Restart</button></br>
+                            <button id="restart_button_prev" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="glyphicon glyphicon-step-backward"></i>Restart Task</button></br>
+                            <button id="continue_button" class="btn btn-sm btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="glyphicon glyphicon-step-forward"></i>Skip Task</button></br>
+                            <a id="delete_btn" href="#confirmationModal" role="button" class="btn btn-sm btn-block btn-danger" data-toggle="modal"><i class="glyphicon glyphicon-trash"></i>Delete</a>
 
                             <div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                               <div class="modal-header">

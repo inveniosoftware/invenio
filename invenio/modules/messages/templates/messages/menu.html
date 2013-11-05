@@ -17,8 +17,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-<ul class="dropdown-menu">
-  <li class="nav-header">{{ _('Messages') }}
+<ul class="dropdown-menu" style="min-width: 400px;">
+  <li class="dropdown-header">{{ _('Messages') }}
     <a class="pull-right" href="{{ url_for('webmessage.add') }}">
       {{ _('Write message') }}
     </a>
@@ -26,7 +26,7 @@
   <li class="divider"></li>
   {% for m, um in messages %}
   <li class="row">
-    {% set a_class = "span5 alert-info" if um.status == 'N' else "span5" %}
+    {% set a_class = "col-md-5 alert-info" if um.status == 'N' else "col-md-5" %}
     <a style="margin-bottom: 1px;" class="{{ a_class }}" href="{{ url_for('webmessage.view', msgid=m.id) }}">
       <div style="width: 100%; float: left;">
         <div style="float:left; width: 30px; padding: 4px;">
@@ -44,8 +44,8 @@
     </a>
   </li>
   {% else %}
-  <li class="row">
-    <strong class="span5" style="padding: 0 15px;">{{ _('Empty inbox') }}</strong>
+  <li role="presentation" class="col-sm-12 col-xs-12">
+    <label>{{ _('Empty inbox') }}</label>
   </li>
   {% endfor %}
   <li class="divider"></li>

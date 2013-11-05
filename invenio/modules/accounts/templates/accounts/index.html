@@ -28,6 +28,7 @@
     <input placeholder="{{ _('Filter widgets') }}"
            type="text"
            name="widget"
+           class="form-control"
            autofocus />
   </small>
   </h1>
@@ -41,24 +42,24 @@
 
 <div class="container">
   <div class="row">
-   <div class="span12">
-    <ul id="widgets" class="thumbnails">
-      <li id="leftColumn" class="widgetColumn">
-        <ul id="widgetsLeft" class="connectedWidgets">
+   <div class="col-md-12">
+    <ul id="widgets" class="list-unstyled">
+      <li id="leftColumn" class="widgetColumn col-md-4">
+        <ul id="widgetsLeft" class="connectedWidgets list-unstyled">
           {%- for p in plugins[0] -%}
             {{display_widget(p)}}
           {%- endfor -%}
         </ul>
       </li>
-      <li id="middleColumn" class="widgetColumn">
-        <ul id="widgetsMiddle" class="connectedWidgets">
+      <li id="middleColumn" class="widgetColumn col-md-4">
+        <ul id="widgetsMiddle" class="connectedWidgets list-unstyled">
           {%- for p in plugins[1] -%}
             {{display_widget(p)}}
           {%- endfor -%}
         </ul>
       </li>
-      <li id="rightColumn" class="widgetColumn">
-        <ul id="widgetsRight" class="connectedWidgets">
+      <li id="rightColumn" class="widgetColumn col-md-4">
+        <ul id="widgetsRight" class="connectedWidgets list-unstyled">
           {%- for p in plugins[2] -%}
             {{display_widget(p)}}
           {%- endfor -%}
@@ -71,11 +72,11 @@
   <hr/>
 
   <div class="row">
-    <div class="span12" id="closed-list-bar">
+    <div class="col-md-12" id="closed-list-bar">
       <h5>{{ _('Closed Widgets') }} <small>{{ _('can be re-opened by clicking on folloing button(s)') }}</small></h5>
       <ul id="closed-list">
       {%- for p in closed_plugins -%}
-        <li id="{{ p.name}}" class="btn display-widget">{{p.title}} <i class="icon-plus"></i></li>
+        <li id="{{ p.name}}" class="btn display-widget">{{p.title}} <i class="glyphicon glyphicon-plus"></i></li>
       {%- endfor -%}
       </ul>
     </div>
@@ -94,11 +95,6 @@
 
 .thumbnail {
   cursor: move;
-}
-
-.thumbnails > li {
-  float: left;
-  width: 30%;
 }
 
 .thumbnails li {
@@ -156,7 +152,7 @@
   function addToClosedList(title, id) {
     $("#closed-list").append("<li id='" + id +
         "' class='btn display-widget'>" +
-        title + "<i class='icon-plus'></i></li>");
+        title + "<i class='glyphicon glyphicon-plus'></i></li>");
     bindDisplayWidgetEvents();
   }
 

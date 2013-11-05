@@ -39,7 +39,7 @@ def missing_doi_warning(dummy_form, field, dummy_submit=False):
 class DOIField(WebDepositField, TextField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-barcode',
+            icon='barcode',
             validators=[
                 doi_syntax_validator,
             ],
@@ -52,6 +52,7 @@ class DOIField(WebDepositField, TextField):
                 datacite_lookup(display_info=True),
             ],
             placeholder="e.g. 10.1234/foo.bar...",
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(DOIField, self).__init__(**defaults)

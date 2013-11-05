@@ -53,19 +53,19 @@ div.star:hover {
 </style>
 
   <div class="row">
-  <div class="span12">
+  <div class="col-md-12">
     <div class="well">
     <div class="row">
-      <div style="text-align: center;" class="span3">
+      <div style="text-align: center;" class="col-md-3">
         {{ format_record(recid, of='HDFILE', ln=g.ln)|safe }}
       </div>
-      <div style="text-align: center;" class="span5">
+      <div style="text-align: center;" class="col-md-5">
       {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS -%}
         {{ get_mini_reviews(recid=recid, ln=g.ln)|safe }}
       {%- endif -%}
       &nbsp;
       </div>
-      <div class="span3">
+      <div class="col-md-3">
         {{ format_record(recid, of='HDACT', ln=g.ln)|safe }}
       </div>
     </div>

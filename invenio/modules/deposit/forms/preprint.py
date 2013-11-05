@@ -30,11 +30,11 @@ __all__ = ['PreprintForm']
 
 class PreprintForm(Form):
 
-    author = fields.AuthorField(label=_('Author'), validators=[Required()])
+    author = fields.AuthorField(label=_('Author'), validators=[Required()], widget_classes="form-control")
     subject_category = fields.TitleField(label=_('Subject category'),
                                                 validators=[Required()])
     note = fields.NotesField(label=_('Note'))
-    institution = fields.TextField(label=_('Institution'))
+    institution = fields.TextField(label=_('Institution'), widget_classes="form-control")
     languages = [("en", _("English")),
                  ("fre", _("French")),
                  ("ger", _("German")),

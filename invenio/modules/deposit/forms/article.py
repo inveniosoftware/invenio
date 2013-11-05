@@ -33,13 +33,15 @@ def keywords_autocomplete(form, field, term, limit=50):
 
 
 class AuthorForm(WebDepositForm):
+
     name = fields.TextField(
         placeholder="Family name, First name",
-        widget_classes='span3',
+        widget_classes='form-control right-not-rounded',
     )
+
     affiliation = fields.TextField(
         placeholder="Affiliation",
-        widget_classes='span2',
+        widget_classes='form-control left-not-rounded',
     )
 
 
@@ -54,26 +56,11 @@ class ArticleForm(WebDepositForm):
     issn = fields.ISSNField(label=_('ISSN'), export_key='issn')
     title = fields.TitleField(label=_('Document Title'),
                               export_key='title.title')
-    authors = fields.DynamicFieldList(
-        fields.FormField(
-            AuthorForm,
-            widget=ExtendedListWidget(
-                item_widget=ListItemWidget(with_label=False),
-                class_='inline',
-            ),
-        ),
-        label='Authors',
-        add_label='Add another author',
-        icon='icon-user',
-        widget_classes='',
-        min_entries=1,
-        export_key='authors'
-    )
 
     abstract = fields.AbstractField(
         label=_('Abstract'),
         export_key='abstract.summary',
-        widget=ckeditor_widget
+        widget=ckeditor_widget,
     )
     pagesnum = fields.PagesNumberField(label=_('Number of Pages'))
     languages = [("en", _("English")),
@@ -95,29 +82,33 @@ class ArticleForm(WebDepositForm):
     language = fields.LanguageField(label=_('Language'), choices=languages)
     date = fields.Date(label=_('Date of Document'), widget=date_widget,
                        export_key='imprint.date')
+
     authors = fields.DynamicFieldList(
         fields.FormField(
             AuthorForm,
             widget=ExtendedListWidget(
-                item_widget=ListItemWidget(with_label=False),
-                class_='inline',
+                item_widget=ListItemWidget(with_label=False, class_="col-sm-6 col-xs-6 no-padding"),
+                class_='collection-item list-unstyled',
             ),
         ),
         label='Authors',
         add_label='Add another author',
-        icon='icon-user',
-        widget_classes='',
+        icon='user',
         min_entries=1,
         export_key='authors'
     )
+
     keywords = fields.DynamicFieldList(
         fields.TextField(
             placeholder="Start typing a keyword...",
             autocomplete=keywords_autocomplete,
-            widget=TagInput()
+            widget_classes="form-control",
         ),
-        widget=TagListWidget(template="{{value}}"),
-        icon='icon-tags',
+        label='Keywords',
+        add_label='Add another keyword',
+        icon='tags',
+        min_entries=1,
+        export_key='keywords'
     )
     notes = fields.NotesField(label=_('Notes'), export_key='comment')
     plupload_file = fields.FileUploadField(widget=plupload_widget, label="")

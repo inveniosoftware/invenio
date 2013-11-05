@@ -326,15 +326,15 @@
 
   $.fn.facet.defaults = {
     box_builder: function(name, title) {
-      return '<div class="accordion-group">' +
-            '<div class="accordion-heading">' +
-              '<a class="accordion-toggle" data-toggle="collapse"' +
-                ' data-target=".accordion-body.' + name + '">' +
+      return '<div class="panel panel-default">' +
+            '<div class="panel-heading">' +
+              '<a data-toggle="collapse"' +
+                ' data-target=".panel-collapse.' + name + '">' +
                     title +
                 '</a>' +
               '</div>' +
-              '<div class="' + name + ' accordion-body collapse">' +
-                '<div class="accordion-inner context">' +
+              '<div class="' + name + ' panel-collapse collapse">' +
+                '<div class="panel-body context">' +
                   '<!-- AJAX load -->' +
                 '</div>' +
               '</div>' +
@@ -349,7 +349,7 @@
             '</div>';
     },
     button_builder: function(title) {
-      return '<span class="btn btn-mini">'+title+'</span>';
+      return '<span class="btn btn-xs">'+title+'</span>';
     },
     clear_button_builder: function(title) {
       return '<span class="pull-right btn btn-danger">'+title+'</span>';

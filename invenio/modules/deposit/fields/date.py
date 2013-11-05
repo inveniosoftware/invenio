@@ -28,8 +28,9 @@ __all__ = ['Date']
 class Date(WebDepositField, DateField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-calendar',
-            validators=[optional()]
+            icon='calendar',
+            validators=[optional()],
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(Date, self).__init__(**defaults)

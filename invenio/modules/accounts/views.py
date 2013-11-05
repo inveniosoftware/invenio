@@ -47,7 +47,8 @@ from invenio.utils.url import rewrite_to_secure_url
 #CFG_FULL_HTTPS = CFG_SITE_URL.lower().startswith("https://")
 
 blueprint = Blueprint('webaccount', __name__, url_prefix="/youraccount",
-                      template_folder='templates')
+                      template_folder='templates',
+                      static_folder='static')
 
 
 def update_login(nickname, password=None, remember_me=False):

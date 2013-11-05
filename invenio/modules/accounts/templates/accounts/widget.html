@@ -1,12 +1,11 @@
 {% macro display_widget(p) %}
-<li id="{{ p.name}}" class="widget span4">
-  <div class="thumbnail">
-    <div class="caption">
-      <h4>
+<li id="{{ p.name}}" class="widget">
+  <div class="panel panel-default">
+    <div class="panel-heading">
       {%- if p.icon -%}
         <small><i
           style="margin-top: 0px;"
-          class="icon-{{ p.icon|safe }}"></i>&nbsp;
+          class="glyphicon glyphicon-{{ p.icon|safe }}"></i>&nbsp;
         </small>
       {%- endif -%}
 
@@ -18,16 +17,15 @@
       {%- endif -%}
       <small>
         {%- if p.edit -%}
-        &nbsp;<a class="edit" href="{{ p.edit|safe }}"><i class="icon-wrench"></i></a>
+        &nbsp;<a class="edit" href="{{ p.edit|safe }}"><i class="glyphicon glyphicon-wrench"></i></a>
         {%- endif -%}
         <span class="close hide">&nbsp;&times;</span>
       </small>
-      </h4>
-      <div style="
-        width: 90%;
-        min-height: 80px;">
-        {{ p.widget()|safe }}
-      </div>
+    </div>
+    <div class="panel-body" style="
+      width: 90%;
+      min-height: 80px;">
+      {{ p.widget()|safe }}
     </div>
   </div>
 </li>

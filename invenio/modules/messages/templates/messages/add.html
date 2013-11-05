@@ -101,13 +101,15 @@
 {% block body %}
 <form name="write_message" action="{{ url_for('.add') }}" method="post" class="form-horizontal">
     {{ form.csrf_token }}
-    {{ render_field(form.sent_to_user_nicks) }}
-    {{ render_field(form.sent_to_group_names) }}
-    {{ render_field(form.subject) }}
-    {{ render_field(form.body) }}
-    {{ render_field(form.received_date) }}
-    <div class="form-actions">
-        <input type="submit" name="send_button" value="{{ _("Send") }}" class="btn btn-primary"/>
+    {{ render_field(form.sent_to_user_nicks, label_size=2, field_size=10) }}
+    {{ render_field(form.sent_to_group_names, label_size=2, field_size=10) }}
+    {{ render_field(form.subject, label_size=2, field_size=10) }}
+    {{ render_field(form.body, label_size=2, field_size=10) }}
+    {{ render_field(form.received_date, label_size=2, field_size=10) }}
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" name="send_button" value="{{ _("Send") }}" class="btn btn-primary"/>
+        </div>
     </div>
 </form>
 {% endblock %}

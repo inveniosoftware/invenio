@@ -152,8 +152,8 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
             else:
                 previous_spans = spans[index]
 
-            for new_span in [(span0, span1) for span0 in previous_spans
-                                            for span1 in spans[index + 1]]:
+            for new_span in [(span0, col-md-1) for span0 in previous_spans
+                                            for col-md-1 in spans[index + 1]]:
                 span = _get_ckw_span(fulltext, new_span)
                 if span is not None:
                     ckw_spans.append(span)
@@ -162,8 +162,8 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
             if index > 0 and ckw_spans:
                 _ckw_spans = []
                 for _span in ckw_spans[len_ckw:]: # new spans
-                    for _span2 in ckw_spans[:len_ckw]:
-                        s = _span_overlapping(_span, _span2)
+                    for _col-md-2 in ckw_spans[:len_ckw]:
+                        s = _span_overlapping(_span, _col-md-2)
                         if s:
                             _ckw_spans.append(s)
                 ckw_spans = _ckw_spans
@@ -315,11 +315,11 @@ def _get_ckw_span(fulltext, spans):
     # There is no inclusion.
     return None
 
-def _contains_span(span0, span1):
-    """Return true if span0 contains span1, False otherwise."""
-    if (span0 == span1 or
-        span0[0] > span1[0] or
-        span0[1] < span1[1]):
+def _contains_span(span0, col-md-1):
+    """Return true if span0 contains col-md-1, False otherwise."""
+    if (span0 == col-md-1 or
+        span0[0] > col-md-1[0] or
+        span0[1] < col-md-1[1]):
         return False
     return True
 

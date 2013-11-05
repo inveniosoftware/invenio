@@ -26,7 +26,8 @@ __all__ = ['NotesField']
 class NotesField(WebDepositField, TextAreaField):
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-list',
+            icon='list',
+            widget_classes="form-control"
         )
         defaults.update(kwargs)
         super(NotesField, self).__init__(**defaults)

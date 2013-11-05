@@ -6,7 +6,7 @@
         {{ record.get('title.title', '') }}
     </a>
     {{ '/' if record.get('title_parallel.title') }}
-    <small class="muted">
+    <small class="text-muted">
         {{ record.get('title_parallel.title', '')}}
     </small>
 </h4>

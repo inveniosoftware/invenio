@@ -234,7 +234,7 @@ WebTagEditor.prototype.onServerError = function(item, intended_action, arguments
 
             for(var i = 0; i < messages.length; i++)
             {
-                this.$errorArea.html('<div class="alert alert-error"><strong>Error:</strong> '+messages[i]+'</div>');
+                this.$errorArea.html('<div class="alert alert-danger"><strong>Error:</strong> '+messages[i]+'</div>');
             }
        }
     }
@@ -300,7 +300,7 @@ WebTagEditor.prototype.tokenInput_tokenFormatter = function(item) {
 
     if(item.status == 'removing')
     {
-        token_html += ' <p class="text-right text-error">&nbsp;(removing)</p>';
+        token_html += ' <p class="text-right text-danger">&nbsp;(removing)</p>';
     }
     else if(item.status == 'adding')
     {

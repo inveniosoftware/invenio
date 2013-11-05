@@ -34,7 +34,7 @@
 
   {% block record_restriction_flag %}
   {% if g.bibrec.is_restricted %}
-  <div class="alert alert-error"><b>{{ _('Restricted') }}</b>
+  <div class="alert alert-danger"><b>{{ _('Restricted') }}</b>
     {%- if g.bibrec.is_processed %} {{ _('Processed Record') }}
     {%- endif -%}</div>
   {% endif %}
@@ -48,7 +48,7 @@
       <a href="{{ url_for(tab.key, recid=recid) if tab.enabled else '#' }}">
         {{ tab.label }}
         {% if tab.count and tab.count > -1 %}
-          &nbsp;<small class="muted">({{ tab.count }})</small>
+          &nbsp;<small class="text-muted">({{ tab.count }})</small>
         {% endif %}
       </a>
     </li>

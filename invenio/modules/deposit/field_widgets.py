@@ -26,11 +26,8 @@ from invenio.ext.template import render_template_to_string
 
 def date_widget(field, **kwargs):
     field_id = kwargs.pop('id', field.id)
-    html = [u'<input class="datepicker" %s type="text">'
+    html = [u'<input class="datepicker form-control" %s type="text">'
             % html_params(id=field_id, name=field_id, value=field.data or '')]
-    field_class = kwargs.pop('class', '') or kwargs.pop('class_', '')
-    kwargs['class'] = u'datepicker %s' % field_class
-    kwargs['class'] = u'date %s' % field_class
     return HTMLString(u''.join(html))
 
 
@@ -115,9 +112,9 @@ def dropbox_widget(field, **kwargs):
                 </tbody>\
             </table>\
             <a class="btn btn-success disabled" id="uploadfiles"> \
-                <i class="icon-upload icon-white"></i> Start upload</a>\
+                <i class="glyphicon glyphicon-upload"></i> Start upload</a>\
             <a class="btn btn-danger" id="stopupload" style="display:none;">\
-                <i class="icon-stop icon-white"></i> Cancel upload</a>\
+                <i class="glyphicon glyphicon-stop"></i> Cancel upload</a>\
             <span id="upload_speed" class="pull-right"></span>\
             <div id="upload-errors"></div>\
         </div>' % html_params(id=field_id)]
@@ -159,7 +156,7 @@ class ButtonWidget(object):
 
         state = ""
         if field._value():
-            state = '<span class="text-success"> <i class="icon-ok"></i></span>'
+            state = '<span class="text-success"> <i class="glyphicon glyphicon-ok"></i></span>'
 
         return HTMLString(u'<button %s>%s%s</button><span %s>%s</span>' % (
             html_params(name=field.name, **params),
@@ -251,8 +248,8 @@ class DynamicItemWidget(ListItemWidget):
         <div><span>"buttons</span>:field</div>
     """
     def __init__(self, **kwargs):
-        self.icon_reorder = kwargs.pop('icon_reorder', 'icon-reorder')
-        self.icon_remove = kwargs.pop('icon_remove', 'icon-remove-sign')
+        self.icon_reorder = kwargs.pop('icon_reorder', 'glyphicon glyphicon-move')
+        self.icon_remove = kwargs.pop('icon_remove', 'glyphicon glyphicon-remove')
         defaults = dict(
             html_tag='div',
             with_label=True,
@@ -261,20 +258,18 @@ class DynamicItemWidget(ListItemWidget):
         super(DynamicItemWidget, self).__init__(**defaults)
 
     def _sort_button(self):
-        return """<a class="sort-element muted sortlink iconlink" rel="tooltip" title="Drag to reorder"><i class="%s icon-large"></i></a>""" % self.icon_reorder
+        return """<a class="sort-element text-muted sortlink iconlink input-group-addon" rel="tooltip" title="Drag to reorder"><i class="%s"></i></a>""" % self.icon_reorder
 
     def _remove_button(self):
-        return """<a class="remove-element muted iconlink" rel="tooltip" title="Click to remove"><i class="%s icon-large"></i></a>""" % self.icon_remove
+        return """<a class="remove-element text-muted iconlink input-group-addon" rel="tooltip" title="Click to remove"><i class="%s"></i></a>""" % self.icon_remove
 
     def render_subfield(self, subfield, **kwargs):
         html = []
         # Button
-        html.append("<span %s>%s</span>" % (
-            html_params(class_='pull-right'),
-            self._sort_button() + self._remove_button()
-        ))
-        # Field
+        html.append(self._sort_button())
         html.append(subfield())
+        html.append(self._remove_button())
+
         return ''.join(html)
 
     def __call__(self, subfield, **kwargs):
@@ -286,7 +281,8 @@ class DynamicItemWidget(ListItemWidget):
         elif subfield.name.endswith('__input__'):
             kwargs['class_'] = kwargs.get('class_', '') + ' input-element'
         else:
-            kwargs['class_'] = kwargs.get('class_', '') + ' field-list-element'
+            # for deposit form
+            kwargs['class_'] = kwargs.get('class_', '') + ' field-list-element input-group'
         return super(DynamicItemWidget, self).__call__(subfield, **kwargs)
 
 
@@ -300,38 +296,11 @@ class TagItemWidget(DynamicItemWidget):
         defaults = dict(
             html_tag='li',
             with_label=False,
-            class_="alert alert-info tag"
+            class_="tag"
         )
         defaults.update(kwargs)
 
         super(TagItemWidget, self).__init__(**defaults)
-
-    def render_subfield(self, subfield, **kwargs):
-        return subfield()
-
-    def open_tag(self, subfield, **kwargs):
-        if self.html_tag:
-            if subfield.name.endswith('__input__'):
-                return '<%s>' % self.html_tag
-            else:
-                ctx = {}
-                if(isinstance(subfield.data, basestring)):
-                    ctx['value'] = subfield.data
-                elif subfield.data:
-                    ctx.update(subfield.data)
-
-                return '<%s %s><button type="button" class="close remove-element" data-dismiss="alert">&times;</button><span class="tag-title">%s</span>' % (
-                    self.html_tag,
-                    html_params(
-                        class_=self.class_ + ' ' + kwargs.get('class_', '')
-                    ),
-                    render_template_to_string(
-                        self.template,
-                        _from_string=True,
-                        **ctx
-                    )
-                )
-        return ''
 
 
 #
@@ -404,7 +373,7 @@ class DynamicListWidget(ExtendedListWidget):
     for each item to sort and remove the item.
     """
     item_widget = DynamicItemWidget()
-    icon_add = "icon-plus"
+    icon_add = "glyphicon glyphicon-plus"
 
     def __init__(self, **kwargs):
         self.icon_add = kwargs.pop('icon_add', self.icon_add)
@@ -418,7 +387,13 @@ class DynamicListWidget(ExtendedListWidget):
 
     def _add_button(self, field):
         label = getattr(field, 'add_label', None) or "Add %s" % field.label.text
-        return """<div><span class="pull-right"><a class="add-element"><i class="%s"></i> %s</a></span></div>""" % (self.icon_add, label)
+        return """<div>
+                    <span class="pull-right">
+                        <a class="add-element">
+                            <i class="%s"></i> %s
+                        </a>
+                    </span>
+                </div>""" % (self.icon_add, label)
 
     def item_kwargs(self, field, subfield):
         return {'empty_index': field.empty_index}
@@ -450,7 +425,7 @@ class TagListWidget(DynamicListWidget):
         self.template = kwargs.pop('template', '{{value}}')
         defaults = dict(
             html_tag='ul',
-            class_='dynamic-field-list unstyled',
+            class_='list-unstyled',
             item_widget=TagItemWidget(
                 template=self.template
             )
@@ -499,7 +474,7 @@ class BigIconRadioInput(RadioInput):
         html = super(BigIconRadioInput, self).__call__(field, **kwargs)
         icon = self.choices_icons.get(field._value(), '')
         if icon:
-            html = """<i class="icon-%s icon-2x"></i><br />%s</br>%s""" % (
+            html = """<i class="glyphicon glyphicon-%s icon-2x"></i><br />%s</br>%s""" % (
                 icon, field.label.text, html
             )
         return html
@@ -513,7 +488,7 @@ class InlineListWidget(object):
         kwargs.setdefault('id', field.id)
         html = [u'<ul class="inline">']
         for subfield in field:
-            html.append(u'<li class="span1"><label>%s</label></li>' % (subfield()))
+            html.append(u'<li class="col-md-1"><label>%s</label></li>' % (subfield()))
         html.append(u'</ul>')
         return HTMLString(u''.join(html))
 

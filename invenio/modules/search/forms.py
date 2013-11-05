@@ -54,7 +54,8 @@ class EasySearchForm(InvenioBaseForm):
         data_source=lambda: url_for('search.autocomplete', field='collaboration'))
     k = AutocompleteField(_('Keywords'), data_provide="typeahead-url",
         data_source=lambda: url_for('search.autocomplete', field='keyword'))
-    journal = FormField(JournalForm, widget=RowWidget())
+    journal = FormField(JournalForm, widget=RowWidget(
+        classes={0:'col-xs-6', 1:'col-xs-3', 2: 'col-xs-3'}))
 
 
 class GetCollections(object):

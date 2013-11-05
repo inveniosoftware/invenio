@@ -22,10 +22,10 @@
 {% from "_formhelpers.html" import render_filter_form with context %}
 
 {% block webtag_display %}
-<div class="row-fluid">
+<div class="row">
 <h4> {{_('Tag list') }} </h4>
-<div class="row-fluid">
-  <div class="span6">
+<div class="row">
+  <div class="col-md-6">
     <form name="webtag_delete" action="{{ url_for('.delete') }}" method="post">
     <table class="table table-striped table-bordered table-condensed">
       <thead class="mailboxheader">

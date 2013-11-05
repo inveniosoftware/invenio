@@ -6,13 +6,13 @@
         <h3 id="myModalLabel">{{ workflow_metadata.name }}</h3>
 </div>
 <div class="modal-body">
-    <div class="row-fluid">
-        <div class="span12">
+    <div class="row">
+        <div class="col-md-12">
                         Owner: <b>{{ workflow_metadata.uid }}</b> | Creation date: <b>{{ workflow_metadata.created }}</b> | Last modification date: <b>{{ workflow_metadata.modified }}</b>
         </div>
     </div>
-    <div class="row-fluid">
-        <div class="span5">
+    <div class="row">
+        <div class="col-md-5">
            Workflow definition:
            <div class="well">
                {{ utils.function_display(workflow_func, [-1]) }}
@@ -28,7 +28,7 @@
                 </div>
             </div>
         </div>
-        <div class="span7">
+        <div class="col-md-7">
            Error message
            <div class="well">
                 <div class="workflow_message">
@@ -37,7 +37,7 @@
             </div>
         </div>
     </div>
-    <div class="row-fluid">
+    <div class="row">
         Log:
         <pre>{{ log }}</pre>
     </div>
@@ -45,7 +45,7 @@
 <div class="modal-footer">
         <input type="submit" class="btn" name="{{workflow_metadata.id}}_beginning" value="Restart from BEGINNING" />
         <input type="submit" class="btn" name="{{workflow_metadata.id}}_current" value="Restart from CURRENT task" />
-        <button id="extra" class="btn">Assign ticket <i class="icon-flag"></i></button>
+        <button id="extra" class="btn">Assign ticket <i class="glyphicon glyphicon-flag"></i></button>
         <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
 </div>
 {% endblock %}

@@ -27,7 +27,8 @@ class KeywordsField(WebDepositField, TextField):
 
     def __init__(self, **kwargs):
         defaults = dict(
-            icon='icon-tags',
+            icon='tags',
+            widget_classes="form-control"
             #validators=[sherpa_romeo_journal_validate], #FIXME
             #autocomplete=sherpa_romeo_journals,
         )
