@@ -270,9 +270,8 @@ def bibsched_send_signal(task_id, sig):
 
 
 def is_monotask(proc):
-    procname = proc.split(':')[0]
-    return procname in CFG_BIBTASK_MONOTASKS
-
+    #procname = proc.split(':')[0]
+    return proc in CFG_BIBTASK_MONOTASKS
 
 def stop_task(task):
     Log("Sending STOP signal to #%d (%s) which was in status %s" % (task.id, task.proc, task.status))
@@ -422,7 +421,7 @@ class BibSched(object):
             if not self.is_task_compatible(task, t):
                 to_stop.append(t)
 
-        if task.proc in CFG_BIBTASK_MONOTASKS:
+        if is_monotask(task.proc):
             to_sleep = [t for t in task_set if t.status != 'SLEEPING']
         else:
             for t in task_set:
@@ -546,7 +545,7 @@ class BibSched(object):
                         ## If there is a task with same sequence number then do not run the current task
                         return False
 
-            if task.proc in CFG_BIBTASK_MONOTASKS and higher:
+            if is_monotask(task.proc) and higher:
                 ## This is a monotask
                 Log("Cannot run because this is a monotask and there are higher priority tasks: %s" % (higher, ), debug)
                 return False
@@ -576,7 +575,7 @@ class BibSched(object):
 
             procname = task.proc.split(':')[0]
             if not tasks_to_stop and not tasks_to_sleep:
-                if task.proc in CFG_BIBTASK_MONOTASKS and self.active_tasks_all_nodes:
+                if is_monotask(task.proc) and self.active_tasks_all_nodes:
                     Log("Cannot run because this is a monotask and there are other tasks running: %s" % (self.active_tasks_all_nodes, ), debug)
                     return False
 
@@ -621,7 +620,7 @@ class BibSched(object):
                     if self.tie_task_to_host(task.id):
                         Log("Task #%d (%s) started" % (task.id, task.proc))
                         ### Relief the lock for the BibTask, it is safe now to do so
-                        spawn_task(command, wait=task.proc in CFG_BIBTASK_MONOTASKS)
+                        spawn_task(command, wait=is_monotask(task.proc))
                         count = 10
                         while run_sql("""SELECT status FROM schTASK
                                          WHERE id=%s AND status='SCHEDULED'""",

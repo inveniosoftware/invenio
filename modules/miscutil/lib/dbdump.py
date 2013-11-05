@@ -52,6 +52,8 @@ __revision__ = "$Id$"
 
 import os
 import re
+import time
+import sys
 
 from invenio.config import CFG_LOGDIR, CFG_PATH_MYSQL, CFG_PATH_GZIP
 from invenio.dbquery import CFG_DATABASE_HOST, \
@@ -59,13 +61,18 @@ from invenio.dbquery import CFG_DATABASE_HOST, \
                             CFG_DATABASE_PASS, \
                             CFG_DATABASE_NAME, \
                             CFG_DATABASE_PORT, \
-                            CFG_DATABASE_SLAVE
+                            CFG_DATABASE_SLAVE, \
+                            CFG_DATABASE_SLAVE_SU_USER, \
+                            CFG_DATABASE_SLAVE_SU_PASS, \
+                            get_connection_for_dump_on_slave, \
+                            run_sql
 from invenio.bibtask import task_init, \
                             write_message, \
                             task_set_option, \
                             task_get_option, \
                             task_update_progress, \
-                            task_get_task_param
+                            task_get_task_param, \
+                            task_low_level_submission
 from invenio.shellutils import run_shell_command, \
                                escape_shell_arg
 
@@ -82,6 +89,61 @@ def _delete_old_dumps(dirname, filename, number_to_keep):
     for afile in files[:-number_to_keep]:
         write_message("... deleting %s" % dirname + os.sep + afile)
         os.remove(dirname + os.sep + afile)
+
+def check_slave_is_up(connection=None):
+    """Raise an StandardError in case the slave is not correctly up."""
+    if connection is None:
+        connection = get_connection_for_dump_on_slave()
+    res = run_sql("SHOW SLAVE STATUS", with_dict=True, connection=connection)
+    if res[0]['Slave_IO_Running'] != 'Yes':
+        raise StandardError("Slave_IO_Running is not set to 'Yes'")
+    if res[0]['Slave_SQL_Running'] != 'Yes':
+        raise StandardError("Slave_SQL_Running is not set to 'Yes'")
+
+def check_slave_is_down(connection=None):
+    """Raise an StandardError in case the slave is not correctly down."""
+    if connection is None:
+        connection = get_connection_for_dump_on_slave()
+    res = run_sql("SHOW SLAVE STATUS", with_dict=True, connection=connection)
+    if res[0]['Slave_SQL_Running'] != 'No':
+        raise StandardError("Slave_SQL_Running is not set to 'No'")
+
+def detach_slave(connection=None):
+    """Detach the slave."""
+    if connection is None:
+        connection = get_connection_for_dump_on_slave()
+    run_sql("STOP SLAVE SQL_THREAD", connection=connection)
+    check_slave_is_down(connection)
+
+def attach_slave(connection=None):
+    """Attach the slave."""
+    if connection is None:
+        connection = get_connection_for_dump_on_slave()
+    run_sql("START SLAVE", connection=connection)
+    check_slave_is_up(connection)
+
+def check_slave_is_in_consistent_state(connection=None):
+    """
+    Check if the slave is already aware that dbdump task is running.
+    dbdump being a monotask, guarantee that no other task is currently
+    running and it's hence safe to detach the slave and start the
+    actual dump.
+    """
+    if connection is None:
+        connection = get_connection_for_dump_on_slave()
+    i = 0
+    ## Let's take the current status of dbdump (e.g. RUNNING, ABOUT TO STOP, etc.)...
+    current_status = run_sql("SELECT status FROM schTASK WHERE id=%s", (task_get_task_param('task_id'), ))[0][0]
+    while True:
+        if i == 10:
+            ## Timeout!!
+            raise StandardError("The slave seems not to pick up with the master")
+        ## ...and let's see if it matches with what the slave sees.
+        if run_sql("SELECT status FROM schTASK WHERE id=%s AND status=%s", (task_get_task_param('task_id'), current_status), connection=connection):
+            ## Bingo!
+            return
+        time.sleep(3)
+        i += 1
 
 
 def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
@@ -135,7 +197,7 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
         # No parameters set, lets use the default ones.
         params = " --skip-opt --add-drop-table --add-locks --create-options" \
                  " --quick --extended-insert --set-charset --disable-keys" \
-                 " --lock-tables=false "
+                 " --lock-tables=false --max_allowed_packet=2G "
 
     if ignore:
         params += " ".join(["--ignore-table=%s.%s" % (CFG_DATABASE_NAME, table) for table in ignore])
@@ -167,59 +229,6 @@ def dump_database(dump_path, host=CFG_DATABASE_HOST, port=CFG_DATABASE_PORT, \
     write_message("... completed writing %s" % (dump_path,))
 
 
-def dump_slave_database(dump_path, host, *args, **kwargs):
-    """
-    Performs a dump of a defined slave database, making sure
-    to halt slave replication until the dump has completed.
-
-    @param dump_path: path on the filesystem to save the dump to.
-    @type dump_path: string
-
-    @param host: hostname or IP of DB slave to dump from.
-    @type host: string
-
-    @param params: command line parameters to pass to mysqldump. Optional.
-    @type params: string
-
-    @param ignore: list of tables to ignore in the dump
-    @type ignore: string
-    """
-    # We need to stop slave replication before performing the dump
-    write_message("... stopping slave")
-
-    # Is mysqladmin installed or in the right path?
-    admin_cmd = CFG_PATH_MYSQL + 'admin'
-    if not os.path.exists(admin_cmd):
-        raise StandardError("%s is not installed." % (admin_cmd))
-
-    slave_cmd = "%s -e 'STOP SLAVE SQL_THREAD;' " \
-                " --host=%s --port=%s --user=%s --password=%s" \
-                % (CFG_PATH_MYSQL,
-                   escape_shell_arg(host),
-                   escape_shell_arg(CFG_DATABASE_PORT),
-                   escape_shell_arg(CFG_DATABASE_USER),
-                   escape_shell_arg(CFG_DATABASE_PASS))
-
-    exit_code, dummy1, stderr = run_shell_command(slave_cmd)
-    if exit_code:
-        raise StandardError("ERROR: Stopping slave failed: %s" % (stderr,))
-
-    write_message("... slave stopped")
-    dump_database(dump_path, host=host, *args, **kwargs)
-    write_message("... starting slave.")
-    admin_cmd += " start-slave " \
-                 " --host=%s --port=%s --user=%s --password=%s " % \
-                 (escape_shell_arg(host),
-                  escape_shell_arg(CFG_DATABASE_PORT),
-                  escape_shell_arg(CFG_DATABASE_USER),
-                  escape_shell_arg(CFG_DATABASE_PASS),)
-
-    exit_code, dummy1, stderr = run_shell_command(admin_cmd)
-    if exit_code:
-        raise StandardError("ERROR: Starting slave failed: %s" % (stderr,))
-    write_message("... slave started")
-
-
 def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
     """
     Elaborate task submission parameter.  See bibtask's
@@ -236,20 +245,22 @@ def _dbdump_elaborate_submit_param(key, value, dummyopts, dummyargs):
         else:
             raise StandardError("ERROR: Output '%s' is not a directory." % \
                   (value,))
-    elif key in ('--params'):
+    elif key in ('--params',):
         task_set_option('params', value)
-    elif key in ('--compress'):
+    elif key in ('--compress',):
         if not CFG_PATH_GZIP or (CFG_PATH_GZIP and not os.path.exists(CFG_PATH_GZIP)):
             raise StandardError("ERROR: No valid gzip path is defined.")
         task_set_option('compress', True)
-    elif key in ('--slave'):
+    elif key in ('-S', '--slave'):
         if value:
             task_set_option('slave', value)
         else:
             if not CFG_DATABASE_SLAVE:
                 raise StandardError("ERROR: No slave defined.")
             task_set_option('slave', CFG_DATABASE_SLAVE)
-    elif key in ('--ignore'):
+    elif key in ('--dump-on-slave-helper', ):
+        task_set_option('dump_on_slave_helper_mode', True)
+    elif key in ('--ignore',):
         task_set_option('ignore', value)
     else:
         return False
@@ -264,6 +275,43 @@ def _dbdump_run_task_core():
     other tasks to interrupt us while we are dumping the DB content.
     """
     # read params:
+    host = CFG_DATABASE_HOST
+    port = CFG_DATABASE_PORT
+    if task_get_option('slave') and not task_get_option('dump_on_slave_helper_mode'):
+        connection = get_connection_for_dump_on_slave()
+        write_message("Dump on slave requested")
+        write_message("... checking if slave is well up...")
+        check_slave_is_up(connection)
+        write_message("... checking if slave is in consistent state...")
+        check_slave_is_in_consistent_state(connection)
+        write_message("... detaching slave database...")
+        detach_slave(connection)
+        write_message("... scheduling dump on slave helper...")
+        helper_arguments = []
+        if task_get_option("number"):
+            helper_arguments += ["--number", str(task_get_option("number"))]
+        if task_get_option("output"):
+            helper_arguments += ["--output", str(task_get_option("output"))]
+        if task_get_option("params"):
+            helper_arguments += ["--params", str(task_get_option("params"))]
+        if task_get_option("ignore"):
+            helper_arguments += ["--ignore", str(task_get_option("ignore"))]
+        if task_get_option("compress"):
+            helper_arguments += ["--compress"]
+        if task_get_option("slave"):
+            helper_arguments += ["--slave", str(task_get_option("slave"))]
+        helper_arguments += ['-N', 'slavehelper', '--dump-on-slave-helper']
+        task_id = task_low_level_submission('dbdump', task_get_task_param('user'), '-P4', *helper_arguments)
+        write_message("Slave scheduled with ID %s" % task_id)
+        task_update_progress("DONE")
+        return True
+    elif task_get_option('dump_on_slave_helper_mode'):
+        write_message("Dumping on slave mode")
+        connection = get_connection_for_dump_on_slave()
+        write_message("... checking if slave is well down...")
+        check_slave_is_down(connection)
+        host = CFG_DATABASE_SLAVE
+
     task_update_progress("Reading parameters")
     write_message("Reading parameters started")
     output_dir = task_get_option('output', CFG_LOGDIR)
@@ -288,22 +336,20 @@ def _dbdump_run_task_core():
 
     if slave:
         output_file_prefix = 'slave-%s-dbdump-' % (CFG_DATABASE_NAME,)
-        output_file = output_file_prefix + output_file_suffix
-        dump_path = output_dir + os.sep + output_file
-        dump_slave_database(dump_path, \
-                            host=slave, \
-                            params=params, \
-                            compress=compress, \
-                            ignore=ignore)
     else:
         output_file_prefix = '%s-dbdump-' % (CFG_DATABASE_NAME,)
-        output_file = output_file_prefix + output_file_suffix
-        dump_path = output_dir + os.sep + output_file
-        dump_database(dump_path, \
-                      params=params, \
-                      compress=compress, \
-                      ignore=ignore)
+    output_file = output_file_prefix + output_file_suffix
+    dump_path = output_dir + os.sep + output_file
+    dump_database(dump_path, \
+                    host=host,
+                    port=port,
+                    params=params, \
+                    compress=compress, \
+                    ignore=ignore)
 
+    if task_get_option('dump_on_slave_helper_mode'):
+        write_message("Reattaching slave")
+        attach_slave(connection)
     write_message("Database dump ended")
     # prune old dump files:
     task_update_progress("Pruning old dump files")
@@ -324,12 +370,12 @@ def main():
   -n, --number=NUM      Keep up to NUM previous dump files. [default=5]
   --params=PARAMS       Specify your own mysqldump parameters. Optional.
   --compress            Compress dump directly into gzip.
-  --slave=HOST          Perform the dump from a slave, if no host use CFG_DATABASE_SLAVE.
+  -S, --slave=HOST      Perform the dump from a slave, if no host use CFG_DATABASE_SLAVE.
   --ignore=TABLES       Specify the tables to ignore (comma seperated)
 """ % CFG_LOGDIR,
               version=__revision__,
-              specific_params=("n:o:p:",
-                               ["number=", "output=", "params=", "slave=", "compress", 'ignore=']),
+              specific_params=("n:o:p:S:",
+                               ["number=", "output=", "params=", "slave=", "compress", 'ignore=', "dump-on-slave-helper"]),
               task_submit_elaborate_specific_parameter_fnc=_dbdump_elaborate_submit_param,
               task_run_fnc=_dbdump_run_task_core)
 

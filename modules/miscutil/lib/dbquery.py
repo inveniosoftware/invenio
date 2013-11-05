@@ -74,7 +74,10 @@ try:
                                        CFG_DATABASE_NAME, \
                                        CFG_DATABASE_USER, \
                                        CFG_DATABASE_PASS, \
-                                       CFG_DATABASE_SLAVE
+                                       CFG_DATABASE_SLAVE, \
+                                       CFG_DATABASE_SLAVE_SU_USER, \
+                                       CFG_DATABASE_SLAVE_SU_PASS, \
+                                       CFG_DATABASE_PASSWORD_FILE
 except ImportError:
     CFG_DATABASE_HOST = 'localhost'
     CFG_DATABASE_PORT = '3306'
@@ -82,11 +85,45 @@ except ImportError:
     CFG_DATABASE_USER = 'invenio'
     CFG_DATABASE_PASS = 'my123p$ss'
     CFG_DATABASE_SLAVE = ''
+    CFG_DATABASE_SLAVE_SU_USER = ''
+    CFG_DATABASE_SLAVE_SU_PASS = ''
+    CFG_DATABASE_PASSWORD_FILE = ''
 
+def _get_password_from_database_password_file(user):
+    """
+    Parse CFG_DATABASE_PASSWORD_FILE and return password
+    corresponding to user.
+    """
+    if os.path.exists(CFG_DATABASE_PASSWORD_FILE):
+        for row in open(CFG_DATABASE_PASSWORD_FILE):
+            if row.strip():
+                a_user, pwd = row.strip().split(" // ")
+                if user == a_user:
+                    return pwd
+        raise ValueError("user '%s' not found in database password file '%s'" % (user, CFG_DATABASE_PASSWORD_FILE))
+    raise IOError("No password defined for user '%s' but database password file is not available" % user)
+
+if CFG_DATABASE_SLAVE_SU_USER and not CFG_DATABASE_SLAVE_SU_PASS and CFG_DATABASE_PASSWORD_FILE:
+    CFG_DATABASE_SLAVE_SU_PASS = _get_password_from_database_password_file(CFG_DATABASE_SLAVE_SU_USER)
 
 _DB_CONN = {}
 _DB_CONN[CFG_DATABASE_HOST] = {}
 _DB_CONN[CFG_DATABASE_SLAVE] = {}
+
+def get_connection_for_dump_on_slave():
+    """
+    Return a valid connection, suitable to perform dump operation
+    on a slave node of choice.
+    """
+    connection = connect(host=CFG_DATABASE_SLAVE,
+                                         port=int(CFG_DATABASE_PORT),
+                                         db=CFG_DATABASE_NAME,
+                                         user=CFG_DATABASE_SLAVE_SU_USER,
+                                         passwd=CFG_DATABASE_SLAVE_SU_PASS,
+                                         use_unicode=False, charset='utf8')
+    connection.autocommit(True)
+    return connection
+
 
 def unlock_all():
     for dbhost in _DB_CONN.keys():
@@ -169,7 +206,7 @@ def close_connection(dbhost=CFG_DATABASE_HOST):
     except KeyError:
         pass
 
-def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave=False):
+def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave=False, connection=None):
     """Run SQL on the server with PARAM and return result.
     @param param: tuple of string params to insert in the query (see
     notes below)
@@ -178,6 +215,7 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
     columns in query.
     @param with_dict: if True, will return a list of dictionaries
     composed of column-value pairs
+    @param connection: if provided, uses the given connection.
     @return: If SELECT, SHOW, DESCRIBE statements, return tuples of data,
     followed by description if parameter with_desc is
     provided.
@@ -214,13 +252,15 @@ def run_sql(sql, param=None, n=0, with_desc=False, with_dict=False, run_on_slave
 
     ### log_sql_query(dbhost, sql, param) ### UNCOMMENT ONLY IF you REALLY want to log all queries
     try:
-        db = _db_login(dbhost)
+        db = connection or _db_login(dbhost)
         cur = db.cursor()
         gc.disable()
         rc = cur.execute(sql, param)
         gc.enable()
     except (OperationalError, InterfaceError): # unexpected disconnect, bad malloc error, etc
         # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
+        if connection is not None:
+            raise
         try:
             db = _db_login(dbhost, relogin=1)
             cur = db.cursor()
@@ -275,7 +315,7 @@ def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT, run_o
         return []
     elif CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
         ## Read only website
-        if not sql.upper().startswith("SELECT") and not sql.upper().startswith("SHOW"):
+        if not query.upper().startswith("SELECT") and not query.upper().startswith("SHOW"):
             return
 
     dbhost = CFG_DATABASE_HOST
