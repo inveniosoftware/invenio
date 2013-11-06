@@ -113,7 +113,7 @@ from invenio.config import CFG_SITE_URL, \
 
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE, \
     CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
-from invenio.pluginutils import PluginContainer
+from invenio.base.utils import import_submodules_from_packages
 from invenio.utils.hash import md5
 
 import invenio.template
@@ -1700,24 +1700,24 @@ class BibDoc(object):
             extensions = data["extensions"]
 
         # now check if the doctypype is supported by any particular plugin
-        def plugin_bldr(dummy, plugin_code):
+        def plugin_bldr(plugin_code):
             """Preparing the plugin dictionary structure"""
+            if not plugin_code.__name__.split('.')[-1].startswith('bom_'):
+                return
             ret = {}
             ret['create_instance'] = getattr(plugin_code, "create_instance", None)
             ret['supports'] = getattr(plugin_code, "supports", None)
             return ret
 
-
-        bibdoc_plugins = PluginContainer(
-            os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'bibdocfile_plugins', 'bom_*.py'),
-            plugin_builder=plugin_bldr)
+        bibdoc_plugins = filter(None, map(
+            plugin_bldr, import_submodules_from_packages(
+                'bibdocfile_plugins', packages=['invenio'])))
 
 
         # Loading an appropriate plugin (by default a generic BibDoc)
         used_plugin = None
 
-        for dummy, plugin in bibdoc_plugins.iteritems():
+        for plugin in bibdoc_plugins:
             if plugin['supports'](doctype, extensions):
                 used_plugin = plugin
 
