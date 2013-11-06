@@ -39,7 +39,7 @@ from invenio.search_engine import get_most_popular_field_values
 from invenio.search_engine import perform_request_search
 from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.intbitset import intbitset
-from invenio.bibformat import format_record, format_records
+from invenio.modules.formatter import format_record, format_records
 
 
 try:

@@ -42,7 +42,7 @@ def format_element(bfo, width="50"):
     recID = bfo.control_field('001')
 
     #Print entry type
-    import invenio.bibformat_elements.bfe_collection as bfe_collection
+    import invenio.modules.formatter.format_elements.bfe_collection as bfe_collection
     collection = bfe_collection.format_element(bfo=bfo, kb="DBCOLLID2BIBTEX")
     if collection == "":
         out += "article"
@@ -85,7 +85,7 @@ def format_element(bfo, width="50"):
 
     #Print authors
     #If author cannot be found, print a field key=recID
-    import invenio.bibformat_elements.bfe_authors as bfe_authors
+    import invenio.modules.formatter.format_elements.bfe_authors as bfe_authors
     authors = bfe_authors.format_element(bfo=bfo,
                                          limit="",
                                          separator=" and ",
@@ -103,7 +103,7 @@ def format_element(bfo, width="50"):
                                    value_width)
 
     #Print editors
-    import invenio.bibformat_elements.bfe_editors as bfe_editors
+    import invenio.modules.formatter.format_elements.bfe_editors as bfe_editors
     editors = bfe_editors.format_element(bfo=bfo, limit="",
                                          separator=" and ",
                                          extension="",
@@ -114,7 +114,7 @@ def format_element(bfo, width="50"):
                                value_width)
 
     #Print title
-    import invenio.bibformat_elements.bfe_title as bfe_title
+    import invenio.modules.formatter.format_elements.bfe_title as bfe_title
     title = bfe_title.format_element(bfo=bfo, separator = ". ")
     out += format_bibtex_field("title",
                                '{' + title + '}',
@@ -147,7 +147,7 @@ def format_element(bfo, width="50"):
            collection == "inproceedings" \
            or collection == "proceedings":
         publishers = []
-        import invenio.bibformat_elements.bfe_publisher as bfe_publisher
+        import invenio.modules.formatter.format_elements.bfe_publisher as bfe_publisher
         publisher = bfe_publisher.format_element(bfo=bfo)
         if publisher != "":
             publishers.append(publisher)

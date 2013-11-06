@@ -59,7 +59,7 @@ from invenio.bibsword_client_dblayer import get_all_remote_server, \
                                             insert_into_swr_clientdata, \
                                             count_nb_submitted_record, \
                                             select_remote_server_infos
-from invenio.bibformat import record_get_xml
+from invenio.modules.formatter import record_get_xml
 from invenio.bibsword_client_templates import BibSwordTemplate
 from invenio.config import CFG_TMPDIR, CFG_SITE_ADMIN_EMAIL
 

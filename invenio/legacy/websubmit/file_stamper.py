@@ -51,7 +51,7 @@ CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
 from invenio.config import CFG_PATH_PDFTK
 from invenio.config import CFG_PATH_PDF2PS
 from invenio.shellutils import escape_shell_arg
-from invenio.websubmit_config import InvenioWebSubmitFileStamperError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFileStamperError
 
 
 ## ***** Functions related to the creation of the PDF Stamp file: *****

@@ -40,7 +40,7 @@ import subprocess
 import re
 from invenio import search_engine
 from invenio.legacy import bibrecord
-from invenio import bibformat
+from invenio.modules import formatter as bibformat
 
 from invenio.config import CFG_TMPSHAREDDIR, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,\
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,\

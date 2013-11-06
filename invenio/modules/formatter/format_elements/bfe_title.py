@@ -67,7 +67,7 @@ def format_element(bfo, separator=" ", highlight='no'):
     titles = [cgi.escape(x) for x in titles]
 
     if highlight == 'yes':
-        from invenio import bibformat_utils
+        from invenio.modules.formatter import utils as bibformat_utils
         titles = [bibformat_utils.highlight(x, bfo.search_pattern) for x in titles]
 
     if len(edition_statement) > 0:

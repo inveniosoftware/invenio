@@ -22,14 +22,14 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibencode_config import (
+from invenio.modules.encoder.config import (
                             CFG_BIBENCODE_FFMPEG_EXTRACT_COMMAND,
                             )
 from invenio.bibtask import (
                              task_update_progress,
                              write_message
                              )
-from invenio.bibencode_utils import (
+from invenio.modules.encoder.utils import (
                             timecode_to_seconds,
                             seconds_to_timecode,
                             is_timecode,
@@ -38,13 +38,13 @@ from invenio.bibencode_utils import (
                             getval,
                             chose
                             )
-from invenio.bibencode_metadata import (
+from invenio.modules.encoder.metadata import (
                         ffprobe_metadata
                         )
 import subprocess
 import os
-from invenio.bibencode_profiles import get_extract_profile
-from invenio.bibencode_encode import determine_resolution_preserving_aspect
+from invenio.modules.encoder.profiles import get_extract_profile
+from invenio.modules.encoder.encode import determine_resolution_preserving_aspect
 import re
 
 ## rename size to resolution

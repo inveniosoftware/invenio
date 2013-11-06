@@ -51,7 +51,7 @@ Links
 
 """
 from __future__ import print_function
-from setuptools import Command, setup
+from setuptools import Command, setup, find_packages
 
 import os
 
@@ -99,6 +99,8 @@ setup(
             'xmlmarclint = invenio.legacy.bibrecord.scripts.xmlmarclint:main',
             'webaccessadmin = invenio.modules.access.scripts.webaccessadmin:main',
             'webcoll = invenio.legacy.websearch.scripts.webcoll:main',
+            'bibclassify = invenio.modules.classifier.scripts.classifier:main',
+            'bibencode = invenio.modules.encoder.scripts.encoder:main',
             'bibsort = invenio.legacy.bibsort.scripts.bibsort:main',
             'bibrank = invenio.legacy.bibrank.scripts.bibrank:main',
             'bibindex = invenio.legacy.bibindex.scripts.bibindex:main',

@@ -36,7 +36,7 @@ from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
 from invenio.dbquery import run_sql
-from invenio.webcomment_washer import EmailWasher
+from invenio.utils.htmlwasher import EmailWasher
 
 
 def prepare_attachments():
@@ -110,7 +110,7 @@ class WebCommentRestrictionsTest(InvenioTestCase):
 
     def setUp(self):
         """Insert some comments in some records"""
-        from invenio.webcomment import query_add_comment_or_remark
+        from invenio.modules.comments.api import query_add_comment_or_remark
         from invenio.webcommentadminlib import query_delete_comment_auth
 
         # Comments have access restrictions when:
@@ -318,7 +318,7 @@ class WebCommentRestrictionsTest(InvenioTestCase):
         # that the comment restriction is inherited, and not the
         # record restriction, we temporary change the restriction of
         # the parent.
-        from invenio.webcomment import query_add_comment_or_remark
+        from invenio.modules.comments.api import query_add_comment_or_remark
 
         self.public_record_restr_comment
         original_restriction = run_sql("SELECT restriction FROM cmtRECORDCOMMENT WHERE id=%s",

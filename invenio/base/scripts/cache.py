@@ -38,7 +38,8 @@ def reset_rec_cache(output_format, get_record, split_by=1000):
     from invenio.intbitset import intbitset
     from invenio.bibsched import server_pid, pidfile
     from invenio.ext.sqlalchemy import db
-    from invenio.modules.record_editor.models import Bibrec, Bibfmt
+    from invenio.modules.record_editor.models import Bibrec
+    from invenio.modules.formatter.models import Bibfmt
     pid = server_pid(ping_the_process=False)
     if pid:
         print >> sys.stderr, "ERROR: bibsched seems to run with pid %d, according to %s." % (pid, pidfile)

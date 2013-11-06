@@ -65,7 +65,7 @@ try:
     from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
     from invenio.bibtask import task_low_level_submission
     from invenio.search_engine import perform_request_search, collection_restricted_p
-    from invenio.bibformat import format_records
+    from invenio.modules.formatter import format_records
     from invenio.utils.url import make_user_agent_string
     LOCAL_SITE_URLS = [CFG_SITE_URL, CFG_SITE_SECURE_URL]
     CFG_USER_AGENT = make_user_agent_string("invenio_connector")

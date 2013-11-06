@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.webcomment import get_first_comments_or_remarks
+from .comments.api import get_first_comments_or_remarks
 
 def format_element(bfo, nbReviews='all', nbComments='all', show_reviews='true'):
     """

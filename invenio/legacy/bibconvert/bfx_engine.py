@@ -287,7 +287,7 @@ def benchmark():
     """
     import profile
     import pstats
-    from invenio.bibformat import record_get_xml
+    from invenio.modules.formatter import record_get_xml
 
     global xmltext
 

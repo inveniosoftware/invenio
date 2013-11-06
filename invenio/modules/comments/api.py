@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -63,7 +63,7 @@ from invenio.ext.email import send_email
 from invenio.errorlib import register_exception
 from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.utils.url import wash_url_argument
-from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
+from .config import CFG_WEBCOMMENT_ACTION_CODE, \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
 from invenio.access_control_engine import acc_authorize_action
@@ -73,7 +73,7 @@ from invenio.search_engine import \
      get_collection_reclist, \
      get_colID
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.webcomment_washer import EmailWasher
+from invenio.utils.htmlwasher import EmailWasher
 try:
     import invenio.template
     webcomment_templates = invenio.template.load('webcomment')

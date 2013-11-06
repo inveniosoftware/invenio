@@ -96,7 +96,7 @@ def format_element(bfo, limit, separator=' ; ',
 
         if author.has_key('a'):
             if highlight == 'yes':
-                from invenio import bibformat_utils
+                from invenio.modules.formatter import utils as bibformat_utils
                 author['a'] = bibformat_utils.highlight(author['a'],
                                                         bfo.search_pattern)
 

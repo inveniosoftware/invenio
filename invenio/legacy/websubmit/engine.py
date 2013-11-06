@@ -36,7 +36,6 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_DEVEL_SITE, \
      CFG_SITE_SECURE_URL, \
@@ -47,7 +46,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, error_page, warning_page
 from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
                             page_not_authorized
-from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES, \
+from invenio.legacy.websubmit.config import CFG_RESERVED_SUBMISSION_FILENAMES, \
     InvenioWebSubmitFunctionError, InvenioWebSubmitFunctionStop, \
     InvenioWebSubmitFunctionWarning
 from invenio.base.i18n import gettext_set_language, wash_language
@@ -1700,10 +1699,13 @@ def print_function_calls(req, doctype, action, step, form, start_time,
                 'error' : 0,
                 'text' : '',
                 }
-                if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name)):
+                from invenio.legacy.websubmit import functions
+                function_path = os.path.join(function.__path__,
+                                             function_name + '.py')
+                if os.path.exists(function_path):
                     # import the function itself
-                    #function = getattr(invenio.websubmit_functions, function_name)
-                    execfile("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name), the_globals)
+                    #function = getattr(invenio.legacy.websubmit.functions, function_name)
+                    execfile(function_path, the_globals)
                     if function_name not in the_globals:
                         currfunction['error'] = 1
                     else:

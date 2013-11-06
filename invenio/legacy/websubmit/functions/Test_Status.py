@@ -25,7 +25,7 @@ __revision__ = "$Id$"
    ## PARAMETERS:    -
 
 from invenio.dbquery import run_sql
-from invenio.websubmit_config import InvenioWebSubmitFunctionStop
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
 
 def Test_Status(parameters, curdir, form, user_info=None):
     """

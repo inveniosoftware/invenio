@@ -25,9 +25,9 @@ import os
 
 from invenio.utils.json import json_decode_file
 from invenio.errorlib import register_exception
-from invenio.bibencode_config import CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION
-from invenio.bibencode_utils import generate_timestamp
-from invenio.bibencode_batch_engine import create_job_from_dictionary
+from invenio.modules.encoder.config import CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION
+from invenio.modules.encoder.utils import generate_timestamp
+from invenio.modules.encoder.batch_engine import create_job_from_dictionary
 from invenio.config import CFG_SITE_ADMIN_EMAIL
 
 def Video_Processing(parameters, curdir, form, user_info=None):

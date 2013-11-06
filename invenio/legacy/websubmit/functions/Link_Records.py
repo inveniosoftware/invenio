@@ -55,7 +55,7 @@ from invenio.modules.formatter.api import get_tag_from_name
 from invenio.search_engine import search_pattern, get_fieldvalues
 from invenio.config import CFG_TMPDIR
 from invenio.bibtask import task_low_level_submission
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 
 
 CFG_OTHER_RELATIONSHIP_ENTRY = (get_tag_from_name('other relationship entry') or '787')[:3]

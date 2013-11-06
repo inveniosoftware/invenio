@@ -30,7 +30,7 @@ import urllib
 import urllib2
 import cookielib
 
-from invenio import bibformat
+from invenio.modules import formatter as bibformat
 
 from invenio.utils.json import json, CFG_JSON_AVAILABLE
 from invenio.utils.url import auto_version_url

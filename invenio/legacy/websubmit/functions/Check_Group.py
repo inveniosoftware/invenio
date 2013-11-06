@@ -21,7 +21,7 @@ import os
 import re
 
 from invenio.dbquery import run_sql
-from invenio.websubmit_config import InvenioWebSubmitFunctionStop
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
 
 def Check_Group(parameters, curdir, form, user_info=None):
     """

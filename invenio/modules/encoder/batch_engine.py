@@ -38,19 +38,19 @@ from invenio.search_engine import (
                                    search_pattern,
                                    get_fieldvalues
                                    )
-from invenio.bibencode_encode import encode_video, assure_quality
-from invenio.bibencode_extract import extract_frames
-from invenio.bibencode_profiles import (
+from invenio.modules.encoder.encode import encode_video, assure_quality
+from invenio.modules.encoder.extract import extract_frames
+from invenio.modules.encoder.profiles import (
                                         get_encoding_profile,
                                         get_extract_profile
                                         )
 from invenio.bibdocfilecli import cli_fix_marc
-from invenio.bibencode_utils import chose2
-from invenio.bibencode_metadata import (
+from invenio.modules.encoder.utils import chose2
+from invenio.modules.encoder.metadata import (
                                         pbcore_metadata
                                         )
-from invenio.bibencode_utils import getval, chose2, generate_timestamp
-from invenio.bibencode_config import (
+from invenio.modules.encoder.utils import getval, chose2, generate_timestamp
+from invenio.modules.encoder.config import (
                                       CFG_BIBENCODE_DAEMON_DIR_NEWJOBS,
                                       CFG_BIBENCODE_PBCORE_MARC_XSLT,
                                       CFG_BIBENCODE_ASPECT_RATIO_MARC_FIELD

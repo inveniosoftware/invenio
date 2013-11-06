@@ -31,7 +31,7 @@ __required_plugin_API_version__ = "WebSubmit File Metadata Plugin API 1.0"
 import sys
 from optparse import OptionParser
 from invenio.bibdocfile import decompose_file
-from invenio.websubmit_config import InvenioWebSubmitFileMetadataRuntimeError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFileMetadataRuntimeError
 from invenio.utils.datastructures import LazyDict
 from invenio.base.utils import import_submodules_from_packages
 

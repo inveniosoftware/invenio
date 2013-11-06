@@ -29,8 +29,8 @@ import sys
 from werkzeug.utils import find_modules, import_string
 from invenio.bibtask import task_init, write_message, task_set_option, \
     task_get_option, task_update_progress
-from invenio.utils.autodiscovery.helpers import get_callable_documentation, \
-    check_arguments_compatibility
+from invenio.utils.autodiscovery.helpers import get_callable_documentation
+from invenio.utils.autodiscovery.checkers import check_arguments_compatibility
 #from invenio.base.utils import import_module_from_packages
 from invenio.utils.datastructures import LazyDict
 

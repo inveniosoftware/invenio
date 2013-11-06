@@ -46,12 +46,12 @@ def bft2tpl(rewrite_existing_templates=False, only_template_re=None, verbose=0):
 
     ## Import all invenio modules inside to avoid side-efects ouside
     ## Flask application context.
-    from invenio.bibformat_config import CFG_BIBFORMAT_OUTPUTS_PATH, \
+    from invenio.modules.formatter.config import CFG_BIBFORMAT_OUTPUTS_PATH, \
         CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION, \
         CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
         CFG_BIBFORMAT_FORMAT_JINJA_TEMPLATE_EXTENSION, \
         CFG_BIBFORMAT_JINJA_TEMPLATE_PATH
-    from invenio.bibformat_engine import get_format_element, \
+    from invenio.modules.formatter.engine import get_format_element, \
         get_output_formats, \
         pattern_function_params, \
         pattern_tag, pattern_lang, \

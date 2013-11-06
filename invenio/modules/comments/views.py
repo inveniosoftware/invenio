@@ -26,7 +26,7 @@ from flask import g, render_template, request, flash, redirect, url_for, \
     current_app, abort, Blueprint
 from invenio.ext.sqlalchemy import db
 from invenio.webmessage_mailutils import email_quote_txt
-from invenio.modules.comments.models import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
+from .models import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
                                      CmtACTIONHISTORY
 from .forms import AddCmtRECORDCOMMENTForm, AddCmtRECORDCOMMENTFormReview
 from invenio.base.i18n import _
@@ -37,7 +37,7 @@ from invenio.ext.breadcrumb import register_breadcrumb
 from invenio.ext.principal import permission_required
 #from invenio.config import CFG_SITE_RECORD
 CFG_SITE_RECORD = 'record'
-from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
+from .config import CFG_WEBCOMMENT_ACTION_CODE
 
 blueprint = Blueprint('comments', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       template_folder='templates')
@@ -177,7 +177,7 @@ def comments(recid):
     from invenio.access_control_config import VIEWRESTRCOLL
     from invenio.access_control_mailcookie import \
         mail_cookie_create_authorize_action
-    from invenio.webcomment import check_user_can_view_comments
+    from .api import check_user_can_view_comments
     auth_code, auth_msg = check_user_can_view_comments(current_user, recid)
     if auth_code and current_user.is_guest:
         cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {
@@ -204,7 +204,7 @@ def reviews(recid):
     from invenio.access_control_config import VIEWRESTRCOLL
     from invenio.access_control_mailcookie import \
         mail_cookie_create_authorize_action
-    from invenio.webcomment import check_user_can_view_comments
+    from .api import check_user_can_view_comments
     auth_code, auth_msg = check_user_can_view_comments(current_user, recid)
     if auth_code and current_user.is_guest:
         cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {

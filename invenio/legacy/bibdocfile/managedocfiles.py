@@ -89,7 +89,7 @@ from invenio.bibdocfilecli import cli_fix_marc
 from invenio.bibdocfile import BibRecDocs, \
      decompose_file, calculate_md5, BibDocFile, \
      InvenioBibDocFileError, BibDocMoreInfo
-from invenio.websubmit_functions.Shared_Functions import \
+from invenio.legacy.websubmit.functions.Shared_Functions import \
      createRelatedFormats
 from invenio.errorlib import register_exception
 from invenio.dbquery import run_sql

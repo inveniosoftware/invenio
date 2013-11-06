@@ -64,7 +64,7 @@ def format_element(bfo, limit, separator='; ',
     from cgi import escape
     import re
     from invenio.config import CFG_SITE_URL
-    from invenio.bibformat_elements.bfe_server_info import format_element as bfe_server
+    from invenio.modules.formatter.format_elements.bfe_server_info import format_element as bfe_server
 
     #regex for parsing last and first names and initials
     re_last_first = re.compile('^(?P<last>[^,]+)\s*,\s*(?P<first_names>[^\,]*)(?P<extension>\,?.*)$')
@@ -100,7 +100,7 @@ def format_element(bfo, limit, separator='; ',
         if author.has_key('a'):
             author['a'] = author['a'][0] # There should not be
             if highlight == 'yes':
-                from invenio import bibformat_utils
+                from invenio.modules.formatter import utils as bibformat_utils
                 author['a'] = bibformat_utils.highlight(author['a'],
                                                         bfo.search_pattern)
 

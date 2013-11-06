@@ -32,8 +32,8 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.websubmit_config import InvenioWebSubmitFunctionStop
-from invenio.websubmit_functions.Retrieve_Data import Get_Field
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
+from invenio.legacy.websubmit.functions.Retrieve_Data import Get_Field
 
 titlevalue = ""
 emailvalue = ""

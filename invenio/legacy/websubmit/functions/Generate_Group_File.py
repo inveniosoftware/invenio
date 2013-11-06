@@ -17,7 +17,7 @@
 
 
 from invenio.errorlib import register_exception
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 
 CFG_WEBSUBMIT_GROUP_FILE_NAME = "Group"
 

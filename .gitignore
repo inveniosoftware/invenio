@@ -103,3 +103,4 @@ configure.lineno
 .settings
 .pydevproject
 org.eclipse.core.resources.prefs
+modules/miscutil/bin/inveniomanage

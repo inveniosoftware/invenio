@@ -1156,3 +1156,33 @@ def build_and_run_flask_test_suite():
 
     complete_suite = unittest.TestSuite(test_modules)
     run_test_suite(complete_suite)
+
+
+from invenio.base.factory import create_app
+from invenio.base.utils import import_submodules_from_packages
+
+def iter_suites():
+    """Yields all testsuites."""
+    app = create_app()
+    packages = ['invenio'] + app.config.get('PACKAGES', [])
+
+    for module in import_submodules_from_packages('testsuite', packages=packages):
+        if hasattr(module, 'TEST_SUITE'):
+            yield module.TEST_SUITE
+
+
+def suite():
+    """A testsuite that has all the tests."""
+    #setup_path()
+    suite = unittest.TestSuite()
+    for other_suite in iter_suites():
+        suite.addTest(other_suite)
+    return suite
+
+
+def main():
+    """Runs the testsuite as command line application."""
+    try:
+        unittest.main(defaultTest='suite')
+    except Exception as e:
+        print('Error: %s' % e)

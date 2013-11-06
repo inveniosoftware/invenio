@@ -47,7 +47,7 @@ from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, \
                                     CFG_SUBMISSION_STATUS_ONHOLD, \
                                     CFG_SUBMISSION_STATUS_REMOVED
 from invenio.bibdocfile import BibRecDocs
-from invenio.bibformat_engine import BibFormatObject
+from invenio.modules.formatter.engine import BibFormatObject
 
 #-------------------------------------------------------------------------------
 # Formating servicedocument file

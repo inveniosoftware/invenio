@@ -35,7 +35,7 @@ CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 CFG_BIBFORMAT_TEMPLATES_DIR = "format_templates"
 CFG_BIBFORMAT_TEMPLATES_PATH = os.path.join(CFG_ETCDIR, 'bibformat', CFG_BIBFORMAT_TEMPLATES_DIR)
 CFG_BIBFORMAT_JINJA_TEMPLATE_PATH = os.path.join(CFG_ETCDIR, 'templates', CFG_BIBFORMAT_TEMPLATES_DIR)
-CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"
+CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = None  # defaults to autodiscovery
 CFG_BIBFORMAT_ELEMENTS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibformat_elements')
 CFG_BIBFORMAT_OUTPUTS_PATH = os.path.join(CFG_ETCDIR, 'bibformat', 'output_formats')
 

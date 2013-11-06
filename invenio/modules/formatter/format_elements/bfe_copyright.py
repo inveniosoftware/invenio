@@ -238,7 +238,7 @@ def test():
     """
     Test the function
     """
-    from invenio.bibformat_engine import BibFormatObject
+    from invenio.modules.formatter.engine import BibFormatObject
 
     xml1 = '''
 <record>

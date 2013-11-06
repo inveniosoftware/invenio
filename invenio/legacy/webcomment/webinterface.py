@@ -2,7 +2,7 @@
 ## Comments and reviews for records.
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 __revision__ = """$Id$"""
 
 import cgi
-from invenio.webcomment import check_recID_is_in_range, \
+from invenio.modules.comments.api import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks, \
                                perform_request_add_comment_or_remark, \
                                perform_request_vote, \
@@ -77,7 +77,7 @@ from invenio.access_control_mailcookie import \
      mail_cookie_check_common, \
      InvenioWebAccessMailCookieDeletedError, \
      InvenioWebAccessMailCookieError
-from invenio.webcomment_config import \
+from invenio.modules.comments.config import \
      InvenioWebCommentError, \
      InvenioWebCommentWarning
 import invenio.template

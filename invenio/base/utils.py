@@ -51,7 +51,7 @@ def register_extensions(app):
     return app
 
 
-def import_module_from_packages(name, app=None, packages=None):
+def import_module_from_packages(name, app=None, packages=None, silent=False):
     if packages is None:
         if app is None and has_app_context():
             app = current_app
@@ -64,7 +64,7 @@ def import_module_from_packages(name, app=None, packages=None):
         if package.endswith('.*'):
             for module in find_modules(package[:-2], include_packages=True):
                 try:
-                    yield import_string(module + '.' + name)
+                    yield import_string(module + '.' + name, silent)
                 except ImportError:
                     pass
                 except Exception as e:
@@ -75,7 +75,7 @@ def import_module_from_packages(name, app=None, packages=None):
                     pass
             continue
         try:
-            yield import_string(package + '.' + name)
+            yield import_string(package + '.' + name, silent)
         except ImportError:
             pass
         except Exception as e:
@@ -86,10 +86,19 @@ def import_module_from_packages(name, app=None, packages=None):
             pass
 
 
-def import_submodules_from_packages(name, app=None, packages=None):
+def import_submodules_from_packages(name, app=None, packages=None,
+                                    silent=False):
     discover = partial(import_module_from_packages, name)
-    return [import_string(m) for p in discover(app=app, packages=packages)
-            for m in find_modules(p.__name__)]
+    out = []
+    for p in discover(app=app, packages=packages, silent=silent):
+        if p is not None:
+            for m in find_modules(p.__name__):
+                try:
+                    out.append(import_string(m, silent))
+                except Exception as e:
+                    if not silent:
+                        raise e
+    return out
 
 
 collect_blueprints = partial(import_module_from_packages, 'views')
@@ -106,7 +115,8 @@ autodiscover_redirect_methods = partial(import_submodules_from_packages,
 autodiscover_celery_tasks = partial(import_module_from_packages, 'tasks')
 autodiscover_template_context_functions = partial(
     import_submodules_from_packages, 'template_context_functions')
-
+autodiscover_format_elements = partial(
+    import_submodules_from_packages, 'format_elements')
 
 
 def autodiscover_non_python_files(file_name, package_name, app=None, packages=None):

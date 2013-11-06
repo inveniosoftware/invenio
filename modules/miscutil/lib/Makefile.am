@@ -31,21 +31,16 @@ pylib_DATA = __init__.py \
              errorlib_unit_tests.py \
              errorlib_webinterface.py \
              flaskshell.py \
-             hashutils_unit_tests.py \
              htmlutils.py \
              htmlutils_unit_tests.py \
-             importutils.py \
-             importutils_unit_tests.py \
              intbitset_helper.py \
              intbitset_unit_tests.py \
              invenio_connector.py \
              invenio_connector_regression_tests.py \
              inveniocfg_unit_tests.py \
              inveniomanage_unit_tests.py \
-             jinja2utils_unit_tests.py \
              jsonutils_unit_tests.py \
              logicutils_unit_tests.py \
-             mailutils_unit_tests.py \
              memoiseutils_unit_tests.py \
              messages_unit_tests.py \
              miscutil_model.py \

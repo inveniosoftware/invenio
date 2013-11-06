@@ -50,7 +50,7 @@ from invenio.bibsword_client import list_collections_from_server, \
                                     get_media_list, \
                                     perform_submission_process
 from invenio.bibsword_client_templates import BibSwordTemplate
-from invenio.websubmit_config import InvenioWebSubmitFunctionStop
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
 
 
 def Export_Via_SWORD(parameters, curdir, form, user_info=None):

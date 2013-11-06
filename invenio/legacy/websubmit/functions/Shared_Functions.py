@@ -30,7 +30,7 @@ from invenio.config import \
 from invenio.bibdocfile import decompose_file
 from invenio.errorlib import register_exception
 from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 from invenio.dbquery import run_sql
 from invenio.bibsched import server_pid
 from invenio.base.i18n import gettext_set_language

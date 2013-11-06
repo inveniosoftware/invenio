@@ -1,8 +1,7 @@
-#!@PYTHON@
-## -*- mode: python; coding: utf-8; -*-
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -51,13 +50,10 @@ Example:
     python bibclassifycli.py -k etc/HEP.rdf article.pdf
     python bibclassifycli.py -k etc/HEP.rdf directory/"""
 
-import sys
+from invenio.base.factory import with_app_context
 
-try:
-    from invenio.flaskshell import *
-    from invenio.bibclassify_cli import main
-except ImportError, e:
-    print "Error: %s" % e
-    sys.exit(1)
 
-main()
+@with_app_context()
+def main():
+    from invenio.bibclassify_cli import main as classify_main
+    return classify_main()

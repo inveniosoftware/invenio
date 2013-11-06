@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibformat_elements.bfe_report_numbers import \
+from invenio.modules.formatter.format_elements.bfe_report_numbers import \
      build_report_number_link
 
 def format_element(bfo, limit, separator=" ", link='yes'):

@@ -19,7 +19,7 @@
 """
 WebJournal widget - display photos from given collections
 """
-from invenio.bibformat_engine import BibFormatObject
+from invenio.modules.formatter.engine import BibFormatObject
 from invenio.search_engine import perform_request_search
 from invenio.config import CFG_CERN_SITE, CFG_SITE_URL, CFG_SITE_RECORD
 

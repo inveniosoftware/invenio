@@ -97,7 +97,7 @@ def inject_utils():
         from invenio.bibfield import get_record  # should not be global due to bibfield_config
     except:
         get_record = lambda *args, **kwargs: None
-    # from invenio.bibformat_engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
+    # from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
     return dict(_=lambda *args, **kwargs: g._(*args, **kwargs),
                 current_user=user,
                 get_css_bundle=current_app.jinja_env.get_css_bundle,

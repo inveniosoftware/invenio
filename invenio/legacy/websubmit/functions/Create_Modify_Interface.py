@@ -26,8 +26,8 @@ import time
 import pprint
 
 from invenio.dbquery import run_sql
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
-from invenio.websubmit_functions.Retrieve_Data import Get_Field
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
+from invenio.legacy.websubmit.functions.Retrieve_Data import Get_Field
 from invenio.errorlib import register_exception
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):

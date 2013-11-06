@@ -23,14 +23,14 @@ import os
 import re
 import shutil
 from invenio.utils.json import json_decode_file
-from invenio.bibencode_utils import generate_timestamp, getval
+from invenio.modules.encoder.utils import generate_timestamp, getval
 from invenio.bibtask import (
                              task_low_level_submission,
                              task_get_task_param,
                              write_message,
                              task_update_progress
                              )
-from invenio.bibencode_config import (
+from invenio.modules.encoder.config import (
                         CFG_BIBENCODE_DAEMON_DIR_NEWJOBS,
                         CFG_BIBENCODE_DAEMON_DIR_OLDJOBS
                         )

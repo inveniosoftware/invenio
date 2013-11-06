@@ -44,5 +44,5 @@ class LangExtension(Extension):
     @staticmethod
     def _lang(caller):
         """Returns corrent language string using `filter_languages`."""
-        from invenio.bibformat_engine import filter_languages
+        from invenio.modules.formatter.engine import filter_languages
         return filter_languages('<lang>' + caller() + '</lang>', g.ln)

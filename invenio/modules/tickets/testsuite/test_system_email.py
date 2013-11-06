@@ -21,7 +21,7 @@
 """Unit tests for bibcatalog_system_email library."""
 
 from invenio.testsuite import make_test_suite, run_test_suite
-from invenio.mailutils_unit_tests import MailTestCase
+from invenio.testsuite.test_ext_email import MailTestCase
 
 
 class BibCatalogSystemEmailTest(MailTestCase):

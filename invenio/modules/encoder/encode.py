@@ -23,21 +23,21 @@ from invenio.bibtask import (
                              write_message,
                              task_update_progress,
                              )
-from invenio.bibencode_config import (
+from invenio.modules.encoder.config import (
                                      CFG_BIBENCODE_FFMPEG_ENCODING_LOG,
                                      CFG_BIBENCODE_FFMPEG_PASSLOGFILE_PREFIX,
                                      CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT,
                                      CFG_BIBENCODE_FFMPEG_ENCODE_TIME
                                      )
-from invenio.bibencode_utils import (
+from invenio.modules.encoder.utils import (
                                      timecode_to_seconds,
                                      generate_timestamp,
                                      chose,
                                      getval,
                                      aspect_string_to_float
                                      )
-from invenio.bibencode_profiles import get_encoding_profile
-from invenio.bibencode_metadata import (
+from invenio.modules.encoder.profiles import get_encoding_profile
+from invenio.modules.encoder.metadata import (
                                         ffprobe_metadata,
                                         mediainfo_metadata
                                         )
@@ -317,7 +317,7 @@ def encode_video(input_file, output_file,
     @rtype: boolean
     """
 
-    def encode():
+    def encode(command):
         """ Subfunction to run the acutal encoding
         """
         ## Start process
@@ -538,7 +538,7 @@ def encode_video(input_file, output_file,
             ## Build command for FFMPEG
             command = build_command(nofpass)
             ## Start encoding, result will define to continue or not to
-            no_error = encode()
+            no_error = encode(command)
     ## !!! Status Update
     return no_error
 

@@ -20,7 +20,7 @@ import os
 from invenio.bibtask import \
      task_low_level_submission, \
      bibtask_allocate_sequenceid
-from invenio.websubmit_functions.Shared_Functions import ParamFromFile
+from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
 
 def Notify_URL(parameters, curdir, form, user_info=None):
     """

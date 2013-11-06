@@ -26,8 +26,8 @@ from invenio.bibdocfile import \
 import os
 import re
 from invenio.websubmit_icon_creator import create_icon
-from invenio.websubmit_config import InvenioWebSubmitFunctionWarning
-from invenio.websubmit_functions.Shared_Functions import get_dictionary_from_string, \
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionWarning
+from invenio.legacy.websubmit.functions.Shared_Functions import get_dictionary_from_string, \
      createRelatedFormats
 from invenio.errorlib import register_exception
 from invenio.config import CFG_BINDIR

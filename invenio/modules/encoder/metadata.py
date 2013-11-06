@@ -29,12 +29,12 @@ from xml.dom import minidom
 
 from invenio.utils.json import json, json_decode_file
 from invenio.bibtask import write_message
-from invenio.bibencode_config import (
+from invenio.modules.encoder.config import (
                         CFG_BIBENCODE_FFMPEG_METADATA_ARGUMENT,
                         CFG_BIBENCODE_FFMPEG_METADATA_SET_COMMAND,
                         CFG_BIBENCODE_PBCORE_MAPPINGS
                         )
-from invenio.bibencode_utils import probe, getval, mediainfo, seconds_to_timecode
+from invenio.modules.encoder.utils import probe, getval, mediainfo, seconds_to_timecode
 
 ## Stores metadata for the process. Many different functions in BibEncode
 ## need access to video metadata regularly. Because we dont pass objects arount

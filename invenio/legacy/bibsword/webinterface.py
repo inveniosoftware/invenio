@@ -37,7 +37,7 @@ from invenio.bibsword_client import perform_display_sub_status, \
 from invenio.webpage import page
 from invenio.base.i18n import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.websubmit_functions.Get_Recid import \
+from invenio.legacy.websubmit.functions.Get_Recid import \
                                            get_existing_records_for_reportnumber
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, CFG_MARC_ADDITIONAL_REPORT_NUMBER

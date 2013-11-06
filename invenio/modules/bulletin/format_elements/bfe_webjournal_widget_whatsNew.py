@@ -25,7 +25,7 @@ import time
 import os
 
 from invenio.search_engine import search_pattern, record_exists
-from invenio.bibformat_engine import BibFormatObject
+from invenio.modules.formatter.engine import BibFormatObject
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_CACHEDIR, \

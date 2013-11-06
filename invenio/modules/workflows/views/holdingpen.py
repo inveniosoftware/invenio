@@ -313,7 +313,7 @@ def _entry_data_preview(data, recformat='hd'):
     """
     if recformat == 'hd' or recformat == 'xm':
         try:
-            from invenio.bibformat_engine import format_record
+            from invenio.modules.formatter.engine import format_record
             data = format_record(recID=None, of=recformat,
                                  xml_record=data)
         except:

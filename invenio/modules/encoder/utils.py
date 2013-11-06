@@ -35,7 +35,7 @@ except ImportError:
     def uuid4():
         return "%x" % random.getrandbits(16*8)
 
-from invenio.bibencode_config import (
+from .config import (
                     CFG_BIBENCODE_FFMPEG_PROBE_LOG,
                     CFG_BIBENCODE_FFMPEG_PROBE_COMMAND,
                     CFD_BIBENCODE_FFMPEG_OUT_RE_CONFIGURATION,

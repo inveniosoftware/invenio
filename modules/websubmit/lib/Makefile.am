@@ -19,7 +19,7 @@ SUBDIRS = functions
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = websubmit_config.py websubmit_engine.py \
+pylib_DATA = \
              websubmit_dblayer.py \
              websubmit_webinterface.py \
              websubmit_templates.py \

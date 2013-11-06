@@ -17,18 +17,7 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibencode.py \
-             bibencode_config.py \
-             bibencode_extract.py \
-             bibencode_metadata.py \
-             bibencode_daemon.py \
-             bibencode_utils.py \
-             bibencode_profiles.py \
-             bibencode_encode.py \
-             bibencode_batch_engine.py \
-             bibencode_websubmit.py \
-             bibencode_tester.py \
-             bibencode_websubmit.js
+pylib_DATA =
 
 EXTRA_DIST = $(pylib_DATA)
 

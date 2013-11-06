@@ -34,9 +34,9 @@ from invenio.config import CFG_SITE_URL, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_RECORD
-from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
+from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.ext.email import send_email
-from invenio.websubmit_functions.Retrieve_Data import Get_Field
+from invenio.legacy.websubmit.functions.Retrieve_Data import Get_Field
 
 def Send_SRV_Mail(parameters, curdir, form, user_info=None):
     """

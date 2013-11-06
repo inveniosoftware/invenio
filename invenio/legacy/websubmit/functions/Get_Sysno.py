@@ -36,7 +36,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.search_engine import search_pattern
-from invenio.websubmit_config import InvenioWebSubmitFunctionStop
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionStop
 
 def Get_Sysno(parameters, curdir, form, user_info=None):
     """

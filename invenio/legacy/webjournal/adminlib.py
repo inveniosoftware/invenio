@@ -77,7 +77,7 @@ from invenio.dbquery import run_sql
 from invenio.legacy.bibrecord import \
      create_record, \
      print_rec
-from invenio.bibformat import format_record
+from invenio.modules.formatter import format_record
 from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 from invenio.search_engine import get_all_collections_of_a_record
 import invenio.template

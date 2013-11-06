@@ -42,7 +42,7 @@ from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
                               convert_datestruct_to_dategui
-from invenio.bibformat import format_record
+from invenio.modules.formatter import format_record
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_CATEGORIES, \

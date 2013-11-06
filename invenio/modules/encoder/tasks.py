@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2011 CERN.
+## Copyright (C) 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,43 +28,35 @@ __revision__ = "$Id$"
 from pprint import pprint
 import os
 
-from invenio.bibtask import (
-                    task_init,
-                    write_message,
-                    task_set_option,
-                    task_get_option,
-                    task_set_task_param
-                    )
-from invenio.bibencode_config import (
-                    CFG_BIBENCODE_FFMPEG_VALID_SIZES,
-                    CFG_BIBENCODE_FFMPEG_VALID_ACODECS,
-                    CFG_BIBENCODE_FFMPEG_VALID_VCODECS,
-                    CFG_BIBENCODE_VALID_MODES,
-                    CFG_BIBENCODE_FFMPEG_RE_VALID_SIZE,
-                    CFG_BIBENCODE_PROFILES_ENCODING,
-                    CFG_BIBENCODE_PROFILES_EXTRACT,
-                    CFG_BIBENCODE_DAEMON_DIR_NEWJOBS,
-                    CFG_BIBENCODE_DAEMON_DIR_OLDJOBS
-                    )
-from invenio.bibencode_profiles import (
-                    get_encoding_profiles,
-                    get_extract_profiles
-                    )
-from invenio.bibencode_utils import check_ffmpeg_configuration
-
+from invenio.bibtask import (task_init,
+                             write_message,
+                             task_set_option,
+                             task_get_option,
+                             task_set_task_param,
+                             )
 from invenio.utils.json import json, json_decode_file
-import invenio.utils.text
-import invenio.bibencode_encode
-import invenio.bibencode_extract
-import invenio.bibencode_metadata
-import invenio.bibencode_daemon
-import invenio.bibencode_batch_engine
+
+from . import (encode, extract, metadata, daemon, batch_engine)
+from .config import (
+    CFG_BIBENCODE_FFMPEG_VALID_SIZES,
+    CFG_BIBENCODE_FFMPEG_VALID_ACODECS,
+    CFG_BIBENCODE_FFMPEG_VALID_VCODECS,
+    CFG_BIBENCODE_VALID_MODES,
+    CFG_BIBENCODE_FFMPEG_RE_VALID_SIZE,
+    CFG_BIBENCODE_PROFILES_ENCODING,
+    CFG_BIBENCODE_PROFILES_EXTRACT,
+    CFG_BIBENCODE_DAEMON_DIR_NEWJOBS,
+    CFG_BIBENCODE_DAEMON_DIR_OLDJOBS,
+    )
+from .profiles import get_encoding_profiles, get_extract_profiles
+from .utils import check_ffmpeg_configuration
 
 
 def _topt(key, fallback=None):
     """ Just a shortcut
     """
     return task_get_option(key, fallback)
+
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key it checks it's meaning, eventually using the
@@ -187,6 +179,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         return True
     return False
 
+
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.
     This is what BibSched will be invoking via daemon call.
@@ -197,7 +190,7 @@ def task_run_core():
     #---------------#
 
     if _topt('mode') == 'encode':
-        return invenio.bibencode_encode.encode_video(
+        return encode.encode_video(
                                     input_file=_topt('input'),
                                     output_file=_topt('output'),
                                     acodec=_topt('acodec'),
@@ -220,7 +213,7 @@ def task_run_core():
     #-----------------#
 
     elif _topt('mode') == 'extract':
-        return invenio.bibencode_extract.extract_frames(
+        return extract.extract_frames(
                                 input_file=_topt('input'),
                                 output_file=_topt('output'),
                                 size=_topt('size'),
@@ -237,7 +230,7 @@ def task_run_core():
     #---------------#
     elif _topt('mode') == 'meta':
         if _topt('meta_dump') is not None:
-            invenio.bibencode_metadata.dump_metadata(
+            metadata.dump_metadata(
                                        input_file=_topt('input'),
                                        output_file=_topt('output'),
                                        meta_type=_topt('meta_dump')
@@ -245,10 +238,10 @@ def task_run_core():
             return True
         elif _topt('meta_input') is not None:
             if type(_topt('meta_input')) is not type(dict()):
-                metadata = invenio.bibencode_metadata.json_decode_file(
+                the_metadata = metadata.json_decode_file(
                                         filename=_topt('meta_input'))
-                task_set_option('meta_input', metadata)
-            return invenio.bibencode_metadata.write_metadata(
+                task_set_option('meta_input', the_metadata)
+            return metadata.write_metadata(
                                        input_file=_topt('input'),
                                        output_file=_topt('output'),
                                        metadata=_topt('meta_input')
@@ -259,28 +252,29 @@ def task_run_core():
     #------------#
     elif _topt('mode') == 'batch':
         if _topt('collection'):
-            return invenio.bibencode_batch_engine.create_update_jobs_by_collection(
+            return batch_engine.create_update_jobs_by_collection(
                             batch_template_file=_topt('input'),
                             collection=_topt('collection'),
                             job_directory=_topt('new_job_dir',
                                             CFG_BIBENCODE_DAEMON_DIR_NEWJOBS))
         elif _topt('search'):
-            return invenio.bibencode_batch_engine.create_update_jobs_by_search(
+            return batch_engine.create_update_jobs_by_search(
                             pattern=_topt('search'),
                             batch_template_file=_topt('input'),
                             job_directory=_topt('new_job_dir',
                                             CFG_BIBENCODE_DAEMON_DIR_NEWJOBS))
         else:
-            return invenio.bibencode_batch_engine.process_batch_job(_topt('input'))
+            return batch_engine.process_batch_job(_topt('input'))
 
     #-------------#
     # Daemon Mode #
     #-------------#
     elif _topt('mode') == 'daemon':
-        return invenio.bibencode_daemon.watch_directory(
+        return daemon.watch_directory(
                                     _topt('new_job_dir', CFG_BIBENCODE_DAEMON_DIR_NEWJOBS),
                                     _topt('old_job_dir', CFG_BIBENCODE_DAEMON_DIR_OLDJOBS)
                                     )
+
 
 def task_submit_check_options():
     """ Checks the tasks arguments for validity
@@ -525,6 +519,7 @@ def task_submit_check_options():
 
     ## If every check went fine
     return True
+
 
 def main():
     """Main that construct all the bibtask."""

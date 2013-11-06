@@ -20,7 +20,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import CFG_SITE_NAME
-from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message, txt2html
+from invenio.legacy.websubmit.functions.Shared_Functions import get_nice_bibsched_related_message, txt2html
 
 # FIXME: cannot import Request_Print(), is defined in websubmit_engine.py
 

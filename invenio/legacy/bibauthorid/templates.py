@@ -30,7 +30,7 @@ import invenio.bibauthorid_config as bconfig
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_BIBAUTHORID_AUTHOR_TICKET_ADMIN_EMAIL
-from invenio.bibformat import format_record
+from invenio.modules.formatter import format_record
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthorid_config import EXTERNAL_SYSTEMS_LIST
 from invenio.bibauthorid_webapi import get_person_redirect_link, get_canonical_id_from_person_id, get_person_names_from_id

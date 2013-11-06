@@ -41,7 +41,6 @@ from invenio.utils.url import string_to_numeric_char_reference
 from invenio.utils.text import encode_for_xml
 from invenio.shellutils import run_shell_command
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.solrutils_bibindex_searcher import solr_get_snippet
 
 def highlight_matches(text, compiled_pattern, \
                       prefix_tag='<strong>', suffix_tag="</strong>"):
@@ -629,6 +628,7 @@ def get_pdf_snippets(recID, patterns, user_info):
                 stemmed_patterns = [stem(p, 'en') for p in patterns]
                 out = get_text_snippets(text_path, stemmed_patterns, nb_chars, max_snippets)
         elif CFG_WEBSEARCH_FULLTEXT_SNIPPETS_GENERATOR == 'SOLR':
+            from invenio.solrutils_bibindex_searcher import solr_get_snippet
             out = solr_get_snippet(patterns, recID, nb_chars, max_snippets)
 
         if out:

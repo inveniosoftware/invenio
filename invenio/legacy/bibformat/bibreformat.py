@@ -38,8 +38,8 @@ try:
     from invenio.search_engine import print_record
     from invenio.bibrank_citation_searcher import get_cited_by
     from invenio.bibrank_citation_indexer import get_bibrankmethod_lastupdate
-    from invenio.bibformat import format_record
-    from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
+    from invenio.modules.formatter import format_record
+    from invenio.modules.formatter.config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
     from invenio.shellutils import split_cli_ids_arg
     from invenio.bibtask import task_init, write_message, task_set_option, \
             task_get_option, task_update_progress, task_has_option, \

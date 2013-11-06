@@ -36,31 +36,19 @@ record basis) should be defined, with name C{def create_*}.
 
 __revision__ = "$Id$"
 
-import zlib
-
-import invenio.modules.formatter.api as bibformat_dblayer
-from invenio import bibformat_engine
-from invenio import bibformat_utils
-from invenio.errorlib import register_exception
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_PATH_PHP, \
-     CFG_SITE_URL, \
-     CFG_BIBFORMAT_HIDDEN_TAGS, \
-     CFG_SITE_RECORD, \
-     CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS
-from invenio.messages import wash_language
-from invenio.bibformat_config import \
-     CFG_BIBFORMAT_USE_OLD_BIBFORMAT
-from invenio.access_control_engine import acc_authorize_action
-from invenio.ext.template import render_template_to_string
 import getopt
 import sys
+import zlib
+
+from invenio.base.globals import cfg
+from invenio.errorlib import register_exception
+from invenio.messages import wash_language
+from invenio.ext.template import render_template_to_string
 
 # Functions to format a single record
 ##
 
-def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
+def format_record(recID, of, ln=None, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False):
     """
     Format a record in given output format.
@@ -102,6 +90,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     @return: formatted record
     @rtype: string
     """
+    ln = ln or cfg['CFG_SITE_LANG']
     from invenio.search_engine import record_exists
     if search_pattern is None:
         search_pattern = []
@@ -113,14 +102,15 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
         Formatting record %i with output format %s.
         </span>""" % (recID, of)
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
-    if CFG_BIBFORMAT_USE_OLD_BIBFORMAT and CFG_PATH_PHP:
+    if cfg['CFG_BIBFORMAT_USE_OLD_BIBFORMAT'] and cfg['CFG_PATH_PHP']:
+        from . import engine as bibformat_engine
         return bibformat_engine.call_old_bibformat(recID, of=of, on_the_fly=on_the_fly)
     ############################# END ##################################
     if not on_the_fly and \
-       (ln == CFG_SITE_LANG or \
+       (ln == cfg['CFG_SITE_LANG'] or \
         of.lower() == 'xm' or \
-        CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
-        (of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS)) and \
+        cfg['CFG_BIBFORMAT_USE_OLD_BIBFORMAT'] or \
+        (of.lower() in cfg['CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS'])) and \
         record_exists(recID) != -1:
         # Try to fetch preformatted record. Only possible for records
         # formatted in CFG_SITE_LANG language (other are never
@@ -130,26 +120,27 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
         # always served from the same cache for any language.  Also,
         # do not fetch from DB when record has been deleted: we want
         # to return an "empty" record in that case
-        res = bibformat_dblayer.get_preformatted_record(recID, of)
+        from . import api
+        res = api.get_preformatted_record(recID, of)
         if res is not None:
             # record 'recID' is formatted in 'of', so return it
             if verbose == 9:
-                last_updated = bibformat_dblayer.get_preformatted_record_date(recID, of)
+                last_updated = api.get_preformatted_record_date(recID, of)
                 out += """\n<br/><span class="quicknote">
                 Found preformatted output for record %i (cache updated on %s).
                 </span><br/>""" % (recID, last_updated)
             if of.lower() == 'xm':
                 res = filter_hidden_fields(res, user_info)
             # try to replace language links in pre-cached res, if applicable:
-            if ln != CFG_SITE_LANG and of.lower() in CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS:
+            if ln != cfg['CFG_SITE_LANG'] and of.lower() in cfg['CFG_BIBFORMAT_DISABLE_I18N_FOR_CACHED_FORMATS']:
                 # The following statements try to quickly replace any
                 # language arguments in URL links.  Not an exact
                 # science, but should work most of the time for most
                 # of the formats, with not too many false positives.
                 # We don't have time to parse output much here.
-                res = res.replace('?ln=' + CFG_SITE_LANG, '?ln=' + ln)
-                res = res.replace('&ln=' + CFG_SITE_LANG, '&ln=' + ln)
-                res = res.replace('&amp;ln=' + CFG_SITE_LANG, '&amp;ln=' + ln)
+                res = res.replace('?ln=' + cfg['CFG_SITE_LANG'], '?ln=' + ln)
+                res = res.replace('&ln=' + cfg['CFG_SITE_LANG'], '&ln=' + ln)
+                res = res.replace('&amp;ln=' + cfg['CFG_SITE_LANG'], '&amp;ln=' + ln)
             out += res
             return out
         else:
@@ -166,6 +157,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
         </span>""" % recID
 
     try:
+        from . import engine as bibformat_engine
         out += bibformat_engine.format_record(recID=recID,
                                               of=of,
                                               ln=ln,
@@ -200,8 +192,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
             out += """\n<br/><span class="quicknote">
             Formatting record %i with websearch_templates.tmpl_print_record_brief.
             </span><br/>""" % recID
-        return out + websearch_templates.tmpl_print_record_brief(ln = ln,
-                                                                 recID = recID,
+        return out + websearch_templates.tmpl_print_record_brief(ln=ln,
+                                                                 recID=recID,
                                                                  )
 
 def record_get_xml(recID, format='xm', decompress=zlib.decompress):
@@ -224,6 +216,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
     @param decompress: the library to use to decompress cache from DB
     @return: the xml string of the record
     """
+    from . import utils as bibformat_utils
     return bibformat_utils.record_get_xml(recID=recID, format=format, decompress=decompress)
 
 # Helper functions to do complex formatting of multiple records
@@ -233,7 +226,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 # that relies on format_records to do the formatting.
 ##
 
-def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
+def format_records(recIDs, of, ln=None, verbose=0, search_pattern=None,
                    xml_records=None, user_info=None, record_prefix=None,
                    record_separator=None, record_suffix=None, prologue="",
                    epilogue="", req=None, on_the_fly=False):
@@ -325,6 +318,7 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                     req.write(string_prefix)
 
         #Print formatted record
+        ln = ln or cfg['CFG_SITE_LANG']
         formatted_record = format_record(recIDs[i], of, ln, verbose, \
                                          search_pattern, xml_records[i],\
                                          user_info, on_the_fly)
@@ -361,7 +355,7 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     return prologue + formatted_records + epilogue
 
-def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_info=None):
+def create_excel(recIDs, req=None, ln=None, ot=None, ot_sep="; ", user_info=None):
     """
     Returns an Excel readable format containing the given recIDs.
     If 'req' is given, also prints the output in 'req' while individual
@@ -384,6 +378,7 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_
     @param user_info: the user_info dictionary
     @return: a string in Excel format
     """
+    from . import utils as bibformat_utils
     # Prepare the column headers to display in the Excel file
     column_headers_list = ['Title',
                            'Authors',
@@ -417,7 +412,8 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_
         for recID in recIDs:
             row = '<tr>'
             row += '<td><a href="%(CFG_SITE_URL)s/%(CFG_SITE_RECORD)s/%(recID)i">%(recID)i</a></td>' % \
-                   {'recID': recID, 'CFG_SITE_RECORD': CFG_SITE_RECORD, 'CFG_SITE_URL': CFG_SITE_URL}
+                   {'recID': recID, 'CFG_SITE_RECORD': cfg['CFG_SITE_RECORD'],
+                    'CFG_SITE_URL': cfg['CFG_SITE_URL']}
             for field in ot:
                 row += '<td>' + \
                        ot_sep.join(bibformat_utils.get_all_fieldvalues(recID, field)) + \
@@ -430,7 +426,8 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; ", user_
         return out
 
     #Format the records
-    excel_formatted_records = format_records(recIDs, 'excel', ln=CFG_SITE_LANG,
+    excel_formatted_records = format_records(recIDs, 'excel',
+                                             ln=ln or cfg['CFG_SITE_LANG'],
                                              record_separator='\n',
                                              prologue = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
                                              epilogue = footer,
@@ -463,7 +460,7 @@ def make_filter_line(hide_tag):
     return 'datafield tag="%s" ind1="%s"  ind2="%s"' % (tag, ind1, ind2)
 
 
-def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
+def filter_hidden_fields(recxml, user_info=None, filter_tags=None,
                          force_filtering=False):
     """
     Filter out tags specified by filter_tags from MARCXML. If the user
@@ -476,6 +473,7 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
     @param force_filtering: do we force filtering regardless of user rights?
     @return: recxml without the hidden fields
     """
+    filter_tags = filter_tags or cfg['CFG_BIBFORMAT_HIDDEN_TAGS']
     if force_filtering:
         pass
     else:
@@ -483,6 +481,7 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
             #by default
             return recxml
         else:
+            from invenio.access_control_engine import acc_authorize_action
             if (acc_authorize_action(user_info, 'runbibedit')[0] == 0):
                 #no need to filter
                 return recxml
@@ -511,7 +510,8 @@ def get_output_format_content_type(of, default_content_type="text/html"):
     @param default_content_type: default content-type when content-type was not set up
     @return: the content-type to use for this output format
     """
-    content_type = bibformat_dblayer.get_output_format_content_type(of)
+    from . import api
+    content_type = api.get_output_format_content_type(of)
 
     if content_type == '':
         content_type = default_content_type
@@ -519,7 +519,7 @@ def get_output_format_content_type(of, default_content_type="text/html"):
     return content_type
 
 
-def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
+def print_records(recIDs, of='hb', ln=None, verbose=0,
                   search_pattern='', on_the_fly=False, **ctx):
     """
     Returns records using Jinja template.
@@ -527,15 +527,15 @@ def print_records(recIDs, of='hb', ln=CFG_SITE_LANG, verbose=0,
     import time
     from math import ceil
     from flask import request
-    from invenio.bibformat_engine import format_record
+    from invenio.modules.formatter.engine import format_record
     from invenio.modules.search.models import Format
     from invenio.utils.pagination import Pagination
-    from invenio.bibformat_engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
+    from invenio.modules.formatter.engine import TEMPLATE_CONTEXT_FUNCTIONS_CACHE
 
     of = of.lower()
     jrec = request.values.get('jrec', ctx.get('jrec', 1), type=int)
     rg = request.values.get('rg', ctx.get('rg', 10), type=int)
-    ln = wash_language(request.values.get('ln', ln))
+    ln = ln or wash_language(request.values.get('ln', cfg['CFG_SITE_LANG']))
     pages = int(ceil(jrec / float(rg))) if rg > 0 else 1
 
     context = dict(

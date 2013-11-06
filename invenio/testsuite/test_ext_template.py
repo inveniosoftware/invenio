@@ -18,14 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Test unit for the miscutil/jinja2utils module.
+Unit test for the template extensions.
 """
 
 from invenio.ext.template import render_template_to_string
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
-class TestJinja2Utils(InvenioTestCase):
+class TemplateTest(InvenioTestCase):
     """
     jinja2utils TestSuite.
     """
@@ -49,7 +49,7 @@ class TestJinja2Utils(InvenioTestCase):
         self.tplEqualToString(pxsx_tpl, '***test###', test_variable='test')
 
 
-TEST_SUITE = make_test_suite(TestJinja2Utils, )
+TEST_SUITE = make_test_suite(TemplateTest, )
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

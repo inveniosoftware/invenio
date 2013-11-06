@@ -24,14 +24,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.testutils import InvenioTestCase
-from invenio import bibencode_utils
-from invenio import bibencode_encode
-from invenio import bibencode_metadata
-import invenio.config
-from invenio.bibencode_encode import encode_video
-from invenio.bibencode_extract import extract_frames
-from invenio.utils.text import wait_for_user
+from invenio.base.globals import cfg
 from invenio.utils.url import make_invenio_opener
 from os.path import basename
 import os
@@ -39,24 +32,70 @@ from urlparse import urlsplit
 import shutil
 import urllib2
 
-from invenio.testsuite import make_test_suite, run_test_suite
+from invenio.base.wrappers import lazy_import
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
-BIBENCODE_OPENER = make_invenio_opener('BibEncode')
+bibencode_utils = lazy_import('invenio.modules.encoder.utils')
+bibencode_encode = lazy_import('invenio.modules.encoder.encode')
+bibencode_metadata = lazy_import('invenio.modules.encoder.metadata')
 
-## original URL
-video_url = "http://media.xiph.org/video/derf/y4m/blue_sky_1080p25.y4m"
-video01 = invenio.config.CFG_TMPDIR + "/blue_sky_1080p25.y4m"
-video01_out01 = invenio.config.CFG_TMPDIR + "/blue_sky_1080p.mp4"
-video01_out02 = invenio.config.CFG_TMPDIR + "/blue_sky_1080p.ogg"
-video01_out03 = invenio.config.CFG_TMPDIR + "/blue_sky_1080p.webm"
-video01_out04 = invenio.config.CFG_TMPDIR + "/blue_sky_720p.mp4"
-video01_out05 = invenio.config.CFG_TMPDIR + "/blue_sky_720p.ogg"
-video01_out06 = invenio.config.CFG_TMPDIR + "/blue_sky_720p.webm"
-video01_out07 = invenio.config.CFG_TMPDIR + "/blue_sky_480p.mp4"
-video01_out08 = invenio.config.CFG_TMPDIR + "/blue_sky_480p.ogg"
-video01_out09 = invenio.config.CFG_TMPDIR + "/blue_sky_480p.webm"
 
-movie_no_aspect = invenio.config.CFG_TMPDIR + "/blue_sky_1080p_anamorphic.webm"
+def url2name(url):
+    return basename(urlsplit(url)[2])
+
+
+class Video(object):
+
+    def __init__(self, url):
+        self.url = url
+        self.name = url2name(url)
+
+    @property
+    def source(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_1080p25.y4m"
+
+    @property
+    def out01(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_1080p.mp4"
+
+    @property
+    def out02(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_1080p.ogg"
+
+    @property
+    def out03(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_1080p.webm"
+
+    @property
+    def out04(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_720p.mp4"
+
+    @property
+    def out05(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_720p.ogg"
+
+    @property
+    def out06(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_720p.webm"
+
+    @property
+    def out07(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_480p.mp4"
+
+    @property
+    def out08(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_480p.ogg"
+
+    @property
+    def out09(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_480p.webm"
+
+    @property
+    def movie_no_aspect(self):
+        return cfg['CFG_TMPDIR'] + "/blue_sky_1080p_anamorphic.webm"
+
+video01 = Video("http://media.xiph.org/video/derf/y4m/blue_sky_1080p25.y4m")
+
 
 metadata = {
         "title": "Super Duper Difficult Test Metadata Video File",
@@ -78,15 +117,13 @@ metadata = {
         "lyrics": "Invenio Lyrics",
         }
 
-def url2name(url):
-    return basename(urlsplit(url)[2])
 
 def download(url, localFileName = None):
     """ Downloads a file from a remote url
     """
     localName = url2name(url)
     req = urllib2.Request(url)
-    r = BIBENCODE_OPENER.open(req)
+    r = make_invenio_opener('BibEncode').open(req)
     if r.info().has_key('Content-Disposition'):
         # If the response has Content-Disposition, we take file name from it
         localName = r.info()['Content-Disposition'].split('filename=')[1]
@@ -110,39 +147,43 @@ def printr(message):
 class SetupTester(InvenioTestCase):
     """Prepares the necessary files for the tests"""
     def test_setUp(self):
-        if not os.path.exists(video01):
+        if not os.path.exists(video01.source):
             print("Downloading sample video ... ")
-            download(video_url, video01)
+            download(video01.url, video01.source)
 
         print("Starting encoding ... ")
-        self.assertEqual(encode_video(video01, video01_out01, "libfaac", "libx264", 128000, 8000000, "1920x1080", 1, "-vpre medium", metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out02, "libvorbis", "libtheora", 128000, 8000000, "1920x1080", 1, metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out03, "libvorbis", "libvpx", 128000, 8000000, "1920x1080", 1, "-g 320 -qmax 63",  metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out04, "libfaac", "libx264", 128000, 4000000, "1280x720", 1, "-vpre medium", metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out05, "libvorbis", "libtheora", 128000, 4000000, "1280x720", 1, metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out06, "libvorbis", "libvpx", 128000, 4000000, "1280x720", 1, "-g 320 -qmax 63", metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out07, "libfaac", "libx264", 128000, 2000000, "852x480", 1, "-vpre medium", metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out08, "libvorbis", "libtheora", 128000, 2000000, "854x480", 1, metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, video01_out09, "libvorbis", "libvpx", 128000, 2000000, "852x480", 1, "-g 320 -qmax 63", metadata=metadata, update_fnc=printr), 1)
-        self.assertEqual(encode_video(video01, movie_no_aspect, "libvorbis", "libvpx", 128000, 8000000, "1440x1080", 1, "-g 320 -qmax 63",  metadata=metadata, update_fnc=printr), 1)
+        from invenio.modules.encoder.encode import encode_video
+        self.assertEqual(encode_video(video01.source, video01.out01, "libfaac", "libx264", 128000, 8000000, "1920x1080", 1, "-vpre medium", metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out02, "libvorbis", "libtheora", 128000, 8000000, "1920x1080", 1, metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out03, "libvorbis", "libvpx", 128000, 8000000, "1920x1080", 1, "-g 320 -qmax 63",  metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out04, "libfaac", "libx264", 128000, 4000000, "1280x720", 1, "-vpre medium", metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out05, "libvorbis", "libtheora", 128000, 4000000, "1280x720", 1, metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out06, "libvorbis", "libvpx", 128000, 4000000, "1280x720", 1, "-g 320 -qmax 63", metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out07, "libfaac", "libx264", 128000, 2000000, "852x480", 1, "-vpre medium", metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out08, "libvorbis", "libtheora", 128000, 2000000, "854x480", 1, metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.out09, "libvorbis", "libvpx", 128000, 2000000, "852x480", 1, "-g 320 -qmax 63", metadata=metadata, update_fnc=printr), 1)
+        self.assertEqual(encode_video(video01.source, video01.movie_no_aspect, "libvorbis", "libvpx", 128000, 8000000, "1440x1080", 1, "-g 320 -qmax 63",  metadata=metadata, update_fnc=printr), 1)
 
         print("Starting frame extraction ...")
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes1_", size=None, positions=None, numberof=10, extension='jpg', width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes2_", size="640x360", positions=None, numberof=10, extension='jpg', width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes3_", size=None, positions=None, numberof=10, extension='jpg', width=640, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes4_", size=None, positions=None, numberof=10, extension='jpg', width=None, height=360, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes5_", size=None, positions=None, numberof=10, extension='jpg', width=640, height=360, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes6_", size=None, positions=[1, 5, 10, 15, 20], numberof=None, extension='jpg',  width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes7_", size=None, positions=["00:00:01.00", "00:00:02.00","00:00:03.00", "00:00:04.00", "00:00:05.00"], numberof=None, extension='jpg', width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
-        self.assertEqual(extract_frames(video01_out01, output_file=invenio.config.CFG_TMPDIR + "/testframes8_", size=None, positions=["00:00:01.00", 5,"00:00:03.00", 10, "00:00:05.00"], numberof=None, extension='jpg',  width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        from invenio.modules.encoder.extract import extract_frames
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes1_", size=None, positions=None, numberof=10, extension='jpg', width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes2_", size="640x360", positions=None, numberof=10, extension='jpg', width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes3_", size=None, positions=None, numberof=10, extension='jpg', width=640, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes4_", size=None, positions=None, numberof=10, extension='jpg', width=None, height=360, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes5_", size=None, positions=None, numberof=10, extension='jpg', width=640, height=360, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes6_", size=None, positions=[1, 5, 10, 15, 20], numberof=None, extension='jpg',  width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes7_", size=None, positions=["00:00:01.00", "00:00:02.00","00:00:03.00", "00:00:04.00", "00:00:05.00"], numberof=None, extension='jpg', width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
+        self.assertEqual(extract_frames(video01.out01, output_file=cfg['CFG_TMPDIR'] + "/testframes8_", size=None, positions=["00:00:01.00", 5,"00:00:03.00", 10, "00:00:05.00"], numberof=None, extension='jpg',  width=None, height=None, aspect=None, profile=None, update_fnc=printr, message_fnc=printr), 1)
 
         print("All done")
+
 
 class TestFFmpegMinInstallation(InvenioTestCase):
     """Tests if the minimum FFmpeg installation is available"""
 
     def test_ffmpeg(self):
         self.assertEqual(bibencode_utils.check_ffmpeg_configuration(), None)
+
 
 class TestUtilsFunctions(InvenioTestCase):
     """Tests the utility functions in bibencode_utils"""
@@ -209,94 +250,95 @@ class TestEncodeFunctions(InvenioTestCase):
 
     def test_determine_aspect(self):
         """Tests if the aspect is correctly detected"""
-        self.assertEqual(bibencode_encode.determine_aspect(video01_out02), ("16:9", 1920, 1080))
-        self.assertEqual(bibencode_encode.determine_aspect(video01_out05), ("16:9", 1280, 720))
-        self.assertEqual(bibencode_encode.determine_aspect(video01_out08), ("427:240", 854, 480))
+        self.assertEqual(bibencode_encode.determine_aspect(video01.out02), ("16:9", 1920, 1080))
+        self.assertEqual(bibencode_encode.determine_aspect(video01.out05), ("16:9", 1280, 720))
+        self.assertEqual(bibencode_encode.determine_aspect(video01.out08), ("427:240", 854, 480))
 
     def test_determine_resolution(self):
         """Tests if the resolution is correctly calculated"""
         # The aspect is fully detectable in the video
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1920, 1080, None), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1280, 720, None), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 854, 480, None), "854x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1920, None, None), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1280, None, None), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 854, None, None), "854x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, None, 1080, None), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, None, 720, None), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, None, 480, None), "854x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1920, 1080, 1.777), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1280, 720, 1.777), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 854, 480, 1.78), "854x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1920, None, 1.777), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 1280, None, 1.777), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, 854, None, 1.78), "854x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, None, 1080, 1.777), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, None, 720, 1.777), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01_out03, None, 480, 1.78), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1920, 1080, None), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1280, 720, None), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 854, 480, None), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1920, None, None), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1280, None, None), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 854, None, None), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, None, 1080, None), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, None, 720, None), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, None, 480, None), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1920, 1080, 1.777), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1280, 720, 1.777), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 854, 480, 1.78), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1920, None, 1.777), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 1280, None, 1.777), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, 854, None, 1.78), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, None, 1080, 1.777), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, None, 720, 1.777), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.out03, None, 480, 1.78), "854x480")
         # The aspect is not detectable in the video
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1920, 1080, None), "1440x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1280, 720, None), "960x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 854, 480, None), "640x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1920, None, None), "1920x1440")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1280, None, None), "1280x960")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 854, None, None), "854x640")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, None, 1080, None), "1440x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, None, 720, None), "960x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, None, 480, None), "640x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1920, 1080, 1.777), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1280, 720, 1.777), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 854, 480, 1.78), "854x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1920, None, 1.777), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1280, None, 1.777), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 854, None, 1.78), "854x480")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, None, 1080, 1.777), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, None, 720, 1.777), "1280x720")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, None, 480, 1.78), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1920, 1080, None), "1440x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1280, 720, None), "960x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 854, 480, None), "640x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1920, None, None), "1920x1440")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1280, None, None), "1280x960")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 854, None, None), "854x640")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, None, 1080, None), "1440x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, None, 720, None), "960x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, None, 480, None), "640x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1920, 1080, 1.777), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1280, 720, 1.777), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 854, 480, 1.78), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1920, None, 1.777), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1280, None, 1.777), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 854, None, 1.78), "854x480")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, None, 1080, 1.777), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, None, 720, 1.777), "1280x720")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, None, 480, 1.78), "854x480")
         # Alternative aspect notation
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1920, 1080, "16:9"), "1920x1080")
-        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(movie_no_aspect, 1920, 1080, "4:3"), "1440x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1920, 1080, "16:9"), "1920x1080")
+        self.assertEqual(bibencode_encode.determine_resolution_preserving_aspect(video01.movie_no_aspect, 1920, 1080, "4:3"), "1440x1080")
 
     def test_assure_quality(self):
         """ Test if the quality is detected correctly"""
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1920, 1080, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1280, 720, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 4443, 2500, 6000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1280, 720, 10000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1920, 1080, 10000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1920, 1080, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, None, 720, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, None, 2500, 6000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, None, 720, 10000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, None, 1080, 10000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1920, None, None, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1280, None, None, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 4443, None, None, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, None, None, 10000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, None, None, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 800, 600, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, "4:3", 800, 600, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, "4:3", 1440, 1080, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, 1.333333333333333333, 800, 600, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, 1.333333333333333333, 1440, 1080, 6000000, True, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, 1.333, 800, 600, 6000000, True, 0.95), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, 1.333, 1440, 1080, 6000000, True, 0.95), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 800, 600, 6000000, True, 0.95), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, None, 1440, 1080, 6000000, True, 0.95), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, 1.333, 800, 600, 6000000, False, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(video01_out03, 1.333, 1440, 1080, 6000000, False, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1920, 1080, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1280, 720, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 4443, 2500, 6000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1280, 720, 10000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1920, 1080, 10000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1920, 1080, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, None, 720, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, None, 2500, 6000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, None, 720, 10000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, None, 1080, 10000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1920, None, None, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1280, None, None, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 4443, None, None, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, None, None, 10000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, None, None, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 800, 600, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, "4:3", 800, 600, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, "4:3", 1440, 1080, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, 1.333333333333333333, 800, 600, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, 1.333333333333333333, 1440, 1080, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, 1.333, 800, 600, 6000000, True, 0.95), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, 1.333, 1440, 1080, 6000000, True, 0.95), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 800, 600, 6000000, True, 0.95), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, None, 1440, 1080, 6000000, True, 0.95), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, 1.333, 800, 600, 6000000, False, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.out03, 1.333, 1440, 1080, 6000000, False, 1.0), True)
 
-        self.assertEqual(bibencode_encode.assure_quality(movie_no_aspect, None, 800, 600, 6000000, False, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(movie_no_aspect, None, 1440, 1080, 6000000, False, 1.0), True)
-        self.assertEqual(bibencode_encode.assure_quality(movie_no_aspect, None, 1920, 1080, 6000000, False, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(movie_no_aspect, None, 1920, 1080, 6000000, True, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(movie_no_aspect, "16:9", 1920, 1080, 6000000, False, 1.0), False)
-        self.assertEqual(bibencode_encode.assure_quality(movie_no_aspect, "16:9", 1920, 1080, 6000000, True, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.movie_no_aspect, None, 800, 600, 6000000, False, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.movie_no_aspect, None, 1440, 1080, 6000000, False, 1.0), True)
+        self.assertEqual(bibencode_encode.assure_quality(video01.movie_no_aspect, None, 1920, 1080, 6000000, False, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.movie_no_aspect, None, 1920, 1080, 6000000, True, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.movie_no_aspect, "16:9", 1920, 1080, 6000000, False, 1.0), False)
+        self.assertEqual(bibencode_encode.assure_quality(video01.movie_no_aspect, "16:9", 1920, 1080, 6000000, True, 1.0), True)
 
 
 class TestExtractFunctions(InvenioTestCase):
     """Tests the functions of bibencode_extract"""
     pass
+
 
 class TestMetadataFunctions(InvenioTestCase):
     """Tests the functions of bibencode_metadata"""
@@ -351,12 +393,13 @@ class TestMetadataFunctions(InvenioTestCase):
               'start_time': '0.000000 ',
               'time_base': '1/50',
               'width': '1920'}]}
-        self.assertEqual(bibencode_metadata.ffprobe_metadata(video01_out01), metadata_check)
+        self.assertEqual(bibencode_metadata.ffprobe_metadata(video01.out01), metadata_check)
 
 
 class TestBatchEngineFunctions(InvenioTestCase):
     """Tests the functions of bibencode_batch_engine"""
     pass
+
 
 class TestDaemonFunctions(InvenioTestCase):
     """Tests the functions of bibencode_daemon"""
@@ -372,6 +415,7 @@ TEST_SUITE = make_test_suite(SetupTester,
                              TestDaemonFunctions)
 
 if __name__ == "__main__":
+    from invenio.utils.text import wait_for_user
     wait_for_user("""
     #######################################################
     # This is the test suite for the BibEncode module     #
@@ -397,4 +441,3 @@ if __name__ == "__main__":
     #######################################################
     """)
     run_test_suite(TEST_SUITE)
-

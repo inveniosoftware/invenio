@@ -228,7 +228,7 @@ def uri():
     print current_app.config['SQLALCHEMY_DATABASE_URI']
 
 
-def load_fixtures(packages=None, truncate_tables_first=False):
+def load_fixtures(packages=['invenio.modules.*'], truncate_tables_first=False):
     from invenio.base.utils import autodiscover_models, \
         import_module_from_packages
     from invenio.ext.sqlalchemy import db

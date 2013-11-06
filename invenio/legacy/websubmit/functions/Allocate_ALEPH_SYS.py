@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_WEBSUBMIT_COUNTERSDIR, \
      CFG_SITE_SUPPORT_EMAIL
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionError
 from invenio.ext.email import send_email
 
 CFG_WARNING_MAX_SYS_APPROACHING = 2000

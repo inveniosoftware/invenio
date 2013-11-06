@@ -25,7 +25,7 @@ from os import access, F_OK, R_OK, getpid, rename, unlink
 from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
-from invenio.websubmit_config import CFG_RESERVED_SUBMISSION_FILENAMES
+from invenio.legacy.websubmit.config import CFG_RESERVED_SUBMISSION_FILENAMES
 from invenio.access_control_admin import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
 from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.access_control_engine import acc_authorize_action
@@ -1458,7 +1458,7 @@ def _functionedit_display_function_details(funcname, user_msg=""):
         ## lines and remove unnecessary leading whitespaces
         docstring = None
         try:
-            websubmit_function = __import__('invenio.websubmit_functions.%s' % funcname,
+            websubmit_function = __import__('invenio.legacy.websubmit.functions.%s' % funcname,
                                             globals(), locals(), [funcname])
             if hasattr(websubmit_function, funcname) and getattr(websubmit_function, funcname).__doc__:
                 docstring = getattr(websubmit_function, funcname).__doc__

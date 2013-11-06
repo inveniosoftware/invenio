@@ -47,7 +47,7 @@ from invenio.utils.url import make_canonical_urlargd, create_html_link, \
                              get_canonical_and_alternates_urls
 from invenio.utils.date import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
-from invenio.bibformat import format_record
+from invenio.modules.formatter import format_record
 from bs4 import BeautifulSoup
 from invenio import template
 websearch_templates = template.load('websearch')
