@@ -68,7 +68,7 @@ class BibMatchValidationTest(InvenioTestCase):
         original_record_instances = ['Brodsky, Stanley J.']
         matched_record_instances = ['Brodsky, S.J.', 'Not, M E']
         comparisons = get_paired_comparisons(original_record_instances, matched_record_instances)
-        threshold = 0.8
+        threshold = 0.85
         matches_needed = 1
         result, dummy = compare_fieldvalues_authorname(comparisons, threshold, matches_needed)
         self.assertTrue(result)

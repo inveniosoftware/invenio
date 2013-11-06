@@ -38,8 +38,8 @@ from invenio.bibmatch_config import CFG_BIBMATCH_VALIDATION_MATCHING_MODES, \
                                     CFG_BIBMATCH_LOGGER
 from invenio.bibrecord import create_records, record_get_field_values
 from invenio.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
-from invenio.bibauthorid_name_utils import compare_names
-from invenio.bibauthorid_name_utils import string_partition
+from invenio.bibauthorid_name_utils import (soft_compare_names,
+                                            string_partition)
 from invenio.textutils import translate_to_ascii
 
 re_valid_tag = re.compile("^[0-9]{3}[a-zA-Z0-9_%]{0,3}$")
@@ -444,7 +444,7 @@ def compare_fieldvalues_authorname(field_comparisons, threshold, matches_needed)
                                           get_reversed_string_variants(other_value))][0]
             for str1, str2 in author_comparisons:
                 # Author-name comparison - using BibAuthorid function
-                diff = compare_names(str1, str2)
+                diff = soft_compare_names(str1, str2)
                 if diff >= threshold:
                     matches_found += 1
                     break
