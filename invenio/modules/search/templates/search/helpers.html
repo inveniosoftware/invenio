@@ -544,10 +544,8 @@
  # This is a dirty hack for browser without Javascript support.
  #}
 <script type="text/javascript">
-<![CDATA[
   var box = {{ search_box(collection)|tojson|safe }};
   document.write(box);
-]]>
 </script>
 
               <!-- Hidden configuration fields -->

@@ -29,7 +29,7 @@
 
 {% block header %}
   {{ super() }}
-  {% js url_for('static.search', filename='js/search/typeahead.js') %}
+  {% js url_for('search.static', filename='js/search/typeahead.js') %}
   {% js url_for('static', filename='js/bootstrap-select.js') %}
 {% endblock %}
 
