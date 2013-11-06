@@ -27,7 +27,7 @@ from flask.ext.login import current_user, login_required
 #from invenio import websession_config
 #from invenio import webuser
 webuser = object
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, LostPasswordForm
 from .models import User
 from .validators import wash_login_method
 from invenio.base.decorators import wash_arguments
