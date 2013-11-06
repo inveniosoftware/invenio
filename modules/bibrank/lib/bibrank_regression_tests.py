@@ -79,7 +79,7 @@ class BibRankWordSimilarityRankingTest(InvenioTestCase):
         """bibrank - search results ranked by word similarity"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id',
-                                               expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 9, 14, 18, 15]"))
+                                               expected_text="[15, 18, 14, 9, 16, 13, 47, 17, 12, 11, 10, 8]"))
 
     def test_similar_records_link(self):
         """bibrank - 'Similar records' link"""
@@ -102,8 +102,7 @@ class BibRankCitationRankingTest(InvenioTestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
                                                username="admin",
-                                               # expected_text="find_citations retlist [[84, 3], [77, 2], [85, 0]]"))
-))
+                                               expected_text="find_citations ret [[85, 0], [77, 2L], [84, 3L]]"))
 
     def test_detailed_record_citations_tab(self):
         """bibrank - detailed record, citations tab"""

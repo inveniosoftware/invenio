@@ -152,7 +152,9 @@ def page(title, body, navtrail="", description="", keywords="",
                           navmenuid = navmenuid,
                           rssurl = rssurl,
                           show_title_p = show_title_p,
-                          body_css_classes=body_css_classes)
+                          body_css_classes=body_css_classes,
+                          show_header=show_header,
+                          show_footer=show_footer)
 
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,

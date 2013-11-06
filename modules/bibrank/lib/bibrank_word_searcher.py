@@ -21,6 +21,8 @@ import time
 import math
 import re
 
+from operator import itemgetter
+
 from invenio.dbquery import run_sql, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
@@ -181,7 +183,6 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance, verb
     prefix - what to show before the rank value
     postfix - what to show after the rank value
     voutput - contains extra information, content dependent on verbose value"""
-
     voutput = ""
     startCreate = time.time()
 
@@ -290,7 +291,8 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
             reclist.append((j, w))
 
     #sort scores
-    reclist.sort(lambda x, y: cmp(x[1], y[1]))
+    reclist.sort(key=itemgetter(1, 0))
+    # reclist.sort(lambda x, y: cmp(x[1], y[1]))
 
     if verbose > 0:
         voutput += "Number of records sorted: %s<br />" % len(reclist)

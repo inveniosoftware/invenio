@@ -189,7 +189,6 @@ class Template:
 
           - HTML code of the page
         """
-
         # load the right message language
         _ = gettext_set_language(ln)
         out = ''

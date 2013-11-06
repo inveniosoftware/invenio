@@ -2307,7 +2307,7 @@ def search_unit(p, f=None, m=None, wl=0, ignore_synonyms=None):
             cjk_tok = BibIndexCJKTokenizer()
             chars = cjk_tok.tokenize_for_words(p)
             for char in chars:
-                hitset_cjk |= search_unit_in_bibwords(char, f, m, wl)
+                hitset_cjk |= search_unit_in_bibwords(char, f, wl)
 
     ## eventually look up runtime synonyms:
     hitset_synonyms = intbitset()
@@ -2962,7 +2962,6 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, of="hb
 
     # calculate the list of recids (restricted or not) that the user has rights to access and we should display (only those)
     records_that_can_be_displayed = intbitset()
-
     if not req or isinstance(req, cStringIO.OutputType): # called from CLI
         user_info = {}
         for coll in colls:
@@ -4078,19 +4077,24 @@ def rank_records(req, rank_method_code, rank_limit_relevance, hitset_global, pat
                     comment = 'find_citations retlist %s' % [[solution_recs[i], solution_scores[i]] for i in range(len(solution_recs))]
                 return solution_recs, solution_scores, '(', ')', comment
 
+    if rank_method_code.lower() == 'citation':
+        related_to = []
+    else:
+        related_to = pattern
+
     solution_recs, solution_scores, prefix, suffix, comment = \
         rank_records_bibrank(rank_method_code=rank_method_code,
                              rank_limit_relevance=rank_limit_relevance,
-                             hitset_global=hitset_global,
-                             pattern=pattern,
+                             hitset=hitset_global,
                              verbose=verbose,
                              field=field,
+                             related_to=related_to,
                              rg=rg,
                              jrec=jrec)
 
     # Solution recs can be None, in case of error or other cases
     # which should be all be changed to return an empty list.
-    if solution_recs and sort_order != 'd':
+    if solution_recs and sort_order == 'd':
         solution_recs.reverse()
 
     return solution_recs, solution_scores, prefix, suffix, comment
@@ -4102,10 +4106,8 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
 
     _ = gettext_set_language(ln)
 
-    #we should return sorted records up to irec_max(exclusive)
-    dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
-    #calculate the min index on the reverted list
-    index_min = max(len(recIDs) - irec_max, 0) #just to be sure that the min index is not negative
+    # Calculate the min index on the reverted list
+    index_min = jrec
 
     #bibsort does not handle sort_pattern for now, use bibxxx
     if sort_pattern:
@@ -4156,15 +4158,20 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
     return recIDs[index_min:]
 
 
-def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None, sort_or_rank = 's'):
+def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=1, sort_or_rank='s'):
     """This function orders the recIDs list, based on a sorting method(sort_field) using the BibSortDataCacher for speed"""
-
     _ = gettext_set_language(ln)
+
+    if not jrec:
+        jrec = 1
 
     #sanity check
     if sort_method not in sorting_methods:
         if sort_or_rank == 'r':
-            return rank_records_bibrank(sort_method, 0, recIDs, None, verbose)
+            return rank_records_bibrank(rank_method_code=sort_method,
+                                        rank_limit_relevance=0,
+                                        hitset=recIDs,
+                                        verbose=verbose)
         else:
             return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, '', verbose, of, ln, rg, jrec)
     if verbose >= 3 and of.startswith('h'):
@@ -4172,7 +4179,7 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
                       % (cgi.escape(repr(sort_method)), cgi.escape(repr(sorting_methods[sort_method]))), req=req)
     #we should return sorted records up to irec_max(exclusive)
     dummy, irec_max = get_interval_for_records_to_sort(len(recIDs), jrec, rg)
-    solution = intbitset([])
+    solution = intbitset()
     input_recids = intbitset(recIDs)
     cache_sorted_data[sort_method].recreate_cache_if_needed()
     sort_cache = cache_sorted_data[sort_method].cache
@@ -4182,48 +4189,63 @@ def sort_records_bibsort(req, recIDs, sort_method, sort_field='', sort_order='d'
         if verbose > 3 and of.startswith('h'):
             write_warning("Not all buckets have been constructed.. switching to old fashion sorting.", req=req)
         if sort_or_rank == 'r':
-            return rank_records_bibrank(sort_method, 0, recIDs, None, verbose)
+            return rank_records_bibrank(rank_method_code=sort_method,
+                                        rank_limit_relevance=0,
+                                        hitset=recIDs,
+                                        verbose=verbose)
         else:
-            return sort_records_bibxxx(req, recIDs, None, sort_field, sort_order, '', verbose, of, ln, rg, jrec)
+            return sort_records_bibxxx(req, recIDs, None, sort_field,
+                                       sort_order, '', verbose, of, ln, rg,
+                                       jrec)
+
     if sort_order == 'd':
         bucket_numbers.reverse()
     for bucket_no in bucket_numbers:
         solution.union_update(input_recids & sort_cache['bucket_data'][bucket_no])
         if len(solution) >= irec_max:
             break
+
     dict_solution = {}
-    missing_records = []
+    missing_records = intbitset()
     for recid in solution:
         try:
             dict_solution[recid] = sort_cache['data_dict_ordered'][recid]
         except KeyError:
             #recid is in buckets, but not in the bsrMETHODDATA,
             #maybe because the value has been deleted, but the change has not yet been propagated to the buckets
-            missing_records.append(recid)
+            missing_records.add(recid)
     #check if there are recids that are not in any bucket -> to be added at the end/top, ordered by insertion date
     if len(solution) < irec_max:
         #some records have not been yet inserted in the bibsort structures
         #or, some records have no value for the sort_method
-        missing_records = sorted(missing_records + list(input_recids.difference(solution)))
+        missing_records += input_recids - solution
     #the records need to be sorted in reverse order for the print record function
     #the return statement should be equivalent with the following statements
     #(these are clearer, but less efficient, since they revert the same list twice)
     #sorted_solution = (missing_records + sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='d'))[:irec_max]
     #sorted_solution.reverse()
     #return sorted_solution
-    if sort_method.strip().lower().startswith('latest') and sort_order == 'd':
-        # if we want to sort the records on their insertion date, add the mission records at the top
-        solution = sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='a') + missing_records
+    reverse = sort_order == 'd'
+
+    if sort_method.strip().lower().startswith('latest') and reverse:
+        # If we want to sort the records on their insertion date, add the missing records at the top
+        solution = sorted(dict_solution, key=dict_solution.__getitem__, reverse=True) + sorted(missing_records, reverse=True)
     else:
-        solution = missing_records + sorted(dict_solution, key=dict_solution.__getitem__, reverse=sort_order=='a')
-    #calculate the min index on the reverted list
-    index_min = max(len(solution) - irec_max, 0) #just to be sure that the min index is not negative
-    #return all the records up to irec_max, but on the reverted list
+        solution = sorted(missing_records) + sorted(dict_solution, key=dict_solution.__getitem__, reverse=reverse)
+
+    # Only keep records, we are going to display
+    index_min = jrec - 1
+    if rg:
+        index_max = index_min + rg
+        solution = solution[index_min:index_max]
+    else:
+        solution = solution[index_min:]
+
     if sort_or_rank == 'r':
-        # we need the recids, with values
-        return (solution[index_min:], [dict_solution.get(record, 0) for record in solution[index_min:]])
+        # We need the recids, with their ranking score
+        return solution, [dict_solution.get(record, 0) for record in solution]
     else:
-        return solution[index_min:]
+        return solution
 
 
 def sort_records_bibxxx(req, recIDs, tags, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG, rg=None, jrec=None):
@@ -4414,19 +4436,25 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
             if print_records_prologue_p:
                 print_records_prologue(req, format)
 
-            # print records
-            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-
             if ot:
                 # asked to print some filtered fields only, so call print_record() on the fly:
-                for irec in range(irec_max, irec_min, -1):
-                    x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                    user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                for recid in recIDs:
+                    x = print_record(recid,
+                                     format,
+                                     ot=ot,
+                                     ln=ln,
+                                     search_pattern=search_pattern,
+                                     user_info=user_info,
+                                     verbose=verbose,
+                                     sf=sf,
+                                     so=so,
+                                     sp=sp,
+                                     rm=rm)
                     req.write(x)
                     if x:
                         req.write('\n')
             else:
-                format_records(recIDs_to_print,
+                format_records(recIDs,
                                format,
                                ln=ln,
                                search_pattern=search_pattern,
@@ -4440,22 +4468,30 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
 
         elif format.startswith('t') or str(format[0:3]).isdigit():
             # we are doing plain text output:
-            for irec in range(irec_max, irec_min, -1):
-                x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
+            for recid in recIDs:
+                x = print_record(recid, format, ot, ln, search_pattern=search_pattern,
                                  user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
                 req.write(x)
                 if x:
                     req.write('\n')
         elif format == 'excel':
-            recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-            create_excel(recIDs=recIDs_to_print, req=req, ot=ot, user_info=user_info)
+            create_excel(recIDs=recIDs, req=req, ot=ot, user_info=user_info)
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
                 # portfolio and on-the-fly formats:
-                for irec in range(irec_max, irec_min, -1):
-                    req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                           user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm))
+                for recid in recIDs:
+                    req.write(print_record(recid,
+                                           format,
+                                           ot=ot,
+                                           ln=ln,
+                                           search_pattern=search_pattern,
+                                           user_info=user_info,
+                                           verbose=verbose,
+                                           sf=sf,
+                                           so=so,
+                                           sp=sp,
+                                           rm=rm))
             elif format.startswith("hb"):
                 # HTML brief format:
                 display_add_to_basket = True
@@ -4468,44 +4504,51 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             display_add_to_basket = False
                 if em != "" and EM_REPOSITORY["basket"] not in em:
                     display_add_to_basket = False
-                req.write(websearch_templates.tmpl_record_format_htmlbrief_header(
-                    ln = ln))
-                for irec in range(irec_max, irec_min, -1):
-                    row_number = jrec+irec_max-irec
-                    recid = recIDs[irec]
+                req.write(websearch_templates.tmpl_record_format_htmlbrief_header(ln=ln))
+                for irec, recid in enumerate(recIDs):
+                    row_number = jrec+irec
                     if relevances and relevances[irec]:
                         relevance = relevances[irec]
                     else:
                         relevance = ''
-                    record = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                                  user_info=user_info, verbose=verbose, sf=sf, so=so, sp=sp, rm=rm)
+                    record = print_record(recid,
+                                          format,
+                                          ot=ot,
+                                          ln=ln,
+                                          search_pattern=search_pattern,
+                                          user_info=user_info,
+                                          verbose=verbose,
+                                          sf=sf,
+                                          so=so,
+                                          sp=sp,
+                                          rm=rm)
 
                     req.write(websearch_templates.tmpl_record_format_htmlbrief_body(
-                        ln = ln,
-                        recid = recid,
-                        row_number = row_number,
-                        relevance = relevance,
-                        record = record,
-                        relevances_prologue = relevances_prologue,
-                        relevances_epilogue = relevances_epilogue,
-                        display_add_to_basket = display_add_to_basket
+                        ln=ln,
+                        recid=recid,
+                        row_number=row_number,
+                        relevance=relevance,
+                        record=record,
+                        relevances_prologue=relevances_prologue,
+                        relevances_epilogue=relevances_epilogue,
+                        display_add_to_basket=display_add_to_basket
                         ))
 
                 req.write(websearch_templates.tmpl_record_format_htmlbrief_footer(
-                    ln = ln,
-                    display_add_to_basket = display_add_to_basket))
+                    ln=ln,
+                    display_add_to_basket=display_add_to_basket))
 
             elif format.startswith("hd"):
                 # HTML detailed format:
-                for irec in range(irec_max, irec_min, -1):
-                    if record_exists(recIDs[irec]) == -1:
+                for recid in recIDs:
+                    if record_exists(recid) == -1:
                         write_warning(_("The record has been deleted."), req=req)
-                        merged_recid = get_merged_recid(recIDs[irec])
+                        merged_recid = get_merged_recid(recid)
                         if merged_recid:
                             write_warning(_("The record %d replaces it." % merged_recid), req=req)
                         continue
-                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
-                                                            recIDs[irec], ln=ln)
+                    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recid)),
+                                                            recid, ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
                     ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
 
@@ -4514,7 +4557,6 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                     if ln != CFG_SITE_LANG:
                         link_ln = '?ln=%s' % ln
 
-                    recid = recIDs[irec]
                     recid_to_display = recid  # Record ID used to build the URL.
                     if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
                         try:
@@ -4545,29 +4587,28 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                      citationnum=citedbynum,
                                                      referencenum=references,
                                                      discussionnum=discussions))
-                        r = calculate_reading_similarity_list(recIDs[irec], "downloads")
+                        r = calculate_reading_similarity_list(recid, "downloads")
                         downloadsimilarity = None
                         downloadhistory = None
                         #if r:
                         #    downloadsimilarity = r
                         if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS:
-                            downloadhistory = create_download_history_graph_and_box(recIDs[irec], ln)
+                            downloadhistory = create_download_history_graph_and_box(recid, ln)
 
-                        r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
+                        r = calculate_reading_similarity_list(recid, "pageviews")
                         viewsimilarity = None
                         if r:
                             viewsimilarity = r
-                        content = websearch_templates.tmpl_detailed_record_statistics(recIDs[irec],
+                        content = websearch_templates.tmpl_detailed_record_statistics(recid,
                                                                                       ln,
                                                                                       downloadsimilarity=downloadsimilarity,
                                                                                       downloadhistory=downloadhistory,
                                                                                       viewsimilarity=viewsimilarity)
                         req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'citations':
-                        recid = recIDs[irec]
                         req.write(webstyle_templates.detailed_record_container_top(recid,
                                                      tabs,
                                                      ln,
@@ -4618,15 +4659,15 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'references':
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
                                                      tabs,
                                                      ln,
                                                      citationnum=citedbynum,
                                                      referencenum=references,
                                                      discussionnum=discussions))
 
-                        req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose, force_2nd_pass=True))
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(format_record(recid, 'HDREF', ln=ln, user_info=user_info, verbose=verbose, force_2nd_pass=True))
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
@@ -4647,7 +4688,7 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                    tabs,
                                                                                    ln))
                         content = websearch_templates.tmpl_record_plots(recID=recid,
-                                                                         ln=ln)
+                                                                        ln=ln)
                         req.write(content)
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
@@ -4672,67 +4713,70 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                             tabs, ln))
                     elif tab == 'plots':
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
                                                                                    ln))
-                        content = websearch_templates.tmpl_record_plots(recID=recIDs[irec],
+                        content = websearch_templates.tmpl_record_plots(recID=recid,
                                                                          ln=ln)
                         req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
 
                     elif tab == 'hepdata':
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
                                                                                    tabs,
-                                                                                   ln, include_jquery = True,
-                                                                                   include_mathjax = True))
+                                                                                   ln,
+                                                                                   include_jquery=True,
+                                                                                   include_mathjax=True))
                         from invenio import hepdatautils
                         from invenio import hepdatadisplayutils
-                        data = hepdatautils.retrieve_data_for_record(recIDs[irec])
+                        data = hepdatautils.retrieve_data_for_record(recid)
 
                         if data:
-                            content = websearch_templates.tmpl_record_hepdata(data, recIDs[irec], True)
+                            content = websearch_templates.tmpl_record_hepdata(data, recid, True)
                         else:
                             content = websearch_templates.tmpl_record_no_hepdata()
 
                         req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln))
                     else:
                         # Metadata tab
-                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_top(
+                                                     recid,
                                                      tabs,
                                                      ln,
                                                      show_short_rec_p=False,
-                                                     citationnum=citedbynum, referencenum=references,
+                                                     citationnum=citedbynum,
+                                                     referencenum=references,
                                                      discussionnum=discussions))
 
                         creationdate = None
                         modificationdate = None
-                        if record_exists(recIDs[irec]) == 1:
-                            creationdate = get_creation_date(recIDs[irec])
-                            modificationdate = get_modification_date(recIDs[irec])
+                        if record_exists(recid) == 1:
+                            creationdate = get_creation_date(recid)
+                            modificationdate = get_modification_date(recid)
 
-                        content = print_record(recIDs[irec], format, ot, ln,
+                        content = print_record(recid, format, ot, ln,
                                                search_pattern=search_pattern,
                                                user_info=user_info, verbose=verbose,
                                                sf=sf, so=so, sp=sp, rm=rm)
                         content = websearch_templates.tmpl_detailed_record_metadata(
-                            recID = recIDs[irec],
-                            ln = ln,
-                            format = format,
-                            creationdate = creationdate,
-                            modificationdate = modificationdate,
-                            content = content)
+                            recID=recid,
+                            ln=ln,
+                            format=format,
+                            creationdate=creationdate,
+                            modificationdate=modificationdate,
+                            content=content)
                         # display of the next-hit/previous-hit/back-to-search links
                         # on the detailed record pages
                         content += websearch_templates.tmpl_display_back_to_search(req,
-                                                                                   recIDs[irec],
+                                                                                   recid,
                                                                                    ln)
                         req.write(content)
-                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
                                                                                       ln,
                                                                                       creationdate=creationdate,
@@ -4743,12 +4787,12 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                             # Add the mini box at bottom of the page
                             if CFG_WEBCOMMENT_ALLOW_REVIEWS:
                                 from invenio.webcomment import get_mini_reviews
-                                reviews = get_mini_reviews(recid = recIDs[irec], ln=ln)
+                                reviews = get_mini_reviews(recid=recid, ln=ln)
                             else:
                                 reviews = ''
-                            actions = format_record(recIDs[irec], 'HDACT', ln=ln, user_info=user_info, verbose=verbose)
-                            files = format_record(recIDs[irec], 'HDFILE', ln=ln, user_info=user_info, verbose=verbose)
-                            req.write(webstyle_templates.detailed_record_mini_panel(recIDs[irec],
+                            actions = format_record(recid, 'HDACT', ln=ln, user_info=user_info, verbose=verbose)
+                            files = format_record(recid, 'HDFILE', ln=ln, user_info=user_info, verbose=verbose)
+                            req.write(webstyle_templates.detailed_record_mini_panel(recid,
                                                                                     ln,
                                                                                     format,
                                                                                     files=files,
@@ -4756,8 +4800,8 @@ def print_records(req, recIDs, jrec=1, rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, f
                                                                                     actions=actions))
             else:
                 # Other formats
-                for irec in range(irec_max, irec_min, -1):
-                    req.write(print_record(recIDs[irec], format, ot, ln,
+                for recid in recIDs:
+                    req.write(print_record(recid, format, ot, ln,
                                            search_pattern=search_pattern,
                                            user_info=user_info, verbose=verbose,
                                            sf=sf, so=so, sp=sp, rm=rm))
@@ -5298,7 +5342,7 @@ def clean_dictionary(dictionary, list_of_items):
 
 ### CALLABLES
 
-def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
+def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, sf="", so="a", sp="", rm="", of="id", ot="", aas=0,
                         p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                         recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
                         d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab="",
@@ -5802,17 +5846,19 @@ def prs_search_similar_records(kwargs=None, req=None, of=None, cc=None, pl_in_ur
     else:
         # record well exists, so find similar ones to it
         t1 = os.times()[4]
-        if rm == 'citation':
-            pattern = 'refersto:recid:%s' % recid
-        else:
-            pattern = 'recid:%s' % recid
         (results_similar_recIDs,
          results_similar_relevances,
          results_similar_relevances_prologue,
          results_similar_relevances_epilogue,
          results_similar_comments) = \
-            rank_records_bibrank(rm, 0, get_collection_reclist(cc), [pattern],
-                                 verbose, f, rg, jrec)
+            rank_records_bibrank(rank_method_code=rm,
+                                 rank_limit_relevance=0,
+                                 hitset=get_collection_reclist(cc),
+                                 related_to=[p],
+                                 verbose=verbose,
+                                 field=f,
+                                 rg=rg,
+                                 jrec=jrec)
         if results_similar_recIDs:
             t2 = os.times()[4]
             cpu_time = t2 - t1
@@ -6284,6 +6330,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
             results_final_relevances = []
             results_final_relevances_prologue = ""
             results_final_relevances_epilogue = ""
+
             if rm: # do we have to rank?
                 results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
                                              rank_records(req, rm, 0, results_final[coll],
@@ -6299,6 +6346,7 @@ def prs_print_records(kwargs=None, results_final=None, req=None, of=None, cc=Non
                     write_warning(results_final_relevances_epilogue, req=req)
             elif sf or (CFG_BIBSORT_BUCKETS and sorting_methods): # do we have to sort?
                 results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of, ln, rg, jrec)
+
 
             if len(results_final_recIDs) < CFG_WEBSEARCH_PREV_NEXT_HIT_LIMIT:
                 results_final_colls.append(results_final_recIDs)

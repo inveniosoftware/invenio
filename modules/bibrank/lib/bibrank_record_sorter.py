@@ -21,7 +21,6 @@
 import time
 import re
 import ConfigParser
-import copy
 
 from operator import itemgetter
 
@@ -211,21 +210,20 @@ def get_bibrank_methods(colID, ln=CFG_SITE_LANG):
     return avail_methods
 
 
-def citation(rank_method_code, pattern, hitset, rank_limit_relevance, verbose):
-    """Sort records by number of citations
+def citation(rank_method_code, related_to, hitset, rank_limit_relevance, verbose):
+    """Sort records by number of citations"""
+    if related_to:
+        from invenio.search_engine import search_pattern
+        hits = intbitset()
+        for pattern in related_to:
+            hits |= hitset & intbitset(search_pattern(p='refersto:%s' % pattern))
+    else:
+        hits = hitset
+    return rank_by_citations(hits, verbose)
 
-    I am not sure why we filter on pattern here. Also we only take the first
-    pattern. This is weird.
-    """
-    # if pattern:
-    #     # TODO: Move it to a higher level that knows what records to rank on
-    #     from invenio.search_engine import search_pattern
-    #     hitset &= intbitset(search_pattern(p=pattern[0]))
-    return find_citations(hitset, verbose)
 
-
-def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=[], verbose=0, field='', rg=None, jrec=None):
-    """Sorts records according to given method
+def rank_records(rank_method_code, rank_limit_relevance, hitset, related_to=[], verbose=0, field='', rg=None, jrec=None):
+    """Sorts given records or related records according to given method
 
        Parameters:
         - rank_method_code: Sort records using this method
@@ -235,10 +233,11 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
                                      or `0.10' for `vec'
                                      This is ignored when sorting by
                                      citations. But I don't know what it means.
-        - hitset: records to sort, actually not all the records in the
-                  collection we are looking in (for some reason)
-        - pattern: search engine query, we filter only on the first as if that
-                   makes sense, it should be done at a higher level
+        - hitset: records to sort
+        - related_to: if specified, instead of sorting given records,
+                      we first fetch the related records ("related" being
+                      defined by the method), then we sort these related
+                      records
         - verbose, verbose level
         - field: stuff
         - rg: more stuff
@@ -260,7 +259,8 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     try:
         # We are receiving a global hitset
-        hitset = copy.deepcopy(hitset_global)
+        hitset_global = hitset
+        hitset = intbitset(hitset_global)
 
         if 'methods' not in globals():
             create_rnkmethod_cache()
@@ -271,13 +271,13 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
         if verbose > 0:
             voutput += "function: %s <br/> " % function
-            voutput += "pattern:  %s <br/>" % str(pattern)
+            voutput += "related_to:  %s <br/>" % str(related_to)
 
-        if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
-            result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose, METHODS)
+        if func_object and related_to and related_to[0][0:6] == "recid:" and function == "word_similarity":
+            result = find_similar(rank_method_code, related_to[0][6:], hitset, rank_limit_relevance, verbose, METHODS)
         elif func_object:
             if function == "word_similarity":
-                result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose, METHODS)
+                result = func_object(rank_method_code, related_to, hitset, rank_limit_relevance, verbose, METHODS)
             elif function in ("word_similarity_solr", "word_similarity_xapian"):
                 if not rg:
                     rg = CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS
@@ -293,15 +293,15 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
                 if function == "word_similarity_solr":
                     if verbose > 0:
                         voutput += "In Solr part:<br/>"
-                    result = word_similarity_solr(pattern, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount)
+                    result = word_similarity_solr(related_to, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount)
                 if function == "word_similarity_xapian":
                     if verbose > 0:
                         voutput += "In Xapian part:<br/>"
-                    result = word_similarity_xapian(pattern, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount)
+                    result = word_similarity_xapian(related_to, hitset, METHODS[rank_method_code], verbose, field, ranked_result_amount)
             else:
-                result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
+                result = func_object(rank_method_code, related_to, hitset, rank_limit_relevance, verbose)
         else:
-            result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
+            result = rank_by_method(rank_method_code, related_to, hitset, rank_limit_relevance, verbose)
     except Exception, e:
         register_exception()
         result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br />" % (e,)]), voutput)
@@ -325,6 +325,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     #dbg = string.join(map(str,methods[rank_method_code].items()))
     #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput)
     return result
+
 
 def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose):
     """combining several methods into one based on methods/percentage in config file"""
@@ -352,6 +353,7 @@ def combine_method(rank_method_code, pattern, hitset, rank_limit_relevance, verb
         return (result, "(", ")", voutput)
     except Exception:
         return (None, "Warning: %s method cannot be used for ranking your query." % rank_method_code, "", voutput)
+
 
 def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance, verbose):
     """Ranking of records based on predetermined values.
@@ -429,10 +431,13 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance, verbo
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, METHODS[rank_method_code]["prefix"], METHODS[rank_method_code]["postfix"], voutput)
 
-def find_citations(hitset, verbose):
-    """Rank by the amount of citations."""
-    #calculate the cited-by values for all the members of the hitset
-    #returns: ((recordid,weight),prefix,postfix,message)
+
+def rank_by_citations(hitset, verbose):
+    """Rank by the amount of citations.
+
+    Calculate the cited-by values for all the members of the hitset
+    Rreturns: ((recordid,weight),prefix,postfix,message)
+    """
     voutput = ""
 
     if len(hitset) > CFG_WEBSEARCH_CITESUMMARY_SCAN_THRESHOLD:
