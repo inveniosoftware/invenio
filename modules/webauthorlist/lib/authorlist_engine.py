@@ -31,7 +31,7 @@ except ImportError:
 from invenio.webuser import page_not_authorized
 from invenio.access_control_engine import acc_authorize_action
 import invenio.authorlist_config as cfg
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import perform_request_search, record_exists
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibedit_utils import get_record
 # from lxml import etree
@@ -51,74 +51,85 @@ def retrieve_data_from_record(recid):
     Extract data from a record id in order to import it to the Author list
     interface
     """
+    if not record_exists(recid):
+        return
+
     output = {}
-    # Save the affiliatons variable, the default value for "Affiliation" column
-    # will be always first value from type_of_affiliation table
-    type_of_affiliation = cfg.OPTIONS.AUTHOR_AFFILIATION_TYPE[0]
-    # Save the default identifier - first element from the list of identifiers
-    default_identifier = cfg.OPTIONS.IDENTIFIERS_LIST[0]
-    # Save identifiers mapping
-    identifiers_mapping = cfg.OPTIONS.IDENTIFIERS_MAPPING
+
+    DEFAULT_AFFILIATION_TYPE = cfg.OPTIONS.AUTHOR_AFFILIATION_TYPE[0]
+    DEFAULT_IDENTIFIER = cfg.OPTIONS.IDENTIFIERS_LIST[0]
+    IDENTIFIERS_MAPPING = cfg.OPTIONS.IDENTIFIERS_MAPPING
 
     bibrecord = get_record(recid)
-    if not bibrecord:
-        # record probably doesn't exist
-        return output
-    # Extract paper title, collaboration name, experiment number
-    paper_title = get_fieldvalues(int(recid), '245__a') and get_fieldvalues(int(recid), '245__a')[0] or ''
-    collaboration_name = get_fieldvalues(int(recid), '710__g') and get_fieldvalues(int(recid), '710__g')[0] or ''
-    experiment_number = get_fieldvalues(int(recid), '693__e') and get_fieldvalues(int(recid), '693__e')[0] or ''
 
-    # Extract authors
     try:
-        record_authors = bibrecord.get('100', [])
-        record_authors.extend(bibrecord.get('700', []))
-    except KeyError:
-        return output
-    # Extract affiliations
-    record_affiliations = get_fieldvalues(int(recid), '100__u')
-    record_affiliations.extend(get_fieldvalues(int(recid), '700__u'))
+        paper_title = get_fieldvalues(recid, '245__a')[0]
+    except IndexError:
+        paper_title = ""
+    try:
+        collaboration_name = get_fieldvalues(recid, '710__g')
+    except IndexError:
+        collaboration_name = ""
+    try:
+        experiment_number = get_fieldvalues(recid, '693__e')
+    except IndexError:
+        experiment_number = ""
 
-    # Generate all the author related information
+    record_authors = bibrecord.get('100', [])
+    record_authors.extend(bibrecord.get('700', []))
+
     author_list = []
-    for i in xrange(len(record_authors)):
-        identifiers = []
-        no_affiliation = True
-        for field in record_authors[i][0][1:]:
-        # check for affiliations and ID's
-            if field[0] == 'u':
-                no_affiliation = False
-            if field[0] == 'i' and field[1] in identifiers_mapping:
-                    identifiers.append([field[1], identifiers_mapping[field[1]]])
-        if not identifiers:
-            # if there are no identifiers, assign the default value
-            identifiers.append(['', default_identifier])
+    unique_affiliations = []
 
-        if no_affiliation:
-            # add this UNKNOWN_AFFILIATION to the record, because later
-            # we will iterate all affiliations
-            record_authors[i][0].append(('u', UNKNOWN_AFFILIATION))
-            # add UNKNOWN_AFFILIATION as affiliation, so catalogers can notice
-            # that something is wrong
-            record_affiliations.append(UNKNOWN_AFFILIATION)
-        author_info = [long(i+1),  # Row number
-                       '',
-                       record_authors[i][0][0][1].split(',')[0],  # Family name
-                       record_authors[i][0][0][1].split(',')[1].lstrip(),  # Given name
-                       record_authors[i][0][0][1],  # Name on paper
-                       '',  # Status
-                       [[x[1], type_of_affiliation] for x in record_authors[i][0][1:] if x[0] == 'u'],
-                       identifiers]
-        author_list.append(author_info)
+    for i, field_instance in enumerate(record_authors, 1):
+        family_name = ""
+        given_name = ""
+        name_on_paper = ""
+        status = ""
+        affiliations = []
+        identifiers = []
+        field = field_instance[0]
+        for subfield_code, subfield_value in field:
+            if subfield_code == "a":
+                try:
+                    family_name = subfield_value.split(',')[0]
+                    given_name = subfield_value.split(',')[1].lstrip()
+                except:
+                    pass
+                name_on_paper = subfield_value
+            elif subfield_code == "u":
+                affiliations.append([subfield_value, DEFAULT_AFFILIATION_TYPE])
+                unique_affiliations.append(subfield_value)
+            elif subfield_code == "i":
+                # FIXME This will currently work only with INSPIRE IDs
+                id_prefix = subfield_value.split("-")[0]
+                if id_prefix in IDENTIFIERS_MAPPING:
+                    identifiers.append([subfield_value, IDENTIFIERS_MAPPING[id_prefix]])
+                else:
+                    identifiers.append(['', DEFAULT_IDENTIFIER])
+        if not affiliations:
+            affiliations.append([UNKNOWN_AFFILIATION, DEFAULT_AFFILIATION_TYPE])
+            unique_affiliations.append(UNKNOWN_AFFILIATION)
+        author_list.append([
+            i,              # Row number
+            '',             # Place holder for the web interface
+            family_name,
+            given_name,
+            name_on_paper,
+            status,
+            affiliations,
+            identifiers
+        ])
+
+    unique_affiliations = list(set(unique_affiliations))
 
     output.update({'authors': author_list})
 
     # Generate all the affiliation related information
-    unique_affiliations = list(set(record_affiliations))
     affiliation_list = []
-    for i in xrange(len(unique_affiliations)):
-        institution = perform_request_search(c="Institutions", p='110__u:"' + unique_affiliations[i] + '"')
-        full_name = unique_affiliations[i]
+    for i, affiliation in enumerate(unique_affiliations, 1):
+        institution = perform_request_search(c="Institutions", p='110__u:"' + affiliation + '"')
+        full_name = affiliation
         if len(institution) == 1:
             full_name_110_a = get_fieldvalues(institution[0], '110__a')
             if full_name_110_a:
@@ -126,17 +137,17 @@ def retrieve_data_from_record(recid):
             full_name_110_b = get_fieldvalues(institution[0], '110__b')
             if full_name_110_b:
                 full_name += ', ' + str(full_name_110_b[0])
-        affiliation = [long(i+1),
+        affiliation = [i,
                        '',
-                       unique_affiliations[i],
+                       affiliation,
                        '',
                        full_name,
                        '',
                        True,
                        '']
         affiliation_list.append(affiliation)
+
     output.update({'affiliations': affiliation_list})
-    # Add generic information about the paper
     output.update({'paper_title': paper_title,
                    'collaboration': collaboration_name,
                    'experiment_number': experiment_number,
