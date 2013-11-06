@@ -42,8 +42,8 @@ def write_coordinates_in_tmp_file(lists_coordinates):
     With gnuplot, first column is used as  x coordinates, and second column as y coordinates.
     One set represents a curve in the graph.
     """
-    tempfile.tempdir = "%s/img/tmp" % (CFG_WEBDIR)
-    fname = tempfile.mktemp()
+    fd, fname = tempfile.mkstemp(dir="%s/img/tmp" % CFG_WEBDIR)
+    os.close(fd)
     file_dest = open(fname, 'a')
     max_y_datas = 0
     for list_elem in lists_coordinates:
