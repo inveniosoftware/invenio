@@ -15,8 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = upgrades
-
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = __init__.py \
@@ -43,8 +41,6 @@ pylib_DATA = __init__.py \
              invenio_connector.py \
              invenio_connector_regression_tests.py \
              inveniocfg_unit_tests.py \
-             inveniocfg_upgrader.py \
-             inveniocfg_upgrader_unit_tests.py \
              inveniomanage_unit_tests.py \
              jinja2utils_unit_tests.py \
              jsonutils_unit_tests.py \

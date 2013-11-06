@@ -142,7 +142,7 @@ Please proceed as follows:
      $ sudo rsync -a /opt/invenio/etc/ /opt/invenio/etc.OLD/
      $ sh /opt/invenio/etc/build/config.nice
      $ make
-     $ make check-upgrade
+     #FIXME: create new python virtual environment, install invenio and check upgrades
      $ sudo -u www-data make install
      $ sudo rsync -a /opt/invenio/etc.OLD/ \
          --exclude invenio-autotools.conf \
