@@ -1587,6 +1587,10 @@ def add_orcid_id_to_author(pid, orcid_id):
     '''
     _add_external_id_to_author(pid, 'ORCID', orcid_id)
 
+def webuser_merge_user(old_uid, new_uid):
+    pid = run_sql("select personid from aidPERSONIDDATA where tag='uid' and data=%s", (old_uid,))
+    if pid:
+        add_userid_to_author(pid[0][0], new_uid)
 
 def add_userid_to_author(pid, uid):
     """

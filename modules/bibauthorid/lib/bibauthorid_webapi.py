@@ -52,7 +52,7 @@ from invenio.bibauthorid_general_utils import is_arxiv_id_or_doi
 
 from itertools import chain
 
-from invenio.bibauthorid_dbinterface import get_external_ids_of_author, add_arxiv_papers_to_author  #pylint: disable-msg=W0614
+from invenio.bibauthorid_dbinterface import get_external_ids_of_author, add_arxiv_papers_to_author, get_arxiv_papers_of_author  #pylint: disable-msg=W0614
 
 
 
