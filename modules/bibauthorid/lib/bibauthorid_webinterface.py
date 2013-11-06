@@ -3733,11 +3733,13 @@ class WebInterfacePerson(WebInterfaceDirectory):
     Supplies the methods:
         /person/welcome
     '''
-    _exports = ['welcome','update']
+    _exports = ['welcome','update', 'you']
 
     def welcome(self, req, form):
-        redirect_to_url(req, "%s/author/choose_profile" % CFG_SITE_URL)
+        redirect_to_url(req, "%s/author/choose_profile" % CFG_SITE_SECURE_URL)
 
+    def you(self, req, form):
+        redirect_to_url(req, "%s/author/choose_profile" % CFG_SITE_SECURE_URL)
 
     def update(self, req, form):
         """
