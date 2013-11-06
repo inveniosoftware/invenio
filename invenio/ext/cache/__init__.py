@@ -35,5 +35,10 @@ def setup_app(app):
 
     app.config.setdefault('CACHE_TYPE',
                           app.config.get('CFG_FLASK_CACHE_TYPE', 'redis'))
+    # if CACHE_KEY_PREFIX is not specified then CFG_DATABASE_NAME:: is used.
+    prefix = app.config.get('CFG_DATABASE_NAME', '')
+    if prefix:
+        prefix += '::'
+    app.config.setdefault('CACHE_KEY_PREFIX', prefix)
     cache.init_app(app)
     return app
