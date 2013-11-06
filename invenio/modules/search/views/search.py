@@ -107,7 +107,7 @@ def check_collection(method=None, name_getter=collection_name_from_request,
 
 
 def response_formated_records(recids, collection, of, **kwargs):
-    from invenio.bibformat import get_output_format_content_type, print_records
+    from invenio.modules.formatter import get_output_format_content_type, print_records
     response = make_response(print_records(recids, collection=collection,
                                            of=of, **kwargs))
     response.mimetype = get_output_format_content_type(of)

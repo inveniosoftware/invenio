@@ -75,7 +75,7 @@ except ImportError:
 datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
-default_ln = lambda ln: cfg('CFG_SITE_LANG') if ln is None else ln
+default_ln = lambda ln: cfg['CFG_SITE_LANG'] if ln is None else ln
 
 class date(real_date):
     def strftime(self, fmt):

@@ -32,13 +32,12 @@ from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
 from flask.ext.login import current_user, login_required
 from invenio.base.globals import cfg
-from sqlalchemy.exc import SQLAlchemyError
 
 # External imports
 from invenio.modules.accounts.models import User
 from invenio.modules.record_editor.models import Bibrec
 from invenio.modules.search.models import Collection
-from invenio.modules.search.blueprint import response_formated_records
+from invenio.modules.search.views.search import response_formated_records
 from invenio.ext.menu import register_menu
 from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
 from invenio.ext.sqlalchemy import db
@@ -54,7 +53,6 @@ from .forms import \
     CreateTagForm, \
     AttachTagForm, \
     DetachTagForm, \
-    DeleteTagForm, \
     EditTagForm, \
     TagAnnotationForm, \
     validate_tag_exists, \

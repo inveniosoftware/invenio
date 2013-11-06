@@ -106,7 +106,7 @@ The APIs of bibformat.py consists in these functions:
 
 
  Example:
-   >> from invenio.bibformat import format_record
+   >> from invenio.modules.formatter import format_record
    >> format_record(5, "hb", "fr")
 
 

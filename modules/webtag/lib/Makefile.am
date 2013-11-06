@@ -18,8 +18,7 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = \
-    webtag_regression_tests.py \
-    webtag_unit_tests.py
+    webtag_regression_tests.py
 
 jsdir=$(localstatedir)/www/js
 

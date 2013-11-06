@@ -27,7 +27,7 @@ import htmlentitydefs
 from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL, \
      CFG_SITE_LANG
-from invenio.bibformat import format_record
+from invenio.modules.formatter import format_record
 from invenio.htmlutils import remove_html_markup
 from invenio.base.i18n import gettext_set_language
 

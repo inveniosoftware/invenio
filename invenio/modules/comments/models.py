@@ -107,7 +107,7 @@ def after_insert(mapper, connection, target):
     """Updates reply order cache  and send record-after-update signal."""
     record_after_update.send(CmtRECORDCOMMENT, recid=target.id_bibrec)
 
-    from invenio.webcomment import get_reply_order_cache_data
+    from .api import get_reply_order_cache_data
     if target.in_reply_to_id_cmtRECORDCOMMENT > 0:
         parent = CmtRECORDCOMMENT.query.get(
             target.in_reply_to_id_cmtRECORDCOMMENT)

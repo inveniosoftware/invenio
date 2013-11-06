@@ -22,7 +22,7 @@ WebJournal - Main Public interface of the WebJournals
 
 import datetime
 import time
-from invenio.bibformat_engine import \
+from invenio.modules.formatter.engine import \
      BibFormatObject, \
      format_with_format_template
 from invenio.errorlib import register_exception

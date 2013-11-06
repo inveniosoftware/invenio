@@ -712,7 +712,7 @@ the submission directory (curdir). You can still use these element
 names, but should be aware of the potential side effects of changing
 such variables with user submitted values. An up-to-date list of
 reserved filenames for your installation can be found by
-running <code>python -c 'from invenio.websubmit_config import
+running <code>python -c 'from invenio.legacy.websubmit.config import
 CFG_RESERVED_SUBMISSION_FILENAMES;print
 CFG_RESERVED_SUBMISSION_FILENAMES'</code>.</p>
 
@@ -812,7 +812,7 @@ A possible skeleton for a response element could be: (FIXME: Check...)
 </p>
 <pre class="code">
 import os
-from invenio.websubmit_functions.ParamFile import ParamFromFile
+from invenio.legacy.websubmit.functions.ParamFile import ParamFromFile
 from invenio.search_engine_utils import get_fieldvalues
 
 this_element_name = "DEMOART_TEST" # This would be your element name

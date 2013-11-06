@@ -598,8 +598,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibcirculation/web/Makefile \
      modules/bibcirculation/web/admin/Makefile \
      modules/bibclassify/Makefile \
-     modules/bibclassify/bin/Makefile \
-     modules/bibclassify/bin/bibclassify \
      modules/bibclassify/doc/Makefile \
      modules/bibclassify/doc/admin/Makefile \
      modules/bibclassify/doc/hacking/Makefile \
@@ -635,8 +633,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibedit/lib/Makefile \
      modules/bibedit/web/Makefile \
      modules/bibencode/Makefile \
-     modules/bibencode/bin/Makefile \
-     modules/bibencode/bin/bibencode \
      modules/bibencode/lib/Makefile \
      modules/bibencode/etc/Makefile \
      modules/bibencode/www/Makefile \
@@ -665,7 +661,6 @@ AC_CONFIG_FILES([config.nice  \
      modules/bibformat/etc/format_templates/Makefile \
      modules/bibformat/etc/output_formats/Makefile \
      modules/bibformat/lib/Makefile \
-     modules/bibformat/lib/elements/Makefile \
      modules/bibformat/web/Makefile \
      modules/bibformat/web/admin/Makefile \
      modules/oaiharvest/Makefile \

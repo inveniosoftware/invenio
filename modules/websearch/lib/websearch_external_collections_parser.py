@@ -37,7 +37,7 @@ try:
 except ImportError:
     CFG_BEAUTIFULSOUP_INSTALLED = False
 
-from invenio.bibformat import format_record
+from invenio.modules.formatter import format_record
 from invenio.websearch_external_collections_getter import fetch_url_content
 import cgi
 

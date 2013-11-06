@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2003, 2005, 2006, 2007, 2008, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,18 +15,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = elements
-
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibformat_config.py bibformat_templates.py \
-             bibformatadminlib.py bibformat_engine.py \
-             bibformat_utils.py bibformat.py \
+pylib_DATA = bibformat_templates.py \
+             bibformatadminlib.py \
              bibformat_manager.py \
-             bibformatadmin_regression_tests.py bibformat_engine_unit_tests.py \
+             bibformatadmin_regression_tests.py \
              bibformat_bfx_engine.py bibformat_bfx_engine_config.py \
              bibformat_regression_tests.py bibformat_xslt_engine.py bibreformat.py \
-             bibformat_web_tests.py bibformat_utils_unit_tests.py
+			 bibformat_web_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

@@ -42,7 +42,7 @@ from invenio.config import \
      CFG_DEVEL_SITE, \
      CFG_CERN_SITE
 from invenio.dbquery import run_sql
-from invenio.bibformat_engine import BibFormatObject
+from invenio.modules.formatter.engine import BibFormatObject
 from invenio.search_engine import search_pattern, record_exists
 from invenio.base.i18n import gettext_set_language
 from invenio.errorlib import register_exception
@@ -1605,7 +1605,7 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln, bfo=No
 
     if CFG_CERN_SITE and bfo:
         try:
-            from invenio.bibformat_elements import bfe_webjournal_cern_toolbar
+            from invenio.modules.formatter.format_elements import bfe_webjournal_cern_toolbar
             cached_file = NOT_FOR_ALERT_COMMENTS_RE.sub(bfe_webjournal_cern_toolbar.format_element(bfo), cached_file, 1)
         except ImportError, e:
             pass

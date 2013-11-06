@@ -36,10 +36,6 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   Authority_HTML_brief.bft Authority_HTML_detailed.bft
 
 
-tmpdir = $(prefix)/var/tmp
-
-tmp_DATA = Test1.bft Test3.bft Test_2.bft Test_no_template.test
-
-EXTRA_DIST = $(etc_DATA) $(tmp_DATA)
+EXTRA_DIST = $(etc_DATA)
 
 CLEANFILES = *.tmp

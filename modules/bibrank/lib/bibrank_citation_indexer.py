@@ -34,7 +34,7 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 from invenio.search_engine import search_pattern, search_unit
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.bibformat_utils import parse_tag
+from invenio.modules.formatter.utils import parse_tag
 from invenio.bibknowledge import get_kb_mappings
 from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \

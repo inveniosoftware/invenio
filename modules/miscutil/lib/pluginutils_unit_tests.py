@@ -36,7 +36,7 @@ class TestPluginContainer(InvenioTestCase):
     """
     def test_plugin_container_wrapping_bibformat_elements(self):
         """pluginutils - wrapping bibformat elements"""
-        from invenio.bibformat_config import CFG_BIBFORMAT_ELEMENTS_PATH
+        from invenio.modules.formatter.config import CFG_BIBFORMAT_ELEMENTS_PATH
 
         def format_signature(bfo, *dummy_args, **dummy_argd):
             pass

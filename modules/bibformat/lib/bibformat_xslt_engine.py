@@ -39,7 +39,7 @@ import os
 
 from invenio.config import \
      CFG_SITE_URL
-from invenio.bibformat_config import \
+from invenio.modules.formatter.config import \
      CFG_BIBFORMAT_TEMPLATES_PATH
 from invenio.modules.formatter.api import \
      get_creation_date, \
@@ -381,7 +381,7 @@ def eval_bibformat_lxml(ctx, recID, template_code):
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
     """ #'
-    from invenio.bibformat_engine import \
+    from invenio.modules.formatter.engine import \
     format_with_format_template, \
     BibFormatObject
     try:
@@ -430,7 +430,7 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
     """ #'
-    from invenio.bibformat_engine import \
+    from invenio.modules.formatter.engine import \
     format_with_format_template, \
     BibFormatObject
     try:
@@ -473,7 +473,7 @@ def eval_bibformat_4suite(ctx, recID, template_code):
     @return: the evalued call to a format template (usually a call to a format element)
     @rtype: string
     """ #'
-    from invenio.bibformat_engine import \
+    from invenio.modules.formatter.engine import \
     format_with_format_template, \
     BibFormatObject
     try:

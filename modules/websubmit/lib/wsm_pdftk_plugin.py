@@ -29,7 +29,7 @@ import tempfile
 from invenio.shellutils import run_shell_command
 from invenio.bibdocfile import decompose_file
 from invenio.config import CFG_PATH_PDFTK, CFG_TMPDIR
-from invenio.websubmit_config import InvenioWebSubmitFileMetadataRuntimeError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFileMetadataRuntimeError
 
 if not CFG_PATH_PDFTK:
     raise ImportError, "Path to PDFTK is not set in CFG_PATH_PDFTK"

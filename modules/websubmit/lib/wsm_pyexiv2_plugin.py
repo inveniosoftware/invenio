@@ -31,7 +31,7 @@ import shutil
 import pyexiv2
 from invenio.bibdocfile import decompose_file
 from invenio.config import CFG_TMPDIR
-from invenio.websubmit_config import InvenioWebSubmitFileMetadataRuntimeError
+from invenio.legacy.websubmit.config import InvenioWebSubmitFileMetadataRuntimeError
 
 def can_read_local(inputfile):
     """

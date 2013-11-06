@@ -33,7 +33,7 @@ We have 3 tables:
 from itertools import chain
 import ConfigParser
 
-from invenio.bibformat_utils import parse_tag
+from invenio.modules.formatter.utils import parse_tag
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrank_citation_indexer import tagify
 from invenio.config import CFG_ETCDIR, \

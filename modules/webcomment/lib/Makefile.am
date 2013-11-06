@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,14 +17,10 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = webcomment_config.py \
-             webcomment.py \
-             webcomment_unit_tests.py \
-             webcomment_templates.py \
+pylib_DATA = webcomment_templates.py \
              webcomment_webinterface.py \
              webcommentadminlib.py \
              webcomment_regression_tests.py \
-             webcomment_washer.py \
              webcomment_web_tests.py
 
 EXTRA_DIST = $(pylib_DATA)

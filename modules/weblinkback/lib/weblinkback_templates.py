@@ -32,7 +32,7 @@ from invenio.config import CFG_SITE_RECORD, \
                            CFG_SITE_URL, \
                            CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS
 from invenio.htmlutils import get_mathjax_header
-from invenio.bibformat import format_record
+from invenio.modules.formatter import format_record
 
 import cgi
 

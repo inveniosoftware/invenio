@@ -37,7 +37,7 @@ try:
     from invenio.access_control_mailcookie import mail_cookie_gc
     from invenio.bibdocfile import BibDoc
     from invenio.bibsched import gc_tasks
-    from invenio.websubmit_config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
+    from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_TMP_VIDEO_PREFIX
     from invenio.utils.date import convert_datestruct_to_datetext
 except ImportError, e:
     print "Error: %s" % (e,)

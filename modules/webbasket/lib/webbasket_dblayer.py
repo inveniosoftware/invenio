@@ -27,7 +27,7 @@ from time import localtime
 from invenio.utils.text import encode_for_xml
 
 from invenio.dbquery import run_sql
-from invenio.webcomment import get_reply_order_cache_data
+from invenio.modules.comments.api import get_reply_order_cache_data
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \

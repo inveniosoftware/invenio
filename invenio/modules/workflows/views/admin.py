@@ -136,7 +136,7 @@ def get_redis_values(key):
 
 def _entry_data_preview(data, of='default'):
     if format == 'hd' or format == 'xm':
-        from invenio.bibformat import format_record
+        from invenio.modules.formatter import format_record
         try:
             data['record'] = format_record(recID=None, of=of,
                                            xml_record=data['record'])

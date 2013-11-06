@@ -30,7 +30,7 @@ import time
 import cgi
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_ETCDIR
-from invenio.bibformat_config import \
+from invenio.modules.formatter.config import \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
      CFG_BIBFORMAT_ELEMENTS_PATH, \
@@ -41,7 +41,7 @@ from invenio.errorlib import register_exception
 from invenio.base.i18n import gettext_set_language, wash_language, language_list_long
 from invenio.search_engine import perform_request_search
 import invenio.modules.formatter.api as bibformat_dblayer
-from invenio import bibformat_engine
+from invenio.modules.formatter import engine as bibformat_engine
 from invenio.utils.text import encode_for_xml
 
 import invenio.template
@@ -1522,7 +1522,7 @@ def check_format_element(name):
                 if module_name.endswith(".py"):
                     module_name = module_name[:-3]
 
-                module = __import__("invenio.bibformat_elements."+module_name)
+                module = __import__("invenio.modules.formatter.format_elements."+module_name)
                 try:
                     function_format  = module.bibformat_elements.__dict__[module_name].format_element
                 except AttributeError, e:

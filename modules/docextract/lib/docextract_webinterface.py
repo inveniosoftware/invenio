@@ -31,7 +31,7 @@ from invenio.config import CFG_TMPSHAREDDIR, CFG_ETCDIR
 from invenio.refextract_api import extract_references_from_file_xml, \
                                    extract_references_from_url_xml, \
                                    extract_references_from_string_xml
-from invenio.bibformat_engine import format_record
+from invenio.modules.formatter.engine import format_record
 
 
 def check_login(req):

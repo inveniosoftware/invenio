@@ -2964,7 +2964,7 @@ class SbmFIELDDESCData(DataSet):
         fddfi2 = None
         cols = None
         cd = datetime.date(2012, 2, 16)
-        fidesc = u'from invenio.bibencode_websubmit import websumbit_aspect_ratio_form_element\r\n\r\ntext = websumbit_aspect_ratio_form_element(curdir, doctype, uid, access)'
+        fidesc = u'from invenio.modules.encoder.websubmit import websumbit_aspect_ratio_form_element\r\n\r\ntext = websumbit_aspect_ratio_form_element(curdir, doctype, uid, access)'
         cookie = 0L
         maxlength = None
         size = None
@@ -3032,7 +3032,7 @@ class SbmFIELDDESCData(DataSet):
         fddfi2 = None
         cols = None
         cd = datetime.date(2012, 2, 16)
-        fidesc = u'from invenio.bibencode_websubmit import (get_session_id, websubmit_singlepage)\r\n\r\n# Retrieve session id\r\ntry:\r\n    # User info is defined only in MBI/MPI actions...\r\n    session_id = get_session_id(None, uid, user_info) \r\nexcept:\r\n    session_id = get_session_id(req, uid, {})\r\n\r\ntext = websubmit_singlepage(curdir, doctype, uid, access, session_id)'
+        fidesc = u'from invenio.modules.encoder.websubmit import (get_session_id, websubmit_singlepage)\r\n\r\n# Retrieve session id\r\ntry:\r\n    # User info is defined only in MBI/MPI actions...\r\n    session_id = get_session_id(None, uid, user_info) \r\nexcept:\r\n    session_id = get_session_id(req, uid, {})\r\n\r\ntext = websubmit_singlepage(curdir, doctype, uid, access, session_id)'
         cookie = 0L
         maxlength = None
         size = None

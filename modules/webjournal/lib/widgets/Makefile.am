@@ -17,11 +17,7 @@
 
 pylibdir=$(libdir)/python/invenio/bibformat_elements
 
-pylib_DATA = bfe_webjournal_widget_weather.py \
-	     bfe_webjournal_widget_seminars.py \
-	     bfe_webjournal_widget_latestPhoto.py \
-	     bfe_webjournal_widget_whatsNew.py \
-	     bfe_webjournal_widget_featureRecord.py
+pylib_DATA =
 
 EXTRA_DIST = $(pylib_DATA) $(tmp_DATA)
 

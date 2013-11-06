@@ -28,7 +28,7 @@ import copy as p_copy
 from xml.dom import minidom, Node
 from xml.sax import saxutils
 
-from invenio.bibformat_engine import BibFormatObject, get_format_element, eval_format_element
+from invenio.modules.formatter.engine import BibFormatObject, get_format_element, eval_format_element
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS, CFG_BIBFORMAT_BFX_TEMPLATES_PATH
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE
 from invenio.bibformat_bfx_engine_config import InvenioBibFormatBfxError, InvenioBibFormatBfxWarning

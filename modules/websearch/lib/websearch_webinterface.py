@@ -120,8 +120,8 @@ from invenio.search_engine_utils import get_fieldvalues, \
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
-from invenio.bibformat import format_records
-from invenio.bibformat_engine import get_output_formats
+from invenio.modules.formatter import format_records
+from invenio.modules.formatter.engine import get_output_formats
 from invenio.websearch_webcoll import get_collection
 from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno

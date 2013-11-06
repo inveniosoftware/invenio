@@ -20,6 +20,7 @@
 """
 Memoisation utilities.
 """
+import functools
 
 
 class Memoise:
@@ -38,3 +39,14 @@ class Memoise:
         if args not in self.memo:
             self.memo[args] = self.function(*args)
         return self.memo[args]
+
+
+def memoize(obj):
+    cache = obj.cache = {}
+    @functools.wraps(obj)
+    def memoizer(*args, **kwargs):
+        key = str(args) + str(kwargs)
+        if key not in cache:
+            cache[key] = obj(*args, **kwargs)
+        return cache[key]
+    return memoizer

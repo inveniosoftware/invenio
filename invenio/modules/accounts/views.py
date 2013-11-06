@@ -122,7 +122,7 @@ def login(nickname=None, password=None, login_method=None, action='',
                         '%s' authentication method.") % login_method, 'warning')
             else:  # account is valid
                 flash(_("You are logged in as %s.") % user.nickname, "info")
-                if referer is not None:
+                if referer:
                     from urlparse import urlparse
                     # we should not redirect to these URLs after login
                     blacklist = [url_for('webaccount.register'),

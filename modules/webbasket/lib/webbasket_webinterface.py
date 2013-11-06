@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011 CERN.
+## Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -71,7 +71,7 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
 from invenio.webuser import collect_user_info
-from invenio.webcomment import check_user_can_attach_file_to_comments
+from invenio.modules.comments.api import check_user_can_attach_file_to_comments
 from invenio.access_control_engine import acc_authorize_action
 from invenio.htmlutils import is_html_text_editor_installed
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response
