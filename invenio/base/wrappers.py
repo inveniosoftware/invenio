@@ -80,7 +80,8 @@ class Flask(FlaskBase):
     def static_dispatchers(self):
         yield super(self.__class__, self).send_static_file
         for blueprint in self.blueprints.values():
-            yield blueprint.send_static_file
+            if blueprint.has_static_folder:
+                yield blueprint.send_static_file
 
     def send_static_file(self, filename):
         last_exception = NotFound
