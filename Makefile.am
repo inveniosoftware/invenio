@@ -58,9 +58,6 @@ BOOTSTRAPV = 2.2.1
 # Hogan.js version
 HOGANVER = 2.0.0
 
-check-upgrade:
-	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg_upgrader.py $(top_srcdir) --upgrade-check
-
 check-custom-templates:
 	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
 

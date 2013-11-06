@@ -296,7 +296,7 @@ def populate(default_data=True, truncate_tables_first=False):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
 
-    from invenio.inveniocfg_upgrader import InvenioUpgrader
+    from invenio.modules.upgrader.engine import InvenioUpgrader
     iu = InvenioUpgrader()
     map(iu.register_success, iu.get_upgrades())
 

@@ -89,7 +89,7 @@ where it would be too late to discover issues and roll-back.
 This means that upgrades cannot assume anything about loaded Invenio modules.
 E.g. the following import::
 
-  from invenio.pluginutils import create_enhanced_plugin_builder
+  from invenio.utils.autodiscovery import create_enhanced_plugin_builder
 
 will fail on 1.0.0 while it works on 1.1.0. If the above import statement is
 put at the module-level (which you would normally do), the upgrade will never
@@ -100,21 +100,14 @@ properly notified.
 """
 
 from datetime import date
-import imp
 import logging
 import os
 import subprocess
 import sys
 import warnings
 
-try:
-    from invenio.dbquery import run_sql
-    from invenio.config import CFG_PREFIX
-    HAS_INVENIO = True
-except ImportError:
-    HAS_INVENIO = False
-
-webstyle_template_module = None
+from invenio.dbquery import run_sql
+from invenio import template as webstyle_template_module
 
 UPGRADE_TEMPLATE = """# -*- coding: utf-8 -*-
 ##
@@ -233,16 +226,10 @@ class InvenioUpgrader(object):
     CONSOLE_LOG_INFO_FMT = '>>> %(prefix)s%(message)s'
     CONSOLE_LOG_FMT = '>>> %(prefix)s%(levelname)s: %(message)s'
 
-    def __init__(self, paths=None, pluginutils=None,
-                 global_pre_upgrade=[], global_post_upgrade=[]):
+    def __init__(self, packages=None, global_pre_upgrade=[], global_post_upgrade=[]):
         """
-        @param path: Path to folder with upgrade. Default is CFG_PREFIX/lib/
-            python/invenio/lib/upgrades/ if path is not specified.
-        @param pluginutils: Pluginutils module - this can be used to manually
-            load pluginutils and make InvenioUpgrader use this version. This is
-            useful when the upgrade engine is being executed *before* actually
-            being installed in site-packages. Only the main() method  below
-            should be using this feature.
+        @param packages: Path to package with upgrades. Default is
+        `invenio.modules.upgrader` if package is not specified.
         @param global_pre_upgrade: List of callables. Each check will be
             executed once per upgrade-batch run. Useful e.g. to check if
             bibsched is running.
@@ -250,15 +237,14 @@ class InvenioUpgrader(object):
             executed once per upgrade-batch run. Useful e.g. to tell users
             to start bibsched again.
         """
-        if paths:
-            self._paths = paths
+        if packages:
+            self.packages = packages
         else:
-            self._paths = [os.path.join(CFG_PREFIX,
-                                        "lib/python/invenio/upgrades/")]
+            self.packages = ['invenio.modules.upgrader']
+
         self.upgrades = None
         self.history = {}
         self.ordered_history = []
-        self.pluginutils = pluginutils
 
         self.global_pre_upgrade = global_pre_upgrade
         if not self.global_pre_upgrade:
@@ -567,17 +553,13 @@ class InvenioUpgrader(object):
             be included, if False the entire upgrade graph will be
             returned.
         """
-        if self.pluginutils is None:
-            from invenio.pluginutils import PluginContainer
-            from invenio.pluginutils import create_enhanced_plugin_builder
-        else:
-            PluginContainer = self.pluginutils.PluginContainer
-            create_enhanced_plugin_builder = self.pluginutils.create_enhanced_plugin_builder
+        from invenio.utils.autodiscovery import create_enhanced_plugin_builder
+        from invenio.base.utils import import_submodules_from_packages
 
         if remove_applied:
             self.load_history()
 
-        builder = create_enhanced_plugin_builder(
+        plugin_builder = create_enhanced_plugin_builder(
             compulsory_objects={
                 'do_upgrade': dummy_signgature,
                 'info': dummy_signgature,
@@ -592,27 +574,16 @@ class InvenioUpgrader(object):
             },
         )
 
+        def builder(plugin):
+            plugin_id = plugin.__name__.split('.')[-1]
+            data = plugin_builder(plugin)
+            data['id'] = plugin_id
+            data['repository'] = self._parse_plugin_id(plugin_id)
+            return plugin_id, data
+
         # Load all upgrades
-        plugins = PluginContainer(
-            [os.path.join(p, '*.py') for p in self._paths],
-            plugin_builder=builder,
-            external=True,
-        )
-
-        # Check for broken plug-ins
-        broken = plugins.get_broken_plugins()
-        if broken:
-            messages = []
-            import traceback
-            for plugin, info in broken.items():
-                messages.append("Failed to load %s:\n"
-                                " %s" % (plugin, "".join(traceback.format_exception(*info))))
-            raise RuntimeError(*messages)
-
-        # Store name and doc of plug-in in itself
-        for plugin_id in plugins.keys():
-            plugins[plugin_id]['id'] = plugin_id
-            plugins[plugin_id]['repository'] = self._parse_plugin_id(plugin_id)
+        plugins = dict(map(builder, import_submodules_from_packages(
+            'upgrades', packages=self.packages)))
 
         return plugins
 
@@ -772,14 +743,11 @@ def pre_check_custom_templates():
 
     Will only run prior to Invenio being installed
     """
-    # webstyle_template_module is only defined when running prior to Invenio
-    # installation
-    if HAS_INVENIO and webstyle_template_module is not None:
-        logger = logging.getLogger('invenio_upgrader')
-        logger.info("Checking custom templates...")
-        messages = webstyle_template_module.check(None, None)
-        if messages:
-            webstyle_template_module.print_messages(messages)
+    logger = logging.getLogger('invenio_upgrader')
+    logger.info("Checking custom templates...")
+    messages = webstyle_template_module.check(None, None)
+    if messages:
+        webstyle_template_module.print_messages(messages)
     return True
 
 
@@ -790,7 +758,7 @@ def pre_check_bibsched():
     logger = logging.getLogger('invenio_upgrader')
     logger.info("Checking bibsched process...")
 
-    output, error = subprocess.Popen(["%s/bin/bibsched" % CFG_PREFIX, "status"],
+    output, error = subprocess.Popen(["bibsched", "status"],
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
 
@@ -806,17 +774,15 @@ def pre_check_bibsched():
 
     if not stopped:
         raise RuntimeError("Bibsched is running. Please stop bibsched "
-                           "using the command:\n%s/bin/bibsched stop" % CFG_PREFIX)
+                           "using the command:\n$ bibsched stop")
 
 
 def post_check_bibsched():
     """
     Inform user to start bibsched again
     """
-    if HAS_INVENIO:
-        logger = logging.getLogger('invenio_upgrader')
-        logger.info("Remember to start bibsched again:\n"
-                    "%s/bin/bibsched start" % CFG_PREFIX)
+    logger = logging.getLogger('invenio_upgrader')
+    logger.info("Remember to start bibsched again:\n$ bibsched start")
     return True
 
 
@@ -1074,126 +1040,14 @@ def cmd_upgrade_create_standard_recipe(path, repository='invenio',
 # Invenio helper functions
 #
 
-def run_sql_ignore(query, *args, **kwargs):
-    """ Execute SQL query but ignore any errors. """
-    try:
-        run_sql(query, *args, **kwargs)
-    except Exception, e:
-        warnings.warn("Failed to execute query %s: %s" % (query, unicode(e)))
-
-
-def load_module(name, path):
-    """
-    Load Python module located in the given path.
-    """
-    fp, mod_path, desc = imp.find_module(name, [path])
-
-    module = None
-    try:
-        module = imp.load_module(name, fp, mod_path, desc)
-    finally:
-        if fp:
-            fp.close()
-
-    return module
-
-
 def _upgrade_recipe_parse_path(path):
     srcdir = os.getenv('CFG_INVENIO_SRCDIR', None)
 
     if not path:
         if srcdir:
-            path = os.path.join(srcdir, 'modules/miscutil/lib/upgrades/')
+            path = os.path.join(srcdir, 'invenio/modules/upgrader/upgrades/')
         else:
             path = os.getcwd()
 
     path = os.path.expandvars(os.path.expanduser(path))
     return path
-
-#
-# Main
-#
-
-
-def main():
-    """
-    Main should *only* be invoked from 'make check-upgrade' target. It allows
-    running the upgrade engine before running 'make install' (i.e before
-    being installed into site-packages).
-
-    Main will check for database connectivity and load pluginutils from the same
-    directory as this file, thus ensuring.
-
-    """
-    global webstyle_template_module  # Needed because we assign to it
-
-    if not HAS_INVENIO:
-        print ">>> New Invenio installation detected (nothing to upgrade)."
-        sys.exit(0)
-
-    try:
-        run_sql("SELECT 1")
-    except Exception:
-        print ">>> WARNING: Existing Invenio installation detected but cannot"
-        " connect to database. Aborting."
-        sys.exit(1)
-
-    # Get paths to src root, upgrades and miscutil-modules.
-    try:
-        arg1 = sys.argv[1]
-        if arg1.startswith('--upgrade'):
-            path = os.getcwd()
-        else:
-            path = os.path.abspath(arg1)
-        upgrades_path = os.path.join(path, "modules/miscutil/lib/upgrades/")
-        pluginutils_modules_path = os.path.join(path, "modules/miscutil/lib/")
-        template_modules_path = os.path.join(path, "modules/webstyle/lib/")
-        for p in []:
-            if not os.path.exists(p):
-                print ">>> ERROR: Path %s does not exists. Aborting." % p
-                sys.exit(1)
-    except IndexError:
-        print ">>> ERROR: No path or command given. Aborting"
-        sys.exit(1)
-
-    # Import pluginutils (from source code directory, since site-packages
-    # version is unreliable)
-    pluginutils = load_module('pluginutils', pluginutils_modules_path)
-    webstyle_template_module = load_module('template', template_modules_path)
-
-    upgrader = InvenioUpgrader(
-        paths=[upgrades_path,
-               os.path.join(CFG_PREFIX, 'lib/python/invenio/lib/upgrades/')],
-        pluginutils=pluginutils)
-    logger = upgrader.get_logger()
-
-    # Alert user to run via inveniocfg instead.
-    if '--upgrade' in sys.argv:
-        logger.error("Please run --upgrade via %s/bin/inveniocfg" % CFG_PREFIX)
-        sys.exit(1)
-
-    for arg in sys.argv:
-        if arg.startswith('--upgrade-create-standard-recipe'):
-            logger.error("Please run --upgrade-create-standard-recipe via %s/bin/inveniocfg" % CFG_PREFIX)
-            sys.exit(1)
-        if arg.startswith('--upgrade-create-release-recipe'):
-            logger.error("Please run --upgrade-create-release-recipe via %s/bin/inveniocfg" % CFG_PREFIX)
-            sys.exit(1)
-
-    if '--upgrade-show-pending' in sys.argv:
-        cmd_upgrade_show_pending(upgrader=upgrader)
-        sys.exit(0)
-
-    if '--upgrade-show-applied' in sys.argv:
-        cmd_upgrade_show_applied(upgrader=upgrader)
-        sys.exit(0)
-
-    if '--upgrade-check' in sys.argv:
-        cmd_upgrade_check(upgrader=upgrader)
-        sys.exit(0)
-
-    logger.error("Unknown command")
-
-
-if __name__ == '__main__':
-    main()
