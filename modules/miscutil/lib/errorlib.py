@@ -561,15 +561,21 @@ def _truncate_dynamic_string(val, maxlength=500):
 
 def wrap_warn():
     import warnings
+    from functools import wraps
 
-    def wrapper(warn_fun):
-        def fun(*args, **kwargs):
-            traceback.print_stack()
-            return warn_fun(*args, **kwargs)
-        return fun
+    def wrapper(showwarning):
+        @wraps(showwarning)
+        def new_showwarning(message=None, category=None, filename=None, lineno=None, file=None, line=None):
+            invenio_err = open(os.path.join(CFG_LOGDIR, 'invenio.err'), "a")
+            print >> invenio_err, "* %(time)s -> WARNING: %(category)s: %(message)s (%(file)s:%(line)s)\n" % {
+            'time': time.strftime("%Y-%m-%d %H:%M:%S"),
+            'category': category,
+            'message': message,
+            'file': filename,
+            'line': lineno}
+            print >> invenio_err, "** Traceback details\n"
+            traceback.print_stack(file=invenio_err)
+            print >> invenio_err, "\n"
+        return new_showwarning
 
-    # Ideally we would use @wraps when we drop python 2.4
-    wrapper.__name__ = warnings.warn.__name__
-    wrapper.__module__ = warnings.warn.__module__
-    wrapper.__doc__ = warnings.warn.__doc__
-    warnings.warn = wrapper(warnings.warn)
+    warnings.showwarning = wrapper(warnings.showwarning)
