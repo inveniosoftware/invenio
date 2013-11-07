@@ -1,4 +1,4 @@
-{% css url_for('bibworkflow.static', filename='css/workflows/style.css', '20-workflows' %}
+{% css url_for('holdingpen.static', filename='css/workflows/style.css', '20-workflows' %}
 {% extends "page.html" %}
 {% block body %}
     <div class="row-fluid">
@@ -6,13 +6,13 @@
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li><a href="{{ url_for('bibworkflow.index') }}"
-                        {% if request.path == url_for('bibworkflow.index') %}
+                        {% if request.path == url_for('workflows.index') %}
                             class="active"
                         {% endif %}>
                         Running workflows
                     </a></li>
                     <li><a href="{{ url_for('bibworkflow.show_workflows') }}"
-                    {% if request.path == url_for('bibworkflow.show_workflows') %}
+                    {% if request.path == url_for('workflows.show_workflows') %}
                         class="active"
                     {% endif %}>
                         Defined workflows
@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="span10">
-            {% block body2 %}{% endblock %}
+            {% block workflowbody %}{% endblock %}
         </div>
     <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     </div>

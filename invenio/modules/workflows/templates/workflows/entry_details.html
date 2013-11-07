@@ -1,7 +1,14 @@
-{%- js url_for('workflows.static', filename='js/workflows/entry_details.js') -%}
 {% extends "workflows/layout_workflow_details.html" %}
 {% import 'workflows/utils.html' as utils %}
+
+{% block header %}
+    {{ super() }}
+    {% block holdingpen_entry_assets %}
+        {% js url_for('holdingpen.static', filename='js/workflows/entry_details.js', '50-workflows') %}
+    {% endblock holdingpen_entry_assets %}
+{% endblock header %}
 {% block body %}
+
 <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
         <h3 id="myModalLabel">{{ entry.id }}</h3>
@@ -59,7 +66,7 @@
     </div>
 </div>
 <div class="modal-footer">
-    <a class="btn btn-primary" href="{{ url_for('holdingpen.details', hpcontainerid=entry.id)}}" >Open in HoldingPen <i class="icon-white icon-wrench"></i></a>
+    <a class="btn btn-primary" href="{{ url_for('holdingpen.details', bwobject_id=entry.id)}}" >Open in HoldingPen <i class="icon-white icon-wrench"></i></a>
     <button class="btn btn-success">Apply <i class="icon-ok icon-white"></i></button>
     <button class="btn btn-danger">Delete <i class="icon-remove icon-white"></i></button>
     <button class="btn">Edit <i class="icon-edit"></i></button>

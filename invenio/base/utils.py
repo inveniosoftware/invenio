@@ -117,6 +117,7 @@ autodiscover_template_context_functions = partial(
     import_submodules_from_packages, 'template_context_functions')
 autodiscover_format_elements = partial(
     import_submodules_from_packages, 'format_elements')
+autodiscover_widgets = partial(import_module_from_packages, 'widgets')
 
 
 def autodiscover_non_python_files(file_name, package_name, app=None, packages=None):

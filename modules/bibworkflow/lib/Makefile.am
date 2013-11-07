@@ -15,21 +15,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = tasks workflows
+SUBDIRS =
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = \
-			 bibworkflow_api.py \
-			 bibworkflow_client.py \
+pylib_DATA = bibworkflow_client.py \
 			 bibworkflow_config.py \
 			 bibworkflow_engine.py \
-			 bibworkflow_hp_container.py \
 			 bibworkflow_hp_field_widgets.py \
 			 bibworkflow_regression_tests.py \
 			 bibworkflow_utils.py \
 			 bibworkflow_worker_engine.py \
-			 bibworkflow_load_workflows.py \
 			 bibworkflow_containers.py
 
 EXTRA_DIST = $(pylib_DATA)

@@ -1,50 +1,23 @@
 {% extends "workflows/hp_layout.html" %}
-{% block body2 %}
+{% block hpbody %}
 
-{%- js 'js/jquery.dataTables.min.js' -%}
-{%- js url_for('workflows.static', filename='js/workflows/DT_bootstrap.js') -%}
-{%- js url_for('workflows.static', filename='js/workflows/hp_index.js') -%}
+	<h1>HoldingPen Overview</h1>
+		<div class="container">
+			<div class="span3">
+				<h4>Main Table</h4>
+				<div><a href="{{url_for('holdingpen.maintable')}}"><button class="btn btn-primary" type="button">Show Table</button></a></div>
+			</div>
+			<div class="span3">
+				<h4>Pending Tasks</h4>
+				{% for task in tasks.iterkeys() %}
+					<div class="task-btns"><a href="{{url_for('holdingpen.maintable')}}"><button class="btn btn-warning" type="button">{{task}}: {{tasks[task][0]}}</button></a></br></div>
+				{% endfor %}
+			</div>
+			<div class="span3">
+				<h4>Assigned to me</h4>
+				<div><a href="{{url_for('holdingpen.maintable')}}"><button class="btn btn-primary" type="button">Show Records</button></a></div>
+			</div>
+		</div>
+		
 
-    <style type="text/css" title="currentStyle">
-      @import "{{ url_for('workflows.static', filename='css/workflows/DT_bootstrap.css') }}";
-    </style>
-
-    <h1>Records in Holding Pen</h1>
-
-    <button id="refresh_button" class="btn btn-primary pull-right">Refresh!</button>
-
-    <div class="container">
-        <div class="row-fluid">
-            <table id="example" cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Title</th>
-                        <th>Source</th>
-                        <th>Category</th>
-                        <th>Workflow ID</th>
-                        <th>Owner</th>
-                        <th>Created</th>
-                        <th>Version</th>
-                        <th>Details</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
 {% endblock %}

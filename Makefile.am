@@ -166,12 +166,33 @@ install-jquery-plugins:
 	wget http://code.jquery.com/jquery-1.7.1.min.js && \
 	mv jquery-1.7.1.min.js jquery.min.js && \
 	wget http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.17/jquery-ui.min.js && \
-        wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
+	wget http://invenio-software.org/download/jquery/v1.5/js/jquery.jeditable.mini.js && \
 	wget https://raw.github.com/malsup/form/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget -O jquery.tablesorter.zip http://invenio-software.org/download/jquery/jquery.tablesorter.20111208.zip && \
 	wget http://invenio-software.org/download/jquery/uploadify-v2.1.4.zip -O uploadify.zip && \
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
+	rm -rf /tmp/invenio-dt-bootstrap && \
+	mkdir /tmp/invenio-dt-bootstrap && \
+	(cd /tmp/invenio-dt-bootstrap && \
+	 git clone 'https://github.com/DataTables/Plugins.git' && \
+	 cp Plugins/integration/bootstrap/2/dataTables.bootstrap.css ${prefix}/var/www/css/dataTables.bootstrap.css && \
+	 cp Plugins/integration/bootstrap/2/dataTables.bootstrap.js ${prefix}/var/www/js/dataTables.bootstrap.js && \
+	 cp Plugins/integration/bootstrap/images/*.png ${prefix}/var/www/img/ && \
+	 ln -s ${prefix}/var/www/img/ ${prefix}/var/www/images) && \
+	rm -rf /tmp/invenio-dt-bootstrap/plugins && \
+	mkdir /tmp/invenio-dt-bootstrap/plugins && \
+	(cd /tmp/invenio-dt-bootstrap/plugins && \
+	 git clone 'https://github.com/DataTables/ColVis' && \
+	 cp ColVis/media/css/ColVis.css ${prefix}/var/www/css/ColVis.css && \
+	 cp ColVis/media/js/ColVis.js ${prefix}/var/www/js/ColVis.js && \
+	 cp ColVis/media/images/*.png ${prefix}/var/www/img/) && \
+	cd ${prefix}/var/www/js && \
+	rm -rf /tmp/invenio-dt-bootstrap && \
+	wget https://google-code-prettify.googlecode.com/files/prettify-small-4-Mar-2013.tar.bz2 && \
+	tar -xf prettify-small-4-Mar-2013.tar.bz2 && \
+	cp google-code-prettify/prettify.css ${prefix}/var/www/css/ && \
+	rm prettify-small-4-Mar-2013.tar.bz2 && \
 	wget http://invenio-software.org/download/jquery/jquery.bookmark.package-1.4.0.zip && \
 	unzip jquery.tablesorter.zip -d tablesorter && \
 	rm jquery.tablesorter.zip && \

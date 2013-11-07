@@ -23,8 +23,36 @@ __all__ = ['bibmatch_widget']
 
 
 class bibmatch_widget(Form):
-    preview = SubmitField(label='DataPreview')
     accept = SubmitField(label='Accept', widget=bootstrap_accept)
+    widget_title = "Bibmatch Widget"
 
+    def render(self, bwobject, *args, **kwargs):
+        from ..models import BibWorkflowObject
+        from ..views.holdingpen import _entry_data_preview
+
+        # setting up bibmatch widget
+        try:
+            matches = bwobject.extra_data['tasks_results']['match_record']
+        except:
+            pass
+
+        match_preview = []
+        # adding dummy matches
+        match_preview.append(BibWorkflowObject.query.filter(
+            BibWorkflowObject.id == bwobject.id).first())
+        match_preview.append(BibWorkflowObject.query.filter(
+            BibWorkflowObject.id == bwobject.id).first())
+
+        data_preview = _entry_data_preview(bwobject.get_data())
+
+        return ('workflows/hp_bibmatch_widget.html',
+                {'bwobject': bwobject,
+                 'widget': bibmatch_widget(),
+                 'match_preview': match_preview,
+                 'matches': matches,
+                 'data_preview': data_preview})
+
+
+bibmatch_widget.__title__ = 'Bibmatch Widget'
 
 widget = bibmatch_widget()

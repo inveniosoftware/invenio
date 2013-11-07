@@ -17,30 +17,26 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Holding Pen & BibWorkflow web interface"""
 
-__revision__ = "$Id$"
-
-__lastupdated__ = """$Date$"""
-
+import traceback
 from flask import render_template, Blueprint
 from flask.ext.login import login_required
-from ..models import Workflow, BibWorkflowObject
+
 from invenio.base.i18n import _
 from invenio.base.decorators import wash_arguments, templated
 from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
-from invenio.ext.menu import register_menu
-from invenio.bibworkflow_api import start_delayed
-from invenio.bibworkflow_load_workflows import workflows
+from ..api import start_delayed
 from invenio.bibworkflow_utils import (get_workflow_definition,
                                        get_redis_keys as utils_get_redis_keys,
                                        filter_holdingpen_results)
 
-import traceback
+from ..models import Workflow, BibWorkflowObject
+from ..loader import workflows
 
-blueprint = Blueprint('bibworkflow', __name__, url_prefix="/admin/bibworkflow",
+blueprint = Blueprint('workflows', __name__, url_prefix="/admin/workflows",
                       template_folder='../templates',
                       static_folder='../static')
 
-default_breadcrumb_root(blueprint, '.admin.bibworkflow')
+default_breadcrumb_root(blueprint, '.admin.workflows')
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
@@ -64,12 +60,15 @@ def entry_details(id_entry):
     """
     Displays entry details.
     """
-    wfe_object = BibWorkflowObject.query.filter(BibWorkflowObject.id == id_entry).first()
+    wfe_object = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
+                                                id_entry).first()
 
     return render_template('workflows/entry_details.html',
                            entry=wfe_object, log="",
-                           data_preview=_entry_data_preview(wfe_object.data, 'hd'),
-                           workflow_func=get_workflow_definition(wfe_object.bwlWORKFLOW.name))
+                           data_preview=_entry_data_preview(
+                               wfe_object.data, 'hd'),
+                           workflow_func=get_workflow_definition(
+                               wfe_object.bwlWORKFLOW.name))
 
 
 @blueprint.route('/workflow_details', methods=['GET', 'POST'])
@@ -81,7 +80,8 @@ def workflow_details(id_workflow):
     return render_template('workflows/workflow_details.html',
                            workflow_metadata=w_metadata,
                            log="",
-                           workflow_func=get_workflow_definition(w_metadata.name))
+                           workflow_func=get_workflow_definition(
+                               w_metadata.name))
 
 
 @blueprint.route('/workflows', methods=['GET', 'POST'])
@@ -129,8 +129,8 @@ def get_redis_keys(key):
 @wash_arguments({'key': (unicode, "")})
 def get_redis_values(key):
     keys = key.split()
-    print keys
-    values = filter_holdingpen_results(*keys)
+    # values = filter_holdingpen_results(*keys)
+    values = filter_holdingpen_results(key)
     return str(values)
 
 
@@ -140,9 +140,7 @@ def _entry_data_preview(data, of='default'):
         try:
             data['record'] = format_record(recID=None, of=of,
                                            xml_record=data['record'])
-        except:
+            return data['record']
+        except ValueError:
             print "This is not a XML string"
-    try:
-        return data['record']
-    except:
-        return data
+    return data

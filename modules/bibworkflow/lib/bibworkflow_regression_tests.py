@@ -114,7 +114,7 @@ distances from it.
     def test_workflow_basic_run(self):
         """Tests running workflow with one data object"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start
+        from invenio.modules.workflows.api import start
         self.test_data = {'data': 20}
         initial_data = self.test_data
         final_data = {'data': 41}
@@ -140,7 +140,7 @@ distances from it.
     def test_workflow_complex_run(self):
         """Tests running workflow with several data objects"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start
+        from invenio.modules.workflows.api import start
 
         self.test_data = [{'data': 1}, {'data': "wwww"}, {'data': 20}]
         final_data = [{'data': 19}, {'data': "wwww"}, {'data': 38}]
@@ -176,7 +176,7 @@ distances from it.
     def test_workflow_recordxml(self):
         """Tests runnning a record ingestion workflow"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start
+        from invenio.modules.workflows.api import start
 
         initial_data = {'data': self.recxml, 'type': "text/xml"}
         workflow = start(workflow_name="marcxml_workflow",
@@ -199,7 +199,7 @@ distances from it.
     def test_workflow_for_halted_object(self):
         """Test starting workflow with halted object given"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start_by_oids
+        from invenio.modules.workflows.api import start_by_oids
         initial_data = {'data': 1}
         obj_init = BibWorkflowObject(id_workflow=123,
                                      version=CFG_OBJECT_VERSION.INITIAL)
@@ -239,7 +239,7 @@ distances from it.
     def test_workflow_for_finished_object(self):
         """Test starting workflow with finished object given"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start_by_oids
+        from invenio.modules.workflows.api import start_by_oids
         initial_data = {'data': 20}
         obj_init = BibWorkflowObject(id_workflow=253,
                                      version=CFG_OBJECT_VERSION.INITIAL)
@@ -314,7 +314,7 @@ distances from it.
     def test_workflow_for_running_object(self):
         """Test starting workflow with running object given"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start_by_oids
+        from invenio.modules.workflows.api import start_by_oids
         initial_data = {'data': 20}
         obj_init = BibWorkflowObject(id_workflow=11,
                                      version=CFG_OBJECT_VERSION.INITIAL)
@@ -356,7 +356,7 @@ distances from it.
         """Tests continuing execution of workflow for object
         given object from prev, current and next task"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import (start,
+        from invenio.modules.workflows.api import (start,
                                              continue_oid)
         initial_data = {'data': 1}
         final_data_prev = {'data': 3}
@@ -422,7 +422,7 @@ distances from it.
     def test_restart_workflow(self):
         """Tests restarting workflow for given workflow id"""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import (start, start_by_wid)
+        from invenio.modules.workflows.api import (start, start_by_wid)
 
         initial_data = {'data': 1}
 
@@ -445,7 +445,7 @@ distances from it.
     def test_simplified_data(self):
         """Tests running workflow with simplified data."""
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start
+        from invenio.modules.workflows.api import start
         self.test_data = 20
         initial_data = self.test_data
         final_data = 41
@@ -469,7 +469,7 @@ distances from it.
 
     def test_redis_for_halted(self):
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start
+        from invenio.modules.workflows.api import start
         from invenio.bibworkflow_utils import set_up_redis
         initial_data = {'data': 1}
 
@@ -492,7 +492,7 @@ distances from it.
 
     def test_data_object_created_outside(self):
         from invenio.modules.workflows.models import BibWorkflowObject
-        from invenio.bibworkflow_api import start
+        from invenio.modules.workflows.api import start
 
         obj = BibWorkflowObject()
         initial_data = {'data': 20}
