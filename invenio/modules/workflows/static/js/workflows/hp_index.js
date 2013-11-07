@@ -1,9 +1,14 @@
 $(document).ready(function() {
+
+    var url_base = "/admin/holdingpen";
+    var url_load_table = url_base + "/load_table";
+    var url_refresh = url_base + "/refresh";
+
     $('#example').dataTable( {
         "bProcessing": true,
         "bServerSide": true,
         "bDestroy": true,
-        "sAjaxSource": "/admin/holdingpen/load_table",
+        "sAjaxSource": url_load_table,
         // "sPaginationType": "bootstrap",
         // "fnServerData": fnDataTablesPipeline
     } );
@@ -16,7 +21,7 @@ $(document).ready(function() {
 
     $('#refresh_button').on('click', function() {
         jQuery.ajax({
-            url: "/admin/holdingpen/refresh",
+            url: url_refresh,
             success: function(json){
                 bootstrap_alert('Objects refreshed');
             }

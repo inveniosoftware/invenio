@@ -7,17 +7,97 @@
     width:100%;
     height:100%;
 }
-/*#entry_detiles {
-    width:80%;
-    height:80%;
-    margin:auto;
-    padding:10px;
-    margin-top:5%;
-    background-color:white;
-    box-shadow:0px 0px 5px 5px rgba(0, 0, 0, 0.3);
-    overflow-y:auto;
-    overflow-x:hidden;
-}*/
+
+.tag-alert{
+    width: 120px;
+    padding: 4px;
+    font-size: 14px;
+}
+
+.close-btn:hover{
+    text-decoration:none;
+    cursor:pointer;
+}
+
+#goodbye-msg{
+    /*text-align: center;*/
+    font-size: 36px;
+    font-color:green;
+}
+
+#datatables-top{
+    background-color: #FF2;
+}
+
+.details_link{
+    padding-bottom: 5px;
+}
+
+#example tbody tr.even:hover, #example tbody tr.odd:hover {
+    background-color: #FFFFCC;
+}
+
+#example tbody tr td {
+    user-select: none; /* CSS3 */
+    -moz-user-select: none; /* Gecko (Firefox) */
+    -khtml-user-select:none; /* Webkit (Safari, Chrome) */
+}
+
+.task-btns{
+    padding-bottom:5px;
+}
+
+#accept-btn-bibmatch{
+    width: 100px;
+    margin: 0 auto;
+    padding-top: 5px;
+}
+
+.decision-btns{
+    width:500px;
+    padding-top: 10px;
+    margin: 0 auto;
+}
+
+#usermessage{
+    margin-top: 10px;
+    text-align: center;
+}
+
+#successmessage{
+    margin-top: 10px;
+    text-align: center;
+}
+
+#record_preview{
+    position: fixed;
+    width: 550px;
+    height: 700px;
+    overflow: auto;
+}
+
+#match_preview{
+    width: 550px;
+    height: 700px;
+    overflow: auto;   
+}
+
+.object_preview_container{
+    padding-top: 10px;
+    padding-left: 50px;
+    width: 750px;
+    height: 700px;
+    overflow: auto;
+}
+
+#object_preview_container{
+    padding-top: 10px;
+    padding-left: 50px;
+    width: 750px;
+    height: 700px;
+    overflow: auto;
+}
+
 #entry_detiles > span {
     position:absolute;
     right:11%;

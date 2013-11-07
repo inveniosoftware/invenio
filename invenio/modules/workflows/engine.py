@@ -300,6 +300,7 @@ BibWorkflowEngine
             obj = objects[i[0]]
             obj.log.info("Object is selected for processing")
             callbacks = self.callback_chooser(obj, self)
+
             if callbacks:
                 try:
                     self.run_callbacks(callbacks, objects, obj)

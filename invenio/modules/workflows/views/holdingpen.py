@@ -17,174 +17,240 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """Holding Pen web interface"""
 
-from flask import render_template, Blueprint, redirect, url_for, flash, request
+from flask import render_template, Blueprint, redirect, url_for, flash, request, current_app
 from flask.ext.login import login_required
 
-from .. import wfwidgets
 from ..models import BibWorkflowObject, Workflow
+from ..loader import widgets
 from invenio.base.decorators import templated, wash_arguments
+from invenio.modules.formatter.engine import format_record
 from invenio.base.i18n import _
-from invenio.ext.breadcrumb import default_breadcrumb_root, register_breadcrumb
+from invenio.ext.breadcrumb import default_breadcrumb_root, breadcrumbs, register_breadcrumb
 from invenio.ext.menu import register_menu
-from invenio.bibworkflow_utils import get_workflow_definition
-from invenio.bibworkflow_api import continue_oid_delayed
-from invenio.bibworkflow_config import CFG_OBJECT_VERSION
+from invenio.utils.date import pretty_date
+from invenio.bibworkflow_utils import (get_workflow_definition,
+                                       sort_bwolist)
+from ..api import continue_oid_delayed, start
+
 
 blueprint = Blueprint('holdingpen', __name__, url_prefix="/admin/holdingpen",
                       template_folder='../templates',
                       static_folder='../static')
 
-default_breadcrumb_root(blueprint, '.admin.holdingpen')
+default_breadcrumb_root(blueprint, '.holdingpen')
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.route('/index', methods=['GET', 'POST'])
 @login_required
-@register_breadcrumb(blueprint, '.', _('Holdingpen'))
 @register_menu(blueprint, 'main.admin.holdingpen', _('Holdingpen'))
+@register_breadcrumb(blueprint, '.', _('Holdingpen'))
 @templated('workflows/hp_index.html')
 def index():
     """
-    Displays main interface of BibHoldingpen.
+    Displays main interface of Holdingpen.
+    Acts as a hub for catalogers (may be removed)
     """
-    from invenio.bibworkflow_utils import create_hp_containers
-    bwolist = create_hp_containers()
-    return dict(hpcontainers=bwolist)
+    from invenio.bibworkflow_containers import bwolist
+
+    # FIXME: need to autodiscover widgets properly
+    widget_list = {}
+    for widget in widgets:
+        widget_list[widget] = [0, []]
+
+    for bwo in bwolist:
+        if ('widget' in bwo.get_extra_data()) and \
+           (bwo.get_extra_data()['widget'] is not None) \
+                and (bwo.version == 2):
+            widget_list[bwo.get_extra_data()['widget']][1].append(bwo)
+    for key in widget_list:
+        widget_list[key][0] = len(widget_list[key][1])
+
+    return dict(tasks=widget_list)
+
+
+@blueprint.route('/maintable', methods=['GET', 'POST'])
+@register_breadcrumb(blueprint, '.records', _('Records'))
+@login_required
+@templated('workflows/hp_maintable.html')
+def maintable():
+    """
+    Displays main table interface of Holdingpen.
+    """
+    from invenio.bibworkflow_containers import bwolist
+
+    # FIXME: need to autodiscover widgets properly
+    widget_list = {}
+    for widget in widgets:
+        widget_list[widget] = [0, []]
+
+    for bwo in bwolist:
+        if ('widget' in bwo.get_extra_data()) and \
+           (bwo.get_extra_data()['widget'] is not None) \
+                and (bwo.version != 1):
+            widget_list[bwo.get_extra_data()['widget']][1].append(bwo)
+    for key in widget_list:
+        widget_list[key][0] = len(widget_list[key][1])
+
+    return dict(bwolist=bwolist, widget_list=widget_list)
 
 
 @blueprint.route('/refresh', methods=['GET', 'POST'])
 @login_required
 def refresh():
+    """
+    Reloads the bibworkflow_containers file,
+    thus rebuilding the BWObject list.
+    """
     import invenio.bibworkflow_containers
     reload(invenio.bibworkflow_containers)
     return 'Records Refreshed'
 
 
+@blueprint.route('/batch_widget', methods=['GET', 'POST'])
+@login_required
+@wash_arguments({'bwolist': (unicode, "")})
+def batch_widget(bwolist):
+    """
+    Renders widget accepting single or multiple records.
+    """
+    from invenio.bibworkflow_utils import parse_bwids
+    bwolist = parse_bwids(bwolist)
+
+    try:
+        bwolist = map(int, bwolist)
+    except ValueError:
+        print 'Error in IDs'
+
+    objlist = []
+    workflow_list = []
+    workflow_func_list = []
+    w_metadata_list = []
+    info_list = []
+    widgetlist = []
+    bwo_parent_list = []
+    logtext_list = []
+
+    objlist = [BibWorkflowObject.query.get(i) for i in bwolist]
+
+    for bwobject in objlist:
+        extracted_data = extract_data(bwobject)
+        bwo_parent_list.append(extracted_data['bwparent'])
+        logtext_list.append(extracted_data['logtext'])
+        info_list.append(extracted_data['info'])
+        w_metadata_list.append(extracted_data['w_metadata'])
+        workflow_func_list.append(extracted_data['workflow_func'])
+        if bwobject.get_extra_data()['widget'] not in widgetlist:
+            widgetlist.append(bwobject.get_extra_data()['widget'])
+
+    widget_form = widgets[widgetlist[0]]
+
+    result = widget_form().render(objlist, bwo_parent_list, info_list,
+                                  logtext_list, w_metadata_list,
+                                  workflow_func_list)
+    url, parameters = result
+
+    return render_template(url, **parameters)
+
+
 @blueprint.route('/load_table', methods=['GET', 'POST'])
 @login_required
-@templated('workflows/hp_index.html')
+@templated('workflows/hp_maintable.html')
 def load_table():
     """
     Function used for the passing of JSON data to the DataTable
     """
     from invenio.bibworkflow_containers import bwolist
 
-    iDisplayStart = request.args.get('iDisplayStart')
-    iDisplayLength = request.args.get('iDisplayLength')
     # sSearch will be used for searching later
-    # sSearch = request.args.get('sSearch')
-    # iSortCol_0 = request.args.get('iSortCol_0')
-    # sSortDir_0 = request.args.get('sSortDir_0')
+    a_search = request.args.get('sSearch')
+    for widget in widgets:
+        if widget == a_search:
+            a_search = widget
+    i_sortcol_0 = request.args.get('iSortCol_0')
+    s_sortdir_0 = request.args.get('sSortDir_0')
 
-    iDisplayStart = int(request.args.get('iDisplayStart'))
-    iDisplayLength = int(request.args.get('iDisplayLength'))
+    i_display_start = int(request.args.get('iDisplayStart'))
+    i_display_length = int(request.args.get('iDisplayLength'))
+
+    if a_search:
+        from invenio.bibworkflow_containers import create_hp_containers
+        bwolist = create_hp_containers(sSearch=a_search)
+
+    if 'iSortCol_0' in current_app.config:
+        i_sortcol_0 = int(i_sortcol_0)
+        if i_sortcol_0 != current_app.config['iSortCol_0'] \
+           or s_sortdir_0 != current_app.config['sSortDir_0']:
+            bwolist = sort_bwolist(bwolist, i_sortcol_0, s_sortdir_0)
+
+    current_app.config['iDisplayStart'] = i_display_start
+    current_app.config['iDisplayLength'] = i_display_length
+    current_app.config['iSortCol_0'] = i_sortcol_0
+    current_app.config['sSortDir_0'] = s_sortdir_0
 
     table_data = {
         "aaData": []
     }
 
-    for bwo in bwolist[iDisplayStart:iDisplayStart+iDisplayLength]:
+    for bwo in bwolist[i_display_start:i_display_start+i_display_length]:
+        try:
+            widgetname = widgets[bwo.get_extra_data()['widget']].__title__
+        except KeyError:
+            widgetname = 'None'
+
         table_data['sEcho'] = int(request.args.get('sEcho')) + 1
         table_data['iTotalRecords'] = len(bwolist)
         table_data['iTotalDisplayRecords'] = len(bwolist)
-
-        if bwo.version == CFG_OBJECT_VERSION.FINAL:
-            bwo_version = \
-                '<span class="label label-success">Final</span>'
-        elif bwo.version == CFG_OBJECT_VERSION.HALTED:
-            bwo_version = \
-                '<span class="label label-warning">Halted</span>'
+        #This will be simplified once Redis is utilized.
+        if 'title' in bwo.get_extra_data()['redis_search']:
+            title = bwo.get_extra_data()['redis_search']['title']
         else:
-            bwo_version = \
-                '<span class="label label-success">Running</span>'
-        if bwo.extra_data['widget'] is not None:
-            widget_link = '<a class="btn btn-info"' + \
-                          'href="/admin/holdingpen/widget?widget=' + \
-                          bwo.extra_data['widget'] + \
-                          '&bwobject_id=' + \
-                          str(bwo.id) + \
-                          '"><i class="icon-wrench"></i></a>'
+            title = None
+        if 'source' in bwo.get_extra_data()['redis_search']:
+            source = bwo.get_extra_data()['redis_search']['source']
         else:
-            widget_link = None
+            source = None
+        if 'category' in bwo.get_extra_data()['redis_search']:
+            category = bwo.get_extra_data()['redis_search']['category']
+        else:
+            category = None
         table_data['aaData'].append(
             [str(bwo.id),
-             None,
-             None,
-             None,
+             title,
+             source,
+             category,
              str(bwo.id_workflow),
-             str(bwo.extra_data['owner']),
-             str(bwo.created),
-             bwo_version,
-             '<a id="info_button" ' +
-             'class="btn btn-info pull-center text-center"' +
-             'href="/admin/holdingpen/details?bwobject_id=' +
-             str(bwo.id) +
-             '"><i class="icon-white icon-zoom-in"></i></a>',
-             widget_link,
+             str(bwo.get_extra_data()['owner']),
+             str(pretty_date(bwo.created))+'#'+str(bwo.created),
+             bwo.version,
+             str(bwo.id),
+             str(bwo.get_extra_data()['widget'])+'#'+widgetname,
              ])
     return table_data
 
 
-@blueprint.route('/resolve_approval', methods=['GET', 'POST'])
-@wash_arguments({'bwobject_id': (int, 0)})
-def resolve_approval(bwobject_id):
-    """
-    Resolves the action taken in the approval widget
-    """
-    from flask import request
-    if request.form['submitButton'] == 'Accept':
-        continue_oid_delayed(bwobject_id)
-        flash('Record Accepted')
-    elif request.form['submitButton'] == 'Reject':
-        _delete_from_db(bwobject_id)
-        flash('Record Rejected')
-    return redirect(url_for('holdingpen.index'))
-
-
 @blueprint.route('/details', methods=['GET', 'POST'])
+@register_breadcrumb(blueprint, '.details', "Record Details")
 @login_required
 @wash_arguments({'bwobject_id': (int, 0)})
 def details(bwobject_id):
     """
-    Displays info about the hpcontainer, and presents the data
+    Displays info about the object, and presents the data
     of all available versions of the object. (Initial, Error, Final)
     """
-    # search for parents
-    bwobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                              bwobject_id).first()
+    bwobject = BibWorkflowObject.query.get(bwobject_id)
 
-    bwparent = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                              bwobject.id_parent).first()
-
-    info = get_info(bwobject)
-    try:
-        info['widget'] = bwobject.extra_data['widget']
-    except (KeyError, AttributeError):
-        pass
-
-    w_metadata = Workflow.query.filter(Workflow.uuid ==
-                                       bwobject.id_workflow).first()
-    # read the logtext from the file system
-    try:
-        #FIXME
-        from invenio.config import CFG_LOGDIR
-        f = open(CFG_LOGDIR + "/object_" + str(bwobject.id)
-                 + "_w_" + str(bwobject.id_workflow) + ".log", "r")
-        logtext = f.read()
-    except IOError:
-        logtext = ""
-
-    print bwobject.get_data()
-    print _entry_data_preview(bwobject.get_data())
+    extracted_data = extract_data(bwobject)
 
     return render_template('workflows/hp_details.html',
                            bwobject=bwobject,
-                           bwparent=bwparent,
-                           info=info, log=logtext,
+                           bwparent=extracted_data['bwparent'],
+                           info=extracted_data['info'],
+                           log=extracted_data['logtext'],
                            data_preview=_entry_data_preview(
                                bwobject.get_data()),
-                           workflow_func=get_workflow_definition(
-                               w_metadata.name).workflow)
+                           workflow_func=extracted_data['workflow_func'],
+                           workflow=extracted_data['w_metadata'])
 
 
 @blueprint.route('/restart_record', methods=['GET', 'POST'])
@@ -194,8 +260,24 @@ def restart_record(bwobject_id, start_point='continue_next'):
     """
     Restarts the initial object in its workflow
     """
-    continue_oid_delayed(oid=bwobject_id, start_point=start_point)
+    bwobject = BibWorkflowObject.query.get(bwobject_id)
+
+    workflow = Workflow.query.filter(
+        Workflow.uuid == bwobject.id_workflow).first()
+
+    start(workflow.name, [bwobject.get_data()])
     return 'Record Restarted'
+
+
+@blueprint.route('/continue_record', methods=['GET', 'POST'])
+@login_required
+@wash_arguments({'bwobject_id': (int, 0)})
+def continue_record(bwobject_id):
+    """
+    Restarts the initial object in its workflow
+    """
+    continue_oid_delayed(oid=bwobject_id, start_point='continue_next')
+    return 'Record continued workflow'
 
 
 @blueprint.route('/restart_record_prev', methods=['GET', 'POST'])
@@ -206,7 +288,7 @@ def restart_record_prev(bwobject_id):
     Restarts the initial object in its workflow from the current task
     """
     continue_oid_delayed(oid=bwobject_id, start_point="restart_task")
-    print "Record restarted from previous task"
+    return 'Record restarted current task'
 
 
 @blueprint.route('/delete_from_db', methods=['GET', 'POST'])
@@ -227,55 +309,60 @@ def _delete_from_db(bwobject_id):
     from invenio.sqlalchemyutils import db
 
     # delete every BibWorkflowObject version from the db
-    BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                   bwobject_id).delete()
+    BibWorkflowObject.query.get(bwobject_id).delete()
     db.session.commit()
 
 
+@blueprint.route('/delete_multi', methods=['GET', 'POST'])
+@login_required
+@wash_arguments({'bwolist': (unicode, "")})
+def delete_multi(bwolist):
+    from invenio.bibworkflow_utils import parse_bwids
+    bwolist = parse_bwids(bwolist)
+
+    for bwobject_id in bwolist:
+        _delete_from_db(bwobject_id)
+    return 'Records Deleted'
+
+
 @blueprint.route('/widget', methods=['GET', 'POST'])
+@register_breadcrumb(blueprint, '.widget', "Widget")
 @login_required
 @wash_arguments({'bwobject_id': (int, 0),
-                 'widget': (unicode, ' ')})
+                 'widget': (unicode, 'default')})
 def show_widget(bwobject_id, widget):
     """
-    Renders the bibmatch widget for a specific record
+    Renders the widget assigned to a specific record
     """
-    bwobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                              bwobject_id).first()
-    bwparent = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                              bwobject.id_parent).first()
+    bwobject = BibWorkflowObject.query.get(bwobject_id)
 
-    widget_form = getattr(wfwidgets, widget)
+    widget_form = widgets[widget]
 
-    if widget == 'bibmatch_widget':
-        # setting up bibmatch widget
-        try:
-            matches = bwobject.extra_data['tasks_results']['match_record']
-        except:
-            pass
+    extracted_data = extract_data(bwobject)
 
-        match_preview = []
-        # adding dummy matches
-        match_preview.append(BibWorkflowObject.query.filter(
-            BibWorkflowObject.id == bwobject_id).first())
-        match_preview.append(BibWorkflowObject.query.filter(
-            BibWorkflowObject.id == bwobject_id).first())
+    result = widget_form().render([bwobject],
+                                  [extracted_data['bwparent']],
+                                  [extracted_data['info']],
+                                  [extracted_data['logtext']],
+                                  [extracted_data['w_metadata']],
+                                  [extracted_data['workflow_func']])
+    url, parameters = result
 
-        data_preview = _entry_data_preview(bwobject.get_data())
+    return render_template(url, **parameters)
 
-        return render_template('workflows/hp_'+widget+'.html',
-                               bwobject=bwobject,
-                               widget=widget_form,
-                               match_preview=match_preview, matches=matches,
-                               data_preview=data_preview)
 
-    elif widget == 'approval_widget':
-        # setting up approval widget
-        data_preview = _entry_data_preview(bwobject.get_data())
-        return render_template('workflows/hp_approval_widget.html',
-                               bwobject=bwobject,
-                               bwparent=bwparent,
-                               widget=widget_form, data_preview=data_preview)
+@blueprint.route('/resolve_widget', methods=['POST'])
+@login_required
+@wash_arguments({'bwobject_id': (unicode, '0'),
+                                 'widget': (unicode, 'default')})
+def resolve_widget(bwobject_id, widget):
+    """
+    Resolves the action taken in a widget.
+    Calls the run_widget function of the specific widget.
+    """
+    widget_form = widgets[widget]
+    widget_form().run_widget(bwobject_id, request)
+    return "Done"
 
 
 @blueprint.route('/entry_data_preview', methods=['GET', 'POST'])
@@ -286,8 +373,7 @@ def entry_data_preview(oid, recformat):
     """
     Presents the data in a human readble form or in xml code
     """
-    bwobject = BibWorkflowObject.query.filter(BibWorkflowObject.id ==
-                                              int(oid)).first()
+    bwobject = BibWorkflowObject.query.get(int(oid))
     return _entry_data_preview(bwobject.get_data(), recformat)
 
 
@@ -296,14 +382,14 @@ def get_info(bwobject):
     Parses the hpobject and extracts its info to a dictionary
     """
     info = {}
-    info['version'] = bwobject.version
-    info['owner'] = bwobject.extra_data['owner']
+    if bwobject.get_extra_data()['owner'] != {}:
+        info['owner'] = bwobject.get_extra_data()['owner']
+    else:
+        info['owner'] = 'None'
     info['parent id'] = bwobject.id_parent
-    info['task counter'] = bwobject.extra_data['task_counter']
     info['workflow id'] = bwobject.id_workflow
     info['object id'] = bwobject.id
-    info['last task name'] = bwobject.extra_data['last_task_name']
-    info['widget'] = bwobject.extra_data['widget']
+    info['widget'] = bwobject.get_extra_data()['widget']
     return info
 
 
@@ -312,16 +398,42 @@ def _entry_data_preview(data, recformat='hd'):
     Formats the data using format_record
     """
     if recformat == 'hd' or recformat == 'xm':
-        try:
-            from invenio.modules.formatter.engine import format_record
-            data = format_record(recID=None, of=recformat,
-                                 xml_record=data)
-        except:
-            print "This is not a XML string"
-
+        data = format_record(recID=None, of=recformat, xml_record=data)
     if data is "" or data is None:
-        print 'NAI EINAI ADEIO'
         data = 'Could not render data'
     else:
         pass
     return data
+
+
+def extract_data(bwobject):
+    """
+    Extracts metadata for BibWorkflowObject needed for rendering
+    the Record's details and widget page.
+    """
+    extracted_data = {}
+
+    extracted_data['bwparent'] = \
+        BibWorkflowObject.query.get(bwobject.id_parent)
+
+    extracted_data['loginfo'] = ""
+
+    extracted_data['logtext'] = {}
+
+    for log in extracted_data['loginfo']:
+        extracted_data['logtext'][log.get_extra_data()['last_task_name']] = \
+            log.message
+
+    extracted_data['info'] = get_info(bwobject)
+    try:
+        extracted_data['info']['widget'] = bwobject.get_extra_data()['widget']
+    except (KeyError, AttributeError):
+        pass
+
+    extracted_data['w_metadata'] = \
+        Workflow.query.filter(Workflow.uuid == bwobject.id_workflow).first()
+
+    extracted_data['workflow_func'] = \
+        get_workflow_definition(extracted_data['w_metadata'].name).workflow
+
+    return extracted_data

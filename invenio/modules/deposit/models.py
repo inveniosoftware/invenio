@@ -36,7 +36,7 @@ from invenio.ext.sqlalchemy import db
 from invenio.bibworkflow_config import CFG_OBJECT_VERSION, CFG_WORKFLOW_STATUS
 from invenio.modules.workflows.models import BibWorkflowObject, Workflow
 from invenio.bibworkflow_engine import BibWorkflowEngine
-from invenio.bibworkflow_api import continue_oid
+from invenio.modules.workflows.api import continue_oid
 
 from invenio.modules.deposit import forms
 from invenio.webdeposit_form import CFG_FIELD_FLAGS, DataExporter

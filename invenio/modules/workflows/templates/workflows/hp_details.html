@@ -1,12 +1,22 @@
 {% extends "workflows/hp_layout.html" %}
 {% import 'workflows/hp_utils.html' as utils %}
-{%- js 'js/prettify.js' -%}
-{%- js url_for('workflows.static', filename='js/workflows/hp_details.js') -%}
-{% block body2 %}
 
-    <h1>Record Details</h1>
-    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&amp;skin=desert"></script> 
-    <link href="../../js/google-code-prettify/src/prettify.css" type="text/css" rel="stylesheet"/>
+{%- block header %}
+    {{ super() }}
+    {%- block holdingpen_assets %}
+        {% js url_for('holdingpen.static', filename='js/workflows/hp_details.js'), '50-workflows' %}
+        {% js url_for('holdingpen.static', filename='js/workflows/hp_datapreview.js'), '50-workflows' %}
+
+        {% js url_for('static', filename='js/google-code-prettify/run_prettify.js'), '50-workflows' %}
+        {% css url_for('static', filename='css/prettify.css') %}
+    {%- endblock holdingpen_assets %}
+{%- endblock header %}
+
+{% block hpbody %}
+    <div class="row-fluid">
+        <div class="span3 pull-left"><a href="{{url_for('holdingpen.maintable')}}"><i class="icon-hand-left"></i> Back to Main Table</a></div>
+        <div class="span3"><h1>Record Details</h1></div>
+    </div>
 
     <div id = "alert_placeholder"></div>
 
@@ -19,74 +29,113 @@
                     <button class="btn btn-mini btn-primary" name="xm" onclick="setDataPreview('xm')">MARC</button>
                 </div>
                 <div class="btn-group pull" name="data_version" data-toggle="buttons-radio">
-                    <button class="btn btn-mini active" name="initial" onclick="setHpid({{hpcontainer.id}})">Initial</button>
-                    {% if hpcontainer.error%}
-                        <button class="btn btn-mini" name="error" onclick="setHpid({{hpcontainer.error.id}})">Error</button>
-                    {% else %}
-                        <button class="btn btn-mini disabled" name="error">Error</button>
-                    {% endif %}
-                    {% if hpcontainer.final%}
-                        <button class="btn btn-mini" name="final" onclick="setHpid({{hpcontainer.final.id}})">Final</button>
+                    <button class="btn btn-mini active" name="initial" onclick="setbwoid({{bwobject.id}})">Initial</button>
+                    {% if bwobject.version == 1 %}
+                        <button class="btn btn-mini" name="final" onclick="setbwoid({{bwobject.id}})">Final</button>
                     {% else %}
                         <button class="btn btn-mini disabled" name="final">Final</button>
                     {% endif %}
+                    {% if bwobject.version == 2 %}
+                        <button class="btn btn-mini" name="error" onclick="setbwoid({{bwobject.id}})">Error</button>
+                    {% else %}
+                        <button class="btn btn-mini disabled" name="error">Error</button>
+                    {% endif %}
                 </div>
+
+                {% if 'message' in bwobject.get_extra_data() and
+                    bwobject.get_extra_data()['widget'] != None %}
+                    <div id="usermessage" class="alert">
+                        {{bwobject.get_extra_data()['message']}}
+                        <a class="close" data-dismiss="alert">×</a>
+                    </div>
+                {% endif %}
+
+                {% if bwobject.version == 1 %}
+                    <div id="successmessage" class="alert alert-success">
+                        Record ran workflow successfully.
+                        <a class="close" data-dismiss="alert">×</a>
+                    </div>
+                {% endif %}
+
                 <div id="object_preview_container">
                     <pre name="object_preview" class="prettyprint">
                             {{ data_preview }}
                     </pre>
                 </div>
             </div>
-            
+
             <div class="span3">
                 <div id="action-area" class="alert">
                     <b>Actions</b>
                     <div class="row-fluid">
                         <div class="span6">
-                            <a class="btn btn-info" href="{{ url_for('holdingpen.show_widget', hpcontainerid=hpcontainer.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i></a></br>
+                            {% if bwobject.get_extra_data()['widget'] %}
+                            <a class="btn btn-info btn-small" href="{{ url_for('holdingpen.show_widget', bwobject_id=bwobject.id, widget=info['widget']) }}" ><i class="icon-wrenchwhite icon-wrench"></i>Widget</a></br>
+                            {% else %}
+                            <a class="btn btn-info btn-small disabled"><i class="icon-wrenchwhite icon-wrench"></i>Widget</a></br>
+                            {% endif %}
+
                         </div>
 
                         <div id="static-actions" class="span6">
-                            <button id="restart_button" class="btn btn-small btn-primary btn-block" rel="popover" name="{{ hpcontainer.id }}"/><i class="icon-repeat"></i>Restart</button></br>
-                            <button id="restart_button_prev" class="btn btn-small btn-block" rel="popover" name="{{ hpcontainer.id }}"/><i class="icon-step-backward"></i>Restart Task</button></br>
+                            <button id="restart_button" class="btn btn-small btn-primary btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-repeat"></i>Restart</button></br>
+                            <button id="restart_button_prev" class="btn btn-small btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-backward"></i>Restart Task</button></br>
+                            <button id="continue_button" class="btn btn-small btn-block" rel="popover" name="{{ bwobject.id }}"/><i class="icon-step-forward"></i>Skip Task</button></br>
                             <a id="delete_btn" href="#confirmationModal" role="button" class="btn btn-small btn-block btn-danger" data-toggle="modal"><i class="icon-trash"></i>Delete</a>
-            
+
                             <div id="confirmationModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                               <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                                 <h3 id="myModalLabel">Please Confirm</h3>
                               </div>
                               <div class="modal-body">
-                                <p>Are you sure you want to delete record #{{hpcontainer.id}}</p>
+                                <p>Are you sure you want to delete record #{{bwobject.id}}</p>
                               </div>
                               <div class="modal-footer">
                                 <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-                                <a class="btn btn-danger" href="{{ url_for('holdingpen.delete_from_db', hpcontainerid=hpcontainer.id) }}" >Delete Record</a>
+                                <a class="btn btn-danger" href="{{ url_for('holdingpen.delete_from_db', bwobject_id=bwobject.id) }}" >Delete Record</a>
                               </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="well">
-                    <b>Workflow definition:</b>
-                    {{ utils.function_display(workflow_func, [-1]) }}
+                    <div class="muted"><b>Workflow Definition:</b></div>
+                    <b>{{workflow.name}}</b>
+                    {{ utils.function_display(workflow_func, bwobject.get_extra_data()['last_task_name'], bwobject.version) }}
                 </div>
 
                 <div class="well">
-                    <b>Error Message:</b></br>
-                    {{ info['last task name'] }} {{ hpcontainer.current.extra_data['error_msg'] }}
-                    <h6 id="show-more" class="text-right"><a href="#moreinfoModal" role="button" data-toggle="modal" class="float-right">Show More</a></h6>
+                    <div class="muted"><b>Error Message:</b></div>
+                    {% if bwobject.get_extra_data()['error_msg'] != "" %}
+                        {{ info['last task name'] }} {{ bwobject.get_extra_data()['error_msg'] }}
+                        <div class="text-right">
+                            <h6 id="show-more" class="text-right"><a href="#moreinfoModal" role="button" data-toggle="modal" class="float-right">Show More</a>
+                            </h6>
+                        </div>
+                    {% else %}
+                        There were no errors.
+                    {% endif %}
 
                     <div id="moreinfoModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                       <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                         <h3 id="myModalLabel">Error Log</h3>
                       </div>
+                      <div class="modal-body">
+                        {% for key, value in log.iteritems() %}
+                        {{key}}: {{value}}
+                        {% endfor %}
+                      </div>
+                      <div class="modal-footer">
+                        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                      </div>
                     </div>
                 </div>
 
                 <div class="well">
+                    <div class="muted"><b>Record Metadata:</b></div></br>
                     <table class="table table-striped">
                         <tbody>
                             {% for key, value in info.iteritems() %}
@@ -94,9 +143,9 @@
                                 <hr>
                             {% endfor %}
 
-                            {% if hpcontainer.final %}
+                            {% if bwobject.version == 1 %}
                                 <span class="badge badge-success">Final</span>
-                            {% elif hpcontainer.error %}
+                            {% elif bwobject.version == 2 %}
                                 <span class="badge badge-warning">Halted</span>
                             {% else %}
                                 <span class="badge badge-info">Initial</span>

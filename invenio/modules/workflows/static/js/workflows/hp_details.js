@@ -1,29 +1,67 @@
+// -*- coding: utf-8 -*-
+// This file is part of Invenio.
+// Copyright (C) 2013 CERN.
+//
+// Invenio is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Invenio is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Invenio; if not, write to the Free Software Foundation, Inc.,
+// 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+function getURLParameter(name) {
+  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+}
+
 $(document).ready(function(){
 
+    var url_base = "/admin/holdingpen";
+    var url_restart_record = url_base + "/restart_record";
+    var url_restart_record_prev = url_base + "/restart_record_prev";
+    var url_continue = url_base + "/continue_record";
+
     function bootstrap_alert(message) {
-        $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>')
+        $('#alert_placeholder').html('<div class="alert"><a class="close" data-dismiss="alert">×</a><span>'+message+'</span></div>');
     }
 
     $('#restart_button').on('click', function() {
         bwo_id = $(this).attr('name');
         console.log(bwo_id);
         jQuery.ajax({
-            url: "/admin/holdingpen/restart_record?bwobject_id=" + bwo_id,
+            url: url_restart_record + "?bwobject_id=" + bwo_id,
             success: function(json){
                 bootstrap_alert('Object restarted');
             }
-        })
+        });
     });
 
     $('#restart_button_prev').on('click', function() {
         bwo_id = $(this).attr('name');
         console.log(bwo_id);
         jQuery.ajax({
-            url: "/admin/holdingpen/restart_record_prev?bwobject_id=" + bwo_id,
+            url: url_restart_record_prev + "?bwobject_id=" + bwo_id,
             success: function(json){
-                bootstrap_alert('Object restarted from previous task');        
+                bootstrap_alert('Object restarted from previous task');
             }
-        })
+        });
+    });
+
+    $('#continue_button').on('click', function() {
+        bwo_id = $(this).attr('name');
+        console.log(bwo_id);
+        jQuery.ajax({
+            url: url_continue + "?bwobject_id=" + bwo_id,
+            success: function(json){
+                bootstrap_alert('Object continued from next task');
+            }
+        });
     });
 
     window.setTimeout(function() {
@@ -31,51 +69,12 @@ $(document).ready(function(){
         });
     }, 2000);
 
-    var bwoid = "{{ bwobject.id }}";
-    var datapreview = "hd";
-
-    window.data_preview = function(format){
-        jQuery.ajax({
-            url: "/admin/holdingpen/entry_data_preview?oid="+bwoid+"&recformat="+format,
-            success: function(json){
-                if(format == 'xm' || format == 'marcxml'){
-                    if( json == ""){
-                        json = "Preview not available"
-                    }
-                    $('div[id="object_preview"]').remove();
-                    $('pre[name="object_preview"]').remove();
-                    if( $('pre[name="object_preview"]').length == 0 ){
-                        $('div[id="object_preview_container"]').append("<pre name='object_preview'></pre>");
-                    }
-                    $('pre[name="object_preview"]').html(json);
-
-                }else{
-                    if( json == ""){
-                        json = "Preview not available"
-                    }
-                    $('pre[name="object_preview"]').remove();
-                    $('div[id="object_preview"]').remove();
-                    $('div[id="object_preview_container"]').append("<div id='object_preview'></div>");
-                    $('div[id="object_preview"]').html(json);
-                }
-            }
-        })
-    }
-
-    window.setbwoid = function(id){
-        bwoid = id;
-        data_preview(datapreview);
-    }
-
-    window.setDataPreview = function(dp){
-        datapreview = dp;
-        data_preview(datapreview);
-    }
-
     if ( window.addEventListener ) {
         $("div.btn-group[name='data_version']").bind('click', function(event){
             version = event.target.name;
-        })
-    };
-});
+        });
+    }
 
+    bwoid = getURLParameter('bwobject_id');
+
+});

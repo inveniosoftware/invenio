@@ -1,13 +1,20 @@
 {% extends "workflows/hp_layout.html" %}
-{% block body2 %}
+
+{%- block header %}
+    {{ super() }}
+    {%- block widget_assets %}
+        {% js url_for('static', filename='js/google-code-prettify/run_prettify.js'), '50-workflows' %}
+        {% css url_for('static', filename='css/prettify.css') %}
+    {%- endblock widget_assets %}
+{%- endblock header %}
+
+{% block hpbody %}
     <h1>Bibmatch Widget</h1>
-    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=css&amp;skin=desert"></script>
 
     <div class="container">
         <div class="row-fluid">
             <div class="span12">
                 <div class="row-fluid">
-                    {% set widget = widget() %}
                     <div class="span6">
                         <div id="record_preview_container">
                             Submitted Record
@@ -21,14 +28,16 @@
                         {% set i = 0 %}
                         {% for match in match_preview %}
                         {% if match %}
-                        
+
                         <strong>Match {{i+1}} </strong>
                         <div id="match_preview">
                             <pre class="prettyprint">
                                 {{ match.get_data() }}
                             </pre>
                         </div>
-                        {{ widget.accept }}
+                        <div id="accept-btn-bibmatch">
+                            {{ widget.accept }}
+                        </div>
                         </br>
 
                         {% set i = i+1 %}
@@ -36,7 +45,7 @@
                         {% endfor %}
                     </div>
                 </div>
-            </div>    
+            </div>
         </div>
     </div>
 {% endblock %}

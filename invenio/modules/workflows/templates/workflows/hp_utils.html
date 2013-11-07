@@ -1,37 +1,51 @@
-{% macro function_display(fun, task_counter) -%}
-    {% set comma2 = joiner(",") %}
+{% macro function_display(fun, task_counter, version) -%}
+    <!-- {% set comma2 = joiner(",") %} -->
+    {% set i = 0 %}
+    {% set flag = 0 %}
     {% for w in fun %}
         {% if w is not iterable %}
-            {{ comma2() }}
+            <!-- {{ comma2() }} -->
             </br>
-            {% if fun.index(w) == task_counter[-1] %}
+            {% if w.__title__ == task_counter and version == 2 %}
                 <b>
             {% endif %}
-            <a href="#infoModal" data-toggle="modal">{{ w.__title__ }}</a>
 
-            <div id="infoModal" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <a href="#infoModal{{i}}" data-toggle="modal">{{ w.__title__ }}</a>
+
+            {% if w.__title__ == task_counter %}
+                {% set flag = 1 %}
+                {% if version == 2 or version == 3  %}
+                    </b><i class="icon-remove"></i>
+                {% else %}
+                    <i class="icon-ok"></i>
+                {% endif %}    
+            {% else %}
+                {% if flag == 0 %}
+                    <i class="icon-ok"></i>
+                {% endif %}
+                
+            {% endif %}
+            
+            <div id="infoModal{{i}}" class="modal hide fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                <h3 id="myModalLabel">Function Description</h3>
+                <h3 id="myModalLabel">{{ w.__title__ }}</h3>
               </div>
               <div class="modal-body">
+                  {% if w.func_closure is defined %}
+                      {% if w.func_closure is iterable %}
+                          {% set comma = joiner(", ") %}
+                          {% for arg in w.func_closure %}
+                              {{ comma() }}
+                              <b>Parameter: {{ arg.cell_contents }}</b>
+                          {% endfor %}
+                          </br>
+                      {% endif %}
+                  {% endif %}
                 {{ w.func_doc }}
               </div>
             </div>
-
-            {% if w.func_closure is defined %}
-                {% if w.func_closure is iterable %}
-                    {% set comma = joiner(", ") %}
-                    {% for arg in w.func_closure %}
-                        {{ comma() }}
-                        {{ arg.cell_contents }}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-            
-            {% if fun.index(w) == task_counter[-1] %}
-                </b>
-            {% endif %}
+            {% set i = i + 1 %}
         {% endif %}
     {% endfor %}
 {%- endmacro %}
