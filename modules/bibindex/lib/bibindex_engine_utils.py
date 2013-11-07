@@ -104,3 +104,21 @@ def get_field_count(recID, tags):
     for tag in tags:
         out += len(get_fieldvalues(recID, tag))
     return out
+
+
+def run_sql_drop_silently(query):
+    """
+        SQL DROP statement with IF EXISTS part generates
+        warning if table does not exist. To mute the warning
+        we can remove IF EXISTS and catch SQL exception telling
+        us that table does not exist.
+    """
+    try:
+        query = query.replace(" IF EXISTS", "")
+        run_sql(query)
+    except Exception, e:
+        if  str(e).find("Unknown table") > -1:
+            pass
+        else:
+            raise e
+

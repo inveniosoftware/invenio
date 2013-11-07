@@ -35,6 +35,7 @@ from invenio.bibindex_engine import WordTable, get_index_id_from_index_name, get
 from invenio.intbitset import intbitset
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibauthority_engine import get_index_strings_by_control_no, get_control_nos_from_recID
+from invenio.bibindex_engine_utils import run_sql_drop_silently
 
 
 def reindex_for_type_with_bibsched(_type):
@@ -126,8 +127,8 @@ def reindex_word_tables_into_testtables(index_name, recids = None, prefix = 'tes
                                            PRIMARY KEY (id_bibrec,type)
                                            ) ENGINE=MyISAM""" % test_tablename
 
-    run_sql(query_drop_forward_index_table)
-    run_sql(query_drop_reversed_index_table)
+    run_sql_drop_silently(query_drop_forward_index_table)
+    run_sql_drop_silently(query_drop_reversed_index_table)
     run_sql(query_create_forward_index_table)
     run_sql(query_create_reversed_index_table)
     if query_update:

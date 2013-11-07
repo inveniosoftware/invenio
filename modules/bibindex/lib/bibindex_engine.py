@@ -27,7 +27,7 @@ import re
 import sys
 import time
 import fnmatch
-
+from datetime import datetime
 
 from invenio.config import CFG_SOLR_URL
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
@@ -66,10 +66,10 @@ from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM, \
     CFG_JOURNAL_PUBINFO_STANDARD_FORM_REGEXP_CHECK
 from invenio.bibindex_engine_utils import get_all_index_names_and_column_values, \
-    load_tokenizers
+    load_tokenizers, \
+    run_sql_drop_silently
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibfield import get_record
-
 
 
 
@@ -207,12 +207,12 @@ def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
         "%sidxPHRASE%02dF TO idxPHRASE%02dF;" % (reindex_prefix, index_id, index_id)
     )
     write_message("Dropping old index tables for id %s" % index_id)
-    run_sql("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPAIR%02dR, old_idxPAIR%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id, index_id, index_id)) # kwalitee: disable=sql
+    run_sql_drop_silently("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPAIR%02dR, old_idxPAIR%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id, index_id, index_id)) # kwalitee: disable=sql
 
 def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Create reindexing temporary tables."""
     write_message("Creating new tmp index tables for id %s" % index_id)
-    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
+    run_sql_drop_silently("""DROP TABLE IF EXISTS %sidxWORD%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxWORD%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term varchar(50) default NULL,
@@ -221,7 +221,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         UNIQUE KEY term (term)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
+    run_sql_drop_silently("""DROP TABLE IF EXISTS %sidxWORD%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxWORD%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL,
                         termlist longblob,
@@ -229,7 +229,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         PRIMARY KEY (id_bibrec,type)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
+    run_sql_drop_silently("""DROP TABLE IF EXISTS %sidxPAIR%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPAIR%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term varchar(100) default NULL,
@@ -238,7 +238,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         UNIQUE KEY term (term)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
+    run_sql_drop_silently("""DROP TABLE IF EXISTS %sidxPAIR%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPAIR%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL,
                         termlist longblob,
@@ -246,7 +246,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         PRIMARY KEY (id_bibrec,type)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
+    run_sql_drop_silently("""DROP TABLE IF EXISTS %sidxPHRASE%02dF""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPHRASE%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term text default NULL,
@@ -255,7 +255,7 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         KEY term (term(50))
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
+    run_sql_drop_silently("""DROP TABLE IF EXISTS %sidxPHRASE%02dR""" % (wash_table_column_name(reindex_prefix), index_id)) # kwalitee: disable=sql
     run_sql("""CREATE TABLE %sidxPHRASE%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL default '0',
                         termlist longblob,
@@ -843,8 +843,9 @@ class WordTable:
                 auth_type = CFG_BIBAUTHORITY_CONTROLLED_FIELDS_BIBLIOGRAPHIC.get(tag_match)
                 # find updated authority records of this type
                 # dates[1] is ignored, needs dates[0] to find res
+                now = datetime.now()
                 auth_recIDs = search_pattern(p='980__a:' + auth_type) \
-                    & search_unit_in_bibrec(str(dates[0]), 'now()', type='m')
+                    & search_unit_in_bibrec(str(dates[0]), str(now), type='m')
                 # now find dependent bibliographic records
                 for auth_recID in auth_recIDs:
                     # get the fix authority identifier of this authority record
