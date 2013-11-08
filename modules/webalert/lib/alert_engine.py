@@ -63,15 +63,23 @@ def update_date_lastrun(alert):
 
     return run_sql('update user_query_basket set date_lastrun=%s where id_user=%s and id_query=%s and id_basket=%s;', (strftime("%Y-%m-%d"), alert[0], alert[1], alert[2],))
 
-def get_alert_queries(frequency):
-    """Return all the queries for the given frequency."""
+def get_alert_queries(frequency, only_active=True):
+    """
+    Return all the active alert queries for the given frequency.
+    If only_active is False: fetch all the alert queries
+    regardless of them being active or not.
+    """
 
-    return run_sql('select distinct id, urlargs from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.frequency=%s and uqb.date_lastrun <= now();', (frequency,))
+    return run_sql('select distinct id, urlargs from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.frequency=%%s and uqb.date_lastrun <= now()%s;' % (only_active and ' and is_active = 1' or '', ), (frequency, ))
 
-def get_alert_queries_for_user(uid):
-    """Returns all the queries for the given user id."""
+def get_alert_queries_for_user(uid, only_active=True):
+    """
+    Returns all the active alert queries for the given user id.
+    If only_active is False: fetch all the alert queries
+    regardless of them being active or not.
+    """
 
-    return run_sql('select distinct id, urlargs, uqb.frequency from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.id_user=%s and uqb.date_lastrun <= now();', (uid,))
+    return run_sql('select distinct id, urlargs, uqb.frequency from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.id_user=%%s and uqb.date_lastrun <= now()%s;' % (only_active and ' and is_active = 1' or '', ), (uid, ))
 
 def get_alerts(query, frequency):
     """Returns a dictionary of all the records found for a specific query and frequency along with other informationm"""

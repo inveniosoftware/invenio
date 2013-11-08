@@ -128,9 +128,20 @@ class Template:
                 }
         return out
 
-    def tmpl_input_alert(self, ln, query, alert_name, action, frequency, notification,
-                         baskets, old_id_basket, id_basket, id_query,
-                         guest, guesttxt):
+    def tmpl_input_alert(self,
+                         ln,
+                         query,
+                         alert_name,
+                         action,
+                         frequency,
+                         notification,
+                         baskets,
+                         old_id_basket,
+                         id_basket,
+                         id_query,
+                         is_active,
+                         guest,
+                         guesttxt):
         """
         Displays an alert adding form.
 
@@ -155,6 +166,8 @@ class Template:
           - 'id_basket' *string* - The id of the basket of this alert
 
           - 'id_query' *string* - The id of the query associated to this alert
+
+          - 'is_active' *boolean* - is the alert active or not
 
           - 'guest' *bool* - If the user is a guest user
 
@@ -198,6 +211,10 @@ class Template:
                   </td>
                 </tr>
                 <tr>
+                  <td style="text-align: right; vertical-align:top; font-weight: bold;">%(is_active_label)s</td>
+                  <td><input type="checkbox" name="is_active" value="1" %(is_active_checkbox)s/></td>
+                </tr>
+                <tr>
                   <td style="text-align:right; font-weight: bold">%(send_email)s</td>
                   <td>
                     <select name="notif">
@@ -209,7 +226,8 @@ class Template:
                 </tr>
                 <tr>
                   <td style="text-align: right; vertical-align:top; font-weight: bold;">%(store_basket)s</td>
-                  <td>%(baskets)s
+                  <td>%(baskets)s</td>
+                </tr>
                """ % {
                  'action': action,
                  'alert_name' : _("Alert identification name:"),
@@ -229,29 +247,27 @@ class Template:
                  'specify' : _("if %(x_fmt_open)sno%(x_fmt_close)s you must specify a basket") % {'x_fmt_open': '<b>',
                                                                                                   'x_fmt_close': '</b>'},
                  'store_basket' : _("Store results in basket?"),
-                 'baskets': baskets
+                 'baskets': baskets,
+                 'is_active_label' : _("Is the alert active?"),
+                 'is_active_checkbox' : is_active and 'checked="checked" ' or '',
                }
 
-        out += """  </td>
-                   </tr>
-                   <tr>
+        out += """<tr>
                     <td colspan="2" style="text-align:center">
                       <input type="hidden" name="idq" value="%(idq)s" />
                       <input type="hidden" name="ln" value="%(ln)s" />
                       <input class="formbutton" type="submit" name="action" value="&nbsp;%(set_alert)s&nbsp;" />&nbsp;
                       <input class="formbutton" type="reset" value="%(clear_data)s" />
-                     </td>
-                    </tr>
-                   </table>
-                  </td>
-                 </tr>
+                    </td>
+                  </tr>
                 </table>
-               """ % {
-                     'idq' : id_query,
-                     'ln' : ln,
-                     'set_alert' : _("SET ALERT"),
-                     'clear_data' : _("CLEAR DATA"),
-                   }
+              </td>
+            </tr>
+          </table>""" % {'idq' : id_query,
+                         'ln' : ln,
+                         'set_alert' : _("SET ALERT"),
+                         'clear_data' : _("CLEAR DATA"),}
+
         if action == "update":
             out += '<input type="hidden" name="old_idb" value="%s" />' % old_id_basket
         out += "</form>"
@@ -291,6 +307,7 @@ class Template:
             'notification' *string* - If notification should be sent by email ('y', 'n')
             'created' *string* - The date of alert creation
             'lastrun' *string* - The last running date            
+            'is_active' *boolean* - is the alert active or not
         @type alerts: list of dictionaries
 
         @param idq: The specified query id for which to display the user alerts
@@ -379,7 +396,7 @@ class Template:
             msg = _('You have defined a total of %(number_of_alerts)s alerts.') % \
                   {'number_of_alerts': '<strong>' + str(nb_alerts) + '</strong>'}
             msg += '<br />'
-            msg += _('You may define new alert based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
+            msg += _('You may define new alerts based on %(yoursearches)s, the %(popular_alerts)s or just by %(search_interface)s.') % \
                    {'yoursearches': '<a href="%s/yoursearches/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('your searches')),
                     'popular_alerts': '<a href="%s/youralerts/popular?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _('popular alerts')),
                     'search_interface': '<a href="%s/?ln=%s">%s</a>' %(CFG_SITE_URL, ln, _('searching for something new'))}
@@ -417,6 +434,7 @@ class Template:
             alert_notification = alert['notification']
             alert_creation_date = alert['created']
             alert_last_run_date = alert['lastrun']
+            alert_active_p = alert['is_active']
 
             alert_details_frequency = _('Runs') + '&nbsp;' + \
                                       (alert_frequency == 'day' and '<strong>' + _('daily') + '</strong>' or \
@@ -444,16 +462,26 @@ class Template:
                                                     _('Last run:') + '&nbsp;' + \
                                                     alert_details_last_run_date
 
+            alert_details_options_pause_or_resume = create_html_link('%s/youralerts/%s' % \
+                (CFG_SITE_SECURE_URL, alert_active_p and 'pause' or 'resume'),
+                {'ln'     :   ln,
+                 'idq'    :   alert_query_id,
+                 'name'   :   alert_name,
+                 'idb'    :   alert_basket_id,},
+                alert_active_p and _('Pause') or _('Resume'))
+
             alert_details_options_edit = create_html_link('%s/youralerts/modify' % \
                                                           (CFG_SITE_SECURE_URL,),
-                                                          {'ln'     :   ln,
-                                                           'idq'    :   alert_query_id,
-                                                           'name'   :   alert_name,
-                                                           'freq'   :   alert_frequency,
-                                                           'notif'  :   alert_notification,
-                                                           'idb'    :   alert_basket_id,
-                                                           'old_idb':   alert_basket_id},
+                                                          {'ln'        : ln,
+                                                           'idq'       : alert_query_id,
+                                                           'name'      : alert_name,
+                                                           'freq'      : alert_frequency,
+                                                           'notif'     : alert_notification,
+                                                           'idb'       : alert_basket_id,
+                                                           'is_active' : alert_active_p,
+                                                           'old_idb'   : alert_basket_id},
                                                           _('Edit'))
+
             alert_details_options_delete = create_html_link('%s/youralerts/remove' % \
                                                             (CFG_SITE_SECURE_URL,),
                                                             {'ln'     :   ln,
@@ -463,10 +491,18 @@ class Template:
                                                             _('Delete'),
                                                             {'onclick': 'return confirm(\'%s\')' % \
                                                              (_('Are you sure you want to permanently delete this alert?'),)})
-            alert_details_options = '<img src="%s/img/youralerts_alert_edit.png" />' % (CFG_SITE_URL,) + \
+
+            # TODO: find a nice way to format the display alert options
+            alert_details_options = '<img src="%s/img/youralerts_alert_%s.png" />' % \
+                                        (CFG_SITE_URL, alert_active_p and 'pause' or 'resume') + \
+                                    alert_details_options_pause_or_resume + \
+                                    '&nbsp;&middot;&nbsp;' + \
+                                    '<img src="%s/img/youralerts_alert_edit.png" />&nbsp;' % \
+                                        (CFG_SITE_URL,) + \
                                     alert_details_options_edit + \
-                                    '&nbsp;&nbsp;&nbsp;' + \
-                                    '<img src="%s/img/youralerts_alert_delete.png" />' % (CFG_SITE_URL,) + \
+                                    '&nbsp;&middot;&nbsp;' + \
+                                    '<img src="%s/img/youralerts_alert_delete.png" />' % \
+                                        (CFG_SITE_URL,) + \
                                     alert_details_options_delete
 
             youralerts_display_html += """
@@ -475,23 +511,28 @@ class Template:
         %(counter)i.
       </td>
       <td class="youralerts_display_table_content" onMouseOver='this.className="youralerts_display_table_content_mouseover"' onMouseOut='this.className="youralerts_display_table_content"'>
-        <div class="youralerts_display_table_content_container_left">
-          <div class="youralerts_display_table_content_name">%(alert_name)s</div>
+        <div class="youralerts_display_table_content_container_main%(css_class_content_is_active_p)s">
+          <div class="youralerts_display_table_content_name">%(warning_label_is_active_p)s%(alert_name)s</div>
           <div class="youralerts_display_table_content_details">%(alert_details_frequency_notification_basket)s</div>
           <div class="youralerts_display_table_content_search_query">%(alert_details_search_query)s</div>
         </div>
-        <div class="youralerts_display_table_content_container_right">
+        <div class="youralerts_display_table_content_clear"></div>
+        <div class="youralerts_display_table_content_container_left">
           <div class="youralerts_display_table_content_options">%(alert_details_options)s</div>
         </div>
-        <div class="youralerts_display_table_content_clear"></div>
-        <div class="youralerts_display_table_content_dates">%(alert_details_creation_last_run_dates)s</div>
+        <div class="youralerts_display_table_content_container_right">
+          <div class="youralerts_display_table_content_dates">%(alert_details_creation_last_run_dates)s</div>
+        </div>
       </td>
     </tr>""" % {'counter': counter,
                 'alert_name': cgi.escape(alert_name),
                 'alert_details_frequency_notification_basket': alert_details_frequency_notification_basket,
                 'alert_details_search_query': alert_details_search_query,
                 'alert_details_options': alert_details_options,
-                'alert_details_creation_last_run_dates': alert_details_creation_last_run_dates}
+                'alert_details_creation_last_run_dates': alert_details_creation_last_run_dates,
+                'css_class_content_is_active_p' : not alert_active_p and ' youralerts_display_table_content_inactive' or '',
+                'warning_label_is_active_p' : not alert_active_p and '<span class="warning">[&nbsp;%s&nbsp;]&nbsp;</span>' % _('paused') or '',
+               }
 
         footer = ''
         if paging_navigation[0]:
