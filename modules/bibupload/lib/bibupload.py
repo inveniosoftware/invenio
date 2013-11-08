@@ -2824,7 +2824,7 @@ def bibupload_records(records, opt_mode=None, opt_notimechange=0,
         if opt_mode == "holdingpen":
                     #inserting into the holding pen
             write_message("Inserting into holding pen", verbose=3)
-            insert_record_into_holding_pen(record, record_id)
+            insert_record_into_holding_pen(record, record_id, pretend=pretend)
         else:
             write_message("Inserting into main database", verbose=3)
             error = bibupload(

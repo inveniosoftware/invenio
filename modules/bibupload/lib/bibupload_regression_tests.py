@@ -3681,32 +3681,30 @@ class BibUploadPretendTest(GenericBibUploadTest):
         GenericBibUploadTest.tearDown(self)
         task_set_task_param('pretend', False)
 
+    @staticmethod
     def _get_tables_fingerprint():
         """
         Take lenght and last modification time of all the tables that
         might be touched by bibupload and return them in a nice structure.
         """
         fingerprint = {}
-        tables = ['bibrec', 'bibdoc', 'bibrec_bibdoc', 'bibdoc_bibdoc', 'bibfmt', 'hstDOCUMENT', 'hstRECORD']
+        tables = ['bibrec', 'bibdoc', 'bibrec_bibdoc', 'bibdoc_bibdoc', 'bibfmt', 'hstDOCUMENT', 'hstRECORD', 'bibHOLDINGPEN', 'bibdocmoreinfo', 'bibdocfsinfo']
         for i in xrange(100):
             tables.append('bib%02dx' % i)
             tables.append('bibrec_bib%02dx' % i)
         for table in tables:
             fingerprint[table] = get_table_status_info(table)
         return fingerprint
-    _get_tables_fingerprint = staticmethod(_get_tables_fingerprint)
 
+    @staticmethod
     def _checks_tables_fingerprints(before, after):
         """
         Checks differences in table_fingerprints.
         """
-        err = True
         for table in before.keys():
             if before[table] != after[table]:
-                print >> sys.stderr, "Table %s has been modified: before was [%s], after was [%s]" % (table, pprint.pformat(before[table]), pprint.pformat(after[table]))
-                err = False
-        return err
-    _checks_tables_fingerprints = staticmethod(_checks_tables_fingerprints)
+                raise StandardError("Table %s has been modified: before was [%s], after was [%s]" % (table, pprint.pformat(before[table]), pprint.pformat(after[table])))
+        return True
 
     def test_pretend_insert(self):
         """bibupload - pretend insert"""
