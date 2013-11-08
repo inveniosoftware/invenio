@@ -329,7 +329,9 @@ img_DATA = add-small.png \
            yoursearches_search.png \
            youralerts_alert.png \
            youralerts_alert_delete.png \
-           youralerts_alert_edit.png
+           youralerts_alert_edit.png \
+           youralerts_alert_pause.png \
+           youralerts_alert_resume.png
 
 tmpdir=$(localstatedir)/tmp
 

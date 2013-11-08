@@ -3749,6 +3749,7 @@ CREATE TABLE IF NOT EXISTS user_query_basket (
   alert_desc text default NULL,
   alert_recipient text default NULL,
   notification char(1) NOT NULL default 'y',
+  is_active tinyint(1) DEFAULT '1',
   PRIMARY KEY  (id_user,id_query,frequency,id_basket),
   KEY alert_name (alert_name)
 ) ENGINE=MyISAM;

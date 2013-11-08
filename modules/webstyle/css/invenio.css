@@ -2583,6 +2583,7 @@ a:hover.bibMergeImgClickable img {
 
 .youralerts_display_table {
    border: 1px solid #ffcc00;
+   min-width: 800px;
 }
 .youralerts_display_table_header td {
    background-color: #ffffcc;
@@ -2628,13 +2629,18 @@ a:hover.bibMergeImgClickable img {
    vertical-align: top;
    border-bottom: 1px solid #ffcc00;
 }
+.youralerts_display_table_content_container_main {
+   width: 100%;
+   border-bottom: 1px solid #CCCCCC;
+   padding-bottom: 10px;
+}
 .youralerts_display_table_content_container_left {
    float: left;
-   width: 75%;
+   width: 50%;
 }
 .youralerts_display_table_content_container_right {
    float: right;
-   width: 25%;
+   width: 50%;
 }
 .youralerts_display_table_content_clear {
    clear: both;
@@ -2673,14 +2679,18 @@ a:hover.bibMergeImgClickable img {
    text-align: right;
    white-space: nowrap;
    color: gray;
+   margin-top: 5px;
+   /*margin-bottom: 5px;*/
 }
 .youralerts_display_table_content_options {
    position: relative;
-   top: 0px;
-   right: 0px;
-   margin-bottom: 5px;
-   font-size: 80%;
-   text-align: right;
+   /*top: 0px;
+   right: 0px;*/
+   margin-top: 5px;
+   /*margin-bottom: 5px;*/
+   font-size: 70%;
+   text-align: left;
+   white-space: nowrap;
 }
 .youralerts_display_table_content_options img{
    vertical-align: top;
@@ -2693,6 +2703,10 @@ a:hover.bibMergeImgClickable img {
 .youralerts_display_table_content_options a:hover {
    text-decoration: underline;
    color: #000;
+}
+
+.youralerts_display_table_content_inactive {
+   color: #CCCCCC;
 }
 /* end of WebAlert module */
 
