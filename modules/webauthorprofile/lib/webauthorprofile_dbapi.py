@@ -100,9 +100,3 @@ def get_expired_person_ids(expire_delay_days=CFG_WEBAUTHORPROFILE_CACHE_EXPIRED_
     keys = [int(x[0].split(':')[1]) for x in set(keys) if ':' in x[0]]
     return keys
 
-def get_expired_person_ids_limit(expire_delay_days=CFG_WEBAUTHORPROFILE_CACHE_EXPIRED_DELAY_BIBSCHED):
-    """ Returns pids with expired caches. """
-    keys = run_sql("select object_key from wapCACHE force index(last_updated) where "
-                   "object_status=%s or last_updated < timestampadd(day, -%s, now()) limit 1000", ('Expired', expire_delay_days))
-    keys = [int(x[0].split(':')[1]) for x in set(keys) if ':' in x[0]]
-    return keys

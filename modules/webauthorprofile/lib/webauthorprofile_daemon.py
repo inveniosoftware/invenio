@@ -24,7 +24,7 @@ WebAuthorProfile daemon
 from sys import stdout
 import bibtask
 from invenio.bibauthorid_dbinterface import get_existing_authors
-from invenio.webauthorprofile_dbapi import get_expired_person_ids_limit
+from invenio.webauthorprofile_dbapi import get_expired_person_ids
 from invenio.webauthorprofile_corefunctions import _compute_cache_for_person
 
 
@@ -87,10 +87,8 @@ def _task_run_core():
         pids = list(get_existing_authors(with_papers_only=True))
         compute_cache_f(mp)(pids)
     else:
-        while True:
-            pids = get_expired_person_ids_limit()
-            if not pids:
-                break
+        pids = get_expired_person_ids()
+        if pids:
             compute_cache_f(mp)(pids)
 
     return 1
@@ -103,8 +101,8 @@ def compute_cache(pids):
     bibtask.write_message("WebAuthorProfile: %s persons to go" % len(pids),
                           stream=stdout, verbose=0)
     for _, p in enumerate(pids):
-        bibtask.write_message("WebAuthorProfile: doing %s out of %s" % (pids.index(p) + 1, len(pids)))
-        bibtask.task_update_progress("WebAuthorProfile: doing %s out of %s" % (pids.index(p) + 1, len(pids)))
+        bibtask.write_message("WebAuthorProfile: doing %s out of %s (personid: %s)" % (pids.index(p) + 1, len(pids), p))
+        bibtask.task_update_progress("WebAuthorProfile: doing %s out of %s (personid: %s)" % (pids.index(p) + 1, len(pids), p))
         _compute_cache_for_person(p)
         bibtask.task_sleep_now_if_required(can_stop_too=True)
 

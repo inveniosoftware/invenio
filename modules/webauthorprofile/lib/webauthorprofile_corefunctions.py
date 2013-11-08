@@ -76,6 +76,10 @@ RECOMPUTE_PRECACHED_ELEMENT_DELAY = timedelta(minutes=30)
 CACHE_IS_OUTDATED_DELAY = timedelta(days=CFG_WEBAUTHORPROFILE_CACHE_EXPIRED_DELAY_LIVE)
 FORCE_CACHE_IS_EXPIRED = False
 
+
+IS_BATCH_PROCESS = False
+CONNECTION_WAITTIME = 2
+
 def set_force_expired_cache(val=True):
     global FORCE_CACHE_IS_EXPIRED
     FORCE_CACHE_IS_EXPIRED = val
@@ -394,6 +398,9 @@ def _get_external_publications(person_id):
             if not recids:
                 arxiv_pubs[arxiv_pubid] = get_title_of_arxiv_pubid(arxiv_pubid)
 
+            if IS_BATCH_PROCESS:
+                time.sleep(CONNECTION_WAITTIME)
+
         return arxiv_pubs
 
     def get_orcid_pubs(person_id):
@@ -413,6 +420,9 @@ def _get_external_publications(person_id):
             recids = perform_request_search(p=doi, f='doi', m1='e', cc='HEP', rg=0)
             if not recids:
                 orcid_pubs[doi] = get_title_of_doi(doi)
+
+            if IS_BATCH_PROCESS:
+                time.sleep(CONNECTION_WAITTIME)
 
         return orcid_pubs
 
@@ -480,12 +490,16 @@ def precompute_cache_for_person(person_ids=None, all_persons=False, only_expired
     pids = pids - empty_pids
 
     last = len(pids)
+
+    global IS_BATCH_PROCESS
+    IS_BATCH_PROCESS = True
     for i, p in enumerate(pids):
 #        start = time()
         print 'Doing ', i,' of ', last
         #print 'STARTED: ', p, ' ', i
         _compute_cache_for_person(p)
         #print 'DONE: ', p , ',' , str(time() - start)
+    IS_BATCH_PROCESS = False
 
 def multiprocessing_precompute_cache_for_person(person_ids=None, all_persons=False, only_expired=False):
     pids = set()

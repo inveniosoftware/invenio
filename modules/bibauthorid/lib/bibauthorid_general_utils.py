@@ -31,6 +31,7 @@ try:
 except ImportError:
     from xml.etree import ElementTree as ET
 from urllib import urlopen
+from urllib2 import HTTPError
 from collections import deque
 
 import multiprocessing as mp
@@ -296,10 +297,13 @@ def get_title_of_arxiv_pubid(arxiv_pubid):
     if xml_referer is None:
         return arxiv_pubid
 
-    fxml = urlopen(xml_referer)
-    xml = fxml.read()
-    fxml.close()
-    root = ET.fromstring(xml)
+    try:
+        fxml = urlopen(xml_referer)
+        xml = fxml.read()
+        fxml.close()
+        root = ET.fromstring(xml)
+    except HTTPError:
+        return arxiv_pubid
 
     title = get_title_from_arxiv_xml(root, deque(['GetRecord', 'record', 'metadata', 'dc', 'title']))
 
