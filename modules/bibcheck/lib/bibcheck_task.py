@@ -47,9 +47,11 @@ from invenio.config import \
     CFG_ETCDIR, \
     CFG_PYLIBDIR, \
     CFG_SITE_URL, \
-    CFG_TMPSHAREDDIR
+    CFG_TMPSHAREDDIR, \
+    CFG_CERN_SITE
 from invenio.search_engine import \
-    perform_request_search
+    perform_request_search, \
+    search_unit_in_bibxxx
 from invenio.bibedit_utils import get_bibrecord
 from invenio.bibrecord import record_xml_output, record_add_field
 from invenio.pluginutils import PluginContainer
@@ -499,10 +501,14 @@ def load_rule(config, plugins, rule_name):
                                               arg_name)
 
     for key, val in config.items(rule_name):
-        if key in ("filter_pattern", "filter_field", "filter_collection", "filter_limit"):
+        if key in ("filter_pattern",
+                   "filter_field",
+                   "filter_collection",
+                   "filter_limit"):
             rule[key] = val
-        elif key == "holdingpen":
-            rule["holdingpen"] = val.lower() in ("true", "1", "yes", "on")
+        elif key in ("holdingpen",
+                     "consider_deleted_records"):
+            rule[key] = val.lower() in ("true", "1", "yes", "on")
         elif key == "check":
             rule["check"] = val
             if val not in plugins:
@@ -582,6 +588,10 @@ def get_recids_for_rules(rules):
         else:
             last_run = get_rule_lastrun(rule_name)
             modified_recids = get_modified_records_since(last_run)
+            if not "consider_deleted_records" in rule:
+                modified_recids -= search_unit_in_bibxxx(p='DELETED', f='980__%', type='e')
+                if CFG_CERN_SITE:
+                    modified_recids -= search_unit_in_bibxxx(p='DUMMY', f='980__%', type='e')
             result.intersection_update(modified_recids)
         recids[rule_name] = result
 
