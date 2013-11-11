@@ -105,7 +105,7 @@ def perform_borrower_loans(uid, barcode, borrower_id,
             db.renew_loan(loan_id, new_due_date)
             #update_status_if_expired(loan_id)
             tag_all_requests_as_done(barcode, borrower_id)
-            infos.append(_("Your loan has been renewed with sucess."))
+            infos.append(_("Your loan has been renewed with success."))
 
     #cancel request
     elif action == 'cancel':
