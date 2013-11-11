@@ -147,7 +147,12 @@ def register_configurations(app):
     any uppercase variable defined in the module `invenio.messages.config` is
     loaded into the system.
     """
+    from flask import Config
+    new_config = Config(app.config.root_path)
     for config in import_module_from_packages('config', app, ['invenio.core.*', ]):
-        app.config.from_object(config)
+        new_config.from_object(config)
     for config in autodiscover_configs(app):
-        app.config.from_object(config)
+        new_config.from_object(config)
+
+    new_config.update(app.config)
+    app.config = new_config
