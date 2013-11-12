@@ -778,8 +778,8 @@ the file_for_citations parameter in the config file [%s]" %err, verbose=2)
     len_ = len(dict_of_ids.keys())
     write_message("Number of nodes(papers) to rank : %s" % str(len_), verbose=3)
     if len_ == 0:
-        write_message("Error: No citations to read!", sys.stderr)
-        raise Exception
+        write_message("No citation data found, nothing to be done.")
+        return
     try:
         method = config.get(function, "citerank_method")
     except ConfigParser.NoOptionError, err:
