@@ -164,9 +164,9 @@ def perform_request_record(requestType, uid, data):
             save_xml_record(recid1, uid, xml_record1, task_name="bibmerge",
                             sequence_id=sequence_id)
 
-            #submit record1
-            xml_record1 = record_xml_output(record1)
-            save_xml_record(recid1, uid, xml_record1)
+            # Delete cache file if it exists
+            if cache_exists(recid1, uid):
+                delete_cache(recid1, uid)
 
             result['resultText'] = 'Records submitted'
             return result
