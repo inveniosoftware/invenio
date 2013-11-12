@@ -587,11 +587,11 @@ def format_with_format_template(format_template_filename, bfo,
                 return unicodifier(f(*args, **kwds))
             return wrapper
 
-        if bfo.recID is not None:
+        if bfo.recID:
             record = bibfield_get_record(bfo.recID)
         else:
             record = bibfield_create_record(bfo.xml_record, master_format='marc')
-            bfo.recID = bfo.recID if bfo.recID is not None else 0
+            bfo.recID = bfo.recID if bfo.recID else 0
         record.__getitem__ = encode_utf8(record.__getitem__)
         record.get = encode_utf8(record.get)
         evaluated_format = render_template_to_string(
@@ -723,6 +723,8 @@ def eval_format_element(format_element, bfo, parameters=None, verbose=0):
     default_value = parameters.get('default', "")
     escape = parameters.get('escape', "")
     output_text = ''
+
+    _ = gettext_set_language(bfo.lang)
 
     # 3 possible cases:
     # a) format element file is found: we execute it
