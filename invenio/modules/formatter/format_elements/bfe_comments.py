@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from .comments.api import get_first_comments_or_remarks
+from ...comments.api import get_first_comments_or_remarks
 
 def format_element(bfo, nbReviews='all', nbComments='all', show_reviews='true'):
     """
