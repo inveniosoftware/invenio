@@ -315,7 +315,7 @@ class WebAuthorPages(WebInterfaceDirectory):
         title_message = 'Author Publication Profile Page'
         expire_cache = False
 
-        if argd['recompute']:
+        if argd['recompute'] and req.get_method() == 'POST':
             expire_cache = True
 
         content = self.create_authorpage_websearch(req, form, ln, expire_cache)

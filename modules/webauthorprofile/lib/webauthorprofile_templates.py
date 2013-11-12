@@ -751,8 +751,11 @@ class Template:
 
         cache_reload_link = ''
         if recompute_allowed:
-            cache_reload_link = ('<a href="%s/author/profile/%s?recompute=1">%s</a>'
-                                % (CFG_SITE_URL, person_link, _("Recompute Now!")))
+            cache_reload_link = """
+                <form method="post">
+                    <input type="submit" value="%s" />
+                    <input type="hidden" name="recompute" value="1" />
+                </form>""" % _("Recompute Now!")
         html_generated_timestamp = "<div align='right' font-size:'50%%'> Generated: %s. %s</div>" % (rec_date, cache_reload_link)
 
         if CFG_WEBAUTHORPROFILE_GENERATED_TIMESTAMP_BOTTOM_POSITION:
