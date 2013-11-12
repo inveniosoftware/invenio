@@ -194,7 +194,7 @@ def comments(recid):
         CmtRECORDCOMMENT.id_bibrec == recid,
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score == 0
-    )).all()
+    )).order_by(CmtRECORDCOMMENT.date_creation).all()
     return render_template('comments/comments.html', comments=comments)
 
 
@@ -220,7 +220,7 @@ def reviews(recid):
         CmtRECORDCOMMENT.id_bibrec == recid,
         CmtRECORDCOMMENT.in_reply_to_id_cmtRECORDCOMMENT == 0,
         CmtRECORDCOMMENT.star_score > 0
-    )).all()
+    )).order_by(CmtRECORDCOMMENT.date_creation).all()
     return render_template('comments/reviews.html', comments=comments)
 
 

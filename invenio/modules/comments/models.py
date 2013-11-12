@@ -67,7 +67,7 @@ class CmtRECORDCOMMENT(db.Model):
     bibrec = db.relationship(Bibrec, backref='recordcomments')
     user = db.relationship(User, backref='recordcomments')
     replies = db.relationship('CmtRECORDCOMMENT', backref=db.backref(
-        'parent', remote_side=[id]))
+        'parent', remote_side=[id], order_by=date_creation))
 
     @property
     def is_deleted(self):
