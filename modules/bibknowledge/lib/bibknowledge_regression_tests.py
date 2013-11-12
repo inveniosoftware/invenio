@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2009, 2010, 2011, 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -204,7 +204,7 @@ class BibknowledgeRegressionTests(unittest.TestCase):
     def test_kb_for_bibedit(self):
         """bibknowledge - test a bibedit-style *very* dynamic kb"""
         myvalues = get_kbd_values_for_bibedit("100__a", searchwith="Ellis", expression="100__a:*%*")
-        self.assertEqual(2, len(myvalues))
+        self.assertEqual(1, len(myvalues))
 
     def test_kb_attribute_update(self):
         """bibknowledge - attribute modifications persist in database"""

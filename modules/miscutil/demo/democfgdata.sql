@@ -648,7 +648,7 @@ INSERT INTO collection_collection VALUES (13,30,'r',20);
 INSERT INTO collection_collection VALUES (14,27,'r',20);
 INSERT INTO collection_collection VALUES (14,28,'r',10);
 INSERT INTO collection_collection VALUES (14,29,'r',10);
-INSERT INTO collection_collection VALUES (1,34,'r',25);
+INSERT INTO collection_collection VALUES (1,34,'v',5);
 INSERT INTO collection_collection VALUES (34,35,'r',4);
 INSERT INTO collection_collection VALUES (34,36,'r',3);
 INSERT INTO collection_collection VALUES (34,37,'r',2);

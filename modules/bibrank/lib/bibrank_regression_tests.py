@@ -79,7 +79,7 @@ class BibRankWordSimilarityRankingTest(unittest.TestCase):
         """bibrank - search results ranked by word similarity"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id',
-                                               expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 9, 14, 18, 118, 15]"))
+                                               expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 9, 14, 18, 15]"))
 
     def test_similar_records_link(self):
         """bibrank - 'Similar records' link"""
