@@ -579,10 +579,10 @@ def process_batch_job(batch_job_file):
                 ## Rename it, adding the subformat
                 os.rename(bibdoc_video_fullpath,
                           compose_file(bibdoc_video_directory,
-                                       bibdoc_slave_video_docname,
                                        bibdoc_video_extension,
                                        bibdoc_video_subformat,
-                                       1)
+                                       1,
+                                       bibdoc_slave_video_docname)
                           )
                 bibdoc_video._build_file_list()
                 bibdoc_video_format = compose_format(bibdoc_video_extension,
