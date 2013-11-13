@@ -26,13 +26,13 @@ __revision__ = \
 
 from mechanize import Browser
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.mailutils_unit_tests import MailTestCase
 from invenio.base.wrappers import lazy_import
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
-webuser = lazy_import('invenio.webuser')
+webuser = lazy_import('invenio.legacy.webuser')
 
 class IsUserSuperAdminTests(InvenioTestCase):
     """Test functions related to the isUserSuperAdmin function."""

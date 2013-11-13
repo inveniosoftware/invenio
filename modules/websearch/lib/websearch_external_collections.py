@@ -32,7 +32,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.config import CFG_SITE_LANG
-from invenio.dbquery import run_sql, OperationalError, ProgrammingError
+from invenio.legacy.dbquery import run_sql, OperationalError, ProgrammingError
 from invenio.base.i18n import gettext_set_language
 
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT

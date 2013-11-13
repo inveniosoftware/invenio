@@ -40,7 +40,7 @@ from invenio.ext.logging import register_exception
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.config import CFG_BINDIR
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.legacy.websubmit.functions.Shared_Functions import \
      createRelatedFormats
 from invenio.bibdocfile_managedocfiles import get_description_and_comment

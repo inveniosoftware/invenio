@@ -31,7 +31,7 @@ from invenio.websubmitadmincli import \
      load_submission, \
      remove_submission, \
      diff_submission
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 class WebSubmitAdminWebPagesAvailabilityTest(InvenioTestCase):
     """Check WebSubmit Admin web pages whether they are up or not."""

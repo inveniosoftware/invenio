@@ -41,7 +41,7 @@ import sys
 from ConfigParser import ConfigParser
 
 from invenio.config import CFG_ETCDIR
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, task_set_option, \
        task_get_option, task_has_option, task_get_task_param
 

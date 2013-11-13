@@ -21,7 +21,7 @@
 WebAuthorProfile Database interface
 '''
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.config import CFG_WEBAUTHORPROFILE_CACHE_EXPIRED_DELAY_BIBSCHED
 
 def _create_db_tables():

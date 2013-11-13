@@ -23,7 +23,6 @@ pylib_DATA = bibsword_config.py \
              bibsword_client_http.py \
              bibsword_client.py \
              bibsword_client_templates.py \
-             bibsword_webinterface.py \
              bibsword_client_tester.py
 
 EXTRA_DIST = $(pylib_DATA)

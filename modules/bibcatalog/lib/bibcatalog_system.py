@@ -23,7 +23,7 @@ Please see the help/hacking/bibcatalog-api page for details.
 This is a base class that cannot be instantiated.
 """
 
-from invenio.webuser import get_user_preferences
+from invenio.legacy.webuser import get_user_preferences
 
 class BibCatalogSystem:
     """ A template class for ticket support."""

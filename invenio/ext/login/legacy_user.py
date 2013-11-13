@@ -205,7 +205,7 @@ class UserInfo(CombinedMultiDict, UserMixin):
         user_info = info
         user_info.update(self.req)
 
-        from invenio.webuser import isUserSubmitter, isUserReferee, \
+        from invenio.legacy.webuser import isUserSubmitter, isUserReferee, \
             isUserAdmin, isUserSuperAdmin
         from invenio.access_control_engine import acc_authorize_action
         from invenio.access_control_admin import acc_get_role_id, \

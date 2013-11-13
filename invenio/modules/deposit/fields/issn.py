@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-#from invenio.webdeposit_processor_utils import sherpa_romeo_issn_validate
+#from ..processor_utils import sherpa_romeo_issn_validate
 
 __all__ = ['ISSNField']
 

@@ -25,7 +25,7 @@ This is a subclass of BibCatalogSystem
 
 import datetime
 from time import mktime
-import invenio.webuser
+import invenio.legacy.webuser
 from invenio.shellutils import escape_shell_arg
 from invenio.bibcatalog_system import BibCatalogSystem
 from invenio.ext.email import send_email
@@ -82,7 +82,7 @@ class BibCatalogSystemEmail(BibCatalogSystem):
         if requestor:
             requestorset = " requestor:" + escape_shell_arg(requestor) + '\n'
         if owner:
-            ownerprefs = invenio.webuser.get_user_preferences(owner)
+            ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
             if ownerprefs.has_key("bibcatalog_username"):
                 owner = ownerprefs["bibcatalog_username"]
             ownerset = " owner:" + escape_shell_arg(owner) + '\n'

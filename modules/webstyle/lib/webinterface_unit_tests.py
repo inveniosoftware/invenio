@@ -72,10 +72,10 @@ class _FakeReq(object):
         self.method = "GET"
         return
 
-FieldStorage = lazy_import('invenio.webinterface_handler_wsgi_utils:FieldStorage')
+FieldStorage = lazy_import('invenio.legacy.wsgi.utils:FieldStorage')
 # --------------------------------------------------
 
-webinterface_handler = lazy_import('invenio.webinterface_handler')
+webinterface_handler = lazy_import('invenio.ext.legacy.handler')
 
 
 class TestWashArgs(InvenioTestCase):

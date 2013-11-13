@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_SITE_URL
 import invenio.access_control_engine as acce
 from invenio.base.i18n import language_list_long
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def getnavtrail(previous = ''):
     navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)

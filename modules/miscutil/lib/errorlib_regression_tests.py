@@ -51,7 +51,7 @@ class ErrorlibRegisterExceptionTest(InvenioTestCase):
     """Check errorlib register_exception functionality."""
 
     def setUp(self):
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         run_sql("DELETE FROM hstEXCEPTION")
 
     def test_simple_register_exception(self):
@@ -89,7 +89,7 @@ class ErrorlibRegisterExceptionTest(InvenioTestCase):
 
     def test_dbquery_password_hiding(self):
         """errorlib - hide dbquery password in frame analysis"""
-        from invenio.dbquery import connect
+        from invenio.legacy.dbquery import connect
         kwargs = {'host': 'foo', 'port': 999, 'db': 'baz', 'user': 'qoox', 'passwd': '123', 'use_unicode': False, 'charset': 'utf8'}
         try:
             connect(**kwargs)

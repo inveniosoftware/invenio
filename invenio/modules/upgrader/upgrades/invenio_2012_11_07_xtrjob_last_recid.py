@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import warnings
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.utils.text import wait_for_user
 
 depends_on = ['invenio_release_1_1_0']

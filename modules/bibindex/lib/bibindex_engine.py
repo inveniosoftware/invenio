@@ -52,7 +52,7 @@ from invenio.search_engine import perform_request_search, \
      get_synonym_terms, \
      search_pattern, \
      search_unit_in_bibrec
-from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
+from invenio.legacy.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
 from invenio.bibindex_engine_washer import wash_index_term
 from invenio.bibtask import task_init, write_message, get_datetime, \

@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 import os
 import re
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def Create_Cplx_Approval(parameters, curdir, form, user_info=None):
     global rn

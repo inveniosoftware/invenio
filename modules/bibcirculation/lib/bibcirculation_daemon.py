@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import sys
 import time
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.bibtask import task_init, \
                             task_sleep_now_if_required, \
                             task_update_progress, \

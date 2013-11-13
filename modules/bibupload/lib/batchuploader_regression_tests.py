@@ -30,7 +30,7 @@ import socket
 from urllib import urlencode
 
 from invenio.testsuite import make_test_suite, run_test_suite
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.utils.json import json
 from invenio.config import CFG_DEVEL_SITE, CFG_SITE_URL, CFG_TMPDIR, CFG_BINDIR
 from invenio.bibsched import get_last_taskid, delete_task

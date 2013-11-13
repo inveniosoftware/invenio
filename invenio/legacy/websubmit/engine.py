@@ -41,10 +41,10 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_USE_MATHJAX
 
-from invenio.dbquery import Error
+from invenio.legacy.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.webpage import page, error_page, warning_page
-from invenio.webuser import getUid, get_email, collect_user_info, isGuestUser, \
+from invenio.legacy.webuser import getUid, get_email, collect_user_info, isGuestUser, \
                             page_not_authorized
 from invenio.legacy.websubmit.config import CFG_RESERVED_SUBMISSION_FILENAMES, \
     InvenioWebSubmitFunctionError, InvenioWebSubmitFunctionStop, \
@@ -54,7 +54,7 @@ from invenio.webstat import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
-from invenio.htmlutils import get_mathjax_header
+from invenio.utils.html import get_mathjax_header
 
 from invenio.websubmit_dblayer import \
      get_storage_directory_of_action, \

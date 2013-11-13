@@ -22,7 +22,6 @@ pylib_DATA = webauthorprofile_corefunctions.py \
 	     webauthorprofile_dbapi.py \
 	     webauthorprofile_interface.py \
 	     webauthorprofile_templates.py  \
-	     webauthorprofile_webinterface.py \
 	     webauthorprofile_cli.py \
 	     webauthorprofile_daemon.py
 

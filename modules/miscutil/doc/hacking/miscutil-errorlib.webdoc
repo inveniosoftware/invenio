@@ -174,7 +174,7 @@ def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=CFG_SITE_LANG):
 <h5>webmessage_webinterface.py: web interface</h5>
 <pre>
 from invenio.webpage import page
-from invenio.webmessage import perform&#95;request&#95;display&#95;msg
+from invenio.legacy.webmessage.api import perform&#95;request&#95;display&#95;msg
 
 def display&#95;msg(req, msgid=-1, ln=CFG_SITE_LANG):
     &#95; = gettext&#95;set&#95;language(ln)

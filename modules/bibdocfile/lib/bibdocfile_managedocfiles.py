@@ -92,11 +92,11 @@ from invenio.bibdocfile import BibRecDocs, \
 from invenio.legacy.websubmit.functions.Shared_Functions import \
      createRelatedFormats
 from invenio.ext.logging import register_exception
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.utils.url import create_html_mailto
-from invenio.htmlutils import escape_javascript_string
+from invenio.utils.html import escape_javascript_string
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 
 CFG_ALLOWED_ACTIONS = ['revise', 'delete', 'add', 'addFormat']

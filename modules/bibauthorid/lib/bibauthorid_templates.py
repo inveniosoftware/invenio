@@ -39,8 +39,8 @@ from invenio.bibauthorid_frontinterface import get_uid_from_personid
 from invenio.bibauthorid_frontinterface import get_bibrefrec_name_string
 from invenio.bibauthorid_frontinterface import get_canonical_id_from_personid
 from invenio.base.i18n import gettext_set_language, wash_language
-from invenio.webuser import get_email
-from invenio.htmlutils import escape_html
+from invenio.legacy.webuser import get_email
+from invenio.utils.html import escape_html
 #from invenio.utils.text import encode_for_xml
 from flask import session
 

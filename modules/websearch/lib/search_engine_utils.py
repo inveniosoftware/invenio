@@ -24,7 +24,7 @@
 import string
 
 from invenio.config import CFG_BIBFORMAT_HIDDEN_TAGS
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.intbitset import intbitset
 from invenio.ext.cache import cache
 

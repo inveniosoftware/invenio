@@ -902,7 +902,7 @@ def generate_tmp_barcode():
 
 def check_database():
 
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
 
     r1 = run_sql(""" SELECT it.barcode, it.status, ln.status
                        FROM crcITEM it, crcLOAN ln

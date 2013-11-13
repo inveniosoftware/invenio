@@ -28,7 +28,7 @@ from invenio.webjournal_utils import \
 from invenio.base.i18n import gettext_set_language
 from invenio.config import CFG_SITE_URL
 from invenio.utils.url import create_html_link
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from urllib import quote
 
 def format_element(bfo, categories, label="Subscribe by RSS",

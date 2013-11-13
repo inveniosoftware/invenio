@@ -19,8 +19,8 @@
 
 from wtforms import TextField
 from invenio.modules.deposit.field_base import WebDepositField
-from invenio.webdeposit_processor_utils import sherpa_romeo_publisher_process
-from invenio.webdeposit_autocomplete_utils import sherpa_romeo_publishers
+from ..processor_utils import sherpa_romeo_publisher_process
+from ..autocomplete_utils import sherpa_romeo_publishers
 
 __all__ = ['PublisherField']
 

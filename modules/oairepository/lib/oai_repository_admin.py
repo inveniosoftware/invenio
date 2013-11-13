@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_SITE_URL
 import invenio.access_control_engine as access_manager
 from invenio.utils.url import create_html_link
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.oai_repository_updater import parse_set_definition
 from invenio.base.i18n import gettext_set_language
 from invenio.ext.logging import register_exception

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -19,17 +19,17 @@
 
 """WebMessage User Settings"""
 
-from flask import Blueprint, session, make_response, g, render_template, \
-                  request, flash, jsonify, redirect, url_for, current_app
-from invenio.modules.accounts.models import User, Usergroup, UserUsergroup
+from flask import url_for, current_app
+from flask.ext.login import current_user
+
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 from invenio.ext.template import render_template_to_string
-from invenio.modules.dashboard.settings import Settings, UserSettingsStorage, \
-                             ModelSettingsStorageBuilder
-from invenio.modules.messages.models import MsgMESSAGE, UserMsgMESSAGE
-from invenio.webmessage_forms import WebMessageUserSettingsForm
-from flask.ext.login import current_user
+from invenio.modules.dashboard.settings import Settings, UserSettingsStorage
+
+from .models import UserMsgMESSAGE
+from .forms import WebMessageUserSettingsForm
+
 
 class WebMessageSettings(Settings):
 

@@ -26,9 +26,9 @@ import cgi
 
 # Invenio imports
 from invenio.utils.url import create_html_link, create_url
-from invenio.webuser import get_user_info, collect_user_info, isGuestUser, get_email
+from invenio.legacy.webuser import get_user_info, collect_user_info, isGuestUser, get_email
 from invenio.utils.date import convert_datetext_to_dategui
-from invenio.webmessage_mailutils import email_quoted_txt2html
+from invenio.utils.mail import email_quoted_txt2html
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_SITE_LANG, \
@@ -44,7 +44,7 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_RECORD, \
                            CFG_WEBCOMMENT_MAX_ATTACHED_FILES, \
                            CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE
-from invenio.htmlutils import get_html_text_editor, create_html_select
+from invenio.utils.html import get_html_text_editor, create_html_select
 from invenio.base.i18n import gettext_set_language
 from invenio.modules.formatter import format_record
 from invenio.access_control_engine import acc_authorize_action

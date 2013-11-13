@@ -29,7 +29,7 @@ import tempfile
 import shutil
 from time import localtime
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.utils.date import convert_datestruct_to_datetext, \
                               convert_datetext_to_datestruct
 from invenio.legacy import bibrecord as bibrecord

@@ -24,6 +24,8 @@
 __revision__ = "$Id$"
 
 import os
+import pkg_resources
+
 from invenio.config import CFG_ETCDIR, CFG_PYLIBDIR
 
 # True if old php format written in EL must be used by Invenio.
@@ -36,7 +38,7 @@ CFG_BIBFORMAT_TEMPLATES_DIR = "format_templates"
 CFG_BIBFORMAT_TEMPLATES_PATH = os.path.join(CFG_ETCDIR, 'bibformat', CFG_BIBFORMAT_TEMPLATES_DIR)
 CFG_BIBFORMAT_JINJA_TEMPLATE_PATH = os.path.join(CFG_ETCDIR, 'templates', CFG_BIBFORMAT_TEMPLATES_DIR)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = None  # defaults to autodiscovery
-CFG_BIBFORMAT_ELEMENTS_PATH = os.path.join(CFG_PYLIBDIR, 'invenio', 'bibformat_elements')
+CFG_BIBFORMAT_ELEMENTS_PATH = pkg_resources.resource_filename('invenio.modules.formatter', 'format_elements')
 CFG_BIBFORMAT_OUTPUTS_PATH = os.path.join(CFG_ETCDIR, 'bibformat', 'output_formats')
 
 # File extensions of formats

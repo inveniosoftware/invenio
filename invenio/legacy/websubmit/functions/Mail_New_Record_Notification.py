@@ -28,7 +28,7 @@ __revision__ = "$Id$"
 import os
 from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_RECORD
-from invenio.webuser import email_valid_p
+from invenio.legacy.webuser import email_valid_p
 from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.legacy.websubmit.functions.Shared_Functions import ParamFromFile
 from invenio.ext.email import scheduled_send_email

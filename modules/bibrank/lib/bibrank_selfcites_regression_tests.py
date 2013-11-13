@@ -114,7 +114,7 @@ class SelfCitesIndexerTests(InvenioTestCase):
         from invenio.bibrank_selfcites_indexer import store_record
         from invenio.bibrank_selfcites_indexer import get_authors_from_record
         from invenio.bibrank_selfcites_indexer import get_authors_tags
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         tags = get_authors_tags()
         recid = 1
         authors = get_authors_from_record(recid, tags)
@@ -138,7 +138,7 @@ class SelfCitesIndexerTests(InvenioTestCase):
         from invenio.bibrank_selfcites_indexer import store_record_coauthors
         from invenio.bibrank_selfcites_indexer import get_authors_from_record
         from invenio.bibrank_selfcites_indexer import get_authors_tags
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         tags = get_authors_tags()
         config = {'friends_threshold': 3}
         recid = 1
@@ -155,7 +155,7 @@ class SelfCitesIndexerTests(InvenioTestCase):
         from invenio.bibrank_selfcites_indexer import store_record_coauthors
         from invenio.bibrank_selfcites_indexer import get_authors_from_record
         from invenio.bibrank_selfcites_indexer import get_authors_tags
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         tags = get_authors_tags()
         recid = 1
         config = {'friends_threshold': 3}
@@ -266,7 +266,7 @@ class SelfCitesTaskTests(InvenioTestCase):
 
     def test_empty_self_cites_tables(self):
         from invenio.bibrank_selfcites_task import empty_self_cites_tables
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         empty_self_cites_tables()
         counts = [
             run_sql('SELECT count(*) from rnkRECORDSCACHE')[0][0],
@@ -277,7 +277,7 @@ class SelfCitesTaskTests(InvenioTestCase):
 
     def test_fill_self_cites_tables(self):
         from invenio.bibrank_selfcites_task import fill_self_cites_tables
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         config = {'algorithm':'friends', 'friends_threshold': 3}
         fill_self_cites_tables(config)
         counts = [

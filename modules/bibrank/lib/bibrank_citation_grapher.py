@@ -23,7 +23,7 @@ import os
 import time
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_WEBDIR, CFG_BIBRANK_SHOW_CITATION_GRAPHS
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import gettext_set_language
 from invenio.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
 from invenio.bibrank_citation_searcher import calculate_cited_by_list

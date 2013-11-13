@@ -46,7 +46,7 @@ from invenio.config import \
     CFG_CERN_SITE
 import invenio.access_control_engine as acce
 from invenio.webpage import page
-from invenio.webuser import getUid, page_not_authorized
+from invenio.legacy.webuser import getUid, page_not_authorized
 from invenio.webstat import register_customevent
 from invenio.ext.logging import register_exception
 from invenio.ext.email import send_email

@@ -26,8 +26,8 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_RECORD, \
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.date import convert_datetext_to_dategui
 from invenio.utils.url import create_html_link
-from invenio.webmessage_mailutils import email_quoted_txt2html
-from invenio.htmlutils import escape_html, escape_javascript_string
+from invenio.utils.mail import email_quoted_txt2html
+from invenio.utils.html import escape_html, escape_javascript_string
 from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION
 
 class Template:

@@ -36,7 +36,7 @@ from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_RECORD
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
     DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
-from invenio.dbquery import run_sql, ProgrammingError
+from invenio.legacy.dbquery import run_sql, ProgrammingError
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
 from invenio.intbitset import intbitset

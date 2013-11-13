@@ -21,7 +21,7 @@
 
 from flask import url_for
 from invenio.base.i18n import _
-from invenio.bibknowledge import get_kb_mappings
+from invenio.modules.knowledge.api import get_kb_mappings
 from invenio.utils.forms import InvenioBaseForm, AutocompleteField, \
     RowWidget
 from wtforms import TextField

@@ -499,7 +499,7 @@ def cli_cmd_reset_sitename(conf):
     CFG_SITE_NAME_INTL* read from conf files.
     """
     print ">>> Going to reset CFG_SITE_NAME and CFG_SITE_NAME_INTL..."
-    from invenio.dbquery import run_sql, IntegrityError
+    from invenio.legacy.dbquery import run_sql, IntegrityError
     # reset CFG_SITE_NAME:
     sitename = conf.get("Invenio", "CFG_SITE_NAME")
     try:
@@ -525,7 +525,7 @@ def cli_cmd_reset_recstruct_cache(conf):
     will adapt the database to either store or not store the recstruct
     format."""
     from invenio.intbitset import intbitset
-    from invenio.dbquery import run_sql, serialize_via_marshal
+    from invenio.legacy.dbquery import run_sql, serialize_via_marshal
     from invenio.search_engine import get_record
     from invenio.bibsched import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
@@ -578,7 +578,7 @@ def cli_cmd_reset_siteadminemail(conf):
     Reset user-related tables with new CFG_SITE_ADMIN_EMAIL read from conf files.
     """
     print ">>> Going to reset CFG_SITE_ADMIN_EMAIL..."
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     siteadminemail = conf.get("Invenio", "CFG_SITE_ADMIN_EMAIL")
     run_sql("DELETE FROM user WHERE id=1")
     run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
@@ -595,7 +595,7 @@ def cli_cmd_reset_fieldnames(conf):
     """
     print ">>> Going to reset I18N field names..."
     from invenio.base.i18n import gettext_set_language, language_list_long
-    from invenio.dbquery import run_sql, IntegrityError
+    from invenio.legacy.dbquery import run_sql, IntegrityError
 
     ## get field id and name list:
     field_id_name_list = run_sql("SELECT id, name FROM field")
@@ -677,7 +677,7 @@ def test_db_connection():
     """
     print "Testing DB connection...",
     from invenio.utils.text import wrap_text_in_a_box
-    from invenio.dbquery import run_sql, Error
+    from invenio.legacy.dbquery import run_sql, Error
 
     ## first, test connection to the DB server:
     try:
@@ -819,7 +819,7 @@ def cli_cmd_create_demo_site(conf):
     """Create demo site.  Useful for testing purposes."""
     print ">>> Going to create demo site..."
     from invenio.config import CFG_PREFIX
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     run_sql("TRUNCATE schTASK")
     run_sql("TRUNCATE session")
     run_sql("DELETE FROM user WHERE email=''")
@@ -842,7 +842,7 @@ def cli_cmd_create_demo_site(conf):
 def cli_cmd_load_demo_records(conf):
     """Load demo records.  Useful for testing purposes."""
     from invenio.config import CFG_PREFIX
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     print ">>> Going to load demo records..."
     run_sql("TRUNCATE schTASK")
     for cmd in ["%s/bin/bibupload -u admin -i %s/var/tmp/demobibdata.xml" % (CFG_PREFIX, CFG_PREFIX),
@@ -871,7 +871,7 @@ def cli_cmd_remove_demo_records(conf):
     """Remove demo records.  Useful when you are finished testing."""
     print ">>> Going to remove demo records..."
     from invenio.config import CFG_PREFIX
-    from invenio.dbquery import run_sql
+    from invenio.legacy.dbquery import run_sql
     from invenio.utils.text import wrap_text_in_a_box, wait_for_user
     wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
 your records and documents!"""))

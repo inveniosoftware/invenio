@@ -25,7 +25,7 @@ import socket
 from flask import g, render_template, request, flash, redirect, url_for, \
     current_app, abort, Blueprint
 from invenio.ext.sqlalchemy import db
-from invenio.webmessage_mailutils import email_quote_txt
+from invenio.utils.mail import email_quote_txt
 from .models import CmtRECORDCOMMENT, CmtSUBSCRIPTION, \
                                      CmtACTIONHISTORY
 from .forms import AddCmtRECORDCOMMENTForm, AddCmtRECORDCOMMENTFormReview

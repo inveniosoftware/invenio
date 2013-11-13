@@ -48,7 +48,7 @@ from invenio.testsuite import make_test_suite, \
                               merge_error_messages, InvenioTestCase, \
                               get_authenticated_mechanize_browser
 from invenio.utils.url import same_urls_p
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.search_engine_query_parser_unit_tests import DATEUTIL_AVAILABLE
 
 reindex_word_tables_into_testtables = lazy_import('invenio.bibindex_regression_tests:reindex_word_tables_into_testtables')
@@ -3283,7 +3283,7 @@ class WebSearchRestrictedCollectionTest(InvenioTestCase):
     def test_get_permitted_restricted_collections(self):
         """websearch - get_permitted_restricted_collections"""
         from invenio.search_engine import get_permitted_restricted_collections
-        from invenio.webuser import get_uid_from_email, collect_user_info
+        from invenio.legacy.webuser import get_uid_from_email, collect_user_info
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses', 'Drafts'])
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('hyde@cds.cern.ch'))), [])
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('balthasar.montague@cds.cern.ch'))), ['ALEPH Theses', 'ALEPH Internal Notes', 'Atlantis Times Drafts'])

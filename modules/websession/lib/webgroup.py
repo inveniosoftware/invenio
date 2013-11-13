@@ -28,11 +28,11 @@ from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       CFG_WEBSESSION_GROUP_JOIN_POLICY, \
       InvenioWebSessionError, \
       InvenioWebSessionWarning
-from invenio.webuser import nickname_valid_p, get_user_info
-from invenio.webmessage import perform_request_send
+from invenio.legacy.webuser import nickname_valid_p, get_user_info
+from invenio.legacy.webmessage.api import perform_request_send
 from invenio.ext.logging import register_exception
 import invenio.webgroup_dblayer as db
-from invenio.dbquery import IntegrityError
+from invenio.legacy.dbquery import IntegrityError
 try:
     import invenio.template
     websession_templates = invenio.template.load('websession')

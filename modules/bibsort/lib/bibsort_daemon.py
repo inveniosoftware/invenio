@@ -56,7 +56,7 @@ import optparse
 import time
 import ConfigParser
 from invenio.utils.date import strftime
-from invenio.dbquery import run_sql, Error
+from invenio.legacy.dbquery import run_sql, Error
 from invenio.config import CFG_ETCDIR
 from invenio.bibsort_engine import run_bibsort_update, \
                             run_bibsort_rebalance

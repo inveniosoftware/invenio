@@ -35,7 +35,7 @@ from invenio.config import \
 from invenio.testsuite import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages, \
                               InvenioTestCase
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.utils.htmlwasher import EmailWasher
 
 

@@ -25,7 +25,7 @@ import invenio.bibrankadminlib as brc
 #reload(brc)
 from invenio.webpage import page, error_page
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
-from invenio.webuser import getUid, page_not_authorized
+from invenio.legacy.webuser import getUid, page_not_authorized
 
 def index(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = brc.getnavtrail() # + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a> """ % (CFG_SITE_URL)

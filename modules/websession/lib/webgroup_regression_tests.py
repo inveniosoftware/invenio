@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 from mechanize import Browser
 
 from invenio.config import CFG_SITE_SECURE_URL
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 class WebGroupTest(InvenioTestCase):

@@ -33,7 +33,7 @@ Main function: migrate_v071_baskets()
 
 __revision__ = "$Id$"
 
-from invenio.dbquery import run_sql, real_escape_string
+from invenio.legacy.dbquery import run_sql, real_escape_string
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS
 
 import sys

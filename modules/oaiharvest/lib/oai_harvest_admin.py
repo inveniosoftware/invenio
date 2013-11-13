@@ -43,7 +43,7 @@ from invenio.bibrankadminlib import \
      addadminbox, \
      tupletotable, \
      createhiddenform
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.oai_harvest_dblayer import get_holdingpen_day_size
 
 from invenio.oai_harvest_dblayer import get_month_logs_size, \

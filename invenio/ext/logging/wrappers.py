@@ -44,7 +44,7 @@ def get_pretty_wide_client_info(req):
     """Return in a pretty way all the avilable information about the current
     user/client"""
     if req:
-        from invenio.webuser import collect_user_info
+        from invenio.legacy.webuser import collect_user_info
         user_info = collect_user_info(req)
         keys = user_info.keys()
         keys.sort()

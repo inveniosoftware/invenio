@@ -17,7 +17,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.dbquery import run_sql, IntegrityError
+from invenio.legacy.dbquery import run_sql, IntegrityError
 
 # Number of retries to insert a value in the DB storage
 MAX_DB_RETRY = 10

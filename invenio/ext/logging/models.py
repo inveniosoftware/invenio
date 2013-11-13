@@ -73,7 +73,7 @@ class HstEXCEPTION(db.Model):
             log.update({'last_notified': db.func.now(),
                         'counter': counter,
                         'total': log.total + 1}, synchronize_settion=False)
-            db.session.merge(log)
+            db.session.add(log)
         except:
             log = HstEXCEPTION(name=name,
                                filename=filename,
@@ -83,7 +83,10 @@ class HstEXCEPTION(db.Model):
                                counter=1,
                                total=1)
             db.session.add(log)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except:
+            db.session.rollback()
         return log
 
     @property

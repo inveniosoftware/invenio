@@ -24,11 +24,11 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_SECURE_URL
-from invenio.dbquery import run_sql, Error
+from invenio.legacy.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_find_possible_roles
 from invenio.webpage import page, error_page
-from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
+from invenio.legacy.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.base.i18n import gettext_set_language, wash_language
 
 import invenio.template

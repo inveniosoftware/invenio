@@ -105,7 +105,7 @@ from invenio.bibindex_engine_utils import get_idx_indexer
 from invenio.modules.formatter import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.modules.formatter.config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
-from invenio.bibknowledge import get_kbr_values
+from invenio.modules.knowledge.api import get_kbr_values
 from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.access_control_admin import acc_get_action_id
@@ -114,12 +114,12 @@ from invenio.access_control_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_VIEWER_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio.websearchadminlib import get_detailed_page_tabs, get_detailed_page_tabs_counts
 from invenio.intbitset import intbitset
-from invenio.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
+from invenio.legacy.dbquery import DatabaseError, deserialize_via_marshal, InvenioDbQueryWildcardLimitError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.ext.logging import register_exception
 from invenio.utils.text import encode_for_xml, wash_for_utf8, strip_accents
-from invenio.htmlutils import get_mathjax_header
-from invenio.htmlutils import nmtoken_from_string
+from invenio.utils.html import get_mathjax_header
+from invenio.utils.html import nmtoken_from_string
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -131,9 +131,9 @@ from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 
-from invenio.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
+from invenio.legacy.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
                             get_table_update_time
-from invenio.webuser import getUid, collect_user_info, session_param_set
+from invenio.legacy.webuser import getUid, collect_user_info, session_param_set
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box, write_warning
 from invenio.base.i18n import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \

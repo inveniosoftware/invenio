@@ -34,8 +34,8 @@ from invenio.config import \
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
-from invenio.dbquery import run_sql
-from invenio.webuser import getUid, get_user_preferences, \
+from invenio.legacy.dbquery import run_sql
+from invenio.legacy.webuser import getUid, get_user_preferences, \
         collect_user_info
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.base.i18n import gettext_set_language

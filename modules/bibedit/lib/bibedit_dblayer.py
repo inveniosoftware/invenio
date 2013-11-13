@@ -20,7 +20,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def get_name_tags_all():
     """Return a dictionary of all MARC tag's textual names."""

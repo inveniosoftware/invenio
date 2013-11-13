@@ -21,7 +21,7 @@ import time
 import math
 import re
 
-from invenio.dbquery import run_sql, deserialize_via_marshal
+from invenio.legacy.dbquery import run_sql, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
 

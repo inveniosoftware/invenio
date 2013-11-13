@@ -89,12 +89,12 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_BIBEDIT_KB_INSTITUTIONS, CFG_BIBEDIT_AUTOCOMPLETE_INSTITUTIONS_FIELDS, \
     CFG_INSPIRE_SITE
 from invenio.search_engine import record_exists, perform_request_search
-from invenio.webuser import session_param_get, session_param_set
+from invenio.legacy.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
-from invenio.htmlutils import get_mathjax_header
+from invenio.utils.html import get_mathjax_header
 from invenio.utils.text import wash_for_xml, show_diff
-from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
+from invenio.modules.knowledge.api import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit, kb_exists
 
 from invenio.batchuploader_engine import perform_upload_check

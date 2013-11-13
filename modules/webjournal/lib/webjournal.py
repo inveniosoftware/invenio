@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.utils.url import redirect_to_url
-from invenio.webuser import collect_user_info
+from invenio.legacy.webuser import collect_user_info
 from invenio.webjournal_config import \
      InvenioWebJournalTemplateNotFoundError
 from invenio.webjournal_utils import \

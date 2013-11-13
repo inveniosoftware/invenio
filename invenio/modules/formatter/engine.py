@@ -68,7 +68,7 @@ from invenio.legacy.bibrecord import \
      record_get_field_values, \
      record_xml_output
 from invenio.bibformat_xslt_engine import format
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.base.i18n import \
      language_list_long, \
      wash_language, \
@@ -84,11 +84,11 @@ from .config import \
 from invenio.modules.formatter.utils import \
      record_get_xml, \
      parse_tag
-from invenio.htmlutils import \
+from invenio.utils.html import \
      HTMLWasher, \
      CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST, \
      CFG_HTML_BUFFER_ALLOWED_ATTRIBUTE_WHITELIST
-from invenio.bibknowledge import get_kbr_values
+from invenio.modules.knowledge.api import get_kbr_values
 from invenio.ext.template import render_template_to_string
 from HTMLParser import HTMLParseError
 from invenio.shellutils import escape_shell_arg

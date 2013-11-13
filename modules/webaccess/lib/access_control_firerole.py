@@ -37,7 +37,7 @@ if sys.hexversion < 0x2040000:
     # pylint: enable=W0622
 
 from invenio.access_control_config import InvenioWebAccessFireroleError
-from invenio.dbquery import run_sql, blob_to_string
+from invenio.legacy.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_CERN_SITE
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ

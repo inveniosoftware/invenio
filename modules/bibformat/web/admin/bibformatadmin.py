@@ -28,7 +28,7 @@ from invenio.modules.formatter import engine as bibformat_engine
 import invenio.modules.formatter.api as bibformat_dblayer
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, error_page
-from invenio.webuser import getUid, page_not_authorized, collect_user_info
+from invenio.legacy.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.utils.url import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \

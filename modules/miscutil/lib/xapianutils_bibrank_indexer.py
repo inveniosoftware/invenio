@@ -25,7 +25,7 @@ Xapian utilities.
 import os
 from invenio.config import CFG_CACHEDIR, CFG_XAPIAN_ENABLED
 from invenio.bibtask import write_message, task_get_option
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.search_engine import get_fieldvalues
 from invenio.xapianutils_config import DATABASES, XAPIAN_DIR, XAPIAN_DIR_NAME, INDEXES
 from invenio.bibdocfile import BibRecDocs

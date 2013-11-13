@@ -23,7 +23,7 @@ This is a subclass of BibCatalogSystem
 """
 
 import os
-import invenio.webuser
+import invenio.legacy.webuser
 from invenio.shellutils import run_shell_command, escape_shell_arg
 from invenio.bibcatalog_system import BibCatalogSystem, get_bibcat_from_prefs
 
@@ -106,13 +106,13 @@ class BibCatalogSystemRT(BibCatalogSystem):
             search_atoms.append("Content like " + escape_shell_arg(str(text)))
         if (len(str(creator)) > 0):
             #search for this person's bibcatalog_username in preferences
-            creatorprefs = invenio.webuser.get_user_preferences(creator)
+            creatorprefs = invenio.legacy.webuser.get_user_preferences(creator)
             creator = "Nobody can Have This Kind of Name"
             if creatorprefs.has_key("bibcatalog_username"):
                 creator = creatorprefs["bibcatalog_username"]
             search_atoms.append("Creator = " + escape_shell_arg(str(creator)))
         if (len(str(owner)) > 0):
-            ownerprefs = invenio.webuser.get_user_preferences(owner)
+            ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
             owner = "Nobody can Have This Kind of Name"
             if ownerprefs.has_key("bibcatalog_username"):
                 owner = ownerprefs["bibcatalog_username"]
@@ -190,7 +190,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             requestorset = " requestor=" + escape_shell_arg(requestor)
         if owner:
             #get the owner name from prefs
-            ownerprefs = invenio.webuser.get_user_preferences(owner)
+            ownerprefs = invenio.legacy.webuser.get_user_preferences(owner)
             if ownerprefs.has_key("bibcatalog_username"):
                 owner = ownerprefs["bibcatalog_username"]
                 ownerset = " owner=" + escape_shell_arg(owner)
@@ -253,7 +253,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
 
         if (attribute == 'owner'):
             #convert from invenio to RT
-            ownerprefs = invenio.webuser.get_user_preferences(new_value)
+            ownerprefs = invenio.legacy.webuser.get_user_preferences(new_value)
             if not ownerprefs.has_key("bibcatalog_username"):
                 return 0
             else:
@@ -359,7 +359,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             #change the ticket owner into invenio UID
             if tdict.has_key('owner'):
                 rt_owner = tdict["owner"]
-                uid = invenio.webuser.get_uid_based_on_pref("bibcatalog_username", rt_owner)
+                uid = invenio.legacy.webuser.get_uid_based_on_pref("bibcatalog_username", rt_owner)
                 candict['owner'] = uid
             if len(attributes) == 0: #return all fields
                 return candict

@@ -20,7 +20,7 @@
 
 
 from invenio.bibdocfile import BibDoc, InvenioBibDocFileError
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from datetime import datetime
 from invenio.ext.logging import register_exception
 import os

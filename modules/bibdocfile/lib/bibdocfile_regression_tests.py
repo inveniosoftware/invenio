@@ -58,7 +58,7 @@ class BibDocFsInfoTest(InvenioTestCase):
 
     def test_hard_delete(self):
         """bibdocfile - test correct update of bibdocfsinfo when hard-deleting"""
-        from invenio.dbquery import run_sql
+        from invenio.legacy.dbquery import run_sql
         self.assertEqual(run_sql("SELECT MAX(version) FROM bibdocfsinfo WHERE id_bibdoc=%s", (self.my_bibdoc_id, ))[0][0], 1)
         self.assertEqual(run_sql("SELECT last_version FROM bibdocfsinfo WHERE id_bibdoc=%s AND version=1 AND format='.jpg'", (self.my_bibdoc_id, ))[0][0], True)
         self.my_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.gif')
@@ -469,7 +469,7 @@ class CheckBibDocAuthorizationTest(InvenioTestCase):
     def test_check_bibdoc_authorization(self):
         """bibdocfile - check_bibdoc_authorization function"""
         from invenio.bibdocfile import check_bibdoc_authorization
-        from invenio.webuser import collect_user_info, get_uid_from_email
+        from invenio.legacy.webuser import collect_user_info, get_uid_from_email
         jekyll = collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'role:thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
         self.assertEqual(check_bibdoc_authorization(jekyll, 'role: thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))

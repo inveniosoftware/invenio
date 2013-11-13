@@ -48,7 +48,7 @@ from cgi import escape
 
 from invenio.bibdocfile import BibRecDocs, InvenioBibDocFileError
 from invenio.config import CFG_BINDIR, CFG_SITE_URL
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 from invenio.bibdocfile_config import CFG_BIBDOCFILE_DEFAULT_ICON_SUBFORMAT
 

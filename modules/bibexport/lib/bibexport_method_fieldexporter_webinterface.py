@@ -26,7 +26,7 @@ __lastupdated__ = """$Date: 2008/03/12 16:48:08 $"""
 
 import re
 from invenio.webpage import page
-from invenio.webinterface_handler import WebInterfaceDirectory, \
+from invenio.ext.legacy.handler import WebInterfaceDirectory, \
                                          wash_urlargd
 from invenio.utils.url import redirect_to_url
 from invenio.config import CFG_SITE_URL, \
@@ -56,7 +56,7 @@ from invenio.bibexport_method_fieldexporter import get_css, \
 from invenio.bibexport_method_fieldexporter_dblayer import Job, \
                                                            Query, \
                                                            JobResult
-from invenio.webuser import collect_user_info, \
+from invenio.legacy.webuser import collect_user_info, \
                             page_not_authorized
 from invenio.access_control_engine import acc_authorize_action
 

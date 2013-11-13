@@ -21,7 +21,7 @@
 Redirecting engine.
 """
 
-from invenio.dbquery import run_sql, IntegrityError
+from invenio.legacy.dbquery import run_sql, IntegrityError
 from invenio.utils.json import json, json_unicode_to_utf8
 from invenio.utils.datastructures import LazyDict
 from invenio.base.utils import autodiscover_redirect_methods

@@ -48,7 +48,7 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_CATEGORIES, \
                                      InvenioWebBasketWarning
 from invenio.utils.url import get_referer
-from invenio.webuser import isGuestUser, collect_user_info
+from invenio.legacy.webuser import isGuestUser, collect_user_info
 from invenio.search_engine import \
      record_exists, \
      get_merged_recid, \
@@ -68,7 +68,7 @@ from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIO
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 from invenio.ext.logging import register_exception
 from invenio.search_engine import search_unit
-from invenio.htmlutils import remove_html_markup, unescape
+from invenio.utils.html import remove_html_markup, unescape
 
 ########################################
 ### Display public baskets and notes ###

@@ -19,7 +19,6 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = webstat.py \
 			 webstat_config.py \
-             webstat_webinterface.py \
              webstat_templates.py \
              webstat_engine.py \
              webstatadmin.py \

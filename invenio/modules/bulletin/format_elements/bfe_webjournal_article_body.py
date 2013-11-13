@@ -22,7 +22,7 @@ CERN Bulletin articles.
 """
 import re
 import types
-from invenio.htmlutils import HTMLWasher
+from invenio.utils.html import HTMLWasher
 from invenio.base.i18n import gettext_set_language
 from invenio.utils.url import create_html_mailto
 from invenio.config import CFG_CERN_SITE

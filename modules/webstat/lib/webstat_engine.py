@@ -42,7 +42,7 @@ from invenio.search_engine import perform_request_search, \
     get_most_popular_field_values, \
     search_pattern
 from invenio.search_engine_utils import get_fieldvalues
-from invenio.dbquery import run_sql, \
+from invenio.legacy.dbquery import run_sql, \
     wash_table_column_name
 from invenio.websubmitadmin_dblayer import get_docid_docname_alldoctypes
 from invenio.bibcirculation_utils import book_title_from_MARC, \

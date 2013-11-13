@@ -24,7 +24,7 @@ import time
 import calendar
 import string
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 def append_to_file(path, content):
     """print result in a file"""

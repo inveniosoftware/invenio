@@ -47,7 +47,7 @@ from invenio.search_engine import check_user_can_view_record, \
                                   guess_primary_collection_of_a_record
 from invenio.access_control_engine import acc_authorize_action, \
                                           acc_get_authorized_emails
-from invenio.webuser import collect_user_info
+from invenio.legacy.webuser import collect_user_info
 from invenio.ext.email import send_email
 from invenio.utils.url import get_title_of_page
 

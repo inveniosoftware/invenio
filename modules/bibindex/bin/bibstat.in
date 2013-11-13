@@ -28,10 +28,9 @@ __revision__ = "$Id$"
 try:
     import sys
     from invenio.flaskshell import *
-    from invenio.dbquery import run_sql, get_table_status_info
-    from invenio.dbquery import CFG_DATABASE_HOST, \
-                                CFG_DATABASE_PORT, \
-                                CFG_DATABASE_NAME
+    from invenio.legacy.dbquery import run_sql, get_table_status_info
+    from invenio.legacy.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_PORT, \
+        CFG_DATABASE_NAME
     import getopt
     import time
 except ImportError, e:
