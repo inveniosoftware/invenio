@@ -31,7 +31,7 @@ from invenio.dbquery import run_sql, OperationalError
 from invenio.bibdocfile import BibDoc
 from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.bibdocfilecli import cli_fix_marc
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.intbitset import intbitset
 from invenio.search_engine import record_exists
 

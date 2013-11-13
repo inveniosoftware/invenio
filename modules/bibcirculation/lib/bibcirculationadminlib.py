@@ -48,7 +48,7 @@ import invenio.access_control_engine as acce
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.webstat import register_customevent
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.ext.email import send_email
 from invenio.search_engine import perform_request_search, record_exists
 from invenio.utils.url import create_html_link, create_url, redirect_to_url

@@ -49,7 +49,7 @@ from invenio.utils.url import make_canonical_urlargd, redirect_to_url
 from invenio.base.i18n import gettext_set_language
 from invenio.bibdocfile import stream_file, \
     decompose_file, propose_next_docname
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.htmlutils import is_html_text_editor_installed
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 from invenio.ckeditor_invenio_connector import process_CKEditor_upload, send_response

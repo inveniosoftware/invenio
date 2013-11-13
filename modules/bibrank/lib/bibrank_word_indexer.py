@@ -36,7 +36,7 @@ from invenio.bibindex_engine import beautify_range_list, \
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
     task_update_status, task_sleep_now_if_required
 from invenio.intbitset import intbitset
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.utils.text import strip_accents
 
 options = {} # global variable to hold task options

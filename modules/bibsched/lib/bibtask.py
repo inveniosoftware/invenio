@@ -64,7 +64,7 @@ from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
     CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR, CFG_SITE_SUPPORT_EMAIL
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
@@ -407,7 +407,7 @@ def task_init(
     if task_name not in CFG_BIBTASK_VALID_TASKS or os.path.realpath(os.path.join(CFG_BINDIR, task_name)) != os.path.realpath(sys.argv[0]):
         raise OSError("%s is not in the allowed modules" % sys.argv[0])
 
-    from invenio.errorlib import wrap_warn
+    from invenio.ext.logging import wrap_warn
     wrap_warn()
 
     if type(argv) is dict:

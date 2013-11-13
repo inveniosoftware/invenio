@@ -17,7 +17,7 @@
 
 from invenio.config import CFG_ETCDIR
 from invenio.modules.formatter.api import get_tag_from_name
-from invenio.errorlib import raise_exception
+from invenio.ext.logging import raise_exception
 
 
 CFG_BIBRANK_WRD_CFG_PATH = '%s/bibrank/wrd.cfg' % CFG_ETCDIR

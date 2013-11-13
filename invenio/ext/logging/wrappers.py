@@ -29,34 +29,15 @@ import datetime
 import re
 import inspect
 from cStringIO import StringIO
+from flask import current_app
 
-from invenio.utils.url import wash_url_argument
-from invenio.base.i18n import wash_language, gettext_set_language
 from invenio.base.globals import cfg
-from invenio.utils.date import convert_datestruct_to_datetext
-from invenio.dbquery import run_sql
+from .models import HstEXCEPTION
 
 
 ## Regular expression to match possible password related variable that should
 ## be disclosed in frame analysis.
 RE_PWD = re.compile(r"pwd|pass|p_pw", re.I)
-
-
-def get_client_info(req):
-    """
-    Returns a dictionary with client information
-    @param req: mod_python request
-    """
-    try:
-        return {
-            'host': req.hostname,
-            'url': req.unparsed_uri,
-            'time': convert_datestruct_to_datetext(time.localtime()),
-            'browser': 'User-Agent' in req.headers_in and \
-                          req.headers_in['User-Agent'] or "N/A",
-            'client_ip': req.remote_ip}
-    except:
-        return {}
 
 
 def get_pretty_wide_client_info(req):
@@ -110,6 +91,7 @@ def get_tracestack():
                     str(trace_tuple[3]) or ""}
     return tracestack_pretty
 
+
 def register_emergency(msg, recipients=None):
     """Launch an emergency. This means to send email messages to each
     address in 'recipients'. By default recipients will be obtained via
@@ -123,6 +105,7 @@ def register_emergency(msg, recipients=None):
     recipients.add(cfg['CFG_SITE_ADMIN_EMAIL'])
     for address_str in recipients:
         send_email(cfg['CFG_SITE_SUPPORT_EMAIL'], address_str, "Emergency notification", msg)
+
 
 def get_emergency_recipients(recipient_cfg=None):
     """Parse a list of appropriate emergency email recipients from
@@ -140,7 +123,7 @@ def get_emergency_recipients(recipient_cfg=None):
 
     from invenio.utils.date import parse_runtime_limit
     if recipient_cfg is None:
-        recifient_cfg = cfg['CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']
+        recipient_cfg = cfg['CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']
 
     recipients = set()
     for time_condition, address_str in recipient_cfg.items():
@@ -151,6 +134,7 @@ def get_emergency_recipients(recipient_cfg=None):
 
         recipients.update([address_str])
     return list(recipients)
+
 
 def find_all_values_to_hide(local_variables, analyzed_stack=None):
     """Return all the potential password to hyde."""
@@ -175,6 +159,7 @@ def find_all_values_to_hide(local_variables, analyzed_stack=None):
         ## :-)
         ret.remove('')
     return ret
+
 
 def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
     """
@@ -286,52 +271,6 @@ def get_pretty_traceback(req=None, exc_info=None, skip_frames=0):
     else:
         return ""
 
-def _is_pow_of_2(n):
-    """
-    Return True if n is a power of 2
-    """
-    while n > 1:
-        if n % 2:
-            return False
-        n = n / 2
-    return True
-
-def exception_should_be_notified(name, filename, line):
-    """
-    Return True if the exception should be notified to the admin.
-    This actually depends on several considerations, e.g. wethever
-    it has passed some since the last time this exception has been notified.
-    """
-    try:
-        exc_log = run_sql("SELECT id,last_notified,counter,total FROM hstEXCEPTION WHERE name=%s AND filename=%s AND line=%s", (name, filename, line))
-        if exc_log:
-            exc_id, last_notified, counter, total = exc_log[0]
-            delta = datetime.datetime.now() - last_notified
-            counter += 1
-            total += 1
-            if (delta.seconds + delta.days * 86400) >= cfg['CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER']:
-                run_sql("UPDATE hstEXCEPTION SET last_seen=NOW(), last_notified=NOW(), counter=1, total=%s WHERE id=%s", (total, exc_id))
-                return True
-            else:
-                run_sql("UPDATE hstEXCEPTION SET last_seen=NOW(), counter=%s, total=%s WHERE id=%s", (counter, total, exc_id))
-                return _is_pow_of_2(counter)
-        else:
-            run_sql("INSERT INTO hstEXCEPTION(name, filename, line, last_seen, last_notified, counter, total) VALUES(%s, %s, %s, NOW(), NOW(), 1, 1)", (name, filename, line))
-            return True
-    except:
-        raise
-        return True
-
-def get_pretty_notification_info(name, filename, line):
-    """
-    Return a sentence describing when this exception was already seen.
-    """
-    exc_log = run_sql("SELECT last_notified,last_seen,total FROM hstEXCEPTION WHERE name=%s AND filename=%s AND line=%s", (name, filename, line))
-    if exc_log:
-        last_notified, last_seen, total = exc_log[0]
-        return "This exception has already been seen %s times\n    last time it was seen: %s\n    last time it was notified: %s\n" % (total, last_seen.strftime("%Y-%m-%d %H:%M:%S"), last_notified.strftime("%Y-%m-%d %H:%M:%S"))
-    else:
-        return "It is the first time this exception has been seen.\n"
 
 def register_exception(stream='error',
                        req=None,
@@ -402,30 +341,36 @@ def register_exception(stream='error',
                 email_text = email_text[:-1]
 
             ## Preparing the exception dump
-            stream = stream=='error' and 'err' or 'log'
+            if stream=='error':
+                logger_method = current_app.logger.error
+            else:
+                logger_method = current_app.logger.info
 
             ## We now have the whole trace
             written_to_log = False
             try:
                 ## Let's try to write into the log.
-                open(os.path.join(cfg['CFG_LOGDIR'], 'invenio.' + stream), 'a').write(
-                    log_text)
+                logger_method(log_text)
                 written_to_log = True
             except:
                 written_to_log = False
             filename, line_no, function_name = _get_filename_and_line(exc_info)
 
             ## let's log the exception and see whether we should report it.
-            pretty_notification_info = get_pretty_notification_info(exc_name, filename, line_no)
-            if exception_should_be_notified(exc_name, filename, line_no) and (cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 1 or
-                (alert_admin and cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 0) or
-                not written_to_log):
+            log = HstEXCEPTION.get_or_create(exc_name, filename, line_no)
+            if log.exception_should_be_notified and (
+                    cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 1 or
+                    (alert_admin and
+                     cfg['CFG_SITE_ADMIN_EMAIL_EXCEPTIONS'] > 0) or
+                    not written_to_log):
                 ## If requested or if it's impossible to write in the log
                 from invenio.ext.email import send_email
                 if not subject:
-                    subject = 'Exception (%s:%s:%s)' % (filename, line_no, function_name)
+                    subject = 'Exception (%s:%s:%s)' % (
+                        filename, line_no, function_name)
                 subject = '%s at %s' % (subject, cfg['CFG_SITE_URL'])
-                email_text = "\n%s\n%s" % (pretty_notification_info, email_text)
+                email_text = "\n%s\n%s" % (log.pretty_notification_info,
+                                           email_text)
                 if not written_to_log:
                     email_text += """\
 Note that this email was sent to you because it has been impossible to log
@@ -444,14 +389,9 @@ this exception into %s""" % os.path.join(cfg['CFG_LOGDIR'], 'invenio.' + stream)
         return 0
 
 
-def raise_exception(exception_type = Exception,
-                    msg = '',
-                       stream='error',
-                       req=None,
-                       prefix='',
-                       suffix='',
-                       alert_admin=False,
-                       subject=''):
+def raise_exception(exception_type=Exception, msg='', stream='error',
+                    req=None, prefix='', suffix='', alert_admin=False,
+                    subject=''):
     """
     Log error exception to invenio.err and warning exception to invenio.log.
     Errors will be logged together with client information (if req is
@@ -533,16 +473,17 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % {
     from invenio.ext.email import send_email
     send_email(from_addr, to_addr, subject="Error notification", content=body)
 
+
 def _get_filename_and_line(exc_info):
-    """
-    Return the filename, the line and the function_name where the exception happened.
-    """
+    """Return the filename, the line and the function_name where
+    the exception happened."""
     tb = exc_info[2]
     exception_info = traceback.extract_tb(tb)[-1]
     filename = os.path.basename(exception_info[0])
     line_no = exception_info[1]
     function_name = exception_info[2]
     return filename, line_no, function_name
+
 
 def _truncate_dynamic_string(val, maxlength=500):
     """

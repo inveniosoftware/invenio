@@ -28,7 +28,7 @@ import re
 import socket
 
 from invenio.config import CFG_ETCDIR
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 _cern_nice_soap_file = open(CFG_ETCDIR + "/webaccess/cern_nice_soap_credentials.txt", "r")
 _cern_nice_soap_auth = _cern_nice_soap_file.read().strip()

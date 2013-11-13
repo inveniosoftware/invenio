@@ -29,10 +29,11 @@ import copy
 import urllib
 import urllib2
 import cookielib
+import json
 
 from invenio.modules import formatter as bibformat
 
-from invenio.utils.json import json, CFG_JSON_AVAILABLE
+from invenio.utils.json import CFG_JSON_AVAILABLE
 from invenio.utils.url import auto_version_url
 from invenio.legacy.bibrecord.scripts.xmlmarc2textmarc import create_marc_record
 from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \

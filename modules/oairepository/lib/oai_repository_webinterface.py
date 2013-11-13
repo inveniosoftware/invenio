@@ -25,7 +25,7 @@ import cStringIO
 
 from invenio.utils import apache
 from invenio import oai_repository_server
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP, CFG_DEVEL_SITE, \
     CFG_ETCDIR
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory

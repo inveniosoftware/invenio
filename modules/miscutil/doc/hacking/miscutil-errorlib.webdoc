@@ -242,7 +242,7 @@ CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES = \
 <h5>webmessage&#95;example&#95;bin.py</h5>
 <pre>
 from invenio.webmessage&#95;config import CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES
-from invenio.errorlib import get&#95;msgs&#95;for&#95;code&#95;list, register&#95;errors
+from invenio.ext.logging import get&#95;msgs&#95;for&#95;code&#95;list, register&#95;errors
 
 def handle&#95;error(error):
     errorlist = get&#95;msgs&#95;for&#95;code&#95;list([error])

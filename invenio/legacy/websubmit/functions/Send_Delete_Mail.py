@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 import os
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.webuser import email_valid_p
 from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
 from invenio.legacy.websubmit.config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN

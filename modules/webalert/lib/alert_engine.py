@@ -45,7 +45,7 @@ from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
 from invenio.webuser import get_email, collect_user_info
 from invenio.ext.email import send_email
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
 
 from invenio.websearch_external_collections_config import \

@@ -41,7 +41,7 @@ from invenio.dbquery import run_sql, blob_to_string
 from invenio.config import CFG_CERN_SITE
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 # INTERFACE
 

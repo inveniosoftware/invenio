@@ -37,7 +37,7 @@ except ImportError:
 from invenio.config import \
      CFG_CACHEDIR, \
      CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.webjournal_utils import \
      parse_url_string, WEBJOURNAL_OPENER
 from invenio.base.i18n import gettext_set_language

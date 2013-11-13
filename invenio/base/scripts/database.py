@@ -168,7 +168,7 @@ def create(default_data=True):
     try:
         test_db_connection()
     except:
-        from invenio.errorlib import get_tracestack
+        from invenio.ext.logging import get_tracestack
         print get_tracestack()
 
     list(autodiscover_models())

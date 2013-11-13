@@ -940,7 +940,7 @@ class Convertor:
             try:
                 document.storeToURL(outputurl, tuple(outputprops) )
             except IOException, e:
-                from invenio.errorlib import get_pretty_traceback
+                from invenio.ext.logging import get_pretty_traceback
                 print >> sys.stderr, get_pretty_traceback()
                 raise UnoException("Unable to store document to %s with properties %s. Exception: %s" % (outputurl, outputprops, e), None)
 
@@ -1182,6 +1182,6 @@ if __name__ == '__main__':
     except KeyboardInterrupt, e:
         die(6, 'Exiting on user request')
     except:
-        from invenio.errorlib import register_exception
+        from invenio.ext.logging import register_exception
         register_exception(alert_admin=True)
     die(exitcode)

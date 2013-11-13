@@ -42,7 +42,7 @@ from invenio.config import \
 	CFG_PATH_PS2PDF, \
 	CFG_PATH_GFILE,\
 	CFG_PATH_PDFLATEX
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_TMPDIR
 from invenio.config import CFG_ETCDIR
 

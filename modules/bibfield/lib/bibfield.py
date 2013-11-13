@@ -35,7 +35,7 @@ from werkzeug import import_string
 
 from invenio.utils.datastructures import LaziestDict
 from invenio.dbquery import run_sql
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.base.signals import record_after_update
 
 from invenio.bibfield_jsonreader import JsonReader

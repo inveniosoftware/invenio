@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.utils.json import json_decode_file
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.modules.encoder.config import CFG_BIBENCODE_TEMPLATE_BATCH_SUBMISSION
 from invenio.modules.encoder.utils import generate_timestamp
 from invenio.modules.encoder.batch_engine import create_job_from_dictionary

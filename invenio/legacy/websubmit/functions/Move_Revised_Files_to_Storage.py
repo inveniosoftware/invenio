@@ -36,7 +36,7 @@ import os
 from invenio.bibdocfile import \
      InvenioBibDocFileError, \
      BibRecDocs
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.config import CFG_BINDIR

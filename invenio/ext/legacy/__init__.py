@@ -57,7 +57,7 @@ def setup_app(app):
                 try:
                     response = self.app.full_dispatch_request()
                 except Exception as e:
-                    from invenio.errorlib import register_exception
+                    from invenio.ext.logging import register_exception
                     register_exception(req=request, alert_admin=True)
                     response = self.app.handle_exception(e)
 

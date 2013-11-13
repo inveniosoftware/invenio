@@ -23,7 +23,7 @@
     Implements application factory.
 """
 
-#from invenio.errorlib import register_exception
+#from invenio.ext.logging import register_exception
 from .helpers import with_app_context, unicodifier
 from .utils import collect_blueprints, register_extensions, \
     register_configurations

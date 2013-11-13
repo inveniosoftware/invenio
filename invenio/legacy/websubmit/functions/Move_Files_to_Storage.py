@@ -29,7 +29,7 @@ from invenio.websubmit_icon_creator import create_icon
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionWarning
 from invenio.legacy.websubmit.functions.Shared_Functions import get_dictionary_from_string, \
      createRelatedFormats
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.config import CFG_BINDIR
 from invenio.dbquery import run_sql
 from invenio.shellutils import run_shell_command

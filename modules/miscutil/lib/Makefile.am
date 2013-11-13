@@ -26,7 +26,6 @@ pylib_DATA = __init__.py \
              dbquery.py \
              dbquery_regression_tests.py \
              dbquery_unit_tests.py \
-             errorlib.py \
              errorlib_regression_tests.py \
              errorlib_unit_tests.py \
              errorlib_webinterface.py \

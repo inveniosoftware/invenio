@@ -59,7 +59,7 @@ from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
      CFG_SITE_LANG
-from invenio.errorlib import \
+from invenio.ext.logging import \
      register_exception
 from invenio.legacy.bibrecord import \
      create_record, \

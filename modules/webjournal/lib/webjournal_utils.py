@@ -45,7 +45,7 @@ from invenio.dbquery import run_sql
 from invenio.modules.formatter.engine import BibFormatObject
 from invenio.search_engine import search_pattern, record_exists
 from invenio.base.i18n import gettext_set_language
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.utils.url import make_invenio_opener
 
 WEBJOURNAL_OPENER = make_invenio_opener('WebJournal')

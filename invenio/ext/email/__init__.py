@@ -198,7 +198,7 @@ def send_email(fromaddr,
 
     @return: [bool]: True if email was sent okay, False if it was not.
     """
-    from invenio.errorlib import register_exception
+    from invenio.ext.logging import register_exception
     ln = default_ln(ln)
 
     if html_images is None:
@@ -370,7 +370,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
                 part.add_header('Content-Disposition', 'attachment; filename="%s"' % os.path.basename(attachment))
                 msg_root.attach(part)
             except:
-                from invenio.errorlib import register_exception
+                from invenio.ext.logging import register_exception
                 register_exception(alert_admin=True, prefix="Can't attach %s" % attachment)
 
     return msg_root

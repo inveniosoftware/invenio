@@ -30,7 +30,7 @@ from invenio.modules.encoder.config import (
                                       CFG_BIBENCODE_PROFILES_EXTRACT_LOCAL
                                       )
 from invenio.modules.encoder.utils import getval
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 #-------------------#
 # Encoding profiles #

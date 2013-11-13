@@ -128,7 +128,7 @@ from invenio.bibupload import find_record_from_sysno
 from invenio.bibrank_citation_searcher import get_cited_by_list
 from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.search_engine_summarizer import summarize_records
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.bibedit_webinterface import WebInterfaceEditPages
 from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.bibmerge_webinterface import WebInterfaceMergePages

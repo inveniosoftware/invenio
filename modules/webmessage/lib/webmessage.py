@@ -40,7 +40,7 @@ try:
     webmessage_templates = invenio.template.load('webmessage')
 except:
     pass
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 
 def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
     """

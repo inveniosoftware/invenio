@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio import websubmit_file_stamper
 from invenio.legacy.websubmit.config import InvenioWebSubmitFunctionWarning, \
      InvenioWebSubmitFunctionError, InvenioWebSubmitFileStamperError

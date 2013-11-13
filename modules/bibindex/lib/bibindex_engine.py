@@ -59,7 +59,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
-from invenio.errorlib import register_exception
+from invenio.ext.logging import register_exception
 from invenio.bibrankadminlib import get_def_name
 from invenio.solrutils_bibindex_indexer import solr_commit
 from invenio.bibindex_tokenizers.BibIndexJournalTokenizer import \
